@@ -68,7 +68,7 @@ public class SYSCALL extends Instruction {
 			edumips64.Main.logger.debug("Stopping CPU due to SYSCALL (" + this.hashCode() + ")");
 			CPU.getInstance().setStatus(CPU.CPUStatus.STOPPING);
 		}
-		else if((syscall_n > 0) && (syscall_n < 5)) {
+		else if((syscall_n > 0) && (syscall_n <= 5)) {
 			CPU cpu = CPU.getInstance();
 			Register r14 = cpu.getRegister(14);
 			if(r14.getWriteSemaphore() > 0)
@@ -268,9 +268,13 @@ public class SYSCALL extends Instruction {
 		else if(syscall_n > 0 && syscall_n <= 5) {
 			edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + "): setting R1 to " + return_value);
 			Register r1 = CPU.getInstance().getRegister(1);
+			edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + "): got R1");
 			r1.setBits(Converter.intToBin(64, return_value), 0);
+			edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + "): set R1 to " + return_value);
 			r1.decrWriteSemaphore();
+			edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + "): decremented write semaphore");
 		}
+		edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + ") exiting from WB. n = " + syscall_n);
     }
     
     public void pack() throws IrregularStringOfBitsException {

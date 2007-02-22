@@ -323,7 +323,7 @@ public class Parser
 								posInWord ++;
 								end = line.length();	
 							}
-							else if(instr.compareToIgnoreCase(".WORD")==0)
+							else if(instr.compareToIgnoreCase(".WORD")==0 || instr.compareToIgnoreCase(".WORD64")==0)
 							{
 								writeIntegerInMemory(row, i, end, line, parameters, 64, "WORD");
 								end = line.length();	
