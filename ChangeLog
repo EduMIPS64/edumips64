@@ -1,0 +1,220 @@
+EduMIPS64 ChangeLog
+------------------- 
+
+0.3.7 (03/11/2006)
+	- 
+
+0.3.6 (10/10/2006)
+	- Added the ability to mask synchronous exceptions and to make those
+	  exceptions stop the CPU (andrea)
+	- Appended three dots to those menu items that open new dialogs, according
+	  to a widespread convention (andrea)
+	- Removed an useless debug print in the BREAK instruction (andrea)
+	- Changed the "Run to" text to "Run", the "Completa" text to "Esegui". and
+	  the "Esegui" menu text to "Esecuzione (andrea)
+
+0.3.5.2 (17/09/2006)
+	- Fixed applet behaviour. (andrea)
+	- Fixed Parser recognizing of TRAP 0 and SYSCALL 0 (andrea)
+
+0.3.5.1 (17/09/2006)
+	- Fixed a bug in labels handling: now only case insensitive labels are
+	  accepted (andrea)
+	- Fixed a bug in BitSet64 regarding bit alignment in unsigned bytes writing (andrea)
+	- TRAP 0 is recognized as the end of the program, like SYSCALL 0 and HALT (andrea)
+
+0.3.5 (17/09/2006)
+	- Fixed the Memory and SymbolTable interfaces. Now all memory accesses via
+	  labels are done through the SymbolTable, and memory accesses via address
+	  are done through Memory.
+	  This object contains instructions and memory elements.
+	  I've removed all the old get() and set() methods that accepted an index in
+	  SymbolTable and MemoryElement. Now every access must be done using the
+	  address as a parameter. (andrea)
+	- Fixed the "package" ant task, that builds automagically a .jar and a
+	  .tar.bz2 file from the edumips64 directory (andrea)
+
+0.3.4 (17/09/2006)
+	- Added command line options (andrea):
+	  -h (--help) 				shows a little help
+	  -f (--file) filename		opens a new file
+	  -d (--debug) 				enters debug mode
+	- SYSCALL 1, 2, 3, 4 implemented! 
+	  They are the EduMIPS64 equivalent of the open(), close(), read() and write()
+	  POSIX syscalls. More documentation will follow (andrea).
+	- Makefile updated with the I/O icon (mancausoft)
+	- The parser now recognizes SYSCALL 0 as HALT, and it doesn't complain if a
+	  SYSCALL 0 closes the program (mancausoft)
+	- The HALT instruction is added to the list of deprecated instruction (mancausoft)
+
+0.3.3 (09/09/2006)
+	- The SYSCALL instruction is born! Right now only SYSCALL 0 and 5 work: 
+	  . SYSCALL 0: acts exactly like the HALT instruction. [exit()]
+	  . SYSCALL 5: roughly acts like printf(), supporting only the following
+		placeholders: %s (string), %d (integer), %i (same as %d), %% (literal %)
+	  SYSCALL works like WinDLX's SYSCALL: it expects in R14 the address of its
+	  parameters and places the return value in R1. SYSCALL 0 doesn't return
+	  anything, but SYSCALL 5 returns the number of bytes written to STDOUT.
+	  SYSCALL 5 is Dinero-friendly: it records every memory access it does in
+	  the tracefile. More documentation will follow. (andrea)
+	- New TRAP instruction, alias of SYSCALL, added for the sake of
+	  compatibility with WinDLX. (andrea)
+	- .ascii and .asciiz parser directives, used to save strings in memory.
+	  .ascii saves it in memory "as is", while .asciiz automatically adds a null
+	  byte at the end of the string. The backslash character is used to escape
+	  special characters (\n, \t, \0, \"). Here's the syntax:
+	  .ascii "string1"[, "string2"[, "stringN"]]
+	- Added the BREAK instruction, that stops the execution as soon as it enters
+	  in the ID stage. (andrea)
+	- Basic I/O window, that automagically pops up when something is written to STDOUT (andrea)
+	- Made the Settings menu item gray when the CPU is running a program, to
+	  prevent race conditions on the configuration settings (andrea).
+	- Solved a little bug that caused the cycles number not to reset correctly (andrea)
+	- Added the version number to the statusbar welcome message (andrea)
+	- Added the right locale entries for the log window's title. (andrea)
+	- The .space instruction now accepts an hexadecimal parameter too. (andrea)
+	- Parser code improvements and cleanups (mancausoft + andrea)
+	- Corrected a bug that made fatal errors send the CPU in an infinite loop.
+	  At least, now we can read the log when there's a fatal error. (andrea)
+	
+0.3.2 (08/09/2006)
+	- Integer overflow and division by zero exception handling. 
+	  The execution is stopped if one of these exceptions is raised. This solved
+	  a previously unknown bug: after an integer overflow, EduMIPS64 entered in
+	  an infinite loop. Now it works (andrea)
+	- New .space directive, that allows to reserve some space in memory. It
+	  takes as a parameter an integer indicating the number of bytes to reserve. (andrea)
+	- Added a log window, that tracks the execution of EduMIPS64. Messages can
+	  be printed via the ui.GUILog methods, called on the static Main.logger
+	  object (andrea)
+	- Ant buildfile added. On my PC, make achieved a 22 seconds build time,
+	  while Ant achieved a 4 seconds build time, due to its ability to consider
+	  dependencies. Some targets are not ready, but jarfile is built by simply
+	  executing "ant". (andrea)
+	- The "Execute" and the "Tools" menu now become gray if all the inner items
+	  are not available (andrea)
+	- Log window icon (vanni)
+	- CPUGUIThread now doesn't wait for the sleep interval to pass when a single
+	  step is issued (andrea)
+	- Removed a debug print in CPUGUIThread (andrea)
+	- Advanced frames handling (improved tiling algorithm, ability to hide/unhide
+	  windows from menu) (andrea)
+	- Added Vanni in the Main class copyrights, because a significant portion of
+	  that class' code is written by him (andrea)
+
+0.3.1 (03/09/2006)
+	- Added the ability to customize the delay between cycles in verbose mode (andrea)
+	- JDialog + XGl fix (mancausoft + andrea)
+	- The jar file can be used as an applet (vanni)
+	- JApplet + XGl fix (mancausoft)
+
+  0.3 (23/07/2006) [Public Release]
+    - Added a progress bar that warns the user that the CPU is executing
+	  something (andrea)
+	- Added an option that allows the user to choose if he wants to see the
+	  progress of the multi-step execution via GUI or not. (andrea)
+    - Handled the FileNotFoundException exception in the Main class. (andrea)
+	- In DineroFrontend, dineroIV is invoked if you press Enter when you are in
+	  the parameters textfield. (andrea)
+	- Updated the manual according to the last changes. (andrea)
+
+0.2.9 (22/07/2006)
+	- Created a thread that controls the CPU and the GUI. (antonella e andrea)
+	- Stop menu item, used to stop the execution at any time. (antonella e
+      andrea)
+	- Minor changes to the GUI code in order to support multi-threading. (andrea)
+	- Internal code fixes: implemented a real state machine for the CPU and the
+	  GUI menu items that are enabled/disabled. For info about the four states,
+	  see the CPU.java documentation and source code. (andrea)
+	- Minor documentation and code improvements (andrea)
+
+0.2.2 (06/07/2006)
+	- Improved error and crash window (vanni)
+
+0.2.1 (29/06/2006) 
+	- Better About Window (vanni)
+	- Fixed the "negative memory address" bug (mancausoft)
+	- Added the Dinero Path to the Preferences (vanni)
+	- The parser reads the file as it's ISO-8859-1. (mancausoft) [Will be made customizable later].
+	- Added some instructions in the Italian manual (Vanni)
+	- Fixed a bug in the CPU reset: now LO and HI are correctly resetted (andrea)
+
+ 0.2 (26/06/2006) [Public Release]
+	- Now in the titlebar there's the version number (andrea)
+	- Fixed Dinero Frontend font that in some PCs wasn't monospaced. (andrea)
+	- Changed DineroIV default options (andrea)
+	- Fixed a DDIV bug: semaphores where wrongly decremented if there was a	
+	  division by zero and forwarding was disabled (mancausoft)
+	- Fixed a micro-bug in the translations (andrea)
+
+0.1.5 (25/06/2006)
+	- Updated the manual in order to include recent features. (andrea)
+	- Removed accented letters from the italian version of the manual (ale)
+	- Now the Manual is a modal dialog, so we solve the multiple-opening
+	  manual bug (andrea)
+	- Solved the "impossible focus" bug for each dialog. (andrea)
+	- Fixed a little bug that made possible to select Dinero Frontend or Write
+	  dinero tracefile if you opened a file after you completed the execution of
+	  another file (andrea)
+	- Fixed the "row selection" bug in the Registers frame: now you can interact
+	  only with GPR registers, as FP registers don't exist. (vanni)
+	- The status bar displays the decimal value of a register or of a memory
+	  cell if you click on it (vanni) [I told you that the status bar would be useful.. :P]
+0.1.4.1 (25/06/2006)
+	- Fixed the missing translations bug (GUIManual && StatusBar) (andrea)
+	- Fixed a bug that didn't make forwarding enabled from the GUI Config (andrea)
+
+0.1.4 (25/06/2006)
+	- Replaced all the Configure menu items with a configuration dialog (Vanni)
+	- Added a status bar, that will be useful later. (andrea)
+	- Fixed the "Timmy bug": memory location that don't hold a value ara
+	  automatically set to zero and a warning is shown (mancausoft)
+	- Fixed a bug that crashed the parser if after a comma there
+	  wasn't a parameter for the instruction (mancausoft)
+	- Recent files list isn't allowed to hold multiple copies of a file (andrea)
+	- Internationalization of the Manual window, plus adding version info from
+	  the Main class (andrea)
+	- Improved the look&feel of the Manual window (filippo)
+	- Fixed a bug in the instruction set: the DMULT instruction was called DMUL (massimo)
+	- Fixed a bug in the parser that made possible to open malformed asm files (mancausoft)
+	- Little bugfix: if the opened file contains syntax errors, the window
+	  title is correctly cleaned (andrea)
+	- The code window now focuses on the IF row even if it's not in the range
+	  of currently visible rows (andrea)
+
+0.1.3 (23/06/2006)
+	- Updated documentation for the new warnings menu option (andrea).
+	- Fixed the bug in the Gui Code frame that made the fetched instruction
+	  not to have its own colored background (andrea).
+	- Fixed the DineroFrontend CPU Burst bug (massimo + mancausoft).
+	- Added an option to enable/disable warnings (vanni).
+	- Debug printouts cleanup (andrea + vanni)
+
+0.1.2 (20/06/2006)
+	- Fixed (maybe) the GREAT FORWARDING BUG (mancausoft)
+	- Dinero Frontend now works under Windows and Linux, with the standard
+	  Dinero distribution. (mancausoft)
+	- Fixed a bug in the Statistics window: CPI's now are back (Ale)
+	- Added the split size chooser in the Cycles window (Filippo)
+	- Added a note in the changelog with the name of the author of the change
+	  entry(andrea)
+
+0.1.1 (19/06/2006)
+	- Improved the cycles windows (vanni)
+	- The statistics windows is now fully internationalized (andrea)
+
+0.1 (17/06/2006) [Public release]
+	- Dinero frontend disabled under windows (andrea)
+	- Fixed the "infinite open" bug (mancausoft)
+	- Recent files list (vanni)
+
+0.0.8 (16/06/2006)
+	- Fixed the config bug: saving config file into the .jar didn't work if
+	  there were spaces in the current directory name (andrea)
+	- Closing the manual Window doesn't exit the program anymore. (vanni)
+	- Added release_notes, readme, changelog, install, authors to the source
+	  distribution (andrea)
+
+0.0.7 (15/06/2006)
+	- First numbered release, contains almost all the planned edumips64
+	  features. (edumips64 team)

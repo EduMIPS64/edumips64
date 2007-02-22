@@ -1,0 +1,364 @@
+INSTRUCTION SET EDUMIPS64
+=========================
+
+Guida veloce all'instruction set di EduMIPS64. Alcune descrizioni sono prese dal 
+manuale MIPS64. Fateci sapere se questo e' un problema, e le rimuoveremo.
+
+Istruzione AND 
+
+Sintassi: AND rd, rs, rt 
+Descrizione: rd = rs and rt
+            Effettua un AND logico bit a bit tra il registro rs ed il registro rt.
+            Mette il risultato nel registro rd.
+            
+            
+Istruzione ANDI 
+
+Sintassi: ANDI rt, rs, immediato
+Descrizione: rt = rs AND immediato
+            Effettua un AND logico bit a bit tra il registro rs ed un immediato.
+            L'immediato a 16 bit "is zero-extended to the left" e successivamente
+            viene effettuato l'AND bit a bit. Il risultato viene memorizzato nel 
+            registro rt.
+            
+Istruzione BEQ 
+
+Sintassi: BEQ rs, rt, offset
+Descrizione: if rs = rt then branch
+            Confronta i GPR rs ed rt ed effettua un salto condizionale.
+            
+Istruzione BEQZ 
+
+Sintassi: BEQZ rs, offset
+Descrizione: if rs == 0 then branch
+            Verifica il valore di un GPR ed effettua un salto condizionale.
+             
+Istruzione BNE 
+
+Sintassi: BNE rt, rs, offset
+Descrizione: if rs != rt then branch
+            Verifica il valore di un GPR ed effettua un salto condizionale.
+            
+Istruzione BNEZ 
+
+Sintassi: BNEZ rs, offset
+Descrizione: if rs != 0 then branch  
+            Verifica il valore di un GPR ed effettua un salto condizionale.
+            
+Istruzione DADD 
+
+Sintassi: DADD rd, rs, rt
+Descrizione: 
+            Somma due interi a 64 bit. Lancia un'eccezione in caso di overflow.
+            
+Istruzione DADDI 
+
+Sintassi: DADDI rt, rs, immediate
+Descrizione: 
+            Somma una costante ad un intero a 64 bit. Lancia un'eccezione in caso di overflow.
+
+Istruzione DADDU 
+
+Sintassi: DADDU rd, rs, rt
+Descrizione: rd = rs + rt
+            Somma due interi a 64 bit.
+            Il valore a 64 bit del GPR rt e' sommato al valore a 64 bit del registro rs, 
+            il risultato e' memorizzato nel registro rd.
+            Non si verificano eccezioni di overflow.
+            
+Istruzione DADDUI 
+
+Sintassi: DADDUI rt, rs, immediate
+Descrizione: 
+            Somma una costante ad un registro a 64 bit.
+            L'immediato con segno e' sommato al valore a 64 bit del GPR rs,
+            il risultato e' memorizzato nel registro rt.
+            Non si verificano eccezioni di overflow.
+
+Istruzione DDIV 
+
+Sintassi: DDIV rs, rt
+Descrizione: (LO, HI) = rs / rt
+            Effettua la divisione tra due interi a 64 bit.
+            Divide il valore a 64 bit del registro rs con quello nel registro rt,
+            considerando entrambi gli operandi come valori con segno.
+            Il quoziente ed il resto a 64 bit sono memorizzati rispettivamente,
+            nei registri speciali LO ed HI.
+            Non si verificano eccezioni di aritmetiche.
+            
+Istruzione DMULT 
+
+Sintassi: DMULT rs, rt
+Descrizione: (LO) = rs * rt
+            Moltiplica due interi con segno a 64 bit.
+            Il valore nel registro rt e' moltiplicato per il valore in rs,
+            considerando entrambi gli operandi come valori con segno.
+           
+Istruzione DSLL 
+
+Sintassi: DSLL rd, rt, sa Doubleword shift left logical
+Descrizione: 
+            Effettua uno shift a sinistra del valore a 64 bit di un numero di 
+            bit fisso che varia da 0 a 31.
+            I valori a 64 bit sono shiftati a sinistra, inserendo degli zeri nei bit
+            vuoti, il risultato e' memorizzato nel registro rd.
+            Il numero di bit di cui shiftare il valore e' specificato dal registro sa.
+            
+Istruzione DSLLV 
+
+Sintassi: DSLLV rd, rs, rt
+Descrizione: 
+            Effettua uno shift a sinistra di un valore a 64 bit di un numero variabile
+            di bit. I 64 bit contenuti nel GPR vengono shiftati a sinistra, 
+            inserendo degli zeri nei bit vuoti, il risultato e' memorizzato nel registro rd.
+            
+Istruzione DSRA 
+
+Format: DSRA rd, rt, sa
+Descrizione: 
+            Effettua uno shift aritmetico a destra di un numero fisso di bit, variabile tra 0 e 31, 
+            del valore a 64 bit.
+            
+Istruzione DSRAV 
+
+ormat: DSRAV rd, rs, rt
+Descrizione: rd = rt >> rs (arithmetic)
+            Effettua uno shift aritmetico di un numero variabile di bit.
+            Il valore a 64 bit contenuto nel GPR rt e' shiftato a destra, duplicando 
+            il bit di segno (63) nei bit vuoti, il risultato e' memorizzato nel registro rd.
+            
+Istruzione DSRL 
+
+Sintassi: DSRL rd, rt, sa
+Descrizione: 
+            Effettua uno shift logico a destra di una doubleword per un numero fisso di bit
+            da 0 a 31. Il valore a 64 bit contenuto nel GPR rt e' shiftato a destra inserendo degli
+            zeri nei bit vuoti, il risultato e' memorizzato nel registro rd.
+            
+Istruzione DSRLV 
+
+Sintassi:      DSRLV rd, rs, rt
+Descrizione: 
+            Effettua uno shift logico a destra di una doubleword per un numero variabile di bit.
+            Il valore a 64 bit contenuto nel GPR rt e' shiftato a destra inserendo degli
+            zeri nei bit vuoti, il risultato e' memorizzato nel registro rd.
+            
+Istruzione DSUB 
+
+Sintassi: DSUB rd, rs, rt
+Descrizione: 
+            Sottrae due interi a 64 bit. Se si verifica un overflow, lancia un'eccezione.
+            Il valore a 64 bit del registro rt e' sottratto a quello contenuto nel registro rs,
+            il risultato e' posto in rd.
+            
+Istruzione DSUBU 
+
+Sintassi: DSUBU rd, rs, rt
+Descrizione: 
+            Sottrae due interi a 64 bit senza segno. Se si verifica un overflow, lancia un'eccezione.
+            Il valore a 64 bit del registro rt e' sottratto a quello contenuto nel registro rs,
+            il risultato e' posto in rd.
+
+Istruzione HALT 
+
+Sintassi:    HALT
+Descrizione: 
+            Termina l'esecuzione del programma.
+            Quando un'istuzione HALT effettua lo stadio ID, notifica alla CPU
+            che tutte le istruzioni della pipeline successive alla HALT devono
+            essere ignorate.
+Eccezioni:   HaltException
+
+Istruzione J 
+
+Sintassi: J targetJ
+Descrizione: 
+            Salta entro la regione corrente allineata a 256 MB. 
+            E' un salto PC-region (non PC-relative); l'effettivo
+            indirizzo e' nella regione corrente allineata a 256 MB.
+            
+Istruzione JAL 
+
+Sintassi: JAL target
+Descrizione: 
+            Esegue una chiamata di procedura all'interno della regione corrente
+            allineata a 256 MB. Inserisce l'indirizzo di ritorno nel GPR 31. 
+            E' un salto PC-region (non PC-relative).
+            
+Istruzione JALR 
+
+Sintassi: JALR rs
+Descrizione: 
+            Esegue una chiamata di procedura all'indirizzo di un'istruzione contenuto
+            in un registro. Inserisce l'indirizzo di ritorno nel GPR rd.
+            
+Istruzione JR 
+
+Sintassi: JR rs
+Descrizione: 
+            Esegue un salto ad un indirizzo di un'istruzione contenuto in un registro.
+            
+Istruzione LB 
+
+Sintassi: LB rt, offset(base)
+Descrizione: rt = memory[base+offset]
+            Carica un byte dalla memoria come valore con segno.
+            
+Istruzione LBU 
+
+Sintassi: LBU rt, offset(base)
+Descrizione: rt = memory[base+offset]
+            Carica un byte dalla memoria come valore con segno.
+            
+Istruzione LD 
+
+Sintassi: LD rt, offset(base)
+Descrizione: rt = memory[base+offset]
+            Carica una doubleword dalla memoria.
+            
+Istruzione LH 
+
+Sintassi: LH rt, offset(base)
+Descrizione: rt = memory[base+offset]
+            Carica un'halfword dalla memoria come valore con segno.
+            
+Istruzione LHU 
+            
+Sintassi: LHU rt, offset(base)
+Descrizione:  rt = memory[base+offset]    
+            Carica un'halfword dalla memoria come valore senza segno.
+Istruzione LH 
+
+Sintassi: LH rt, offset(base)
+Descrizione: rt = memory[base+offset]
+            Carica una halfword dalla memoria come valore con segno.
+            
+Istruzione LHU 
+
+Sintassi: LHU rt, offset(base)
+Descrizione:  rt = memory[base+offset]    
+            Carica una halfword dalla memoria come valore senza segno.
+            
+Istruzione LUI 
+
+Format: LUI rt, rs, immediate
+Descrizione:   
+            L'immediato a 16 bit e' shiftato a sinistra e concatenata con zeri nei 16 bit 
+            meno significativi.
+            
+Istruzione LW 
+
+Format: LW rt, offset(base)
+Descrizione:   rt = memory[base+offset]
+            Carica una word dalla memoria come valore con segno.
+
+Istruzione LWU 
+
+Sintassi: LWU rt, offset(base)
+Descrizione:   rt = memory[base+offset]
+            Carica una word dalla memoria come valore senza segno.
+
+Istruzione MFHI 
+
+Sintassi: MFHI rd
+Descrizione: rd = HI
+            Copia il registro speciale HI nel GPR rd.
+            
+Istruzione MFLO 
+
+Sintassi: MFLO rd
+Descrizione: rd = LO
+            Copia il registro speciale HI nel GPR rd.
+            
+Istruzione MOVN 
+
+Sintassi: MOVN rd, rs, rt  
+Descrizione: if rt != 0 then rd = rs
+            Se il valore del registro rt non e' uguale a zero il contenuto 
+            viene copiato nel registro rd.
+            
+Istruzione MOVZ 
+
+Sintassi: MOVZ rd, rs, rt
+Descrizione: if rt = 0 then rd = rs
+            Se il valore del registro rt non e' uguale a zero il contenuto 
+            viene copiato nel registro rd.
+            
+Istruzione NOP 
+
+Sintassi: NOP
+Descrizione:
+            Crea spazi vuoti nella pipeline.
+
+Istruzione OR 
+
+Sintassi: OR rd, rs, rt
+Descrizione: rd = rs or rt 
+            Effettua un OR logico bit a bit.
+            L'operazione di OR logico bit a bit e' effettuata tra il valore
+            contenuto nel registro rs e quello contenuto nel registro rt.
+            
+Istruzione ORI 
+
+Sintassi: ORI rt, rs, immediate
+Descrizione:   
+            Effettua un OR logico bit a bit con una costante.
+
+Istruzione SB 
+
+Sintassi: SB rt, offset(base)
+Descrizione: memory[base+offset] = rt
+            Memorizza gli 8 bit meno significativi di rt in memoria.
+            
+Istruzione SD 
+
+Sintassi: SD rt, offset(base)
+Descrizione: memory[base+offset] = rt
+            Memorizza la doubleword contenuta in rt in memoria.
+            
+Istruzione SH 
+
+Sintassi: SH rt, offset(base)
+Descrizione: memory[base+offset] = rt
+            Memorizza l'halfword contenuta in rt in memoria.
+            
+Istruzione SLTIU 
+
+Sintassi: SLTIU rt, rs, immediate
+Descrizione: 
+            Memorizza il risultato del confronto di minoranza tra il registro rs 
+            ed una costante senza segno. Pone il risultato nel registro rt.
+            Se il registro rs contiene un valore minore dell'immediato, rt viene
+            posto ad 1 (true), altrimenti viene posto a 0 (false).            
+        
+Istruzione SLTU 
+
+Sintassi: SLT rd, rs, rt
+Descrizione: 
+            Memorizza il risultato del confronto rs<rt nel GPR rd.
+            Non si verifica alcuna eccezione di overflow.
+            
+Istruzione SW 
+
+Sintassi: SW rt, offset(base)
+Descrizione: rt = memory[base+offset]
+            Memorizza in memoria un byte, aggiungengo l'offset con segno 
+            all'indirizzo base per formare l'indirizzo finale.
+            
+Istruzione XOR 
+
+Sintassi: XOR rd, rs, rt
+Descrizione: rd = rs XOR rt
+            Effettua l'OR esclusivo tra i valori contenuti nei registri rs ed rt.
+            
+Istruzione XORI 
+
+Sintassi: XORI rt, rs, immediate
+Descrizione: rt = rs XOR immediate
+             Effettua l'OR esclusivo con una costante.
+             
+
+
+
+
+

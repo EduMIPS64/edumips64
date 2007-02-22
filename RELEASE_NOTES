@@ -1,0 +1,54 @@
+23rd July 2006                                            EduMIPS64 0.3
+
+				     EduMIPS64 RELEASE NOTES	
+				     http://www.edumips.org
+
+EduMIPS64 is a GPL porting to Java Swing of the MIPS64 instruction set 
+simulator WinMIPS64
+
+Notes for this release:
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This is the third public release of EduMIPS64. 
+
+The BIG changes from EduMIPS64 are the new error dialogs, that make
+debugging easier, and the "Stop execution" feature, that solves the
+awful "infinite loop" bug.
+
+Please keep in mind that this is still EXPERIMENTAL SOFTWARE. It may
+BURN YOUR HARD DISK, DESTROY ALL YOUR DATA and even GO OUT WITH YOUR
+WIFE/HUSBAND. :)
+
+If you find a bug, please send us a bug report to
+
+	edumips64-devel@lists.sourceforge.net (requires subscription)
+
+If you don't want to subscribe, send the bug report to bugs@edumips.org.
+But if you use EduMIPS64, please consider subscribing and helping us with
+testing and bug reports. Thanks!
+
+New in this release:
+~~~~~~~~~~~~~~~~~~~~
+
+New functionalities:
+--------------------
+
+- New error dialogs (with cute graphics!)
+- Stop execution feature
+- More responsive UI
+- Multi-threaded core
+- Updated manual
+- Ability to choose to see what's going on in the CPU in a multi-step execution
+
+Fixed bugs:
+-----------
+
+- ISO-8859-1 files are now handled correctly
+- Misc bugs about registers resetting
+- If a file is not found, fail gracefully
+
+Known bugs:
+-----------
+At the moment, there are no known bugs.
+Maybe the parser will have problems if it gets as its input a file that is not
+encoded using ISO-8859-1

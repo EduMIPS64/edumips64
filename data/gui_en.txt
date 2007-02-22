@@ -1,0 +1,133 @@
+USER INTERFACE
+==============
+
+EduMIPS64 offers an easy-to-use user interface, composed by 6 frames that show
+you different informations about the execution of the current program.
+
+The look'n'feel resembles WinMIPS64's UI.
+
+----------------
+   The frames
+----------------
+
+Pipeline
+--------
+This frame represents the actual status of the pipeline, showing which
+instruction is in each pipeline stage.
+The five pipeline stages are represented in all the frames using different 
+colors, that can be customized via the Settings dialog.
+Note that actually FP stages are not used, because there's no FP support in
+EduMIPS64.
+
+Cycles
+------
+This window shows the changes that occur in the pipeline as time goes by.
+On the left side there's the instructions that are executed, and on the right
+side there's its situation in the pipeline. You can think of columns as time
+slots, so each column represents the photography of the pipeline in a given
+simulation step, as it would be represented in the Pipeline window
+
+Registers
+---------
+This frame shows the situation of the registers of our virtual CPU, including
+GPR and FPR. As there's no support for floating point operation, the FPR are
+always 0.
+If you click on a register, you'll see its decimal value in the status bar. If
+you double-click on a register, you'll be able to change its value. Please be
+sure to enter a valid hexadecimal number.
+
+Data
+----
+This frame shows the situation of the memory. 
+The first column contains the (hex) address of the memory cell, the second column
+contains the hexadecimal representation of the contents of the cell, the third
+contains the label and the fourth contains the values that the cell should
+contain, as it's stated in the source code you've opened.
+Clicking on a memory cell will show its decimal value in the status bar, and
+double-clicking on it will allow you to change its value. The content of the
+fourth column won't change.
+
+Code
+----
+This frame shows the source code of the program you've loaded.
+The first column contains the (hex) address of the instruction, the second column
+contains the hexadecimal representation of the instruction, the third contains
+the label of the instruction, the fourth contains the textual representation of the
+instruction and the fifth contains the comment of the instruction, as it's
+written in the source code.
+
+Statistics
+----------
+This window shows the execution statistics of the program. The labels explain
+the meaning of each number.
+
+---------------
+   The menus
+---------------
+
+FILE
+----
+-  Open (CTRL + O): Loads a file
+-  Reset (CTRL + R): Resets the simulator
+-  Write Dinero tracefile (CTRL + D): Creates a DineroIV xdin tracefile,
+   containing informations about memory accesses (data and instructions) issued
+   by the current program. This menu option is disabled until you complete the
+   execution of the program (ie. the simulator executes the HALT instruction).
+
+EXECUTE
+-------
+These menu options aren't available until you load a file
+
+-  Single cycle (F7): Executes a simulation step
+-  Multi cycle (F8): Executes a certain number of steps. This number can be set
+   via the Configure menu.
+-  Run (F4): Executes the whole program.
+-  Stop (F9):  Stops the execution of the program executed via F4 or F8.
+
+CONFIGURE
+---------
+
+You can open the Settings dialog, can allows you to customize these options:
+-  Multiple steps: Sets the cycles number for Multi Cycle.
+-  Enable forwarding: Enables forwarding, reducing the CPU cycles acting on the
+   instructions' behavior.
+   ALU Instructions, in the EX stage, make their calculations and write the
+   results in the registers without waiting the WB stage. This applies to Load
+   instructions too, that read the data in the MEM stage and directly write it
+   without waiting for the WB stage.
+-  Enable warnings: Lets parsing warnings to be shown in a window as if they
+   were errors.
+-  Sync graphics with CPU in multi-step execution: syncs the GUI with the CPU
+   every execution step when the program is run in multi-step mode, via F4 or F8
+-  Change pipeline colors: Allows you to choose the colors to be associated, in
+   the ui, with each pipeline stage. 
+
+Or else, you can change the GUI language via the Change language option.
+
+TOOLS
+-----
+
+-  Dinero Frontend: Allows you to call the DineroIV simulator directly from
+   inside EduMIPS64, showing a report of its output. You have to insert the
+   command line parameters for DineroIV and the path to dineroIV executable.
+   The option is disablet until the execution of the current program is
+   terminated.
+
+WINDOW
+------
+
+-  Tile: re-arranges windows in order to make them fill the whole area of the
+   main window.
+
+HELP
+----
+
+-  Manual: shows this manual.
+-  About EduMIPS64: shows an about dialog.
+
+
+----------------------------
+   The configuration file
+----------------------------
+The configuration file stores your preferences about edumips64's inner working
+and appereance. They are automatically saved every time you exit from EduMIPS64.

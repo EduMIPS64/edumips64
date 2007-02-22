@@ -1,0 +1,65 @@
+<project name="edumips64" default="jar" basedir=".">
+	<target name="init">
+		<property name="sourceDir" value="." />
+		<property name="version" value="0.3.7" />
+		<property name="outputDir" value="edumips" />
+		<property name="jarFile" value="edumips64-${version}.jar" />
+		<property name="tarBz2File" value="edumips64-${version}.tar.bz2" />
+	</target>
+
+	<target name="vim-clean" depends="init">
+		<exec dir="${sourceDir}" executable="./vim-clean.sh" />
+	</target>
+
+	<target name="docs" depends="init">
+		<mkdir dir="${outputDir}/docs" />
+		<javadoc destdir="${outputDir}/docs" 
+				 author="true"
+				 version="true"
+				 use="true"
+				 sourcepath="."
+				 classpath="${sourceDir}/.."
+				 packagenames="edumips64.*"/>
+	</target>
+
+	<target name="clean" depends="vim-clean">
+		<delete file="${jarFile}" />
+	</target>
+
+	<target name="package" depends="vim-clean,jar">
+		<move file="${jarFile}" tofile="../${jarFile}" />
+		<tar compression="bzip2" tarfile="../${tarBz2File}"
+			basedir=".." includes="edumips64/" />
+	</target>
+
+	<target name="jar" depends="init">
+		<mkdir dir="${outputDir}" />
+		<javac srcdir="${sourceDir}" destdir="${outputDir}" nowarn="yes" />
+		<mkdir dir="${outputDir}/edumips64/img" />
+		<mkdir dir="${outputDir}/edumips64/data" />
+		<mkdir dir="${outputDir}/edumips64/utils" />
+
+		<copy todir="${outputDir}/edumips64/img">
+			<fileset dir="img">
+				<include name="**/*.png" />
+			</fileset>
+		</copy>
+		<copy todir="${outputDir}/edumips64/data">
+			<fileset dir="data">
+				<include name="**/*.txt" />
+			</fileset>
+		</copy>
+		<copy todir="${outputDir}/edumips64/utils">
+			<fileset dir="utils">
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+		<jar destfile="${jarFile}" basedir="edumips">
+			<manifest>
+				<attribute name="Main-Class" value="edumips64.Main"/>
+			</manifest>
+		</jar>
+		<signjar jar="${jarFile}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
+		<delete dir="${outputDir}" />
+	</target>
+</project>
