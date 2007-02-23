@@ -182,6 +182,9 @@ public class SYSCALL extends Instruction {
 			edumips64.Main.logger.debug("Reading memory cell at address " + address + ", searching for the address of the format string");
 			MemoryElement tempMemCell = memory.getCell((int)address);
             int format_string_address = (int)tempMemCell.getValue();
+
+            // Recording in the tracefile the last memory access
+            din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),8);
             
             // Fetching the format string
 			String format_string = fetchString(format_string_address);
@@ -191,8 +194,11 @@ public class SYSCALL extends Instruction {
             int next_param_address = (int)address + 8;
 
 			// Let's record in the tracefile the format string's memory access
-            // TODO: WRONG, to be modified.
-			for(int i = (int)address; i < next_param_address; i += 8)
+            // t1 will hold the address of the last memory cell accessed
+            // while we were reading format_string.
+            int t1 = (int)format_string_address + format_string.length();
+            t1 += 8 - (t1 % 8);
+			for(int i = (int)format_string_address; i < t1; i += 8)
 				din.Load(Converter.binToHex(Converter.positiveIntToBin(64,i)),8);
 			
 			int oldIndex = 0, newIndex = 0;
@@ -205,16 +211,19 @@ public class SYSCALL extends Instruction {
                         int str_address = (int)tempMemCell.getValue();
 						edumips64.Main.logger.debug("Retrieving the string @ " + str_address + "...");
 						String param = fetchString(str_address);
+
+                        next_param_address += 8;
                         /* Old, buggy behavior
 						int old_param_address = next_param_address;
 						next_param_address += param.length();
 						next_param_address += 8 - (next_param_address % 8);
                         */
-						
+                        
 						// Tracefile entry for this string
-                        // TODO: MUST BE FIXED, doesn't work.
-						/* for(int i = old_param_address; i < next_param_address; i += 8)
-							din.Load(Converter.binToHex(Converter.positiveIntToBin(64,i)),8);*/
+                        int t2 = str_address + param.length();
+                        t2 += 8 - (t2 % 8);
+						for(int i = str_address; i < t2; i += 8)
+							din.Load(Converter.binToHex(Converter.positiveIntToBin(64,i)),8);
 
 						edumips64.Main.logger.debug("Got " + param);
 						temp.append(param);
