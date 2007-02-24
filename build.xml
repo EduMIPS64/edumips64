@@ -1,14 +1,11 @@
 <project name="edumips64" default="jar" basedir=".">
 	<target name="init">
 		<property name="sourceDir" value="." />
+        <property name="helpClassesDir" value="./javahelp_classes" />
 		<property name="version" value="0.3.7-svn" />
 		<property name="outputDir" value="edumips" />
 		<property name="jarFile" value="edumips64-${version}.jar" />
 		<property name="tarBz2File" value="edumips64-${version}.tar.bz2" />
-	</target>
-
-	<target name="vim-clean" depends="init">
-		<exec dir="${sourceDir}" executable="./vim-clean.sh" />
 	</target>
 
 	<target name="docs" depends="init">
@@ -22,11 +19,11 @@
 				 packagenames="edumips64.*"/>
 	</target>
 
-	<target name="clean" depends="vim-clean">
+	<target name="clean">
 		<delete file="${jarFile}" />
 	</target>
 
-	<target name="package" depends="vim-clean,jar">
+	<target name="package" depends="jar">
 		<move file="${jarFile}" tofile="../${jarFile}" />
 		<tar compression="bzip2" tarfile="../${tarBz2File}"
 			basedir=".." includes="edumips64/" />
@@ -34,11 +31,28 @@
 
 	<target name="jar" depends="init">
 		<mkdir dir="${outputDir}" />
-		<javac srcdir="${sourceDir}" destdir="${outputDir}" nowarn="yes" />
+        <javac srcdir="${helpClassesDir}" destdir="${outputDir}" nowarn="yes" />
+        <javac srcdir="${sourceDir}" classpath="${helpClassesDir}" destdir="${outputDir}" nowarn="yes"/>
 		<mkdir dir="${outputDir}/edumips64/img" />
 		<mkdir dir="${outputDir}/edumips64/data" />
 		<mkdir dir="${outputDir}/edumips64/utils" />
+		<mkdir dir="${outputDir}/edumips64/help" />
 
+		<copy todir="${outputDir}/javax">
+            <fileset dir="${helpClassesDir}/javax">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+		<copy todir="${outputDir}/com">
+            <fileset dir="${helpClassesDir}/com">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+		<copy todir="${outputDir}/edumips64/help">
+			<fileset dir="help">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
 		<copy todir="${outputDir}/edumips64/img">
 			<fileset dir="img">
 				<include name="**/*.png" />
@@ -60,6 +74,6 @@
 			</manifest>
 		</jar>
 		<signjar jar="${jarFile}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
-		<delete dir="${outputDir}" />
+        <delete dir="${outputDir}" /> 
 	</target>
 </project>

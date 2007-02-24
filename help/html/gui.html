@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<html>
+  <head>
+    <meta name="generator" content="HTML Tidy, see www.w3.org">
+
+    <title></title>
+  </head>
+
+  <body>
+    <table width="600" align="center">
+      <tr>
+        <td>
+          <h2>INTERFACCIA UTENTE<br>
+          ==================</h2>
+
+          <p>Edumips64 offre un'interfaccia utente facile da utilizzare, presentandosi con <br>
+            una frame contenente 6 finestre principali. Le finestre  visualizzano <br>
+            informazioni differenti sull'esecuzione del programma.</p>
+          <p>L'interfaccia ricalca abbastanza fedelmente quella di WinMIPS64.</p>
+          <p>-----------------<br>
+            Le finestre<br>
+            -----------------</p>
+          <p>Pipeline<br>
+            --------<br>
+            Questa finestra rappresenta lo stato attuale della pipeline, mostrando quale<br>
+            istruzione si trovi in ciascuno degli stadi della pipeline.<br>
+            I cinque stadi sono rappresentati in tutte le finestre utilizzando colori<br>
+            diversi, che possono essere personalizzati tramite la finestra di dialogo delle<br>
+            impostazioni.<br>
+            Attualmente gli stadi FP (virgola mobile) non sono utilizzati perch&eacute; nonc'&egrave;<br>
+            supporto FP in EduMIPS64.</p>
+          <p>Cicli<br>
+            -----<br>
+            Questa finestra mostra i cambiamenti che si verificano nella pipeline man mano<br>
+            che la simulazione va avanti. Sulla parte sinistra ci sono le istruzioni<br>
+            eseguite, e sulla parte destra c'e' la sua situazione nella pipeline. E'<br>
+            possibile immaginare le colonne come slot temporali, e quindi ogni colonna<br>
+            rappresenta la fotografia della pipeline in un certo step di simulazione, cos&igrave;<br>
+            come sarebbe rappresentato nella finestra della Pipeline.</p>
+          <p>Registri<br>
+            --------<br>
+            Questa finestra mostra la situazione dei registri della nostra CPU virtuale,<br>
+            includendo GPR e FPR. <br>
+            Un singolo click su un registro mostra il valore decimale di quest'ultimo nella<br>
+            barra di stato, mentre il doppio click permette di modificarne il valore. E'<br>
+            necessario inserire il nuovo valore in esadecimale.<br>
+            Dato che non c'e' supporto per le operazioni in virgola mobile, i registri FPR <br>
+            sono sempre a zero, e non sono modificabili.</p>
+          <p>Dati<br>
+            ----<br>
+            Questa finestra mostra la situazione della memoria.<br>
+            La prima colonna contiene l'indirizzo della cella di memoria, espresso in<br>
+            esadecimale; la seconda contiene la rappresentazione esadecimale del contenuto<br>
+            della cella; la terza contiene l'etichetta e la quarta contiene i valori che la<br>
+            cella dovrebbe contenere, cos&igrave; com'&egrave; scritto nel file sorgente aperto.<br>
+            Un singolo click su una cella di memoria mostra il valore decimale di<br>
+            quest'ultima nella barra di stato, mentre un doppio click permette di<br>
+            modificarne il valore. Comunque la modifica non influira' sul contenuto della<br>
+            quarta colonna, che e' puramente descrittivo.</p>
+          <p>Codice<br>
+            ------<br>
+            Questa finestra mostra il codice sorgente del programma caricato.<br>
+            La prima colonna contiene l'indirizzo esadecimale dell'istruzione; la seconda<br>
+            contiene la rappresentazione esadcimale dell'istruzione; la terza contiene<br>
+            l'etichetta dell'istruzione; la quarta contiene la rappresentazione testuale<br>
+            dell'istruzione e la quinta contiene il commento dell'istruzione, cos&igrave; com'e'<br>
+            scritto nel codice sorgente.</p>
+          <p>Statistiche<br>
+            -----------<br>
+            Questa finestra mostra le statistiche d'esecuzione del programma. Le etichette<br>
+            spiegano il significato dei numeri che vi stanno accanto.</p>
+          <p>------------<br>
+            I menu<br>
+            ------------</p>
+          <p>FILE<br>
+            ----<br>
+            -  Apri (CTRL + O):  Carica un file da mandare in esecuzione.<br>
+            -  Resetta (CTRL + R): Resetta i valori caricati  del programma aperto.<br>
+            -  Scrivi Dinero tracefile (CTRL +  D): Permette di creare un tracefile per <br>
+            DineroV in formato xdin, contenente informazioni sugli accessi in memoria <br>
+            (dati ed istruzioni) effettuati dal programma corrente.  La funzionalita' e'<br>
+            disabilitata finche' non si completa l'esecuzione del programma corrente.<br>
+          </p>
+          <p>ESEGUI<br>
+            ------<br>
+            Queste opzioni non sono selezionabili finche' non viene caricato un file.</p>
+          <p>- Ciclo Singolo (F7):  Esegue uno step di simulazione.<br>
+            - Cicli Multipli (F8): Esegue piu' step di simulazione. Il numero degli step viene <br>
+            impostato nel menu Configura.<br>
+            - Completa (F4):  Esegue il programma fino alla fine.<br>
+            - Ferma (F9):  Blocca l'esecuzione del programma lanciato con F4 o F8.</p>
+          <p>CONFIGURA<br>
+            ---------<br>
+            E' possibile aprire la finestra di dialogo &quot;Impostazioni&quot;, che permette di<br>
+            impostare le seguenti opzioni:<br>
+            - Passi Multipli (CTRL + T): Imposta il numero di cicli per i Cicli Multipli.<br>
+            - Abilita Forwarding:  Riduce il numero di cicli in CPU agendo sulle operazioni <br>
+            eseguite nella pipeline. Le istruzioni ALU, nello stadio EX, eseguono i calcoli <br>
+            e scrivono i registri implicati direttamente senza  attendere la WB per tale operazione. <br>
+            Lo stesso vale per le istruzioni Load, le quali accedono in memoria in MEM e <br>
+            contemporaneamente scrivono sui registri senza attendere la WB.<br>
+            - Abilita warnings: Mostra i warnings di parsing in una finestra, come se<br>
+            fossero degli errori.<br>
+            - Sincronizza la GUI con la CPU nell'esecuzione multi-step: aggiorna la grafica<br>
+            con la CPU ad ogni passo di esecuzione quando il programma viene eseguito in<br>
+            modalit&agrave; multi-step, ovvero tramite F4 o F8<br>
+            - Selezione Lingua: Permette la scelta della lingua desiderata, (Inglese-Italiano).<br>
+            - Selezione colori della pipeline: Permette di cambiare i colori che vengono<br>
+            associati, in ciascuna finestra, ai differenti stadi della pipeline.</p>
+          <p>E' inoltre possibile cambiare il linguaggio dell'interfaccia tramite l'opzione<br>
+            &quot;Selezione Lingua&quot;.</p>
+          <p>STRUMENTI<br>
+            ---------<br>
+            - Dinero Frontend:  Consente di ottenere dati e informazioni dalla simulazione di cache,<br>
+            strettamente collegato all'output di DineroIV. Vanno inseriti i parametri per simulare <br>
+            il tipo di cache scelta , e selezionato il percorso contenente l'eseguibile di DineroIV.<br>
+            L'opzione non viene abilitata sino alla terminazione dell'esecuzione del programma corrente.</p>
+          <p>FINESTRE<br>
+            --------<br>
+            - Tile: Ridispone le sei finestre ordinatamente.</p>
+          <p>AIUTO<br>
+            -----<br>
+            - Manuale<br>
+            - Informazioni su Edumips64<br>
+          </p>
+          <p>-------------------------------<br>
+            Il file di configurazione<br>
+            -------------------------------<br>
+            All'interno del file .jar e' contenuto un file di configurazione, che registra<br>
+            qualsiasi cambiamento nella configurazione del programma per permettervi di<br>
+            ripristinare automaticamente le impostazioni.<br>
+          </p></td>
+      </tr>
+    </table>
+  </body>
+</html>
+
