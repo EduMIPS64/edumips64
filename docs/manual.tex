@@ -52,6 +52,15 @@ set in order to maintain compatibility with other simulators.}
 %\end{titlepage}
 \maketitle
 \chapter{Introduction}
+\EM{} is a \MS{} Instruction Set Architecture (ISA) simulator. It is designed to
+be used to execute small programs that use the subset of the \MS{} ISA
+implemented by the simulator, allowing the user to see how instructions behave
+in the pipeline, how stalls are handled by the CPU, the status of registers and
+memory and much more. It is both a simulator and a visual debugger.
+
+This manual will introduce you to \EM{}, and will cover some details on how to
+use it.
+
 The first section covers the format of source files accepted by the simulator,
 describing the data types and the directives, in addition to command line
 parameters. In the second section there's an overview of the subset of the \MS{}
@@ -716,9 +725,9 @@ non-existent file descriptor, the attempt to write to file descriptor 0
 
 \index{system calls!printf()}
 \subsection{\texttt{SYSCALL 5 - printf()}}
-SYSCALL 5 expects a variable number of parameters, the first being a so-called
-``format string''. In the format string can be included some placeholders,
-described in the following list:
+SYSCALL 5 expects a variable number of parameters, the first being the address
+of the so-called ``format string''. In the format string can be included some
+placeholders, described in the following list:
 \begin{itemize}
 	\item \texttt{\%s} indicates a string parameter;
 	\item \texttt{\%i} indicates an integer parameter;
@@ -728,6 +737,10 @@ described in the following list:
 
 For each \texttt{\%s}, \texttt{\%d} or \texttt{\%i} placeholder, SYSCALL 5
 expects a parameter, starting from the address of the previous one.
+
+When the SYSCALL finds a placeholder for an integer parameter, it expects that
+the corresponding parameter is an integer value, when if it finds a placeholder
+for a string parameter, it expects as a parameter the address of the string.
 
 The result is printed in the input/output frame, and the number of bytes
 written is put into R1.
@@ -1005,6 +1018,9 @@ the \texttt{.jar} file.
 To embed it in an HTML, the \texttt{<applet>} tag must be used. The \EM{} web
 site contains a page that already contains the applet, so
 that everyone can execute it without the hassle of using the command line.
+
+\chapter{Tutorial}
+TODO TODO TODO TODO
 
 %\cite{edumips-web} contains a page that already contains the applet, so
 %that everyone can execute it without the hassle of using the command line.

@@ -2,6 +2,7 @@ EduMIPS64 ChangeLog
 ------------------- 
 
 0.3.7 (?)
+	- New PDF manual (andrea)
 	- Fixed a bug in SYSCALL 5. (andrea)
 	- New JavaHelp system (Vanni)
 
