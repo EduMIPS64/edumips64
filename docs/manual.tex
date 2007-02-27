@@ -330,40 +330,40 @@ Here's the list of R-Type ALU Instructions.
 	\index{instructions!DSLL}
 	\item \texttt{DSLL rd, rt, sa}\\
 	Does a left shift to of rt, by the amount specified in the
-	immediate value sa, and puts the result into rs. Empty bits are padded with
+	immediate value sa, and puts the result into rd. Empty bits are padded with
 	zeros.
 
 	\index{DSLLV}
 	\index{instructions!DSLLV}
 	\item \texttt{DSLLV rd, rs, rt}\\
 	Does a left shift to of rs, by the amount specified in rt, and puts the
-	result into rs. Empty bits are padded with zeros.
+	result into rd. Empty bits are padded with zeros.
 
 	\index{DSRA}
 	\index{instructions!DSRA}
 	\item \texttt{DSRA rd, rs, sa}\\
 	Does a right shift to of rs, by the amount specified in the immediate value
-	sa, and puts the result into rs. Empty bits are padded with zeros if the
+	sa, and puts the result into rd. Empty bits are padded with zeros if the
 	leftmost bit of rs is zero, otherwise they are padded with ones.
 
 	\index{DSRAV}
 	\index{instructions!DSRAV}
 	\item \texttt{DSRAV rd, rs, rt}\\
 	Does a right shift to of rs, by the amount specified in rt, and puts the
-	result into rs. Empty bits are padded with zeros if the leftmost bit of rs
+	result into rd. Empty bits are padded with zeros if the leftmost bit of rs
 	is zero, otherwise they are padded with ones.
 
 	\index{DSRL}
 	\index{instructions!DSRL}
 	\item \texttt{DSRL rd, rs, sa}\\
 	Does a right shift to of rs, by the amount specified in the immediate value
-	sa, and puts the result into rs. Empty bits are padded with zeros.
+	sa, and puts the result into rd. Empty bits are padded with zeros.
 	
 	\index{DSRLV}
 	\index{instructions!DSRLV}
 	\item \texttt{DSRLV rd, rs, rt}\\
 	Does a right shift to of rs, by the amount specified in rt, and puts the
-	result into rs. Empty bits are padded with zeros.
+	result into rd. Empty bits are padded with zeros.
 
 	\index{DSUB}
 	\index{instructions!DSUB}
@@ -463,13 +463,13 @@ Here's the list of I-Type ALU Instructions.
 
 	\index{SLTUI}
 	\index{instructions!SLTUI}
-	\item \texttt{ANDI rt, rs, immediate}\\
+	\item \texttt{SLTUI rt, rs, immediate}\\
 	Sets the value of rt to 1 if the value of rs is less than the value of the
 	immediate, otherwise sets it to 0. This instruction performs an unsigned comparison.
 
 	\index{XORI}
 	\index{instructions!XORI}
-	\item \texttt{ANDI rt, rs, immediate}\\
+	\item \texttt{XORI rt, rs, immediate}\\
 	Executes a bitwise exclusive OR (XOR) between rs and the immediate value,
 	and puts the result into rt.
 
