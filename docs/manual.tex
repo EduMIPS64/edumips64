@@ -84,7 +84,8 @@ There are two sections in a source file, the \textbf{data} section and the
 \EM{} program.
 
 To distinguish the various parts of each source code line, any combination of
-spaces and tabs can be used, as the parser ignores multiple spaces.
+spaces and tabs can be used, as the parser ignores multiple spaces and only
+detects whitespaces to separate tokens.
 
 \begin{lstlisting}[caption={Sample \EM{} code}, label={code:sample}, style={mips}]
 ; This is a comment
@@ -231,6 +232,7 @@ is:
 The \textbf{code} section can be specified with the \texttt{.text} alias.
 
 The number and the type of parameters depends on the instruction itself.
+%TODO: questa va sicuramente inserita.
 %Please see table~\ref{table:segm-type} for the list of possible parameters.
 
 %Instructions can take three types of parameters:
@@ -250,6 +252,7 @@ The number and the type of parameters depends on the instruction itself.
 The size of immediate values is limited by the number of bits that are available
 in the bit encoding of the instruction. 
 
+% TODO: anche questa, ma nell'indice
 %Please see~\cite{mips-2} for more details about how instruction are actually encoded.
 
 The instructions that can be used in this section will be discussed in
@@ -446,8 +449,8 @@ Here's the list of I-Type ALU Instructions.
 	\index{LUI}
 	\index{instructions!LUI}
 	\item \texttt{LUI rt, immediate}\\
-	Loads the constant defined in the immediate value in the upper half of the
-	first 32 bits of rt, sign-extending the upper 32 bits of the register.
+	Loads the constant defined in the immediate value in the upper half (16 bit) of the
+	lower 32 bits of rt, sign-extending the upper 32 bits of the register.
 
 	\index{ORI}
 	\index{instructions!ORI}
@@ -716,7 +719,7 @@ SYSCALL 4 expects three parameters: the file descriptor to write to, the address
 where the data must be read from, the number of bytes to write.
 
 If the first parameter is two or three, the simulator will pop the input/output
-frame, and write there the input.
+frame, and write there the read data.
 
 It returns the number of bytes that have been written, or -1 if the write
 operation fails. Possible causes of failure are the attempt to write to a
