@@ -64,7 +64,7 @@ public class Parser
 	*/
 	private BufferedReader in;
 	int memoryCount;
-
+	String filename;
 	private SymbolTable symTab;
 	
 	/** Singleton pattern constructor
@@ -81,6 +81,93 @@ public class Parser
 			instance = new Parser();
 		return instance;
 	}
+
+	private String fileToString(BufferedReader in) throws IOException
+	{
+		String ret = ""; 
+
+		int charRead =0;
+		String line;
+
+		while ((line = in.readLine())!=null)
+		{	
+			String tmp = cleanFormat(line);
+			if (tmp!=null)
+				ret += tmp + "\n";
+		}while (charRead == 1024);
+		
+		return ret;
+	}
+	
+	/**  
+	 *
+	 */
+	private void checkLoop(String data, Stack<String> included ) throws IOException, ParserMultiException
+	{
+		int i = 0;
+		do 
+		{
+			i = data.indexOf("#include ",i);
+			
+			if (i != -1)
+			{
+				int end = data.indexOf("\n", i);
+				if (end == -1)
+				{
+					end = data.length();
+				}
+				int a = included.search(data.substring(i+9, end ).trim()); 
+				if ( a!= -1)
+				{
+					error = new ParserMultiException ();
+					error.add("INCLUDE_LOOP",0,0,"#include "+ data.substring(i+9, end ).trim() );
+					throw error;
+				}
+
+				String filetmp = fileToString(new BufferedReader(new InputStreamReader(new FileInputStream(data.substring(i+9, end ).trim()),"ISO-8859-1")));
+				checkLoop(filetmp ,included);
+				i ++;
+			}
+		}while(i!=-1);
+	}
+
+	/** Process the #include (Syntax #include file.ext ) 
+	 */
+	private String preprocessor() throws IOException, ParserMultiException
+	{
+		String filetmp = "";
+		
+		filetmp = fileToString(in);
+
+		int i=0;
+
+		//check loop
+		Stack<String> included = new Stack<String>();
+		included.push(filename);
+		checkLoop(filetmp, included);	
+		// include
+		do 
+		{
+			i = filetmp.indexOf("#include ",i);
+			if (i != -1)
+			{
+				int end = filetmp.indexOf("\n", i);	
+				if (end == -1)
+				{
+					end = filetmp.length();
+				}
+				edumips64.Main.logger.debug("Open by #include: " + filetmp.substring(i+9, end).trim());
+				filetmp = filetmp.substring(0,i) + fileToString (new BufferedReader(new InputStreamReader(
+					new FileInputStream(filetmp.substring(i+9, end ).trim())
+					,"ISO-8859-1"))) + filetmp.substring(end);
+			}
+			
+		}while(i!=-1);
+
+		return filetmp;
+	}
+
+
 	/** Loading from File
 	 * @param filename A String with the system-dependent file name
 	 * @throws FileNotFoundException if the file does not exist, is a directory rather than a regular file, or for some other reason cannot be opened for reading
@@ -89,16 +176,11 @@ public class Parser
 	public void parse(String filename) throws FileNotFoundException, SecurityException, IOException,ParserMultiException
 
 	{
-		try
-		{
-			in = new BufferedReader(new InputStreamReader(new FileInputStream(filename),"ISO-8859-1"));
-			doParsing();
-		}
-		catch(java.nio.charset.MalformedInputException e)
-		{
-			edumips64.Main.logger.warning("Not an ISO-8850-1 file");
-			e.printStackTrace();
-		}
+		in = new BufferedReader(new InputStreamReader(new FileInputStream(filename),"ISO-8859-1"));
+		this.filename = filename;
+		String code = preprocessor();
+		parse(code.toCharArray());
+
 	}
 	/** Loading from buffer 
 	 * @param buffer An Array of char with the MIPS code
@@ -110,7 +192,7 @@ public class Parser
 	}
 	/** commit the parsing (public or private?) 
 	*/
-	private void doParsing () throws IOException,ParserMultiException//,MemoryElementNotFoundException,IrregularWriteOperationException,IrregularStringOfBitsException,SymbolTableOverflowException
+	private void doParsing () throws IOException,ParserMultiException
 	{  
 
 		boolean isFirstOutOfInstructionMemory = false;
