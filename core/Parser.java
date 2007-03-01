@@ -52,6 +52,7 @@ public class Parser
 	ParserMultiWarningException warning; 
 	ParserMultiException error;
 	boolean isFirstOutOfMemory;
+	String path;
 	int numError;
 	int numWarning;
 	/** Instance of Parser
@@ -123,8 +124,10 @@ public class Parser
 					error.add("INCLUDE_LOOP",0,0,"#include "+ data.substring(i+9, end ).trim() );
 					throw error;
 				}
-
-				String filetmp = fileToString(new BufferedReader(new InputStreamReader(new FileInputStream(data.substring(i+9, end ).trim()),"ISO-8859-1")));
+				String filename = data.substring(i+9, end).trim();
+				if (!(new File(filename)).isAbsolute())
+					filename = path + filename;
+				String filetmp = fileToString(new BufferedReader(new InputStreamReader(new FileInputStream(filename),"ISO-8859-1")));
 				checkLoop(filetmp ,included);
 				i ++;
 			}
@@ -143,7 +146,8 @@ public class Parser
 
 		//check loop
 		Stack<String> included = new Stack<String>();
-		included.push(filename);
+		included.push(this.filename);
+		
 		checkLoop(filetmp, included);	
 		// include
 		do 
@@ -157,8 +161,10 @@ public class Parser
 					end = filetmp.length();
 				}
 				edumips64.Main.logger.debug("Open by #include: " + filetmp.substring(i+9, end).trim());
-				filetmp = filetmp.substring(0,i) + fileToString (new BufferedReader(new InputStreamReader(
-					new FileInputStream(filetmp.substring(i+9, end ).trim())
+				String filename = filetmp.substring(i+9, end).trim();
+				if (!(new File(filename)).isAbsolute())
+					filename = path + filename;
+				filetmp = filetmp.substring(0,i) + fileToString (new BufferedReader(new InputStreamReader(new FileInputStream(filename)
 					,"ISO-8859-1"))) + filetmp.substring(end);
 			}
 			
@@ -178,6 +184,14 @@ public class Parser
 	{
 		in = new BufferedReader(new InputStreamReader(new FileInputStream(filename),"ISO-8859-1"));
 		this.filename = filename;
+		int oldindex = 0;
+		int index = 0;
+		while ((index = filename.indexOf(File.separator,index)) != -1 )
+		{
+			oldindex = index;
+			index ++;
+		}
+		path = filename.substring(0,oldindex+1);
 		String code = preprocessor();
 		parse(code.toCharArray());
 
