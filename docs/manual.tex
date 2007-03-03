@@ -68,9 +68,11 @@ instruction set that is accepted by \EM{}, with all the needed parameters and
 indications to use them. The third section is a description of the user
 interface of \EM{}, that explains the purpose of each frame and menu, along with a
 description of the configuration dialog, the Dinero frontend dialog, the Manual
-dialog and command line options. The fourth section contains an example session
-with \EM{}, a practical tutorial that will guide you through the execution of a
-simple \MS{} program.
+dialog and command line options. 
+
+%The fourth section contains an example session
+%with \EM{}, a practical tutorial that will guide you through the execution of a
+%simple \MS{} program.
 
 \chapter{Source files format}
 \EM{} tries to follow the conventions used in other \MS{} and DLX simulators, so
@@ -258,6 +260,15 @@ in the bit encoding of the instruction.
 The instructions that can be used in this section will be discussed in
 section~\ref{instructions}
 
+\subsection{The \texttt{\#include} command}
+Source files can contain the \texttt{\textbf{\#include} filename} command, which has the
+effect of putting in place of the command row the content of the file
+\texttt{filename}.
+It is useful if you want to include external routines, and it comes with a
+loop-detection algorithm that will warn you if you try to do something like
+``\texttt{\#include A.s}'' in file \texttt{B.s} and ``\texttt{\#include B.s}'' in
+file \texttt{A.s}.
+
 \chapter{The instruction set}
 \label{instructions}
 \index{instructions}
@@ -278,6 +289,7 @@ The fourth subsection will describe instructions that do not fit in any of the
 three categories.
 
 %For a more complete \MS{} instruction set reference, please refer to~\cite{mips-2}.
+
 
 \section{ALU Instructions}
 The Arithmetic Logic Unit (in short, ALU) is a part of the execution unit of a
