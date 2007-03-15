@@ -46,12 +46,42 @@ set in order to maintain compatibility with other simulators.}
 
 \begin{document}
 \setlength{\baselineskip}{1.60\baselineskip} % interlinea
-% TODO: prettier titlepage
-%\begin{titlepage}
-%EduMIPS64
-%\end{titlepage}
-\maketitle
-\chapter{Introduction}
+% START OF TITLEPAGE
+
+\newlength{\centeroffset}
+\setlength{\centeroffset}{-0.5\oddsidemargin}
+\addtolength{\centeroffset}{0.5\evensidemargin}
+%\addtolength{\textwidth}{-\centeroffset}
+\thispagestyle{empty}
+\vspace*{\stretch{1}}
+\noindent\hspace*{\centeroffset}\makebox[0pt][l]{\begin{minipage}{\textwidth}
+\flushright
+{\Huge\bfseries EduMIPS64 User Manual 
+}
+\noindent\rule[-1ex]{\textwidth}{5pt}\\[2.5ex]
+\end{minipage}}
+
+\vspace{\stretch{1}}
+\noindent\hspace*{\centeroffset}\makebox[0pt][l]{\begin{minipage}{\textwidth}
+\flushright
+{\bfseries 
+by Andrea Spadaccini\\[1.5ex]
+%Translation by Simona Ullo\\[3ex]
+} 
+Version~1, 15 March 2007
+\end{minipage}}
+
+%\addtolength{\textwidth}{\centeroffset}
+\vspace{\stretch{2}}
+
+
+\pagebreak
+% END OF TITLEPAGE
+
+\tableofcontents
+\listoftables
+\lstlistoflistings
+\chapter*{Introduction}
 \EM{} is a \MS{} Instruction Set Architecture (ISA) simulator. It is designed to
 be used to execute small programs that use the subset of the \MS{} ISA
 implemented by the simulator, allowing the user to see how instructions behave
@@ -61,11 +91,11 @@ memory and much more. It is both a simulator and a visual debugger.
 This manual will introduce you to \EM{}, and will cover some details on how to
 use it.
 
-The first section covers the format of source files accepted by the simulator,
+The first chapter covers the format of source files accepted by the simulator,
 describing the data types and the directives, in addition to command line
-parameters. In the second section there's an overview of the subset of the \MS{}
+parameters. In the second chapter there's an overview of the subset of the \MS{}
 instruction set that is accepted by \EM{}, with all the needed parameters and
-indications to use them. The third section is a description of the user
+indications to use them. The third chapter is a description of the user
 interface of \EM{}, that explains the purpose of each frame and menu, along with a
 description of the configuration dialog, the Dinero frontend dialog, the Manual
 dialog and command line options. 
@@ -73,6 +103,8 @@ dialog and command line options.
 %The fourth section contains an example session
 %with \EM{}, a practical tutorial that will guide you through the execution of a
 %simple \MS{} program.
+
+This manual refers to EduMIPS64 version 0.4.
 
 \chapter{Source files format}
 \EM{} tries to follow the conventions used in other \MS{} and DLX simulators, so
@@ -1034,8 +1066,8 @@ To embed it in an HTML, the \texttt{<applet>} tag must be used. The \EM{} web
 site contains a page that already contains the applet, so
 that everyone can execute it without the hassle of using the command line.
 
-\chapter{Tutorial}
-TODO TODO TODO TODO
+%\chapter{Tutorial}
+%TODO TODO TODO TODO
 
 %\cite{edumips-web} contains a page that already contains the applet, so
 %that everyone can execute it without the hassle of using the command line.
