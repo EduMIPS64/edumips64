@@ -124,12 +124,12 @@ label:  .word   15     ; Questo \`{e} un commento in linea
 
 \index{commenti}\index{;}
 I commenti possono essere introdotti utilizzando il carattere ``;'' qualsiasi cosa venga scritta successivamente ad esso verr\`{a} ignorata.
-Un commento pu\`{o} quindi essere usato ``inline'' (dopo una direttiva) oppure una riga a s\`{e} stante.
+Un commento pu\`{o} quindi essere usato ``inline'' (dopo una direttiva) oppure in una riga a s\`{e} stante.
 
 \index{etichette} Le etichette possono essere usate nel codice per fare riferimento ad una cella di memoria o ad un'istruzione. 
 Esse sono case insensitive. Per ciascuna linea di codice pu\`{o} essere utilizzata un'unica etichetta. Quest'ultima pu\`{o} essere 
 inserita una o pi\`{u} righe al di sopra dell'effettiva dichiarazione del dato o dell'istruzione, facendo in modo che non ci sia nulla, 
-eccetto che commenti e linee vuote, tra l'etichetta stessa e la dichiarazione. 
+eccetto commenti e linee vuote, tra l'etichetta stessa e la dichiarazione. 
 
 \subsection{La sezione \texttt{.data}}
 \index{.data}
@@ -181,7 +181,7 @@ in una differente cella di memoria, occupando 32 byte, come specificato nella ta
 	.byte	4
 \end{lstlisting}
 
-Nella tabella~\ref{table:effect}, a memoria \`{e} rappresentata utilizzando celle di dimensione pari 
+Nella tabella~\ref{table:effect}, la memoria \`{e} rappresentata utilizzando celle di dimensione pari 
 ad 1 byte e ciascuna riga \`{e} lunga 64 bit. L'indirizzo posto alla sinistra di ogni riga della tabella \`{e} 
 riferito alla cella di memoria pi\`{u} a destra, che possiede l'indirizzo pi\`{u} basso rispetto alle otto celle in ciascuna linea.
 
@@ -213,7 +213,7 @@ Tale direttiva \`{e} utile quando \`{e} necessario conservare dello spazio in me
 
 \index{.ascii}
 La direttiva \texttt{.ascii} accetta stringhe contenenti un qualunque carattere ASCII, 
-ed alcune ``sequenze di escape”, simili a quelle presenti nel linguaggio C, che sono descritte nella 
+ed alcune ``sequenze di escape'', simili a quelle presenti nel linguaggio C, che sono descritte nella 
 tabella~\ref{table:escaping}, ed inserisce tali stringhe in memoria.
 
 \index{.asciiz}
@@ -229,7 +229,7 @@ con la differenza che essa pone automaticamente alla fine della stringa un byte 
 		\texttt{$\backslash$0} & Byte nullo & 0\\
 		\texttt{$\backslash$t} & Tabulazione orizzontale & 9\\
 		\texttt{$\backslash$n} & Nuova linea & 10\\
-		\texttt{$\backslash$"} & Apici doppi & 34\\
+		\texttt{$\backslash$}`` & Apici doppi & 34\\
 		\texttt{$\backslash\backslash$} & Backslash & 92
 	\end{tabular}
 	\caption{Sequenze di escape}
@@ -296,7 +296,6 @@ che effettuano questo tipo di operazioni.
 Le istruzioni ALU possono essere suddivise in due gruppi: \textbf{tipo R} e \textbf{tipo I}. 
 
 \index{istruzioni!istruzioni ALU}
-Di seguito \`{e} riportata una lista delle istruzioni ALU di tipo R:
 \index{LO}
 \index{HI}
 \index{registri!LO}
@@ -460,13 +459,13 @@ Ecco la lista delle istruzioni ALU di tipo I.
 
 	\index{SLTUI}
 	\index{istruzioni!SLTUI}
-	\item \texttt{ANDI rt, rs, immediato}\\
+	\item \texttt{SLTUI rt, rs, immediato}\\
 	Pone il valore di rt ad 1 se il valore di rs \`{e} minore di quello dell'immediato, 
 	altrimenti pone rt a 0. Questa operazione effettua un confronto senza segno.
 	
 	\index{XORI}
 	\index{istruzioni!XORI}
-	\item \texttt{ANDI rt, rs, immediato}\\
+	\item \texttt{XORI rt, rs, immediato}\\
 	Effettua l'OR esclusivo bit a bit tra rs ed il valore immediato, ponendo il risultato in rt.
 
 \end{itemize}
@@ -788,16 +787,18 @@ Il menu Esegui contiene voci riguardanti il flusso di esecuzione della simulazio
 	\item \textbf{Ciclo singolo} Esegue un singolo passo di simulazione.
 	\item \textbf{Completa} Inizia l'esecuzione, fermandosi quando il simulatore raggiunge una SYSCALL 0 (o equivalente) o
 	un'istruzione di \texttt{BREAK}, oppure quando l'utente seleziona la voce Stop del men\`{u} (o preme F9).  
-	\item \textbf{Cicli multipli} Esegue un certo numero di passi di simulazione, tale valore può essere configurato 
+	\item \textbf{Cicli multipli} Esegue un certo numero di passi di
+    simulazione, tale valore pu\`o essere configurato 
 	attraverso la finestra di configurazione. Vedere la sezione~\ref{dialog-settings} per ulteriori dettagli.
-	\item \textbf{Ferma} Ferma l'esecuzione quando il simulatore \`{e} in modalit\`{a} ``Completa” o ``Cicli multipli”, come descritto precedentemente.
+	\item \textbf{Ferma} Ferma l'esecuzione quando il simulatore \`{e} in
+    modalit\`{a} ``Completa'' o ``Cicli multipli'', come descritto precedentemente.
 \end{itemize}
 Il menu \`{e} disponibile solo quando \`{e} stato caricato un file sorgente e non \`{e} ancora stato raggiunto il termine della simulazione.
 La voce \textbf{Stop} del men\`{u} è disponibile solo in modalit\`{a} ``Completa'' o ``Cicli multipli'' mode.
 
 \index{\EM{}!menu!Configura}
 \subsection{Configura}
-Il menu Configura fornisce l'opportunità di personalizzare l'aspetto ed il funzionamento di \EM{}.
+Il menu Configura fornisce l'opportunit\`a di personalizzare l'aspetto ed il funzionamento di \EM{}.
 \begin{itemize}
 	\item \textbf{Impostazioni...} Apre la finestra di configurazione, descritta nella sezione~\ref{dialog-settings}
 	\item \textbf{Selezione lingua} Consente di modificare la lingua usata dall'interfaccia utente. Attualmente sono 
@@ -877,26 +878,27 @@ ma future versioni includeranno una casella di testo per l'input.
 
 \index{\EM{}!finestre di dialogo}
 \section{Finestre di dialogo}
-Le finestre di dialogo sono utilizzate da EduMIPS64 per interagire con l'utente in vari modi. Ecco un riassunto delle più importanti:
+Le finestre di dialogo sono utilizzate da EduMIPS64 per interagire con l'utente
+in vari modi. Ecco un riassunto delle pi\`u importanti:
 
 \index{\EM{}!finestre di dialogo!Impostazioni}
 \subsection{Impostazioni}
 \label{dialog-settings}
 Nella finestra di configurazione possono essere configurati vari aspetti del simulatore.
 
-La sezione ``Impostazioni generali” consente di configurare il forwarding ed il numero di passi da effettuare nella modalit\`{a} Cicli multipli.
+La sezione ``Impostazioni generali'' consente di configurare il forwarding ed il numero di passi da effettuare nella modalit\`{a} Cicli multipli.
 
-La sezione ``Comportamento” permette di abilitare o disabilitare gli avvisi durante la fase di parsing, 
-l'opzione ``sincronizza la GUI con la CPU nell'esecuzione multi step”, quando abilitata, sincronizzer\`{a}
+La sezione ``Comportamento'' permette di abilitare o disabilitare gli avvisi durante la fase di parsing, 
+l'opzione ``sincronizza la GUI con la CPU nell'esecuzione multi step'', quando abilitata, sincronizzer\`{a}
 lo stato grafico delle finestre con lo stato interno del simulatore. Ci\`{o} implicher\`{a} una simulazione pi\`{u} lenta, 
 ma con la possibilit\`{a} di avere un resoconto grafico esplicito di ci\`{o} che sta avvenendo durante la simulazione. 
-L'opzione ``intervallo tra i cicli”, qualora sia abilitata, influenzer\`{a} il numero di millisecondi che il simulatore dovr\`{a} 
+L'opzione ``intervallo tra i cicli'', qualora sia abilitata, influenzer\`{a} il numero di millisecondi che il simulatore dovr\`{a} 
 attendere prima di cominciare un nuovo ciclo. Tali opzioni hanno effetto solo quando la simulazione \`{e} avviata 
-utilizzando le opzioni ``Completa” o ``Cicli multipli” dal menu Esegui.
+utilizzando le opzioni ``Completa'' o ``Cicli multipli'' dal menu Esegui.
 
 Le ultime due opzioni stabiliscono il comportamento del simulatore quando si verifica un'eccezione sincrona. 
 \`{E} importante notare che se le eccezioni sincrone sono mascherate, non succeder\`{a} nulla, anche se l'opzione 
-``Termina se si verifica un'eccezione sincrona” \`{e} abilitata. Se le eccezioni non sono mascherate e tale opzione \`{e} abilitata, apparir\`{a} una finestra di dialogo, 
+``Termina se si verifica un'eccezione sincrona'' \`{e} abilitata. Se le eccezioni non sono mascherate e tale opzione \`{e} abilitata, apparir\`{a} una finestra di dialogo, 
 e la simulazione sar\`{a} fermata non appena tale finestra verr\`{a} chiusa.
 
 L'ultima sezione permette di modificare i colori associati ai diversi stadi della pipeline. Abbastanza inutile, ma carino.
@@ -929,8 +931,8 @@ Nomi abbreviati e per esteso possono essere utilizzati indifferentemente.
 	\item \texttt{-d (--debug)} Accede alla modalit\`{a} di debugging.
 \end{itemize}
 
-The \texttt{--debug} ha l'effetto di attivare la modalit\`{a} di debugging. 
-In tale modalità \`{e} disponibile una nuova finestra, la finestra Debug, che mostra il resoconto delle 
+L'opzione \texttt{--debug} ha l'effetto di attivare la modalit\`{a} di debugging. 
+In tale modalit\`a \`{e} disponibile una nuova finestra, la finestra Debug, che mostra il resoconto delle 
 attivit\`{a} interne di  \EM{}. Tale finestra non \`{e} utile per l'utente finale, \`{e} stata infatti ideata per poter essere utilizzata 
 dagli sviluppatori di \EM{}.
 
@@ -944,7 +946,7 @@ Per eseguire il file come applicazione a s\`{e} stante, l'eseguibile \texttt{jav
 \texttt{version} deve essere sostituita con la versione attuale del simulatore. 
 Su alcuni sistemi, potrebbe essere possibile eseguire il programma semplicemente con un click sul file \texttt{.jar}.
 
-Per eseguire il file come applet deve essere utilizzato il teg \texttt{<applet>}. Il sito web di \EM{}
+Per eseguire il file come applet deve essere utilizzato il tg \texttt{<applet>}. Il sito web di \EM{}
 presenta una pagina gi\`{a} contenente l'applet, in modo tale che chiunque possa eseguire il programma senza il problema dell'utilizzo da linea di comando.
 
 %\cite{edumips-web} contains a page that already contains the applet, so
