@@ -273,6 +273,15 @@ La dimensione dei valori immediati \`{e} limitata al numero di bit disponibili n
 
 Le istruzioni che possono essere utilizzate in questa sezione saranno discusse nella sezione~\ref{instructions}
 
+\subsection{Il comando \texttt{\#include}}
+I sorgenti possono includere il comando \texttt{\textbf{\#include} nomefile}, che
+ha l'effetto di inserire, al posto della riga contenente questo comando, il
+contenuto del file \texttt{nomefile}.
+Questo comando \`e utile se si vogliono includere delle funzioni esterne, ed \`e
+dotato di un algoritmo di rilevamento dei cicli, che impedisce di eseguire
+inclusioni circolari tipo ``\texttt{\#include A.s}'' nel file \texttt{B.s} e
+``\texttt{\#include B.s}'' nel file \texttt{A.s}.
+
 \chapter{Il repertorio delle istruzioni}
 \label{instructions}
 \index{istruzioni}
