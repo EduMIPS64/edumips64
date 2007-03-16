@@ -269,19 +269,19 @@ The number and the type of parameters depends on the instruction itself.
 %TODO: questa va sicuramente inserita.
 %Please see table~\ref{table:segm-type} for the list of possible parameters.
 
-%Instructions can take three types of parameters:
-%\begin{itemize}
-%	\item \textbf{Registers} a register parameter is indicated by an uppercase
-%	or lowercase ``r'', or a \$, followed by the number of the register (between
-%	0 and 31), as in ``r4'', ``R4'' or ``\$4'';
-%	\item \textbf{Immediate values} an immediate value can be a number or a
-%	label; the number can be specified in base 10 or in base 16: base 10 numbers
-%	are simply inserted by writing the number, while base 16 number are inserted
-%	by putting before the number the prefix``0x''
-%	\item \textbf{Address} an address is composed by an immediate value followed
-%	by a register name enclosed in brackets. The value of the register will be 
-%	used as the offset.
-%\end{itemize}
+Instructions can take three types of parameters:
+\begin{itemize}
+	\item \textbf{Registers} a register parameter is indicated by an uppercase
+    or lowercase ``r'', or a \$, followed by the number of the register (between
+	0 and 31), as in ``r4'', ``R4'' or ``\$4'';
+	\item \textbf{Immediate values} an immediate value can be a number or a
+	label; the number can be specified in base 10 or in base 16: base 10 numbers
+	are simply inserted by writing the number, while base 16 number are inserted
+	by putting before the number the prefix``0x''
+	\item \textbf{Address} an address is composed by an immediate value followed
+	by a register name enclosed in brackets. The value of the register will be 
+	used as the offset.
+\end{itemize}
 
 The size of immediate values is limited by the number of bits that are available
 in the bit encoding of the instruction. 

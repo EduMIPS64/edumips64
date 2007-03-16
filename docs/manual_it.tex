@@ -251,19 +251,21 @@ quando il programma verr\`{a} eseguito. La forma generale di un comando \texttt{
 Il numero e il tipo di parametri dipendono dall'istruzione stessa. 
 %Please see table~\ref{table:segm-type} for the list of possible parameters.
 
-%Instructions can take three types of parameters:
-%\begin{itemize}
-%	\item \textbf{Registers} a register parameter is indicated by an uppercase
-%	or lowercase ``r'', or a \$, followed by the number of the register (between
-%	0 and 31), as in ``r4'', ``R4'' or ``\$4'';
-%	\item \textbf{Immediate values} an immediate value can be a number or a
-%	label; the number can be specified in base 10 or in base 16: base 10 numbers
-%	are simply inserted by writing the number, while base 16 number are inserted
-%	by putting before the number the prefix``0x''
-%	\item \textbf{Address} an address is composed by an immediate value followed
-%	by a register name enclosed in brackets. The value of the register will be 
-%	used as the offset.
-%\end{itemize}
+Le istruzioni possono accettare tre tipi di parametri:
+\begin{itemize}
+	\item \textbf{Registri} un parametro di tipo registro \`e indicato da una
+    ``r'' maiuscola o minuscola, o da un carattere ``\$'', a fianco del numero
+    di registro (tra 0 e 31). Ad esempio, le scritture ``r4'', ``R4'' e ``\$4''
+    identificano tutt'e tre il quarto registro;
+	\item \textbf{Valori immediati} un valore immediato pu\`o essere un numero o
+    un'etichetta; il numero pu\`o essere specificato in base 10 o in base 16. I
+    numeri in base 10 sono inseriti semplicemente scrivendo il numero
+    utilizzando l'usuale notazione decimale; i numeri in base 16 si inseriscono
+    aggiungendo all'inizio del numero il prefisso ``0x'';
+    \item \textbf{Indirizzi} un indirizzo \`e composto da un valore immediato
+    seguito dal nome di un registro tra parentesi. Il valore del registro sar\`a
+    utilizzato come offset.
+\end{itemize}
 
 La dimensione dei valori immediati \`{e} limitata al numero di bit disponibili nella codifica associata all'istruzione. 
 
