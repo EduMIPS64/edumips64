@@ -45,7 +45,7 @@ import javax.imageio.ImageIO;
 
 public class Main extends JApplet{
 
-	public static final String VERSION = "0.3.7";
+	public static final String VERSION = "0.4";
 	static CPU cpu;
 	public static CPUGUIThread cgt;
 	static Parser parser;

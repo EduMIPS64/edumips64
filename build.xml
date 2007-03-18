@@ -2,7 +2,7 @@
 	<target name="init">
 		<property name="sourceDir" value="." />
         <property name="helpClassesDir" value="./javahelp_classes" />
-		<property name="version" value="0.3.7-svn" />
+		<property name="version" value="0.4" />
 		<property name="outputDir" value="edumips" />
 		<property name="jarFile" value="edumips64-${version}.jar" />
 		<property name="tarBz2File" value="edumips64-${version}.tar.bz2" />
