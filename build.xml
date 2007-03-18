@@ -5,7 +5,6 @@
 		<property name="version" value="0.4" />
 		<property name="outputDir" value="edumips" />
 		<property name="jarFile" value="edumips64-${version}.jar" />
-		<property name="tarBz2File" value="edumips64-${version}.tar.bz2" />
 	</target>
 
 	<target name="docs" depends="init">
@@ -21,12 +20,6 @@
 
 	<target name="clean">
 		<delete file="${jarFile}" />
-	</target>
-
-	<target name="package" depends="jar">
-		<move file="${jarFile}" tofile="../${jarFile}" />
-		<tar compression="bzip2" tarfile="../${tarBz2File}"
-			basedir=".." includes="edumips64/" />
 	</target>
 
 	<target name="jar" depends="init">
