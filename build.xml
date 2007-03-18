@@ -31,13 +31,13 @@
 
 	<target name="jar" depends="init">
 		<mkdir dir="${outputDir}" />
-        <javac srcdir="${helpClassesDir}" destdir="${outputDir}" nowarn="yes" />
         <javac srcdir="${sourceDir}" classpath="${helpClassesDir}" destdir="${outputDir}" nowarn="yes"/>
 		<mkdir dir="${outputDir}/edumips64/img" />
 		<mkdir dir="${outputDir}/edumips64/data" />
 		<mkdir dir="${outputDir}/edumips64/utils" />
 		<mkdir dir="${outputDir}/edumips64/help" />
 
+        <!--
 		<copy todir="${outputDir}/javax">
             <fileset dir="${helpClassesDir}/javax">
 				<include name="**/*.*" />
@@ -53,6 +53,7 @@
 				<include name="**/*.*" />
 			</fileset>
 		</copy>
+        -->
 		<copy todir="${outputDir}/edumips64/img">
 			<fileset dir="img">
 				<include name="**/*.png" />
