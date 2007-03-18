@@ -160,6 +160,7 @@ table~\ref{table:datatypes}.
 \index{.word}
 \index{.word16}
 \index{.word32}
+\index{.word64}
 \begin{table}[!htb]
 	\begin{centering}
 		\begin{tabular}{lll}
@@ -170,12 +171,15 @@ table~\ref{table:datatypes}.
 			Byte & \texttt{.byte} & 8\\
 			Half word & \texttt{.word16} & 16\\
 			Word & \texttt{.word32} & 32\\
-			Double Word & \texttt{.word} & 64
+			Double Word & \texttt{.word} or \texttt{.word64} & 64
 		\end{tabular}
 		\caption{Basic data types}
 		\label{table:datatypes}
 	\end{centering}
 \end{table}
+
+Please note that a double word can be introduced either by the \texttt{.word}
+directive or by the \texttt{.word64} directive.
 
 \index{array} There's a big difference between declaring a list of data elements
 using a single directive or by using multiple directives of the same type. \EM{}

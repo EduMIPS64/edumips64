@@ -1,10 +1,12 @@
 EduMIPS64 ChangeLog
 ------------------- 
 
-0.3.7 (?)
+0.4   (18/03/2007)
 	- New PDF manual (andrea)
+	- Italian translation of the PDF manual (simona)
 	- Fixed a bug in SYSCALL 5. (andrea)
-	- New JavaHelp system (Vanni)
+	- #include command (mancausoft)
+	- .word64 directive (andrea)
 
 0.3.6 (10/10/2006)
 	- Added the ability to mask synchronous exceptions and to make those

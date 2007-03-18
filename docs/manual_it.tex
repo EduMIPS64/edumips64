@@ -147,6 +147,7 @@ dell'esecuzione del programma. La forma generale di un comando \texttt{.data} \`
 \index{.word}
 \index{.word16}
 \index{.word32}
+\index{.word64}
 \begin{table}[!htb]
 	\begin{centering}
 		\begin{tabular}{lll}
@@ -157,12 +158,15 @@ dell'esecuzione del programma. La forma generale di un comando \texttt{.data} \`
 			Byte & \texttt{.byte} & 8\\
 			Half word & \texttt{.word16} & 16\\
 			Word & \texttt{.word32} & 32\\
-			Double Word & \texttt{.word} & 64
+			Double Word & \texttt{.word} o \texttt{.word64} & 64
 		\end{tabular}
 		\caption{Basic data types}
 		\label{table:datatypes}
 	\end{centering}
 \end{table}
+
+Dati di tipo doubleword possono essere introdotti sia dalla direttiva
+\texttt{.word} che dalla direttiva \texttt{.word64}.
 
 \index{array} Esiste una differenza sostanziale tra la dichiarazione di una lista di dati 
 utilizzando un'unica direttiva oppure direttive multiple dello stesso tipo.
