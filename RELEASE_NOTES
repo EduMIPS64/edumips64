@@ -1,19 +1,22 @@
-23rd July 2006                                            EduMIPS64 0.3
+18th March 2007                                                    EduMIPS64 0.4
 
 				     EduMIPS64 RELEASE NOTES	
 				     http://www.edumips.org
 
-EduMIPS64 is a GPL porting to Java Swing of the MIPS64 instruction set 
-simulator WinMIPS64
+EduMIPS64 is a GPL MIPS64 Instruction Set Architecture (ISA) simulator and
+graphical debugger.
 
 Notes for this release:
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This is the third public release of EduMIPS64. 
+This is the fourth public release of EduMIPS64. 
 
-The BIG changes from EduMIPS64 are the new error dialogs, that make
-debugging easier, and the "Stop execution" feature, that solves the
-awful "infinite loop" bug.
+Many features have been added since last version, and the product went through
+many development release before this public stable version.
+
+From now on, development will use SVN, so that development releases will be made
+available to the public not only via www.edumips.org, but even via
+SourceForge.org.
 
 Please keep in mind that this is still EXPERIMENTAL SOFTWARE. It may
 BURN YOUR HARD DISK, DESTROY ALL YOUR DATA and even GO OUT WITH YOUR
@@ -33,19 +36,26 @@ New in this release:
 New functionalities:
 --------------------
 
-- New error dialogs (with cute graphics!)
-- Stop execution feature
-- More responsive UI
-- Multi-threaded core
-- Updated manual
-- Ability to choose to see what's going on in the CPU in a multi-step execution
+- New instructions:
+  SYSCALL (or TRAP)
+  BREAK
+- New directives: 
+  .space
+  .word64
+  .ascii
+  .asciiz
+- PDF Manual (English and Italian)
+- Synchronous exception handling (includes masked interrupts)
+- Ability to include other source files (#include)
+- Ant buildfile
+- Debug mode
+- New command line options
 
 Fixed bugs:
 -----------
 
-- ISO-8859-1 files are now handled correctly
-- Misc bugs about registers resetting
-- If a file is not found, fail gracefully
+No known 0.3 bug has been fixed, but there were many internal code improvements
+and cleanups.
 
 Known bugs:
 -----------
