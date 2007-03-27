@@ -55,12 +55,6 @@ class LUI extends ALU_IType
     
     public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
 	//if the source register is valid passing its own values into a temporary register
-        Register rs=cpu.getRegister(params.get(RS_FIELD));
-        if(rs.getWriteSemaphore()>0)
-        {
-            throw new RAWException();
-        }
-        TR[RS_FIELD]=rs;        
         //locking the target register
         Register rt=cpu.getRegister(params.get(RT_FIELD));
         rt.incrWriteSemaphore();
