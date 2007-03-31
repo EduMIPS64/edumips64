@@ -1,10 +1,11 @@
-<project name="edumips64" default="jar" basedir=".">
+<project name="edumips64" default="svnjar" basedir=".">
 	<target name="init">
 		<property name="sourceDir" value="." />
         <property name="helpClassesDir" value="./javahelp_classes" />
 		<property name="version" value="0.4.1" />
 		<property name="outputDir" value="edumips" />
 		<property name="jarFile" value="edumips64-${version}.jar" />
+		<property name="svnJarFile" value="edumips64-svn.jar" />
 	</target>
 
 	<target name="docs" depends="init">
@@ -21,6 +22,37 @@
 	<target name="clean">
 		<delete file="${jarFile}" />
 	</target>
+	<target name="svnjar" depends="init">
+		<mkdir dir="${outputDir}" />
+        <javac srcdir="${sourceDir}" classpath="${helpClassesDir}" destdir="${outputDir}" nowarn="yes"/>
+		<mkdir dir="${outputDir}/edumips64/img" />
+		<mkdir dir="${outputDir}/edumips64/data" />
+		<mkdir dir="${outputDir}/edumips64/utils" />
+		<mkdir dir="${outputDir}/edumips64/help" />
+
+		<copy todir="${outputDir}/edumips64/img">
+			<fileset dir="img">
+				<include name="**/*.png" />
+			</fileset>
+		</copy>
+		<copy todir="${outputDir}/edumips64/data">
+			<fileset dir="data">
+				<include name="**/*.txt" />
+			</fileset>
+		</copy>
+		<copy todir="${outputDir}/edumips64/utils">
+			<fileset dir="utils">
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+		<jar destfile="${svnJarFile}" basedir="edumips">
+			<manifest>
+				<attribute name="Main-Class" value="edumips64.Main"/>
+			</manifest>
+		</jar>
+		<signjar jar="${svnJarFile}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
+        <delete dir="${outputDir}" /> 
+	</target>
 
 	<target name="jar" depends="init">
 		<mkdir dir="${outputDir}" />
@@ -30,23 +62,6 @@
 		<mkdir dir="${outputDir}/edumips64/utils" />
 		<mkdir dir="${outputDir}/edumips64/help" />
 
-        <!--
-		<copy todir="${outputDir}/javax">
-            <fileset dir="${helpClassesDir}/javax">
-				<include name="**/*.*" />
-			</fileset>
-		</copy>
-		<copy todir="${outputDir}/com">
-            <fileset dir="${helpClassesDir}/com">
-				<include name="**/*.*" />
-			</fileset>
-		</copy>
-		<copy todir="${outputDir}/edumips64/help">
-			<fileset dir="help">
-				<include name="**/*.*" />
-			</fileset>
-		</copy>
-        -->
 		<copy todir="${outputDir}/edumips64/img">
 			<fileset dir="img">
 				<include name="**/*.png" />
