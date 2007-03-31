@@ -43,7 +43,7 @@ import javax.imageio.ImageIO;
  * @author Andrea Spadaccini, Antonella Scandura, Vanni Rizzo
  * */
 
-public class Main extends JApplet{
+public class Main extends JApplet {
 
 	public static final String VERSION = "0.4.1";
 	static CPU cpu;
