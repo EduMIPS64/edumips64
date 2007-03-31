@@ -241,10 +241,10 @@ Descrizione:  rt = memory[base+offset]
             
 Istruzione LUI 
 
-Format: LUI rt, rs, immediate
+Format: LUI rt, immediate
 Descrizione:   
-            L'immediato a 16 bit e' shiftato a sinistra e concatenata con zeri nei 16 bit 
-            meno significativi.
+            L'immediato a 16 bit e' shiftato a sinistra di 16 bit e concatenato
+            con zeri nei 16 bit meno significativi.
             
 Istruzione LW 
 

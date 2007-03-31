@@ -176,7 +176,7 @@ Description:  rt = memory[base+offset]
             
 LUI Instruction
 
-Format: LUI rt, rs, immediate
+Format: LUI rt, immediate
 Description:   
             The 16-bit immediate is shifted left 16 bits and concatenated 
             with 16 bits of low-order zeros. 
