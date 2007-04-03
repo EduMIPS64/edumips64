@@ -23,12 +23,16 @@ command shell the command
 Where VERSION is the edumips64 version that you are using.
 
 If you've got the source distribution, before running it you must build
-the .jar file. This requires the Java Development Kit 5 or later.
+the .jar file. This requires the Java Development Kit 5 or later and 
+the Ant tool.
 From a command shell, run the command
 
-	make jar
+	ant
 
 After that, you'll get the .jar file, and you can run it.
+
+If you want you can use the makefile, but it's unmantained and it could
+not work.
 
 Enjoy EduMIPS64!!
 
