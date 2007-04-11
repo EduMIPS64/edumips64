@@ -38,7 +38,7 @@ import java.lang.reflect.Array;
 
 public class Parser
 {
-	private static final String deprecateInstruction[] = {"BNEZ","BEQZ", "HALT"};
+	private static final String deprecateInstruction[] = {"BNEZ","BEQZ", "HALT", "DADDUI"};
 	private class VoidJump 
 	{
 		public Instruction instr;
