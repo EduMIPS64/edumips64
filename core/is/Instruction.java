@@ -109,6 +109,7 @@ public abstract class Instruction {
 			ANDI  { Instruction getObject() { ANDI newObject=new ANDI();return newObject; } },
 			DADDI { Instruction getObject() { DADDI newObject=new DADDI(); return newObject; } },
                         DADDUI{ Instruction getObject() { DADDUI newObject=new DADDUI(); return newObject; } },
+                        DADDIU{ Instruction getObject() { DADDIU newObject=new DADDIU(); return newObject; } },
                         LUI   { Instruction getObject() { LUI newObject=new LUI(); return newObject; } },
                         ORI   { Instruction getObject() { ORI newObject=new ORI(); return newObject; } },
                         SLTI  { Instruction getObject() { SLTI newObject=new SLTI(); return newObject; } },
@@ -141,10 +142,10 @@ public abstract class Instruction {
                         JALR  { Instruction getObject() { JALR newObject=new JALR(); return newObject; } },
                         JR    { Instruction getObject() { JR newObject=new JR(); return newObject; } },
                         BNE   { Instruction getObject() { BNE newObject=new BNE(); return newObject; } },
+                        //Conditional branches
                         BEQ   { Instruction getObject() { BEQ newObject=new BEQ(); return newObject; } },
                         BNEZ   { Instruction getObject() { BNEZ newObject=new BNEZ(); return newObject; } },
                         BEQZ   { Instruction getObject() { BEQZ newObject=new BEQZ(); return newObject; } },
-                        //Conditional branches
                         //Special instructions
                         NOP   { Instruction getObject() {NOP newObject=new NOP(); return newObject; } },
                         BUBBLE{ Instruction getObject() {BUBBLE newObject=new BUBBLE(); return newObject; } },
