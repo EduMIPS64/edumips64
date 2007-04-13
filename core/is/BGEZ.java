@@ -1,5 +1,5 @@
 /*
- * BEQ.java
+ * BGEZ.java
  *
  * 8th may 2006
  * Instruction BEQ of the MIPS64 Instruction Set
@@ -27,34 +27,35 @@ package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
 /** <pre>
- *         Syntax: BEQ rs, rt, offset
- *    Description: if rs = rt then branch
- *                 To compare GPRs then do a PC-relative conditional branch
+ *         Syntax: BGEZ rs, offset
+ *    Description: if rs >= 0  then branch
+ *                 To test a GPR then do a PC-relative conditional branch
  *</pre>
-  * @author Trubia Massimo, Russo Daniele
+  * @author Amdre Milazzo
  */
 
-public class BEQ extends FlowControl_IType {
-    final String OPCODE_VALUE="000100";
-    
-    /** Creates a new instance of BEQ */
-    public BEQ() {
+public class BGEZ extends FlowControl_IType {
+    final String OPCODE_VALUE="000001";
+    final static int OFFSET_FIELD=1;
+    final String RT_VALUE="00001";
+
+    /** Creates a new instance of BGEZ */
+    public BGEZ() {
         super.OPCODE_VALUE = OPCODE_VALUE;
-        syntax="%R,%R,%B";
-	name="BEQ";
+        syntax="%R,%B";
+	name="BGEZ";
     }
 
     public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException,TwosComplementSumException {
-        if(cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore()>0 || cpu.getRegister(params.get(RT_FIELD)).getWriteSemaphore()>0)
+        if(cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore()>0 )
             throw new RAWException();
-        //getting registers rs and rt
+        //getting register rs 
         String rs=cpu.getRegister(params.get(RS_FIELD)).getBinString();
-        String rt=cpu.getRegister(params.get(RT_FIELD)).getBinString();
         //converting offset into a signed binary value of 64 bits in length
         BitSet64 bs=new BitSet64();
         bs.writeHalf(params.get(OFFSET_FIELD));
         String offset=bs.getBinString();
-        boolean condition=rs.equals(rt);
+        boolean condition= rs.charAt(0)=='0';
         if(condition)
         {
             String pc_new="";
@@ -73,6 +74,11 @@ public class BEQ extends FlowControl_IType {
             throw new JumpException(); 
         }    
     }
-
+    public void pack() throws IrregularStringOfBitsException {
+	repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);
+	repr.setBits(Converter.intToBin(RS_FIELD_LENGTH, params.get(RS_FIELD)), RS_FIELD_INIT);
+	repr.setBits(RT_VALUE, RT_FIELD_INIT);
+	repr.setBits(Converter.intToBin(OFFSET_FIELD_LENGTH, params.get(OFFSET_FIELD)/4), OFFSET_FIELD_INIT); 
+    }
     
 }

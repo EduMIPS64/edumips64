@@ -142,10 +142,12 @@ public abstract class Instruction {
                         JALR  { Instruction getObject() { JALR newObject=new JALR(); return newObject; } },
                         JR    { Instruction getObject() { JR newObject=new JR(); return newObject; } },
                         BNE   { Instruction getObject() { BNE newObject=new BNE(); return newObject; } },
+			B     { Instruction getObject() { B newObject=new B(); return newObject; } },
                         //Conditional branches
                         BEQ   { Instruction getObject() { BEQ newObject=new BEQ(); return newObject; } },
                         BNEZ   { Instruction getObject() { BNEZ newObject=new BNEZ(); return newObject; } },
                         BEQZ   { Instruction getObject() { BEQZ newObject=new BEQZ(); return newObject; } },
+                        BGEZ   { Instruction getObject() { BGEZ newObject=new BGEZ(); return newObject; } },
                         //Special instructions
                         NOP   { Instruction getObject() {NOP newObject=new NOP(); return newObject; } },
                         BUBBLE{ Instruction getObject() {BUBBLE newObject=new BUBBLE(); return newObject; } },

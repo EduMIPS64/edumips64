@@ -1,5 +1,5 @@
 /*
- * BEQ.java
+ * B.java
  *
  * 8th may 2006
  * Instruction BEQ of the MIPS64 Instruction Set
@@ -27,52 +27,51 @@ package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
 /** <pre>
- *         Syntax: BEQ rs, rt, offset
- *    Description: if rs = rt then branch
- *                 To compare GPRs then do a PC-relative conditional branch
+ *         Syntax: B offset
+ *         B denote an unconditional branch. The actual instruction is interpreted by the
+ *         hardware as BEQ r0, r0, offset.
+ *    
  *</pre>
-  * @author Trubia Massimo, Russo Daniele
+  * @author Andrea Milazzo 
  */
 
-public class BEQ extends FlowControl_IType {
+public class B extends FlowControl_IType {
     final String OPCODE_VALUE="000100";
-    
-    /** Creates a new instance of BEQ */
-    public BEQ() {
+    final static int OFFSET_FIELD=0;
+
+    /** Creates a new instance of B */
+    public B() {
         super.OPCODE_VALUE = OPCODE_VALUE;
-        syntax="%R,%R,%B";
-	name="BEQ";
+        syntax="%B";
+	name="B";
     }
 
     public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException,TwosComplementSumException {
-        if(cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore()>0 || cpu.getRegister(params.get(RT_FIELD)).getWriteSemaphore()>0)
-            throw new RAWException();
-        //getting registers rs and rt
-        String rs=cpu.getRegister(params.get(RS_FIELD)).getBinString();
-        String rt=cpu.getRegister(params.get(RT_FIELD)).getBinString();
+                //getting registers rs and rt
         //converting offset into a signed binary value of 64 bits in length
         BitSet64 bs=new BitSet64();
         bs.writeHalf(params.get(OFFSET_FIELD));
         String offset=bs.getBinString();
-        boolean condition=rs.equals(rt);
-        if(condition)
-        {
-            String pc_new="";
-            Register pc=cpu.getPC();
-            String pc_old=cpu.getPC().getBinString();
-            
-            //subtracting 4 to the pc_old temporary variable using bitset64 safe methods
-            BitSet64 bs_temp=new BitSet64();
-            bs_temp.writeDoubleWord(-4);
-            pc_old=InstructionsUtils.twosComplementSum(pc_old,bs_temp.getBinString());
-            
-            //updating program counter
-            pc_new=InstructionsUtils.twosComplementSum(pc_old,offset);
-            pc.setBits(pc_new,0);
-             
-            throw new JumpException(); 
-        }    
-    }
+        
+	String pc_new="";
+	Register pc=cpu.getPC();
+	String pc_old=cpu.getPC().getBinString();
 
+	//subtracting 4 to the pc_old temporary variable using bitset64 safe methods
+	BitSet64 bs_temp=new BitSet64();
+	bs_temp.writeDoubleWord(-4);
+	pc_old=InstructionsUtils.twosComplementSum(pc_old,bs_temp.getBinString());
+
+	//updating program counter
+	pc_new=InstructionsUtils.twosComplementSum(pc_old,offset);
+	pc.setBits(pc_new,0);
+
+	throw new JumpException(); 
+    }    
     
+    public void pack() throws IrregularStringOfBitsException {
+	repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);
+	repr.setBits(Converter.intToBin(OFFSET_FIELD_LENGTH, params.get(OFFSET_FIELD)/4), OFFSET_FIELD_INIT); 
+    }    
+
 }

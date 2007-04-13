@@ -29,7 +29,7 @@ import edumips64.core.*;
 import edumips64.utils.*;
 
 /** <pre>
- *        Syntax: BNEZ rs, offset
+ *        Syntax: BNQZ rs, offset
  *   Description: if rs == 0 then branch
  *                To test a GPR then do a PC-relative conditional branch
  *</pre>
