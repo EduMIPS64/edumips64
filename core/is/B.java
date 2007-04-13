@@ -3,7 +3,7 @@
  *
  * 8th may 2006
  * Instruction BEQ of the MIPS64 Instruction Set
- * (c) 2006 EduMips64 project - Trubia Massimo, Russo Daniele
+ * (c) 2006 EduMips64 project - Andrea Milazzo (MancaUSoft) 
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
