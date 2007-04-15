@@ -24,6 +24,11 @@ Description: rt = rs AND immediate
             with the contents of GPR rs in a bitwise logical AND
             operation. The result is placed into GPR rt.
             
+B Instruction
+
+Syntax: B offset
+Description: Jumps inconditionally to offset
+
 BEQ Instruction
 
 Syntax: BEQ rs, rt, offset
@@ -32,10 +37,16 @@ Description: if rs = rt then branch
             
 BEQZ Instruction
 
-Syntax: BNEZ rs, offset
+Syntax: BEQZ rs, offset
 Description: if rs == 0 then branch
             To test a GPR then do a PC-relative conditional branch
              
+BGEZ Instruction
+
+Syntax: BGEZ rs, offset
+Description: if rs >= 0 then branch
+            Does a PC-relative branch to offset if rs >= 0
+
 BNE Instruction
 
 Syntax: BNE rt, rs, immediate

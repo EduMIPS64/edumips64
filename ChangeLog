@@ -1,9 +1,16 @@
 EduMIPS64 ChangeLog
 ------------------- 
 
+0.4.2 ()
+	- Added DADDIU instruction, and marked DADDUI as deprecated (mancausoft)
+	- New instructions: B and BGEZ (mancausoft)
+	- Updated all the manuals (andrea)
+	- Bug fixes for the manuals (andrea)
+
 0.4.1 (31/03/2007)
 	- Corrected a bug in the LUI instruction (mancausoft)
 	- Corrected a bug in the manual regarding the LUI instruction (andrea)
+
 0.4   (18/03/2007)
 	- New PDF manual (andrea)
 	- Italian translation of the PDF manual (simona)

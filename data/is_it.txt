@@ -20,6 +20,11 @@ Descrizione: rt = rs AND immediato
             L'immediato a 16 bit "is zero-extended to the left" e successivamente
             viene effettuato l'AND bit a bit. Il risultato viene memorizzato nel 
             registro rt.
+
+Istruzione B
+
+Sintassi: B offset
+Descrizione: Effettua un salto incondizionato ad offset
             
 Istruzione BEQ 
 
@@ -32,6 +37,12 @@ Istruzione BEQZ
 Sintassi: BEQZ rs, offset
 Descrizione: if rs == 0 then branch
             Verifica il valore di un GPR ed effettua un salto condizionale.
+
+Istruzione BGEZ
+
+Sintassi: BGEZ rs, offset
+Descrizione: if rs >= 0 then branch
+            Se rs >= 0, effettua un salto relativo al PC ad offset.
              
 Istruzione BNE 
 
