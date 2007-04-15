@@ -9,7 +9,7 @@
 \newcommand{\EM}{EduMIPS64}
 \newcommand{\EV}{0.4}
 \newcommand{\MS}{MIPS64}
-\newcommand{\WARN}{\textbf{WARNING:} Questa \`{e} un'istruzione deprecated, che
+\newcommand{\WARN}{\textbf{ATTENZIONE:} Questa \`{e} un'istruzione deprecated, che
 non appartiene al repertorio delle istruzioni \MS{}, ma \`{e} stata inclusa nel set di
 istruzioni per mantenere la compatibilit\`{a} con altri simulatori.}
 
@@ -453,11 +453,18 @@ Ecco la lista delle istruzioni ALU di tipo I.
 	Effettua la somma tra rs ed il valore immediato, ponendo il risultato in rt. 
 	Questa istruzione considera gli operandi come valori con segno.
 
+	\index{DADDIU}
+	\index{istruzioni!DADDIU}
+	\item \texttt{DADDIU rt, rs, immediato}\\
+	Effettua la somma tra rs ed il valore immediato, ponendo il risultato in rt. 
+	Questa istruzione considera gli operandi come valori senza segno.
+
 	\index{DADDUI}
 	\index{istruzioni!DADDUI}
 	\item \texttt{DADDUI rt, rs, immediato}\\
 	Effettua la somma tra rs ed il valore immediato, ponendo il risultato in rt. 
-	Questa istruzione considera gli operandi come valori senza segno.
+	Questa istruzione considera gli operandi come valori senza segno.\\
+    \WARN{}
 
 	\index{LUI}
 	\index{istruzioni!LUI}

@@ -486,12 +486,20 @@ Here's the list of I-Type ALU Instructions.
 	rt. This instruction considers rs and the immediate value as signed
 	values.
 
+	\index{DADDIU}
+	\index{instructions!DADDIU}
+	\item \texttt{DADDIU rt, rs, immediate}\\
+	Executes the sum between rs and the immediate value, putting the result in
+	rt. This instruction considers rs and the immediate value as unsigned
+	values.
+
 	\index{DADDUI}
 	\index{instructions!DADDUI}
 	\item \texttt{DADDUI rt, rs, immediate}\\
 	Executes the sum between rs and the immediate value, putting the result in
 	rt. This instruction considers rs and the immediate value as unsigned
 	values.
+    \WARN{}
 
 	\index{LUI}
 	\index{instructions!LUI}
