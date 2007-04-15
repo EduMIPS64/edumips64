@@ -1,9 +1,8 @@
 /*
  * BGEZ.java
  *
- * 8th may 2006
- * Instruction BEQ of the MIPS64 Instruction Set
- * (c) 2006 EduMips64 project - Andrea Milazzo (MancaUSoft)
+ * Instruction BGEZ of the MIPS64 Instruction Set
+ * (c) 2007 EduMips64 project - Andrea Milazzo (MancaUSoft)
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -31,7 +30,7 @@ import edumips64.utils.*;
  *    Description: if rs >= 0  then branch
  *                 To test a GPR then do a PC-relative conditional branch
  *</pre>
-  * @author Amdre Milazzo
+  * @author Andrea Milazzo
  */
 
 public class BGEZ extends FlowControl_IType {
@@ -43,7 +42,7 @@ public class BGEZ extends FlowControl_IType {
     public BGEZ() {
         super.OPCODE_VALUE = OPCODE_VALUE;
         syntax="%R,%B";
-	name="BGEZ";
+        name="BGEZ";
     }
 
     public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException,TwosComplementSumException {
