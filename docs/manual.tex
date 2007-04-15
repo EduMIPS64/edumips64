@@ -652,6 +652,11 @@ List of R-Type flow control instructions:
 List of I-Type flow control instructions:
 
 \begin{itemize}
+	\index{B}
+	\index{instructions!B}
+	\item \texttt{B offset}\\
+	Unconditionally jumps to offset
+
 	\index{BEQ}
 	\index{instructions!BEQ}
 	\item \texttt{BEQ rs, rt, offset}\\
@@ -662,6 +667,11 @@ List of I-Type flow control instructions:
 	\item \texttt{BEQZ rs, offset}\\
 	Jumps to offset if rs is equal to zero.\\
 	\WARN
+
+	\index{BGEZ}
+	\index{instructions!BGEZ}
+	\item \texttt{BGEZ rs, offset}\\
+	If rs is greather than zero, does a PC-relative jump to offset.
 
 	\index{BNE}
 	\index{instructions!BNE}

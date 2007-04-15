@@ -612,6 +612,11 @@ Ecco la lista delle istruzioni di controllo del flusso di tipo R:
 Ed ecco le istruzioni di controllo del flusso di tipo I:
 
 \begin{itemize}
+	\index{B}
+	\index{instructions!B}
+	\item \texttt{B offset}\\
+	Salto incondizionato ad offset.
+
 	\index{BEQ}
 	\index{istruzioni!BEQ}
 	\item \texttt{BEQ rs, rt, offset}\\
@@ -622,6 +627,11 @@ Ed ecco le istruzioni di controllo del flusso di tipo I:
 	\item \texttt{BEQZ rs, offset}\\
 	Salta ad offset se rs \`{e} uguale a zero.\\
 	\WARN
+
+	\index{BGEZ}
+	\index{instructions!BGEZ}
+	\item \texttt{BGEZ rs, offset}\\
+	Effettua un salto relativo al PC ad offset se rs \`e maggiore di zero.
 
 	\index{BNE}
 	\index{istruzioni!BNE}
