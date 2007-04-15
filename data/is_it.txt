@@ -216,19 +216,6 @@ Sintassi: LD rt, offset(base)
 Descrizione: rt = memory[base+offset]
             Carica una doubleword dalla memoria.
             
-Istruzione LH 
-
-Sintassi: LH rt, offset(base)
-Descrizione: rt = memory[base+offset]
-            Carica un'halfword dalla memoria come valore con segno.
-            
-Istruzione LHU 
-            
-Sintassi: LHU rt, offset(base)
-Descrizione:  rt = memory[base+offset]    
-            Carica un'halfword dalla memoria come valore senza segno.
-Istruzione LH 
-
 Sintassi: LH rt, offset(base)
 Descrizione: rt = memory[base+offset]
             Carica una halfword dalla memoria come valore con segno.
