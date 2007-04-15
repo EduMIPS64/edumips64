@@ -69,9 +69,9 @@ Description: rd = rs + rt
   		    in GPR rs and the 64-bit arithmetic result is placed into GPR rd.
   		    No Integer Overflow exception occurs under any circumstances.
             
-DADDUI Instruction
+DADDIU Instruction
 
-Syntax: DADDUI rt, rs, immediate
+Syntax: DADDIU rt, rs, immediate
 Description: 
             To add a constant to a 64-bit integer
             The 16-bit signed immediate is added to the 64-bit value 

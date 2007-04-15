@@ -66,9 +66,9 @@ Descrizione: rd = rs + rt
             il risultato e' memorizzato nel registro rd.
             Non si verificano eccezioni di overflow.
             
-Istruzione DADDUI 
+Istruzione DADDIU 
 
-Sintassi: DADDUI rt, rs, immediate
+Sintassi: DADDIU rt, rs, immediate
 Descrizione: 
             Somma una costante ad un registro a 64 bit.
             L'immediato con segno e' sommato al valore a 64 bit del GPR rs,
