@@ -45,7 +45,7 @@ import javax.imageio.ImageIO;
 
 public class Main extends JApplet {
 
-	public static final String VERSION = "0.4.1";
+	public static final String VERSION = "0.4.2";
 	static CPU cpu;
 	public static CPUGUIThread cgt;
 	static Parser parser;
@@ -419,6 +419,7 @@ public class Main extends JApplet {
 
 			// The file has correctly been parsed
 			cpu.setStatus(CPU.CPUStatus.RUNNING);
+			logger.debug("Set the status to RUNNING");
 
 			// Let's fetch the first instruction
 			cgt.setSteps(1);
@@ -510,20 +511,20 @@ public class Main extends JApplet {
 	}
 
 	public static void resetSimulator() {
-		cpu.reset();
-		try {
-			iom.reset();
-		}
-		catch(IOException e1) {
-			logger.debug("I/O error while resetting IOManager");
-		}
-		cpu.setStatus(CPU.CPUStatus.READY);
-		front.updateComponents();
-		front.represent();
-		if(openedFile != null)
-			openFile(openedFile);
+        cpu.reset();
+        try {
+            iom.reset();
+        }
+        catch(IOException e1) {
+            logger.debug("I/O error while resetting IOManager");
+        }
+        cpu.setStatus(CPU.CPUStatus.READY);
+        front.updateComponents();
+        front.represent();
+        if(openedFile != null)
+            openFile(openedFile);
 
-		changeShownMenuItems(cpu.getStatus());
+        changeShownMenuItems(cpu.getStatus());
 	}
 
 	/** Sets the menu items captions, adding, if possible, the mnemonic. */

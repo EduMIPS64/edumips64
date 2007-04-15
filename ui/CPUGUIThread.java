@@ -136,6 +136,10 @@ public class CPUGUIThread extends Thread{
 								front.represent();
 							}
 						}
+                        catch(StoppedCPUException ex) {
+							edumips64.Main.logger.debug("CPUGUIThread: CPU was stopped");
+                            break;
+                        }
 						catch(BreakException ex) {
 							front.updateComponents();
 							if(verbose) {
@@ -156,6 +160,7 @@ public class CPUGUIThread extends Thread{
 							break;
 						}
 						catch(Exception ex) {
+                            Main.logger.debug("Exception in CPUGUIThread");
 							haltCPU();
 							new ReportDialog(f,ex,CurrentLocale.getString("GUI_STEP_ERROR"));
 							break;
@@ -182,6 +187,10 @@ public class CPUGUIThread extends Thread{
 								front.represent();
 							}
 						}
+                        catch(StoppedCPUException ex) {
+							edumips64.Main.logger.debug("CPUGUIThread: CPU was stopped");
+                            break;
+                        }
 						catch(BreakException ex) {
 							edumips64.Main.logger.debug("Caught a BreakException.");
 							front.updateComponents();
