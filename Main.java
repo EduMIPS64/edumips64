@@ -663,6 +663,7 @@ public class Main extends JApplet {
         dinero_tracefile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
         dinero_tracefile.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                jfc.setSelectedFile(new File(openedFile + ".xdin"));
                 int val = jfc.showSaveDialog(f);
                 if(val==JFileChooser.APPROVE_OPTION) {
                     String filename = jfc.getSelectedFile().getPath();
