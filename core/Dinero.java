@@ -119,12 +119,9 @@ catch(IrregularStringOfHexException ex)
 	 */
 	public void WriteXdinFile (String filename) throws java.io.IOException
 	{
-		if(CPU.getInstance().getStatus() == CPU.CPUStatus.RUNNING)
-		{
-			BufferedWriter out = new BufferedWriter(new FileWriter(filename));
-			writeTraceData(out);
-			out.close();
-		}
+        BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+        writeTraceData(out);
+        out.close();
 	}
 	/** Calculate the offset */
 	public void findOffset ()

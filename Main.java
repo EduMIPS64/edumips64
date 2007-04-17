@@ -669,9 +669,11 @@ public class Main extends JApplet {
                     Dinero din = Dinero.getInstance();
                     try {
                         din.WriteXdinFile(filename);
+                        logger.debug("Wrote dinero tracefile");
                     }
                     catch (Exception ex) {
                         ex.printStackTrace();
+                        logger.debug("Exception in DineroTracefile: " + ex);
                     }
                 }
             }
