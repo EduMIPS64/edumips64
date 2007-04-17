@@ -27,6 +27,7 @@
 package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
+import java.math.BigInteger;
 
 //per diagnostica
 import java.util.*;
@@ -46,8 +47,10 @@ class DMULT extends ALU_RType
 {
     final int RS_FIELD=0;
     final int RT_FIELD=1;
-    final int LO_REG=2;
     final String OPCODE_VALUE="011100";
+
+    String lo;
+    String hi;
     
 	public DMULT()
 	{
@@ -64,26 +67,37 @@ class DMULT extends ALU_RType
         TR[RS_FIELD]=rs;
         TR[RT_FIELD]=rt;
         //locking the destination register 
-        cpu.getLO().incrWriteSemaphore();
   
+        cpu.getLO().incrWriteSemaphore();
+        cpu.getHI().incrWriteSemaphore();
     }
 	public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException 
 	{
 
 		//getting values from temporary registers
 		boolean sign;
-		long rs=TR[RS_FIELD].getValue();
-		long rt=TR[RT_FIELD].getValue();
-
-		long result= rs*rt;
-
-		//writing result in temporary registers
-		try{
-			TR[LO_REG].writeDoubleWord(result);
-		}catch(IrregularWriteOperationException e)
+		BigInteger rs = new BigInteger(Long.toString(TR[RS_FIELD].getValue()));
+		BigInteger rt = new BigInteger(Long.toString(TR[RT_FIELD].getValue()));
+		BigInteger result= rs.multiply(rt);
+		
+		// Convert result to a String of 128-bit 
+		String tmp = result.toString(2);
+		if (tmp.charAt(0) =='-')
 		{
-			e.printStackTrace();
+		    tmp = tmp.substring(1);
+		    tmp = Converter.twoComplement(tmp);
+		    while (tmp.length()<128)
+			tmp = "1" + tmp;
 		}
+		else
+		    while (tmp.length()<128)
+			tmp = "0" + tmp;
+		
+		hi = tmp.substring(0,64);
+		lo = tmp.substring(64);
+
+		System.out.println("bitCount(): " + result.bitCount() +" bitLength(): "+ result.bitLength());
+	
 		if(enableForwarding)
 		{
 			doWB();
@@ -99,9 +113,13 @@ class DMULT extends ALU_RType
     public void doWB() throws IrregularStringOfBitsException 
     {
         //passing results from temporary registers to destination registers and unlocking them
-        Register lo=cpu.getLO();
-        lo.setBits(TR[LO_REG].getBinString(),0);
+        Register lo = cpu.getLO();
+	Register hi = cpu.getHI();
+        lo.setBits(this.lo,0);
+	hi.setBits(this.hi,0);
+
         lo.decrWriteSemaphore();
+        hi.decrWriteSemaphore();
     }
     public void pack() throws IrregularStringOfBitsException 
     {
