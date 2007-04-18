@@ -39,26 +39,5 @@ import edumips64.utils.*;
  * @author Trubia Massimo, Russo Daniele
  */
 
-class DADDUI extends ALU_IType
-{
-   final String OPCODE_VALUE="011001";
-   DADDUI()
-    {
-	super.OPCODE_VALUE = OPCODE_VALUE;
-	this.name="DADDUI";
-    }
-    
-    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException,IrregularWriteOperationException
-    {
-	//getting values from temporary registers
-	long imm=TR[IMM_FIELD].getValue();
-        long rs=TR[RS_FIELD].getValue();
-        //adding values without to control integer overflow
-        long result=imm+rs;
-        TR[RT_FIELD].writeDoubleWord(result);
-	if(enableForwarding)
-	{
-		doWB();
-	}
-    }
-}
+class DADDUI extends DADDIU {}
+
