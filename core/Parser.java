@@ -38,8 +38,10 @@ import java.lang.reflect.Array;
 
 public class Parser
 {
+	private enum AliasRegister 
+    {zero,at,v0,v1,a0,a1,a2,a3,t0,t1,t2,t3,t4,t5,t6,t7,s0,s1,s2,s3,s4,s5,s6,s7,t8,t9,k0,k1,gp,sp,fp,ra};
 	private static final String deprecateInstruction[] = {"BNEZ","BEQZ", "HALT", "DADDUI"};
-	private class VoidJump 
+	private class VoidJump
 	{
 		public Instruction instr;
 		public String label;
@@ -49,7 +51,7 @@ public class Parser
 		String line;
 		boolean isBranch = false;
 	}
-	ParserMultiWarningException warning; 
+	ParserMultiWarningException warning;
 	ParserMultiException error;
 	boolean isFirstOutOfMemory;
 	String path;
@@ -67,13 +69,13 @@ public class Parser
 	int memoryCount;
 	String filename;
 	private SymbolTable symTab;
-	
+
 	/** Singleton pattern constructor
 	*/
 	private Parser () {
 		symTab = SymbolTable.getInstance();
 	}
-	/** Singleton Pattern implementation 
+	/** Singleton Pattern implementation
 	 *  @return get the Singleton instance of the Parser
 	 */
 	public static Parser getInstance()
@@ -85,31 +87,31 @@ public class Parser
 
 	private String fileToString(BufferedReader in) throws IOException
 	{
-		String ret = ""; 
+		String ret = "";
 
 		int charRead =0;
 		String line;
 
 		while ((line = in.readLine())!=null)
-		{	
+		{
 			String tmp = cleanFormat(line);
 			if (tmp!=null)
 				ret += tmp + "\n";
 		}while (charRead == 1024);
-		
+
 		return ret;
 	}
-	
-	/**  
+
+	/**
 	 *
 	 */
 	private void checkLoop(String data, Stack<String> included ) throws IOException, ParserMultiException
 	{
 		int i = 0;
-		do 
+		do
 		{
 			i = data.indexOf("#include ",i);
-			
+
 			if (i != -1)
 			{
 				int end = data.indexOf("\n", i);
@@ -117,7 +119,7 @@ public class Parser
 				{
 					end = data.length();
 				}
-				int a = included.search(data.substring(i+9, end ).trim()); 
+				int a = included.search(data.substring(i+9, end ).trim());
 				if ( a!= -1)
 				{
 					error = new ParserMultiException ();
@@ -134,12 +136,12 @@ public class Parser
 		}while(i!=-1);
 	}
 
-	/** Process the #include (Syntax #include file.ext ) 
+	/** Process the #include (Syntax #include file.ext )
 	 */
 	private String preprocessor() throws IOException, ParserMultiException
 	{
 		String filetmp = "";
-		
+
 		filetmp = fileToString(in);
 
 		int i=0;
@@ -147,15 +149,15 @@ public class Parser
 		//check loop
 		Stack<String> included = new Stack<String>();
 		included.push(this.filename);
-		
-		checkLoop(filetmp, included);	
+
+		checkLoop(filetmp, included);
 		// include
-		do 
+		do
 		{
 			i = filetmp.indexOf("#include ",i);
 			if (i != -1)
 			{
-				int end = filetmp.indexOf("\n", i);	
+				int end = filetmp.indexOf("\n", i);
 				if (end == -1)
 				{
 					end = filetmp.length();
@@ -167,7 +169,7 @@ public class Parser
 				filetmp = filetmp.substring(0,i) + fileToString (new BufferedReader(new InputStreamReader(new FileInputStream(filename)
 					,"ISO-8859-1"))) + filetmp.substring(end);
 			}
-			
+
 		}while(i!=-1);
 
 		return filetmp;
@@ -196,7 +198,7 @@ public class Parser
 		parse(code.toCharArray());
 
 	}
-	/** Loading from buffer 
+	/** Loading from buffer
 	 * @param buffer An Array of char with the MIPS code
 	 * */
 	public void parse(char[] buffer)  throws  IOException,ParserMultiException
@@ -204,10 +206,10 @@ public class Parser
 		in = new BufferedReader(new CharArrayReader(buffer));
 		doParsing();
 	}
-	/** commit the parsing (public or private?) 
+	/** commit the parsing (public or private?)
 	*/
 	private void doParsing () throws IOException,ParserMultiException
-	{  
+	{
 
 		boolean isFirstOutOfInstructionMemory = false;
 		isFirstOutOfMemory = true;
@@ -228,9 +230,9 @@ public class Parser
 		memoryCount=0;
 		String lastLabel ="";
 
-		while ((line = in.readLine())!=null) //read all file 
+		while ((line = in.readLine())!=null) //read all file
 		{
-			row++; 
+			row++;
 			for(int i=0; i<line.length(); i++)
 			{
 				if(line.charAt(i)==';') //comments
@@ -278,7 +280,7 @@ public class Parser
 								else
 									parameters = line.substring(end + 2);
 							}
-							catch (StringIndexOutOfBoundsException e) {	
+							catch (StringIndexOutOfBoundsException e) {
 								numWarning++;
 								warning.add("VALUE_MISS", row, i+1, line);
 								error.addWarning("VALUE_MISS", row, i+1, line);
@@ -286,7 +288,7 @@ public class Parser
 								i = line.length();
 								continue;
 							}
-							if (instr==null) {	
+							if (instr==null) {
 								numWarning++;
 								warning.add("VALUE_MISS", row, i+1, line);
 								error.addWarning("VALUE_MISS", row, i+1, line);
@@ -380,7 +382,7 @@ public class Parser
 									// TODO: more descriptive error message
 									error.add("INVALIDVALUE",row,0,line);
 								}
-								end = line.length();	
+								end = line.length();
 							}
 							else if(instr.compareToIgnoreCase(".SPACE") == 0) {
 								int posInWord=0;  //position of byte to write into a doubleword
@@ -400,8 +402,8 @@ public class Parser
 											tmpMem.writeByte(0,posInWord++);
 										}
 									}
-									else				
-									{	
+									else
+									{
 										throw new NumberFormatException();
 									}
 								}
@@ -417,17 +419,17 @@ public class Parser
 									continue;
 								}
 								posInWord ++;
-								end = line.length();	
+								end = line.length();
 							}
 							else if(instr.compareToIgnoreCase(".WORD")==0 || instr.compareToIgnoreCase(".WORD64")==0)
 							{
 								writeIntegerInMemory(row, i, end, line, parameters, 64, "WORD");
-								end = line.length();	
+								end = line.length();
 							}
 							else if (instr.compareToIgnoreCase(".WORD32")==0)
-							{	
+							{
 								writeIntegerInMemory(row, i, end, line, parameters, 32, "WORD32");
-								end = line.length();	
+								end = line.length();
 							}
 							else if(instr.compareToIgnoreCase(".BYTE")==0)
 							{
@@ -435,7 +437,7 @@ public class Parser
 								end = line.length();
 							}
 							else if(instr.compareToIgnoreCase(".WORD16")==0)
-							{ 
+							{
 								writeIntegerInMemory(row, i, end, line, parameters,16 , "WORD16");
 								end = line.length();
 							}
@@ -451,7 +453,7 @@ public class Parser
 					else if(line.charAt(end)==':')
 					{
 						edumips64.Main.logger.debug("Processing a label..");
-						if(status==1) 
+						if(status==1)
 						{
 							edumips64.Main.logger.debug("in .data section");
 							MemoryElement tmpMem = null;
@@ -464,15 +466,15 @@ public class Parser
 								edumips64.Main.logger.debug("Label " + line.substring(i, end) + " is already assigned");
 							}
 						}
-						else if(status==2) 
+						else if(status==2)
 						{
 							edumips64.Main.logger.debug("in .text section");
 							lastLabel = line.substring(i,end);
-						}		
+						}
 						edumips64.Main.logger.debug("done");
 					}
 					else
-					{	
+					{
 						if(status!=2)
 						{
 							numError++;
@@ -486,14 +488,14 @@ public class Parser
 							boolean doPack = true;
 							end++;
 							Instruction tmpInst;
-							
+
 							// Check for halt-like instructions
 							String temp = cleanFormat(line.substring(i)).toUpperCase();
 							if(temp.equals("HALT") || temp.equals("SYSCALL 0") || temp.equals("TRAP 0")) {
 								halt = true;
 							}
 
-							//timmy 
+							//timmy
 							for(int timmy = 0; timmy < Array.getLength(deprecateInstruction); timmy++)
 							{
 								if(deprecateInstruction[timmy].toUpperCase().equals(line.substring(i, end).toUpperCase()))
@@ -509,7 +511,7 @@ public class Parser
 								numError++;
 								error.add("INVALIDCODE",row,i+1,line);
 								i = line.length();
-								continue;	
+								continue;
 							}
 
 
@@ -596,7 +598,7 @@ public class Parser
 													{
 														imm=0;
 														numError++;
-														error.add("IMMEDIATE_TOO_LARGE",row,line.indexOf(param.substring(indPar,endPar))+1,line);	
+														error.add("IMMEDIATE_TOO_LARGE",row,line.indexOf(param.substring(indPar,endPar))+1,line);
 													}
 													tmpInst.getParams().add(imm);
 													indPar = endPar+1;
@@ -605,7 +607,7 @@ public class Parser
 												{
 													try
 													{
-														try 
+														try
 														{
 															imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar,endPar)));
 															if( imm < -32768 || imm > 32767)
@@ -649,7 +651,7 @@ public class Parser
 															{
 																imm=0;
 																numError++;
-																error.add("IMMEDIATE_TOO_LARGE",row,line.indexOf(param.substring(indPar,endPar))+1,line);	
+																error.add("IMMEDIATE_TOO_LARGE",row,line.indexOf(param.substring(indPar,endPar))+1,line);
 															}
 															tmpInst.getParams().add(tmpMem.getAddress() + imm);
 															indPar = endPar+1;
@@ -658,7 +660,7 @@ public class Parser
 														{
 															try
 															{
-																try 
+																try
 																{
 																	imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar,endPar)));
 																	if( imm < -32768 || imm > 32767)
@@ -677,7 +679,7 @@ public class Parser
 															{
 																//non ci dovrebbe mai arrivare
 															}
-														}  
+														}
 														else
 														{
 															MemoryElement tmpMem1 = symTab.getCell(param.substring(cc+1,endPar).trim());
@@ -705,7 +707,7 @@ public class Parser
 																{
 																	imm=0;
 																	numError++;
-																	error.add("IMMEDIATE_TOO_LARGE",row,line.indexOf(param.substring(indPar,endPar))+1,line);	
+																	error.add("IMMEDIATE_TOO_LARGE",row,line.indexOf(param.substring(indPar,endPar))+1,line);
 																}
 																tmpInst.getParams().add(tmpMem.getAddress() - imm);
 																indPar = endPar+1;
@@ -714,7 +716,7 @@ public class Parser
 															{
 																try
 																{
-																	try 
+																	try
 																	{
 																		imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar,endPar)));
 																		if( imm < -32768 || imm > 32767)
@@ -733,7 +735,7 @@ public class Parser
 																{
 																	//non ci dovrebbe mai arrivare
 																}
-															}  
+															}
 															else
 															{
 																MemoryElement tmpMem1 = symTab.getCell(param.substring(cc+1,endPar).trim());
@@ -835,7 +837,7 @@ public class Parser
 													}
 												}
 
-											}	
+											}
 											else
 											{
 												numError++;
@@ -851,7 +853,7 @@ public class Parser
 											if(z!=syntax.length()-1)
 												endPar = param.indexOf(syntax.charAt(++z),indPar);
 											else
-												endPar = param.length(); 	
+												endPar = param.length();
 											if (endPar==-1)
 											{
 												numError++;
@@ -859,17 +861,17 @@ public class Parser
 												i = line.length();
 												tmpInst.getParams().add(0);
 												continue;
-											}	
+											}
 											try
 											{
 												MemoryElement tmpMem;
 												if(param.substring(indPar,endPar).equals(""))
 													tmpInst.getParams().add(0);
-												else if(isNumber(param.substring(indPar,endPar).trim())) 
+												else if(isNumber(param.substring(indPar,endPar).trim()))
 												{
 													tmpInst.getParams().add(Integer.parseInt(param.substring(indPar,endPar).trim()));
 												}
-												else 
+												else
 												{
 													int offset=0,cc;
 
@@ -877,7 +879,7 @@ public class Parser
 													if (cc!=-1)
 													{
 														tmpMem = symTab.getCell(param.substring(indPar,cc).trim());
-														try 
+														try
 														{
 															tmpInst.getParams().add(tmpMem.getAddress() + Integer.parseInt(param.substring(cc+1,endPar)));
 														}
@@ -899,7 +901,7 @@ public class Parser
 														if (cc!=-1)
 														{
 															tmpMem = symTab.getCell(param.substring(indPar,cc).trim());
-															try 
+															try
 															{
 																tmpInst.getParams().add(tmpMem.getAddress() - Integer.parseInt(param.substring(cc+1,endPar)));
 															}
@@ -919,7 +921,7 @@ public class Parser
 															tmpInst.getParams().add(tmpMem.getAddress());
 														}
 													}
-												}	
+												}
 												indPar = endPar+1;
 											}
 											catch (MemoryElementNotFoundException e)
@@ -938,7 +940,7 @@ public class Parser
 											if(z!=syntax.length()-1)
 												endPar = param.indexOf(syntax.charAt(++z),indPar);
 											else
-												endPar = param.length(); 	
+												endPar = param.length();
 											if (endPar==-1)
 											{
 												numError++;
@@ -946,7 +948,7 @@ public class Parser
 												i = line.length();
 												tmpInst.getParams().add(0);
 												continue;
-											}				
+											}
 
 											Integer labelAddr = symTab.getInstructionAddress(param.substring(indPar,endPar).trim());
 											if (labelAddr != null)
@@ -971,7 +973,7 @@ public class Parser
 											if(z!=syntax.length()-1)
 												endPar = param.indexOf(syntax.charAt(++z),indPar);
 											else
-												endPar = param.length(); 	
+												endPar = param.length();
 											if (endPar==-1)
 											{
 												numError++;
@@ -979,7 +981,7 @@ public class Parser
 												i = line.length();
 												tmpInst.getParams().add(0);
 												continue;
-											}				
+											}
 
 											Integer labelAddr = symTab.getInstructionAddress(param.substring(indPar,endPar).trim());
 											if (labelAddr != null)
@@ -1014,7 +1016,7 @@ public class Parser
 									}
 									else
 									{
-										if(syntax.charAt(z)!=param.charAt(indPar++))	
+										if(syntax.charAt(z)!=param.charAt(indPar++))
 										{
 											numError++;
 											error.add("UNKNOWNSYNTAX",row,1,line);
@@ -1054,7 +1056,7 @@ public class Parser
 							tmpInst.setFullName(replaceTab(comment[0].substring(i)));
 							if (Array.getLength(comment)==2)
 								if (Array.getLength(comment)==2)
-									tmpInst.setComment(comment[1]);	
+									tmpInst.setComment(comment[1]);
 							try
 							{
 								mem.addInstruction(tmpInst,instrCount);
@@ -1076,7 +1078,7 @@ public class Parser
 								error.add("SAMELABEL", row, 1, line);
 								i = line.length();
 							}
-							// Il finally e' totalmente inutile, ma è bello utilizzarlo per la 
+							// Il finally e' totalmente inutile, ma è bello utilizzarlo per la
 							// prima volta in un programma ;)
 							finally {
 								lastLabel = "";
@@ -1084,7 +1086,7 @@ public class Parser
 							end = line.length();
 						}
 					}
-					i=end;				
+					i=end;
 				}
 				catch(MemoryElementNotFoundException ex)
 				{
@@ -1119,7 +1121,7 @@ public class Parser
 				catch(IrregularStringOfBitsException ex)
 				{
 					//ISGROUP HA SBAGLIATO QUALCOSA
-				}	
+				}
 			}
 			else
 			{
@@ -1173,7 +1175,7 @@ public class Parser
 
 	/** Clean multiple tab or spaces in a bad format String //and converts  this String to upper case
 	 *   @param the bad format String
-	 *  @return the cleaned String 
+	 *  @return the cleaned String
 	 */
 	public String cleanFormat(String s){
 		if(s.length()>0 && s.charAt(0)!=';' &&  s.charAt(0)!='\n' )
@@ -1199,15 +1201,33 @@ public class Parser
 
 		try
 		{
-			if(reg.charAt(0)=='r' || reg.charAt(0)=='R' || reg.charAt(0)=='$')//ci sono altri modi di scrivere un registro???	
+			int num;
+			if(reg.charAt(0)=='r' || reg.charAt(0)=='R' || reg.charAt(0)=='$')//ci sono altri modi di scrivere un registro???
 				if(isNumber(reg.substring(1)))
 				{
-					int num = Integer.parseInt(reg.substring(1));
+					num = Integer.parseInt(reg.substring(1));
 					if (num<32 && num>=0)
 						return num;
 				}
+				if((num=isAlias(reg.substring(1)))!=-1)
+					return num;
 		}
 		catch(Exception e){}
+		return -1;
+	}
+
+	/** Check if the parameter is a valid string for an alias-register
+	 *  @param reg the string to validate
+	 *  @return -1 if reg isn't a valid alias-register, else a number of 
+register
+	 */
+	private int isAlias(String reg)
+	{
+		for(AliasRegister x : AliasRegister.values())
+		{
+			if(reg.equalsIgnoreCase(x.name()))
+				return x.ordinal();
+		}
 		return -1;
 	}
 
@@ -1240,13 +1260,13 @@ public class Parser
 					return false;
 			return true;
 		}
-		catch(Exception e) 
+		catch(Exception e)
 		{
 			return false;
 		}
 
 	}
-	/** Check if a number is a valid .byte 
+	/** Check if a number is a valid .byte
 	 *  @param num the value to validate
 	 *  @return true if num is a valid .byte, else false
 	 */
@@ -1279,7 +1299,7 @@ public class Parser
 			}
 			return false;
 		}
-		catch(Exception e) 
+		catch(Exception e)
 		{
 			return false;
 		}
@@ -1294,9 +1314,6 @@ public class Parser
 		return text.replace("\t"," ");
 
 	}
-	/** 
-	 *  @param  
-	 * */
 	private void writeIntegerInMemory (int row,  int i, int end, String line, String instr, int numBit, String name ) throws MemoryElementNotFoundException
 	{
 		Memory mem = Memory.getInstance();
@@ -1326,7 +1343,7 @@ public class Parser
 					else if (numBit==64)
 						tmpMem.writeDoubleWord(num);
 
-					if( (num < -(Converter.powLong(2,numBit-1)) || num > (Converter.powLong( 2,numBit)-1)) &&  numBit != 64) 
+					if( (num < -(Converter.powLong(2,numBit-1)) || num > (Converter.powLong( 2,numBit)-1)) &&  numBit != 64)
 						throw new NumberFormatException();
 				}
 				catch(NumberFormatException ex)
@@ -1342,7 +1359,7 @@ public class Parser
 				}
 			}
 			else if(isHexNumber(value[j]))
-			{		
+			{
 				try
 				{
 					long num = Long.parseLong(Converter.hexToLong(value[j]));
@@ -1370,7 +1387,7 @@ public class Parser
 				}
 
 			}
-			else				
+			else
 			{	//manca riempimento errore
 				numError++;
 				error.add("INVALIDVALUE",row,i+1,line);
