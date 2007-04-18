@@ -36,7 +36,7 @@ import java.util.*;
  * <pre>
  *      Syntax: DMULT rs, rt
  * Description: (LO) = rs * rt
- *              To divide 64-bit signed integers
+ *              To multiply 64-bit signed integers
  *              The 64-bit doubleword value in GPR rt is multiplied by the 64-bit 
  *              value in GPR rs, treating both operands as signed values.
  * </pre>
@@ -56,7 +56,7 @@ class DMULT extends ALU_RType
 	{
 		super.OPCODE_VALUE = OPCODE_VALUE;
 		syntax="%R,%R";
-		name="DMUL";
+		name="DMULT";
 	}
     public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
         //if source registers are valid passing their own values into temporary registers
