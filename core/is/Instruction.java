@@ -100,6 +100,7 @@ public abstract class Instruction {
                         MOVN { Instruction getObject() { MOVN newObject=new MOVN(); return newObject; } },
                         MOVZ { Instruction getObject() { MOVZ newObject=new MOVZ(); return newObject; } },
                         DDIV { Instruction getObject() { DDIV newObject=new DDIV(); return newObject; } },
+                        DDIVU { Instruction getObject() { DDIVU newObject=new DDIVU(); return newObject; } },
                         DMULT { Instruction getObject() { DMULT newObject=new DMULT(); return newObject; } },
                         DMULTU { Instruction getObject() { DMULTU newObject=new DMULTU(); return newObject; } },
                         MFLO { Instruction getObject() { MFLO newObject=new MFLO(); return newObject; } },
