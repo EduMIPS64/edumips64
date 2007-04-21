@@ -276,9 +276,13 @@ public class Parser
 									// We don't want strings to be uppercase, do we?
 									parameters = cleanFormat(line.substring(end+2));
 									parameters = parameters.toUpperCase();
+									parameters = parameters.split(";")[0];
+									Main.logger.debug("parameters: " + parameters);
 								}
 								else
 									parameters = line.substring(end + 2);
+									parameters = parameters.split(";")[0].trim();
+									Main.logger.debug("parameters: " + parameters);
 							}
 							catch (StringIndexOutOfBoundsException e) {
 								numWarning++;
@@ -298,9 +302,13 @@ public class Parser
 							}
 							MemoryElement tmpMem = null;
 							tmpMem = mem.getCell(memoryCount * 8);
+							Main.logger.debug("line: "+line);
 							String[] comment = (line.substring(i)).split(";",2);
 							if (Array.getLength(comment) == 2)
+							{
+								Main.logger.debug("commenti trovati: "+comment[1]);
 								tmpMem.setComment(comment[1]);
+							}
 							tmpMem.setCode(comment[0]);
 
 							if(instr.compareToIgnoreCase(".ASCII") == 0 || instr.compareToIgnoreCase(".ASCIIZ") == 0) {
@@ -423,6 +431,7 @@ public class Parser
 							}
 							else if(instr.compareToIgnoreCase(".WORD")==0 || instr.compareToIgnoreCase(".WORD64")==0)
 							{
+								Main.logger.debug("pamword: "+parameters);
 								writeIntegerInMemory(row, i, end, line, parameters, 64, "WORD");
 								end = line.length();
 							}
@@ -528,6 +537,8 @@ public class Parser
 							{
 								String param = cleanFormat(line.substring(end+1));
 								param = param.toUpperCase();
+								param = param.split(";")[0].trim();
+									Main.logger.debug("param: " + param);
 								int indPar=0;
 								for(int z=0; z < syntax.length(); z++)
 								{
@@ -1049,6 +1060,8 @@ public class Parser
 								{
 								}
 							}
+							
+							Main.logger.debug("line: "+line);
 							String comment[] = line.split(";",2);
 							tmpInst.setFullName(replaceTab(comment[0].substring(i)));
 							tmpInst.setFullName(replaceTab(comment[0].substring(i)));
@@ -1180,8 +1193,8 @@ public class Parser
 	public String cleanFormat(String s){
 		if(s.length()>0 && s.charAt(0)!=';' &&  s.charAt(0)!='\n' )
 		{
-			String[] nocomment=s.split(";");
-			s=nocomment[0];//.toUpperCase();
+			//String[] nocomment=s.split(";");
+			//s=nocomment[0];//.toUpperCase();
 			s=s.trim();
 			s=s.replace("\t"," ");
 			while(s.contains("  ")) s=s.replace("  "," ");
