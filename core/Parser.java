@@ -1342,7 +1342,6 @@ register
 						tmpMem.writeWord(num,posInWord);
 					else if (numBit==64)
 						tmpMem.writeDoubleWord(num);
-
 					if( (num < -(Converter.powLong(2,numBit-1)) || num > (Converter.powLong( 2,numBit)-1)) &&  numBit != 64)
 						throw new NumberFormatException();
 				}
@@ -1370,8 +1369,14 @@ register
 					else if (numBit==32)
 						tmpMem.writeWord(num,posInWord);
 					else if (numBit==64)
+					{
+						String tmp = value[j].substring(2);
+						while(tmp.charAt(0)=='0')
+							tmp=tmp.substring(1);
+						if(tmp.length()>numBit/4)
+							throw new NumberFormatException();
 						tmpMem.writeDoubleWord(num);
-
+					}
 					if( (num < -(Converter.powLong(2,numBit-1)) || num > (Converter.powLong( 2,numBit)-1)) &&  numBit != 64)
 						throw new NumberFormatException();
 				}

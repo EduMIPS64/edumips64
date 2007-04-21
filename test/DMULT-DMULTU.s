@@ -1,7 +1,7 @@
 .data
-menouno:	.word64 0xFFFFFFFFFFFFFFFFF ; -1 signed or 2^64-1 unsigned
+menouno:	.word64 0xFFFFFFFFFFFFFFFF ; -1 signed or 2^64-1 unsigned
 uno:		.word64 0x1
-high:		.word64 0x7FFFFFFFFFFFFFFFF ; 2^63-1
+high:		.word64 0x7FFFFFFFFFFFFFFF ; 2^63-1
 .code
 ld	r1,menouno(r0)	; r1  = FFFFFFFFFFFFFFFFF
 ld	r2,uno(r0)	; r2  = 00000000000000001
