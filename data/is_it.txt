@@ -96,6 +96,17 @@ Descrizione: (LO, HI) = rs / rt
             Il quoziente ed il resto a 64 bit sono memorizzati rispettivamente,
             nei registri speciali LO ed HI.
             Non si verificano eccezioni di aritmetiche.
+
+Istruzione DDIVU
+
+Sintassi: DDIVU rs, rt
+Descrizione: (LO, HI) = rs / rt
+            Effettua la divisione tra due interi a 64 bit.
+            Divide il valore a 64 bit del registro rs con quello nel registro rt,
+            considerando entrambi gli operandi come valori senza segno.
+            Il quoziente ed il resto a 64 bit sono memorizzati rispettivamente,
+            nei registri speciali LO ed HI.
+            Non si verificano eccezioni di aritmetiche.
             
 Istruzione DMULT 
 
@@ -104,6 +115,14 @@ Descrizione: (LO) = rs * rt
             Moltiplica due interi con segno a 64 bit.
             Il valore nel registro rt e' moltiplicato per il valore in rs,
             considerando entrambi gli operandi come valori con segno.
+
+Istruzione DMULTU
+
+Sintassi: DMULTU rs, rt
+Descrizione: (LO) = rs * rt
+            Moltiplica due interi con segno a 64 bit.
+            Il valore nel registro rt e' moltiplicato per il valore in rs,
+            considerando entrambi gli operandi come valori senza segno.
            
 Istruzione DSLL 
 

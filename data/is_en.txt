@@ -99,6 +99,17 @@ Description: (LO, HI) = rs / rt
             The 64-bit quotient is placed into special register LO and the 
             64-bit remainder is placed into special register HI.
             No arithmetic exception occurs under any circumstances.
+
+DDIVU Instruction
+
+Syntax: DDIVU rs, rt
+Description: (LO, HI) = rs / rt
+            To divide 64-bit signed integers
+            The 64-bit doubleword in GPR rs is divided by the 64-bit 
+            doubleword in GPR rt, treating both operands as unsigned values.
+            The 64-bit quotient is placed into special register LO and the 
+            64-bit remainder is placed into special register HI.
+            No arithmetic exception occurs under any circumstances.
             
 DMULT Instruction
 
@@ -107,12 +118,20 @@ Description: (LO) = rs * rt
            To divide 64-bit signed integers
            The 64-bit doubleword value in GPR rt is multiplied by the 64-bit 
            value in GPR rs, treating both operands as signed values.
+
+DMULTU Instruction
+
+Syntax: DMULTU rs, rt
+Description: (LO) = rs * rt
+           To divide 64-bit signed integers
+           The 64-bit doubleword value in GPR rt is multiplied by the 64-bit 
+           value in GPR rs, treating both operands as unsigned values.
            
 DSLL Instruction
 
 Syntax: DSLL rd, rt, sa Doubleword shift left logical
 Description: 
-            To execute a left-shift of a doubleword by a fixed amount—0 to 31 bits
+            To execute a left-shift of a doubleword by a fixed amount 0 to 31 bits
             The 64-bit doubleword contents of GPR rt are shifted left, 
             inserting zeros into the emptied bits; the result is placed in GPR rd. 
             The bit-shift amount in the range 0 to 31 is specified by sa.
