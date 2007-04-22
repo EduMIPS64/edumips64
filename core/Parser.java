@@ -1222,7 +1222,7 @@ public class Parser
 					if (num<32 && num>=0)
 						return num;
 				}
-				if((num=isAlias(reg.substring(1)))!=-1)
+				if(reg.charAt(0)=='$' && (num=isAlias(reg.substring(1)))!=-1)
 					return num;
 		}
 		catch(Exception e){}
