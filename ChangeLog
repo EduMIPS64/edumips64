@@ -1,11 +1,22 @@
 EduMIPS64 ChangeLog
 ------------------- 
 
-0.4.2 ()
+0.4.2 (22/04/2007)
 	- Added DADDIU instruction, and marked DADDUI as deprecated (mancausoft)
-	- New instructions: B and BGEZ (mancausoft)
+	- New instructions: B, BGEZ, DMULTU, DDIVU (mancausoft)
+	- Standard MIPS aliases for the first 32 registers (thegoodgiant, jesky,
+      lorenzo)
+	- Fixed a parsing bug with big values (mancausoft)
+	- Fixed a bug regarding SynchronousException (mancausoft)
 	- Updated all the manuals (andrea)
 	- Bug fixes for the manuals (andrea)
+	- Solved a bug that happened opening files (andrea)
+	- Fixed DMULT in order to use HI and LO registers (andrea)
+	- Solved a bug in the CPUGUIThread class that made the graphics not synced
+      with the CPU status at the end of the execution (andrea)
+	- Fixed the availability of some menus during the execution (andrea)
+	- Fixed a bug that didn't allow the Dinero Tracefile to be written (andrea)
+	- Changed the default Dinero Tracefile output filename (andrea)
 
 0.4.1 (31/03/2007)
 	- Corrected a bug in the LUI instruction (mancausoft)
