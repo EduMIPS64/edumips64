@@ -1,4 +1,4 @@
-<project name="edumips64" default="svnjar" basedir=".">
+<project name="edumips64" default="jar" basedir=".">
 	<target name="init">
 		<property name="sourceDir" value="." />
         <property name="helpClassesDir" value="./javahelp_classes" />
