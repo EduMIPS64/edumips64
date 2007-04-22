@@ -7,7 +7,7 @@
 \usepackage{fancyhdr}
 \usepackage[italian]{babel}
 \newcommand{\EM}{EduMIPS64}
-\newcommand{\EV}{0.4}
+\newcommand{\EV}{0.4.2}
 \newcommand{\MS}{MIPS64}
 \newcommand{\WARN}{\textbf{ATTENZIONE:} Questa \`{e} un'istruzione deprecated, che
 non appartiene al repertorio delle istruzioni \MS{}, ma \`{e} stata inclusa nel set di
@@ -43,7 +43,7 @@ istruzioni per mantenere la compatibilit\`{a} con altri simulatori.}
 \makeindex
 
 \author{Andrea Spadaccini\\Traduzione italiana di Simona Ullo}
-\title{Manuale Utente EduMIPS64 0.4}
+\title{Manuale Utente EduMIPS64 \EV}
 
 \hyphenation{mo-di-fica}
 \hyphenation{vi-sua-liz-zan-do}
@@ -78,7 +78,7 @@ istruzioni per mantenere la compatibilit\`{a} con altri simulatori.}
 di Andrea Spadaccini\\[1.5ex]
 Traduzione italiana di Simona Ullo\\[3ex]
 } 
-Versione~1, 15 Marzo 2007
+Versione~1.1, 22 Aprile 2007
 \end{minipage}}
 
 %\addtolength{\textwidth}{\centeroffset}
@@ -127,18 +127,24 @@ label:  .word   15     ; Questo e' un commento in linea
 \end{lstlisting}
 
 \index{commenti}\index{;}
-I commenti possono essere introdotti utilizzando il carattere ``;'' qualsiasi cosa venga scritta successivamente ad esso verr\`{a} ignorata.
-Un commento pu\`{o} quindi essere usato ``inline'' (dopo una direttiva) oppure in una riga a s\`{e} stante.
+I commenti possono essere introdotti utilizzando il carattere ``;'' qualsiasi
+cosa venga scritta successivamente ad esso verr\`{a} ignorata.  Un commento
+pu\`{o} quindi essere usato ``inline'' (dopo una direttiva) oppure in una riga a
+s\`{e} stante.
 
-\index{etichette} Le etichette possono essere usate nel codice per fare riferimento ad una cella di memoria o ad un'istruzione. 
-Esse sono case insensitive. Per ciascuna linea di codice pu\`{o} essere utilizzata un'unica etichetta. Quest'ultima pu\`{o} essere 
-inserita una o pi\`{u} righe al di sopra dell'effettiva dichiarazione del dato o dell'istruzione, facendo in modo che non ci sia nulla, 
-eccetto commenti e linee vuote, tra l'etichetta stessa e la dichiarazione. 
+\index{etichette} Le etichette possono essere usate nel codice per fare
+riferimento ad una cella di memoria o ad un'istruzione.  Esse sono case
+insensitive. Per ciascuna linea di codice pu\`{o} essere utilizzata un'unica
+etichetta. Quest'ultima pu\`{o} essere inserita una o pi\`{u} righe al di sopra
+dell'effettiva dichiarazione del dato o dell'istruzione, facendo in modo che non
+ci sia nulla, eccetto commenti e linee vuote, tra l'etichetta stessa e la
+dichiarazione. 
 
 \subsection{La sezione \texttt{.data}}
 \index{.data}
-La sezione \textbf{data} contiene i comandi che specificano il modo in cui la memoria deve essere riempita prima dell'inizio 
-dell'esecuzione del programma. La forma generale di un comando \texttt{.data} \`{e}:
+La sezione \textbf{data} contiene i comandi che specificano il modo in cui la
+memoria deve essere riempita prima dell'inizio dell'esecuzione del programma. La
+forma generale di un comando \texttt{.data} \`{e}:
 
 \begin{center}
 	\texttt{[etichetta:] \textbf{.tipoDiDato} valore1 [, valore2 [, ...]]}
@@ -164,7 +170,7 @@ dell'esecuzione del programma. La forma generale di un comando \texttt{.data} \`
 			Word & \texttt{.word32} & 32\\
 			Double Word & \texttt{.word} o \texttt{.word64} & 64
 		\end{tabular}
-		\caption{Basic data types}
+		\caption{Tipi di dato}
 		\label{table:datatypes}
 	\end{centering}
 \end{table}
@@ -275,7 +281,58 @@ Le istruzioni possono accettare tre tipi di parametri:
     usato come base, quello dell'immediato come offset.
 \end{itemize}
 
-La dimensione dei valori immediati \`{e} limitata al numero di bit disponibili nella codifica associata all'istruzione. 
+La dimensione dei valori immediati \`{e} limitata al numero di bit disponibili
+nella codifica associata all'istruzione. 
+
+\`E possibile utilizzare gli alias standard MIPS per i primi 32 registri,
+mettendo in coda ai prefissi standard per i registri (``r'', ``\$'', ``R'') uno
+degli alias indicati in tabella~\ref{table:mips32-reg}
+
+\index{registri}
+\begin{table}[!htb]
+	\begin{centering}
+		\begin{tabular}{ll}
+			\hline
+			\hline
+			Registro & Alias\\
+			\hline
+			0 & \texttt{zero}\\
+			1 & \texttt{at}\\
+			2 & \texttt{v0}\\
+			3 & \texttt{v1}\\
+			4 & \texttt{a0}\\
+			5 & \texttt{a1}\\
+			6 & \texttt{a2}\\
+			7 & \texttt{a3}\\
+			8 & \texttt{t0}\\
+			9 & \texttt{t1}\\
+			10 & \texttt{t2}\\
+			11 & \texttt{t3}\\
+			12 & \texttt{t4}\\
+			13 & \texttt{t5}\\
+			14 & \texttt{t6}\\
+			15 & \texttt{t7}\\
+			16 & \texttt{s0}\\
+			17 & \texttt{s1}\\
+			18 & \texttt{s2}\\
+			19 & \texttt{s3}\\
+			20 & \texttt{s4}\\
+			21 & \texttt{s5}\\
+			22 & \texttt{s6}\\
+			23 & \texttt{s7}\\
+			24 & \texttt{t8}\\
+			25 & \texttt{t9}\\
+			26 & \texttt{k0}\\
+			27 & \texttt{k1}\\
+			28 & \texttt{gp}\\
+			29 & \texttt{sp}\\
+			30 & \texttt{fp}\\
+			31 & \texttt{ra}\\
+		\end{tabular}
+		\caption{Alias per i primi 32 registri}
+		\label{table:mips32-reg}
+	\end{centering}
+\end{table}
 
 %Please see~\cite{mips-2} for more details about how instruction are actually encoded.
 
@@ -345,10 +402,22 @@ Ecco la lista delle istruzioni ALU di tipo R.
 	\item \texttt{DDIV rs, rt}\\
 	Esegue la divisione tra rs ed rt, ponendo il quoziente in LO ed il resto in HI.
 
+	\index{DDIVU}
+	\index{istruzioni!DDIVU}
+	\item \texttt{DDIVU rs, rt}\\
+    Esegue la divisione tra rs ed rt, considerandoli come valori senza segno e
+    ponendo il quoziente in LO ed il resto in HI.
+
 	\index{DMULT}
 	\index{istruzioni!DMULT}
 	\item \texttt{DMULT rs, rt}\\
 	Esegue il prodotto tra rs ed rt, ponendo il risultato in LO.
+
+	\index{DMULTU}
+	\index{istruzioni!DMULTU}
+	\item \texttt{DMULTU rs, rt}\\
+    Esegue il prodotto tra rs ed rt, considerandoli come valori senza segno e
+    ponendo il risultato in LO.
 
 	\index{DSLL}
 	\index{istruzioni!DSLL}
