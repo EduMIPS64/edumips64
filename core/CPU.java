@@ -311,6 +311,8 @@ public class CPU
 			pipe.put(PipeStatus.ID, Instruction.buildInstruction("BUBBLE"));	
 			old_pc.writeDoubleWord((pc.getValue()));
 			pc.writeDoubleWord((pc.getValue())+4);
+			if(syncex != null)
+				throw new SynchronousException(syncex);
 
 		}
 		catch(RAWException ex)
@@ -318,6 +320,9 @@ public class CPU
 			if(currentPipeStatus == PipeStatus.ID)
 				pipe.put(PipeStatus.EX, Instruction.buildInstruction("BUBBLE"));
 			RAWStalls++;
+			if(syncex != null)
+				throw new SynchronousException(syncex);
+
 		}
 		catch(SynchronousException ex) {
 			edumips64.Main.logger.exception(ex.getCode());
