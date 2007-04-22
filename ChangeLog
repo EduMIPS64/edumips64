@@ -1,6 +1,8 @@
 EduMIPS64 ChangeLog
 ------------------- 
 
+0.4.3 ()
+
 0.4.2 (22/04/2007)
 	- Added DADDIU instruction, and marked DADDUI as deprecated (mancausoft)
 	- New instructions: B, BGEZ, DMULTU, DDIVU (mancausoft)
@@ -11,7 +13,7 @@ EduMIPS64 ChangeLog
 	- Updated all the manuals (andrea)
 	- Bug fixes for the manuals (andrea)
 	- Solved a bug that happened opening files (andrea)
-	- Fixed DMULT in order to use HI and LO registers (andrea)
+	- Fixed DMULT in order to use HI and LO registers (mancausoft)
 	- Solved a bug in the CPUGUIThread class that made the graphics not synced
       with the CPU status at the end of the execution (andrea)
 	- Fixed the availability of some menus during the execution (andrea)
