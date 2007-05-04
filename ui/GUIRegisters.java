@@ -45,7 +45,7 @@ public class GUIRegisters extends GUIComponent
 	RegPanel regPanel;
 	JTextArea text;
 	String oldValue;
-	String value[] = new String[32];
+	String value[] = new String[34];
 	int rowCurrent;
 	String valueCurrent[];
 	
@@ -68,6 +68,8 @@ public class GUIRegisters extends GUIComponent
 		for (int i = 0; i < 32; i++) {
 			value[i] = registers[i].toString();
 		}
+		value[32]=cpu.getLO().toString();
+		value[33]=cpu.getHI().toString();
 	}
 	
 	public void draw() 
@@ -80,8 +82,8 @@ public class GUIRegisters extends GUIComponent
 		JTable theTable;
 		JScrollPane scrollTable;
 		public FileTableModel tableModel;
-		String numR[] = new String[32];
-		String numRF[] = new String[32];
+		String numR[] = new String[34];
+		String numRF[] = new String[34];
 
 		int cont = 0; //contatore che conta le cifre significative dei valori di input
 		
@@ -138,7 +140,11 @@ public class GUIRegisters extends GUIComponent
 				numR[i] = "R" + i + "=";
 				numRF[i] = "F" + i + "=";
 				value[i] = "0000000000000000";
-			}			
+			}
+			numR[32] = "LO=";
+			value[32] = "0000000000000000";
+			numR[33] = "HI=";
+			value[33] = "0000000000000000";
 		}	
 
 		//classe interna che gestisce l'evento doppio click
@@ -148,12 +154,33 @@ public class GUIRegisters extends GUIComponent
     			Object premuto = e.getSource();
       			if ((premuto == theTable) && (theTable.getSelectedColumn() == 1)){
 				try{
+					if(theTable.getSelectedRow()==32)
+					{
+					
+					edumips64.Main.getSB().setText(
+							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
+							"LO" +
+							" : " +
+							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
+	
+					}
+					else if (theTable.getSelectedRow()==33)
+					{
+					edumips64.Main.getSB().setText(
+							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
+							"HI" +
+							" : " +
+							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
+					}	
+					else
+					{
 					edumips64.Main.getSB().setText(
 							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
 							CurrentLocale.getString("StatusBar.OFREGISTER") +
 							theTable.getSelectedRow() +
 							" : " +
-							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));
+							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
+					}
 				}catch(IrregularStringOfHexException hex) { hex.printStackTrace();}
         			if (theTable.getSelectedRow() != 0 && e.getClickCount() == 2) {
 					int row = theTable.getSelectedRow();
@@ -207,8 +234,12 @@ public class GUIRegisters extends GUIComponent
                   		return value[row];
             		case 2:
                   		return numRF[row];
-            		case 3:
-                  		return "00000000.00000000";
+///
+			case 3:
+				if(row!=32 && row!=33)
+					return "0000000000000000";
+				else
+					return "";
             		default:
                   		return new Object();
       			}
