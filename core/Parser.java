@@ -1392,13 +1392,15 @@ register
 		    catch(edumips64.core.fpu.FPOverflowException ex)
 		    {
 			numError++;
-			error.add("DOUBLE_TOO_LARGE",row,i+1,line);
+			//error.add("DOUBLE_TOO_LARGE",row,i+1,line);
+			error.add("FP_OVERFLOW",row,i+1,line);
 			continue;
 		    }
 		    catch(edumips64.core.fpu.FPUnderflowException ex)
 		    {
 			numError++;
-			error.add("MINUS_DOUBLE_TOO_LARGE",row,i+1,line);
+			//error.add("MINUS_DOUBLE_TOO_LARGE",row,i+1,line);
+			error.add("FP_UNDERFLOW",row,i+1,line);
 			continue;
 		    }
 		    catch(Exception e)
