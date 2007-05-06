@@ -3,6 +3,7 @@ package edumips64.core;
 import edumips64.Main;
 import edumips64.utils.*;
 import edumips64.core.is.*;
+import java.util.regex.*;
 
 import java.io.*;
 import java.util.*;
@@ -450,8 +451,14 @@ public class Parser
 								writeIntegerInMemory(row, i, end, line, parameters,16 , "WORD16");
 								end = line.length();
 							}
+							else if(instr.compareToIgnoreCase(".DOUBLE")==0)
+							{
+								writeDoubleInMemory(row, i, end, line, parameters);
+								end = line.length();
+							}
 							else
 							{
+								edumips64.Main.logger.debug("Che Cazzo e': " + instr);
 								numError++;
 								error.add("INVALIDCODEFORDATA",row,i+1,line);
 								i = line.length();
@@ -1327,6 +1334,101 @@ register
 		return text.replace("\t"," ");
 
 	}
+	
+	/** Write a double in memory 
+	 *  @param row number of row 
+	 *  @param i 
+	 *  @param end
+	 *  @param line the line of code
+	 *  @param instr params
+	 */ 
+	private void writeDoubleInMemory (int row,  int i, int end, String line, String instr ) throws MemoryElementNotFoundException
+	{
+	    Memory mem = Memory.getInstance();
+	    String value[] = instr.split(",");
+	    MemoryElement tmpMem = null;
+
+	    for(int j=0; j< Array.getLength(value);j++)
+	    {
+		tmpMem = mem.getCell(memoryCount * 8);
+		memoryCount++;
+		Pattern p = Pattern.compile("-?[0-9]+.[0-9]+");
+		Matcher m = p.matcher(value[j]);
+		boolean b = m.matches();
+		p = Pattern.compile("-?[0-9]+.[0-9]+E-?[0-9]+");
+		m = p.matcher(value[j]);
+		b = b || m.matches();
+
+
+		/*if(isHexNumber(value[j]))
+		{
+		    try
+		    {
+			//insert here support for exadecimal 
+		    }
+		    catch(NumberFormatException ex)
+		    {
+			numError++;
+			error.add("DOUBLE_TOO_LARGE",row,i+1,line);
+			continue;
+		    }
+		    catch( Exception e)//modificare in un altro modo
+		    {
+			e.printStackTrace();
+		    }
+
+		}
+		else*/ if (b)
+		{
+		    try
+		    {
+		     tmpMem.setBits (edumips64.core.fpu.FPInstructionUtils.doubleToBin(value[j] ,true),0);
+		    }
+		    catch(edumips64.core.fpu.FPExponentTooLargeException ex)
+		    {
+			numError++;
+			error.add("DOUBLE_EXT_TOO_LARGE",row,i+1,line);
+			continue;
+		    }
+		    catch(edumips64.core.fpu.FPOverflowException ex)
+		    {
+			numError++;
+			error.add("DOUBLE_TOO_LARGE",row,i+1,line);
+			continue;
+		    }
+		    catch(edumips64.core.fpu.FPUnderflowException ex)
+		    {
+			numError++;
+			error.add("MINUS_DOUBLE_TOO_LARGE",row,i+1,line);
+			continue;
+		    }
+		    catch(Exception e)
+		    {
+			e.printStackTrace();
+			//non ci dovrebbe arrivare mai ma se per caso ci arriva che faccio?
+		    }
+		}
+		else
+		{	//manca riempimento errore
+		    numError++;
+		    error.add("INVALIDVALUE",row,i+1,line);
+		    i = line.length();
+		    continue;
+		}
+	    }
+
+	}
+
+
+	/** Write an integer in memory 
+	 *  @param row number of row 
+	 *  @param i 
+	 *  @param end
+	 *  @param line the line of code
+	 *  @param instr 
+	 *  @param numBit 
+	 *  @param name type of data
+	 */ 
 	private void writeIntegerInMemory (int row,  int i, int end, String line, String instr, int numBit, String name ) throws MemoryElementNotFoundException
 	{
 		Memory mem = Memory.getInstance();
