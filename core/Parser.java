@@ -458,7 +458,6 @@ public class Parser
 							}
 							else
 							{
-								edumips64.Main.logger.debug("Che Cazzo e': " + instr);
 								numError++;
 								error.add("INVALIDCODEFORDATA",row,i+1,line);
 								i = line.length();
@@ -1382,7 +1381,7 @@ register
 		{
 		    try
 		    {
-		     tmpMem.setBits (edumips64.core.fpu.FPInstructionUtils.doubleToBin(value[j] ,true),0);
+		        tmpMem.setBits (edumips64.core.fpu.FPInstructionUtils.doubleToBin(value[j] ,true),0);
 		    }
 		    catch(edumips64.core.fpu.FPExponentTooLargeException ex)
 		    {
