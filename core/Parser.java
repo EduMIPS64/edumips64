@@ -626,9 +626,12 @@ public class Parser
 													{
 														try
 														{
-															imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar,endPar)));
-															if( imm < -32768 || imm > 32767)
+															long imm_long=Long.parseLong(Converter.hexToLong(param.substring(indPar,endPar)));
+										
+															if( imm_long < -32768 || imm_long > 32767)
 																throw new NumberFormatException();
+															
+															imm=(int)imm_long;
 														}
 														catch(NumberFormatException ex)
 														{
