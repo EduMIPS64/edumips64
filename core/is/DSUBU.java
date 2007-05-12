@@ -49,14 +49,14 @@ public class DSUBU extends ALU_RType{
         //getting strings from temporary registers
         String rs=TR[RS_FIELD].getBinString();
         String rt=TR[RT_FIELD].getBinString();
-        //performing sign extension to detect IntegerOverflow
-        rs=rs.charAt(0)+rs;
-        rt=rt.charAt(0)+rt; 
-        String outputstring=InstructionsUtils.twosComplementSubstraction(rs,rt);
-        //comparison between the two most significant bits of the outputstring and 
-        //raising integer overflow if the first bit is different from the second one
-        outputstring=outputstring.substring(1,65);
-        TR[RD_FIELD].setBits(outputstring,0);
+
+        long rs_int = Converter.binToLong(rs,false);
+        long rt_int = Converter.binToLong(rt,false);
+        
+	String outputstring=InstructionsUtils.twosComplementSubstraction(rs,rt);
+        
+	//There isn't IntegerOverflow cases
+        TR[RD_FIELD].setBits(outputstring, 0);
 	if(enableForwarding)
 	{
 		doWB();
