@@ -1,13 +1,3 @@
-package edumips64.core;
-
-import edumips64.Main;
-import edumips64.utils.*;
-import edumips64.core.is.*;
-import java.util.regex.*;
-
-import java.io.*;
-import java.util.*;
-import java.lang.reflect.Array;
 /*
  * Parser.java
  *
@@ -36,6 +26,17 @@ import java.lang.reflect.Array;
 /** Parses a MIPS64 source code and fills the symbol table and the memory.
  * @author mancausoft, Vanni
  */
+
+package edumips64.core;
+
+import edumips64.Main;
+import edumips64.utils.*;
+import edumips64.core.is.*;
+import java.util.regex.*;
+
+import java.io.*;
+import java.util.*;
+import java.lang.reflect.Array;
 
 public class Parser
 {
@@ -307,7 +308,7 @@ public class Parser
 							String[] comment = (line.substring(i)).split(";",2);
 							if (Array.getLength(comment) == 2)
 							{
-								Main.logger.debug("commenti trovati: "+comment[1]);
+								Main.logger.debug("found comments: "+comment[1]);
 								tmpMem.setComment(comment[1]);
 							}
 							tmpMem.setCode(comment[0]);
@@ -598,7 +599,6 @@ public class Parser
 											}
 
 											int imm;
-
 											if (isImmediate(param.substring(indPar,endPar)))
 											{
 												if (param.charAt(indPar)=='#')
@@ -626,12 +626,10 @@ public class Parser
 													{
 														try
 														{
-															long imm_long=Long.parseLong(Converter.hexToLong(param.substring(indPar,endPar)));
-										
-															if( imm_long < -32768 || imm_long > 32767)
+															imm = (int) Long.parseLong(Converter.hexToShort(param.substring(indPar,endPar)));
+											Main.logger.debug("imm = "+ imm);
+															if( imm < -32768 || imm > 32767)
 																throw new NumberFormatException();
-															
-															imm=(int)imm_long;
 														}
 														catch(NumberFormatException ex)
 														{
@@ -1317,7 +1315,8 @@ register
 			}
 			else if(isHexNumber(imm))
 			{
-				return true;
+				if(imm.length()<=6)
+					return true;
 			}
 			return false;
 		}
