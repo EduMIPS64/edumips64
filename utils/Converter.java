@@ -315,6 +315,48 @@ public class Converter{
 		return new String(ret);
 	}
 
+	/** Converts a string of hexadecimal in the relative Short value.
+	 * @param hex string of hexadecimal, must start whith a 'x' or a 'X' and continue with only [0-9] or [A-F] (or [a-f]) chars, otherwise 
+	 * an IrregularStringOfHexException exception will be thrown.
+	 * @return string of long digit [0-9].
+	 * @throws IrregularStringOHexException if the string of hexadecimal is not well-formed.
+	 */	
+	public static String hexToShort(String hex) throws IrregularStringOfHexException 
+	{
+		if(hex.charAt(0)!='0' || hex.toUpperCase().charAt(1)!='X' )
+			 throw new IrregularStringOfHexException();
+
+		short ret = 0;
+		int reversecont=hex.length()-2;
+		for(int i = 2; i < hex.length(); i++){
+			reversecont--;
+			char value = hex.toUpperCase().charAt(i);
+			
+			switch(value)
+			{
+				case '0': ret += 0 * powLong(16, reversecont); break;
+				case '1': ret += 1 * powLong(16, reversecont); break;
+				case '2': ret += 2 * powLong(16, reversecont); break;
+				case '3': ret += 3 * powLong(16, reversecont); break;
+				case '4': ret += 4 * powLong(16, reversecont); break;
+				case '5': ret += 5 * powLong(16, reversecont); break;
+				case '6': ret += 6 * powLong(16, reversecont); break;
+				case '7': ret += 7 * powLong(16, reversecont); break;
+				case '8': ret += 8 * powLong(16, reversecont); break;
+				case '9': ret += 9 * powLong(16, reversecont); break;
+				case 'A': ret += 10 * powLong(16,reversecont); break;
+				case 'B': ret += 11 * powLong(16,reversecont); break;
+				case 'C': ret += 12 * powLong(16,reversecont); break;
+				case 'D': ret += 13 * powLong(16,reversecont); break;
+				case 'E': ret += 14 * powLong(16,reversecont); break;
+				case 'F': ret += 15 * powLong(16,reversecont); break;
+				default: throw new IrregularStringOfHexException();
+			}
+		
+		}
+		return new String("" + ret);
+	}
+
 	/** Converts a string of hexadecimal in the relative long value.
 	 * @param hex string of hexadecimal, must start whith a 'x' or a 'X' and continue with only [0-9] or [A-F] (or [a-f]) chars, otherwise 
 	 * an IrregularStringOfHexException exception will be thrown.

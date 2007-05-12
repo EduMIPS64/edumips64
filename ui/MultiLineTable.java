@@ -83,6 +83,11 @@ public class MultiLineTable extends JTable {
 		return numLines * fm.getHeight();
 	}
 
+	public boolean isCellEditable(int r,int c)
+	{
+		return false;
+	}
+
 	public int getTabbedTextOffset(Segment s, 
 			FontMetrics metrics,
 			int x0, int x, TabExpander e,
