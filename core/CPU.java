@@ -37,6 +37,11 @@ public class CPU
 	private Register[] gpr;
     private static final Logger logger = Logger.getLogger(CPU.class.getName());
 
+    /** FPU Elements*/	
+	public enum FPExceptions {INVALID_OPERATION,DIVISION_BY_ZERO,INEXACT,UNDERFLOW,OVERFLOW};
+	private Map<FPExceptions,Boolean> fpEnabledExceptions;
+	public enum FPRoundingModes { MINUS_INFINITY, PLUS_INFINITY, ZERO, HALF_EVEN, UNNECESSARY };
+	private FPRoundingModes fpRoundingStatus;
 	
     /** Program Counter*/
 	private Register pc,old_pc;
@@ -113,7 +118,18 @@ public class CPU
 		pipe = new HashMap<PipeStatus, Instruction>();
 		clearPipe();
 		currentPipeStatus = PipeStatus.IF;
+		
+		//FPU initialization
+		fpEnabledExceptions=new HashMap<FPExceptions,Boolean>();
+		fpEnabledExceptions.put(FPExceptions.DIVISION_BY_ZERO,true);
+		fpEnabledExceptions.put(FPExceptions.INEXACT,true);
+		fpEnabledExceptions.put(FPExceptions.INVALID_OPERATION,true);
+		fpEnabledExceptions.put(FPExceptions.OVERFLOW,true);
+		fpEnabledExceptions.put(FPExceptions.UNDERFLOW,true);
+		fpRoundingStatus=FPRoundingModes.HALF_EVEN;
+
 		logger.info("CPU Created.");
+
 	}
 
 	
@@ -196,6 +212,22 @@ public class CPU
 	public int getRAWStalls() {
 		return RAWStalls;
 	}
+//FPU methods	
+	/** Sets the floating point unit enabled exceptions
+	 *  @param the exception name to set
+	 *  @param boolean that is true in order to enable that exception or false for disabling it
+	 */
+	public  void setFPExceptions(FPExceptions exceptionName, boolean value) {
+		this.fpEnabledExceptions.put(exceptionName,value);
+	}
+
+	/** Gets the floating point unit enabled exceptions
+	 *  @return true if exceptionName is enabled, false in the other case
+	 */
+	public boolean getFPExceptions(FPExceptions exceptionName) {
+		return this.fpEnabledExceptions.get(exceptionName);
+	}	
+	
 
     /** This method performs a single pipeline step
     * @throws RAWHazardException when a RAW hazard is detected

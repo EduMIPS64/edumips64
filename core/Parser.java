@@ -1356,7 +1356,7 @@ register
 		{
 		    try
 		    {
-		        tmpMem.setBits (edumips64.core.fpu.FPInstructionUtils.doubleToBin(value[j] ,true),0);
+		        tmpMem.setBits (edumips64.core.fpu.FPInstructionUtils.doubleToBin(value[j]),0);
 		    }
 		    catch(edumips64.core.fpu.FPExponentTooLargeException ex)
 		    {
@@ -1374,10 +1374,19 @@ register
 		    catch(edumips64.core.fpu.FPUnderflowException ex)
 		    {
 			numError++;
-			//error.add("MINUS_DOUBLE_TOO_LARGE",row,i+1,line);
 			error.add("FP_UNDERFLOW",row,i+1,line);
 			continue;
 		    }
+		    catch(edumips64.core.fpu.FPInexactException ex)
+		    {
+			numError++;
+			error.add("FP_INEXACT",row,i+1,line);
+System.out.println("INEXACT");
+			continue;
+			    
+		    }
+		    
+		    
 		    catch(Exception e)
 		    {
 			e.printStackTrace();

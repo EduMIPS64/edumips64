@@ -24,6 +24,7 @@
 
 package edumips64.core.fpu;
 import java.math.*;
+import edumips64.core.CPU;
 
 /** Group of functions used in the Floating point unit
  */
@@ -40,13 +41,13 @@ public class FPInstructionUtils
 	*  @throws ExponentTooLargeException,FPOverflowException,FPUnderflowException
 	*  @return the binary string
 	*/    
-	public static String doubleToBin(String value,boolean exceptionEnabled) throws FPExponentTooLargeException,FPOverflowException,FPUnderflowException
+	public static String doubleToBin(String value) throws FPExponentTooLargeException,FPOverflowException,FPUnderflowException,FPInexactException
 	{
 	    String PLUSINFINITY="0111111111110000000000000000000000000000000000000000000000000000";
 	    String MINUSINFINITY="1111111111110000000000000000000000000000000000000000000000000000";
 	    String PLUSZERO="0000000000000000000000000000000000000000000000000000000000000000";
 	    String MINUSZERO="1000000000000000000000000000000000000000000000000000000000000000";
-
+	    CPU cpu=CPU.getInstance();
 	    try //Check if the exponent is not in signed 32 bit, in this case the NumberFormatException occurs
 	    {
 		BigDecimal value_bd=new BigDecimal(value);
@@ -60,7 +61,7 @@ public class FPInstructionUtils
 		if(value_bd.compareTo(theBiggest)==1 || value_bd.compareTo(theSmallest)==-1)
 		{
 			//exception
-			if(exceptionEnabled)
+			if(cpu.getFPExceptions(CPU.FPExceptions.OVERFLOW))
 				throw new FPOverflowException();
 			if(value_bd.compareTo(theBiggest)==1)
 				return PLUSINFINITY;
@@ -70,7 +71,7 @@ public class FPInstructionUtils
 		//Check for underflow
 		if(value_bd.compareTo(theZeroMinus)==1 && value_bd.compareTo(theZeroPlus)==-1)
 		{
-			if(exceptionEnabled)
+			if(cpu.getFPExceptions(CPU.FPExceptions.UNDERFLOW))
 				throw new FPUnderflowException();
 			if(value_bd.compareTo(zero)==1)
 				return PLUSZERO;
@@ -85,7 +86,7 @@ public class FPInstructionUtils
 	    }
 	    catch(NumberFormatException e)
 	    {
-		    if(exceptionEnabled)
+		    if(cpu.getFPExceptions(CPU.FPExceptions.OVERFLOW))
 			throw new FPExponentTooLargeException();
 		    return PLUSZERO;
 	    }
