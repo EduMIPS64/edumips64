@@ -1,7 +1,7 @@
 /* CPU.java
  *
  * This class models a MIPS CPU with 32 64-bit General Purpose Register.
- * (c) 2006 Andrea Spadaccini, Simona Ullo, Antonella Scandura
+ * (c) 2006 Andrea Spadaccini, Simona Ullo, Antonella Scandura, Massimo Trubia (FPU modifications)
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -29,7 +29,7 @@ import edumips64.core.is.*;
 import edumips64.utils.*;
 
 /** This class models a MIPS CPU with 32 64-bit General Purpose Registers.
-*  @author Andrea Spadaccini, Simona Ullo, Antonella Scandura
+*  @author Andrea Spadaccini, Simona Ullo, Antonella Scandura, Massimo Trubia (FPU modifications)
 */
 public class CPU 
 {
@@ -38,10 +38,9 @@ public class CPU
     private static final Logger logger = Logger.getLogger(CPU.class.getName());
 
     /** FPU Elements*/	
-	public enum FPExceptions {INVALID_OPERATION,DIVISION_BY_ZERO,INEXACT,UNDERFLOW,OVERFLOW};
+	private RegisterFP[] fpr;
+	public enum FPExceptions {INVALID_OPERATION,DIVISION_BY_ZERO,UNDERFLOW,OVERFLOW};
 	private Map<FPExceptions,Boolean> fpEnabledExceptions;
-	public enum FPRoundingModes { MINUS_INFINITY, PLUS_INFINITY, ZERO, HALF_EVEN, UNNECESSARY };
-	private FPRoundingModes fpRoundingStatus;
 	
     /** Program Counter*/
 	private Register pc,old_pc;
@@ -113,20 +112,25 @@ public class CPU
 		old_pc = new Register();
 		LO=new Register();
 		HI=new Register();
+		
+//FPU
+		//Floating point registers initialization
+		fpr=new RegisterFP[32];
+		for(int i=0;i<32;i++)
+			fpr[i]=new RegisterFP();
 
 		// Pipeline initialization
 		pipe = new HashMap<PipeStatus, Instruction>();
 		clearPipe();
 		currentPipeStatus = PipeStatus.IF;
 		
+//FPU
 		//FPU initialization
 		fpEnabledExceptions=new HashMap<FPExceptions,Boolean>();
 		fpEnabledExceptions.put(FPExceptions.DIVISION_BY_ZERO,true);
-		fpEnabledExceptions.put(FPExceptions.INEXACT,true);
 		fpEnabledExceptions.put(FPExceptions.INVALID_OPERATION,true);
 		fpEnabledExceptions.put(FPExceptions.OVERFLOW,true);
 		fpEnabledExceptions.put(FPExceptions.UNDERFLOW,true);
-		fpRoundingStatus=FPRoundingModes.HALF_EVEN;
 
 		logger.info("CPU Created.");
 
@@ -168,6 +172,12 @@ public class CPU
     {
         return gpr;
     }
+    
+//FPU
+    public RegisterFP[] getRegistersFP()
+    {
+	return fpr;
+    }
 
     public Memory getMemory()
     {
@@ -185,6 +195,12 @@ public class CPU
     public Register getRegister(int index)
     {
         return gpr[index];
+    }
+    
+//FPU
+    public RegisterFP getRegisterFP(int index)
+    {
+	    return fpr[index];
     }
     
     public Map<PipeStatus, Instruction> getPipeline()
@@ -418,6 +434,11 @@ public class CPU
 		// Reset dei registri
         for(int i = 0; i < 32; i++)
             gpr[i].reset();
+		
+//FPU
+		//reset FPRs
+		for(int i=0;i<32;i++)
+			fpr[i].reset();
 
 		LO.reset();
 		HI.reset();
@@ -469,12 +490,27 @@ public class CPU
 		return s;
 	}
 
+//FPU
+	/** Test method that returns a string containing the values of every
+	 * FPR.
+	 * @returns a string
+	 */
+	public String fprString() {
+		String s = new String();
+		int i= 0;
+		for(RegisterFP r: fpr)
+			s+= "Registro " + i++ + ":\t" + r.toString() + "\n";
+		return s;
+	}
+	
+
 
 	public String toString() {
 		String s = new String();
 		s += mem.toString() + "\n";
 		s += pipeLineString();
 		s += gprString();
+		s += fprString();
 		return s;
 	}
 

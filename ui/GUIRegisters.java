@@ -35,17 +35,22 @@ import javax.swing.table.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 
+//diagnostics
+import edumips64.core.fpu.*;
+
 /**
 * This class shows the values stored in the registers.
 */
 
 public class GUIRegisters extends GUIComponent 
 { 	
-    Register registers[];
+	Register registers[];
+	RegisterFP registersFP[];
 	RegPanel regPanel;
 	JTextArea text;
 	String oldValue;
 	String value[] = new String[34];
+	String valueFP[]=new String[32];
 	int rowCurrent;
 	String valueCurrent[];
 	private enum AliasRegister 
@@ -55,6 +60,7 @@ public class GUIRegisters extends GUIComponent
 	{
 		super();
 		registers = cpu.getRegisters();
+		registersFP=cpu.getRegistersFP();
 		regPanel = new RegPanel();
 	}
 
@@ -67,9 +73,35 @@ public class GUIRegisters extends GUIComponent
 	public void update() 
 	{
 		regPanel.updateRegistersNames(); 
+
+//DEBUG: writing test on FPR 0
+	CPU cpu=CPU.getInstance();
+	cpu.setFPExceptions(CPU.FPExceptions.OVERFLOW,false);
+		try {
+			cpu.getRegisterFP(0).writeDouble("54E38");
+		} catch (IrregularWriteOperationException ex) {
+			ex.printStackTrace();
+		} catch (FPOverflowException ex) {
+			ex.printStackTrace();
+		} catch (FPInvalidOperationException ex) {
+			ex.printStackTrace();
+		} catch (FPExponentTooLargeException ex) {
+			ex.printStackTrace();
+		} catch (FPUnderflowException ex) {
+			ex.printStackTrace();
+		}
+		System.out.println(cpu.fprString());
+// fine debug	
+		
+		
+		
 		registers = cpu.getRegisters();
+		registersFP=cpu.getRegistersFP();
 		for (int i = 0; i < 32; i++) {
 			value[i] = registers[i].toString();
+		}
+		for(int i=0;i<32;i++){
+			valueFP[i]=registersFP[i].toString();
 		}
 		value[32]=cpu.getLO().toString();
 		value[33]=cpu.getHI().toString();
@@ -158,6 +190,8 @@ public class GUIRegisters extends GUIComponent
 				numR[i] = fillFirstColumn(i); 
 				numRF[i] = "F" + i + " =";
 				value[i] = "0000000000000000";
+//FPU
+				valueFP[i]="0000000000000000";
 			}
 			numR[32] = "LO =";
 			value[32] = "0000000000000000";
@@ -185,27 +219,39 @@ public class GUIRegisters extends GUIComponent
 		{
     		public void mouseClicked (MouseEvent e){
     			Object premuto = e.getSource();
-      			if ((premuto == theTable) && (theTable.getSelectedColumn() == 1)){
+      			if ((premuto == theTable)){
 				try{
-					if(theTable.getSelectedRow()==32)
+					if(theTable.getSelectedRow()==32 && theTable.getSelectedColumn()==1)
 					{
 					
 					edumips64.Main.getSB().setText(
-							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +	"LO" +
-              " : " +
-							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
+					    CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " + "LO" + " : " +
+						Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
 	
 					}
-					else if (theTable.getSelectedRow()==33)
+					else if (theTable.getSelectedRow()==33  && theTable.getSelectedColumn()==1)
 					{
-					edumips64.Main.getSB().setText(
+						edumips64.Main.getSB().setText(
 							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
 							"HI" + " : " +
 							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
-					}	
-					else
+					}
+			//FPU		
+					else if(theTable.getSelectedColumn()==3 && theTable.getSelectedRow()<32)
 					{
-					edumips64.Main.getSB().setText(
+						CPU cpu=CPU.getInstance();
+						edumips64.Main.getSB().setText(
+							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
+							CurrentLocale.getString("StatusBar.OFREGISTERFP") +
+							theTable.getSelectedRow() +
+							" : " +
+							cpu.getRegisterFP(theTable.getSelectedRow()).readDouble());
+					
+					}
+					
+					else if(theTable.getSelectedColumn()==1)
+					{
+							edumips64.Main.getSB().setText(
 							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
 							CurrentLocale.getString("StatusBar.OFREGISTER") +
 							theTable.getSelectedRow() +
@@ -268,7 +314,8 @@ public class GUIRegisters extends GUIComponent
 ///
 			case 3:
 				if(row!=32 && row!=33)
-					return "0000000000000000";
+//FPU					//return "0000000000000000";
+					return valueFP[row];
 				else
 					return "";
             		default:

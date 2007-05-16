@@ -1377,16 +1377,12 @@ register
 			error.add("FP_UNDERFLOW",row,i+1,line);
 			continue;
 		    }
-		    catch(edumips64.core.fpu.FPInexactException ex)
+		    catch(edumips64.core.fpu.FPInvalidOperationException ex)
 		    {
 			numError++;
-			error.add("FP_INEXACT",row,i+1,line);
-System.out.println("INEXACT");
-			continue;
-			    
+			error.add("FP_INVALID_OPERATION",row,i+1,line);
+			continue;			
 		    }
-		    
-		    
 		    catch(Exception e)
 		    {
 			e.printStackTrace();

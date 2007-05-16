@@ -41,7 +41,7 @@ public class FPInstructionUtils
 	*  @throws ExponentTooLargeException,FPOverflowException,FPUnderflowException
 	*  @return the binary string
 	*/    
-	public static String doubleToBin(String value) throws FPExponentTooLargeException,FPOverflowException,FPUnderflowException,FPInexactException
+	public static String doubleToBin(String value) throws FPExponentTooLargeException,FPOverflowException,FPUnderflowException,FPInvalidOperationException
 	{
 	    String PLUSINFINITY="0111111111110000000000000000000000000000000000000000000000000000";
 	    String MINUSINFINITY="1111111111110000000000000000000000000000000000000000000000000000";

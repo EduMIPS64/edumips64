@@ -23,6 +23,10 @@
 package edumips64;
 
 import edumips64.ui.*;
+import edumips64.core.fpu.FPExponentTooLargeException;
+import edumips64.core.fpu.FPInvalidOperationException;
+import edumips64.core.fpu.FPOverflowException;
+import edumips64.core.fpu.FPUnderflowException;
 import edumips64.img.*;
 import edumips64.utils.*;
 import edumips64.core.*;
@@ -45,6 +49,9 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.KeyStroke.*;
 import javax.imageio.ImageIO;
+
+//FPU diagnostics 
+import java.io.*;
 
 /** Entry point of EduMIPS64
  * @author Andrea Spadaccini, Antonella Scandura, Vanni Rizzo
@@ -170,6 +177,42 @@ public class Main extends JApplet {
         }
 
         f.setExtendedState(f.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+	
+// FPU DIAGNOSTICS
+	/* BitSet64FP
+		BitSet64FP bs=new BitSet64FP();
+		try{
+			//interactive inputs
+			//BufferedReader stdin = new BufferedReader( new InputStreamReader(System.in)); System.out.print("Read value:"); 
+			//bs.writeDouble(Double.parseDouble(stdin.readLine()));
+			
+			bs.writeDouble("3.5E309");
+			System.out.println(bs.readDouble());
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	 */
+	
+	//writing test on FPR 0
+	CPU cpu=CPU.getInstance();
+	cpu.setFPExceptions(CPU.FPExceptions.OVERFLOW,false);
+		try {
+			cpu.getRegisterFP(0).writeDouble("54E380");
+		} catch (IrregularWriteOperationException ex) {
+			ex.printStackTrace();
+		} catch (FPOverflowException ex) {
+			ex.printStackTrace();
+		} catch (FPInvalidOperationException ex) {
+			ex.printStackTrace();
+		} catch (FPExponentTooLargeException ex) {
+			ex.printStackTrace();
+		} catch (FPUnderflowException ex) {
+			ex.printStackTrace();
+		}
+	System.out.println(cpu.fprString());
+	
+		
     }
 
     private static void addFrame(String name, JInternalFrame f) {
