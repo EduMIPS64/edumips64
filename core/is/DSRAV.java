@@ -29,7 +29,7 @@ import edumips64.utils.*;
 
 /**
  * <pre>
- *      Format: DSRAV rd, rs, rt
+ *      Format: DSRAV rd, rt, rs
  * Description: To execute an arithmetic right-shift of a doubleword by a variable number of bits
  * Description: rd = rt >> rs (arithmetic)
  *              The doubleword contents of GPR rt are shifted right, duplicating 

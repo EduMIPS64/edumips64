@@ -30,7 +30,7 @@ import edumips64.utils.*;
 
 /**
  * <pre>
- *      Syntax: DSLLV rd, rs, rt
+ *      Syntax: DSLLV rd, rt, rs
  * Description: To execute a left-shift of a doubleword by a variable number of bits.
  *              The 64-bit doubleword contents of GPR rt are shifted left, inserting 
  *              zeros into the emptied bits; the result is placed in GPR rd. 
@@ -39,7 +39,16 @@ import edumips64.utils.*;
  **/
 public class DSLLV extends ALU_RType
 {
-	final String OPCODE_VALUE="010100";
+    final int RD_FIELD=0;
+    final int RT_FIELD=1;
+    final int RS_FIELD=2;
+    final int RD_FIELD_INIT=11;
+    final int RT_FIELD_INIT=16;
+    final int RS_FIELD_INIT=21;
+    final int RD_FIELD_LENGTH=5;
+    final int RT_FIELD_LENGTH=5;
+    final int RS_FIELD_LENGTH=5;
+    final String OPCODE_VALUE="010100";
 	/** Creates a new instance of DSLLV */
 	public DSLLV()
 	{
@@ -50,8 +59,8 @@ public class DSLLV extends ALU_RType
 	public void EX() 
 		throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException 
 	{
-		String rt = TR[RS_FIELD].getBinString();//HACK FITUSO
-		String rs = TR[RT_FIELD].getBinString();//HACK FITUSO
+		String rt = TR[RT_FIELD].getBinString();
+		String rs = TR[RS_FIELD].getBinString();
 		String shift = "",rd;
 		int nbits;
 		shift=rs.substring(58);
