@@ -353,8 +353,17 @@ public class GUIRegisters extends GUIComponent
 
 					try
 					{
+						CPU cpu=CPU.getInstance();
 						String bin = Converter.hexToBin(valueCurrent[rowCurrent]);
-						registers[rowCurrent].setBits(bin,0);
+						//writing generic gpr
+						if(rowCurrent<32)
+							registers[rowCurrent].setBits(bin,0);
+						//writing LO
+						else if(rowCurrent==32)
+							cpu.getLO().setBits(bin,0);
+						//writing HI
+						else if(rowCurrent==33)
+							cpu.getHI().setBits(bin,0);
 					}
 					catch (Exception e)
 					{
