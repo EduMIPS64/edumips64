@@ -1,7 +1,7 @@
 /* GUIRegisters.java
  *
  * This class shows the values stored in the registers.
- * (c) 2006 Carmelo Mirko Musumeci
+ * (c) 2006 Carmelo Mirko Musumeci, Massimo Trubia (FPU modifications)
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -55,6 +55,9 @@ public class GUIRegisters extends GUIComponent
 	String valueCurrent[];
 	private enum AliasRegister 
 		{zero,at,v0,v1,a0,a1,a2,a3,t0,t1,t2,t3,t4,t5,t6,t7,s0,s1,s2,s3,s4,s5,s6,s7,t8,t9,k0,k1,gp,sp,fp,ra};
+	public int xprLastDoubleClick; //used for instanciating an InsertValueDialog if a double click on gpr or fpr is performed 
+				//(i want to avoid to modify the class constructor) the value is zero if a gpr is double clicked
+				//1 if an fpr is double clicked
 	
 	public GUIRegisters()
 	{
@@ -62,6 +65,7 @@ public class GUIRegisters extends GUIComponent
 		registers = cpu.getRegisters();
 		registersFP=cpu.getRegistersFP();
 		regPanel = new RegPanel();
+		xprLastDoubleClick=0;
 	}
 
 	public void setContainer (Container co) 
@@ -221,6 +225,7 @@ public class GUIRegisters extends GUIComponent
     			Object premuto = e.getSource();
       			if ((premuto == theTable)){
 				try{
+					//click on LO register
 					if(theTable.getSelectedRow()==32 && theTable.getSelectedColumn()==1)
 					{
 					
@@ -229,6 +234,7 @@ public class GUIRegisters extends GUIComponent
 						Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
 	
 					}
+					//click on HI register
 					else if (theTable.getSelectedRow()==33  && theTable.getSelectedColumn()==1)
 					{
 						edumips64.Main.getSB().setText(
@@ -236,7 +242,7 @@ public class GUIRegisters extends GUIComponent
 							"HI" + " : " +
 							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
 					}
-			//FPU		
+			//FPU		//click on generic fpr
 					else if(theTable.getSelectedColumn()==3 && theTable.getSelectedRow()<32)
 					{
 						CPU cpu=CPU.getInstance();
@@ -248,7 +254,7 @@ public class GUIRegisters extends GUIComponent
 							cpu.getRegisterFP(theTable.getSelectedRow()).readDouble());
 					
 					}
-					
+					//click on generic gpr
 					else if(theTable.getSelectedColumn()==1)
 					{
 							edumips64.Main.getSB().setText(
@@ -259,10 +265,22 @@ public class GUIRegisters extends GUIComponent
 							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
 					}
 				}catch(IrregularStringOfHexException hex) { hex.printStackTrace();}
-        			if (theTable.getSelectedRow() != 0 && e.getClickCount() == 2) {
+        			
+				
+				//double click on the generic gpr 
+				if (theTable.getSelectedColumn()==1 &&  theTable.getSelectedRow() != 0 && e.getClickCount() == 2) {
+					xprLastDoubleClick=0;
 					int row = theTable.getSelectedRow();
 					oldValue = value[row]; //estraggo il valore corrente dal registro
 					JDialog IVD = new InsertValueDialog(row,oldValue,value); 
+				}
+				//double click on the generic fpr
+				else if(theTable.getSelectedColumn()==3 && theTable.getSelectedRow()<32 && e.getClickCount()==2)
+				{
+					xprLastDoubleClick=1;
+					int row=theTable.getSelectedRow();
+					oldValue = valueFP[row];
+					JDialog IVD = new InsertValueDialog(row,oldValue,valueFP);
 				}
       			}
     		}
@@ -341,7 +359,7 @@ public class GUIRegisters extends GUIComponent
 				
 		public InsertValueDialog (int row, String oldValue, String value[]) 
 		{
-			super();
+			super();			
 			rowCurrent = row;
 			valueCurrent = value;
 			JFrame frameDialog = new JFrame();
@@ -351,7 +369,13 @@ public class GUIRegisters extends GUIComponent
 			Dimension d = new Dimension(150,20);
 			Container c = getContentPane();
 			c.setLayout(GBL);
-			JLabel label = new JLabel("R"+rowCurrent+" ( "+registerToAlias("R"+rowCurrent)+" ) = ");
+			JLabel label=null;
+		//double click on generic gpr
+			if(xprLastDoubleClick==0)
+				label = new JLabel("R"+rowCurrent+" ( "+registerToAlias("R"+rowCurrent)+" ) = ");
+		//double click on generic fpr	
+			else if(xprLastDoubleClick==1)
+				label = new JLabel("F" + rowCurrent + "=");
 			c.add(label);
 			GBC.gridx = 0;
 			GBC.gridy = 0;
@@ -417,7 +441,10 @@ public class GUIRegisters extends GUIComponent
 					try
 					{
 						String bin = Converter.hexToBin(valueCurrent[rowCurrent]);
-						registers[rowCurrent].setBits(bin,0);
+						if(xprLastDoubleClick==0)
+							registers[rowCurrent].setBits(bin,0);
+						else if(xprLastDoubleClick==1)
+							registersFP[rowCurrent].setBits(bin,0);
 					}
 					catch (Exception e)
 					{
@@ -432,14 +459,18 @@ public class GUIRegisters extends GUIComponent
 					{
 						CPU cpu=CPU.getInstance();
 						String bin = Converter.hexToBin(valueCurrent[rowCurrent]);
-						//writing generic gpr
-						if(rowCurrent<32)
+					//writing labels on registers	
+						//writing gprs
+						if(xprLastDoubleClick==0 && rowCurrent<32)
 							registers[rowCurrent].setBits(bin,0);
+						//writing fprs
+						else if(xprLastDoubleClick==1 && rowCurrent<32)
+							registersFP[rowCurrent].setBits(bin,0);
+						
 						//writing LO
-						else if(rowCurrent==32)
+						if(xprLastDoubleClick==0 && rowCurrent==32)
 							cpu.getLO().setBits(bin,0);
-						//writing HI
-						else if(rowCurrent==33)
+						else if(xprLastDoubleClick==0 && rowCurrent==33)
 							cpu.getHI().setBits(bin,0);
 					}
 					catch (Exception e)
