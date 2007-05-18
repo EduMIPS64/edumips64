@@ -831,7 +831,7 @@ associated respectively to standard input, standard output and standard error.
 SYSCALL 3 expects three parameters: the file descriptor to read from, the
 address where the read data must be put into, the number of bytes to read.
 
-If the first parameter is 1, the simulator will prompt the user for an input,
+If the first parameter is 0, the simulator will prompt the user for an input,
 via an input dialog. If the length of the input is greater than the number of
 bytes that have to be read, the simulator will show again the message dialog.
 

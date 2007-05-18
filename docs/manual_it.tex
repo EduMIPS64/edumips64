@@ -787,7 +787,7 @@ SYSCALL 2 richiede solo un parametro, il file descriptor del file che deve esser
 SYSCALL 3 richiede tre parametri: il file descriptor da cui leggere, l'indirizzo nel quale i dati letti 
 dovranno essere copiati, il numero di byte da leggere.
 
-Se il primo parametro \`{e} 1, il simulatore permetter\`{a} all'utente di inserire un valore mediante un'apposita finestra di dialogo. 
+Se il primo parametro \`{e} 0, il simulatore permetter\`{a} all'utente di inserire un valore mediante un'apposita finestra di dialogo. 
 Se la lunghezza del valore immesso \`{e} maggiore del numero di byte che devono essere letti, il simulatore mostrer\`{a} nuovamente la finestra.
 
 La chiamata di sistema ritorna il numero di byte effettivamente letti, o -1 se l'operazione di lettura fallisce. Possibili cause di errore sono 
