@@ -40,6 +40,7 @@ import java.text.*;
 
 public class GUIIO extends JInternalFrame {
 	private JTextArea output_area;
+    private JButton clear;
 
 	/** Writes a message to the output area. */
 	public void write(String message) {
@@ -81,10 +82,23 @@ public class GUIIO extends JInternalFrame {
 		output_area.setEditable(false);
 		output_area.setFont(new Font("Monospaced", Font.PLAIN, 12));
 
+        clear = new JButton(CurrentLocale.getString("CLEAR"));
+
 		Container cp = this.getContentPane();
+        Container lowerbox = Box.createHorizontalBox();
+        lowerbox.add(clear);
+
+        clear.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                output_area.setText("");
+            }
+        });
+
+
 		cp.setLayout(new BoxLayout(cp, BoxLayout.PAGE_AXIS));
 
 		cp.add(new JScrollPane(output_area));
+        cp.add(lowerbox);
 		setSize(650, 300);
 	}
 }
