@@ -332,7 +332,7 @@ public class Parser
 										boolean placeholder = false;
 										int escaped = 0;		// to avoid escape sequences to count as two bytes
 										for(int tmpi = 0; tmpi < num; tmpi++) {
-											if((tmpi - escaped) % 8 == 0 && (tmpi - escaped) != 0) {
+											if((tmpi - escaped) % 8 == 0 && (tmpi - escaped) != 0 && !escape) {
 												edumips64.Main.logger.debug(".ascii(z): requested new memory cell (" + memoryCount + ")");
 												tmpMem = mem.getCell(memoryCount * 8);
 												memoryCount++;
