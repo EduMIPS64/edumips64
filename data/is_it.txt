@@ -136,11 +136,12 @@ Descrizione:
             
 Istruzione DSLLV 
 
-Sintassi: DSLLV rd, rs, rt
+Sintassi: DSLLV rd, rt, rs
 Descrizione: 
             Effettua uno shift a sinistra di un valore a 64 bit di un numero variabile
-            di bit. I 64 bit contenuti nel GPR vengono shiftati a sinistra, 
-            inserendo degli zeri nei bit vuoti, il risultato e' memorizzato nel registro rd.
+            di bit. I 64 bit contenuti nel GPR vengono shiftati a sinistra del valore contenuto negli
+            ultimi 6 bit in GPR rs, inserendo degli zeri nei bit vuoti.
+            Il risultato e' memorizzato nel registro rd.
             
 Istruzione DSRA 
 
@@ -151,11 +152,12 @@ Descrizione:
             
 Istruzione DSRAV 
 
-ormat: DSRAV rd, rs, rt
+Format: DSRAV rd, rs, rt
 Descrizione: rd = rt >> rs (arithmetic)
             Effettua uno shift aritmetico di un numero variabile di bit.
-            Il valore a 64 bit contenuto nel GPR rt e' shiftato a destra, duplicando 
-            il bit di segno (63) nei bit vuoti, il risultato e' memorizzato nel registro rd.
+            Il valore a 64 bit contenuto nel GPR rt e' shiftato a destra del valore contenuto negli
+            ultimi 6 bit in GPR rs, duplicando il bit di segno (63) nei bit vuoti.
+            Il risultato e' memorizzato nel registro rd.
             
 Istruzione DSRL 
 
@@ -170,8 +172,9 @@ Istruzione DSRLV
 Sintassi:      DSRLV rd, rs, rt
 Descrizione: 
             Effettua uno shift logico a destra di una doubleword per un numero variabile di bit.
-            Il valore a 64 bit contenuto nel GPR rt e' shiftato a destra inserendo degli
-            zeri nei bit vuoti, il risultato e' memorizzato nel registro rd.
+            Il valore a 64 bit contenuto nel GPR rt e' shiftato a destra del valore contenuto negli
+            ultimi 6 bit in GPR rs, inserendo degli zeri nei bit vuoti.
+            Il risultato e' memorizzato nel registro rd.
             
 Istruzione DSUB 
 
@@ -338,7 +341,23 @@ Istruzione SH
 Sintassi: SH rt, offset(base)
 Descrizione: memory[base+offset] = rt
             Memorizza l'halfword contenuta in rt in memoria.
+
+Istruzione SLT
+
+Sintassi: SLT rd, rs, rt
+Descrizione: 
+            Memorizza il risultato del confronto rs<rt nel GPR rd.
+            Non si verifica alcuna eccezione di overflow.
             
+Istruzione SLTI
+
+Sintassi: SLTI rd, rs, immediate
+Descrizione: 
+            Memorizza il risultato del confronto di minoranza tra il registro rs 
+            ed una costante. Pone il risultato nel registro rt.
+            Se il registro rs contiene un valore minore dell'immediato, rt viene
+            posto ad 1 (true), altrimenti viene posto a 0 (false).   
+			
 Istruzione SLTIU 
 
 Sintassi: SLTIU rt, rs, immediate
@@ -348,13 +367,13 @@ Descrizione:
             Se il registro rs contiene un valore minore dell'immediato, rt viene
             posto ad 1 (true), altrimenti viene posto a 0 (false).            
         
-Istruzione SLTU 
+Istruzione SLTU
 
-Sintassi: SLT rd, rs, rt
+Sintassi: SLTU rd, rs, rt
 Descrizione: 
-            Memorizza il risultato del confronto rs<rt nel GPR rd.
-            Non si verifica alcuna eccezione di overflow.
-            
+            Memorizza il risultato del confronto senza segno rs<rt nel GPR rd.
+            Non si verifica alcuna eccezione di overflow.			
+			         
 Istruzione SW 
 
 Sintassi: SW rt, offset(base)
@@ -374,8 +393,3 @@ Sintassi: XORI rt, rs, immediate
 Descrizione: rt = rs XOR immediate
              Effettua l'OR esclusivo con una costante.
              
-
-
-
-
-

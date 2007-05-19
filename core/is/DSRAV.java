@@ -32,8 +32,9 @@ import edumips64.utils.*;
  *      Format: DSRAV rd, rt, rs
  * Description: To execute an arithmetic right-shift of a doubleword by a variable number of bits
  * Description: rd = rt >> rs (arithmetic)
- *              The doubleword contents of GPR rt are shifted right, duplicating 
- *              the sign bit (63) into the emptied bits; the result is placed in GPR rd.
+ *	The doubleword contents of GPR rt are shifted right, duplicating 
+ *	the sign bit (63) into the emptied bits. The bit-shift amount in the range 0 to 63 is specified by the low-order 6 bits in GPR rs.
+ *	The result is placed in GPR rd.
  *</pre>
  * @author Trubia Massimo, Russo Daniele
  */

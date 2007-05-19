@@ -10,9 +10,9 @@ AND Instruction
 
 Syntax: AND rd, rs, rt 
 Description: rd = rs and rt
-Does a bitwise logical AND, the contents of GPR rs are combined 
-with the contents of GPR rt in a bitwise logical AND operation.
-The result is placed into GPR rd.
+            Does a bitwise logical AND, the contents of GPR rs are combined 
+            with the contents of GPR rt in a bitwise logical AND operation.
+            The result is placed into GPR rd.
             
             
 ANDI Instruction
@@ -77,8 +77,8 @@ Syntax: DADDU rd, rs, rt
 Description: rd = rs + rt
             To add 64-bit integers
             The 64-bit doubleword value in GPR rt is added to the 64-bit value 
-  		    in GPR rs and the 64-bit arithmetic result is placed into GPR rd.
-  		    No Integer Overflow exception occurs under any circumstances.
+            in GPR rs and the 64-bit arithmetic result is placed into GPR rd.
+            No Integer Overflow exception occurs under any circumstances.
             
 DADDIU Instruction
 
@@ -142,7 +142,8 @@ Syntax: DSLLV rd, rs, rt
 Description: 
             To execute a left-shift of a doubleword by a variable number of bits.
             The 64-bit doubleword contents of GPR rt are shifted left, inserting 
-            zeros into the emptied bits; the result is placed in GPR rd. 
+            zeros into the emptied bits; the result is placed in GPR rd.
+            The bit-shift amount is specified by the low-order 6 bits in GPR rs.
             
 DSRA Instruction
 
@@ -153,11 +154,12 @@ Description:
             
 DSRAV Instruction
 
-ormat: DSRAV rd, rs, rt
+Format: DSRAV rd, rs, rt
 Description: rd = rt >> rs (arithmetic)
             To execute an arithmetic right-shift of a doubleword by a variable number of bits
             The doubleword contents of GPR rt are shifted right, duplicating 
             the sign bit (63) into the emptied bits; the result is placed in GPR rd.
+            The bit-shift amount is specified by the low-order 6 bits in GPR rs.
             
 DSRL Instruction
 
@@ -174,6 +176,7 @@ Description:
             To execute a logical right-shift of a doubleword by a variable number of bits
             The 64-bit doubleword contents of GPR rt are shifted right, inserting 
             zeros into the emptied bits; the result is placed in GPR rd. 
+            The bit-shift amount is specified by the low-order 6 bits in GPR rs.
             
 DSUB Instruction
 
@@ -358,13 +361,34 @@ Syntax: ORI rt, rs, immediate
 Description:   
             To do a bitwise logical OR with a constant.
             
-SLTU Instruction
+SLT Instruction
 
 Syntax: SLT rd, rs, rt
 Description: 
+            Records the result of a less-than comparison (rs<rt).
+
+SLTI Instruction
+
+Syntax: SLTI rd, rs, immediate
+Description: 
+            Records the result of a less-than comparison with a constant.      
+			
+SLTIU Instruction
+
+Syntax: SLTIU rt, rs, immediate
+Description:
+            Records the result of an unsigned less-than comparison with a constant
+            comparing the contents of GPR rs and the sign-extended immediate as unsigned 
+            and recording the result in GPR rt. If GPR rs is less than immediate, rt 
+            will be 1 i.e true, else rt will be 0 i.e false.
+			
+SLTU Instruction
+
+Syntax: SLTU rd, rs, rt
+Description: 
             Records the result of an unsigned less-than comparison
-   		    (rs<rt) in the GPR rd. In case, an Integer Overflow 
-   		    exception will not occours.
+            (rs<rt) in the GPR rd. In case, an Integer Overflow 
+            exception will not occours.
             
 SW Instruction
 
@@ -372,20 +396,7 @@ Syntax: SW rt, offset(base)
 Description: 
             Stores in memory a byte from memory i.e rt = memory[base+offset]
             adding the signed offset to base to form the final address.
-            
-XOR Instruction
-
-Syntax: XOR rd, rs, rt
-Description: rd = rs XOR rt
-            Combine the contents of GPR rs and GPR rt in a bitwise
-            logical Exclusive OR operation.
-            
-XORI Instruction
-
-Syntax: XORI rt, rs, immediate
-Description: rt = rs XOR immediate
-             To do a bitwise logical Exclusive OR with a constant.
-             
+                         
 SB Instruction
 
 Syntax: SB rt, offset(base)
@@ -403,30 +414,17 @@ SH Instruction
 Syntax: SH rt, offset(base)
 Description: memory[base+offset] = rt
             Stores the halfword in rt to memory.
+			
+XOR Instruction
+
+Syntax: XOR rd, rs, rt
+Description: rd = rs XOR rt
+            Combine the contents of GPR rs and GPR rt in a bitwise
+            logical Exclusive OR operation.
+            
+XORI Instruction
+
+Syntax: XORI rt, rs, immediate
+Description: rt = rs XOR immediate
+             To do a bitwise logical Exclusive OR with a constant.
     
-SLT Instruction
-
-Syntax: SLT rd, rs, rt
-Description: rd = (rs < rt)
-            Records the result of a less-than comparison.
-            
-SLTI Instruction
-
-Syntax: SLTI rt, rs, immediate
-Description: 
-            Records the result of a less-than comparison with a constant.
-            
-SLTIU Instruction
-
-Syntax: SLTIU rt, rs, immediate
-Description: 
-            Records the result of an unsigned less-than comparison with a constant
-   	        comparing the contents of GPR rs and the sign-extended immediate as unsigned 
-            and recording the result in GPR rt. If GPR rs is less than immediate, rt 
-    		will be 1 i.e true, else rt will be 0 i.e false.
- 	        
-
-  		    
-
-
-            

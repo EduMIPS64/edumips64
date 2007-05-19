@@ -33,7 +33,8 @@ import edumips64.utils.*;
  *      Syntax: DSLLV rd, rt, rs
  * Description: To execute a left-shift of a doubleword by a variable number of bits.
  *              The 64-bit doubleword contents of GPR rt are shifted left, inserting 
- *              zeros into the emptied bits; the result is placed in GPR rd. 
+ *              zeros into the emptied bits. The bit-shift amount in the range 0 to 63 is specified by the low-order 6 bits in GPR rs.
+ *	       The result is placed in GPR rd. 
  *</pre>
  * @author Trubia Massimo, Russo Daniele
  **/
