@@ -246,37 +246,6 @@ Description:
             the 64-bit value in GPR rs and the 64-bit arithmetic result 
             is placed into GPR rd.
             
-LH Instruction
-
-Syntax: LH rt, offset(base)
-Description: rt = memory[base+offset]
-            To load a halfword from memory as a signed value.
-            
-LHU Instruction
-
-Syntax: LHU rt, offset(base)
-Description:  rt = memory[base+offset]    
-            To load a halfword from memory as an unsigned value  
-            
-LUI Instruction
-
-Format: LUI rt, immediate
-Description:   
-            The 16-bit immediate is shifted left 16 bits and concatenated 
-            with 16 bits of low-order zeros. 
-            
-LW Instruction
-
-Format: LW rt, offset(base)
-Description:   rt = memory[base+offset]
-            To load a word from memory as a signed value.
-            
-LWU Instruction
-
-Syntax: LWU rt, offset(base)
-Description:   rt = memory[base+offset]
-            To load a word from memory as an unsigned value.
-            
 HALT Instruction
 
 Syntax:    HALT
