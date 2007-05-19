@@ -87,9 +87,32 @@ public abstract class Instruction {
         return returnedObject;
     }
     public enum InstructionEnumerator {
+	
+						//ALU R-Type 32-bits
+						ADD  { Instruction getObject() { ADD newObject=new ADD();return newObject; } },
+						ADDU { Instruction getObject() { ADDU newObject=new ADDU(); return newObject; } },
+						SUB  { Instruction getObject() { SUB newObject=new SUB();return newObject;}},
+					    SUBU { Instruction getObject() { SUBU newObject=new SUBU(); return newObject; } },
+						DIV { Instruction getObject() { DIV newObject=new DIV(); return newObject; } },
+						DIVU { Instruction getObject() { DIVU newObject=new DIVU(); return newObject; } },
+						MULT { Instruction getObject() { MULT newObject=new MULT(); return newObject; } },
+						MULTU { Instruction getObject() { MULTU newObject=new MULTU(); return newObject; } },
+											
+						//ALU I-Type 32-bits
+						ADDI { Instruction getObject() { ADDI newObject=new ADDI(); return newObject; } },
+						ADDIU{ Instruction getObject() { ADDIU newObject=new ADDIU(); return newObject; } },			
+
+						//ALU Shifting 32-bits
+						SLL { Instruction getObject() {SLL newObject=new SLL();return newObject;}},
+						SLLV { Instruction getObject() {SLLV newObject=new SLLV();return newObject;}},
+						SRA { Instruction getObject() {SRA newObject=new SRA();return newObject;}},
+						SRAV { Instruction getObject() {SRAV newObject=new SRAV();return newObject;}},
+						SRL { Instruction getObject() {SRL newObject=new SRL();return newObject;}},
+						SRLV { Instruction getObject() {SRLV newObject=new SRLV();return newObject;}},
+						
                         //ALU R-Type
                         AND   { Instruction getObject() { AND newObject=new AND(); return newObject; } },
-			DADD  { Instruction getObject() { DADD newObject=new DADD();return newObject; } },
+						DADD  { Instruction getObject() { DADD newObject=new DADD();return newObject; } },
                         DADDU { Instruction getObject() { DADDU newObject=new DADDU(); return newObject; } },
                         DSUB  { Instruction getObject() { DSUB newObject=new DSUB();return newObject;}},
                         DSUBU { Instruction getObject() { DSUBU newObject=new DSUBU(); return newObject; } },

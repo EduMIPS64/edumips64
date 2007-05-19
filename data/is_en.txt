@@ -5,7 +5,36 @@ Here's a quick reference guide to the EduMIPS64 Instruction Set. Some
 descriptions are taken from the MIPS64 Manual. Please let us know if it is a 
 problem, and we will remove them.
 
+ADD Instruction
 
+Syntax: ADD rd, rs, rt
+Description: 
+            To add 32-bit integers. If overflow occurs, then trap.
+            
+ADDI Instruction
+
+Syntax: ADDI rt, rs, immediate
+Description: 
+            To add a constant to a 32-bit integer. If overflow occurs, then trap.
+
+ADDU Instruction
+
+Syntax: ADDU rd, rs, rt
+Description: rd = rs + rt
+            To add 32-bit integers
+            The 32-bit word value in GPR rt is added to the 32-bit value 
+            in GPR rs and the 32-bit arithmetic result is placed into GPR rd.
+            No Integer Overflow exception occurs under any circumstances.
+            
+ADDIU Instruction
+
+Syntax: ADDIU rt, rs, immediate
+Description: 
+            To add a constant to a 32-bit integer
+            The 16-bit signed immediate is added to the 32-bit value 
+            in GPR rs and the 32-bit arithmetic result is placed into
+            GPR rt. No Integer Overflow exception occurs under any circumstances.
+			
 AND Instruction
 
 Syntax: AND rd, rs, rt 
@@ -104,13 +133,35 @@ DDIVU Instruction
 
 Syntax: DDIVU rs, rt
 Description: (LO, HI) = rs / rt
-            To divide 64-bit signed integers
+            To divide 64-bit unsigned integers
             The 64-bit doubleword in GPR rs is divided by the 64-bit 
             doubleword in GPR rt, treating both operands as unsigned values.
             The 64-bit quotient is placed into special register LO and the 
             64-bit remainder is placed into special register HI.
             No arithmetic exception occurs under any circumstances.
             
+DIV Instruction
+
+Syntax: DIV rs, rt
+Description: (LO, HI) = rs / rt
+            To divide 32-bit signed integers
+            The 32-bit word in GPR rs is divided by the 32-bit 
+            word in GPR rt, treating both operands as signed values.
+            The 32-bit quotient is placed into special register LO and the 
+            32-bit remainder is placed into special register HI.
+            No arithmetic exception occurs under any circumstances.
+
+DIVU Instruction
+
+Syntax: DIVU rs, rt
+Description: (LO, HI) = rs / rt
+            To divide 32-bit unsigned integers
+            The 32-bit word in GPR rs is divided by the 32-bit 
+            word in GPR rt, treating both operands as unsigned values.
+            The 32-bit quotient is placed into special register LO and the 
+            32-bit remainder is placed into special register HI.
+            No arithmetic exception occurs under any circumstances.
+			
 DMULT Instruction
 
 Syntax: DMULT rs, rt
@@ -129,7 +180,7 @@ Description: (LO) = rs * rt
            
 DSLL Instruction
 
-Syntax: DSLL rd, rt, sa Doubleword shift left logical
+Syntax: DSLL rd, rt, sa
 Description: 
             To execute a left-shift of a doubleword by a fixed amount 0 to 31 bits
             The 64-bit doubleword contents of GPR rt are shifted left, 
@@ -138,7 +189,7 @@ Description:
             
 DSLLV Instruction
 
-Syntax: DSLLV rd, rs, rt
+Syntax: DSLLV rd, rt, rs
 Description: 
             To execute a left-shift of a doubleword by a variable number of bits.
             The 64-bit doubleword contents of GPR rt are shifted left, inserting 
@@ -154,7 +205,7 @@ Description:
             
 DSRAV Instruction
 
-Format: DSRAV rd, rs, rt
+Format: DSRAV rd, rt, rs
 Description: rd = rt >> rs (arithmetic)
             To execute an arithmetic right-shift of a doubleword by a variable number of bits
             The doubleword contents of GPR rt are shifted right, duplicating 
@@ -171,7 +222,7 @@ Description:
             
 DSRLV Instruction
 
-Syntax:      DSRLV rd, rs, rt
+Syntax:      DSRLV rd, rt, rs
 Description: 
             To execute a logical right-shift of a doubleword by a variable number of bits
             The 64-bit doubleword contents of GPR rt are shifted right, inserting 
@@ -341,6 +392,22 @@ Description: if rt = 0 then rd = rs
             If the value in GPR rt is equal to zero, then the contents 
             of GPR rs are placed into GPR rd.
             
+MULT Instruction
+
+Syntax: MULT rs, rt
+Description: (LO) = rs * rt
+           To divide 32-bit signed integers
+           The 32-bit word value in GPR rt is multiplied by the 32-bit 
+           value in GPR rs, treating both operands as signed values.
+
+MULTU Instruction
+
+Syntax: MULTU rs, rt
+Description: (LO) = rs * rt
+           To divide 32-bit signed integers
+           The 32-bit word value in GPR rt is multiplied by the 32-bit 
+           value in GPR rs, treating both operands as unsigned values.
+		   
 NOP Instruction
 
 Syntax: NOP
@@ -361,6 +428,24 @@ Syntax: ORI rt, rs, immediate
 Description:   
             To do a bitwise logical OR with a constant.
             
+SLL Instruction
+
+Syntax: SLL rd, rt, sa
+Description: 
+            To execute a left-shift of a word by a fixed amount 0 to 31 bits
+            The 32-bit word contents of GPR rt are shifted left, 
+            inserting zeros into the emptied bits; the result is placed in GPR rd. 
+            The bit-shift amount in the range 0 to 31 is specified by sa.
+            
+SLLV Instruction
+
+Syntax: SLLV rd, rt, rs
+Description: 
+            To execute a left-shift of a word by a variable number of bits.
+            The 32-bit word contents of GPR rt are shifted left, inserting 
+            zeros into the emptied bits; the result is placed in GPR rd.
+            The bit-shift amount is specified by the low-order 5 bits in GPR rs.
+			
 SLT Instruction
 
 Syntax: SLT rd, rs, rt
@@ -390,6 +475,39 @@ Description:
             (rs<rt) in the GPR rd. In case, an Integer Overflow 
             exception will not occours.
             
+SRA Instruction
+
+Format: SRA rd, rt, sa
+Description: 
+            To execute an arithmetic right-shift of a word 
+            by a fixed amount—0 to 31 bits.
+            
+SRAV Instruction
+
+Format: SRAV rd, rt, rs
+Description: rd = rt >> rs (arithmetic)
+            To execute an arithmetic right-shift of a word by a variable number of bits
+            The word contents of GPR rt are shifted right, duplicating 
+            the sign bit (31) into the emptied bits; the result is placed in GPR rd.
+            The bit-shift amount is specified by the low-order 5 bits in GPR rs.
+			
+SRL Instruction
+
+Syntax: SRL rd, rt, sa
+Description: 
+            To execute a logical right-shift of a word by a fixed amount of 0 to 31 bits
+            The word contents of GPR rt are shifted right, inserting zeros 
+            into the emptied bits; the result is placed in GPR rd.
+            
+SRLV Instruction
+
+Syntax:      SRLV rd, rt, rs
+Description: 
+            To execute a logical right-shift of a word by a variable number of bits
+            The 32-bit word contents of GPR rt are shifted right, inserting 
+            zeros into the emptied bits; the result is placed in GPR rd. 
+            The bit-shift amount is specified by the low-order 5 bits in GPR rs.
+			
 SW Instruction
 
 Syntax: SW rt, offset(base)
@@ -414,6 +532,23 @@ SH Instruction
 Syntax: SH rt, offset(base)
 Description: memory[base+offset] = rt
             Stores the halfword in rt to memory.
+			
+SUB Instruction
+
+Syntax: SUB rd, rs, rt
+Description: 
+            To subtract 32-bit integers; trap on overflow
+            The 32-bit word value in GPR rt is subtracted from 
+            the 32-bit value in GPR rs to produce a 32-bit result. 
+            
+SUBU Instruction
+
+Syntax: SUBU rd, rs, rt
+Description: 
+            To subtract 32-bit integers;
+            The 32-bit doubleword value in GPR rt is subtracted from 
+            the 32-bit value in GPR rs and the 32-bit arithmetic result 
+            is placed into GPR rd.
 			
 XOR Instruction
 
