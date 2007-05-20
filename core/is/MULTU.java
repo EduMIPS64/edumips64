@@ -27,6 +27,7 @@
 package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
+import java.math.BigInteger;
 
 //per diagnostica
 import java.util.*;
@@ -81,26 +82,19 @@ class MULTU extends ALU_RType
 		//cutting the high part of registers
 		str_rs=str_rs.substring(32,64);
 		str_rt=str_rt.substring(32,64);
-		/*for (int i=str_rs.length();i<64;i++){
-			str_rs='0'+str_rs;		
-		}
-		for (int i=str_rt.length();i<64;i++){
-			str_rt='0'+str_rt;		
-		}*/
 		
-		long rs = Converter.binToLong(str_rs,true);
-		long rt = Converter.binToLong(str_rt,true);						
-		long result = rs * rt;
-		//converting result to a String of 64-bits
-		String tmp = Long.toString(result,2);
-		if(tmp.charAt(0)=='-')
-			tmp=tmp.substring(1);
-		for (int i=tmp.length();i<64;i++){
-			tmp='0'+tmp;		
-		}
-		hi =tmp.substring(0,32);
-		lo =tmp.substring(32);
-		//performing sign extension
+		BigInteger rs = new BigInteger(str_rs,2);
+		BigInteger rt = new BigInteger(str_rt,2);
+		BigInteger result= rs.multiply(rt);
+		
+		// Convert result to a String of 64-bit 
+		String tmp = result.toString(2);
+		while (tmp.length()<64)
+			tmp = "0" + tmp;
+		
+		hi = tmp.substring(0,32);
+		lo = tmp.substring(32);
+		//filling the first 32-bits
 		for(int i=hi.length(); i<64; i++)
 			hi = '0'+hi;
 		for(int i=lo.length(); i<64; i++)
