@@ -171,9 +171,8 @@ Istruzione DMULTU
 
 Sintassi: DMULTU rs, rt
 Descrizione: (LO) = rs * rt
-            Moltiplica due interi con segno a 64 bit.
-            Il valore nel registro rt e' moltiplicato per il valore in rs,
-            considerando entrambi gli operandi come valori senza segno.
+            Moltiplica due interi senza segno a 64 bit.
+            Il valore nel registro rt e' moltiplicato per il valore in rs.
            
 Istruzione DSLL 
 
@@ -367,9 +366,8 @@ Istruzione MULTU
 
 Sintassi: MULTU rs, rt
 Descrizione: (LO) = rs * rt
-            Moltiplica due interi con segno a 32 bit.
-            Il valore nel registro rt e' moltiplicato per il valore in rs,
-            considerando entrambi gli operandi come valori senza segno.
+            Moltiplica due interi senza segno a 32 bit.
+            Il valore nel registro rt e' moltiplicato per il valore in rs.
 
 Istruzione NOP 
 

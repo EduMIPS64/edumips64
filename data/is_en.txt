@@ -174,7 +174,7 @@ DMULTU Instruction
 
 Syntax: DMULTU rs, rt
 Description: (LO) = rs * rt
-           To divide 64-bit signed integers
+           To divide 64-bit unsigned integers
            The 64-bit doubleword value in GPR rt is multiplied by the 64-bit 
            value in GPR rs, treating both operands as unsigned values.
            
@@ -449,7 +449,7 @@ SRA Instruction
 Format: SRA rd, rt, sa
 Description: 
             To execute an arithmetic right-shift of a word 
-            by a fixed amount—0 to 31 bits.
+            by a fixed amount of 0 to 31 bits.
             
 SRAV Instruction
 
@@ -515,7 +515,7 @@ SUBU Instruction
 Syntax: SUBU rd, rs, rt
 Description: 
             To subtract 32-bit integers;
-            The 32-bit doubleword value in GPR rt is subtracted from 
+            The 32-bit word value in GPR rt is subtracted from 
             the 32-bit value in GPR rs and the 32-bit arithmetic result 
             is placed into GPR rd.
 			
