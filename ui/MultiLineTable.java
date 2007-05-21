@@ -68,6 +68,8 @@ public class MultiLineTable extends JTable {
 	}
 
 	public int getHeight(String text, int width) {
+        if(text == null)
+            text = "";
 		FontMetrics fm = getFontMetrics(getFont());
 		int numLines = 1;
 		Segment s = new Segment(text.toCharArray(), 0, 0);
