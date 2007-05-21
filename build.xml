@@ -24,7 +24,7 @@
 	</target>
 	<target name="svnjar" depends="init">
 		<mkdir dir="${outputDir}" />
-        <javac srcdir="${sourceDir}" classpath="${helpClassesDir}" destdir="${outputDir}" nowarn="yes"/>
+        <javac target="5" srcdir="${sourceDir}" classpath="${helpClassesDir}" destdir="${outputDir}" nowarn="yes"/>
 		<mkdir dir="${outputDir}/edumips64/img" />
 		<mkdir dir="${outputDir}/edumips64/data" />
 		<mkdir dir="${outputDir}/edumips64/utils" />
@@ -56,7 +56,7 @@
 
 	<target name="jar" depends="init">
 		<mkdir dir="${outputDir}" />
-        <javac srcdir="${sourceDir}" classpath="${helpClassesDir}" destdir="${outputDir}" nowarn="yes"/>
+        <javac target="5" srcdir="${sourceDir}" classpath="${helpClassesDir}" destdir="${outputDir}" nowarn="yes"/>
 		<mkdir dir="${outputDir}/edumips64/img" />
 		<mkdir dir="${outputDir}/edumips64/data" />
 		<mkdir dir="${outputDir}/edumips64/utils" />
