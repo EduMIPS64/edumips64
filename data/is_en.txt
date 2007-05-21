@@ -194,7 +194,7 @@ Description:
             To execute a left-shift of a doubleword by a variable number of bits.
             The 64-bit doubleword contents of GPR rt are shifted left, inserting 
             zeros into the emptied bits; the result is placed in GPR rd.
-            The bit-shift amount is specified by the low-order 6 bits in GPR rs.
+            The bit-shift amount is specified by the low-order 6 bits in GPR rs (the value is unsigned).
             
 DSRA Instruction
 
@@ -210,7 +210,7 @@ Description: rd = rt >> rs (arithmetic)
             To execute an arithmetic right-shift of a doubleword by a variable number of bits
             The doubleword contents of GPR rt are shifted right, duplicating 
             the sign bit (63) into the emptied bits; the result is placed in GPR rd.
-            The bit-shift amount is specified by the low-order 6 bits in GPR rs.
+            The bit-shift amount is specified by the low-order 6 bits in GPR rs (the value is unsigned).
             
 DSRL Instruction
 
@@ -227,7 +227,7 @@ Description:
             To execute a logical right-shift of a doubleword by a variable number of bits
             The 64-bit doubleword contents of GPR rt are shifted right, inserting 
             zeros into the emptied bits; the result is placed in GPR rd. 
-            The bit-shift amount is specified by the low-order 6 bits in GPR rs.
+            The bit-shift amount is specified by the low-order 6 bits in GPR rs (the value is unsigned).
             
 DSUB Instruction
 
@@ -413,7 +413,7 @@ Description:
             To execute a left-shift of a word by a variable number of bits.
             The 32-bit word contents of GPR rt are shifted left, inserting 
             zeros into the emptied bits; the result is placed in GPR rd.
-            The bit-shift amount is specified by the low-order 5 bits in GPR rs.
+            The bit-shift amount is specified by the low-order 5 bits in GPR rs (the value is unsigned).
 			
 SLT Instruction
 
@@ -458,7 +458,7 @@ Description: rd = rt >> rs (arithmetic)
             To execute an arithmetic right-shift of a word by a variable number of bits
             The word contents of GPR rt are shifted right, duplicating 
             the sign bit (31) into the emptied bits; the result is placed in GPR rd.
-            The bit-shift amount is specified by the low-order 5 bits in GPR rs.
+            The bit-shift amount is specified by the low-order 5 bits in GPR rs (the value is unsigned).
 			
 SRL Instruction
 
@@ -475,7 +475,7 @@ Description:
             To execute a logical right-shift of a word by a variable number of bits
             The 32-bit word contents of GPR rt are shifted right, inserting 
             zeros into the emptied bits; the result is placed in GPR rd. 
-            The bit-shift amount is specified by the low-order 5 bits in GPR rs.
+            The bit-shift amount is specified by the low-order 5 bits in GPR rs (the value is unsigned).
 			
 SW Instruction
 

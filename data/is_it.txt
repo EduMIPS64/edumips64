@@ -190,7 +190,7 @@ Sintassi: DSLLV rd, rt, rs
 Descrizione: 
             Effettua uno shift a sinistra di un valore a 64 bit di un numero variabile
             di bit. I 64 bit contenuti nel GPR rt vengono shiftati a sinistra del valore contenuto negli
-            ultimi 6 bit in GPR rs, inserendo degli zeri nei bit vuoti.
+            ultimi 6 bit in GPR rs (valore senza segno), inserendo degli zeri nei bit vuoti.
             Il risultato e' memorizzato nel registro rd.
             
 Istruzione DSRA 
@@ -206,7 +206,7 @@ Format: DSRAV rd, rt, rs
 Descrizione: rd = rt >> rs (arithmetic)
             Effettua uno shift aritmetico di un numero variabile di bit.
             Il valore a 64 bit contenuto nel GPR rt e' shiftato a destra del valore contenuto negli
-            ultimi 6 bit in GPR rs, duplicando il bit di segno (63) nei bit vuoti.
+            ultimi 6 bit in GPR rs (valore senza segno), duplicando il bit di segno (63) nei bit vuoti.
             Il risultato e' memorizzato nel registro rd.
             
 Istruzione DSRL 
@@ -223,7 +223,7 @@ Sintassi:      DSRLV rd, rt, rs
 Descrizione: 
             Effettua uno shift logico a destra di una doubleword per un numero variabile di bit.
             Il valore a 64 bit contenuto nel GPR rt e' shiftato a destra del valore contenuto negli
-            ultimi 6 bit in GPR rs, inserendo degli zeri nei bit vuoti.
+            ultimi 6 bit in GPR rs (valore senza segno), inserendo degli zeri nei bit vuoti.
             Il risultato e' memorizzato nel registro rd.
             
 Istruzione DSUB 
@@ -423,7 +423,7 @@ Sintassi: SLLV rd, rt, rs
 Descrizione: 
             Effettua uno shift a sinistra di un valore a 32 bit di un numero variabile
             di bit. I 32 bit contenuti nel GPR rt vengono shiftati a sinistra del valore contenuto negli
-            ultimi 5 bit in GPR rs, inserendo degli zeri nei bit vuoti.
+            ultimi 5 bit in GPR rs (valore senza segno), inserendo degli zeri nei bit vuoti.
             Il risultato e' memorizzato nel registro rd.
 			
 Istruzione SLT
@@ -471,7 +471,7 @@ Format: SRAV rd, rt, rs
 Descrizione: rd = rt >> rs (arithmetic)
             Effettua uno shift aritmetico di un numero variabile di bit.
             Il valore a 32 bit contenuto nel GPR rt e' shiftato a destra del valore contenuto negli
-            ultimi 5 bit in GPR rs, duplicando il bit di segno (31) nei bit vuoti.
+            ultimi 5 bit in GPR rs (valore senza segno), duplicando il bit di segno (31) nei bit vuoti.
             Il risultato e' memorizzato nel registro rd.
 			
 Istruzione SRL 
@@ -488,7 +488,7 @@ Sintassi: SRLV rd, rt, rs
 Descrizione: 
             Effettua uno shift logico a destra di una word32 per un numero variabile di bit.
             Il valore a 32 bit contenuto nel GPR rt e' shiftato a destra del valore contenuto negli
-            ultimi 5 bit in GPR rs, inserendo degli zeri nei bit vuoti.
+            ultimi 5 bit in GPR rs (valore senza segno), inserendo degli zeri nei bit vuoti.
             Il risultato e' memorizzato nel registro rd.
 			
 Istruzione SUB 
