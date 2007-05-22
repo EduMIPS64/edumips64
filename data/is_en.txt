@@ -245,6 +245,7 @@ Description:
             The 64-bit doubleword value in GPR rt is subtracted from 
             the 64-bit value in GPR rs and the 64-bit arithmetic result 
             is placed into GPR rd.
+			No Integer Overflow exception occurs under any circumstances.
             
 HALT Instruction
 
@@ -373,7 +374,7 @@ MULTU Instruction
 
 Syntax: MULTU rs, rt
 Description: (LO) = rs * rt
-           To divide 32-bit signed integers
+           To divide 32-bit unsigned integers
            The 32-bit word value in GPR rt is multiplied by the 32-bit 
            value in GPR rs, treating both operands as unsigned values.
 		   
@@ -518,6 +519,7 @@ Description:
             The 32-bit word value in GPR rt is subtracted from 
             the 32-bit value in GPR rs and the 32-bit arithmetic result 
             is placed into GPR rd.
+			No Integer Overflow exception occurs under any circumstances.
 			
 XOR Instruction
 

@@ -238,9 +238,10 @@ Istruzione DSUBU
 
 Sintassi: DSUBU rd, rs, rt
 Descrizione: 
-            Sottrae due interi a 64 bit senza segno. Se si verifica un overflow, lancia un'eccezione.
+            Sottrae due interi a 64 bit. 
             Il valore a 64 bit del registro rt e' sottratto a quello contenuto nel registro rs,
             il risultato e' posto in rd.
+			Non si verificano eccezioni di overflow.
 
 Istruzione HALT 
 
@@ -503,9 +504,10 @@ Istruzione SUBU
 
 Sintassi: SUBU rd, rs, rt
 Descrizione: 
-            Sottrae due interi a 32 bit senza segno. Se si verifica un overflow, lancia un'eccezione.
+            Sottrae due interi a 32 bit.
             Il valore a 32 bit del registro rt e' sottratto a quello contenuto nel registro rs,
             il risultato e' posto in rd.
+			Non si verificano eccezioni di overflow.
 			
 Istruzione SW 
 
