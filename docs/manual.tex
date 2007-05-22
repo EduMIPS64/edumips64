@@ -403,93 +403,119 @@ Here's the list of R-Type ALU Instructions.
 	\item \texttt{AND rd, rs, rt}\\
 	Executes a bitwise AND between rs and rt, and puts the result into rd.
 
+	\index{ADD}
+	\index{instructions!ADD}
+	\item \texttt{ADD rd, rs, rt}\\
+	Sums the content of 32-bits registers rs and rt, considering them as signed values, and puts
+	the result into rd. If an overflow occurs then trap.
+
+	\index{ADDU}
+	\index{instructions!ADDU}
+	\item \texttt{ADDU rd, rs, rt}\\
+	Sums the content of 32-bits registers rs and rt, and puts the result into rd.
+	No integer overflow occurs under any circumstances.
+
 	\index{DADD}
 	\index{instructions!DADD}
 	\item \texttt{DADD rd, rs, rt}\\
-	Sums the content of rs and rt, considering them as signed values, and puts
-	the result into rd.
+	Sums the content of 64-bits registers rs and rt, considering them as signed values, and puts
+	the result into rd. If an overflow occurs then trap.
 
 	\index{DADDU}
 	\index{instructions!DADDU}
 	\item \texttt{DADDU rd, rs, rt}\\
-	Sums the content of rs and rt, considering them as unsigned values, and puts
-	the result into rd.
+	Sums the content of 64-bits registers rs and rt, and puts the result into rd.
+	No integer overflow occurs under any circumstances.
 
 	\index{DDIV}
 	\index{instructions!DDIV}
 	\item \texttt{DDIV rs, rt}\\
-	Executes the division between rs and rt, putting the quotient in LO and the
-	remainder in HI.
+	Executes the division between 64-bits registers rs and rt, putting the 64-bits quotient in LO and the
+	64-bits remainder in HI.
 
 	\index{DDIVU}
 	\index{instructions!DDIVU}
 	\item \texttt{DDIVU rs, rt}\\
-	Executes the division between rs and rt, considering them as unsigned values
-    and putting the quotient in LO and the
-	remainder in HI.
+	Executes the division between 64-bits registers rs and rt, considering them as unsigned values
+    	and putting the 64-bits quotient in LO and the 64-bits remainder in HI.
+	
+	\index{DIV}
+	\index{instructions!DIV}
+	\item \texttt{DIV rs, rt}\\
+	Executes the division between 32-bits registers rs and rt, putting the 32-bits quotient in LO and the
+	32-bits remainder in HI.
+
+	\index{DIVU}
+	\index{instructions!DIVU}
+	\item \texttt{DIVU rs, rt}\\
+	Executes the division between 32-bits registers rs and rt, considering them as unsigned values
+    	and putting the 32-bits quotient in LO and the 32-bits remainder in HI.
 
 	\index{DMULT}
 	\index{instructions!DMULT}
 	\item \texttt{DMULT rs, rt}\\
-	Executes the multiplication between rs and rt, putting the result in LO.
+	Executes the multiplication between 64-bits registers rs and rt, putting the low-order 64-bits doubleword
+	of the result into special register LO and the high-order 64-bits doubleword of the result into special
+	register HI.
 
 	\index{DMULTU}
 	\index{instructions!DMULTU}
 	\item \texttt{DMULTU rs, rt}\\
-	Executes the multiplication between rs and rt, considering them as unsigned
-    values and putting the result in LO.
-
+	Executes the multiplication between 64-bits registers rs and rt, considering them as unsigned
+  	values and putting the low-order 64-bits doubleword of the result into special register LO 
+	and the high-order 64-bits doubleword of the result into special register HI.
+	
 	\index{DSLL}
 	\index{instructions!DSLL}
 	\item \texttt{DSLL rd, rt, sa}\\
-	Does a left shift to of rt, by the amount specified in the
-	immediate value sa, and puts the result into rd. Empty bits are padded with
+	Does a left shift of 64-bits register rt, by the amount specified in the
+	immediate value sa, and puts the result into 64-bits register rd. Empty bits are padded with
 	zeros.
 
 	\index{DSLLV}
 	\index{instructions!DSLLV}
-	\item \texttt{DSLLV rd, rs, rt}\\
-	Does a left shift to of rs, by the amount specified in rt, and puts the
-	result into rd. Empty bits are padded with zeros.
+	\item \texttt{DSLLV rd, rt, rs}\\
+	Does a left shift of 64-bits register rt, by the amount specified in low-order 6-bits of rs,
+	and puts the result into 64-bits register rd. Empty bits are padded with zeros.
 
 	\index{DSRA}
 	\index{instructions!DSRA}
-	\item \texttt{DSRA rd, rs, sa}\\
-	Does a right shift to of rs, by the amount specified in the immediate value
-	sa, and puts the result into rd. Empty bits are padded with zeros if the
-	leftmost bit of rs is zero, otherwise they are padded with ones.
+	\item \texttt{DSRA rd, rt, sa}\\
+	Does a right shift of 64-bits register rt, by the amount specified in the immediate value sa,
+	and puts the result into 64-bits register rd. Empty bits are padded with zeros if the leftmost bit
+	of rt is zero, otherwise they are padded with ones.
 
 	\index{DSRAV}
 	\index{instructions!DSRAV}
-	\item \texttt{DSRAV rd, rs, rt}\\
-	Does a right shift to of rs, by the amount specified in rt, and puts the
-	result into rd. Empty bits are padded with zeros if the leftmost bit of rs
-	is zero, otherwise they are padded with ones.
+	\item \texttt{DSRAV rd, rt, rs}\\
+	Does a right shift of 64-bits register rt, by the amount specified in low-order 6-bits of rs,
+	and puts the result into 64-bits register rd. Empty bits are padded with zeros if the leftmost bit
+	of rt is zero, otherwise they are padded with ones.
 
 	\index{DSRL}
 	\index{instructions!DSRL}
 	\item \texttt{DSRL rd, rs, sa}\\
-	Does a right shift to of rs, by the amount specified in the immediate value
-	sa, and puts the result into rd. Empty bits are padded with zeros.
+	Does a right shift of 64-bits register rs, by the amount specified in the immediate value sa,
+	and puts the result into 64-bits register rd. Empty bits are padded with zeros.
 	
 	\index{DSRLV}
 	\index{instructions!DSRLV}
-	\item \texttt{DSRLV rd, rs, rt}\\
-	Does a right shift to of rs, by the amount specified in rt, and puts the
-	result into rd. Empty bits are padded with zeros.
+	\item \texttt{DSRLV rd, rt, rs}\\
+	Does a right shift of 64-bits register rt, by the amount specified in low-order 6-bits of rs,
+	and puts the result into 64-bits register rd. Empty bits are padded with zeros.
 
 	\index{DSUB}
 	\index{instructions!DSUB}
 	\item \texttt{DSUB rd, rs, rt}\\
-	Subtracts the value of rt to rs, considering them as signed values, and
-	puts the result in rd.
+	Subtracts the value of 64-bits register rt to 64-bits register rs, considering them as signed values,
+	and puts the result in rd. If an overflow occurs then trap.
 
 	\index{DSUBU}
 	\index{instructions!DSUBU}
 	\item \texttt{DSUBU rd, rs, rt}\\
-	Subtracts the value of rt to rs, considering them as unsigned values, and
-	puts the result in rd.
-
+	Subtracts the value of 64-bits register rt to 64-bits register rs, and puts the result in rd.
+	No integer overflow occurs under any circumstances.
+	
 	\index{MFLO}
 	\index{instructions!MFLO}
 	\item \texttt{MFLO rd}\\
@@ -510,10 +536,74 @@ Here's the list of R-Type ALU Instructions.
 	\item \texttt{MOVZ rd, rs, rt}\\
 	If rt is equal to zero, then moves the content of rs into rd.
 
+	\index{MULT}
+	\index{instructions!MULT}
+	\item \texttt{MULT rs, rt}\\
+	Executes the multiplication between 32-bits registers rs and rt, putting the low-order 32-bits word
+	of the result into special register LO and the high-order 32-bits word of the result into special
+	register HI.
+
+	\index{MULTU}
+	\index{instructions!MULTU}
+	\item \texttt{MULTU rs, rt}\\
+	Executes the multiplication between 32-bits registers rs and rt, considering them as unsigned
+  	values and putting the low-order 32-bits word of the result into special register LO 
+	and the high-order 32-bits word of the result into special register HI.
+	
 	\index{OR}
 	\index{instructions!OR}
 	\item \texttt{OR rd, rs, rt}\\
 	Executes a bitwise OR between rs and rt, and puts the result into rd.
+
+	\index{SLL}
+	\index{instructions!SLL}
+	\item \texttt{SLL rd, rt, sa}\\
+	Does a left shift of 32-bits register rt, by the amount specified in the immediate value sa,
+	and puts the result into 32-bits register rd. Empty bits are padded with zeros.
+
+	\index{SLLV}
+	\index{instructions!SLLV}
+	\item \texttt{SLLV rd, rt, rs}\\
+	Does a left shift of 32-bits register rt, by the amount specified in low-order 5-bits of rs,
+	and puts the result into 32-bits register rd. Empty bits are padded with zeros.
+
+	\index{SRA}
+	\index{instructions!SRA}
+	\item \texttt{SRA rd, rt, sa}\\
+	Does a right shift of 32-bits register rt, by the amount specified in the immediate value sa,
+	and puts the result into 32-bits register rd. Empty bits are padded with zeros if the leftmost bit
+	of rt is zero, otherwise they are padded with ones.
+
+	\index{SRAV}
+	\index{instructions!SRAV}
+	\item \texttt{SRAV rd, rt, rs}\\
+	Does a right shift of 32-bits register rt, by the amount specified in low-order 5-bits of rs,
+	and puts the result into 32-bits register rd. Empty bits are padded with zeros if the leftmost bit
+	of rt is zero, otherwise they are padded with ones.
+
+	\index{SRL}
+	\index{instructions!SRL}
+	\item \texttt{SRL rd, rs, sa}\\
+	Does a right shift of 32-bits register rs, by the amount specified in the immediate value sa,
+	and puts the result into 32-bits register rd. Empty bits are padded with zeros.
+	
+	\index{SRLV}
+	\index{instructions!SRLV}
+	\item \texttt{SRLV rd, rt, rs}\\
+	Does a right shift of 32-bits register rt, by the amount specified in low-order 5-bits of rs,
+	and puts the result into 32-bits register rd. Empty bits are padded with zeros.
+
+	\index{SUB}
+	\index{instructions!SUB}
+	\item \texttt{SUB rd, rs, rt}\\
+	Subtracts the value of 32-bits register rt to 32-bits register rs, considering them as signed values, and
+	puts the result in rd. If an overflow occurs then trap.
+
+	\index{SUBU}
+	\index{instructions!SUBU}
+	\item \texttt{SUBU rd, rs, rt}\\
+	Subtracts the value of 32-bits register rt to 32-bits register rs, and
+	puts the result in rd. No integer overflow occurs under any circumstances.
 
 	\index{SLT}
 	\index{instructions!SLT}
@@ -536,32 +626,42 @@ Here's the list of R-Type ALU Instructions.
 Here's the list of I-Type ALU Instructions.
 
 \begin{itemize}
+	\index{ADDI}
+	\index{instructions!ADDI}
+	\item \texttt{ADDI rt, rs, immediate}\\
+	Executes the sum between 32-bits register rs and the immediate value, putting the result in rt.
+	This instruction considers rs and the immediate value as signed values.
+	If an overflow occurs then trap.
+
+	\index{ADDIU}
+	\index{instructions!ADDIU}
+	\item \texttt{ADDIU rt, rs, immediate}\\
+	Executes the sum between 32-bits register rs and the immediate value, putting the result in rt.
+	No integer overflow occurs under any circumstances.
+
 	\index{ANDI}
 	\index{instructions!ANDI}
 	\item \texttt{ANDI rt, rs, immediate}\\
-	Executes the bitwise AND between rs and the immediate value, putting the
-	result in rt.
+	Executes the bitwise AND between rs and the immediate value, putting the result in rt.
 
 	\index{DADDI}
 	\index{instructions!DADDI}
 	\item \texttt{DADDI rt, rs, immediate}\\
-	Executes the sum between rs and the immediate value, putting the result in
-	rt. This instruction considers rs and the immediate value as signed
-	values.
+	Executes the sum between 64-bits register rs and the immediate value, putting the result in rt.
+	This instruction considers rs and the immediate value as signed values.
+	If an overflow occurs then trap.
 
 	\index{DADDIU}
 	\index{instructions!DADDIU}
 	\item \texttt{DADDIU rt, rs, immediate}\\
-	Executes the sum between rs and the immediate value, putting the result in
-	rt. This instruction considers rs and the immediate value as unsigned
-	values.
+	Executes the sum between 64-bits register rs and the immediate value, putting the result in rt.
+	No integer overflow occurs under any circumstances.
 
 	\index{DADDUI}
 	\index{instructions!DADDUI}
 	\item \texttt{DADDUI rt, rs, immediate}\\
-	Executes the sum between rs and the immediate value, putting the result in
-	rt. This instruction considers rs and the immediate value as unsigned
-	values.
+	Executes the sum between 64-bits register rs and the immediate value, putting the result in rt.
+	No integer overflow occurs under any circumstances.
     \WARN{}
 
 	\index{LUI}
@@ -831,7 +931,7 @@ associated respectively to standard input, standard output and standard error.
 SYSCALL 3 expects three parameters: the file descriptor to read from, the
 address where the read data must be put into, the number of bytes to read.
 
-If the first parameter is 0, the simulator will prompt the user for an input,
+If the first parameter is 1, the simulator will prompt the user for an input,
 via an input dialog. If the length of the input is greater than the number of
 bytes that have to be read, the simulator will show again the message dialog.
 
