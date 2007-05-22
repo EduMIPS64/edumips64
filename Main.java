@@ -193,7 +193,7 @@ public class Main extends JApplet {
 			e.printStackTrace();
 		}
 	 */
-	
+	/*
 	//writing test on FPR 0
 	CPU cpu=CPU.getInstance();
 	cpu.setFPExceptions(CPU.FPExceptions.OVERFLOW,false);
@@ -211,7 +211,7 @@ public class Main extends JApplet {
 			ex.printStackTrace();
 		}
 	System.out.println(cpu.fprString());
-	
+	*/
 		
     }
 
