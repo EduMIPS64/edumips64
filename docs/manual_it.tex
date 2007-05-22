@@ -450,12 +450,12 @@ Ecco la lista delle istruzioni ALU di tipo R.
 	\index{DSLL}
 	\index{istruzioni!DSLL}
 	\item \texttt{DSLL rd, rt, sa}\\
-	Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di bit indicati nel valore immediato sa, 
+	Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di bit indicato nel valore immediato sa, 
 	e pone il risultato in rd. I bit liberi vengono posti a zero.
 
 	\index{DSLLV}
 	\index{istruzioni!DSLLV}
-	\item \texttt{DSLLV rd, rs, rt}\\
+	\item \texttt{DSLLV rd, rt, rs}\\
 	Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di bit specificato nei 6 bit bassi del registro rs, 
 	e pone il risultato in rd. I bit liberi vengono posti a zero.
 
@@ -525,8 +525,8 @@ Ecco la lista delle istruzioni ALU di tipo R.
 	\index{MULTU}
 	\index{istruzioni!MULTU}
 	\item \texttt{MULTU rs, rt}\\
-	Esegue il prodotto tra i registri a 32-bit rs ed rt, ponendo i 32 bit bassi del risultato nel registro speciale LO
-	e i 32 bit alti del risultato nel registro speciale HI.
+	Esegue il prodotto tra i registri a 32-bit rs ed rt, considerandoli come valori senza segno e ponendo i 32 bit 
+	bassi del risultato nel registro speciale LO e i 32 bit alti del risultato nel registro speciale HI.
 	
 	\index{OR}
 	\index{istruzioni!OR}
