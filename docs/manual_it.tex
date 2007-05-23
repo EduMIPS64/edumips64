@@ -12,6 +12,9 @@
 \newcommand{\WARN}{\textbf{ATTENZIONE:} Questa \`{e} un'istruzione deprecated, che
 non appartiene al repertorio delle istruzioni \MS{}, ma \`{e} stata inclusa nel set di
 istruzioni per mantenere la compatibilit\`{a} con altri simulatori.}
+\newcommand{\MISN}{\textbf{NB:} La 'U' dell'istruzione sta per 'unsigned'; tuttavia questo \`{e} 
+un nome equivoco, perch\'{e} l'operazione considera i valori con segno. La sua caratteristica \`{e} 
+quella di non lanciare eccezioni (nemmeno in caso di overflow).}
 
 % Per avere il bold typewriter
 \DeclareFontShape{OT1}{cmtt}{bx}{n}{ <5><6><7><8><9><10><10.95><12><14.4><17.28><20.74><24.88>cmttb10}{}
@@ -101,7 +104,7 @@ che espone lo scopo di ciascuna finestra e di ciascun men\`{u}, insieme ad una d
 delle finestre di configurazione, del Dinero frontend, del manuale e delle opzioni da linea di comando. 
 %La quarta sezione contiene un esempio di utilizzo di \EM{}, 
 %un pratico tutorial che vi guider\`{a} attraverso l'esecuzione di un semplice programma \MS{}.
-Questo manuale si riferisce ad EduMIPS64 versione 0.4.
+Questo manuale si riferisce ad EduMIPS64 versione \EV{}
 
 \chapter{Formato dei file sorgenti}
 \EM{} si propone di seguire le convenzioni usate negli altri simulatori \MS{} e DLX, 
@@ -398,6 +401,7 @@ Ecco la lista delle istruzioni ALU di tipo R.
 	\item \texttt{ADDU rd, rs, rt}\\
 	Somma il contenuto dei registri a 32-bit rs ed rt, e pone il risultato in rd.
 	Non si verificano eccezioni di overflow.
+	\MISN{}
 
 	\index{DADD}
 	\index{istruzioni!DADD}
@@ -410,6 +414,7 @@ Ecco la lista delle istruzioni ALU di tipo R.
 	\item \texttt{DADDU rd, rs, rt}\\
 	Somma il contenuto dei registri a 64-bit rs ed rt, e pone il risultato in rd.
 	Non si verificano eccezioni di overflow.
+	\MISN{}
 
 	\index{DDIV}
 	\index{istruzioni!DDIV}
@@ -450,38 +455,38 @@ Ecco la lista delle istruzioni ALU di tipo R.
 	\index{DSLL}
 	\index{istruzioni!DSLL}
 	\item \texttt{DSLL rd, rt, sa}\\
-	Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di bit indicato nel valore immediato sa, 
+	Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di bit indicato nel valore immediato (positivo compreso tra 0 e 63) sa, 
 	e pone il risultato in rd. I bit liberi vengono posti a zero.
 
 	\index{DSLLV}
 	\index{istruzioni!DSLLV}
 	\item \texttt{DSLLV rd, rt, rs}\\
-	Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di bit specificato nei 6 bit bassi del registro rs, 
-	e pone il risultato in rd. I bit liberi vengono posti a zero.
+	Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di bit specificato nei 6 bit bassi del registro 
+    rs che verr\`{a} letto come valore senza segno, e pone il risultato in rd. I bit liberi vengono posti a zero.
 
 	\index{DSRA}
 	\index{istruzioni!DSRA}
 	\item \texttt{DSRA rd, rt, sa}\\
-	Effettua uno shift verso destra del registro a 64-bit rt, di un numero di bit specificato nel valore immediato sa, 
+	Effettua uno shift verso destra del registro a 64-bit rt, di un numero di bit specificato nel valore senza segno immediato (positivo compreso tra 0 e 63) sa, 
 	e pone il risultato in rd. I bit liberi vengono posti a zero se il bit pi\`{u} a sinistra di rs \`{e} zero, altrimenti vengono posti a uno.
 
 	\index{DSRAV}
 	\index{istruzioni!DSRAV}
 	\item \texttt{DSRAV rd, rt, rs}\\
-	Effettua uno shift verso destra del registro a 64-bit rt, di un numero di bit specificato nei 6 bit bassi del registro rs,
-	e pone il risultato in rd. 
+	Effettua uno shift verso destra del registro a 64-bit rt, di un numero di bit specificato nei 6 bit bassi del registro rs 
+	 che verr\`{a} letto come valore senza segno,e pone il risultato in rd. 
 	I bit liberi vengono posti a zero se il bit pi\`{u} a sinistra di rs \`{e} zero, altrimenti vengono posti a uno.
 
 	\index{DSRL}
 	\index{istruzioni!DSRL}
 	\item \texttt{DSRL rd, rt, sa}\\
-	Effettua uno shift verso destra del registro a 64-bit rt, di un numero di bit specificato nel valore immediato sa, 
+	Effettua uno shift verso destra del registro a 64-bit rt, di un numero di bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, 
 	e pone il risultato in rd. I bit liberi vengono posti a zero.
 	
 	\index{DSRLV}
 	\index{istruzioni!DSRLV}
 	\item \texttt{DSRLV rd, rt, rs}\\
-	Effettua uno shift verso destra del registro a 64-bit rt, di un numero di bit specificato nei 6 bit bassi del registro rs, 
+	Effettua uno shift verso destra del registro a 64-bit rt, di un numero di bit specificato nei 6 bit bassi del registro rs che verr\`{a} letto come valore senza segno, 
 	e pone il risultato in rd. I bit liberi vengono posti a zero.
 
 	\index{DSUB}
@@ -495,6 +500,7 @@ Ecco la lista delle istruzioni ALU di tipo R.
 	\item \texttt{DSUBU rd, rs, rt}\\
 	Sottrae il valore del registro a 64-bit rt al valore del registro a 64-bit rs, e pone il risultato in rd.
 	Non si verificano eccezioni di overflow.
+	\MISN{}
 
 	\index{MFLO}
 	\index{istruzioni!MFLO}
@@ -536,39 +542,39 @@ Ecco la lista delle istruzioni ALU di tipo R.
 	\index{SLL}
 	\index{istruzioni!SLL}
 	\item \texttt{SLL rd, rt, sa}\\
-	Effettua uno shift verso sinistra del registro a 32-bit rt, di un numero di bit indicati nel valore immediato sa, 
+	Effettua uno shift verso sinistra del registro a 32-bit rt, di un numero di bit indicati nel valore immediato (positivo compreso tra 0 e 63) sa, 
 	e pone il risultato nel registro a 32-bit rd. I bit liberi vengono posti a zero.
 
 	\index{SLLV}
 	\index{istruzioni!SLLV}
 	\item \texttt{SLLV rd, rt, rs}\\
-	Effettua uno shift verso sinistra del registro a 32-bit rt, di un numero di bit specificato nei 5 bit bassi del registro rs, 
+	Effettua uno shift verso sinistra del registro a 32-bit rt, di un numero di bit specificato nei 5 bit bassi del registro rs che verr\`{a} letto come valore senza segno, 
 	e pone il risultato nel registro a 32-bit rd. I bit liberi vengono posti a zero.
 
 	\index{SRA}
 	\index{istruzioni!SRA}
 	\item \texttt{SRA rd, rt, sa}\\
-	Effettua uno shift verso destra del registro a 32-bit rt, di un numero di bit specificato nel valore immediato sa, 
+	Effettua uno shift verso destra del registro a 32-bit rt, di un numero di bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, 
 	e pone il risultato nel registro a 32-bit rd.
 	I bit liberi vengono posti a zero se il bit pi\`{u} a sinistra di rs \`{e} zero, altrimenti vengono posti a uno.
 
 	\index{SRAV}
 	\index{istruzioni!SRAV}
 	\item \texttt{SRAV rd, rt, rs}\\
-	Effettua uno shift verso destra del registro a 32-bit rt, di un numero di bit specificato nei 5 bit bassi del registro rs,
+	Effettua uno shift verso destra del registro a 32-bit rt, di un numero di bit specificato nei 5 bit bassi del registro rs che verr\`{a} letto come valore senza segno,
 	e pone il risultato nel registro a 32-bit in rd. 
 	I bit liberi vengono posti a zero se il bit pi\`{u} a sinistra di rs \`{e} zero, altrimenti vengono posti a uno.
 
 	\index{SRL}
 	\index{istruzioni!SRL}
 	\item \texttt{SRL rd, rt, sa}\\
-	Effettua uno shift verso destra del registro a 32-bit rt, di un numero di bit specificato nel valore immediato sa, 
+	Effettua uno shift verso destra del registro a 32-bit rt, di un numero di bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, 
 	e pone il risultato nel registro a 32-bit rd. I bit liberi vengono posti a zero.
 	
 	\index{SRLV}
 	\index{istruzioni!SRLV}
 	\item \texttt{SRLV rd, rt, rs}\\
-	Effettua uno shift verso destra del registro a 32-bit rt, del numero di bit specificato nei 5 bit bassi del registro rs, 
+	Effettua uno shift verso destra del registro a 32-bit rt, del numero di bit specificato nei 5 bit bassi del registro rs che verr\`{a} letto come valore senza segno, 
 	e pone il risultato nel registro a 32-bit rd. I bit liberi vengono posti a zero.
 
 	\index{SUB}
@@ -582,6 +588,7 @@ Ecco la lista delle istruzioni ALU di tipo R.
 	\item \texttt{SUBU rd, rs, rt}\\
 	Sottrae il valore del registro a 32-bit rt al valore del registro a 32-bit rs, e pone il risultato in rd.
 	Non si verificano eccezioni di overflow.
+	\MISN{}
 
 	\index{SLT}
 	\index{istruzioni!SLT}
@@ -616,6 +623,7 @@ Ecco la lista delle istruzioni ALU di tipo I.
 	\item \texttt{ADDIU rt, rs, immediato}\\
 	Effettua la somma tra il registro a 32 bit rs ed il valore immediato, ponendo il risultato in rt. 
 	Non si verificano eccezioni di overflow.
+	\MISN{}
 	
 	\index{ANDI}
 	\index{istruzioni!ANDI}
@@ -634,12 +642,14 @@ Ecco la lista delle istruzioni ALU di tipo I.
 	\item \texttt{DADDIU rt, rs, immediato}\\
 	Effettua la somma tra il registro a 64 bit rs ed il valore immediato, ponendo il risultato in rt. 
 	Non si verificano eccezioni di overflow.
+	\MISN{}
 
 	\index{DADDUI}
 	\index{istruzioni!DADDUI}
 	\item \texttt{DADDUI rt, rs, immediato}\\
 	Effettua la somma tra il registro a 64 bit rs ed il valore immediato, ponendo il risultato in rt. 
 	Non si verificano eccezioni di overflow.
+	\MISN{}
     \WARN{}
 
 	\index{LUI}
@@ -894,7 +904,7 @@ SYSCALL 2 richiede solo un parametro, il file descriptor del file che deve esser
 SYSCALL 3 richiede tre parametri: il file descriptor da cui leggere, l'indirizzo nel quale i dati letti 
 dovranno essere copiati, il numero di byte da leggere.
 
-Se il primo parametro \`{e} 1, il simulatore permetter\`{a} all'utente di inserire un valore mediante un'apposita finestra di dialogo. 
+Se il primo parametro \`{e} 0, il simulatore permetter\`{a} all'utente di inserire un valore mediante un'apposita finestra di dialogo. 
 Se la lunghezza del valore immesso \`{e} maggiore del numero di byte che devono essere letti, il simulatore mostrer\`{a} nuovamente la finestra.
 
 La chiamata di sistema ritorna il numero di byte effettivamente letti, o -1 se l'operazione di lettura fallisce. Possibili cause di errore sono 
