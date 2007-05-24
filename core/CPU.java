@@ -41,7 +41,8 @@ public class CPU
 	private RegisterFP[] fpr;
 	public enum FPExceptions {INVALID_OPERATION,DIVISION_BY_ZERO,UNDERFLOW,OVERFLOW};
 	private Map<FPExceptions,Boolean> fpEnabledExceptions;
-	
+	public static List<String> knownFPInstructions;
+
     /** Program Counter*/
 	private Register pc,old_pc;
 	private Register LO,HI;
@@ -131,9 +132,15 @@ public class CPU
 		fpEnabledExceptions.put(FPExceptions.INVALID_OPERATION,true);
 		fpEnabledExceptions.put(FPExceptions.OVERFLOW,true);
 		fpEnabledExceptions.put(FPExceptions.UNDERFLOW,true);
-
+		
+		knownFPInstructions=new LinkedList<String>();
+		knownFPInstructions.add("ADD.D");
+		knownFPInstructions.add("SUB.D");
+		knownFPInstructions.add("MUL.D");
+		knownFPInstructions.add("DIV.D");
+		
 		logger.info("CPU Created.");
-
+		
 	}
 
 	

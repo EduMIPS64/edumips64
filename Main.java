@@ -212,7 +212,58 @@ public class Main extends JApplet {
 		}
 	System.out.println(cpu.fprString());
 	*/
+	/*
+	        //DEBUGGING FPPipeline
+		try{
+		Instruction ins1=Instruction.buildInstruction("DMULT");
+		LinkedList<Integer>params=new LinkedList<Integer>();
+		int rs=1;
+		int rt=2;
+		params.add(rs);  //fattore1
+		params.add(rt);  //fattore2
+		ins1.setParams(params);
+		ins1.pack();
+
+		Instruction ins2=Instruction.buildInstruction("DMULT");
+		LinkedList<Integer>params2=new LinkedList<Integer>();
+		rs=1;
+		rt=2;
+		params2.add(rs);  //fattore1
+		params2.add(rt);  //fattore2
+		ins2.setParams(params2);
 		
+		ins2.pack();
+		
+		Instruction  ins3=Instruction.buildInstruction("DMULT");
+		LinkedList<Integer>params3=new LinkedList<Integer>();
+		rs=3;
+		rt=4;
+		params3.add(rs);  //fattore1
+		params3.add(rt);  //fattore2
+		ins3.setParams(params3);
+		ins3.pack();
+
+		
+		if(ins1.equals(ins2))
+			System.out.println("istruzioni identiche");
+		
+		if(ins2.equals(ins3))
+			System.out.println("istruzioni differenti");
+		
+
+
+		//DEBUGGING FPPipeline
+	
+		FPPipeline fpu=new FPPipeline();
+		fpu.putInstruction(ins1);
+		fpu.putInstruction(ins2);
+		fpu.putInstruction(ins3);
+		
+		}
+		catch(Exception e)
+		{ e.printStackTrace();}
+
+	*/
     }
 
     private static void addFrame(String name, JInternalFrame f) {

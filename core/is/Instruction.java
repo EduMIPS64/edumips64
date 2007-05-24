@@ -361,4 +361,22 @@ public abstract class Instruction {
     {
        label=value;
     }
+    
+    /**<pre>
+     * The repr field of the passed instruction is compared with the repr field 
+     * of this instruction. If they are identical then true is returned else false is returned
+     * </pre>
+     * @instr instruction to compare with this
+     * return the result of the comparison
+     */
+    public boolean equals(Instruction instr)
+    {
+	if(instr!=null)
+	{
+		if(instr.getRepr().getBinString().equalsIgnoreCase(this.repr.getBinString()))
+			return true;
+	}
+	return false;	
+    }
+	    
 }
