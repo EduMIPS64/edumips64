@@ -1,7 +1,8 @@
 /*
  * FPPipeline.java
  *
- * This class models a MIPS CPU with 32 64-bit General Purpose Register.
+ * This class models a MIPS FPU  pipeline that supports multiple outstanding FP operations
+ * it is used only by the cpu class
  * (c) 2006 Massimo Trubia
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -34,6 +35,8 @@ public class FPPipeline {
 	//FPU functional units
 	public enum FPAdderStatus{A1,A2,A3,A4};
 	public enum FPMultiplierStatus{M1,M2,M3,M4,M5,M6,M7};
+	public static int STRUCT_HAZARD=0; //status constant of pipeStatus[]
+	private int pipeStatus[];
 	private Divider divider;
 	private Multiplier multiplier;
 	private Adder adder;
@@ -45,9 +48,15 @@ public class FPPipeline {
 		cpu=CPU.getInstance();
 		//Instanciating functional units objects
 		divider= new Divider();
+		divider.reset();
 		multiplier=new Multiplier();
+		multiplier.reset();
 		adder =new Adder();
+		adder.reset();
 		entryQueue=new LinkedList<Instruction>();
+		pipeStatus=new int[1];
+		pipeStatus[STRUCT_HAZARD]=0; // 0 means that any structural hazard at the last getInstruction() call
+					     // happened. 1 means the contrary.
 	}
 	
 	
@@ -55,7 +64,7 @@ public class FPPipeline {
 	 *  0 is returned, else, if we want to insert an ADD.fmt, MUL.fmt, SUB.fmt  and 
 	 *  the first place of the adder or multiplier is filled by other 
 	 *  instructions 1 is returned, else, if we want to insert a DIV.fmt and the
-	 *  divider is full 2 is returned and CPU raises a StructuralException.
+	 *  divider is full 2 is returned and the CPU raises a StructuralException.
 	 *  If an integer instruction is passed at the method 3 is returned
 	 */
 	public int putInstruction(Instruction instr)
@@ -63,13 +72,14 @@ public class FPPipeline {
 		if(cpu.knownFPInstructions.contains(instr.getName()) && instr!=null)
 		{
 			entryQueue.offer(instr);
-			if(instr.getName().compareToIgnoreCase("ADD.D")==0 || instr.getName().compareToIgnoreCase("SUB.D")==0)
+			String instrName=instr.getName();
+			if((instrName.compareToIgnoreCase("ADD.D")==0) || (instrName.compareToIgnoreCase("SUB.D")==0))
 				if(adder.putInstruction(instr)==-1)
 					return 1;
-			else if(instr.getName().compareToIgnoreCase("MUL.D")==0)
+			/*else (non funge)*/ if(instrName.compareToIgnoreCase("MUL.D")==0)
 				if(multiplier.putInstruction(instr)==-1)
 					return 1;
-			else if(instr.getName().compareToIgnoreCase("DIV.D")==0)
+			/*else(non funge)*/ if(instrName.compareToIgnoreCase("DIV.D")==0)
 				if(divider.putInstruction(instr)==-1)
 					return 2;
 			return 0;
@@ -81,7 +91,7 @@ public class FPPipeline {
 	{
 		//checking if multiple FP instructions are leaving at the same time the FPPipeline
 		
-		int readyToExit=0; //number of instructions hold the last position of the f.u.
+		int readyToExit=0; //number of instructions that hold the last position of the f.u.
 		Instruction instr_mult=multiplier.getInstruction();
 		Instruction instr_adder=adder.getInstruction();
 		Instruction instr_div=divider.getInstruction();
@@ -93,6 +103,10 @@ public class FPPipeline {
 			readyToExit++;
 		if(readyToExit>1)
 		{
+			//structural stall status is setted
+			pipeStatus[STRUCT_HAZARD]=1;
+			
+		     
 			//Retrieves, but not remove from a temporary queue info about the oldest instruction entered in the pipeline
 			Instruction oldestInstr=entryQueue.peek();
 			if(oldestInstr!=null)
@@ -115,9 +129,14 @@ public class FPPipeline {
 				}
 					
 			}
+
+			
+			
 		}
 		else if(readyToExit==1)
 		{
+			//structural stall status deactivated
+			pipeStatus[STRUCT_HAZARD]=0;
 			if(instr_mult!=null)
 			{
 				multiplier.removeLast();
@@ -135,11 +154,40 @@ public class FPPipeline {
 			}
 		}
 		else if(readyToExit==0)
+		{
+			//structural stall status deactivated
+			pipeStatus[STRUCT_HAZARD]=0;
 			return null;
-		
+		}
 		
 		return null;
 		
+	}
+
+	/* Shifts instructions into the functional units and calls the EX() method for instructions in the first step
+	 * this method is called from getInstruction in order to prepare the pipeline for a new instruction entrance	*/
+	public void step()
+	{
+		//try catch is necessary for handling structural stalls and  stalls coming from the EX() method  
+
+		//adder
+		adder.step();
+		//multiplier
+		multiplier.step();
+		//divider
+		divider.step();
+	}
+	
+	
+	/** Returns the FPPipeline status, index must be one between the status constants
+	 * @returns the value of the status vector. 0 means the status is false, 1 the contrary . -1 if the status doesn't exist
+	 *
+	 **/
+	public int getStatus(int index)
+	{
+		if(index>-1 && index<pipeStatus.length)
+			return pipeStatus[index];
+		return -1;
 	}
 	
 	/** This class models the 7 steps floating point multiplier*/
@@ -193,7 +241,33 @@ public class FPPipeline {
 		{
 			multiplier.put(FPPipeline.FPMultiplierStatus.M7,null);
 		}
-		
+
+		/* Shifts instructions into the functional unit and calls the EX() method for instructions in the secondary step
+		 * this method is called from getInstruction in order to prepare the pipeline for a new instruction entrance	*/
+		private void step()
+		{
+			
+			//only if the M7 stage is available the shift is carried out
+			if(multiplier.get(FPPipeline.FPMultiplierStatus.M7)==null)
+			{
+				multiplier.put(FPPipeline.FPMultiplierStatus.M7,multiplier.get(FPPipeline.FPMultiplierStatus.M6));
+				multiplier.put(FPPipeline.FPMultiplierStatus.M6,multiplier.get(FPPipeline.FPMultiplierStatus.M5));
+				multiplier.put(FPPipeline.FPMultiplierStatus.M5,multiplier.get(FPPipeline.FPMultiplierStatus.M4));
+				multiplier.put(FPPipeline.FPMultiplierStatus.M4,multiplier.get(FPPipeline.FPMultiplierStatus.M3));
+				multiplier.put(FPPipeline.FPMultiplierStatus.M3,multiplier.get(FPPipeline.FPMultiplierStatus.M2));
+
+				//here there is the EX() invocation of the M1 instruction
+				
+				multiplier.put(FPPipeline.FPMultiplierStatus.M2,multiplier.get(FPPipeline.FPMultiplierStatus.M1));
+				multiplier.put(FPPipeline.FPMultiplierStatus.M1,null);
+			}
+			//a structural stall happens because the instruction in the M7 was not removed from the getInstruction()
+			else
+			{
+				pipeStatus[FPPipeline.STRUCT_HAZARD]=1;
+			}
+		}	
+				
 		
 	}
 	
@@ -245,6 +319,30 @@ public class FPPipeline {
 			adder.put(FPPipeline.FPAdderStatus.A4,null);
 		}
 		
+		/* Shifts instructions into the functional unit and calls the EX() method for the instruction in the secondary step
+		 * this method is called from getInstruction in order to prepare the pipeline for a new instruction entrance	*/
+		private void step()
+		{
+			//only if the A4 stage is available the shift is carried out
+			if(adder.get(FPPipeline.FPAdderStatus.A4)==null)
+			{
+				adder.put(FPPipeline.FPAdderStatus.A4,adder.get(FPPipeline.FPAdderStatus.A3));
+				adder.put(FPPipeline.FPAdderStatus.A3,adder.get(FPPipeline.FPAdderStatus.A2));
+			
+				//here there is the EX() invocation of the A1 instruction
+				
+				adder.put(FPPipeline.FPAdderStatus.A2,adder.get(FPPipeline.FPAdderStatus.A1));
+				adder.put(FPPipeline.FPAdderStatus.A1,null);
+			}
+			//a structural stall happens because the instruction in the A4 was not removed from the getInstruction()
+			else
+			{
+				pipeStatus[FPPipeline.STRUCT_HAZARD]=1;
+			}
+
+		}	
+		
+		
 	}
 	
 	/** This class models the 24 steps floating point divider, instructions are not pipelined
@@ -277,6 +375,29 @@ public class FPPipeline {
 		{
 			return this.instr;
 		}
+
+		/* Shifts instructions into the functional unit and calls the EX() method for the instruction in the secondary step
+		 * this method is called from getInstruction in order to prepare the pipeline for a new instruction entrance	*/
+		private void step()
+		{
+			if(this.instr!=null && counter>0)
+			{
+				//EX() is called if the instruction is just get in in the divider and it is at the first step
+				if(counter==24)
+				{
+					//invocazione EX()
+				}
+				//the instruction was withdrawn from the getInstruction() and now the divider is empty
+				else if(counter==0)
+					instr=null;
+				counter--;
+				
+				//any control about the structural hazard is performed because the div.fmt 
+				//has got the highest priority in order to exit from the pipeline. When getInstruction()
+				//is called, if a div instruction has got 0 as counter then it must go out
+			}	
+		}
+		
 		
 		/** Resets the functional unit*/
 		private void reset()
@@ -284,21 +405,21 @@ public class FPPipeline {
 			instr=null;
 			counter=0;
 		}
-		
-		/** Increases the counter and return the new value*/
+/*		
+		** Increases the counter and return the new value*
 		private int incrCounter()
 		{
 			counter++;
 			return counter;
 		}
 		
-		/** Decreases the counter and return the new value*/
+		** Decreases the counter and return the new value*
 		private int decrCounter()
 		{
 			counter--;
 			return counter;
 		}
-		
+*/		
 		/** Return the counter of the divider*/
 		private int getCounter()
 		{
@@ -313,6 +434,8 @@ public class FPPipeline {
 		}
 		
 	}
+	
+
 	
 	
 }
