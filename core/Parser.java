@@ -585,6 +585,37 @@ public class Parser
 												continue;
 											}
 										}
+										else if(syntax.charAt(z)=='F') //floating point register
+										{
+											int endPar;
+											if(z!=syntax.length()-1)
+												endPar = param.indexOf(syntax.charAt(++z),indPar);
+											else
+												endPar = param.length();
+											if (endPar==-1)
+											{
+												numError++;
+												error.add("SEPARATORMISS",row,indPar,line);
+												i = line.length();
+												tmpInst.getParams().add(0);
+												continue;
+											}
+											int reg;
+											if ((reg = isRegisterFP(param.substring(indPar,endPar).trim()))>=0)
+											{
+												tmpInst.getParams().add(reg);
+												indPar = endPar+1;
+											}
+											else
+											{
+												numError++;
+												error.add("INVALIDREGISTER",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+												tmpInst.getParams().add(0);
+												i = line.length();
+												continue;
+											}
+										}
+										
 										else if(syntax.charAt(z)=='I') //immediate
 										{
 											int endPar;
@@ -1209,6 +1240,31 @@ public class Parser
 		return -1;
 	}
 
+	/** Check if is a valid string for a floating point register
+	 *  @param reg the string to validate
+	 *  @return -1 if reg isn't a valid register, else a number of register
+	 */
+	private int isRegisterFP(String reg)
+	{
+
+		try
+		{
+			int num;
+			if(reg.charAt(0)=='f' || reg.charAt(0)=='F' || reg.charAt(0)=='$')
+				if(isNumber(reg.substring(1)))
+				{
+					num = Integer.parseInt(reg.substring(1));
+					if (num<32 && num>=0)
+						return num;
+				}
+				if(reg.charAt(0)=='$' && (num=isAlias(reg.substring(1)))!=-1)
+					return num;
+		}
+		catch(Exception e){}
+		return -1;
+	}
+	
+	
 	/** Check if the parameter is a valid string for an alias-register
 	 *  @param reg the string to validate
 	 *  @return -1 if reg isn't a valid alias-register, else a number of 

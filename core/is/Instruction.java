@@ -187,8 +187,9 @@ public abstract class Instruction {
                         SYSCALL  { Instruction getObject() {SYSCALL newObject=new SYSCALL(); return newObject; } },
                         BREAK  { Instruction getObject() {BREAK newObject=new BREAK(); return newObject; } },
 			//Floating point instructions
-			            ADD_D {Instruction getObject() {ADD_D newObject=new ADD_D(); return newObject; } },
-			            MUL_D { Instruction getObject() {MUL_D newObject=new MUL_D();return newObject;}};
+			ADD_D {Instruction getObject() {ADD_D newObject=new ADD_D(); return newObject; } },
+			MUL_D { Instruction getObject() {MUL_D newObject=new MUL_D();return newObject;}},
+			LDC1 {Instruction getObject() {LDC1 newObject=new LDC1(); return newObject;}};
 
 		abstract Instruction getObject();
     }
