@@ -179,87 +179,11 @@ public class Main extends JApplet {
         f.setExtendedState(f.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	
 // FPU DIAGNOSTICS
-	/* BitSet64FP
-		BitSet64FP bs=new BitSet64FP();
-		try{
-			//interactive inputs
-			//BufferedReader stdin = new BufferedReader( new InputStreamReader(System.in)); System.out.print("Read value:"); 
-			//bs.writeDouble(Double.parseDouble(stdin.readLine()));
-			
-			bs.writeDouble("3.5E309");
-			System.out.println(bs.readDouble());
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-	 */
-	/*
-	//writing test on FPR 0
-	CPU cpu=CPU.getInstance();
+	//deactivating FPInvalidException
+	cpu.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION,false);
 	cpu.setFPExceptions(CPU.FPExceptions.OVERFLOW,false);
-		try {
-			cpu.getRegisterFP(0).writeDouble("54E380");
-		} catch (IrregularWriteOperationException ex) {
-			ex.printStackTrace();
-		} catch (FPOverflowException ex) {
-			ex.printStackTrace();
-		} catch (FPInvalidOperationException ex) {
-			ex.printStackTrace();
-		} catch (FPExponentTooLargeException ex) {
-			ex.printStackTrace();
-		} catch (FPUnderflowException ex) {
-			ex.printStackTrace();
-		}
-	System.out.println(cpu.fprString());
-	*/
-	/*
-	        //DEBUGGING FPPipeline
-		try{
-		Instruction ins1=Instruction.buildInstruction("ADD.D");
-		LinkedList<Integer>params=new LinkedList<Integer>();
-		int rs=1;
-		int rt=2;
-		int rd=3;
-		params.add(rs);  //addendo1
-		params.add(rt);  //addendo2
-		params.add(rd);
-		ins1.setParams(params);
-		ins1.pack();
-
-		Instruction ins2=Instruction.buildInstruction("MUL.D");
-		LinkedList<Integer>params2=new LinkedList<Integer>();
-		rs=4;
-		rt=5;
-		rd=6;
-		params2.add(rs);  //fattore1
-		params2.add(rt);  //fattore2
-		params2.add(rd);
-		ins2.setParams(params2);
-		
-		ins2.pack();
-		
-		Instruction  ins3=Instruction.buildInstruction("DMULT");
-		LinkedList<Integer>params3=new LinkedList<Integer>();
-		rs=3;
-		rt=4;
-		params3.add(rs);  //fattore1
-		params3.add(rt);  //fattore2
-		ins3.setParams(params3);
-		ins3.pack();
-
-		
-		//DEBUGGING FPPipeline
+	cpu.setFPExceptions(CPU.FPExceptions.UNDERFLOW,false);
 	
-		FPPipeline fpu=new FPPipeline();
-		fpu.putInstruction(ins1);
-		fpu.putInstruction(ins2);
-		fpu.putInstruction(ins3);
-		
-		}
-		catch(Exception e)
-		{ e.printStackTrace();}
-
-	*/
     }
 
     private static void addFrame(String name, JInternalFrame f) {

@@ -87,20 +87,15 @@ public class BitSet64FP extends FixedBitSet {
 		
 	}
 	
-	/** Get the value of the bitset read as double
-	 *  @return the value of the double
-	 */
-	public double readDouble() 
+	/**Returns a string with a double value or the name of a special value
+	  * it is recommended the use of this method only for the visualisation of the double value because it may return an alphanumeric value
+	  * @return the double value or the special values "Quiet NaN","Signaling NaN", "Positive infinity", "Negative infinity","Positive zero","Negative zero"
+	  */
+	public String readDouble() 
 	{
-		double value = 0;
-		//this exception doesn't happens because read values are correct
-		try {
-			value= Double.longBitsToDouble(Converter.binToLong(this.getBinString(),false));
-		} catch (IrregularStringOfBitsException ex) {
-			ex.printStackTrace();
-		}
-		return value;
+		return FPInstructionUtils.binToDouble(this.getBinString());
 	}
+
 	
 }
 		

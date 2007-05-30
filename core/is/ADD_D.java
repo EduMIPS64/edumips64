@@ -1,9 +1,8 @@
 /*
  * ADD_D.java
  *
- * 8th may 2006
- * Instruction DADD of the MIPS64 Instruction Set
- * (c) 2006 EduMips64 project - Trubia Massimo
+ * 27th may 2007
+  * (c) 2006 EduMips64 project - Trubia Massimo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -26,15 +25,17 @@
 
 package edumips64.core.is;
 import edumips64.core.*;
+import edumips64.core.fpu.*;
 import edumips64.utils.*;
+import java.math.*;
 
 /**
  * <pre>
  *
  */
-class ADD_D extends ALU_RType
+class ADD_D extends FPArithmeticInstructions
 {
-    final String OPCODE_VALUE="101100";
+    final String OPCODE_VALUE="000000";
     
     
     public ADD_D()
@@ -43,8 +44,16 @@ class ADD_D extends ALU_RType
         name="ADD.D";
     }
 
-    public void EX()
+    public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException
     {
-
+        //getting values from temporary registers
+	String operand1=TRfp[FS_FIELD].getBinString();
+	String operand2=TRfp[FT_FIELD].getBinString();
+        String outputstring=FPInstructionUtils.doubleSum(operand1,operand2);
+	TRfp[FD_FIELD].setBits(outputstring,0);
+	if(enableForwarding)
+	{
+		doWB();
+	}
     }    
 }

@@ -22,6 +22,7 @@
 package edumips64.core.is;
 
 import edumips64.core.*;
+import edumips64.core.fpu.*;
 import edumips64.utils.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -40,6 +41,7 @@ public abstract class Instruction {
     protected String comment;
     protected static Memory memory=Memory.getInstance();
     protected Register[] TR; //is not static because each instruction has got its own registers
+    protected RegisterFP[] TRfp;
     protected String fullname;
     protected static boolean enableForwarding=(Boolean)Config.get("forwarding");
     protected String label;
@@ -49,6 +51,7 @@ public abstract class Instruction {
     public Instruction() {
         params=new LinkedList<Integer>();
         TR=new Register[5];
+	TRfp=new RegisterFP[5];
         repr=new BitSet32();
         repr.reset(false);
         syntax=new String();
@@ -56,6 +59,7 @@ public abstract class Instruction {
 	for(int i=0;i<TR.length;i++)
 	{
 		TR[i]=new Register();
+		TRfp[i]=new RegisterFP();
 	}
     }
     
@@ -189,8 +193,9 @@ public abstract class Instruction {
 			//Floating point instructions
 			ADD_D {Instruction getObject() {ADD_D newObject=new ADD_D(); return newObject; } },
 			MUL_D { Instruction getObject() {MUL_D newObject=new MUL_D();return newObject;}},
-			LDC1 {Instruction getObject() {LDC1 newObject=new LDC1(); return newObject;}};
-
+			LDC1 {Instruction getObject() {LDC1 newObject=new LDC1(); return newObject;}},
+			SDC1 {Instruction getObject() {SDC1 newObject=new SDC1(); return newObject;}};
+			
 		abstract Instruction getObject();
     }
     /**
@@ -216,7 +221,7 @@ public abstract class Instruction {
      * </pre>
      **/
     
-    public abstract void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, IrregularWriteOperationException, DivisionByZeroException, NotAlignException;
+    public abstract void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, NotAlignException, FPInvalidOperationException, FPExponentTooLargeException, FPUnderflowException, FPOverflowException;
     
     /**
      * <pre>

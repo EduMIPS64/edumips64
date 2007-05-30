@@ -31,8 +31,10 @@ package edumips64.core;
 
 import edumips64.utils.*;
 import edumips64.core.is.*;
+import edumips64.core.fpu.*;
 import java.util.regex.*;
 import java.util.logging.Logger;
+
 
 import java.io.*;
 import java.util.*;
@@ -1388,7 +1390,12 @@ register
 		p = Pattern.compile("-?[0-9]+.[0-9]+E-?[0-9]+");
 		m = p.matcher(value[j]);
 		b = b || m.matches();
-
+		
+		//checking for floating point special values
+		value[j]=value[j].trim();
+		boolean b2;
+		b2=FPInstructionUtils.isFPKeyword(value[j]);
+		b= b || b2;	
 
 		/*if(isHexNumber(value[j]))
 		{
@@ -1433,12 +1440,12 @@ register
 			error.add("FP_UNDERFLOW",row,i+1,line);
 			continue;
 		    }
-		    catch(edumips64.core.fpu.FPInvalidOperationException ex)
+		    /*catch(edumips64.core.fpu.FPInvalidOperationException ex)
 		    {
 			numError++;
 			error.add("FP_INVALID_OPERATION",row,i+1,line);
 			continue;			
-		    }
+		    }*/
 		    catch(Exception e)
 		    {
 			e.printStackTrace();
