@@ -1,8 +1,8 @@
 /*
- * MUL_D.java
+ * SUB_D.java
  *
- * 1th june 2007
- * (c) 2006 EduMips64 project - Trubia Massimo
+ * 06th june 2007
+  * (c) 2006 EduMips64 project - Trubia Massimo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -33,27 +33,27 @@ import java.math.*;
  * <pre>
  *
  */
-class MUL_D extends FPArithmeticInstructions
+class SUB_D extends FPArithmeticInstructions
 {
-    final String OPCODE_VALUE="000010";
+    final String OPCODE_VALUE="000001";
     
     
-    public MUL_D()
+    public SUB_D()
     {
 	super.OPCODE_VALUE = OPCODE_VALUE;
-        name="MUL.D";
+        name="SUB.D";
     }
-    
+
     public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException
     {
         //getting values from temporary registers
 	String operand1=TRfp[FS_FIELD].getBinString();
 	String operand2=TRfp[FT_FIELD].getBinString();
-        String outputstring=FPInstructionUtils.doubleMultiplication(operand1,operand2);
+        String outputstring=FPInstructionUtils.doubleSubtraction(operand1,operand2);
 	TRfp[FD_FIELD].setBits(outputstring,0);
 	if(enableForwarding)
 	{
 		doWB();
 	}
-    }   
+    }    
 }

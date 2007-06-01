@@ -192,6 +192,7 @@ public abstract class Instruction {
                         BREAK  { Instruction getObject() {BREAK newObject=new BREAK(); return newObject; } },
 			//Floating point instructions
 			ADD_D {Instruction getObject() {ADD_D newObject=new ADD_D(); return newObject; } },
+			SUB_D {Instruction getObject() {SUB_D newObject=new SUB_D();return newObject; } },
 			MUL_D { Instruction getObject() {MUL_D newObject=new MUL_D();return newObject;}},
 			LDC1 {Instruction getObject() {LDC1 newObject=new LDC1(); return newObject;}},
 			SDC1 {Instruction getObject() {SDC1 newObject=new SDC1(); return newObject;}};

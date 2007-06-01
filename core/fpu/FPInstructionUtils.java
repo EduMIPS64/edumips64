@@ -168,8 +168,12 @@ public class FPInstructionUtils
 		return sb.toString();
 	}
 	
-	/** This method performs the sum between two double values, if passed values are Snan or Qnan
-	 *  the result of the operation is a Qnan, if the passed values are infinity, an infinity type(positive or negative is returned)
+	/** This method performs the sum between two double values, if  the passed values are Snan or Qnan
+	 *  and the invalid operation exception is not enabled  the result of the operation is a Qnan  else an InvalidOperation exception occurs,
+	 *  if the passed values are infinities and their signs agree, an infinity (positive or negative is returned),
+	 *  if signs don't agree then an invalid operation exception occurs if this trap is enabled.
+	 *  After the addition, if the result is too large in absolute value a right signed infinity is returned, else
+	 *  if the FP overflow or underflow are enabled an exception occurs.
 	 *  @param value1 the binary string representing the double value
 	 *  @param value2 the binary string representing the double value
 	 *  @return the result value (if trap are disabled, special values are returned as binary string)
@@ -209,7 +213,8 @@ public class FPInstructionUtils
 			if(cond1)
 				return MINUSINFINITY;
 			
-	 
+//RIDONDANTE
+/*
 		//any + (QNan/SNan)= QNan
 			cond1=isQNaN(value1) || isQNaN(value2) || isSNaN(value1) || isSNaN(value2);
 			if(cond1)
@@ -218,7 +223,7 @@ public class FPInstructionUtils
 					throw new FPInvalidOperationException();
 				return QNAN_NEW;
 			}
-			
+*/			
 		//+/- Infinity + (any value, inclusive PLUSZERO and MINUSZERO, except QNan/Snan)=+/- Infinity	
 			//in this point the (QNan/SNan) control is not necessary
 			
@@ -258,6 +263,189 @@ public class FPInstructionUtils
 		return null;
 	}
 	
+
+	/** This method performs the subtraction between two double values, if  the passed values are Snan or Qnan
+	 *  and the invalid operation exception is not enabled  the result of the operation is a Qnan else an InvalidOperation exception occurs,
+	 *  if the passed values are infinities and their signs agree, an infinity (positive or negative is returned),
+	 *  if signs don't agree then an invalid operation exception occurs if this trap is enabled.
+	 *  After the addition, if the result is too large in absolute value a right signed infinity is returned, else
+	 *  if the FP overflow or underflow are enabled an exception occurs.*/
+	public static String doubleSubtraction(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException
+	{
+		if(is64BinaryString(value1) && is64BinaryString(value2))
+		{
+			//if one or both of two operands are Not a Number then the result is a nan
+			//and if the trap is enabled an exception occurs, else a Qnan is returned
+			if((isQNaN(value1) || isQNaN(value2)) || (isSNaN(value1)||isSNaN(value2) ))
+			{
+				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
+					throw new FPInvalidOperationException();
+				return QNAN_NEW;
+			}
+			
+		//(sign)Infinity - (sign)Infinity = NAN   when signs agree (but (sign)Infinity - (sign)Infinity =Infinity   when signs don't agree ) (Status of IEEE754)
+
+			// +infinity  -   +infinity
+			boolean cond1 =isPositiveInfinity(value1) && isPositiveInfinity(value2);
+			//-infinity   -   -infinity
+			boolean cond2 =isNegativeInfinity(value1) && isNegativeInfinity(value2);
+			
+			
+			if(cond1 || cond2)
+			{
+				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
+					throw new FPInvalidOperationException();
+				return QNAN_NEW;
+			}
+
+			//+infinity   -   -infinity
+			cond1=isPositiveInfinity(value1) && isNegativeInfinity(value2);
+			if(cond1)
+				return PLUSINFINITY;
+			//-infinity   -   +infinity
+			cond1=isNegativeInfinity(value1) && isPositiveInfinity(value2);
+			if(cond1)
+				return MINUSINFINITY;
+			
+			
+			
+//RIDONDANTE	 
+/*			
+		//any + (QNan/SNan)= QNan
+			cond1=isQNaN(value1) || isQNaN(value2) || isSNaN(value1) || isSNaN(value2);
+			if(cond1)
+			{
+				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
+					throw new FPInvalidOperationException();
+				return QNAN_NEW;
+			}
+*/			
+		//+/- Infinity + (any value, inclusive PLUSZERO and MINUSZERO, except QNan/Snan)=+/- Infinity	
+			//in this point the (QNan/SNan) control is not necessary
+			
+			//+infinity - (any)
+			cond1=isPositiveInfinity(value1) && !isInfinity(value2);
+			if(cond1) return PLUSINFINITY;
+			//-infinity - (any)
+			cond1=isNegativeInfinity(value1) && !isInfinity(value2);
+			if(cond1) return MINUSINFINITY;
+			//(any) - +infinity
+			cond1=!isInfinity(value1) && isPositiveInfinity(value2);
+			if(cond1) return MINUSINFINITY;
+			//(any) - -infinity
+			cond1=!isInfinity(value1) && isNegativeInfinity(value2);
+			if(cond1) return PLUSINFINITY;
+			
+			
+			//at this point operands can be subtracted and if an overflow or an underflow occurs
+			//and if exceptions are activated then a trap happens else results are returned
+			MathContext mc=new MathContext(1000,RoundingMode.HALF_EVEN);
+			BigDecimal operand1=null;
+			BigDecimal operand2=null;
+			try {
+				operand1=new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1,false)));
+				operand2=new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2,false)));
+			}catch (IrregularStringOfBitsException ex) 
+			{ex.printStackTrace();}
+		
+			BigDecimal result=operand1.subtract(operand2,mc);
+		
+			//checking for underflows or overflows are performed inside the doubleToBin method (if the relative traps are disabled the output is returned)
+			String output=doubleToBin(result.toString());
+			
+			//if an underflow or overflow occur and they are activated (trap enabled) this point is never reached
+			return output;
+		}
+		return null;
+		
+		
+	}
+
+	/** This method performs the multiplication between two double values, if  the passed values are Snan or Qnan
+	 *  and the invalid operation exception is not enabled  the result of the operation is a Qnan else an InvalidOperation exception occurs,
+	 *  if the passed values are infinities a positive or negative infinity is returned depending of the signs product,
+	 *  Only if we attempt to perform (sign)0 X (sign)Infinity and the Invalid operation exception is not enabled NAN is returned,
+	 *  else a trap occur. After the multiplication, if the result is too large in absolute value a right signed infinity is returned, else
+	 *  if the FP overflow or underflow are enabled an exception occurs.*/
+	public static String doubleMultiplication(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException
+	{
+		if(is64BinaryString(value1) && is64BinaryString(value2))
+		{
+			//if one or both of two operands are Not a Number then the result is a nan
+			//and if the exception is enabled a trap occurs, else a Qnan is returned
+			if((isQNaN(value1) || isQNaN(value2)) || (isSNaN(value1)||isSNaN(value2) ))
+			{
+				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
+					throw new FPInvalidOperationException();
+				return QNAN_NEW;
+			}
+			
+			
+			// (sign)Zero X (sign)Infinity
+			boolean cond1 =isZero(value1) && isInfinity(value2);
+			boolean cond2 =isInfinity(value1) && isZero(value2);
+			if(cond1 || cond2)
+			{
+				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
+					throw new FPInvalidOperationException();
+				return QNAN_NEW;
+			}	
+			
+			//(sign)Infinity X (sign)Infinity
+			if(isInfinity(value1) && isInfinity(value2))
+			{
+				int sign1=getInfinitySign(value1);
+				int sign2=getInfinitySign(value2);
+				int res_sign=sign1 * sign2;
+				if(res_sign==-1)
+					return MINUSINFINITY;
+				else if(res_sign==1)
+					return PLUSINFINITY;
+			}
+			//(sign)Infinity X any
+			if(isInfinity(value1) && !isInfinity(value2))
+			{
+				if(isPositiveInfinity(value1))
+					return PLUSINFINITY;
+				else//isNegativeInfinity
+					return MINUSINFINITY;
+			}
+			//any x (sign)Infinity
+			if(!isInfinity(value1) && isInfinity(value2))
+			{
+				if(isPositiveInfinity(value2))
+					return PLUSINFINITY;
+				else//isNegativeInfinity
+					return MINUSINFINITY;
+			}
+			
+			//at this point operands can be multiplied and if an overflow or an underflow occurs
+			//and if exceptions are activated then a trap happens else results are returned
+			MathContext mc=new MathContext(1000,RoundingMode.HALF_EVEN);
+			BigDecimal operand1=null;
+			BigDecimal operand2=null;
+			try {
+				operand1=new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1,false)));
+				operand2=new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2,false)));
+			}catch (IrregularStringOfBitsException ex) 
+			{ex.printStackTrace();}
+		
+			BigDecimal result=operand1.multiply(operand2,mc);
+		
+			//checking for underflows or overflows are performed inside the doubleToBin method (if the relative traps are disabled the output is returned)
+			String output=doubleToBin(result.toString());
+			
+			//if an underflow or overflow occur and they are activated (trap enabled) this point is never reached
+			return output;
+		}
+		return null;
+		
+		
+		
+	
+	}
+	
+	
 	/**Returns a string with a double value or the name of a special value
 	  * it is recommended the use of this method only for the visualisation of the double value because it may return an alphanumeric value
 	  * @param value the 64 bit binary string in the IEEE754 format to convert
@@ -295,9 +483,9 @@ public class FPInstructionUtils
 			return "Positive infinity";
 		else if(isNegativeInfinity(value))
 			return "Negative infinity";
-		else if(isPlusZero(value))
+		else if(isPositiveZero(value))
 			return "Positive zero";
-		else if(isMinusZero(value))
+		else if(isNegativeZero(value))
 			return "Negative zero";
 		else return value;
 	}
@@ -356,7 +544,7 @@ public class FPInstructionUtils
 		
 	}
 	
-	/*Determines if the passed binary string is an infinity value
+	/*Determines if the passed binary string is an infinity value according to the IEEE754 standard
 	 * @param value the binary string of 64 bits
 	 * @return true if the value is positive infinity
 	 */
@@ -369,6 +557,11 @@ public class FPInstructionUtils
 		}
 		return false;
 	}
+
+	/** Determines if value is a negative infinity according to the IEEE754 standard
+	 * @param value the binary string of 64 bits
+	 * @return true if the value is negative infinity
+	 */
 	public static boolean isNegativeInfinity(String value)
 	{
 		if(is64BinaryString(value))
@@ -379,6 +572,10 @@ public class FPInstructionUtils
 		return false;
 	}
 	
+	/** Determines if value is an infinity according to the IEEE754 standard
+	 * @param value the binary string of 64 bits
+	 * @return true if the value is  infinity
+	 */
 	public static boolean isInfinity(String value)
 	{
 		if(is64BinaryString(value))
@@ -387,14 +584,27 @@ public class FPInstructionUtils
 				return true;
 		}
 		return false;
-		
 	}
 	
-	/*Determines if the passed binary string is a zero
+	/** Returns -1 if the infinity sign is negative, 1 if it is positive, 0 if "value" is not a well formed infinity according IEEE754 for FP64*/
+	public static int getInfinitySign(String value)
+	{
+		if(is64BinaryString(value))
+		{
+			if(isPositiveInfinity(value))
+				return 1;
+			else if(isNegativeInfinity(value))
+				return -1;
+		}
+		return 0;
+	}
+	
+	/** Determines if value is a positive zero according to the IEEE754 standard
 	 * @param value the binary string of 64 bits
-	 * @return true if the value is a positive zero
+	 * @return true if the value is  positive zero
 	 */
-	public static boolean isPlusZero(String value)
+
+	public static boolean isPositiveZero(String value)
 	{
 		if(is64BinaryString(value))
 		{
@@ -404,7 +614,11 @@ public class FPInstructionUtils
 		return false;
 	}
 	
-	public static boolean isMinusZero(String value)
+	/*Determines if the passed binary string is a  negative zero
+	 * @param value the binary string of 64 bits
+	 * @return true if the value is a positive zero
+	 */
+	public static boolean isNegativeZero(String value)
 	{
 		if(is64BinaryString(value))
 		{
@@ -414,6 +628,21 @@ public class FPInstructionUtils
 		return false;
 	}
 	
+	/** Determines if value is a zero according to the IEEE754 standard
+	 * @param value the binary string of 64 bits
+	 * @return true if the value is  infinity
+	 */
+	public static boolean isZero(String value)
+	{
+		if(is64BinaryString(value))
+		{
+			if(isPositiveZero(value) || isNegativeZero(value))
+				return true;
+		}
+		return false;
+		
+	}
+
 	
 	/** Determines if the passed value is a binary string of 64 bits
 	 *  @param value the binary string
