@@ -213,17 +213,6 @@ public class FPInstructionUtils
 			if(cond1)
 				return MINUSINFINITY;
 			
-//RIDONDANTE
-/*
-		//any + (QNan/SNan)= QNan
-			cond1=isQNaN(value1) || isQNaN(value2) || isSNaN(value1) || isSNaN(value2);
-			if(cond1)
-			{
-				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
-					throw new FPInvalidOperationException();
-				return QNAN_NEW;
-			}
-*/			
 		//+/- Infinity + (any value, inclusive PLUSZERO and MINUSZERO, except QNan/Snan)=+/- Infinity	
 			//in this point the (QNan/SNan) control is not necessary
 			
@@ -308,18 +297,6 @@ public class FPInstructionUtils
 				return MINUSINFINITY;
 			
 			
-			
-//RIDONDANTE	 
-/*			
-		//any + (QNan/SNan)= QNan
-			cond1=isQNaN(value1) || isQNaN(value2) || isSNaN(value1) || isSNaN(value2);
-			if(cond1)
-			{
-				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
-					throw new FPInvalidOperationException();
-				return QNAN_NEW;
-			}
-*/			
 		//+/- Infinity + (any value, inclusive PLUSZERO and MINUSZERO, except QNan/Snan)=+/- Infinity	
 			//in this point the (QNan/SNan) control is not necessary
 			
@@ -383,6 +360,7 @@ public class FPInstructionUtils
 			
 			// (sign)Zero X (sign)Infinity
 			boolean cond1 =isZero(value1) && isInfinity(value2);
+			// (sign)Infinity X (sign)Zero
 			boolean cond2 =isInfinity(value1) && isZero(value2);
 			if(cond1 || cond2)
 			{
@@ -394,31 +372,51 @@ public class FPInstructionUtils
 			//(sign)Infinity X (sign)Infinity
 			if(isInfinity(value1) && isInfinity(value2))
 			{
-				int sign1=getInfinitySign(value1);
-				int sign2=getInfinitySign(value2);
+				int sign1=getDoubleSign(value1);
+				int sign2=getDoubleSign(value2);
 				int res_sign=sign1 * sign2;
-				if(res_sign==-1)
-					return MINUSINFINITY;
-				else if(res_sign==1)
-					return PLUSINFINITY;
-			}
-			//(sign)Infinity X any
-			if(isInfinity(value1) && !isInfinity(value2))
-			{
-				if(isPositiveInfinity(value1))
-					return PLUSINFINITY;
-				else//isNegativeInfinity
-					return MINUSINFINITY;
-			}
-			//any x (sign)Infinity
-			if(!isInfinity(value1) && isInfinity(value2))
-			{
-				if(isPositiveInfinity(value2))
-					return PLUSINFINITY;
-				else//isNegativeInfinity
-					return MINUSINFINITY;
+				switch(res_sign)
+				{
+					case -1:				
+						return MINUSINFINITY;
+					case 1:
+						return PLUSINFINITY;
+				}
 			}
 			
+			//(sign)Infinity X any
+			cond1=isInfinity(value1) && !isInfinity(value2);
+			// any X (sign)Infinity
+			cond2=!isInfinity(value1) && isInfinity(value2);
+			if(cond1 || cond2)
+			{
+				int sign1=getDoubleSign(value1);
+				int sign2=getDoubleSign(value2);
+				int res_sign=sign1*sign2;
+				switch(res_sign)
+				{
+					case 1:
+						return PLUSINFINITY;
+					case -1:
+						return MINUSINFINITY;
+				}
+			}
+			
+			//(sign)zero X (sign)zero
+			if(isZero(value1) && isZero(value2))
+			{
+				int sign1=getDoubleSign(value1);
+				int sign2=getDoubleSign(value2);
+				int res_sign=sign1*sign2;
+				switch(res_sign)
+				{
+					case 1:
+						return PLUSZERO;
+					case -1:
+						return MINUSZERO;
+				}
+			}
+
 			//at this point operands can be multiplied and if an overflow or an underflow occurs
 			//and if exceptions are activated then a trap happens else results are returned
 			MathContext mc=new MathContext(1000,RoundingMode.HALF_EVEN);
@@ -444,6 +442,116 @@ public class FPInstructionUtils
 		
 	
 	}
+	
+	
+	/** This method performs the division between two double values, if  the passed values are Snan or Qnan
+	 *  and the invalid operation exception is not enabled  the result of the operation is a Qnan else an InvalidOperation exception occurs,
+	 *  Only if the passed values are  both infinities or zeros a Qnan is returned if  the InvalidOperation exception is not enabled else a trap occurs,
+	 *  If value2 (not also value1) is Zero a DivisionByZero Exception occurs if it is enabled else a right infinity is returned depending on the product's signs
+	 *  After the operation, if the result is too small in absolute value a right signed infinity is returned, else
+	 *  if the FP underflow is enabled an exception occurs.*/
+	public static String doubleDivision(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, FPDivideByZeroException
+	{
+
+		if(is64BinaryString(value1) && is64BinaryString(value2))
+		{
+			//if one or both of two operands are Not a Number then the result is a nan
+			//and if the exception is enabled a trap occurs, else a Qnan is returned
+			if((isQNaN(value1) || isQNaN(value2)) || (isSNaN(value1)||isSNaN(value2) ))
+			{
+				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
+					throw new FPInvalidOperationException();
+				return QNAN_NEW;
+			}
+			
+			//(sign)Infinity / (sign)Infinity
+			boolean cond1=isInfinity(value1) && isInfinity(value2);
+			//(sign)zero / (sign)Zero
+			boolean cond2=isZero(value1) && isZero(value2);
+			if(cond1 || cond2)
+			{
+				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
+					throw new FPInvalidOperationException();
+				return QNAN_NEW;
+			}
+			
+			// (sign)Zero / any
+			cond1=isZero(value1) && !isZero(value2);
+			if(cond1)
+			{
+				int sign1=getDoubleSign(value1);
+				int sign2=getDoubleSign(value2);
+				int res_sign=sign1*sign2;
+				switch(res_sign)
+				{
+					case 1:
+						return PLUSZERO;
+					case -1:
+						return MINUSZERO;
+				}
+			}
+			
+			// any / (sign)Zero
+			cond1=!isZero(value1) && isZero(value2);
+			if(cond1)
+			{
+				if(cpu.getFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO))
+					throw new FPDivideByZeroException();
+				int sign1=getDoubleSign(value1);
+				int sign2=getDoubleSign(value2);
+				int res_sign=sign1*sign2;
+				switch(res_sign)
+				{
+					case 1:
+						return PLUSINFINITY;
+					case -1:
+						return MINUSINFINITY;
+				}
+			}
+			
+			// (sign)infinity / any(different from infinity and zero)
+			if(isInfinity(value1))
+			{
+				int sign1=getDoubleSign(value1);
+				int sign2=getDoubleSign(value2);
+				int res_sign=sign1*sign2;
+				switch(res_sign)
+				{
+					case 1:
+						return PLUSINFINITY;
+					case -1:
+						return MINUSINFINITY;
+				}
+				
+			}	
+			
+			
+			
+			//at this point operands can be divided and if an  underflow occurs
+			//and if exceptions are activated then a trap happens else results are returned
+			MathContext mc=new MathContext(1000,RoundingMode.HALF_EVEN);
+			BigDecimal operand1=null;
+			BigDecimal operand2=null;
+			try {
+				operand1=new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1,false)));
+				operand2=new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2,false)));
+			}catch (IrregularStringOfBitsException ex) 
+			{ex.printStackTrace();}
+		
+			BigDecimal result=operand1.divide(operand2,mc);
+		
+			//checking for underflows is performed inside the doubleToBin method (if the relative traps are disabled the output is returned)
+			String output=doubleToBin(result.toString());
+
+			return output;
+		}
+		return null;
+		
+		
+		
+		
+	}
+	
 	
 	
 	/**Returns a string with a double value or the name of a special value
@@ -586,15 +694,19 @@ public class FPInstructionUtils
 		return false;
 	}
 	
-	/** Returns -1 if the infinity sign is negative, 1 if it is positive, 0 if "value" is not a well formed infinity according IEEE754 for FP64*/
-	public static int getInfinitySign(String value)
+	
+	/** Returns -1 if "value" is a negative double binary string,+1 if it is positive, 0 if "value" is not a well formed 64 binary string according to IEEE754 standard*/
+	public static int getDoubleSign(String value)
 	{
 		if(is64BinaryString(value))
 		{
-			if(isPositiveInfinity(value))
-				return 1;
-			else if(isNegativeInfinity(value))
-				return -1;
+			switch(value.charAt(0))
+			{
+				case '0':
+					return 1;
+				case '1':
+					return -1;
+			}
 		}
 		return 0;
 	}
@@ -654,21 +766,7 @@ public class FPInstructionUtils
 		return false;
 	}
 	
-	
-	
-	
-	 
-	
-	
-	/*
-	public static String doubleToHex(double value)
-	{
-		return Long.toHexString(Double.doubleToLongBits(value));
-	}
-	*/
 
-
-   
 }
 
 

@@ -194,6 +194,7 @@ public abstract class Instruction {
 			ADD_D {Instruction getObject() {ADD_D newObject=new ADD_D(); return newObject; } },
 			SUB_D {Instruction getObject() {SUB_D newObject=new SUB_D();return newObject; } },
 			MUL_D { Instruction getObject() {MUL_D newObject=new MUL_D();return newObject;}},
+			DIV_D { Instruction getObject() {DIV_D newObject=new DIV_D(); return newObject;}},
 			LDC1 {Instruction getObject() {LDC1 newObject=new LDC1(); return newObject;}},
 			SDC1 {Instruction getObject() {SDC1 newObject=new SDC1(); return newObject;}};
 			
@@ -222,7 +223,7 @@ public abstract class Instruction {
      * </pre>
      **/
     
-    public abstract void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, NotAlignException, FPInvalidOperationException, FPExponentTooLargeException, FPUnderflowException, FPOverflowException;
+    public abstract void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, NotAlignException, FPInvalidOperationException, FPExponentTooLargeException, FPUnderflowException, FPOverflowException, FPDivideByZeroException;
     
     /**
      * <pre>

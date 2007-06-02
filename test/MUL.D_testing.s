@@ -7,7 +7,8 @@ var4: .double NEGATIVEZERO           ;0x8000000000000000; MINUS INFINITY
 var5: .double SNAN                   ;0x7FFFFFFFFFFFFFFF; SNAN
 var6: .double QNAN                   ;0x7ff7ffffffffffff; QNAN
 
-var7: .word 3534535 ; a number
+var7: .double 1.5 ; a positive number
+var14: .double -1.5; a negative number
 var8: .double 1.7E308 ; a positive big number
 var9: .double -1.7E308; a negative big number
 var10: .double 9.0E-324; a positive small number
@@ -29,12 +30,22 @@ ldc1 f9,var10(r0)
 ldc1 f25,var11(r0)
 ldc1 f26,var12(r0)
 ldc1 f27,var13(r0)
+ldc1 f28,var14(r0)
 
 ;//operations between infinities
 mul.d f10,f0,f0 ; +Infinity  X  +Infinity = +Infinity
 mul.d f11,f0,f1 ; +Infinity  X  -Infinity = -Infinity
 mul.d f12,f1,f1 ; -Infinity  X  -Infinity = +Infinity
 mul.d f13,f1,f0 ; -Infinity  X  +Infinity = -Infinity
+
+;//operations between infinities and signed numbers
+mul.d f22,f0,f6     ; +Infinity X positive number = +Infinity
+mul.d f23,f0,f28    ; +Infinity X negative number = -Infinity
+mul.d f24,f1,f6     ; -Infinity X positive number = -Infinity
+mul.d f29,f1,f28    ; -Infinity X negative number = +Infinity
+
+;//operations betwen zeros (1 example)
+mul.d f30,f2,f1     ; +Zero X -Zero = -Zero
 
 ;//operations containing qnans
 mul.d f14,f5,f6 ;  QNaN  X number = QNaN(if InvalidOperationException disabled)           //Trap (if InvalidOperationException enabled)

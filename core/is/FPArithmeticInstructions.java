@@ -66,7 +66,7 @@ public abstract class FPArithmeticInstructions extends ALUInstructions {
 	fd.incrReadSemaphore();
     }
 
-    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException,IrregularWriteOperationException,DivisionByZeroException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException {
+    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException,IrregularWriteOperationException,DivisionByZeroException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, FPDivideByZeroException {
     }
 
     public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
