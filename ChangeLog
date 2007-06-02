@@ -1,7 +1,17 @@
 EduMIPS64 ChangeLog
 ------------------- 
 
-0.4.3 ()
+  0.5 (03/06/2007)
+  	- Implemented a subset of MIPS32 instructions (MIPS32 group)
+	- Added LO and HI registers visualization in GUI (max83t)
+	- Bug fixes for the parser (max83t, mancausoft)
+	- Bug fixes for the Error Dialog (mancausoft)
+	- DSRAV fix (MIPS32 group)
+	- Bug fix for SYSCALL 5 (andrea)
+	- Updated manual (MIPS32 group, andrea)
+	- Clear button for the I/O window (andrea)
+	- Fixed compilation under Java 6 (andrea)
+	- Bug fix in the locale files (andrea)
 
 0.4.2 (22/04/2007)
 	- Added DADDIU instruction, and marked DADDUI as deprecated (mancausoft)
