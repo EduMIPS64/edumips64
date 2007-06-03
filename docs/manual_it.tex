@@ -23,6 +23,7 @@ relativo al file da chiudere (se utilizzate questo listato copia-incollate il co
 
 \lstdefinestyle{mips}{
 	language=java,
+	numbers=left,
 	basicstyle=\small,
 	keywordstyle=\bfseries,
 	identifierstyle=\ttfamily,
@@ -33,6 +34,7 @@ relativo al file da chiudere (se utilizzate questo listato copia-incollate il co
 }
 \lstdefinestyle{java}{
 	language=java,
+	numbers=left,
 	basicstyle=\small,
 	keywordstyle=\bfseries,
 	identifierstyle=\ttfamily,
@@ -926,6 +928,7 @@ Possibili cause di errore sono il tentativo di scrivere su un file inesistente, 
 oppure il tentativo di scrivere su un file di sola lettura.
 
 \index{system calls!printf()}
+\label{sys5}
 \subsection{\texttt{SYSCALL 5 - printf()}}
 SYSCALL 5 richiede un numero variabile di parametri, il primo \`{e} la cosiddetta
 ``format string'' o stringa di formato. Nella stringa di formato possono essere inseriti alcuni segnaposto,
@@ -1204,55 +1207,33 @@ Torna il descrittore del file o '-1' se si \'{e} verificato un errore.
 Ecco un semplice esempio di programma che apre un file:
 \begin{lstlisting}[caption={syscall1}, label={code:syscall1}, style={mips}]
       	.data
+error_op:	.asciiz	"An error occurred opening file"	
 
-		;error message
-error_op:				
-		.asciiz "An error occurred opening file"	
+ok_message:	.asciiz	"All right, operation succesfully done"
 
-
-		;ok message
-ok_message:		
-		.asciiz "All right, operation succesfully done"
-
-
-		;filename path
-params_sys1:		
-		.asciiz	"/home/giorgio/Desktop/filename.txt"
-
-		;opening file in both reading and writing mode
-		;with append and creation options(3+4+8=15)	
-		.word64	0xF					
-
+params_sys1:	.asciiz	"/home/giorgio/Desktop/filename.txt"
+						.word64	0xF					
 
 	.text
-	;includes the print.s file
 	#include print.s			
-
 open:
-	;writing the address of the 'params_sys1' label into r14 register
 	daddi r14,r0,params_sys1	
-
-	;opening filename..	
-	syscall 1
-	
-	;\$s0=-1			
-	daddi \$s0,r0,-1	
-
-	;\$s2 contains now the file descriptor of "filename.txt" 	
-	dadd \'s2,r0,r1	
-
-	;now \$a0 has the address of the label 'ok_message'			
-	daddi \$a0,r0,ok_message	
-
-	;if there are no errors.. go to 'read' label		
-	BNE r1 \$s0,print_string	
-
-	;now \$a0 has the address of the label 'error_op'	
-	daddi \$a0,r0,error_op		
-
-	;calls the 'print_string' function into 'print.s' file	
+	syscall 1	
+	daddi $s0,r0,-1
+	dadd $s2,r0,r1		
+	daddi $a0,r0,ok_message	
+	BNE r1 $s0,print_string	
+	daddi $a0,r0,error_op		
 	jal print_string			
 \end{lstlisting}
+Inizialmente vengono salvati in memoria i dati richiesti dalla syscall 1, cioe' la stringa contenente il path del file da aprire(riga 2), 
+e (nella locazione di memoria immediatamente successiva) un intero che ne definisce la modalita' di apertura(riga 3).Si applica un' etichetta
+ a questi dati per potervici accedere in seguito.Successivamente si salvano in memoria (e gli si assegna un'etichetta) le stringe relative ai messaggi 
+di successo ed errore da passare alla funzione 'print_string'(righe 5, 7).Passando alla sezione .text, inizialmente si salva l'indirizzo di params_sys1
+(che per il compilatore \'{e} un numero) nel registro r14(l'indirizzo al quale la syscall 1 si riferir\'{a}); subito dopo si pu\'{o} chiamare la syscall 1 e 
+salvare il registro r1(che contiene il valore di ritorno dell syscall) in $s2(in modo da poterlo riutilizzare, per esempio, con le altre syscall).A questo 
+punto viene chiamata la funzione print_string facendo in modo da passargli l'indirizzo di 'error_op' nel caso in cui r1 sia uguale a -1(righe 18-19).
+Altrimenti si chiama la funzione 'print_string' facendo in modo di passargli l'indirizzo di _'ok_message' (righe 16-17).
 
 \subsection{syscall 2}
 La syscall 2 richiede un solo parametro: il file descriptor del file da chiudere .\\
@@ -1260,54 +1241,32 @@ Torna '0' in caso di successo o '-1' se si \'{e} verificato un errore.\\
 Ecco un semplice esempio di un programma che chiude un file:
 \begin{lstlisting}[caption={syscall2}, label={code:syscall2}, style={mips}]
       		.data
-	;error message
-error_cl:	
-	.asciiz "An error occurred closing file"
+params_sys2:	.space 8
 
-	
-	;ok message
-ok_message:	
-	.asciiz "All right, operation succesfully done"	
+error_cl:	.asciiz "An error occurred closing file"
 
-
-	;file descriptor
-params_sys2:	
-	.space 8					
+ok_message:	.asciiz "All right, operation succesfully done"						
 
 
 	.text
-	;includes the print.s file
 	#include print.s	
-
-
 close:	
-	;writing the address of the 'params_sys2' label into r14 register	
 	daddi r14,r0,params_sys2		
-
-	;moving file descriptor of filename.txt into memory
-	sw \$s2,params_sys2(r0)	
-
-	;closing filename..	
+	sw $s2,params_sys2(r0)	
 	syscall 2			
-
-	;\$s0=-1
-	daddi \$s0,r0,-1		
-
-	;now \$a0 has the address of the label 'ok_message'		
-	daddi \$a0,r0,ok_message		
-	
-	;if there are no errors.. calls the 'print_string' function
-	BNE r1,\$s0,print_string		
-
-	;now \$s1 has the address of the label 'error_cl'
-	daddi \$a0,r0,error_cl
-
-	;calls the 'print_string' function into 'print.s' file			
-	jal print_string				
-
+	daddi $s0,r0,-1		
+	daddi $a0,r0,ok_message		
+	BNE r1,$s0,print_string		
+	daddi $a0,r0,error_cl	
+	jal print_string			
 \end{lstlisting}
 \OF{}
-
+Inizialmente vengono salvati in memoria i dati richiesti dalla syscall 2, cioe'  il file descriptor del file da chiudere(riga 2) e gli si applica un' etichetta
+ per potervici accedere in seguito.Successivamente si salvano in memoria (e gli si assegna un'etichetta) le stringe relative ai messaggi 
+di successo ed errore da passare alla funzione 'print_string'(righe 4, 6).Passando alla sezione .text, inizialmente si salva l'indirizzo di params_sys2
+(che per il compilatore \'{e} un numero) nel registro r14(l'indirizzo al quale la syscall 2 si riferir\'{a}); subito dopo si pu\'{o} chiamare la syscall 2.
+A questo punto viene chiamata la funzione print_string facendo in modo da passargli l'indirizzo di 'error_cl' nel caso in cui r1 sia uguale a -1(righe 18, 19).
+Altrimenti si chiama la funzione 'print_string' facendo in modo di passargli l'indirizzo di _'ok_message' (righe 16, 17).
 
 \subsection{syscall 3}
 La syscall 3 richiede tre parametri: il file descriptor da cui leggere('0' per lo standard input), 
@@ -1316,66 +1275,42 @@ Torna il numero di byte letti in caso di successo o '-1' se si \'{e} verificato 
 Ecco un semplice esempio di un programma che legge 30 byte da un file e li salva in memoria:
 \begin{lstlisting}[caption={syscall3}, label={code:syscall3}, style={mips}]
       		.data
-	;error message
-error_3:	
-	.asciiz "An error occurred reading file"	
+params_sys3:	.space 8				
+ind_value:	.space 8			
+	.word64 16		
 
-	;error message
+error_3:	.asciiz "An error occurred reading file"	
 
+ok_message:	.asciiz "All right, operation succesfully done"	
 
-	;ok message
-ok_message:	
-	.asciiz "All right, operation succesfully done"	
+value:	.space 30					
 
-
-value:		
-	.space 30					
-
-params_sys3:	
-		;file descriptor		
-		.space 8	
-		
-		;memory address of the label 'value'				
-ind_value:	.space 8
-
-		;number of bytes to read					
-		.word64 16					
+			
 
 
 	.text
-	;includes the print.s file
 #include print.s	
 
 read:
-	;writing the address of the 'params_sys3' label into r14 register
-	daddi r14,r0,params_sys3_4	
-
-	;moving file descriptor of filename.txt into memory
-	sw \$s2,params_sys3(r0)
-
-	;now \$s1 has the address of the label 'value'
-	daddi \$s1,r0,value
-
-	;moving the value of \$s1 into memory			
-	sw \$s1,ind_value(r0)	
-
-	;reading 30 bytes from filename.txt and moving them into 'value'			
+	daddi r14,r0,params_sys3	
+	sw $s2,params_sys3(r0)
+	daddi $s1,r0,value			
+	sw $s1,ind_value(r0)			
 	syscall 3			
-	
-	;\$s0=-1
-	daddi \$s0,r0,-1			
-
-	;if there are no errors.. calls the 'print_string' function	
-	BNE r1,\$s0,print_string
-
-	;now \$s1 has the address of the label 'error_3'		
-	daddi \$a0,r0,error_3
-
-	;calls the 'print_string' function into 'print.s' file
+	daddi $s0,r0,-1			
+	BNE r1,$s0,print_string	
+	daddi $a0,r0,error_3
 	jal print_string
 \end{lstlisting}
 \OF{}
-
+Inizialmente vengono salvati in memoria i dati richiesti dalla syscall 3, cioe' il file descriptor del file da cui leggere (riga 2), 
+l'indirizzo di memoria in cui inserire i byte letti(riga 3), e il numero di byte da leggere(riga 4).Si applica un' etichetta
+ a questi dati per potervici accedere in seguito.Successivamente si salvano in memoria (e gli si assegna un'etichetta) le stringe relative ai messaggi 
+di successo ed errore da passare alla funzione 'print_string'(righe 6, 8).Passando alla sezione .text, inizialmente si salva l'indirizzo di params_sys3
+(che per il compilatore \'{e} un numero) nel registro r14(l'indirizzo al quale la syscall 3 si riferir\'{a});dopodich\'{e} salviamo nelle apposite locazioni 
+di memoria l'indirizzo del file descriptor (che supponiamo avere nel registro \$s2) e l'indirizzo su cui andare a salvare i byte letti(ossia l'indirizzo di 'value').
+Subito dopo si pu\'{o} chiamare la syscall 3.A questo  punto viene chiamata la funzione print_string facendo in modo da passargli l'indirizzo di 'error_3'
+ nel caso in cui r1 sia uguale a -1(righe 26,27). Altrimenti si chiama la funzione 'print_string' facendo in modo di passargli l'indirizzo di _'ok_message' (righe 24, 25).
 
 \subsection{syscall 4}
 La syscall 4 richiede tre parametri: il file descriptor su cui scrivere('1' per lo standard output - '2' per lo standard error), 
@@ -1384,86 +1319,61 @@ Torna il numero di byte scritto in caso di successo o '-1' se si \'{e} verificat
 Ecco un semplice esempio di un programma che scrive su un file una stringa salvata in memoria:
 \begin{lstlisting}[caption={syscall4}, label={code:syscall4}, style={mips}]
       		.data
-	;error message
-error_4:	
-	.asciiz "An error occurred writing file"	
+params_sys4:	.space 8			
+ind_value:	.space 8			
+	.word64 16		
 
-	;error message
+error_4:	.asciiz "An error occurred writing file"	
 
+ok_message:	.asciiz "All right, operation succesfully done"	
 
-	;ok message
-ok_message:	
-	.asciiz "All right, operation succesfully done"	
-
-
-value:		
-	.space 30					
-
-params_sys4:	
-		;file descriptor		
-		.space 8	
-		
-		;memory address of the label 'value'				
-ind_value:	.space 8
-
-		;number of bytes to read					
-		.word64 16					
+value:	.space 30								
 
 
 	.text
-	;includes the print.s file
 #include print.s	
 
 read:
-	;writing the address of the 'params_sys4' label into r14 register
-	daddi r14,r0,params_sys4	
-
-	;moving file descriptor of filename.txt into memory
-	sw \$s2,params_sys3_4(r0)
-
-	;now \$s1 has the address of the label 'value'
-	daddi \$s1,r0,value
-
-	;moving the value of \$s1 into memory			
-	sw \$s1,ind_value(r0)	
-
-	;writing the content of 'value' into filename.txt			
+	daddi r14,r0,params_sys4
+	sw $s2,params_sys3_4(r0)
+	daddi $s1,r0,value	
+	sw $s1,ind_value(r0)	
 	syscall 3			
-	
-	;\$s0=-1
-	daddi \$s0,r0,-1			
-
-	;if there are no errors.. calls the 'print_string' function	
-	BNE r1,\$s0,print_string
-
-	;now \$s1 has the address of the label 'error_4'		
-	daddi \$a0,r0,error_4
-
-	;calls the 'print_string' function into 'print.s' file
+	daddi $s0,r0,-1			
+	BNE r1,$s0,print_string
+	daddi $a0,r0,error_4
 	jal print_string				
 \end{lstlisting}
 \OF{}
-
+Inizialmente vengono salvati in memoria i dati richiesti dalla syscall 4, cioe' il file descriptor del file da cui leggere (riga 2), 
+l'indirizzo di memoria da cui prelevare i byte da scrivere(riga 3), e il numero di byte da scrivere(riga 4).Si applica un' etichetta
+ a questi dati per potervici accedere in seguito.Successivamente si salvano in memoria (e gli si assegna un'etichetta) le stringe relative ai messaggi 
+di successo ed errore da passare alla funzione 'print_string'(righe 6, 8).Passando alla sezione .text, inizialmente si salva l'indirizzo di params_sys4
+(che per il compilatore \'{e} un numero) nel registro r14(l'indirizzo al quale la syscall 4 si riferir\'{a});dopodich\'{e} salviamo nelle apposite locazioni 
+di memoria l'indirizzo del file descriptor (che supponiamo avere nel registro \$s2) e l'indirizzo da cui leggere i byte da scrivere(ossia l'indirizzo di 'value').
+Subito dopo si pu\'{o} chiamare la syscall 4.A questo  punto viene chiamata la funzione print_string facendo in modo da passargli l'indirizzo di 'error_4'
+ nel caso in cui r1 sia uguale a -1(righe 24, 25). Altrimenti si chiama la funzione 'print_string' facendo in modo di passargli l'indirizzo di _'ok_message' (righe 22, 23).
 
 \subsection{syscall 5}
-La syscall 5 richiede un numero variabile di parametri (nelle modalità specificate a pag.30)
+La syscall 5 richiede un numero variabile di parametri (nelle modalità specificate in  \ref{sys5})
 Torna '-1' se si \'{e} verificato un errore.\\ 
 Ecco un semplice esempio di un programma che contiene una funzione che stampa nello standard output
 la stringa contenuta nel registro \$a0:
 \begin{lstlisting}[caption={syscall5}, label={code:syscall5}, style={mips}]
-      			.text
+    .data
+params_sys5: .space 8	  			
+	.text
 print_string:
-	;moving the value of \$s1 into memory
 	sw \$a0,params_sys5(r0)	
-
-	;writing the address of the 'params_sys5' label into r14 register
-	daddi r14,r0,params_sys5		
-
-	;a message will appear
-	syscall 5				
-
-	;end of the program;
+	daddi r14,r0,params_sys5
+	syscall 5
 	syscall 0				
 \end{lstlisting}
+Inizialmente vengono salvati in memoria i dati richiesti dalla syscall 5, cioe' la stringa da stampare(riga 2) e gli si applica un' etichetta
+ per potervici accedere in seguito.Nel caso la stringa necessiti di inserire altri parametri in memoria(vedi \ref{sys5}), questi dovranno
+necessariamente essere inseriti nell'area di memoria immediatamente sucessiva a 'params_sys5', (cioè nelle righe 3, 4, etc..).
+Passando alla sezione .text, inizialmente si salva l'indirizzo di params_sys5 (che per il compilatore \'{e} un numero) nel registro r14
+(l'indirizzo al quale la syscall 2 si riferir\'{a}); subito dopo si pu\'{o} chiamare la syscall 5 che stampa nello standard output (una fiestra didialogo)
+la stringa desiderata.
 
 \end{document}
