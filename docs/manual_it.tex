@@ -15,6 +15,8 @@ istruzioni per mantenere la compatibilit\`{a} con altri simulatori.}
 \newcommand{\MISN}{\textbf{NB:} La 'U' dell'istruzione sta per 'unsigned'; tuttavia questo \`{e} 
 un nome equivoco, perch\'{e} l'operazione considera i valori con segno. La sua caratteristica \`{e} 
 quella di non lanciare eccezioni (nemmeno in caso di overflow).}
+\newcommand{\OF}{\textbf{NB:} Questo listato prevede che il registro \$s2 contenga il file descriptor
+relativo al file da chiudere (se utilizzate questo listato copia-incollate il codice del listato 5.2 prima di questo).}
 
 % Per avere il bold typewriter
 \DeclareFontShape{OT1}{cmtt}{bx}{n}{ <5><6><7><8><9><10><10.95><12><14.4><17.28><20.74><24.88>cmttb10}{}
@@ -881,8 +883,9 @@ Tale intero pu\`{o} essere costruito sommando i parametri che si vogliono utiliz
 	\item \texttt{O\_TRUNC (0x08)} In modalit\`{a} di scrittura, cancella il contenuto del file al momento della sua apertura.
 \end{itemize}
 
-\`{E} obbligatorio specificare una delle prime tre modalit\`{a}. La quarta e la quinta sono esclusive, 
-non \`{e} possibile specificare O\_APPEND se si specifica O\_TRUNC (e viceversa).
+\`{E} obbligatorio specificare una delle prime tre modalit\`{a}. La quinta e la sesta sono esclusive, 
+non \`{e} possibile specificare O\_APPEND se si specifica O\_TRUNC (e viceversa).Inoltre non si puo' specificare O\_CREAT 
+se si specifica O\_RDONLY (oppure O\_RDWR).
 
 \`{E} possibile specificare una combinazione di modalit\`{a} semplicemente sommando i valori interi ad esse associati. 
 Ad esempio, se si vuole aprire un file in modalit\`{a} di sola scrittura ed aggiungere il testo alla fine del file, 
@@ -890,6 +893,7 @@ si dovr\`{a} specificare la modalit\`{a} $2 + 8 = 10$.
 
 Il valore di ritorno delle chiamate di sistema \`{e} il nuovo descrittore del file (file descriptor) associato al file, 
 che potr\`{a} essere utilizzato con le altre chiamate di sistema. Qualora si verifichi un errore, il valore di ritorno sar\`{a} -1.
+
 
 \index{system calls!close()}
 \subsection{\texttt{SYSCALL 2 - close()}}
@@ -1174,4 +1178,292 @@ presenta una pagina gi\`{a} contenente l'applet, in modo tale che chiunque possa
 %\cite{edumips-web} contains a page that already contains the applet, so
 %that everyone can execute it without the hassle of using the command line.
 \printindex
+
+\chapter{Listati di esempio}
+Qui di seguito sono elencati degli esempi utili per comprendere il funzionamento delle istruziuoni che accetta \EM{} (versione \EV)
+\section{SYSCALL}
+Tutte le Syscall (tranne la 0) hanno un comportamento simile.\\
+Esse  richiedono che l'indirizzo dei loro parametri sia memorizzato nel registro R14. 
+Nel momento in cui chiamiamo una qualunque syscall essa preleva il primo parametro dall'indirizzo specificato in R14; qualora ce ne siano altri, 
+saranno prelevati dalle aree di memoria immediatamente adiacenti.\\ Il valore di ritorno \'{a} memorizzato nel registro R1, e varia a seconda della syscall. 
+Tutte comunque tornano -1 in caso di errore.\\
+\newpage
+\subsection{syscall 0}
+La syscall 0 non richiede nessun parametro in ingresso , e non ne ritorna nessuno. Quando invocata, semplicemente termina l'esecuzione del programma .
+Eccone un semplice esempio:
+
+\begin{lstlisting}[caption={syscall0}, label={code:syscall0}, style={mips}]
+        .code
+        daddi   r1, r0, 0	;salva 0 nel registro R1
+        syscall 0				;esce dal programma
+\end{lstlisting}
+
+\subsection{syscall 1}
+La syscall 1 richiede due parametri: il path del file da aprire e la modalit\'{a} di apertura.\\
+Torna il descrittore del file o '-1' se si \'{e} verificato un errore.
+Ecco un semplice esempio di programma che apre un file:
+\begin{lstlisting}[caption={syscall1}, label={code:syscall1}, style={mips}]
+      	.data
+
+		;error message
+error_op:				
+		.asciiz "An error occurred opening file"	
+
+
+		;ok message
+ok_message:		
+		.asciiz "All right, operation succesfully done"
+
+
+		;filename path
+params_sys1:		
+		.asciiz	"/home/giorgio/Desktop/filename.txt"
+
+		;opening file in both reading and writing mode
+		;with append and creation options(3+4+8=15)	
+		.word64	0xF					
+
+
+	.text
+	;includes the print.s file
+	#include print.s			
+
+open:
+	;writing the address of the 'params_sys1' label into r14 register
+	daddi r14,r0,params_sys1	
+
+	;opening filename..	
+	syscall 1
+	
+	;\$s0=-1			
+	daddi \$s0,r0,-1	
+
+	;\$s2 contains now the file descriptor of "filename.txt" 	
+	dadd \'s2,r0,r1	
+
+	;now \$a0 has the address of the label 'ok_message'			
+	daddi \$a0,r0,ok_message	
+
+	;if there are no errors.. go to 'read' label		
+	BNE r1 \$s0,print_string	
+
+	;now \$a0 has the address of the label 'error_op'	
+	daddi \$a0,r0,error_op		
+
+	;calls the 'print_string' function into 'print.s' file	
+	jal print_string			
+\end{lstlisting}
+
+\subsection{syscall 2}
+La syscall 2 richiede un solo parametro: il file descriptor del file da chiudere .\\
+Torna '0' in caso di successo o '-1' se si \'{e} verificato un errore.\\ 
+Ecco un semplice esempio di un programma che chiude un file:
+\begin{lstlisting}[caption={syscall2}, label={code:syscall2}, style={mips}]
+      		.data
+	;error message
+error_cl:	
+	.asciiz "An error occurred closing file"
+
+	
+	;ok message
+ok_message:	
+	.asciiz "All right, operation succesfully done"	
+
+
+	;file descriptor
+params_sys2:	
+	.space 8					
+
+
+	.text
+	;includes the print.s file
+	#include print.s	
+
+
+close:	
+	;writing the address of the 'params_sys2' label into r14 register	
+	daddi r14,r0,params_sys2		
+
+	;moving file descriptor of filename.txt into memory
+	sw \$s2,params_sys2(r0)	
+
+	;closing filename..	
+	syscall 2			
+
+	;\$s0=-1
+	daddi \$s0,r0,-1		
+
+	;now \$a0 has the address of the label 'ok_message'		
+	daddi \$a0,r0,ok_message		
+	
+	;if there are no errors.. calls the 'print_string' function
+	BNE r1,\$s0,print_string		
+
+	;now \$s1 has the address of the label 'error_cl'
+	daddi \$a0,r0,error_cl
+
+	;calls the 'print_string' function into 'print.s' file			
+	jal print_string				
+
+\end{lstlisting}
+\OF{}
+
+
+\subsection{syscall 3}
+La syscall 3 richiede tre parametri: il file descriptor da cui leggere('0' per lo standard input), 
+l’indirizzo nel quale i dati letti dovranno essere copiati, il numero di byte da leggere.\\
+Torna il numero di byte letti in caso di successo o '-1' se si \'{e} verificato un errore.\\ 
+Ecco un semplice esempio di un programma che legge 30 byte da un file e li salva in memoria:
+\begin{lstlisting}[caption={syscall3}, label={code:syscall3}, style={mips}]
+      		.data
+	;error message
+error_3:	
+	.asciiz "An error occurred reading file"	
+
+	;error message
+
+
+	;ok message
+ok_message:	
+	.asciiz "All right, operation succesfully done"	
+
+
+value:		
+	.space 30					
+
+params_sys3:	
+		;file descriptor		
+		.space 8	
+		
+		;memory address of the label 'value'				
+ind_value:	.space 8
+
+		;number of bytes to read					
+		.word64 16					
+
+
+	.text
+	;includes the print.s file
+#include print.s	
+
+read:
+	;writing the address of the 'params_sys3' label into r14 register
+	daddi r14,r0,params_sys3_4	
+
+	;moving file descriptor of filename.txt into memory
+	sw \$s2,params_sys3(r0)
+
+	;now \$s1 has the address of the label 'value'
+	daddi \$s1,r0,value
+
+	;moving the value of \$s1 into memory			
+	sw \$s1,ind_value(r0)	
+
+	;reading 30 bytes from filename.txt and moving them into 'value'			
+	syscall 3			
+	
+	;\$s0=-1
+	daddi \$s0,r0,-1			
+
+	;if there are no errors.. calls the 'print_string' function	
+	BNE r1,\$s0,print_string
+
+	;now \$s1 has the address of the label 'error_3'		
+	daddi \$a0,r0,error_3
+
+	;calls the 'print_string' function into 'print.s' file
+	jal print_string
+\end{lstlisting}
+\OF{}
+
+
+\subsection{syscall 4}
+La syscall 4 richiede tre parametri: il file descriptor su cui scrivere('1' per lo standard output - '2' per lo standard error), 
+l’indirizzo dal quale prelevare i dati che dovranno essere scritti, il numero di byte da scrivere.\\
+Torna il numero di byte scritto in caso di successo o '-1' se si \'{e} verificato un errore.\\ 
+Ecco un semplice esempio di un programma che scrive su un file una stringa salvata in memoria:
+\begin{lstlisting}[caption={syscall4}, label={code:syscall4}, style={mips}]
+      		.data
+	;error message
+error_4:	
+	.asciiz "An error occurred writing file"	
+
+	;error message
+
+
+	;ok message
+ok_message:	
+	.asciiz "All right, operation succesfully done"	
+
+
+value:		
+	.space 30					
+
+params_sys4:	
+		;file descriptor		
+		.space 8	
+		
+		;memory address of the label 'value'				
+ind_value:	.space 8
+
+		;number of bytes to read					
+		.word64 16					
+
+
+	.text
+	;includes the print.s file
+#include print.s	
+
+read:
+	;writing the address of the 'params_sys4' label into r14 register
+	daddi r14,r0,params_sys4	
+
+	;moving file descriptor of filename.txt into memory
+	sw \$s2,params_sys3_4(r0)
+
+	;now \$s1 has the address of the label 'value'
+	daddi \$s1,r0,value
+
+	;moving the value of \$s1 into memory			
+	sw \$s1,ind_value(r0)	
+
+	;writing the content of 'value' into filename.txt			
+	syscall 3			
+	
+	;\$s0=-1
+	daddi \$s0,r0,-1			
+
+	;if there are no errors.. calls the 'print_string' function	
+	BNE r1,\$s0,print_string
+
+	;now \$s1 has the address of the label 'error_4'		
+	daddi \$a0,r0,error_4
+
+	;calls the 'print_string' function into 'print.s' file
+	jal print_string				
+\end{lstlisting}
+\OF{}
+
+
+\subsection{syscall 5}
+La syscall 5 richiede un numero variabile di parametri (nelle modalità specificate a pag.30)
+Torna '-1' se si \'{e} verificato un errore.\\ 
+Ecco un semplice esempio di un programma che contiene una funzione che stampa nello standard output
+la stringa contenuta nel registro \$a0:
+\begin{lstlisting}[caption={syscall5}, label={code:syscall5}, style={mips}]
+      			.text
+print_string:
+	;moving the value of \$s1 into memory
+	sw \$a0,params_sys5(r0)	
+
+	;writing the address of the 'params_sys5' label into r14 register
+	daddi r14,r0,params_sys5		
+
+	;a message will appear
+	syscall 5				
+
+	;end of the program;
+	syscall 0				
+\end{lstlisting}
+
 \end{document}
