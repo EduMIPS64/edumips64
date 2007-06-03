@@ -121,6 +121,10 @@ public class IOManager {
 		// must check if the user hasn't specified O_CREAT, has specified
 		// O_WRONLY (or O_RDWR) and the file does't exist
 
+		if((flags & O_CREAT) == O_CREAT) {
+			edumips64.Main.logger.debug("flags & O_CREAT = " + O_CREAT );
+		}
+
 		if(((flags & O_CREAT) != O_CREAT) && ((flags & O_WRONLY) == O_WRONLY)) {
 			edumips64.Main.logger.debug("No O_CREAT, but O_WRONLY. We must check if the file exists");
 			File temp = new File(pathname);
