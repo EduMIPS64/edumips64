@@ -12,11 +12,12 @@ EduMIPS64 ChangeLog
 	- Bug fixes for the parser (max83t, mancausoft)
 	- Bug fixes for the Error Dialog (mancausoft)
 	- DSRAV fix (MIPS32 group)
-	- Bug fix for SYSCALL 5 (andrea)
+	- Bug fix for SYSCALL 1 and 5 (andrea)
 	- Updated manual (MIPS32 group, andrea)
 	- Clear button for the I/O window (andrea)
 	- Fixed compilation under Java 6 (andrea)
 	- Bug fix in the locale files (andrea)
+	- Changed default interval between cycles from 100ms to 10ms (andrea)
 
 0.4.2 (22/04/2007)
 	- Added DADDIU instruction, and marked DADDUI as deprecated (mancausoft)
