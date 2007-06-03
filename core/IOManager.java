@@ -128,6 +128,16 @@ public class IOManager {
 				throw new FileNotFoundException();
 		}
 
+        // The user can't open with the O_CREAT flag a file that could be read.
+        
+        if(((flags & O_CREAT) == O_CREAT) && ((flags & O_RDONLY) == O_RDONLY)) {
+			edumips64.Main.logger.debug("Trying to open in read mode a file that might not exist.");
+			File temp = new File(pathname);
+			if(!temp.exists())
+                throw new IOManagerException("OPENREADANDCREATE");
+        }
+
+
 		boolean append = false;
 		if((flags & O_APPEND) == O_APPEND) {
 			edumips64.Main.logger.debug("flags & O_APPEND = " + O_APPEND );
@@ -146,7 +156,7 @@ public class IOManager {
 			outs.put(next_descriptor, w);
 		}
 
-		// TODO: gestire append, creat, trunc
+		// TODO: gestire creat, trunc
 		return next_descriptor++;
 	}
 
