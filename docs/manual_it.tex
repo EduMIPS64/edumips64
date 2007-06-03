@@ -17,7 +17,7 @@ istruzioni per mantenere la compatibilit\`{a} con altri simulatori.}
 un nome equivoco, perch\'{e} l'operazione considera i valori con segno. La sua caratteristica \`{e} 
 quella di non lanciare eccezioni (nemmeno in caso di overflow).}
 \newcommand{\OF}{\textbf{NB:} Questo listato prevede che il registro \$s2 contenga il file descriptor
-relativo al file da chiudere (se utilizzate questo listato copia-incollate il codice del listato 5.2 prima di questo).}
+relativo al file da utilizzare (se utilizzate questo listato copia-incollate il codice del listato \ref{lst5.2} prima di questo).}
 
 % Per avere il bold typewriter
 \DeclareFontShape{OT1}{cmtt}{bx}{n}{ <5><6><7><8><9><10><10.95><12><14.4><17.28><20.74><24.88>cmttb10}{}
@@ -1194,7 +1194,7 @@ parametro dall'indirizzo specificato in R14; qualora ce ne siano altri, saranno
 prelevati dalle aree di memoria immediatamente adiacenti. Il valore di ritorno
 \`{e} memorizzato nel registro R1, e varia a seconda della \SC{}. 
 
-Tutte le \SC{} tornano -1 in caso di errore.
+Tutte le \SC{} tornano $-1$ in caso di errore, tranne la \SC{} 0, che non può fallire.
 \subsection{\SC{} 0}
 La \SC{} 0 non richiede alcun parametro in ingresso, e non ha valori di ritorno.
 Quando \`e invocata, semplicemente termina l'esecuzione del programma.
@@ -1210,7 +1210,7 @@ Eccone un esempio:
 La \SC{} 1 richiede due parametri: il path del file da aprire e la modalit\'{a} di apertura.\\
 Torna il descrittore del file o '-1' se si \'{e} verificato un errore.
 Ecco un semplice esempio di programma che apre un file:
-\begin{lstlisting}[caption={syscall1}, label={code:syscall1}, style={mips}]
+\label{lst5.2} \begin{lstlisting} [caption={syscall1}, label={code:syscall1}, style={mips} ] 
       	.data
 error_op:	.asciiz	"An error occurred opening file"	
 
@@ -1272,13 +1272,13 @@ close:
 	daddi $a0,r0,error_cl	
 	jal print_string			
 \end{lstlisting}
-\OF{}
 Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 2, cioe'  il file descriptor del file da chiudere(riga 2) e gli si applica un' etichetta
  per potervici accedere in seguito.Successivamente si salvano in memoria (e gli si assegna un'etichetta) le stringe relative ai messaggi 
 di successo ed errore da passare alla funzione 'print\_string'(righe 4, 6).Passando alla sezione .text, inizialmente si salva l'indirizzo di params\_sys2
 (che per il compilatore \'{e} un numero) nel registro r14(l'indirizzo al quale la \SC{} 2 si riferir\'{a}); subito dopo si pu\'{o} chiamare la \SC{} 2.
 A questo punto viene chiamata la funzione print\_string facendo in modo da passargli l'indirizzo di 'error\_cl' nel caso in cui r1 sia uguale a -1(righe 18, 19).
 Altrimenti si chiama la funzione 'print\_string' facendo in modo di passargli l'indirizzo di 'ok\_message' (righe 16, 17).
+\OF{}
 
 \subsection{\SC{} 3}
 La \SC{} 3 richiede tre parametri: il file descriptor da cui leggere('0' per lo standard input), 
@@ -1314,7 +1314,7 @@ read:
 	daddi $a0,r0,error_3
 	jal print_string
 \end{lstlisting}
-\OF{}
+
 Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 3, cioe' il file descriptor del file da cui leggere (riga 2), 
 l'indirizzo di memoria in cui inserire i byte letti(riga 3), e il numero di byte da leggere(riga 4).Si applica un' etichetta
  a questi dati per potervici accedere in seguito.Successivamente si salvano in memoria (e gli si assegna un'etichetta) le stringe relative ai messaggi 
@@ -1323,7 +1323,7 @@ di successo ed errore da passare alla funzione 'print\_string'(righe 6, 8).Passa
 di memoria l'indirizzo del file descriptor (che supponiamo avere nel registro \$s2) e l'indirizzo su cui andare a salvare i byte letti(ossia l'indirizzo di 'value').
 Subito dopo si pu\'{o} chiamare la \SC{} 3.A questo  punto viene chiamata la funzione print\_string facendo in modo da passargli l'indirizzo di 'error\_3'
  nel caso in cui r1 sia uguale a -1(righe 26,27). Altrimenti si chiama la funzione 'print\_string' facendo in modo di passargli l'indirizzo di \_'ok\_message' (righe 24, 25).
-
+\OF{}
 \subsection{syscall 4}
 La \SC{} 4 richiede tre parametri: il file descriptor su cui scrivere('1' per lo standard output - '2' per lo standard error), 
 l’indirizzo dal quale prelevare i dati che dovranno essere scritti, il numero di byte da scrivere.\\
@@ -1356,7 +1356,7 @@ read:
 	daddi $a0,r0,error_4
 	jal print_string				
 \end{lstlisting}
-\OF{}
+
 Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 4, cioe'
 il file descriptor del file da cui leggere (riga 2), l'indirizzo di memoria da
 cui prelevare i byte da scrivere(riga 3), e il numero di byte da scrivere(riga
@@ -1373,7 +1373,7 @@ scrivere(ossia l'indirizzo di 'value').  Subito dopo si pu\'{o} chiamare la
 modo da passargli l'indirizzo di 'error\_4' nel caso in cui r1 sia uguale a
 -1(righe 24, 25). Altrimenti si chiama la funzione 'print\_string' facendo in
 modo di passargli l'indirizzo di 'ok\_message' (righe 22, 23).
-
+\OF{}
 \subsection{\SC{} 5}
 La \SC{} 5 richiede un numero variabile di parametri (nelle modalità specificate in  \ref{sys5})
 Torna '-1' se si \'{e} verificato un errore.\\ 
