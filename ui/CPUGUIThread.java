@@ -120,7 +120,7 @@ public class CPUGUIThread extends Thread{
 				if(nStep < 0){
 					while(true){
 						if(verbose && (sleep_interval != 0)) {
-							Main.logger.debug("Waiting for " + sleep_interval + " milliseconds...");
+							// Main.logger.debug("Waiting for " + sleep_interval + " milliseconds...");
 							sleep(sleep_interval);
 						}
 						synchronized(this) {
@@ -179,7 +179,7 @@ public class CPUGUIThread extends Thread{
 				else{
 					for(int i=0 ; i<nStep; i++){
 						if(verbose && (sleep_interval != 0) && nStep > 1) {
-							Main.logger.debug("Waiting for " + sleep_interval + " milliseconds...");
+							// Main.logger.debug("Waiting for " + sleep_interval + " milliseconds...");
 							sleep(sleep_interval);
 						}
 						synchronized(this) {

@@ -6,14 +6,8 @@ EduMIPS64 ChangeLog
 	  * ADD, ADDI, ADDIU, ADDU
 	  * DIV, DIVU
 	  * MULT, MULTU
-	  * SLL
-	  SLLV
-	  SRA
-	  SRAV
-	  SRL
-	  SRLV
-	  SUB
-	  SUBU
+	  * SLL, SLLV, SRA, SRAV, SRL, SRLV
+	  * SUB, SUBU
 	- Added LO and HI registers visualization in GUI (max83t)
 	- Bug fixes for the parser (max83t, mancausoft)
 	- Bug fixes for the Error Dialog (mancausoft)

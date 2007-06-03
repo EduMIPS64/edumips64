@@ -60,7 +60,7 @@ public class Config{
 			config.put("syncexc-masked",false);
 			config.put("syncexc-terminate",false);
 			config.put("n_step",4);
-			config.put("sleep_interval",100);
+			config.put("sleep_interval",10);
 		}
 	}
 	public static void setMap(Map<String,Object> newConfig){
