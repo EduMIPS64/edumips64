@@ -7,8 +7,9 @@
 \usepackage{fancyhdr}
 \usepackage[italian]{babel}
 \newcommand{\EM}{EduMIPS64}
-\newcommand{\EV}{0.4.2}
+\newcommand{\EV}{0.5}
 \newcommand{\MS}{MIPS64}
+\newcommand{\SC}{\texttt{SYSCALL}}
 \newcommand{\WARN}{\textbf{ATTENZIONE:} Questa \`{e} un'istruzione deprecated, che
 non appartiene al repertorio delle istruzioni \MS{}, ma \`{e} stata inclusa nel set di
 istruzioni per mantenere la compatibilit\`{a} con altri simulatori.}
@@ -855,7 +856,7 @@ Ecco la lista delle istruzioni di controllo del flusso di tipo J:
 \label{sysc-man}
 \index{istruzioni!SYSCALL}
 \index{system calls}
-L'istruzione SYSCALL offre al programmatore un'interfaccia simile a quella offerta 
+L'istruzione \SC{} offre al programmatore un'interfaccia simile a quella offerta 
 da un sistema operativo, rendendo disponibili sei differenti chiamate di sistema (system call).
 
 Le system call richiedono che l'indirizzo dei loro parametri sia memorizzato nel registro R14, 
@@ -864,14 +865,14 @@ Tali system call sono il pi\`{u} possibile fedeli alla convenzione POSIX.
 
 \index{system calls!exit()}
 \subsection{\texttt{SYSCALL 0 - exit()}}
-SYSCALL 0 non richiede alcun parametro n\`{e} ritorna nulla, semplicemente ferma il simulatore.
+\SC{} 0 non richiede alcun parametro n\`{e} ritorna nulla, semplicemente ferma il simulatore.
 
-\`{E} opportuno notare che se il simulatore non trova SYSCALL 0 nel codice sorgente, 
+\`{E} opportuno notare che se il simulatore non trova \SC{} 0 nel codice sorgente, 
 o una qualsiasi istruzione equivalente (HALT  TRAP 0), terminer\`{a} automaticamente alla fine del sorgente.
 
 \index{system calls!open()}
 \subsection{\texttt{SYSCALL 1 - open()}}
-SYSCALL 1 richiede due parametri: una stringa (che termini con valore zero) che indica il percorso del file 
+\SC{} 1 richiede due parametri: una stringa (che termini con valore zero) che indica il percorso del file 
 che deve essere aperto, ed una double word contenente un intero che indica i parametri che devono 
 essere usati per specificare come aprire il file.
 
@@ -899,15 +900,15 @@ che potr\`{a} essere utilizzato con le altre chiamate di sistema. Qualora si ver
 
 \index{system calls!close()}
 \subsection{\texttt{SYSCALL 2 - close()}}
-SYSCALL 2 richiede solo un parametro, il file descriptor del file che deve essere chiuso. 
+\SC{} 2 richiede solo un parametro, il file descriptor del file che deve essere chiuso. 
 
- Qualora l'operazione termini con successo, SYSCALL 2 ritorner\`{a} 0, altrimenti -1. 
+ Qualora l'operazione termini con successo, \SC{} 2 ritorner\`{a} 0, altrimenti -1. 
  Possibili cause di errore sono il tentativo di chiudere un file inesistente, o di chiudere i file descriptor 0, 1 o 2, 
  che sono associati rispettivamente allo standard input, allo standard output ed allo standard error.
 
 \index{system calls!read()}
 \subsection{\texttt{SYSCALL 3 - read()}}
-SYSCALL 3 richiede tre parametri: il file descriptor da cui leggere, l'indirizzo nel quale i dati letti 
+\SC{} 3 richiede tre parametri: il file descriptor da cui leggere, l'indirizzo nel quale i dati letti 
 dovranno essere copiati, il numero di byte da leggere.
 
 Se il primo parametro \`{e} 0, il simulatore permetter\`{a} all'utente di inserire un valore mediante un'apposita finestra di dialogo. 
@@ -919,7 +920,7 @@ oppure il tentativo di leggere da un file di sola scrittura.
 
 \index{system calls!write()}
 \subsection{\texttt{SYSCALL 4 - write()}}
-SYSCALL 4 richiede tre parametri: il file descriptor su cui scrivere, l'indirizzo dal quale i dati dovranno essere letti, il numero di byte da scrivere.
+\SC{} 4 richiede tre parametri: il file descriptor su cui scrivere, l'indirizzo dal quale i dati dovranno essere letti, il numero di byte da scrivere.
 
 Se il primo parametro \`{e} 2 o 3, il simulatore mostrer\`{a} la finestra di input/output dove scriver\`{a} i dati letti.
 
@@ -930,7 +931,7 @@ oppure il tentativo di scrivere su un file di sola lettura.
 \index{system calls!printf()}
 \label{sys5}
 \subsection{\texttt{SYSCALL 5 - printf()}}
-SYSCALL 5 richiede un numero variabile di parametri, il primo \`{e} la cosiddetta
+\SC{} 5 richiede un numero variabile di parametri, il primo \`{e} la cosiddetta
 ``format string'' o stringa di formato. Nella stringa di formato possono essere inseriti alcuni segnaposto,
 descritti nella seguente lista:
 \begin{itemize}
@@ -940,10 +941,10 @@ descritti nella seguente lista:
 	\item \texttt{\%\%} indica \texttt{\%}
 \end{itemize}
 
-Per ciascuno dei segnaposto \texttt{\%s}, \texttt{\%d} o \texttt{\%i} la SYSCALL 5
+Per ciascuno dei segnaposto \texttt{\%s}, \texttt{\%d} o \texttt{\%i} la \SC{} 5
 si aspetta un parametro, partendo dall'indirizzo del precedente.
 
-Quando la SYSCALL trova un segnaposto per un parametro intero, si aspetta che
+Quando la \SC{} trova un segnaposto per un parametro intero, si aspetta che
 il corrispondente parametro sia un valore intero, quando trova un segnaposto per un 
 parametro stringa, si aspetta come parametro l'indirizzo della stringa stessa.
 
@@ -968,12 +969,12 @@ L'istruzione NOP non fa nulla, ed \`{e} utilizzata per creare pause nel codice s
 \index{TRAP}
 \index{istruzioni!TRAP}
 \subsection{\texttt{TRAP}}
-L'istruzione TRAP \`{e} deprecated, rappresenta un'alternativa all'istruzione SYSCALL.
+L'istruzione TRAP \`{e} deprecated, rappresenta un'alternativa all'istruzione \SC{}.
 
 \index{HALT}
 \index{istruzioni!HALT}
 \subsection{\texttt{HALT}}
-L'istruzione HALT \`{e} deprecated, rappresenta un'alternativa all'istruzione SYSCALL 0, che ferma il simulatore.
+L'istruzione HALT \`{e} deprecated, rappresenta un'alternativa all'istruzione \SC{} 0, che ferma il simulatore.
 
 \index{\EM{}!UI}
 \index{\EM{}!GUI}
@@ -1014,7 +1015,7 @@ stato completamente eseguito ed \`{e} stata gi\`{a} raggiunta la fine dell'esecu
 Il menu Esegui contiene voci riguardanti il flusso di esecuzione della simulazione.
 \begin{itemize}
 	\item \textbf{Ciclo singolo} Esegue un singolo passo di simulazione.
-	\item \textbf{Completa} Inizia l'esecuzione, fermandosi quando il simulatore raggiunge una SYSCALL 0 (o equivalente) o
+	\item \textbf{Completa} Inizia l'esecuzione, fermandosi quando il simulatore raggiunge una \SC{} 0 (o equivalente) o
 	un'istruzione di \texttt{BREAK}, oppure quando l'utente seleziona la voce Stop del men\`{u} (o preme F9).  
 	\item \textbf{Cicli multipli} Esegue un certo numero di passi di
     simulazione, tale valore pu\`o essere configurato 
@@ -1101,8 +1102,8 @@ informazioni addizionali provenienti dal codice sorgente.
 \index{\EM{}!finestre!Input/Output}
 \subsection{Input/Output}
 La finestra Input/Output fornisce un'interfaccia all'utente per la visualizzazione dell'output creato dai programmi 
-mediante le SYSCALL 4 e 5. Attualmente non \`{e} utilizzata per l'input di dati, ed al suo posto viene utilizzata una 
-finestra di dialogo che viene mostrata quando una SYSCALL 3  tenta di leggere dallo standard input, 
+mediante le \SC{} 4 e 5. Attualmente non \`{e} utilizzata per l'input di dati, ed al suo posto viene utilizzata una 
+finestra di dialogo che viene mostrata quando una \SC{} 3  tenta di leggere dallo standard input, 
 ma future versioni includeranno una casella di testo per l'input.
 
 \index{\EM{}!finestre di dialogo}
@@ -1183,26 +1184,30 @@ presenta una pagina gi\`{a} contenente l'applet, in modo tale che chiunque possa
 \printindex
 
 \chapter{Listati di esempio}
-Qui di seguito sono elencati degli esempi utili per comprendere il funzionamento delle istruziuoni che accetta \EM{} (versione \EV)
-\section{SYSCALL}
-Tutte le Syscall (tranne la 0) hanno un comportamento simile.\\
-Esse  richiedono che l'indirizzo dei loro parametri sia memorizzato nel registro R14. 
-Nel momento in cui chiamiamo una qualunque syscall essa preleva il primo parametro dall'indirizzo specificato in R14; qualora ce ne siano altri, 
-saranno prelevati dalle aree di memoria immediatamente adiacenti.\\ Il valore di ritorno \'{a} memorizzato nel registro R1, e varia a seconda della syscall. 
-Tutte comunque tornano -1 in caso di errore.\\
-\newpage
-\subsection{syscall 0}
-La syscall 0 non richiede nessun parametro in ingresso , e non ne ritorna nessuno. Quando invocata, semplicemente termina l'esecuzione del programma .
-Eccone un semplice esempio:
+Qui di seguito sono elencati degli esempi utili per comprendere il funzionamento delle istruzioni che accetta \EM{} (versione \EV)
+\section{\SC{}}
+Tutte le \SC{} (tranne la 0) hanno un comportamento simile: richiedono che
+l'indirizzo dei loro parametri sia memorizzato nel registro R14. 
+
+Nel momento in cui viene chiamata una qualunque \SC{} essa preleva il primo
+parametro dall'indirizzo specificato in R14; qualora ce ne siano altri, saranno
+prelevati dalle aree di memoria immediatamente adiacenti. Il valore di ritorno
+\`{e} memorizzato nel registro R1, e varia a seconda della \SC{}. 
+
+Tutte le \SC{} tornano -1 in caso di errore.
+\subsection{\SC{} 0}
+La \SC{} 0 non richiede alcun parametro in ingresso, e non ha valori di ritorno.
+Quando \`e invocata, semplicemente termina l'esecuzione del programma.
+Eccone un esempio:
 
 \begin{lstlisting}[caption={syscall0}, label={code:syscall0}, style={mips}]
         .code
         daddi   r1, r0, 0	;salva 0 nel registro R1
-        syscall 0				;esce dal programma
+        syscall 0	    	;esce dal programma
 \end{lstlisting}
 
-\subsection{syscall 1}
-La syscall 1 richiede due parametri: il path del file da aprire e la modalit\'{a} di apertura.\\
+\subsection{\SC{} 1}
+La \SC{} 1 richiede due parametri: il path del file da aprire e la modalit\'{a} di apertura.\\
 Torna il descrittore del file o '-1' se si \'{e} verificato un errore.
 Ecco un semplice esempio di programma che apre un file:
 \begin{lstlisting}[caption={syscall1}, label={code:syscall1}, style={mips}]
@@ -1226,7 +1231,7 @@ open:
 	daddi $a0,r0,error_op		
 	jal print_string			
 \end{lstlisting}
-Inizialmente vengono salvati in memoria i dati richiesti dalla syscall 1, cioe'
+Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 1, cioe'
 la stringa contenente il path del file da aprire(riga 2), e (nella locazione di
 memoria immediatamente successiva) un intero che ne definisce la modalita' di
 apertura(riga 3).Si applica un' etichetta a questi dati per potervici accedere
@@ -1234,16 +1239,16 @@ in seguito.Successivamente si salvano in memoria (e gli si assegna un'etichetta)
 le stringe relative ai messaggi di successo ed errore da passare alla funzione
 'print\_string'(righe 5, 7).Passando alla sezione .text, inizialmente si salva
 l'indirizzo di params\_sys1 (che per il compilatore \'{e} un numero) nel registro
-r14(l'indirizzo al quale la syscall 1 si riferir\'{a}); subito dopo si pu\'{o}
-chiamare la syscall 1 e salvare il registro r1(che contiene il valore di ritorno
-dell syscall) in \$s2(in modo da poterlo riutilizzare, per esempio, con le altre
-syscall).A questo punto viene chiamata la funzione print\_string facendo in modo
+r14(l'indirizzo al quale la \SC{} 1 si riferir\'{a}); subito dopo si pu\'{o}
+chiamare la \SC{} 1 e salvare il registro r1(che contiene il valore di ritorno
+dell \SC{}) in \$s2(in modo da poterlo riutilizzare, per esempio, con le altre
+\SC{}).A questo punto viene chiamata la funzione print\_string facendo in modo
 da passargli l'indirizzo di 'error\_op' nel caso in cui r1 sia uguale a -1(righe
 18-19).  Altrimenti si chiama la funzione 'print\_string' facendo in modo di
 passargli l'indirizzo di \_'ok\_message' (righe 16-17).
 
-\subsection{syscall 2}
-La syscall 2 richiede un solo parametro: il file descriptor del file da chiudere .\\
+\subsection{\SC{} 2}
+La \SC{} 2 richiede un solo parametro: il file descriptor del file da chiudere .\\
 Torna '0' in caso di successo o '-1' se si \'{e} verificato un errore.\\ 
 Ecco un semplice esempio di un programma che chiude un file:
 \begin{lstlisting}[caption={syscall2}, label={code:syscall2}, style={mips}]
@@ -1268,15 +1273,15 @@ close:
 	jal print_string			
 \end{lstlisting}
 \OF{}
-Inizialmente vengono salvati in memoria i dati richiesti dalla syscall 2, cioe'  il file descriptor del file da chiudere(riga 2) e gli si applica un' etichetta
+Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 2, cioe'  il file descriptor del file da chiudere(riga 2) e gli si applica un' etichetta
  per potervici accedere in seguito.Successivamente si salvano in memoria (e gli si assegna un'etichetta) le stringe relative ai messaggi 
 di successo ed errore da passare alla funzione 'print\_string'(righe 4, 6).Passando alla sezione .text, inizialmente si salva l'indirizzo di params\_sys2
-(che per il compilatore \'{e} un numero) nel registro r14(l'indirizzo al quale la syscall 2 si riferir\'{a}); subito dopo si pu\'{o} chiamare la syscall 2.
+(che per il compilatore \'{e} un numero) nel registro r14(l'indirizzo al quale la \SC{} 2 si riferir\'{a}); subito dopo si pu\'{o} chiamare la \SC{} 2.
 A questo punto viene chiamata la funzione print\_string facendo in modo da passargli l'indirizzo di 'error\_cl' nel caso in cui r1 sia uguale a -1(righe 18, 19).
 Altrimenti si chiama la funzione 'print\_string' facendo in modo di passargli l'indirizzo di 'ok\_message' (righe 16, 17).
 
-\subsection{syscall 3}
-La syscall 3 richiede tre parametri: il file descriptor da cui leggere('0' per lo standard input), 
+\subsection{\SC{} 3}
+La \SC{} 3 richiede tre parametri: il file descriptor da cui leggere('0' per lo standard input), 
 l’indirizzo nel quale i dati letti dovranno essere copiati, il numero di byte da leggere.\\
 Torna il numero di byte letti in caso di successo o '-1' se si \'{e} verificato un errore.\\ 
 Ecco un semplice esempio di un programma che legge 30 byte da un file e li salva in memoria:
@@ -1310,17 +1315,17 @@ read:
 	jal print_string
 \end{lstlisting}
 \OF{}
-Inizialmente vengono salvati in memoria i dati richiesti dalla syscall 3, cioe' il file descriptor del file da cui leggere (riga 2), 
+Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 3, cioe' il file descriptor del file da cui leggere (riga 2), 
 l'indirizzo di memoria in cui inserire i byte letti(riga 3), e il numero di byte da leggere(riga 4).Si applica un' etichetta
  a questi dati per potervici accedere in seguito.Successivamente si salvano in memoria (e gli si assegna un'etichetta) le stringe relative ai messaggi 
 di successo ed errore da passare alla funzione 'print\_string'(righe 6, 8).Passando alla sezione .text, inizialmente si salva l'indirizzo di params\_sys3
-(che per il compilatore \'{e} un numero) nel registro r14(l'indirizzo al quale la syscall 3 si riferir\'{a});dopodich\'{e} salviamo nelle apposite locazioni 
+(che per il compilatore \'{e} un numero) nel registro r14(l'indirizzo al quale la \SC{} 3 si riferir\'{a});dopodich\'{e} salviamo nelle apposite locazioni 
 di memoria l'indirizzo del file descriptor (che supponiamo avere nel registro \$s2) e l'indirizzo su cui andare a salvare i byte letti(ossia l'indirizzo di 'value').
-Subito dopo si pu\'{o} chiamare la syscall 3.A questo  punto viene chiamata la funzione print\_string facendo in modo da passargli l'indirizzo di 'error\_3'
+Subito dopo si pu\'{o} chiamare la \SC{} 3.A questo  punto viene chiamata la funzione print\_string facendo in modo da passargli l'indirizzo di 'error\_3'
  nel caso in cui r1 sia uguale a -1(righe 26,27). Altrimenti si chiama la funzione 'print\_string' facendo in modo di passargli l'indirizzo di \_'ok\_message' (righe 24, 25).
 
 \subsection{syscall 4}
-La syscall 4 richiede tre parametri: il file descriptor su cui scrivere('1' per lo standard output - '2' per lo standard error), 
+La \SC{} 4 richiede tre parametri: il file descriptor su cui scrivere('1' per lo standard output - '2' per lo standard error), 
 l’indirizzo dal quale prelevare i dati che dovranno essere scritti, il numero di byte da scrivere.\\
 Torna il numero di byte scritto in caso di successo o '-1' se si \'{e} verificato un errore.\\ 
 Ecco un semplice esempio di un programma che scrive su un file una stringa salvata in memoria:
@@ -1352,7 +1357,7 @@ read:
 	jal print_string				
 \end{lstlisting}
 \OF{}
-Inizialmente vengono salvati in memoria i dati richiesti dalla syscall 4, cioe'
+Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 4, cioe'
 il file descriptor del file da cui leggere (riga 2), l'indirizzo di memoria da
 cui prelevare i byte da scrivere(riga 3), e il numero di byte da scrivere(riga
 4).Si applica un' etichetta a questi dati per potervici accedere in
@@ -1360,17 +1365,17 @@ seguito.Successivamente si salvano in memoria (e gli si assegna un'etichetta) le
 stringe relative ai messaggi di successo ed errore da passare alla funzione
 'print\_string'(righe 6, 8).Passando alla sezione .text, inizialmente si salva
 l'indirizzo di params\_sys4 (che per il compilatore \'{e} un numero) nel
-registro r14(l'indirizzo al quale la syscall 4 si riferir\'{a});dopodich\'{e}
+registro r14(l'indirizzo al quale la \SC{} 4 si riferir\'{a});dopodich\'{e}
 salviamo nelle apposite locazioni di memoria l'indirizzo del file descriptor
 (che supponiamo avere nel registro \$s2) e l'indirizzo da cui leggere i byte da
 scrivere(ossia l'indirizzo di 'value').  Subito dopo si pu\'{o} chiamare la
-syscall 4.A questo  punto viene chiamata la funzione print\_string facendo in
+\SC{} 4.A questo  punto viene chiamata la funzione print\_string facendo in
 modo da passargli l'indirizzo di 'error\_4' nel caso in cui r1 sia uguale a
 -1(righe 24, 25). Altrimenti si chiama la funzione 'print\_string' facendo in
 modo di passargli l'indirizzo di 'ok\_message' (righe 22, 23).
 
-\subsection{syscall 5}
-La syscall 5 richiede un numero variabile di parametri (nelle modalità specificate in  \ref{sys5})
+\subsection{\SC{} 5}
+La \SC{} 5 richiede un numero variabile di parametri (nelle modalità specificate in  \ref{sys5})
 Torna '-1' se si \'{e} verificato un errore.\\ 
 Ecco un semplice esempio di un programma che contiene una funzione che stampa nello standard output
 la stringa contenuta nel registro \$a0:
@@ -1384,15 +1389,15 @@ print_string:
 	syscall 5
 	syscall 0				
 \end{lstlisting}
-Inizialmente vengono salvati in memoria i dati richiesti dalla syscall 5, cioe'
+Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 5, cioe'
 la stringa da stampare(riga 2) e gli si applica un' etichetta per potervici
 accedere in seguito.Nel caso la stringa necessiti di inserire altri parametri in
 memoria(vedi \ref{sys5}), questi dovranno necessariamente essere inseriti
 nell'area di memoria immediatamente sucessiva a 'params\_sys5', (cioè nelle
 righe 3, 4, etc..).  Passando alla sezione .text, inizialmente si salva
 l'indirizzo di params\_sys5 (che per il compilatore \'{e} un numero) nel
-registro r14 (l'indirizzo al quale la syscall 2 si riferir\'{a}); subito dopo si
-pu\'{o} chiamare la syscall 5 che stampa nello standard output (una fiestra
+registro r14 (l'indirizzo al quale la \SC{} 2 si riferir\'{a}); subito dopo si
+pu\'{o} chiamare la \SC{} 5 che stampa nello standard output (una fiestra
 didialogo) la stringa desiderata.
 
 \end{document}
