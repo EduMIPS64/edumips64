@@ -5,6 +5,7 @@
 		<property name="version" value="0.5" />
 		<property name="outputDir" value="edumips" />
 		<property name="jarFile" value="edumips64-${version}.jar" />
+		<property name="tarbz2File" value="edumips64-${version}.tar.bz2" />
 		<property name="svnJarFile" value="edumips64-svn.jar" />
 	</target>
 
@@ -54,6 +55,19 @@
         <delete dir="${outputDir}" /> 
 	</target>
 
+    <target name="release" depends="init">
+        <mkdir dir="edumips64" />
+		<copy todir="edumips64/">
+			<fileset dir=".">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+
+        <tar destfile="${tarbz2File}" basedir="." includes="edumips64/" compression="bzip2" />
+        <delete dir="edumips64" /> 
+    </target> 
+
+
 	<target name="jar" depends="init">
 		<mkdir dir="${outputDir}" />
         <javac target="5" srcdir="${sourceDir}" classpath="${helpClassesDir}" destdir="${outputDir}" nowarn="yes"/>
@@ -61,7 +75,6 @@
 		<mkdir dir="${outputDir}/edumips64/data" />
 		<mkdir dir="${outputDir}/edumips64/utils" />
 		<mkdir dir="${outputDir}/edumips64/help" />
-
 		<copy todir="${outputDir}/edumips64/img">
 			<fileset dir="img">
 				<include name="**/*.png" />
