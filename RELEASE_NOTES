@@ -1,4 +1,4 @@
-18th March 2007                                                    EduMIPS64 0.4
+3rd June, 2007                                                    EduMIPS64 0.5
 
 				     EduMIPS64 RELEASE NOTES	
 				     http://www.edumips.org
@@ -9,14 +9,12 @@ graphical debugger.
 Notes for this release:
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This is the fourth public release of EduMIPS64. 
+This is version 0.5 of EduMIPS64. Many bug fixes occurred since version 0.4, but
+the most significant improvement is the implementation of a big subset of the
+MIPS32 ISA that is contained in the MIPS64 ISA.
 
-Many features have been added since last version, and the product went through
-many development release before this public stable version.
-
-From now on, development will use SVN, so that development releases will be made
-available to the public not only via www.edumips.org, but even via
-SourceForge.org.
+EduMIPS64 0.5 is far stabler than 0.4, and the new instructions have been tested
+and should work correctly.
 
 Please keep in mind that this is still EXPERIMENTAL SOFTWARE. It may
 BURN YOUR HARD DISK, DESTROY ALL YOUR DATA and even GO OUT WITH YOUR
@@ -37,28 +35,33 @@ New functionalities:
 --------------------
 
 - New instructions:
-  SYSCALL (or TRAP)
-  BREAK
-- New directives: 
-  .space
-  .word64
-  .ascii
-  .asciiz
-- PDF Manual (English and Italian)
-- Synchronous exception handling (includes masked interrupts)
-- Ability to include other source files (#include)
-- Ant buildfile
-- Debug mode
-- New command line options
+  * ADD, ADDI, ADDIU, ADDU
+  * DIV, DIVU
+  * MULT, MULTU
+  * SLL, SLLV, SRA, SRAV, SRL, SRLV
+  * SUB, SUBU
+  * B, BGEZ
+  * DADDIU, DMULTU, DDIVU
+- Standard MIPS aliases for the first 32 registers
+- Visualization of LO and HI registers
+- Jarfile compiled under Java 6 works with Java 5
+- Clear button for the I/O window
 
 Fixed bugs:
 -----------
 
-No known 0.3 bug has been fixed, but there were many internal code improvements
-and cleanups.
+- Dinero Tracefile is correctly saved
+- LUI bug
+- Out-of-sync GUI in the last execution step
+- Locale bugfixes
+- DSRAV bug
+- Error dialog bug
+- Parser bugs
+- SYSCALL various bugs
 
 Known bugs:
 -----------
-At the moment, there are no known bugs.
+Changing the language, you may notice that some labels aren't updated correctly.
+
 Maybe the parser will have problems if it gets as its input a file that is not
 encoded using ISO-8859-1
