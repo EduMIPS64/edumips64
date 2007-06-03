@@ -2,7 +2,18 @@ EduMIPS64 ChangeLog
 ------------------- 
 
   0.5 (03/06/2007)
-  	- Implemented a subset of MIPS32 instructions (MIPS32 group)
+  	- Implemented a subset of MIPS32 instructions:
+	  * ADD, ADDI, ADDIU, ADDU
+	  * DIV, DIVU
+	  * MULT, MULTU
+	  * SLL
+	  SLLV
+	  SRA
+	  SRAV
+	  SRL
+	  SRLV
+	  SUB
+	  SUBU
 	- Added LO and HI registers visualization in GUI (max83t)
 	- Bug fixes for the parser (max83t, mancausoft)
 	- Bug fixes for the Error Dialog (mancausoft)
