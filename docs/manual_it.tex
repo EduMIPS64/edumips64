@@ -84,9 +84,10 @@ relativo al file da utilizzare (se utilizzate questo listato copia-incollate il 
 \flushright
 {\bfseries 
 di Andrea Spadaccini\\[1.5ex]
-Traduzione italiana di Simona Ullo\\[3ex]
+ed il team di EduMIPS64\\[3ex]
 } 
-Versione~1.1, 22 Aprile 2007
+Traduzione italiana di Simona Ullo\\[3ex]
+Versione~1.3, 4 Giugno 2007
 \end{minipage}}
 
 %\addtolength{\textwidth}{\centeroffset}
@@ -1186,195 +1187,231 @@ presenta una pagina gi\`{a} contenente l'applet, in modo tale che chiunque possa
 
 \chapter{Listati di esempio}
 Qui di seguito sono elencati degli esempi utili per comprendere il funzionamento delle istruzioni che accetta \EM{} (versione \EV)
+
 \section{\SC{}}
-Per informazioni dettagliate riguardo l'utilizzo delle \SC{} consultare la sezione \ref{sysc-man}. Di seguito si trovano degli esempi pratici per ognuna delle 6 \SC{}:
+Per informazioni dettagliate riguardo l'utilizzo delle \SC{} consultare la
+sezione \ref{sysc-man}. Di seguito si trovano degli esempi pratici per ognuna
+delle 6 \SC{}.
+
+\`E importante notare che gli esempi delle \SC{} 1-4 fanno riferimento ad un
+file \texttt{print.s}, che \`e l'esempio della \SC{} 5. \`E possibile copiare il
+codice del suddetto esempio in un file chiamato \texttt{print.s} ed includerlo
+negli altri esempi, o semplicemente copiare il codice in ciascuno degli esempi,
+per poterli eseguire senza bisogno di altri file.
+
 \subsection{\SC{} 0}
 La \SC{} 0, quando invocata, termina l'esecuzione del programma.
 Eccone un esempio:
 \begin{lstlisting}[caption={syscall0}, label={code:syscall0}, style={mips}]
         .code
-        daddi   r1, r0, 0	;salva 0 nel registro R1
-        syscall 0	    	;esce dal programma
+        daddi   r1, r0, 0    ;salva 0 nel registro R1
+        syscall 0            ;esce dal programma
 \end{lstlisting}
 
 \subsection{\SC{} 1}
 Ecco un esempio di programmma che apre un file:
 \begin{lstlisting} [caption={syscall1}, label={code:syscall1}, style={mips} ] 
-      	.data
-error_op:	.asciiz	"An error occurred opening file"	
+                .data 
+error_op:       .asciiz     "Errore durante l'apertura del file"    
 
-ok_message:	.asciiz	"All right, operation succesfully done"
+ok_message:     .asciiz     "Tutto a posto"
 
-params_sys1:	.asciiz	"filename.txt"
-						.word64	0xF					
+params_sys1:    .asciiz     "filename.txt"
+                .word64     0xF                    
 
-	.text
-	#include print.s			
-open:
-	daddi r14,r0,params_sys1	
-	syscall 1	
-	daddi $s0,r0,-1
-	dadd $s2,r0,r1		
-	daddi $a0,r0,ok_message	
-	BNE r1 $s0,print_string	
-	daddi $a0,r0,error_op		
-	jal print_string			
+                .text
+                #include    print.s            
+
+open:           daddi       r14, r0, params_sys1    
+                syscall     1    
+                daddi       $s0, r0, -1
+                dadd        $s2, r0, r1        
+                daddi       $a0, r0, ok_message    
+                bne         r1 $s0, print_string    
+                daddi       $a0, r0, error_op        
+                jal         print_string            
 \end{lstlisting}
-Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 1 (righe 2, 3), cioe'
-la stringa contenente il path del file da aprire(che deve esistere), e (nella locazione di
-memoria immediatamente successiva) un intero che ne definisce la modalita' di
-apertura(per maggiori informazioni sulla modalita' di aprtura di un file rimandiamo alla sezione \ref{sys1}).
-Si applica un' etichetta a questi dati per potervici accedere
-in seguito.Successivamente (righe 5, 7) si salvano in memoria (e gli si assegna un'etichetta)
-le stringe relative ai messaggi di successo ed errore da passare alla funzione
-'print\_string' (presente nel file print.s).Passando alla sezione .text, inizialmente si salva
-l'indirizzo di params\_sys1 (che per il compilatore \'{e} un numero) nel registro
-r14; subito dopo si pu\'{o} chiamare la \SC{} 1 e salvare il registro r1(che contiene il valore di ritorno) in \$s2
-(in modo da poterlo riutilizzare, per esempio, con le altre
-\SC{}).A questo punto viene chiamata la funzione 'print\_string' facendo in modo
-da passargli l'indirizzo di 'error\_op' nel caso in cui r1 sia uguale a $-1$(righe
+Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 1 (righe 2,
+3), cio\'e la stringa contenente il path del file da aprire (che deve esistere),
+e, nella locazione di memoria immediatamente successiva,) un intero che ne
+definisce la modalit\`a di apertura. Per maggiori informazioni sulla modalit\`a
+di aprtura di un file rimandiamo alla sezione \ref{sys1}.
+
+Si applica un'etichetta a questi dati per potervici accedere in seguito.
+Successivamente (righe 5, 7) si salvano in memoria (e gli si assegna
+un'etichetta) le stringhe relative ai messaggi di successo ed errore da passare 
+alla funzione 'print\_string', presente nel file print.s, incluso all'inizio
+della sezione .text.
+
+Passando alla sezione .text, inizialmente si salva
+l'indirizzo di params\_sys1 (che per il compilatore \`{e} un numero) nel registro
+r14; subito dopo si pu\`{o} chiamare la \SC{} 1 e salvare il contenuto del
+registro, ovvero il valore di ritorno della \SC{}, in \$s2 (in modo da poterlo 
+riutilizzare, per esempio, con le altre \SC{}).
+
+A questo punto viene chiamata la funzione 'print\_string' facendo in modo
+da passargli l'indirizzo di 'error\_op' nel caso in cui r1 sia uguale a $-1$ (righe
 18-19).  Altrimenti si chiama la stessa funzione facendo in modo di
 passargli l'indirizzo di 'ok\_message' (righe 16-17).
 
 \subsection{\SC{} 2}
 Ecco un esempio di un programma che chiude un file:
 \begin{lstlisting}[caption={syscall2}, label={code:syscall2}, style={mips}]
-      		.data
-params_sys2:	.space 8
+                .data
+params_sys2:    .space 8
 
-error_cl:	.asciiz "An error occurred closing file"
+error_cl:       .asciiz     "Errore durante la chiusura del file"
 
-ok_message:	.asciiz "All right, operation succesfully done"						
+ok_message:     .asciiz     "Tutto a posto"
 
-
-	.text
-	#include print.s	
-close:	
-	daddi r14,r0,params_sys2		
-	sw $s2,params_sys2(r0)	
-	syscall 2			
-	daddi $s0,r0,-1		
-	daddi $a0,r0,ok_message		
-	BNE r1,$s0,print_string		
-	daddi $a0,r0,error_cl	
-	jal print_string			
+                .text
+                #include    print.s    
+close:          daddi       r14, r0, params_sys2        
+                sw          $s2, params_sys2(r0)    
+                syscall     2            
+                daddi       $s0, r0, -1        
+                daddi       $a0, r0, ok_message        
+                bne         r1, $s0, print_string        
+                daddi       $a0, r0, error_cl    
+                jal         print_string            
 \end{lstlisting}
-Inizialmente viene salvato in memoria l'unico dato richiesto dalla \SC{} 2, cioe'  il file descriptor del file da chiudere(riga 2) e gli si applica un' etichetta
- per potervici accedere in seguito.Successivamente si salvano in memoria (e gli si assegna un'etichetta) le stringe relative ai messaggi 
-di successo ed errore da passare alla funzione 'print\_string'(righe 4, 6).Passando alla sezione .text, inizialmente si salva l'indirizzo di params\_sys2
-(che per il compilatore \'{e} un numero) nel registro r14; subito dopo si pu\'{o} chiamare la \SC{} 2.
-A questo punto viene chiamata la funzione print\_string (presente nel file print.s) facendo in modo da passargli l'indirizzo di 'error\_cl' nel caso in cui r1 sia uguale a $-1$(righe 18, 19).
-Altrimenti si chiama la stessa funzione facendo in modo di passargli l'indirizzo di 'ok\_message' (righe 16, 17).
+Inizialmente viene salvato in memoria l'unico dato richiesto dalla \SC{} 2,
+cio\`e  il file descriptor del file da chiudere (riga 2) e gli si applica un'
+etichetta per potervici accedere in seguito.
+ 
+Successivamente si salvano in memoria (e gli si assegna un'etichetta) le
+stringhe relative ai messaggi di successo ed errore da passare alla funzione
+'print\_string'(righe 4, 6).
+
+Passando alla sezione .text, inizialmente si salva l'indirizzo di params\_sys2
+(che per il compilatore \`{e} un numero) nel registro r14; subito dopo si
+pu\`{o} chiamare la \SC{} 2.
+
+A questo punto viene chiamata la funzione print\_string (presente nel file
+print.s) facendo in modo da passargli l'indirizzo di 'error\_cl' nel caso in cui
+r1 sia uguale a $-1$(righe 18, 19).
+
+Altrimenti si chiama la stessa funzione facendo in modo di passargli l'indirizzo
+di 'ok\_message' (righe 16, 17).
 \OF{}
 
 \subsection{\SC{} 3}
-Ecco un esempio di un programma che legge 30 byte da un file e li salva in memoria:
+Ecco un esempio di programma che legge 30 byte da un file e li salva in memoria:
 \begin{lstlisting}[caption={syscall3}, label={code:syscall3}, style={mips}]
-      		.data
-params_sys3:	.space 8				
-ind_value:	.space 8			
-	.word64 16		
+                .data
+params_sys3:    .space      8                
+ind_value:      .space      8            
+                .word64     16        
+error_3:        .asciiz     "Errore durante la lettura del file"    
+ok_message:     .asciiz     "Tutto a posto"    
 
-error_3:	.asciiz "An error occurred reading file"	
+value:          .space 30                    
 
-ok_message:	.asciiz "All right, operation succesfully done"	
+                .text
+                #include    print.s    
 
-value:	.space 30					
-
-			
-
-
-	.text
-#include print.s	
-
-read:
-	daddi r14,r0,params_sys3	
-	sw $s2,params_sys3(r0)
-	daddi $s1,r0,value			
-	sw $s1,ind_value(r0)			
-	syscall 3			
-	daddi $s0,r0,-1			
-	BNE r1,$s0,print_string	
-	daddi $a0,r0,error_3
-	jal print_string
+read:           daddi       r14, r0, params_sys3    
+                sw          $s2, params_sys3(r0)
+                daddi       $s1, r0, value            
+                sw          $s1, ind_value(r0)            
+                syscall     3            
+                daddi       $s0, r0, -1            
+                BNE         r1, $s0, print_string    
+                daddi       $a0, r0, error_3
+                jal         print_string
 \end{lstlisting}
 
-Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 3, cioe' il file descriptor del file da cui leggere (riga 2), 
-l'indirizzo di memoria in cui inserire i byte letti(riga 3), e il numero di byte da leggere(riga 4).Si applica un' etichetta
- a questi dati per potervici accedere in seguito.Successivamente si salvano in memoria (e gli si assegna un'etichetta) le stringe relative ai messaggi 
-di successo ed errore da passare alla funzione 'print\_string'(righe 6, 8).Passando alla sezione .text, inizialmente si salva l'indirizzo di params\_sys3
-(che per il compilatore \'{e} un numero) nel registro r14;dopodich\'{e} salviamo nelle apposite locazioni 
-di memoria l'indirizzo del file descriptor (che supponiamo avere nel registro \$s2) e l'indirizzo su cui andare a salvare i byte letti(ossia l'indirizzo di 'value').
-Subito dopo si pu\'{o} chiamare la \SC{} 3.A questo  punto viene chiamata la funzione print\_string (presente nel file print.s) facendo in modo da passargli l'indirizzo di 'error\_3'
- nel caso in cui r1 sia uguale a $-1$(righe 26, 27). Altrimenti si chiama la funzione 'print\_string' facendo in modo di passargli l'indirizzo di \_'ok\_message' (righe 24, 25).
+Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 3, cioe' il
+file descriptor del file da cui leggere (riga 2), l'indirizzo di memoria in cui
+inserire i byte letti(riga 3), e il numero di byte da leggere(riga 4).Si applica
+un' etichetta a questi dati per potervici accedere in seguito.
+
+Successivamente si salvano in memoria (e gli si assegna un'etichetta) le stringhe
+relative ai messaggi di successo ed errore da passare alla funzione
+'print\_string'(righe 6, 8). Passando alla sezione .text, inizialmente si salva
+l'indirizzo di params\_sys3 (che per il compilatore \`{e} un numero) nel
+registro r14; dopodich\'{e} salviamo nelle apposite locazioni di memoria
+l'indirizzo del file descriptor (che supponiamo avere nel registro \$s2) e
+l'indirizzo su cui andare a salvare i byte letti, ossia l'indirizzo di 'value'.
+
+Subito dopo si pu\`{o} chiamare la \SC{} 3. A questo  punto viene chiamata la
+funzione print\_string (presente nel file print.s), facendo in modo da passargli
+l'indirizzo di 'error\_3' nel caso in cui r1 sia uguale a $-1$(righe 26, 27).
+Altrimenti si chiama la funzione 'print\_string' passando l'indirizzo di
+\_'ok\_message' (righe 24, 25).
 \OF{}
 \subsection{\SC{} 4}
-Ecco un esempio di un programma che scrive su un file una stringa salvata in memoria:
+Ecco un esempio di programma che scrive su un file una stringa salvata in memoria:
 \begin{lstlisting}[caption={syscall4}, label={code:syscall4}, style={mips}]
-      		.data
-params_sys4:	.space 8			
-ind_value:	.space 8			
-	.word64 16		
-
-error_4:	.asciiz "An error occurred writing file"	
-
-ok_message:	.asciiz "All right, operation succesfully done"	
-
-value:	.space 30								
+                .data
+params_sys4:    .space      8         
+ind_value:      .space      8         
+                .word64     16      
+error_4:        .asciiz     "Errore durante la scrittura su file"   
+ok_message:     .asciiz     "Tutto a posto"   
+value:          .space      30                        
 
 
-	.text
-#include print.s	
+                .text
+                #include    print.s   
 
-read:
-	daddi r14,r0,params_sys4
-	sw $s2,params_sys3_4(r0)
-	daddi $s1,r0,value	
-	sw $s1,ind_value(r0)	
-	syscall 3			
-	daddi $s0,r0,-1			
-	BNE r1,$s0,print_string
-	daddi $a0,r0,error_4
-	jal print_string				
+read:           daddi       r14, r0, params_sys4
+                sw          $s2, params_sys3_4(r0)
+                daddi       $s1, r0, value   
+                sw          $s1, ind_value(r0)   
+                syscall     3         
+                daddi       $s0, r0, -1         
+                BNE         r1, $s0, print_string
+                daddi       $a0, r0, error_4
+                jal         print_string            
 \end{lstlisting}
 
-Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 4, cioe'
-il file descriptor del file su cui scrivere (riga 2), l'indirizzo di memoria da
-cui prelevare i byte da scrivere(riga 3), e il numero di byte da scrivere(riga
-4).Si applica un' etichetta a questi dati per potervici accedere in
-seguito.Successivamente si salvano in memoria (e gli si assegna un'etichetta) le
-stringe relative ai messaggi di successo ed errore da passare alla funzione
-'print\_string'(righe 6, 8).Passando alla sezione .text, inizialmente si salva
-l'indirizzo di params\_sys4 (che per il compilatore \'{e} un numero) nel
-registro r14;dopodich\'{e} salviamo nelle apposite locazioni di memoria l'indirizzo 
-del file descriptor (che supponiamo avere nel registro \$s2) e l'indirizzo da cui leggere 
-i byte da scrivere(ossia l'indirizzo di 'value'). Subito dopo si pu\'{o} chiamare la
-\SC{} 4.A questo  punto viene chiamata la funzione print\_string (presente nel file print.s) 
-facendo in modo da passargli l'indirizzo di 'error\_4' nel caso in cui r1 sia uguale a
-$-1$(righe 24, 25). Altrimenti si chiama la funzione 'print\_string' facendo in
-modo di passargli l'indirizzo di 'ok\_message' (righe 22, 23).
+Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 4, cioe' il
+file descriptor del file su cui scrivere (riga 2), l'indirizzo di memoria da cui
+prelevare i byte da scrivere(riga 3), e il numero di byte da scrivere(riga 4).Si
+applica un' etichetta a questi dati per potervici accedere in seguito.
+
+Successivamente si salvano in memoria (e gli si assegna un'etichetta) le
+stringhe relative ai messaggi di successo ed errore da passare alla funzione
+'print\_string'(righe 6, 8).
+
+Passando alla sezione .text, inizialmente si salva l'indirizzo di params\_sys4,
+che per il compilatore \`{e} un numero) nel registro r14; dopodich\'{e} salviamo
+nelle apposite locazioni di memoria l'indirizzo del file descriptor (che
+supponiamo avere nel registro \$s2) e l'indirizzo da cui leggere i byte da
+scrivere, ossia l'indirizzo di 'value'. Subito dopo si pu\`{o} chiamare la \SC{}
+4.
+
+A questo  punto viene chiamata la funzione print\_string (presente nel file
+print.s) facendo in modo da passargli l'indirizzo di 'error\_4' nel caso in cui
+r1 sia uguale a $-1$(righe 24, 25). Altrimenti si chiama la funzione
+'print\_string' facendo in modo di passargli l'indirizzo di 'ok\_message' (righe
+22, 23).
 \OF{}
 \subsection{\SC{} 5}
-Ecco un esempio di un programma che contiene una funzione che stampa nello standard output
-la stringa contenuta nel registro \$a0:
+Ecco un esempio di un programma che contiene una funzione che stampa nello
+standard output la stringa contenuta nel registro \$a0:
 \begin{lstlisting}[caption={syscall5}, label={code:syscall5}, style={mips}]
-    .data
-params_sys5: .space 8	  			
-	.text
-print_string:
-	sw \$a0,params_sys5(r0)	
-	daddi r14,r0,params_sys5
-	syscall 5
-	syscall 0				
+                .data
+params_sys5:    .space  8
+
+                .text
+print_string:   sw      \$a0, params_sys5(r0)    
+                daddi   r14, r0, params_sys5
+                syscall 5
 \end{lstlisting}
 Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 5, cioe'
 la stringa da stampare(riga 2) e gli si applica un' etichetta per potervici
-accedere in seguito.Nel caso la stringa necessiti di inserire altri parametri in
-memoria(vedi \ref{sys5}), questi dovranno necessariamente essere inseriti
-nell'area di memoria immediatamente sucessiva a 'params\_sys5', (cioè nelle
-righe 3, 4, etc..).  Passando alla sezione .text, inizialmente si salva
-l'indirizzo di params\_sys5 (che per il compilatore \'{e} un numero) nel
-registro r14; subito dopo si pu\'{o} chiamare la \SC{} 5 che stampa nello 
-standard output (una finestra didialogo) la stringa desiderata.
+accedere in seguito.
+
+Nel caso la stringa necessiti di inserire altri parametri in memoria(vedi
+\ref{sys5}), questi dovranno necessariamente essere inseriti nell'area di
+memoria immediatamente sucessiva a 'params\_sys5', (cioè nelle righe 3, 4,
+etc..).  
+
+Passando alla sezione .text, inizialmente si salva l'indirizzo di params\_sys5,
+che per il compilatore \`{e} un numero, nel registro r14; subito dopo si pu\`{o}
+chiamare la \SC{} 5 che stampa nello standard output (una finestra di dialogo)
+la stringa desiderata.
 
 \end{document}
