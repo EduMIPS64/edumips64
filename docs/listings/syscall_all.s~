@@ -7,7 +7,7 @@ error_4:	.asciiz "An error occurred writing file"	;error message
 ok_message:	.asciiz "All right, operation succesfully done"	;ok message
 value:		.space 30					;filename.txt value
 
-params_sys1:	.asciiz	"filename.txt"				;filename path
+params_sys1:	.asciiz	"/home/giorgio/Desktop/filename.txt"	;filename path
 		.word64	0xF					;opening file in both reading and writing mode,with append and creation options(3+4+8=15)
 
 params_sys2:	.space 8					;file descriptor
