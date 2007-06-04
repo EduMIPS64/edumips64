@@ -888,10 +888,10 @@ public class Parser
 												else if(isNumber(param.substring(indPar,endPar).trim()))
 												{
 													int tmp = Integer.parseInt(param.substring(indPar,endPar).trim());
-													if (tmp<0)
+													if (tmp<0 || tmp%4!=0 )
 													{   
 															numError++;
-															error.add("LABELNOTFOUND",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+															error.add("MEMORYADDRESSINVALID",row,line.indexOf(param.substring(indPar,endPar))+1,line);
 															i = line.length();
 															indPar = endPar+1;
 															tmpInst.getParams().add(0);
