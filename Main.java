@@ -428,20 +428,27 @@ public class Main extends JApplet {
             }    
             openedFile = file;
             logger.debug("File " + file + " successfully opened");
-            //f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + file);
+			StringTokenizer token = new StringTokenizer(file,File.separator,false);
+			String nome_file=null;
+			while (token.hasMoreElements()){
+				nome_file = token.nextToken();
+			}
+			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
         }
         catch (ParserMultiException ex) {
             logger.debug("Error opening " + file);
             new ErrorDialog(f,ex.getExceptionList(),CurrentLocale.getString("GUI_PARSER_ERROR")); 
             openedFile = null;
-            //f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
+            f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
             resetSimulator();
         }
         catch (java.io.FileNotFoundException ex) {
-            logger.debug("File not found: " + file);
+			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));		
+			logger.debug("File not found: " + file);
             JOptionPane.showMessageDialog(f, CurrentLocale.getString("FILE_NOT_FOUND") + ": " + file, "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
         }
         catch (Exception e) {
+			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));				
             logger.debug("Error opening " + file);
             new ReportDialog(f,e,CurrentLocale.getString("ERROR"));
         }
