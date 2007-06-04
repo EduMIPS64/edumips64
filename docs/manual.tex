@@ -1423,7 +1423,51 @@ argument error\_3 or ok\_message, according to the success of the operation.
 
 \OF{}
 
+\subsection{\SC{} 4}
+Example program that writes to a file a string:
 
+\begin{lstlisting}[caption={\SC{} 4 example}, label={code:syscall4}, style={mips}]
+                .data
+params_sys4:    .space      8                
+ind_value:      .space      8            
+                .word64     16        
+error_4:        .asciiz     "Error writing to file"    
+ok_message:     .asciiz     "All right"    
+value:          .space      30                    
+
+                .text
+            
+write:          daddi       r14, r0,params_sys4        
+                sw          $s2, params_sys4(r0)        
+                daddi       $s1, r0,value            
+                sw          $s1, ind_value(r0)            
+                syscall     4                
+                daddi       $s0, r0,-1
+                daddi       $a0, r0,ok_message            
+                bne         r1, $s0,end            
+                daddi       $a0, r0,error_4
+
+end:            jal         print_string
+                syscall     0
+        
+                #include    print.s 
+\end{lstlisting}
+
+The first 4 rows of the .data section contain the arguments of \SC{} 4, the file
+descriptor of the from which we must read, the memory address from where the \SC{}
+must read the bytes to write, the number of bytes to write. We give labels to those
+parameters that must be accessed later.  Next we put, as usual, the strings
+containing the error message and the success message.
+
+In the .text section, we save the params\_sys4 address to register r14, we save
+in the memory cells for the \SC{} parameters the file descriptor (that we
+suppose to have in \$s2) and the address from where we must take the bytes to
+weite.
+
+Next we can call \SC{} 3, and then we call the print\_string function passing as
+argument error\_3 or ok\_message, according to the success of the operation.
+
+\OF{}
 
 \printindex
 \end{document}
