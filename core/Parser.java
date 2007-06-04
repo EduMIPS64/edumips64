@@ -887,12 +887,22 @@ public class Parser
 													tmpInst.getParams().add(0);
 												else if(isNumber(param.substring(indPar,endPar).trim()))
 												{
-													tmpInst.getParams().add(Integer.parseInt(param.substring(indPar,endPar).trim()));
+													int tmp = Integer.parseInt(param.substring(indPar,endPar).trim());
+													if (tmp<0)
+													{   
+															numError++;
+															error.add("LABELNOTFOUND",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+															i = line.length();
+															indPar = endPar+1;
+															tmpInst.getParams().add(0);
+															continue;
+													}
+													tmpInst.getParams().add(tmp);
 												}
 												else
 												{
 													int offset=0,cc;
-
+													
 													cc = param.indexOf("+",indPar);
 													if (cc!=-1)
 													{
@@ -902,7 +912,7 @@ public class Parser
 															tmpInst.getParams().add(tmpMem.getAddress() + Integer.parseInt(param.substring(cc+1,endPar)));
 														}
 														catch(NumberFormatException ex)
-														{
+														{   
 															numError++;
 															error.add("LABELNOTFOUND",row,line.indexOf(param.substring(indPar,endPar))+1,line);
 															i = line.length();
@@ -937,6 +947,7 @@ public class Parser
 														{
 															tmpMem = symTab.getCell(param.substring(indPar,endPar).trim());
 															tmpInst.getParams().add(tmpMem.getAddress());
+															
 														}
 													}
 												}
