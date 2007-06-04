@@ -1265,35 +1265,31 @@ To embed it in an HTML, the \texttt{<applet>} tag must be used. The \EM{} web
 site contains a page that already contains the applet, so
 that everyone can execute it without the hassle of using the command line.
 
-\chapter{Examples}
+\chapter{Code Examples}
 In this chapter you'll find some sample listings that will prove to be useful in
 order to understand how the instructions accepted by \EM{} (version \EV{}) work.
 
 \section{\SC{}}
-All the \SC{} (except for \SC{} 0) behave in a similar fashion: they require
-that the address of their parameters is saved into register R14.
+For detailed informations about how \SC{} works, go to~\ref{sysc-man}. This
+section will cover all the six \SC{} with some pratical examples.
 
-When a \SC{} is called, it fetches the first parameter from the address
-specified in R14; if it needs more than one parameter, they will be fetched from
-the the memory areas immediately after the first one. The return value is saved
-in R1, and has a different meaning, according to the \SC{} type.
+It's important to understand that examples for \SC{} 1-4 refer to the
+\texttt{print.s} file, that is the example for \SC{} 5. If you want to run the
+examples, you should copy the content of that example in a file named
+\texttt{print.s} and include it in your code.
 
-All the \SC{} return $-1$ if there are errors, except for \SC{} 0 that cannot
-issue any error.
+Some examples use an already existing file descriptor, even if it doesn't truly
+exist. If you want to run those examples, use the \SC{} 1 example to open a
+file.
 
 \subsection{\SC{} 0}
-\SC{} 0 doesn't need any argument, and doesn't give back any result value. When
-it's called, it stops the execution of the program.
+When \SC{} 0 it's called, it stops the execution of the program.
 Example:
-
-\begin{lstlisting}[caption={syscall0}, label={code:syscall0}, style={mips}]
+\begin{lstlisting}[caption={\SC{} 0 example}, label={code:syscall0}, style={mips}]
         .code
         daddi   r1, r0, 0	; saves 0 in R1
         syscall 0	    	; exits
 \end{lstlisting}
-
-\subsection{\SC{} 1}
-\SC{} 1 needs two arguments: the path of the file to open and the opening mode.
 
 \printindex
 \end{document}
