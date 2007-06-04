@@ -168,6 +168,12 @@ public class CPUGUIThread extends Thread{
 							}
 							break;
 						}
+                        catch(MemoryElementNotFoundException ex) {
+                            Main.logger.debug("Attempt to read a non-existent cell");
+							haltCPU();
+				            JOptionPane.showMessageDialog(edumips64.Main.ioFrame, CurrentLocale.getString("ERROR_LABEL"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
+                            break;
+                        }
 						catch(Exception ex) {
                             Main.logger.debug("Exception in CPUGUIThread");
 							haltCPU();
@@ -229,6 +235,12 @@ public class CPUGUIThread extends Thread{
 							}
 							break;
 						}
+                        catch(MemoryElementNotFoundException ex) {
+                            Main.logger.debug("Attempt to read a non-existent cell");
+							haltCPU();
+				            JOptionPane.showMessageDialog(edumips64.Main.ioFrame, CurrentLocale.getString("ERROR_LABEL"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
+                            break;
+                        }
 						catch(Exception ex) {
 							new ReportDialog(f,ex,CurrentLocale.getString("GUI_STEP_ERROR"));
 							haltCPU();
