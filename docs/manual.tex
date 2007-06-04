@@ -1293,7 +1293,7 @@ Example:
 \end{lstlisting}
 
 \subsection{\SC{} 1}
-Example of a program that opens a file:
+Example program that opens a file:
 \begin{lstlisting} [caption={\SC{} 1 example}, label={code:syscall1}, style={mips} ] 
                 .data 
 error_op:       .asciiz     "Error opening the file"    
@@ -1342,7 +1342,7 @@ r1 is equal to $-1$ (rows 13-14) or else passing ok\_message as an argument if
 everything went smoothly (rows 12 and 16).
 
 \subsection{\SC{} 2}
-Example of a program that closes a file:
+Example program that closes a file:
 \begin{lstlisting}[caption={\SC{} 2 example}, label={code:syscall2}, style={mips}]
                 .data
 params_sys2:    .space 8
@@ -1378,6 +1378,52 @@ yields $-1$ (row 13), or we call it using ok\_message as a parameter if all went
 smoothly (row 11).
 
 \OF{}
+
+\subsection{\SC{} 3}
+Example program that reads 16 bytes from a file and saves them to memory:
+\begin{lstlisting}[caption={\SC{} 3 example}, label={code:syscall3}, style={mips}]
+                .data
+params_sys3:    .space      8                
+ind_value:      .space      8            
+                .word64     16        
+error_3:        .asciiz     "Error while reading from file"    
+ok_message:     .asciiz     "All right"    
+
+value:          .space      30                    
+
+                .text
+read:           daddi       r14, r0, params_sys3 
+                sw          $s2, params_sys3(r0)
+                daddi       $s1, r0, value            
+                sw          $s1, ind_value(r0)            
+                syscall     3            
+                daddi       $s0, r0, -1            
+                daddi       $a0, r0,ok_message            
+                bne         r1, $s0,end            
+                daddi       $a0, r0,error_3
+
+end:            jal         print_string
+                syscall     0
+        
+                #include    print.s 
+\end{lstlisting}
+The first 4 rows of the .data section contain the arguments of \SC{} 3, the file
+descriptor of the from which we must read, the memory address where the \SC{}
+must save the read data, the number of bytes to read. We give labels to those
+parameters that must be accessed later.  Next we put, as usual, the strings
+containing the error message and the success message.
+
+In the .text section, we save the params\_sys3 address to register r14, we save
+in the memory cells for the \SC{} parameters the file descriptor (that we
+suppose to have in \$s2) and the address that we want to use to save the read
+bytes.
+
+Next we can call \SC{} 3, and then we call the print\_string function passing as
+argument error\_3 or ok\_message, according to the success of the operation.
+
+\OF{}
+
+
 
 \printindex
 \end{document}
