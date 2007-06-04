@@ -1341,5 +1341,43 @@ Then the print\_string function is called, passing error\_op as an argument if
 r1 is equal to $-1$ (rows 13-14) or else passing ok\_message as an argument if
 everything went smoothly (rows 12 and 16).
 
+\subsection{\SC{} 2}
+Example of a program that closes a file:
+\begin{lstlisting}[caption={\SC{} 2 example}, label={code:syscall2}, style={mips}]
+                .data
+params_sys2:    .space 8
+error_cl:       .asciiz     "Error closing the file"
+ok_message:     .asciiz     "All right"
+
+                .text
+close:          daddi       r14, r0, params_sys2        
+                sw          $s2, params_sys2(r0)    
+                syscall     2            
+                daddi       $s0, r0, -1        
+                daddi       $a0, r0, ok_message            
+                bne         r1, $s0, end            
+                daddi       $a0, r0, error_cl
+
+end:            jal         print_string
+                syscall     0
+    
+                #include    print.s         
+\end{lstlisting}
+First we save some memory for the only argument of \SC{} 2, the file descriptor
+of the file that must be closed (row 2), and we give it a label so that we can
+access it later.
+
+Next we put in memory the strings containing the error message and the success
+message, that will be passed to the print\_string function (rows 3, 4).
+
+In the .text section, we save the address of params\_sys2 in r14; then we can
+call \SC{} 2.
+
+Now we call the print\_string function using error\_cl as a parameter if r1
+yields $-1$ (row 13), or we call it using ok\_message as a parameter if all went
+smoothly (row 11).
+
+\OF{}
+
 \printindex
 \end{document}

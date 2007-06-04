@@ -94,7 +94,7 @@ Versione~1.3, 4 Giugno 2007
 \tableofcontents
 \listoftables
 \lstlistoflistings
-\chapter{Introduzione}
+\chapter*{Introduzione}
 \EM{} \`e un simulatore di Instruction Set Architecture (ISA) \MS{}. \`E stato
 progettato per eseguire piccoli programmi che utilizzino il sottoinsieme
 dell'Instruction Set \MS{} implementato dal simulatore stesso, permettendo
@@ -1282,7 +1282,7 @@ da passargli l'indirizzo di 'error\_op' nel caso in cui r1 sia uguale a $-1$
 passargli l'indirizzo di 'ok\_message' (righe 12 e 16).
 
 \subsection{\SC{} 2}
-Ecco un esempio di un programma che chiude un file:
+Ecco un esempio programma che chiude un file:
 \begin{lstlisting}[caption={Esempio \SC{} 2}, label={code:syscall2}, style={mips}]
                 .data
 params_sys2:    .space 8
