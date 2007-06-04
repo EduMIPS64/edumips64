@@ -1455,11 +1455,11 @@ parametri, che verr\`a chiarito con il seguente esempio:
 
 \begin{lstlisting}[caption={Esempio non banale di \SC{} 5}, label={code:printf}, style={mips}]
                 .data
-format_str:     .asciiz   "%dth of %s:\n%s version %i.%i is being tested!"
-s1:             .asciiz   "June"
+format_str:     .asciiz   "%d %s:\n%s versione %i.%i funziona!"
+s1:             .asciiz   "Giugno"
 s2:             .asciiz   "EduMIPS64"
 fs_addr:        .space    4
-                .word     23    
+                .word     5    
 s1_addr:        .space    4
 s2_addr:        .space    4
                 .word     0

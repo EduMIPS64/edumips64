@@ -1491,5 +1491,46 @@ The next instruction puts in r14 the address of this string, and then we can
 call \SC{} 5 and print the string. The last instruction sets the program counter
 to the content of r31, as the usual MIPS calling convention states.
 
+\subsection{A more complex usage example of \SC{} 5}
+\SC{} 5 uses a not-so-simple arguments passing mechanism, that will be shown in
+the following example:
+
+\begin{lstlisting}[caption={More complex \SC{} 5 example}, label={code:printf}, style={mips}]
+                .data
+format_str:     .asciiz   "%dth of %s:\n%s version %i.%i is being tested!"
+s1:             .asciiz   "June"
+s2:             .asciiz   "EduMIPS64"
+fs_addr:        .space    4
+                .word     5    
+s1_addr:        .space    4
+s2_addr:        .space    4
+                .word     0
+                .word     5
+test:
+                .code
+                daddi     r5, r0, format_str
+                sw        r5, fs_addr(r0)
+                daddi     r2, r0, s1
+                daddi     r3, r0, s2
+                sd        r2, s1_addr(r0)
+                sd        r3, s2_addr(r0)
+                daddi     r14, r0, fs_addr
+                syscall   5
+                syscall   0
+\end{lstlisting}
+The address of the format string is put into R5, whose content is then saved to
+memory at address fs\_addr. The string parameters' addresses are saved into
+s1\_addr and s2\_addr. Those two string parameters are the ones that match the
+two \%s placeholders in the format string.
+
+Looking at the memory, it's obvious that the parameters matching the
+placeholders are stored immediately after the address of the format string:
+numbers match integer parameters, while addresses match string parameters. In
+the s1\_addr and s2\_addr locations there are the addresses of the two strings
+that we want to print instead of the \%s placeholders.
+
+The execution of the example will show how \SC{} 5 can handle complex format
+strings like the one stored at format\_str.
+
 \printindex
 \end{document}
