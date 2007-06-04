@@ -202,8 +202,9 @@ public class SYSCALL extends Instruction {
 				din.Load(Converter.binToHex(Converter.positiveIntToBin(64,i)),8);
 			
 			int oldIndex = 0, newIndex = 0;
-			while((newIndex = format_string.indexOf('%', oldIndex)) > 0) {
+			while((newIndex = format_string.indexOf('%', oldIndex)) >= 0) {
 				char type = format_string.charAt(newIndex + 1);
+				edumips64.Main.logger.debug("Found a placeholder... type " + type);
 				temp.append(format_string.substring(oldIndex, newIndex));
 				switch(type) {
 					case 's':		// %s
