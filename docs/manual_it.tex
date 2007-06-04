@@ -1443,11 +1443,6 @@ Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 5, cio\'e
 la stringa da stampare(riga 2) e gli si applica un' etichetta per potervici
 accedere in seguito.
 
-Nel caso la stringa necessiti di inserire altri parametri in memoria(vedi
-\ref{sys5}), questi dovranno necessariamente essere inseriti nell'area di
-memoria immediatamente sucessiva a 'params\_sys5', (cio\'e nelle righe 3, 4,
-etc..).  
-
 Passando alla sezione .text,essa contiene una funzione che inizialmente salva
 l'indirizzo di params\_sys5, che per il compilatore \`{e} un numero, nel
 registro r14; subito dopo chiama la \SC{} 5 che stampa nello

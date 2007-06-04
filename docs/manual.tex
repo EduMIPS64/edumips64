@@ -1469,5 +1469,27 @@ argument error\_3 or ok\_message, according to the success of the operation.
 
 \OF{}
 
+\subsection{\SC{} 5}
+Example program that contains a function that prints to standard output the
+string contained in \$a0:
+\begin{lstlisting}[caption={\SC{} 5 example}, label={code:syscall5}, style={mips}]
+                .data
+params_sys5:    .space  8
+
+                .text
+print_string:   
+                sw      $a0, params_sys5(r0)    
+                daddi   r14, r0, params_sys5
+                syscall 5
+                jr      r31
+\end{lstlisting}
+The second row is used to save space for the string that must be printed by the
+\SC{}, that is filled by the first instruction of the .text section, that
+assumes that in \$a0 there's the address of the string to be printed.
+
+The next instruction puts in r14 the address of this string, and then we can
+call \SC{} 5 and print the string. The last instruction sets the program counter
+to the content of r31, as the usual MIPS calling convention states.
+
 \printindex
 \end{document}
