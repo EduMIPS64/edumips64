@@ -1,5 +1,4 @@
 ; Example for SYSCALL 3
-
                 .data
 params_sys3:    .space      8                
 ind_value:      .space      8            
@@ -18,6 +17,11 @@ read:           daddi       r14, r0, params_sys3
                 sw          $s1, ind_value(r0)            
                 syscall     3            
                 daddi       $s0, r0, -1            
-                BNE         r1, $s0, print_string    
-                daddi       $a0, r0, error_3
-                jal         print_string
+		daddi	    $a0,r0,ok_message			
+		BNE 	    r1,$s0,end			
+		daddi 	    $a0,r0,error_3
+
+end:		jal 	    print_string
+		syscall 0
+		
+		#include    print.s 
