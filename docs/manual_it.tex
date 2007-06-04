@@ -1253,14 +1253,15 @@ end:            jal         print_string
 
 Inizialmente (righe 2, 3) si salvano in memoria (e gli si assegna
 un'etichetta) le stringhe relative ai messaggi di successo ed errore da passare 
-alla funzione 'print\_string', presente nel file print.s, incluso all'inizio
+alla funzione 'print\_string', presente nel file print.s, incluso alla fine
 della sezione .text.
 
-Successivamente vengono salvati in memoria i dati richiesti dalla \SC{} 1 (righe 4,
-5), cio\'e la stringa contenente il path del file da aprire (che deve esistere),
-e, nella locazione di memoria immediatamente successiva, un intero che ne
-definisce la modalit\`a di apertura. Per maggiori informazioni sulla modalit\`a
-di apertura di un file rimandiamo alla sezione \ref{sys1}.
+Successivamente vengono salvati in memoria i dati richiesti dalla \SC{} 1 (righe
+4, 5), cio\'e la stringa contenente il path del file da aprire (che deve
+esistere se si opera in modalit\`a lettura o lettura/scrittura), e, nella
+locazione di memoria immediatamente successiva, un intero che ne definisce la
+modalit\`a di apertura. Per maggiori informazioni sulla modalit\`a di apertura
+di un file rimandiamo alla sezione \ref{sys1}.
 
 In questo caso il file \`e stato aperto utilizzando le seguenti modalit\`a:
 \texttt{O\_RDWR} \textbar{} \texttt{O\_CREAT} \textbar{} \texttt{O\_APPEND}. Infatti il valore
@@ -1272,7 +1273,7 @@ Si applica un'etichetta a questi dati per potervici accedere in seguito.
 Passando alla sezione .text, inizialmente si salva
 l'indirizzo di params\_sys1 (che per il compilatore \`{e} un numero) nel registro
 r14; subito dopo si pu\`{o} chiamare la \SC{} 1 e salvare il contenuto del
-registro, ovvero il valore di ritorno della \SC{}, in \$s2 (in modo da poterlo 
+registro r1, ovvero il valore di ritorno della \SC{}, in \$s2 (in modo da poterlo 
 riutilizzare, per esempio, con le altre \SC{}).
 
 A questo punto viene chiamata la funzione 'print\_string' facendo in modo

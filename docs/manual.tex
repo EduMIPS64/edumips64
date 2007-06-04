@@ -903,6 +903,7 @@ the source.
 
 \index{system calls!open()}
 \subsection{\texttt{SYSCALL 1 - open()}}
+\label{sys1}
 The SYSCALL 1 expects two parameters: a zero-terminated string that indicates
 the pathname of the file that must be opened, and a double word containing an
 integer that indicates the flags that must be used to specify how to open the
@@ -1290,6 +1291,55 @@ Example:
         daddi   r1, r0, 0	; saves 0 in R1
         syscall 0	    	; exits
 \end{lstlisting}
+
+\subsection{\SC{} 1}
+Example of a program that opens a file:
+\begin{lstlisting} [caption={\SC{} 1 example}, label={code:syscall1}, style={mips} ] 
+                .data 
+error_op:       .asciiz     "Error opening the file"    
+ok_message:     .asciiz     "All right"
+params_sys1:    .asciiz     "filename.txt"
+                .word64     0xF                    
+
+                .text
+open:           daddi       r14, r0, params_sys1    
+                syscall     1    
+                daddi       $s0, r0, -1
+                dadd        $s2, r0, r1        
+                daddi       $a0,r0,ok_message            
+                bne         r1,$s0,end            
+                daddi       $a0,r0,error_op
+
+end:            jal         print_string
+                syscall 0
+        
+                #include    print.s      
+\end{lstlisting}
+In the first two rows we write to memory the strings containing the error
+message and the success message that we will pass to print\_string function, and
+we give them two labels. The print\_string function is included in the print.s
+file.
+
+Next, we write to memory the data required from \SC{} 1 (row 4, 5), the path of
+the file to be opened (that must exist if we work in read or read/write mode)
+and, in the next memory cell, an integer that defines the opening mode. For more
+info about the opening mode of a file, please refer to \ref{sys1}.
+
+In this example, the file was opened using the following modes: 
+\texttt{O\_RDWR} \textbar{} \texttt{O\_CREAT} \textbar{} \texttt{O\_APPEND}. The
+number $15$ (0xF in base $16$) comes from the sum of the values of these three
+modes ($3 + 4 + 8$).
+
+We give a label to this data so that we can use it later.
+
+In the .text section, we save the address of params\_sys1 (that for the compiler
+is a number) in register r14; next we can call \SC{} 1 and save the content of
+r1 in \$s2, so that we can use it in the rest of the program (for instance, with
+other \SC{}).
+
+Then the print\_string function is called, passing error\_op as an argument if
+r1 is equal to $-1$ (rows 13-14) or else passing ok\_message as an argument if
+everything went smoothly (rows 12 and 16).
 
 \printindex
 \end{document}
