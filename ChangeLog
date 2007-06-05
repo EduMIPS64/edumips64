@@ -1,6 +1,8 @@
 EduMIPS64 ChangeLog
 ------------------- 
 
+0.5.1 (someday)
+
   0.5 (05/06/2007)
   	- Implemented a subset of MIPS32 instructions:
 	  * ADD, ADDI, ADDIU, ADDU
