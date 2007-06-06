@@ -8,8 +8,7 @@ ok_message:     .asciiz     "Tutto a posto"
 
 value:          .space 30                    
 
-                .text
-                #include    print.s    
+                .text 
 
 read:           daddi       r14, r0, params_sys3    
                 sw          $s2, params_sys3(r0)
