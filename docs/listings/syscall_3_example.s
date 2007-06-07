@@ -22,3 +22,5 @@ read:           daddi       r14, r0, params_sys3
 
 end:		jal 	    print_string
 		syscall 0
+
+		#include    print.s 

@@ -7,8 +7,8 @@ error_cl:       .asciiz     "Errore durante la chiusura del file"
 ok_message:     .asciiz     "Tutto a posto"
 
 
-                .text
-                #include    print.s    
+                .text 
+
 close:          daddi       r14, r0, params_sys2        
                 sw          $s2, params_sys2(r0)    
                 syscall     2            

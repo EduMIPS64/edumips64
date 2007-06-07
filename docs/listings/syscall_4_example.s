@@ -5,11 +5,10 @@ ind_value:      .space      8
                 .word64     16      
 error_4:        .asciiz     "Errore durante la scrittura su file"   
 ok_message:     .asciiz     "Tutto a posto"   
+
 value:          .space      30                        
 
-
                 .text
-                             
 write:
 		daddi 	    r14,r0,params_sys4		
 		sw	    $s2,params_sys4(r0)		
