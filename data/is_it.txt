@@ -255,7 +255,7 @@ Eccezioni:   HaltException
 
 Istruzione J 
 
-Sintassi: J targetJ
+Sintassi: J target
 Descrizione: 
             Salta entro la regione corrente allineata a 256 MB. 
             E' un salto PC-region (non PC-relative); l'effettivo
@@ -527,4 +527,40 @@ Istruzione XORI
 Sintassi: XORI rt, rs, immediate
 Descrizione: rt = rs XOR immediate
              Effettua l'OR esclusivo con una costante.
-             
+
+
+Syscall 0
+
+Descrizione: Ferma il simulatore.
+Parametri: Nessuno
+
+Syscall 1
+
+Descrizione: Permette l'apertura di un file
+Parametri: 1° - Percorso del file da aprire
+           2° - Modalita' apertura file
+
+Syscall 2
+
+Descrizione: Chiude un file aperto.
+Parametri: 1° - File descriptor del file da chiudere
+
+Syscall 3
+
+Descrizione: Permette di leggere byte da una fonte di input
+Parametri: 1° - file descriptor da cui leggere
+           2° - indirizzo dove copiare i dati letti
+           3° - numero di byte da leggere
+
+Syscall 4
+
+Descrizione: Permette di scrivere byte in una fonte di output
+Parametri: 1° - file descriptor su cui scrivere
+           2° - indirizzo da dove leggere i dati
+           3° - numero di byte da scrivere
+
+Syscall 5
+
+Descrizione: Permette di stampare una stringa
+Parametri: 1° - stringa di formato con possibili segnaposti
+              - un parametro per ogni segnaposto della stringa di formato

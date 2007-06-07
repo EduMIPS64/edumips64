@@ -804,7 +804,7 @@ public class Main extends JApplet {
         help.add(manual);
         manual.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                GUIManual man = new GUIManual(f, CurrentLocale.getString("INTRO_FILENAME"), CurrentLocale.getString("IS_FILENAME"), CurrentLocale.getString("GUI_FILENAME"));
+                GUIManual man = new GUIManual(f, CurrentLocale.getString("INTRO_FILENAME"), CurrentLocale.getString("IS_FILENAME"), CurrentLocale.getString("GUI_FILENAME"),CurrentLocale.getString("SYSCALL_FILENAME"));
                 man.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);    // In order to avoid that closing the manual exits the program
                 man.setVisible(true);
                 /*try{

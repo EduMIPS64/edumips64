@@ -256,6 +256,8 @@ public class GUIRegisters extends GUIComponent
 	class InsertValueDialog extends JDialog implements ActionListener 
 	{
 		JButton OK;
+		private enum AliasRegister 
+		{zero,at,v0,v1,a0,a1,a2,a3,t0,t1,t2,t3,t4,t5,t6,t7,s0,s1,s2,s3,s4,s5,s6,s7,t8,t9,k0,k1,gp,sp,fp,ra};
 
 		public InsertValueDialog()
 		{
@@ -274,7 +276,7 @@ public class GUIRegisters extends GUIComponent
 			Dimension d = new Dimension(150,20);
 			Container c = getContentPane();
 			c.setLayout(GBL);
-			JLabel label = new JLabel("R" + rowCurrent + "=");
+			JLabel label = new JLabel("R" + rowCurrent + " ( " + AliasRegister(rowCurrent) + " ) = ");
 			c.add(label);
 			GBC.gridx = 0;
 			GBC.gridy = 0;

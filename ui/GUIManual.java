@@ -35,7 +35,7 @@ import java.io.*;
 */
 public class GUIManual extends JDialog {
 	
-	JTextArea jta1,jta2,jta3;
+	JTextArea jta1,jta2,jta3,jta4;
 	Bottone bott;
 	
 	/** Builds a new instance of the Manual window.
@@ -45,7 +45,7 @@ public class GUIManual extends JDialog {
 	 *  chapter
 	 *  @param GUI the absolute pathname of the GUI-related manual chapter
 	 */
-	public GUIManual(Frame owner, String intro, String instr, String GUI){
+	public GUIManual(Frame owner, String intro, String instr, String GUI, String syscall){
 		super(owner);
 		setTitle("EduMIPS64 - " + CurrentLocale.getString("Manual.CAPTION"));
 		setModal(true);
@@ -75,11 +75,20 @@ public class GUIManual extends JDialog {
 		JScrollPane jsp3=new JScrollPane(jta3);
 		tabbedPane.addTab(CurrentLocale.getString("Manual.IS"), jsp3);
 		tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
+
+		jta4=new JTextArea();
+		jta4.setEnabled(true);
+		jta4.setEditable(false);
+		JScrollPane jsp4=new JScrollPane(jta4);
+		tabbedPane.addTab(CurrentLocale.getString("Manual.SYSCALL"), jsp4);
+		tabbedPane.setMnemonicAt(2, KeyEvent.VK_4);
+    
 		Font f = new Font("Monospaced", Font.PLAIN, 12);
 
 		jta1.setFont(f);
 		jta2.setFont(f);
 		jta3.setFont(f);
+    jta4.setFont(f);
 		
 		Intestazione in=new Intestazione();
 		in.setPreferredSize(new Dimension(400,100));
@@ -111,6 +120,7 @@ public class GUIManual extends JDialog {
 		setIntroduzione(intro);
 		setGUI(GUI);
 		setIstruzioni(instr);
+    setSyscall(syscall);
         //Uncomment the following line to use scrolling tabs.
         //tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 	}
@@ -156,6 +166,14 @@ public class GUIManual extends JDialog {
 		setTextAreaFile(nomeFile, jta3);
 	}
 	
+	/**
+	* Sets the file to be shown in the tabbed pane dedicated to the Syscall 
+	* manual page.
+	* @param nomeFile the file name where the introduction manual page is stored
+	*/
+	public void setSyscall(String nomeFile){
+		setTextAreaFile(nomeFile, jta4);
+	}
 	
 	class Intestazione extends JPanel{
 		public void paintComponent(Graphics g){
