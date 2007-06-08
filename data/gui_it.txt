@@ -1,4 +1,4 @@
-ï»¿INTERFACCIA UTENTE
+INTERFACCIA UTENTE
 ==================
 
 Edumips64 offre un'interfaccia utente facile da utilizzare, presentandosi con 
@@ -18,7 +18,7 @@ istruzione si trovi in ciascuno degli stadi della pipeline.
 I cinque stadi sono rappresentati in tutte le finestre utilizzando colori
 diversi, che possono essere personalizzati tramite la finestra di dialogo delle
 impostazioni.
-Attualmente gli stadi FP (virgola mobile) non sono utilizzati perchÃ© nonc'Ã¨
+Attualmente gli stadi FP (virgola mobile) non sono utilizzati perché nonc'è
 supporto FP in EduMIPS64.
 
 Cicli
@@ -27,7 +27,7 @@ Questa finestra mostra i cambiamenti che si verificano nella pipeline man mano
 che la simulazione va avanti. Sulla parte sinistra ci sono le istruzioni
 eseguite, e sulla parte destra c'e' la sua situazione nella pipeline. E'
 possibile immaginare le colonne come slot temporali, e quindi ogni colonna
-rappresenta la fotografia della pipeline in un certo step di simulazione, cosÃ¬
+rappresenta la fotografia della pipeline in un certo step di simulazione, così
 come sarebbe rappresentato nella finestra della Pipeline.
 
 Registri
@@ -46,7 +46,7 @@ Questa finestra mostra la situazione della memoria.
 La prima colonna contiene l'indirizzo della cella di memoria, espresso in
 esadecimale; la seconda contiene la rappresentazione esadecimale del contenuto
 della cella; la terza contiene l'etichetta e la quarta contiene i valori che la
-cella dovrebbe contenere, cosÃ¬ com'Ã¨ scritto nel file sorgente aperto.
+cella dovrebbe contenere, così com'è scritto nel file sorgente aperto.
 Un singolo click su una cella di memoria mostra il valore decimale di
 quest'ultima nella barra di stato, mentre un doppio click permette di
 modificarne il valore. Comunque la modifica non influira' sul contenuto della
@@ -58,7 +58,7 @@ Questa finestra mostra il codice sorgente del programma caricato.
 La prima colonna contiene l'indirizzo esadecimale dell'istruzione; la seconda
 contiene la rappresentazione esadcimale dell'istruzione; la terza contiene
 l'etichetta dell'istruzione; la quarta contiene la rappresentazione testuale
-dell'istruzione e la quinta contiene il commento dell'istruzione, cosÃ¬ com'e'
+dell'istruzione e la quinta contiene il commento dell'istruzione, così com'e'
 scritto nel codice sorgente.
 
 Statistiche
@@ -104,7 +104,7 @@ impostare le seguenti opzioni:
   fossero degli errori.
 - Sincronizza la GUI con la CPU nell'esecuzione multi-step: aggiorna la grafica
   con la CPU ad ogni passo di esecuzione quando il programma viene eseguito in
-  modalitÃ  multi-step, ovvero tramite F4 o F8
+  modalità multi-step, ovvero tramite F4 o F8
 - Selezione Lingua: Permette la scelta della lingua desiderata, (Inglese-Italiano).
 - Selezione colori della pipeline: Permette di cambiare i colori che vengono
   associati, in ciascuna finestra, ai differenti stadi della pipeline.

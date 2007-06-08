@@ -527,4 +527,3 @@ Istruzione XORI
 Sintassi: XORI rt, rs, immediate
 Descrizione: rt = rs XOR immediate
              Effettua l'OR esclusivo con una costante.
-

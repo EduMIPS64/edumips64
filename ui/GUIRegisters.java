@@ -48,6 +48,8 @@ public class GUIRegisters extends GUIComponent
 	String value[] = new String[34];
 	int rowCurrent;
 	String valueCurrent[];
+	private enum AliasRegister 
+		{zero,at,v0,v1,a0,a1,a2,a3,t0,t1,t2,t3,t4,t5,t6,t7,s0,s1,s2,s3,s4,s5,s6,s7,t8,t9,k0,k1,gp,sp,fp,ra};
 	
 	public GUIRegisters()
 	{
@@ -76,6 +78,21 @@ public class GUIRegisters extends GUIComponent
 	{
 		cont.repaint();
 	}
+
+  public String registerToAlias(String reg)
+		{
+			int number = Integer.parseInt(reg.substring(1));
+			if (number == 32) return ("   LO    =  ");
+			if (number == 33) return ("   HI    =  ");
+			
+			for(AliasRegister x : AliasRegister.values())
+			{
+				if(number==(x.ordinal()))
+					return ("$" + x.name());
+			}
+			return "";
+		}
+
 
 	class RegPanel extends JPanel 
 	{
@@ -120,8 +137,8 @@ public class GUIRegisters extends GUIComponent
 								CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
 								CurrentLocale.getString("StatusBar.OFREGISTER") +
 								theTable.getSelectedRow() +
-								" : " +
-								Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));
+              " ( "+ registerToAlias("R"+theTable.getSelectedRow()) + " ) : " +
+              Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));
 						}catch(IrregularStringOfHexException hex) { hex.printStackTrace();}
 					}
 				}
@@ -158,9 +175,8 @@ public class GUIRegisters extends GUIComponent
 					{
 					
 					edumips64.Main.getSB().setText(
-							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
-							"LO" +
-							" : " +
+							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +	"LO" +
+              " : " +
 							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
 	
 					}
@@ -168,8 +184,7 @@ public class GUIRegisters extends GUIComponent
 					{
 					edumips64.Main.getSB().setText(
 							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
-							"HI" +
-							" : " +
+							"HI" + " : " +
 							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
 					}	
 					else
@@ -178,7 +193,7 @@ public class GUIRegisters extends GUIComponent
 							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
 							CurrentLocale.getString("StatusBar.OFREGISTER") +
 							theTable.getSelectedRow() +
-							" : " +
+              " ( "+ registerToAlias("R"+theTable.getSelectedRow()) + " ) : " +
 							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
 					}
 				}catch(IrregularStringOfHexException hex) { hex.printStackTrace();}
@@ -256,14 +271,11 @@ public class GUIRegisters extends GUIComponent
 	class InsertValueDialog extends JDialog implements ActionListener 
 	{
 		JButton OK;
-		private enum AliasRegister 
-		{zero,at,v0,v1,a0,a1,a2,a3,t0,t1,t2,t3,t4,t5,t6,t7,s0,s1,s2,s3,s4,s5,s6,s7,t8,t9,k0,k1,gp,sp,fp,ra};
-
 		public InsertValueDialog()
 		{
 			super();
 		}
-		
+				
 		public InsertValueDialog (int row, String oldValue, String value[]) 
 		{
 			super();
@@ -276,7 +288,7 @@ public class GUIRegisters extends GUIComponent
 			Dimension d = new Dimension(150,20);
 			Container c = getContentPane();
 			c.setLayout(GBL);
-			JLabel label = new JLabel("R" + rowCurrent + " ( " + AliasRegister(rowCurrent) + " ) = ");
+			JLabel label = new JLabel("R"+rowCurrent+" ( "+registerToAlias("R"+rowCurrent)+" ) = ");
 			c.add(label);
 			GBC.gridx = 0;
 			GBC.gridy = 0;
@@ -296,9 +308,9 @@ public class GUIRegisters extends GUIComponent
 			c.add(OK);
 			GBC.gridx = 1;
 			GBC.gridy = 1;
-			GBC.insets = new Insets(15,0,0,0);  //spaziatura
+			GBC.insets = new Insets(15,-60,0,0);  //spaziatura
 			GBL.setConstraints(OK,GBC);	
-			setSize(200,100);
+			setSize(210,100);
 			setLocation(400,300);
 			setVisible(true);
 		}
