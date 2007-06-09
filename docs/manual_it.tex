@@ -16,14 +16,23 @@ istruzioni per mantenere la compatibilit\`{a} con altri simulatori.}
 \newcommand{\MISN}{\textbf{NB:} La 'U' dell'istruzione sta per 'unsigned'; tuttavia questo \`{e} 
 un nome equivoco, perch\'{e} l'operazione considera i valori con segno. La sua caratteristica \`{e} 
 quella di non lanciare eccezioni (nemmeno in caso di overflow).}
-\newcommand{\OF}{\textbf{NB:} Questo listato prevede che il registro \$s2 contenga il file descriptor
-relativo al file da utilizzare (se utilizzate questo listato copia-incollate il codice del listato \ref{code:syscall1} prima di questo).}
+
+%\lstdefinelanguage
+%[[MIPS]]{Assembler}
+%[[]{Assembler}]
+%{keywords= add, addi, addiu, addu, and, andi, b, beq, beqz, bgez, bne, bnez, break, % 
+% bubble, dadd, daddi, daddu, daddiu, daddui, ddiv, ddivu, div, divu, dmult, dmultu,% 
+% dsll, dsllv, dsra, dsrav, dsrl, dsrlv, dsub, dubu, halt, j, jal, jalr, jr, lb, lbu, lh, lhu, lw, lwu,%
+% ld, lui, mfhi, mflo, movn, movz, mult, multu, nop, or, ori, sb, sh, sw, sd, sll, sllv, slt, slti,%
+% sltiu, sltu, sra, srav, srl, srlv, sub, subu, syscall, trap, xor, xori }
+%[[ directives={ .data, .text, .ascii, .asciiz, .space, .byte, .half, .word, .word32, .word64, .double } ]]
+
 
 % Per avere il bold typewriter
 \DeclareFontShape{OT1}{cmtt}{bx}{n}{ <5><6><7><8><9><10><10.95><12><14.4><17.28><20.74><24.88>cmttb10}{}
 
 \lstdefinestyle{mips}{
-	language=java,
+%	language=[MIPS]Assembler,
 	numbers=left,
 	basicstyle=\small,
 	keywordstyle=\bfseries,
@@ -1205,277 +1214,63 @@ delle istruzioni che accetta \EM{} (versione \EV)
 
 \section{\SC{}}
 Per informazioni dettagliate riguardo l'utilizzo delle \SC{} consultare la
-sezione \ref{sysc-man}. Di seguito si trovano degli esempi pratici per ognuna
-delle 6 \SC{}.
+sezione \ref{sysc-man}. Di seguito si trovano degli esempi pratici per utilizzare tutte e 6 le \SC{}.
 
-\`E importante notare che gli esempi delle \SC{} 1-4 fanno riferimento ad un
-file \texttt{print.s}, che \`e l'esempio della \SC{} 5. \`E possibile copiare il
-codice del suddetto esempio in un file chiamato \texttt{print.s} ed includerlo
-negli altri esempi, o semplicemente copiare il codice in ciascuno degli esempi,
-per poterli eseguire senza bisogno di altri file.
+\subsection{Esempio sulle \SC{}}
+Ecco un esempio di programmma che apre un file, ne legge i primi 16 byte, 
+li scrive in append sullo stesso file (che poi chiude) ed infine stampa un messaggio di conferma:\\
+\lstinputlisting[caption={Esempio \SC{}}, label={code:syscall_all}, style={mips}] {listings/syscall_all.s}
 
-Inoltre parte degli esempi si aspettano che esista gi\`a un file descriptor su
-cui operare. Se si vuole eseguire questi esempi, utilizzare l'esempio della
-\SC{} 1 per aprire un file.
+La sezione '.data' comincia con l'inserimento in memoria di 5 messaggi che serviranno per far sapere
+all'utilizzatore l'esito delle operazioni effettuate.L'etichetta 'value'  \'{e} quella dove verranno salvati i dati letti,
+dati che verranno prelevati per essere successivamente scritti sul file.
+ Di seguito troviamo l'elenco dei parametri necessari per la chiamata delle \SC{}. \\Per quanto riguarda la \SC{} 1 
+bisogna salvare in memoria per prima cosa il path del file da aprire, e nella locazione di memoria immediatamente
+ successiva (quindi nella riga successiva) un intero che rappresenta la modalit\`{a} d'apertura (per maggiori informazioni 
+riguardo alle modalit\`{a} d'apertura rimandiamo alla sezione \ref{sys1}).\\ La \SC{} 2 invece richiede un solo parametro, 
+il file descriptor del file da chiudere.\\ Le \SC{} 3 e 4 necessitano dello stesso numero di parametri (tre), il primo  \'{e}  il file descriptor
+del file da cui leggere(per la \SC{} 3) o scrivere (per la \SC{} 4), il secondo \'{e} l'indirizzo di memoria da cui 
+leggere (o scrivere) i byte, e il terzo \'{e} un'intero che rappresenta il numero di byte da leggere (o scrivere).
+\\Infine la \SC{} 5 accetta in ingresso un numero variabile di parametri; il primo \'{e} sempre necessario, ed \'{e}
+ la cosiddetta format string, cio\`{e} la striga da inviare allo standard output. A seconda del tipo di format string
+ pu\`{o} essere necessario salvare un numero arbitrario di altri parametri (per maggiori informazioni consultare 
+la sezione \ref{sys5} o l'esempio \ref{code:printf}).\\
 
-\subsection{\SC{} 0}
-La \SC{} 0, quando invocata, termina l'esecuzione del programma.
-Eccone un esempio:
-\begin{lstlisting}[caption={Esempio \SC{} 0}, label={code:syscall0}, style={mips}]
-        .code
-        daddi   r1, r0, 0    ;salva 0 nel registro R1
-        syscall 0            ;esce dal programma
-\end{lstlisting}
+Passiamo ora alla sezione '.text'.Essa comincia con le operazioni necessarie per l'apertura del file, cio\`{e} 
+l'inserimento dell'indirizzo di memoria dell'etichetta 'params\_sys1' nel registro r14 (riga 26). Ora si pu\`{o} chiamare la \SC{} 1,
+salvare il file descriptor del file letto in modo da poterlo riutilizzare (riga 29), e 
+ controllare poi che il valore di ritorno della \SC{} (contenuto in r1) sia diverso da $-1$ , nel qual caso si passa all' etichetta 
+'read'(riga 30).Se invece il valore dovesse essere $-1$ si passa all'etichetta 'end', facendo in modo da salvare in r4 l'indirizzo di memoria 
+del messaggio di errore appropriato (righe 31, 32).\\
 
-\subsection{\SC{} 1}
-Ecco un esempio di programmma che apre un file:
-\begin{lstlisting} [caption={Esempio \SC{} 1}, label={code:syscall1}, style={mips} ] 
-                .data 
-error_op:       .asciiz     "Errore durante l'apertura del file"    
-ok_message:     .asciiz     "Tutto a posto"
-params_sys1:    .asciiz     "filename.txt"
-                .word64     0xF                    
+Il listato continua con il salvataggio nel registro r14 dell'indirizzo di memoria dell'etichetta 'params\_sys3', dove viene poi 
+inserito (riga 35) il file descriptor del file da cui leggere precedentemente salvato. Allo stesso modo salviamo nell'apposta
+zona di memoria l'indirizzo in cui salvare i byte letti (righe 36-37) e poi chiamiamo la \SC{} 3. Come fatto precedentemente  
+controlliamo che il valore di ritorno della \SC{} (contenuto in r1) sia diverso da $-1$ , nel qual caso si passa all' etichetta 
+'write'(riga 39).Se invece il valore dovesse essere $-1$ si passa all'etichetta 'end', facendo in modo da salvare in r4 l'indirizzo di memoria 
+del messaggio di errore appropriato (righe 40, 41).\\
 
-                .text
-open:           daddi       r14, r0, params_sys1    
-                syscall     1    
-                daddi       $s0, r0, -1
-                dadd        $s2, r0, r1        
-                daddi       $a0,r0,ok_message            
-                bne         r1,$s0,end            
-                daddi       $a0,r0,error_op
+La parte relativa alla \SC{} 4 \'{e} molto simile a quella della \SC{} 3. Infatti anche qui salviamo in memoria l'indirizzo iniziale dei
+parametri richiesti (riga 43) e poi  inseriamo lì il file descriptor del file su cui scrivere (riga 44), e nella locazione di memoria immediatamente
+successiva mettiamo l'indirizzo (anch'esso di memoria) da cui prelevare i byte da scrivere (in questo caso lo stesso indirizzo in cui sono stati
+depositati i byte appena letti dalla \SC{} 3). Ora controlliamo che il valore di ritorno della \SC{} (contenuto in r1) sia diverso da $-1$ , 
+nel qual caso si passa all' etichetta 'close'(riga 48).Se invece il valore dovesse essere $-1$ si passa all'etichetta 'end', facendo in modo da salvare
+ in r4 l'indirizzo di memoria del messaggio di errore appropriato (righe 49, 50).\\
 
-end:            jal         print_string
-                syscall 0
-        
-                #include    print.s      
-\end{lstlisting}
+A questo punto bisogna chiudere il file, tramite la \SC{} 4, che accetta come unico parametro il file descriptor da chiudere. Dopo aver controllato 
+ancora una volta l'assenza di errori (righe 55, 56, 57) passiamo all'etichetta 'end'.\\
 
-Inizialmente (righe 2, 3) si salvano in memoria (e gli si assegna
-un'etichetta) le stringhe relative ai messaggi di successo ed errore da passare 
-alla funzione 'print\_string', presente nel file print.s, incluso alla fine
-della sezione .text.
+Quest' ultima contiene le operazioni da effettuare prima di invocare la \SC{} 5. Tali operazioni consitono nel salvare in r14 l'indirizzo di 
+'params\_sys5' , e in 'params\_sys5' l'indirizzo della format string. Eventuali paramtri aggiuntivi saranno prelevati
+dalle locazioni di memoria immediatamente successive. Come si pu\`{o} notare la 'format string' nel nostro caso  \'{e} molto semplice, e non
+ richiede parametri aggiuntivi; per un esempio pi\`{u} esaustivo da questo punto di vista consultare l'esempio \ref{code:printf} .
 
-Successivamente vengono salvati in memoria i dati richiesti dalla \SC{} 1 (righe
-4, 5), cio\'e la stringa contenente il path del file da aprire (che deve
-esistere se si opera in modalit\`a lettura o lettura/scrittura), e, nella
-locazione di memoria immediatamente successiva, un intero che ne definisce la
-modalit\`a di apertura. Per maggiori informazioni sulla modalit\`a di apertura
-di un file rimandiamo alla sezione \ref{sys1}.
-
-In questo caso il file \`e stato aperto utilizzando le seguenti modalit\`a:
-\texttt{O\_RDWR} \textbar{} \texttt{O\_CREAT} \textbar{} \texttt{O\_APPEND}. Infatti il valore
-0xF, ossia $15$ in base decimale, deriva dalla somma di queste tre modalit\`a
-($3+4+8$).
-
-Si applica un'etichetta a questi dati per potervici accedere in seguito.
-
-Passando alla sezione .text, inizialmente si salva
-l'indirizzo di params\_sys1 (che per il compilatore \`{e} un numero) nel registro
-r14; subito dopo si pu\`{o} chiamare la \SC{} 1 e salvare il contenuto del
-registro r1, ovvero il valore di ritorno della \SC{}, in \$s2 (in modo da poterlo 
-riutilizzare, per esempio, con le altre \SC{}).
-
-A questo punto viene chiamata la funzione 'print\_string' facendo in modo
-da passargli l'indirizzo di 'error\_op' nel caso in cui r1 sia uguale a $-1$
-(righe 13-14).  Altrimenti si chiama la stessa funzione facendo in modo di
-passargli l'indirizzo di 'ok\_message' (righe 12 e 16).
-
-\subsection{\SC{} 2}
-Ecco un esempio programma che chiude un file:
-\begin{lstlisting}[caption={Esempio \SC{} 2}, label={code:syscall2}, style={mips}]
-                .data
-params_sys2:    .space 8
-error_cl:       .asciiz     "Errore durante la chiusura del file"
-ok_message:     .asciiz     "Tutto a posto"
-
-                .text
-close:          daddi       r14, r0, params_sys2        
-                sw          $s2, params_sys2(r0)    
-                syscall     2            
-                daddi       $s0, r0, -1        
-                daddi       $a0, r0, ok_message            
-                bne         r1, $s0, end            
-                daddi       $a0, r0, error_cl
-
-end:            jal         print_string
-                syscall     0
-    
-                #include    print.s         
-\end{lstlisting}
-Inizialmente viene conservato in memoria dello spazio per l'unico dato richiesto
-dalla \SC{} 2, cio\`e  il file descriptor del file da chiudere (riga 2) e gli si
-applica un' etichetta per potervici accedere in seguito.
- 
-Successivamente si salvano in memoria (e gli si assegna un'etichetta) le
-stringhe relative ai messaggi di successo ed errore da passare alla funzione
-'print\_string'(righe 3, 4).
-
-Passando alla sezione .text, inizialmente si salva l'indirizzo di params\_sys2
-(che per il compilatore \`{e} un numero) nel registro r14; subito dopo si
-pu\`{o} chiamare la \SC{} 2.
-
-A questo punto viene chiamata la funzione print\_string (presente nel file
-print.s) facendo in modo da passargli l'indirizzo di 'error\_cl' nel caso in cui
-r1 sia uguale a $-1$(riga 13).
-
-Altrimenti si chiama la stessa funzione facendo in modo di passargli l'indirizzo
-di 'ok\_message' (riga 11).
-
-\OF{}
-
-\subsection{\SC{} 3}
-Ecco un esempio di programma che legge 16 byte da un file e li salva in memoria:
-\begin{lstlisting}[caption={Esempio \SC{} 3}, label={code:syscall3}, style={mips}]
-                .data
-params_sys3:    .space      8                
-ind_value:      .space      8            
-                .word64     16        
-error_3:        .asciiz     "Errore durante la lettura del file"    
-ok_message:     .asciiz     "Tutto a posto"    
-
-value:          .space      30                    
-
-                .text
-read:           daddi       r14, r0, params_sys3 
-                sw          $s2, params_sys3(r0)
-                daddi       $s1, r0, value            
-                sw          $s1, ind_value(r0)            
-                syscall     3            
-                daddi       $s0, r0, -1            
-                daddi       $a0, r0,ok_message            
-                bne         r1, $s0,end            
-                daddi       $a0, r0,error_3
-
-end:            jal         print_string
-                syscall     0
-        
-                #include    print.s 
-\end{lstlisting}
-
-Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 3, cioe' il
-file descriptor del file da cui leggere (riga 2), l'indirizzo di memoria in cui
-inserire i byte letti(riga 3), e il numero di byte da leggere(riga 4).Si applica
-un' etichetta a questi dati per potervici accedere in seguito.
-
-Successivamente si salvano in memoria (e gli si assegna un'etichetta) le stringhe
-relative ai messaggi di successo ed errore da passare alla funzione
-'print\_string'(righe 5, 6). Passando alla sezione .text, inizialmente si salva
-l'indirizzo di params\_sys3 (che per il compilatore \`{e} un numero) nel
-registro r14; dopodich\'{e} salviamo nelle apposite locazioni di memoria
-l'indirizzo del file descriptor (che supponiamo avere nel registro \$s2) e
-l'indirizzo su cui andare a salvare i byte letti, ossia l'indirizzo di 'value'.
-
-Subito dopo si pu\`{o} chiamare la \SC{} 3. A questo  punto viene chiamata la
-funzione print\_string (presente nel file print.s), facendo in modo da passargli
-l'indirizzo di 'error\_3' nel caso in cui r1 sia uguale a $-1$(riga 21).
-Altrimenti si chiama la funzione 'print\_string' passando l'indirizzo di
-\_'ok\_message' (riga 19).
-
-\OF{}
-\subsection{\SC{} 4}
-Ecco un esempio di programma che scrive su un file una stringa salvata in memoria:
-\begin{lstlisting}[caption={Esempio \SC{} 4}, label={code:syscall4}, style={mips}]
-                .data
-params_sys4:    .space      8                
-ind_value:      .space      8            
-                .word64     16        
-error_4:        .asciiz     "Errore durante la scrittura del file"    
-ok_message:     .asciiz     "Tutto a posto"    
-value:          .space      30                    
-
-                .text
-            
-write:          daddi       r14, r0,params_sys4        
-                sw          $s2, params_sys4(r0)        
-                daddi       $s1, r0,value            
-                sw          $s1, ind_value(r0)            
-                syscall     4                
-                daddi       $s0, r0,-1
-                daddi       $a0, r0,ok_message            
-                bne         r1, $s0,end            
-                daddi       $a0, r0,error_4
-
-end:            jal         print_string
-                syscall     0
-        
-                #include    print.s 
-\end{lstlisting}
-
-Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 4, cioe' il
-file descriptor del file su cui scrivere (riga 2), l'indirizzo di memoria da cui
-prelevare i byte da scrivere(riga 3), e il numero di byte da scrivere(riga 4).Si
-applica un' etichetta a questi dati per potervici accedere in seguito.
-
-Successivamente si salvano in memoria (e gli si assegna un'etichetta) le
-stringhe relative ai messaggi di successo ed errore da passare alla funzione
-'print\_string'(righe 5, 6).
-
-Passando alla sezione .text, inizialmente si salva l'indirizzo di params\_sys4,
-che per il compilatore \`{e} un numero) nel registro r14; dopodich\'{e} salviamo
-nelle apposite locazioni di memoria l'indirizzo del file descriptor (che
-supponiamo avere nel registro \$s2) e l'indirizzo da cui leggere i byte da
-scrivere, ossia l'indirizzo di 'value'. Subito dopo si pu\`{o} chiamare la \SC{}
-4.
-
-A questo  punto viene chiamata la funzione print\_string (presente nel file
-print.s) facendo in modo da passargli l'indirizzo di 'error\_4' nel caso in cui
-r1 sia uguale a $-1$(riga 21). Altrimenti si chiama la funzione
-'print\_string' facendo in modo di passargli l'indirizzo di 'ok\_message' (riga
-19).
-
-\OF{}
-\subsection{\SC{} 5}
-Ecco un esempio di un programma che contiene una funzione che stampa nello
-standard output la stringa contenuta nel registro \$a0:
-\begin{lstlisting}[caption={Esempio \SC{} 5}, label={code:syscall5}, style={mips}]
-                .data
-params_sys5:    .space  8
-
-                .text
-print_string:   
-                sw      $a0, params_sys5(r0)    
-                daddi   r14, r0, params_sys5
-                syscall 5
-                jr      r31
-\end{lstlisting}
-Inizialmente vengono salvati in memoria i dati richiesti dalla \SC{} 5, cio\'e
-la stringa da stampare(riga 2) e gli si applica un' etichetta per potervici
-accedere in seguito.
-
-Passando alla sezione .text,essa contiene una funzione che inizialmente salva
-l'indirizzo di params\_sys5, che per il compilatore \`{e} un numero, nel
-registro r14; subito dopo chiama la \SC{} 5 che stampa nello
-standard output (una finestra di dialogo) la stringa desiderata. Alla fine viene
-restituito il controllo alla funzione chiamante.
 
 \subsection{Un esempio pi\`u complesso di \SC{} 5}
 La \SC{} 5 utilizza un meccanismo un po' complesso per il passaggio dei
 parametri, che verr\`a chiarito con il seguente esempio:
+\lstinputlisting[caption={Esempio non banale di \SC{} 5}, label={code:printf}, style={mips}] {listings/test-printf.s}
 
-\begin{lstlisting}[caption={Esempio non banale di \SC{} 5}, label={code:printf}, style={mips}]
-                .data
-format_str:     .asciiz   "%d %s:\n%s versione %i.%i funziona!"
-s1:             .asciiz   "Giugno"
-s2:             .asciiz   "EduMIPS64"
-fs_addr:        .space    4
-                .word     5    
-s1_addr:        .space    4
-s2_addr:        .space    4
-                .word     0
-                .word     5
-test:
-                .code
-                daddi     r5, r0, format_str
-                sw        r5, fs_addr(r0)
-                daddi     r2, r0, s1
-                daddi     r3, r0, s2
-                sd        r2, s1_addr(r0)
-                sd        r3, s2_addr(r0)
-                daddi     r14, r0, fs_addr
-                syscall   5
-                syscall   0
-\end{lstlisting}
 L'indirizzo della stringa di formato viene inserito nel registro R5, il cui
 contenuto viene salvato in memoria all'indirizzo fs\_addr. Agli indirizzi
 s1\_addr ed s2\_addr vengono salvati gli indirizzi dei parametri di tipo stringa
