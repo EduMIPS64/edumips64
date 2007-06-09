@@ -17,22 +17,22 @@ istruzioni per mantenere la compatibilit\`{a} con altri simulatori.}
 un nome equivoco, perch\'{e} l'operazione considera i valori con segno. La sua caratteristica \`{e} 
 quella di non lanciare eccezioni (nemmeno in caso di overflow).}
 
-%\lstdefinelanguage
-%[[MIPS]]{Assembler}
-%[[]{Assembler}]
-%{keywords= add, addi, addiu, addu, and, andi, b, beq, beqz, bgez, bne, bnez, break, % 
-% bubble, dadd, daddi, daddu, daddiu, daddui, ddiv, ddivu, div, divu, dmult, dmultu,% 
-% dsll, dsllv, dsra, dsrav, dsrl, dsrlv, dsub, dubu, halt, j, jal, jalr, jr, lb, lbu, lh, lhu, lw, lwu,%
-% ld, lui, mfhi, mflo, movn, movz, mult, multu, nop, or, ori, sb, sh, sw, sd, sll, sllv, slt, slti,%
-% sltiu, sltu, sra, srav, srl, srlv, sub, subu, syscall, trap, xor, xori }
-%[[ directives={ .data, .text, .ascii, .asciiz, .space, .byte, .half, .word, .word32, .word64, .double } ]]
+\lstdefinelanguage{MIPS64}%
+{keywords={add, addi, addiu, addu, and, andi, b, beq, beqz, bgez, bne, bnez, break,% 
+ bubble, dadd, daddi, daddu, daddiu, daddui, ddiv, ddivu, div, divu, dmult, dmultu,% 
+ dsll, dsllv, dsra, dsrav, dsrl, dsrlv, dsub, dubu, halt, j, jal, jalr, jr, lb, lbu, lh, lhu, lw, lwu,%
+ ld, lui, mfhi, mflo, movn, movz, mult, multu, nop, or, ori, sb, sh, sw, sd, sll, sllv, slt, slti,%
+ sltiu, sltu, sra, srav, srl, srlv, sub, subu, syscall, trap, xor, xori},%
+ comment=[l];,%
+ directives={.data, .text, .ascii, .asciiz, .space, .byte, .half, .word, .word32, .word64, .double}%
+}[keywords,comments,strings,directives]%
 
 
 % Per avere il bold typewriter
 \DeclareFontShape{OT1}{cmtt}{bx}{n}{ <5><6><7><8><9><10><10.95><12><14.4><17.28><20.74><24.88>cmttb10}{}
 
 \lstdefinestyle{mips}{
-%	language=[MIPS]Assembler,
+	language=MIPS64,
 	numbers=left,
 	basicstyle=\small,
 	keywordstyle=\bfseries,
