@@ -905,82 +905,9 @@ public class Parser
 												}
 												else
 												{
-													int offset=0,cc;
-													
-													cc = param.indexOf("+",indPar);
-													if (cc!=-1)
-													{
-														tmpMem = symTab.getCell(param.substring(indPar,cc).trim());
-														try
-														{
-														    int tmp = tmpMem.getAddress() + Integer.parseInt(param.substring(cc+1,endPar));
-														    if (tmp<0 || tmp%8!=0 || tmp > edumips64.core.CPU.DATALIMIT)
-														    {   
-															numError++;
-															String er = "LABELADDRESSINVALID";
-															if (tmp > edumips64.core.CPU.DATALIMIT)
-															    er = "LABELTOOLARGE";
-															    error.add(er,row,line.indexOf(param.substring(indPar,endPar))+1,line);
-															    i = line.length();
-															    indPar = endPar+1;
-															    tmpInst.getParams().add(0);
-															    continue;
-														    }
-															
-															tmpInst.getParams().add(tmp);
-														}
-														catch(NumberFormatException ex)
-														{   
-															numError++;
-															error.add("LABELNOTFOUND",row,line.indexOf(param.substring(indPar,endPar))+1,line);
-															i = line.length();
-															indPar = endPar+1;
-															tmpInst.getParams().add(0);
-															continue;
-														}
+												    tmpMem = symTab.getCell(param.substring(indPar,endPar).trim());
+												    tmpInst.getParams().add(tmpMem.getAddress());
 
-													}
-													else
-													{
-
-														cc = param.indexOf("-",indPar);
-														if (cc!=-1)
-														{
-															tmpMem = symTab.getCell(param.substring(indPar,cc).trim());
-															try
-															{
-															    int tmp = tmpMem.getAddress() - Integer.parseInt(param.substring(cc+1,endPar));
-															    if (tmp<0 || tmp%8!=0 || tmp > edumips64.core.CPU.DATALIMIT)
-															    {   
-																numError++;
-																String er = "LABELADDRESSINVALID";
-																if (tmp > edumips64.core.CPU.DATALIMIT)
-																    er = "LABELTOOLARGE";
-																error.add(er,row,line.indexOf(param.substring(indPar,endPar))+1,line);
-																i = line.length();
-																indPar = endPar+1;
-																tmpInst.getParams().add(0);
-																continue;
-															    }
-															    tmpInst.getParams().add(tmp);
-															}
-															catch(NumberFormatException ex)
-															{
-															    numError++;
-																error.add("LABELNOTFOUND",row,line.indexOf(param.substring(indPar,endPar))+1,line);
-																i = line.length();
-																indPar = endPar+1;
-																tmpInst.getParams().add(0);
-																continue;
-															}
-														}
-														else
-														{
-															tmpMem = symTab.getCell(param.substring(indPar,endPar).trim());
-															tmpInst.getParams().add(tmpMem.getAddress());
-															
-														}
-													}
 												}
 												indPar = endPar+1;
 											}
