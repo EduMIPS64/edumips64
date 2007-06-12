@@ -111,9 +111,9 @@ public class GUIRegisters extends GUIComponent
 			tableModel = new FileTableModel(value);
 			setBackground(Color.WHITE);
 			theTable = new JTable(tableModel);
-			theTable.getColumnModel().getColumn(0).setPreferredWidth(32);
+			theTable.getColumnModel().getColumn(0).setPreferredWidth(95);
 			theTable.getColumnModel().getColumn(1).setPreferredWidth(122);
-			theTable.getColumnModel().getColumn(2).setPreferredWidth(32);
+			theTable.getColumnModel().getColumn(2).setPreferredWidth(45);
 			theTable.getColumnModel().getColumn(3).setPreferredWidth(122);
 			theTable.setRowSelectionAllowed(false);
 			theTable.setColumnSelectionAllowed(false);
@@ -154,13 +154,13 @@ public class GUIRegisters extends GUIComponent
 			//init dei vettori statici 1a e 3a colonna
 			for (int i = 0; i < 32; i++) 
 			{
-				numR[i] = "R" + i + "=";
-				numRF[i] = "F" + i + "=";
+				numR[i] = "R" + i + " (" + registerToAlias(" " + i) + ") =";
+				numRF[i] = "F" + i + " =";
 				value[i] = "0000000000000000";
 			}
-			numR[32] = "LO=";
+			numR[32] = "LO =";
 			value[32] = "0000000000000000";
-			numR[33] = "HI=";
+			numR[33] = "HI =";
 			value[33] = "0000000000000000";
 		}	
 
