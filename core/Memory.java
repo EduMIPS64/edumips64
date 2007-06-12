@@ -93,7 +93,8 @@ public class Memory{
 	 */
 	public MemoryElement getCell(int address) throws MemoryElementNotFoundException{
 		int index = address / 8;
-		if(index >= CPU.DATALIMIT || index < 0)
+		
+		if(index >= CPU.DATALIMIT || index < 0 || address < 0)
 			throw new MemoryElementNotFoundException();
 
 		return cells.get(index);
