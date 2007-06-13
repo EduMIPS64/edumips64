@@ -443,9 +443,15 @@ public class Main extends JApplet {
             resetSimulator();
         }
         catch (java.io.FileNotFoundException ex) {
+			String tmpfile;
+			if (ex.getMessage().indexOf("(")!=-1)
+				tmpfile=ex.getMessage().substring(0,ex.getMessage().indexOf("("));
+			else
+				tmpfile=ex.getMessage();
+
 			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));		
-			logger.debug("File not found: " + file);
-            JOptionPane.showMessageDialog(f, CurrentLocale.getString("FILE_NOT_FOUND") + ": " + file, "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
+			logger.debug("File not found: " + tmpfile);
+            JOptionPane.showMessageDialog(f, CurrentLocale.getString("FILE_NOT_FOUND") + ": " + tmpfile, "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
         }
         catch (Exception e) {
 			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));				
