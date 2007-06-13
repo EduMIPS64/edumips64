@@ -128,7 +128,7 @@ public class Parser
 					error.add("INCLUDE_LOOP",0,0,"#include "+ data.substring(i+9, end ).trim() );
 					throw error;
 				}
-				String filename = data.substring(i+9, end).trim();
+				String filename = data.substring(i+9, end).split(";")[0].trim();
 				if (!(new File(filename)).isAbsolute())
 					filename = path + filename;
 				String filetmp = fileToString(new BufferedReader(new InputStreamReader(new FileInputStream(filename),"ISO-8859-1")));
@@ -165,7 +165,7 @@ public class Parser
 					end = filetmp.length();
 				}
 				edumips64.Main.logger.debug("Open by #include: " + filetmp.substring(i+9, end).trim());
-				String filename = filetmp.substring(i+9, end).trim();
+				String filename = filetmp.substring(i+9, end).split(";")[0].trim();
 				if (!(new File(filename)).isAbsolute())
 					filename = path + filename;
 				filetmp = filetmp.substring(0,i) + fileToString (new BufferedReader(new InputStreamReader(new FileInputStream(filename)
@@ -190,6 +190,8 @@ public class Parser
 		this.filename = filename;
 		int oldindex = 0;
 		int index = 0;
+		
+		filename = new File(filename).getAbsolutePath() ;
 		while ((index = filename.indexOf(File.separator,index)) != -1 )
 		{
 			oldindex = index;
