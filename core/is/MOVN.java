@@ -51,6 +51,7 @@ class MOVN extends ALU_RType
 
     public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException 
     {
+        /*
         //getting strings from temporary registers
         String rs=TR[RS_FIELD].getBinString();
         String rt=TR[RT_FIELD].getBinString();
@@ -66,11 +67,18 @@ class MOVN extends ALU_RType
                 break;
             }
         }
-	if(enableForwarding)
-	{
-		doWB();
-	}
-	
+        */
+
+        if(TR[RT_FIELD].getValue() != 0) {
+            edumips64.Main.logger.debug("Executing MOVN, rt != 0 => rd <- rs");
+            TR[RD_FIELD].setBits(TR[RS_FIELD].getBinString(), 0);
+        }
+
+        if(enableForwarding)
+        {
+            doWB();
+        }
+
     }
     
 

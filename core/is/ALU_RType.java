@@ -62,6 +62,7 @@ public abstract class ALU_RType extends ALUInstructions {
         TR[RT_FIELD]=rt;
         //locking the destination register
         Register rd=cpu.getRegister(params.get(RD_FIELD));
+        TR[RD_FIELD]=rd;
         rd.incrWriteSemaphore(); 
     }
 
