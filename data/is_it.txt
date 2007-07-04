@@ -4,12 +4,6 @@ INSTRUCTION SET EDUMIPS64
 Guida veloce all'instruction set di EduMIPS64. Alcune descrizioni sono prese dal 
 manuale MIPS64. Fateci sapere se questo e' un problema, e le rimuoveremo.
 
-Istruzione AND 
-
-Sintassi: AND rd, rs, rt 
-Descrizione: rd = rs and rt
-            Effettua un AND logico bit a bit tra il registro rs ed il registro rt.
-            Mette il risultato nel registro rd.
 
 Istruzione ADD
 
@@ -41,6 +35,13 @@ Descrizione: rd = rs + rt
             il risultato e' memorizzato nel registro rd.
             Non si verificano eccezioni di overflow.
 			
+Istruzione AND 
+
+Sintassi: AND rd, rs, rt 
+Descrizione: rd = rs and rt
+            Effettua un AND logico bit a bit tra il registro rs ed il registro rt.
+            Mette il risultato nel registro rd.
+
 Istruzione ANDI 
 
 Sintassi: ANDI rt, rs, immediato
