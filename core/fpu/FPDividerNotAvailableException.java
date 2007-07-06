@@ -1,4 +1,4 @@
-/* StructuralHazardException.java
+/* FPDividerNotAvailableException.java
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -17,11 +17,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package edumips64.core;
+package edumips64.core.fpu;
 
-/* This exception is launched when an resource (Memory or Divider) would be employed
- * by lots of instructions
+/* This exception is launched when we would insert a DIV.fmt into the divider
+ * when it is filled by another DIV.fmt instruction
  *
  * @author Massimo Trubia 
  */
-public class StructuralHazardException extends Exception{}
+public class FPDividerNotAvailableException extends Exception{}

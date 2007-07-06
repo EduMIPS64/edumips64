@@ -214,7 +214,7 @@ public abstract class Instruction {
      * In this method all instructions that modify GPRs lock the involved register
      *</pre>
      **/
-    public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException,HaltException,JumpException, BreakException;
+    public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException,HaltException,JumpException, BreakException,WAWException;
     
     /**
      * <pre>

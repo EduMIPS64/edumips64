@@ -149,7 +149,10 @@ public class GUIConfig extends JDialog{
 		addRow(panel,row++, "EXColor",new JButton());
 		addRow(panel,row++, "MEMColor",new JButton());	
 		addRow(panel,row++, "WBColor",new JButton());
-                addRow(panel,row++, "show_aliases",new JCheckBox()); 
+        addRow(panel,row++, "show_aliases",new JCheckBox()); 
+		addRow(panel,row++, "FPAdderColor",new JButton());
+		addRow(panel,row++, "FPMultiplierColor",new JButton());
+		addRow(panel,row++, "FPDividerColor",new JButton());
 
 
 		// fill remaining vertical space

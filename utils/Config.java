@@ -47,6 +47,9 @@ public class Config{
 			config.put("IDColor",new Color(0,120,240));
 			config.put("EXColor",Color.red);
 			config.put("MEMColor",Color.green);
+			config.put("FPAdderColor",new Color(0,128,0));
+			config.put("FPMultiplierColor",new Color(0,128,128));
+			config.put("FPDividerColor",new Color(128,128,0));
 			config.put("WBColor",Color.magenta.darker());
 			config.put("RAWColor",Color.blue.brighter());
 			config.put("SAMEIFColor",new Color(150,150,180));

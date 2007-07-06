@@ -46,7 +46,7 @@ public abstract class ALUInstructions extends Instruction {
             e.printStackTrace();
         }
     }
-    public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException;
+    public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,WAWException;
     public abstract void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException,IrregularWriteOperationException,DivisionByZeroException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, FPDivideByZeroException;
     public abstract void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException;
     public abstract void WB() throws IrregularStringOfBitsException;

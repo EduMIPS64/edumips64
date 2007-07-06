@@ -1,7 +1,4 @@
-/* RAWHazardException.java
- *
- * Exception thrown when trying to get a MemoryElement that does not exists.
- * (c) 2006 CPU Group
+/* OutputStructuralHazardException.java
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -22,4 +19,10 @@
  */
 package edumips64.core;
 
-public class RAWHazardException extends Exception{}
+/* This exception is launched when lots of instructions would use the Memory at the same time
+ * (for example when two FP instructions finished at the same time or an FP instruction
+ * finish when an integer instruction is passing from the EX to the MEM stage)
+ *
+ * @author Massimo Trubia 
+ */
+public class OutputStructuralHazardException extends Exception{}

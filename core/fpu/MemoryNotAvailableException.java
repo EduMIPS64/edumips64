@@ -1,4 +1,4 @@
-/* WAWHazardException.java
+/* MemoryNotAvailableException.java
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -17,11 +17,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package edumips64.core;
+package edumips64.core.fpu;
 
-/* This exception is launched when an instruction is stalled because it must write
- * a register only after another instruction writes it
+/* This exception is launched when multiple instructions would fill the MEM stage instead
+ * of the fact only one can fill it
  *
  * @author Massimo Trubia 
  */
-public class WAWHazardException extends Exception{}
+public class MemoryNotAvailableException extends Exception{}

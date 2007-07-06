@@ -52,7 +52,7 @@ public abstract class FPArithmeticInstructions extends ALUInstructions {
         paramCount=3;         
     }
 
-    public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+    public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, WAWException {
         //if source registers are valid passing their own values into temporary registers
         RegisterFP fs=cpu.getRegisterFP(params.get(FS_FIELD));
         RegisterFP ft=cpu.getRegisterFP(params.get(FT_FIELD));
@@ -62,15 +62,15 @@ public abstract class FPArithmeticInstructions extends ALUInstructions {
         TRfp[FT_FIELD]=ft;
         //locking the destination register
         RegisterFP fd=cpu.getRegisterFP(params.get(FD_FIELD));
+	if(fd.getWriteSemaphore()>0)
+		throw new WAWException();
         fd.incrWriteSemaphore(); 
-	fd.incrReadSemaphore();
     }
 
     public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException,IrregularWriteOperationException,DivisionByZeroException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, FPDivideByZeroException {
     }
 
     public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
-        cpu.getRegisterFP(params.get(FD_FIELD)).decrReadSemaphore();    	    
     }
 
     public void WB() throws IrregularStringOfBitsException 

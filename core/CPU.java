@@ -41,7 +41,9 @@ public class CPU
 	private RegisterFP[] fpr;
 	public enum FPExceptions {INVALID_OPERATION,DIVIDE_BY_ZERO,UNDERFLOW,OVERFLOW};
 	private Map<FPExceptions,Boolean> fpEnabledExceptions;
-	public static List<String> knownFPInstructions;
+	public static List<String> knownFPInstructions; // set of Floating point instructions that must pass through the FPU pipeline
+	private FPPipeline fpPipe;
+	private List<String> terminatingInstructionsOPCodes;
 
     /** Program Counter*/
 	private Register pc,old_pc;
@@ -85,7 +87,7 @@ public class CPU
 	private static CPU cpu;
 
 	/** Statistics */
-	private int cycles, instructions, RAWStalls; 
+	private int cycles, instructions, RAWStalls, WAWStalls, dividerStalls,funcUnitStalls,memoryStalls; 
 
 	/** Static initializer */
 	static {
@@ -119,6 +121,8 @@ public class CPU
 		fpr=new RegisterFP[32];
 		for(int i=0;i<32;i++)
 			fpr[i]=new RegisterFP();
+		fpPipe= new FPPipeline();
+		fpPipe.reset();
 
 		// Pipeline initialization
 		pipe = new HashMap<PipeStatus, Instruction>();
@@ -139,6 +143,10 @@ public class CPU
 		knownFPInstructions.add("SUB.D");
 		knownFPInstructions.add("MUL.D");
 		knownFPInstructions.add("DIV.D");
+		
+		terminatingInstructionsOPCodes = new LinkedList();
+		terminatingInstructionsOPCodes.add("0000000C"); // syscall 0
+		terminatingInstructionsOPCodes.add("04000000"); // halt
 		
 		logger.info("CPU Created.");
 		
@@ -210,6 +218,21 @@ public class CPU
     {
 	    return fpr[index];
     }
+
+/** Returns true if the specified functional unit is filled by an instruction, false when the contrary happens.
+ *  No controls are carried out on the legality of parameters, for mistaken parameters false is returned
+ *  @param funcUnit The functional unit to check. Legal values are "ADDER", "MULTIPLIER", "DIVIDER"
+ *  @param stage The integer that refers to the stage of the functional unit. 
+ *			ADDER [1,4], MULTIPLIER [1,7], DIVIDER [any] */
+    public boolean isFuncUnitFilled(String funcUnit, int stage)
+    {
+	   return fpPipe.isFuncUnitFilled(funcUnit, stage);
+    }
+    
+    public int getDividerCounter()
+    {
+	    return fpPipe.getDividerCounter();
+    }
     
     public Map<PipeStatus, Instruction> getPipeline()
     {
@@ -236,6 +259,22 @@ public class CPU
 	public int getRAWStalls() {
 		return RAWStalls;
 	}
+	
+	/** Returns the number of WAW stalls that happened inside the pipeline
+	 * @return an integer
+	 */
+	public int getWAWStalls() {
+		return WAWStalls;
+	}
+/*	
+	** Returns the number of Structural Stalls that happened inside the pipeline
+	 * @ return an integer
+	 *
+	public int getSructuralStalls(){
+		return StructuralStalls;
+	}
+*/
+	
 //FPU methods	
 	/** Sets the floating point unit enabled exceptions
 	 *  @param the exception name to set
@@ -256,13 +295,15 @@ public class CPU
     /** This method performs a single pipeline step
     * @throws RAWHazardException when a RAW hazard is detected
     */
-    public void step() throws IntegerOverflowException, AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, FPInvalidOperationException, FPExponentTooLargeException, FPUnderflowException, FPOverflowException, FPDivideByZeroException
+    public void step() throws IntegerOverflowException, AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, FPInvalidOperationException, FPExponentTooLargeException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, WAWException, MemoryNotAvailableException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException
 	{
 		/* The integer "breaking" is used to keep track of the BREAK
 		 * instruction. When the BREAK instruction enters ID, the BreakException
 		 * is thrown. We continue the normal cpu step flow, and at the end of
 		 * this flow the BreakException is re-thrown.
 		 */
+		boolean SIMUL_MODE_ENABLED=true;
+		boolean SIMUL_MODE_DISABLED=false;
 		int breaking = 0;
 
 		// Used for exception handling
@@ -280,7 +321,9 @@ public class CPU
 			// Let's execute the WB() method of the instruction located in the 
 			// WB pipeline status
 			if(pipe.get(PipeStatus.WB)!=null) {
-				pipe.get(PipeStatus.WB).WB();
+				//if the fpPipe is working any WB stage of a terminating instruction cannot be executed
+				if(fpPipe.isEmpty() || (!fpPipe.isEmpty() && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.WB).getRepr().getHexString())))
+					pipe.get(PipeStatus.WB).WB();
 				if(!pipe.get(PipeStatus.WB).getName().equals(" "))
 					instructions++;
 			}
@@ -295,8 +338,13 @@ public class CPU
 			if(pipe.get(PipeStatus.MEM)!=null)
 				pipe.get(PipeStatus.MEM).MEM();
 			pipe.put(PipeStatus.WB, pipe.get(PipeStatus.MEM));
+			pipe.put(PipeStatus.MEM,null);
 
+//FPU			//if there will be an OutputStructuralStall the EX() method cannot be called
+			//because the integer instruction in EX cannot be moved
 			// EX
+		if(fpPipe.getInstruction(SIMUL_MODE_ENABLED)==null)
+		{
 			try {
 				// Handling synchronous exceptions
 				currentPipeStatus = PipeStatus.EX;
@@ -319,12 +367,91 @@ public class CPU
 				}
 			}
 			pipe.put(PipeStatus.MEM, pipe.get(PipeStatus.EX));
+			pipe.put(PipeStatus.EX,null);
+		}
+		else
+		{
+			//a structural stall has to be raised if EX stage contains an instruction different from a bubble or other fu's contain instructions (counter of structural stalls must be incremented)
+			if((pipe.get(PipeStatus.EX)!=null && !(pipe.get(PipeStatus.EX).getName().compareTo(" ")==0)) || fpPipe.getNReadyToExitInstr()>1)
+				memoryStalls++;	
 
-			// ID
+			//the fpPipe is issuing an instruction and the EX method has to be called on it
+			Instruction instr;
+			//call EX
+			instr=fpPipe.getInstruction(SIMUL_MODE_DISABLED);
+
+			try {
+				// Handling synchronous exceptions
+				currentPipeStatus = PipeStatus.EX;
+				instr.EX();
+			}
+			catch (SynchronousException e) {
+				if(masked)
+					logger.info("[MASKED] " + e.getCode());
+				else {
+					if(terminate) {
+						logger.info("Terminating due to an unmasked exception");
+						throw new SynchronousException(e.getCode());
+					}
+					else
+						// We must complete this cycle, but we must notify the user.
+						// If the syncex string is not null, the CPU code will throw
+						// the exception at the end of the step
+						syncex = e.getCode();
+				}
+			}
+			pipe.put(PipeStatus.MEM, instr);
+			pipe.put(PipeStatus.EX,null);			
+		}
+			
+		//shifting instructions in the fpPipe
+		fpPipe.step();	
+			
+		// ID
 			currentPipeStatus = PipeStatus.ID;
 			if(pipe.get(PipeStatus.ID)!=null)
-				pipe.get(PipeStatus.ID).ID();
-			pipe.put(PipeStatus.EX, pipe.get(PipeStatus.ID));
+			{
+				//if an FP instruction fills the ID stage a checking for InputStructuralStall must be performed before the ID() invocation.
+				//This operation is carried out by checking if the fpPipe could accept the instruction we would insert in it (2nd condition)
+				if(knownFPInstructions.contains(pipe.get(PipeStatus.ID).getName()))
+				{
+					//it is an FPArithmetic and it must be inserted in the fppipe
+					//the fu is free
+					if(fpPipe.putInstruction(pipe.get(PipeStatus.ID),SIMUL_MODE_ENABLED)==0)
+					{
+						if(fpPipe.isEmpty() || (!fpPipe.isEmpty() && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())))
+							pipe.get(PipeStatus.ID).ID();
+						fpPipe.putInstruction(pipe.get(PipeStatus.ID),SIMUL_MODE_DISABLED);
+						pipe.put(PipeStatus.ID,null);
+					}
+					else //the fu is filled by another instruction
+					{
+						if(pipe.get(PipeStatus.ID).getName().compareToIgnoreCase("DIV.D")==0)
+							throw new FPDividerNotAvailableException();
+						else
+							throw new FPFunctionalUnitNotAvailableException();
+					}
+				}
+				//if an integer instruction or an FP instruction that will not pass through the FP pipeline fills the ID stage a checking for
+				//InputStructuralStall (second type) must be performed. We must control if the EX stage is filled by another instruction
+				else
+				{
+					if(pipe.get(PipeStatus.EX)==null)
+					{
+						if(fpPipe.isEmpty() || (!fpPipe.isEmpty() && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())))
+							pipe.get(PipeStatus.ID).ID();
+						pipe.put(PipeStatus.EX,pipe.get(PipeStatus.ID));
+						pipe.put(PipeStatus.ID,null);	
+					}
+					else// the EX stage is filled by another instruction
+					{
+						throw new MemoryNotAvailableException();
+					}
+				}
+				
+			}
+			
+	
 
 			// IF
 			// We don't have to execute any methods, but we must get the new 
@@ -357,6 +484,9 @@ public class CPU
 			}
 			if(syncex != null)
 				throw new SynchronousException(syncex);
+			
+//DEBUG
+			logger.info(fpPipe.toString());
 		}
 		catch(JumpException ex)
 		{
@@ -387,6 +517,36 @@ public class CPU
 			if(syncex != null)
 				throw new SynchronousException(syncex);
 
+		}
+//FPU
+		catch(WAWException ex)
+		{
+			logger.info(fpPipe.toString());			
+			if(currentPipeStatus == PipeStatus.ID)
+					pipe.put(PipeStatus.EX, Instruction.buildInstruction("BUBBLE"));
+
+			WAWStalls++;
+			if(syncex != null)
+				throw new SynchronousException(syncex);
+		}
+		catch(FPDividerNotAvailableException ex)
+		{
+			if(currentPipeStatus == PipeStatus.ID)
+					pipe.put(PipeStatus.EX, Instruction.buildInstruction("BUBBLE"));
+
+			dividerStalls++;
+			if(syncex != null)
+				throw new SynchronousException(syncex);
+			
+		}
+		catch(FPFunctionalUnitNotAvailableException ex)
+		{
+			if(currentPipeStatus == PipeStatus.ID)
+					pipe.put(PipeStatus.EX, Instruction.buildInstruction("BUBBLE"));
+
+			funcUnitStalls++;
+			if(syncex != null)
+				throw new SynchronousException(syncex);
 		}
 		catch(SynchronousException ex) {
 			logger.info("Exception: " + ex.getCode());
@@ -438,6 +598,9 @@ public class CPU
 		cycles = 0;
 		instructions = 0;
 		RAWStalls = 0;
+		dividerStalls = 0;
+		funcUnitStalls = 0;
+		memoryStalls = 0; 
 
 		// Reset dei registri
         for(int i = 0; i < 32; i++)
@@ -460,6 +623,8 @@ public class CPU
 
 		// Reset pipeline
         clearPipe();
+		// Reset FP pipeline
+	fpPipe.reset();
 
 		// Reset Symbol table
         symTable.reset();
