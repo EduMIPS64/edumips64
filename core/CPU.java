@@ -266,14 +266,22 @@ public class CPU
 	public int getWAWStalls() {
 		return WAWStalls;
 	}
-/*	
-	** Returns the number of Structural Stalls that happened inside the pipeline
+	
+	/** Returns the number of Structural Stalls (Divider not available) that happened inside the pipeline
 	 * @ return an integer
-	 *
-	public int getSructuralStalls(){
-		return StructuralStalls;
+	 */
+	public int getStructuralStallsDivider(){
+		return dividerStalls;
 	}
-*/
+	
+	/** Returns the number of Structural Stalls (Memory not available) that happened inside the pipeline
+	 * @ return an integer
+	 */
+	public int getStructuralStallsMemory(){
+		return memoryStalls;
+	}
+	
+
 	
 //FPU methods	
 	/** Sets the floating point unit enabled exceptions
