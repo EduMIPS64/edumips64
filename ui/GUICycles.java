@@ -166,6 +166,11 @@ public class GUICycles extends GUIComponent {
 								flag[2]=true;
 						}
 
+						//si deve scandire lista e per le istruzioni floating point in ID o in RAW o in WAW o in stallo strutturale aggiungere lo stato successivo (a seconda che sia addizione,moltipl, o divisione)
+
+					
+						
+
 						if( (tempo>1) && (instr[1]!= null) ){
 
 							if(instr[1].getName()!=" "){
@@ -213,7 +218,7 @@ public class GUICycles extends GUIComponent {
 								}
 							}
 						}
-
+						
 					}
 					else{
 						lista.clear();
