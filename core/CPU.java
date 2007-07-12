@@ -44,7 +44,7 @@ public class CPU
 	public static List<String> knownFPInstructions; // set of Floating point instructions that must pass through the FPU pipeline
 	private FPPipeline fpPipe;
 	private List<String> terminatingInstructionsOPCodes;
-	private long serialNumberSeed; //is used for numerating instructions so that they are unambiguous in the pipelines
+	private long serialNumberSeed; //is used for numerating instructions so that they are unambiguous into the pipelines
 
     /** Program Counter*/
 	private Register pc,old_pc;
@@ -99,7 +99,7 @@ public class CPU
 		//instructions enumerating
 		serialNumberSeed=0;
 		// To avoid future singleton problems
-//		Instruction dummy = Instruction.buildInstruction("BUBBLE");
+		Instruction dummy = Instruction.buildInstruction("BUBBLE");
 
 		logger.info("Creating the CPU...");
 		cycles = 0;
@@ -233,6 +233,17 @@ public class CPU
 	   return fpPipe.isFuncUnitFilled(funcUnit, stage);
     }
     
+    /** Returns true if the pipeline is empty. In this case, if CPU is in stopping state
+     *  we can halt the pipeline. The sufficient condition in order to return true is that fpPipe doesn't work
+     *	and it hadn't issued any instrution now in the MEM stage */
+    public boolean isPipelinesEmpty()
+    {
+	    boolean empty=true;
+	    empty=empty && (pipe.get(PipeStatus.MEM)==null || pipe.get(PipeStatus.MEM).getName()==" ");
+	    empty=empty && fpPipe.isEmpty();
+	    return empty;
+    }
+    
 /** Returns the instruction of the specified functional unit , null if it is empty.
  *  No controls are carried out on the legality of parameters, for mistaken parameters null is returned
  *  @param funcUnit The functional unit to check. Legal values are "ADDER", "MULTIPLIER", "DIVIDER"
@@ -311,7 +322,6 @@ public class CPU
 	public int getStructuralStallsFuncUnit(){
 		return funcUnitStalls;
 	}
-
 	
 	/** Returns a legal serial number in order to numerate a new instruction
 	 */
@@ -400,11 +410,26 @@ public class CPU
 			// Let's execute the WB() method of the instruction located in the 
 			// WB pipeline status
 			if(pipe.get(PipeStatus.WB)!=null) {
-				//if the fpPipe is working any WB stage of a terminating instruction cannot be executed
-				if(fpPipe.isEmpty() || (!fpPipe.isEmpty() && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.WB).getRepr().getHexString())))
+				boolean terminatorInstrInWB= terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.WB).getRepr().getHexString());
+				//we have to execute the WB method only if some conditions occur
+				boolean notWBable=false;
+				//the current instruction in WB is a terminating instruction and the fpPipe is working
+				notWBable=notWBable || (terminatorInstrInWB && !fpPipe.isEmpty());
+				//the current instruction in WB is a terminating instruction, the fpPipe doesn't work because it has just issued an instruction and it is in the MEM stage
+				notWBable=notWBable || (terminatorInstrInWB && fpPipe.isEmpty() && pipe.get(PipeStatus.MEM).getName()!=" ");
+				if(!notWBable)
 					pipe.get(PipeStatus.WB).WB();
+				
 				if(!pipe.get(PipeStatus.WB).getName().equals(" "))
 					instructions++;
+				
+				//if the pipeline is empty and it is into the stopping state (because a long latency instruction was executed) we can halt the cpu when computations finished
+				if(isPipelinesEmpty() && getStatus()==CPUStatus.STOPPING)
+				{
+					setStatus(CPU.CPUStatus.HALTED);
+					throw new HaltException();
+				}
+				
 			}
 
 			// We put null in WB, in order to avoid that an exception thrown in 
@@ -480,7 +505,6 @@ public class CPU
 				}
 			}
 			pipe.put(PipeStatus.MEM, instr);
-			//pipe.put(PipeStatus.EX,null);			
 		}
 			
 		//shifting instructions in the fpPipe
@@ -566,6 +590,10 @@ public class CPU
 			}
 			if(syncex != null)
 				throw new SynchronousException(syncex);
+
+			
+
+			
 			
 //DEBUG
 			//logger.info(fpPipe.toString());

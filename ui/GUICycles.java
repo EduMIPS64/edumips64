@@ -2,7 +2,7 @@
  *
  * This class draw the cycles component. It gives a representation of the timing 
  * behaviour of the pipeline.
- * (c) 2006 Filippo Mondello
+ * (c) 2006 Filippo Mondello, Trubia Massimo (FPU modifications)
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -268,40 +268,42 @@ public class GUICycles extends GUIComponent {
 							else
 								flag[1]=true;
 							 */
-							int index= searchListaBySerialNumber(instr[1].getSerialNumber());		
-							if(!inputStallOccurred)
-								if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-									lista.get(index).addStato("ID");
-								else
-								{
-									//the instruction in ID is a bubble because the CPU was stopped from a terminating instruction
+							if(instr[1].getName()!=" "){
+								int index= searchListaBySerialNumber(instr[1].getSerialNumber());		
+								if(!inputStallOccurred)
+									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
+										lista.get(index).addStato("ID");
+									else
+									{
+										//the instruction in ID is a bubble because the CPU was stopped from a terminating instruction
 									
-								}	
-							if(RAWStallOccurred)
-							{
-								if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-									lista.get(index).addStato("RAW");
-							}
-							if(WAWStallOccurred)
-							{
-								if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-									lista.get(index).addStato("WAW");
-							}
-							if(structStallDividerOccured)
-							{
-								if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-									lista.get(index).addStato("StDiv");
-							}
-							if(structStallEXOccurred)
-							{
-								if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-									lista.get(index).addStato("StEx");
-							}
-							if(structStallsFuncUnitOccurred)
-							{
-								if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-									lista.get(index).addStato("StFun");
-							}
+									}	
+								if(RAWStallOccurred)
+								{
+									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
+										lista.get(index).addStato("RAW");
+								}
+								if(WAWStallOccurred)
+								{
+									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
+										lista.get(index).addStato("WAW");
+								}
+								if(structStallDividerOccured)
+								{
+									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
+										lista.get(index).addStato("StDiv");
+								}
+								if(structStallEXOccurred)
+								{
+									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
+										lista.get(index).addStato("StEx");
+								}
+								if(structStallsFuncUnitOccurred)
+								{
+									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
+										lista.get(index).addStato("StFun");
+								}
+							}	
 							
 						}
 
@@ -328,10 +330,11 @@ public class GUICycles extends GUIComponent {
 							*/
 							if(!inputStallOccurred)
 							{
+								//we must instanciate a new ElementoCiclo only if the CPU is running or there was a JumpException and the the IF instruction was changed
 								if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
 								{
 									lista.add(new ElementoCiclo(instr[0].getFullName(),tempo,instr[0].getSerialNumber()));
-									//n_instr++;
+									n_instr++;
 								}
 							}
 							else
