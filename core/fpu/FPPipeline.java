@@ -121,6 +121,63 @@ public class FPPipeline {
 		
 		return false;
 	}
+	/** Returns the instruction of the specified functional unit , null if it is empty.
+	 *  No controls are carried out on the legality of parameters, for mistaken parameters null is returned
+	 *  @param funcUnit The functional unit to check. Legal values are "ADDER", "MULTIPLIER", "DIVIDER"
+	 *  @param stage The integer that refers to the stage of the functional unit. 
+	 *			ADDER [1,4], MULTIPLIER [1,7], DIVIDER [any] */
+	
+	public Instruction getInstructionByFuncUnit(String funcUnit, int stage)
+	{
+		if(funcUnit.compareToIgnoreCase("ADDER")==0)
+			switch(stage)
+			{
+				case 1:
+					return (adder.getFuncUnit().get(FPAdderStatus.A1)); 
+				case 2:
+					return (adder.getFuncUnit().get(FPAdderStatus.A2));
+				case 3:
+					return (adder.getFuncUnit().get(FPAdderStatus.A3));
+				case 4:
+					return (adder.getFuncUnit().get(FPAdderStatus.A4));
+			}
+		if(funcUnit.compareToIgnoreCase("MULTIPLIER")==0)
+			switch(stage)
+			{
+				case 1:
+					return (multiplier.getFuncUnit().get(FPMultiplierStatus.M1));
+				case 2:
+					return (multiplier.getFuncUnit().get(FPMultiplierStatus.M2));
+				case 3:
+					return (multiplier.getFuncUnit().get(FPMultiplierStatus.M3));
+				case 4:
+					return (multiplier.getFuncUnit().get(FPMultiplierStatus.M4));
+				case 5:
+					return (multiplier.getFuncUnit().get(FPMultiplierStatus.M5));
+				case 6:
+					return (multiplier.getFuncUnit().get(FPMultiplierStatus.M6));
+				case 7:
+					return (multiplier.getFuncUnit().get(FPMultiplierStatus.M7));
+			}
+		if(funcUnit.compareToIgnoreCase("DIVIDER")==0)
+			return (divider.getFuncUnit());
+		
+		return null;
+	}
+	/** Returns the stage's name of the instruction passed as serialNumber between this values
+	 *  A1,A2,A3,A4,M1,M2,M3,M4,M5,M6,M7,DIVXX, in wich XX means the divider's counter value
+	 *  If the FP pipe doesn't contain the instruction null is returned */
+	public String getInstructionStage(long serialNumber)
+	{
+		String stage;
+		if ((stage=adder.getInstructionStage(serialNumber))!=null)
+			return stage;
+		else if((stage=multiplier.getInstructionStage(serialNumber))!=null)
+			return stage;
+		else if((stage=divider.getInstructionStage(serialNumber))!=null)
+			return stage;
+		return null;
+	}
 	
 	/** Inserts the passed instruction into the right functional unit. If no errors occur
 	 *  0 is returned, else, if we want to insert an ADD.fmt, MUL.fmt, SUB.fmt  and 
@@ -134,8 +191,9 @@ public class FPPipeline {
 		cpu=CPU.getInstance();
 		if(cpu.knownFPInstructions.contains(instr.getName()) && instr!=null)
 		{
-			if(!simulation)
-				entryQueue.offer(instr);
+			//only for aging mechanism
+			//if(!simulation)
+			//	entryQueue.offer(instr);
 			String instrName=instr.getName();
 			if((instrName.compareToIgnoreCase("ADD.D")==0) || (instrName.compareToIgnoreCase("SUB.D")==0))
 				if(adder.putInstruction(instr,simulation)==-1)
@@ -177,6 +235,7 @@ public class FPPipeline {
 			
 		     
 			//Retrieves, and remove from a temporary queue info about the oldest instruction entered in the pipeline
+	/*--------- WITH AGING MECHANISM
 			Instruction oldestInstr=null;
 			if(simulation)
 				oldestInstr=entryQueue.peek();
@@ -214,7 +273,35 @@ public class FPPipeline {
 				}
 					
 			}
-
+	---------------------*/
+			//WITHOUT AGING MECHANISM (order for exiting from the pipeline (Divider, Multiplier, Adder)
+				if(instr_div!=null)
+				{
+					if(!simulation)
+					{
+						divider.removeLast();
+						nInstructions--;
+					}
+					return instr_div;
+				}
+				if(instr_mult!=null)
+				{	
+					if(!simulation)
+					{
+						multiplier.removeLast();
+						nInstructions--;
+					}
+					return instr_mult;
+				}				
+				if(instr_adder!=null)
+				{
+					if(!simulation)
+					{
+						adder.removeLast();
+						nInstructions--;
+					}
+					return instr_adder;
+				}
 
 			
 			
@@ -480,7 +567,37 @@ public class FPPipeline {
 				multiplier.put(FPPipeline.FPMultiplierStatus.M2,multiplier.get(FPPipeline.FPMultiplierStatus.M1));
 				multiplier.put(FPPipeline.FPMultiplierStatus.M1,null);
 			}
-		}	
+		}
+		
+		public String getInstructionStage(long serialNumber)
+		{
+			Instruction instr;
+			if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M1))!=null)
+				if(instr.getSerialNumber()==serialNumber)
+					return "M1";
+			else if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M2))!=null)
+				if(instr.getSerialNumber()==serialNumber)
+					return "M2";
+			else if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M3))!=null)
+				if(instr.getSerialNumber()==serialNumber)
+					return "M3";
+			else if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M4))!=null)
+				if(instr.getSerialNumber()==serialNumber)
+					return "M4";
+			else if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M5))!=null)
+				if(instr.getSerialNumber()==serialNumber)
+					return "M5";
+			else if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M6))!=null)
+				if(instr.getSerialNumber()==serialNumber)
+					return "M6";
+			else if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M7))!=null)
+				if(instr.getSerialNumber()==serialNumber)
+					return "M7";
+			
+			return null;
+		}
+		
+
 	}
 	
 	/** This class models the 4 steps floating point adder*/
@@ -591,7 +708,24 @@ public class FPPipeline {
 			}
 		}
 		
+		public String getInstructionStage(long serialNumber)
+		{
+			Instruction instr;
+			if((instr=adder.get(FPPipeline.FPAdderStatus.A1))!=null)
+				if(instr.getSerialNumber()==serialNumber)
+					return "A1";
+			else if((instr=adder.get(FPPipeline.FPAdderStatus.A2))!=null)
+				if(instr.getSerialNumber()==serialNumber)
+					return "A2";
+			if((instr=adder.get(FPPipeline.FPAdderStatus.A3))!=null)
+				if(instr.getSerialNumber()==serialNumber)
+					return "A3";
+			if((instr=adder.get(FPPipeline.FPAdderStatus.A4))!=null)
+				if(instr.getSerialNumber()==serialNumber)
+					return "A4";
+			return null;
 		
+		}
 	}
 	
 	/** This class models the 24 steps floating point divider, instructions are not pipelined
@@ -733,6 +867,17 @@ public class FPPipeline {
 		{
 			this.instr=null;
 			this.counter=0;
+		}
+		
+		public String getInstructionStage(long serialNumber)
+		{
+			if(instr!=null)
+				if(instr.getSerialNumber()==serialNumber)
+					if(counter>9)
+						return "DIV" + counter;
+					else
+						return "DIV0" + counter;
+			return null;
 		}
 		
 	}
