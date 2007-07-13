@@ -332,6 +332,7 @@ public class CPU
 
 	/** Returns the stage's name of the instruction passed as serialNumber between this values
 	 *  ID,EX,MEM,WB, A1,A2,A3,A4,M1,M2,M3,M4,M5,M6,M7,DIVXX in which XX means the FP Divider Counter*/
+	/*
 	public String getInstructionStage(long serialNumber)
 	{
 		String stage;
@@ -339,23 +340,23 @@ public class CPU
 		if((instr=pipe.get(PipeStatus.IF))!=null)
 			if(instr.getSerialNumber()==serialNumber)
 				return "IF";
-		else if((instr=pipe.get(PipeStatus.ID))!=null)
+		if((instr=pipe.get(PipeStatus.ID))!=null)
 			if(instr.getSerialNumber()==serialNumber)
 				return "ID";
-		else if((instr=pipe.get(PipeStatus.EX))!=null)
+		if((instr=pipe.get(PipeStatus.EX))!=null)
 			if(instr.getSerialNumber()==serialNumber)
 				return "EX";
-		else if((instr=pipe.get(PipeStatus.MEM))!=null)
+		if((instr=pipe.get(PipeStatus.MEM))!=null)
 			if(instr.getSerialNumber()==serialNumber)
 				return "MEM";
-		else if((instr=pipe.get(PipeStatus.WB))!=null)
+		if((instr=pipe.get(PipeStatus.WB))!=null)
 			if(instr.getSerialNumber()==serialNumber)
 				return "WB";
-		//checking for FP pipe
-		else return fpPipe.getInstructionStage(serialNumber);
-		return null;
+		//checking for FP pipe (may return null)
+		return fpPipe.getInstructionStage(serialNumber);
 	}
-
+	*/
+	 
 	/** Gets the stage's name of the instruction passed as serialNumber between this values
 	 * A1,A2,A3,A4,M1,M2,M3,M4,M5,M6,M7,DIVXX in which XX means the FP Divider Counter.
 	 * If the fpPipe doesn't contain that instruction null is returned*/

@@ -172,9 +172,9 @@ public class FPPipeline {
 		String stage;
 		if ((stage=adder.getInstructionStage(serialNumber))!=null)
 			return stage;
-		else if((stage=multiplier.getInstructionStage(serialNumber))!=null)
+		if((stage=multiplier.getInstructionStage(serialNumber))!=null)
 			return stage;
-		else if((stage=divider.getInstructionStage(serialNumber))!=null)
+		if((stage=divider.getInstructionStage(serialNumber))!=null)
 			return stage;
 		return null;
 	}
@@ -575,22 +575,22 @@ public class FPPipeline {
 			if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M1))!=null)
 				if(instr.getSerialNumber()==serialNumber)
 					return "M1";
-			else if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M2))!=null)
+			if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M2))!=null)
 				if(instr.getSerialNumber()==serialNumber)
 					return "M2";
-			else if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M3))!=null)
+			if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M3))!=null)
 				if(instr.getSerialNumber()==serialNumber)
 					return "M3";
-			else if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M4))!=null)
+			if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M4))!=null)
 				if(instr.getSerialNumber()==serialNumber)
 					return "M4";
-			else if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M5))!=null)
+			if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M5))!=null)
 				if(instr.getSerialNumber()==serialNumber)
 					return "M5";
-			else if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M6))!=null)
+			if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M6))!=null)
 				if(instr.getSerialNumber()==serialNumber)
 					return "M6";
-			else if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M7))!=null)
+			if((instr=multiplier.get(FPPipeline.FPMultiplierStatus.M7))!=null)
 				if(instr.getSerialNumber()==serialNumber)
 					return "M7";
 			
@@ -714,7 +714,7 @@ public class FPPipeline {
 			if((instr=adder.get(FPPipeline.FPAdderStatus.A1))!=null)
 				if(instr.getSerialNumber()==serialNumber)
 					return "A1";
-			else if((instr=adder.get(FPPipeline.FPAdderStatus.A2))!=null)
+			if((instr=adder.get(FPPipeline.FPAdderStatus.A2))!=null)
 				if(instr.getSerialNumber()==serialNumber)
 					return "A2";
 			if((instr=adder.get(FPPipeline.FPAdderStatus.A3))!=null)

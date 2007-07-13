@@ -166,4 +166,11 @@ public class Memory{
 			throw new HaltException();
 		}
     }
+    
+    /** This method returns the list of instructions in memory in order to be showed in the GUICode
+     */
+    public List<Instruction> getInstructions()
+    {
+	    return instructions;
+    }
 }
