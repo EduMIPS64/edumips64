@@ -137,11 +137,6 @@ public class CPU
 		
 		//FPU initialization
 		fpEnabledExceptions=new HashMap<FPExceptions,Boolean>();
-		fpEnabledExceptions.put(FPExceptions.DIVIDE_BY_ZERO,true);
-		fpEnabledExceptions.put(FPExceptions.INVALID_OPERATION,true);
-		fpEnabledExceptions.put(FPExceptions.OVERFLOW,true);
-		fpEnabledExceptions.put(FPExceptions.UNDERFLOW,true);
-		
 		knownFPInstructions=new LinkedList<String>();
 		knownFPInstructions.add("ADD.D");
 		knownFPInstructions.add("SUB.D");
@@ -399,6 +394,12 @@ public class CPU
 		// Used for exception handling
 		boolean masked = (Boolean)Config.get("syncexc-masked");
 		boolean terminate = (Boolean)Config.get("syncexc-terminate");
+
+		setFPExceptions(CPU.FPExceptions.INVALID_OPERATION,(Boolean)Config.get("INVALID_OPERATION"));
+		setFPExceptions(CPU.FPExceptions.OVERFLOW,(Boolean)Config.get("OVERFLOW"));
+		setFPExceptions(CPU.FPExceptions.UNDERFLOW,(Boolean)Config.get("UNDERFLOW"));
+		setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO,(Boolean)Config.get("DIVIDE_BY_ZERO"));
+		
 		String syncex = null;
 
 		if(status != CPUStatus.RUNNING && status != CPUStatus.STOPPING)

@@ -178,12 +178,6 @@ public class Main extends JApplet {
 
         f.setExtendedState(f.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	
-// FPU DIAGNOSTICS
-	//deactivating FPInvalidException
-	cpu.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION,false);
-	cpu.setFPExceptions(CPU.FPExceptions.OVERFLOW,false);
-	cpu.setFPExceptions(CPU.FPExceptions.UNDERFLOW,false);
-	cpu.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO,false);
 	
     }
 

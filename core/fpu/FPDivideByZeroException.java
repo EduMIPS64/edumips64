@@ -26,7 +26,8 @@ package edumips64.core.fpu;
  *  The addition or multiplication of two numbers may also give infinity as a result. 
  *  So to differentiate between the two cases, a divide-by-zero exception was implemented.
  */
-public class FPDivideByZeroException extends Exception{
-	public FPDivideByZeroException() {}
-	
+public class FPDivideByZeroException extends edumips64.core.SynchronousException{
+	public FPDivideByZeroException() {
+		super("FPDIVBYZERO");
+	}
 }

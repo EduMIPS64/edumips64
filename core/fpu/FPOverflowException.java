@@ -25,7 +25,8 @@ package edumips64.core.fpu;
 /** Exception thrown when a big double number cannot be represented on 64 bit according to IEEE754 standard
  * @author Trubia Massimo
  */
-public class FPOverflowException extends Exception{
-	public FPOverflowException() {}
-	
+public class FPOverflowException extends edumips64.core.SynchronousException{
+	public FPOverflowException() {
+		super("FPOVERFLOW");
+	}
 }

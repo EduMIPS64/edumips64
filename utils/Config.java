@@ -65,6 +65,13 @@ public class Config{
 			config.put("n_step",4);
 			config.put("sleep_interval",10);
             config.put("show_aliases",false); 
+			
+			//fpu exceptions configuration
+			config.put("INVALID_OPERATION",true);
+			config.put("OVERFLOW",true);
+			config.put("UNDERFLOW",true);
+			config.put("DIVIDE_BY_ZERO",true);
+			
 			// seed to generate a serial number for instructions
 			config.put("serialNumber",(long)0);
 		}

@@ -25,6 +25,7 @@
 package edumips64.ui;
 
 
+import edumips64.Main;
 import edumips64.utils.Config;
 import edumips64.core.*;
 import edumips64.core.is.*;
@@ -72,6 +73,7 @@ public class GUICycles extends GUIComponent {
 		pannello=new Panel1();
 		
 		jsp1=new JScrollPane(pannello);//pannello di destra
+//jsp1.setViewportView(pannello);				
 		dim=new Dimension(20,30);
 		pannello.setPreferredSize(dim);
 		
@@ -159,7 +161,7 @@ public class GUICycles extends GUIComponent {
 						}
 
 						//if there was stalls as RAW,WAW,EXNotAvailable,DividerNotAvailable, FuncUnitNotAvailable
-						//we cannot add  a new ElementoCiclo in "lista" and we must add tags as RAW, WAW, StEx,StDiv,StFun into the right instruction
+						//we cannot add  a new ElementoCiclo in "lista" and we must add tags as RAW, WAW, StEx,StDiv,StFun into the right instruction's state list
 						
 						//EX stage stalls
 						boolean RAWStallOccurred =(RAWStalls!=cpu.getRAWStalls());
@@ -396,11 +398,18 @@ public class GUICycles extends GUIComponent {
 		dim2.setSize(splitPane.getDividerLocation(),30+n_instr*15);
 		else
 		dim2.setSize(splitPane.getDividerLocation(),pannello2.getHeight());
+/*
+jsp1.setViewportView(pannello);	
+Main.logger.debug("altezza" + pannello.getBounds().height);
+Main.logger.debug("larghezza " +pannello.getBounds().width);
+jsp1.getViewport().setViewPosition(new Point(pannello.getBounds().width,pannello.getBounds().height));
+*/
+Main.logger.debug("\nlarghezza:" + pannello.getBounds().width + "altezza:" + pannello.getBounds().height);		
 		jsp1.getViewport().setViewSize(dim);
 		jsp2.getViewport().setViewSize(dim2);
 		jsp2.getViewport().setViewPosition(new Point(0,n_instr*15));
 		jsp1.getViewport().setViewPosition(new Point(tempo*30,n_instr*15));
-		
+
 		cont.repaint();
 	}
 	

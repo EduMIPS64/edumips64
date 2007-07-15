@@ -68,7 +68,7 @@ public class FPInstructionUtils
 	*/    
 	public static String doubleToBin(String value) throws FPExponentTooLargeException,FPOverflowException,FPUnderflowException
 	{
-		//if a special values is passed then the proper binary string is returned
+		//if a special value is passed then the proper binary string is returned
 		String old_value=value;
 		value=parseKeywords(value);
 		if(old_value.compareToIgnoreCase(value)!=0)
@@ -82,27 +82,28 @@ public class FPInstructionUtils
 		BigDecimal theZeroMinus= new BigDecimal(MINUSZERO_DEC);
 		BigDecimal theZeroPlus=new BigDecimal(PLUSZERO_DEC);
 		BigDecimal zero=new BigDecimal(0.0);
+		BigDecimal minuszero=new BigDecimal(-0.0);
 
 		//Check for overflow
 		if(value_bd.compareTo(theBiggest)==1 || value_bd.compareTo(theSmallest)==-1)
 		{
 			//exception
 			if(cpu.getFPExceptions(CPU.FPExceptions.OVERFLOW))
-				throw new FPOverflowException();
+				throw new FPOverflowException();			
 			if(value_bd.compareTo(theBiggest)==1)
 				return PLUSINFINITY;
 			if(value_bd.compareTo(theSmallest)==-1)
 				return MINUSINFINITY;
 		}
 		//Check for underflow
-		if(value_bd.compareTo(theZeroMinus)==1 && value_bd.compareTo(theZeroPlus)==-1)
+		if((value_bd.compareTo(theZeroMinus)==1 && value_bd.compareTo(theZeroPlus)==-1) && (value_bd.compareTo(zero)!=0 && value_bd.compareTo(minuszero)!=0))
 		{			
 			if(cpu.getFPExceptions(CPU.FPExceptions.UNDERFLOW))
 				throw new FPUnderflowException();
 			if(value_bd.compareTo(zero)==1)
 				return PLUSZERO;
 			if(value_bd.compareTo(zero)==-1)
-				return MINUSZERO;
+				return MINUSZERO;	
 		}
 	
 		String output= Long.toBinaryString(Double.doubleToLongBits(value_bd.doubleValue()));
@@ -212,6 +213,10 @@ public class FPInstructionUtils
 			cond1 =isNegativeInfinity(value1) && isNegativeInfinity(value2);
 			if(cond1)
 				return MINUSINFINITY;
+		
+		//(sign)Zero + (sign)Zero = (sign)Zero
+//			if(isZero(value1) && isZero(value2))
+//				return PLUSZERO;
 			
 		//+/- Infinity + (any value, inclusive PLUSZERO and MINUSZERO, except QNan/Snan)=+/- Infinity	
 			//in this point the (QNan/SNan) control is not necessary
@@ -313,6 +318,9 @@ public class FPInstructionUtils
 			cond1=!isInfinity(value1) && isNegativeInfinity(value2);
 			if(cond1) return PLUSINFINITY;
 			
+		//(sign)Zero + (sign)Zero = (sign)Zero
+//			if(isZero(value1) && isZero(value2))
+//				return PLUSZERO;			
 			
 			//at this point operands can be subtracted and if an overflow or an underflow occurs
 			//and if exceptions are activated then a trap happens else results are returned

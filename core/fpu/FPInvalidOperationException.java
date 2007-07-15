@@ -29,6 +29,8 @@ package edumips64.core.fpu;
  * 3) Multiplication: ± 0 × ± ?
  * 4) Division: ± 0/ ± 0 or ± ?/ ± ?
  */
-public class FPInvalidOperationException extends Exception{
-	public FPInvalidOperationException() {}	
+public class FPInvalidOperationException  extends edumips64.core.SynchronousException{
+	public FPInvalidOperationException() {
+		super("FPINVALID");
+	}
 }

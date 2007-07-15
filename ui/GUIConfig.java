@@ -41,23 +41,26 @@ public class GUIConfig extends JDialog{
 
 	String MAIN;
 	String APPEARANCE;
+	String FPUEXCEPTIONS;
 	String BEHAVIOR;
 	
 	JTabbedPane tabPanel;
 	JButton okButton;
 	HashMap<String,Object> updatedMap;
-	int width = 400, height = 250;	
+	int width = 450, height = 250;	
 	public GUIConfig(final JFrame owner){
 		super(owner, CurrentLocale.getString("Config.ITEM"), true);
 		MAIN = CurrentLocale.getString("Config.MAIN");
 		APPEARANCE = CurrentLocale.getString("Config.APPEARANCE");
 		BEHAVIOR = CurrentLocale.getString("Config.BEHAVIOR");
+		FPUEXCEPTIONS=CurrentLocale.getString("Config.FPUEXCEPTIONS");
 		updatedMap = new HashMap<String, Object>();
 		updatedMap.putAll(Config.getMap());
 
 		tabPanel = new JTabbedPane();
 		tabPanel.addTab(MAIN, makeMainPanel());
 		tabPanel.addTab(BEHAVIOR, makeBehaviorPanel());
+		tabPanel.addTab(FPUEXCEPTIONS, makeExceptionsPanel());
 		tabPanel.addTab(APPEARANCE, makeAppearancePanel());
 
 		final JPanel buttonPanel = new JPanel();
@@ -127,6 +130,32 @@ public class GUIConfig extends JDialog{
 		grid_add(panel,new JPanel(),gbl,gbc,0,1,0,row,GridBagConstraints.REMAINDER,1);
 
 		return panel;
+	}
+	
+	private JPanel makeExceptionsPanel(){
+		gbl = new GridBagLayout();
+		gbc = new GridBagConstraints();
+		
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(0,10,0,10);
+
+		JPanel panel = new JPanel();
+
+		panel.setLayout(gbl);
+		panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
+		int row = 2;
+
+		addRow(panel, row++, "INVALID_OPERATION",new JCheckBox());
+		addRow(panel, row++, "OVERFLOW",new JCheckBox());
+		addRow(panel, row++, "UNDERFLOW", new JCheckBox());
+		addRow(panel, row++, "DIVIDE_BY_ZERO", new JCheckBox());
+
+		// fill remaining vertical space
+		grid_add(panel,new JPanel(),gbl,gbc,0,1,0,row,GridBagConstraints.REMAINDER,1);
+
+		return panel;
+		
 	}
 
 	private JPanel makeAppearancePanel(){
