@@ -1,7 +1,7 @@
 /*
- * SUB_D.java
+ * MOVZ_D.java
  *
- * 06th june 2007
+ * 27th may 2007
   * (c) 2006 EduMips64 project - Trubia Massimo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -33,27 +33,27 @@ import java.math.*;
  * <pre>
  *
  */
-class SUB_D extends FPArithmeticInstructions
+class MOVZ_D extends FPConditionalZerosMoveInstructions
 {
-    final String OPCODE_VALUE="000001";
+    String OPCODE_VALUE="010010";
     String FMT_FIELD="10001"; //DOUBLE IS 17
-    String NAME = "SUB.D";
+    String NAME = "MOVZ.D";
     
-    
-    public SUB_D()
+    public MOVZ_D()
     {
 	super.OPCODE_VALUE = OPCODE_VALUE;
-	super.FMT_FIELD=FMT_FIELD;
+	super.FMT_FIELD = FMT_FIELD;
         super.name=NAME;
     }
 
-    public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException
+    public void EX() throws IrregularStringOfBitsException
     {
         //getting values from temporary registers
-	String operand1=TRfp[FS_FIELD].getBinString();
-	String operand2=TRfp[FT_FIELD].getBinString();
-        String outputstring=FPInstructionUtils.doubleSubtraction(operand1,operand2);
-	TRfp[FD_FIELD].setBits(outputstring,0);
+	String rt=TR[RT_FIELD].getBinString();
+	String fs=TRfp[FS_FIELD].getBinString();
+	
+	if(rt.matches("[0]{64}"))
+		TRfp[FD_FIELD].setBits(fs,0);
 	if(enableForwarding)
 	{
 		doWB();

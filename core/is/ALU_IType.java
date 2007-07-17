@@ -58,7 +58,7 @@ public class ALU_IType extends ALUInstructions {
         {
             throw new RAWException();
         }
-        TR[RS_FIELD]=rs;        
+        TR[RS_FIELD].setBits(rs.getBinString(),0);        
         //locking the target register
         Register rt=cpu.getRegister(params.get(RT_FIELD));
         rt.incrWriteSemaphore();

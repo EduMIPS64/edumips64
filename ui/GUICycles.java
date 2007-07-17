@@ -73,7 +73,6 @@ public class GUICycles extends GUIComponent {
 		pannello=new Panel1();
 		
 		jsp1=new JScrollPane(pannello);//pannello di destra
-//jsp1.setViewportView(pannello);				
 		dim=new Dimension(20,30);
 		pannello.setPreferredSize(dim);
 		

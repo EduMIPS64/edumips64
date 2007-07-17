@@ -1,7 +1,7 @@
 /*
- * SUB_D.java
+ * MOV_D.java
  *
- * 06th june 2007
+ * 17th july 2007
   * (c) 2006 EduMips64 project - Trubia Massimo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -33,30 +33,24 @@ import java.math.*;
  * <pre>
  *
  */
-class SUB_D extends FPArithmeticInstructions
-{
-    final String OPCODE_VALUE="000001";
-    String FMT_FIELD="10001"; //DOUBLE IS 17
-    String NAME = "SUB.D";
-    
-    
-    public SUB_D()
-    {
-	super.OPCODE_VALUE = OPCODE_VALUE;
-	super.FMT_FIELD=FMT_FIELD;
-        super.name=NAME;
-    }
+class MOV_D extends FPFormattedOperandMoveInstructions {
+	String OPCODE_VALUE="000110";
+	String NAME = "MOV.D";
+	String FMT_FIELD="10001";
+	
+	public MOV_D() {
+		super.OPCODE_VALUE = OPCODE_VALUE;
+		super.name=NAME;
+		super.FMT_FIELD=FMT_FIELD;
+	}	
 
-    public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException
-    {
-        //getting values from temporary registers
-	String operand1=TRfp[FS_FIELD].getBinString();
-	String operand2=TRfp[FT_FIELD].getBinString();
-        String outputstring=FPInstructionUtils.doubleSubtraction(operand1,operand2);
-	TRfp[FD_FIELD].setBits(outputstring,0);
-	if(enableForwarding)
-	{
-		doWB();
+	public void EX() throws IrregularStringOfBitsException {
+		//moving values from the source temporary register to the destination one
+		String value=TRfp[FS_FIELD].getBinString();
+		TRfp[FD_FIELD].setBits(value,0);
+		if(enableForwarding) {
+			doWB();
+		}
 	}
-    }    
-}
+	
+}	

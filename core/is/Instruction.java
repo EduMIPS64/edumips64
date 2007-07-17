@@ -200,13 +200,20 @@ public abstract class Instruction {
                         SYSCALL  { Instruction getObject() {SYSCALL newObject=new SYSCALL(); return newObject; } },
                         BREAK  { Instruction getObject() {BREAK newObject=new BREAK(); return newObject; } },
 			//Floating point instructions
+			//Arithmetic
 			ADD_D {Instruction getObject() {ADD_D newObject=new ADD_D(); return newObject; } },
 			SUB_D {Instruction getObject() {SUB_D newObject=new SUB_D();return newObject; } },
 			MUL_D { Instruction getObject() {MUL_D newObject=new MUL_D();return newObject;}},
 			DIV_D { Instruction getObject() {DIV_D newObject=new DIV_D(); return newObject;}},
+			//Load store
 			LDC1 {Instruction getObject() {LDC1 newObject=new LDC1(); return newObject;}},
-			SDC1 {Instruction getObject() {SDC1 newObject=new SDC1(); return newObject;}};
-			
+			SDC1 {Instruction getObject() {SDC1 newObject=new SDC1(); return newObject;}},
+			//Move to and from
+			DMTC1 {Instruction getObject() {DMTC1 newObject=new DMTC1(); return newObject;}},
+			DMFC1 {Instruction getObject() {DMFC1 newObject=new DMFC1(); return newObject;}},
+			//Formatted operand move
+			MOV_D {Instruction getObject() {MOV_D newObject=new MOV_D(); return newObject;}},
+			MOVZ_D {Instruction getObject() {MOVZ_D newObject=new MOVZ_D(); return newObject;}};
 		abstract Instruction getObject();
     }
     /**

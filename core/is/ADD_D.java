@@ -35,13 +35,15 @@ import java.math.*;
  */
 class ADD_D extends FPArithmeticInstructions
 {
-    final String OPCODE_VALUE="000000";
-    
+    String OPCODE_VALUE="000000";
+    String FMT_FIELD="10001"; //DOUBLE IS 17
+    String NAME = "ADD.D";
     
     public ADD_D()
     {
 	super.OPCODE_VALUE = OPCODE_VALUE;
-        name="ADD.D";
+	super.FMT_FIELD = FMT_FIELD;
+        super.name=NAME;
     }
 
     public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException

@@ -36,12 +36,15 @@ import java.math.*;
 class MUL_D extends FPArithmeticInstructions
 {
     final String OPCODE_VALUE="000010";
+    String FMT_FIELD="10001"; //DOUBLE IS 17
+    String NAME = "MUL.D";
     
     
     public MUL_D()
     {
 	super.OPCODE_VALUE = OPCODE_VALUE;
-        name="MUL.D";
+	super.FMT_FIELD = FMT_FIELD;
+        name=NAME;
     }
     
     public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException
