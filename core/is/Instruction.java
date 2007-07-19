@@ -85,8 +85,8 @@ public abstract class Instruction {
     
     /** 
      * Creates a new instance of an Instruction's subclass 
-    @param name string value to pass in order to instanciate an instruction object 
-    @return the instruction object 
+     * @param name string value to pass in order to instanciate an instruction object 
+     * @return the instruction object 
      *
      */
      public static Instruction buildInstruction(String name){
@@ -94,10 +94,8 @@ public abstract class Instruction {
 	//If the name of the requested instruction has got a dot, the istruction is FP and an
 	//underscore takes the place of the dot because classes names cannot contain dots
 	name=name.replaceAll("\\.","_");
-	for (InstructionEnumerator op : InstructionEnumerator.values())
-	{
-	    if (op.name().equals(name)==true)
-	    {		    
+	for (InstructionEnumerator op : InstructionEnumerator.values()) {
+	    if (op.name().equals(name)==true) {		    
 		returnedObject=op.getObject();
                 return returnedObject;
 	    }
@@ -213,7 +211,11 @@ public abstract class Instruction {
 			DMFC1 {Instruction getObject() {DMFC1 newObject=new DMFC1(); return newObject;}},
 			//Formatted operand move
 			MOV_D {Instruction getObject() {MOV_D newObject=new MOV_D(); return newObject;}},
-			MOVZ_D {Instruction getObject() {MOVZ_D newObject=new MOVZ_D(); return newObject;}};
+		MOVZ_D {Instruction getObject() {MOVZ_D newObject=new MOVZ_D(); return newObject;}},
+		MOVN_D {Instruction getObject() {MOVN_D newObject=new MOVN_D(); return newObject;}},
+		//Special arithmetic instructions
+		C_LT_D {Instruction getObject() {C_LT_D newObject = new C_LT_D(); return newObject; }},
+		C_EQ_D {Instruction getObject() {C_EQ_D newObject = new C_EQ_D(); return newObject; }};
 		abstract Instruction getObject();
     }
     /**
@@ -230,7 +232,7 @@ public abstract class Instruction {
      * In this method all instructions that modify GPRs lock the involved register
      *</pre>
      **/
-    public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException,HaltException,JumpException, BreakException,WAWException;
+    public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException,HaltException,JumpException, BreakException,WAWException, FPInvalidOperationException;
     
     /**
      * <pre>
@@ -349,66 +351,59 @@ public abstract class Instruction {
    /** Gets the serial number of this instruction */
     public long getSerialNumber() { return serialNumber;}
     
-    public String toString() 
-    {
+    public String toString() {
 		return fullname;
-    }
-    
-    /** 
-     * Enable forwarding mode
-     * @param value This variable enable the forwarding modality if it is true
-      * */
-    public static void setEnableForwarding(boolean value)
-    {
-	enableForwarding = value;
-    }
-
-    /** Gets the state of EnableForwarding. This modality anticipates writing on registers
-     * at EX stage for Alu instructions or at MEM stage for Load-Store instructions
-     * @return The forwarding state
-     * */	
-    public static boolean getEnableForwarding()
-    {
-	return enableForwarding;
-    }
-    
-    /**<pre>
-     * Gets the label of the instruction. Labels may be assigned to instructions
-     * when they are inserted in the symbol table
-     *</pre>
-     * @return label of the instruction
-     */
-    public String getLabel()
-    {
-        return label;
-    }
-    
-    /**<pre>
-     * Sets the label of the instruction. Labels may be assigned to instructions
-     * when they are inserted in the symbol table
-     *</pre>
-     * @value label of the instruction
-     */
-    public void setLabel(String value)
-    {
-       label=value;
-    }
-    
-    /**<pre>
-     * The repr field of the passed instruction is compared with the repr field 
-     * of this instruction. If they are identical then true is returned else false is returned
-     * </pre>
-     * @instr instruction to compare with this
-     * return the result of the comparison
-     */
-    public boolean equals(Instruction instr)
-    {
-	if(instr!=null)
-	{
-		if(instr.getRepr().getBinString().equalsIgnoreCase(this.repr.getBinString()))
-			return true;
 	}
-	return false;	
-    }
-	    
+	
+	/**
+	 * Enable forwarding mode
+	 * @param value This variable enable the forwarding modality if it is true
+	 * */
+	public static void setEnableForwarding(boolean value) {
+		enableForwarding = value;
+	}
+	
+	/** Gets the state of EnableForwarding. This modality anticipates writing on registers
+	 * at EX stage for Alu instructions or at MEM stage for Load-Store instructions
+	 * @return The forwarding state
+	 * */
+	public static boolean getEnableForwarding() {
+		return enableForwarding;
+	}
+	
+	/**<pre>
+	 * Gets the label of the instruction. Labels may be assigned to instructions
+	 * when they are inserted in the symbol table
+	 *</pre>
+	 * @return label of the instruction
+	 */
+	public String getLabel() {
+		return label;
+	}
+	
+	/**<pre>
+	 * Sets the label of the instruction. Labels may be assigned to instructions
+	 * when they are inserted in the symbol table
+	 *</pre>
+	 * @value label of the instruction
+	 */
+	public void setLabel(String value) {
+		label=value;
+	}
+	
+	/**<pre>
+	 * The repr field of the passed instruction is compared with the repr field
+	 * of this instruction. If they are identical then true is returned else false is returned
+	 * </pre>
+	 * @instr instruction to compare with this
+	 * return the result of the comparison
+	 */
+	public boolean equals(Instruction instr) {
+		if(instr!=null) {
+			if(instr.getRepr().getBinString().equalsIgnoreCase(this.repr.getBinString()))
+				return true;
+		}
+		return false;
+	}
+	
 }

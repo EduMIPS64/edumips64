@@ -403,7 +403,6 @@ Main.logger.debug("altezza" + pannello.getBounds().height);
 Main.logger.debug("larghezza " +pannello.getBounds().width);
 jsp1.getViewport().setViewPosition(new Point(pannello.getBounds().width,pannello.getBounds().height));
 */
-Main.logger.debug("\nlarghezza:" + pannello.getBounds().width + "altezza:" + pannello.getBounds().height);		
 		jsp1.getViewport().setViewSize(dim);
 		jsp2.getViewport().setViewSize(dim2);
 		jsp2.getViewport().setViewPosition(new Point(0,n_instr*15));

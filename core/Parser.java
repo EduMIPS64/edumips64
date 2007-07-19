@@ -903,6 +903,95 @@ public class Parser
 												continue;
 											}
 										}
+										else if(syntax.charAt(z)=='C') //Unsigned Immediate (3 bit)
+										{
+											int endPar;
+											if(z!=syntax.length()-1)
+												endPar = param.indexOf(syntax.charAt(++z),indPar);
+											else
+												endPar = param.length();
+											if (endPar==-1)
+											{
+												numError++;
+												error.add("SEPARATORMISS",row,indPar,line);
+												i = line.length();
+												tmpInst.getParams().add(0);
+												continue;
+											}
+											int imm;
+											if (isImmediate(param.substring(indPar,endPar)))
+											{
+												if (param.charAt(indPar)=='#')
+													indPar++;
+												if (isNumber(param.substring(indPar,endPar)))
+												{
+													try{
+														imm = Integer.parseInt(param.substring(indPar,endPar).trim());
+														if (imm < 0)
+														{
+															numError++;
+															error.add("VALUEISNOTUNSIGNED",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+															i = line.length();
+															tmpInst.getParams().add(0);
+															continue;
+														}
+														if( imm < 0 || imm > 7)
+															throw new NumberFormatException();
+													}
+													catch(NumberFormatException ex)
+													{
+														imm=0;
+														numError++;
+														error.add("3BIT_IMMEDIATE_TOO_LARGE",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+													}
+													tmpInst.getParams().add(imm);
+													indPar = endPar+1;
+												}
+												else if (isHexNumber(param.substring(indPar,endPar).trim()))
+												{
+													try
+													{
+														imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar,endPar)));
+														if (imm < 0)
+														{
+															numError++;
+															error.add("VALUEISNOTUNSIGNED",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+															i = line.length();
+															tmpInst.getParams().add(0);
+															continue;
+														}
+														tmpInst.getParams().add(imm);
+														indPar = endPar+1;
+														if( imm < 0 || imm > 31)
+															throw new NumberFormatException();
+													}
+													catch(NumberFormatException ex)
+													{
+														imm=0;
+														numError++;
+														error.add("3BIT_IMMEDIATE_TOO_LARGE",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+
+														tmpInst.getParams().add(imm);
+														indPar = endPar+1;
+
+													}
+													catch(IrregularStringOfHexException ex)
+													{
+														//non ci dovrebbe mai arrivare
+													}
+												}
+
+											}
+											else
+											{
+												numError++;
+												error.add("INVALIDIMMEDIATE",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+												i = line.length();
+												tmpInst.getParams().add(0);
+												continue;
+											}
+										}
+					
 										else if(syntax.charAt(z)=='L') //Memory Label
 										{
 											int endPar;
