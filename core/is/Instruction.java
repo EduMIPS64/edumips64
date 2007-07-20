@@ -215,7 +215,13 @@ public abstract class Instruction {
 		MOVN_D {Instruction getObject() {MOVN_D newObject=new MOVN_D(); return newObject;}},
 		//Special arithmetic instructions
 		C_LT_D {Instruction getObject() {C_LT_D newObject = new C_LT_D(); return newObject; }},
-		C_EQ_D {Instruction getObject() {C_EQ_D newObject = new C_EQ_D(); return newObject; }};
+		C_EQ_D {Instruction getObject() {C_EQ_D newObject = new C_EQ_D(); return newObject; }},
+		//Conditional branches instructions
+		BC1T {Instruction getObject() { BC1T newObject =new BC1T(); return newObject; }},
+		BC1F {Instruction getObject() { BC1F newObject =new BC1F(); return newObject; }},
+		//Conditional move on CC instructions
+		MOVT_D {Instruction getObject() { MOVT_D newObject =new MOVT_D(); return newObject; }},
+		MOVF_D {Instruction getObject() { MOVF_D newObject =new MOVF_D(); return newObject; }};
 		abstract Instruction getObject();
     }
     /**

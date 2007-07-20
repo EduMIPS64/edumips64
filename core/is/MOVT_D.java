@@ -1,7 +1,7 @@
 /*
- * C_EQ_D.java
+ * MOVT_D.java
  *
- * 19th july 2007
+ * 27th may 2007
   * (c) 2006 EduMips64 project - Trubia Massimo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -33,19 +33,13 @@ import java.math.*;
  * <pre>
  *
  */
-class C_EQ_D extends FPC_cond_DInstructions {
-	String COND_VALUE="0010"; // the first bit doesn't mean anything into this simulator
-				// (010)bin=(2)dec is the condition code assigned to the predicate equal in a MIPS64 processor
-	String NAME = "C.EQ.D";
+class MOVT_D extends FPConditionalCC_DMoveInstructions {
+	String NAME = "MOVT.D";
+	int TF_FIELD_VALUE=1;
 	
-	public C_EQ_D() {
-		super.COND_VALUE = COND_VALUE;
+	public MOVT_D() {
+		super.TF_FIELD_VALUE = TF_FIELD_VALUE;
 		super.name=NAME;
 	}
-
-	public void MEM() {
-	}
 	
-	public void WB() {
-	}
 }

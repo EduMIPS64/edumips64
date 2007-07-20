@@ -1,5 +1,5 @@
 /*
- * FPConditionalZerosMoveInstructions.java
+ * FPConditionalCC_DMoveInstructions.java
  *
  * 17th july 2007
  * (c) 2006 EduMips64 project - Trubia Massimo
@@ -31,44 +31,51 @@ import edumips64.utils.*;
  * @author Trubia Massimo
  */
 
-public abstract class FPConditionalZerosMoveInstructions extends ALUInstructions{
+public abstract class FPConditionalCC_DMoveInstructions extends ALUInstructions{
 	final static int FD_FIELD=0;
 	final static int FD_FIELD_INIT=21;
 	final static int FD_FIELD_LENGTH=5;
 	final static int FS_FIELD=1;
 	final static int FS_FIELD_INIT=16;
 	final static int FS_FIELD_LENGTH=5;
-	final static int RT_FIELD=2;
-	final static int RT_FIELD_INIT=11;
-	final static int RT_FIELD_LENGTH=5;
+	final static int CC_FIELD=2;
+	final static int CC_FIELD_INIT=11;
+	final static int CC_FIELD_LENGTH=3;
 	static String COP1_FIELD="010001";
 	static int COP1_FIELD_INIT=0;
-	static int OPCODE_VALUE_INIT=26;
+	static int MOVCF_FIELD_INIT=26;
+	static String MOVCF_FIELD_VALUE="010001";
+	static String ZERO_FIELD="0";
+	final static int ZERO_FIELD_INIT=14;
+	static String FMT_FIELD="10001"; //17 for double
 	static int FMT_FIELD_INIT=6;
+	final static int TF_FIELD_INIT=15;
 	static CPU cpu=CPU.getInstance();
 
-	String OPCODE_VALUE="";
-	String FMT_FIELD="";
-	public FPConditionalZerosMoveInstructions() {
-		this.syntax="%F,%F,%R";
+	int TF_FIELD_VALUE;
+	
+	public FPConditionalCC_DMoveInstructions() {
+		this.syntax="%F,%F,%C";
 		this.paramCount=3;
 	}
 	public void ID() throws RAWException, WAWException, IrregularStringOfBitsException {
 		//if the source register is valid we pass its own value into a temporary register
 		RegisterFP fd=cpu.getRegisterFP(params.get(FD_FIELD));
 		RegisterFP fs=cpu.getRegisterFP(params.get(FS_FIELD));
-		Register rt=cpu.getRegister(params.get(RT_FIELD));
-		if(fs.getWriteSemaphore()>0 || rt.getWriteSemaphore()>0)
+		if(fs.getWriteSemaphore()>0)
 			throw new RAWException();
 		TRfp[FS_FIELD].setBits(fs.getBinString(),0);
 		TRfp[FD_FIELD].setBits(fd.getBinString(),0);
-		TR[RT_FIELD].setBits(rt.getBinString(),0);
 		//locking the destination register
 		if(fd.getWriteSemaphore()>0)
 			throw new WAWException();
 		fd.incrWriteSemaphore();
 	}
-	public abstract void EX() throws IrregularStringOfBitsException;
+	public void EX() throws IrregularStringOfBitsException{
+		String fs=TRfp[FS_FIELD].getBinString();
+		if(cpu.getFCSRConditionCode(params.get(CC_FIELD).intValue())==TF_FIELD_VALUE)
+			TRfp[FD_FIELD].setBits(fs,0);
+	}
 	public void MEM() throws MemoryElementNotFoundException{};
 	public void WB() throws IrregularStringOfBitsException
 	{
@@ -86,10 +93,12 @@ public abstract class FPConditionalZerosMoveInstructions extends ALUInstructions
 		//conversion of instruction parameters of params list to the "repr" 32 binary value
 		repr.setBits(COP1_FIELD,COP1_FIELD_INIT);
 		repr.setBits(FMT_FIELD,FMT_FIELD_INIT);
-		repr.setBits(Converter.intToBin(RT_FIELD_LENGTH,params.get(RT_FIELD)),RT_FIELD_INIT);
+		repr.setBits(Converter.intToBin(CC_FIELD_LENGTH,params.get(CC_FIELD)),CC_FIELD_INIT);
+		repr.setBits(ZERO_FIELD,ZERO_FIELD_INIT);
+		repr.setBits(String.valueOf(TF_FIELD_VALUE),TF_FIELD_INIT);
 		repr.setBits(Converter.intToBin(FS_FIELD_LENGTH,params.get(FS_FIELD)),FS_FIELD_INIT);
 		repr.setBits(Converter.intToBin(FD_FIELD_LENGTH,params.get(FD_FIELD)),FD_FIELD_INIT);
-		repr.setBits(OPCODE_VALUE,OPCODE_VALUE_INIT);
+		repr.setBits(MOVCF_FIELD_VALUE,MOVCF_FIELD_INIT);
 	}
 	
 }

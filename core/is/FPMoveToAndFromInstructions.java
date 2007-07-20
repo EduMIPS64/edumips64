@@ -31,7 +31,7 @@ import edumips64.utils.*;
  * @author Trubia Massimo
  */
 
-public abstract class FPMoveToAndFromInstructions extends Instruction{
+public abstract class FPMoveToAndFromInstructions extends ALUInstructions{
 	final static int RT_FIELD=0;
 	final static int RT_FIELD_INIT=11;
 	final static int RT_FIELD_LENGTH=5;
@@ -52,7 +52,7 @@ public abstract class FPMoveToAndFromInstructions extends Instruction{
 	}
 	public abstract void ID() throws RAWException, WAWException, IrregularStringOfBitsException;
 	public abstract void EX() throws IrregularStringOfBitsException;
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException{};
+	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException{};
 	public abstract void WB() throws IrregularStringOfBitsException;
 	
 	public void pack() throws IrregularStringOfBitsException {

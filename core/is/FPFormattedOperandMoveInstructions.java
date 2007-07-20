@@ -31,7 +31,7 @@ import edumips64.utils.*;
  * @author Trubia Massimo
  */
 
-public abstract class FPFormattedOperandMoveInstructions extends Instruction{
+public abstract class FPFormattedOperandMoveInstructions extends ALUInstructions{
 	final static int FD_FIELD=0;
 	final static int FD_FIELD_INIT=21;
 	final static int FD_FIELD_LENGTH=5;
@@ -66,7 +66,7 @@ public abstract class FPFormattedOperandMoveInstructions extends Instruction{
 		fd.incrWriteSemaphore();
 	}
 	public abstract void EX() throws IrregularStringOfBitsException;
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException{};
+	public void MEM() throws MemoryElementNotFoundException{};
 	public void WB() throws IrregularStringOfBitsException
 	{
 		if(!enableForwarding)

@@ -35,7 +35,7 @@ import java.util.*;
  *
  * @author Trubia Massimo
  */
-public abstract class FPC_cond_DInstructions extends Instruction {
+public abstract class FPC_cond_DInstructions extends ALUInstructions {
 	static CPU cpu= CPU.getInstance();
 	final static int CC_FIELD=0;
 	final static int FS_FIELD=1;
@@ -61,18 +61,23 @@ public abstract class FPC_cond_DInstructions extends Instruction {
 		paramCount=3;
 	}
 	
-	public void ID() throws IrregularStringOfBitsException, FPInvalidOperationException, RAWException{
+	public void ID() throws IrregularStringOfBitsException, RAWException{
 		//if source registers are valid passing their own values into temporary registers
+/*
 		boolean less;
 		boolean equal;
 		boolean unordered;
 		boolean condition;
 		int condition_int;
+ */
 		RegisterFP fs=cpu.getRegisterFP(params.get(FS_FIELD));
 		RegisterFP ft=cpu.getRegisterFP(params.get(FT_FIELD));
 		if(fs.getWriteSemaphore()>0 || ft.getWriteSemaphore()>0)
 			throw new RAWException();
-
+		
+		TRfp[FS_FIELD].setBits(fs.getBinString(),0);
+		TRfp[FT_FIELD].setBits(ft.getBinString(),0);
+/*
 		//truth mask
 		boolean cond0=(COND_VALUE.charAt(3)=='1')?true:false; //codes the unordered predicate
 		boolean cond1=(COND_VALUE.charAt(2)=='1')?true:false; //codes the equal predicate
@@ -101,9 +106,48 @@ public abstract class FPC_cond_DInstructions extends Instruction {
 		condition = (cond2 && less) || (cond1 && equal) || (cond0 && unordered);
 		condition_int=(condition==true)?1:0;
 		cpu.setFCSRConditionCode(params.get(CC_FIELD).intValue(),condition_int);
+ */
 	}
 	
-	public abstract void EX();
+	public void EX() throws IrregularStringOfBitsException, FPInvalidOperationException{
+		RegisterFP fs=TRfp[FS_FIELD];
+		RegisterFP ft=TRfp[FT_FIELD];
+		boolean less;
+		boolean equal;
+		boolean unordered;
+		boolean condition;
+		int condition_int;
+
+		
+		//truth mask
+		boolean cond0=(COND_VALUE.charAt(3)=='1')?true:false; //codes the unordered predicate
+		boolean cond1=(COND_VALUE.charAt(2)=='1')?true:false; //codes the equal predicate
+		boolean cond2=(COND_VALUE.charAt(1)=='1')?true:false; //codes the less predicate
+		if(FPInstructionUtils.isSNaN(fs.getBinString())	|| FPInstructionUtils.isSNaN(ft.getBinString())
+		|| FPInstructionUtils.isQNaN(fs.getBinString())	|| FPInstructionUtils.isQNaN(ft.getBinString())){
+			less=false;
+			equal=false;
+			unordered=true;
+			//checking for invalid operation exception (if it is raised the FCSR isn't modified)
+			//this exception occurs 
+			if(FPInstructionUtils.isSNaN(fs.getBinString()) || FPInstructionUtils.isSNaN(ft.getBinString()) 
+			|| (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION) && (FPInstructionUtils.isQNaN(fs.getBinString()) || FPInstructionUtils.isQNaN(ft.getBinString()))))
+				throw new FPInvalidOperationException();
+		}
+		else{
+			BigDecimal fsbd=new BigDecimal(Double.longBitsToDouble(Converter.binToLong(fs.getBinString(),false)));
+			BigDecimal ftbd=new BigDecimal(Double.longBitsToDouble(Converter.binToLong(ft.getBinString(),false)));
+			
+			less= fsbd.doubleValue()<ftbd.doubleValue();
+			equal=(fs.getBinString().compareTo(ft.getBinString())==0);
+			unordered= false;
+		}
+		
+		//now we make the and operation between the truth mask and the comparison of the registers
+		condition = (cond2 && less) || (cond1 && equal) || (cond0 && unordered);
+		condition_int=(condition==true)?1:0;
+		cpu.setFCSRConditionCode(params.get(CC_FIELD).intValue(),condition_int);		
+	}
 	public abstract void MEM();
 	public abstract void WB() ;
 	
