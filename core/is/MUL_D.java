@@ -47,7 +47,7 @@ class MUL_D extends FPArithmeticInstructions
         name=NAME;
     }
     
-    public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException
+    public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPUnderflowException,FPOverflowException
     {
         //getting values from temporary registers
 	String operand1=TRfp[FS_FIELD].getBinString();

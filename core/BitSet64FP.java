@@ -45,10 +45,9 @@ public class BitSet64FP extends FixedBitSet {
 	 * For values that belong to ]-Infinity,A[ U ]D,+ Infinity[  an overflow exception will be thrown, on the contrary
 	 * values that belong to ]B,C[ an underflow exception will be thrown. 
 	 * @param value double number to be written: must be on the format  "2.345" or "2345E-3"
-	 * @throws FPExponentTooLargeException is catched into the method FPInstructionUtils.doubleTobin()
 	 * @throws FPUnderflowException,FPOverflowException, IrregularWriteOperationException,FPInvalidOperationException
 	 */
-	public void writeDouble(double value) throws FPExponentTooLargeException,FPUnderflowException,FPOverflowException, FPInvalidOperationException, IrregularWriteOperationException, IrregularStringOfBitsException
+	public void writeDouble(double value) throws FPUnderflowException,FPOverflowException, FPInvalidOperationException, IrregularWriteOperationException, IrregularStringOfBitsException
 	{
 		this.reset(false);
 		String bits=FPInstructionUtils.doubleToBin(value +""); 
@@ -68,10 +67,9 @@ public class BitSet64FP extends FixedBitSet {
 	 * For values that belong to ]-Infinity,A[ U ]D,+ Infinity[  an overflow exception will be thrown, on the contrary
 	 * values that belong to ]B,C[ an underflow exception will be thrown. 
 	 * @param value double number a string to be written: must be on the format  "2.345" or "2345E-3"
-	 * @throws FPExponentTooLargeException is catched into the method FPInstructionUtils.doubleTobin()
 	 * @throws FPUnderflowException,FPOverflowException, IrregularWriteOperationException,FPInvalidOperationException
 	 */
-	public void writeDouble(String value) throws FPExponentTooLargeException, FPOverflowException, FPUnderflowException, FPInvalidOperationException, IrregularWriteOperationException, IrregularStringOfBitsException
+	public void writeDouble(String value) throws  FPOverflowException, FPUnderflowException, FPInvalidOperationException, IrregularWriteOperationException, IrregularStringOfBitsException
 	{
 		this.reset(false);
 		String bits=FPInstructionUtils.doubleToBin(value); 

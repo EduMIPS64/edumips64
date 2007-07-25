@@ -33,26 +33,13 @@ import java.math.*;
  * <pre>
  *
  */
-class DMFC1 extends FPMoveToAndFromInstructions {
+class DMFC1 extends FPMoveFromInstructions {
 	String OPCODE_VALUE="00001";
 	String NAME = "DMFC1";
 	
 	public DMFC1() {
 		super.OPCODE_VALUE = OPCODE_VALUE;
 		super.name=NAME;
-	}
-	public void ID() throws RAWException, WAWException, IrregularStringOfBitsException {
-		//if the source register is valid we pass its own value into a temporary register
-		RegisterFP fs=cpu.getRegisterFP(params.get(FS_FIELD));
-		Register rt=cpu.getRegister(params.get(RT_FIELD));
-		if(fs.getWriteSemaphore()>0)
-			throw new RAWException();
-		TRfp[FS_FIELD].setBits(fs.getBinString(),0);
-		TR[RT_FIELD].setBits(rt.getBinString(),0);
-		//locking the destination register
-		if(rt.getWriteSemaphore()>0)
-			throw new WAWException();
-		rt.incrWriteSemaphore();
 	}
 	
 	
@@ -65,16 +52,5 @@ class DMFC1 extends FPMoveToAndFromInstructions {
 		}
 	}
 	
-	public void WB() throws IrregularStringOfBitsException
-	{
-		if(!enableForwarding)
-			doWB();
-	}
-	
-	public void doWB() throws IrregularStringOfBitsException {
-		//passing result from temporary register to destination register and unlocking it
-		cpu.getRegister(params.get(RT_FIELD)).setBits(TR[RT_FIELD].getBinString(),0);
-		cpu.getRegister(params.get(RT_FIELD)).decrWriteSemaphore();
 		
-	}	
 }

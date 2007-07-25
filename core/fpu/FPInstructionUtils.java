@@ -65,7 +65,7 @@ public class FPInstructionUtils {
 	*  @throws ExponentTooLargeException,FPOverflowException,FPUnderflowException
 	*  @return the binary string
 	*/    
-	public static String doubleToBin(String value) throws FPExponentTooLargeException,FPOverflowException,FPUnderflowException, IrregularStringOfBitsException {
+	public static String doubleToBin(String value) throws FPOverflowException,FPUnderflowException, IrregularStringOfBitsException {
 		//if a special value is passed then the proper binary string is returned
 		String old_value=value;
 		value=parseKeywords(value);
@@ -178,9 +178,9 @@ public class FPInstructionUtils {
 	 *  @param value1 the binary string representing the double value
 	 *  @param value2 the binary string representing the double value
 	 *  @return the result value (if trap are disabled, special values are returned as binary string)
-	 *  @throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException 
+	 *  @throws FPInvalidOperationException,FPUnderflowException,FPOverflowException 
 	 */
-	public static String doubleSum(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, IrregularStringOfBitsException
+	public static String doubleSum(String value1, String value2) throws FPInvalidOperationException,FPUnderflowException,FPOverflowException, IrregularStringOfBitsException
 	{
 		if(is64BinaryString(value1) && is64BinaryString(value2))
 		{
@@ -268,7 +268,7 @@ public class FPInstructionUtils {
 	 *  if signs don't agree then an invalid operation exception occurs if this trap is enabled.
 	 *  After the addition, if the result is too large in absolute value a right signed infinity is returned, else
 	 *  if the FP overflow or underflow are enabled an exception occurs.*/
-	public static String doubleSubtraction(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, IrregularStringOfBitsException
+	public static String doubleSubtraction(String value1, String value2) throws FPInvalidOperationException,FPUnderflowException,FPOverflowException, IrregularStringOfBitsException
 	{
 		if(is64BinaryString(value1) && is64BinaryString(value2))
 		{
@@ -360,7 +360,7 @@ public class FPInstructionUtils {
 	 *  Only if we attempt to perform (sign)0 X (sign)Infinity and the Invalid operation exception is not enabled NAN is returned,
 	 *  else a trap occur. After the multiplication, if the result is too large in absolute value a right signed infinity is returned, else
 	 *  if the FP overflow or underflow are enabled an exception occurs.*/
-	public static String doubleMultiplication(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, IrregularStringOfBitsException
+	public static String doubleMultiplication(String value1, String value2) throws FPInvalidOperationException,FPUnderflowException,FPOverflowException, IrregularStringOfBitsException
 	{
 		if(is64BinaryString(value1) && is64BinaryString(value2))
 		{
@@ -470,7 +470,7 @@ public class FPInstructionUtils {
 	 *  If value2 (not also value1) is Zero a DivisionByZero Exception occurs if it is enabled else a right infinity is returned depending on the product's signs
 	 *  After the operation, if the result is too small in absolute value a right signed infinity is returned, else
 	 *  if the FP underflow is enabled an exception occurs.*/
-	public static String doubleDivision(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, FPDivideByZeroException, IrregularStringOfBitsException
+	public static String doubleDivision(String value1, String value2) throws FPInvalidOperationException,FPUnderflowException,FPOverflowException, FPDivideByZeroException, IrregularStringOfBitsException
 	{
 
 		if(is64BinaryString(value1) && is64BinaryString(value2))
@@ -793,11 +793,13 @@ public class FPInstructionUtils {
 	}
 	
 	/** Returns the long fixed point format with the passed rounding mode, or null if an XNan or Infinity is passed to this function
+	 *  @param value a binary string representing a double value according to the IEEE754 standard
+	 *  @param rm the rounding mode to use for the conversion
 	 **/
 	public static BigInteger doubleTo64FixedPoint(String value, CPU.FPRoundingMode rm) throws IrregularStringOfBitsException
 	{
 		//we have to check if a XNan o Infinity was passed to this function
-		if(isQNaN(value) || isSNaN(value) || isInfinity(value))
+		if(isQNaN(value) || isSNaN(value) || isInfinity(value) || !is64BinaryString(value))
 			return null;
 		
 		final int INT_PART=0;
@@ -846,6 +848,30 @@ public class FPInstructionUtils {
 			if(bd.doubleValue()<0) int_part_value*=(-1);
 			return new BigInteger(String.valueOf(int_part_value));	
 	}
+	
+	/** Returns the double value of the 64 bit fixed point number , or null if an XNan or Infinity is passed to this function
+	 *  @param value a binary string representing a long value
+	 **/
+	public static BigDecimal fixedPoint64ToDouble(String value) throws IrregularStringOfBitsException{
+		//we have to check if a XNan o Infinity was passed to this function
+		if(isQNaN(value) || isSNaN(value) || isInfinity(value) || !is64BinaryString(value))
+			return null;
+		long toConvertValue=Converter.binToLong(value, false);
+		return new BigDecimal(toConvertValue);
+	}
+	
+	/** Returns the double value of the 64 bit fixed point number, or null if an  if an XNan or Infinity is passed to this function
+	 *
+	 **/
+	public static BigDecimal fixedPoint32ToDouble(String value) throws IrregularStringOfBitsException{
+		//we have to check if a XNan o Infinity was passed to this function
+		if(isQNaN(value) || isSNaN(value) || isInfinity(value) || !is64BinaryString(value))
+			return null;
+		long toConvertValue=Converter.binToInt(value.substring(32,value.length()), false);
+		return new BigDecimal(toConvertValue);
+	}
+	
+	
 	
 
 	

@@ -42,7 +42,7 @@ import edumips64.utils.*;
     }
     public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException;
     public abstract void EX() throws IrregularStringOfBitsException,IntegerOverflowException;
-    public abstract void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
+    public abstract void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
     public abstract void WB() throws IrregularStringOfBitsException;
     public void pack() throws IrregularStringOfBitsException
     {

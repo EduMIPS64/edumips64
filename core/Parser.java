@@ -1512,12 +1512,12 @@ register
 		    {
 		        tmpMem.setBits (edumips64.core.fpu.FPInstructionUtils.doubleToBin(value[j]),0);
 		    }
-		    catch(edumips64.core.fpu.FPExponentTooLargeException ex)
+		   /* catch(edumips64.core.fpu.FPExponentTooLargeException ex)
 		    {
 			numError++;
 			error.add("DOUBLE_EXT_TOO_LARGE",row,i+1,line);
 			continue;
-		    }
+		    }*/
 		    catch(edumips64.core.fpu.FPOverflowException ex)
 		    {
 			numError++;

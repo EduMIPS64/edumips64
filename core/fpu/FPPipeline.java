@@ -345,7 +345,7 @@ public class FPPipeline {
 	}
 	
 	/* Calls EX methods for fu passed as strings (MULTIPLIER,ADDER,DIVIDER) returning obtained values*/
-	public int callEX(String funcUnit) throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, FPInvalidOperationException, FPExponentTooLargeException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, NotAlignException
+	public int callEX(String funcUnit) throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, NotAlignException
 	{
 		if(funcUnit.compareToIgnoreCase("MULTIPLIER")==0)
 			return multiplier.EX();
@@ -494,7 +494,7 @@ public class FPPipeline {
 		}
 
 		/** Calls the EX() method of the instruction in M1, if no instruction fills M1 this method returns 0,if EX is correctly executed 1 is returned, if EX cannot be executed becaus M2 contains an instruction, -1 is returned */
-		private int EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, FPInvalidOperationException, FPExponentTooLargeException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, NotAlignException
+		private int EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, NotAlignException
 		{
 			Instruction instr;
 			if((instr=multiplier.get(FPMultiplierStatus.M1))!=null && multiplier.get(FPMultiplierStatus.M2)==null)
@@ -667,7 +667,7 @@ public class FPPipeline {
 		}
 		
 		/** Calls the EX() method of the instruction in A1, if no instruction fills A1 this method returns 0,if EX is correctly executed 1 is returned, if EX cannot be executed becaus A2 contains an instruction, -1 is returned */
-		private int EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, FPInvalidOperationException, FPExponentTooLargeException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, NotAlignException
+		private int EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, NotAlignException
 		{
 			Instruction instr;
 			if((instr=adder.get(FPAdderStatus.A1))!=null && adder.get(FPAdderStatus.A2)==null)
@@ -780,7 +780,7 @@ public class FPPipeline {
 
 
 		/** Call the EX() method of the instruction, if anyone instruction fills the divider this method return 0, if EX is correctly executed (alway in theory) 1 is returned else -1 */
-		private int EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, FPInvalidOperationException, FPExponentTooLargeException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, NotAlignException
+		private int EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, NotAlignException
 		{
 			if(instr!=null && counter==24)
 			{

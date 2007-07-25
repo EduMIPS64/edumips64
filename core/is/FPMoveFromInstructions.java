@@ -1,7 +1,7 @@
 /*
- * FPMoveInstructions.java
+ * FPMoveFromInstructions.java
  *
- * 16th july 2007
+ * 25th july 2007
  * (c) 2006 EduMips64 project - Trubia Massimo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -31,39 +31,36 @@ import edumips64.utils.*;
  * @author Trubia Massimo
  */
 
-public abstract class FPMoveToAndFromInstructions extends ALUInstructions{
-	final static int RT_FIELD=0;
-	final static int RT_FIELD_INIT=11;
-	final static int RT_FIELD_LENGTH=5;
-	final static int FS_FIELD=1;
-	final static int FS_FIELD_INIT=16;
-	final static int FS_FIELD_LENGTH=5;
-	static String ZERO_FIELD="00000000000";
-	final static int ZERO_FIELD_INIT=21;
-	static String COP1_FIELD="010001";
-	static int COP1_FIELD_INIT=0;
-	static int OPCODE_VALUE_INIT=6;
-	String OPCODE_VALUE="";
-	CPU cpu=CPU.getInstance();
-	
-	public FPMoveToAndFromInstructions() {
-		this.syntax="%R,%F";
-		this.paramCount=2;
+public abstract class FPMoveFromInstructions extends FPMoveToAndFromInstructions{
+
+	public FPMoveFromInstructions() {
 	}
-	public abstract void ID() throws RAWException, WAWException, IrregularStringOfBitsException;
+	public void ID() throws RAWException, WAWException, IrregularStringOfBitsException {
+		//if the source register is valid we pass its own value into a temporary register
+		RegisterFP fs=cpu.getRegisterFP(params.get(FS_FIELD));
+		Register rt=cpu.getRegister(params.get(RT_FIELD));
+		if(fs.getWriteSemaphore()>0)
+			throw new RAWException();
+		TRfp[FS_FIELD].setBits(fs.getBinString(),0);
+		TR[RT_FIELD].setBits(rt.getBinString(),0);
+		//locking the destination register
+		if(rt.getWriteSemaphore()>0)
+			throw new WAWException();
+		rt.incrWriteSemaphore();
+	}
 	public abstract void EX() throws IrregularStringOfBitsException,IrregularWriteOperationException;
 	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException{};
-	public abstract void WB() throws IrregularStringOfBitsException;
-	
-	public void pack() throws IrregularStringOfBitsException {
-		//conversion of instruction parameters of params list to the "repr" 32 binary value
-		repr.setBits(COP1_FIELD,COP1_FIELD_INIT);
-		repr.setBits(OPCODE_VALUE,OPCODE_VALUE_INIT);
-		repr.setBits(Converter.intToBin(RT_FIELD_LENGTH,params.get(RT_FIELD)),RT_FIELD_INIT);
-		repr.setBits(Converter.intToBin(FS_FIELD_LENGTH,params.get(FS_FIELD)),FS_FIELD_INIT);
-		repr.setBits(ZERO_FIELD,ZERO_FIELD_INIT);
+	public void WB() throws IrregularStringOfBitsException
+	{
+		if(!enableForwarding)
+			doWB();
 	}
 	
+	public void doWB() throws IrregularStringOfBitsException {
+		//passing result from temporary register to destination register and unlocking it
+		cpu.getRegister(params.get(RT_FIELD)).setBits(TR[RT_FIELD].getBinString(),0);
+		cpu.getRegister(params.get(RT_FIELD)).decrWriteSemaphore();
+	}
 }
 
  

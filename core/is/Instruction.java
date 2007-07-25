@@ -206,9 +206,13 @@ public abstract class Instruction {
 			//Load store
 			LDC1 {Instruction getObject() {LDC1 newObject=new LDC1(); return newObject;}},
 			SDC1 {Instruction getObject() {SDC1 newObject=new SDC1(); return newObject;}},
+		LWC1 {Instruction getObject() {LWC1 newObject=new LWC1(); return newObject;}},
+		SWC1 {Instruction getObject() {SWC1 newObject=new SWC1(); return newObject;}},
 			//Move to and from
 			DMTC1 {Instruction getObject() {DMTC1 newObject=new DMTC1(); return newObject;}},
 			DMFC1 {Instruction getObject() {DMFC1 newObject=new DMFC1(); return newObject;}},
+		MTC1 {Instruction getObject() {MTC1 newObject=new MTC1(); return newObject;}},
+		MFC1 {Instruction getObject() {MFC1 newObject=new MFC1(); return newObject;}},
 			//Formatted operand move
 			MOV_D {Instruction getObject() {MOV_D newObject=new MOV_D(); return newObject;}},
 		MOVZ_D {Instruction getObject() {MOVZ_D newObject=new MOVZ_D(); return newObject;}},
@@ -223,7 +227,9 @@ public abstract class Instruction {
 		MOVT_D {Instruction getObject() { MOVT_D newObject =new MOVT_D(); return newObject; }},
 		MOVF_D {Instruction getObject() { MOVF_D newObject =new MOVF_D(); return newObject; }},
 		//Conversion instructions
-		CVT_L_D {Instruction getObject() { CVT_L_D newObject= new CVT_L_D(); return newObject; }};
+		CVT_L_D {Instruction getObject() { CVT_L_D newObject= new CVT_L_D(); return newObject; }},
+		CVT_D_L {Instruction getObject() { CVT_D_L newObject=new CVT_D_L(); return newObject; }},
+		CVT_D_W {Instruction getObject() { CVT_D_W newObject=new CVT_D_W(); return newObject; }};
 		abstract Instruction getObject();
     }
     /**
@@ -249,7 +255,7 @@ public abstract class Instruction {
      * </pre>
      **/
     
-    public abstract void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, NotAlignException, FPInvalidOperationException, FPExponentTooLargeException, FPUnderflowException, FPOverflowException, FPDivideByZeroException;
+    public abstract void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, NotAlignException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException;
     
     /**
      * <pre>

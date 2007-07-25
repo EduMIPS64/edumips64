@@ -1,7 +1,7 @@
 /*
- * ADD_D.java
+ * MTC1.java
  *
- * 27th may 2007
+ * 25th july 2007
   * (c) 2006 EduMips64 project - Trubia Massimo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -33,29 +33,22 @@ import java.math.*;
  * <pre>
  *
  */
-class ADD_D extends FPArithmeticInstructions
-{
-    String OPCODE_VALUE="000000";
-    String FMT_FIELD="10001"; //DOUBLE IS 17
-    String NAME = "ADD.D";
-    
-    public ADD_D()
-    {
-	super.OPCODE_VALUE = OPCODE_VALUE;
-	super.FMT_FIELD = FMT_FIELD;
-        super.name=NAME;
-    }
-
-    public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPUnderflowException,FPOverflowException
-    {
-        //getting values from temporary registers
-	String operand1=TRfp[FS_FIELD].getBinString();
-	String operand2=TRfp[FT_FIELD].getBinString();
-        String outputstring=FPInstructionUtils.doubleSum(operand1,operand2);
-	TRfp[FD_FIELD].setBits(outputstring,0);
-	if(enableForwarding)
-	{
-		doWB();
+class MTC1 extends FPMoveToInstructions {
+	String OPCODE_VALUE="00100";
+	String NAME = "MTC1";
+	
+	public MTC1() {
+		super.OPCODE_VALUE = OPCODE_VALUE;
+		super.name=NAME;
+	}	
+	
+	public void EX() throws IrregularStringOfBitsException {
+		//getting values from temporary registers
+		String value=TR[RT_FIELD].getBinString();
+		TRfp[FS_FIELD].setBits(value.substring(32,64),32);
+		if(enableForwarding) {
+			doWB();
+		}
 	}
-    }    
+	
 }

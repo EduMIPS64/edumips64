@@ -1,7 +1,7 @@
 /*
- * DMTC1.java
+ * CVT_D_L.java
  *
- * 17th july 2007
+ * 25th july 2007
   * (c) 2006 EduMips64 project - Trubia Massimo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -31,24 +31,36 @@ import java.math.*;
 
 /**
  * <pre>
- *
+ * whether a qnan or snan is passed or the rounded value is outside the range [2^63,2^63-1]
+ *  null is returned
  */
-class DMTC1 extends FPMoveToInstructions {
-	String OPCODE_VALUE="00101";
-	String NAME = "DMTC1";
+class CVT_D_L extends FPConversionFCSRInstructions {
+	static String OPCODE_VALUE="100101";
+	static String FMT_FIELD="10101"; //LONG IS 21
+	static String NAME = "CVT.D.L";
 	
-	public DMTC1() {
+	public CVT_D_L() {
 		super.OPCODE_VALUE = OPCODE_VALUE;
+		super.FMT_FIELD = FMT_FIELD;
 		super.name=NAME;
-	}	
+	}
 	
-	public void EX() throws IrregularStringOfBitsException {
+	public void EX() throws IrregularStringOfBitsException, FPInvalidOperationException, IrregularWriteOperationException, FPUnderflowException, FPOverflowException {
 		//getting values from temporary registers
-		String value=TR[RT_FIELD].getBinString();
-		TRfp[FS_FIELD].setBits(value,0);
+		BigDecimal bd;
+		String fs=TRfp[FS_FIELD].getBinString();
+		if((bd=FPInstructionUtils.fixedPoint64ToDouble(fs))==null)
+			if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
+				throw new FPInvalidOperationException();
+			else{
+				cpu.setFCSRFlags("V",1);
+				TRfp[FD_FIELD].setBits("0000000000000000000000000000000000000000000000000000000000000000",0);
+			}
+		else{
+			TRfp[FD_FIELD].writeDouble(bd.doubleValue());
+		}
 		if(enableForwarding) {
 			doWB();
 		}
 	}
-	
 }

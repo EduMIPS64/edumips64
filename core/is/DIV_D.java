@@ -47,7 +47,7 @@ class DIV_D extends FPArithmeticInstructions
         name=NAME;
     }
     
-    public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, FPDivideByZeroException
+    public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPUnderflowException,FPOverflowException, FPDivideByZeroException
     {
         //getting values from temporary registers
 	String operand1=TRfp[FS_FIELD].getBinString();

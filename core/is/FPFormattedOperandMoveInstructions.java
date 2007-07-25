@@ -66,7 +66,7 @@ public abstract class FPFormattedOperandMoveInstructions extends ALUInstructions
 			throw new WAWException();
 		fd.incrWriteSemaphore();
 	}
-	public abstract void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,IrregularWriteOperationException;
+	public abstract void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,IrregularWriteOperationException,FPUnderflowException,FPOverflowException;
 	public void MEM() throws MemoryElementNotFoundException{};
 	public void WB() throws IrregularStringOfBitsException
 	{
