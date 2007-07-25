@@ -39,6 +39,7 @@ public class CPU {
     /** FPU Elements*/	
 	private RegisterFP[] fpr;
 	public static enum FPExceptions {INVALID_OPERATION,DIVIDE_BY_ZERO,UNDERFLOW,OVERFLOW};
+	public static enum FPRoundingMode { TO_NEAREST, TOWARD_ZERO,TOWARDS_PLUS_INFINITY,TOWARDS_MINUS_INFINITY};
 	private BitSet32 FCSR;
 	public static List<String> knownFPInstructions; // set of Floating point instructions that must pass through the FPU pipeline
 	private FPPipeline fpPipe;
@@ -229,9 +230,26 @@ public class CPU {
 			FCSR.setBits(String.valueOf(condition),FCC0);
 		else
 			FCSR.setBits(String.valueOf(condition),OFFSET-cc);
-System.out.println("---------\n" +FCSR.getBinString());
-for(int i=0;i<8;i++)		
-	System.out.println("\n"+getFCSRConditionCode(i));		
+	}
+	
+	/** Sets the current rouding mode
+	 * @param rm a constant that belongs to TO_NEAREST ,TOWARD_ZERO,TOWARDS_PLUS_INFINITY,TOWARDS_MINUS_INFINITY*/
+	public void setFCSRRoundingMode(FPRoundingMode rm) throws IrregularStringOfBitsException{
+		final int FCSR_RM_FIELD_INIT=30;
+		switch(rm){
+			case TO_NEAREST:
+				FCSR.setBits("00",FCSR_RM_FIELD_INIT);
+				break;
+			case TOWARD_ZERO:
+				FCSR.setBits("01",FCSR_RM_FIELD_INIT);
+				break;
+			case TOWARDS_PLUS_INFINITY:
+				FCSR.setBits("10",FCSR_RM_FIELD_INIT);
+				break;
+			case TOWARDS_MINUS_INFINITY:
+				FCSR.setBits("11",FCSR_RM_FIELD_INIT);
+				break;
+		}
 	}
 	
 //GETTING PROPERTIES -----------------------------------------------------------------
@@ -314,6 +332,10 @@ for(int i=0;i<8;i++)
 	public Instruction getInstructionByFuncUnit(String funcUnit, int stage) {
 		return fpPipe.getInstructionByFuncUnit(funcUnit,stage);
 	}
+	
+	public String getFCSR(){
+		return FCSR.getBinString();
+	}
 
 	/** Gets the selected flag bit of the FCSR
 	* @param tag a string value between  V=Invalid  Z=Divide by zero O=Overflow U=Underflow I=Inexact (not implemented)
@@ -361,6 +383,19 @@ for(int i=0;i<8;i++)
 			return (Integer.valueOf(FCSR.getBinString().substring(FCC0,FCC0+1)));
 		else
 			return (Integer.valueOf(FCSR.getBinString().substring(OFFSET-cc,OFFSET-cc+1)));
+	}
+	
+	public FPRoundingMode getFCSRRoundingMode(){
+		final int FCSR_RM_FIELD_INIT=30;
+		if(FCSR.getBinString().substring(FCSR_RM_FIELD_INIT,FCSR.size).compareTo("00")==0)
+			return FPRoundingMode.TO_NEAREST;
+		if(FCSR.getBinString().substring(FCSR_RM_FIELD_INIT,FCSR.size).compareTo("01")==0)
+			return FPRoundingMode.TOWARD_ZERO;
+		if(FCSR.getBinString().substring(FCSR_RM_FIELD_INIT,FCSR.size).compareTo("10")==0)
+			return FPRoundingMode.TOWARDS_PLUS_INFINITY;
+		if(FCSR.getBinString().substring(FCSR_RM_FIELD_INIT,FCSR.size).compareTo("11")==0)
+			return FPRoundingMode.TOWARDS_MINUS_INFINITY;
+		return null;
 	}
 	
 	
@@ -548,6 +583,16 @@ for(int i=0;i<8;i++)
 		setFPExceptions(CPU.FPExceptions.UNDERFLOW,(Boolean)Config.get("UNDERFLOW"));
 		setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO,(Boolean)Config.get("DIVIDE_BY_ZERO"));
 		
+		//setting the rounding mode
+		if((Boolean)Config.get("NEAREST"))
+			setFCSRRoundingMode(FPRoundingMode.TO_NEAREST);
+		else if((Boolean)Config.get("TOWARDZERO"))
+			setFCSRRoundingMode(FPRoundingMode.TOWARD_ZERO);
+		else if((Boolean)Config.get("TOWARDS_PLUS_INFINITY"))
+			setFCSRRoundingMode(FPRoundingMode.TOWARDS_PLUS_INFINITY);
+		else if((Boolean)Config.get("TOWARDS_MINUS_INFINITY"))
+			setFCSRRoundingMode(FPRoundingMode.TOWARDS_MINUS_INFINITY);
+		
 		String syncex = null;
 		
 		if(status != CPUStatus.RUNNING && status != CPUStatus.STOPPING)
@@ -717,6 +762,7 @@ for(int i=0;i<8;i++)
 				logger.info("Re-thrown the exception");
 				throw new BreakException();
 			}
+System.out.println("\nV" + getFCSRFlags("V") + " Z" +getFCSRFlags("Z") + " O" + getFCSRFlags("O") + " U" + getFCSRFlags("U"));
 			if(syncex != null)
 				throw new SynchronousException(syncex);
 			
@@ -815,13 +861,20 @@ for(int i=0;i<8;i++)
 		for(int i=0;i<32;i++)
 			fpr[i].reset();
 		
-		//reset the FCSR (only condition codes)
-		for(int cc=0;cc<8;cc++)
-			try {
+		
+		try {
+			//reset the FCSR (only condition codes)
+			for(int cc=0;cc<8;cc++)
 				setFCSRConditionCode(cc,0);
-			} catch (IrregularStringOfBitsException ex) {
-				ex.printStackTrace();
-			}
+			//reset the FCSR flags
+			setFCSRFlags("V",0);
+			setFCSRFlags("O",0);
+			setFCSRFlags("U",0);
+			setFCSRFlags("Z",0);
+		} catch (IrregularStringOfBitsException ex) {
+			ex.printStackTrace();
+		}
+
 		
 		LO.reset();
 		HI.reset();

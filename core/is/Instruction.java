@@ -221,7 +221,9 @@ public abstract class Instruction {
 		BC1F {Instruction getObject() { BC1F newObject =new BC1F(); return newObject; }},
 		//Conditional move on CC instructions
 		MOVT_D {Instruction getObject() { MOVT_D newObject =new MOVT_D(); return newObject; }},
-		MOVF_D {Instruction getObject() { MOVF_D newObject =new MOVF_D(); return newObject; }};
+		MOVF_D {Instruction getObject() { MOVF_D newObject =new MOVF_D(); return newObject; }},
+		//Conversion instructions
+		CVT_L_D {Instruction getObject() { CVT_L_D newObject= new CVT_L_D(); return newObject; }};
 		abstract Instruction getObject();
     }
     /**

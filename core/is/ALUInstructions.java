@@ -47,7 +47,7 @@ public abstract class ALUInstructions extends Instruction {
         }
     }
     public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,WAWException;
-    public abstract void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException,IrregularWriteOperationException,DivisionByZeroException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, FPDivideByZeroException;
+    public abstract void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException,IrregularWriteOperationException,DivisionByZeroException,FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, FPDivideByZeroException,FPInvalidOperationException;
     public abstract void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException;
     public abstract void WB() throws IrregularStringOfBitsException;
     public abstract void pack() throws IrregularStringOfBitsException;

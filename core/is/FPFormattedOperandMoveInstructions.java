@@ -25,6 +25,7 @@
 package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
+import edumips64.core.fpu.*;
 
 /**This is the base class of the move to and from instructions
  *
@@ -65,7 +66,7 @@ public abstract class FPFormattedOperandMoveInstructions extends ALUInstructions
 			throw new WAWException();
 		fd.incrWriteSemaphore();
 	}
-	public abstract void EX() throws IrregularStringOfBitsException;
+	public abstract void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,IrregularWriteOperationException;
 	public void MEM() throws MemoryElementNotFoundException{};
 	public void WB() throws IrregularStringOfBitsException
 	{

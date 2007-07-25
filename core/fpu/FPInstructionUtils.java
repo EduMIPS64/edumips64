@@ -31,8 +31,7 @@ import edumips64.utils.*;
 
 /** Group of functions used in the Floating point unit
  */
-public class FPInstructionUtils 
-{
+public class FPInstructionUtils {
 	static CPU cpu=CPU.getInstance();
 	final static String PLUSINFINITY= "0111111111110000000000000000000000000000000000000000000000000000";
 	final static String MINUSINFINITY="1111111111110000000000000000000000000000000000000000000000000000";
@@ -57,7 +56,7 @@ public class FPInstructionUtils
 	X 11111111111 0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (pattern for qnans values)	*/
 	final static String QNAN_NEW="0111111111110111111111111111111111111111111111111111111111111111";
 	final static String QNAN_PATTERN="X111111111110XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-						       
+	
 	
 	/** Converts a double value passed as string to a 64 bit binary string according with IEEE754 standard for double precision floating point numbers
 	*  @param value the double value in the format "123.213" or "1.23213E2"
@@ -66,59 +65,60 @@ public class FPInstructionUtils
 	*  @throws ExponentTooLargeException,FPOverflowException,FPUnderflowException
 	*  @return the binary string
 	*/    
-	public static String doubleToBin(String value) throws FPExponentTooLargeException,FPOverflowException,FPUnderflowException
-	{
+	public static String doubleToBin(String value) throws FPExponentTooLargeException,FPOverflowException,FPUnderflowException, IrregularStringOfBitsException {
 		//if a special value is passed then the proper binary string is returned
 		String old_value=value;
 		value=parseKeywords(value);
 		if(old_value.compareToIgnoreCase(value)!=0)
 			return value;
-			
-	    try //Check if the exponent is not in signed 32 bit, in this case the NumberFormatException occurs
-	    {
-		BigDecimal value_bd=new BigDecimal(value);
-		BigDecimal theBiggest=new BigDecimal(BIGGEST);
-		BigDecimal theSmallest=new BigDecimal(SMALLEST);
-		BigDecimal theZeroMinus= new BigDecimal(MINUSZERO_DEC);
-		BigDecimal theZeroPlus=new BigDecimal(PLUSZERO_DEC);
-		BigDecimal zero=new BigDecimal(0.0);
-		BigDecimal minuszero=new BigDecimal(-0.0);
-
-		//Check for overflow
-		if(value_bd.compareTo(theBiggest)==1 || value_bd.compareTo(theSmallest)==-1)
-		{
-			//exception
-			if(cpu.getFPExceptions(CPU.FPExceptions.OVERFLOW))
-				throw new FPOverflowException();			
-			if(value_bd.compareTo(theBiggest)==1)
-				return PLUSINFINITY;
-			if(value_bd.compareTo(theSmallest)==-1)
-				return MINUSINFINITY;
-		}
-		//Check for underflow
-		if((value_bd.compareTo(theZeroMinus)==1 && value_bd.compareTo(theZeroPlus)==-1) && (value_bd.compareTo(zero)!=0 && value_bd.compareTo(minuszero)!=0))
-		{			
-			if(cpu.getFPExceptions(CPU.FPExceptions.UNDERFLOW))
-				throw new FPUnderflowException();
-			if(value_bd.compareTo(zero)==1)
-				return PLUSZERO;
-			if(value_bd.compareTo(zero)==-1)
-				return MINUSZERO;	
-		}
-	
-		String output= Long.toBinaryString(Double.doubleToLongBits(value_bd.doubleValue()));
 		
-
-		return padding64(output);
-	    }
-	    catch(NumberFormatException e)
-	    {
-		    if(cpu.getFPExceptions(CPU.FPExceptions.OVERFLOW))
-			throw new FPExponentTooLargeException();
-		    return PLUSZERO;
-	    }
+		try //Check if the exponent is not in signed 32 bit, in this case the NumberFormatException occurs
+		{
+			BigDecimal value_bd=new BigDecimal(value);
+			BigDecimal theBiggest=new BigDecimal(BIGGEST);
+			BigDecimal theSmallest=new BigDecimal(SMALLEST);
+			BigDecimal theZeroMinus= new BigDecimal(MINUSZERO_DEC);
+			BigDecimal theZeroPlus=new BigDecimal(PLUSZERO_DEC);
+			BigDecimal zero=new BigDecimal(0.0);
+			BigDecimal minuszero=new BigDecimal(-0.0);
+			
+			//Check for overflow
+			if(value_bd.compareTo(theBiggest)==1 || value_bd.compareTo(theSmallest)==-1) {
+				//exception
+				if(cpu.getFPExceptions(CPU.FPExceptions.OVERFLOW))
+					throw new FPOverflowException();
+				else
+					cpu.setFCSRFlags("O",1);
+				if(value_bd.compareTo(theBiggest)==1)
+					return PLUSINFINITY;
+				if(value_bd.compareTo(theSmallest)==-1)
+					return MINUSINFINITY;
+			}
+			//Check for underflow
+			if((value_bd.compareTo(theZeroMinus)==1 && value_bd.compareTo(theZeroPlus)==-1) && (value_bd.compareTo(zero)!=0 && value_bd.compareTo(minuszero)!=0)) {
+				if(cpu.getFPExceptions(CPU.FPExceptions.UNDERFLOW))
+					throw new FPUnderflowException();
+				else
+					cpu.setFCSRFlags("U",1);
+				if(value_bd.compareTo(zero)==1)
+					return PLUSZERO;
+				if(value_bd.compareTo(zero)==-1)
+					return MINUSZERO;
+			}
+			
+			String output= Long.toBinaryString(Double.doubleToLongBits(value_bd.doubleValue()));
+			
+			
+			return padding64(output);
+		} catch(NumberFormatException e) {
+			if(cpu.getFPExceptions(CPU.FPExceptions.OVERFLOW))
+				throw new FPOverflowException();
+			else
+				cpu.setFCSRFlags("V",1);
+			return PLUSZERO;
+		}
 	}
-	
+
 	/** determines if the passed string contains the keywords for special values
 	 * @param value a binary string or a string containing POSITIVEINFINITY,NEGATIVEINFINITY,POSITIVEZERO,NEGATIVEZERO,QNAN,SNAN
 	 * @return the proper binary string if value contains special values, or value itself if the string is not special*/
@@ -180,7 +180,7 @@ public class FPInstructionUtils
 	 *  @return the result value (if trap are disabled, special values are returned as binary string)
 	 *  @throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException 
 	 */
-	public static String doubleSum(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException
+	public static String doubleSum(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, IrregularStringOfBitsException
 	{
 		if(is64BinaryString(value1) && is64BinaryString(value2))
 		{
@@ -190,6 +190,8 @@ public class FPInstructionUtils
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 					throw new FPInvalidOperationException();
+				else
+					cpu.setFCSRFlags("V",1);
 				return QNAN_NEW;
 			}
 			
@@ -203,6 +205,8 @@ public class FPInstructionUtils
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 					throw new FPInvalidOperationException();
+				else
+					cpu.setFCSRFlags("V",1);				
 				return QNAN_NEW;
 			}
 			// infinity + infinity
@@ -264,7 +268,7 @@ public class FPInstructionUtils
 	 *  if signs don't agree then an invalid operation exception occurs if this trap is enabled.
 	 *  After the addition, if the result is too large in absolute value a right signed infinity is returned, else
 	 *  if the FP overflow or underflow are enabled an exception occurs.*/
-	public static String doubleSubtraction(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException
+	public static String doubleSubtraction(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, IrregularStringOfBitsException
 	{
 		if(is64BinaryString(value1) && is64BinaryString(value2))
 		{
@@ -274,6 +278,8 @@ public class FPInstructionUtils
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 					throw new FPInvalidOperationException();
+				else
+					cpu.setFCSRFlags("V",1);				
 				return QNAN_NEW;
 			}
 			
@@ -289,6 +295,8 @@ public class FPInstructionUtils
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 					throw new FPInvalidOperationException();
+				else
+					cpu.setFCSRFlags("V",1);				
 				return QNAN_NEW;
 			}
 
@@ -352,7 +360,7 @@ public class FPInstructionUtils
 	 *  Only if we attempt to perform (sign)0 X (sign)Infinity and the Invalid operation exception is not enabled NAN is returned,
 	 *  else a trap occur. After the multiplication, if the result is too large in absolute value a right signed infinity is returned, else
 	 *  if the FP overflow or underflow are enabled an exception occurs.*/
-	public static String doubleMultiplication(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException
+	public static String doubleMultiplication(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, IrregularStringOfBitsException
 	{
 		if(is64BinaryString(value1) && is64BinaryString(value2))
 		{
@@ -362,6 +370,8 @@ public class FPInstructionUtils
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 					throw new FPInvalidOperationException();
+				else
+					cpu.setFCSRFlags("V",1);				
 				return QNAN_NEW;
 			}
 			
@@ -374,6 +384,8 @@ public class FPInstructionUtils
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 					throw new FPInvalidOperationException();
+				else
+					cpu.setFCSRFlags("V",1);				
 				return QNAN_NEW;
 			}	
 			
@@ -458,7 +470,7 @@ public class FPInstructionUtils
 	 *  If value2 (not also value1) is Zero a DivisionByZero Exception occurs if it is enabled else a right infinity is returned depending on the product's signs
 	 *  After the operation, if the result is too small in absolute value a right signed infinity is returned, else
 	 *  if the FP underflow is enabled an exception occurs.*/
-	public static String doubleDivision(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, FPDivideByZeroException
+	public static String doubleDivision(String value1, String value2) throws FPInvalidOperationException,FPExponentTooLargeException,FPUnderflowException,FPOverflowException, FPDivideByZeroException, IrregularStringOfBitsException
 	{
 
 		if(is64BinaryString(value1) && is64BinaryString(value2))
@@ -469,6 +481,8 @@ public class FPInstructionUtils
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 					throw new FPInvalidOperationException();
+				else
+					cpu.setFCSRFlags("V",1);				
 				return QNAN_NEW;
 			}
 			
@@ -480,6 +494,8 @@ public class FPInstructionUtils
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 					throw new FPInvalidOperationException();
+				else
+					cpu.setFCSRFlags("V",1);				
 				return QNAN_NEW;
 			}
 			
@@ -505,6 +521,8 @@ public class FPInstructionUtils
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO))
 					throw new FPDivideByZeroException();
+				else
+					cpu.setFCSRFlags("Z",1);
 				int sign1=getDoubleSign(value1);
 				int sign2=getDoubleSign(value2);
 				int res_sign=sign1*sign2;
@@ -774,7 +792,63 @@ public class FPInstructionUtils
 		return false;
 	}
 	
+	/** Returns the long fixed point format with the passed rounding mode, or null if an XNan or Infinity is passed to this function
+	 **/
+	public static BigInteger doubleTo64FixedPoint(String value, CPU.FPRoundingMode rm) throws IrregularStringOfBitsException
+	{
+		//we have to check if a XNan o Infinity was passed to this function
+		if(isQNaN(value) || isSNaN(value) || isInfinity(value))
+			return null;
+		
+		final int INT_PART=0;
+		final int DEC_PART=1;
+		
+		BigDecimal bd=new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value,false)));
+		String plainValue= bd.toPlainString();
+		//removing the sign
+		plainValue=plainValue.replaceFirst("-","");
+		
+		//if the decimal part contains only zeros we must remove it
+		if(plainValue.matches("[0123456789]+.[0]+"))
+			plainValue=plainValue.substring(0,plainValue.indexOf("."));
+		//we now split the integer part and the decimal one
+		String[] splittedParts=plainValue.split("\\.");			
+		
+		long int_part_value=Long.valueOf(splittedParts[INT_PART]);
+		
+		//if the decimal part of the plain value exists, we must round to the passed rounding mode
+		if(splittedParts.length==2)
+			switch(rm){
+				case TO_NEAREST: 
+					//ex. 1.6-->2   1.8-->2  
+					if(splittedParts[DEC_PART].matches("[6789][0123456789]*"))
+						int_part_value++;
+					//1.5-->2   2.5-->2(we must round to the nearest even)
+					else if(splittedParts[DEC_PART].matches("[5][0123456789]*"))
+						if(splittedParts[INT_PART].matches("[0123456789]*[13579]"))
+							int_part_value++;
+					break;
+					
+				case TOWARD_ZERO:
+					//it is a truncation +-4.X -->+-4   
+					break;
+				case TOWARDS_PLUS_INFINITY:
+					if(bd.doubleValue()>0)
+						int_part_value++;
+					break;
+				case TOWARDS_MINUS_INFINITY:
+					if(bd.doubleValue()<0)
+						int_part_value++;
+					break;
+				
+					
+			}
+			if(bd.doubleValue()<0) int_part_value*=(-1);
+			return new BigInteger(String.valueOf(int_part_value));	
+	}
+	
 
+	
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * MOVZ_D.java
+ * MOVN_D.java
  *
  * 27th may 2007
   * (c) 2006 EduMips64 project - Trubia Massimo

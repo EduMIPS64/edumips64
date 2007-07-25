@@ -48,7 +48,7 @@ public class BitSet64FP extends FixedBitSet {
 	 * @throws FPExponentTooLargeException is catched into the method FPInstructionUtils.doubleTobin()
 	 * @throws FPUnderflowException,FPOverflowException, IrregularWriteOperationException,FPInvalidOperationException
 	 */
-	public void writeDouble(double value) throws FPExponentTooLargeException,FPUnderflowException,FPOverflowException, FPInvalidOperationException, IrregularWriteOperationException
+	public void writeDouble(double value) throws FPExponentTooLargeException,FPUnderflowException,FPOverflowException, FPInvalidOperationException, IrregularWriteOperationException, IrregularStringOfBitsException
 	{
 		this.reset(false);
 		String bits=FPInstructionUtils.doubleToBin(value +""); 
@@ -71,7 +71,7 @@ public class BitSet64FP extends FixedBitSet {
 	 * @throws FPExponentTooLargeException is catched into the method FPInstructionUtils.doubleTobin()
 	 * @throws FPUnderflowException,FPOverflowException, IrregularWriteOperationException,FPInvalidOperationException
 	 */
-	public void writeDouble(String value) throws FPExponentTooLargeException, FPOverflowException, FPUnderflowException, FPInvalidOperationException, IrregularWriteOperationException
+	public void writeDouble(String value) throws FPExponentTooLargeException, FPOverflowException, FPUnderflowException, FPInvalidOperationException, IrregularWriteOperationException, IrregularStringOfBitsException
 	{
 		this.reset(false);
 		String bits=FPInstructionUtils.doubleToBin(value); 
