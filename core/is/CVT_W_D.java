@@ -1,7 +1,7 @@
 /*
- * CVT_L_D.java
+ * CVT_W_D.java
  *
- * 24th july 2007
+ * 29th july 2007
   * (c) 2006 EduMips64 project - Trubia Massimo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -31,17 +31,17 @@ import java.math.*;
 
 /**
  *<pre>
- *	Format: CVT.L.D fd, fs
- * Description: To convert an FP value to a 64-bit fixed point
+ *	Format: CVT.W.D fd, fs
+ * Description: To convert an FP value to 32-bit fixed point
  *   Operation: fd = convert_and_round(fs.readdouble,FCSR[CURRENT_ROUND_MODE])
  *</pre>
  */
-class CVT_L_D extends FPConversionFCSRInstructions {
-	static String OPCODE_VALUE="100101";
+class CVT_W_D extends FPConversionFCSRInstructions {
+	static String OPCODE_VALUE="100100";
 	static String FMT_FIELD="10001"; //DOUBLE IS 17
-	static String NAME = "CVT.L.D";
+	static String NAME = "CVT.W.D";
 	
-	public CVT_L_D() {
+	public CVT_W_D() {
 		super.OPCODE_VALUE = OPCODE_VALUE;
 		super.FMT_FIELD = FMT_FIELD;
 		super.name=NAME;
@@ -51,21 +51,21 @@ class CVT_L_D extends FPConversionFCSRInstructions {
 		//getting values from temporary registers
 		String fs=TRfp[FS_FIELD].getBinString();
 		BigInteger bi=FPInstructionUtils.doubleToBigInteger(fs,cpu.getFCSRRoundingMode());
-		BigInteger biggest=new BigInteger("9223372036854775807"); //2^63-1
-		BigInteger smallest=new BigInteger("-9223372036854775808"); //-2^63
-		//if the value is larger than a long an exception may occur
+		BigInteger biggest=new BigInteger("2147483647"); //2^31-1
+		BigInteger smallest=new BigInteger("-2147483648"); //-2^31
+		//if the value is larger than an int an exception may occur
 		if(bi==null || bi.compareTo(biggest)==1 || bi.compareTo(smallest)==-1)
 			if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 				throw new FPInvalidOperationException();
 			else{
 				cpu.setFCSRFlags("V",1);
 				//if an exception occured without a trap the biggest value is returned
-				bi=new BigInteger("9223372036854775807");//2^63-1
+				bi=new BigInteger("2147483648");//2^31-1
 			}
 		
-		//writing the long value into a temporary integer register in order to obtain the binary value
+		//writing the int value into a temporary integer register in order to obtain the binary value
 		Register tmp= new Register();
-		tmp.writeDoubleWord(bi.longValue());
+		tmp.writeWord(bi.intValue());
 		TRfp[FD_FIELD].setBits(tmp.getBinString(),0);
 		if(enableForwarding) {
 			doWB();

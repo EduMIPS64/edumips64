@@ -1,7 +1,7 @@
 /*
- * SDC1.java
+ * S_D.java
  *
- * 27th may 2007
+ * 29th july 2007
  * (c) 2006 EduMips64 project - Trubia Massimo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -26,42 +26,21 @@ package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
 /** <pre>
- *       Syntax: SDC1 ft, offset(base)
+ *DEPRECATED INSTRUCTION (SDC1 is to be used against S.D)
+ *       Syntax: S.D ft, offset(base)
  *  Description: memory[base+offset] = ft
  *               The double value in ft is stored in memory.
  * </pre>
  */
-public class SDC1 extends FPStoring {
+public class S_D extends SDC1 {
 
-	String OPCODE_VALUE="111101";
-	public SDC1()
+	final String OPCODE_VALUE="111101";
+	public S_D()
 	{
 		super.OPCODE_VALUE = OPCODE_VALUE;
-		this.name="SDC1";
+		this.name="S.D";
 	}
 
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException
-	{
-		try
-		{
-			//restoring the address from the temporary register
-			long address=TR[OFFSET_PLUS_BASE].getValue();
-			//For the trace file
-			Dinero din=Dinero.getInstance();
-			din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),8);
-            MemoryElement memEl = memory.getCellByAddress(address); 
-			//writing on the memory element the RT register
-			memEl.setBits(TR[RT_FIELD].getBinString(),0);
-			if(enableForwarding)
-			{
-				WB();
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
 
 }
     

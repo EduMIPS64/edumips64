@@ -205,7 +205,9 @@ public abstract class Instruction {
 			DIV_D { Instruction getObject() {DIV_D newObject=new DIV_D(); return newObject;}},
 			//Load store
 			LDC1 {Instruction getObject() {LDC1 newObject=new LDC1(); return newObject;}},
+		L_D {Instruction getObject() {L_D newObject=new L_D(); return newObject;}},
 			SDC1 {Instruction getObject() {SDC1 newObject=new SDC1(); return newObject;}},
+		S_D {Instruction getObject() {S_D newObject=new S_D(); return newObject;}},
 		LWC1 {Instruction getObject() {LWC1 newObject=new LWC1(); return newObject;}},
 		SWC1 {Instruction getObject() {SWC1 newObject=new SWC1(); return newObject;}},
 			//Move to and from
@@ -229,6 +231,7 @@ public abstract class Instruction {
 		//Conversion instructions
 		CVT_L_D {Instruction getObject() { CVT_L_D newObject= new CVT_L_D(); return newObject; }},
 		CVT_D_L {Instruction getObject() { CVT_D_L newObject=new CVT_D_L(); return newObject; }},
+		CVT_W_D {Instruction getObject() { CVT_W_D newObject=new CVT_W_D(); return newObject; }},
 		CVT_D_W {Instruction getObject() { CVT_D_W newObject=new CVT_D_W(); return newObject; }};
 		abstract Instruction getObject();
     }

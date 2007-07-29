@@ -34,6 +34,8 @@ import java.math.*;
  *      Format: ADD.D fd, fs, ft
  * Description: To add floating point values
  *   Operation: fd = fs + ft
+ * 
+ * Invalid Operation, Overflow, Underflow
  *</pre>
  */
 class ADD_D extends FPArithmeticInstructions {

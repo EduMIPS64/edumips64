@@ -697,8 +697,6 @@ public class CPU {
 			fpPipe.step();
 			
 			// ID
-if(getCycles()==338)
-	System.out.println("");
 			currentPipeStatus = PipeStatus.ID;
 			if(pipe.get(PipeStatus.ID)!=null) {
 				//if an FP instruction fills the ID stage a checking for InputStructuralStall must be performed before the ID() invocation.

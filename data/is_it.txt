@@ -5,6 +5,23 @@ Guida veloce all'instruction set di EduMIPS64. Alcune descrizioni sono prese dal
 manuale MIPS64. Fateci sapere se questo e' un problema, e le rimuoveremo.
 
 
+---------------------------------------------------------------------------------
+                        ISTRUZIONI INTERE
+---------------------------------------------------------------------------------                        
+
+-Istruzione ADD
+Sintassi: ADD rd, rs, rt 
+Descrizione: 
+            Somma due interi a 32 bit. Lancia un'eccezione in caso di overflow.           
+
+
+-Istruzione ADDI 
+Sintassi: ADDI rt, rs, immediate
+Descrizione: 
+            Somma una costante ad un intero a 32 bit. Lancia un'eccezione in caso di overflow.
+
+
+
 Istruzione ADD
 
 Sintassi: ADD rd, rs, rt 
@@ -37,6 +54,16 @@ Descrizione: rd = rs + rt
 			
 Istruzione AND 
 
+-Istruzione ADDU 
+Sintassi: ADDU rd, rs, rt
+Descrizione: rd = rs + rt
+            Somma due interi a 32 bit.
+            Il valore a 32 bit del GPR rt e' sommato al valore a 32 bit del registro rs, 
+            il risultato e' memorizzato nel registro rd.
+            Non si verificano eccezioni di overflow.
+
+
+-Istruzione AND 
 Sintassi: AND rd, rs, rt 
 Descrizione: rd = rs and rt
             Effettua un AND logico bit a bit tra il registro rs ed il registro rt.
@@ -44,6 +71,7 @@ Descrizione: rd = rs and rt
 
 Istruzione ANDI 
 
+-Istruzione ANDI 
 Sintassi: ANDI rt, rs, immediato
 Descrizione: rt = rs AND immediato
             Effettua un AND logico bit a bit tra il registro rs ed un immediato.
@@ -51,55 +79,55 @@ Descrizione: rt = rs AND immediato
             viene effettuato l'AND bit a bit. Il risultato viene memorizzato nel 
             registro rt.
 
-Istruzione B
 
+-Istruzione B
 Sintassi: B offset
 Descrizione: Effettua un salto incondizionato ad offset
-            
-Istruzione BEQ 
 
+
+-Istruzione BEQ 
 Sintassi: BEQ rs, rt, offset
 Descrizione: if rs = rt then branch
             Confronta i GPR rs ed rt ed effettua un salto condizionale.
-            
-Istruzione BEQZ 
 
+
+-Istruzione BEQZ 
 Sintassi: BEQZ rs, offset
 Descrizione: if rs == 0 then branch
             Verifica il valore di un GPR ed effettua un salto condizionale.
 
-Istruzione BGEZ
 
+-Istruzione BGEZ
 Sintassi: BGEZ rs, offset
 Descrizione: if rs >= 0 then branch
             Se rs >= 0, effettua un salto relativo al PC ad offset.
-             
-Istruzione BNE 
 
+
+-Istruzione BNE 
 Sintassi: BNE rt, rs, offset
 Descrizione: if rs != rt then branch
             Verifica il valore di un GPR ed effettua un salto condizionale.
-            
-Istruzione BNEZ 
 
+
+-Istruzione BNEZ 
 Sintassi: BNEZ rs, offset
 Descrizione: if rs != 0 then branch  
             Verifica il valore di un GPR ed effettua un salto condizionale.
-            
-Istruzione DADD 
 
+
+-Istruzione DADD 
 Sintassi: DADD rd, rs, rt
 Descrizione: 
             Somma due interi a 64 bit. Lancia un'eccezione in caso di overflow.
-            
-Istruzione DADDI 
 
+
+-Istruzione DADDI 
 Sintassi: DADDI rt, rs, immediate
 Descrizione: 
             Somma una costante ad un intero a 64 bit. Lancia un'eccezione in caso di overflow.
 
-Istruzione DADDU 
 
+-Istruzione DADDU 
 Sintassi: DADDU rd, rs, rt
 Descrizione: rd = rs + rt
             Somma due interi a 64 bit.
@@ -107,8 +135,8 @@ Descrizione: rd = rs + rt
             il risultato e' memorizzato nel registro rd.
             Non si verificano eccezioni di overflow.
             
-Istruzione DADDIU 
 
+-Istruzione DADDIU 
 Sintassi: DADDIU rt, rs, immediate
 Descrizione: 
             Somma una costante ad un registro a 64 bit.
@@ -116,8 +144,8 @@ Descrizione:
             il risultato e' memorizzato nel registro rt.
             Non si verificano eccezioni di overflow.
 
-Istruzione DDIV 
 
+-Istruzione DDIV 
 Sintassi: DDIV rs, rt
 Descrizione: (LO, HI) = rs / rt
             Effettua la divisione tra due interi a 64 bit.
@@ -129,6 +157,7 @@ Descrizione: (LO, HI) = rs / rt
 
 Istruzione DDIVU
 
+-Istruzione DDIVU
 Sintassi: DDIVU rs, rt
 Descrizione: (LO, HI) = rs / rt
             Effettua la divisione tra due interi senza segno a 64 bit.
@@ -162,14 +191,15 @@ Descrizione: (LO, HI) = rs / rt
 			
 Istruzione DMULT 
 
+-Istruzione DMULT 
 Sintassi: DMULT rs, rt
 Descrizione: (LO) = rs * rt
             Moltiplica due interi con segno a 64 bit.
             Il valore nel registro rt e' moltiplicato per il valore in rs,
             considerando entrambi gli operandi come valori con segno.
 
-Istruzione DMULTU
 
+-Istruzione DMULTU
 Sintassi: DMULTU rs, rt
 Descrizione: (LO) = rs * rt
             Moltiplica due interi senza segno a 64 bit.
@@ -196,12 +226,12 @@ Descrizione:
             
 Istruzione DSRA 
 
+-Istruzione DSRA 
 Format: DSRA rd, rt, sa
 Descrizione: 
             Effettua uno shift aritmetico a destra di un numero fisso di bit, variabile tra 0 e 31, 
             del valore a 64 bit.
-            
-Istruzione DSRAV 
+
 
 Format: DSRAV rd, rt, rs
 Descrizione: rd = rt >> rs (arithmetic)
@@ -212,13 +242,13 @@ Descrizione: rd = rt >> rs (arithmetic)
             
 Istruzione DSRL 
 
+-Istruzione DSRL 
 Sintassi: DSRL rd, rt, sa
 Descrizione: 
             Effettua uno shift logico a destra di una doubleword per un numero fisso di bit
             da 0 a 31. Il valore a 64 bit contenuto nel GPR rt e' shiftato a destra inserendo degli
             zeri nei bit vuoti, il risultato e' memorizzato nel registro rd.
-            
-Istruzione DSRLV 
+
 
 Sintassi:      DSRLV rd, rt, rs
 Descrizione: 
@@ -229,14 +259,15 @@ Descrizione:
             
 Istruzione DSUB 
 
+-Istruzione DSUB 
 Sintassi: DSUB rd, rs, rt
 Descrizione: 
             Sottrae due interi a 64 bit. Se si verifica un overflow, lancia un'eccezione.
             Il valore a 64 bit del registro rt e' sottratto a quello contenuto nel registro rs,
             il risultato e' posto in rd.
-            
-Istruzione DSUBU 
 
+
+-Istruzione DSUBU 
 Sintassi: DSUBU rd, rs, rt
 Descrizione: 
             Sottrae due interi a 64 bit. 
@@ -244,8 +275,7 @@ Descrizione:
             il risultato e' posto in rd.
 			Non si verificano eccezioni di overflow.
 
-Istruzione HALT 
-
+-Istruzione HALT 
 Sintassi:    HALT
 Descrizione: 
             Termina l'esecuzione del programma.
@@ -254,6 +284,7 @@ Descrizione:
             essere ignorate.
 Eccezioni:   HaltException
 
+
 Istruzione J 
 
 Sintassi: J target
@@ -261,96 +292,97 @@ Descrizione:
             Salta entro la regione corrente allineata a 256 MB. 
             E' un salto PC-region (non PC-relative); l'effettivo
             indirizzo e' nella regione corrente allineata a 256 MB.
-            
-Istruzione JAL 
 
+
+-Istruzione JAL 
 Sintassi: JAL target
 Descrizione: 
             Esegue una chiamata di procedura all'interno della regione corrente
             allineata a 256 MB. Inserisce l'indirizzo di ritorno nel GPR 31. 
             E' un salto PC-region (non PC-relative).
-            
-Istruzione JALR 
 
+
+-Istruzione JALR 
 Sintassi: JALR rs
 Descrizione: 
             Esegue una chiamata di procedura all'indirizzo di un'istruzione contenuto
             in un registro. Inserisce l'indirizzo di ritorno nel GPR rd.
-            
-Istruzione JR 
 
+
+-Istruzione JR 
 Sintassi: JR rs
 Descrizione: 
             Esegue un salto ad un indirizzo di un'istruzione contenuto in un registro.
-            
-Istruzione LB 
 
+
+-Istruzione LB 
 Sintassi: LB rt, offset(base)
 Descrizione: rt = memory[base+offset]
             Carica un byte dalla memoria come valore con segno.
-            
-Istruzione LBU 
 
+
+-Istruzione LBU 
 Sintassi: LBU rt, offset(base)
 Descrizione: rt = memory[base+offset]
             Carica un byte dalla memoria come valore con segno.
-            
-Istruzione LD 
 
+
+-Istruzione LD 
 Sintassi: LD rt, offset(base)
 Descrizione: rt = memory[base+offset]
             Carica una doubleword dalla memoria.
-            
-Sintassi: LH rt, offset(base)
+
+
+-Sintassi: LH rt, offset(base)
 Descrizione: rt = memory[base+offset]
             Carica una halfword dalla memoria come valore con segno.
-            
-Istruzione LHU 
-
+ 
+ 
+-Istruzione LHU 
 Sintassi: LHU rt, offset(base)
 Descrizione:  rt = memory[base+offset]    
             Carica una halfword dalla memoria come valore senza segno.
-            
-Istruzione LUI 
 
+
+-Istruzione LUI 
 Format: LUI rt, immediate
 Descrizione:   
             L'immediato a 16 bit e' shiftato a sinistra di 16 bit e concatenato
             con zeri nei 16 bit meno significativi.
-            
-Istruzione LW 
 
+
+-Istruzione LW 
 Format: LW rt, offset(base)
 Descrizione:   rt = memory[base+offset]
             Carica una word dalla memoria come valore con segno.
 
-Istruzione LWU 
 
+-Istruzione LWU 
 Sintassi: LWU rt, offset(base)
 Descrizione:   rt = memory[base+offset]
             Carica una word dalla memoria come valore senza segno.
 
-Istruzione MFHI 
 
+-Istruzione MFHI 
 Sintassi: MFHI rd
 Descrizione: rd = HI
             Copia il registro speciale HI nel GPR rd.
-            
-Istruzione MFLO 
 
+
+-Istruzione MFLO 
 Sintassi: MFLO rd
 Descrizione: rd = LO
             Copia il registro speciale HI nel GPR rd.
-            
-Istruzione MOVN 
 
+
+-Istruzione MOVN 
 Sintassi: MOVN rd, rs, rt  
 Descrizione: if rt != 0 then rd = rs
             Se il valore del registro rt non e' uguale a zero il contenuto 
             viene copiato nel registro rd.
-            
-Istruzione MOVZ 
 
+
+-Istruzione MOVZ 
 Sintassi: MOVZ rd, rs, rt
 Descrizione: if rt = 0 then rd = rs
             Se il valore del registro rt non e' uguale a zero il contenuto 
@@ -373,38 +405,46 @@ Descrizione: (LO) = rs * rt
 
 Istruzione NOP 
 
+-Istruzione MULTU
+Sintassi: MULTU rs, rt
+Descrizione: (LO) = rs * rt
+            Moltiplica due interi senza segno a 32 bit.
+            Il valore nel registro rt e' moltiplicato per il valore in rs.
+
+
+-Istruzione NOP 
 Sintassi: NOP
 Descrizione:
             Crea spazi vuoti nella pipeline.
 
-Istruzione OR 
 
+-Istruzione OR 
 Sintassi: OR rd, rs, rt
 Descrizione: rd = rs or rt 
             Effettua un OR logico bit a bit.
             L'operazione di OR logico bit a bit e' effettuata tra il valore
             contenuto nel registro rs e quello contenuto nel registro rt.
-            
-Istruzione ORI 
 
+
+-Istruzione ORI 
 Sintassi: ORI rt, rs, immediate
 Descrizione:   
             Effettua un OR logico bit a bit con una costante.
 
-Istruzione SB 
 
+-Istruzione SB 
 Sintassi: SB rt, offset(base)
 Descrizione: memory[base+offset] = rt
             Memorizza gli 8 bit meno significativi di rt in memoria.
-            
-Istruzione SD 
 
+
+-Istruzione SD 
 Sintassi: SD rt, offset(base)
 Descrizione: memory[base+offset] = rt
             Memorizza la doubleword contenuta in rt in memoria.
-            
-Istruzione SH 
 
+
+-Istruzione SH 
 Sintassi: SH rt, offset(base)
 Descrizione: memory[base+offset] = rt
             Memorizza l'halfword contenuta in rt in memoria.
@@ -446,6 +486,7 @@ Descrizione:
 			
 Istruzione SLTIU 
 
+-Istruzione SLTIU 
 Sintassi: SLTIU rt, rs, immediate
 Descrizione: 
             Memorizza il risultato del confronto di minoranza tra il registro rs 
@@ -512,19 +553,258 @@ Descrizione:
 			
 Istruzione SW 
 
+-Istruzione SRLV 
+Sintassi: SRLV rd, rt, rs
+Descrizione: 
+            Effettua uno shift logico a destra di una word32 per un numero variabile di bit.
+            Il valore a 32 bit contenuto nel GPR rt e' shiftato a destra del valore contenuto negli
+            ultimi 5 bit in GPR rs (valore senza segno), inserendo degli zeri nei bit vuoti.
+            Il risultato e' memorizzato nel registro rd.
+
+
+-Istruzione SUB 
+Sintassi: SUB rd, rs, rt
+Descrizione: 
+            Sottrae due interi a 32 bit. Se si verifica un overflow, lancia un'eccezione.
+            Il valore a 32 bit del registro rt e' sottratto a quello contenuto nel registro rs,
+            il risultato e' posto in rd.
+
+
+-Istruzione SUBU 
+Sintassi: SUBU rd, rs, rt
+Descrizione: 
+            Sottrae due interi a 32 bit.
+            Il valore a 32 bit del registro rt e' sottratto a quello contenuto nel registro rs,
+            il risultato e' posto in rd.
+			Non si verificano eccezioni di overflow.
+
+
+-Istruzione SW 
 Sintassi: SW rt, offset(base)
 Descrizione: rt = memory[base+offset]
             Memorizza in memoria un byte, aggiungengo l'offset con segno 
             all'indirizzo base per formare l'indirizzo finale.
             
-Istruzione XOR 
 
+-Istruzione XOR 
 Sintassi: XOR rd, rs, rt
 Descrizione: rd = rs XOR rt
             Effettua l'OR esclusivo tra i valori contenuti nei registri rs ed rt.
-            
-Istruzione XORI 
 
+
+-Istruzione XORI 
 Sintassi: XORI rt, rs, immediate
 Descrizione: rt = rs XOR immediate
              Effettua l'OR esclusivo con una costante.
+
+---------------------------------------------------------------------------------
+                    ISTRUZIONI FLOATING POINT
+---------------------------------------------------------------------------------            
+-Istruzione ADD.D
+Sintassi: ADD.D fd, fs, ft
+Descrizione:fd = fs + ft
+            Effettua la somma di due valori double floating point
+Eccezioni:  Overflow e Underflow vengono generate se il risultato non può essere 
+            rappresentato secondo lo standard IEEE754
+            Invalid Operation è generata se fs o ft contiene QNaN o SNaN, 
+            o se viene eseguita un'operazione non valida (i.e +infinito-infinito)
+
+
+-Istruzione BC1F
+Sintassi: BC1F cc, offset
+Descrizione: if FCSR[cc] = 0 then branch
+            Testa una condizione cc ed effettua un salto PC-relative
+            Il valore booleano FCSR[cc] può essere scritto solo dalle istruzioni
+            C.condition.format
+            (es.  C.EQ.D 7,f1,f2 --->  NOP ---> BC1T 7,label)
+
+
+-Istruzione BC1T 
+Sintassi: BC1T cc, offset
+Descrizione: if FCSR[cc] = 1 then branch
+            Testa una condizione cc ed effettua un salto PC-relative
+            Il valore booleano FCSR[cc] può essere scritto solo dalle istruzioni
+            C.condition.format
+            (es.  C.EQ.D 7,f1,f2 --->  NOP ---> BC1T 7,label)
+
+
+-Istruzione C.EQ.D 
+Sintassi: C.EQ.D cc, fs, ft
+Descrizione: FCSR[cc] = (fs==ft)
+            Verifica il predicato "uguale a" tra i due registri fs ed ft e 
+            salva il risultato in FCSR[cc]. Il risultato viene scritto nello stadio EX,
+            per cui si deve porre una nop immediatamente dopo questa istruzione
+            se si vuole testare il valore scritto in FCSR[cc] con un'istruzione di salto.
+            (es.  C.EQ.D 7,f1,f2 --->  NOP ---> BC1T 7,label)
+            cc è un immediato a 3 bit del range [0,7]
+Eccezioni: Invalid Operation  è lanciata quando fs o ft contengono valori QNaN 
+            (se attiva si ha una trap)  o SNaN(si ha sempre una trap)  
+            
+
+-Istruzione C.LT.D 
+Sintassi: C.LT.D cc, fs, ft
+Descrizione: FCSR[cc]=(fs<ft)
+            Verifica il predicato "minore di" tra i due registri fs ed ft e salva 
+            il risultato in FCSR[cc]. Il risultato viene scritto nello stadio EX,
+            per cui si deve porre una nop immediatamente dopo questa istruzione
+            se si vuole testare il valore scritto in FCSR[cc] con un'istruazione di salto.
+            (es.  C.LT.D 7,f1,f2 --->  NOP ---> BC1T 7,label)
+            cc è un immediato a 3 bit del range [0,7]
+Eccezioni: Invalid Operation  è lanciata quando fs o ft contengono valori QNaN 
+            (se attiva si ha una trap)  o SNaN(si ha sempre una trap)  
+
+
+-Istruzione CVT.D.L 
+Sintassi: CVT.D.L fd, fs
+Descrizione: fd = convert(fs)
+            Converte un long in un double
+Eccezioni: Invalid Operation è lanciata quando fs contiene QNaN,SNaN o Infinito
+
+
+-CVT.W.D Istruzione
+Sintassi: CVT.D.W fd, fs
+Descrizione: fd = convert(fs)
+            Converte un int in un double
+Eccezioni: Invalid Operation è lanciata quando fs contiene QNaN,SNaN or Infinity values            
+
+
+-Istruzione CVT.L.D 
+Sintassi: CVT.L.D fd, fs
+Descrizione: fd = convert_and_round(fs, CurrentRoundingMode)
+            Converte un double in un long
+            La modalità di arrotondamento corrente si cambia dalla scheda Configure/Settings/FPURound 
+Eccezioni: Invalid Operation è lanciata quando fs è Infinito, XNaN, o 
+            il risultato è fuori dal range -2^63 a 2^63 -1 (long)
+            
+
+-Istruzione CVT.W.D 
+Sintassi: CVT.W.D fd, fs
+Descrizione: fd = convert_and_round(fs, CurrentRoundingMode)
+            Converte un double in un int
+            La modalità di arrotondamento corrente si cambia dalla scheda Configure/Settings/FPURound 
+Eccezioni:  Invalid Operation è lanciata quando fs è Infinito, XNaN, o 
+            il risultato è fuori dal range -2^31 a 2^31 -1 (int)
+            
+            
+-Istruzione DIV.D 
+Sintassi: DIV.D fd, fs, ft
+Descrizione: fd = fs / ft
+            Divide valori floating point double
+Eccezioni: Overflow and Underflow vengono generati se il risultato non può essere
+            rappresentato secondo lo standard IEEE754
+            Invalid Operation viene generata se fs o ft contengono QNaN or SNaN
+            o viene eseguita un'operazione non valida (es. 0/0)            
+            Divide by zero è generata se è eseguita una divisione per zero
+            
+
+-Istruzione DMFC1 
+Sintassi: DMFC1 rt,fs
+Descrizione: ft = fs
+            Sposta una double word da un FPR a un GPR
+            
+
+-Istruzione DMTC1 
+Sintassi: DMTC1 rt, fs
+Descrizione: fs = rt
+            Copia una doubleword da un GPR ad un FPR
+            
+
+-Istruzione L.D  (Obsoleta: Si deve usare LDC1)
+Sintassi: L.D ft, offset(base)
+Descrizione:ft = memory[base+offset]
+            Carica una double word dalla memoria all'FPR
+
+
+-Istruzione LDC1 
+Sintassi: LDC1 ft, offset(base)
+Descrizione: ft = memory[base+offset]
+            Carica una double word dalla memoria all'FPR
+
+
+-Istruzione LWC1 
+Sintassi: LWC1 ft, offset(base)
+Descrizione: ft= memory[base + offset]
+             Carica una  word dalla memoria all'FPR
+
+
+-Istruzione MFC1 
+Sintassi: MFC1 rt, fs
+Descrizione: rt = readword(fs)
+            Copia una word da un GPR ad un FPR
+
+
+-Istruzione MOVF.D 
+Sintassi: MOVF.D fd, fs, cc
+Descrizione: if FCSR[cc] = 0 then fd=fs
+            Testa il booleano FCSR[cc] e sposta un valore FP
+
+            
+-Istruzione MOVT.D 
+Sintassi: MOVT.D fd, fs, cc
+Descrizione: if FCSR[cc] = 1 then fd=fs
+            Testa il booleano FCSR[cc] e sposta un valore FP
+            
+            
+-Istruzione MOV.D 
+Sintassi: MOV.D fd, fs
+Descrizione: fd = fs
+            Sposta valori tra FPRs
+
+
+-Istruzione MOVN.D 
+Sintassi: MOVN.D fd, fs, rt
+Descrizione: if rt != 0 then fd=fs
+            Testa un GPR e sposta valori tra FPRs
+
+
+-Istruzione MOVZ.D 
+Sintassi: MOVZ.D fd, fs, rt
+Descrizione: if rt = 0 then fd=fs
+            Testa un GPR e sposta valori tra FPRs
+
+
+-Istruzione MTC1 
+Sintassi: MTC1 rt, fs
+Descrizione: fs = rt(31..0)
+            Copia una word da un GPR a un FPR
+            La word più bassa del GPR è posta nella word più bassa dell'FPR
+
+
+-Istruzione MUL.D 
+Sintassi: MUL.D fd, fs, ft
+Descrizione: fd = fs * ft
+            Moltiplica valori double
+Eccezioni: Overflow and Underflow vengono generati se il risultato non può essere
+            rappresentato secondo lo standard IEEE754
+            Invalid Operation è generato se fs o ft contiene  QNaN o SNaN, 
+            o se si effettua un'operazione non valida (es. Infinito*0)    
+
+
+-Istruzione S.D  (OBSOLETA: Si deve usare SDC1)
+Sintassi: S.D ft, offset(base)
+Descrizione: memory[base+ offset] = ft
+           Per memorizzare una double word da un FPR alla memoria
+
+
+-Istruzione SDC1 
+Sintassi: SDC1 ft, offset(base)
+Descrizione:memory[base+ offset] =ft 
+            Per memorizzare una double word da un FPR alla memoria
+
+
+-Istruzione SUB.D 
+Sintassi: SUB.D fd, fs, ft
+Descrizione:
+           Per sottrarre valori FP
+Eccezioni: Overflow and Underflow avengono generati se il risultato non può essere
+            rappresentato secondo lo standard IEEE754
+            Invalid Operation è generata se fs o ft contengono
+             QNaN o SNaN, o se viene eseguita un'operazione non valida
+             (es. +Infinito -  +Infinito) 
+
+
+-Istruzione SWC1 
+Sintassi: SWC1 ft, offset(base)
+Descrizione: memory[base + offset] =ft
+            Memorizza una word da un FPR alla memoria. La word più bassa dell'FPR 
+             è salvata in memoria.           

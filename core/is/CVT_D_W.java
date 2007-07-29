@@ -32,7 +32,7 @@ import java.math.*;
 /**
  *<pre>
  *	Format: CVT.D.W fd, fs
- * Description: To convert an FP or fixed point value to double FP
+ * Description: To convert a word fixed point value to double FP
  *   Operation: fd = convert_and_round(fs.readword,FCSR[CURRENT_ROUND_MODE])
  *</pre>
  */

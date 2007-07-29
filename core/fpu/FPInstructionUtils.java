@@ -768,7 +768,7 @@ public class FPInstructionUtils {
 	 *  @param value a binary string representing a double value according to the IEEE754 standard
 	 *  @param rm the rounding mode to use for the conversion
 	 **/
-	public static BigInteger doubleToLong(String value, CPU.FPRoundingMode rm) throws IrregularStringOfBitsException
+	public static BigInteger doubleToBigInteger(String value, CPU.FPRoundingMode rm) throws IrregularStringOfBitsException
 	{
 		//we have to check if a XNan o Infinity was passed to this function
 		if(isQNaN(value) || isSNaN(value) || isInfinity(value) || !is64BinaryString(value))
