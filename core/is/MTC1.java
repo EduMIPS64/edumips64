@@ -30,8 +30,11 @@ import edumips64.utils.*;
 import java.math.*;
 
 /**
- * <pre>
- *
+ *<pre>
+ *	Format: MTC1 rt, fs
+ * Description: To copy a word from a GPR to an FPR
+ *   Operation: fs.writeword_nosignextend(readword(rt))
+ *</pre>
  */
 class MTC1 extends FPMoveToInstructions {
 	String OPCODE_VALUE="00100";

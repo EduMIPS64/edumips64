@@ -30,8 +30,11 @@ import edumips64.utils.*;
 import java.math.*;
 
 /**
- * <pre>
- *
+ *<pre>
+ *	Format: MFC1 rt,fs
+ * Description: To copy a word from an FPU general register to a GPR
+ *   Operation: rt.writeword_signextend(fs.readword)
+ *</pre>
  */
 class MFC1 extends FPMoveFromInstructions {
 	String OPCODE_VALUE="00000";

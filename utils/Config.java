@@ -78,6 +78,8 @@ public class Config{
 			config.put("TOWARDS_MINUS_INFINITY",false);
 			// seed to generate a serial number for instructions
 			config.put("serialNumber",(long)0);
+			// modality by which memory cells value are showed (long,double)
+			config.put("LONGDOUBLEVIEW",true); //long=true  double=false
 		}
 	}
 	public static void setMap(Map<String,Object> newConfig){

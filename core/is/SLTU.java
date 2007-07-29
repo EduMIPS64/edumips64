@@ -38,50 +38,45 @@ import edumips64.utils.*;
  * @author Trubia Massimo, Russo Daniele
  *
  */
-class SLTU extends ALU_RType
-{
-   final String OPCODE_VALUE="101011";
-    
-    
-    public SLTU()
-    {
-	super.OPCODE_VALUE = OPCODE_VALUE;
-        name="SLTU";
-    }
-
-    public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException,IrregularWriteOperationException 
-    {
-        //getting strings from temporary registers
-        String rs=TR[RS_FIELD].getBinString();
-        String rt=TR[RT_FIELD].getBinString();
-        boolean rsbit,rtbit,diff,slt=false;
-        //comparison between registers as unsigned integers
-        for(int i=0;i<64;i++)
-        {
-            //XOR
-            rsbit=rs.charAt(i)=='1'? true:false;
-            rtbit=rt.charAt(i)=='1'? true:false;
-            diff=rsbit^rtbit;
-            if(diff) //bits are different
-            {
-                if(rtbit) //rtbit is 1
-                {    
-                    slt=true;
-                    break;
-                }
-                break;
-            }
-
-        }
-        if(slt)
-            TR[RD_FIELD].writeDoubleWord(1);
-        else
-            TR[RD_FIELD].writeDoubleWord(0);
-	if(enableForwarding)
-	{
-		doWB();
+class SLTU extends ALU_RType {
+	final String OPCODE_VALUE="101011";
+	
+	
+	public SLTU() {
+		super.OPCODE_VALUE = OPCODE_VALUE;
+		name="SLTU";
 	}
-     }
-    
-  
+	
+	public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException,IrregularWriteOperationException {
+		//getting strings from temporary registers
+		String rs=TR[RS_FIELD].getBinString();
+		String rt=TR[RT_FIELD].getBinString();
+		boolean rsbit,rtbit,diff,slt=false;
+		//comparison between registers as unsigned integers
+		for(int i=0;i<64;i++) {
+			//XOR
+			rsbit=rs.charAt(i)=='1'? true:false;
+			rtbit=rt.charAt(i)=='1'? true:false;
+			diff=rsbit^rtbit;
+			if(diff) //bits are different
+			{
+				if(rtbit) //rtbit is 1
+				{
+					slt=true;
+					break;
+				}
+				break;
+			}
+			
+		}
+		if(slt)
+			TR[RD_FIELD].writeDoubleWord(1);
+		else
+			TR[RD_FIELD].writeDoubleWord(0);
+		if(enableForwarding) {
+			doWB();
+		}
+	}
+	
+	
 }

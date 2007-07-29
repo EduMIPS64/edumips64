@@ -44,8 +44,10 @@ public abstract class FPMoveFromInstructions extends FPMoveToAndFromInstructions
 		TRfp[FS_FIELD].setBits(fs.getBinString(),0);
 		TR[RT_FIELD].setBits(rt.getBinString(),0);
 		//locking the destination register
-		if(rt.getWriteSemaphore()>0)
-			throw new WAWException();
+		
+		// it is not necessary because no one long latency instruction writes an integer register
+		/*if(rt.getWriteSemaphore()>0)
+			throw new WAWException();*/
 		rt.incrWriteSemaphore();
 	}
 	public abstract void EX() throws IrregularStringOfBitsException,IrregularWriteOperationException;

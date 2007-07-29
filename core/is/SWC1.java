@@ -28,10 +28,10 @@ import edumips64.core.*;
 import edumips64.utils.*;
 
 
-/** <pre>
- * 
- * </pre>
- * @author Trubia Massimo
+/**
+ *       Syntax: SWC1 ft, offset(base)
+ *  Description: writewordmemory[base+offset] = ft
+ *               To store a word from an FPR to memory
  */
 class SWC1 extends FPStoring
 {

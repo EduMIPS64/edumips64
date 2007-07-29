@@ -30,11 +30,6 @@ import edumips64.utils.*;
  *  Description: memory[base+offset] = ft
  *               The double value in ft is stored in memory.
  * </pre>
- * @author Trubia Massimo
- */
-/**
- *
- * @author Massimo
  */
 public class SDC1 extends FPStoring {
 
@@ -44,7 +39,6 @@ public class SDC1 extends FPStoring {
 		super.OPCODE_VALUE = OPCODE_VALUE;
 		this.name="SDC1";
 	}
-
 
 	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException
 	{
@@ -67,15 +61,6 @@ public class SDC1 extends FPStoring {
 		{
 			e.printStackTrace();
 		}
-	}
-
-	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
-
-	}
-
-	public void WB() throws IrregularStringOfBitsException
-	{
-
 	}
 
 }

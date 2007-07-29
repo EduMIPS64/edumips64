@@ -28,10 +28,13 @@ import edumips64.core.*;
 import edumips64.utils.*;
 
 
-/** <pre>
- 
-  * </pre>
- * @author Trubia Massimo
+/** 
+  * <pre>
+ *      Format: LWC1 ft, offset(base)
+ * Description: To load a word from memory to an FPR
+ *   Operation: ft = readmemoryword[base+offset]
+ *</pre>
+
  */
 class LWC1 extends FPLoading
 {
@@ -45,6 +48,7 @@ class LWC1 extends FPLoading
 
     public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
     { 
+		super.MEM(); //unlock the fp register in order to avoid WAW hazards
         //restoring the address from the temporary register
         long address=TR[OFFSET_PLUS_BASE].getValue();
         //For the trace file

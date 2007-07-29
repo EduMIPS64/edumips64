@@ -31,7 +31,10 @@ import java.math.*;
 
 /**
  * <pre>
- *
+ *      Format: DMTC1 rt, fs
+ * Description: To copy a doubleword from a GPR to an FPR
+ *   Operation: fs = rt
+ *</pre>
  */
 class DMTC1 extends FPMoveToInstructions {
 	String OPCODE_VALUE="00101";

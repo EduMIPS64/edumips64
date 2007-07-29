@@ -30,8 +30,11 @@ import edumips64.utils.*;
 import java.math.*;
 
 /**
- * <pre>
- *
+ *<pre>
+ *	Format: DMFC1 rt,fs
+ * Description: To move a doubleword from an FPR to a GPR.
+ *   Operation: rt=fs
+ *</pre>
  */
 class DMFC1 extends FPMoveFromInstructions {
 	String OPCODE_VALUE="00001";

@@ -33,12 +33,12 @@ import edumips64.utils.*;
  */
 public class RegisterFP extends BitSet64FP {
 	private int writeSemaphore;
-	private int readSemaphore;
+	private int WAWSemaphore;
 
 	/** Creates a default new instance of Register. */
 	public RegisterFP(){
 		writeSemaphore = 0;
-		readSemaphore = 0;
+		WAWSemaphore = 0;
 	}
 	
 	/** Returns the value of the semaphore
@@ -51,14 +51,14 @@ public class RegisterFP extends BitSet64FP {
 	/** Returns the value of the semaphore
 	 *  @return the numerical value of the semaphore
 	 */
-	public int getReadSemaphore() {
-		return readSemaphore;
+	public int getWAWSemaphore() {
+		return WAWSemaphore;
 	}
 
 	/** Increments the value of the semaphore
 	 */
-	public void incrReadSemaphore() {
-		readSemaphore++;
+	public void incrWAWSemaphore() {
+		WAWSemaphore++;
 	}
 	
 	/** Increments the value of the semaphore
@@ -82,8 +82,8 @@ public class RegisterFP extends BitSet64FP {
 	 *  the value becomes negative only in case of programming errors, and the EduMIPS64 team
 	 *  doesn't make any programming error.
 	 */
-	public void decrReadSemaphore() {
-		if(--readSemaphore < 0)
+	public void decrWAWSemaphore() {
+		if(--WAWSemaphore < 0)
 			throw new RuntimeException();
 	}
 
@@ -100,7 +100,7 @@ public class RegisterFP extends BitSet64FP {
 	public void reset() {
 		super.reset(false);
 		writeSemaphore = 0;
-		readSemaphore = 0;
+		WAWSemaphore = 0;
 	}
 		
 

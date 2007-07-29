@@ -26,9 +26,9 @@ package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
 
-/**This is the base class of Load store instructions
+/**This is the base class of FP Load store instructions
  *
- * @author Trubia Massimo, Russo Daniele
+ * @author Trubia Massimo
  */
 
  public abstract class FPLDSTInstructions extends LDSTInstructions {
@@ -40,10 +40,10 @@ import edumips64.utils.*;
         this.syntax="%F,%L(%R)";
         this.paramCount=3;
     }
-    public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException;
-    public abstract void EX() throws IrregularStringOfBitsException,IntegerOverflowException;
-    public abstract void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
-    public abstract void WB() throws IrregularStringOfBitsException;
+    public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException, WAWException {}
+    public void EX() throws IrregularStringOfBitsException,IntegerOverflowException {}
+    public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {}
+    public void WB() throws IrregularStringOfBitsException {}
     public void pack() throws IrregularStringOfBitsException
     {
        //conversion of instruction parameters of params list to the "repr" 32 binary value

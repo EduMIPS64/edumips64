@@ -27,12 +27,13 @@ import edumips64.core.*;
 import edumips64.utils.*;
 
 
-/** <pre>
- *         Format: LDC1 ft, offset(base)
- *    Description: ft = memory[base+offset]
- *                 To load a doubleword from memory to an FPR
- * </pre>
- * @author Trubia Massimo
+/** 
+ * <pre>
+ *      Format: LDC1 ft, offset(base)
+ * Description: To load a doubleword from memory to an FPR
+ *   Operation: ft = memory[base+offset]
+ *</pre>
+
  */
 class LDC1 extends FPLoading
 {
@@ -54,9 +55,8 @@ class LDC1 extends FPLoading
         MemoryElement memEl = memory.getCellByAddress(address); 
 		//reading from the memory element and saving values on LMD register
 		TR[LMD_REGISTER].setBits(memEl.getBinString(),0);
-		if(enableForwarding)
-		{
+		if(enableForwarding) {
 			doWB();
 		}
-	}        
+	}
 }

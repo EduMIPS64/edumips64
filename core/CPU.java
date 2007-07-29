@@ -140,7 +140,7 @@ public class CPU {
 		knownFPInstructions.add("MUL.D");
 		knownFPInstructions.add("DIV.D");
 		
-		terminatingInstructionsOPCodes = new LinkedList();
+		terminatingInstructionsOPCodes = new LinkedList<String>();
 		terminatingInstructionsOPCodes.add("0000000C"); // syscall 0
 		terminatingInstructionsOPCodes.add("04000000"); // halt
 		
@@ -697,6 +697,8 @@ public class CPU {
 			fpPipe.step();
 			
 			// ID
+if(getCycles()==338)
+	System.out.println("");
 			currentPipeStatus = PipeStatus.ID;
 			if(pipe.get(PipeStatus.ID)!=null) {
 				//if an FP instruction fills the ID stage a checking for InputStructuralStall must be performed before the ID() invocation.
@@ -762,7 +764,6 @@ public class CPU {
 				logger.info("Re-thrown the exception");
 				throw new BreakException();
 			}
-System.out.println("\nV" + getFCSRFlags("V") + " Z" +getFCSRFlags("Z") + " O" + getFCSRFlags("O") + " U" + getFCSRFlags("U"));
 			if(syncex != null)
 				throw new SynchronousException(syncex);
 			

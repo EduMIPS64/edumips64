@@ -64,12 +64,15 @@ public abstract class FPConditionalZerosMoveInstructions extends ALUInstructions
 		TRfp[FD_FIELD].setBits(fd.getBinString(),0);
 		TR[RT_FIELD].setBits(rt.getBinString(),0);
 		//locking the destination register
-		if(fd.getWriteSemaphore()>0)
+		if(fd.getWAWSemaphore()>0)
 			throw new WAWException();
 		fd.incrWriteSemaphore();
+		fd.incrWAWSemaphore();
 	}
 	public abstract void EX() throws IrregularStringOfBitsException;
-	public void MEM() throws MemoryElementNotFoundException{};
+	public void MEM() throws MemoryElementNotFoundException{
+		cpu.getRegisterFP(params.get(FD_FIELD)).decrWAWSemaphore();
+	};
 	public void WB() throws IrregularStringOfBitsException
 	{
 		if(!enableForwarding)

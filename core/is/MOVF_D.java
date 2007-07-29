@@ -30,8 +30,11 @@ import edumips64.utils.*;
 import java.math.*;
 
 /**
- * <pre>
- *
+ *<pre>
+ *	Format: MOVF.D fd, fs, cc
+ * Description: To test an FP condition code then conditionally move an FP value
+ *   Operation: if FCSR[cc] = 1 then fd = fs
+ *</pre>
  */
 class MOVF_D extends FPConditionalCC_DMoveInstructions {
 	String NAME = "MOVF.D";

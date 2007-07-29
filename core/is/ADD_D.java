@@ -31,31 +31,30 @@ import java.math.*;
 
 /**
  * <pre>
- *
+ *      Format: ADD.D fd, fs, ft
+ * Description: To add floating point values
+ *   Operation: fd = fs + ft
+ *</pre>
  */
-class ADD_D extends FPArithmeticInstructions
-{
-    String OPCODE_VALUE="000000";
-    String FMT_FIELD="10001"; //DOUBLE IS 17
-    String NAME = "ADD.D";
-    
-    public ADD_D()
-    {
-	super.OPCODE_VALUE = OPCODE_VALUE;
-	super.FMT_FIELD = FMT_FIELD;
-        super.name=NAME;
-    }
-
-    public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPUnderflowException,FPOverflowException
-    {
-        //getting values from temporary registers
-	String operand1=TRfp[FS_FIELD].getBinString();
-	String operand2=TRfp[FT_FIELD].getBinString();
-        String outputstring=FPInstructionUtils.doubleSum(operand1,operand2);
-	TRfp[FD_FIELD].setBits(outputstring,0);
-	if(enableForwarding)
-	{
-		doWB();
+class ADD_D extends FPArithmeticInstructions {
+	String OPCODE_VALUE="000000";
+	String FMT_FIELD="10001"; //DOUBLE IS 17
+	String NAME = "ADD.D";
+	
+	public ADD_D() {
+		super.OPCODE_VALUE = OPCODE_VALUE;
+		super.FMT_FIELD = FMT_FIELD;
+		super.name=NAME;
 	}
-    }    
+	
+	public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPUnderflowException,FPOverflowException {
+		//getting values from temporary registers
+		String operand1=TRfp[FS_FIELD].getBinString();
+		String operand2=TRfp[FT_FIELD].getBinString();
+		String outputstring=FPInstructionUtils.doubleSum(operand1,operand2);
+		TRfp[FD_FIELD].setBits(outputstring,0);
+		if(enableForwarding) {
+			doWB();
+		}
+	}
 }

@@ -63,13 +63,6 @@ public abstract class FPC_cond_DInstructions extends ALUInstructions {
 	
 	public void ID() throws IrregularStringOfBitsException, RAWException{
 		//if source registers are valid passing their own values into temporary registers
-/*
-		boolean less;
-		boolean equal;
-		boolean unordered;
-		boolean condition;
-		int condition_int;
- */
 		RegisterFP fs=cpu.getRegisterFP(params.get(FS_FIELD));
 		RegisterFP ft=cpu.getRegisterFP(params.get(FT_FIELD));
 		if(fs.getWriteSemaphore()>0 || ft.getWriteSemaphore()>0)
@@ -77,36 +70,6 @@ public abstract class FPC_cond_DInstructions extends ALUInstructions {
 		
 		TRfp[FS_FIELD].setBits(fs.getBinString(),0);
 		TRfp[FT_FIELD].setBits(ft.getBinString(),0);
-/*
-		//truth mask
-		boolean cond0=(COND_VALUE.charAt(3)=='1')?true:false; //codes the unordered predicate
-		boolean cond1=(COND_VALUE.charAt(2)=='1')?true:false; //codes the equal predicate
-		boolean cond2=(COND_VALUE.charAt(1)=='1')?true:false; //codes the less predicate
-		if(FPInstructionUtils.isSNaN(fs.getBinString())	|| FPInstructionUtils.isSNaN(ft.getBinString())
-		|| FPInstructionUtils.isQNaN(fs.getBinString())	|| FPInstructionUtils.isQNaN(ft.getBinString())){
-			less=false;
-			equal=false;
-			unordered=true;
-			//checking for invalid operation exception (if it is raised the FCSR isn't modified)
-			//this exception occurs 
-			if(FPInstructionUtils.isSNaN(fs.getBinString()) || FPInstructionUtils.isSNaN(ft.getBinString()) 
-			|| (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION) && (FPInstructionUtils.isQNaN(fs.getBinString()) || FPInstructionUtils.isQNaN(ft.getBinString()))))
-				throw new FPInvalidOperationException();
-		}
-		else{
-			BigDecimal fsbd=new BigDecimal(Double.longBitsToDouble(Converter.binToLong(fs.getBinString(),false)));
-			BigDecimal ftbd=new BigDecimal(Double.longBitsToDouble(Converter.binToLong(ft.getBinString(),false)));
-			
-			less= fsbd.doubleValue()<ftbd.doubleValue();
-			equal=(fs.getBinString().compareTo(ft.getBinString())==0);
-			unordered= false;
-		}
-		
-		//now we make the and operation between the truth mask and the result of the registers
-		condition = (cond2 && less) || (cond1 && equal) || (cond0 && unordered);
-		condition_int=(condition==true)?1:0;
-		cpu.setFCSRConditionCode(params.get(CC_FIELD).intValue(),condition_int);
- */
 	}
 	
 	public void EX() throws IrregularStringOfBitsException, FPInvalidOperationException{
@@ -148,8 +111,8 @@ public abstract class FPC_cond_DInstructions extends ALUInstructions {
 		condition_int=(condition==true)?1:0;
 		cpu.setFCSRConditionCode(params.get(CC_FIELD).intValue(),condition_int);		
 	}
-	public abstract void MEM();
-	public abstract void WB() ;
+	public void MEM(){}
+	public void WB(){};
 	
 	public void pack() throws IrregularStringOfBitsException {
 		//conversion of instruction parameters of "params" list to the "repr" form (32 binary value)

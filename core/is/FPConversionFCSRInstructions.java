@@ -40,7 +40,6 @@ public abstract class FPConversionFCSRInstructions extends FPFormattedOperandMov
 		this.paramCount=2;
 	}
 	public abstract void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,IrregularWriteOperationException,FPUnderflowException,FPOverflowException;
-	public void MEM() throws MemoryElementNotFoundException{};
 }
 
  

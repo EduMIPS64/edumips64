@@ -69,10 +69,10 @@ class DADD extends ALU_RType
         else
             outputstring=outputstring.substring(1,65);
         TR[RD_FIELD].setBits(outputstring,0);
-	if(enableForwarding)
-	{
-		doWB();
-	}
+        if(enableForwarding)
+        {
+            doWB();
+        }
     }
-   
+	
 }

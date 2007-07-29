@@ -30,9 +30,11 @@ import edumips64.utils.*;
 import java.math.*;
 
 /**
- * <pre>
- * whether a qnan or snan is passed or the rounded value is outside the range [2^63,2^63-1]
- *  null is returned
+ *<pre>
+ *	Format: CVT.D.L fd, fs
+ * Description: To convert an FP or fixed point value to double FP
+ *   Operation: fd = convert_and_round(fs,FCSR[CURRENT_ROUND_MODE])
+ *</pre>
  */
 class CVT_D_L extends FPConversionFCSRInstructions {
 	static String OPCODE_VALUE="100101";
@@ -49,7 +51,7 @@ class CVT_D_L extends FPConversionFCSRInstructions {
 		//getting values from temporary registers
 		BigDecimal bd;
 		String fs=TRfp[FS_FIELD].getBinString();
-		if((bd=FPInstructionUtils.fixedPoint64ToDouble(fs))==null)
+		if((bd=FPInstructionUtils.longToDouble(fs))==null)
 			if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 				throw new FPInvalidOperationException();
 			else{

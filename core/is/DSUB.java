@@ -37,39 +37,30 @@ import edumips64.utils.*;
 public class DSUB extends ALU_RType {
     final String OPCODE_VALUE="101110";
     /** Creates a new instance of DSUB */
-    public DSUB() 
-    {
+    public DSUB() {
     	super.OPCODE_VALUE = OPCODE_VALUE;
         name="DSUB";
-   }
-    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException,TwosComplementSumException
-   {
-        //getting strings from temporary registers
-        String rs=TR[RS_FIELD].getBinString();
-        String rt=TR[RT_FIELD].getBinString();
-        //performing sign extension to detect IntegerOverflow
-        rs=rs.charAt(0)+rs;
-        rt=rt.charAt(0)+rt; 
-        String outputstring=InstructionsUtils.twosComplementSubstraction(rs,rt);
-        //comparison between the two most significant bits of the outputstring and 
-        //raising integer overflow if the first bit is different from the second one
-        if(outputstring.charAt(0)!=outputstring.charAt(1)){ 
-            //if the enable forwarding is turned on we have to ensure that registers 
-            //should be unlocked also if a synchronous exception occurs. This is performed 
-            //by executing the WB method before raising the trap 
-            if(enableForwarding) 
-                doWB(); 
-            throw new IntegerOverflowException(); 
-        }  
-        else
-            outputstring=outputstring.substring(1,65);
-        TR[RD_FIELD].setBits(outputstring,0);
-	if(enableForwarding)
-	{
-		doWB();
-	}
-    
     }
-
-    
+	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException,TwosComplementSumException {
+		//getting strings from temporary registers
+		String rs=TR[RS_FIELD].getBinString();
+		String rt=TR[RT_FIELD].getBinString();
+		//performing sign extension to detect IntegerOverflow
+		rs=rs.charAt(0)+rs;
+		rt=rt.charAt(0)+rt;
+		String outputstring=InstructionsUtils.twosComplementSubstraction(rs,rt);
+		//comparison between the two most significant bits of the outputstring and
+		//raising integer overflow if the first bit is different from the second one
+		if(outputstring.charAt(0)!=outputstring.charAt(1))
+			throw new IntegerOverflowException();
+		else
+			outputstring=outputstring.substring(1,65);
+		TR[RD_FIELD].setBits(outputstring,0);
+		if(enableForwarding) {
+			doWB();
+		}
+		
+	}
+	
+	
 }

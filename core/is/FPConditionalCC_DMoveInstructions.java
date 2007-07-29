@@ -26,7 +26,7 @@ package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
 
-/**This is the base class of the move to and from instructions
+/**This is the base class of the conditional move to and from instructions
  *
  * @author Trubia Massimo
  */
@@ -67,16 +67,19 @@ public abstract class FPConditionalCC_DMoveInstructions extends ALUInstructions{
 		TRfp[FS_FIELD].setBits(fs.getBinString(),0);
 		TRfp[FD_FIELD].setBits(fd.getBinString(),0);
 		//locking the destination register
-		if(fd.getWriteSemaphore()>0)
+		if(fd.getWAWSemaphore()>0)
 			throw new WAWException();
 		fd.incrWriteSemaphore();
+		fd.incrWAWSemaphore();
 	}
 	public void EX() throws IrregularStringOfBitsException{
 		String fs=TRfp[FS_FIELD].getBinString();
 		if(cpu.getFCSRConditionCode(params.get(CC_FIELD).intValue())==TF_FIELD_VALUE)
 			TRfp[FD_FIELD].setBits(fs,0);
 	}
-	public void MEM() throws MemoryElementNotFoundException{};
+	public void MEM() throws MemoryElementNotFoundException{
+		cpu.getRegisterFP(params.get(FD_FIELD)).decrWAWSemaphore();
+	}
 	public void WB() throws IrregularStringOfBitsException
 	{
 		if(!enableForwarding)

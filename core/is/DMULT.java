@@ -43,111 +43,97 @@ import java.util.*;
  * 
  * @author Trubia Massimo, Russo Daniele
  */
-class DMULT extends ALU_RType
-{
-    final int RS_FIELD=0;
-    final int RT_FIELD=1;
-    final String OPCODE_VALUE="011100";
-
-    String lo;
-    String hi;
-    
-	public DMULT()
-	{
+class DMULT extends ALU_RType {
+	final int RS_FIELD=0;
+	final int RT_FIELD=1;
+	final String OPCODE_VALUE="011100";
+	
+	String lo;
+	String hi;
+	
+	public DMULT() {
 		super.OPCODE_VALUE = OPCODE_VALUE;
 		syntax="%R,%R";
 		name="DMULT";
 	}
-    public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
-        //if source registers are valid passing their own values into temporary registers
-        Register rs=cpu.getRegister(params.get(RS_FIELD));
-        Register rt=cpu.getRegister(params.get(RT_FIELD));
-        if(rs.getWriteSemaphore()>0 || rt.getWriteSemaphore()>0)
-            throw new RAWException();
-        TR[RS_FIELD]=rs;
-        TR[RT_FIELD]=rt;
-        //locking the destination register 
-  
-        cpu.getLO().incrWriteSemaphore();
-        cpu.getHI().incrWriteSemaphore();
-    }
-	public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException 
-	{
-
+	public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+		//if source registers are valid passing their own values into temporary registers
+		Register rs=cpu.getRegister(params.get(RS_FIELD));
+		Register rt=cpu.getRegister(params.get(RT_FIELD));
+		if(rs.getWriteSemaphore()>0 || rt.getWriteSemaphore()>0)
+			throw new RAWException();
+		TR[RS_FIELD]=rs;
+		TR[RT_FIELD]=rt;
+		//locking the destination register
+		
+		cpu.getLO().incrWriteSemaphore();
+		cpu.getHI().incrWriteSemaphore();
+	}
+	public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException {
+		
 		//getting values from temporary registers
 		boolean sign;
 		BigInteger rs = new BigInteger(Long.toString(TR[RS_FIELD].getValue()));
 		BigInteger rt = new BigInteger(Long.toString(TR[RT_FIELD].getValue()));
 		BigInteger result= rs.multiply(rt);
 		
-		// Convert result to a String of 128-bit 
+		// Convert result to a String of 128-bit
 		String tmp = result.toString(2);
-		if (tmp.charAt(0) =='-')
-		{
-		    tmp = tmp.substring(1);
-		    tmp = Converter.twoComplement(tmp);
-		    while (tmp.length()<128)
-			tmp = "1" + tmp;
-		}
-		else
-		    while (tmp.length()<128)
-			tmp = "0" + tmp;
+		if (tmp.charAt(0) =='-') {
+			tmp = tmp.substring(1);
+			tmp = Converter.twoComplement(tmp);
+			while (tmp.length()<128)
+				tmp = "1" + tmp;
+		} else
+			while (tmp.length()<128)
+				tmp = "0" + tmp;
 		
 		hi = tmp.substring(0,64);
 		lo = tmp.substring(64);
-
-		if(enableForwarding)
-		{
-			doWB();
-		}    
-	}
-	public void WB() throws IrregularStringOfBitsException 
-	{
-		if(!enableForwarding)
-		{
+		
+		if(enableForwarding) {
 			doWB();
 		}
 	}
-    public void doWB() throws IrregularStringOfBitsException 
-    {
-        //passing results from temporary registers to destination registers and unlocking them
-        Register lo = cpu.getLO();
-	Register hi = cpu.getHI();
-        lo.setBits(this.lo,0);
-	hi.setBits(this.hi,0);
-
-        lo.decrWriteSemaphore();
-        hi.decrWriteSemaphore();
-    }
-    public void pack() throws IrregularStringOfBitsException 
-    {
-        //conversion of instruction parameters of "params" list to the "repr" form (32 binary value) 
-        repr.setBits(OPCODE_VALUE,OPCODE_VALUE_INIT);
-        repr.setBits(Converter.intToBin(RS_FIELD_LENGTH,params.get(RS_FIELD)),RS_FIELD_INIT);
-        repr.setBits(Converter.intToBin(RT_FIELD_LENGTH,params.get(RT_FIELD)),RT_FIELD_INIT);
-    }   
-    
-    
-
-	public static void main(String[] args)
-	{
+	public void WB() throws IrregularStringOfBitsException {
+		if(!enableForwarding) {
+			doWB();
+		}
+	}
+	public void doWB() throws IrregularStringOfBitsException {
+		//passing results from temporary registers to destination registers and unlocking them
+		Register lo = cpu.getLO();
+		Register hi = cpu.getHI();
+		lo.setBits(this.lo,0);
+		hi.setBits(this.hi,0);
+		
+		lo.decrWriteSemaphore();
+		hi.decrWriteSemaphore();
+	}
+	public void pack() throws IrregularStringOfBitsException {
+		//conversion of instruction parameters of "params" list to the "repr" form (32 binary value)
+		repr.setBits(OPCODE_VALUE,OPCODE_VALUE_INIT);
+		repr.setBits(Converter.intToBin(RS_FIELD_LENGTH,params.get(RS_FIELD)),RS_FIELD_INIT);
+		repr.setBits(Converter.intToBin(RT_FIELD_LENGTH,params.get(RT_FIELD)),RT_FIELD_INIT);
+	}
+	
+	
+	
+	public static void main(String[] args) {
 		DMULT ins=new DMULT();
 		List<Integer>params=new Vector<Integer>();
 		int rs=1;
 		int rt=2;
 		params.add(rs);  //fattore1
 		params.add(rt);  //fattore2
-		try
-		{
+		try {
 			cpu.getRegister(rs).writeDoubleWord(-9345345345223L); //rs register
 			cpu.getRegister(rt).writeDoubleWord(9224234234234234L);     //rt register
 			ins.setParams(params);
-		}
-		catch(IrregularWriteOperationException e)
-		{
+		} catch(IrregularWriteOperationException e) {
 			e.printStackTrace();
 		}
-
+		
 		try {
 			ins.pack();
 			ins.ID();
@@ -155,6 +141,6 @@ class DMULT extends ALU_RType
 			ins.WB();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}        
+		}
 	}
 }

@@ -30,9 +30,11 @@ import edumips64.utils.*;
 import java.math.*;
 
 /**
- * <pre>
- * whether a qnan or snan is passed or the rounded value is outside the range [2^63,2^63-1]
- *  null is returned
+ *<pre>
+ *	Format: CVT.L.D fd, fs
+ * Description: To convert an FP value to a 64-bit fixed point
+ *   Operation: fd = convert_and_round(fs.readdouble,FCSR[CURRENT_ROUND_MODE])
+ *</pre>
  */
 class CVT_L_D extends FPConversionFCSRInstructions {
 	static String OPCODE_VALUE="100101";
@@ -48,7 +50,7 @@ class CVT_L_D extends FPConversionFCSRInstructions {
 	public void EX() throws IrregularStringOfBitsException, FPInvalidOperationException, IrregularWriteOperationException {
 		//getting values from temporary registers
 		String fs=TRfp[FS_FIELD].getBinString();
-		BigInteger bi=FPInstructionUtils.doubleTo64FixedPoint(fs,cpu.getFCSRRoundingMode());
+		BigInteger bi=FPInstructionUtils.doubleToLong(fs,cpu.getFCSRRoundingMode());
 		BigInteger biggest=new BigInteger("9223372036854775807"); //2^63-1
 		BigInteger smallest=new BigInteger("-9223372036854775808"); //-2^63
 		//if the value is larger than a long an exception may occur

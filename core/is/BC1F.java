@@ -26,9 +26,12 @@ package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
 /** <pre>
- *
- *
- * @author Trubia Massimo
+   *<pre>
+ *	Format: BC1F cc, offset
+ * Description: To test an FP condition code  in the range [0,7] previously stored from c.cond.fmt instructions
+ *		on the FCSR as binary value and do a PC-relative conditional branch
+ *   Operation: if FCSR[cc] = 0 then branch_to_offset
+ *</pre>
  */
 
 public class BC1F extends FPConditionalBranchesInstructions {

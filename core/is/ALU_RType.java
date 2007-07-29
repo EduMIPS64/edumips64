@@ -48,8 +48,7 @@ public abstract class ALU_RType extends ALUInstructions {
     String OPCODE_VALUE="";
     final static int OPCODE_VALUE_INIT=26;
     private static final Logger logger = Logger.getLogger(ALU_RType.class.getName());
-    public ALU_RType() 
-    {
+    public ALU_RType() {
         syntax="%R,%R,%R";
         paramCount=3;         
     }
@@ -149,16 +148,7 @@ public abstract class ALU_RType extends ALUInstructions {
         catch(IrregularWriteOperationException e)
         {
 			e.printStackTrace();
-        }
-        
-        try {
-            ins.pack();
-            ins.ID();
-            ins.EX();
-            ins.WB();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }        
-    }
-    
+		}
+	}
+	
 }

@@ -30,8 +30,11 @@ import edumips64.utils.*;
 import java.math.*;
 
 /**
- * <pre>
- *
+ *<pre>
+ *	Format: MOV.D fd, fs
+ * Description: To move an FP value between FPRs
+ *   Operation: fd=fs
+ *</pre>
  */
 class MOV_D extends FPFormattedOperandMoveInstructions {
 	String OPCODE_VALUE="000110";

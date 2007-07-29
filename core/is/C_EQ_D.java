@@ -30,8 +30,12 @@ import edumips64.utils.*;
 import java.math.*;
 
 /**
- * <pre>
- *
+  *<pre>
+ *	Format: C.EQ.D cc, fs, ft
+ * Description: To compare FP values and record the Boolean result in a condition code in the range [0,7] stored on the FCSR as binary value
+ *   Operation: if fs=ft FCSR[cc]=1 else FCSR[cc]=0
+ *</pre>
+
  */
 class C_EQ_D extends FPC_cond_DInstructions {
 	String COND_VALUE="0010"; // the first bit doesn't mean anything into this simulator
@@ -43,9 +47,4 @@ class C_EQ_D extends FPC_cond_DInstructions {
 		super.name=NAME;
 	}
 
-	public void MEM() {
-	}
-	
-	public void WB() {
-	}
 }

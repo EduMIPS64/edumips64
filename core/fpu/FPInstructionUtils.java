@@ -33,14 +33,14 @@ import edumips64.utils.*;
  */
 public class FPInstructionUtils {
 	static CPU cpu=CPU.getInstance();
-	final static String PLUSINFINITY= "0111111111110000000000000000000000000000000000000000000000000000";
-	final static String MINUSINFINITY="1111111111110000000000000000000000000000000000000000000000000000";
-	final static String PLUSZERO="0000000000000000000000000000000000000000000000000000000000000000";
-	final static String MINUSZERO="1000000000000000000000000000000000000000000000000000000000000000";
-	final static String BIGGEST="1.797693134862315708145274237317E308";
-	final static String SMALLEST="-1.797693134862315708145274237317E308";
-	final static String MINUSZERO_DEC="-4.9406564584124654417656879286822E-324";
-	final static String PLUSZERO_DEC="4.9406564584124654417656879286822E-324";
+	static String PLUSINFINITY= "0111111111110000000000000000000000000000000000000000000000000000";
+	static String MINUSINFINITY="1111111111110000000000000000000000000000000000000000000000000000";
+	static String PLUSZERO="0000000000000000000000000000000000000000000000000000000000000000";
+	static String MINUSZERO="1000000000000000000000000000000000000000000000000000000000000000";
+	static String BIGGEST="1.797693134862315708145274237317E308";
+	static String SMALLEST="-1.797693134862315708145274237317E308";
+	static String MINUSZERO_DEC="-4.9406564584124654417656879286822E-324";
+	static String PLUSZERO_DEC="4.9406564584124654417656879286822E-324";
 	
 	/*
 	snan
@@ -48,14 +48,14 @@ public class FPInstructionUtils {
 	0 11111111111 1111111111111111111111111111111111111111111111111111 (bynary equivalent)
 	X 11111111111 1XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (pattern for snans values)*/
 	final static String SNAN_NEW= "0111111111111111111111111111111111111111111111111111111111111111";
-	final static String SNAN_PATTERN="X111111111111XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+	final static String SNAN_PATTERN="X111111111111XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";//XX..XX cannot be equal to zero at the same time
 	
 	/*qnan
 	0x7ff7ffffffffffff (value used in MIPS64 to generate a new qnan)
 	0 11111111111 0111111111111111111111111111111111111111111111111111 (bynary equivalent)
 	X 11111111111 0XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX (pattern for qnans values)	*/
 	final static String QNAN_NEW="0111111111110111111111111111111111111111111111111111111111111111";
-	final static String QNAN_PATTERN="X111111111110XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+	final static String QNAN_PATTERN="X111111111110XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"; //XX..XX cannot be equal to zero at the same time
 	
 	
 	/** Converts a double value passed as string to a 64 bit binary string according with IEEE754 standard for double precision floating point numbers
@@ -198,10 +198,10 @@ public class FPInstructionUtils {
 		//(sign)Infinity - (sign)Infinity =NAN when signs agree ( but (sign)Infinity + (sign)Infinity = Infinity when signs agree ) (Status of IEEE754)
 
 			//+infinity-infinity
-			boolean cond1=isPositiveInfinity(value1) && isNegativeInfinity(value2);
+			boolean cond=isPositiveInfinity(value1) && isNegativeInfinity(value2);
 			//-infinity+infinity
-			boolean cond2=isNegativeInfinity(value1) && isPositiveInfinity(value2);
-			if(cond1 || cond2)
+			cond =cond ||(isNegativeInfinity(value1) && isPositiveInfinity(value2));
+			if(cond)
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 					throw new FPInvalidOperationException();
@@ -210,12 +210,12 @@ public class FPInstructionUtils {
 				return QNAN_NEW;
 			}
 			// infinity + infinity
-			cond1 =isPositiveInfinity(value1) && isPositiveInfinity(value2);
-			if(cond1)
+			cond =isPositiveInfinity(value1) && isPositiveInfinity(value2);
+			if(cond)
 				return PLUSINFINITY;
 			//-infinity - infinity
-			cond1 =isNegativeInfinity(value1) && isNegativeInfinity(value2);
-			if(cond1)
+			cond =isNegativeInfinity(value1) && isNegativeInfinity(value2);
+			if(cond)
 				return MINUSINFINITY;
 		
 		//(sign)Zero + (sign)Zero = (sign)Zero
@@ -226,17 +226,17 @@ public class FPInstructionUtils {
 			//in this point the (QNan/SNan) control is not necessary
 			
 			//+infinity + (any)
-			cond1=isPositiveInfinity(value1) && !isInfinity(value2);
-			if(cond1) return PLUSINFINITY;
+			cond=isPositiveInfinity(value1) && !isInfinity(value2);
+			if(cond) return PLUSINFINITY;
 			//-infinity + (any)
-			cond1=isNegativeInfinity(value1) && !isInfinity(value2);
-			if(cond1) return MINUSINFINITY;
+			cond=isNegativeInfinity(value1) && !isInfinity(value2);
+			if(cond) return MINUSINFINITY;
 			//(any) + +infinity
-			cond1=!isInfinity(value1) && isPositiveInfinity(value2);
-			if(cond1) return PLUSINFINITY;
+			cond=!isInfinity(value1) && isPositiveInfinity(value2);
+			if(cond) return PLUSINFINITY;
 			//(any) + -infinity
-			cond1=!isInfinity(value1) && isNegativeInfinity(value2);
-			if(cond1) return MINUSINFINITY;
+			cond=!isInfinity(value1) && isNegativeInfinity(value2);
+			if(cond) return MINUSINFINITY;
 			
 			
 			//at this point operands can be added and if an overflow or an underflow occurs
@@ -286,12 +286,12 @@ public class FPInstructionUtils {
 		//(sign)Infinity - (sign)Infinity = NAN   when signs agree (but (sign)Infinity - (sign)Infinity =Infinity   when signs don't agree ) (Status of IEEE754)
 
 			// +infinity  -   +infinity
-			boolean cond1 =isPositiveInfinity(value1) && isPositiveInfinity(value2);
+			boolean cond =isPositiveInfinity(value1) && isPositiveInfinity(value2);
 			//-infinity   -   -infinity
-			boolean cond2 =isNegativeInfinity(value1) && isNegativeInfinity(value2);
+			cond =cond || (isNegativeInfinity(value1) && isNegativeInfinity(value2));
 			
 			
-			if(cond1 || cond2)
+			if(cond)
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 					throw new FPInvalidOperationException();
@@ -301,12 +301,12 @@ public class FPInstructionUtils {
 			}
 
 			//+infinity   -   -infinity
-			cond1=isPositiveInfinity(value1) && isNegativeInfinity(value2);
-			if(cond1)
+			cond=isPositiveInfinity(value1) && isNegativeInfinity(value2);
+			if(cond)
 				return PLUSINFINITY;
 			//-infinity   -   +infinity
-			cond1=isNegativeInfinity(value1) && isPositiveInfinity(value2);
-			if(cond1)
+			cond=isNegativeInfinity(value1) && isPositiveInfinity(value2);
+			if(cond)
 				return MINUSINFINITY;
 			
 			
@@ -314,17 +314,17 @@ public class FPInstructionUtils {
 			//in this point the (QNan/SNan) control is not necessary
 			
 			//+infinity - (any)
-			cond1=isPositiveInfinity(value1) && !isInfinity(value2);
-			if(cond1) return PLUSINFINITY;
+			cond=isPositiveInfinity(value1) && !isInfinity(value2);
+			if(cond) return PLUSINFINITY;
 			//-infinity - (any)
-			cond1=isNegativeInfinity(value1) && !isInfinity(value2);
-			if(cond1) return MINUSINFINITY;
+			cond=isNegativeInfinity(value1) && !isInfinity(value2);
+			if(cond) return MINUSINFINITY;
 			//(any) - +infinity
-			cond1=!isInfinity(value1) && isPositiveInfinity(value2);
-			if(cond1) return MINUSINFINITY;
+			cond=!isInfinity(value1) && isPositiveInfinity(value2);
+			if(cond) return MINUSINFINITY;
 			//(any) - -infinity
-			cond1=!isInfinity(value1) && isNegativeInfinity(value2);
-			if(cond1) return PLUSINFINITY;
+			cond=!isInfinity(value1) && isNegativeInfinity(value2);
+			if(cond) return PLUSINFINITY;
 			
 		//(sign)Zero + (sign)Zero = (sign)Zero
 //			if(isZero(value1) && isZero(value2))
@@ -377,10 +377,10 @@ public class FPInstructionUtils {
 			
 			
 			// (sign)Zero X (sign)Infinity
-			boolean cond1 =isZero(value1) && isInfinity(value2);
+			boolean cond =isZero(value1) && isInfinity(value2);
 			// (sign)Infinity X (sign)Zero
-			boolean cond2 =isInfinity(value1) && isZero(value2);
-			if(cond1 || cond2)
+			cond =cond || (isInfinity(value1) && isZero(value2));
+			if(cond)
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 					throw new FPInvalidOperationException();
@@ -405,10 +405,10 @@ public class FPInstructionUtils {
 			}
 			
 			//(sign)Infinity X any
-			cond1=isInfinity(value1) && !isInfinity(value2);
+			cond=isInfinity(value1) && !isInfinity(value2);
 			// any X (sign)Infinity
-			cond2=!isInfinity(value1) && isInfinity(value2);
-			if(cond1 || cond2)
+			cond=cond || (!isInfinity(value1) && isInfinity(value2));
+			if(cond)
 			{
 				int sign1=getDoubleSign(value1);
 				int sign2=getDoubleSign(value2);
@@ -487,10 +487,10 @@ public class FPInstructionUtils {
 			}
 			
 			//(sign)Infinity / (sign)Infinity
-			boolean cond1=isInfinity(value1) && isInfinity(value2);
+			boolean cond=isInfinity(value1) && isInfinity(value2);
 			//(sign)zero / (sign)Zero
-			boolean cond2=isZero(value1) && isZero(value2);
-			if(cond1 || cond2)
+			cond=cond || (isZero(value1) && isZero(value2));
+			if(cond)
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 					throw new FPInvalidOperationException();
@@ -500,8 +500,8 @@ public class FPInstructionUtils {
 			}
 			
 			// (sign)Zero / any
-			cond1=isZero(value1) && !isZero(value2);
-			if(cond1)
+			cond=isZero(value1) && !isZero(value2);
+			if(cond)
 			{
 				int sign1=getDoubleSign(value1);
 				int sign2=getDoubleSign(value2);
@@ -516,8 +516,8 @@ public class FPInstructionUtils {
 			}
 			
 			// any / (sign)Zero
-			cond1=!isZero(value1) && isZero(value2);
-			if(cond1)
+			cond=!isZero(value1) && isZero(value2);
+			if(cond)
 			{
 				if(cpu.getFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO))
 					throw new FPDivideByZeroException();
@@ -631,27 +631,11 @@ public class FPInstructionUtils {
 	 */
 	public static boolean isQNaN(String value)
 	{
-		//check if value is a binary string of 64 bits of type
-		// X111111111110XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-		final int CONSTANT_PART_INIT=1;
-		final int CONSTANT_PART_END=13;
-		final int VARIABLE_PART_INIT=13;
-		final int VARIABLE_PART_END=64;
-		final String PROHIBITE_FOR_VAR_PART="000000000000000000000000000000000000000000000000000";
-		if(is64BinaryString(value))
-		{
-			
-			boolean cond1=QNAN_PATTERN.substring(CONSTANT_PART_INIT,CONSTANT_PART_END).compareTo(value.substring(CONSTANT_PART_INIT,CONSTANT_PART_END))==0;
-			boolean cond2=value.substring(VARIABLE_PART_INIT,VARIABLE_PART_END).compareTo(PROHIBITE_FOR_VAR_PART)==0; 
-			if(cond1 && !cond2)
-				return true;
-			/*
-			String stringa;
-			if(value.matches("[01]111111111110[01]{51}") && value.substring(VARIABLE_PART_INIT,VARIABLE_PART_END).compareTo(PROHIBITE_FOR_VAR_PART)!=0)
-				return true;
-			*/
-		}
+		if(value.matches("[01]111111111110[01]{51}") && !value.matches("[01]111111111110[0]{51}"))
+			return true;
 		return false;
+		
+			
 	}
 	
 	/*Determines if the passed binary string is an SNan value, in other words if 
@@ -661,21 +645,9 @@ public class FPInstructionUtils {
 	 */
 	public static boolean isSNaN(String value)
 	{
-		final int CONSTANT_PART_INIT=1;
-		final int CONSTANT_PART_END=13;
-		final int VARIABLE_PART_INIT=13;
-		final int VARIABLE_PART_END=64;
-		final String PROHIBITE_FOR_VAR_PART="000000000000000000000000000000000000000000000000000";
-		if(is64BinaryString(value))
-		{
-			if(SNAN_PATTERN.substring(CONSTANT_PART_INIT,CONSTANT_PART_END).compareTo(value.substring(CONSTANT_PART_INIT,CONSTANT_PART_END))==0
-			&& !(value.substring(VARIABLE_PART_INIT,VARIABLE_PART_END).compareTo(PROHIBITE_FOR_VAR_PART)==0))
-			{
-				return true;
-			}	
-		}
+		if(value.matches("[01]111111111111[01]{51}") && !value.matches("[01]111111111110[0]{51}"))
+			return true;
 		return false;
-		
 	}
 	
 	/*Determines if the passed binary string is an infinity value according to the IEEE754 standard
@@ -796,7 +768,7 @@ public class FPInstructionUtils {
 	 *  @param value a binary string representing a double value according to the IEEE754 standard
 	 *  @param rm the rounding mode to use for the conversion
 	 **/
-	public static BigInteger doubleTo64FixedPoint(String value, CPU.FPRoundingMode rm) throws IrregularStringOfBitsException
+	public static BigInteger doubleToLong(String value, CPU.FPRoundingMode rm) throws IrregularStringOfBitsException
 	{
 		//we have to check if a XNan o Infinity was passed to this function
 		if(isQNaN(value) || isSNaN(value) || isInfinity(value) || !is64BinaryString(value))
@@ -852,7 +824,7 @@ public class FPInstructionUtils {
 	/** Returns the double value of the 64 bit fixed point number , or null if an XNan or Infinity is passed to this function
 	 *  @param value a binary string representing a long value
 	 **/
-	public static BigDecimal fixedPoint64ToDouble(String value) throws IrregularStringOfBitsException{
+	public static BigDecimal longToDouble(String value) throws IrregularStringOfBitsException{
 		//we have to check if a XNan o Infinity was passed to this function
 		if(isQNaN(value) || isSNaN(value) || isInfinity(value) || !is64BinaryString(value))
 			return null;
@@ -863,7 +835,7 @@ public class FPInstructionUtils {
 	/** Returns the double value of the 64 bit fixed point number, or null if an  if an XNan or Infinity is passed to this function
 	 *
 	 **/
-	public static BigDecimal fixedPoint32ToDouble(String value) throws IrregularStringOfBitsException{
+	public static BigDecimal intToDouble(String value) throws IrregularStringOfBitsException{
 		//we have to check if a XNan o Infinity was passed to this function
 		if(isQNaN(value) || isSNaN(value) || isInfinity(value) || !is64BinaryString(value))
 			return null;

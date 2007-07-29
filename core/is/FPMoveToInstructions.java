@@ -45,12 +45,15 @@ public abstract class FPMoveToInstructions extends FPMoveToAndFromInstructions{
 		TRfp[FS_FIELD].setBits(fs.getBinString(),0);
 		TR[RT_FIELD].setBits(rt.getBinString(),0);
 		//locking the destination register
-		if(fs.getWriteSemaphore()>0)
+		if(fs.getWAWSemaphore()>0)
 			throw new WAWException();
 		fs.incrWriteSemaphore();
+		fs.incrWAWSemaphore();
 	}
 	public abstract void EX() throws IrregularStringOfBitsException;
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException{};
+	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException{
+		cpu.getRegisterFP(params.get(FS_FIELD)).decrWAWSemaphore();
+	}
 	
 	public void WB() throws IrregularStringOfBitsException
 	{
