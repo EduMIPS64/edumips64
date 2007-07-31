@@ -1,2 +1,0 @@
-.data
-.double POSITIVEINFINITY
