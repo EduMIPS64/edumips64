@@ -72,8 +72,8 @@ public class Config{
 			config.put("UNDERFLOW",true);
 			config.put("DIVIDE_BY_ZERO",true);
 			//fpu rounding mode configuration
-			config.put("NEAREST",true);
-			config.put("TOWARDZERO",false);
+			config.put("NEAREST",false);
+			config.put("TOWARDZERO",true);
 			config.put("TOWARDS_PLUS_INFINITY",false);
 			config.put("TOWARDS_MINUS_INFINITY",false);
 			// seed to generate a serial number for instructions

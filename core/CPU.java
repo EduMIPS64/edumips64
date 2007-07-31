@@ -134,16 +134,10 @@ public class CPU {
 		
 
 		//FPU initialization
-		knownFPInstructions=new LinkedList<String>();
-		knownFPInstructions.add("ADD.D");
-		knownFPInstructions.add("SUB.D");
-		knownFPInstructions.add("MUL.D");
-		knownFPInstructions.add("DIV.D");
-		
-		terminatingInstructionsOPCodes = new LinkedList<String>();
-		terminatingInstructionsOPCodes.add("0000000C"); // syscall 0
-		terminatingInstructionsOPCodes.add("04000000"); // halt
-		
+		FPUConfigurator conf=new FPUConfigurator();
+		knownFPInstructions=conf.getFPArithmeticInstructions();
+		terminatingInstructionsOPCodes=conf.getTerminatingInstructions();
+
 		logger.info("CPU Created.");
 		
 	}
