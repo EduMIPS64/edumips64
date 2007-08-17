@@ -302,8 +302,14 @@ public class CPU
 		}
 		catch(JumpException ex)
 		{
-			if(pipe.get(PipeStatus.IF) != null) //rispetto a dimips scambia le load con le IF
-					pipe.get(PipeStatus.IF).IF();
+            try {
+                if(pipe.get(PipeStatus.IF) != null) //rispetto a dimips scambia le load con le IF
+                        pipe.get(PipeStatus.IF).IF();
+            }
+            catch(BreakException bex) {
+				edumips64.Main.logger.debug("Caught a BREAK after a Jump: ignoring it.");
+            }
+
 			// A J-Type instruction has just modified the Program Counter. We need to
 			// put in the IF state the instruction the PC points to
 			pipe.put(PipeStatus.IF, mem.getInstruction(pc));
