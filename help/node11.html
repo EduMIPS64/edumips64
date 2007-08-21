@@ -1,0 +1,239 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Istruzioni Load/Store</TITLE>
+<META NAME="description" CONTENT="Istruzioni Load/Store">
+<META NAME="keywords" CONTENT="manual_it">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual_it.css">
+
+<LINK REL="next" HREF="node12.html">
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="up" HREF="node9.html">
+<LINK REL="next" HREF="node12.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html281"
+  HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html275"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html269"
+  HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html277"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html279"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html282"
+  HREF="node12.html">Istruzioni di controllo del</A>
+<B> Up:</B> <A NAME="tex2html276"
+  HREF="node9.html">Il repertorio delle istruzioni</A>
+<B> Previous:</B> <A NAME="tex2html270"
+  HREF="node10.html">Istruzioni ALU</A>
+ &nbsp; <B>  <A NAME="tex2html278"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html280"
+  HREF="node47.html">Indice analitico</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00520000000000000000">
+Istruzioni Load/Store</A>
+</H1>
+Questa categoria contiene tutte le istruzioni che effettuano trasferimenti di dati tra i registri 
+e la memoria. Ognuna di esse &#232; espressa nella forma:
+
+<P>
+<DIV ALIGN="CENTER">
+<TT>[etichetta:] <SPAN  CLASS="textbf">ISTRUZIONE</SPAN> rt, offset(base)</TT>
+
+</DIV>
+
+<P>
+In base all'utilizzo di un'istruzione load oppure store, rt rappresenter&#224; di volta in volta il registro 
+sorgente o destinazione; offset &#232; un'etichetta o un valore immediato e base &#232; un registro. 
+L'indirizzo &#232; ottenuto sommando al valore del registro<TT>base</TT> il valore immediato di <TT>offset</TT>.
+
+<P>
+L'indirizzo specificato deve essere allineato in base al tipo di dato che si sta trattando. 
+Le istruzioni di caricamento che terminano con ``U'' considerano il contenuto del registro rt 
+come un valore senza segno.
+
+<P>
+Ecco la lista delle istruzioni di caricamento (LOAD):
+
+<P>
+
+	<A NAME="487"></A>
+	<A NAME="488"></A>
+<UL>
+<LI><TT>LB rt, offset(base)</TT>
+<BR>
+Carica il contenuto della cella di memoria all'indirizzo specificato da offset e base nel registro rt, 
+	considerando tale valore come byte con segno.
+
+<P>
+<A NAME="490"></A>
+	<A NAME="491"></A>
+</LI>
+<LI><TT>LBU rt, offset(base)</TT>
+<BR>
+Carica il contenuto della cella di memoria all'indirizzo specificato da offset e base nel registro rt, 
+	considerando tale valore come byte senza segno.
+
+<P>
+<A NAME="493"></A>
+	<A NAME="494"></A>
+</LI>
+<LI><TT>LD rt, offset(base)</TT>
+<BR>
+Carica il contenuto della cella di memoria all'indirizzo specificato da offset e base nel registro rt, 
+	considerando tale valore come una double word.
+
+<P>
+<A NAME="496"></A>
+	<A NAME="497"></A>
+</LI>
+<LI><TT>LH rt, offset(base)</TT>
+<BR>
+Carica il contenuto della cella di memoria all'indirizzo specificato da offset e base nel registro rt, 
+	considerando tale valore come una half word con segno.
+
+<P>
+<A NAME="499"></A>
+	<A NAME="500"></A>
+</LI>
+<LI><TT>LHU rt, offset(base)</TT>
+<BR>
+Carica il contenuto della cella di memoria all'indirizzo specificato da offset e base nel registro rt, 
+	considerando tale valore come una half word senza segno.
+
+<P>
+<A NAME="502"></A>
+	<A NAME="503"></A>
+</LI>
+<LI><TT>LW rt, offset(base)</TT>
+<BR>
+Carica il contenuto della cella di memoria all'indirizzo specificato da offset e base nel registro rt, 
+	considerando tale valore come una word con segno.
+
+<P>
+<A NAME="505"></A>
+	<A NAME="506"></A>
+</LI>
+<LI><TT>LWU rt, offset(base)</TT>
+<BR>
+Carica il contenuto della cella di memoria all'indirizzo specificato da offset e base nel registro rt, 
+	considerando tale valore come una word senza segno.
+</LI>
+</UL>
+
+<P>
+Ecco la lista delle istruzioni di memorizzazione (STORE):
+
+<P>
+
+	<A NAME="510"></A>
+	<A NAME="511"></A>
+<UL>
+<LI><TT>SB rt, offset(base)</TT>
+<BR>
+Memorizza il contenuto del registro rt nella cella di memoria specificata da offset e base, 
+	considerando tale valore come un byte.
+
+<P>
+<A NAME="513"></A>
+	<A NAME="514"></A>
+</LI>
+<LI><TT>SD rt, offset(base)</TT>
+<BR>
+Memorizza il contenuto del registro rt nella cella di memoria specificata da offset e base, 
+	considerando tale valore come una double word.
+
+<P>
+<A NAME="516"></A>
+	<A NAME="517"></A>
+</LI>
+<LI><TT>SH rt, offset(base)</TT>
+<BR>
+Memorizza il contenuto del registro rt nella cella di memoria specificata da offset e base, 
+	considerando tale valore come una half word.
+
+<P>
+<A NAME="519"></A>
+	<A NAME="520"></A>
+</LI>
+<LI><TT>SW rt, offset(base)</TT>
+<BR>
+Memorizza il contenuto del registro rt nella cella di memoria specificata da offset e base, 
+	considerando tale valore come una word.
+</LI>
+</UL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html281"
+  HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html275"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html269"
+  HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html277"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html279"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html282"
+  HREF="node12.html">Istruzioni di controllo del</A>
+<B> Up:</B> <A NAME="tex2html276"
+  HREF="node9.html">Il repertorio delle istruzioni</A>
+<B> Previous:</B> <A NAME="tex2html270"
+  HREF="node10.html">Istruzioni ALU</A>
+ &nbsp; <B>  <A NAME="tex2html278"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html280"
+  HREF="node47.html">Indice analitico</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+andrea
+2007-08-22
+</ADDRESS>
+</BODY>
+</HTML>

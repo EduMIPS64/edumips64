@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Istruzioni di controllo del flusso</TITLE>
+<META NAME="description" CONTENT="Istruzioni di controllo del flusso">
+<META NAME="keywords" CONTENT="manual_it">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual_it.css">
+
+<LINK REL="next" HREF="node13.html">
+<LINK REL="previous" HREF="node11.html">
+<LINK REL="up" HREF="node9.html">
+<LINK REL="next" HREF="node13.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html295"
+  HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html289"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html283"
+  HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html291"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html293"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html296"
+  HREF="node13.html">L'istruzione SYSCALL</A>
+<B> Up:</B> <A NAME="tex2html290"
+  HREF="node9.html">Il repertorio delle istruzioni</A>
+<B> Previous:</B> <A NAME="tex2html284"
+  HREF="node11.html">Istruzioni Load/Store</A>
+ &nbsp; <B>  <A NAME="tex2html292"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html294"
+  HREF="node47.html">Indice analitico</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00530000000000000000">
+Istruzioni di controllo del flusso</A>
+</H1>
+Le istruzioni di controllo del flusso sono utilizzate per alterare l'ordine delle istruzioni prelevate 
+dalla CPU nella fase di fetch. &#200; possibile fare una distinzione tra tali istruzioni: tipo R, tipo I e tipo J.
+
+<P>
+<A NAME="525"></A>
+Tali istruzioni eseguono il salto alla fase di Instruction Decode (ID), ogni qual volta viene effettuato 
+un fetch inutile. In tal caso, due istruzioni vengono rimosse dalla pipeline, ed il contatore degli stalli 
+dovuti ai salti effettuati viene incrementato di due unit&#225;.
+
+<P>
+Ecco la lista delle istruzioni di controllo del flusso di tipo R:
+
+	<A NAME="528"></A>
+	<A NAME="529"></A>
+<UL>
+<LI><TT>JALR rs</TT>
+<BR>
+Pone il contenuto di rs nel program counter, e salva in R31 l'indirizzo dell'istruzione che segue 
+	l'istruzione JALR, che rappresenta il valore di ritorno.
+
+<P>
+<A NAME="531"></A>
+	<A NAME="532"></A>
+</LI>
+<LI><TT>JR rs</TT>
+<BR>
+Pone il contenuto di rs nel program counter.
+</LI>
+</UL>
+
+<P>
+Ed ecco le istruzioni di controllo del flusso di tipo I:
+
+<P>
+
+	<A NAME="536"></A>
+	<A NAME="537"></A>
+<UL>
+<LI><TT>B offset</TT>
+<BR>
+Salto incondizionato ad offset.
+
+<P>
+<A NAME="539"></A>
+	<A NAME="540"></A>
+</LI>
+<LI><TT>BEQ rs, rt, offset</TT>
+<BR>
+Salta ad offset se rs &#232; uguale ad rt.
+
+<P>
+<A NAME="543"></A>
+	<A NAME="544"></A>
+</LI>
+<LI><TT>BEQZ rs, offset</TT>
+<BR>
+Salta ad offset se rs &#232; uguale a zero.
+<BR>	<SPAN  CLASS="textbf">ATTENZIONE:</SPAN> Questa &#232; un'istruzione deprecated, che
+non appartiene al repertorio delle istruzioni MIPS64, ma &#232; stata inclusa nel set di
+istruzioni per mantenere la compatibilit&#224; con altri simulatori.
+
+<P>
+<A NAME="547"></A>
+	<A NAME="548"></A>
+</LI>
+<LI><TT>BGEZ rs, offset</TT>
+<BR>
+Effettua un salto relativo al PC ad offset se rs &#232; maggiore di zero.
+
+<P>
+<A NAME="550"></A>
+	<A NAME="551"></A>
+</LI>
+<LI><TT>BNE rs, rt, offset</TT>
+<BR>
+Salta ad offset se rs non &#232; uguale ad rt.
+
+<P>
+<A NAME="554"></A>
+	<A NAME="555"></A>
+</LI>
+<LI><TT>BNEZ rs</TT>
+<BR>
+Salta ad offset se rs non &#232; uguale a zero.
+<BR>	<SPAN  CLASS="textbf">ATTENZIONE:</SPAN> Questa &#232; un'istruzione deprecated, che
+non appartiene al repertorio delle istruzioni MIPS64, ma &#232; stata inclusa nel set di
+istruzioni per mantenere la compatibilit&#224; con altri simulatori.
+</LI>
+</UL>
+
+<P>
+Ecco la lista delle istruzioni di controllo del flusso di tipo J:
+
+<P>
+
+	<A NAME="560"></A>
+	<A NAME="561"></A>
+<UL>
+<LI><TT>J target</TT>
+<BR>
+Pone il valore immediato nel program counter
+
+<P>
+<A NAME="563"></A>
+	<A NAME="564"></A>
+</LI>
+<LI><TT>JAL target</TT>
+<BR>
+Pone il valore immediato nel program counter, e salva in R31 l'indirizzo 
+	dell'istruzione che segue l'istruzione JAL, che rappresenta il valore di ritorno.
+</LI>
+</UL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html295"
+  HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html289"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html283"
+  HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html291"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html293"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html296"
+  HREF="node13.html">L'istruzione SYSCALL</A>
+<B> Up:</B> <A NAME="tex2html290"
+  HREF="node9.html">Il repertorio delle istruzioni</A>
+<B> Previous:</B> <A NAME="tex2html284"
+  HREF="node11.html">Istruzioni Load/Store</A>
+ &nbsp; <B>  <A NAME="tex2html292"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html294"
+  HREF="node47.html">Indice analitico</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+andrea
+2007-08-22
+</ADDRESS>
+</BODY>
+</HTML>

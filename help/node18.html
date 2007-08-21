@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>SYSCALL 4 - write()</TITLE>
+<META NAME="description" CONTENT="SYSCALL 4 - write()">
+<META NAME="keywords" CONTENT="manual_it">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual_it.css">
+
+<LINK REL="next" HREF="node19.html">
+<LINK REL="previous" HREF="node17.html">
+<LINK REL="up" HREF="node13.html">
+<LINK REL="next" HREF="node19.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html385"
+  HREF="node19.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html379"
+  HREF="node13.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html373"
+  HREF="node17.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html381"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html383"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html386"
+  HREF="node19.html">SYSCALL 5 - printf()</A>
+<B> Up:</B> <A NAME="tex2html380"
+  HREF="node13.html">L'istruzione SYSCALL</A>
+<B> Previous:</B> <A NAME="tex2html374"
+  HREF="node17.html">SYSCALL 3 - read()</A>
+ &nbsp; <B>  <A NAME="tex2html382"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html384"
+  HREF="node47.html">Indice analitico</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00545000000000000000">
+<TT>SYSCALL 4 - write()</TT></A>
+</H2>
+<TT>SYSCALL</TT> 4 richiede tre parametri: il file descriptor su cui scrivere, l'indirizzo dal quale i dati dovranno essere letti, il numero di byte da scrivere.
+
+<P>
+Se il primo parametro &#232; 2 o 3, il simulatore mostrer&#224; la finestra di input/output dove scriver&#224; i dati letti.
+
+<P>
+Questa chiamata di sistema ritorna il numero di byte che sono stati scritti, o -1 se l'operazione di scrittura fallisce. 
+Possibili cause di errore sono il tentativo di scrivere su un file inesistente, o sul file descriptor 0 (standard input), 
+oppure il tentativo di scrivere su un file di sola lettura.
+
+<P>
+<A NAME="628"></A>
+<A NAME="sys5"></A>
+<BR><HR>
+<ADDRESS>
+andrea
+2007-08-22
+</ADDRESS>
+</BODY>
+</HTML>

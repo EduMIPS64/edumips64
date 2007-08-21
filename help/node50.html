@@ -1,0 +1,193 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Esempio sulle SYSCALL</TITLE>
+<META NAME="description" CONTENT="Esempio sulle SYSCALL">
+<META NAME="keywords" CONTENT="manual_it">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual_it.css">
+
+<LINK REL="next" HREF="node51.html">
+<LINK REL="previous" HREF="node49.html">
+<LINK REL="up" HREF="node49.html">
+<LINK REL="next" HREF="node51.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html861"
+  HREF="node51.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html855"
+  HREF="node49.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html849"
+  HREF="node49.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html857"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html859"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html862"
+  HREF="node51.html">Un esempio pi&#249; complesso</A>
+<B> Up:</B> <A NAME="tex2html856"
+  HREF="node49.html">SYSCALL</A>
+<B> Previous:</B> <A NAME="tex2html850"
+  HREF="node49.html">SYSCALL</A>
+ &nbsp; <B>  <A NAME="tex2html858"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html860"
+  HREF="node47.html">Indice analitico</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00811000000000000000">
+Esempio sulle <TT>SYSCALL</TT></A>
+</H2>
+Ecco un esempio di programmma che apre un file, ne legge i primi 16 byte, 
+li scrive in append sullo stesso file (che poi chiude) ed infine stampa un messaggio di conferma:
+<BR>[caption=Esempio <TT>SYSCALL</TT>, label=code:syscall_all, style=mips] listings/syscall_all.s
+
+<P>
+La sezione '.data' comincia con l'inserimento in memoria di 5 messaggi che serviranno per far sapere
+all'utilizzatore l'esito delle operazioni effettuate.L'etichetta 'value'  &#233; quella dove verranno salvati i dati letti,
+dati che verranno prelevati per essere successivamente scritti sul file.
+ Di seguito troviamo l'elenco dei parametri necessari per la chiamata delle <TT>SYSCALL</TT>. 
+<BR>
+Per quanto riguarda la <TT>SYSCALL</TT> 1 
+bisogna salvare in memoria per prima cosa il path del file da aprire, e nella locazione di memoria immediatamente
+ successiva (quindi nella riga successiva) un intero che rappresenta la modalit&#224; d'apertura (per maggiori informazioni 
+riguardo alle modalit&#224; d'apertura rimandiamo alla sezione <A HREF="node15.html#sys1"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A>).
+<BR>
+La <TT>SYSCALL</TT> 2 invece richiede un solo parametro, 
+il file descriptor del file da chiudere.
+<BR>
+Le <TT>SYSCALL</TT> 3 e 4 necessitano dello stesso numero di parametri (tre), il primo  &#233;  il file descriptor
+del file da cui leggere(per la <TT>SYSCALL</TT> 3) o scrivere (per la <TT>SYSCALL</TT> 4), il secondo &#233; l'indirizzo di memoria da cui 
+leggere (o scrivere) i byte, e il terzo &#233; un'intero che rappresenta il numero di byte da leggere (o scrivere).
+
+<BR>
+Infine la <TT>SYSCALL</TT> 5 accetta in ingresso un numero variabile di parametri; il primo &#233; sempre necessario, ed &#233;
+ la cosiddetta format string, cio&#232; la striga da inviare allo standard output. A seconda del tipo di format string
+ pu&#242; essere necessario salvare un numero arbitrario di altri parametri (per maggiori informazioni consultare 
+la sezione <A HREF="node18.html#sys5"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A> o l'esempio <A HREF="#code:printf"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A>).
+<BR>
+<P>
+Passiamo ora alla sezione '.text'.Essa comincia con le operazioni necessarie per l'apertura del file, cio&#232; 
+l'inserimento dell'indirizzo di memoria dell'etichetta 'params_sys1' nel registro r14 (riga 26). Ora si pu&#242; chiamare la <TT>SYSCALL</TT> 1,
+salvare il file descriptor del file letto in modo da poterlo riutilizzare (riga 29), e 
+ controllare poi che il valore di ritorno della <TT>SYSCALL</TT> (contenuto in r1) sia diverso da <SPAN CLASS="MATH"><IMG
+ WIDTH="29" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img6.png"
+ ALT="$-1$"></SPAN> , nel qual caso si passa all' etichetta 
+'read'(riga 30).Se invece il valore dovesse essere <SPAN CLASS="MATH"><IMG
+ WIDTH="29" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img6.png"
+ ALT="$-1$"></SPAN> si passa all'etichetta 'end', facendo in modo da salvare in r4 l'indirizzo di memoria 
+del messaggio di errore appropriato (righe 31, 32).
+<BR>
+<P>
+Il listato continua con il salvataggio nel registro r14 dell'indirizzo di memoria dell'etichetta 'params_sys3', dove viene poi 
+inserito (riga 35) il file descriptor del file da cui leggere precedentemente salvato. Allo stesso modo salviamo nell'apposta
+zona di memoria l'indirizzo in cui salvare i byte letti (righe 36-37) e poi chiamiamo la <TT>SYSCALL</TT> 3. Come fatto precedentemente  
+controlliamo che il valore di ritorno della <TT>SYSCALL</TT> (contenuto in r1) sia diverso da <SPAN CLASS="MATH"><IMG
+ WIDTH="29" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img6.png"
+ ALT="$-1$"></SPAN> , nel qual caso si passa all' etichetta 
+'write'(riga 39).Se invece il valore dovesse essere <SPAN CLASS="MATH"><IMG
+ WIDTH="29" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img6.png"
+ ALT="$-1$"></SPAN> si passa all'etichetta 'end', facendo in modo da salvare in r4 l'indirizzo di memoria 
+del messaggio di errore appropriato (righe 40, 41).
+<BR>
+<P>
+La parte relativa alla <TT>SYSCALL</TT> 4 &#233; molto simile a quella della <TT>SYSCALL</TT> 3. Infatti anche qui salviamo in memoria l'indirizzo iniziale dei
+parametri richiesti (riga 43) e poi  inseriamo lì il file descriptor del file su cui scrivere (riga 44), e nella locazione di memoria immediatamente
+successiva mettiamo l'indirizzo (anch'esso di memoria) da cui prelevare i byte da scrivere (in questo caso lo stesso indirizzo in cui sono stati
+depositati i byte appena letti dalla <TT>SYSCALL</TT> 3). Ora controlliamo che il valore di ritorno della <TT>SYSCALL</TT> (contenuto in r1) sia diverso da <SPAN CLASS="MATH"><IMG
+ WIDTH="29" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img6.png"
+ ALT="$-1$"></SPAN> , 
+nel qual caso si passa all' etichetta 'close'(riga 48).Se invece il valore dovesse essere <SPAN CLASS="MATH"><IMG
+ WIDTH="29" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img6.png"
+ ALT="$-1$"></SPAN> si passa all'etichetta 'end', facendo in modo da salvare
+ in r4 l'indirizzo di memoria del messaggio di errore appropriato (righe 49, 50).
+<BR>
+<P>
+A questo punto bisogna chiudere il file, tramite la <TT>SYSCALL</TT> 4, che accetta come unico parametro il file descriptor da chiudere. Dopo aver controllato 
+ancora una volta l'assenza di errori (righe 55, 56, 57) passiamo all'etichetta 'end'.
+<BR>
+<P>
+Quest' ultima contiene le operazioni da effettuare prima di invocare la <TT>SYSCALL</TT> 5. Tali operazioni consitono nel salvare in r14 l'indirizzo di 
+'params_sys5' , e in 'params_sys5' l'indirizzo della format string. Eventuali paramtri aggiuntivi saranno prelevati
+dalle locazioni di memoria immediatamente successive. Come si pu&#242; notare la 'format string' nel nostro caso  &#233; molto semplice, e non
+ richiede parametri aggiuntivi; per un esempio pi&#249; esaustivo da questo punto di vista consultare l'esempio <A HREF="#code:printf"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A> .
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html861"
+  HREF="node51.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html855"
+  HREF="node49.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html849"
+  HREF="node49.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html857"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html859"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html862"
+  HREF="node51.html">Un esempio pi&#249; complesso</A>
+<B> Up:</B> <A NAME="tex2html856"
+  HREF="node49.html">SYSCALL</A>
+<B> Previous:</B> <A NAME="tex2html850"
+  HREF="node49.html">SYSCALL</A>
+ &nbsp; <B>  <A NAME="tex2html858"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html860"
+  HREF="node47.html">Indice analitico</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+andrea
+2007-08-22
+</ADDRESS>
+</BODY>
+</HTML>

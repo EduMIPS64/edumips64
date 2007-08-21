@@ -1,0 +1,344 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>La sezione .data</TITLE>
+<META NAME="description" CONTENT="La sezione .data">
+<META NAME="keywords" CONTENT="manual_it">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual_it.css">
+
+<LINK REL="next" HREF="node7.html">
+<LINK REL="previous" HREF="node5.html">
+<LINK REL="up" HREF="node5.html">
+<LINK REL="next" HREF="node7.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html198"
+  HREF="node7.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html192"
+  HREF="node5.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html186"
+  HREF="node5.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html194"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html196"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html199"
+  HREF="node7.html">La sezione .code</A>
+<B> Up:</B> <A NAME="tex2html193"
+  HREF="node5.html">Sezioni</A>
+<B> Previous:</B> <A NAME="tex2html187"
+  HREF="node5.html">Sezioni</A>
+ &nbsp; <B>  <A NAME="tex2html195"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html197"
+  HREF="node47.html">Indice analitico</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00411000000000000000"></A>
+<A NAME="115"></A>
+<BR>
+La sezione <TT>.data</TT>
+</H2>
+La sezione <SPAN  CLASS="textbf">data</SPAN> contiene i comandi che specificano il modo in cui la
+memoria deve essere riempita prima dell'inizio dell'esecuzione del programma. La
+forma generale di un comando <TT>.data</TT> &#232;:
+
+<P>
+<DIV ALIGN="CENTER">
+<TT>[etichetta:] <SPAN  CLASS="textbf">.tipoDiDato</SPAN> valore1 [, valore2 [, ...]]</TT>
+
+</DIV>
+
+<P>
+EduMIPS64 supporta diversi tipi di dato, che sono descritti nella tabella&nbsp;<A HREF="#table:datatypes"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A>.
+
+<P>
+<A NAME="124"></A>
+<A NAME="125"></A>
+<A NAME="126"></A>
+<A NAME="127"></A>
+<A NAME="128"></A>
+<A NAME="129"></A>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="140"></A>
+<TABLE>
+<CAPTION><STRONG>Tabella:</STRONG>
+Tipi di dato</CAPTION>
+<TR><TD>	<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="LEFT">Tipo</TD>
+<TD ALIGN="LEFT">Direttiva</TD>
+<TD ALIGN="LEFT">Bit richiesti</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Byte</TD>
+<TD ALIGN="LEFT"><TT>.byte</TT></TD>
+<TD ALIGN="LEFT">8</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Half word</TD>
+<TD ALIGN="LEFT"><TT>.word16</TT></TD>
+<TD ALIGN="LEFT">16</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Word</TD>
+<TD ALIGN="LEFT"><TT>.word32</TT></TD>
+<TD ALIGN="LEFT">32</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Double Word</TD>
+<TD ALIGN="LEFT"><TT>.word</TT> o <TT>.word64</TT></TD>
+<TD ALIGN="LEFT">64</TD>
+</TR>
+</TABLE>
+		
+		<A NAME="table:datatypes"></A>	
+</DIV></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+Dati di tipo doubleword possono essere introdotti sia dalla direttiva
+<TT>.word</TT> che dalla direttiva <TT>.word64</TT>.
+
+<P>
+<A NAME="146"></A> Esiste una differenza sostanziale tra la dichiarazione di una lista di dati 
+utilizzando un'unica direttiva oppure direttive multiple dello stesso tipo.
+EduMIPS64 inizia la scrittura a partire dalla successiva double word a 64 bit non appena 
+trova un identificatore del tipo di dato, in tal modo la prima istruzione <TT>.byte</TT> 
+del listato&nbsp;<A HREF="#code:data_array"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A> inserir&#224; i numeri 1, 2, 3 e 4 nello spazio di 4 byte, 
+occupando 32 bit, mentre il codice delle successive quattro righe inserir&#224; ciascun numero 
+in una differente cella di memoria, occupando 32 byte, come specificato nella tabella&nbsp;<A HREF="#table:effect"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A>.
+
+<P>
+<BR>
+<IMG
+ WIDTH="412" HEIGHT="171" ALIGN="BOTTOM" BORDER="0"
+ SRC="img2.png"
+ ALT="\begin{lstlisting}[caption={Byte adiacenti}, label={code:data_array}, style={mips}]
+.data
+.byte 1, 2, 3, 4
+.byte 1
+.byte 2
+.byte 3
+.byte 4
+\end{lstlisting}">
+<BR>
+
+<P>
+Nella tabella&nbsp;<A HREF="#table:effect"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A>, la memoria &#232; rappresentata utilizzando celle di dimensione pari 
+ad 1 byte e ciascuna riga &#232; lunga 64 bit. L'indirizzo posto alla sinistra di ogni riga della tabella &#232; 
+riferito alla cella di memoria pi&#249; a destra, che possiede l'indirizzo pi&#249; basso rispetto alle otto celle in ciascuna linea.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="916"></A>
+<TABLE>
+<CAPTION><STRONG>Tabella:</STRONG>
+Stato della memoria per il listato&nbsp;<A HREF="#code:data_array"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A></CAPTION>
+<TR><TD>	<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="RIGHT">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">4</TD>
+<TD ALIGN="CENTER">3</TD>
+<TD ALIGN="CENTER">2</TD>
+<TD ALIGN="CENTER">1</TD>
+</TR>
+<TR><TD ALIGN="RIGHT">8</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">1</TD>
+</TR>
+<TR><TD ALIGN="RIGHT">16</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">2</TD>
+</TR>
+<TR><TD ALIGN="RIGHT">24</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">3</TD>
+</TR>
+<TR><TD ALIGN="RIGHT">36</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">4</TD>
+</TR>
+</TABLE>
+		
+		<A NAME="table:effect"></A>	
+</DIV></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+Ci sono alcune direttive speciali che devono essere discusse: <TT>.space</TT>, 
+<TT>.ascii</TT> e <TT>.asciiz</TT>.
+<A NAME="182"></A>
+La direttiva <TT>.space</TT> &#232; usata per lasciare dello spazio vuoto in memoria. 
+Essa accetta un intero come parametro, che indica il numero di byte che devono essere lasciati liberi. 
+Tale direttiva &#232; utile quando &#232; necessario conservare dello spazio in memoria per i risultati dei propri calcoli.
+
+<P>
+<A NAME="187"></A>
+La direttiva <TT>.ascii</TT> accetta stringhe contenenti un qualunque carattere ASCII, 
+ed alcune ``sequenze di escape'', simili a quelle presenti nel linguaggio C, che sono descritte nella 
+tabella&nbsp;<A HREF="#table:escaping"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A>, ed inserisce tali stringhe in memoria.
+
+<P>
+<A NAME="190"></A>
+La direttiva <TT>.asciiz</TT> si comporta esattamente come il comando <TT>.ascii</TT>,
+con la differenza che essa pone automaticamente alla fine della stringa un byte nullo.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="202"></A>
+<TABLE>
+<CAPTION><STRONG>Tabella:</STRONG>
+Sequenze di escape</CAPTION>
+<TR><TD>	<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT">Sequenza di escape</TD>
+<TD ALIGN="LEFT">Significato</TD>
+<TD ALIGN="LEFT">Codifica ASCII</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT><SPAN CLASS="MATH"><IMG
+ WIDTH="14" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img3.png"
+ ALT="$\backslash$"></SPAN>0</TT></TD>
+<TD ALIGN="LEFT">Byte nullo</TD>
+<TD ALIGN="LEFT">0</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT><SPAN CLASS="MATH"><IMG
+ WIDTH="14" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img3.png"
+ ALT="$\backslash$"></SPAN>t</TT></TD>
+<TD ALIGN="LEFT">Tabulazione orizzontale</TD>
+<TD ALIGN="LEFT">9</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT><SPAN CLASS="MATH"><IMG
+ WIDTH="14" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img3.png"
+ ALT="$\backslash$"></SPAN>n</TT></TD>
+<TD ALIGN="LEFT">Nuova linea</TD>
+<TD ALIGN="LEFT">10</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT><SPAN CLASS="MATH"><IMG
+ WIDTH="14" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img3.png"
+ ALT="$\backslash$"></SPAN></TT>``</TD>
+<TD ALIGN="LEFT">Apici doppi</TD>
+<TD ALIGN="LEFT">34</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT><!-- MATH
+ $\backslash\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="24" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img4.png"
+ ALT="$\backslash\backslash$"></SPAN></TT></TD>
+<TD ALIGN="LEFT">Backslash</TD>
+<TD ALIGN="LEFT">92</TD>
+</TR>
+</TABLE>
+	
+	<A NAME="table:escaping"></A></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html198"
+  HREF="node7.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html192"
+  HREF="node5.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html186"
+  HREF="node5.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html194"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html196"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html199"
+  HREF="node7.html">La sezione .code</A>
+<B> Up:</B> <A NAME="tex2html193"
+  HREF="node5.html">Sezioni</A>
+<B> Previous:</B> <A NAME="tex2html187"
+  HREF="node5.html">Sezioni</A>
+ &nbsp; <B>  <A NAME="tex2html195"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html197"
+  HREF="node47.html">Indice analitico</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+andrea
+2007-08-22
+</ADDRESS>
+</BODY>
+</HTML>

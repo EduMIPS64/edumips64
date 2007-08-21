@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>SYSCALL 5 - printf()</TITLE>
+<META NAME="description" CONTENT="SYSCALL 5 - printf()">
+<META NAME="keywords" CONTENT="manual_it">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual_it.css">
+
+<LINK REL="previous" HREF="node18.html">
+<LINK REL="up" HREF="node13.html">
+<LINK REL="next" HREF="node20.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html397"
+  HREF="node20.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html391"
+  HREF="node13.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html387"
+  HREF="node18.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html393"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html395"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html398"
+  HREF="node20.html">Altre istruzioni</A>
+<B> Up:</B> <A NAME="tex2html392"
+  HREF="node13.html">L'istruzione SYSCALL</A>
+<B> Previous:</B> <A NAME="tex2html388"
+  HREF="node18.html">SYSCALL 4 - write()</A>
+ &nbsp; <B>  <A NAME="tex2html394"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html396"
+  HREF="node47.html">Indice analitico</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00546000000000000000">
+<TT>SYSCALL 5 - printf()</TT></A>
+</H2>
+<TT>SYSCALL</TT> 5 richiede un numero variabile di parametri, il primo &#232; la cosiddetta
+``format string'' o stringa di formato. Nella stringa di formato possono essere inseriti alcuni segnaposto,
+descritti nella seguente lista:
+
+<UL>
+<LI><TT>%s</TT> indica un parametro stringa;
+</LI>
+<LI><TT>%i</TT> indica un parametro intero;
+</LI>
+<LI><TT>%d</TT> si comporta come <TT>%i</TT>;
+</LI>
+<LI><TT>%%</TT> indica <TT>%</TT>
+</LI>
+</UL>
+
+<P>
+Per ciascuno dei segnaposto <TT>%s</TT>, <TT>%d</TT> o <TT>%i</TT> la <TT>SYSCALL</TT> 5
+si aspetta un parametro, partendo dall'indirizzo del precedente.
+
+<P>
+Quando la <TT>SYSCALL</TT> trova un segnaposto per un parametro intero, si aspetta che
+il corrispondente parametro sia un valore intero, quando trova un segnaposto per un 
+parametro stringa, si aspetta come parametro l'indirizzo della stringa stessa.
+
+<P>
+Il risultato  visualizzato nella finestra di input/output, ed il numero di byte scritti 
+ posto in R1.
+
+<P>
+Qualora si verifichi un errore, R1 avr valore -1.
+
+<P>
+<BR><HR>
+<ADDRESS>
+andrea
+2007-08-22
+</ADDRESS>
+</BODY>
+</HTML>

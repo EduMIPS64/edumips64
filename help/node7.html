@@ -1,0 +1,278 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>La sezione .code</TITLE>
+<META NAME="description" CONTENT="La sezione .code">
+<META NAME="keywords" CONTENT="manual_it">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual_it.css">
+
+<LINK REL="next" HREF="node8.html">
+<LINK REL="previous" HREF="node6.html">
+<LINK REL="up" HREF="node5.html">
+<LINK REL="next" HREF="node8.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html212"
+  HREF="node8.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html206"
+  HREF="node5.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html200"
+  HREF="node6.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html208"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html210"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html213"
+  HREF="node8.html">Il comando #include</A>
+<B> Up:</B> <A NAME="tex2html207"
+  HREF="node5.html">Sezioni</A>
+<B> Previous:</B> <A NAME="tex2html201"
+  HREF="node6.html">La sezione .data</A>
+ &nbsp; <B>  <A NAME="tex2html209"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html211"
+  HREF="node47.html">Indice analitico</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00412000000000000000"></A>
+<A NAME="206"></A>
+<BR>
+La sezione <TT>.code</TT>
+</H2>
+La sezione <SPAN  CLASS="textbf">code</SPAN> contiene comandi che specificano come la memoria debba essere riempita 
+quando il programma verr&#224; eseguito. La forma generale di un comando <TT>.code</TT> &#232;:
+
+<P>
+<A NAME="211"></A>
+<DIV ALIGN="CENTER">
+<TT>[etichette:] <SPAN  CLASS="textbf">istruzione</SPAN> [param1 [, param2 [, param3]]]</TT>
+
+</DIV>
+
+<P>
+<A NAME="215"></A> pu&#242; essere indicata anche con la direttiva <TT>.text</TT>.
+
+<P>
+Il numero e il tipo di parametri dipendono dall'istruzione stessa. 
+
+<P>
+Le istruzioni possono accettare tre tipi di parametri:
+
+<UL>
+<LI><SPAN  CLASS="textbf">Registri</SPAN> un parametro di tipo registro &#232; indicato da una
+    ``r'' maiuscola o minuscola, o da un carattere ``$'', a fianco del numero
+    di registro (tra 0 e 31). Ad esempio, le scritture ``r4'', ``R4'' e ``$4''
+    identificano tutt'e tre il quarto registro;
+</LI>
+<LI><SPAN  CLASS="textbf">Valori immediati</SPAN> un valore immediato pu&#242; essere un numero o
+    un'etichetta; il numero pu&#242; essere specificato in base 10 o in base 16. I
+    numeri in base 10 sono inseriti semplicemente scrivendo il numero
+    utilizzando l'usuale notazione decimale; i numeri in base 16 si inseriscono
+    aggiungendo all'inizio del numero il prefisso ``0x'';
+</LI>
+<LI><SPAN  CLASS="textbf">Indirizzi</SPAN> un indirizzo &#232; composto da un valore immediato
+    seguito dal nome di un registro tra parentesi. Il valore del registro sar&#224;
+    usato come base, quello dell'immediato come offset.
+</LI>
+</UL>
+
+<P>
+La dimensione dei valori immediati &#232; limitata al numero di bit disponibili
+nella codifica associata all'istruzione. 
+
+<P>
+&#200; possibile utilizzare gli alias standard MIPS per i primi 32 registri,
+mettendo in coda ai prefissi standard per i registri (``r'', ``$'', ``R'') uno
+degli alias indicati in tabella&nbsp;<A HREF="#table:mips32-reg"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A>
+
+<P>
+<A NAME="225"></A>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="263"></A>
+<TABLE>
+<CAPTION><STRONG>Tabella:</STRONG>
+Alias per i primi 32 registri</CAPTION>
+<TR><TD>	<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="LEFT">Registro</TD>
+<TD ALIGN="LEFT">Alias</TD>
+</TR>
+<TR><TD ALIGN="LEFT">0</TD>
+<TD ALIGN="LEFT"><TT>zero</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">1</TD>
+<TD ALIGN="LEFT"><TT>at</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">2</TD>
+<TD ALIGN="LEFT"><TT>v0</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">3</TD>
+<TD ALIGN="LEFT"><TT>v1</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">4</TD>
+<TD ALIGN="LEFT"><TT>a0</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">5</TD>
+<TD ALIGN="LEFT"><TT>a1</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">6</TD>
+<TD ALIGN="LEFT"><TT>a2</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">7</TD>
+<TD ALIGN="LEFT"><TT>a3</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">8</TD>
+<TD ALIGN="LEFT"><TT>t0</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">9</TD>
+<TD ALIGN="LEFT"><TT>t1</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">10</TD>
+<TD ALIGN="LEFT"><TT>t2</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">11</TD>
+<TD ALIGN="LEFT"><TT>t3</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">12</TD>
+<TD ALIGN="LEFT"><TT>t4</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">13</TD>
+<TD ALIGN="LEFT"><TT>t5</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">14</TD>
+<TD ALIGN="LEFT"><TT>t6</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">15</TD>
+<TD ALIGN="LEFT"><TT>t7</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">16</TD>
+<TD ALIGN="LEFT"><TT>s0</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">17</TD>
+<TD ALIGN="LEFT"><TT>s1</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">18</TD>
+<TD ALIGN="LEFT"><TT>s2</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">19</TD>
+<TD ALIGN="LEFT"><TT>s3</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">20</TD>
+<TD ALIGN="LEFT"><TT>s4</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">21</TD>
+<TD ALIGN="LEFT"><TT>s5</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">22</TD>
+<TD ALIGN="LEFT"><TT>s6</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">23</TD>
+<TD ALIGN="LEFT"><TT>s7</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">24</TD>
+<TD ALIGN="LEFT"><TT>t8</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">25</TD>
+<TD ALIGN="LEFT"><TT>t9</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">26</TD>
+<TD ALIGN="LEFT"><TT>k0</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">27</TD>
+<TD ALIGN="LEFT"><TT>k1</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">28</TD>
+<TD ALIGN="LEFT"><TT>gp</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">29</TD>
+<TD ALIGN="LEFT"><TT>sp</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">30</TD>
+<TD ALIGN="LEFT"><TT>fp</TT></TD>
+</TR>
+<TR><TD ALIGN="LEFT">31</TD>
+<TD ALIGN="LEFT"><TT>ra</TT></TD>
+</TR>
+</TABLE>
+		
+		<A NAME="table:mips32-reg"></A>	
+</DIV></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+Le istruzioni che possono essere utilizzate in questa sezione saranno discusse nella sezione&nbsp;<A HREF="node9.html#instructions"><IMG  ALIGN="BOTTOM" BORDER="1" ALT="[*]"
+ SRC="/usr/share/latex2html/icons/crossref.png"></A>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html212"
+  HREF="node8.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html206"
+  HREF="node5.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html200"
+  HREF="node6.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html208"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html210"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html213"
+  HREF="node8.html">Il comando #include</A>
+<B> Up:</B> <A NAME="tex2html207"
+  HREF="node5.html">Sezioni</A>
+<B> Previous:</B> <A NAME="tex2html201"
+  HREF="node6.html">La sezione .data</A>
+ &nbsp; <B>  <A NAME="tex2html209"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html211"
+  HREF="node47.html">Indice analitico</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+andrea
+2007-08-22
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,590 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Istruzioni ALU</TITLE>
+<META NAME="description" CONTENT="Istruzioni ALU">
+<META NAME="keywords" CONTENT="manual_it">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual_it.css">
+
+<LINK REL="next" HREF="node11.html">
+<LINK REL="previous" HREF="node9.html">
+<LINK REL="up" HREF="node9.html">
+<LINK REL="next" HREF="node11.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html267"
+  HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html261"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html255"
+  HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html263"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html265"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html268"
+  HREF="node11.html">Istruzioni Load/Store</A>
+<B> Up:</B> <A NAME="tex2html262"
+  HREF="node9.html">Il repertorio delle istruzioni</A>
+<B> Previous:</B> <A NAME="tex2html256"
+  HREF="node9.html">Il repertorio delle istruzioni</A>
+ &nbsp; <B>  <A NAME="tex2html264"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html266"
+  HREF="node47.html">Indice analitico</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00510000000000000000">
+Istruzioni ALU</A>
+</H1>
+L'unit&#224; logico-aritmetica (ALU) fa parte dell'unit&#224; esecutiva di una CPU ed assume il ruolo di esecuzione 
+di operazioni logiche ed aritmetiche. Il gruppo di istruzioni ALU conterr&#224; quindi quelle istruzioni 
+che effettuano questo tipo di operazioni.
+
+<P>
+Le istruzioni ALU possono essere suddivise in due gruppi: <SPAN  CLASS="textbf">tipo R</SPAN> e <SPAN  CLASS="textbf">tipo I</SPAN>. 
+
+<P>
+<A NAME="290"></A>
+<A NAME="291"></A>
+<A NAME="292"></A>
+<A NAME="293"></A>
+<A NAME="294"></A>
+Quattro di esse utilizzano due registri speciali: LO e HI. Tali registri sono interni alla CPU ed &#232; 
+possibile accedere al loro valore mediante le istruzioni <TT>MFLO</TT> e <TT>MFHI</TT>.
+
+<P>
+Ecco la lista delle istruzioni ALU di tipo R.
+
+<P>
+
+	<A NAME="299"></A>
+	<A NAME="300"></A>
+<UL>
+<LI><TT>AND rd, rs, rt</TT>
+<BR>
+Esegue un AND bit a bit tra rs ed rt, e pone il risultato in rd.
+
+<P>
+<A NAME="302"></A>
+	<A NAME="303"></A>
+</LI>
+<LI><TT>ADD rd, rs, rt</TT>
+<BR>
+Somma il contenuto dei registri a 32-bit rs ed rt, considerandoli come valori con segno, e pone il risultato in rd.
+	Lancia un eccezione in caso di overflow.
+
+<P>
+<A NAME="305"></A>
+	<A NAME="306"></A>
+</LI>
+<LI><TT>ADDU rd, rs, rt</TT>
+<BR>
+Somma il contenuto dei registri a 32-bit rs ed rt, e pone il risultato in rd.
+	Non si verificano eccezioni di overflow.
+	<SPAN  CLASS="textbf">NB:</SPAN> La 'U' dell'istruzione sta per 'unsigned'; tuttavia questo &#232; 
+un nome equivoco, perch&#233; l'operazione considera i valori con segno. La sua caratteristica &#232; 
+quella di non lanciare eccezioni (nemmeno in caso di overflow).
+
+<P>
+<A NAME="309"></A>
+	<A NAME="310"></A>
+</LI>
+<LI><TT>DADD rd, rs, rt</TT>
+<BR>
+Somma il contenuto dei registri a 64-bit rs ed rt, considerandoli come valori con segno, e pone il risultato in rd.
+	Lancia un eccezione in caso di overflow.
+
+<P>
+<A NAME="312"></A>
+	<A NAME="313"></A>
+</LI>
+<LI><TT>DADDU rd, rs, rt</TT>
+<BR>
+Somma il contenuto dei registri a 64-bit rs ed rt, e pone il risultato in rd.
+	Non si verificano eccezioni di overflow.
+	<SPAN  CLASS="textbf">NB:</SPAN> La 'U' dell'istruzione sta per 'unsigned'; tuttavia questo &#232; 
+un nome equivoco, perch&#233; l'operazione considera i valori con segno. La sua caratteristica &#232; 
+quella di non lanciare eccezioni (nemmeno in caso di overflow).
+
+<P>
+<A NAME="316"></A>
+	<A NAME="317"></A>
+</LI>
+<LI><TT>DDIV rs, rt</TT>
+<BR>
+Esegue la divisione tra i registri a 64-bit rs ed rt, ponendo i 64-bit del quoziente
+	in LO ed i 64-bit del resto in HI.
+
+<P>
+<A NAME="319"></A>
+	<A NAME="320"></A>
+</LI>
+<LI><TT>DDIVU rs, rt</TT>
+<BR>
+Esegue la divisione tra i registri a 64-bit rs ed rt, considerandoli come valori senza segno e
+    	ponendo i 64-bit del quoziente in LO ed i 64-bit del resto in HI.
+
+<P>
+<A NAME="322"></A>
+	<A NAME="323"></A>
+</LI>
+<LI><TT>DIV rs, rt</TT>
+<BR>
+Esegue la divisione tra i registri a 32-bit rs ed rt, ponendo i 32-bit del quoziente
+	in LO ed i 32-bit del resto in HI.
+
+<P>
+<A NAME="325"></A>
+	<A NAME="326"></A>
+</LI>
+<LI><TT>DIVU rs, rt</TT>
+<BR>
+Esegue la divisione tra i registri a 32-bit rs ed rt, considerandoli come valori senza segno e
+    	pone i 32-bit del quoziente in LO ed i 32-bit del resto in HI.
+
+<P>
+<A NAME="328"></A>
+	<A NAME="329"></A>
+</LI>
+<LI><TT>DMULT rs, rt</TT>
+<BR>
+Esegue il prodotto tra i registri a 64-bit rs ed rt, ponendo i 64 bit bassi del risultato nel registro speciale LO
+	e i 64 bit alti del risultato nel registro speciale HI.
+
+<P>
+<A NAME="331"></A>
+	<A NAME="332"></A>
+</LI>
+<LI><TT>DMULTU rs, rt</TT>
+<BR>
+Esegue il prodotto tra i registri a 64-bit rs ed rt, considerandoli come valori senza segno e ponendo i 64 bit bassi
+	del risultato nel registro speciale LO e i 64 bit alti del risultato nel registro speciale HI.
+
+<P>
+<A NAME="334"></A>
+	<A NAME="335"></A>
+</LI>
+<LI><TT>DSLL rd, rt, sa</TT>
+<BR>
+Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di bit indicato nel valore immediato (positivo compreso tra 0 e 63) sa, 
+	e pone il risultato in rd. I bit liberi vengono posti a zero.
+
+<P>
+<A NAME="337"></A>
+	<A NAME="338"></A>
+</LI>
+<LI><TT>DSLLV rd, rt, rs</TT>
+<BR>
+Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di bit specificato nei 6 bit bassi del registro 
+    rs che verr&#224; letto come valore senza segno, e pone il risultato in rd. I bit liberi vengono posti a zero.
+
+<P>
+<A NAME="341"></A>
+	<A NAME="342"></A>
+</LI>
+<LI><TT>DSRA rd, rt, sa</TT>
+<BR>
+Effettua uno shift verso destra del registro a 64-bit rt, di un numero di bit specificato nel valore senza segno immediato (positivo compreso tra 0 e 63) sa, 
+	e pone il risultato in rd. I bit liberi vengono posti a zero se il bit pi&#249; a sinistra di rs &#232; zero, altrimenti vengono posti a uno.
+
+<P>
+<A NAME="346"></A>
+	<A NAME="347"></A>
+</LI>
+<LI><TT>DSRAV rd, rt, rs</TT>
+<BR>
+Effettua uno shift verso destra del registro a 64-bit rt, di un numero di bit specificato nei 6 bit bassi del registro rs 
+	 che verr&#224; letto come valore senza segno,e pone il risultato in rd. 
+	I bit liberi vengono posti a zero se il bit pi&#249; a sinistra di rs &#232; zero, altrimenti vengono posti a uno.
+
+<P>
+<A NAME="352"></A>
+	<A NAME="353"></A>
+</LI>
+<LI><TT>DSRL rd, rt, sa</TT>
+<BR>
+Effettua uno shift verso destra del registro a 64-bit rt, di un numero di bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, 
+	e pone il risultato in rd. I bit liberi vengono posti a zero.
+
+<P>
+<A NAME="355"></A>
+	<A NAME="356"></A>
+</LI>
+<LI><TT>DSRLV rd, rt, rs</TT>
+<BR>
+Effettua uno shift verso destra del registro a 64-bit rt, di un numero di bit specificato nei 6 bit bassi del registro rs che verr&#224; letto come valore senza segno, 
+	e pone il risultato in rd. I bit liberi vengono posti a zero.
+
+<P>
+<A NAME="359"></A>
+	<A NAME="360"></A>
+</LI>
+<LI><TT>DSUB rd, rs, rt</TT>
+<BR>
+Sottrae il valore del registro a 64-bit rt al valore del registro a 64-bit rs, considerandoli come valori con segno,
+	e pone il risultato in rd. Lancia un eccezione in caso di overflow.
+
+<P>
+<A NAME="362"></A>
+	<A NAME="363"></A>
+</LI>
+<LI><TT>DSUBU rd, rs, rt</TT>
+<BR>
+Sottrae il valore del registro a 64-bit rt al valore del registro a 64-bit rs, e pone il risultato in rd.
+	Non si verificano eccezioni di overflow.
+	<SPAN  CLASS="textbf">NB:</SPAN> La 'U' dell'istruzione sta per 'unsigned'; tuttavia questo &#232; 
+un nome equivoco, perch&#233; l'operazione considera i valori con segno. La sua caratteristica &#232; 
+quella di non lanciare eccezioni (nemmeno in caso di overflow).
+
+<P>
+<A NAME="366"></A>
+	<A NAME="367"></A>
+</LI>
+<LI><TT>MFLO rd</TT>
+<BR>
+Copia il contenuto del registro speciale LO in rd.
+
+<P>
+<A NAME="369"></A>
+	<A NAME="370"></A>
+</LI>
+<LI><TT>MFHI rd</TT>
+<BR>
+Copia il contenuto del registro speciale HI in rd.
+
+<P>
+<A NAME="372"></A>
+	<A NAME="373"></A>
+</LI>
+<LI><TT>MOVN rd, rs, rt</TT>
+<BR>
+Se rt &#232; diverso da zero, copia il contenuto di rs in rd.
+
+<P>
+<A NAME="376"></A>
+	<A NAME="377"></A>
+</LI>
+<LI><TT>MOVZ rd, rs, rt</TT>
+<BR>
+Se rt &#232; uguale a zero, copia il contenuto di rs in rd.
+
+<P>
+<A NAME="380"></A>
+	<A NAME="381"></A>
+</LI>
+<LI><TT>MULT rs, rt</TT>
+<BR>
+Esegue il prodotto tra i registri a 32-bit rs ed rt, ponendo i 32 bit bassi del risultato nel registro speciale LO
+	e i 32 bit alti del risultato nel registro speciale HI.
+
+<P>
+<A NAME="383"></A>
+	<A NAME="384"></A>
+</LI>
+<LI><TT>MULTU rs, rt</TT>
+<BR>
+Esegue il prodotto tra i registri a 32-bit rs ed rt, considerandoli come valori senza segno e ponendo i 32 bit 
+	bassi del risultato nel registro speciale LO e i 32 bit alti del risultato nel registro speciale HI.
+
+<P>
+<A NAME="386"></A>
+	<A NAME="387"></A>
+</LI>
+<LI><TT>OR rd, rs, rt</TT>
+<BR>
+Esegue un OR bit a bit tra rs ed rt, e pone il risultato in rd.
+
+<P>
+<A NAME="389"></A>
+	<A NAME="390"></A>
+</LI>
+<LI><TT>SLL rd, rt, sa</TT>
+<BR>
+Effettua uno shift verso sinistra del registro a 32-bit rt, di un numero di bit indicati nel valore immediato (positivo compreso tra 0 e 63) sa, 
+	e pone il risultato nel registro a 32-bit rd. I bit liberi vengono posti a zero.
+
+<P>
+<A NAME="392"></A>
+	<A NAME="393"></A>
+</LI>
+<LI><TT>SLLV rd, rt, rs</TT>
+<BR>
+Effettua uno shift verso sinistra del registro a 32-bit rt, di un numero di bit specificato nei 5 bit bassi del registro rs che verr&#224; letto come valore senza segno, 
+	e pone il risultato nel registro a 32-bit rd. I bit liberi vengono posti a zero.
+
+<P>
+<A NAME="396"></A>
+	<A NAME="397"></A>
+</LI>
+<LI><TT>SRA rd, rt, sa</TT>
+<BR>
+Effettua uno shift verso destra del registro a 32-bit rt, di un numero di bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, 
+	e pone il risultato nel registro a 32-bit rd.
+	I bit liberi vengono posti a zero se il bit pi&#249; a sinistra di rs &#232; zero, altrimenti vengono posti a uno.
+
+<P>
+<A NAME="401"></A>
+	<A NAME="402"></A>
+</LI>
+<LI><TT>SRAV rd, rt, rs</TT>
+<BR>
+Effettua uno shift verso destra del registro a 32-bit rt, di un numero di bit specificato nei 5 bit bassi del registro rs che verr&#224; letto come valore senza segno,
+	e pone il risultato nel registro a 32-bit in rd. 
+	I bit liberi vengono posti a zero se il bit pi&#249; a sinistra di rs &#232; zero, altrimenti vengono posti a uno.
+
+<P>
+<A NAME="407"></A>
+	<A NAME="408"></A>
+</LI>
+<LI><TT>SRL rd, rt, sa</TT>
+<BR>
+Effettua uno shift verso destra del registro a 32-bit rt, di un numero di bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, 
+	e pone il risultato nel registro a 32-bit rd. I bit liberi vengono posti a zero.
+
+<P>
+<A NAME="410"></A>
+	<A NAME="411"></A>
+</LI>
+<LI><TT>SRLV rd, rt, rs</TT>
+<BR>
+Effettua uno shift verso destra del registro a 32-bit rt, del numero di bit specificato nei 5 bit bassi del registro rs che verr&#224; letto come valore senza segno, 
+	e pone il risultato nel registro a 32-bit rd. I bit liberi vengono posti a zero.
+
+<P>
+<A NAME="414"></A>
+	<A NAME="415"></A>
+</LI>
+<LI><TT>SUB rd, rs, rt</TT>
+<BR>
+Sottrae il valore del registro a 32-bit rt al valore del registro a 32-bit rs, considerandoli come valori con segno,
+	e pone il risultato in rd. Lancia un eccezione in caso di overflow.
+
+<P>
+<A NAME="417"></A>
+	<A NAME="418"></A>
+</LI>
+<LI><TT>SUBU rd, rs, rt</TT>
+<BR>
+Sottrae il valore del registro a 32-bit rt al valore del registro a 32-bit rs, e pone il risultato in rd.
+	Non si verificano eccezioni di overflow.
+	<SPAN  CLASS="textbf">NB:</SPAN> La 'U' dell'istruzione sta per 'unsigned'; tuttavia questo &#232; 
+un nome equivoco, perch&#233; l'operazione considera i valori con segno. La sua caratteristica &#232; 
+quella di non lanciare eccezioni (nemmeno in caso di overflow).
+
+<P>
+<A NAME="421"></A>
+	<A NAME="422"></A>
+</LI>
+<LI><TT>SLT rd, rs, rt</TT>
+<BR>
+Pone il valore di rd ad 1 se il valore contenuto in rs &#232; minore di quello contenuto in rt, 
+	altrimenti pone rd a 0. Questa istruzione esegue un confronto con segno.
+
+<P>
+<A NAME="425"></A>
+	<A NAME="426"></A>
+</LI>
+<LI><TT>SLTU rd, rs, rt</TT>
+<BR>
+Pone il valore di rd ad 1 se il valore contenuto in rs &#232; minore di quello contenuto in rt, 
+	altrimenti pone rd a 0. Questa istruzione esegue un confronto senza segno.
+
+<P>
+<A NAME="429"></A>
+	<A NAME="430"></A>
+</LI>
+<LI><TT>XOR rd, rs, rt</TT>
+<BR>
+Esegue un OR esclusivo (XOR) bit a bit tra rs ed rt, e pone il risultato in rd.
+</LI>
+</UL>
+
+<P>
+Ecco la lista delle istruzioni ALU di tipo I.
+
+<P>
+
+	<A NAME="434"></A>
+	<A NAME="435"></A>
+<UL>
+<LI><TT>ADDI rt, rs, immediato</TT>
+<BR>
+Effettua la somma tra il registro a 32 bit rs ed il valore immediato, ponendo il risultato in rt. 
+	Questa istruzione considera gli operandi come valori con segno.
+	Lancia un eccezione in caso di overflow.
+
+<P>
+<A NAME="437"></A>
+	<A NAME="438"></A>
+</LI>
+<LI><TT>ADDIU rt, rs, immediato</TT>
+<BR>
+Effettua la somma tra il registro a 32 bit rs ed il valore immediato, ponendo il risultato in rt. 
+	Non si verificano eccezioni di overflow.
+	<SPAN  CLASS="textbf">NB:</SPAN> La 'U' dell'istruzione sta per 'unsigned'; tuttavia questo &#232; 
+un nome equivoco, perch&#233; l'operazione considera i valori con segno. La sua caratteristica &#232; 
+quella di non lanciare eccezioni (nemmeno in caso di overflow).
+
+<P>
+<A NAME="441"></A>
+	<A NAME="442"></A>
+</LI>
+<LI><TT>ANDI rt, rs, immediato</TT>
+<BR>
+Esegue un AND bit a bit tra rs ed il valore immediato, ponendo il risultato in rt.
+
+<P>
+<A NAME="444"></A>
+	<A NAME="445"></A>
+</LI>
+<LI><TT>DADDI rt, rs, immediato</TT>
+<BR>
+Effettua la somma tra il registro a 64 bit rs ed il valore immediato, ponendo il risultato in rt. 
+	Questa istruzione considera gli operandi come valori con segno.
+	Lancia un eccezione in caso di overflow.
+
+<P>
+<A NAME="447"></A>
+	<A NAME="448"></A>
+</LI>
+<LI><TT>DADDIU rt, rs, immediato</TT>
+<BR>
+Effettua la somma tra il registro a 64 bit rs ed il valore immediato, ponendo il risultato in rt. 
+	Non si verificano eccezioni di overflow.
+	<SPAN  CLASS="textbf">NB:</SPAN> La 'U' dell'istruzione sta per 'unsigned'; tuttavia questo &#232; 
+un nome equivoco, perch&#233; l'operazione considera i valori con segno. La sua caratteristica &#232; 
+quella di non lanciare eccezioni (nemmeno in caso di overflow).
+
+<P>
+<A NAME="451"></A>
+	<A NAME="452"></A>
+</LI>
+<LI><TT>DADDUI rt, rs, immediato</TT>
+<BR>
+Effettua la somma tra il registro a 64 bit rs ed il valore immediato, ponendo il risultato in rt. 
+	Non si verificano eccezioni di overflow.
+	<SPAN  CLASS="textbf">NB:</SPAN> La 'U' dell'istruzione sta per 'unsigned'; tuttavia questo &#232; 
+un nome equivoco, perch&#233; l'operazione considera i valori con segno. La sua caratteristica &#232; 
+quella di non lanciare eccezioni (nemmeno in caso di overflow).
+    <SPAN  CLASS="textbf">ATTENZIONE:</SPAN> Questa &#232; un'istruzione deprecated, che
+non appartiene al repertorio delle istruzioni MIPS64, ma &#232; stata inclusa nel set di
+istruzioni per mantenere la compatibilit&#224; con altri simulatori.
+
+<P>
+<A NAME="456"></A>
+	<A NAME="457"></A>
+</LI>
+<LI><TT>LUI rt, immediato</TT>
+<BR>
+Carica la costante definita dal valore immediato nella met&#224; superiore dei 32
+	bit inferiori di rt, effettuando l'estensione del segno sui 32 bit superiori del registro. 
+
+<P>
+<A NAME="460"></A>
+	<A NAME="461"></A>
+</LI>
+<LI><TT>ORI rt, rs, immediato</TT>
+<BR>
+Effettua l'OR bit a bit tra rs ed il valore immediato, ponendo il risultato in rt.
+
+<P>
+<A NAME="463"></A>
+	<A NAME="464"></A>
+</LI>
+<LI><TT>SLTI rt, rs, immediato</TT>
+<BR>
+Pone il valore di rt ad 1 se il valore di rs &#232; minore di quello dell'immediato, 
+	altrimenti pone rt a 0. Questa operazione effettua un confronto con segno.
+
+<P>
+<A NAME="467"></A>
+	<A NAME="468"></A>
+</LI>
+<LI><TT>SLTUI rt, rs, immediato</TT>
+<BR>
+Pone il valore di rt ad 1 se il valore di rs &#232; minore di quello dell'immediato, 
+	altrimenti pone rt a 0. Questa operazione effettua un confronto senza segno.
+
+<P>
+<A NAME="471"></A>
+	<A NAME="472"></A>
+</LI>
+<LI><TT>XORI rt, rs, immediato</TT>
+<BR>
+Effettua l'OR esclusivo bit a bit tra rs ed il valore immediato, ponendo il risultato in rt.
+
+<P>
+</LI>
+</UL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html267"
+  HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html261"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html255"
+  HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html263"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A> 
+<A NAME="tex2html265"
+  HREF="node47.html">
+<IMG WIDTH="43" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="index"
+ SRC="/usr/share/latex2html/icons/index.png"></A> 
+<BR>
+<B> Next:</B> <A NAME="tex2html268"
+  HREF="node11.html">Istruzioni Load/Store</A>
+<B> Up:</B> <A NAME="tex2html262"
+  HREF="node9.html">Il repertorio delle istruzioni</A>
+<B> Previous:</B> <A NAME="tex2html256"
+  HREF="node9.html">Il repertorio delle istruzioni</A>
+ &nbsp; <B>  <A NAME="tex2html264"
+  HREF="node1.html">Indice</A></B> 
+ &nbsp; <B>  <A NAME="tex2html266"
+  HREF="node47.html">Indice analitico</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+andrea
+2007-08-22
+</ADDRESS>
+</BODY>
+</HTML>
