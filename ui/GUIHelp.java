@@ -60,7 +60,7 @@ public class GUIHelp {
         	HSurl = Main.class.getResource("help/");
         	String s = HSurl.getProtocol()+ ":" + HSurl.getPath().replace("%20", " ");
         	//JOptionPane.showInputDialog("Inserisci l'URL: ");///helpSetURL.getText();
-            String s1 = "edumips64.hs";//helpSetName.getText();
+            String s1 = "EduMIPS64it.hs";//helpSetName.getText();
             //System.err.println("FINALE: " + s);
             try {
             	//Surl = JLogoApplication.class.getResource("help/jlogo.hs");
