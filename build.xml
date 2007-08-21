@@ -1,7 +1,7 @@
 <project name="edumips64" default="jar" basedir=".">
 	<target name="init">
 		<property name="sourceDir" value="." />
-        <property name="helpClassesDir" value="./javahelp_classes" />
+        <property name="helpClassesDir" value="./libs" />
 		<property name="version" value="0.5.1" />
 		<property name="outputDir" value="edumips" />
 		<property name="jarFile" value="edumips64-${version}.jar" />
@@ -30,6 +30,8 @@
 		<mkdir dir="${outputDir}/edumips64/data" />
 		<mkdir dir="${outputDir}/edumips64/utils" />
 		<mkdir dir="${outputDir}/edumips64/help" />
+		<mkdir dir="${outputDir}/com" />
+		<mkdir dir="${outputDir}/javax" />
 
 		<copy todir="${outputDir}/edumips64/img">
 			<fileset dir="img">
@@ -46,6 +48,21 @@
 				<include name="**/*.properties" />
 			</fileset>
 		</copy>
+		<copy todir="${outputDir}/edumips64/help">
+			<fileset dir="help">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+        <copy todir="${outputDir}/com">
+            <fileset dir="libs/com">
+                <include name="**/*.class" />
+            </fileset>
+        </copy>
+        <copy todir="${outputDir}/javax">
+            <fileset dir="libs/javax">
+                <include name="**/*.class" />
+            </fileset>
+        </copy>
 		<jar destfile="${svnJarFile}" basedir="edumips">
 			<manifest>
 				<attribute name="Main-Class" value="edumips64.Main"/>

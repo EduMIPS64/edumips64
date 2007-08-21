@@ -64,7 +64,6 @@ public class GUIHelp {
             //System.err.println("FINALE: " + s);
             try {
             	//Surl = JLogoApplication.class.getResource("help/jlogo.hs");
-                s = JOptionPane.showInputDialog("Va bene così il percorso?",s);
             	URL aurl[] = GUIHelp.parseURLs(s);
             	URLClassLoader urlclassloader = new URLClassLoader(aurl);
             	//System.out.println("URL = " + aurl[0]);
