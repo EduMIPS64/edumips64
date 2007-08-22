@@ -23,7 +23,8 @@
 	<target name="clean">
 		<delete file="${jarFile}" />
 	</target>
-	<target name="svnjar" depends="init">
+
+    <target name="dirs" depends="init">
 		<mkdir dir="${outputDir}" />
         <javac target="5" srcdir="${sourceDir}" classpath="${helpClassesDir}" destdir="${outputDir}" nowarn="yes" debug="on" debuglevel="lines,vars,source"/>
 		<mkdir dir="${outputDir}/edumips64/img" />
@@ -63,6 +64,20 @@
                 <include name="**/*.class" />
             </fileset>
         </copy>
+    </target>
+
+
+	<target name="jar" depends="init, dirs">
+		<jar destfile="${jarFile}" basedir="edumips">
+			<manifest>
+				<attribute name="Main-Class" value="edumips64.Main"/>
+			</manifest>
+		</jar>
+		<signjar jar="${jarFile}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
+        <delete dir="${outputDir}" /> 
+	</target>
+
+	<target name="svnjar" depends="init, dirs">
 		<jar destfile="${svnJarFile}" basedir="edumips">
 			<manifest>
 				<attribute name="Main-Class" value="edumips64.Main"/>
@@ -83,36 +98,4 @@
         <tar destfile="${tarbz2File}" basedir="." includes="edumips64/" compression="bzip2" />
         <delete dir="edumips64" /> 
     </target> 
-
-
-	<target name="jar" depends="init">
-		<mkdir dir="${outputDir}" />
-        <javac target="5" srcdir="${sourceDir}" classpath="${helpClassesDir}" destdir="${outputDir}" nowarn="yes"/>
-		<mkdir dir="${outputDir}/edumips64/img" />
-		<mkdir dir="${outputDir}/edumips64/data" />
-		<mkdir dir="${outputDir}/edumips64/utils" />
-		<mkdir dir="${outputDir}/edumips64/help" />
-		<copy todir="${outputDir}/edumips64/img">
-			<fileset dir="img">
-				<include name="**/*.png" />
-			</fileset>
-		</copy>
-		<copy todir="${outputDir}/edumips64/data">
-			<fileset dir="data">
-				<include name="**/*.txt" />
-			</fileset>
-		</copy>
-		<copy todir="${outputDir}/edumips64/utils">
-			<fileset dir="utils">
-				<include name="**/*.properties" />
-			</fileset>
-		</copy>
-		<jar destfile="${jarFile}" basedir="edumips">
-			<manifest>
-				<attribute name="Main-Class" value="edumips64.Main"/>
-			</manifest>
-		</jar>
-		<signjar jar="${jarFile}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
-        <delete dir="${outputDir}" /> 
-	</target>
 </project>
