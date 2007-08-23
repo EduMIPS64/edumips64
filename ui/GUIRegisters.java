@@ -112,10 +112,10 @@ public class GUIRegisters extends GUIComponent
 			tableModel = new FileTableModel(value);
 			setBackground(Color.WHITE);
 			theTable = new JTable(tableModel);
-			theTable.getColumnModel().getColumn(0).setPreferredWidth(95);
-			theTable.getColumnModel().getColumn(1).setPreferredWidth(122);
-			theTable.getColumnModel().getColumn(2).setPreferredWidth(45);
-			theTable.getColumnModel().getColumn(3).setPreferredWidth(122);
+			theTable.getColumnModel().getColumn(0).setPreferredWidth(50);
+			theTable.getColumnModel().getColumn(1).setPreferredWidth(147);
+			theTable.getColumnModel().getColumn(2).setPreferredWidth(50);
+			theTable.getColumnModel().getColumn(3).setPreferredWidth(147);
 			theTable.setRowSelectionAllowed(false);
 			theTable.setColumnSelectionAllowed(false);
 			theTable.setCellSelectionEnabled(false);
