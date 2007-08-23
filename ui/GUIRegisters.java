@@ -66,6 +66,7 @@ public class GUIRegisters extends GUIComponent
 	
 	public void update() 
 	{
+		regPanel.updateRegistersNames();
 		registers = cpu.getRegisters();
 		for (int i = 0; i < 32; i++) {
 			value[i] = registers[i].toString();
@@ -79,7 +80,7 @@ public class GUIRegisters extends GUIComponent
 		cont.repaint();
 	}
 
-  public String registerToAlias(String reg)
+	public String registerToAlias(String reg)
 		{
 			int number = Integer.parseInt(reg.substring(1));
 			if (number == 32) return ("   LO    =  ");
@@ -154,7 +155,7 @@ public class GUIRegisters extends GUIComponent
 			//init dei vettori statici 1a e 3a colonna
 			for (int i = 0; i < 32; i++) 
 			{
-				numR[i] = "R" + i + " (" + registerToAlias(" " + i) + ") =";
+				numR[i] = fillFirstColumn(i);
 				numRF[i] = "F" + i + " =";
 				value[i] = "0000000000000000";
 			}
@@ -163,6 +164,21 @@ public class GUIRegisters extends GUIComponent
 			numR[33] = "HI =";
 			value[33] = "0000000000000000";
 		}	
+
+		public String fillFirstColumn(int i)
+		{
+			if((Boolean) Config.get("show_aliases"))
+				return registerToAlias(" " + i) + "=";
+			else
+				return "R" + i+ " =";
+		}
+
+		public void updateRegistersNames()
+		{
+			for (int i = 0; i < 32; i++) 
+				numR[i] = fillFirstColumn(i);
+			draw();
+		}
 
 		//classe interna che gestisce l'evento doppio click
   		class MyMouseListener implements MouseListener 

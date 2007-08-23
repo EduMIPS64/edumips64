@@ -96,6 +96,7 @@ public class GUIConfig extends JDialog{
 		
 		addRow(panel,row++, "forwarding",new JCheckBox());
 		addRow(panel,row++, "n_step",new JNumberField());
+		addRow(panel,row++, "show_aliases",new JCheckBox());
 
 		// fill remaining vertical space
 		grid_add(panel,new JPanel(),gbl,gbc,0,1,0,row,GridBagConstraints.REMAINDER,1);
@@ -275,7 +276,14 @@ public class GUIConfig extends JDialog{
 		});
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
-				Config.setMap(updatedMap);
+				
+				if( (Boolean) Config.get("show_aliases")  !=  updatedMap.get("show_aliases"))
+				{
+					Config.setMap(updatedMap);
+					((GUIFrontend) edumips64.Main.getGUIFrontend()).updateComponents();
+				}
+				else
+					Config.setMap(updatedMap);
 				setVisible(false);
 				if(Instruction.getEnableForwarding() != (Boolean)Config.get("forwarding")) {
 					CPU cpu = CPU.getInstance();
@@ -288,6 +296,7 @@ public class GUIConfig extends JDialog{
 					}
 				}
 				edumips64.Main.updateCGT();
+				
 			}
 		});
 	}
