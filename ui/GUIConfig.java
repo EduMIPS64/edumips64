@@ -96,7 +96,6 @@ public class GUIConfig extends JDialog{
 		
 		addRow(panel,row++, "forwarding",new JCheckBox());
 		addRow(panel,row++, "n_step",new JNumberField());
-		addRow(panel,row++, "show_aliases",new JCheckBox());
 
 		// fill remaining vertical space
 		grid_add(panel,new JPanel(),gbl,gbc,0,1,0,row,GridBagConstraints.REMAINDER,1);
@@ -150,6 +149,7 @@ public class GUIConfig extends JDialog{
 		addRow(panel,row++, "EXColor",new JButton());
 		addRow(panel,row++, "MEMColor",new JButton());	
 		addRow(panel,row++, "WBColor",new JButton());
+		addRow(panel,row++, "show_aliases",new JCheckBox());
 
 
 		// fill remaining vertical space
