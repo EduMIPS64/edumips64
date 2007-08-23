@@ -202,7 +202,8 @@ public class GUIRegisters extends GUIComponent
 			value[33] = "0000000000000000";
 		}	
 
-         public String fillFirstColumn(int i) { 
+         public String fillFirstColumn(int i)
+         {
              if((Boolean) Config.get("show_aliases")) {
                  return registerToAlias(" " + i) + "="; 
              } else {
