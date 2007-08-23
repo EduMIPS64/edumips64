@@ -40,7 +40,7 @@ public class CPU {
 	private RegisterFP[] fpr;
 	public static enum FPExceptions {INVALID_OPERATION,DIVIDE_BY_ZERO,UNDERFLOW,OVERFLOW};
 	public static enum FPRoundingMode { TO_NEAREST, TOWARD_ZERO,TOWARDS_PLUS_INFINITY,TOWARDS_MINUS_INFINITY};
-	private BitSet32 FCSR;
+	private FCSRRegister FCSR;
 	public static List<String> knownFPInstructions; // set of Floating point instructions that must pass through the FPU pipeline
 	private FPPipeline fpPipe;
 	private List<String> terminatingInstructionsOPCodes;
@@ -122,7 +122,7 @@ public class CPU {
 		fpr=new RegisterFP[32];
 		for(int i=0;i<32;i++)
 			fpr[i]=new RegisterFP();
-		FCSR = new BitSet32();
+		FCSR = new FCSRRegister();
 		fpPipe= new FPPipeline();
 		fpPipe.reset();
 		
@@ -151,63 +151,12 @@ public class CPU {
 		this.status = status;
 	}
 	
-	/** Sets the floating point unit enabled exceptions
-	 *  @param the exception name to set
-	 *  @param boolean that is true in order to enable that exception or false for disabling it
-	 */
-	public  void setFPExceptions(FPExceptions exceptionName, boolean value) throws IrregularStringOfBitsException {
-		switch(exceptionName){
-			case DIVIDE_BY_ZERO:
-				setFCSREnables("Z",(value==true)?1:0);
-				break;
-			case OVERFLOW:
-				setFCSREnables("O",(value==true)?1:0);
-				break;
-			case UNDERFLOW:
-				setFCSREnables("U",(value==true)?1:0);
-				break;
-			case INVALID_OPERATION:
-				setFCSREnables("V",(value==true)?1:0);
-				break;
-		}
-	}
-
-	/** Sets the FCSR Enables bits (the numeration of the bitset bits goes in this way  0 1 .... 30 31 
-	*		 31 30 29 28 27 26 25  | 24 | 23 | 22 21 | 20 19 18 |17 16 15 14 13 12 | 11 10 9 8 7 | 6 5 4 3 2 | 1 0
-        *			 FCC           | FS | FCC|  Impl |    000   |        Cause     |    Enables  |   Flags   |  RM
-	* 		  7  6  5  4  3  2  1  |       0				       |  V  Z O U I | V Z O U I
-	* @param tag a string value between  V  Z O U I
-	* @param value a binary value
-	*/	
-	public void setFCSREnables(String tag, int value) throws IrregularStringOfBitsException{
-		if(tag.compareToIgnoreCase("V")==0)
-			FCSR.setBits(String.valueOf(value),20);
-		else if(tag.compareToIgnoreCase("Z")==0)
-			FCSR.setBits(String.valueOf(value),21);
-		else if(tag.compareToIgnoreCase("O")==0)
-			FCSR.setBits(String.valueOf(value),22);
-		else if	(tag.compareToIgnoreCase("U")==0)
-			FCSR.setBits(String.valueOf(value),23);
-		else if	(tag.compareToIgnoreCase("I")==0) //not implemented
-			FCSR.setBits(String.valueOf(value),24);
-		
-	}
-	
-	/** Sets the flags bits of the FCSR
+	/** Sets the flag bits of the FCSR
 	* @param tag a string value between  V  Z O U I
 	* @param value a binary value
 	 */
 	public void setFCSRFlags(String tag,int value) throws IrregularStringOfBitsException{
-		if(tag.compareToIgnoreCase("V")==0)
-			FCSR.setBits(String.valueOf(value),25);
-		else if(tag.compareToIgnoreCase("Z")==0)
-			FCSR.setBits(String.valueOf(value),26);
-		else if(tag.compareToIgnoreCase("O")==0)
-			FCSR.setBits(String.valueOf(value),27);
-		else if	(tag.compareToIgnoreCase("U")==0)
-			FCSR.setBits(String.valueOf(value),28);
-		else if	(tag.compareToIgnoreCase("I")==0) // not implemented
-			FCSR.setBits(String.valueOf(value),29);
+		FCSR.setFCSRFlags(tag,value);
 	}
 	
 	
@@ -217,33 +166,7 @@ public class CPU {
 	 */
 	public void setFCSRConditionCode(int cc, int condition) throws IrregularStringOfBitsException
 	{
-		final int FCC0=8;
-		final int DISCONTINUITY=1;
-		final int OFFSET=FCC0-DISCONTINUITY;
-		if(cc==0)
-			FCSR.setBits(String.valueOf(condition),FCC0);
-		else
-			FCSR.setBits(String.valueOf(condition),OFFSET-cc);
-	}
-	
-	/** Sets the current rouding mode
-	 * @param rm a constant that belongs to TO_NEAREST ,TOWARD_ZERO,TOWARDS_PLUS_INFINITY,TOWARDS_MINUS_INFINITY*/
-	public void setFCSRRoundingMode(FPRoundingMode rm) throws IrregularStringOfBitsException{
-		final int FCSR_RM_FIELD_INIT=30;
-		switch(rm){
-			case TO_NEAREST:
-				FCSR.setBits("00",FCSR_RM_FIELD_INIT);
-				break;
-			case TOWARD_ZERO:
-				FCSR.setBits("01",FCSR_RM_FIELD_INIT);
-				break;
-			case TOWARDS_PLUS_INFINITY:
-				FCSR.setBits("10",FCSR_RM_FIELD_INIT);
-				break;
-			case TOWARDS_MINUS_INFINITY:
-				FCSR.setBits("11",FCSR_RM_FIELD_INIT);
-				break;
-		}
+		FCSR.setFCSRConditionCode(cc,condition);
 	}
 	
 //GETTING PROPERTIES -----------------------------------------------------------------
@@ -327,76 +250,32 @@ public class CPU {
 		return fpPipe.getInstructionByFuncUnit(funcUnit,stage);
 	}
 	
+	/** Gets a binary string representing the Floating Point Control Status Register*/
 	public String getFCSR(){
 		return FCSR.getBinString();
-	}
-
-	/** Gets the selected flag bit of the FCSR
-	* @param tag a string value between  V=Invalid  Z=Divide by zero O=Overflow U=Underflow I=Inexact (not implemented)
-	 */
-	public boolean getFCSREnables(String tag){
-		if(tag.compareToIgnoreCase("V")==0)
-			return (FCSR.getBinString().charAt(20)=='1') ? true : false;
-		if(tag.compareToIgnoreCase("Z")==0)
-			return (FCSR.getBinString().charAt(21)=='1') ? true : false;
-		if(tag.compareToIgnoreCase("O")==0)
-			return (FCSR.getBinString().charAt(22)=='1') ? true : false;
-		if(tag.compareToIgnoreCase("U")==0)
-			return (FCSR.getBinString().charAt(23)=='1') ? true : false;
-		if(tag.compareToIgnoreCase("I")==0) //not implemented
-			return (FCSR.getBinString().charAt(24)=='1') ? true : false;
-		return false;
-	}
-	
-	/** Gets the flags bits of the FCSR
-	* @param tag a string value between  V=Invalid  Z=Divide by zero O=Overflow U=Underflow I=Inexact (not implemented)
-	 */
-	public boolean getFCSRFlags(String tag){
-		if(tag.compareToIgnoreCase("V")==0)
-			return (FCSR.getBinString().charAt(25)=='1') ? true : false;
-		if(tag.compareToIgnoreCase("Z")==0)
-			return (FCSR.getBinString().charAt(26)=='1') ? true : false;
-		if(tag.compareToIgnoreCase("O")==0)
-			return (FCSR.getBinString().charAt(27)=='1') ? true : false;
-		if(tag.compareToIgnoreCase("U")==0)
-			return (FCSR.getBinString().charAt(28)=='1') ? true : false;
-		if(tag.compareToIgnoreCase("I")==0) // not implemented
-			return (FCSR.getBinString().charAt(29)=='1') ? true : false;
-		return false;
 	}
 
 	/** Gets the selected FCC bit of the FCSR 
 	 * @param cc condition code is an int value in the range [0,7]
 	 */
-	public int getFCSRConditionCode(int cc)
-	{
-		final int FCC0=8;
-		final int DISCONTINUITY=1;
-		final int OFFSET=FCC0-DISCONTINUITY;
-		if(cc==0)
-			return (Integer.valueOf(FCSR.getBinString().substring(FCC0,FCC0+1)));
-		else
-			return (Integer.valueOf(FCSR.getBinString().substring(OFFSET-cc,OFFSET-cc+1)));
+	public int getFCSRConditionCode(int cc){
+		return FCSR.getFCSRConditionCode(cc);
 	}
 	
+	/** Gets the current rounding mode readeng the FCSR
+	 * @return the rounding mode */
 	public FPRoundingMode getFCSRRoundingMode(){
-		final int FCSR_RM_FIELD_INIT=30;
-		if(FCSR.getBinString().substring(FCSR_RM_FIELD_INIT,FCSR.size).compareTo("00")==0)
-			return FPRoundingMode.TO_NEAREST;
-		if(FCSR.getBinString().substring(FCSR_RM_FIELD_INIT,FCSR.size).compareTo("01")==0)
-			return FPRoundingMode.TOWARD_ZERO;
-		if(FCSR.getBinString().substring(FCSR_RM_FIELD_INIT,FCSR.size).compareTo("10")==0)
-			return FPRoundingMode.TOWARDS_PLUS_INFINITY;
-		if(FCSR.getBinString().substring(FCSR_RM_FIELD_INIT,FCSR.size).compareTo("11")==0)
-			return FPRoundingMode.TOWARDS_MINUS_INFINITY;
-		return null;
+		return FCSR.getFCSRRoundingMode();
 	}
 	
-	
+	/** Gets the current computing step of the divider*/
 	public int getDividerCounter() {
 		return fpPipe.getDividerCounter();
 	}
 	
+	/** Gets the integer pipeline
+	 *  @return an HashMap 	  
+	 */
 	public Map<PipeStatus, Instruction> getPipeline() {
 		return pipe;
 	}
@@ -464,56 +343,20 @@ public class CPU {
 		return serialNumberSeed-1;
 	}
 	
-	/** Returns the stage's name of the instruction passed as serialNumber between this values
-	 *  ID,EX,MEM,WB, A1,A2,A3,A4,M1,M2,M3,M4,M5,M6,M7,DIVXX in which XX means the FP Divider Counter*/
-	/*
-	public String getInstructionStage(long serialNumber)
-	{
-		String stage;
-		Instruction instr;
-		if((instr=pipe.get(PipeStatus.IF))!=null)
-			if(instr.getSerialNumber()==serialNumber)
-				return "IF";
-		if((instr=pipe.get(PipeStatus.ID))!=null)
-			if(instr.getSerialNumber()==serialNumber)
-				return "ID";
-		if((instr=pipe.get(PipeStatus.EX))!=null)
-			if(instr.getSerialNumber()==serialNumber)
-				return "EX";
-		if((instr=pipe.get(PipeStatus.MEM))!=null)
-			if(instr.getSerialNumber()==serialNumber)
-				return "MEM";
-		if((instr=pipe.get(PipeStatus.WB))!=null)
-			if(instr.getSerialNumber()==serialNumber)
-				return "WB";
-		//checking for FP pipe (may return null)
-		return fpPipe.getInstructionStage(serialNumber);
-	}
-	 */
 	
-	/** Gets the stage's name of the instruction passed as serialNumber between this values
+	/* Gets the stage's name of the instruction passed as serialNumber between this values
 	 * A1,A2,A3,A4,M1,M2,M3,M4,M5,M6,M7,DIVXX in which XX means the FP Divider Counter.
-	 * If the fpPipe doesn't contain that instruction null is returned*/
+	 * If the fpPipe doesn't contain that instruction null is returned
 	public String getFPInstructionStage(long serialNumber) {
 		return fpPipe.getInstructionStage(serialNumber);
 	}
-	
+	*/
+		
 	/** Gets the floating point unit enabled exceptions
 	 *  @return true if exceptionName is enabled, false in the other case
 	 */
 	public boolean getFPExceptions(FPExceptions exceptionName) {
-		//return this.fpEnabledExceptions.get(exceptionName);
-		switch(exceptionName){
-			case DIVIDE_BY_ZERO:
-				return getFCSREnables("Z");
-			case OVERFLOW:
-				return getFCSREnables("O");
-			case UNDERFLOW:
-				return getFCSREnables("U");
-			case INVALID_OPERATION:
-				return getFCSREnables("V");
-		}
-		return false;
+		return FCSR.getFPExceptions(exceptionName);
 	}
 	
 	/** Gets the Program Counter register
@@ -572,20 +415,20 @@ public class CPU {
 		boolean masked = (Boolean)Config.get("syncexc-masked");
 		boolean terminate = (Boolean)Config.get("syncexc-terminate");
 		
-		setFPExceptions(CPU.FPExceptions.INVALID_OPERATION,(Boolean)Config.get("INVALID_OPERATION"));
-		setFPExceptions(CPU.FPExceptions.OVERFLOW,(Boolean)Config.get("OVERFLOW"));
-		setFPExceptions(CPU.FPExceptions.UNDERFLOW,(Boolean)Config.get("UNDERFLOW"));
-		setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO,(Boolean)Config.get("DIVIDE_BY_ZERO"));
+		FCSR.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION,(Boolean)Config.get("INVALID_OPERATION"));
+		FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW,(Boolean)Config.get("OVERFLOW"));
+		FCSR.setFPExceptions(CPU.FPExceptions.UNDERFLOW,(Boolean)Config.get("UNDERFLOW"));
+		FCSR.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO,(Boolean)Config.get("DIVIDE_BY_ZERO"));
 		
 		//setting the rounding mode
 		if((Boolean)Config.get("NEAREST"))
-			setFCSRRoundingMode(FPRoundingMode.TO_NEAREST);
+			FCSR.setFCSRRoundingMode(FPRoundingMode.TO_NEAREST);
 		else if((Boolean)Config.get("TOWARDZERO"))
-			setFCSRRoundingMode(FPRoundingMode.TOWARD_ZERO);
+			FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARD_ZERO);
 		else if((Boolean)Config.get("TOWARDS_PLUS_INFINITY"))
-			setFCSRRoundingMode(FPRoundingMode.TOWARDS_PLUS_INFINITY);
+			FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_PLUS_INFINITY);
 		else if((Boolean)Config.get("TOWARDS_MINUS_INFINITY"))
-			setFCSRRoundingMode(FPRoundingMode.TOWARDS_MINUS_INFINITY);
+			FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_MINUS_INFINITY);
 		
 		String syncex = null;
 		
@@ -631,7 +474,7 @@ public class CPU {
 			pipe.put(PipeStatus.WB, pipe.get(PipeStatus.MEM));
 			pipe.put(PipeStatus.MEM,null);
 			
-			//if there will be a stall because more instructions would fill the MEM stage, the EX() method cannot be called
+			//if there will be a stall because a lot of instructions would fill the MEM stage, the EX() method cannot be called
 			//because the integer instruction in EX cannot be moved
 			// EX
 		if(fpPipe.getInstruction(SIMUL_MODE_ENABLED)==null) {
@@ -720,7 +563,7 @@ public class CPU {
 						pipe.put(PipeStatus.EX,pipe.get(PipeStatus.ID));
 						pipe.put(PipeStatus.ID,null);
 					}
-					//caso in cui EX è occupata
+					//the EX stage is full
 					else {
 						throw new EXNotAvailableException();
 					}
