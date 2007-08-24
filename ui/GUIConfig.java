@@ -48,7 +48,7 @@ public class GUIConfig extends JDialog{
 	JTabbedPane tabPanel;
 	JButton okButton;
 	HashMap<String,Object> updatedMap;
-	int width = 500, height = 250;	
+	int width = 500, height = 270;	
 	public GUIConfig(final JFrame owner){
 		super(owner, CurrentLocale.getString("Config.ITEM"), true);
 		MAIN = CurrentLocale.getString("Config.MAIN");
