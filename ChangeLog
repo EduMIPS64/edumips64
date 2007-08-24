@@ -1,7 +1,16 @@
 EduMIPS64 ChangeLog
 ------------------- 
 
-0.5.1 (someday)
+0.5.1 (24/08/2007)
+	- Updated embedded manual with a SYSCALL page (jesky)
+	- Parser bug fixes (mancausoft)
+	- Memory bug fixes (mancausoft)
+	- Added the MIPS alias to each register's name in the Registers window (andrea)
+	- Fixed MOVN/MOVZ behavior (andrea)
+	- Manual fixes (jesky)
+	- Fixed Jump-after-Break bug (andrea)
+	- Added debug info to svnjar (mancausoft)
+	- Fixed OSX issues (mancausoft)
 
   0.5 (05/06/2007)
   	- Implemented a subset of MIPS32 instructions:
