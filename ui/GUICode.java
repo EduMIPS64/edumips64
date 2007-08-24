@@ -1,7 +1,7 @@
 /* GUICode.java
  *
  * This class draw the code memory representation in a window with three columns.
- * (c) 2006 Alessandro Nicolosi
+ * (c) 2006 Alessandro Nicolosi, Massimo Trubia (FPU modifications)
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -21,19 +21,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package edumips64.ui;
+import edumips64.Main;
 import edumips64.core.*;
+import edumips64.core.is.Instruction;
 import edumips64.utils.*;
 import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.table.*;
 /**
-* This class draw the code memory representation in a window with five columns.
+* This class draws the code memory representation in a window with five columns.
 */
 public class GUICode extends GUIComponent{
 	CodePanel codePanel;
 	String memoryAddress[]= new String[CPU.CODELIMIT];
-	private static int ifIndex, idIndex, exIndex, memIndex, wbIndex;
+	private static int ifIndex, idIndex, exIndex, memIndex, wbIndex, A1Index,A2Index,A3Index,A4Index,M1Index,M2Index,M3Index,M4Index,M5Index,M6Index,M7Index,DIVIndex;
 	
 	public GUICode(){
 		super();
@@ -68,6 +70,20 @@ public class GUICode extends GUIComponent{
 		exIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStatus.EX));
 		memIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStatus.MEM));
 		wbIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStatus.WB));
+		
+		A1Index=cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER",1));
+		A2Index=cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER",2));
+		A3Index=cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER",3));
+		A4Index=cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER",4));
+		M1Index=cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER",1));
+		M2Index=cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER",2));
+		M3Index=cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER",3));
+		M4Index=cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER",4));
+		M5Index=cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER",5));
+		M6Index=cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER",6));
+		M7Index=cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER",7));
+		DIVIndex=cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("DIVIDER",0));
+
 	}
 	
 	public void draw(){
@@ -233,6 +249,22 @@ public class GUICode extends GUIComponent{
 					label.setOpaque(true);
 					label.setBackground((Color)Config.get("WBColor"));
 				}
+				if(rowTable==M1Index || rowTable==M2Index || rowTable==M3Index || rowTable==M4Index || rowTable==M5Index || rowTable==M6Index || rowTable==M7Index )
+				{
+					label.setOpaque(true);
+					label.setBackground((Color)Config.get("FPMultiplierColor"));
+				}
+				if(rowTable==A1Index || rowTable==A2Index || rowTable==A3Index || rowTable==A4Index)
+				{
+					label.setOpaque(true);
+					label.setBackground((Color)Config.get("FPAdderColor"));
+				}
+				if(rowTable==DIVIndex)
+				{
+					label.setOpaque(true);
+					label.setBackground((Color)Config.get("FPDividerColor"));
+				}
+
 				return label;
 			}
 	}

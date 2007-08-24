@@ -47,24 +47,6 @@ class MOVZ extends ALU_RType
     }
     public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException 
     {
-        /*
-        //getting strings from temporary registers
-        String rs=TR[RS_FIELD].getBinString();
-        String rt=TR[RT_FIELD].getBinString();
-        //if the move test will be true the rs value must be written in rd register
-        TR[RD_FIELD].setBits(rs,0);
-        boolean rtbit,diff=false;
-        for(int i=0;i<64;i++)
-        {
-        rtbit=rt.charAt(i)=='1'?true:false;
-        if(diff=rtbit^false)
-        {
-        //the move test is false because strings are different, the old value must be rewritten in rd
-        TR[RD_FIELD].setBits(cpu.getRegister(params.get(RD_FIELD)).getBinString(),0);                   
-        break;
-        }
-        }
-        */
         if(TR[RT_FIELD].getValue() == 0) {
             edumips64.Main.logger.debug("Executing MOVZ, rt == 0 => rd <- rs");
             TR[RD_FIELD].setBits(TR[RS_FIELD].getBinString(), 0);
@@ -73,11 +55,5 @@ class MOVZ extends ALU_RType
         {
             doWB();
         }
-
     }
-    
-
-
-
-   
 }

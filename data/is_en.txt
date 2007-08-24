@@ -534,3 +534,214 @@ Syntax: XORI rt, rs, immediate
 Description: rt = rs XOR immediate
              To do a bitwise logical Exclusive OR with a constant.
     
+---------------------------------------------------------------------------------
+                    FLOATING POINT INSTRUCTION SET
+---------------------------------------------------------------------------------            
+-ADD.D Instruction
+Syntax: ADD.D fd, fs, ft
+Description: fd = fs + ft
+            To add double floating point values. 
+Exceptions: Overflow and Underflow are generated if the result cannot be 
+            represented according to the IEEE754 standard
+            Invalid Operation is generated if fs or ft contain a QNaN or SNaN, 
+            or if an invalid operation is performed (i.e +Infinity-Infinity)
+
+
+-BC1F Instruction
+Syntax: BC1F cc, offset
+Description: if FCSR[cc] = 0 then branch
+            To test an FP condition code and do a PC-relative conditional branch
+            The boolean value FCSR[cc] can be written only by the
+            C.condition.format instructions
+            (i.e  C.EQ.D 7,f1,f2 --->  NOP ---> BC1T 7,label)
+
+
+-BC1T Instruction
+Syntax: BC1T cc, offset
+Description: if FCSR[cc] = 1 then branch
+            To test an FP condition code and do a PC-relative conditional branch
+            The boolean value FCSR[cc] can be written only by the C.cond.fmt instructions
+            (i.e  C.EQ.D 7,f1,f2 --->  NOP ---> BC1T 7,label)
+
+
+-C.EQ.D Instruction
+Syntax: C.EQ.D cc, fs, ft
+Description: FCSR[cc] = (fs==ft)
+            To compare the sameness between FP values and record the Boolean result 
+            in a condition code on the FCSR register. The result is written in the 
+            instruction's EX stage, for this reason a nop instruction must precede 
+            a conditional branch instruction or another test instruction
+            (i.e  C.EQ.D 7,f1,f2 --->  NOP ---> BC1T 7,label)
+            cc is a 3 bit immediate value in the range [0,7]
+Exceptions: Invalid Operation  is raised when fs or ft contain QNaN 
+            (trap if enabled)  or SNaN(trap always)  
+            
+
+-C.LT.D Instruction
+Syntax: C.LT.D cc, fs, ft
+Description: FCSR[cc]=(fs<ft)
+            To compare FP values and record the Boolean result in a condition 
+            code on the FCSR register. The result is written in the 
+            instruction's EX stage, for this reason a nop instruction must precede 
+            a conditional branch instruction or another test instruction
+            (i.e  C.LT.D 7,f1,f2 --->  NOP ---> BC1T 7,label)
+            cc is a 3 bit immediate value in the range [0,7]
+Exceptions: Invalid Operation  is raised when fs or ft contain QNaN 
+            (trap if enabled)  or SNaN(trap always)
+
+
+-CVT.D.L Instruction
+Syntax: CVT.D.L fd, fs
+Description: fd = convert(fs)
+            To convert a 64 fixed point value (long)  to double FP
+Exceptions: Invalid Operation is raised when fs contains QNaN,SNaN or Infinity values
+
+
+-CVT.W.D Instruction
+Syntax: CVT.D.W fd, fs
+Description: fd = convert(fs)
+            To convert a 32 bit fixed point value (int) to double FP
+Exceptions: Invalid Operation is raised when fs contains QNaN,SNaN or Infinity values            
+
+
+-CVT.L.D Instruction
+Syntax: CVT.L.D fd, fs
+Description: fd = convert_and_round(fs, CurrentRoundingMode)
+            To convert a double value to a 64-bit fixed point (long)
+            The current rounding mode may be changed from the Configure/Settings/FPURound  tab
+Exceptions: Invalid Operation is raised when the source value is Infinity, XNaN, or 
+            the result is outside the range -2^63 to 2^63 -1 (long)
+            
+
+-CVT.W.D Instruction
+Syntax: CVT.W.D fd, fs
+Description: fd = convert_and_round(fs, CurrentRoundingMode)
+            To convert an FP value to 32-bit fixed point (int)
+            The current rounding mode may be changed from the Configure/Settings/FPURound  tab
+Exceptions: Invalid Operation is raised when the source value is Infinity, XNaN, or 
+            the result is outside the range -2^31 to 2^31 -1 (long)
+            
+            
+-DIV.D Instruction
+Syntax: DIV.D fd, fs, ft
+Description: fd = fs / ft
+            To divide double FP values;
+Exceptions: Overflow and Underflow are generated if the result cannot be 
+            represented according to the IEEE754 standard
+            Invalid Operation is generated if fs or ft contain a QNaN or SNaN
+            or an invalid operation was performed (i.e 0/0)            
+            Divide by zero is generated if a division by zero occured 
+            
+
+-DMFC1 Instruction
+Syntax: DMFC1 rt,fs
+Description: ft = fs
+            To move a doubleword from an FPR to a GPR.
+            
+
+-DMTC1 Instruction
+Syntax: DMTC1 rt, fs
+Description: fs = rt
+            To copy a doubleword from a GPR to an FPR.
+            
+
+-L.D Instruction (Deprecated: LDC1 must be used)
+Syntax: L.D ft, offset(base)
+Description:ft = memory[base+offset]
+            To load a doubleword from memory to an FPR
+
+
+-LDC1 Instruction
+Syntax: LDC1 ft, offset(base)
+Description: ft = memory[base+offset]
+            To load a doubleword from memory to an FPR  
+
+
+-LWC1 Instruction
+Syntax: LWC1 ft, offset(base)
+Description: ft= memory[base + offset]
+            To load a word from memory to an FPR
+
+
+-MFC1 Instruction
+Syntax: MFC1 rt, fs
+Description: rt = readword(fs)
+            To copy a word from an FPU general register to a GPR
+
+
+-MOVF.D Instruction
+Syntax: MOVF.D fd, fs, cc
+Description: if FCSR[cc] = 0 then fd=fs
+            To test an FP condition code then conditionally move an FP value
+
+            
+-MOVT.D Instruction
+Syntax: MOVT.D fd, fs, cc
+Description: if FCSR[cc] = 1 then fd=fs
+            To test an FP condition code then conditionally move an FP value
+            
+            
+-MOV.D Instruction
+Syntax: MOV.D fd, fs
+Description: fd = fs
+            To move an FP value between FPRs
+
+
+-MOVN.D Instruction
+Syntax: MOVN.D fd, fs, rt
+Description: if rt != 0 then fd=fs
+            To test a GPR then conditionally move an FP value
+
+
+-MOVZ.D Instruction
+Syntax: MOVZ.D fd, fs, rt
+Description: if rt = 0 then fd=fs
+            To test a GPR then conditionally move an FP value
+
+
+-MTC1 Instruction
+Syntax: MTC1 rt, fs
+Description: fs = rt(31..0)
+            To copy a word from a GPR to an FPU general register
+            The low word in GPR rt is placed into the low word of FPR fs. 
+
+
+-MUL.D Instruction
+Syntax: MUL.D fd, fs, ft
+Description: fd = fs * ft
+            To multiply double FP values.
+Exceptions: Overflow and Underflow are generated if the result cannot be 
+            represented according to the IEEE754 standard
+            Invalid Operation is generated if fs or ft contain a QNaN or SNaN, 
+            or if an invalid operation is performed (i.e Infinity*0)    
+
+
+-S.D Instruction (DEPRECATED: SDC1 must to be used)
+Syntax: S.D ft, offset(base)
+Description: memory[base+ offset] = ft
+            To store a doubleword from an FPR to memory
+
+
+-SDC1 Instruction
+Syntax: SDC1 ft, offset(base)
+Description:memory[base+ offset] =ft 
+            To store a doubleword from an FPR to memory
+
+
+-SUB.D Instruction
+Syntax: SUB.D fd, fs, ft
+Description:
+           To subtract double FP values;
+Exceptions: Overflow and Underflow are generated if the result 
+            cannot be represented according to the IEEE754 standard
+            Invalid Operation is generated if fs or ft contain
+            a QNaN or SNaN, or if an invalid operation 
+            is performed (i.e +Infinity -  +Infinity) 
+
+
+-SWC1 Instruction
+Syntax: SWC1 ft, offset(base)
+Description: memory[base + offset] =ft
+            To store a word from an FPR to memory. The low 32-bit word from FPR 
+            ft is stored in memory. 
+            

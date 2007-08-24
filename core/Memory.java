@@ -39,6 +39,7 @@ public class Memory{
 
 	private int instr_num;
 	private static Memory memory = null;
+	private static CPU cpu;
 	
 	private Memory(){
 		edumips64.Main.logger.debug("Building Memory: " + this.hashCode());
@@ -153,5 +154,12 @@ public class Memory{
 		catch(IndexOutOfBoundsException e) {
 			throw new HaltException();
 		}
+    }
+    
+    /** This method returns the list of instructions in memory in order to be showed in the GUICode
+     */
+    public List<Instruction> getInstructions()
+    {
+	    return instructions;
     }
 }

@@ -1,7 +1,8 @@
-/* RAWHazardException.java
+/*
+ * MTC1.java
  *
- * Exception thrown when trying to get a MemoryElement that does not exists.
- * (c) 2006 CPU Group
+ * 25th july 2007
+  * (c) 2006 EduMips64 project - Trubia Massimo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -20,6 +21,37 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package edumips64.core;
 
-public class RAWHazardException extends Exception{}
+
+package edumips64.core.is;
+import edumips64.core.*;
+import edumips64.core.fpu.*;
+import edumips64.utils.*;
+import java.math.*;
+
+/**
+ *<pre>
+ *	Format: MTC1 rt, fs
+ * Description: To copy a word from a GPR to an FPR
+ *   Operation: fs.writeword_nosignextend(readword(rt))
+ *</pre>
+ */
+class MTC1 extends FPMoveToInstructions {
+	String OPCODE_VALUE="00100";
+	String NAME = "MTC1";
+	
+	public MTC1() {
+		super.OPCODE_VALUE = OPCODE_VALUE;
+		super.name=NAME;
+	}	
+	
+	public void EX() throws IrregularStringOfBitsException {
+		//getting values from temporary registers
+		String value=TR[RT_FIELD].getBinString();
+		TRfp[FS_FIELD].setBits(value.substring(32,64),32);
+		if(enableForwarding) {
+			doWB();
+		}
+	}
+	
+}

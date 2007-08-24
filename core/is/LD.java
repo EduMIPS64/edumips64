@@ -35,28 +35,24 @@ import edumips64.utils.*;
  * </pre>
  * @author Trubia Massimo, Russo Daniele
  */
-class LD extends Loading
-{
-    final String OPCODE_VALUE="110111";
-    public LD()
-    {
-    	super.OPCODE_VALUE = OPCODE_VALUE;
-        this.name="LD";
-    }
-    public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException 
-	{ 
+class LD extends Loading {
+	final String OPCODE_VALUE="110111";
+	public LD() {
+		super.OPCODE_VALUE = OPCODE_VALUE;
+		this.name="LD";
+	}
+	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
 		//restoring the address from the temporary register
 		long address=TR[OFFSET_PLUS_BASE].getValue();
 		//For the trace file
 		Dinero din=Dinero.getInstance();
 		din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),8);
-
+		
 		MemoryElement memEl = memory.getCell((int)address);
 		//reading from the memory element and saving values on LMD register
 		TR[LMD_REGISTER].setBits(memEl.getBinString(),0);
-		if(enableForwarding)
-		{
+		if(enableForwarding) {
 			doWB();
 		}
-	}        
+	}
 }

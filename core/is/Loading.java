@@ -33,47 +33,43 @@ import edumips64.utils.*;
  * @author  Trubia Massimo, Russo Daniele
  */
 public abstract class Loading extends LDSTInstructions{
-    
-    /** Creates a new instance of Loading */
-    public Loading() {
-    }
-
-    public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException {
-        //if the base register is valid ...
-        Register base=cpu.getRegister(params.get(BASE_FIELD));
-        if(base.getWriteSemaphore()>0)
-            throw new RAWException();
-        //calculating  address (base+offset)
-        long address = base.getValue() + params.get(OFFSET_FIELD);
-        //saving address into a temporary register
-        TR[OFFSET_PLUS_BASE].writeDoubleWord(address);
-        //locking rt register
-        Register rt=cpu.getRegister(params.get(RT_FIELD));
-        rt.incrWriteSemaphore();
-    }
-
-    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
-    }
-
-    public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
-    }
-
-    public void WB() throws IrregularStringOfBitsException 
-    {
-	if(!enableForwarding)
-	    doWB();
-    }
-    
-    public void doWB() throws IrregularStringOfBitsException
-    {
-        //passing memory value from temporary LMD register to the destination register and unlocking it
-        cpu.getRegister(params.get(RT_FIELD)).setBits(TR[LMD_REGISTER].getBinString(),0);
-        cpu.getRegister(params.get(RT_FIELD)).decrWriteSemaphore();
-    }
-	public static void main (String args[])
-	{
-		try
-		{	
+	
+	/** Creates a new instance of Loading */
+	public Loading() {
+	}
+	
+	public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException {
+		//if the base register is valid ...
+		Register base=cpu.getRegister(params.get(BASE_FIELD));
+		if(base.getWriteSemaphore()>0)
+			throw new RAWException();
+		//calculating  address (base+offset)
+		long address = base.getValue() + params.get(OFFSET_FIELD);
+		//saving address into a temporary register
+		TR[OFFSET_PLUS_BASE].writeDoubleWord(address);
+		//locking rt register
+		Register rt=cpu.getRegister(params.get(RT_FIELD));
+		rt.incrWriteSemaphore();
+	}
+	
+	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
+	}
+	
+	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+	}
+	
+	public void WB() throws IrregularStringOfBitsException {
+		if(!enableForwarding)
+			doWB();
+	}
+	
+	public void doWB() throws IrregularStringOfBitsException {
+		//passing memory value from temporary LMD register to the destination register and unlocking it
+		cpu.getRegister(params.get(RT_FIELD)).setBits(TR[LMD_REGISTER].getBinString(),0);
+		cpu.getRegister(params.get(RT_FIELD)).decrWriteSemaphore();
+	}
+	public static void main(String args[]) {
+		try {
 			//LD inst=new LD();
 			//LB inst=new LB();
 			//LH inst=new LH();
@@ -91,11 +87,9 @@ public abstract class Loading extends LDSTInstructions{
 			inst.ID();
 			inst.MEM();
 			inst.WB();
-		}
-		catch(Exception e)
-		{
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
-	}    
+	}
 }
 

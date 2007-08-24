@@ -1,7 +1,7 @@
 /* GUIConfig.java
  *
  * This class provides a window for configuration options.
- * (c) 2006 EduMIPS64 project - Rizzo Vanni G.
+ * (c) 2006 EduMIPS64 project - Rizzo Vanni G,  Trubia Massimo (FPU modifications)
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -41,23 +41,29 @@ public class GUIConfig extends JDialog{
 
 	String MAIN;
 	String APPEARANCE;
+	String FPUEXCEPTIONS;
+	String FPUROUNDING;
 	String BEHAVIOR;
 	
 	JTabbedPane tabPanel;
 	JButton okButton;
 	HashMap<String,Object> updatedMap;
-	int width = 400, height = 250;	
+	int width = 500, height = 250;	
 	public GUIConfig(final JFrame owner){
 		super(owner, CurrentLocale.getString("Config.ITEM"), true);
 		MAIN = CurrentLocale.getString("Config.MAIN");
 		APPEARANCE = CurrentLocale.getString("Config.APPEARANCE");
 		BEHAVIOR = CurrentLocale.getString("Config.BEHAVIOR");
+		FPUEXCEPTIONS=CurrentLocale.getString("Config.FPUEXCEPTIONS");
+		FPUROUNDING=CurrentLocale.getString("Config.FPUROUNDING");
 		updatedMap = new HashMap<String, Object>();
 		updatedMap.putAll(Config.getMap());
 
 		tabPanel = new JTabbedPane();
 		tabPanel.addTab(MAIN, makeMainPanel());
 		tabPanel.addTab(BEHAVIOR, makeBehaviorPanel());
+		tabPanel.addTab(FPUEXCEPTIONS, makeExceptionsPanel());
+		tabPanel.addTab(FPUROUNDING,makeRoundingPanel());
 		tabPanel.addTab(APPEARANCE, makeAppearancePanel());
 
 		final JPanel buttonPanel = new JPanel();
@@ -96,6 +102,7 @@ public class GUIConfig extends JDialog{
 		
 		addRow(panel,row++, "forwarding",new JCheckBox());
 		addRow(panel,row++, "n_step",new JNumberField());
+		addRow(panel,row++, "LONGDOUBLEVIEW",new JCheckBox());
 
 		// fill remaining vertical space
 		grid_add(panel,new JPanel(),gbl,gbc,0,1,0,row,GridBagConstraints.REMAINDER,1);
@@ -128,7 +135,71 @@ public class GUIConfig extends JDialog{
 
 		return panel;
 	}
+	
+	private JPanel makeExceptionsPanel(){
+		gbl = new GridBagLayout();
+		gbc = new GridBagConstraints();
+		
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(0,10,0,10);
 
+		JPanel panel = new JPanel();
+
+		panel.setLayout(gbl);
+		panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
+		int row = 2;
+
+		addRow(panel, row++, "INVALID_OPERATION",new JCheckBox());
+		addRow(panel, row++, "OVERFLOW",new JCheckBox());
+		addRow(panel, row++, "UNDERFLOW", new JCheckBox());
+		addRow(panel, row++, "DIVIDE_BY_ZERO", new JCheckBox());
+
+		// fill remaining vertical space
+		grid_add(panel,new JPanel(),gbl,gbc,0,1,0,row,GridBagConstraints.REMAINDER,1);
+
+		return panel;
+		
+	}
+
+	private JPanel makeRoundingPanel(){
+		ButtonGroup bg=new ButtonGroup();
+		JRadioButton rdoNearest=new JRadioButton();
+		JRadioButton rdoTowardZero=new JRadioButton();
+		JRadioButton rdoTowardsPlusInfinity=new JRadioButton();
+		JRadioButton rdoTowardsMinusInfinity=new JRadioButton();
+		bg.add(rdoNearest);
+		bg.add(rdoTowardZero);
+		bg.add(rdoTowardsPlusInfinity);
+		bg.add(rdoTowardsMinusInfinity);
+			
+		gbl = new GridBagLayout();
+		gbc = new GridBagConstraints();
+		
+		
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.insets = new Insets(0,10,0,10);
+
+		JPanel panel = new JPanel();
+
+		panel.setLayout(gbl);
+		panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
+		int row = 2;
+
+		addRow(panel, row++, "NEAREST",rdoNearest);
+		addRow(panel, row++, "TOWARDZERO",rdoTowardZero);
+		addRow(panel, row++, "TOWARDS_PLUS_INFINITY", rdoTowardsPlusInfinity);
+		addRow(panel, row++, "TOWARDS_MINUS_INFINITY",rdoTowardsMinusInfinity);
+
+		// fill remaining vertical space
+		grid_add(panel,new JPanel(),gbl,gbc,0,1,0,row,GridBagConstraints.REMAINDER,1);
+
+		return panel;
+		
+	}
+
+	
 	private JPanel makeAppearancePanel(){
 
 		gbl = new GridBagLayout();
@@ -149,6 +220,9 @@ public class GUIConfig extends JDialog{
 		addRow(panel,row++, "EXColor",new JButton());
 		addRow(panel,row++, "MEMColor",new JButton());	
 		addRow(panel,row++, "WBColor",new JButton());
+		addRow(panel,row++, "FPAdderColor",new JButton());
+		addRow(panel,row++, "FPMultiplierColor",new JButton());
+		addRow(panel,row++, "FPDividerColor",new JButton());
 		addRow(panel,row++, "show_aliases",new JCheckBox());
 
 
@@ -178,6 +252,32 @@ public class GUIConfig extends JDialog{
 			cbox.setAction(new AbstractAction() {
 				public void actionPerformed(ActionEvent e) {
 					updatedMap.put(key,cbox.getModel().isSelected());
+				}
+			});
+		}
+		else if(comp instanceof JRadioButton){
+			final JRadioButton rbut=(JRadioButton)comp;
+			rbut.setHorizontalAlignment(SwingConstants.LEFT);
+			rbut.setVerticalAlignment(SwingConstants.CENTER);
+			rbut.setSelected((Boolean)Config.get(key));
+			
+			//when a radio button is clicked, the other buttons in the updatedMap must be deselected
+			rbut.setAction(new AbstractAction() {
+				public void actionPerformed(ActionEvent e) {
+					LinkedList<String> keys=new LinkedList<String>();
+					keys.add("NEAREST");
+					keys.add("TOWARDZERO");
+					keys.add("TOWARDS_PLUS_INFINITY");
+					keys.add("TOWARDS_MINUS_INFINITY");
+					updatedMap.put(key,true);
+					keys.remove(key);
+					//the other flags for not selected radio buttons are false
+					String currentKey;
+					for(ListIterator it=keys.listIterator();it.hasNext();){
+						currentKey=(String)it.next();
+						updatedMap.put(currentKey,false);
+					}
+					
 				}
 			});
 		}
@@ -276,15 +376,14 @@ public class GUIConfig extends JDialog{
 		});
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
-				
-				if( (Boolean) Config.get("show_aliases")  !=  updatedMap.get("show_aliases"))
-				{
-					Config.setMap(updatedMap);
-					((GUIFrontend) edumips64.Main.getGUIFrontend()).updateComponents();
-				}
-				else
-					Config.setMap(updatedMap);
 				setVisible(false);
+
+                if((Boolean)Config.get("show_aliases") != updatedMap.get("show_aliases")) {
+                    Config.setMap(updatedMap);
+                    ((GUIFrontend)edumips64.Main.getGUIFrontend()).updateComponents();
+                } else 
+                    Config.setMap(updatedMap);
+
 				if(Instruction.getEnableForwarding() != (Boolean)Config.get("forwarding")) {
 					CPU cpu = CPU.getInstance();
 					Instruction.setEnableForwarding((Boolean)Config.get("forwarding"));

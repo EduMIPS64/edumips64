@@ -128,16 +128,16 @@ public abstract class ALU_RType extends ALUInstructions {
         catch(IrregularWriteOperationException e)
         {
 			e.printStackTrace();
-        }
-        
-        try {
-            ins.pack();
-            ins.ID();
-            ins.EX();
-            ins.WB();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }        
-    }
-    
+		}
+		
+		try {
+			ins.pack();
+			ins.ID();
+			ins.EX();
+			ins.WB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 }

@@ -528,3 +528,215 @@ Istruzione XORI
 Sintassi: XORI rt, rs, immediate
 Descrizione: rt = rs XOR immediate
              Effettua l'OR esclusivo con una costante.
+
+---------------------------------------------------------------------------------
+                    ISTRUZIONI FLOATING POINT
+---------------------------------------------------------------------------------            
+-Istruzione ADD.D
+Sintassi: ADD.D fd, fs, ft
+Descrizione:fd = fs + ft
+            Effettua la somma di due valori double floating point
+Eccezioni:  Overflow e Underflow vengono generate se il risultato non può essere 
+            rappresentato secondo lo standard IEEE754
+            Invalid Operation è generata se fs o ft contiene QNaN o SNaN, 
+            o se viene eseguita un'operazione non valida (i.e +infinito-infinito)
+
+
+-Istruzione BC1F
+Sintassi: BC1F cc, offset
+Descrizione: if FCSR[cc] = 0 then branch
+            Testa una condizione cc ed effettua un salto PC-relative
+            Il valore booleano FCSR[cc] può essere scritto solo dalle istruzioni
+            C.condition.format
+            (es.  C.EQ.D 7,f1,f2 --->  NOP ---> BC1T 7,label)
+
+
+-Istruzione BC1T 
+Sintassi: BC1T cc, offset
+Descrizione: if FCSR[cc] = 1 then branch
+            Testa una condizione cc ed effettua un salto PC-relative
+            Il valore booleano FCSR[cc] può essere scritto solo dalle istruzioni
+            C.condition.format
+            (es.  C.EQ.D 7,f1,f2 --->  NOP ---> BC1T 7,label)
+
+
+-Istruzione C.EQ.D 
+Sintassi: C.EQ.D cc, fs, ft
+Descrizione: FCSR[cc] = (fs==ft)
+            Verifica il predicato "uguale a" tra i due registri fs ed ft e 
+            salva il risultato in FCSR[cc]. Il risultato viene scritto nello stadio EX,
+            per cui si deve porre una nop immediatamente dopo questa istruzione
+            se si vuole testare il valore scritto in FCSR[cc] con un'istruzione di salto.
+            (es.  C.EQ.D 7,f1,f2 --->  NOP ---> BC1T 7,label)
+            cc è un immediato a 3 bit del range [0,7]
+Eccezioni: Invalid Operation  è lanciata quando fs o ft contengono valori QNaN 
+            (se attiva si ha una trap)  o SNaN(si ha sempre una trap)  
+            
+
+-Istruzione C.LT.D 
+Sintassi: C.LT.D cc, fs, ft
+Descrizione: FCSR[cc]=(fs<ft)
+            Verifica il predicato "minore di" tra i due registri fs ed ft e salva 
+            il risultato in FCSR[cc]. Il risultato viene scritto nello stadio EX,
+            per cui si deve porre una nop immediatamente dopo questa istruzione
+            se si vuole testare il valore scritto in FCSR[cc] con un'istruazione di salto.
+            (es.  C.LT.D 7,f1,f2 --->  NOP ---> BC1T 7,label)
+            cc è un immediato a 3 bit del range [0,7]
+Eccezioni: Invalid Operation  è lanciata quando fs o ft contengono valori QNaN 
+            (se attiva si ha una trap)  o SNaN(si ha sempre una trap)  
+
+
+-Istruzione CVT.D.L 
+Sintassi: CVT.D.L fd, fs
+Descrizione: fd = convert(fs)
+            Converte un long in un double
+Eccezioni: Invalid Operation è lanciata quando fs contiene QNaN,SNaN o Infinito
+
+
+-CVT.W.D Istruzione
+Sintassi: CVT.D.W fd, fs
+Descrizione: fd = convert(fs)
+            Converte un int in un double
+Eccezioni: Invalid Operation è lanciata quando fs contiene QNaN,SNaN or Infinity values            
+
+
+-Istruzione CVT.L.D 
+Sintassi: CVT.L.D fd, fs
+Descrizione: fd = convert_and_round(fs, CurrentRoundingMode)
+            Converte un double in un long
+            La modalità di arrotondamento corrente si cambia dalla scheda Configure/Settings/FPURound 
+Eccezioni: Invalid Operation è lanciata quando fs è Infinito, XNaN, o 
+            il risultato è fuori dal range -2^63 a 2^63 -1 (long)
+            
+
+-Istruzione CVT.W.D 
+Sintassi: CVT.W.D fd, fs
+Descrizione: fd = convert_and_round(fs, CurrentRoundingMode)
+            Converte un double in un int
+            La modalità di arrotondamento corrente si cambia dalla scheda Configure/Settings/FPURound 
+Eccezioni:  Invalid Operation è lanciata quando fs è Infinito, XNaN, o 
+            il risultato è fuori dal range -2^31 a 2^31 -1 (int)
+            
+            
+-Istruzione DIV.D 
+Sintassi: DIV.D fd, fs, ft
+Descrizione: fd = fs / ft
+            Divide valori floating point double
+Eccezioni: Overflow and Underflow vengono generati se il risultato non può essere
+            rappresentato secondo lo standard IEEE754
+            Invalid Operation viene generata se fs o ft contengono QNaN or SNaN
+            o viene eseguita un'operazione non valida (es. 0/0)            
+            Divide by zero è generata se è eseguita una divisione per zero
+            
+
+-Istruzione DMFC1 
+Sintassi: DMFC1 rt,fs
+Descrizione: ft = fs
+            Sposta una double word da un FPR a un GPR
+            
+
+-Istruzione DMTC1 
+Sintassi: DMTC1 rt, fs
+Descrizione: fs = rt
+            Copia una doubleword da un GPR ad un FPR
+            
+
+-Istruzione L.D  (Obsoleta: Si deve usare LDC1)
+Sintassi: L.D ft, offset(base)
+Descrizione:ft = memory[base+offset]
+            Carica una double word dalla memoria all'FPR
+
+
+-Istruzione LDC1 
+Sintassi: LDC1 ft, offset(base)
+Descrizione: ft = memory[base+offset]
+            Carica una double word dalla memoria all'FPR
+
+
+-Istruzione LWC1 
+Sintassi: LWC1 ft, offset(base)
+Descrizione: ft= memory[base + offset]
+             Carica una  word dalla memoria all'FPR
+
+
+-Istruzione MFC1 
+Sintassi: MFC1 rt, fs
+Descrizione: rt = readword(fs)
+            Copia una word da un GPR ad un FPR
+
+
+-Istruzione MOVF.D 
+Sintassi: MOVF.D fd, fs, cc
+Descrizione: if FCSR[cc] = 0 then fd=fs
+            Testa il booleano FCSR[cc] e sposta un valore FP
+
+            
+-Istruzione MOVT.D 
+Sintassi: MOVT.D fd, fs, cc
+Descrizione: if FCSR[cc] = 1 then fd=fs
+            Testa il booleano FCSR[cc] e sposta un valore FP
+            
+            
+-Istruzione MOV.D 
+Sintassi: MOV.D fd, fs
+Descrizione: fd = fs
+            Sposta valori tra FPRs
+
+
+-Istruzione MOVN.D 
+Sintassi: MOVN.D fd, fs, rt
+Descrizione: if rt != 0 then fd=fs
+            Testa un GPR e sposta valori tra FPRs
+
+
+-Istruzione MOVZ.D 
+Sintassi: MOVZ.D fd, fs, rt
+Descrizione: if rt = 0 then fd=fs
+            Testa un GPR e sposta valori tra FPRs
+
+
+-Istruzione MTC1 
+Sintassi: MTC1 rt, fs
+Descrizione: fs = rt(31..0)
+            Copia una word da un GPR a un FPR
+            La word più bassa del GPR è posta nella word più bassa dell'FPR
+
+
+-Istruzione MUL.D 
+Sintassi: MUL.D fd, fs, ft
+Descrizione: fd = fs * ft
+            Moltiplica valori double
+Eccezioni: Overflow and Underflow vengono generati se il risultato non può essere
+            rappresentato secondo lo standard IEEE754
+            Invalid Operation è generato se fs o ft contiene  QNaN o SNaN, 
+            o se si effettua un'operazione non valida (es. Infinito*0)    
+
+
+-Istruzione S.D  (OBSOLETA: Si deve usare SDC1)
+Sintassi: S.D ft, offset(base)
+Descrizione: memory[base+ offset] = ft
+           Per memorizzare una double word da un FPR alla memoria
+
+
+-Istruzione SDC1 
+Sintassi: SDC1 ft, offset(base)
+Descrizione:memory[base+ offset] =ft 
+            Per memorizzare una double word da un FPR alla memoria
+
+
+-Istruzione SUB.D 
+Sintassi: SUB.D fd, fs, ft
+Descrizione:
+           Per sottrarre valori FP
+Eccezioni: Overflow and Underflow avengono generati se il risultato non può essere
+            rappresentato secondo lo standard IEEE754
+            Invalid Operation è generata se fs o ft contengono
+             QNaN o SNaN, o se viene eseguita un'operazione non valida
+             (es. +Infinito -  +Infinito) 
+
+
+-Istruzione SWC1 
+Sintassi: SWC1 ft, offset(base)
+Descrizione: memory[base + offset] =ft
+            Memorizza una word da un FPR alla memoria. La word più bassa dell'FPR 
+             è salvata in memoria.           

@@ -47,6 +47,9 @@ public class Config{
 			config.put("IDColor",new Color(0,120,240));
 			config.put("EXColor",Color.red);
 			config.put("MEMColor",Color.green);
+			config.put("FPAdderColor",new Color(0,128,0));
+			config.put("FPMultiplierColor",new Color(0,128,128));
+			config.put("FPDividerColor",new Color(128,128,0));
 			config.put("WBColor",Color.magenta.darker());
 			config.put("RAWColor",Color.blue.brighter());
 			config.put("SAMEIFColor",new Color(150,150,180));
@@ -62,6 +65,21 @@ public class Config{
 			config.put("n_step",4);
 			config.put("sleep_interval",10);
 			config.put("show_aliases",false);
+			
+			//fpu exceptions configuration
+			config.put("INVALID_OPERATION",true);
+			config.put("OVERFLOW",true);
+			config.put("UNDERFLOW",true);
+			config.put("DIVIDE_BY_ZERO",true);
+			//fpu rounding mode configuration
+			config.put("NEAREST",false);
+			config.put("TOWARDZERO",true);
+			config.put("TOWARDS_PLUS_INFINITY",false);
+			config.put("TOWARDS_MINUS_INFINITY",false);
+			// seed to generate a serial number for instructions
+			config.put("serialNumber",(long)0);
+			// modality by which memory cells value are showed (long,double)
+			config.put("LONGDOUBLEVIEW",true); //long=true  double=false
 		}
 	}
 	public static void setMap(Map<String,Object> newConfig){

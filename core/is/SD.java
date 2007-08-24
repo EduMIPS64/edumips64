@@ -38,19 +38,16 @@ import edumips64.utils.*;
  * @author Massimo
  */
 public class SD extends Storing {
-
+	
 	final String OPCODE_VALUE="111111";
-	public SD()
-	{
+	public SD() {
 		super.OPCODE_VALUE = OPCODE_VALUE;
 		this.name="SD";
 	}
-
-
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException
-	{
-		try
-		{
+	
+	
+	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException {
+		try {
 			//restoring the address from the temporary register
 			long address=TR[OFFSET_PLUS_BASE].getValue();
 			//For the trace file
@@ -60,25 +57,21 @@ public class SD extends Storing {
 			//writing on the memory element the RT register
 			//memEl.writeDoubleWord(TR[RT_FIELD].getValue());
 			memEl.setBits(TR[RT_FIELD].getBinString(),0);
-			if(enableForwarding)
-			{
+			if(enableForwarding) {
 				WB();
 			}
-		}
-		catch(Exception e)
-		{
+		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
-
+	
 	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
-
+		
 	}
-
-	public void WB() throws IrregularStringOfBitsException
-	{
-
+	
+	public void WB() throws IrregularStringOfBitsException {
+		
 	}
-
+	
 }
-    
+ 

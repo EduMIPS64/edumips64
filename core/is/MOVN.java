@@ -38,10 +38,8 @@ import edumips64.utils.*;
  * @author Trubia Massimo, Russo Daniele
  *
  */
-class MOVN extends ALU_RType
-{
+class MOVN extends ALU_RType {
     final String OPCODE_VALUE="001011";
-    
     
     public MOVN()
     {
@@ -51,24 +49,6 @@ class MOVN extends ALU_RType
 
     public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException 
     {
-        /*
-        //getting strings from temporary registers
-        String rs=TR[RS_FIELD].getBinString();
-        String rt=TR[RT_FIELD].getBinString();
-        //saving rd value because, if the move test is false, the old value must be rewritten in rd
-        TR[RD_FIELD].setBits(cpu.getRegister(params.get(RD_FIELD)).getBinString(),0);
-        boolean rtbit,diff=false;
-        for(int i=0;i<64;i++)
-        {
-            rtbit=rt.charAt(i)=='1'?true:false;
-            if(diff=rtbit^false)
-            {
-                TR[RD_FIELD].setBits(rs,0);
-                break;
-            }
-        }
-        */
-
         if(TR[RT_FIELD].getValue() != 0) {
             edumips64.Main.logger.debug("Executing MOVN, rt != 0 => rd <- rs");
             TR[RD_FIELD].setBits(TR[RS_FIELD].getBinString(), 0);
@@ -78,11 +58,5 @@ class MOVN extends ALU_RType
         {
             doWB();
         }
-
     }
-    
-
-
-
-   
 }

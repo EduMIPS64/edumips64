@@ -48,34 +48,31 @@ public class DSRAV extends ALU_RType {
     final int RD_FIELD_LENGTH=5;
     final int RT_FIELD_LENGTH=5;
     final int RS_FIELD_LENGTH=5;
-    final String OPCODE_VALUE="010111";
-
-   DSRAV()
-   {
-   	super.OPCODE_VALUE = OPCODE_VALUE;
-	name="DSRAV";
-   }    
-   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException 
-    {
-        //getting strings from temporary registers
-        int shift_value;
-        String shift="";
-       
-        String rt=TR[RT_FIELD].getBinString();
-        String rs=TR[RS_FIELD].getBinString();
-        
-        shift = rs.substring(58);
-        shift_value =  Converter.binToInt(shift,true);
-        //composing new shifted value
-        StringBuffer sb=new StringBuffer();
-        char c=rt.charAt(0);
-        for(int i=0;i<shift_value;i++)
-            sb.append(c);
-        sb.append(rt.substring(0,64-shift_value));
-        TR[RD_FIELD].setBits(sb.substring(0),0);
-	if(enableForwarding)
-	{
-		doWB();
+	final String OPCODE_VALUE="010111";
+	
+	DSRAV() {
+		super.OPCODE_VALUE = OPCODE_VALUE;
+		name="DSRAV";
 	}
-    }
+	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+		//getting strings from temporary registers
+		int shift_value;
+		String shift="";
+		
+		String rt=TR[RT_FIELD].getBinString();
+		String rs=TR[RS_FIELD].getBinString();
+		
+		shift = rs.substring(58);
+		shift_value =  Converter.binToInt(shift,true);
+		//composing new shifted value
+		StringBuffer sb=new StringBuffer();
+		char c=rt.charAt(0);
+		for(int i=0;i<shift_value;i++)
+			sb.append(c);
+		sb.append(rt.substring(0,64-shift_value));
+		TR[RD_FIELD].setBits(sb.substring(0),0);
+		if(enableForwarding) {
+			doWB();
+		}
+	}
 }

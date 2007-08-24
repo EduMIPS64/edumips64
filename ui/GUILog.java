@@ -23,6 +23,7 @@
 
 package edumips64.ui;
 
+import edumips64.core.CPU;
 import edumips64.utils.Config;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -65,6 +66,10 @@ public class GUILog extends JInternalFrame {
 			log_area.append(getTimeStamp() + ": " + message + "\n");
 			log_area.setCaretPosition(log_area.getText().length());
 		}
+	}
+
+	public void debug(CPU.CPUStatus cPUStatus) {
+		throw new UnsupportedOperationException("Not yet implemented");
 	}
 
 	public GUILog(String title, boolean resizable, boolean closable, boolean maximizable, boolean iconifiable) {

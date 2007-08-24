@@ -42,6 +42,7 @@ public class GUIPipeline extends GUIComponent{
 
 	Map <CPU.PipeStatus,Instruction> pipeline;
 	
+	
 	/**
 	* Set the number of multiplier latency stages.
 	* Currently this method is not used. 
@@ -69,10 +70,11 @@ public class GUIPipeline extends GUIComponent{
 	
 	public GUIPipeline(){
 		super();
-		numMultiplier=6;
+		numMultiplier=7;
 		numAdder=4;
 		pannello=new Pannello1();
 		pipeline=new HashMap<CPU.PipeStatus,Instruction>();
+		cpu.getInstance();
 	}
 	
 	public void setContainer(Container co){
@@ -142,7 +144,7 @@ public class GUIPipeline extends GUIComponent{
 			//EX---MEM
 			g.drawLine(largh*11/20,alt/2-alt/3,largh*14/20,(alt/2)-(alt/20));
 			
-			
+//MULTIPLIER			
 			int spiazzMul= (largh*20/60)/numMultiplier;
 			for(int j=0;j<numMultiplier;j++){
 				g.drawRect((largh*20/60)+(j*spiazzMul)+(largh/(10*numMultiplier)),(alt/2)-(alt/10),spiazzMul*5/8,alt/10);
@@ -184,7 +186,7 @@ public class GUIPipeline extends GUIComponent{
 			g.drawString("MEM", largh*142/200,(alt/2));
 			g.drawString("WB", largh*175/200,(alt/2));
 			g.drawString("EX", largh*97/200,(alt/2)-(alt*40/120));
-			g.drawString("FP-DIV 0", largh*87/200,(alt/2)+(alt*40/120));
+			g.drawString("FP-DIV " + cpu.getDividerCounter(), largh*87/200,(alt/2)+(alt*40/120));
 			g.drawString("FP Multiplier", largh*85/200,(alt/2)-(alt*15/120));
 			g.drawString("FP Adder", largh*85/200,(alt/2)+(alt*23/120));
 			
@@ -202,6 +204,22 @@ public class GUIPipeline extends GUIComponent{
 			g.fillRect(largh*14/20,(alt/2)-(alt/12),largh/10,alt/6);
 			g.fillRect(largh*9/20,(alt/2)-(alt*5/12),largh/10,alt/6);
 			g.fillRect(largh*17/20,(alt/2)-(alt/12),largh/10,alt/6);
+			
+			//Filling FPU elements
+			//divider
+			g.fillRect(largh*8/20,(alt/2)+(alt*3/12),largh*2/10,alt/6);
+			//multiplier
+			int spiazzMul= (largh*20/60)/numMultiplier;
+			for(int j=0;j<numMultiplier;j++){
+				g.fillRect((largh*20/60)+(j*spiazzMul)+(largh/(10*numMultiplier)),(alt/2)-(alt/10),spiazzMul*5/8,alt/10);
+			}
+			//adder
+			int spiazzAdd= (largh*20/60)/numAdder;
+			for(int j=0;j<numAdder;j++)
+				g.fillRect((largh*20/60)+(j*spiazzAdd)+(largh/(10*numAdder)),(alt/2)+(alt/40),spiazzAdd*5/8,alt/10);
+			
+			
+			
 			Instruction i=pipeline.get(CPU.PipeStatus.IF);
 			if((i!=null)&&((i.getName()!=null))){//!i.getName().equals(" ")
 				g.setColor((Color)Config.get("IFColor"));
@@ -231,6 +249,77 @@ public class GUIPipeline extends GUIComponent{
 				g.setColor((Color)Config.get("WBColor"));
 				g.fillRect(largh*17/20,(alt/2)-(alt/12),largh/10,alt/6);
 			}
+			
+			
+			//filling FPU elements
+			//ADDER
+			g.setColor((Color)Config.get("FPAdderColor"));
+			spiazzAdd= (largh*20/60)/numAdder;
+			int j;
+			if(cpu.isFuncUnitFilled("ADDER",1))
+			{
+				j=0;	
+				g.fillRect((largh*20/60)+(j*spiazzAdd)+(largh/(10*numAdder)),(alt/2)+(alt/40),spiazzAdd*5/8,alt/10);
+			}
+			if(cpu.isFuncUnitFilled("ADDER",2))
+			{
+				j=1;	
+				g.fillRect((largh*20/60)+(j*spiazzAdd)+(largh/(10*numAdder)),(alt/2)+(alt/40),spiazzAdd*5/8,alt/10);
+			}
+			if(cpu.isFuncUnitFilled("ADDER",3))
+			{
+				j=2;	
+				g.fillRect((largh*20/60)+(j*spiazzAdd)+(largh/(10*numAdder)),(alt/2)+(alt/40),spiazzAdd*5/8,alt/10);
+			}
+			if(cpu.isFuncUnitFilled("ADDER",4))
+			{
+				j=3;	
+				g.fillRect((largh*20/60)+(j*spiazzAdd)+(largh/(10*numAdder)),(alt/2)+(alt/40),spiazzAdd*5/8,alt/10);
+			}
+			
+//MULTIPLIER
+			g.setColor((Color)Config.get("FPMultiplierColor"));
+			spiazzMul= (largh*20/60)/numMultiplier;
+			if(cpu.isFuncUnitFilled("MULTIPLIER",1))
+			{
+				j=0;
+				g.fillRect((largh*20/60)+(j*spiazzMul)+(largh/(10*numMultiplier)),(alt/2)-(alt/10),spiazzMul*5/8,alt/10);
+			}
+			if(cpu.isFuncUnitFilled("MULTIPLIER",2))
+			{
+				j=1;
+				g.fillRect((largh*20/60)+(j*spiazzMul)+(largh/(10*numMultiplier)),(alt/2)-(alt/10),spiazzMul*5/8,alt/10);
+			}
+			if(cpu.isFuncUnitFilled("MULTIPLIER",3))
+			{
+				j=2;
+				g.fillRect((largh*20/60)+(j*spiazzMul)+(largh/(10*numMultiplier)),(alt/2)-(alt/10),spiazzMul*5/8,alt/10);
+			}
+			if(cpu.isFuncUnitFilled("MULTIPLIER",4))
+			{
+				j=3;
+				g.fillRect((largh*20/60)+(j*spiazzMul)+(largh/(10*numMultiplier)),(alt/2)-(alt/10),spiazzMul*5/8,alt/10);
+			}
+			if(cpu.isFuncUnitFilled("MULTIPLIER",5))
+			{
+				j=4;
+				g.fillRect((largh*20/60)+(j*spiazzMul)+(largh/(10*numMultiplier)),(alt/2)-(alt/10),spiazzMul*5/8,alt/10);
+			}
+			if(cpu.isFuncUnitFilled("MULTIPLIER",6))
+			{
+				j=5;
+				g.fillRect((largh*20/60)+(j*spiazzMul)+(largh/(10*numMultiplier)),(alt/2)-(alt/10),spiazzMul*5/8,alt/10);
+			}
+			if(cpu.isFuncUnitFilled("MULTIPLIER",7))
+			{
+				j=6;
+				g.fillRect((largh*20/60)+(j*spiazzMul)+(largh/(10*numMultiplier)),(alt/2)-(alt/10),spiazzMul*5/8,alt/10);
+			}
+			
+			//DIVIDER
+			g.setColor((Color)Config.get("FPDividerColor"));
+			if(cpu.isFuncUnitFilled("DIVIDER",0))
+				g.fillRect(largh*8/20,(alt/2)+(alt*3/12),largh*2/10,alt/6);
 		}
 		
 		/**

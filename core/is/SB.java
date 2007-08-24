@@ -35,51 +35,44 @@ import edumips64.utils.*;
  * </pre>
  * @author Trubia Massimo, Russo Daniele
  */
-class SB extends Storing
-{
-    final String OPCODE_VALUE="101000";
-    public SB()
-    {
-     	super.OPCODE_VALUE = OPCODE_VALUE;
-        this.name="SB";
-    }
-
-                       
-    public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException
-    {
-	try
-	{
-           //restoring the address from the temporary register
-            long address=TR[OFFSET_PLUS_BASE].getValue();
-            //For the trace file
-            Dinero din=Dinero.getInstance();
-            din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),1);
-	    MemoryElement memEl = memory.getCell((int)address);
-            //writing on the memory element the RT register
-  	    memEl.writeByte(TR[RT_FIELD].readByte(0), (int) (address%8));
-		if(enableForwarding)
-		{
-			WB();
-		}
+class SB extends Storing {
+	final String OPCODE_VALUE="101000";
+	public SB() {
+		super.OPCODE_VALUE = OPCODE_VALUE;
+		this.name="SB";
 	}
+	
+	
+	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException {
+		try {
+			//restoring the address from the temporary register
+			long address=TR[OFFSET_PLUS_BASE].getValue();
+			//For the trace file
+			Dinero din=Dinero.getInstance();
+			din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),1);
+			MemoryElement memEl = memory.getCell((int)address);
+			//writing on the memory element the RT register
+			memEl.writeByte(TR[RT_FIELD].readByte(0), (int) (address%8));
+			if(enableForwarding) {
+				WB();
+			}
+		}
 /*	catch(NotAlingException er)     //DICHIARARE QUESTA ECCEZIONE NEL METODO WRITEHALF
 	{
 	    throw new AddressErrorException();
 	}*/
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-    
-    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
-    
-    }
-    
-    public void WB() throws IrregularStringOfBitsException
-    {
-
-    }
-
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
+		
+	}
+	
+	public void WB() throws IrregularStringOfBitsException {
+		
+	}
+	
 }
 

@@ -36,33 +36,29 @@ import edumips64.utils.*;
  *</pre>
  * @author Trubia Massimo, Russo Daniele
  */
-public class DSUBU extends ALU_RType{   
-    final String OPCODE_VALUE="101111"; 
-    public DSUBU() 
-    {
-        super.OPCODE_VALUE = OPCODE_VALUE;
-	name="DSUBU";
-    }    
 
-    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException,TwosComplementSumException
-   {
-        //getting strings from temporary registers
-        String rs=TR[RS_FIELD].getBinString();
-        String rt=TR[RT_FIELD].getBinString();
-
-        long rs_int = Converter.binToLong(rs,false);
-        long rt_int = Converter.binToLong(rt,false);
-        
-	String outputstring=InstructionsUtils.twosComplementSubstraction(rs,rt);
-        
-	//There isn't IntegerOverflow cases
-        TR[RD_FIELD].setBits(outputstring, 0);
-	if(enableForwarding)
-	{
-		doWB();
+public class DSUBU extends ALU_RType{
+	final String OPCODE_VALUE="101111";
+	public DSUBU() {
+		super.OPCODE_VALUE = OPCODE_VALUE;
+		name="DSUBU";
 	}
 	
-   }    
-
-    
+	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException,TwosComplementSumException {
+		//getting strings from temporary registers
+		String rs=TR[RS_FIELD].getBinString();
+		String rt=TR[RT_FIELD].getBinString();
+		
+		long rs_int = Converter.binToLong(rs,false);
+		long rt_int = Converter.binToLong(rt,false);
+		
+		String outputstring=InstructionsUtils.twosComplementSubstraction(rs,rt);
+		
+		//There isn't IntegerOverflow cases
+		TR[RD_FIELD].setBits(outputstring, 0);
+		if(enableForwarding) {
+			doWB();
+		}
+		
+	}
 }
