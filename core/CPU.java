@@ -419,7 +419,8 @@ public class CPU {
 		FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW,(Boolean)Config.get("OVERFLOW"));
 		FCSR.setFPExceptions(CPU.FPExceptions.UNDERFLOW,(Boolean)Config.get("UNDERFLOW"));
 		FCSR.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO,(Boolean)Config.get("DIVIDE_BY_ZERO"));
-		
+if (getCycles()==29)
+	System.out.println();
 		//setting the rounding mode
 		if((Boolean)Config.get("NEAREST"))
 			FCSR.setFCSRRoundingMode(FPRoundingMode.TO_NEAREST);
