@@ -52,7 +52,26 @@ class SUB_D extends FPArithmeticInstructions {
 		//getting values from temporary registers
 		String operand1=TRfp[FS_FIELD].getBinString();
 		String operand2=TRfp[FT_FIELD].getBinString();
-		String outputstring=FPInstructionUtils.doubleSubtraction(operand1,operand2);
+		String outputstring=null;
+		try{
+			outputstring=FPInstructionUtils.doubleSubtraction(operand1,operand2);
+		}
+		catch(Exception ex){
+			//if the enable forwarding is turned on we have to ensure that registers
+			//should be unlocked also if a synchronous exception occurs. This is performed
+			//by executing the WB method before raising the trap
+			if(enableForwarding){
+				doWB();
+			}
+			if(ex instanceof FPInvalidOperationException){
+				throw new FPInvalidOperationException();
+			}else if(ex instanceof FPUnderflowException){
+				throw new FPUnderflowException();
+			}else if(ex instanceof FPOverflowException){
+				throw new FPOverflowException();
+			}
+		}
+		
 		TRfp[FD_FIELD].setBits(outputstring,0);
 		if(enableForwarding) {
 			doWB();

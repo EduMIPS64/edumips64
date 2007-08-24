@@ -45,7 +45,8 @@ public class SUB extends ALU_RType {
 	    	super.OPCODE_VALUE = OPCODE_VALUE;
 	        name="SUB";
 	   }
-	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException,TwosComplementSumException	{
+	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException,TwosComplementSumException
+	{
 		//getting strings from temporary registers
 	        String rs=TR[RS_FIELD].getBinString();
 	        String rt=TR[RT_FIELD].getBinString();
@@ -58,8 +59,14 @@ public class SUB extends ALU_RType {
 	        String outputstring=InstructionsUtils.twosComplementSubstraction(rs,rt);
 	        //comparison between the two most significant bits of the outputstring and 
 	        //raising integer overflow if the first bit is different from the second one
-	        if(outputstring.charAt(0)!=outputstring.charAt(1))
-	            throw new IntegerOverflowException();
+	        if(outputstring.charAt(0)!=outputstring.charAt(1)){
+			//if the enable forwarding is turned on we have to ensure that registers
+			//should be unlocked also if a synchronous exception occurs. This is performed
+			//by executing the WB method before raising the trap
+			if(enableForwarding)
+				doWB();
+			throw new IntegerOverflowException();
+		}    
 		else{
 			//performing sign extension
 		        outputstring=outputstring.substring(1,33);

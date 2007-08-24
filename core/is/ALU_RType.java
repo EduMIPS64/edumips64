@@ -58,11 +58,11 @@ public abstract class ALU_RType extends ALUInstructions {
         Register rt=cpu.getRegister(params.get(RT_FIELD));
         if(rs.getWriteSemaphore()>0 || rt.getWriteSemaphore()>0)
             throw new RAWException();
-        TR[RS_FIELD]=rs;
-        TR[RT_FIELD]=rt;
+        TR[RS_FIELD].setBits(rs.getBinString(),0);
+        TR[RT_FIELD].setBits(rt.getBinString(),0);
         //locking the destination register
         Register rd=cpu.getRegister(params.get(RD_FIELD));
-        TR[RD_FIELD]=rd;
+        TR[RD_FIELD].setBits(rd.getBinString(),0);
         rd.incrWriteSemaphore(); 
     }
 
