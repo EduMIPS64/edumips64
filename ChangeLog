@@ -1,6 +1,10 @@
 EduMIPS64 ChangeLog
 ------------------- 
 
+1.0alpha (someday)
+	- Merged the FPU branch (max83t)
+	- JavaHelp support (andrea, vanni, thegoodgiant)
+
 0.5.1 (24/08/2007)
 	- Updated embedded manual with a SYSCALL page (jesky)
 	- Parser bug fixes (mancausoft)
