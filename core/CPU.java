@@ -158,7 +158,14 @@ public class CPU {
 	public void setFCSRFlags(String tag,int value) throws IrregularStringOfBitsException{
 		FCSR.setFCSRFlags(tag,value);
 	}
-	
+
+	/** Sets the cause bits of the FCSR
+	* @param tag a string value between  V  Z O U I
+	* @param value a binary value
+	 */
+	public void setFCSRCause(String tag,int value) throws IrregularStringOfBitsException{
+		FCSR.setFCSRCause(tag,value);
+	}	
 	
 	/** Sets the selected FCC bit of the FCSR 
 	 * @param cc condition code is an int value in the range [0,7]
@@ -708,6 +715,11 @@ if (getCycles()==29)
 			setFCSRFlags("O",0);
 			setFCSRFlags("U",0);
 			setFCSRFlags("Z",0);
+			//reset the FCSR cause bits
+			setFCSRCause("V",0);
+			setFCSRCause("O",0);
+			setFCSRCause("U",0);
+			setFCSRCause("Z",0);
 		} catch (IrregularStringOfBitsException ex) {
 			ex.printStackTrace();
 		}

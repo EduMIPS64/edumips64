@@ -94,8 +94,11 @@ public abstract class FPC_cond_DInstructions extends ALUInstructions {
 			//checking for invalid operation exception (if it is raised the FCSR isn't modified)
 			//this exception occurs 
 			if(FPInstructionUtils.isSNaN(fs.getBinString()) || FPInstructionUtils.isSNaN(ft.getBinString()) 
-			|| (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION) && (FPInstructionUtils.isQNaN(fs.getBinString()) || FPInstructionUtils.isQNaN(ft.getBinString()))))
+			|| (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION) && (FPInstructionUtils.isQNaN(fs.getBinString()) || FPInstructionUtils.isQNaN(ft.getBinString())))){
+				//before raising the trap or return the special value we modify the cause bit
+				cpu.setFCSRCause("V",1);				
 				throw new FPInvalidOperationException();
+			}
 		}
 		else{
 			BigDecimal fsbd=new BigDecimal(Double.longBitsToDouble(Converter.binToLong(fs.getBinString(),false)));

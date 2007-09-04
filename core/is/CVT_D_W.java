@@ -51,13 +51,16 @@ class CVT_D_W extends FPConversionFCSRInstructions {
 		//getting values from temporary registers
 		BigDecimal bd;
 		String fs=TRfp[FS_FIELD].getBinString();
-		if((bd=FPInstructionUtils.intToDouble(fs))==null)
+		if((bd=FPInstructionUtils.intToDouble(fs))==null){
+			//before raising the trap or return the special value we modify the cause bit
+			cpu.setFCSRCause("V",1);			
 			if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 				throw new FPInvalidOperationException();
 			else{
 				cpu.setFCSRFlags("V",1);
 				TRfp[FD_FIELD].setBits("0000000000000000000000000000000000000000000000000000000000000000",0);
 			}
+		}
 		else{
 			TRfp[FD_FIELD].writeDouble(bd.doubleValue());
 		}

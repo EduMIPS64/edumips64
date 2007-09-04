@@ -66,8 +66,26 @@ public class FCSRRegister extends BitSet32 {
 		else if	(tag.compareToIgnoreCase("I")==0) // not implemented
 			setBits(String.valueOf(value),29);
 	}
+
+	/** Sets the flags bits of the FCSR
+	* @param tag a string value between  V  Z O U I
+	* @param value a binary value
+	 */
+	public void setFCSRCause(String tag,int value) throws IrregularStringOfBitsException{
+		if(tag.compareToIgnoreCase("V")==0)
+			setBits(String.valueOf(value),15);
+		else if(tag.compareToIgnoreCase("Z")==0)
+			setBits(String.valueOf(value),16);
+		else if(tag.compareToIgnoreCase("O")==0)
+			setBits(String.valueOf(value),17);
+		else if	(tag.compareToIgnoreCase("U")==0)
+			setBits(String.valueOf(value),18);
+		else if	(tag.compareToIgnoreCase("I")==0) // not implemented
+			setBits(String.valueOf(value),19);
+	}
 	
-	/** Sets the selected FCC bit of the FCSR 
+	
+	/** Sets the selected condition bit of the FCSR 
 	 * @param cc condition code is an int value in the range [0,7]
 	 * @condition the binary value of the relative bit
 	 */
