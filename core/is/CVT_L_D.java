@@ -54,7 +54,9 @@ class CVT_L_D extends FPConversionFCSRInstructions {
 		BigInteger biggest=new BigInteger("9223372036854775807"); //2^63-1
 		BigInteger smallest=new BigInteger("-9223372036854775808"); //-2^63
 		//if the value is larger than a long an exception may occur
-		if(bi==null || bi.compareTo(biggest)==1 || bi.compareTo(smallest)==-1)
+		if(bi==null || bi.compareTo(biggest)==1 || bi.compareTo(smallest)==-1){
+			//before raising the trap or return the special value we modify the cause bit
+			cpu.setFCSRCause("V",1);			
 			if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
 				throw new FPInvalidOperationException();
 			else{
@@ -62,7 +64,7 @@ class CVT_L_D extends FPConversionFCSRInstructions {
 				//if an exception occured without a trap the biggest value is returned
 				bi=new BigInteger("9223372036854775807");//2^63-1
 			}
-		
+		}
 		//writing the long value into a temporary integer register in order to obtain the binary value
 		Register tmp= new Register();
 		tmp.writeDoubleWord(bi.longValue());

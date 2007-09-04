@@ -193,12 +193,12 @@ public class GUIStatistics extends GUIComponent {
 						label.setText(" " + CurrentLocale.getString("FPUFCSR"));
 						label.setFont(f);
 						return label;
-					case 16:
-						label.setText(" "+ "    FCC             Enab Flag RM" );
+					case 16:                    
+						label.setText(" "+ "    FCC       Cause EnablFlag RM" );
 						label.setFont(f);
 						return label;
-					case 17:		    
-						label.setText(" " + "7654321 0           VZOUIVZOUI" );
+					case 17:
+						label.setText(" " + "7654321 0      VZOUIVZOUIVZOUI" );
 						label.setFont(f);
 						return label;
 					case 18:
