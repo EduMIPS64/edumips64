@@ -32,7 +32,7 @@ import edumips64.core.fpu.*;
  * @author Trubia Massimo
  */
 
-public abstract class FPFormattedOperandMoveInstructions extends ALUInstructions{
+public abstract class FPFormattedOperandMoveInstructions extends ComputationalInstructions{
 	final static int FD_FIELD=0;
 	final static int FD_FIELD_INIT=21;
 	final static int FD_FIELD_LENGTH=5;

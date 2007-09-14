@@ -31,7 +31,7 @@ import edumips64.utils.*;
  * @author Trubia Massimo
  */
 
-public abstract class FPConditionalZerosMoveInstructions extends ALUInstructions{
+public abstract class FPConditionalZerosMoveInstructions extends ComputationalInstructions{
 	final static int FD_FIELD=0;
 	final static int FD_FIELD_INIT=21;
 	final static int FD_FIELD_LENGTH=5;

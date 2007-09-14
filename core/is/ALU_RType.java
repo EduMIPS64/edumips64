@@ -34,7 +34,7 @@ import java.util.*;
  *
  * @author Trubia Massimo, Russo Daniele
  */
-public abstract class ALU_RType extends ALUInstructions {
+public abstract class ALU_RType extends ComputationalInstructions {
     final static int RD_FIELD=0;
     final static int RS_FIELD=1;
     final static int RT_FIELD=2;

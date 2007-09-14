@@ -35,7 +35,7 @@ import java.util.*;
  *
  * @author Trubia Massimo
  */
-public abstract class FPC_cond_DInstructions extends ALUInstructions {
+public abstract class FPC_cond_DInstructions extends ComputationalInstructions {
 	static CPU cpu= CPU.getInstance();
 	final static int CC_FIELD=0;
 	final static int FS_FIELD=1;
