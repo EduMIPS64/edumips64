@@ -34,7 +34,7 @@ import java.util.*;
  *
  * @author Trubia Massimo
  */
-public abstract class FPArithmeticInstructions extends ALUInstructions {
+public abstract class FPArithmeticInstructions extends ComputationalInstructions {
 	final static int FD_FIELD=0;
 	final static int FS_FIELD=1;
 	final static int FT_FIELD=2;

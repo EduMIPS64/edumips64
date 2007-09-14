@@ -32,7 +32,7 @@ import java.util.logging.Logger;
  *
  * @author Trubia Massimo, Russo Daniele
  */
-public class ALU_IType extends ALUInstructions {
+public class ALU_IType extends ComputationalInstructions {
     final static int RT_FIELD=0; 
     final static int RS_FIELD=1;
     final static int IMM_FIELD=2;

@@ -31,7 +31,7 @@ import edumips64.utils.*;
  * @author Trubia Massimo
  */
 
-public abstract class FPMoveToAndFromInstructions extends ALUInstructions{
+public abstract class FPMoveToAndFromInstructions extends ComputationalInstructions{
 	final static int RT_FIELD=0;
 	final static int RT_FIELD_INIT=11;
 	final static int RT_FIELD_LENGTH=5;
