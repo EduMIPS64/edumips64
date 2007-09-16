@@ -272,6 +272,7 @@ public class FPPipeline {
 
 //---------------------- FUNCTIONAL UNITS ----------------------------------------
 	interface FPFunctionalUnit{
+        public Object getFuncUnit();
 		public int putInstruction(Instruction instr,boolean simulation);
 		public Instruction getInstruction();
 		public void removeLast();
