@@ -1,0 +1,248 @@
+\EM{} tries to follow the conventions used in other \MS{} and DLX simulators, so
+that old time users will not be confused by its syntax.
+
+\section{Sections}
+\index{.data}\index{.code}
+There are two sections in a source file, the \textbf{data} section and the
+\textbf{code} section, introduced respectively by the \textbf{.data} and the
+\textbf{.code} directives. In listing~\ref{code:sample} you can see a very basic
+\EM{} program.
+
+To distinguish the various parts of each source code line, any combination of
+spaces and tabs can be used, as the parser ignores multiple spaces and only
+detects whitespaces to separate tokens.
+
+\begin{lstlisting}[caption={Sample \EM{} code}, label={code:sample}, style={mips}]
+; This is a comment
+        .data
+label:  .word   15     ; This is an inline comment
+
+        .code
+        daddi   r1, r0, 0
+        syscall 0
+\end{lstlisting}
+
+\index{comments}\index{;}
+Comments can be specified using the ``;'' character, everything that follows
+that character will be ignored. So a comment can be used ``inline'' (after the
+directive) or on a row by itself.
+
+\index{label} Labels can be used in the code to reference a memory cell or an
+instruction.  They are case insensitive. Only a label for each source code line
+can be used.  The label can be specified one or more rows above the effective
+data declaration or instruction, provided that there's nothing, except for
+comments and empty lines, between the label and the declaration. 
+
+\subsection{The \texttt{.data} section}
+\index{.data}
+The \textbf{data} section contains commands that specify how the memory must be
+filled before program execution starts. The general form of a \texttt{.data} command
+is:
+
+\begin{center}
+	\texttt{[label:] \textbf{.datatype} value1 [, value2 [, ...]]}
+\end{center}
+
+\EM{} supports different data types, that are described in
+table~\ref{table:datatypes}.
+
+\index{data types}
+\index{.byte}
+\index{.word}
+\index{.word16}
+\index{.word32}
+\index{.word64}
+\begin{table}[!htb]
+	\begin{centering}
+		\begin{tabular}{lll}
+			\hline
+			\hline
+			Type & Directive & Bits required\\
+			\hline
+			Byte & \texttt{.byte} & 8\\
+			Half word & \texttt{.word16} & 16\\
+			Word & \texttt{.word32} & 32\\
+			Double Word & \texttt{.word} or \texttt{.word64} & 64
+		\end{tabular}
+		\caption{Basic data types}
+		\label{table:datatypes}
+	\end{centering}
+\end{table}
+
+Please note that a double word can be introduced either by the \texttt{.word}
+directive or by the \texttt{.word64} directive.
+
+\index{array} There's a big difference between declaring a list of data elements
+using a single directive or by using multiple directives of the same type. \EM{}
+starts writing from the next 64-bit double word as soon as it finds a datatype identifier,
+so the first \texttt{.byte} statement in listing~\ref{code:data_array} will put
+the numbers 1, 2, 3 and 4 in the space of 4 bytes, taking 32 bits, while code in
+the next four rows will put each number in a different memory cell, occupying 32
+bytes, as in table~\ref{table:effect}.
+
+\begin{lstlisting}[caption={Adjacent bytes}, label={code:data_array}, style={mips}]
+	.data
+	.byte	1, 2, 3, 4
+	.byte	1
+	.byte	2
+	.byte	3
+	.byte	4
+\end{lstlisting}
+
+In table~\ref{table:effect}, the memory is represented using byte-sized cells
+and each row is 64 bits wide. The address on the left side of each row of the
+table refers to the right-most memory cell, that has the lowest address of the
+eight cells in each line.
+
+\begin{table}[htb]
+	\begin{centering}
+		\begin{tabular}{r|c|c|c|c|c|c|c|c|}
+			\cline{2-9}
+			0 & 0 & 0 & 0 & 0 &4 & 3 &2 &1 \\
+			\cline{2-9}
+			8 & 0 & 0 & 0 & 0 &0 & 0 &0 &1 \\
+			\cline{2-9}
+			16 & 0 & 0 & 0 & 0 &0 & 0 &0 &2 \\
+			\cline{2-9}
+			24 & 0 & 0 & 0 & 0 &0 & 0 &0 &3 \\
+			\cline{2-9}
+			36 & 0 & 0 & 0 & 0 &0 & 0 &0 &4\\ 
+			\cline{2-9}
+		\end{tabular}
+		\caption{Memory status for Listing~\ref{code:data_array}}
+		\label{table:effect}
+	\end{centering}
+\end{table}
+There are some special directives that need to be discussed: \texttt{.space}, 
+\texttt{.ascii} and \texttt{.asciiz}.
+\index{.space}
+The \texttt{.space} directive is used to leave some free space in memory. It
+accepts as a parameter an integer, that indicates the number of bytes that must
+be left empty. It is handy when you must save some space in memory for the
+results of your computations.
+
+\index{.ascii}
+The \texttt{.ascii} directive accepts strings containing any of the ASCII
+characters, and some special C-like escaping sequences, that are described in
+table~\ref{table:escaping}, and puts those strings in memory.
+
+\index{.asciiz}
+The \texttt{.asciiz} directive behaves exactly like the \texttt{.ascii} command,
+with the difference that it automatically ends the string with a null byte.
+
+\begin{table}[!htb]
+	\begin{tabular}{lll}
+		\hline
+		\hline
+		Escaping sequence & Meaning & ASCII encoding\\
+		\hline
+		\texttt{$\backslash$0} & Null byte & 0\\
+		\texttt{$\backslash$t} & Horizontal tabulation & 9\\
+		\texttt{$\backslash$n} & Newline character & 10\\
+		\texttt{$\backslash$"} & Literal quote character & 34\\
+		\texttt{$\backslash\backslash$} & Literal backslash character & 92
+	\end{tabular}
+	\caption{Escaping sequences}
+	\label{table:escaping}
+\end{table}
+
+\subsection{The \texttt{.code} section}
+\index{.code}
+The \textbf{code} section contains commands that specify how the memory must be
+filled when the program will start. The general form of a \texttt{.code} command
+is:
+
+\index{syntax!instruction parameters}
+\begin{center}
+	\texttt{[label:] \textbf{instruction} [param1 [, param2 [, param3]]]}
+\end{center}
+
+\index{.text}
+The \textbf{code} section can be specified with the \texttt{.text} alias.
+
+The number and the type of parameters depends on the instruction itself.
+%TODO: questa va sicuramente inserita.
+%Please see table~\ref{table:segm-type} for the list of possible parameters.
+
+Instructions can take three types of parameters:
+\begin{itemize}
+	\item \textbf{Registers} a register parameter is indicated by an uppercase
+    or lowercase ``r'', or a \$, followed by the number of the register (between
+	0 and 31), as in ``r4'', ``R4'' or ``\$4'';
+	\item \textbf{Immediate values} an immediate value can be a number or a
+	label; the number can be specified in base 10 or in base 16: base 10 numbers
+	are simply inserted by writing the number, while base 16 number are inserted
+	by putting before the number the prefix``0x''
+	\item \textbf{Address} an address is composed by an immediate value followed
+	by a register name enclosed in brackets. The value of the register will be 
+	used as base, the value of the immediate will be the offset.
+\end{itemize}
+
+The size of immediate values is limited by the number of bits that are available
+in the bit encoding of the instruction. 
+
+You can use standard MIPS assembly aliases to address the first 32 registers,
+appending the alias to one of the standard register prefixes like ``r'', ``\$''
+and ``R''. See table~\ref{table:mips32-reg}.
+
+\index{registers}
+\begin{table}[!htb]
+	\begin{centering}
+		\begin{tabular}{ll}
+			\hline
+			\hline
+			Register & Alias\\
+			\hline
+			0 & \texttt{zero}\\
+			1 & \texttt{at}\\
+			2 & \texttt{v0}\\
+			3 & \texttt{v1}\\
+			4 & \texttt{a0}\\
+			5 & \texttt{a1}\\
+			6 & \texttt{a2}\\
+			7 & \texttt{a3}\\
+			8 & \texttt{t0}\\
+			9 & \texttt{t1}\\
+			10 & \texttt{t2}\\
+			11 & \texttt{t3}\\
+			12 & \texttt{t4}\\
+			13 & \texttt{t5}\\
+			14 & \texttt{t6}\\
+			15 & \texttt{t7}\\
+			16 & \texttt{s0}\\
+			17 & \texttt{s1}\\
+			18 & \texttt{s2}\\
+			19 & \texttt{s3}\\
+			20 & \texttt{s4}\\
+			21 & \texttt{s5}\\
+			22 & \texttt{s6}\\
+			23 & \texttt{s7}\\
+			24 & \texttt{t8}\\
+			25 & \texttt{t9}\\
+			26 & \texttt{k0}\\
+			27 & \texttt{k1}\\
+			28 & \texttt{gp}\\
+			29 & \texttt{sp}\\
+			30 & \texttt{fp}\\
+			31 & \texttt{ra}\\
+		\end{tabular}
+		\caption{Aliases for the first 32 registers}
+		\label{table:mips32-reg}
+	\end{centering}
+\end{table}
+
+% TODO: anche questa, ma nell'indice
+%Please see~\cite{mips-2} for more details about how instruction are actually encoded.
+
+The instructions that can be used in this section will be discussed in
+section~\ref{instructions}
+
+\subsection{The \texttt{\#include} command}
+Source files can contain the \texttt{\textbf{\#include} filename} command, which has the
+effect of putting in place of the command row the content of the file
+\texttt{filename}.
+It is useful if you want to include external routines, and it comes with a
+loop-detection algorithm that will warn you if you try to do something like
+``\texttt{\#include A.s}'' in file \texttt{B.s} and ``\texttt{\#include B.s}'' in
+file \texttt{A.s}.
+

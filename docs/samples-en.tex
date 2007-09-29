@@ -1,0 +1,264 @@
+In this chapter you'll find some sample listings that will prove to be useful in
+order to understand how the instructions accepted by \EM{} (version \EV{}) work.
+
+\section{\SC{}}
+For detailed informations about how \SC{} works, go to~\ref{sysc-man}. This
+section will cover all the six \SC{} with some pratical examples.
+
+It's important to understand that examples for \SC{} 1-4 refer to the
+\texttt{print.s} file, that is the example for \SC{} 5. If you want to run the
+examples, you should copy the content of that example in a file named
+\texttt{print.s} and include it in your code.
+
+Some examples use an already existing file descriptor, even if it doesn't truly
+exist. If you want to run those examples, use the \SC{} 1 example to open a
+file.
+
+\subsection{\SC{} 0}
+When \SC{} 0 it's called, it stops the execution of the program.
+Example:
+\begin{lstlisting}[caption={\SC{} 0 example}, label={code:syscall0}, style={mips}]
+        .code
+        daddi   r1, r0, 0	; saves 0 in R1
+        syscall 0	    	; exits
+\end{lstlisting}
+
+\subsection{\SC{} 1}
+Example program that opens a file:
+\begin{lstlisting} [caption={\SC{} 1 example}, label={code:syscall1}, style={mips} ] 
+                .data 
+error_op:       .asciiz     "Error opening the file"    
+ok_message:     .asciiz     "All right"
+params_sys1:    .asciiz     "filename.txt"
+                .word64     0xF                    
+
+                .text
+open:           daddi       r14, r0, params_sys1    
+                syscall     1    
+                daddi       $s0, r0, -1
+                dadd        $s2, r0, r1        
+                daddi       $a0,r0,ok_message            
+                bne         r1,$s0,end            
+                daddi       $a0,r0,error_op
+
+end:            jal         print_string
+                syscall 0
+        
+                #include    print.s      
+\end{lstlisting}
+In the first two rows we write to memory the strings containing the error
+message and the success message that we will pass to print\_string function, and
+we give them two labels. The print\_string function is included in the print.s
+file.
+
+Next, we write to memory the data required from \SC{} 1 (row 4, 5), the path of
+the file to be opened (that must exist if we work in read or read/write mode)
+and, in the next memory cell, an integer that defines the opening mode. For more
+info about the opening mode of a file, please refer to \ref{sys1}.
+
+In this example, the file was opened using the following modes: 
+\texttt{O\_RDWR} \textbar{} \texttt{O\_CREAT} \textbar{} \texttt{O\_APPEND}. The
+number $15$ (0xF in base $16$) comes from the sum of the values of these three
+modes ($3 + 4 + 8$).
+
+We give a label to this data so that we can use it later.
+
+In the .text section, we save the address of params\_sys1 (that for the compiler
+is a number) in register r14; next we can call \SC{} 1 and save the content of
+r1 in \$s2, so that we can use it in the rest of the program (for instance, with
+other \SC{}).
+
+Then the print\_string function is called, passing error\_op as an argument if
+r1 is equal to $-1$ (rows 13-14) or else passing ok\_message as an argument if
+everything went smoothly (rows 12 and 16).
+
+\subsection{\SC{} 2}
+Example program that closes a file:
+\begin{lstlisting}[caption={\SC{} 2 example}, label={code:syscall2}, style={mips}]
+                .data
+params_sys2:    .space 8
+error_cl:       .asciiz     "Error closing the file"
+ok_message:     .asciiz     "All right"
+
+                .text
+close:          daddi       r14, r0, params_sys2        
+                sw          $s2, params_sys2(r0)    
+                syscall     2            
+                daddi       $s0, r0, -1        
+                daddi       $a0, r0, ok_message            
+                bne         r1, $s0, end            
+                daddi       $a0, r0, error_cl
+
+end:            jal         print_string
+                syscall     0
+    
+                #include    print.s         
+\end{lstlisting}
+First we save some memory for the only argument of \SC{} 2, the file descriptor
+of the file that must be closed (row 2), and we give it a label so that we can
+access it later.
+
+Next we put in memory the strings containing the error message and the success
+message, that will be passed to the print\_string function (rows 3, 4).
+
+In the .text section, we save the address of params\_sys2 in r14; then we can
+call \SC{} 2.
+
+Now we call the print\_string function using error\_cl as a parameter if r1
+yields $-1$ (row 13), or we call it using ok\_message as a parameter if all went
+smoothly (row 11).
+
+\OF{}
+
+\subsection{\SC{} 3}
+Example program that reads 16 bytes from a file and saves them to memory:
+\begin{lstlisting}[caption={\SC{} 3 example}, label={code:syscall3}, style={mips}]
+                .data
+params_sys3:    .space      8                
+ind_value:      .space      8            
+                .word64     16        
+error_3:        .asciiz     "Error while reading from file"    
+ok_message:     .asciiz     "All right"    
+
+value:          .space      30                    
+
+                .text
+read:           daddi       r14, r0, params_sys3 
+                sw          $s2, params_sys3(r0)
+                daddi       $s1, r0, value            
+                sw          $s1, ind_value(r0)            
+                syscall     3            
+                daddi       $s0, r0, -1            
+                daddi       $a0, r0,ok_message            
+                bne         r1, $s0,end            
+                daddi       $a0, r0,error_3
+
+end:            jal         print_string
+                syscall     0
+        
+                #include    print.s 
+\end{lstlisting}
+The first 4 rows of the .data section contain the arguments of \SC{} 3, the file
+descriptor of the from which we must read, the memory address where the \SC{}
+must save the read data, the number of bytes to read. We give labels to those
+parameters that must be accessed later.  Next we put, as usual, the strings
+containing the error message and the success message.
+
+In the .text section, we save the params\_sys3 address to register r14, we save
+in the memory cells for the \SC{} parameters the file descriptor (that we
+suppose to have in \$s2) and the address that we want to use to save the read
+bytes.
+
+Next we can call \SC{} 3, and then we call the print\_string function passing as
+argument error\_3 or ok\_message, according to the success of the operation.
+
+\OF{}
+
+\subsection{\SC{} 4}
+Example program that writes to a file a string:
+
+\begin{lstlisting}[caption={\SC{} 4 example}, label={code:syscall4}, style={mips}]
+                .data
+params_sys4:    .space      8                
+ind_value:      .space      8            
+                .word64     16        
+error_4:        .asciiz     "Error writing to file"    
+ok_message:     .asciiz     "All right"    
+value:          .space      30                    
+
+                .text
+            
+write:          daddi       r14, r0,params_sys4        
+                sw          $s2, params_sys4(r0)        
+                daddi       $s1, r0,value            
+                sw          $s1, ind_value(r0)            
+                syscall     4                
+                daddi       $s0, r0,-1
+                daddi       $a0, r0,ok_message            
+                bne         r1, $s0,end            
+                daddi       $a0, r0,error_4
+
+end:            jal         print_string
+                syscall     0
+        
+                #include    print.s 
+\end{lstlisting}
+
+The first 4 rows of the .data section contain the arguments of \SC{} 4, the file
+descriptor of the from which we must read, the memory address from where the \SC{}
+must read the bytes to write, the number of bytes to write. We give labels to those
+parameters that must be accessed later.  Next we put, as usual, the strings
+containing the error message and the success message.
+
+In the .text section, we save the params\_sys4 address to register r14, we save
+in the memory cells for the \SC{} parameters the file descriptor (that we
+suppose to have in \$s2) and the address from where we must take the bytes to
+weite.
+
+Next we can call \SC{} 3, and then we call the print\_string function passing as
+argument error\_3 or ok\_message, according to the success of the operation.
+
+\OF{}
+
+\subsection{\SC{} 5}
+Example program that contains a function that prints to standard output the
+string contained in \$a0:
+\begin{lstlisting}[caption={\SC{} 5 example}, label={code:syscall5}, style={mips}]
+                .data
+params_sys5:    .space  8
+
+                .text
+print_string:   
+                sw      $a0, params_sys5(r0)    
+                daddi   r14, r0, params_sys5
+                syscall 5
+                jr      r31
+\end{lstlisting}
+The second row is used to save space for the string that must be printed by the
+\SC{}, that is filled by the first instruction of the .text section, that
+assumes that in \$a0 there's the address of the string to be printed.
+
+The next instruction puts in r14 the address of this string, and then we can
+call \SC{} 5 and print the string. The last instruction sets the program counter
+to the content of r31, as the usual MIPS calling convention states.
+
+\subsection{A more complex usage example of \SC{} 5}
+\SC{} 5 uses a not-so-simple arguments passing mechanism, that will be shown in
+the following example:
+
+\begin{lstlisting}[caption={More complex \SC{} 5 example}, label={code:printf}, style={mips}]
+                .data
+format_str:     .asciiz   "%dth of %s:\n%s version %i.%i is being tested!"
+s1:             .asciiz   "June"
+s2:             .asciiz   "EduMIPS64"
+fs_addr:        .space    4
+                .word     5    
+s1_addr:        .space    4
+s2_addr:        .space    4
+                .word     0
+                .word     5
+test:
+                .code
+                daddi     r5, r0, format_str
+                sw        r5, fs_addr(r0)
+                daddi     r2, r0, s1
+                daddi     r3, r0, s2
+                sd        r2, s1_addr(r0)
+                sd        r3, s2_addr(r0)
+                daddi     r14, r0, fs_addr
+                syscall   5
+                syscall   0
+\end{lstlisting}
+The address of the format string is put into R5, whose content is then saved to
+memory at address fs\_addr. The string parameters' addresses are saved into
+s1\_addr and s2\_addr. Those two string parameters are the ones that match the
+two \%s placeholders in the format string.
+
+Looking at the memory, it's obvious that the parameters matching the
+placeholders are stored immediately after the address of the format string:
+numbers match integer parameters, while addresses match string parameters. In
+the s1\_addr and s2\_addr locations there are the addresses of the two strings
+that we want to print instead of the \%s placeholders.
+
+The execution of the example will show how \SC{} 5 can handle complex format
+strings like the one stored at format\_str.
