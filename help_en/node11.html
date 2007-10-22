@@ -1,0 +1,228 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Load/Store instructions</TITLE>
+<META NAME="description" CONTENT="Load/Store instructions">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="node12.html">
+<LINK REL="previous" HREF="node10.html">
+<LINK REL="up" HREF="node9.html">
+<LINK REL="next" HREF="node12.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html249"
+  HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html245"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html239"
+  HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html247"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html250"
+  HREF="node12.html">Flow control instructions</A>
+<B> Up:</B> <A NAME="tex2html246"
+  HREF="node9.html">The instruction set</A>
+<B> Previous:</B> <A NAME="tex2html240"
+  HREF="node10.html">ALU Instructions</A>
+ &nbsp; <B>  <A NAME="tex2html248"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00520000000000000000">
+Load/Store instructions</A>
+</H1>
+This category contains all the instructions that operate transfers between
+registers and the memory. All of these instructions are in the form
+
+<P>
+<DIV ALIGN="CENTER">
+<TT>[label:] <SPAN  CLASS="textbf">INSTRUCTION</SPAN> rt, offset(base)</TT>
+
+</DIV>
+
+<P>
+Where rt is the source or destination register, depending if we are using a
+store or a load instruction; offset is a label or an immediate value and base is
+a register. The address is obtained by adding to the value of the register
+<TT>base</TT> the immediate value <TT>offset</TT>.
+
+<P>
+The address specified must be aligned according to the data type that is
+treated. Load instructions ending with ``U'' treat the content of the register
+rt as an unsigned value.
+
+<P>
+List of load instructions:
+
+<P>
+
+	<A NAME="597"></A>
+	<A NAME="598"></A>
+<UL>
+<LI><TT>LB rt, offset(base)</TT>
+<BR>
+Loads the content of the memory cell at address specified by offset
+	and base in register rt, treating it as a signed byte.
+
+<P>
+<A NAME="600"></A>
+	<A NAME="601"></A>
+</LI>
+<LI><TT>LBU rt, offset(base)</TT>
+<BR>
+Loads the content of the memory cell at address specified by offset
+	and base in register rt, treating it as an unsigned byte.
+
+<P>
+<A NAME="603"></A>
+	<A NAME="604"></A>
+</LI>
+<LI><TT>LD rt, offset(base)</TT>
+<BR>
+Loads the content of the memory cell at address specified by offset
+	and base in register rt, treating it as a double word.
+
+<P>
+<A NAME="606"></A>
+	<A NAME="607"></A>
+</LI>
+<LI><TT>LH rt, offset(base)</TT>
+<BR>
+Loads the content of the memory cell at address specified by offset
+	and base in register rt, treating it as a signed half word.
+
+<P>
+<A NAME="609"></A>
+	<A NAME="610"></A>
+</LI>
+<LI><TT>LHU rt, offset(base)</TT>
+<BR>
+Loads the content of the memory cell at address specified by offset
+	and base in register rt, treating it as an unsigned half word.
+
+<P>
+<A NAME="612"></A>
+	<A NAME="613"></A>
+</LI>
+<LI><TT>LW rt, offset(base)</TT>
+<BR>
+Loads the content of the memory cell at address specified by offset
+	and base in register rt, treating it as a signed word.
+
+<P>
+<A NAME="615"></A>
+	<A NAME="616"></A>
+</LI>
+<LI><TT>LWU rt, offset(base)</TT>
+<BR>
+Loads the content of the memory cell at address specified by offset
+	and base in register rt, treating it as a signed word.
+</LI>
+</UL>
+
+<P>
+List of store instructions:
+
+<P>
+
+	<A NAME="620"></A>
+	<A NAME="621"></A>
+<UL>
+<LI><TT>SB rt, offset(base)</TT>
+<BR>
+Stores the content of register rt in the memory cell specified by offset and
+	base, treating it as a byte.
+
+<P>
+<A NAME="623"></A>
+	<A NAME="624"></A>
+</LI>
+<LI><TT>SD rt, offset(base)</TT>
+<BR>
+Stores the content of register rt in the memory cell specified by offset and
+	base, treating it as a double word.
+
+<P>
+<A NAME="626"></A>
+	<A NAME="627"></A>
+</LI>
+<LI><TT>SH rt, offset(base)</TT>
+<BR>
+Stores the content of register rt in the memory cell specified by offset and
+	base, treating it as a half word.
+
+<P>
+<A NAME="629"></A>
+	<A NAME="630"></A>
+</LI>
+<LI><TT>SW rt, offset(base)</TT>
+<BR>
+Stores the content of register rt in the memory cell specified by offset and
+	base, treating it as a word.
+</LI>
+</UL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html249"
+  HREF="node12.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html245"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html239"
+  HREF="node10.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html247"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html250"
+  HREF="node12.html">Flow control instructions</A>
+<B> Up:</B> <A NAME="tex2html246"
+  HREF="node9.html">The instruction set</A>
+<B> Previous:</B> <A NAME="tex2html240"
+  HREF="node10.html">ALU Instructions</A>
+ &nbsp; <B>  <A NAME="tex2html248"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+andrea
+2007-09-29
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Flow control instructions</TITLE>
+<META NAME="description" CONTENT="Flow control instructions">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="node13.html">
+<LINK REL="previous" HREF="node11.html">
+<LINK REL="up" HREF="node9.html">
+<LINK REL="next" HREF="node13.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html261"
+  HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html257"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html251"
+  HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html259"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html262"
+  HREF="node13.html">The SYSCALL instruction</A>
+<B> Up:</B> <A NAME="tex2html258"
+  HREF="node9.html">The instruction set</A>
+<B> Previous:</B> <A NAME="tex2html252"
+  HREF="node11.html">Load/Store instructions</A>
+ &nbsp; <B>  <A NAME="tex2html260"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00530000000000000000">
+Flow control instructions</A>
+</H1>
+Flow control instructions are used to alter the order of instructions that are
+fetched by the CPU. We can make a distinction between these instructions:
+R-Type, I-Type and J-Type.
+
+<P>
+<A NAME="634"></A>
+Those instructions effectively executes the jump in the ID stage, so often an
+useless fetch is executed. In this case, two instructions are removed from the
+pipeline, and the branch taken stalls counter is incremented by two units.
+
+<P>
+List of R-Type flow control instructions:
+
+	<A NAME="636"></A>
+	<A NAME="637"></A>
+<UL>
+<LI><TT>JALR rs</TT>
+<BR>
+Puts the content of rs into the program counter, and puts into R31 the
+	address of the instruction that follows the JALR instruction, the return
+	value.
+
+<P>
+<A NAME="639"></A>
+	<A NAME="640"></A>
+</LI>
+<LI><TT>JR rs</TT>
+<BR>
+Puts the content of rs into the program counter.
+</LI>
+</UL>
+
+<P>
+List of I-Type flow control instructions:
+
+<P>
+
+	<A NAME="644"></A>
+	<A NAME="645"></A>
+<UL>
+<LI><TT>B offset</TT>
+<BR>
+Unconditionally jumps to offset
+
+<P>
+<A NAME="647"></A>
+	<A NAME="648"></A>
+</LI>
+<LI><TT>BEQ rs, rt, offset</TT>
+<BR>
+Jumps to offset if rs is equal to rt.
+
+<P>
+<A NAME="650"></A>
+	<A NAME="651"></A>
+</LI>
+<LI><TT>BEQZ rs, offset</TT>
+<BR>
+Jumps to offset if rs is equal to zero.
+<BR>	<SPAN  CLASS="textbf">WARNING:</SPAN> This is a deprecated instruction, that
+does not belong to the MIPS64 instruction set, but it is included in the instruction
+set in order to maintain compatibility with other simulators.
+
+<P>
+<A NAME="653"></A>
+	<A NAME="654"></A>
+</LI>
+<LI><TT>BGEZ rs, offset</TT>
+<BR>
+If rs is greather than zero, does a PC-relative jump to offset.
+
+<P>
+<A NAME="656"></A>
+	<A NAME="657"></A>
+</LI>
+<LI><TT>BNE rs, rt, offset</TT>
+<BR>
+Jumps to offset if rs is not equal to rt.
+
+<P>
+<A NAME="659"></A>
+	<A NAME="660"></A>
+</LI>
+<LI><TT>BNEZ rs</TT>
+<BR>
+Jumps to offset if rs is not equal to zero.
+<BR>	<SPAN  CLASS="textbf">WARNING:</SPAN> This is a deprecated instruction, that
+does not belong to the MIPS64 instruction set, but it is included in the instruction
+set in order to maintain compatibility with other simulators.
+</LI>
+</UL>
+
+<P>
+List of J-Type flow control instructions:
+
+<P>
+
+	<A NAME="664"></A>
+	<A NAME="665"></A>
+<UL>
+<LI><TT>J target</TT>
+<BR>
+Puts the immediate value target into the program counter.
+
+<P>
+<A NAME="667"></A>
+	<A NAME="668"></A>
+</LI>
+<LI><TT>JAL target</TT>
+<BR>
+Puts the immediate value target into the program counter, and puts into R31 the
+	address of the instruction that follows the JAL instruction, the return
+	value.
+</LI>
+</UL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html261"
+  HREF="node13.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html257"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html251"
+  HREF="node11.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html259"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html262"
+  HREF="node13.html">The SYSCALL instruction</A>
+<B> Up:</B> <A NAME="tex2html258"
+  HREF="node9.html">The instruction set</A>
+<B> Previous:</B> <A NAME="tex2html252"
+  HREF="node11.html">Load/Store instructions</A>
+ &nbsp; <B>  <A NAME="tex2html260"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+andrea
+2007-09-29
+</ADDRESS>
+</BODY>
+</HTML>

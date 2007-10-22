@@ -30,7 +30,8 @@
 		<mkdir dir="${outputDir}/edumips64/img" />
 		<mkdir dir="${outputDir}/edumips64/data" />
 		<mkdir dir="${outputDir}/edumips64/utils" />
-		<mkdir dir="${outputDir}/edumips64/help" />
+		<mkdir dir="${outputDir}/edumips64/help_en" />
+		<mkdir dir="${outputDir}/edumips64/help_it" />
 		<mkdir dir="${outputDir}/com" />
 		<mkdir dir="${outputDir}/javax" />
 
@@ -49,8 +50,13 @@
 				<include name="**/*.properties" />
 			</fileset>
 		</copy>
-		<copy todir="${outputDir}/edumips64/help">
-			<fileset dir="help">
+		<copy todir="${outputDir}/edumips64/help_en">
+			<fileset dir="help_en">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+		<copy todir="${outputDir}/edumips64/help_it">
+			<fileset dir="help_it">
 				<include name="**/*.*" />
 			</fileset>
 		</copy>

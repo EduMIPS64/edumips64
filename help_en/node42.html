@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>Settings</TITLE>
+<META NAME="description" CONTENT="Settings">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="node43.html">
+<LINK REL="previous" HREF="node41.html">
+<LINK REL="up" HREF="node41.html">
+<LINK REL="next" HREF="node43.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html658"
+  HREF="node43.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html654"
+  HREF="node41.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html648"
+  HREF="node41.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html656"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html659"
+  HREF="node43.html">Dinero Frontend</A>
+<B> Up:</B> <A NAME="tex2html655"
+  HREF="node41.html">Dialogs</A>
+<B> Previous:</B> <A NAME="tex2html649"
+  HREF="node41.html">Dialogs</A>
+ &nbsp; <B>  <A NAME="tex2html657"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00631000000000000000"></A>
+<A NAME="dialog-settings"></A>
+<BR>
+Settings
+</H2>
+In the Settings dialog various aspects of the simulator can be configured.
+
+<P>
+The Main Settings tab allow to configure forwarding and the number of steps in the
+Multi Cycle mode.
+
+<P>
+The Behavior tab allow to enable or disable warnings during the parsing phase,
+the ``Sync graphics with CPU in multi-step execution'' option, when checked,
+will synchronize the frames' graphical status with the internal status of the
+simulator. This means that the simulation will be slower, but you'll have an
+explicit graphical feedback of what is happening during the simulation. If this
+option is checked, the ``Interval between cycles'' option will influence how
+many milliseconds the simulator will wait before starting a new cycle.
+Those options are effective only when the simulation is run using the
+``Run'' or the ``Multi Cycle'' options from the Execute menu.
+
+<P>
+The last two options set the behavior of the simulator when a synchronous
+exception is raised. If the ``Mask synchronous exceptions'' option is checked,
+the simulator will ignore any Division by zero or Integer overflow exception. If
+the ``Terminate on synchronous exception'' option is checked, the simulation
+will be halted if a synchronous exception is raised. Please note that if
+synchronous exceptions are masked, nothing will happen, even if the termination
+option is checked. If exceptions are not masked and the termination option is not
+checked, a dialog will pop out, but the simulation will go on as soon as the
+dialog is closed. If exceptions are not masked and the termination option is
+checked, the dialog will pop out, and the simulation will be stopped as soon as
+the dialog is closed.
+
+<P>
+The last tab allows to change the colors that are associated to the different
+pipeline stages through the frames. It's pretty useless, but it's cute.
+
+<P>
+<A NAME="1106"></A>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html658"
+  HREF="node43.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html654"
+  HREF="node41.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html648"
+  HREF="node41.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html656"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html659"
+  HREF="node43.html">Dinero Frontend</A>
+<B> Up:</B> <A NAME="tex2html655"
+  HREF="node41.html">Dialogs</A>
+<B> Previous:</B> <A NAME="tex2html649"
+  HREF="node41.html">Dialogs</A>
+ &nbsp; <B>  <A NAME="tex2html657"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+andrea
+2007-09-29
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>SYSCALL 5 - printf()</TITLE>
+<META NAME="description" CONTENT="SYSCALL 5 - printf()">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="previous" HREF="node18.html">
+<LINK REL="up" HREF="node13.html">
+<LINK REL="next" HREF="node20.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html349"
+  HREF="node20.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html345"
+  HREF="node13.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html341"
+  HREF="node18.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html347"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html350"
+  HREF="node20.html">Other instructions</A>
+<B> Up:</B> <A NAME="tex2html346"
+  HREF="node13.html">The SYSCALL instruction</A>
+<B> Previous:</B> <A NAME="tex2html342"
+  HREF="node18.html">SYSCALL 4 - write()</A>
+ &nbsp; <B>  <A NAME="tex2html348"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00546000000000000000">
+<TT>SYSCALL 5 - printf()</TT></A>
+</H2>
+SYSCALL 5 expects a variable number of parameters, the first being the address
+of the so-called ``format string''. In the format string can be included some
+placeholders, described in the following list:
+
+<UL>
+<LI><TT>%s</TT> indicates a string parameter;
+</LI>
+<LI><TT>%i</TT> indicates an integer parameter;
+</LI>
+<LI><TT>%d</TT> behaves like <TT>%i</TT>;
+</LI>
+<LI><TT>%%</TT> literal <TT>%</TT>
+</LI>
+</UL>
+
+<P>
+For each <TT>%s</TT>, <TT>%d</TT> or <TT>%i</TT> placeholder, SYSCALL 5
+expects a parameter, starting from the address of the previous one.
+
+<P>
+When the SYSCALL finds a placeholder for an integer parameter, it expects that
+the corresponding parameter is an integer value, when if it finds a placeholder
+for a string parameter, it expects as a parameter the address of the string.
+
+<P>
+The result is printed in the input/output frame, and the number of bytes
+written is put into R1.
+
+<P>
+If there's an error, -1 is written to R1.
+
+<P>
+<BR><HR>
+<ADDRESS>
+andrea
+2007-09-29
+</ADDRESS>
+</BODY>
+</HTML>

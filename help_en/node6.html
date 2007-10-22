@@ -1,0 +1,329 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>The .data section</TITLE>
+<META NAME="description" CONTENT="The .data section">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="node7.html">
+<LINK REL="previous" HREF="node5.html">
+<LINK REL="up" HREF="node5.html">
+<LINK REL="next" HREF="node7.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html176"
+  HREF="node7.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html172"
+  HREF="node5.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html166"
+  HREF="node5.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html174"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html177"
+  HREF="node7.html">The .code section</A>
+<B> Up:</B> <A NAME="tex2html173"
+  HREF="node5.html">Sections</A>
+<B> Previous:</B> <A NAME="tex2html167"
+  HREF="node5.html">Sections</A>
+ &nbsp; <B>  <A NAME="tex2html175"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00411000000000000000"></A>
+<A NAME="189"></A>
+<BR>
+The <TT>.data</TT> section
+</H2>
+The <SPAN  CLASS="textbf">data</SPAN> section contains commands that specify how the memory must be
+filled before program execution starts. The general form of a <TT>.data</TT> command
+is:
+
+<P>
+<DIV ALIGN="CENTER">
+<TT>[label:] <SPAN  CLASS="textbf">.datatype</SPAN> value1 [, value2 [, ...]]</TT>
+
+</DIV>
+
+<P>
+EduMIPS64 supports different data types, that are described in
+table&nbsp;<A HREF="#table:datatypes">1.1</A>.
+
+<P>
+<A NAME="197"></A>
+<A NAME="198"></A>
+<A NAME="199"></A>
+<A NAME="200"></A>
+<A NAME="201"></A>
+<A NAME="202"></A>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="213"></A>
+<TABLE>
+<CAPTION><STRONG>Table 1.1:</STRONG>
+Basic data types</CAPTION>
+<TR><TD>	<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="LEFT">Type</TD>
+<TD ALIGN="LEFT">Directive</TD>
+<TD ALIGN="LEFT">Bits required</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Byte</TD>
+<TD ALIGN="LEFT"><TT>.byte</TT></TD>
+<TD ALIGN="LEFT">8</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Half word</TD>
+<TD ALIGN="LEFT"><TT>.word16</TT></TD>
+<TD ALIGN="LEFT">16</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Word</TD>
+<TD ALIGN="LEFT"><TT>.word32</TT></TD>
+<TD ALIGN="LEFT">32</TD>
+</TR>
+<TR><TD ALIGN="LEFT">Double Word</TD>
+<TD ALIGN="LEFT"><TT>.word</TT> or <TT>.word64</TT></TD>
+<TD ALIGN="LEFT">64</TD>
+</TR>
+</TABLE>
+		
+		<A NAME="table:datatypes"></A>	
+</DIV></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+Please note that a double word can be introduced either by the <TT>.word</TT>
+directive or by the <TT>.word64</TT> directive.
+
+<P>
+<A NAME="219"></A> There's a big difference between declaring a list of data elements
+using a single directive or by using multiple directives of the same type. EduMIPS64
+starts writing from the next 64-bit double word as soon as it finds a datatype identifier,
+so the first <TT>.byte</TT> statement in listing&nbsp;<A HREF="#code:data_array">1.2</A> will put
+the numbers 1, 2, 3 and 4 in the space of 4 bytes, taking 32 bits, while code in
+the next four rows will put each number in a different memory cell, occupying 32
+bytes, as in table&nbsp;<A HREF="#table:effect">1.2</A>.
+
+<P>
+<BR>
+<IMG
+ WIDTH="299" HEIGHT="170" ALIGN="BOTTOM" BORDER="0"
+ SRC="img2.png"
+ ALT="\begin{lstlisting}[caption={Adjacent bytes}, label={code:data_array}, style={mips}]
+.data
+.byte 1, 2, 3, 4
+.byte 1
+.byte 2
+.byte 3
+.byte 4
+\end{lstlisting}">
+<BR>
+
+<P>
+In table&nbsp;<A HREF="#table:effect">1.2</A>, the memory is represented using byte-sized cells
+and each row is 64 bits wide. The address on the left side of each row of the
+table refers to the right-most memory cell, that has the lowest address of the
+eight cells in each line.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="339"></A>
+<TABLE>
+<CAPTION><STRONG>Table 1.2:</STRONG>
+Memory status for Listing&nbsp;<A HREF="#code:data_array">1.2</A></CAPTION>
+<TR><TD>	<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1" ALIGN="CENTER">
+<TR><TD ALIGN="RIGHT">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">4</TD>
+<TD ALIGN="CENTER">3</TD>
+<TD ALIGN="CENTER">2</TD>
+<TD ALIGN="CENTER">1</TD>
+</TR>
+<TR><TD ALIGN="RIGHT">8</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">1</TD>
+</TR>
+<TR><TD ALIGN="RIGHT">16</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">2</TD>
+</TR>
+<TR><TD ALIGN="RIGHT">24</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">3</TD>
+</TR>
+<TR><TD ALIGN="RIGHT">36</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">0</TD>
+<TD ALIGN="CENTER">4</TD>
+</TR>
+</TABLE>
+		
+		<A NAME="table:effect"></A>	
+</DIV></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+There are some special directives that need to be discussed: <TT>.space</TT>, 
+<TT>.ascii</TT> and <TT>.asciiz</TT>.
+<A NAME="248"></A>
+The <TT>.space</TT> directive is used to leave some free space in memory. It
+accepts as a parameter an integer, that indicates the number of bytes that must
+be left empty. It is handy when you must save some space in memory for the
+results of your computations.
+
+<P>
+<A NAME="250"></A>
+The <TT>.ascii</TT> directive accepts strings containing any of the ASCII
+characters, and some special C-like escaping sequences, that are described in
+table&nbsp;<A HREF="#table:escaping">1.3</A>, and puts those strings in memory.
+
+<P>
+<A NAME="253"></A>
+The <TT>.asciiz</TT> directive behaves exactly like the <TT>.ascii</TT> command,
+with the difference that it automatically ends the string with a null byte.
+
+<P>
+<BR><P></P>
+<DIV ALIGN="CENTER"><A NAME="265"></A>
+<TABLE>
+<CAPTION><STRONG>Table 1.3:</STRONG>
+Escaping sequences</CAPTION>
+<TR><TD>	<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="LEFT">Escaping sequence</TD>
+<TD ALIGN="LEFT">Meaning</TD>
+<TD ALIGN="LEFT">ASCII encoding</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT><SPAN CLASS="MATH"><IMG
+ WIDTH="14" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img3.png"
+ ALT="$\backslash$"></SPAN>0</TT></TD>
+<TD ALIGN="LEFT">Null byte</TD>
+<TD ALIGN="LEFT">0</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT><SPAN CLASS="MATH"><IMG
+ WIDTH="14" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img3.png"
+ ALT="$\backslash$"></SPAN>t</TT></TD>
+<TD ALIGN="LEFT">Horizontal tabulation</TD>
+<TD ALIGN="LEFT">9</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT><SPAN CLASS="MATH"><IMG
+ WIDTH="14" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img3.png"
+ ALT="$\backslash$"></SPAN>n</TT></TD>
+<TD ALIGN="LEFT">Newline character</TD>
+<TD ALIGN="LEFT">10</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT><SPAN CLASS="MATH"><IMG
+ WIDTH="14" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img3.png"
+ ALT="$\backslash$"></SPAN>"</TT></TD>
+<TD ALIGN="LEFT">Literal quote character</TD>
+<TD ALIGN="LEFT">34</TD>
+</TR>
+<TR><TD ALIGN="LEFT"><TT><!-- MATH
+ $\backslash\backslash$
+ -->
+<SPAN CLASS="MATH"><IMG
+ WIDTH="24" HEIGHT="37" ALIGN="MIDDLE" BORDER="0"
+ SRC="img4.png"
+ ALT="$\backslash\backslash$"></SPAN></TT></TD>
+<TD ALIGN="LEFT">Literal backslash character</TD>
+<TD ALIGN="LEFT">92</TD>
+</TR>
+</TABLE>
+	
+	<A NAME="table:escaping"></A></TD></TR>
+</TABLE>
+</DIV><P></P>
+<BR>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html176"
+  HREF="node7.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html172"
+  HREF="node5.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html166"
+  HREF="node5.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html174"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html177"
+  HREF="node7.html">The .code section</A>
+<B> Up:</B> <A NAME="tex2html173"
+  HREF="node5.html">Sections</A>
+<B> Previous:</B> <A NAME="tex2html167"
+  HREF="node5.html">Sections</A>
+ &nbsp; <B>  <A NAME="tex2html175"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+andrea
+2007-09-29
+</ADDRESS>
+</BODY>
+</HTML>

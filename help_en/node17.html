@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>SYSCALL 3 - read()</TITLE>
+<META NAME="description" CONTENT="SYSCALL 3 - read()">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="node18.html">
+<LINK REL="previous" HREF="node16.html">
+<LINK REL="up" HREF="node13.html">
+<LINK REL="next" HREF="node18.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html327"
+  HREF="node18.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html323"
+  HREF="node13.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html317"
+  HREF="node16.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html325"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html328"
+  HREF="node18.html">SYSCALL 4 - write()</A>
+<B> Up:</B> <A NAME="tex2html324"
+  HREF="node13.html">The SYSCALL instruction</A>
+<B> Previous:</B> <A NAME="tex2html318"
+  HREF="node16.html">SYSCALL 2 - close()</A>
+ &nbsp; <B>  <A NAME="tex2html326"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00544000000000000000">
+<TT>SYSCALL 3 - read()</TT></A>
+</H2>
+SYSCALL 3 expects three parameters: the file descriptor to read from, the
+address where the read data must be put into, the number of bytes to read.
+
+<P>
+If the first parameter is 0, the simulator will prompt the user for an input,
+via an input dialog. If the length of the input is greater than the number of
+bytes that have to be read, the simulator will show again the message dialog.
+
+<P>
+It returns the number of bytes that have effectively been read, or -1 if the
+read operation fails. Possible causes of failure are the attempt to read from a
+non-existent file descriptor, the attempt to read from file descriptors 1
+(standard output) or 2 (standard error) or the attempt to read from a write-only
+file descriptor.
+
+<P>
+<A NAME="693"></A>
+<BR><HR>
+<ADDRESS>
+andrea
+2007-09-29
+</ADDRESS>
+</BODY>
+</HTML>

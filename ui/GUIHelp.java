@@ -38,57 +38,27 @@ import javax.help.HelpSetException;
 import javax.swing.JOptionPane;
 
 import edumips64.Main;
+import edumips64.utils.CurrentLocale;
 
 
 /**
  * This class controls the Edumips64 user guide.  
  */
 public class GUIHelp {
-
-
-        public final static String HELP_DEFAULT = "JLogoHelp";
+        public final static String HELP_DEFAULT = "EduMIPS64Help";
         
-       
-            
         /**
          * The help broker used to display Edumips's help.
          */
         private static HelpBroker helpBroker;
         private static URL url,HSurl;
-        static {
-        	//file:C:\Documents and Settings\vanni\workspace\logo\jlogo\help\
-        	HSurl = Main.class.getResource("help/");
-        	String s = HSurl.getProtocol()+ ":" + HSurl.getPath().replace("%20", " ");
-        	//JOptionPane.showInputDialog("Inserisci l'URL: ");///helpSetURL.getText();
-            String s1 = "EduMIPS64it.hs";//helpSetName.getText();
-            //System.err.println("FINALE: " + s);
-            try {
-            	//Surl = JLogoApplication.class.getResource("help/jlogo.hs");
-            	URL aurl[] = GUIHelp.parseURLs(s);
-            	URLClassLoader urlclassloader = new URLClassLoader(aurl);
-            	//System.out.println("URL = " + aurl[0]);
-            	url = HelpSet.findHelpSet(urlclassloader, s1);
-            
-            	
-            	HelpSet helpset = new HelpSet(urlclassloader, url);
-                
-                
-                helpBroker = helpset.createHelpBroker();                
-                helpBroker.initPresentation();
-                helpBroker.setSize(new Dimension(800,600));
-            }
-            catch(HelpSetException helpsetexception)
-            {
-                System.err.println("Could not create HelpSet for " + url);
-                //new ReportDialog(null,helpsetexception,"Cannot find User Guide");
-            }
-        }
 
         private static URL[] parseURLs(String s){
         	Vector<URL> vector = new Vector<URL>();
         	try{
         		URL url = new URL(s);
         		vector.addElement(url);
+                System.err.println("Aggiungo " + s);
         	}
         	catch(Exception exception){
         		System.err.println("cannot create URL for " + s);
@@ -110,43 +80,29 @@ public class GUIHelp {
          *            displayed)
          */
         public static void showHelp(Window parent, String helpId) {
-            if (helpBroker != null) {
-
-                try {
-                    //helpBroker.setCurrentID(helpId); //da verificare
-
-                    // This is a workaround--the help window freezes when launched from a
-                    // modal dialog unless we first set the activation window. However,
-                    // if we set the activation window to a modal dialog, we have to
-                    // re-initialize the presentation as well! Definitely a result of
-                    // various bugs in JavaHelp.
-                    ((DefaultHelpBroker) helpBroker).setActivationWindow(parent);
-                    helpBroker.initPresentation();
-                }
-                catch (BadIDException bie) {
-                    helpBroker.setCurrentID(HELP_DEFAULT);
-                }
-
-
-                // To maintain the last size of the help window, it
-                // is necessary to explicitly get the size and set
-                // it again. Note that the CSH class that normally
-                // should be used to display the help window doesn't
-                // respect the last size of the help window (a bug
-                // in JavaHelp?).
-                //menuItem.addActionListener(new CSH.DisplayHelpFromSource(helpBroker));
+        	HSurl = Main.class.getResource(CurrentLocale.getString("HELPDIR") + "/");
+        	String s = HSurl.getProtocol()+ ":" + HSurl.getPath().replace("%20", " ");
+            String s1 = CurrentLocale.getString("HELPSET");
+            try {
+            	URL aurl[] = GUIHelp.parseURLs(s);
+            	URLClassLoader urlclassloader = new URLClassLoader(aurl);
+            	url = HelpSet.findHelpSet(urlclassloader, s1);
+            	
+            	HelpSet helpset = new HelpSet(urlclassloader, url);
+                helpBroker = helpset.createHelpBroker();                
+                helpBroker.initPresentation();
+                helpBroker.setSize(new Dimension(800,600));
+                ((DefaultHelpBroker) helpBroker).setActivationWindow(parent);
+                helpBroker.initPresentation();
                 helpBroker.setSize(helpBroker.getSize());
-
                 helpBroker.setDisplayed(true);
             }
-
-
-            else {        
-                JOptionPane.showMessageDialog(parent,
-                                              "Could not locate the Edumips64 User Guide!", //da internazionalizzare
-                                              "Help Error", 
-                                              JOptionPane.WARNING_MESSAGE);
+            catch(HelpSetException helpsetexception)
+            {
+                System.err.println("Could not create HelpSet for " + url);
+            }
+            catch (BadIDException bie) {
+                helpBroker.setCurrentID(HELP_DEFAULT);
             }
         }
-
     }

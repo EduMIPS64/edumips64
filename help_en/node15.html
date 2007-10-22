@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>SYSCALL 1 - open()</TITLE>
+<META NAME="description" CONTENT="SYSCALL 1 - open()">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="node16.html">
+<LINK REL="previous" HREF="node14.html">
+<LINK REL="up" HREF="node13.html">
+<LINK REL="next" HREF="node16.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html303"
+  HREF="node16.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html299"
+  HREF="node13.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html293"
+  HREF="node14.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html301"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html304"
+  HREF="node16.html">SYSCALL 2 - close()</A>
+<B> Up:</B> <A NAME="tex2html300"
+  HREF="node13.html">The SYSCALL instruction</A>
+<B> Previous:</B> <A NAME="tex2html294"
+  HREF="node14.html">SYSCALL 0 - exit()</A>
+ &nbsp; <B>  <A NAME="tex2html302"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H2><A NAME="SECTION00542000000000000000"></A>
+<A NAME="sys1"></A>
+<BR>
+<TT>SYSCALL 1 - open()</TT>
+</H2>
+The SYSCALL 1 expects two parameters: a zero-terminated string that indicates
+the pathname of the file that must be opened, and a double word containing an
+integer that indicates the flags that must be used to specify how to open the
+file.
+
+<P>
+This integer must be built summing the flags that you want to use, choosing them
+from the following list:
+
+<UL>
+<LI><TT>O_RDONLY (0x01)</TT> Opens the file in read only mode;
+</LI>
+<LI><TT>O_WRONLY (0x02)</TT> Opens the file in write only mode;
+</LI>
+<LI><TT>O_RDWR (0x03)</TT> Opens the file in read/write mode;
+</LI>
+<LI><TT>O_CREAT (0x04)</TT> Creates the file if it does not exist;
+</LI>
+<LI><TT>O_APPEND (0x08)</TT> In write mode, appends written text at the end of the file;
+</LI>
+<LI><TT>O_TRUNC (0x08)</TT> In write mode, deletes the content of the file as soon as it is opened.
+</LI>
+</UL>
+
+<P>
+It is mandatory to specify one of the first three modes. The fourth and the
+fifth modes are exclusive, you can not specify O_APPEND if you specify O_TRUNC
+(and vice versa). 
+
+<P>
+You can specify a combination of modes by simply adding the integer values of
+those flags. For instance, if you want to open a file in write only mode and
+append the written text to the end of file, you should specify the mode <SPAN CLASS="MATH"><IMG
+ WIDTH="90" HEIGHT="33" ALIGN="MIDDLE" BORDER="0"
+ SRC="img5.png"
+ ALT="$2 + 8 = 10$"></SPAN>.
+
+<P>
+The return value of the system call is the new file descriptor associated with
+the file, that can be further used with the other system calls. If there is an
+error, the return value will be -1.
+
+<P>
+<A NAME="689"></A>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html303"
+  HREF="node16.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html299"
+  HREF="node13.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html293"
+  HREF="node14.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html301"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html304"
+  HREF="node16.html">SYSCALL 2 - close()</A>
+<B> Up:</B> <A NAME="tex2html300"
+  HREF="node13.html">The SYSCALL instruction</A>
+<B> Previous:</B> <A NAME="tex2html294"
+  HREF="node14.html">SYSCALL 0 - exit()</A>
+ &nbsp; <B>  <A NAME="tex2html302"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+andrea
+2007-09-29
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,582 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>ALU Instructions</TITLE>
+<META NAME="description" CONTENT="ALU Instructions">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="node11.html">
+<LINK REL="previous" HREF="node9.html">
+<LINK REL="up" HREF="node9.html">
+<LINK REL="next" HREF="node11.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html237"
+  HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html233"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html227"
+  HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html235"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html238"
+  HREF="node11.html">Load/Store instructions</A>
+<B> Up:</B> <A NAME="tex2html234"
+  HREF="node9.html">The instruction set</A>
+<B> Previous:</B> <A NAME="tex2html228"
+  HREF="node9.html">The instruction set</A>
+ &nbsp; <B>  <A NAME="tex2html236"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00510000000000000000">
+ALU Instructions</A>
+</H1>
+The Arithmetic Logic Unit (in short, ALU) is a part of the execution unit of a
+CPU, that has the duty of doing arithmetical and logic operations. So in the ALU
+instructions group we will find those instructions that do this kind of
+operations.
+
+<P>
+ALU Instructions can be divided in two groups: <SPAN  CLASS="textbf">R-Type</SPAN> and
+<SPAN  CLASS="textbf">I-Type</SPAN>. 
+
+<P>
+<A NAME="427"></A>
+<A NAME="428"></A>
+<A NAME="429"></A>
+<A NAME="430"></A>
+<A NAME="431"></A>
+Four of those instructions make use of two special registers: LO and HI. They
+are internal CPU registers, whose value can be accessed through the
+<TT>MFLO</TT> and <TT>MFHI</TT> instructions.
+
+<P>
+Here's the list of R-Type ALU Instructions.
+
+<P>
+
+	<A NAME="435"></A>
+	<A NAME="436"></A>
+<UL>
+<LI><TT>AND rd, rs, rt</TT>
+<BR>
+Executes a bitwise AND between rs and rt, and puts the result into rd.
+
+<P>
+<A NAME="438"></A>
+	<A NAME="439"></A>
+</LI>
+<LI><TT>ADD rd, rs, rt</TT>
+<BR>
+Sums the content of 32-bits registers rs and rt, considering them as signed values, and puts
+	the result into rd. If an overflow occurs then trap.
+
+<P>
+<A NAME="441"></A>
+	<A NAME="442"></A>
+</LI>
+<LI><TT>ADDU rd, rs, rt</TT>
+<BR>
+Sums the content of 32-bits registers rs and rt, and puts the result into rd.
+	No integer overflow occurs under any circumstances.
+	<SPAN  CLASS="textbf">NB:</SPAN> The 'U' (stands for 'unsigned') in the instruction name is a misnomer; 
+this operation threats operands as signed values, but does not trap on overflow.
+
+<P>
+<A NAME="445"></A>
+	<A NAME="446"></A>
+</LI>
+<LI><TT>DADD rd, rs, rt</TT>
+<BR>
+Sums the content of 64-bits registers rs and rt, considering them as signed values, and puts
+	the result into rd. If an overflow occurs then trap.
+
+<P>
+<A NAME="448"></A>
+	<A NAME="449"></A>
+</LI>
+<LI><TT>DADDU rd, rs, rt</TT>
+<BR>
+Sums the content of 64-bits registers rs and rt, and puts the result into rd.
+	No integer overflow occurs under any circumstances.
+	<SPAN  CLASS="textbf">NB:</SPAN> The 'U' (stands for 'unsigned') in the instruction name is a misnomer; 
+this operation threats operands as signed values, but does not trap on overflow.
+
+<P>
+<A NAME="452"></A>
+	<A NAME="453"></A>
+</LI>
+<LI><TT>DDIV rs, rt</TT>
+<BR>
+Executes the division between 64-bits registers rs and rt, putting the 64-bits quotient in LO and the
+	64-bits remainder in HI.
+
+<P>
+<A NAME="455"></A>
+	<A NAME="456"></A>
+</LI>
+<LI><TT>DDIVU rs, rt</TT>
+<BR>
+Executes the division between 64-bits registers rs and rt, considering them as unsigned values
+    	and putting the 64-bits quotient in LO and the 64-bits remainder in HI.
+
+<P>
+<A NAME="458"></A>
+	<A NAME="459"></A>
+</LI>
+<LI><TT>DIV rs, rt</TT>
+<BR>
+Executes the division between 32-bits registers rs and rt, putting the 32-bits quotient in LO and the
+	32-bits remainder in HI.
+
+<P>
+<A NAME="461"></A>
+	<A NAME="462"></A>
+</LI>
+<LI><TT>DIVU rs, rt</TT>
+<BR>
+Executes the division between 32-bits registers rs and rt, considering them as unsigned values
+    	and putting the 32-bits quotient in LO and the 32-bits remainder in HI.
+
+<P>
+<A NAME="464"></A>
+	<A NAME="465"></A>
+</LI>
+<LI><TT>DMULT rs, rt</TT>
+<BR>
+Executes the multiplication between 64-bits registers rs and rt, putting the low-order 64-bits doubleword
+	of the result into special register LO and the high-order 64-bits doubleword of the result into special
+	register HI.
+
+<P>
+<A NAME="467"></A>
+	<A NAME="468"></A>
+</LI>
+<LI><TT>DMULTU rs, rt</TT>
+<BR>
+Executes the multiplication between 64-bits registers rs and rt, considering them as unsigned
+  	values and putting the low-order 64-bits doubleword of the result into special register LO 
+	and the high-order 64-bits doubleword of the result into special register HI.
+
+<P>
+<A NAME="470"></A>
+	<A NAME="471"></A>
+</LI>
+<LI><TT>DSLL rd, rt, sa</TT>
+<BR>
+Does a left shift of 64-bits register rt, by the amount specified in the
+	immediate (positive) value sa, and puts the result into 64-bits register rd. Empty bits are padded with
+	zeros.
+
+<P>
+<A NAME="473"></A>
+	<A NAME="474"></A>
+</LI>
+<LI><TT>DSLLV rd, rt, rs</TT>
+<BR>
+Does a left shift of 64-bits register rt, by the amount specified in low-order 6-bits of rs threatd as unsigned value,
+	and puts the result into 64-bits register rd. Empty bits are padded with zeros.
+
+<P>
+<A NAME="476"></A>
+	<A NAME="477"></A>
+</LI>
+<LI><TT>DSRA rd, rt, sa</TT>
+<BR>
+Does a right shift of 64-bits register rt, by the amount specified in the immediate (positive) value sa,
+	and puts the result into 64-bits register rd. Empty bits are padded with zeros if the leftmost bit
+	of rt is zero, otherwise they are padded with ones.
+
+<P>
+<A NAME="479"></A>
+	<A NAME="480"></A>
+</LI>
+<LI><TT>DSRAV rd, rt, rs</TT>
+<BR>
+Does a right shift of 64-bits register rt, by the amount specified in low-order 6-bits of rs threatd as unsigned value,
+	and puts the result into 64-bits register rd. Empty bits are padded with zeros if the leftmost bit
+	of rt is zero, otherwise they are padded with ones.
+
+<P>
+<A NAME="482"></A>
+	<A NAME="483"></A>
+</LI>
+<LI><TT>DSRL rd, rs, sa</TT>
+<BR>
+Does a right shift of 64-bits register rs, by the amount specified in the immediate (positive) value sa,
+	and puts the result into 64-bits register rd. Empty bits are padded with zeros.
+
+<P>
+<A NAME="485"></A>
+	<A NAME="486"></A>
+</LI>
+<LI><TT>DSRLV rd, rt, rs</TT>
+<BR>
+Does a right shift of 64-bits register rt, by the amount specified in low-order 6-bits of rs threatd as unsigned value,
+	and puts the result into 64-bits register rd. Empty bits are padded with zeros.
+
+<P>
+<A NAME="488"></A>
+	<A NAME="489"></A>
+</LI>
+<LI><TT>DSUB rd, rs, rt</TT>
+<BR>
+Subtracts the value of 64-bits register rt to 64-bits register rs, considering them as signed values,
+	and puts the result in rd. If an overflow occurs then trap.
+
+<P>
+<A NAME="491"></A>
+	<A NAME="492"></A>
+</LI>
+<LI><TT>DSUBU rd, rs, rt</TT>
+<BR>
+Subtracts the value of 64-bits register rt to 64-bits register rs, and puts the result in rd.
+	No integer overflow occurs under any circumstances.
+	<SPAN  CLASS="textbf">NB:</SPAN> The 'U' (stands for 'unsigned') in the instruction name is a misnomer; 
+this operation threats operands as signed values, but does not trap on overflow.
+
+<P>
+<A NAME="495"></A>
+	<A NAME="496"></A>
+</LI>
+<LI><TT>MFLO rd</TT>
+<BR>
+Moves the content of the special register LO into rd.
+
+<P>
+<A NAME="498"></A>
+	<A NAME="499"></A>
+</LI>
+<LI><TT>MFHI rd</TT>
+<BR>
+Moves the content of the special register HI into rd.
+
+<P>
+<A NAME="501"></A>
+	<A NAME="502"></A>
+</LI>
+<LI><TT>MOVN rd, rs, rt</TT>
+<BR>
+If rt is different from zero, then moves the content of rs into rd.
+
+<P>
+<A NAME="504"></A>
+	<A NAME="505"></A>
+</LI>
+<LI><TT>MOVZ rd, rs, rt</TT>
+<BR>
+If rt is equal to zero, then moves the content of rs into rd.
+
+<P>
+<A NAME="507"></A>
+	<A NAME="508"></A>
+</LI>
+<LI><TT>MULT rs, rt</TT>
+<BR>
+Executes the multiplication between 32-bits registers rs and rt, putting the low-order 32-bits word
+	of the result into special register LO and the high-order 32-bits word of the result into special
+	register HI.
+
+<P>
+<A NAME="510"></A>
+	<A NAME="511"></A>
+</LI>
+<LI><TT>MULTU rs, rt</TT>
+<BR>
+Executes the multiplication between 32-bits registers rs and rt, considering them as unsigned
+  	values and putting the low-order 32-bits word of the result into special register LO 
+	and the high-order 32-bits word of the result into special register HI.
+
+<P>
+<A NAME="513"></A>
+	<A NAME="514"></A>
+</LI>
+<LI><TT>OR rd, rs, rt</TT>
+<BR>
+Executes a bitwise OR between rs and rt, and puts the result into rd.
+
+<P>
+<A NAME="516"></A>
+	<A NAME="517"></A>
+</LI>
+<LI><TT>SLL rd, rt, sa</TT>
+<BR>
+Does a left shift of 32-bits register rt, by the amount specified in the immediate (positive) value sa,
+	and puts the result into 32-bits register rd. Empty bits are padded with zeros.
+
+<P>
+<A NAME="519"></A>
+	<A NAME="520"></A>
+</LI>
+<LI><TT>SLLV rd, rt, rs</TT>
+<BR>
+Does a left shift of 32-bits register rt, by the amount specified in low-order 5-bits of rs threatd as unsigned value,
+	and puts the result into 32-bits register rd. Empty bits are padded with zeros.
+
+<P>
+<A NAME="522"></A>
+	<A NAME="523"></A>
+</LI>
+<LI><TT>SRA rd, rt, sa</TT>
+<BR>
+Does a right shift of 32-bits register rt, by the amount specified in the immediate (positive) value sa,
+	and puts the result into 32-bits register rd. Empty bits are padded with zeros if the leftmost bit
+	of rt is zero, otherwise they are padded with ones.
+
+<P>
+<A NAME="525"></A>
+	<A NAME="526"></A>
+</LI>
+<LI><TT>SRAV rd, rt, rs</TT>
+<BR>
+Does a right shift of 32-bits register rt, by the amount specified in low-order 5-bits of rs threatd as unsigned value,
+	and puts the result into 32-bits register rd. Empty bits are padded with zeros if the leftmost bit
+	of rt is zero, otherwise they are padded with ones.
+
+<P>
+<A NAME="528"></A>
+	<A NAME="529"></A>
+</LI>
+<LI><TT>SRL rd, rs, sa</TT>
+<BR>
+Does a right shift of 32-bits register rs, by the amount specified in the immediate (positive) value sa,
+	and puts the result into 32-bits register rd. Empty bits are padded with zeros.
+
+<P>
+<A NAME="531"></A>
+	<A NAME="532"></A>
+</LI>
+<LI><TT>SRLV rd, rt, rs</TT>
+<BR>
+Does a right shift of 32-bits register rt, by the amount specified in low-order 5-bits of rs threatd as unsigned value,
+	and puts the result into 32-bits register rd. Empty bits are padded with zeros.
+
+<P>
+<A NAME="534"></A>
+	<A NAME="535"></A>
+</LI>
+<LI><TT>SUB rd, rs, rt</TT>
+<BR>
+Subtracts the value of 32-bits register rt to 32-bits register rs, considering them as signed values, and
+	puts the result in rd. If an overflow occurs then trap.
+
+<P>
+<A NAME="537"></A>
+	<A NAME="538"></A>
+</LI>
+<LI><TT>SUBU rd, rs, rt</TT>
+<BR>
+Subtracts the value of 32-bits register rt to 32-bits register rs, and
+	puts the result in rd. No integer overflow occurs under any circumstances.
+	<SPAN  CLASS="textbf">NB:</SPAN> The 'U' (stands for 'unsigned') in the instruction name is a misnomer; 
+this operation threats operands as signed values, but does not trap on overflow.
+
+<P>
+<A NAME="541"></A>
+	<A NAME="542"></A>
+</LI>
+<LI><TT>SLT rd, rs, rt</TT>
+<BR>
+Sets the value of rd to 1 if the value of rs is less than the value of rt,
+	otherwise sets it to 0. This instruction performs a signed comparison.
+
+<P>
+<A NAME="544"></A>
+	<A NAME="545"></A>
+</LI>
+<LI><TT>SLTU rd, rs, rt</TT>
+<BR>
+Sets the value of rd to 1 if the value of rs is less than the value of rt,
+	otherwise sets it to 0. This instruction performs an unsigned comparison.
+
+<P>
+<A NAME="547"></A>
+	<A NAME="548"></A>
+</LI>
+<LI><TT>XOR rd, rs, rt</TT>
+<BR>
+Executes a bitwise exclusive OR (XOR) between rs and rt, and puts the result into rd.
+</LI>
+</UL>
+
+<P>
+Here's the list of I-Type ALU Instructions.
+
+<P>
+
+	<A NAME="552"></A>
+	<A NAME="553"></A>
+<UL>
+<LI><TT>ADDI rt, rs, immediate</TT>
+<BR>
+Executes the sum between 32-bits register rs and the immediate value, putting the result in rt.
+	This instruction considers rs and the immediate value as signed values.
+	If an overflow occurs then trap.
+
+<P>
+<A NAME="555"></A>
+	<A NAME="556"></A>
+</LI>
+<LI><TT>ADDIU rt, rs, immediate</TT>
+<BR>
+Executes the sum between 32-bits register rs and the immediate value, putting the result in rt.
+	No integer overflow occurs under any circumstances.
+	<SPAN  CLASS="textbf">NB:</SPAN> The 'U' (stands for 'unsigned') in the instruction name is a misnomer; 
+this operation threats operands as signed values, but does not trap on overflow.
+
+<P>
+<A NAME="559"></A>
+	<A NAME="560"></A>
+</LI>
+<LI><TT>ANDI rt, rs, immediate</TT>
+<BR>
+Executes the bitwise AND between rs and the immediate value, putting the result in rt.
+
+<P>
+<A NAME="562"></A>
+	<A NAME="563"></A>
+</LI>
+<LI><TT>DADDI rt, rs, immediate</TT>
+<BR>
+Executes the sum between 64-bits register rs and the immediate value, putting the result in rt.
+	This instruction considers rs and the immediate value as signed values.
+	If an overflow occurs then trap.
+
+<P>
+<A NAME="565"></A>
+	<A NAME="566"></A>
+</LI>
+<LI><TT>DADDIU rt, rs, immediate</TT>
+<BR>
+Executes the sum between 64-bits register rs and the immediate value, putting the result in rt.
+	No integer overflow occurs under any circumstances.
+	<SPAN  CLASS="textbf">NB:</SPAN> The 'U' (stands for 'unsigned') in the instruction name is a misnomer; 
+this operation threats operands as signed values, but does not trap on overflow.
+
+<P>
+<A NAME="569"></A>
+	<A NAME="570"></A>
+</LI>
+<LI><TT>DADDUI rt, rs, immediate</TT>
+<BR>
+Executes the sum between 64-bits register rs and the immediate value, putting the result in rt.
+	No integer overflow occurs under any circumstances.
+	<SPAN  CLASS="textbf">NB:</SPAN> The 'U' (stands for 'unsigned') in the instruction name is a misnomer; 
+this operation threats operands as signed values, but does not trap on overflow.
+    <SPAN  CLASS="textbf">WARNING:</SPAN> This is a deprecated instruction, that
+does not belong to the MIPS64 instruction set, but it is included in the instruction
+set in order to maintain compatibility with other simulators.
+
+<P>
+<A NAME="574"></A>
+	<A NAME="575"></A>
+</LI>
+<LI><TT>LUI rt, immediate</TT>
+<BR>
+Loads the constant defined in the immediate value in the upper half (16 bit) of the
+	lower 32 bits of rt, sign-extending the upper 32 bits of the register.
+
+<P>
+<A NAME="577"></A>
+	<A NAME="578"></A>
+</LI>
+<LI><TT>ORI rt, rs, immediate</TT>
+<BR>
+Executes the bitwise OR between rs and the immediate value, putting the
+	result in rt.
+
+<P>
+<A NAME="580"></A>
+	<A NAME="581"></A>
+</LI>
+<LI><TT>SLTI rt, rs, immediate</TT>
+<BR>
+Sets the value of rt to 1 if the value of rs is less than the value of the
+	immediate, otherwise sets it to 0. This instruction performs a signed comparison.
+
+<P>
+<A NAME="583"></A>
+	<A NAME="584"></A>
+</LI>
+<LI><TT>SLTUI rt, rs, immediate</TT>
+<BR>
+Sets the value of rt to 1 if the value of rs is less than the value of the
+	immediate, otherwise sets it to 0. This instruction performs an unsigned comparison.
+
+<P>
+<A NAME="586"></A>
+	<A NAME="587"></A>
+</LI>
+<LI><TT>XORI rt, rs, immediate</TT>
+<BR>
+Executes a bitwise exclusive OR (XOR) between rs and the immediate value,
+	and puts the result into rt.
+
+<P>
+</LI>
+</UL>
+
+<P>
+
+<DIV CLASS="navigation"><HR>
+<!--Navigation Panel-->
+<A NAME="tex2html237"
+  HREF="node11.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<A NAME="tex2html233"
+  HREF="node9.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up.png"></A> 
+<A NAME="tex2html227"
+  HREF="node9.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev.png"></A> 
+<A NAME="tex2html235"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html238"
+  HREF="node11.html">Load/Store instructions</A>
+<B> Up:</B> <A NAME="tex2html234"
+  HREF="node9.html">The instruction set</A>
+<B> Previous:</B> <A NAME="tex2html228"
+  HREF="node9.html">The instruction set</A>
+ &nbsp; <B>  <A NAME="tex2html236"
+  HREF="node1.html">Contents</A></B> </DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+andrea
+2007-09-29
+</ADDRESS>
+</BODY>
+</HTML>

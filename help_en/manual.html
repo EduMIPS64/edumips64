@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!--Converted with LaTeX2HTML 2002-2-1 (1.71)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>EduMIPS64 0.5User Manual</TITLE>
+<META NAME="description" CONTENT="EduMIPS64 0.5User Manual">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META NAME="Generator" CONTENT="LaTeX2HTML v2002-2-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="node1.html">
+</HEAD>
+
+<BODY >
+
+<DIV CLASS="navigation"><!--Navigation Panel-->
+<A NAME="tex2html8"
+  HREF="node1.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next"
+ SRC="/usr/share/latex2html/icons/next.png"></A> 
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up"
+ SRC="/usr/share/latex2html/icons/up_g.png"> 
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous"
+ SRC="/usr/share/latex2html/icons/prev_g.png"> 
+<A NAME="tex2html6"
+  HREF="node1.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents"
+ SRC="/usr/share/latex2html/icons/contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html9"
+  HREF="node1.html">Contents</A>
+ &nbsp; <B>  <A NAME="tex2html7"
+  HREF="node1.html">Contents</A></B> 
+<BR>
+<BR></DIV>
+<!--End of Navigation Panel-->
+  
+<P>
+
+<BR>
+ <TABLE  WIDTH="100%">
+<TR><TD>
+<DIV ALIGN="RIGHT"1893>
+<BIG CLASS="XHUGE"><B>EduMIPS64 User Manual 
+</B></BIG>
+<BR>
+<BR>
+<BR>
+<BR>
+</DIV></TD></TR>
+</TABLE>
+
+<P>
+<BR>
+ <TABLE  WIDTH="100%">
+<TR><TD>
+<DIV ALIGN="RIGHT"1894>
+<B>by Andrea Spadaccini
+<BR>
+<BR>
+and the EduMIPS64 Team
+<BR>
+<BR>
+<BR>
+<BR></B> 
+Version&nbsp;1.3, 5th of June 2007
+
+</DIV></TD></TR>
+</TABLE>
+
+<P>
+<BR>
+
+<P>
+
+<P>
+<BR><HR>
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"></A>
+
+<UL CLASS="ChildLinks">
+<LI><A NAME="tex2html10"
+  HREF="node1.html">Contents</A>
+<LI><A NAME="tex2html11"
+  HREF="node2.html">List of Tables</A>
+<LI><A NAME="tex2html12"
+  HREF="node3.html">Introduction</A>
+<LI><A NAME="tex2html13"
+  HREF="node4.html">Source files format</A>
+<UL>
+<LI><A NAME="tex2html14"
+  HREF="node5.html">Sections</A>
+<UL>
+<LI><A NAME="tex2html15"
+  HREF="node6.html">The <TT>.data</TT> section</A>
+<LI><A NAME="tex2html16"
+  HREF="node7.html">The <TT>.code</TT> section</A>
+<LI><A NAME="tex2html17"
+  HREF="node8.html">The <TT>#include</TT> command</A>
+</UL>
+</UL>
+<BR>
+<LI><A NAME="tex2html18"
+  HREF="node9.html">The instruction set</A>
+<UL>
+<LI><A NAME="tex2html19"
+  HREF="node10.html">ALU Instructions</A>
+<LI><A NAME="tex2html20"
+  HREF="node11.html">Load/Store instructions</A>
+<LI><A NAME="tex2html21"
+  HREF="node12.html">Flow control instructions</A>
+<LI><A NAME="tex2html22"
+  HREF="node13.html">The <TT>SYSCALL</TT> instruction</A>
+<UL>
+<LI><A NAME="tex2html23"
+  HREF="node14.html"><TT>SYSCALL 0 - exit()</TT></A>
+<LI><A NAME="tex2html24"
+  HREF="node15.html"><TT>SYSCALL 1 - open()</TT></A>
+<LI><A NAME="tex2html25"
+  HREF="node16.html"><TT>SYSCALL 2 - close()</TT></A>
+<LI><A NAME="tex2html26"
+  HREF="node17.html"><TT>SYSCALL 3 - read()</TT></A>
+<LI><A NAME="tex2html27"
+  HREF="node18.html"><TT>SYSCALL 4 - write()</TT></A>
+<LI><A NAME="tex2html28"
+  HREF="node19.html"><TT>SYSCALL 5 - printf()</TT></A>
+</UL>
+<LI><A NAME="tex2html29"
+  HREF="node20.html">Other instructions</A>
+<UL>
+<LI><A NAME="tex2html30"
+  HREF="node21.html"><TT>BREAK</TT></A>
+<LI><A NAME="tex2html31"
+  HREF="node22.html"><TT>NOP</TT></A>
+<LI><A NAME="tex2html32"
+  HREF="node23.html"><TT>TRAP</TT></A>
+<LI><A NAME="tex2html33"
+  HREF="node24.html"><TT>HALT</TT></A>
+</UL>
+</UL>
+<BR>
+<LI><A NAME="tex2html34"
+  HREF="node25.html">The user interface</A>
+<UL>
+<LI><A NAME="tex2html35"
+  HREF="node26.html">The menu bar</A>
+<UL>
+<LI><A NAME="tex2html36"
+  HREF="node27.html">File</A>
+<LI><A NAME="tex2html37"
+  HREF="node28.html">Execute</A>
+<LI><A NAME="tex2html38"
+  HREF="node29.html">Configure</A>
+<LI><A NAME="tex2html39"
+  HREF="node30.html">Tools</A>
+<LI><A NAME="tex2html40"
+  HREF="node31.html">Window</A>
+<LI><A NAME="tex2html41"
+  HREF="node32.html">Help</A>
+</UL>
+<LI><A NAME="tex2html42"
+  HREF="node33.html">Frames</A>
+<UL>
+<LI><A NAME="tex2html43"
+  HREF="node34.html">Cycles</A>
+<LI><A NAME="tex2html44"
+  HREF="node35.html">Registers</A>
+<LI><A NAME="tex2html45"
+  HREF="node36.html">Statistics</A>
+<LI><A NAME="tex2html46"
+  HREF="node37.html">Pipeline</A>
+<LI><A NAME="tex2html47"
+  HREF="node38.html">Memory</A>
+<LI><A NAME="tex2html48"
+  HREF="node39.html">Code</A>
+<LI><A NAME="tex2html49"
+  HREF="node40.html">Input/Output</A>
+</UL>
+<LI><A NAME="tex2html50"
+  HREF="node41.html">Dialogs</A>
+<UL>
+<LI><A NAME="tex2html51"
+  HREF="node42.html">Settings</A>
+<LI><A NAME="tex2html52"
+  HREF="node43.html">Dinero Frontend</A>
+<LI><A NAME="tex2html53"
+  HREF="node44.html">Help</A>
+</UL>
+<LI><A NAME="tex2html54"
+  HREF="node45.html">Command line options</A>
+<LI><A NAME="tex2html55"
+  HREF="node46.html">Running EduMIPS64</A>
+</UL>
+<BR>
+<LI><A NAME="tex2html56"
+  HREF="node47.html">Code Examples</A>
+<LI><A NAME="tex2html57"
+  HREF="node48.html">About this document ...</A>
+</UL>
+<!--End of Table of Child-Links-->
+<BR><HR>
+<ADDRESS>
+andrea
+2007-09-29
+</ADDRESS>
+</BODY>
+</HTML>
