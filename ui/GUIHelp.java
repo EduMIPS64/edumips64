@@ -58,7 +58,6 @@ public class GUIHelp {
         	try{
         		URL url = new URL(s);
         		vector.addElement(url);
-                System.err.println("Aggiungo " + s);
         	}
         	catch(Exception exception){
         		System.err.println("cannot create URL for " + s);
