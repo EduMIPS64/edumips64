@@ -49,9 +49,15 @@ class LDC1 extends FPLoading {
 		Dinero din=Dinero.getInstance();
 		din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),8);
 		
-		MemoryElement memEl = memory.getCell((int)address);
+		/*MemoryElement memEl = memory.getCell((int)address);
 		//reading from the memory element and saving values on LMD register
-		TR[LMD_REGISTER].setBits(memEl.getBinString(),0);
+		TR[LMD_REGISTER].setBits(memEl.getBinString(),0);*/
+            
+                 /*MODIFICA*/
+                String value=memory.readD((int)address);
+                TR[LMD_REGISTER].setBits(value,0);
+                /*MODIFICA FINE*/
+                
 		if(enableForwarding) {
 			doWB();
 		}

@@ -49,9 +49,13 @@ class SWC1 extends FPStoring {
 			//For the trace file
 			Dinero din=Dinero.getInstance();
 			din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),4);
-			MemoryElement memEl = memory.getCell((int)address);
+			/*MemoryElement memEl = memory.getCell((int)address);
 			//writing on the memory element the RT register
-			memEl.writeWord(TR[RT_FIELD].readWord(0), (int) (address%8));
+			memEl.writeWord(TR[RT_FIELD].readWord(0), (int) (address%8));*/
+                    
+                          //MODIFICA
+                        memory.writeW((int)address,TR[RT_FIELD].readWord(0));
+                        //MODIFICA FINE
 		} catch(NotAlingException er) {
 			throw new AddressErrorException();
 		} catch(Exception e) {

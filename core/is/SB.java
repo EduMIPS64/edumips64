@@ -50,10 +50,16 @@ class SB extends Storing {
 			//For the trace file
 			Dinero din=Dinero.getInstance();
 			din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),1);
-			MemoryElement memEl = memory.getCell((int)address);
+			/*
+                        MemoryElement memEl = memory.getCell((int)address);
 			//writing on the memory element the RT register
 			memEl.writeByte(TR[RT_FIELD].readByte(0), (int) (address%8));
-			if(enableForwarding) {
+			*/
+                        //MODIFICA
+                        memory.writeB((int)address,TR[RT_FIELD].readByte(0));
+                        //MODIFICA FINE
+                    
+                        if(enableForwarding) {
 				WB();
 			}
 		}

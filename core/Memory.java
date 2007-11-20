@@ -30,8 +30,10 @@ import edumips64.core.is.*;
 /**  This class models the main memory of a computer, with 64-bit elements (that is 8 byte).
  * The Memory is composed of MemoryElement and its size is not limited.
  */
-public class Memory{
+public class Memory implements MemoryAccessor {
 	// cancellabile?
+        int numStore=0;
+        int numLoad=0;
 	private List<MemoryElement> cells;
     private List<Instruction> instructions;
 	
@@ -101,6 +103,112 @@ public class Memory{
 		return cells.get(index);
 	}
 
+        public void writeB(int address, int data) throws MemoryElementNotFoundException,IrregularWriteOperationException{
+		int index = address / 8;
+                if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+               cells.get(index).writeByte(data,(int)(address%8));
+               numStore++;
+                }
+    
+    public void writeD(int address, String data) throws MemoryElementNotFoundException,IrregularStringOfBitsException
+                {
+		int index = address / 8;
+		if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+               cells.get(index).setBits(data,0);
+               numStore++;
+                }
+   
+    public void writeH(int address,int data) throws MemoryElementNotFoundException,IrregularWriteOperationException,NotAlingException{
+		int index = address / 8;
+		if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+               cells.get(index).writeHalf(data,(int)(address%8));
+               numStore++;
+                }
+  
+    public void writeW(int address,int data) throws MemoryElementNotFoundException,IrregularWriteOperationException,NotAlingException
+                {
+		int index = address / 8;
+		if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+               cells.get(index).writeWord(data,(int)(address%8));
+               numStore++;
+                }
+                
+    public int readB(int address) throws MemoryElementNotFoundException
+            {
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            int value=cells.get(index).readByte((int)(address%8)); 
+            numLoad++;
+            return value;
+            }
+            
+    public int readBU(int address) throws MemoryElementNotFoundException
+            {
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            int value=cells.get(index).readByteUnsigned((int)(address%8));
+            numLoad++;
+            return value;
+            }
+            
+    public int readH(int address) throws MemoryElementNotFoundException,IrregularStringOfBitsException,NotAlingException
+            {
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            int value=cells.get(index).readHalf((int)(address%8));
+            numLoad++;
+            return value;
+            }
+           
+    public int readHU(int address) throws MemoryElementNotFoundException,NotAlingException
+            {
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            int value=cells.get(index).readHalfUnsigned((int)(address%8));
+            numLoad++;
+            return value;
+            }
+            
+    public int readW(int address) throws MemoryElementNotFoundException,NotAlingException
+            {
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            int value=cells.get(index).readWord((int)(address%8));
+            numLoad++;
+            return value;
+            }
+            
+    public long readWU(int address) throws MemoryElementNotFoundException,NotAlingException
+            {
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            long value=cells.get(index).readWordUnsigned((int)(address%8));
+            numLoad++;
+            return value;
+            }
+           
+    
+            
+    public String readD(int address) throws MemoryElementNotFoundException
+            {
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            String value=cells.get(index).getBinString(); 
+            numLoad++;
+            return value;
+            }
+        
 	/** This method resets the memory*/
 	public void reset()
 	{

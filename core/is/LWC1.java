@@ -50,7 +50,7 @@ class LWC1 extends FPLoading {
 		//For the trace file
 		Dinero din=Dinero.getInstance();
 		din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),4);
-		MemoryElement memEl = memory.getCell((int)address);
+		/*MemoryElement memEl = memory.getCell((int)address);
 		try {
 			//reading from the memory element and saving values on LMD register
 			TR[LMD_REGISTER].writeWord(memEl.readWord((int)(address%8)));
@@ -59,7 +59,19 @@ class LWC1 extends FPLoading {
 			}
 		} catch(NotAlingException er) {
 			throw new AddressErrorException();
+		}*/
+	/*MODIFICA*/
+                try{
+                int value=memory.readW((int)address);
+                TR[LMD_REGISTER].writeWord(value);
+                if(enableForwarding) {
+				doWB();
+			}
+		} catch(NotAlingException er) {
+			throw new AddressErrorException();
 		}
-	}
+            /*MODIFICA FINE*/ 
+            
+        }
 	
 }

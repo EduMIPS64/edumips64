@@ -55,9 +55,13 @@ class SH extends Storing
 			//For the trace file
 			Dinero din=Dinero.getInstance();
 			din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),2);
-			MemoryElement memEl = memory.getCell((int)address);
+			/*MemoryElement memEl = memory.getCell((int)address);
 			//writing on the memory element the RT register
-			memEl.writeHalf(TR[RT_FIELD].readHalf(0), (int) (address%8));
+			memEl.writeHalf(TR[RT_FIELD].readHalf(0), (int) (address%8));*/
+                        
+                         //MODIFICA
+                        memory.writeH((int)address,TR[RT_FIELD].readHalf(0));
+                        //MODIFICA FINE
 			if(enableForwarding)
 			{
 				WB();

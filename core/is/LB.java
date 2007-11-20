@@ -44,15 +44,27 @@ class LB extends Loading {
 	
 	public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
 		
-		//restoring the address from the temporary register
-		long address=TR[OFFSET_PLUS_BASE].getValue();
+		/**restoring the address from the temporary register*/
+		/*(s) assegno alla var long address il contenuto del registro(di Instruction) TR[4]*/
+                long address=TR[OFFSET_PLUS_BASE].getValue();
 		//For the trace file
-		Dinero din=Dinero.getInstance();
-		din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),1);
-		MemoryElement memEl = memory.getCell((int)address);
-		//reading from the memory element and saving values on LMD register
-		TR[LMD_REGISTER].writeByte(memEl.readByte((int)(address%8)));
-		if(enableForwarding) {
+		//(s) Aquisisco l'unica istanza din della classe DINERO
+                Dinero din=Dinero.getInstance();
+                din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),1);
+		
+                
+                /*MemoryElement memEl = memory.getCell((int)address);
+		reading from the memory element and saving values on LMD register TR[3] 
+                TR[LMD_REGISTER].writeByte(memEl.readByte((int)(address%8)));
+		*/
+            
+                /*MODIFICA*/
+                int value=memory.readB((int)address);
+                TR[LMD_REGISTER].writeByte(value);
+                /*MODIFICA FINE*/
+            
+                //invoco la funzione doWB
+                if(enableForwarding) {
 			doWB();
 		}
 	}

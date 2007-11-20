@@ -48,7 +48,7 @@ class LHU extends Loading {
 		//For the trace file
 		Dinero din=Dinero.getInstance();
 		din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),2);
-		MemoryElement memEl = memory.getCell((int)address);
+		/*MemoryElement memEl = memory.getCell((int)address);
 		try {
 			//reading from the memory element and saving values on LMD register
 			TR[LMD_REGISTER].writeHalfUnsigned(memEl.readHalfUnsigned((int)(address%8)));
@@ -58,7 +58,21 @@ class LHU extends Loading {
 			
 		} catch(NotAlingException er) {
 			throw new AddressErrorException();
+		}*/
+            
+            /*MODIFICA*/
+               
+                try{
+                int value=memory.readHU((int)address);   
+                TR[LMD_REGISTER].writeHalfUnsigned(value);
+                if(enableForwarding) {
+				doWB();
+			}
+		} catch(NotAlingException er) {
+			throw new AddressErrorException();
 		}
+            /*MODIFICA FINE*/ 
+            
 	}
 	
 }

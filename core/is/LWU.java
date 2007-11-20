@@ -48,7 +48,7 @@ class LWU extends Loading {
 		//For the trace file
 		Dinero din=Dinero.getInstance();
 		din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),4);
-		MemoryElement memEl = memory.getCell((int)address);
+		/*MemoryElement memEl = memory.getCell((int)address);
 		try {
 			//reading from the memory element and saving values on LMD register
 			TR[LMD_REGISTER].writeWordUnsigned(memEl.readWordUnsigned((int)(address%8)));
@@ -57,7 +57,18 @@ class LWU extends Loading {
 			}
 		} catch(NotAlingException er) {
 			throw new AddressErrorException();
+		}*/
+            /*MODIFICA*/
+                try{
+                long value=memory.readWU((int)address);
+                TR[LMD_REGISTER].writeWordUnsigned(value);
+                if(enableForwarding) {
+				doWB();
+			}
+		} catch(NotAlingException er) {
+			throw new AddressErrorException();
 		}
+            /*MODIFICA FINE*/ 
 	}
 	
 }
