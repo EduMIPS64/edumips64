@@ -26,17 +26,19 @@ package edumips64.core;
 import edumips64.utils.*;
 import java.util.*;
 import edumips64.core.is.*;
+import java.io.*;
 
 /**  This class models the main memory of a computer, with 64-bit elements (that is 8 byte).
  * The Memory is composed of MemoryElement and its size is not limited.
  */
 public class Memory implements MemoryAccessor {
-	// cancellabile?
         int numStore=0;
         int numLoad=0;
+        private LinkedList <String> MemoryData;
+        int offset = 0;
+        
 	private List<MemoryElement> cells;
-    private List<Instruction> instructions;
-	
+        private List<Instruction> instructions;
 	private Map<Integer, String> mem_comments;
 
 	private int instr_num;
@@ -45,10 +47,12 @@ public class Memory implements MemoryAccessor {
 	
 	private Memory(){
 		edumips64.Main.logger.debug("Building Memory: " + this.hashCode());
-		mem_comments = new HashMap<Integer,String>();
+		MemoryData = new LinkedList <String>();
+            
+                mem_comments = new HashMap<Integer,String>();
 		cells = new ArrayList<MemoryElement>();
 		instr_num = 0;
-        instructions = new LinkedList<Instruction>();
+                instructions = new LinkedList<Instruction>();
 		for(int i = 0; i < CPU.DATALIMIT; i++)
 			cells.add(new MemoryElement(i*8));
 		for(int i = 0; i < CPU.CODELIMIT; i++)
@@ -109,7 +113,27 @@ public class Memory implements MemoryAccessor {
 			throw new MemoryElementNotFoundException();
                cells.get(index).writeByte(data,(int)(address%8));
                numStore++;
-                }
+                if(offset == 0)
+		{	
+			findOffset();
+		}
+		
+		try
+                    {	
+                    long addr = Long.parseLong(Converter.hexToLong("0x"+Converter.binToHex(Converter.positiveIntToBin(64,address))));
+                    addr+=offset;
+                    MemoryData.add("w "+Converter.binToHex(Converter.intToBin(64,addr))+" "+1);
+                    }
+                catch(IrregularStringOfHexException ex)
+                    {
+                    ex.printStackTrace();
+                    }
+		catch(IrregularStringOfBitsException ex)
+		{
+			ex.printStackTrace();
+		}
+                
+            }
     
     public void writeD(int address, String data) throws MemoryElementNotFoundException,IrregularStringOfBitsException
                 {
@@ -118,7 +142,27 @@ public class Memory implements MemoryAccessor {
 			throw new MemoryElementNotFoundException();
                cells.get(index).setBits(data,0);
                numStore++;
-                }
+                 if(offset == 0)
+		{	
+			findOffset();
+		}
+		
+		try
+                    {	
+                    long addr = Long.parseLong(Converter.hexToLong("0x"+Converter.binToHex(Converter.positiveIntToBin(64,address))));
+                    addr+=offset;
+                    MemoryData.add("w "+Converter.binToHex(Converter.intToBin(64,addr))+" "+8);
+                    }
+                catch(IrregularStringOfHexException ex)
+                    {
+                    ex.printStackTrace();
+                    }
+		catch(IrregularStringOfBitsException ex)
+		{
+			ex.printStackTrace();
+		}
+                
+            }
    
     public void writeH(int address,int data) throws MemoryElementNotFoundException,IrregularWriteOperationException,NotAlingException{
 		int index = address / 8;
@@ -126,7 +170,27 @@ public class Memory implements MemoryAccessor {
 			throw new MemoryElementNotFoundException();
                cells.get(index).writeHalf(data,(int)(address%8));
                numStore++;
-                }
+                 if(offset == 0)
+		{	
+			findOffset();
+		}
+		
+		try
+                    {	
+                    long addr = Long.parseLong(Converter.hexToLong("0x"+Converter.binToHex(Converter.positiveIntToBin(64,address))));
+                    addr+=offset;
+                    MemoryData.add("w "+Converter.binToHex(Converter.intToBin(64,addr))+" "+2);
+                    }
+                catch(IrregularStringOfHexException ex)
+                    {
+                    ex.printStackTrace();
+                    }
+		catch(IrregularStringOfBitsException ex)
+		{
+			ex.printStackTrace();
+		}
+                
+            }
   
     public void writeW(int address,int data) throws MemoryElementNotFoundException,IrregularWriteOperationException,NotAlingException
                 {
@@ -135,7 +199,27 @@ public class Memory implements MemoryAccessor {
 			throw new MemoryElementNotFoundException();
                cells.get(index).writeWord(data,(int)(address%8));
                numStore++;
-                }
+                 if(offset == 0)
+		{	
+			findOffset();
+		}
+		
+		try
+                    {	
+                    long addr = Long.parseLong(Converter.hexToLong("0x"+Converter.binToHex(Converter.positiveIntToBin(64,address))));
+                    addr+=offset;
+                    MemoryData.add("w "+Converter.binToHex(Converter.intToBin(64,addr))+" "+4);
+                    }
+                catch(IrregularStringOfHexException ex)
+                    {
+                    ex.printStackTrace();
+                    }
+		catch(IrregularStringOfBitsException ex)
+		{
+			ex.printStackTrace();
+		}
+                
+            }
                 
     public int readB(int address) throws MemoryElementNotFoundException
             {
@@ -144,7 +228,36 @@ public class Memory implements MemoryAccessor {
 			throw new MemoryElementNotFoundException();
             int value=cells.get(index).readByte((int)(address%8)); 
             numLoad++;
-            return value;
+            if(offset == 0)
+		{	
+			findOffset();
+		}
+		
+		try
+                    {	
+                    long addr = Long.parseLong(Converter.hexToLong("0x"+Converter.binToHex(Converter.positiveIntToBin(64,address))));
+                    addr+=offset;
+                    MemoryData.add("r "+Converter.binToHex(Converter.intToBin(64,addr))+" "+1);
+                    }
+                catch(IrregularStringOfHexException ex)
+                    {
+                    ex.printStackTrace();
+                    }
+		catch(IrregularStringOfBitsException ex)
+		{
+			ex.printStackTrace();
+		}
+                return value;
+            }
+            
+   //(s)Utilizzata in Syscall analoga a meno della scrittura nel triceFile di memory
+            
+    public int readBNT(int address) throws MemoryElementNotFoundException
+            {
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            return cells.get(index).readByte((int)(address%8));
             }
             
     public int readBU(int address) throws MemoryElementNotFoundException
@@ -154,8 +267,28 @@ public class Memory implements MemoryAccessor {
 			throw new MemoryElementNotFoundException();
             int value=cells.get(index).readByteUnsigned((int)(address%8));
             numLoad++;
-            return value;
+            if(offset == 0)
+		{	
+			findOffset();
+		}
+		
+		try
+                    {	
+                    long addr = Long.parseLong(Converter.hexToLong("0x"+Converter.binToHex(Converter.positiveIntToBin(64,address))));
+                    addr+=offset;
+                    MemoryData.add("r "+Converter.binToHex(Converter.intToBin(64,addr))+" "+1);
+                    }
+                catch(IrregularStringOfHexException ex)
+                    {
+                    ex.printStackTrace();
+                    }
+		catch(IrregularStringOfBitsException ex)
+		{
+			ex.printStackTrace();
+		}
+                return value;
             }
+            
             
     public int readH(int address) throws MemoryElementNotFoundException,IrregularStringOfBitsException,NotAlingException
             {
@@ -164,8 +297,28 @@ public class Memory implements MemoryAccessor {
 			throw new MemoryElementNotFoundException();
             int value=cells.get(index).readHalf((int)(address%8));
             numLoad++;
-            return value;
+            if(offset == 0)
+		{	
+			findOffset();
+		}
+		
+		try
+                    {	
+                    long addr = Long.parseLong(Converter.hexToLong("0x"+Converter.binToHex(Converter.positiveIntToBin(64,address))));
+                    addr+=offset;
+                    MemoryData.add("r "+Converter.binToHex(Converter.intToBin(64,addr))+" "+2);
+                    }
+                catch(IrregularStringOfHexException ex)
+                    {
+                    ex.printStackTrace();
+                    }
+		catch(IrregularStringOfBitsException ex)
+		{
+			ex.printStackTrace();
+		}
+                return value;
             }
+            
            
     public int readHU(int address) throws MemoryElementNotFoundException,NotAlingException
             {
@@ -174,8 +327,28 @@ public class Memory implements MemoryAccessor {
 			throw new MemoryElementNotFoundException();
             int value=cells.get(index).readHalfUnsigned((int)(address%8));
             numLoad++;
-            return value;
+            if(offset == 0)
+		{	
+			findOffset();
+		}
+		
+		try
+                    {	
+                    long addr = Long.parseLong(Converter.hexToLong("0x"+Converter.binToHex(Converter.positiveIntToBin(64,address))));
+                    addr+=offset;
+                    MemoryData.add("r "+Converter.binToHex(Converter.intToBin(64,addr))+" "+2);
+                    }
+                catch(IrregularStringOfHexException ex)
+                    {
+                    ex.printStackTrace();
+                    }
+		catch(IrregularStringOfBitsException ex)
+		{
+			ex.printStackTrace();
+		}
+                return value;
             }
+            
             
     public int readW(int address) throws MemoryElementNotFoundException,NotAlingException
             {
@@ -184,8 +357,28 @@ public class Memory implements MemoryAccessor {
 			throw new MemoryElementNotFoundException();
             int value=cells.get(index).readWord((int)(address%8));
             numLoad++;
-            return value;
+            if(offset == 0)
+		{	
+			findOffset();
+		}
+		
+		try
+                    {	
+                    long addr = Long.parseLong(Converter.hexToLong("0x"+Converter.binToHex(Converter.positiveIntToBin(64,address))));
+                    addr+=offset;
+                    MemoryData.add("r "+Converter.binToHex(Converter.intToBin(64,addr))+" "+4);
+                    }
+                catch(IrregularStringOfHexException ex)
+                    {
+                    ex.printStackTrace();
+                    }
+		catch(IrregularStringOfBitsException ex)
+		{
+			ex.printStackTrace();
+		}
+                return value;
             }
+            
             
     public long readWU(int address) throws MemoryElementNotFoundException,NotAlingException
             {
@@ -194,8 +387,28 @@ public class Memory implements MemoryAccessor {
 			throw new MemoryElementNotFoundException();
             long value=cells.get(index).readWordUnsigned((int)(address%8));
             numLoad++;
-            return value;
+            if(offset == 0)
+		{	
+			findOffset();
+		}
+		
+		try
+                    {	
+                    long addr = Long.parseLong(Converter.hexToLong("0x"+Converter.binToHex(Converter.positiveIntToBin(64,address))));
+                    addr+=offset;
+                    MemoryData.add("r "+Converter.binToHex(Converter.intToBin(64,addr))+" "+4);
+                    }
+                catch(IrregularStringOfHexException ex)
+                    {
+                    ex.printStackTrace();
+                    }
+		catch(IrregularStringOfBitsException ex)
+		{
+			ex.printStackTrace();
+		}
+                return value;
             }
+            
            
     
             
@@ -206,10 +419,100 @@ public class Memory implements MemoryAccessor {
 			throw new MemoryElementNotFoundException();
             String value=cells.get(index).getBinString(); 
             numLoad++;
-            return value;
+            if(offset == 0)
+		{	
+			findOffset();
+		}
+		
+		try
+                    {	
+                    long addr = Long.parseLong(Converter.hexToLong("0x"+Converter.binToHex(Converter.positiveIntToBin(64,address))));
+                    addr+=offset;
+                    MemoryData.add("r "+Converter.binToHex(Converter.intToBin(64,addr))+" "+8);
+                    }
+                catch(IrregularStringOfHexException ex)
+                    {
+                    ex.printStackTrace();
+                    }
+		catch(IrregularStringOfBitsException ex)
+		{
+			ex.printStackTrace();
+		}
+                return value;
+            }
+            
+            
+        public long readVal(int address) throws MemoryElementNotFoundException{
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            return cells.get(index).getValue();
+        }
+            
+            
+        
+          public void SyscallL(int address){
+                if(offset == 0)
+		{	
+			findOffset();
+		}
+		
+		try
+                    {	
+                    long addr = Long.parseLong(Converter.hexToLong("0x"+Converter.binToHex(Converter.positiveIntToBin(64,address))));
+                    addr+=offset;
+                    MemoryData.add("r "+Converter.binToHex(Converter.intToBin(64,addr))+" "+8);
+                    }
+                catch(IrregularStringOfHexException ex)
+                    {
+                    ex.printStackTrace();
+                    }
+		catch(IrregularStringOfBitsException ex)
+		{
+			ex.printStackTrace();
+		}
+            }
+            
+        
+    public void findOffset ()
+	{
+		CPU cpu = CPU.getInstance();
+		int i;
+		for (i=0; i<CPU.CODELIMIT; i++)
+		{	
+			if(cpu.getMemory().getInstruction(i * 4).getName().equals(" "))
+				break;
+		}
+
+		offset = i*4;
+		offset+=offset%8;		
+	}
+       
+        /** Write a file comatible with DineroIV cache simulator 
+        * @param filename A String with the system-dependent file name
+        */
+        public void WriteXdinFile (String filename) throws java.io.IOException
+	{
+        BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+        //Scrivo il contenuto della lista dineroData nel file filename
+        writeTraceData(out);
+        out.close();
+	}
+        
+	
+        /** Writes the trace data to a Writer
+	 *  @param buff the Writer to output the data to
+	 */
+	public void writeTraceData(Writer buff) throws java.io.IOException {
+		for (int i=0; i < MemoryData.size();i++) {
+			String tmp = MemoryData.get(i) + "\n";
+			//scrivo la stringa in buff e dunque nel file filename.
+                        buff.write(tmp,0,tmp.length());
+		}
             }
         
-	/** This method resets the memory*/
+        
+        /** This method resets the memory*/
 	public void reset()
 	{
 		for(int i = 0; i < CPU.DATALIMIT; i++)

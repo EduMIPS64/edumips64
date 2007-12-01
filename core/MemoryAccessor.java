@@ -7,8 +7,6 @@ import edumips64.core.is.*;
 public interface MemoryAccessor{
         public int getMemorySize();
         public int getInstructionsNumber();
-        /*Mi pare che in una interfaccia non possono essere messi metodi statici, dunque lo ometto?! 
-        public static Memory getInstance();*/
         public int getInstructionIndex(Instruction i);
         public MemoryElement getCell(int address) throws MemoryElementNotFoundException;
         public void reset();
@@ -26,9 +24,14 @@ public interface MemoryAccessor{
         public long readWU(int address) throws MemoryElementNotFoundException,NotAlingException;
         public String readD(int address) throws MemoryElementNotFoundException;
         
+        public long readVal(int address) throws MemoryElementNotFoundException;
+        public int readBNT(int address) throws MemoryElementNotFoundException;
+            
+        
         public void writeB(int address, int data) throws MemoryElementNotFoundException,IrregularWriteOperationException;
         public void writeD(int address, String data) throws MemoryElementNotFoundException,IrregularStringOfBitsException;;
         public void writeH(int address,int data) throws MemoryElementNotFoundException,IrregularWriteOperationException,NotAlingException;
         public void writeW(int address,int data) throws MemoryElementNotFoundException,IrregularWriteOperationException,NotAlingException;
         
+         public void findOffset();
         }

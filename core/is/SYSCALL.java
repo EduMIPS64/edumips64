@@ -92,19 +92,32 @@ public class SYSCALL extends Instruction {
 
     public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
 		edumips64.Main.logger.log("SYSCALL (" + this.hashCode() + ") -> MEM");
-		if(syscall_n == 1) {
-			// int open(const char* filename, int flags)
+		//(s) Prendo l'istanza di Memory
+                Memory mem= Memory.getInstance();
+                
+                if(syscall_n == 1) {
+			
+                        // int open(const char* filename, int flags)
 			String filename = fetchString(address);
 			int flags_address = (int)address + filename.length();
 			flags_address += 8 - (flags_address % 8);
-
+                       
+                        /*
 			MemoryElement flags_m = Memory.getInstance().getCell((int)flags_address);
 			int flags = (int)flags_m.getValue();
-
-			// Memory access for the string and the flags (note the <=)
+                        */
+                        int flags=(int)mem.readVal((int)flags_address);
+                    
+                        // Memory access for the string and the flags (note the <=)
 			for(int i = (int)address; i <= flags_address; i += 8)
 				din.Load(Converter.binToHex(Converter.positiveIntToBin(64,i)),8);
-
+                        
+                        for(int i = (int)address; i <= flags_address; i += 8)
+                                mem.SyscallL(i);
+                       
+                        
+                        
+                        
 			edumips64.Main.logger.debug("We must open " + filename + " with flags " + flags);
 
 			return_value = -1;
@@ -124,9 +137,13 @@ public class SYSCALL extends Instruction {
 		}
 		else if(syscall_n == 2) {
 			// int close(int fd)
-			MemoryElement fd_cell = Memory.getInstance().getCell((int)address);
+			/*
+                        MemoryElement fd_cell = Memory.getInstance().getCell((int)address);
 			int fd = (int)fd_cell.getValue();
-			edumips64.Main.logger.debug("Closing fd " + fd);
+			*/
+                        int fd=(int)mem.readVal((int)address);
+                        
+                        edumips64.Main.logger.debug("Closing fd " + fd);
 			return_value = -1;
 			try {
 				return_value = edumips64.Main.iom.close(fd);
@@ -141,17 +158,26 @@ public class SYSCALL extends Instruction {
 			int fd, count;
 			long buf_addr;
 
-			MemoryElement temp = Memory.getInstance().getCell((int)address);
+			/*MemoryElement temp = Memory.getInstance().getCell((int)address);
 			fd = (int)temp.getValue();
-			address += 8;
+			*/
+                        fd=(int)mem.readVal((int)address);
+                    
+                        address += 8;
 
-			temp = Memory.getInstance().getCell((int)address);
+			/*temp = Memory.getInstance().getCell((int)address);
 			buf_addr = temp.getValue();
-			address += 8;
+			*/
+                        buf_addr=(int)mem.readVal((int)address);
+                    
+                        address += 8;
 
-			temp = Memory.getInstance().getCell((int)address);
+			/*temp = Memory.getInstance().getCell((int)address);
 			count = (int)temp.getValue();
-			address += 8;
+			*/
+                        count=(int)mem.readVal((int)address);
+                        
+                        address += 8;
 			
 			return_value = -1;
 			try {
@@ -180,12 +206,17 @@ public class SYSCALL extends Instruction {
             // In the address variable (content of R14) we have the address of
             // the format string, that we get and put in the format_string_address variable
 			edumips64.Main.logger.debug("Reading memory cell at address " + address + ", searching for the address of the format string");
-			MemoryElement tempMemCell = memory.getCell((int)address);
-            int format_string_address = (int)tempMemCell.getValue();
-
+                        /*
+                        MemoryElement tempMemCell = memory.getCell((int)address);
+                        int format_string_address = (int)tempMemCell.getValue();
+                        */
+                        int format_string_address=(int)mem.readVal((int)address);
+                    
             // Recording in the tracefile the last memory access
             din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),8);
-            
+            /**//**//**//**//**/
+              mem.SyscallL((int)address);      
+            /**//**//**//**//**/        
             // Fetching the format string
 			String format_string = fetchString(format_string_address);
 			edumips64.Main.logger.debug("Read " + format_string);
@@ -200,7 +231,12 @@ public class SYSCALL extends Instruction {
             t1 += 8 - (t1 % 8);
 			for(int i = (int)format_string_address; i < t1; i += 8)
 				din.Load(Converter.binToHex(Converter.positiveIntToBin(64,i)),8);
-			
+			/**//**//**//**//**//**//**//**/
+                        for(int i = (int)format_string_address; i < t1; i += 8)
+                                mem.SyscallL(i);
+                        /**//**//**//**//**//**//**/
+                        
+                        
 			int oldIndex = 0, newIndex = 0;
 			while((newIndex = format_string.indexOf('%', oldIndex)) >= 0) {
 				char type = format_string.charAt(newIndex + 1);
@@ -208,9 +244,13 @@ public class SYSCALL extends Instruction {
 				temp.append(format_string.substring(oldIndex, newIndex));
 				switch(type) {
 					case 's':		// %s
-                        tempMemCell = memory.getCell(next_param_address);
-                        int str_address = (int)tempMemCell.getValue();
-						edumips64.Main.logger.debug("Retrieving the string @ " + str_address + "...");
+                                   /*
+                                    tempMemCell = memory.getCell(next_param_address);
+                                    int str_address = (int)tempMemCell.getValue();
+                                   */
+                                    int str_address=(int)mem.readVal((int)next_param_address);
+
+                                        edumips64.Main.logger.debug("Retrieving the string @ " + str_address + "...");
 						String param = fetchString(str_address);
 
                         next_param_address += 8;
@@ -225,20 +265,27 @@ public class SYSCALL extends Instruction {
                         t2 += 8 - (t2 % 8);
 						for(int i = str_address; i < t2; i += 8)
 							din.Load(Converter.binToHex(Converter.positiveIntToBin(64,i)),8);
-
+                                                /**//**//**//**/
+                                                for(int i = str_address; i < t2; i += 8)
+                                                        mem.SyscallL(i);
+                                                /**//**//**//**/       
 						edumips64.Main.logger.debug("Got " + param);
 						temp.append(param);
 						break;
 					case 'i':		// %i
 					case 'd':		// %d
 						edumips64.Main.logger.debug("Retrieving the integer @ " + next_param_address + "...");
-						MemoryElement memCell = memory.getCell((int)next_param_address);
 						
-						// Tracefile entry for this memory access
+                                                //MemoryElement memCell = memory.getCell((int)next_param_address);
+						Long val=mem.readVal((int)next_param_address);
+                                                // Tracefile entry for this memory access
 						din.Load(Converter.binToHex(Converter.positiveIntToBin(64,next_param_address)),8);
-
-						Long val = memCell.getValue();
-						next_param_address += 8;
+                                                /**//**//**//**/
+                                                mem.SyscallL(next_param_address);
+                                                /**//**//**//**/
+						//Long val = memCell.getValue();
+                                        
+                                                next_param_address += 8;
 						temp.append(val.toString());
 						edumips64.Main.logger.debug("Got " + val);
 						break;
@@ -264,10 +311,13 @@ public class SYSCALL extends Instruction {
 		boolean end_of_string = false;
 
 		while(!end_of_string) {
-			MemoryElement memEl = memory.getCell((int)address);
-			for(int i = 0; i < 8; ++i) {
-				int tempInt = memEl.readByte(i);
-				if(tempInt == 0) {
+			/*MemoryElement memEl = memory.getCell((int)address);
+			for(int i = 0; i < 8; ++i) {*/
+				for(long i=address;i<address+8;++i){
+                                //int tempInt = memEl.readByte(i);
+                                //readBNT da sostituire con readB se non si scrive il triceFile DaMemory
+				int tempInt =memory.readBNT((int)i);
+                                if(tempInt == 0) {
 					end_of_string = true;
 					break;
 				}

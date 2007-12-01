@@ -692,6 +692,7 @@ public class Main extends JApplet {
                 if(val==JFileChooser.APPROVE_OPTION) {
                     String filename = jfc.getSelectedFile().getPath();
                     Dinero din = Dinero.getInstance();
+                    //Memory mem= Memory.getInstance();
                     try {
                         din.WriteXdinFile(filename);
                         logger.debug("Wrote dinero tracefile");
