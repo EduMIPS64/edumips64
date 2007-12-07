@@ -36,7 +36,6 @@ public class Memory implements MemoryAccessor {
         int numLoad=0;
         private LinkedList <String> MemoryData;
         int offset = 0;
-        
 	private List<MemoryElement> cells;
         private List<Instruction> instructions;
 	private Map<Integer, String> mem_comments;
@@ -48,7 +47,6 @@ public class Memory implements MemoryAccessor {
 	private Memory(){
 		edumips64.Main.logger.debug("Building Memory: " + this.hashCode());
 		MemoryData = new LinkedList <String>();
-            
                 mem_comments = new HashMap<Integer,String>();
 		cells = new ArrayList<MemoryElement>();
 		instr_num = 0;
@@ -525,7 +523,6 @@ public class Memory implements MemoryAccessor {
 		instructions.clear();
 		for(int i = 0; i < CPU.CODELIMIT; i++)
 			instructions.add(Instruction.buildInstruction("BUBBLE"));
-
 		mem_comments.clear();
 		instr_num = 0;
 		// TODO sistemare il reset

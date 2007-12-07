@@ -36,7 +36,7 @@ public class GUIStatistics extends GUIComponent {
 
 	StatPanel statPanel;
 	JScrollPane jsp;
-	private int nCycles, nInstructions, rawStalls, codeSize, WAWStalls, dividerStalls,memoryStalls;
+	private int nCycles, nInstructions, rawStalls, codeSize, WAWStalls, dividerStalls,memoryStalls/*---*/,MEMStalls/*---*/;
 	private float cpi;
 	
 	public GUIStatistics () 
@@ -53,7 +53,7 @@ public class GUIStatistics extends GUIComponent {
 	class StatPanel extends JPanel {
 		JList statList;
 		String [] statistics = {" Execution", " 0 Cycles", " 0 Instructions", " ", " Stalls", " 0 RAW Stalls", " 0 WAW Stalls",
-		       		       " 0 WAR Stalls", " 0 Structural Stalls(Divider not available)", "0 Structural Stalls (Memory not available)", " 0 Branch Taken Stalls", " 0 Branch Misprediction Stalls",
+		       		       " 0 WAR Stalls",/*--*/"0 MemStalls"/*--*/, " 0 Structural Stalls(Divider not available)", "0 Structural Stalls (Memory not available)", " 0 Branch Taken Stalls", " 0 Branch Misprediction Stalls",
 				       " Code Size", " 0 Bytes", "FPU info", "FCSR","FCSRGroups", "FCSRMnemonics","FCSRValues"};
 		public StatPanel () 
 		{
@@ -85,6 +85,9 @@ public class GUIStatistics extends GUIComponent {
 		WAWStalls = cpu.getWAWStalls();
 		dividerStalls =cpu.getStructuralStallsDivider();
 		memoryStalls = cpu.getStructuralStallsMemory();
+                /*-----------------*/
+                MEMStalls=cpu.getMEMStalls();
+                /*-----------------*/
 	}
 
 	public void draw ()
@@ -156,56 +159,66 @@ public class GUIStatistics extends GUIComponent {
 						label.setText(" 0 " + CurrentLocale.getString("WARS"));
 						label.setFont(f);
 						return label;
-					case 8:
+					
+                                        /*--------------- CHE UTILITA HA CURRENT LOCALE??*/
+                                        case 8:
+						label.setText(" " + MEMStalls + " " + "MEM Stalls");
+						label.setFont(f);
+						return label;
+                                        /*---------------*/	
+                                        
+                                        case 9:
 						label.setText(" " + dividerStalls + " " + CurrentLocale.getString("STRUCTS_DIVNOTAVAILABLE"));
 						label.setFont(f);
 						return label;
-					case 9:
+					case 10:
 						label.setText(" " + memoryStalls  + " " + CurrentLocale.getString("STRUCTS_MEMNOTAVAILABLE"));
 						label.setFont(f);
 						return label;
-					case 10:
+                                    
+                                        case 11:
 						label.setText(" 0 " + CurrentLocale.getString("BTS"));
 						label.setFont(f);
 						return label;
-					case 11:
+					case 12:
 						label.setText(" 0 " + CurrentLocale.getString("BMS"));
 						label.setFont(f);
 						return label;
 					//case 12:
 					//	label.setText(" ");
 					//	return label;
-					case 12:
+					case 13:
 						label.setText(" " + CurrentLocale.getString("CSIZE"));
 						label.setForeground(Color.red);
 						label.setFont(f);
 						return label;
-					case 13:
+					case 14:
 						label.setText(" " + codeSize + " " + CurrentLocale.getString("BYTES"));
 						label.setFont(f);
 						return label;
-					case 14:	
+					case 15:	
 						label.setText(" " + CurrentLocale.getString("FPUINFO"));
 						label.setForeground(Color.red);
 						label.setFont(f);
 						return label;
-					case 15:
+					case 16:
 						label.setText(" " + CurrentLocale.getString("FPUFCSR"));
 						label.setFont(f);
 						return label;
-					case 16:                    
+					case 17:                    
 						label.setText(" "+ "    FCC       Cause EnablFlag RM" );
 						label.setFont(f);
 						return label;
-					case 17:
+					case 18:
 						label.setText(" " + "7654321 0      VZOUIVZOUIVZOUI" );
 						label.setFont(f);
 						return label;
-					case 18:
+					case 19:
 						label.setText(" " + cpu.getFCSR());
 						label.setFont(f);
 						return label;
-						
+                                       
+					 
 						
 				}
 				return label;

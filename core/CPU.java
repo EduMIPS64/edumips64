@@ -34,7 +34,14 @@ import edumips64.Main;
 *  @author Andrea Spadaccini, Simona Ullo, Antonella Scandura, Massimo Trubia (FPU modifications)
 */
 public class CPU {
-	private Memory mem;
+	/*----------------------------------*/
+        int stallsNumber;
+        /*-----------------------------------*/
+    
+        private Memory mem;
+        /*------------*/
+        private Cache cache;
+        /*-------------*/
 	private Register[] gpr;
 	/** FPU Elements*/
 	private RegisterFP[] fpr;
@@ -88,7 +95,7 @@ public class CPU {
 	private static CPU cpu;
 	
 	/** Statistics */
-	private int cycles, instructions, RAWStalls, WAWStalls, dividerStalls,funcUnitStalls,memoryStalls,exStalls;
+	private int /*------------*/MEMStalls,/*------------*/cycles, instructions, RAWStalls, WAWStalls, dividerStalls,funcUnitStalls,memoryStalls,exStalls;
 	
 	/** Static initializer */
 	static {
@@ -97,6 +104,11 @@ public class CPU {
 	private CPU() {
 		//instructions enumerating
 		serialNumberSeed=0;
+                /*----------------------------------*/
+                stallsNumber=0;
+                
+                /*-----------------------------------*/
+            
 		// To avoid future singleton problems
 		Instruction dummy = Instruction.buildInstruction("BUBBLE");
 		
@@ -104,6 +116,9 @@ public class CPU {
 		cycles = 0;
 		status = CPUStatus.READY;
 		mem = Memory.getInstance();
+                /*------------------*/
+                cache = Cache.getInstance();
+                /*-----------------*/
 		edumips64.Main.logger.debug("Got Memory instance..");
 		symTable = SymbolTable.getInstance();
 		edumips64.Main.logger.debug("Got SymbolTable instance..");
@@ -297,6 +312,12 @@ public class CPU {
 		return RAWStalls;
 	}
 	
+        /*-------------------------------------*/
+        public int getMEMStalls() {
+		return MEMStalls;
+	}
+        /*------------------------------------*/
+        
 	/** Returns the number of WAW stalls that happened inside the pipeline
 	 * @return an integer
 	 */
@@ -407,7 +428,9 @@ public class CPU {
 	/** This method performs a single pipeline step
 	 * @throw RAWHazardException when a RAW hazard is detected
 	 */
-	public void step() throws IntegerOverflowException, AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException,WAWException,  MemoryNotAvailableException, FPDividerNotAvailableException,FPFunctionalUnitNotAvailableException {
+        
+	//NOTA BENE: memoryEcveptionStall NON DOVREBBE ESSERE TRA I throws DI step() POICHE STEP LO GESTISCE!!!
+        public void step() throws/*---*/MemoryExceptionStall,/*-----------*/ IntegerOverflowException, AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException,WAWException,  MemoryNotAvailableException, FPDividerNotAvailableException,FPFunctionalUnitNotAvailableException {
 		/* The integer "breaking" is used to keep track of the BREAK
 		 * instruction. When the BREAK instruction enters ID, the BreakException
 		 * is thrown. We continue the normal cpu step flow, and at the end of
@@ -440,7 +463,8 @@ if (getCycles()==29)
 		String syncex = null;
 		
 		if(status != CPUStatus.RUNNING && status != CPUStatus.STOPPING)
-			throw new StoppedCPUException();
+		                throw new StoppedCPUException();
+               
 		try {
 			Main.logger.debug("Starting cycle " + ++cycles);
 			currentPipeStatus = PipeStatus.WB;
@@ -448,7 +472,7 @@ if (getCycles()==29)
 			// Let's execute the WB() method of the instruction located in the
 			// WB pipeline status
 			if(pipe.get(PipeStatus.WB)!=null) {
-				boolean terminatorInstrInWB= terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.WB).getRepr().getHexString());
+                                boolean terminatorInstrInWB= terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.WB).getRepr().getHexString());
 				//we have to execute the WB method only if some conditions occur
 				boolean notWBable=false;
 				//the current instruction in WB is a terminating instruction and the fpPipe is working
@@ -465,9 +489,11 @@ if (getCycles()==29)
 				if(isPipelinesEmpty() && getStatus()==CPUStatus.STOPPING) {
 					setStatus(CPU.CPUStatus.HALTED);
 					throw new HaltException();
-				}
+				
 				
 			}
+                    }
+                        
 			
 			// We put null in WB, in order to avoid that an exception thrown in
 			// the next instruction leaves the already completed instruction in
@@ -476,9 +502,15 @@ if (getCycles()==29)
 			
 			// MEM
 			currentPipeStatus = PipeStatus.MEM;
-			if(pipe.get(PipeStatus.MEM)!=null)
+			/*--------------------------------*/
+                        if(stallsNumber>0)
+                        throw new MemoryExceptionStall(stallsNumber);
+                        //}
+                        /*--------------------------------*/
+                        if(pipe.get(PipeStatus.MEM)!=null)
 				pipe.get(PipeStatus.MEM).MEM();
-			pipe.put(PipeStatus.WB, pipe.get(PipeStatus.MEM));
+			
+                        pipe.put(PipeStatus.WB, pipe.get(PipeStatus.MEM));
 			pipe.put(PipeStatus.MEM,null);
 			
 			//if there will be a stall because a lot of instructions would fill the MEM stage, the EX() method cannot be called
@@ -488,8 +520,9 @@ if (getCycles()==29)
 				try {
 					// Handling synchronous exceptions
 					currentPipeStatus = PipeStatus.EX;
-					if(pipe.get(PipeStatus.EX)!=null)
+                                        if(pipe.get(PipeStatus.EX)!=null)
 						pipe.get(PipeStatus.EX).EX();
+                                        
 				} catch (SynchronousException e) {
 					if(masked)
 						edumips64.Main.logger.exception("[MASKED] " + e.getCode());
@@ -628,7 +661,39 @@ if (getCycles()==29)
 			if(syncex != null)
 				throw new SynchronousException(syncex);
 			
-		} catch(RAWException ex) {
+		}
+                /*------------------------------------------------------*/
+                catch(MemoryExceptionStall e){
+                     stallsNumber=e.getStalls();
+                     stallsNumber=stallsNumber-1;
+                     pipe.put(PipeStatus.WB, Instruction.buildInstruction("BUBBLE"));
+                     MEMStalls++;
+                    }
+                /*----------------------------------------------------------------*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                catch(RAWException ex) {
 			if(currentPipeStatus == PipeStatus.ID)
 				pipe.put(PipeStatus.EX, Instruction.buildInstruction("BUBBLE"));
 			RAWStalls++;
@@ -698,6 +763,9 @@ if (getCycles()==29)
 		cycles = 0;
 		instructions = 0;
 		RAWStalls = 0;
+                /*-----------------------------*/
+                MEMStalls = 0;
+                /*----------------------------*/
 		WAWStalls = 0;
 		dividerStalls = 0;
 		funcUnitStalls = 0;
@@ -742,7 +810,9 @@ if (getCycles()==29)
 		
 		// Reset memoria
 		mem.reset();
-		
+		/*-----------*/
+                cache.resetMap();
+                /*-----------*/
 		// Reset pipeline
 		clearPipe();
 		// Reset FP pipeline

@@ -42,7 +42,7 @@ class LB extends Loading {
 		this.name="LB";
 	}
 	
-	public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+	public  void MEM() throws /*-----*/MemoryExceptionStall,/*-----------*/IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
 		
 		/**restoring the address from the temporary register*/
 		/*(s) assegno alla var long address il contenuto del registro(di Instruction) TR[4]*/
@@ -59,7 +59,10 @@ class LB extends Loading {
 		*/
             
                 /*MODIFICA*/
-                int value=memory.readB((int)address);
+                /*-----------------------------------------*/
+                //int value=memory.readB((int)address);
+                 int value=cache.readB((int)address);
+                /*------------------------------------------*/
                 TR[LMD_REGISTER].writeByte(value);
                 /*MODIFICA FINE*/
             

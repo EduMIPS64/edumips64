@@ -42,7 +42,10 @@ public abstract class Instruction {
 	protected String name;
 	protected String comment;
 	protected static Memory memory=Memory.getInstance();
-	//protected static CPU cpu;
+        /*-----------------------------*/
+	protected static Cache cache=Cache.getInstance();
+        /*-----------------------------*/
+        //protected static CPU cpu;
 	protected Register[] TR; //is not static because each instruction has got its own registers
 	protected RegisterFP[] TRfp;
 	protected String fullname;
@@ -260,7 +263,7 @@ public abstract class Instruction {
 	 * In this stage all Load and Store instructions access memory for getting or putting data
 	 * </pre>
 	 **/
-	public abstract void MEM() throws HaltException, IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
+	public abstract void MEM() throws /*-----*/MemoryExceptionStall,/*-----------*/ HaltException, IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
 	
 	/**
 	 * <pre>

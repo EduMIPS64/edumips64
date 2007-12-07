@@ -63,7 +63,7 @@ public abstract class LDSTInstructions extends Instruction {
 	}
 	public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException,WAWException;
 	public abstract void EX() throws IrregularStringOfBitsException,IntegerOverflowException;
-	public abstract void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
+	public abstract void MEM() throws /*-----*/MemoryExceptionStall,/*-----------*/ IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
 	public abstract void WB() throws IrregularStringOfBitsException;
 	public void pack() throws IrregularStringOfBitsException {
 		//conversion of instruction parameters of params list to the "repr" 32 binary value
