@@ -34,15 +34,13 @@ import edumips64.Main;
 *  @author Andrea Spadaccini, Simona Ullo, Antonella Scandura, Massimo Trubia (FPU modifications)
 */
 public class CPU {
-	/*----------------------------------*/
+	
         int stallsNumber;
-        /*-----------------------------------*/
-    
         private Memory mem;
-        /*------------*/
         private Cache cache;
-        /*-------------*/
-	private Register[] gpr;
+        boolean flag;
+	
+        private Register[] gpr;
 	/** FPU Elements*/
 	private RegisterFP[] fpr;
 	public static enum FPExceptions {INVALID_OPERATION,DIVIDE_BY_ZERO,UNDERFLOW,OVERFLOW};
@@ -95,8 +93,8 @@ public class CPU {
 	private static CPU cpu;
 	
 	/** Statistics */
-	private int /*------------*/MEMStalls,/*------------*/cycles, instructions, RAWStalls, WAWStalls, dividerStalls,funcUnitStalls,memoryStalls,exStalls;
-	
+	private int MEMStalls,cycles, instructions, RAWStalls, WAWStalls, dividerStalls,funcUnitStalls,memoryStalls,exStalls;
+	boolean verific;
 	/** Static initializer */
 	static {
 		cpu = null;
@@ -104,21 +102,16 @@ public class CPU {
 	private CPU() {
 		//instructions enumerating
 		serialNumberSeed=0;
-                /*----------------------------------*/
                 stallsNumber=0;
-                
-                /*-----------------------------------*/
-            
-		// To avoid future singleton problems
+		boolean flag;
+                // To avoid future singleton problems
 		Instruction dummy = Instruction.buildInstruction("BUBBLE");
 		
 		edumips64.Main.logger.debug("Creating the CPU...");
 		cycles = 0;
 		status = CPUStatus.READY;
 		mem = Memory.getInstance();
-                /*------------------*/
                 cache = Cache.getInstance();
-                /*-----------------*/
 		edumips64.Main.logger.debug("Got Memory instance..");
 		symTable = SymbolTable.getInstance();
 		edumips64.Main.logger.debug("Got SymbolTable instance..");
@@ -150,7 +143,8 @@ public class CPU {
 
 		//FPU initialization
 		FPUConfigurator conf=new FPUConfigurator();
-		knownFPInstructions=conf.getFPArithmeticInstructions();
+		//(s)Ritorna una lista di stringhe(Ciascuna delle quali dovrebbe contenere il contenuto di una istr.FP??)
+                knownFPInstructions=conf.getFPArithmeticInstructions();
 		terminatingInstructionsOPCodes=conf.getTerminatingInstructions();
 		
 		edumips64.Main.logger.debug("CPU Created.");
@@ -311,12 +305,16 @@ public class CPU {
 	public int getRAWStalls() {
 		return RAWStalls;
 	}
-	
-        /*-------------------------------------*/
+
         public int getMEMStalls() {
 		return MEMStalls;
 	}
-        /*------------------------------------*/
+        
+        /**/ public boolean getVerific(){
+                return verific;
+        }
+        
+       
         
 	/** Returns the number of WAW stalls that happened inside the pipeline
 	 * @return an integer
@@ -339,7 +337,8 @@ public class CPU {
 		return memoryStalls;
 	}
 	
-	/** Returns the number of Structural Stalls (EX not available) that happened inside the pipeline
+	
+        /** Returns the number of Structural Stalls (EX not available) that happened inside the pipeline
 	 * @ return an integer
 	 */
 	public int getStructuralStallsEX(){
@@ -409,7 +408,6 @@ public class CPU {
 	public int getMemoryStalls(){
 		return memoryStalls;
 	}
-	
 	/** Gets the list of terminating instructions*/
 	public List<String> getTerminatingInstructions(){
 		return terminatingInstructionsOPCodes;
@@ -430,7 +428,7 @@ public class CPU {
 	 */
         
 	//NOTA BENE: memoryEcveptionStall NON DOVREBBE ESSERE TRA I throws DI step() POICHE STEP LO GESTISCE!!!
-        public void step() throws/*---*/MemoryExceptionStall,/*-----------*/ IntegerOverflowException, AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException,WAWException,  MemoryNotAvailableException, FPDividerNotAvailableException,FPFunctionalUnitNotAvailableException {
+        public void step() throws /*----*/RAWException,EXNotAvailableException,JumpException,/*---*/ MemoryExceptionStall,IntegerOverflowException, AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException,WAWException,  MemoryNotAvailableException, FPDividerNotAvailableException,FPFunctionalUnitNotAvailableException {
 		/* The integer "breaking" is used to keep track of the BREAK
 		 * instruction. When the BREAK instruction enters ID, the BreakException
 		 * is thrown. We continue the normal cpu step flow, and at the end of
@@ -441,6 +439,7 @@ public class CPU {
 		boolean SIMUL_MODE_DISABLED=false;
 		int breaking = 0;
 		// Used for exception handling
+                //(s) masked,terminate=false.
 		boolean masked = (Boolean)Config.get("syncexc-masked");
 		boolean terminate = (Boolean)Config.get("syncexc-terminate");
 		
@@ -502,11 +501,8 @@ if (getCycles()==29)
 			
 			// MEM
 			currentPipeStatus = PipeStatus.MEM;
-			/*--------------------------------*/
                         if(stallsNumber>0)
                         throw new MemoryExceptionStall(stallsNumber);
-                        //}
-                        /*--------------------------------*/
                         if(pipe.get(PipeStatus.MEM)!=null)
 				pipe.get(PipeStatus.MEM).MEM();
 			
@@ -515,40 +511,72 @@ if (getCycles()==29)
 			
 			//if there will be a stall because a lot of instructions would fill the MEM stage, the EX() method cannot be called
 			//because the integer instruction in EX cannot be moved
-			// EX
+                    
+                        // EX
+                        /*(s) getInstruction con in ingresso SIMUL_MODE_ENABLE=TRUE si limita a controllare che su M7 o A4 o istr di divider
+                             vi sia una istruzione incrementando la var readyToExit=[0,3]
+                             
+                             Se in ingresso si ha  SIMUL_MODE_DISABLE se su istr,M7,A4, vi e una istruzione
+                             la ritornara,la rimuove e decrementa nInstruction
+                             
+                        Se getInstructiion(true) e uguale a null, dunque nè divider, nè adder, nè multiplier ha 
+                        associata una istruzione all'ultima key, readyToExit==0*/
 			if(fpPipe.getInstruction(SIMUL_MODE_ENABLED)==null) {
-				try {
+				
+                                /*(s) Eseguo le normali procedure: Eseguo Ex, lo passo in MEM , metto null in EX*/
+                                try {
 					// Handling synchronous exceptions
 					currentPipeStatus = PipeStatus.EX;
                                         if(pipe.get(PipeStatus.EX)!=null)
 						pipe.get(PipeStatus.EX).EX();
                                         
 				} catch (SynchronousException e) {
-					if(masked)
+					
+                                        //(s) se masked=true.
+                                        if(masked)
 						edumips64.Main.logger.exception("[MASKED] " + e.getCode());
-					else {
+					
+                                        //(s) se masked=false.
+                                        else {
+                                        //(s) se terminate=true.
 						if(terminate) {
 							edumips64.Main.logger.log("Terminating due to an unmasked exception");
 							throw new SynchronousException(e.getCode());
-						} else
+						
+                                                //(s) se terminate=false.
+                                                } else
 							// We must complete this cycle, but we must notify the user.
 							// If the syncex string is not null, the CPU code will throw
 							// the exception at the end of the step
-							syncex = e.getCode();
+							
+                                                        syncex = e.getCode();
 					}
 				}
 				pipe.put(PipeStatus.MEM, pipe.get(PipeStatus.EX));
 				pipe.put(PipeStatus.EX,null);
-			} else {
+			} 
+                        
+                        /*(s) Se si ha una istruzione associata all'ultima chiave di adder,multiplier, o divider*/
+                        else {
 				//a structural stall has to be raised if the EX stage contains an instruction different from a bubble or other fu's contain instructions (counter of structural stalls must be incremented)
-				if((pipe.get(PipeStatus.EX)!=null && !(pipe.get(PipeStatus.EX).getName().compareTo(" ")==0)) || fpPipe.getNReadyToExitInstr()>1)
-					memoryStalls++;
+				
+                            /*(s)Se l'istruzione associata a PipeStatus.Ex non e null e non e uguale a ""  
+                            oppure se  all'ultima chiave(A4,o M7,o ..) di qualche Fuctional unit(HAshMap)
+                            vi e già associata una istruzione ovvero readyToExit>0 */
+                            if((pipe.get(PipeStatus.EX)!=null && !(pipe.get(PipeStatus.EX).getName().compareTo(" ")==0)) || fpPipe.getNReadyToExitInstr()>1)
+					//(incremento numero stalli memoryStalls)
+                                    memoryStalls++;
 				
 				//the fpPipe is issuing an instruction and the EX method has to be called on it
 				Instruction instr;
 				//call EX
+                            
+                                /*(s) Mi prendo l'istruzione associata all'ultima key di divider(o adder o multiplier) con successivo 
+                                decremento del contatore nInstruction che avevo incrementato in ID nel momento dell'inserimento 
+                                    dell'istruzione FP in FPPipe*/
 				instr=fpPipe.getInstruction(SIMUL_MODE_DISABLED);
 				
+                                /*(s) Eseguo il metodo EX dell'istruzione e la passo in MEM*/
 				try {
 					// Handling synchronous exceptions
 					currentPipeStatus = PipeStatus.EX;
@@ -570,42 +598,98 @@ if (getCycles()==29)
 				pipe.put(PipeStatus.MEM, instr);
 			}
 			
-			//shifting instructions in the fpPipe
+			//shifting instructions in the fpPipe(dalla prima key(A1,M1,..) l'istruzione si sposta all'ultima key(A4,M7))
 			fpPipe.step();
 			
 			// ID
 			currentPipeStatus = PipeStatus.ID;
-			if(pipe.get(PipeStatus.ID)!=null) {
+			//(S)Verifico che l'istruzione nello stato ID non sia null
+                        if(pipe.get(PipeStatus.ID)!=null) {
 				//if an FP instruction fills the ID stage a checking for InputStructuralStall must be performed before the ID() invocation.
 				//This operation is carried out by checking if the fpPipe could accept the instruction we would insert in it (2nd condition)
-				if(knownFPInstructions.contains(pipe.get(PipeStatus.ID).getName())) {
+				
+                            /*(s)Se L'istruzione relativa a ID non è null, verifico se l'istruzioni e FP
+                                La verifica viene effettuata confrontando il nome dell'istruzione con la lista
+                            della istruzioni FP(knownFPInstructions)
+                            */
+                                if(knownFPInstructions.contains(pipe.get(PipeStatus.ID).getName())) {
 					//it is an FPArithmetic and it must be inserted in the fppipe
 					//the fu is free
-					if(fpPipe.putInstruction(pipe.get(PipeStatus.ID),SIMUL_MODE_ENABLED)==0) {
-						if(fpPipe.isEmpty() || (!fpPipe.isEmpty()/* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/))
-							pipe.get(PipeStatus.ID).ID();
+					
+                                    
+                                    /*(s) Invoco il metodo putInstruction passando come parametri L'istruzione in ID
+                                    e SIMUL_MODE_ENABLE (o in seguito DISABLE) 
+                                    putInstruction si occupa di:
+                                    1- Verificare che l'istruzione in ingresso sai contenuta alla lista delle istruzionei
+                                        FP knownFPInstructions
+                                    
+                                    2-Verifica se l'istruzione sia div.d o mult.d o add.d(sub.d) invocando il comando
+                                    divider.putInstruction o adder.putInstruction o multipler.putInstruction che si occupano:
+                                    
+                                    2.1 Verifica che alla kiave M1(Multipler) o A1(Adder) o Instr(Divider) non sia ossociata
+                                        alcuna istruzione in tal caso:
+                                        se SIMUL_MODE_DISABLE=false inserisci l'istruzione in M1 o A1 o istr e ritorna 0
+                                        se SIMUL_MODE_ENABLE=true ritorna 0
+                                        
+                                        Se alla kiave M1(A1 o istr) è associata gia una istruzione ritorna -1;
+                                    
+                                    3-Se il valore ritornato da divider.putInstruction o adder.putInstruction o multipler.putInstruction
+                                        è pari a -1(Duqnue se non e stato possibile inserire l'istruzione in FPpipe)
+                                        la funzione ritorna 1 o 2 
+                                        
+                                    Se il valore ritornato da divider.putInstruction o adder.putInstruction o multipler.putInstruction
+                                    è diverso da -1(c'e stato l'inserimento(SIMUL_MODE_DISABLE) o
+                                        cmq e possibile farlo(SIMUL_MODE_ENABLE) ma non e stato effettuato inserimento)
+                                    allora se si ha SIMUL_MODE_DISABLE viene incrementata la var nIstructrion e ritornato 0*/
+                                    
+                                    /*(s) Se l'istruzione FP puo essere inserita(in ingresso ho SIMUL_MODE_ENABLED)
+                                            in adder o multiplier o divider*/
+                                    if(fpPipe.putInstruction(pipe.get(PipeStatus.ID),SIMUL_MODE_ENABLED)==0) {
+                                       // verific=true;
+						
+                                        if(fpPipe.isEmpty() || (!fpPipe.isEmpty()/* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/))
+						//(s)Eseguo l metodo ID l'istruzione FP che e al momenento memorizzata in ID	
+                                                pipe.get(PipeStatus.ID).ID();
+                                                /*(s) Inserisco l'istruzione in FPpipeline(in ingresso ho SIMUL_MODE_DISABLED) 
+                                        con corrispondente incremento del contatore nInstruction*/
 						fpPipe.putInstruction(pipe.get(PipeStatus.ID),SIMUL_MODE_DISABLED);
-						pipe.put(PipeStatus.ID,null);
-					} else //the fu is filled by another instruction
+						//(s)Metto null in ID.
+                                                pipe.put(PipeStatus.ID,null);
+                                                verific=true;
+                                        } 
+                                        
+                                        
+                                        /*else ovvero se adder (multilpler o divider) e gia pieno e non e possibile inserire l'istruzione in esso
+                                            anche se cmq l'istruzione in ID e di tipo FP.*/
+                                        
+                                        else //the fu is filled by another instruction
 					{
 						if(pipe.get(PipeStatus.ID).getName().compareToIgnoreCase("DIV.D")==0)
 							throw new FPDividerNotAvailableException();
 						else
-							throw new FPFunctionalUnitNotAvailableException();
+                                                        //(s)Se e piena la pipelineFP allora si ha uno stallo in ID -> bolla in EX
+							throw new FPFunctionalUnitNotAvailableException(); 
 					}
 				}
 				//if an integer instruction or an FP instruction that will not pass through the FP pipeline fills the ID stage a checking for
 				//InputStructuralStall (second type) must be performed. We must control if the EX stage is filled by another instruction, in this case we have to raise a stall
-				else {
+				
+                                //(s) Se invece l'istruzione è una istruzione normale, non FP;
+                                else {
+                                        //(s)Se l'istruzione non è FP, e l'istruzione associata allo stato EX è NULL
 					if(pipe.get(PipeStatus.EX)==null || /*testing*/ pipe.get(PipeStatus.EX).getName().compareTo(" ")==0) {
 						if(fpPipe.isEmpty() || (!fpPipe.isEmpty()/* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/))
-							pipe.get(PipeStatus.ID).ID();
+						//(s)Eseguo L'istruzione in Id, la passo in EX, e metto null in ID;	
+                                                pipe.get(PipeStatus.ID).ID();
 						pipe.put(PipeStatus.EX,pipe.get(PipeStatus.ID));
 						pipe.put(PipeStatus.ID,null);
 					}
 					//the EX stage is full
-					else {
-						throw new EXNotAvailableException();
+					
+                                        //(s)Se l'istruzione non è FP, e l'istruzione associata allo stato EX NON è NULL
+					 else {
+                                                 //(s)Tale eccezione incrementa la var Exstalls.
+						throw new EXNotAvailableException(); 
 					}
 					
 					
@@ -668,12 +752,89 @@ if (getCycles()==29)
                      stallsNumber=stallsNumber-1;
                      pipe.put(PipeStatus.WB, Instruction.buildInstruction("BUBBLE"));
                      MEMStalls++;
-                    }
-                /*----------------------------------------------------------------*/
+                    
+                //EX
+                   // if(fpPipe.getInstruction(SIMUL_MODE_ENABLED)==null)
+                    //        fpPipe.step();
+                    //else{   
+                      //  memoryStalls++;
+                        fpPipe.step();
+                   // }
+/*---------------------------  */                
+                //ID
+                    
+                    currentPipeStatus = PipeStatus.ID;
+                    if(pipe.get(PipeStatus.ID)!=null) 
+                        {
+                                if(knownFPInstructions.contains(pipe.get(PipeStatus.ID).getName())) {
+                                    if(fpPipe.putInstruction(pipe.get(PipeStatus.ID),SIMUL_MODE_ENABLED)==0) {
+						
+                                       if(fpPipe.isEmpty() || (!fpPipe.isEmpty()))
+						
+                                                try{
+                                                pipe.get(PipeStatus.ID).ID();
+                                                }catch(RAWException eez){
+                                                   //throw new RAWException();
+                                                   pipe.put(PipeStatus.EX, Instruction.buildInstruction("BUBBLE"));
+                                                    flag=true;
+                                                    RAWStalls++;
+                                                }
+                                                if(flag==false){
+                                                fpPipe.putInstruction(pipe.get(PipeStatus.ID),SIMUL_MODE_DISABLED);
+						pipe.put(PipeStatus.ID,null);
+                                                verific=true;
+                                                }
+                                                else flag=false;
+                                        }
+                                    //}
+                              //  }
+                            //}
+                                
+                                    else //the fu is filled by another instruction
+					{
+						if(pipe.get(PipeStatus.ID).getName().compareToIgnoreCase("DIV.D")==0)
+							throw new FPDividerNotAvailableException();
+						else
+                                                        //(s)Se e piena la pipelineFP allora si ha uno stallo in ID -> bolla in EX
+							throw new FPFunctionalUnitNotAvailableException(); 
+					}
+                                    }	
+                              //  }
+                            //}
+                                 
+                             
+                                    else {//DEVO ESEGUIRE SOLO SE DAVANTI CE SPAZIO
+                                        if(verific==true){
+                                        //(s)Se l'istruzione non è FP, e l'istruzione associata allo stato EX è NULL
+					if(pipe.get(PipeStatus.EX)==null || pipe.get(PipeStatus.EX).getName().compareTo(" ")==0) {
+						if(fpPipe.isEmpty() || (!fpPipe.isEmpty()/* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/))
+						//(s)Eseguo L'istruzione in Id, la passo in EX, e metto null in ID;	
+                                                pipe.get(PipeStatus.ID).ID();
+						pipe.put(PipeStatus.EX,pipe.get(PipeStatus.ID));
+						pipe.put(PipeStatus.ID,null);
+                                                }
+					//the EX stage is full
+					
+                                        //(s)Se l'istruzione non è FP, e l'istruzione associata allo stato EX NON è NULL
+					 else {
+                                                 //(s)Tale eccezione incrementa la var Exstalls.
+						exStalls++; 
+					}
+					
+                                    }
+				}
 
-
-
-
+                                    
+                                
+                            }
+				
+                }   
+                                    
+/*------------*/
+                    
+                    
+                    
+               
 
 
 
@@ -763,9 +924,9 @@ if (getCycles()==29)
 		cycles = 0;
 		instructions = 0;
 		RAWStalls = 0;
-                /*-----------------------------*/
                 MEMStalls = 0;
-                /*----------------------------*/
+                verific=false;
+                flag=false;
 		WAWStalls = 0;
 		dividerStalls = 0;
 		funcUnitStalls = 0;
@@ -810,9 +971,9 @@ if (getCycles()==29)
 		
 		// Reset memoria
 		mem.reset();
-		/*-----------*/
+                //Reset cache
                 cache.resetMap();
-                /*-----------*/
+                flag=false;
 		// Reset pipeline
 		clearPipe();
 		// Reset FP pipeline

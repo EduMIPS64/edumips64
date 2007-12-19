@@ -137,46 +137,59 @@ public class GUICycles extends GUIComponent {
 
 						
                                                 
-                                               
-                                               
+                                               //MEM
+                                            
                                                 if((tempo>3)&&(instr[3] != null)){
 							if(instr[3].getName()!=" "){
 								index= searchListaBySerialNumber(instr[3].getSerialNumber());
+                                                                boolean exTag=false;
                                                                 if(index!=-1)
 								{
 									//the instruction has to be tagged as "MEM" 
 									lista.get(index).addStato("MEM");
 								}
+                                                               
 							}
 						}
-                                                                //EX
-                                            /*---------*/
-                                                boolean MEMStallOccurred=(MEMStalls!=cpu.getMEMStalls());
-                                                /*----------*/
+                                                                
+                                               
+                                                //EX
+                                                /**/boolean MEMStallOccurred=(MEMStalls!=cpu.getMEMStalls());/**/
 						if( (tempo>2) && (instr[2]!=null) ){
 
 							if(instr[2].getName()!=" "){
 								index= searchListaBySerialNumber(instr[2].getSerialNumber());
 								boolean exTagged=false; //if a structural stall(memory) occurs the instruction in EX has to be tagged with "EX" and succefully with "StEx"
-                                                                /*----------------------*/
-                                                               if(MEMStallOccurred)
+                                                                
+                                                            //DA SISTEMARE
+                                                            /*/if(MEMStallOccurred)
 								{
-									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-                                                                            lista.get(index).addStato("  ");
+									if(memoryStalls!=cpu.getMemoryStalls())
+                                                                            lista.get(index).addStato("Str");
+                                                                        else if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
+                                                                            lista.get(index).addStato("Alt");
 								}
-                                                               /*------------------------*/
+                                                               /**/
                                                             
                                                             
                                                                 if(index!=-1)
 								{       //(s) Aggiungo alla lista EX se lo stato precedente è ID o RAW o WAV
-									if(lista.get(index).getStato().getLast()=="ID" || lista.get(index).getStato().getLast()=="RAW" ||  lista.get(index).getStato().getLast()=="WAW" || lista.get(index).getStato().getLast()=="StEx"/*----*/ || lista.get(index).getStato().getLast()=="   "/*---*/){
+									if(lista.get(index).getStato().getLast()=="ID" || /**/  lista.get(index).getStato().getLast()=="Alt." ||/*---*/ lista.get(index).getStato().getLast()=="RAW" ||  lista.get(index).getStato().getLast()=="WAW" || lista.get(index).getStato().getLast()=="StEx"){
 										lista.get(index).addStato("EX");
 										exTagged=true;
 									}
 									//we check if a structural hazard  occurred if there's a difference between the previous value of memoryStall counter and the current one
 									if(memoryStalls!=cpu.getMemoryStalls() && !exTagged)
 										lista.get(index).addStato("Str");
-								}
+								
+                                                                        if(MEMStallOccurred && !exTagged){
+                                                                            if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
+                                                                            lista.get(index).addStato("Alt");
+                                                                        }
+                                                                            
+                                                                            
+                                                                    
+                                                                }
 								exTagged=false;
 							}
 						}
@@ -188,11 +201,6 @@ public class GUICycles extends GUIComponent {
 						boolean structStallEXOccurred =(structStallsEX!=cpu.getStructuralStallsEX());
 						boolean structStallDividerOccured=(structStallsDivider!=cpu.getStructuralStallsDivider());
 						boolean structStallsFuncUnitOccurred=(structStallsFuncUnit!=cpu.getStructuralStallsFuncUnit());
-						
-                                                /*(s) inputStallOccurred mi permette di valutare se si sono verificate situazioni di stallo WAW e RAW o MEM.
-                                                Di partenza inputStructuralStalls=cpu.getStructuralStallsDivider()+cpu.getStructuralStallsEX()+cpu.getStructuralStallsFuncUnit()
-                                                //DEVO DUNQUE AGGIUNGERE UNA NUOVA POSSIBILITA LEGATA ALLO STALLO DELLA MEMORIA,(MEM)
-                                                */
                                                 boolean inputStallOccurred=(inputStructuralStalls!=cpu.getStructuralStallsDivider()+cpu.getStructuralStallsEX()+cpu.getStructuralStallsFuncUnit() + cpu.getRAWStalls() + cpu.getWAWStalls()/*----*/+cpu.getMEMStalls()/*---*/);
 
                                                 //(s) Analizzo lo stato ID
@@ -203,13 +211,20 @@ public class GUICycles extends GUIComponent {
 								if(!inputStallOccurred)
 									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
 										lista.get(index).addStato("ID");
-                                                                /*-----*/
-								if(MEMStallOccurred)
+                                                                /**/
+								if(MEMStallOccurred /*AAA*/&& !RAWStallOccurred/*AAA*/)
 								{
-                                                                    if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-                                                                            lista.get(index).addStato("   ");
+                                                                    if(cpu.getVerific()==true && cpu.getStatus()==CPU.CPUStatus.RUNNING){
+                                                                        if(structStallEXOccurred){
+										lista.get(index).addStato("StEx");
+                                                                        }
+                                                                        else
+                                                                        lista.get(index).addStato("ID");
+                                                                    }  
+                                                                    else if(cpu.getVerific()==false)
+                                                                        lista.get(index).addStato("Alt.");
 								}
-                                                                /*---------*/
+                                                                /**/
                                                                 
                                                                 if(RAWStallOccurred)
 								{
@@ -404,9 +419,9 @@ public class GUICycles extends GUIComponent {
 				memoryStalls=cpu.getMemoryStalls();
 				inputStructuralStalls=cpu.getStructuralStallsDivider()+cpu.getStructuralStallsEX()+cpu.getStructuralStallsFuncUnit()+ cpu.getRAWStalls() + cpu.getWAWStalls()/*----*/+cpu.getMEMStalls()/*---*/;
 				RAWStalls=cpu.getRAWStalls();
-                                /*----------------*/
+                                /**/
                                 MEMStalls=cpu.getMEMStalls();
-                                /*----------------*/
+                                /**/
 				WAWStalls=cpu.getWAWStalls();
 				structStallsEX=cpu.getStructuralStallsEX();
 				structStallsDivider =cpu.getStructuralStallsDivider();
@@ -502,14 +517,18 @@ Main.logger.debug("\nlarghezza:" + pannello.getBounds().width + "altezza:" + pan
 					else if(st.equals("WAW") || st.equals("StDiv") || st.equals("StEx") || st.equals("StFun")){
 						g.setColor((Color)Config.get("IDColor"));	
 					}
-                                        /*---------------------*/
-                                        else if(st.equals("  ")){
+                                       
+
+                                        /**/
+                                        
+                                        else if(st.equals("Alt")){
 						g.setColor((Color)Config.get("EXColor"));	
 					}
-                                         else if(st.equals("   ")){
+                                         else if(st.equals("Alt.")){
 						g.setColor((Color)Config.get("IDColor"));	
 					}
-                                        /*------------------------*/
+                                        /**/
+                                        
 					else if(st.equals(" ")){
 						if(pre.equals("IF")){
 							ext_st=" ";
