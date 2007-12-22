@@ -147,6 +147,23 @@ public class Cache{
             else return mem.readW(address);
             }
             
+            
+    public long readWU(int address) throws MemoryExceptionStall,MemoryElementNotFoundException,NotAlingException
+            {
+            
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            boolean control=CacheControl.get(index);
+            if(control==false){
+                CacheControl.put(index,true);
+                //Al momento suppongo 2 stalli in caso di miss
+                throw new MemoryExceptionStall(2);
+                }
+            else return mem.readWU(address);
+            }
+            
+            
     public void writeB(int address, int data) throws MemoryExceptionStall,MemoryElementNotFoundException,IrregularWriteOperationException,NotAlingException
         {
             int index= address/8;
