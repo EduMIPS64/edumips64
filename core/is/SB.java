@@ -43,7 +43,7 @@ class SB extends Storing {
 	}
 	
 	
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException {
+	public void MEM() throws MemoryExceptionStall,IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException {
 		try {
 			//restoring the address from the temporary register
 			long address=TR[OFFSET_PLUS_BASE].getValue();
@@ -56,7 +56,8 @@ class SB extends Storing {
 			memEl.writeByte(TR[RT_FIELD].readByte(0), (int) (address%8));
 			*/
                         //MODIFICA
-                        memory.writeB((int)address,TR[RT_FIELD].readByte(0));
+                        //memory.writeB((int)address,TR[RT_FIELD].readByte(0));
+                        cache.writeB((int)address,TR[RT_FIELD].readByte(0));
                         //MODIFICA FINE
                     
                         if(enableForwarding) {

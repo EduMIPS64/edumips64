@@ -95,6 +95,7 @@ public class CPU {
 	/** Statistics */
 	private int MEMStalls,cycles, instructions, RAWStalls, WAWStalls, dividerStalls,funcUnitStalls,memoryStalls,exStalls;
 	boolean verific;
+        private int RAW;
 	/** Static initializer */
 	static {
 		cpu = null;
@@ -313,6 +314,10 @@ public class CPU {
         /**/ public boolean getVerific(){
                 return verific;
         }
+            public void setVerific(boolean in){
+                verific=in;
+                }
+        
         
        
         
@@ -764,6 +769,7 @@ if (getCycles()==29)
                 //ID
                     
                     currentPipeStatus = PipeStatus.ID;
+                    RAW=RAWStalls;
                     if(pipe.get(PipeStatus.ID)!=null) 
                         {
                                 if(knownFPInstructions.contains(pipe.get(PipeStatus.ID).getName())) {
@@ -827,7 +833,34 @@ if (getCycles()==29)
                                     
                                 
                             }
-				
+                            
+                        if(verific==true && RAW==RAWStalls){
+                        currentPipeStatus = PipeStatus.IF;
+			if(status == CPUStatus.RUNNING) {
+				if(pipe.get(PipeStatus.IF) != null) { //rispetto a dinmips scambia le load con le IF
+					try {
+						pipe.get(PipeStatus.IF).IF();
+					} catch (BreakException exc) {
+						breaking = 1;
+						edumips64.Main.logger.debug("breaking = 1");
+					}
+				}
+				pipe.put(PipeStatus.ID, pipe.get(PipeStatus.IF));
+				pipe.put(PipeStatus.IF, mem.getInstruction(pc));
+				old_pc.writeDoubleWord((pc.getValue()));
+				pc.writeDoubleWord((pc.getValue())+4);
+			} else {
+				pipe.put(PipeStatus.ID, Instruction.buildInstruction("BUBBLE"));
+			}
+			if(breaking == 1) {
+				breaking = 0;
+				edumips64.Main.logger.debug("Re-thrown the exception");
+				throw new BreakException();
+			}
+			if(syncex != null)
+				throw new SynchronousException(syncex);
+                    }
+                    //RAW=RAWStalls;
                 }   
                                     
 /*------------*/
@@ -924,6 +957,7 @@ if (getCycles()==29)
 		cycles = 0;
 		instructions = 0;
 		RAWStalls = 0;
+                RAW=0;
                 MEMStalls = 0;
                 verific=false;
                 flag=false;

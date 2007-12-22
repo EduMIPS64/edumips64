@@ -57,7 +57,7 @@ public abstract class FPLoading extends FPLDSTInstructions{
 	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
 	}
 	
-	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+	public void MEM() throws MemoryExceptionStall,IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
 		//since the load instruction reaches the MEM() stage, the (read) lock can be removed because WB() is reached first by the load instruction
 		cpu.getRegisterFP(params.get(FT_FIELD)).decrWAWSemaphore();
 	}

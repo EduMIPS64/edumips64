@@ -53,7 +53,7 @@ public class Storing extends LDSTInstructions{
 	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
 	}
 	
-	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+	public void MEM() throws MemoryExceptionStall,IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
 	}
 	
 	public void WB() throws IrregularStringOfBitsException {

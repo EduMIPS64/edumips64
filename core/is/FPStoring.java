@@ -47,7 +47,7 @@ public abstract class FPStoring extends FPLDSTInstructions{
 	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
 	}
 	
-	public abstract void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
+	public abstract void MEM() throws MemoryExceptionStall,IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
 	
 	public void WB() throws IrregularStringOfBitsException {
 	}

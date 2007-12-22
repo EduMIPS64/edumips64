@@ -257,7 +257,7 @@ public class GUICycles extends GUIComponent {
                                                 //(s) Analizzo lo stato IF
 						if(instr[0]!=null){
 							//(s) Se non accorrono situazioni di stallo, viene esaminata una nuova istruzione
-                                                        if(!inputStallOccurred)
+                                                        if(!inputStallOccurred || (MEMStallOccurred && cpu.getVerific()==true))
 							{
 								//we must instanciate a new ElementoCiclo only if the CPU is running or there was a JumpException and the the IF instruction was changed
 								if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
@@ -265,6 +265,8 @@ public class GUICycles extends GUIComponent {
 									lista.add(new ElementoCiclo(instr[0].getFullName(),tempo,instr[0].getSerialNumber()));
 									n_instr++;
 								}
+                                                                if((MEMStallOccurred && cpu.getVerific()==true))
+                                                                        cpu.setVerific(false);
 							}
 							else
                                                         //(s)Se accorrono situazioni di stallo allora si ha un prolungamente(un blocco giallo senza scritta)di IF

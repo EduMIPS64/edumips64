@@ -40,7 +40,7 @@ public class SDC1 extends FPStoring {
 		this.name="SDC1";
 	}
 
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException
+	public void MEM() throws MemoryExceptionStall,IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException
 	{
 		try
 		{
@@ -54,7 +54,8 @@ public class SDC1 extends FPStoring {
 			memEl.setBits(TR[RT_FIELD].getBinString(),0);*/
                          
                         //MODIFICA
-                        memory.writeD((int)address,TR[RT_FIELD].getBinString());
+                        //memory.writeD((int)address,TR[RT_FIELD].getBinString());
+                           cache.writeD((int)address,TR[RT_FIELD].getBinString());
                         //MODIFICA FINE
 			if(enableForwarding)
 			{

@@ -42,7 +42,7 @@ class LW extends Loading {
 		this.name="LW";
 	}
 	
-	public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+	public  void MEM() throws MemoryExceptionStall,IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
 		//restoring the address from the temporary register
 		long address=TR[OFFSET_PLUS_BASE].getValue();
 		//For the trace file
@@ -61,7 +61,8 @@ class LW extends Loading {
             /*MODIFICA*/
                
                 try{
-                int value=memory.readW((int)address);
+                //int value=memory.readW((int)address);
+                int value=cache.readW((int)address);
                 TR[LMD_REGISTER].writeWord(value);
                 if(enableForwarding) {
 				doWB();

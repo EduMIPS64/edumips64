@@ -69,18 +69,152 @@ public class Cache{
             else return mem.readB(address);
             }
      
-     
-     //Funzione che genera un numero random[tra 1 e 2]di stalli.AL MOMENTO NON UTILIZZATA.
+     public int readBU(int address) throws MemoryElementNotFoundException,MemoryExceptionStall
+            {
+            
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            boolean control=CacheControl.get(index);
+            if(control==false){
+                CacheControl.put(index,true);
+                //Al momento suppongo 2 stalli in caso di miss
+                throw new MemoryExceptionStall(2);
+                }
+            else return mem.readBU(address);
+            }
+            
+    public String readD(int address) throws MemoryElementNotFoundException,MemoryExceptionStall
+            {
+            
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            boolean control=CacheControl.get(index);
+            if(control==false){
+                CacheControl.put(index,true);
+                //Al momento suppongo 2 stalli in caso di miss
+                throw new MemoryExceptionStall(2);
+                }
+            else return mem.readD(address);
+            }
+        
+            
+    public int readH(int address) throws MemoryExceptionStall,MemoryElementNotFoundException,IrregularStringOfBitsException,NotAlingException
+            {
+            
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            boolean control=CacheControl.get(index);
+            if(control==false){
+                CacheControl.put(index,true);
+                //Al momento suppongo 2 stalli in caso di miss
+                throw new MemoryExceptionStall(2);
+                }
+            else return mem.readH(address);
+            }
+            
+            
+     public int readHU(int address) throws MemoryExceptionStall,MemoryElementNotFoundException,NotAlingException
+            {
+            
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            boolean control=CacheControl.get(index);
+            if(control==false){
+                CacheControl.put(index,true);
+                //Al momento suppongo 2 stalli in caso di miss
+                throw new MemoryExceptionStall(2);
+                }
+            else return mem.readHU(address);
+            }
+            
+    
+    public int readW(int address) throws MemoryExceptionStall,MemoryElementNotFoundException,NotAlingException
+            {
+            
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            boolean control=CacheControl.get(index);
+            if(control==false){
+                CacheControl.put(index,true);
+                //Al momento suppongo 2 stalli in caso di miss
+                throw new MemoryExceptionStall(2);
+                }
+            else return mem.readW(address);
+            }
+            
+    public void writeB(int address, int data) throws MemoryExceptionStall,MemoryElementNotFoundException,IrregularWriteOperationException,NotAlingException
+        {
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            boolean control=CacheControl.get(index);
+            if(control==false){
+                CacheControl.put(index,true);
+                //Al momento suppongo 2 stalli in caso di miss
+                throw new MemoryExceptionStall(2);
+                }
+            else mem.writeW(address,data);
+            }
+    
+        
+    public void writeD(int address, String data) throws MemoryExceptionStall,MemoryElementNotFoundException,IrregularStringOfBitsException
+        {
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            boolean control=CacheControl.get(index);
+            if(control==false){
+                CacheControl.put(index,true);
+                //Al momento suppongo 2 stalli in caso di miss
+                throw new MemoryExceptionStall(2);
+                }
+            else mem.writeD(address,data);
+            }
+            
+            
+     public void writeH(int address,int data) throws MemoryExceptionStall,MemoryElementNotFoundException,IrregularWriteOperationException,NotAlingException
+        {
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            boolean control=CacheControl.get(index);
+            if(control==false){
+                CacheControl.put(index,true);
+                //Al momento suppongo 2 stalli in caso di miss
+                throw new MemoryExceptionStall(2);
+                }
+            else mem.writeH(address,data);
+            }
+            
+            
+            
+    public void writeW(int address,int data) throws MemoryExceptionStall,MemoryElementNotFoundException,IrregularWriteOperationException,NotAlingException
+        {
+            int index= address/8;
+            if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+			throw new MemoryElementNotFoundException();
+            boolean control=CacheControl.get(index);
+            if(control==false){
+                CacheControl.put(index,true);
+                //Al momento suppongo 2 stalli in caso di miss
+                throw new MemoryExceptionStall(2);
+                }
+            else mem.writeW(address,data);
+            }
+            
+            
+            
+    //Funzione che genera un numero random[tra 1 e 2]di stalli.AL MOMENTO NON UTILIZZATA potenzialemente da sostituire ai 2 stalli posti di default in presenza di un miss dati.
      public int chekCache(int address){
              int stalls=(int)Math.random()+1;
              return stalls;
      }
+
+ }
      
-     //Resetta il contenuto dell'hashMap CacheControl che tiene conto degli accessi in memoria.AL MOMENTO NON UTILIZZATA
-    public void clear(){
-                for(int i = 0; i < CPU.DATALIMIT; i++)
-                CacheControl.put(i,false);
-            }
-         
-}
      

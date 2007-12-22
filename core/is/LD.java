@@ -41,7 +41,7 @@ class LD extends Loading {
 		super.OPCODE_VALUE = OPCODE_VALUE;
 		this.name="LD";
 	}
-	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+	public void MEM() throws MemoryExceptionStall,IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
 		//restoring the address from the temporary register
 		long address=TR[OFFSET_PLUS_BASE].getValue();
 		//For the trace file
@@ -53,7 +53,8 @@ class LD extends Loading {
 		TR[LMD_REGISTER].setBits(memEl.getBinString(),0);
 		*/
                  /*MODIFICA*/
-                String value=memory.readD((int)address);
+                //String value=memory.readD((int)address);
+                String value=cache.readD((int)address);
                 TR[LMD_REGISTER].setBits(value,0);
                 /*MODIFICA FINE*/
             

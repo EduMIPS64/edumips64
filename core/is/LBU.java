@@ -44,7 +44,7 @@ class LBU extends Loading
 		this.name="LBU";
 	}
 
-	public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
+	public  void MEM() throws MemoryExceptionStall,IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
 	{ 
 		//restoring the address from the temporary register
 		long address=TR[OFFSET_PLUS_BASE].getValue();
@@ -60,7 +60,8 @@ class LBU extends Loading
 		*/
             
                  /*MODIFICA*/
-                int value=memory.readBU((int)address);
+                //int value=memory.readBU((int)address);
+                int value=cache.readBU((int)address);
                 TR[LMD_REGISTER].writeByteUnsigned(value);
                 /*MODIFICA FINE*/
             

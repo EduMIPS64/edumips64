@@ -46,7 +46,7 @@ class SH extends Storing
 		this.name="SH";
 	}
 
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException
+	public void MEM() throws MemoryExceptionStall,IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException
 	{ 
 		try
 		{
@@ -60,7 +60,8 @@ class SH extends Storing
 			memEl.writeHalf(TR[RT_FIELD].readHalf(0), (int) (address%8));*/
                         
                          //MODIFICA
-                        memory.writeH((int)address,TR[RT_FIELD].readHalf(0));
+                       // memory.writeH((int)address,TR[RT_FIELD].readHalf(0));
+                         cache.writeH((int)address,TR[RT_FIELD].readHalf(0));
                         //MODIFICA FINE
 			if(enableForwarding)
 			{

@@ -43,7 +43,7 @@ class SW extends Storing {
 	}
 	
 	
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+	public void MEM() throws MemoryExceptionStall,IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
 		
 		try {
 			//restoring the address from the temporary register
@@ -56,7 +56,8 @@ class SW extends Storing {
 			memEl.writeWord(TR[RT_FIELD].readWord(0), (int) (address%8));*/
                         
                          //MODIFICA
-                        memory.writeW((int)address,TR[RT_FIELD].readWord(0));
+                        //memory.writeW((int)address,TR[RT_FIELD].readWord(0));
+                         cache.writeW((int)address,TR[RT_FIELD].readWord(0));
                         //MODIFICA FINE
 		} catch(NotAlingException er) {
 			throw new AddressErrorException();

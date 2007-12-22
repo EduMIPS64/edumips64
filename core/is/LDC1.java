@@ -41,7 +41,7 @@ class LDC1 extends FPLoading {
 		super.OPCODE_VALUE = OPCODE_VALUE;
 		this.name="LDC1";
 	}
-	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+	public void MEM() throws MemoryExceptionStall,IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
 		super.MEM(); //unlock the fp register in order to avoid WAW hazards
 		//restoring the address from the temporary register
 		long address=TR[OFFSET_PLUS_BASE].getValue();
@@ -54,7 +54,8 @@ class LDC1 extends FPLoading {
 		TR[LMD_REGISTER].setBits(memEl.getBinString(),0);*/
             
                  /*MODIFICA*/
-                String value=memory.readD((int)address);
+                //String value=memory.readD((int)address);
+                String value=cache.readD((int)address);
                 TR[LMD_REGISTER].setBits(value,0);
                 /*MODIFICA FINE*/
                 
