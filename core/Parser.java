@@ -537,6 +537,7 @@ public class Parser
 
 
 							String syntax = tmpInst.getSyntax();
+                            Main.logger.debug("Syntax: " + syntax);
 							instrCount += 4;
 							if (syntax.compareTo("")!=0 && (line.length()<end+1))
 							{
@@ -1007,13 +1008,15 @@ public class Parser
 											}
 											try
 											{
+							                    Main.logger.debug("Working with a label. Param = " + param);
 												MemoryElement tmpMem;
 												if(param.substring(indPar,endPar).equals(""))
 													tmpInst.getParams().add(0);
 												else if(isNumber(param.substring(indPar,endPar).trim()))
 												{
 													int tmp = Integer.parseInt(param.substring(indPar,endPar).trim());
-													if (tmp<0 || tmp%8!=0 || tmp > edumips64.core.CPU.DATALIMIT)
+							                        Main.logger.debug("tmp = " + tmp);
+													if (tmp<0 || tmp%2!=0 || tmp > edumips64.core.CPU.DATALIMIT)
 													{   
 															numError++;
 															String er = "LABELADDRESSINVALID";
