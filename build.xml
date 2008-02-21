@@ -93,6 +93,16 @@
         <delete dir="${outputDir}" /> 
 	</target>
 
+	<target name="parsertest" depends="init, dirs">
+		<jar destfile="edumips64-parser.jar" basedir="edumips">
+			<manifest>
+				<attribute name="Main-Class" value="edumips64.ParserTest"/>
+			</manifest>
+		</jar>
+		<signjar jar="${svnJarFile}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
+        <delete dir="${outputDir}" /> 
+	</target>
+
     <target name="release" depends="init">
         <mkdir dir="edumips64" />
 		<copy todir="edumips64/">
