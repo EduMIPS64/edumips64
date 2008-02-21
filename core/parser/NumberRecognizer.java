@@ -23,7 +23,7 @@ package edumips64.core.parser;
 
 public class NumberRecognizer extends Recognizer{
     protected void buildTable(){
-        numStates = 14;
+        numStates = 16;
         table = new ScannerTable<Character>(numStates);
 
         table.setTransition(0,1, new Validator<Character>(){
@@ -161,13 +161,37 @@ public class NumberRecognizer extends Recognizer{
             }
         });
 
-        table.setFinalStatus(3, new IntegerToken("").getClass());
-        table.setFinalStatus(4, new IntegerToken("").getClass());
-        table.setFinalStatus(5, new IntegerToken("").getClass());
-        table.setFinalStatus(7, new FloatToken("").getClass());
-        table.setFinalStatus(11, new FloatToken("").getClass());
-        table.setFinalStatus(12, new FloatToken("").getClass());
-        table.setFinalStatus(13, new FloatToken("").getClass());
+        //transizioni per i numeri in esadecimale
+        table.setTransition(3,14, new Validator<Character>(){
+            public boolean validate(Character c){
+                return c == 'x';
+            }
+        });
+        table.setTransition(14,15, new Validator<Character>(){
+            public boolean validate(Character c){
+                return Character.isDigit(c) || 
+                     (c >= 'a' && c <= 'f') ||
+                     (c >= 'A' && c <= 'F');
+            }
+        });
+        table.setTransition(15,15, new Validator<Character>(){
+            public boolean validate(Character c){
+                return Character.isDigit(c) || 
+                     (c >= 'a' && c <= 'f') ||
+                     (c >= 'A' && c <= 'F');
+            }
+        });
+           
+        Class c = new IntegerToken("").getClass();
+
+        table.setFinalStatus(3,c);
+        table.setFinalStatus(4,c);
+        table.setFinalStatus(5,c);
+        table.setFinalStatus(7,c);
+        table.setFinalStatus(11,c);
+        table.setFinalStatus(12,c);
+        table.setFinalStatus(13,c);
+        table.setFinalStatus(15,c);
     }
 }
 

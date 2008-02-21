@@ -23,7 +23,7 @@ package edumips64.core.parser;
 
 public class TestRecognizer{
     public static void main(String[] args) throws Exception{
-        Recognizer recognizer = new IDRecognizer();
+        Recognizer recognizer = new NumberRecognizer();
         java.io.BufferedReader in = new java.io.BufferedReader(
                 new java.io.InputStreamReader(System.in));
         while(true){
