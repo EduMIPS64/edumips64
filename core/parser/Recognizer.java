@@ -21,7 +21,6 @@
  */
 package edumips64.core.parser;
 
-package edumips.core.parser;
 import java.io.*;
 
 public abstract class Recognizer{
