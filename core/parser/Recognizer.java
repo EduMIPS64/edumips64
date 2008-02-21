@@ -24,7 +24,7 @@ package edumips64.core.parser;
 import java.io.*;
 
 public abstract class Recognizer{
-    protected ScannerTable<Character> table;
+    protected ScannerTable<Character,Token> table;
     protected int numStates;
     protected StringBuffer buffer;
 

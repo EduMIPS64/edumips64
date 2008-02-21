@@ -24,7 +24,7 @@ package edumips64.core.parser;
 public class NumberRecognizer extends Recognizer{
     protected void buildTable(){
         numStates = 16;
-        table = new ScannerTable<Character>(numStates);
+        table = new ScannerTable<Character,Token>(numStates);
 
         table.setTransition(0,1, new Validator<Character>(){
             public boolean validate(Character c){

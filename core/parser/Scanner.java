@@ -24,7 +24,6 @@ package edumips64.core.parser;
 import java.io.*;
 
 public class Scanner{
-    private ScannerTable<Character> table;
     private Reader reader;
     private DirectiveRecognizer directiveRec = new DirectiveRecognizer();
     private NumberRecognizer numRec = new NumberRecognizer();

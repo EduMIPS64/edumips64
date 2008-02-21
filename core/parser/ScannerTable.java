@@ -30,9 +30,11 @@ import java.io.*;
  * a validating function to specifiy what element may trigger the transition.
  *
  * Given a state X and an element A, the next status of X under A SHOULD be
- * unique, otherways the behaviour is unpredictable.
+ * unique, otherways the behaviour is unpredictable. 
+ * Scanned element are objects of class E, while upon recognition a 
+ * Class< ? extends T> object is return to dynamically create an instance.
  */
-public class ScannerTable<E>{
+public class ScannerTable<E,T>{
     
     /**
      * Represents a table entry as a transition with a 2-tuple:
@@ -63,7 +65,7 @@ public class ScannerTable<E>{
     private ArrayList<List<TableEntry<E>>> table;
     private int numStates;
     private boolean[] isFinalStatus;
-    private ArrayList<Class<? extends Token>> tokenClass;
+    private ArrayList<Class<? extends T>> tokenClass;
 
     /** Standard constructor.
      * @param numStates number of states in the DFA
@@ -73,10 +75,10 @@ public class ScannerTable<E>{
         isFinalStatus = new boolean[numStates];
 
         table = new ArrayList<List<TableEntry<E>>>(numStates);
-        tokenClass = new ArrayList<Class<? extends Token>>(numStates);
+        tokenClass = new ArrayList<Class<? extends T>>(numStates);
         for(int i = 0; i<numStates; i++){
             table.add(new ArrayList<TableEntry<E>>());
-            tokenClass.add(new ErrorToken("").getClass());
+            tokenClass.add(null);
         }
     }
 
@@ -90,7 +92,7 @@ public class ScannerTable<E>{
         table.get(status).add(new TableEntry<E>(nextStatus, validator));
     }
     
-    public void setFinalStatus(int status, Class<? extends Token> clazz ){
+    public void setFinalStatus(int status, Class<? extends T> clazz ){
         isFinalStatus[status] = true;
         tokenClass.set(status,clazz);
     }
@@ -106,7 +108,7 @@ public class ScannerTable<E>{
      * @param status current status of the DFA
      * @return a Class Object used to dynamically instantiate Token objects
      */
-    public Class<? extends Token> getFinalStatusClass(int status){
+    public Class<? extends T> getFinalStatusClass(int status){
         return tokenClass.get(status);
     }
 
@@ -127,7 +129,7 @@ public class ScannerTable<E>{
     
     public static void main(String[] args) throws IOException{
         final int NUMSTATES = 6;
-        ScannerTable<Character> table = new ScannerTable<Character>(NUMSTATES);
+        ScannerTable<Character,Token> table = new ScannerTable<Character,Token>(NUMSTATES);
 
         table.setTransition(0,1, new Validator<Character>(){
             public boolean validate(Character c){

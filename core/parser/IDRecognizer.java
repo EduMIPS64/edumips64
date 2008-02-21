@@ -24,7 +24,7 @@ package edumips64.core.parser;
 public class IDRecognizer extends Recognizer{
     protected void buildTable(){
         numStates = 14;
-        table = new ScannerTable<Character>(numStates);
+        table = new ScannerTable<Character,Token>(numStates);
         
         //riconoscimento registro
         table.setTransition(0,1, new Validator<Character>(){
