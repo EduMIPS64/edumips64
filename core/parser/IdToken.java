@@ -26,6 +26,9 @@ public class IdToken extends Token{
         super(buffer);
     }
 
+    public IdToken(String buffer, int line) {
+        super(buffer,line);
+    }
     public boolean validate(char pattern){
         return pattern == 'L';
     }

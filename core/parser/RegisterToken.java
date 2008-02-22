@@ -22,10 +22,13 @@
 package edumips64.core.parser;
 
 public class RegisterToken extends Token{
+    public RegisterToken(String buffer,int line){
+        super(buffer,line);
+    }
+
     public RegisterToken(String buffer){
         super(buffer);
     }
-
     public boolean validate(char pattern){
         return pattern == 'R';
     }

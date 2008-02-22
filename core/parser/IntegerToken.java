@@ -22,6 +22,9 @@
 package edumips64.core.parser;
 
 public class IntegerToken extends Token{
+    public IntegerToken(String buffer, int line){
+        super(buffer, line);
+    }
     public IntegerToken(String buffer){
         super(buffer);
     }

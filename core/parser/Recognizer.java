@@ -41,14 +41,12 @@ public abstract class Recognizer{
         char token;
             try{
                 while(true){
-                    stream.mark(1);
+                    stream.mark(2);
                     int r = stream.read();
                     if( r == -1) //end of stream
                         break;
                     token = (char)r;
-                    //System.out.println("Processing token " + token);
                     nextState = table.getNextStatus(state,token);
-                    //System.out.println("Next state " + nextState);
                     if( nextState == -1){
                         stream.reset();
                         break;

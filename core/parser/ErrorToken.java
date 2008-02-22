@@ -26,6 +26,10 @@ public class ErrorToken extends Token{
         super(buffer);
     }
 
+    public ErrorToken(String buffer, int line) {
+        super(buffer, line);
+    }
+
     public boolean validate(char pattern){
         return false;
     }

@@ -22,10 +22,13 @@
 package edumips64.core.parser;
 
 public class LeftParenToken extends Token{
+    public LeftParenToken(int  line) {
+        super("(",line);
+    }
+
     public LeftParenToken() {
         super("(");
     }
-
     public boolean validate(char pattern){
         return pattern == '(';
     }

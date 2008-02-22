@@ -22,10 +22,13 @@
 package edumips64.core.parser;
 
 public class EOFToken extends Token{
+    public EOFToken(int line){
+        super("", line);
+    }
+
     public EOFToken(){
         super("");
     }
-
     public boolean validate(char pattern){
         return false;
     }

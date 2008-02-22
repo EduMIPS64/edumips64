@@ -26,6 +26,9 @@ public class FloatToken extends Token{
         super(buffer);
     }
 
+    public FloatToken(String buffer, int line){
+        super(buffer, line);
+    }
     public boolean validate(char pattern){
         return pattern == 'G';
     }

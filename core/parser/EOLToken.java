@@ -26,6 +26,9 @@ public class EOLToken extends Token{
         super("\n");
     }
 
+    public EOLToken(int line){
+        super("\n",line);
+    }
     public boolean validate(char pattern){
         return pattern == '\n'; //TODO: da sistemare
     }

@@ -22,6 +22,10 @@
 package edumips64.core.parser;
 
 public class FPRegisterToken extends Token{
+    public FPRegisterToken(String buffer,int line){
+        super(buffer,line);
+    }
+
     public FPRegisterToken(String buffer){
         super(buffer);
     }

@@ -22,10 +22,13 @@
 package edumips64.core.parser;
 
 public class ColonToken extends Token{
+    public ColonToken(int line){
+        super(":", line);
+    }
+
     public ColonToken(){
         super(":");
     }
-
     public boolean validate(char pattern){
         return pattern == ':';
     }

@@ -31,12 +31,18 @@ public class Scanner{
     private RegisterRecognizer regRec = new RegisterRecognizer();
     //private FPRegisterRecognizer fpRegRec = new FPRegisterRecognizer();
     private IDRecognizer idRec = new IDRecognizer();
+    private int currentLine;
     
     /** Constructor.
      * @param reader stream for consuming characters
      */
     public Scanner(Reader reader){
         this.reader = reader;
+        this.currentLine = 1;
+    }
+
+    private Token getEOLToken(){
+        return new EOLToken(currentLine++);
     }
 
     /** Returns true only if the scanner has a new token.
@@ -65,24 +71,30 @@ public class Scanner{
 
             //A comment line may end with EOL or with EOF
             if( r == -1)
-                return new EOFToken();
+                return new EOFToken(currentLine);
             else
-                return new EOLToken();
+                return getEOLToken();
         }catch(IOException e){
             return new ErrorToken("I/O Error");
         }
     }
 
     public Token nextToken(){
+        Token t;
         while(true){
             try{
                 reader.mark(1);
                 int r = reader.read();
                 if( r == -1)
-                    return new EOFToken();
+                    return new EOFToken(currentLine);
 
                 char token = (char) r;
                 
+                //Pay attention, newline character is recognized as
+                //whitespace...!
+                if( token == '\n')
+                    return getEOLToken();
+
                 if( Character.isWhitespace(token))
                     continue;
                 
@@ -90,34 +102,43 @@ public class Scanner{
                 if( Character.isLetter(token)){
                     reader.reset();
                     //may be an identifier or a register
-                    return idRec.recognize(reader);
+                    t = idRec.recognize(reader);
+                    t.setLine(currentLine);
+                    return t;
                 }
 
                 //numbers (integer and float) start with a digit or + and -
                 if( Character.isDigit(token) || token == '+' || token == '-'){
                     reader.reset();
-                    return numRec.recognize(reader);
+                    t = numRec.recognize(reader);
+                    t.setLine(currentLine);
+                    return t;
                 }
 
                 //single characters, comment, strings and directives
                 //only start with certain characters
                 switch(token){
-                    case '\n': return new EOLToken();
-                    case '(': return new LeftParenToken();       
-                    case ')': return new RightParenToken();       
-                    case ',': return new CommaToken();
-                    case ':': return new ColonToken();
+                    case '(': return new LeftParenToken(currentLine);       
+                    case ')': return new RightParenToken(currentLine);       
+                    case ',': return new CommaToken(currentLine);
+                    case ':': return new ColonToken(currentLine);
                     case ';': return skipComment(); 
                     case '$': reader.reset();
-                              return regRec.recognize(reader);
+                              t = regRec.recognize(reader);
+                              t.setLine(currentLine);
+                              return t;
                     case '.': reader.reset(); 
-                              return directiveRec.recognize(reader);
+                              t = directiveRec.recognize(reader);
+                              t.setLine(currentLine);
+                              return t;
                     case '"': reader.reset();
-                              return stringRec.recognize(reader);
+                              t = stringRec.recognize(reader);
+                              t.setLine(currentLine);
+                              return t;
                 }
-                return new ErrorToken(""+token);
+                return new ErrorToken(""+token, currentLine);
             } catch (IOException e){
-                return new ErrorToken("I/O Error");
+                return new ErrorToken("I/O Error", currentLine);
             }
         }
     }
@@ -127,7 +148,6 @@ public class Scanner{
         Scanner scanner = new Scanner(reader);
         while(scanner.hasToken())
             System.out.println(scanner.nextToken());
-        System.out.println(scanner.nextToken());
     }
 }
 

@@ -22,6 +22,10 @@
 package edumips64.core.parser;
 
 public class CommaToken extends Token{
+    public CommaToken(int line) {
+        super(",", line);
+    }
+
     public CommaToken() {
         super(",");
     }

@@ -23,9 +23,20 @@ package edumips64.core.parser;
 
 public abstract class Token{
     protected String buffer;
+    protected int line;
     
+    public Token(String buffer, int line){
+        this.buffer = buffer;
+        this.line = line;
+    }
+
     public Token(String buffer){
         this.buffer = buffer;
+        this.line = -1;
+    }
+
+    public void setLine(int line){
+        this.line = line;
     }
 
     public boolean validate(char pattern){
@@ -33,11 +44,15 @@ public abstract class Token{
     }
 
     public String toString(){
-        return getClass().getName() + ": " + buffer;
+        return getClass().getName() + "[line " + line + "]: " + buffer;
     }
 
     public boolean isErrorToken(){
         return false;
+    }
+
+    public int getLine(){
+        return line;
     }
 
     public void addParameter(){}
