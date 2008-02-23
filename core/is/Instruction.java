@@ -87,6 +87,7 @@ public abstract class Instruction {
 	 */
 	public static Instruction buildInstruction(String name){
 		Instruction returnedObject=null;
+        name = name.toUpperCase();
 		//If the name of the requested instruction has got a dot, the istruction is FP and an
 		//underscore takes the place of the dot because classes names cannot contain dots
 		name=name.replaceAll("\\.","_");
