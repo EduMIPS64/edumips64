@@ -79,6 +79,7 @@ public class Scanner{
         }
     }
 
+    // TODO: eccezione END OF TOKEN STREAM
     public Token nextToken(){
         Token t;
         while(true){

@@ -69,8 +69,11 @@ public class Parser {
     protected Parser() {
         algorithms = new HashMap<String, ParsingAlgorithm>();
         default_alg = new NullParsingAlgorithm(this);
+        CodeParsingAlgorithm cpa = new CodeParsingAlgorithm(this);
+
         registerAlgorithm(".DATA", default_alg);
-        registerAlgorithm(".CODE", default_alg);
+        registerAlgorithm(".CODE", cpa);
+        registerAlgorithm(".TEXT", cpa);
     }
 
     protected void registerAlgorithm(String directive, ParsingAlgorithm p) {
