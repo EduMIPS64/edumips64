@@ -100,13 +100,13 @@ public class CPU {
 		// To avoid future singleton problems
 		Instruction dummy = Instruction.buildInstruction("BUBBLE");
 		
-		edumips64.Main.logger.debug("Creating the CPU...");
+		//edumips64.Main.logger.debug("Creating the CPU...");
 		cycles = 0;
 		status = CPUStatus.READY;
 		mem = Memory.getInstance();
-		edumips64.Main.logger.debug("Got Memory instance..");
+		//edumips64.Main.logger.debug("Got Memory instance..");
 		symTable = SymbolTable.getInstance();
-		edumips64.Main.logger.debug("Got SymbolTable instance..");
+	//	edumips64.Main.logger.debug("Got SymbolTable instance..");
 		
 		// Registers initialization
 		gpr = new Register[32];
@@ -138,7 +138,7 @@ public class CPU {
 		knownFPInstructions=conf.getFPArithmeticInstructions();
 		terminatingInstructionsOPCodes=conf.getTerminatingInstructions();
 		
-		edumips64.Main.logger.debug("CPU Created.");
+		//edumips64.Main.logger.debug("CPU Created.");
 		
 	}
 	

@@ -42,7 +42,7 @@ public class Memory{
 	private static CPU cpu;
 	
 	private Memory(){
-		edumips64.Main.logger.debug("Building Memory: " + this.hashCode());
+		//edumips64.Main.logger.debug("Building Memory: " + this.hashCode());
 		mem_comments = new HashMap<Integer,String>();
 		cells = new ArrayList<MemoryElement>();
 		instr_num = 0;
@@ -51,7 +51,7 @@ public class Memory{
 			cells.add(new MemoryElement(i*8));
 		for(int i = 0; i < CPU.CODELIMIT; i++)
 			instructions.add(Instruction.buildInstruction("BUBBLE"));
-		edumips64.Main.logger.debug("Memory built: " + this.hashCode());
+		//edumips64.Main.logger.debug("Memory built: " + this.hashCode());
 	}
 
 	/** Returns the maximum number of MemoryElement stored in Memory
