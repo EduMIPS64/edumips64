@@ -29,6 +29,10 @@ public class DirectiveToken extends Token{
     public boolean validate(char pattern){
         return pattern == 'D';
     }
+
+    public String getBuffer() {
+        return buffer.toUpperCase();
+    }
 }
 
 

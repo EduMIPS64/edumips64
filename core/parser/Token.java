@@ -56,6 +56,10 @@ public abstract class Token{
     }
 
     public void addParameter(){}
+
+    public String getBuffer() {
+        return buffer;
+    }
 }
 
 
