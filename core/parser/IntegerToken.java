@@ -30,7 +30,7 @@ public class IntegerToken extends Token{
     }
 
     public boolean validate(char pattern){
-        return pattern == 'I'; //TODO: da sistemare
+        return (pattern == 'I') || (pattern == 'U' && Integer.parseInt(buffer) >= 0);
     }
 }
 
