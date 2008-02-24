@@ -1,7 +1,7 @@
 .code
 a: B d		; goto d
-b: B f		; goto f
-c: B g		; goto g
+n: B f		; goto f
+b: B g		; goto g
 d: B b		; goto b
 e: B i		; goto i
 f: B h		; goto h
