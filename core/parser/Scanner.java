@@ -79,6 +79,13 @@ public class Scanner{
         }
     }
 
+    // Debug method, prints the actual token
+    public Token next() {
+        Token t = nextToken();
+        System.out.println(t);
+        return t;
+    }
+
     // TODO: eccezione END OF TOKEN STREAM
     public Token nextToken(){
         Token t;
