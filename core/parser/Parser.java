@@ -24,6 +24,8 @@
  */
 
 package edumips64.core.parser;
+
+import edumips64.core.*;
 import java.util.HashMap;
 
 public class Parser {
@@ -32,6 +34,7 @@ public class Parser {
     protected static Parser instance;
     protected Scanner scanner;
     protected ParsingAlgorithm default_alg;
+    protected SymbolTable symbols;
 
     /* --------------------
      * Public methods
@@ -51,6 +54,7 @@ public class Parser {
     };
     /* ----------------------------
      * Package-wide visible methods
+     * used by parsing algorithms
      * ----------------------------
      */
     boolean hasAlgorithm(String directive) {
@@ -62,6 +66,23 @@ public class Parser {
         algorithms.get(directive).parse(scanner);
     }
 
+    // TODO: right now the addError method prints the error.
+    // It will use ParserMultiException to report errors to user.
+    void addError(Token t, String error) {
+        System.out.println("************* " + error + ": " + t);
+    }
+
+    void addInstructionToSymbolTable(int address, String label, Token instruction) {
+        System.out.println("Adding " + instruction.getBuffer() + " to SymbolTable, label " + label + ", address " + address);
+        try {
+            symbols.setInstructionLabel(address, label);
+        }
+        catch (SameLabelsException e) {
+            addError(instruction, "Duplicate label");
+        }
+    }
+
+
     /* -----------------
      * Protected methods
      * -----------------
@@ -70,6 +91,7 @@ public class Parser {
         algorithms = new HashMap<String, ParsingAlgorithm>();
         default_alg = new NullParsingAlgorithm(this);
         CodeParsingAlgorithm cpa = new CodeParsingAlgorithm(this);
+        symbols = SymbolTable.getInstance();
 
         registerAlgorithm(".DATA", default_alg);
         registerAlgorithm(".CODE", cpa);

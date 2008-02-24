@@ -35,39 +35,53 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
 
     public void parse(Scanner s) {
         System.out.println("Starting CodeParsingAlgorithm");
+        int address = 0;
         while(s.hasToken()) {
-            Token token = s.nextToken();
+            System.out.println("Starting Instruction parsing cycle");
+            String label = null;
+            Token token = s.next();
+            Token instructionToken;
             String data = token.getBuffer();
 
             // Error
-            if(token.isErrorToken())
-                System.out.println("Lexical error: " + token);
+            if(token.isErrorToken()) {
+                parser.addError(token, "Lexical error");
+                continue;
+            }
 
 
             // Directive
             else if(token.validate('D')) {
                 if(parser.hasAlgorithm(data))
                     parser.switchParsingAlgorithm(data);
-                else
-                    System.out.println("Invalid directive in .data section");
+                else {
+                    parser.addError(token, "Invalid directive");
+                    continue;
+                } 
             }
 
             // ID
             else if(token.validate('L')) {
                 // Label?
                 Instruction tmpInstr = Instruction.buildInstruction(data);
+                instructionToken = token;
                 if(tmpInstr == null) {
                     // Label! It would be useful if there was a "EndOfTokenStream" exception
-                    Token colon = s.nextToken(); 
-                    if(!colon.validate(':'))
-                        System.out.println("Error: colon expected");
+                    token = s.next(); 
+                    if(!token.validate(':')) {
+                        parser.addError(token, "Colon expected");
+                        continue;
+                    } 
                     else {
                         // Good label
-                        System.out.println("Label - " + data);
-                        Token temp = s.nextToken();
-                        tmpInstr = Instruction.buildInstruction(temp.getBuffer());
-                        if(tmpInstr == null)
-                            System.out.println("Error: missing instruction");
+                        label = data;
+                        token = s.next();
+                        tmpInstr = Instruction.buildInstruction(token.getBuffer());
+                        instructionToken = token;
+                        if(tmpInstr == null) {
+                            parser.addError(token, "Instruction expected");
+                            continue;
+                        }
                     }
                 }
 
@@ -77,14 +91,27 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
 
                 for(int i = 0; i < syntax.length(); ++i) {
                     char c = syntax.charAt(i);
+
+                    // The syntax string is something like "%I,%I,%C".
+                    // We don't need the % characters, so we strip them out.
                     if(c == '%')
                         continue;
-                    Token temp = s.nextToken();
-                    if(temp.validate(c))
-                        System.out.println("OK");
-                    else
-                        System.out.println("Unexpected token: " + temp);
+                    token = s.next();
+                    if(!token.validate(c))
+                        parser.addError(token, "Unexpected token");
+
+                    // TODO: add parameter to parameters' list
                 }
+
+                if(label != null) {
+                    parser.addInstructionToSymbolTable(address, label, instructionToken);
+                }
+
+                token = s.next();
+                if(!token.validate('\n'))
+                    parser.addError(token, "Expected EOL");
+
+                address += 4;
             }
         }
     }
