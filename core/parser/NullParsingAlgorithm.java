@@ -33,13 +33,13 @@ class NullParsingAlgorithm extends ParsingAlgorithm {
     public void parse(Scanner s) {
         System.out.println("Starting NullParsingAlgorithm");
         while(s.hasToken()) {
-            Token token = s.nextToken();
+            Token token = s.next();
             String data = token.getBuffer();
 
-            if(token.validate('D') && parser.hasAlgorithm(data))
+            if(token.validate('D') && parser.hasAlgorithm(data)) {
                 parser.switchParsingAlgorithm(data);
-            else
-                System.out.println("Throwing away: " + token.toString());
+                break;
+            }
         }
     }
 }

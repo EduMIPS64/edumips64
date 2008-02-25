@@ -52,8 +52,10 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
 
             // Directive
             else if(token.validate('D')) {
-                if(parser.hasAlgorithm(data))
+                if(parser.hasAlgorithm(data)) {
                     parser.switchParsingAlgorithm(data);
+                    break;
+                }
                 else {
                     parser.addError(token, "Invalid directive");
                     continue;

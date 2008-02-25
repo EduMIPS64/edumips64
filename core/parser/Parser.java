@@ -26,11 +26,17 @@
 package edumips64.core.parser;
 
 import edumips64.core.*;
+import edumips64.core.is.Instruction;
 import java.util.HashMap;
 
 public class Parser {
-    // Association between directives and parsing algorithms
+    // Association between directives and parsing algorithms (State design
+    // pattern)
     protected HashMap<String, ParsingAlgorithm> algorithms;
+
+    // List of instructions with parameters
+    // TODO
+
     protected static Parser instance;
     protected Scanner scanner;
     protected ParsingAlgorithm default_alg;
@@ -44,6 +50,8 @@ public class Parser {
         System.out.println("Starting the parser subsystem");
         scanner = s;
         default_alg.parse(s);
+
+        System.out.println("Will now pack the instructions");
     }
 
     // Singleton design pattern
@@ -82,6 +90,11 @@ public class Parser {
         }
     }
 
+    static boolean isInstruction(Token t) {
+        // TODO: should we improve it?
+        return Instruction.buildInstruction(t.getBuffer()) != null;
+    }
+
 
     /* -----------------
      * Protected methods
@@ -90,12 +103,16 @@ public class Parser {
     protected Parser() {
         algorithms = new HashMap<String, ParsingAlgorithm>();
         default_alg = new NullParsingAlgorithm(this);
-        CodeParsingAlgorithm cpa = new CodeParsingAlgorithm(this);
+        CodeParsingAlgorithm code_pa = new CodeParsingAlgorithm(this);
+        DataParsingAlgorithm data_pa = new DataParsingAlgorithm(this);
         symbols = SymbolTable.getInstance();
 
-        registerAlgorithm(".DATA", default_alg);
-        registerAlgorithm(".CODE", cpa);
-        registerAlgorithm(".TEXT", cpa);
+        // Association of parsing algorithms with directives
+        registerAlgorithm(".DATA", data_pa);
+        registerAlgorithm(".CODE", code_pa);
+        registerAlgorithm(".TEXT", code_pa);
+
+        // Data types
     }
 
     protected void registerAlgorithm(String directive, ParsingAlgorithm p) {
