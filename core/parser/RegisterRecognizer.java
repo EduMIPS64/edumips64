@@ -23,7 +23,7 @@ package edumips64.core.parser;
 
 public class RegisterRecognizer extends Recognizer{
     protected void buildTable(){
-        numStates = 7;
+        numStates = 20;
         table = new ScannerTable<Character,Token>(numStates);
 
         table.setTransition(0,1, new Validator<Character>(){
@@ -57,10 +57,125 @@ public class RegisterRecognizer extends Recognizer{
             }
         });
 
-        table.setFinalStatus(2, new RegisterToken("").getClass());
-        table.setFinalStatus(3, new RegisterToken("").getClass());
-        table.setFinalStatus(4, new RegisterToken("").getClass());
-        table.setFinalStatus(5, new RegisterToken("").getClass());
-        table.setFinalStatus(6, new RegisterToken("").getClass());
+        //inizio riconscimento alias: lo stato 18 è lo stato di accettazione
+        
+        //riconoscitore {at, a0, a1, a2, a3}
+        table.setTransition(1,7, new Validator<Character>(){
+            public boolean validate(Character c){
+                return   c == 'a';
+            }
+        });
+        table.setTransition(7,18, new Validator<Character>(){
+            public boolean validate(Character c){
+                return  c == 't' ||( c >= '0' && c <= '3');
+            }
+        });
+        //riconoscitore {s0,..,s7, sp}
+        table.setTransition(1,8, new Validator<Character>(){
+            public boolean validate(Character c){
+                return   c == 's';
+            }
+        });
+        table.setTransition(8,18, new Validator<Character>(){
+            public boolean validate(Character c){
+                return  c == 'p' ||( c >= '0' && c <= '7');
+            }
+        });
+        //riconoscitore {t0,..,t9}
+        table.setTransition(1,9, new Validator<Character>(){
+            public boolean validate(Character c){
+                return   c == 't';
+            }
+        });
+        table.setTransition(9,18, new Validator<Character>(){
+            public boolean validate(Character c){
+                return  c >= '0' && c <= '9';
+            }
+        });
+        //riconoscitore {v0,v1}
+        table.setTransition(1,10, new Validator<Character>(){
+            public boolean validate(Character c){
+                return   c == 'v';
+            }
+        });
+        table.setTransition(10,18, new Validator<Character>(){
+            public boolean validate(Character c){
+                return  c >= '0' && c <= '1';
+            }
+        });
+        //riconoscitore {k0,k1}
+        table.setTransition(1,11, new Validator<Character>(){
+            public boolean validate(Character c){
+                return   c == 'k';
+            }
+        });
+        table.setTransition(11,18, new Validator<Character>(){
+            public boolean validate(Character c){
+                return  c >= '0' && c <= '1';
+            }
+        });
+        //riconoscitore {gp}
+        table.setTransition(1,12, new Validator<Character>(){
+            public boolean validate(Character c){
+                return   c == 'g';
+            }
+        });
+        table.setTransition(12,18, new Validator<Character>(){
+            public boolean validate(Character c){
+                return  c == 'p';
+            }
+        });
+        //riconoscitore {fp}
+        table.setTransition(1,13, new Validator<Character>(){
+            public boolean validate(Character c){
+                return   c == 'f';
+            }
+        });
+        table.setTransition(13,18, new Validator<Character>(){
+            public boolean validate(Character c){
+                return  c == 'p';
+            }
+        });
+        //riconoscitore {ra}
+        table.setTransition(1,14, new Validator<Character>(){
+            public boolean validate(Character c){
+                return   c == 'r';
+            }
+        });
+        table.setTransition(14,18, new Validator<Character>(){
+            public boolean validate(Character c){
+                return  c == 'a';
+            }
+        });
+        //riconoscitore {zero}
+        table.setTransition(1,15, new Validator<Character>(){
+            public boolean validate(Character c){
+                return   c == 'z';
+            }
+        });
+        table.setTransition(15,16, new Validator<Character>(){
+            public boolean validate(Character c){
+                return  c == 'e';
+            }
+        });
+        table.setTransition(16,17, new Validator<Character>(){
+            public boolean validate(Character c){
+                return   c == 'r';
+            }
+        });
+        table.setTransition(17,18, new Validator<Character>(){
+            public boolean validate(Character c){
+                return  c == 'o';
+            }
+        });
+
+        Class c = new RegisterToken("").getClass();
+        table.setFinalStatus(2,c);
+        table.setFinalStatus(3,c);
+        table.setFinalStatus(4,c);
+        table.setFinalStatus(5,c);
+        table.setFinalStatus(6,c);
+        table.setFinalStatus(18,c);
+
     }
 }
