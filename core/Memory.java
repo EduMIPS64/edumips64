@@ -101,6 +101,25 @@ public class Memory{
 		return cells.get(index);
 	}
 
+    public void writeInteger(int address, long value, String type) throws IrregularWriteOperationException, NotAlingException {
+        MemoryElement tmpMem = getCell(address);
+        int offset = address % 8;
+
+        if(type.equalsIgnoreCase("BYTE")) 
+            tmpMem.writeByte((int)value);
+
+        else if(type.equalsIgnoreCase("WORD16")) 
+            tmpMem.writeHalf((int)value);
+
+        else if(type.equalsIgnoreCase("WORD32")) 
+            tmpMem.writeWord((int)value);
+
+        else if(type.equalsIgnoreCase("WORD64") ||
+            type.equalsIgnoreCase("WORD"))  
+            tmpMem.writeDoubleWord((int)value);
+    }
+
+
 	/** This method resets the memory*/
 	public void reset()
 	{

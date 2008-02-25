@@ -166,7 +166,7 @@ public class NumberRecognizer extends Recognizer{
         //transizioni per i numeri in esadecimale
         table.setTransition(3,14, new Validator<Character>(){
             public boolean validate(Character c){
-                return c == 'x';
+                return c == 'x' || c == 'X';
             }
         });
         table.setTransition(14,15, new Validator<Character>(){

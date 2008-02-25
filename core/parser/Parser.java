@@ -29,12 +29,12 @@ import edumips64.core.parser.tokens.*;
 import edumips64.core.*;
 import edumips64.core.is.Instruction;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Parser {
-    // Association between directives and parsing algorithms (State design
+    // Association between directives and parsing algorithms (Strategy design
     // pattern)
     protected HashMap<String, ParsingAlgorithm> algorithms;
-
     // List of instructions with parameters
     // TODO
 
@@ -42,7 +42,7 @@ public class Parser {
     protected Scanner scanner;
     protected ParsingAlgorithm default_alg;
     protected SymbolTable symbols;
-
+    protected Memory memory;
     /* --------------------
      * Public methods
      * --------------------
@@ -91,6 +91,16 @@ public class Parser {
         }
     }
 
+    void addMemoryAddressToSymbolTable(int address, Token label){
+        System.out.println("Adding " + label.getBuffer() " to SymbolTable, address " + address);
+        try {
+            symbols.setCellLabel(address, label.getBuffer());
+        }
+        catch (SameLabelsException e) {
+            addError(instruction, "Duplicate label");
+        }
+
+
     static boolean isInstruction(Token t) {
         // TODO: should we improve it?
         return Instruction.buildInstruction(t.getBuffer()) != null;
@@ -107,17 +117,18 @@ public class Parser {
         CodeParsingAlgorithm code_pa = new CodeParsingAlgorithm(this);
         DataParsingAlgorithm data_pa = new DataParsingAlgorithm(this);
         symbols = SymbolTable.getInstance();
+        memory = Memory.getInstance();
 
         // Association of parsing algorithms with directives
         registerAlgorithm(".DATA", data_pa);
         registerAlgorithm(".CODE", code_pa);
         registerAlgorithm(".TEXT", code_pa);
 
-        // Data types
     }
 
     protected void registerAlgorithm(String directive, ParsingAlgorithm p) {
         System.out.println("Registering a parser for directive " + directive + ", " + p.toString());
         algorithms.put(directive, p);
     }
+
 }

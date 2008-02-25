@@ -27,8 +27,10 @@ package edumips64.core.parser;
 import edumips64.core.parser.tokens.*;
 import edumips64.core.is.*;
 import edumips64.core.*;
+import edumips64.utils.Converter;
 
 class DataParsingAlgorithm extends ParsingAlgorithm {
+    protected List<String> integerDataTypes
 
     public DataParsingAlgorithm(Parser p) {
         super(p);
@@ -37,7 +39,12 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
     public void parse(Scanner s) {
         System.out.println("Starting DataParsingAlgorithm");
         int address = 0;
+        boolean memoryDirty = false;
+
         while(s.hasToken()) {
+            if(address > 0)
+                address += address % 8;
+
             System.out.println("Starting Data parsing cycle");
             String label = null;
             Token token = s.next();
@@ -50,7 +57,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
             }
 
             // Parser change directive
-            else if(token.validate('D') && parser.hasAlgorithm(data)) {
+            if(token.validate('D') && parser.hasAlgorithm(data)) {
                 if(parser.hasAlgorithm(data)) {
                     parser.switchParsingAlgorithm(data);
                     break;
@@ -61,8 +68,8 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                 } 
             }
             
-            // ID - label verification
-            else if(token.validate('L')) {
+            // ID - optional label verification
+            if(token.validate('L')) {
                 if(!parser.isInstruction(token)) {
                     label = token.getBuffer();
                     token = s.next(); 
@@ -71,19 +78,117 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                         continue;
                     } 
 
-                    // Fetch the actual data directive for the next
-                    // control
-                    token = s.next();
+                    //skip End-Of-Lines until fetching next data directive
+                    do{
+                        token = s.next();
+                    }while(token.validate('\n'));
                 }
             }
 
             // Directive
             if(token.validate('D')) {
                 System.out.println("** Data type: " + token.getBuffer());
-                // Real .data parsing. We have the label
-                // TODO: right now we toss away tokens
-                while(!s.next().validate('\n')) ;
+                String directiveName = token.getBuffer();
+                //we have only 4 data types directive
+                // 1 - .space
+                if( directiveName.equalsIgnoreCase(".SPACE")){
+                    System.out.println("Ho validato .SPACE");
+                    token = s.next();
+                    if( token.validate('I')){
+                        long spaces = Converter.parseInteger(token.getBuffer());
+                        System.out.println("Riservo "+spaces+" spazi in memoria");
+                        //TODO:chiamare un metodo per lasciare lo spazio
+                        token = s.next(); //EOL for final control
+                    }
+                    else{
+                        parser.addError(token, "Expected integer");
+                        continue;
+                    }
+                }
+                // 2- .double
+                else if(directiveName.equalsIgnoreCase(".DOUBLE")){
+                    System.out.println("Ho validato .DOUBLE");
+                    boolean error = false;
+                    do{
+                        token = s.next();
+                        if(token.validate('F')){
+                            //converti il numero e salvalo
+                            System.out.println("Float value: " + token.getBuffer());
+                        }
+                        else{
+                            parser.addError(token, "Expected float");
+                            error = true;
+                            break;
+                        }
+                        token = s.next();
+                    }while(token.validate(','));
+                    if(error)
+                        continue;
+                }
+                // 3- integer types directive
+                else if(directiveName.equalsIgnoreCase(".BYTE") ||
+                    (directiveName.equalsIgnoreCase(".WORD16") ||
+                    (directiveName.equalsIgnoreCase(".WORD32") ||
+                    (directiveName.equalsIgnoreCase(".WORD64") ||
+                    (directiveName.equalsIgnoreCase(".WORD")) {
+
+                    System.out.println("Ho validato " + directiveName);
+                    boolean error = false;
+                    do{
+                        token = s.next();
+                        if(token.validate('I')){
+                            //converti il numero e salvalo
+                            long value = Converter.parseInteger(token.getBuffer());
+                            System.out.println("Integer value: " + value);
+                            try {
+                                System.out.println("Writing to memory " + value);
+                            }
+                            catch (IrregularWriteOperationException e) {
+                                // TODO: must be a warning
+                                parser.addError(token, "Value out of bounds");
+                            }
+                        }
+                        else{
+                            parser.addError(token, "Expected float");
+                            error = true;
+                            break;
+                        }
+                        token = s.next();
+                    }while(token.validate(','));
+
+                    if(error)
+                        continue;
+                }
+                // 4 - string directive
+                else if(directiveName.equalsIgnoreCase(".ASCII") || 
+                        directiveName.equalsIgnoreCase(".ASCIIZ")) {
+                    System.out.println("Ho validato " + directiveName);
+                    boolean error = false;
+                    do{
+                        token = s.next();
+                        if(token.validate('S')){
+                            System.out.println("Writing string to memory: " + token.getBuffer());
+                        }
+                        else{
+                            parser.addError(token, "String expected");
+                            error = true;
+                            break;
+                        }
+                        token = s.next();
+                    }while(token.validate(','));
+
+                    if(error)
+                        continue;
+                    
+                }
+                else {
+                    parser.addError(token, "Invalid directive");
+                    token = s.next();
+                }
             }
+            //every chunk of code exits with a token, that MUST BE EOL
+            if(!token.validate('\n'))
+                parser.addError(token, "Missing EOL");
         }
     }
 }
