@@ -1,4 +1,4 @@
-/* IntegerToken.java
+/* CommaToken.java
  *
  * (c) 2008 Salvo Scellato
  *
@@ -19,18 +19,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package edumips64.core.parser;
+package edumips64.core.parser.tokens;
 
-public class IntegerToken extends Token{
-    public IntegerToken(String buffer, int line){
-        super(buffer, line);
+public class CommaToken extends Token{
+    public CommaToken(int line) {
+        super(",", line);
     }
-    public IntegerToken(String buffer){
-        super(buffer);
+
+    public CommaToken() {
+        super(",");
     }
 
     public boolean validate(char pattern){
-        return (pattern == 'I') || (pattern == 'U' && Integer.parseInt(buffer) >= 0);
+        return pattern == ',';
     }
 }
-

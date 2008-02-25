@@ -1,4 +1,4 @@
-/* EOLToken.java
+/* ErrorToken.java
  *
  * (c) 2008 Salvo Scellato
  *
@@ -19,18 +19,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package edumips64.core.parser;
+package edumips64.core.parser.tokens;
 
-public class EOLToken extends Token{
-    public EOLToken(){
-        super("\n");
+public class ErrorToken extends Token{
+    public ErrorToken(String buffer) {
+        super(buffer);
     }
 
-    public EOLToken(int line){
-        super("\n",line);
+    public ErrorToken(String buffer, int line) {
+        super(buffer, line);
     }
+
     public boolean validate(char pattern){
-        return pattern == '\n'; //TODO: da sistemare
+        return false;
+    }
+
+    public boolean isErrorToken(){
+        return true;
     }
 }
+
+
+
 

@@ -24,6 +24,7 @@
  */
 package edumips64.core.parser;
 
+import edumips64.core.parser.tokens.*;
 import edumips64.core.is.*;
 import edumips64.core.*;
 

@@ -1,4 +1,4 @@
-/* ColonToken.java
+/* LeftParenToken.java
  *
  * (c) 2008 Salvo Scellato
  *
@@ -19,18 +19,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package edumips64.core.parser;
+package edumips64.core.parser.tokens;
 
-public class ColonToken extends Token{
-    public ColonToken(int line){
-        super(":", line);
+public class LeftParenToken extends Token{
+    public LeftParenToken(int  line) {
+        super("(",line);
     }
 
-    public ColonToken(){
-        super(":");
+    public LeftParenToken() {
+        super("(");
     }
     public boolean validate(char pattern){
-        return pattern == ':';
+        return pattern == '(';
     }
 }
-

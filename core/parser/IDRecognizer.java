@@ -21,6 +21,8 @@
  */
 package edumips64.core.parser;
 
+import edumips64.core.parser.tokens.*;
+
 public class IDRecognizer extends Recognizer{
     protected void buildTable(){
         numStates = 14;

@@ -1,4 +1,4 @@
-/* RightParenToken.java
+/* EOFToken.java
  *
  * (c) 2008 Salvo Scellato
  *
@@ -19,18 +19,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package edumips64.core.parser;
+package edumips64.core.parser.tokens;
 
-public class RightParenToken extends Token{
-    public RightParenToken(int line) {
-        super(")",line);
+public class EOFToken extends Token{
+    public EOFToken(int line){
+        super("", line);
     }
 
-    public RightParenToken() {
-        super(")");
+    public EOFToken(){
+        super("");
     }
     public boolean validate(char pattern){
-        return pattern == ')';
+        return false;
     }
 }
 

@@ -25,6 +25,7 @@
 
 package edumips64.core.parser;
 
+import edumips64.core.parser.tokens.*;
 import edumips64.core.*;
 import edumips64.core.is.Instruction;
 import java.util.HashMap;

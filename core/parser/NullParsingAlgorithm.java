@@ -24,6 +24,8 @@
  */
 package edumips64.core.parser;
 
+import edumips64.core.parser.tokens.*;
+
 class NullParsingAlgorithm extends ParsingAlgorithm {
 
     public NullParsingAlgorithm(Parser p) {

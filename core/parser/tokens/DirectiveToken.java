@@ -1,4 +1,4 @@
-/* RegisterToken.java
+/* DirectiveToken.java
  *
  * (c) 2008 Salvo Scellato
  *
@@ -19,20 +19,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package edumips64.core.parser;
+package edumips64.core.parser.tokens;
 
-public class RegisterToken extends Token{
-    public RegisterToken(String buffer,int line){
-        super(buffer,line);
-    }
-
-    public RegisterToken(String buffer){
+public class DirectiveToken extends Token{
+    public DirectiveToken(String buffer) {
         super(buffer);
     }
+
     public boolean validate(char pattern){
-        return pattern == 'R';
+        return pattern == 'D';
+    }
+
+    public String getBuffer() {
+        return buffer.toUpperCase();
     }
 }
+
 
 
 

@@ -1,4 +1,4 @@
-/* FPRegisterToken.java
+/* IdToken.java
  *
  * (c) 2008 Salvo Scellato
  *
@@ -19,22 +19,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package edumips64.core.parser;
+package edumips64.core.parser.tokens;
 
-public class FPRegisterToken extends Token{
-    public FPRegisterToken(String buffer,int line){
-        super(buffer,line);
-    }
-
-    public FPRegisterToken(String buffer){
+public class IdToken extends Token{
+    public IdToken(String buffer) {
         super(buffer);
     }
 
-    public boolean validate(char pattern){
-        return pattern == 'F';
+    public IdToken(String buffer, int line) {
+        super(buffer,line);
     }
-
+    public boolean validate(char pattern){
+        return pattern == 'L' || pattern == 'B';
+    }
 }
+
 
 
 

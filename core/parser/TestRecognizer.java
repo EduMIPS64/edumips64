@@ -21,6 +21,8 @@
  */
 package edumips64.core.parser;
 
+import edumips64.core.parser.tokens.*;
+
 public class TestRecognizer{
     public static void main(String[] args) throws Exception{
         Recognizer recognizer = new NumberRecognizer();

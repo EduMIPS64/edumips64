@@ -1,4 +1,4 @@
-/* CommaToken.java
+/* FPRegisterToken.java
  *
  * (c) 2008 Salvo Scellato
  *
@@ -19,18 +19,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package edumips64.core.parser;
+package edumips64.core.parser.tokens;
 
-public class CommaToken extends Token{
-    public CommaToken(int line) {
-        super(",", line);
+public class FPRegisterToken extends Token{
+    public FPRegisterToken(String buffer,int line){
+        super(buffer,line);
     }
 
-    public CommaToken() {
-        super(",");
+    public FPRegisterToken(String buffer){
+        super(buffer);
     }
 
     public boolean validate(char pattern){
-        return pattern == ',';
+        return pattern == 'F';
     }
+
 }
+
+
+

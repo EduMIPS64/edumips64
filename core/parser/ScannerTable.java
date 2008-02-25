@@ -21,6 +21,7 @@
  */
 package edumips64.core.parser;
 
+import edumips64.core.parser.tokens.*;
 import java.util.*;
 import java.io.*;
 

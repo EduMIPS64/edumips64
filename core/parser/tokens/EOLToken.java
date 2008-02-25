@@ -1,4 +1,4 @@
-/* FloatToken.java
+/* EOLToken.java
  *
  * (c) 2008 Salvo Scellato
  *
@@ -19,19 +19,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package edumips64.core.parser;
+package edumips64.core.parser.tokens;
 
-public class FloatToken extends Token{
-    public FloatToken(String buffer){
-        super(buffer);
+public class EOLToken extends Token{
+    public EOLToken(){
+        super("\n");
     }
 
-    public FloatToken(String buffer, int line){
-        super(buffer, line);
+    public EOLToken(int line){
+        super("\n",line);
     }
     public boolean validate(char pattern){
-        return pattern == 'G';
+        return pattern == '\n'; //TODO: da sistemare
     }
 }
-
 

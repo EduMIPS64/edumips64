@@ -1,4 +1,4 @@
-/* ErrorToken.java
+/* ColonToken.java
  *
  * (c) 2008 Salvo Scellato
  *
@@ -19,26 +19,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package edumips64.core.parser;
+package edumips64.core.parser.tokens;
 
-public class ErrorToken extends Token{
-    public ErrorToken(String buffer) {
-        super(buffer);
+public class ColonToken extends Token{
+    public ColonToken(int line){
+        super(":", line);
     }
 
-    public ErrorToken(String buffer, int line) {
-        super(buffer, line);
+    public ColonToken(){
+        super(":");
     }
-
     public boolean validate(char pattern){
-        return false;
-    }
-
-    public boolean isErrorToken(){
-        return true;
+        return pattern == ':';
     }
 }
-
-
-
 
