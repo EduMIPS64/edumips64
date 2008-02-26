@@ -91,6 +91,7 @@ public class Parser {
         }
     }
 
+
     void addMemoryAddressToSymbolTable(int address, Token label) throws MemoryElementNotFoundException{
         System.out.println("Adding " + label.getBuffer() + " to SymbolTable, address " + address);
         try {

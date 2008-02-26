@@ -109,6 +109,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
 
                             token = s.next(); //EOL for final control
                         }
+
                         else{
                             parser.addError(token, "Expected integer");
                             continue;
