@@ -91,14 +91,15 @@ public class Parser {
         }
     }
 
-    void addMemoryAddressToSymbolTable(int address, Token label){
-        System.out.println("Adding " + label.getBuffer() " to SymbolTable, address " + address);
+    void addMemoryAddressToSymbolTable(int address, Token label) throws MemoryElementNotFoundException{
+        System.out.println("Adding " + label.getBuffer() + " to SymbolTable, address " + address);
         try {
             symbols.setCellLabel(address, label.getBuffer());
         }
         catch (SameLabelsException e) {
-            addError(instruction, "Duplicate label");
+            addError(label, "Duplicate label");
         }
+    }
 
 
     static boolean isInstruction(Token t) {

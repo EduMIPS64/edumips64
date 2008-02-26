@@ -101,22 +101,45 @@ public class Memory{
 		return cells.get(index);
 	}
 
-    public void writeInteger(int address, long value, String type) throws IrregularWriteOperationException, NotAlingException {
-        MemoryElement tmpMem = getCell(address);
+	/** Writes to memory the given integer value at the given address.
+	 * Data is written to memory according to the type passed, as a string, in
+     * the type parameter.
+     * @param address memory address to write to
+     * @param value the value to write
+     * @param type the data type of value
+	 * @return the number of bytes written to memory
+	 * @throws IrregularWriteOperationException
+	 * @throws NotAlingException
+	 */
+    public int writeInteger(int address, long value, String type) throws IrregularWriteOperationException, NotAlingException, MemoryElementNotFoundException {
         int offset = address % 8;
+        MemoryElement tmpMem = getCell(address - offset);
 
-        if(type.equalsIgnoreCase("BYTE")) 
-            tmpMem.writeByte((int)value);
+        System.out.println("Address: " + address + ", offset: " + offset);
 
-        else if(type.equalsIgnoreCase("WORD16")) 
-            tmpMem.writeHalf((int)value);
+        if(type.equalsIgnoreCase("BYTE")) {
+            tmpMem.writeByte((int)value, offset);
+            return 1;
+        }
 
-        else if(type.equalsIgnoreCase("WORD32")) 
-            tmpMem.writeWord((int)value);
+        else if(type.equalsIgnoreCase("WORD16")) {
+            tmpMem.writeHalf((int)value, offset);
+            return 2;
+        }
+
+        else if(type.equalsIgnoreCase("WORD32")) {
+            tmpMem.writeWord((int)value, offset);
+            return 4;
+        }
 
         else if(type.equalsIgnoreCase("WORD64") ||
-            type.equalsIgnoreCase("WORD"))  
+            type.equalsIgnoreCase("WORD")) {
             tmpMem.writeDoubleWord((int)value);
+            return 8;
+        }
+
+        // TODO: should we throw an exception if the type is not known?
+        return 0;
     }
 
 
