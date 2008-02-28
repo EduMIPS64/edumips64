@@ -26,6 +26,7 @@ package edumips64.core;
 import edumips64.utils.*;
 import java.util.*;
 import edumips64.core.is.*;
+import edumips64.core.fpu.*;
 
 /**  This class models the main memory of a computer, with 64-bit elements (that is 8 byte).
  * The Memory is composed of MemoryElement and its size is not limited.
@@ -100,6 +101,24 @@ public class Memory{
 
 		return cells.get(index);
 	}
+
+	/** Writes to memory the given double value.
+     * @param address memory address to write to
+     * @param value the string representing the value to write
+	 * @return the number of bytes written to memory
+	 * @throws IrregularWriteOperationException
+	 * @throws MemoryElementNotFoundException
+	 * @throws NotAlingException
+	 */
+    public int writeDouble(int address, String value) throws IrregularWriteOperationException, MemoryElementNotFoundException, NotAlingException, FPUnderflowException, FPOverflowException, IrregularStringOfBitsException {
+        if(address % 8 != 0)
+            throw new NotAlingException();
+
+        MemoryElement el = memory.getCell(address);
+        el.setBits(edumips64.core.fpu.FPInstructionUtils.doubleToBin(value), 0);
+        
+        return 8;
+    }
 
 	/** Writes to memory the given string, starting at the given address.
      * @param address memory address to write to

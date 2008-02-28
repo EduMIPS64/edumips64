@@ -25,6 +25,7 @@
 package edumips64.core.parser;
 
 import edumips64.core.parser.tokens.*;
+import edumips64.utils.*;
 import edumips64.core.is.*;
 import edumips64.core.*;
 import edumips64.utils.Converter;
@@ -124,6 +125,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                             if(token.validate('F')){
                                 //converti il numero e salvalo
                                 System.out.println("Float value: " + token.getBuffer());
+                                address += memory.writeDouble(address, token.getBuffer());
                             }
                             else{
                                 parser.addError(token, "Expected float");
@@ -215,6 +217,17 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
             }  catch (MemoryElementNotFoundException e) {
                 // TODO: must be a warning
                 parser.addError(token, "Attempt to write beyond the limits of EduMIPS64's memory");
+            }
+		    catch(edumips64.core.fpu.FPOverflowException ex)
+		    {
+			    parser.addError(token, "FP_OVERFLOW");
+		    }
+		    catch(edumips64.core.fpu.FPUnderflowException ex)
+		    {
+			    parser.addError(token, "FP_UNDERFLOW");
+            }  
+            catch (IrregularStringOfBitsException e) {
+			    parser.addError(token, "INVALID_VALUE");
             }
         }
     }
