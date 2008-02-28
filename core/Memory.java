@@ -101,6 +101,80 @@ public class Memory{
 		return cells.get(index);
 	}
 
+	/** Writes to memory the given string, starting at the given address.
+     * @param address memory address to write to
+     * @param str the string to write
+     * @param auto_terminate whether to add a '\0' character at the end of the string
+	 * @return the number of bytes written to memory
+	 * @throws IrregularWriteOperationException
+	 * @throws MemoryElementNotFoundException
+	 * @throws StringFormatException
+	 */
+    public int writeString(int address, String str, boolean auto_terminate) throws IrregularWriteOperationException, MemoryElementNotFoundException, StringFormatException {
+        MemoryElement tmpMem = memory.getCell(address);
+        int written = 0;
+        int posInWord = 0;
+        int escaped = 0;		// to avoid escape sequences to count as two bytes
+        int len = str.length();
+        boolean escape = false;
+        boolean placeholder = false;
+        for(int i = 0; i < len; i++) {
+            if((i - escaped) % 8 == 0 && (i - escaped) != 0 && !escape) {
+                address += 8;
+                posInWord = 0;
+                tmpMem = memory.getCell(address);
+            }
+            char c = str.charAt(i);
+            int to_write = (int)c;
+            System.out.println("Char: " + c + " (" + to_write + ") [" + Integer.toHexString(to_write) + "]");
+            if(escape) {
+                switch(c) {
+                    case '0':
+                        to_write = 0;
+                        break;
+                    case 'n':
+                        to_write = 10;
+                        break;
+                    case 't':
+                        to_write = 9;
+                        break;
+                    case '\\':
+                        to_write = 92;
+                        break;
+                    case '"':
+                        to_write = 34;
+                        break;
+                    default:
+                        throw new StringFormatException();
+                }
+                System.out.println("(escaped to [" + Integer.toHexString(to_write) + "])");
+                escape = false;
+                c = 0;	// to avoid re-entering the escape if branch.
+            }
+            if(placeholder) {
+                if(c != '%' && c != 's' && c != 'd' && c != 'i') {
+                    System.out.println("Invalid placeholder: %" + c);
+                    // Invalid placeholder
+                    throw new StringFormatException();
+                }
+                placeholder = false;
+            }
+            if(c == '%' && !placeholder) {
+                System.out.println("Expecting on next step a valid placeholder...");
+                placeholder = true;
+            }
+            if(c == '\\') {
+                escape = true;
+                escaped++;
+                continue;
+            }
+            tmpMem.writeByte(to_write, posInWord++);
+            written++;
+        }
+
+        return written;
+    }
+
 	/** Writes to memory the given integer value at the given address.
 	 * Data is written to memory according to the type passed, as a string, in
      * the type parameter.
@@ -109,6 +183,7 @@ public class Memory{
      * @param type the data type of value
 	 * @return the number of bytes written to memory
 	 * @throws IrregularWriteOperationException
+	 * @throws MemoryElementNotFoundException
 	 * @throws NotAlingException
 	 */
     public int writeInteger(int address, long value, String type) throws IrregularWriteOperationException, NotAlingException, MemoryElementNotFoundException {

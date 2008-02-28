@@ -33,6 +33,14 @@ public class StringToken extends Token{
     public boolean validate(char pattern){
         return pattern == 'S';
     }
+
+    // This overloaded version returns the buffer without the initial and final
+    // " characters
+    public String getBuffer() {
+        // I miss python's slicing.
+        return buffer.substring(1, buffer.length() - 1);
+    }
+
 }
 
 

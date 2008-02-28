@@ -175,10 +175,16 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                             directiveName.equalsIgnoreCase(".ASCIIZ")) {
                         System.out.println("Ho validato " + directiveName);
                         boolean error = false;
+                        boolean auto_terminate = directiveName.equalsIgnoreCase(".ASCIIZ"); // inserimento automatico '\0'
                         do{
                             token = s.next();
                             if(token.validate('S')){
-                                System.out.println("Writing string to memory: " + token.getBuffer());
+                                try {
+                                    address += memory.writeString(address, token.getBuffer(), auto_terminate);
+                                }
+                                catch (StringFormatException e) {
+                                    parser.addError(token, "Invalid string format");
+                                }
                             }
                             else{
                                 parser.addError(token, "String expected");
@@ -186,7 +192,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                                 break;
                             }
                             token = s.next();
-                        }while(token.validate(','));
+                        } while(token.validate(','));
 
                         if(error)
                             continue;

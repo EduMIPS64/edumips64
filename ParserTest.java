@@ -1,6 +1,7 @@
 package edumips64;
 import java.io.*;
 import edumips64.core.parser.*;
+import edumips64.core.Memory;
 
 public class ParserTest {
     public static void main(String[] args) throws Exception {
@@ -15,6 +16,8 @@ public class ParserTest {
             Scanner scanner = new Scanner(reader);
             Parser p = Parser.getInstance();
             p.parse(scanner);
+            Memory m = Memory.getInstance();
+            System.out.println(m.toString());
         }
     }
 }
