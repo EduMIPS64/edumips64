@@ -56,7 +56,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
             
             // Error
             if(token.isErrorToken()) {
-                parser.addError(token, "Lexical error");
+                parser.addError(token, "PARSER_LEXICAL_ERROR");
                 continue;
             }
             
@@ -67,7 +67,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                     break;
                 }
                 else {
-                    parser.addError(token, "Invalid directive");
+                    parser.addError(token, "PARSER_INVALID_DIRECTIVE");
                     continue;
                 } 
             }
@@ -78,7 +78,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                     label = token.getBuffer();
                     token = s.next(); 
                     if(!token.validate(':')) {
-                        parser.addError(token, "Colon expected");
+                        parser.addError(token, "PARSER_COLON_EXPECTED");
                         continue;
                     } 
 
@@ -112,7 +112,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                         }
 
                         else{
-                            parser.addError(token, "Expected integer");
+                            parser.addError(token, "PARSER_INTEGER_EXPECTED");
                             continue;
                         }
                     }
@@ -128,7 +128,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                                 address += memory.writeDouble(address, token.getBuffer());
                             }
                             else{
-                                parser.addError(token, "Expected float");
+                                parser.addError(token, "PARSER_FLOAT_EXPECTED");
                                 error = true;
                                 break;
                             }
@@ -161,7 +161,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                                 address += memory.writeInteger(address, value, directiveName.toUpperCase().substring(1));
                             }
                             else{
-                                parser.addError(token, "Expected integer");
+                                parser.addError(token, "PARSER_INTEGER_EXPECTED");
                                 error = true;
                                 break;
                             }
@@ -184,11 +184,11 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                                     address += memory.writeString(address, token.getBuffer(), auto_terminate);
                                 }
                                 catch (StringFormatException e) {
-                                    parser.addError(token, "Invalid string format");
+                                    parser.addError(token, "PARSER_INVALID_STRING");
                                 }
                             }
                             else{
-                                parser.addError(token, "String expected");
+                                parser.addError(token, "PARSER_STRING_EXPECTED");
                                 error = true;
                                 break;
                             }
@@ -200,23 +200,23 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                         
                     }
                     else {
-                        parser.addError(token, "Invalid directive");
+                        parser.addError(token, "PARSER_INVALID_DIRECTIVE");
                         token = s.next();
                     }
                 }
                 //every chunk of code exits with a token, that MUST BE EOL
                 if(!token.validate('\n'))
-                    parser.addError(token, "Missing EOL");
+                    parser.addError(token, "PARSER_EOL_EXPECTED");
                 
             }  catch (IrregularWriteOperationException e) {
                 // TODO: must be a warning
-                parser.addError(token, "Value out of bounds");
+                parser.addError(token, "PARSER_OUT_OF_BOUNDS");
             }  catch (NotAlingException e) {
                 // TODO: must be a warning
-                parser.addError(token, "Attempt to do a not-aligned write operation");
+                parser.addError(token, "PARSER_NOT_ALIGN");
             }  catch (MemoryElementNotFoundException e) {
                 // TODO: must be a warning
-                parser.addError(token, "Attempt to write beyond the limits of EduMIPS64's memory");
+                parser.addError(token, "PARSER_EXCEED_MEMORY");
             }
 		    catch(edumips64.core.fpu.FPOverflowException ex)
 		    {
@@ -227,7 +227,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
 			    parser.addError(token, "FP_UNDERFLOW");
             }  
             catch (IrregularStringOfBitsException e) {
-			    parser.addError(token, "INVALID_VALUE");
+			    parser.addError(token, "PARSER_INVALID_VALUE");
             }
         }
     }
