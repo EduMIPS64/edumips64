@@ -106,6 +106,13 @@ public class NumberRecognizer extends Recognizer{
             }
         });
         //esponente in notazione scientifica
+        //intero con esponente
+        table.setTransition(5,8, new Validator<Character>(){
+            public boolean validate(Character c){
+                return c == 'e' || c == 'E';
+            }
+        });
+        //float con esponente
         table.setTransition(7,8, new Validator<Character>(){
             public boolean validate(Character c){
                 return c == 'e' || c == 'E';
@@ -184,16 +191,17 @@ public class NumberRecognizer extends Recognizer{
             }
         });
            
-        Class c = new IntegerToken("").getClass();
+        Class c_int = new IntegerToken("").getClass();
+        Class c_float = new FloatToken("").getClass();
 
-        table.setFinalStatus(3,c);
-        table.setFinalStatus(4,c);
-        table.setFinalStatus(5,c);
-        table.setFinalStatus(7,c);
-        table.setFinalStatus(11,c);
-        table.setFinalStatus(12,c);
-        table.setFinalStatus(13,c);
-        table.setFinalStatus(15,c);
+        table.setFinalStatus(3,c_int);
+        table.setFinalStatus(4,c_int);
+        table.setFinalStatus(5,c_int);
+        table.setFinalStatus(7,c_float);
+        table.setFinalStatus(11,c_float);
+        table.setFinalStatus(12,c_float);
+        table.setFinalStatus(13,c_float);
+        table.setFinalStatus(15,c_int);
     }
 }
 

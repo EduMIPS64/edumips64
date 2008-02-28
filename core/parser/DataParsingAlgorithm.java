@@ -122,7 +122,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                         boolean error = false;
                         do{
                             token = s.next();
-                            if(token.validate('F')){
+                            if(token.validate('G')){
                                 //converti il numero e salvalo
                                 System.out.println("Float value: " + token.getBuffer());
                                 address += memory.writeDouble(address, token.getBuffer());
