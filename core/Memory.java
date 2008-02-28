@@ -115,9 +115,17 @@ public class Memory{
         int written = 0;
         int posInWord = 0;
         int escaped = 0;		// to avoid escape sequences to count as two bytes
+        
+        // If auto-terminate is set to true, we must add \0 to the end of the
+        // string
+        if(auto_terminate)
+            str += "\\0";
         int len = str.length();
         boolean escape = false;
         boolean placeholder = false;
+        
+
+        
         for(int i = 0; i < len; i++) {
             if((i - escaped) % 8 == 0 && (i - escaped) != 0 && !escape) {
                 address += 8;
@@ -171,6 +179,7 @@ public class Memory{
             tmpMem.writeByte(to_write, posInWord++);
             written++;
         }
+
 
         return written;
     }
