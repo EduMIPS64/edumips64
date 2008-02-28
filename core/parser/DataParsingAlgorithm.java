@@ -149,7 +149,6 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                             if(token.validate('I')){
                                 //converti il numero e salvalo
                                 long value = Converter.parseInteger(token.getBuffer());
-                                System.out.println("Integer value: " + value);
                                 System.out.println("Writing to memory " + value);
 
                                 // Rememmber that Memory.writeInteger returns
@@ -160,12 +159,12 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                                 address += memory.writeInteger(address, value, directiveName.toUpperCase().substring(1));
                             }
                             else{
-                                parser.addError(token, "Expected float");
+                                parser.addError(token, "Expected integer");
                                 error = true;
                                 break;
                             }
                             token = s.next();
-                        }while(token.validate(','));
+                        } while(token.validate(','));
 
                         if(error)
                             continue;
@@ -175,7 +174,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                             directiveName.equalsIgnoreCase(".ASCIIZ")) {
                         System.out.println("Ho validato " + directiveName);
                         boolean error = false;
-                        boolean auto_terminate = directiveName.equalsIgnoreCase(".ASCIIZ"); // inserimento automatico '\0'
+                        boolean auto_terminate = directiveName.equalsIgnoreCase(".ASCIIZ"); // auto-append of '\0'
                         do{
                             token = s.next();
                             if(token.validate('S')){
