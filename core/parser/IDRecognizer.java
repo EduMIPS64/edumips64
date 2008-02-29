@@ -23,9 +23,47 @@ package edumips64.core.parser;
 
 import edumips64.core.parser.tokens.*;
 
+//queste due classi servono per implementare velocemente il riconoscimento di un
+//carattere oppure il riconoscimento di tutti i caratteri ammessi tranne un
+//carattere
+class CharValidator implements Validator<Character>{
+    private Character pattern;
+    public CharValidator(char pattern){
+        this.pattern = pattern;
+    }
+    public boolean validate(Character element){
+        return Character.toUpperCase(element) == 
+            Character.toUpperCase(pattern);
+    }
+}
+
+class NotCharValidator implements Validator<Character>{
+    private Character pattern;
+    public NotCharValidator(char pattern){
+        this.pattern = pattern;
+    }
+    public boolean validate(Character element){
+        return (
+                !(Character.toUpperCase(element) == 
+                Character.toUpperCase(pattern))
+                )
+            && 
+            (
+             Character.isLetterOrDigit(element) || 
+             element == '_' || element == '.'
+             );
+    }
+}
+
 public class IDRecognizer extends Recognizer{
     protected void buildTable(){
-        numStates = 14;
+        numStates = 100;
+
+        Class c_float = new FloatToken("").getClass();
+        Class c_id = new IdToken("").getClass();
+        Class c_reg = new RegisterToken("").getClass();
+        Class c_fpReg = new FPRegisterToken("").getClass();
+
         table = new ScannerTable<Character,Token>(numStates);
         
         //riconoscimento registro
@@ -96,7 +134,9 @@ public class IDRecognizer extends Recognizer{
         //al riconoscitore di ID
         table.setTransition(0,13, new Validator<Character>(){
             public boolean validate(Character c){
-                return !(c == 'R' || c == 'r' || c == 'F' || c == 'f') && 
+                return !(c == 'R' || c == 'r' || c == 'F' || c == 'f' ||
+                         c == 'P' || c == 'p' || c == 'N' || c == 'n' ||
+                         c == 'Q' || c == 'q' || c == 'S' || c == 's') && 
                         (Character.isLetter(c) || c == '_');
             }
         });
@@ -173,21 +213,101 @@ public class IDRecognizer extends Recognizer{
             }
         });
 
-        table.setFinalStatus(2, new RegisterToken("").getClass());
-        table.setFinalStatus(3, new RegisterToken("").getClass());
-        table.setFinalStatus(4, new RegisterToken("").getClass());
-        table.setFinalStatus(5, new RegisterToken("").getClass());
-        table.setFinalStatus(6, new RegisterToken("").getClass());
+        //parole chiave per i float number
+        //prefisso per POSITIVEINFINITY e POSITIVEZERO
+        String keyword = "POSITIVE";
+        table.setTransition(0,14, new CharValidator(keyword.charAt(0)));
 
-        table.setFinalStatus(8, new FPRegisterToken("").getClass());
-        table.setFinalStatus(9, new FPRegisterToken("").getClass());
-        table.setFinalStatus(10, new FPRegisterToken("").getClass());
-        table.setFinalStatus(11, new FPRegisterToken("").getClass());
-        table.setFinalStatus(12, new FPRegisterToken("").getClass());
+        //finisce nello stato 21
+        for(int i = 1; i<keyword.length(); i++){
+            table.setTransition(14+i-1,14+i, new CharValidator(keyword.charAt(i)));
+            table.setTransition(14+i-1, 13, new NotCharValidator(keyword.charAt(i)));
+            table.setFinalStatus(14+i-1, c_id);
+        }
 
-        table.setFinalStatus(1, new IdToken("").getClass());
-        table.setFinalStatus(7, new IdToken("").getClass());
-        table.setFinalStatus(13, new IdToken("").getClass());
+        //prefisso per NEGATIVEINFINITY e NEGATIVEZERO
+        keyword = "NEGATIVE";
+        table.setTransition(0,22, new CharValidator(keyword.charAt(0)));
+
+        //finisce nello stato 28
+        for(int i = 1; i<keyword.length()-1; i++){
+            table.setTransition(22+i-1, 22+i, new CharValidator(keyword.charAt(i)));
+            table.setTransition(22+i-1, 13, new NotCharValidator(keyword.charAt(i)));
+            table.setFinalStatus(22+i-1, c_id);
+        }
+
+        //POSITIVE e NEGATIVE finiscono nello stesso stato 21
+        table.setTransition(28, 21, new CharValidator(keyword.charAt(keyword.length()-1)));
+        table.setTransition(28, 13, new NotCharValidator(keyword.charAt(keyword.length()-1)));
+        table.setFinalStatus(21, c_id);
+
+        //suffisso INFINITY (parte dalla transizione 21-->29 
+        //e arriva fino allo stato 36)
+        keyword = "INFINITY";
+        table.setTransition(21, 29, new CharValidator(keyword.charAt(0)));
+
+
+
+         
+
+        for(int i = 1; i<keyword.length(); i++){
+            table.setTransition(29+i-1, 29+i, new CharValidator(keyword.charAt(i)));
+            table.setTransition(29+i-1, 13, new NotCharValidator(keyword.charAt(i)));
+            table.setFinalStatus(29+i-1, c_id);
+        }
+
+        //suffisso ZERO (parte dalla transizione 21-->37 
+        //e arriva fino allo stato 40)
+        keyword = "ZERO";
+        table.setTransition(21, 37, new CharValidator(keyword.charAt(0)));
+        table.setTransition(21,13, new Validator<Character>(){
+            public boolean validate(Character c){
+                return  (!(c == 'Z' || c == 'z' || c == 'I' || c == 'i') &&
+                        Character.isLetterOrDigit(c));
+            }
+        });
+
+        for(int i = 1; i<keyword.length(); i++){
+            table.setTransition(37+i-1, 37+i, new CharValidator(keyword.charAt(i)));
+            table.setTransition(37+i-1, 13, new NotCharValidator(keyword.charAt(i)));
+            table.setFinalStatus(37+i-1, c_id);
+        }
+
+
+        //prefisso Q e S per QNAN e SNAN
+        table.setTransition(0,41, new Validator<Character>(){
+            public boolean validate(Character c){
+                return c == 'Q' || c == 'q' || c == 'S' || c == 's';
+            }
+        });
+
+        keyword = "QNAN";
+        //dallo stato 41 al 44
+        for(int i = 1; i<keyword.length(); i++){
+            table.setTransition(41+i-1, 41+i, new CharValidator(keyword.charAt(i)));
+            table.setTransition(41+i-1, 13, new NotCharValidator(keyword.charAt(i)));
+            table.setFinalStatus(41+i-1, c_id);
+        }
+
+        table.setFinalStatus(36, c_float); // fine INFINITY
+        table.setFinalStatus(40, c_float); // fine ZERO
+        table.setFinalStatus(44, c_float); // fine NAN
+
+        table.setFinalStatus(2, c_reg);
+        table.setFinalStatus(3, c_reg);
+        table.setFinalStatus(4, c_reg);
+        table.setFinalStatus(5, c_reg);
+        table.setFinalStatus(6, c_reg);
+
+        table.setFinalStatus(8, c_fpReg);
+        table.setFinalStatus(9, c_fpReg);
+        table.setFinalStatus(10, c_fpReg);
+        table.setFinalStatus(11, c_fpReg);
+        table.setFinalStatus(12, c_fpReg);
+
+        table.setFinalStatus(1,c_id);
+        table.setFinalStatus(7, c_id);
+        table.setFinalStatus(13, c_id);
     }
 
     public static void main(String[] args) throws java.io.IOException{

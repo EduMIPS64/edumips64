@@ -161,7 +161,6 @@ public class FPInstructionUtils {
 		return false;
 	}
 	
-	
 
 	/**In order to create a 64 bit binary string, the zero-padding on the left of the value is carried out
 	*  @param value the string to pad
