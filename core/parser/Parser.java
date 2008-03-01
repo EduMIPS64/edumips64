@@ -162,7 +162,7 @@ public class Parser {
         edumips64.Main.logger.debug("************* " + error + ": " + t);
         System.out.println("************* " + error + ": " + t);
         hasOnlyWarnings = false;
-        exceptions.add(new ParserException(error, t.getLine(), 0, t.toString(), true));
+        exceptions.add(new ParserException(error, t.getLine(), t.getColumn(), t.toString(), true));
     }
 
     void addInstruction(Instruction instr, int address, List<Token> params, String label, Token instrToken) {

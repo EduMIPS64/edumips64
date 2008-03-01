@@ -58,8 +58,7 @@ public abstract class Token{
     }
 
     public String toString(){
-        return getClass().getName() + "[line " + line +
-            ", column " + column + "]: " + buffer;
+        return  buffer;
     }
 
     public boolean isErrorToken(){
