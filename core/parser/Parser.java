@@ -142,7 +142,6 @@ public class Parser {
         instructions.add(new InstructionData(instr, params, address, instrToken));
     }
 
-
     void addMemoryAddressToSymbolTable(int address, Token label) throws MemoryElementNotFoundException{
         edumips64.Main.logger.debug("Adding " + label.getBuffer() + " to SymbolTable, address " + address);
         try {
@@ -177,7 +176,6 @@ public class Parser {
         registerAlgorithm(".DATA", data_pa);
         registerAlgorithm(".CODE", code_pa);
         registerAlgorithm(".TEXT", code_pa);
-
     }
 
     protected void registerAlgorithm(String directive, ParsingAlgorithm p) {
