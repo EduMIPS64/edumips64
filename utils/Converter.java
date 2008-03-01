@@ -457,8 +457,9 @@ public class Converter{
 	}		
 
     public static long parseInteger(String value){
-        if( (value.length() >= 3) && value.substring(0,2).equalsIgnoreCase("0x")) 
-            return Long.parseLong(value,16);
+        if( (value.length() >= 3) && value.substring(0,2).equalsIgnoreCase("0x"))  {
+            return Long.parseLong(value.substring(2),16);
+        }
         return Long.parseLong(value);
     }
 

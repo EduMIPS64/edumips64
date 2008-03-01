@@ -414,6 +414,7 @@ public class Main extends JApplet {
             front.represent();
         }
         catch(Exception ex) {
+            edumips64.Main.logger.debug(ex.getMessage());
             new ReportDialog(f,ex,CurrentLocale.getString("GUI_STEP_ERROR"));
         }
 

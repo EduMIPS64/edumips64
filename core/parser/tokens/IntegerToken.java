@@ -21,6 +21,7 @@
  */
 package edumips64.core.parser.tokens;
 import edumips64.core.is.Instruction;
+import edumips64.utils.Converter;
 
 public class IntegerToken extends Token{
     public IntegerToken(String buffer, int line){
@@ -31,7 +32,9 @@ public class IntegerToken extends Token{
     }
 
     public boolean validate(char pattern){
-        int value = Integer.parseInt(buffer);
+        System.out.println("Entering in IntegerToken::validate()");
+        long value = Converter.parseInteger(buffer);
+        System.out.println("BOOOOOOM");
         return (pattern == 'I') || (pattern == 'G')
             || (pattern == 'U' && value >= 0)
             || (pattern == 'C' && value >= 0 && value <= 7)
@@ -39,12 +42,11 @@ public class IntegerToken extends Token{
     }
 
     public void addToParametersList(Instruction instr) {
-        int base = 10;
+        System.out.println("IntegerToken: I'm about to add " + buffer);
 
-        if(buffer.length() >= 3 && Character.toUpperCase(buffer.charAt(1)) == 'X')
-            base = 16;
-
-        instr.addParam(Integer.parseInt(buffer, base));
+        // We can explicitly cast to integer because we know that an
+        // instruction will never hold a long in its parameters
+        instr.addParam((int)Converter.parseInteger(buffer));
     }
 }
 

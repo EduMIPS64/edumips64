@@ -63,6 +63,7 @@ public class IdToken extends Token{
             // we are only interested in the latter character
             char type = syntaxElements[n_param].charAt(1);
 
+            edumips64.Main.logger.debug("IdToken::addToParametersList - Type = " + type);
             // Data label
             if(type == 'L') {
                 MemoryElement elem = symTab.getCell(buffer);

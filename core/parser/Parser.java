@@ -67,14 +67,14 @@ public class Parser {
 	public void parse(String filename) throws FileNotFoundException, SecurityException, IOException,ParserMultiException {
         BufferedReader reader = new BufferedReader(new FileReader(filename));
         scanner = new Scanner(reader);
-        System.out.println("Starting the parser subsystem");
+        edumips64.Main.logger.debug("Starting the parser subsystem");
         default_alg.parse(scanner);
 
-        System.out.println("Will now pack the instructions");
+        edumips64.Main.logger.debug("Will now pack the instructions");
         for(InstructionData i : instructions) {
-            System.out.println("Processing " + i.instr.getFullName());
+            edumips64.Main.logger.debug("Processing " + i.instr.getFullName());
             for(Token t : i.params) {
-                System.out.println("Adding " + t + " to parameters list");
+                edumips64.Main.logger.debug("Adding " + t + " to parameters list");
                 try {
                     t.addToParametersList(i.instr);
                 }
@@ -112,22 +112,22 @@ public class Parser {
     }
 
     void switchParsingAlgorithm(String directive) { 
-        System.out.println("Switching parser due to directive " + directive);
+        edumips64.Main.logger.debug("Switching parser due to directive " + directive);
         algorithms.get(directive).parse(scanner);
     }
 
     // TODO: right now the addError method prints the error.
     // It will use ParserMultiException to report errors to user.
     void addError(Token t, String error) {
-        System.out.println("************* " + error + ": " + t);
+        edumips64.Main.logger.debug("************* " + error + ": " + t);
     }
 
     void addInstruction(Instruction instr, int address, List<Token> params, String label, Token instrToken) {
-        //System.out.println("Adding " + instr + " to SymbolTable, label " + label + ", address " + address);
+        //edumips64.Main.logger.debug("Adding " + instr + " to SymbolTable, label " + label + ", address " + address);
         if(label != null) {
             try {
                 symbols.setInstructionLabel(address, label);
-                System.out.println("ADDED LABEL " + label);
+                edumips64.Main.logger.debug("ADDED LABEL " + label);
             }
             catch (SameLabelsException e) {
                 addError(instrToken, "Duplicate label");
@@ -139,7 +139,7 @@ public class Parser {
 
 
     void addMemoryAddressToSymbolTable(int address, Token label) throws MemoryElementNotFoundException{
-        System.out.println("Adding " + label.getBuffer() + " to SymbolTable, address " + address);
+        edumips64.Main.logger.debug("Adding " + label.getBuffer() + " to SymbolTable, address " + address);
         try {
             symbols.setCellLabel(address, label.getBuffer());
         }
@@ -176,7 +176,7 @@ public class Parser {
     }
 
     protected void registerAlgorithm(String directive, ParsingAlgorithm p) {
-        System.out.println("Registering a parser for directive " + directive + ", " + p.toString());
+        edumips64.Main.logger.debug("Registering a parser for directive " + directive + ", " + p.toString());
         algorithms.put(directive, p);
     }
 

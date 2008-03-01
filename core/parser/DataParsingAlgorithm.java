@@ -150,6 +150,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                             token = s.next();
                             if(token.validate('I')){
                                 //converti il numero e salvalo
+                                System.out.println("About to convert " + token.getBuffer());
                                 long value = Converter.parseInteger(token.getBuffer());
                                 System.out.println("Writing to memory " + value);
 

@@ -36,10 +36,10 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
     }
 
     public void parse(Scanner s) {
-        System.out.println("Starting CodeParsingAlgorithm");
+        edumips64.Main.logger.debug("Starting CodeParsingAlgorithm");
         int address = 0;
         while(s.hasToken()) {
-            System.out.println("Starting Instruction parsing cycle");
+            edumips64.Main.logger.debug("Starting Instruction parsing cycle");
             String label = null;
             Token token = s.next();
             Token instructionToken;
@@ -109,18 +109,12 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                     else {
                         params.add(token);
                         fullname += token.getBuffer();
-                        System.out.println(fullname);
+                        edumips64.Main.logger.debug(fullname);
                     }
                 }
 
                 tmpInstr.setFullName(fullname);
-                System.out.println("Added " + fullname);
-
-                /*
-                if(label != null) {
-                    parser.addInstructionToSymbolTable(address, label, instructionToken);
-                }
-                */
+                edumips64.Main.logger.debug("Added " + fullname);
 
                 parser.addInstruction(tmpInstr, address, params, label, instructionToken);
 
