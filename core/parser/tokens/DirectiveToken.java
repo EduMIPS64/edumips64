@@ -22,6 +22,14 @@
 package edumips64.core.parser.tokens;
 
 public class DirectiveToken extends Token{
+    public DirectiveToken(String buffer, int line, int column) {
+        super(buffer, line, column);
+    }
+
+    public DirectiveToken(String buffer, int line) {
+        super(buffer, line);
+    }
+
     public DirectiveToken(String buffer) {
         super(buffer);
     }

@@ -22,6 +22,10 @@
 package edumips64.core.parser.tokens;
 
 public class ColonToken extends Token{
+    public ColonToken(int line, int column){
+        super(":", line,column);
+    }
+
     public ColonToken(int line){
         super(":", line);
     }

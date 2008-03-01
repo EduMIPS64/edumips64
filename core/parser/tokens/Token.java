@@ -25,19 +25,32 @@ import edumips64.core.is.Instruction;
 public abstract class Token{
     protected String buffer;
     protected int line;
+    protected int column;
     
+    public Token(String buffer, int line, int column){
+        this.buffer = buffer;
+        this.line = line;
+        this.column = column;
+    }
+
     public Token(String buffer, int line){
         this.buffer = buffer;
         this.line = line;
+        this.column = -1;
     }
 
     public Token(String buffer){
         this.buffer = buffer;
         this.line = -1;
+        this.column = -1;
     }
 
     public void setLine(int line){
         this.line = line;
+    }
+
+    public void setColumn(int column){
+        this.column = column;
     }
 
     public boolean validate(char pattern){
@@ -45,7 +58,8 @@ public abstract class Token{
     }
 
     public String toString(){
-        return getClass().getName() + "[line " + line + "]: " + buffer;
+        return getClass().getName() + "[line " + line +
+            ", column " + column + "]: " + buffer;
     }
 
     public boolean isErrorToken(){
@@ -54,6 +68,10 @@ public abstract class Token{
 
     public int getLine(){
         return line;
+    }
+
+    public int getColumn(){
+        return column;
     }
 
     // TODO: abstract?

@@ -22,6 +22,10 @@
 package edumips64.core.parser.tokens;
 
 public class LeftParenToken extends Token{
+    public LeftParenToken(int  line, int column) {
+        super("(",line, column);
+    }
+
     public LeftParenToken(int  line) {
         super("(",line);
     }

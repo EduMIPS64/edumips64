@@ -22,6 +22,10 @@
 package edumips64.core.parser.tokens;
 
 public class EOFToken extends Token{
+    public EOFToken(int line, int column){
+        super("", line, column);
+    }
+
     public EOFToken(int line){
         super("", line);
     }

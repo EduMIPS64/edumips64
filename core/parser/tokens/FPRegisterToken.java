@@ -24,6 +24,10 @@ import edumips64.core.is.*;
 
 
 public class FPRegisterToken extends Token{
+    public FPRegisterToken(String buffer,int line, int column){
+        super(buffer,line, column);
+    }
+
     public FPRegisterToken(String buffer,int line){
         super(buffer,line);
     }

@@ -33,6 +33,7 @@ public class Scanner{
     //private FPRegisterRecognizer fpRegRec = new FPRegisterRecognizer();
     private IDRecognizer idRec = new IDRecognizer();
     private int currentLine;
+    private int currentColumn;
     
     /** Constructor.
      * @param reader stream for consuming characters
@@ -40,10 +41,11 @@ public class Scanner{
     public Scanner(Reader reader){
         this.reader = reader;
         this.currentLine = 1;
+        this.currentColumn = 1;
     }
 
     private Token getEOLToken(){
-        return new EOLToken(currentLine++);
+        return new EOLToken(currentLine++,currentColumn);
     }
 
     /** Returns true only if the scanner has a new token.
@@ -68,13 +70,17 @@ public class Scanner{
         try{
             do{
                 r = reader.read();
+                currentColumn++;
             }while (r != -1 && (char)r != '\n');
 
             //A comment line may end with EOL or with EOF
+            Token t;
             if( r == -1)
-                return new EOFToken(currentLine);
+                t = new EOFToken(currentLine,currentColumn);
             else
-                return getEOLToken();
+                t = getEOLToken();
+            currentColumn = 1;
+            return t;
         }catch(IOException e){
             return new ErrorToken("I/O Error");
         }
@@ -89,63 +95,67 @@ public class Scanner{
 
     // TODO: eccezione END OF TOKEN STREAM
     public Token nextToken(){
-        Token t;
+        Token t = null;
         while(true){
             try{
                 reader.mark(1);
                 int r = reader.read();
                 if( r == -1)
-                    return new EOFToken(currentLine);
+                    return new EOFToken(currentLine, currentColumn);
 
                 char token = (char) r;
                 
                 //Pay attention, newline character is recognized as
                 //whitespace...!
-                if( token == '\n')
+                if( token == '\n'){
+                    currentColumn = 1;
                     return getEOLToken();
+                }
 
-                if( Character.isWhitespace(token))
+                if( Character.isWhitespace(token)){
+                    currentColumn++;
                     continue;
+                }
                 
                 //registers and IDs start with a letter
                 if( Character.isLetter(token)){
                     reader.reset();
                     //may be an identifier or a register
                     t = idRec.recognize(reader);
-                    t.setLine(currentLine);
-                    return t;
                 }
-
                 //numbers (integer and float) start with a digit or + and -
-                if( Character.isDigit(token) || token == '+' || token == '-'){
+                else if( Character.isDigit(token) || token == '+' || token == '-'){
                     reader.reset();
                     t = numRec.recognize(reader);
-                    t.setLine(currentLine);
-                    return t;
+                }else{
+                    //single characters, comment, strings and directives
+                    //only start with certain characters
+                    switch(token){
+                        case '(': t = new LeftParenToken(); break;      
+                        case ')': t = new RightParenToken(); break;      
+                        case ',': t = new CommaToken(); break;
+                        case ':': t = new ColonToken(); break;
+                        case ';': t = skipComment(); break;
+                        case '$': reader.reset();
+                                  t = regRec.recognize(reader);
+                                  break;
+                        case '.': reader.reset(); 
+                                  t = directiveRec.recognize(reader);
+                                  break;
+                        case '"': reader.reset();
+                                  t = stringRec.recognize(reader);
+                                  break;
+                        default: t = new ErrorToken(""+token,currentLine, currentColumn);
+                    }
                 }
 
-                //single characters, comment, strings and directives
-                //only start with certain characters
-                switch(token){
-                    case '(': return new LeftParenToken(currentLine);       
-                    case ')': return new RightParenToken(currentLine);       
-                    case ',': return new CommaToken(currentLine);
-                    case ':': return new ColonToken(currentLine);
-                    case ';': return skipComment(); 
-                    case '$': reader.reset();
-                              t = regRec.recognize(reader);
-                              t.setLine(currentLine);
-                              return t;
-                    case '.': reader.reset(); 
-                              t = directiveRec.recognize(reader);
-                              t.setLine(currentLine);
-                              return t;
-                    case '"': reader.reset();
-                              t = stringRec.recognize(reader);
-                              t.setLine(currentLine);
-                              return t;
-                }
-                return new ErrorToken(""+token, currentLine);
+                if( t == null)
+                    t = new ErrorToken(""+token,currentLine, currentColumn);
+                
+                currentColumn += t.getBuffer().length();
+                t.setLine(currentLine);
+                t.setColumn(currentColumn);
+                return t;
             } catch (IOException e){
                 return new ErrorToken("I/O Error", currentLine);
             }

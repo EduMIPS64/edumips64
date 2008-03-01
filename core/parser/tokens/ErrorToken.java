@@ -22,12 +22,16 @@
 package edumips64.core.parser.tokens;
 
 public class ErrorToken extends Token{
-    public ErrorToken(String buffer) {
-        super(buffer);
+    public ErrorToken(String buffer, int line, int column) {
+        super(buffer, line, column);
     }
 
     public ErrorToken(String buffer, int line) {
         super(buffer, line);
+    }
+
+    public ErrorToken(String buffer) {
+        super(buffer);
     }
 
     public boolean validate(char pattern){

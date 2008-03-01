@@ -22,6 +22,10 @@
 package edumips64.core.parser.tokens;
 
 public class EOLToken extends Token{
+    public EOLToken(int line, int column){
+        super("\n",line, column);
+    }
+
     public EOLToken(){
         super("\n");
     }

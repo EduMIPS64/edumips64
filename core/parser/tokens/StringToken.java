@@ -22,6 +22,10 @@
 package edumips64.core.parser.tokens;
 
 public class StringToken extends Token{
+    public StringToken(String buffer,int line, int column){
+        super(buffer, line, column);
+    }
+
     public StringToken(String buffer,int line){
         super(buffer, line);
     }

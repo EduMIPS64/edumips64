@@ -40,6 +40,10 @@ public class IdToken extends Token{
         keywords.put("SNAN",c);
     }
 
+    public IdToken(String buffer, int line, int column) {
+        super(buffer,line, column);
+    }
+
     public IdToken(String buffer) {
         super(buffer);
     }
@@ -47,6 +51,7 @@ public class IdToken extends Token{
     public IdToken(String buffer, int line) {
         super(buffer,line);
     }
+
     public boolean validate(char pattern){
         return pattern == 'L' || pattern == 'B' || pattern == 'E';
     }

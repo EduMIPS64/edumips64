@@ -22,13 +22,18 @@
 package edumips64.core.parser.tokens;
 
 public class FloatToken extends Token{
-    public FloatToken(String buffer){
-        super(buffer);
+    public FloatToken(String buffer, int line, int column){
+        super(buffer, line, column);
     }
 
     public FloatToken(String buffer, int line){
         super(buffer, line);
     }
+
+    public FloatToken(String buffer){
+        super(buffer);
+    }
+
     public boolean validate(char pattern){
         return pattern == 'G';
     }

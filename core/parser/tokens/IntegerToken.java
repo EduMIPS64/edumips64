@@ -24,9 +24,14 @@ import edumips64.core.is.Instruction;
 import edumips64.utils.Converter;
 
 public class IntegerToken extends Token{
+    public IntegerToken(String buffer, int line, int column){
+        super(buffer, line, column);
+    }
+
     public IntegerToken(String buffer, int line){
         super(buffer, line);
     }
+
     public IntegerToken(String buffer){
         super(buffer);
     }
