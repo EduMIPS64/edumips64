@@ -32,9 +32,11 @@ import edumips64.utils.Converter;
 
 class DataParsingAlgorithm extends ParsingAlgorithm {
     protected Memory memory;
+    protected SymbolTable symTab;
     public DataParsingAlgorithm(Parser p) {
         super(p);
         memory = Memory.getInstance();
+        symTab = SymbolTable.getInstance();
     }
 
     public void parse(Scanner s) {
@@ -76,6 +78,15 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
             if(token.validate('L')) {
                 if(!parser.isInstruction(token)) {
                     label = token.getBuffer();
+                    try {
+                        symTab.setCellLabel(address, label);
+                    }
+                    catch (SameLabelsException e) {
+                        parser.addError(token, "Duplicate label");
+                    }
+                    catch (MemoryElementNotFoundException e) {
+                        parser.addError(token, "PARSER_OUT_OF_BOUNDS");
+                    }
                     token = s.next(); 
                     if(!token.validate(':')) {
                         parser.addError(token, "PARSER_COLON_EXPECTED");

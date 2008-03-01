@@ -83,14 +83,18 @@ public class Parser {
                 }
             }
 
+            for(Integer __ : i.instr.getParams())
+                edumips64.Main.logger.debug("Param: " + __);
+
             try {
                 i.instr.pack();
+                edumips64.Main.logger.debug("Instruction packed, adding to memory");
                 memory.addInstruction(i.instr, i.address);
             }
             catch (SymbolTableOverflowException e) {
                 addError(i.token, "Address out of range");
             }
-            catch (IrregularStringOfBitsException e) {
+            catch (Exception e) {
                 addError(i.token, "Unexpected error");
             }
         }
@@ -127,6 +131,7 @@ public class Parser {
         if(label != null) {
             try {
                 symbols.setInstructionLabel(address, label);
+                instr.setLabel(label);
                 edumips64.Main.logger.debug("ADDED LABEL " + label);
             }
             catch (SameLabelsException e) {

@@ -38,7 +38,7 @@ public class IntegerToken extends Token{
 
         return (pattern == 'I') || (pattern == 'G')
             || ( pattern == 'L')
-            || (pattern == 'U' && sign != '-');
+            || (pattern == 'U' && buffer.charAt(0) != '-');
     }
 
     public void addToParametersList(Instruction instr) {

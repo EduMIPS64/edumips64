@@ -299,6 +299,7 @@ public class Memory{
 		if(address > CPU.CODELIMIT)
 			throw new SymbolTableOverflowException();
 
+        edumips64.Main.logger.debug("adding instruction " + i + " @ " + address);
 		int listIndex = address / 4;
 
         maxWrittenCodeAddress = Math.max(maxWrittenCodeAddress, address);

@@ -83,7 +83,7 @@ public class Scanner{
     // Debug method, prints the actual token
     public Token next() {
         Token t = nextToken();
-        System.out.println(t);
+        edumips64.Main.logger.debug(t.toString());
         return t;
     }
 
@@ -156,7 +156,7 @@ public class Scanner{
         BufferedReader reader = new BufferedReader(new FileReader(args[0]));
         Scanner scanner = new Scanner(reader);
         while(scanner.hasToken())
-            System.out.println(scanner.nextToken());
+            edumips64.Main.logger.debug(scanner.nextToken().toString());
     }
 }
 
