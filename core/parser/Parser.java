@@ -37,6 +37,10 @@ public class Parser {
     // pattern)
     protected HashMap<String, ParsingAlgorithm> algorithms;
 
+    // List of parsing errors
+    protected List<ParserException> exceptions;
+    protected boolean hasOnlyWarnings = true;   // Set to false if the parser encounters errors
+
     // Stupid inner class, because we are using a stupid programming language
     // And no, I'm not going to write getters and setters.
     protected class InstructionData {
@@ -66,7 +70,15 @@ public class Parser {
      * --------------------
      */
 
-	public void parse(String filename) throws FileNotFoundException, SecurityException, IOException,ParserMultiException {
+    public void reset() {
+        edumips64.Main.logger.debug("Resetting parser");
+        instructions = new LinkedList<InstructionData>();
+        exceptions = new LinkedList<ParserException>();
+        hasOnlyWarnings = true;
+    }
+
+
+	public void parse(String filename) throws FileNotFoundException, SecurityException, IOException,ParserErrorsException {
         edumips64.Main.logger.debug("Parse begins!");
 
         String absolutePath = new File(filename).getAbsolutePath();
@@ -87,6 +99,7 @@ public class Parser {
         scanner = new Scanner(reader);
         default_alg.parse(scanner);
 
+        // Packing instruction
         edumips64.Main.logger.debug("Will now pack the instructions");
         for(InstructionData i : instructions) {
             edumips64.Main.logger.debug("Processing " + i.instr.getFullName());
@@ -96,6 +109,7 @@ public class Parser {
                     t.addToParametersList(i.instr);
                 }
                 catch(ParameterException e) {
+                    // TODO: correzione addError
                     addError(t, e.getMessage());
                 }
             }
@@ -109,12 +123,17 @@ public class Parser {
                 memory.addInstruction(i.instr, i.address);
             }
             catch (SymbolTableOverflowException e) {
-                addError(i.token, "Address out of range");
+                addError(i.token, "PARSER_OUT_OF_BOUNDS");
             }
+            // TODO: verificare il precedente try/catch
             catch (Exception e) {
-                addError(i.token, "Unexpected error");
+                addError(i.token, "PARSER_UNKNOWN");
             }
         }
+
+        // Throw exception if needed
+        if(exceptions.size() > 0)
+            throw new ParserErrorsException(exceptions, false);
     }
 
     // Singleton design pattern
@@ -141,6 +160,9 @@ public class Parser {
     // It will use ParserMultiException to report errors to user.
     void addError(Token t, String error) {
         edumips64.Main.logger.debug("************* " + error + ": " + t);
+        System.out.println("************* " + error + ": " + t);
+        hasOnlyWarnings = false;
+        exceptions.add(new ParserException(error, t.getLine(), 0, t.toString(), true));
     }
 
     void addInstruction(Instruction instr, int address, List<Token> params, String label, Token instrToken) {
@@ -152,7 +174,7 @@ public class Parser {
                 edumips64.Main.logger.debug("ADDED LABEL " + label);
             }
             catch (SameLabelsException e) {
-                addError(instrToken, "Duplicate label");
+                addError(instrToken, "PARSER_DUPLICATE_LABEL");
             }
         }
         // For later parameters processing
@@ -165,7 +187,7 @@ public class Parser {
             symbols.setCellLabel(address, label.getBuffer());
         }
         catch (SameLabelsException e) {
-            addError(label, "Duplicate label");
+            addError(label, "PARSER_DUPLICATE_LABEL");
         }
     }
 
@@ -251,6 +273,7 @@ public class Parser {
         symbols = SymbolTable.getInstance();
         memory = Memory.getInstance();
         instructions = new LinkedList<InstructionData>();
+        exceptions = new LinkedList<ParserException>();
 
         // Association of parsing algorithms with directives
         registerAlgorithm(".DATA", data_pa);

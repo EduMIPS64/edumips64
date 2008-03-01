@@ -53,6 +53,22 @@ public class ParserException
 
 	}
 
+	/** Create a new instance of ParserException
+	 *  @param description The Description of exception
+	 *  @param row The row where there are a error
+	 *  @param column The column where there are a error
+	 *  @param line A String with bad code 
+	 *  @param error A boolean indicating whether the exception is an error
+	 */
+	public ParserException(String description,int row,int column,String line,boolean error)
+	{
+		this.row = row;
+		this.column = column;
+		this.line = line;
+		this.description = CurrentLocale.getString(description);
+        this.isError = error;
+
+	}
 	public void setError(boolean iserror){
 		isError = iserror;
 	}

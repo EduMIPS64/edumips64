@@ -82,7 +82,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                         symTab.setCellLabel(address, label);
                     }
                     catch (SameLabelsException e) {
-                        parser.addError(token, "Duplicate label");
+                        parser.addError(token, "PARSER_DUPLICATE_LABEL");
                     }
                     catch (MemoryElementNotFoundException e) {
                         parser.addError(token, "PARSER_OUT_OF_BOUNDS");

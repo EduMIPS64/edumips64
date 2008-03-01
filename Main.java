@@ -30,6 +30,8 @@ import edumips64.utils.*;
 import edumips64.ui.*;
 
 import edumips64.core.parser.Parser;
+import edumips64.core.ParserException;
+import edumips64.core.parser.ParserErrorsException;
 
 import java.net.*;
 import java.util.*;
@@ -407,6 +409,7 @@ public class Main extends JApplet {
     private static void openFile(String file) {
         logger.debug("Trying to open " + file);
         cpu.reset();
+        parser.reset();
 
         try {
             // Aggiorniamo i componenti gai
@@ -423,9 +426,17 @@ public class Main extends JApplet {
             try {
                 parser.parse(file);
             }
+            catch (ParserErrorsException ex) {
+                if(ex.hasOnlyWarnings())
+                    new ErrorDialog(f,ex.getExceptionList(),CurrentLocale.getString("GUI_PARSER_ERROR")); 
+                else
+                    throw ex;
+            }
+            /*
             catch (ParserMultiWarningException pmwe) {
                 new ErrorDialog(f,pmwe.getExceptionList(),CurrentLocale.getString("GUI_PARSER_ERROR"));
             }
+            */
             catch (NullPointerException e) {
                 logger.debug("NullPointerException: " + e.toString());
                 e.printStackTrace();
@@ -450,6 +461,14 @@ public class Main extends JApplet {
 			}
 			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
         }
+        catch (ParserErrorsException ex) {
+            logger.debug("Error opening " + file);
+            new ErrorDialog(f,ex.getExceptionList(),CurrentLocale.getString("GUI_PARSER_ERROR")); 
+            openedFile = null;
+            f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
+            resetSimulator();
+        }
+        /*
         catch (ParserMultiException ex) {
             logger.debug("Error opening " + file);
             new ErrorDialog(f,ex.getExceptionList(),CurrentLocale.getString("GUI_PARSER_ERROR")); 
@@ -457,6 +476,7 @@ public class Main extends JApplet {
             f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
             resetSimulator();
         }
+        */
         catch (java.io.FileNotFoundException ex) {
 			String tmpfile;
 			if (ex.getMessage().indexOf("(")!=-1)
@@ -540,6 +560,7 @@ public class Main extends JApplet {
 
     public static void resetSimulator() {
         cpu.reset();
+        parser.reset();
         try {
             iom.reset();
         }

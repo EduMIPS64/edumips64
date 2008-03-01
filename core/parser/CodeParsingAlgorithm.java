@@ -47,7 +47,7 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
 
             // Error
             if(token.isErrorToken()) {
-                parser.addError(token, "Lexical error");
+                parser.addError(token, "PARSER_LEXICAL_ERROR");
                 continue;
             }
 
@@ -59,7 +59,7 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                     break;
                 }
                 else {
-                    parser.addError(token, "Invalid directive");
+                    parser.addError(token, "PARSER_INVALID_DIRECTIVE");
                     continue;
                 } 
             }
@@ -73,7 +73,7 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                     // Label! It would be useful if there was a "EndOfTokenStream" exception
                     token = s.next(); 
                     if(!token.validate(':')) {
-                        parser.addError(token, "Colon expected");
+                        parser.addError(token, "PARSER_COLON_EXPECTED");
                         continue;
                     } 
                     else {
@@ -83,7 +83,7 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                         tmpInstr = Instruction.buildInstruction(token.getBuffer());
                         instructionToken = token;
                         if(tmpInstr == null) {
-                            parser.addError(token, "Instruction expected");
+                            parser.addError(token, "PARSER_INSTRUCTION_EXPECTED");
                             continue;
                         }
                     }
@@ -105,7 +105,7 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                         continue;
                     token = s.next();
                     if(!token.validate(c))
-                        parser.addError(token, "Unexpected token");
+                        parser.addError(token, "PARSER_UNEXPECTED");
                     else {
                         params.add(token);
                         fullname += token.getBuffer();
@@ -121,7 +121,7 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
 
                 token = s.next();
                 if(!token.validate('\n'))
-                    parser.addError(token, "Expected EOL");
+                    parser.addError(token, "PARSER_EOL_EXPECTED");
 
                 address += 4;
             }

@@ -45,7 +45,7 @@ public class ErrorDialog extends JDialog{
 	private static boolean[] lineIsError;
 	JButton okButton;
 	int numError = 0, width = 710, height = 350;	
-	public ErrorDialog(final JFrame owner,LinkedList<ParserException> peList,String title){
+	public ErrorDialog(final JFrame owner,java.util.List<ParserException> peList,String title){
 	
 		super(owner, title, true);
 		
