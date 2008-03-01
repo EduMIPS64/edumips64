@@ -57,7 +57,7 @@ public abstract class Token{
     }
 
     // TODO: abstract?
-    public void addToParametersList(Instruction instr){}
+    public void addToParametersList(Instruction instr) throws ParameterException{}
 
     public String getBuffer() {
         return buffer;

@@ -20,19 +20,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package edumips64.core.parser.tokens;
+
+import edumips64.core.is.*;
+import edumips64.core.*;
 import java.util.*;
 
 public class IdToken extends Token{
-    public IdToken(String buffer) {
-        super(buffer);
-    }
-
-    public IdToken(String buffer, int line) {
-        super(buffer,line);
-    }
-    public boolean validate(char pattern){
-        return pattern == 'L' || pattern == 'B';
-    }
 
     public static Map<String,Class> keywords =
         new TreeMap<String,Class>(String.CASE_INSENSITIVE_ORDER);
@@ -46,6 +39,29 @@ public class IdToken extends Token{
         keywords.put("QNAN",c);
         keywords.put("SNAN",c);
     }
+
+    public IdToken(String buffer) {
+        super(buffer);
+    }
+
+    public IdToken(String buffer, int line) {
+        super(buffer,line);
+    }
+    public boolean validate(char pattern){
+        return pattern == 'L' || pattern == 'B';
+    }
+
+    public void addToParametersList(Instruction instr) throws ParameterException{
+        try{
+            SymbolTable symTab = SymbolTable.getInstance();
+            MemoryElement elem = symTab.getCell(buffer);
+            instr.addParam(elem.getAddress());
+        }
+        catch(MemoryElementNotFoundException e){
+            throw new ParameterException(this, "LABEL NOT FOUND");
+        }
+    }
+
 
 }
 
