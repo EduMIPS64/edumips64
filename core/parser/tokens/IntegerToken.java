@@ -39,8 +39,16 @@ public class IntegerToken extends Token{
     }
 
     public void addToParametersList(Instruction instr) {
-        System.out.println("Adding parameter " + Integer.parseInt(buffer));
-        instr.addParam(Integer.parseInt(buffer));
+        int value = 0;
+        char hex = buffer.charAt(1); //can be a hex number
+
+        if( hex == 'x' || hex == 'X')
+            value = Integer.parseInt(buffer,16);
+        else
+            value = Integer.parseInt(buffer);
+
+        System.out.println("Adding parameter " + value);
+        instr.addParam(value);
     }
 }
 
