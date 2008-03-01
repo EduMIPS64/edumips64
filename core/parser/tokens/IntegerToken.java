@@ -32,13 +32,13 @@ public class IntegerToken extends Token{
     }
 
     public boolean validate(char pattern){
-        System.out.println("Entering in IntegerToken::validate()");
         long value = Converter.parseInteger(buffer);
-        System.out.println("BOOOOOOM");
+        if(pattern == 'C' && value >= 0 && value <= 7)
+            return true;
+
         return (pattern == 'I') || (pattern == 'G')
-            || (pattern == 'U' && value >= 0)
-            || (pattern == 'C' && value >= 0 && value <= 7)
-            || (pattern == 'L');
+            || ( pattern == 'L')
+            || (pattern == 'U' && sign != '-');
     }
 
     public void addToParametersList(Instruction instr) {
