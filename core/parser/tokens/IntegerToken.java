@@ -31,8 +31,10 @@ public class IntegerToken extends Token{
     }
 
     public boolean validate(char pattern){
-        return (pattern == 'I') || (pattern == 'F')
-            || (pattern == 'U' && Integer.parseInt(buffer) >= 0)
+        int value = Integer.parseInt(buffer);
+        return (pattern == 'I') || (pattern == 'G')
+            || (pattern == 'U' && value >= 0)
+            || (pattern == 'C' && value >= 0 && value <= 7)
             || (pattern == 'L');
     }
 

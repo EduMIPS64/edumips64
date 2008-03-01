@@ -48,7 +48,7 @@ public class IdToken extends Token{
         super(buffer,line);
     }
     public boolean validate(char pattern){
-        return pattern == 'L' || pattern == 'B';
+        return pattern == 'L' || pattern == 'B' || pattern == 'E';
     }
 
     public void addToParametersList(Instruction instr) throws ParameterException{
