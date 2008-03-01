@@ -20,6 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package edumips64.core.parser.tokens;
+import java.util.*;
 
 public class IdToken extends Token{
     public IdToken(String buffer) {
@@ -32,6 +33,20 @@ public class IdToken extends Token{
     public boolean validate(char pattern){
         return pattern == 'L' || pattern == 'B';
     }
+
+    public static Map<String,Class> keywords =
+        new TreeMap<String,Class>(String.CASE_INSENSITIVE_ORDER);
+
+    static{
+        Class c = new FloatToken("").getClass();
+        keywords.put("POSITIVEINFINITY",c);
+        keywords.put("NEGATIVEINFINITY",c);
+        keywords.put("POSITIVEZERO",c);
+        keywords.put("NEGATIVEZERO",c);
+        keywords.put("QNAN",c);
+        keywords.put("SNAN",c);
+    }
+
 }
 
 

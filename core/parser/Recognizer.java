@@ -61,24 +61,29 @@ public abstract class Recognizer{
             }
 
             if( table.isFinalStatus(state)){
-                try{
-                    Class<? extends Token> c = table.getFinalStatusClass(state);
-
-                    java.lang.reflect.Constructor<? extends Token> ctor = c.getConstructor(
-                            new Class[] {String.class});
-
-                    Token t = ctor.newInstance(
-                            new Object[]{buffer.toString()});
-
-                    return t;
-                }
-                catch( Exception e){
-                    return new ErrorToken("Program error");
-                }
+                Class<? extends Token> c = table.getFinalStatusClass(state);
+                return createToken(c);
             }
+            
             else
                 return new ErrorToken(buffer.toString());
     }
+
+    protected Token createToken(Class<? extends Token> c){
+        try{
+            java.lang.reflect.Constructor<? extends Token> ctor = c.getConstructor(
+                    new Class[] {String.class});
+
+            Token t = ctor.newInstance(
+                    new Object[]{buffer.toString()});
+
+            return t;
+        }
+        catch( Exception e){
+            return new ErrorToken("Program error");
+        }
+    }
+
 }
 
 

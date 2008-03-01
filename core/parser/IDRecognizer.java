@@ -57,7 +57,7 @@ class NotCharValidator implements Validator<Character>{
 
 public class IDRecognizer extends Recognizer{
     protected void buildTable(){
-        numStates = 100;
+        numStates = 14;
 
         Class c_float = new FloatToken("").getClass();
         Class c_id = new IdToken("").getClass();
@@ -134,9 +134,7 @@ public class IDRecognizer extends Recognizer{
         //al riconoscitore di ID
         table.setTransition(0,13, new Validator<Character>(){
             public boolean validate(Character c){
-                return !(c == 'R' || c == 'r' || c == 'F' || c == 'f' ||
-                         c == 'P' || c == 'p' || c == 'N' || c == 'n' ||
-                         c == 'Q' || c == 'q' || c == 'S' || c == 's') && 
+                return !(c == 'R' || c == 'r' || c == 'F' || c == 'f') &&
                         (Character.isLetter(c) || c == '_');
             }
         });
@@ -213,86 +211,6 @@ public class IDRecognizer extends Recognizer{
             }
         });
 
-        //parole chiave per i float number
-        //prefisso per POSITIVEINFINITY e POSITIVEZERO
-        String keyword = "POSITIVE";
-        table.setTransition(0,14, new CharValidator(keyword.charAt(0)));
-
-        //finisce nello stato 21
-        for(int i = 1; i<keyword.length(); i++){
-            table.setTransition(14+i-1,14+i, new CharValidator(keyword.charAt(i)));
-            table.setTransition(14+i-1, 13, new NotCharValidator(keyword.charAt(i)));
-            table.setFinalStatus(14+i-1, c_id);
-        }
-
-        //prefisso per NEGATIVEINFINITY e NEGATIVEZERO
-        keyword = "NEGATIVE";
-        table.setTransition(0,22, new CharValidator(keyword.charAt(0)));
-
-        //finisce nello stato 28
-        for(int i = 1; i<keyword.length()-1; i++){
-            table.setTransition(22+i-1, 22+i, new CharValidator(keyword.charAt(i)));
-            table.setTransition(22+i-1, 13, new NotCharValidator(keyword.charAt(i)));
-            table.setFinalStatus(22+i-1, c_id);
-        }
-
-        //POSITIVE e NEGATIVE finiscono nello stesso stato 21
-        table.setTransition(28, 21, new CharValidator(keyword.charAt(keyword.length()-1)));
-        table.setTransition(28, 13, new NotCharValidator(keyword.charAt(keyword.length()-1)));
-        table.setFinalStatus(21, c_id);
-
-        //suffisso INFINITY (parte dalla transizione 21-->29 
-        //e arriva fino allo stato 36)
-        keyword = "INFINITY";
-        table.setTransition(21, 29, new CharValidator(keyword.charAt(0)));
-
-
-
-         
-
-        for(int i = 1; i<keyword.length(); i++){
-            table.setTransition(29+i-1, 29+i, new CharValidator(keyword.charAt(i)));
-            table.setTransition(29+i-1, 13, new NotCharValidator(keyword.charAt(i)));
-            table.setFinalStatus(29+i-1, c_id);
-        }
-
-        //suffisso ZERO (parte dalla transizione 21-->37 
-        //e arriva fino allo stato 40)
-        keyword = "ZERO";
-        table.setTransition(21, 37, new CharValidator(keyword.charAt(0)));
-        table.setTransition(21,13, new Validator<Character>(){
-            public boolean validate(Character c){
-                return  (!(c == 'Z' || c == 'z' || c == 'I' || c == 'i') &&
-                        Character.isLetterOrDigit(c));
-            }
-        });
-
-        for(int i = 1; i<keyword.length(); i++){
-            table.setTransition(37+i-1, 37+i, new CharValidator(keyword.charAt(i)));
-            table.setTransition(37+i-1, 13, new NotCharValidator(keyword.charAt(i)));
-            table.setFinalStatus(37+i-1, c_id);
-        }
-
-
-        //prefisso Q e S per QNAN e SNAN
-        table.setTransition(0,41, new Validator<Character>(){
-            public boolean validate(Character c){
-                return c == 'Q' || c == 'q' || c == 'S' || c == 's';
-            }
-        });
-
-        keyword = "QNAN";
-        //dallo stato 41 al 44
-        for(int i = 1; i<keyword.length(); i++){
-            table.setTransition(41+i-1, 41+i, new CharValidator(keyword.charAt(i)));
-            table.setTransition(41+i-1, 13, new NotCharValidator(keyword.charAt(i)));
-            table.setFinalStatus(41+i-1, c_id);
-        }
-
-        table.setFinalStatus(36, c_float); // fine INFINITY
-        table.setFinalStatus(40, c_float); // fine ZERO
-        table.setFinalStatus(44, c_float); // fine NAN
-
         table.setFinalStatus(2, c_reg);
         table.setFinalStatus(3, c_reg);
         table.setFinalStatus(4, c_reg);
@@ -310,16 +228,19 @@ public class IDRecognizer extends Recognizer{
         table.setFinalStatus(13, c_id);
     }
 
-    public static void main(String[] args) throws java.io.IOException{
-        IDRecognizer recognizer = new IDRecognizer();
-        java.io.BufferedReader in = new java.io.BufferedReader(
-                new java.io.InputStreamReader(System.in));
-        while(true){
-            System.out.print("Inserisci una stringa: ");
-            String line = in.readLine();
-            Token t = recognizer.recognize(new java.io.StringReader(line));
-            System.out.println(t);
+    //questo metodo va ridefinito perchè dopo aver riconosciuto un ID si deve
+    //verificare se è una parola chiave
+    public Token recognize(java.io.Reader stream){
+        Token t = super.recognize(stream); //riconoscimento della classe base
+        String key = t.getBuffer();
+
+        //verifica nel dizionario delle parole chiave
+        if(IdToken.keywords.containsKey(key)){
+            Class c = IdToken.keywords.get(key);
+            return createToken(c);
         }
+        else
+            return t;
     }
 }
 
