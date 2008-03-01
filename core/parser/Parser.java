@@ -73,7 +73,12 @@ public class Parser {
             System.out.println("Processing " + i.instr.getFullName());
             for(Token t : i.params) {
                 System.out.println("Adding " + t + " to parameters list");
-                t.addToParametersList(i.instr);
+                try {
+                    t.addToParametersList(i.instr);
+                }
+                catch(ParameterException e) {
+                    addError(t, e.getMessage());
+                }
             }
 
             try {
@@ -120,6 +125,7 @@ public class Parser {
         if(label != null) {
             try {
                 symbols.setInstructionLabel(address, label);
+                System.out.println("ADDED LABEL " + label);
             }
             catch (SameLabelsException e) {
                 addError(instrToken, "Duplicate label");

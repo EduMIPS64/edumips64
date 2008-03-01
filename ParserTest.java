@@ -17,7 +17,7 @@ public class ParserTest {
             Parser p = Parser.getInstance();
             p.parse(scanner);
             Memory m = Memory.getInstance();
-//            System.out.println(m.toString());
+            System.out.println(m.toString());
         }
     }
 }

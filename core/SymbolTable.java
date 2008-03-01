@@ -56,19 +56,19 @@ import edumips64.core.MemoryElementNotFoundException;
 			MemoryElement temp = mem.getCell(address);
 			// TODO: attualmente la cella  si prende l'ultima etichetta
 			temp.setLabel(label);
-			edumips64.Main.logger.debug("Added label " + label + " to address " + address);
+			//edumips64.Main.logger.debug("Added label " + label + " to address " + address);
 		}
 	}
 
 	public Instruction getInstruction(String label) {
-		edumips64.Main.logger.debug("Request for instruction labelled " + label);
+		////edumips64.Main.logger.debug("Request for instruction labelled " + label);
 		int address = instr_labels.get(label);
-		edumips64.Main.logger.debug("Label found at address " + address);
+		////edumips64.Main.logger.debug("Label found at address " + address);
 		return mem.getInstruction(address);
 	}
 
 	public MemoryElement getCell(String label) throws MemoryElementNotFoundException {
-		edumips64.Main.logger.debug("Request for memory element labelled " + label);
+		////edumips64.Main.logger.debug("Request for memory element labelled " + label);
 		if(label == null)
 			throw new MemoryElementNotFoundException();
 		label = label.toLowerCase();
@@ -76,7 +76,7 @@ import edumips64.core.MemoryElementNotFoundException;
 			throw new MemoryElementNotFoundException();
 
 		int address = mem_labels.get(label);
-		edumips64.Main.logger.debug("Label found at address " + address);
+		////edumips64.Main.logger.debug("Label found at address " + address);
 		return mem.getCell(address);
 	}
     

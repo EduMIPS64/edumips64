@@ -41,6 +41,10 @@ public class Memory{
 	private int instr_num;
 	private static Memory memory = null;
 	private static CPU cpu;
+
+    // Used to print via toString() only the used part of memory
+    private int maxWrittenDataAddress = 0;
+    private int maxWrittenCodeAddress = 0;
 	
 	private Memory(){
 		//edumips64.Main.logger.debug("Building Memory: " + this.hashCode());
@@ -116,6 +120,8 @@ public class Memory{
 
         MemoryElement el = memory.getCell(address);
         el.setBits(edumips64.core.fpu.FPInstructionUtils.doubleToBin(value), 0);
+
+        maxWrittenDataAddress = Math.max(maxWrittenDataAddress, address);
         
         return 8;
     }
@@ -199,6 +205,7 @@ public class Memory{
             written++;
         }
 
+        maxWrittenDataAddress = Math.max(maxWrittenDataAddress, address);
 
         return written;
     }
@@ -219,6 +226,8 @@ public class Memory{
         MemoryElement tmpMem = getCell(address - offset);
 
         System.out.println("Address: " + address + ", offset: " + offset);
+
+        maxWrittenDataAddress = Math.max(maxWrittenDataAddress, address);
 
         if(type.equalsIgnoreCase("BYTE")) {
             tmpMem.writeByte((int)value, offset);
@@ -268,10 +277,20 @@ public class Memory{
     public String toString()
 	{
 		String tmp="";
-		for(int i=0; i<CPU.DATALIMIT;i++)
+		for(int i=0; i < (maxWrittenDataAddress / 8) + 1;i++)
 		{
 			tmp += cells.get(i).toString()+"\n";
 		}
+
+        tmp += "\n\n";
+        for(int i=0; i < (maxWrittenCodeAddress / 4) + 1;i++) {
+            try {
+                tmp += instructions.get(i).toString() + " " + instructions.get(i).getRepr().getHexString() + "\n";
+            }
+            catch(IrregularStringOfBitsException e) {
+                System.out.println("Impossible");
+            }
+        }
 		return tmp;
 	} 
 
@@ -281,6 +300,8 @@ public class Memory{
 			throw new SymbolTableOverflowException();
 
 		int listIndex = address / 4;
+
+        maxWrittenCodeAddress = Math.max(maxWrittenCodeAddress, address);
 		instructions.set(listIndex, i);
 	}
 
