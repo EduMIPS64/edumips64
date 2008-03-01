@@ -20,6 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package edumips64.core.parser.tokens;
+import edumips64.core.is.Instruction;
 
 public class IntegerToken extends Token{
     public IntegerToken(String buffer, int line){
@@ -32,6 +33,10 @@ public class IntegerToken extends Token{
     public boolean validate(char pattern){
         return (pattern == 'I') || (pattern == 'F')
             || (pattern == 'U' && Integer.parseInt(buffer) >= 0);
+    }
+
+    public void addToParametersList(Instruction instr) {
+        instr.addParam(Integer.parseInt(buffer));
     }
 }
 
