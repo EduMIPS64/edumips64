@@ -27,6 +27,7 @@ package edumips64.core.parser;
 import edumips64.core.parser.tokens.*;
 import edumips64.core.is.*;
 import edumips64.core.*;
+import java.util.*;
 
 class CodeParsingAlgorithm extends ParsingAlgorithm {
 
@@ -91,8 +92,11 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                 // Now we should have a valid instruction. Let's get its
                 // syntax and validate the remaining tokens against it.
                 String syntax = tmpInstr.getSyntax();
+                int syntax_length = syntax.length();
+                String fullname = instructionToken.getBuffer() + " ";
+                List<Token> params = new LinkedList<Token>();
 
-                for(int i = 0; i < syntax.length(); ++i) {
+                for(int i = 0; i < syntax_length; ++i) {
                     char c = syntax.charAt(i);
 
                     // The syntax string is something like "%I,%I,%C".
@@ -102,13 +106,24 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                     token = s.next();
                     if(!token.validate(c))
                         parser.addError(token, "Unexpected token");
-
-                    // TODO: add parameter to parameters' list
+                    else {
+                        params.add(token);
+                        fullname += token.getBuffer();
+                        System.out.println(fullname);
+                    }
                 }
 
+                tmpInstr.setFullName(fullname);
+                System.out.println("Added " + fullname);
+
+                /*
                 if(label != null) {
                     parser.addInstructionToSymbolTable(address, label, instructionToken);
                 }
+                */
+
+                parser.addInstruction(tmpInstr, address, params, label, instructionToken);
+
 
                 token = s.next();
                 if(!token.validate('\n'))

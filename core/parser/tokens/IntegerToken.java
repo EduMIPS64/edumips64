@@ -39,6 +39,7 @@ public class IntegerToken extends Token{
     }
 
     public void addToParametersList(Instruction instr) {
+        System.out.println("Adding parameter " + Integer.parseInt(buffer));
         instr.addParam(Integer.parseInt(buffer));
     }
 }

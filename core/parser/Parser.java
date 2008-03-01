@@ -25,18 +25,34 @@
 
 package edumips64.core.parser;
 
-import edumips64.core.parser.tokens.*;
+import edumips64.utils.IrregularStringOfBitsException;
 import edumips64.core.*;
 import edumips64.core.is.Instruction;
-import java.util.HashMap;
-import java.util.Map;
+import edumips64.core.parser.tokens.*;
+import java.util.*;
 
 public class Parser {
     // Association between directives and parsing algorithms (Strategy design
     // pattern)
     protected HashMap<String, ParsingAlgorithm> algorithms;
+
+    // Stupid inner class, because we are using a stupid programming language
+    // And no, I'm not going to write getters and setters.
+    protected class InstructionData {
+        public InstructionData(Instruction instr, List<Token> params, int address, Token token) {
+            this.instr = instr;
+            this.params = params;
+            this.address = address;
+            this.token = token;
+        }
+        public Instruction instr;
+        public Token token;
+        public int address;
+        public List<Token> params;
+    }
+
     // List of instructions with parameters
-    // TODO
+    protected List<InstructionData> instructions;
 
     protected static Parser instance;
     protected Scanner scanner;
@@ -53,6 +69,24 @@ public class Parser {
         default_alg.parse(s);
 
         System.out.println("Will now pack the instructions");
+        for(InstructionData i : instructions) {
+            System.out.println("Processing " + i.instr.getFullName());
+            for(Token t : i.params) {
+                System.out.println("Adding " + t + " to parameters list");
+                t.addToParametersList(i.instr);
+            }
+
+            try {
+                i.instr.pack();
+                memory.addInstruction(i.instr, i.address);
+            }
+            catch (SymbolTableOverflowException e) {
+                addError(i.token, "Address out of range");
+            }
+            catch (IrregularStringOfBitsException e) {
+                addError(i.token, "Unexpected error");
+            }
+        }
     }
 
     // Singleton design pattern
@@ -81,14 +115,18 @@ public class Parser {
         System.out.println("************* " + error + ": " + t);
     }
 
-    void addInstructionToSymbolTable(int address, String label, Token instruction) {
-        System.out.println("Adding " + instruction.getBuffer() + " to SymbolTable, label " + label + ", address " + address);
-        try {
-            symbols.setInstructionLabel(address, label);
+    void addInstruction(Instruction instr, int address, List<Token> params, String label, Token instrToken) {
+        //System.out.println("Adding " + instr + " to SymbolTable, label " + label + ", address " + address);
+        if(label != null) {
+            try {
+                symbols.setInstructionLabel(address, label);
+            }
+            catch (SameLabelsException e) {
+                addError(instrToken, "Duplicate label");
+            }
         }
-        catch (SameLabelsException e) {
-            addError(instruction, "Duplicate label");
-        }
+        // For later parameters processing
+        instructions.add(new InstructionData(instr, params, address, instrToken));
     }
 
 
@@ -120,6 +158,7 @@ public class Parser {
         DataParsingAlgorithm data_pa = new DataParsingAlgorithm(this);
         symbols = SymbolTable.getInstance();
         memory = Memory.getInstance();
+        instructions = new LinkedList<InstructionData>();
 
         // Association of parsing algorithms with directives
         registerAlgorithm(".DATA", data_pa);

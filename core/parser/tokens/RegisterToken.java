@@ -54,12 +54,13 @@ public class RegisterToken extends Token{
         else if( first == '$'){
             char second = buffer.charAt(1);
         
-            if(Character.isDigit(second)) //registro
+            if(Character.isDigit(second))  {//registro
                 try{
                     value = Integer.parseInt(buffer.substring(1));
                 }
-            catch(NumberFormatException e){
-                value = 0;
+                catch(NumberFormatException e){
+                    value = 0;
+                }
             }
             else{ //alias
                 String alias = buffer.substring(1);
@@ -68,6 +69,7 @@ public class RegisterToken extends Token{
                         value = x.ordinal();
             }
         }
+        System.out.println("Adding parameter " + value);
         instr.addParam(value);
     }
 }        
