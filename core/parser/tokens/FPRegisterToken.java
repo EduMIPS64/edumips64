@@ -20,6 +20,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package edumips64.core.parser.tokens;
+import edumips64.core.is.*;
+
 
 public class FPRegisterToken extends Token{
     public FPRegisterToken(String buffer,int line){
@@ -34,6 +36,19 @@ public class FPRegisterToken extends Token{
         return pattern == 'F';
     }
 
+    public void addToParametersList(Instruction instr){
+        char first = buffer.charAt(0);
+        int value = -1;
+
+        if(first == 'F' || first == 'f')
+            try{
+                value = Integer.parseInt(buffer.substring(1));
+            }
+        catch(NumberFormatException e){
+            value = 0;
+        }        
+        instr.addParam(value);
+    }
 }
 
 
