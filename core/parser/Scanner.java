@@ -93,7 +93,6 @@ public class Scanner{
         return t;
     }
 
-    // TODO: eccezione END OF TOKEN STREAM
     public Token nextToken(){
         Token t = null;
         while(true){
@@ -152,9 +151,10 @@ public class Scanner{
                 if( t == null)
                     t = new ErrorToken(""+token,currentLine, currentColumn);
                 
-                currentColumn += t.getBuffer().length();
+                currentColumn++; //primo carattere del token
                 t.setLine(currentLine);
                 t.setColumn(currentColumn);
+                currentColumn += t.getBuffer().length()-1;
                 return t;
             } catch (IOException e){
                 return new ErrorToken("I/O Error", currentLine);
