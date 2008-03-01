@@ -60,14 +60,31 @@ public class Parser {
     protected ParsingAlgorithm default_alg;
     protected SymbolTable symbols;
     protected Memory memory;
+    protected String path;
     /* --------------------
      * Public methods
      * --------------------
      */
+
 	public void parse(String filename) throws FileNotFoundException, SecurityException, IOException,ParserMultiException {
-        BufferedReader reader = new BufferedReader(new FileReader(filename));
+        edumips64.Main.logger.debug("Parse begins!");
+
+        String absolutePath = new File(filename).getAbsolutePath();
+        int separator = new File(filename).getAbsolutePath().lastIndexOf(File.separator);
+
+        edumips64.Main.logger.debug("Absolute path " + absolutePath);
+        edumips64.Main.logger.debug("Separator: " + separator);
+
+        if(separator != -1)
+            this.path = absolutePath.substring(0,separator);
+        else
+            this.path = "";
+
+        edumips64.Main.logger.debug("Filename: " + filename);
+        edumips64.Main.logger.debug("Path: " + path);
+
+        BufferedReader reader = new BufferedReader(preProcess(absolutePath));
         scanner = new Scanner(reader);
-        edumips64.Main.logger.debug("Starting the parser subsystem");
         default_alg.parse(scanner);
 
         edumips64.Main.logger.debug("Will now pack the instructions");
@@ -163,6 +180,69 @@ public class Parser {
      * Protected methods
      * -----------------
      */
+	protected String readLines(Reader stream) throws IOException
+	{
+		String ret = "";
+		String line;
+        BufferedReader in = new BufferedReader(stream);
+
+		while ((line = in.readLine()) != null)
+		    ret += line + "\n";
+
+		return ret;
+	}
+
+    protected String processInclude(String filename, Set<String> alreadyIncluded){
+        edumips64.Main.logger.debug("processInclude file " + filename);
+        edumips64.Main.logger.debug("Files already included: ");
+        for(String s : alreadyIncluded)
+            edumips64.Main.logger.debug(s);
+
+        BufferedReader reader;
+        String code;
+        try{
+            if(!(new File(filename)).isAbsolute())
+                filename = this.path + File.separator + filename;
+
+            if(alreadyIncluded.contains(filename)){
+                edumips64.Main.logger.debug("file " + filename + " already included");
+                return new String("");
+            }
+
+            alreadyIncluded.add(filename);
+            
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename),"ISO-8859-1"));
+
+            code = readLines(reader);
+            int i = 0;
+            while(true){
+                i = code.indexOf("#include", i);
+
+                if(i == -1)
+                    break;
+
+                int end = code.indexOf("\n", i);
+                if(end == -1)
+                    end = code.length();
+
+                String includedFileName = code.substring(i+9, end).split(";")[0].trim();
+                code = code.substring(0,i) + processInclude(includedFileName,alreadyIncluded) + code.substring(end);
+            }
+        }
+        catch(IOException e){
+            addError(new ErrorToken("#include"), "PARSER_WRONG_INCLUDE");
+            return new String("");
+        }
+        
+        return code;
+    }
+
+    protected Reader preProcess(String fileName){
+        Set<String> included = new HashSet<String>();
+        String code = processInclude(fileName,included);
+        return new StringReader(code);
+    }
+
     protected Parser() {
         algorithms = new HashMap<String, ParsingAlgorithm>();
         default_alg = new NullParsingAlgorithm(this);
