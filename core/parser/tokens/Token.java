@@ -20,6 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package edumips64.core.parser.tokens;
+import edumips64.core.is.Instruction;
 
 public abstract class Token{
     protected String buffer;
@@ -55,7 +56,7 @@ public abstract class Token{
         return line;
     }
 
-    public void addParameter(){}
+    public void addToParametersList(Instruction instr){}
 
     public String getBuffer() {
         return buffer;
