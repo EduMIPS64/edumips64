@@ -30,6 +30,7 @@ import edumips64.core.*;
 import edumips64.core.is.Instruction;
 import edumips64.core.parser.tokens.*;
 import java.util.*;
+import java.io.*;
 
 public class Parser {
     // Association between directives and parsing algorithms (Strategy design
@@ -63,10 +64,11 @@ public class Parser {
      * Public methods
      * --------------------
      */
-    public void parse(Scanner s) {
+	public void parse(String filename) throws FileNotFoundException, SecurityException, IOException,ParserMultiException {
+        BufferedReader reader = new BufferedReader(new FileReader(filename));
+        scanner = new Scanner(reader);
         System.out.println("Starting the parser subsystem");
-        scanner = s;
-        default_alg.parse(s);
+        default_alg.parse(scanner);
 
         System.out.println("Will now pack the instructions");
         for(InstructionData i : instructions) {
