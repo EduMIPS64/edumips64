@@ -334,6 +334,13 @@ public abstract class Instruction {
 	 *@param params The list of parameters
 	 **/
 	public void setParams(List<Integer> params){this.params=params; }
+
+    /** Adds a parameter to the parameters list.
+     * @param param the parameter to add
+     */
+    public void addParam(Integer param) {
+        params.add(param);
+    }
 	
 	/**
 	 * Sets the full name of the instruction as string
