@@ -54,8 +54,24 @@ public class IdToken extends Token{
     public void addToParametersList(Instruction instr) throws ParameterException{
         try{
             SymbolTable symTab = SymbolTable.getInstance();
-            MemoryElement elem = symTab.getCell(buffer);
-            instr.addParam(elem.getAddress());
+            // We need to know whether the label is an Instruction label or a
+            // Memory label
+            int n_param = instr.getActualParamsCount();
+            String[] syntaxElements = instr.getSyntax().split(",");
+            
+            // Each element of syntaxElements will be in the form %C,
+            // we are only interested in the latter character
+            char type = syntaxElements[n_param].charAt(1);
+
+            // Data label
+            if(type == 'L') {
+                MemoryElement elem = symTab.getCell(buffer);
+                instr.addParam(elem.getAddress());
+            }
+            // Instruction label
+            else {
+                instr.addParam(symTab.getInstructionAddress(buffer));
+            }
         }
         catch(MemoryElementNotFoundException e){
             throw new ParameterException(this, "LABEL NOT FOUND");

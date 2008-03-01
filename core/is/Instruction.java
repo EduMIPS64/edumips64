@@ -323,6 +323,8 @@ public abstract class Instruction {
 	 *@return the list of parameters
 	 **/
 	public List<Integer> getParams(){return params;}
+
+    public int getActualParamsCount() {return params.size();}
 	
 	
 	/**
