@@ -282,11 +282,25 @@ public class Parser {
 
         code = readLines(reader);
         int i = 0;
+        int j,k;
+
         while(true){
+            System.out.println(code);
             i = code.indexOf("#include", i);
+            k = code.lastIndexOf("\n", i);
+            j = code.lastIndexOf(";", i); //potrebbe esserci un commento!
+            System.out.println("\n" + k);
+            System.out.println(j);
+            System.out.println(i);
 
             if(i == -1)
                 break;
+
+            if( j > 0 && k > 0  && (j > k && j < i)){
+                System.out.println("Continuo");
+                i++;
+                continue;
+            }
 
             int end = code.indexOf("\n", i);
             if(end == -1)
@@ -294,6 +308,7 @@ public class Parser {
 
             String includedFileName = code.substring(i+9, end).split(";")[0].trim();
             code = code.substring(0,i) + processInclude(includedFileName,alreadyIncluded) + code.substring(end);
+            i++;
         }
         
         return code;
