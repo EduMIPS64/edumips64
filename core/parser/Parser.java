@@ -99,6 +99,10 @@ public class Parser {
         scanner = new Scanner(reader);
         default_alg.parse(scanner);
 
+        // Checking if HALT instruction is present
+        // and adding it if it's not
+        checkAndAddHalt();
+
         // Packing instruction
         edumips64.Main.logger.debug("Will now pack the instructions");
         for(InstructionData i : instructions) {
@@ -113,9 +117,6 @@ public class Parser {
                     addError(t, e.getMessage());
                 }
             }
-
-            for(Integer __ : i.instr.getParams())
-                edumips64.Main.logger.debug("Param: " + __);
 
             try {
                 i.instr.pack();
@@ -205,7 +206,33 @@ public class Parser {
     /* -----------------
      * Protected methods
      * -----------------
-     */
+     */ 
+
+    protected void checkAndAddHalt(){
+        boolean halt = false;
+        for(InstructionData i : instructions){
+            String instrName = i.token.getBuffer();
+            if(instrName.equalsIgnoreCase("HALT") || 
+                    (instrName.equalsIgnoreCase("SYSCALL") && i.params.get(0).getBuffer().equals("0"))){
+                halt = true;
+                return;
+            }
+        }
+
+        if(!halt){
+            int lastAddress = instructions.get(instructions.size()-1).address;
+            addWarning(new ErrorToken("HALT"), "HALT_NOT_PRESENT");
+
+            Instruction tmpInst = Instruction.buildInstruction("SYSCALL");
+            Token instrName = new IdToken("SYSCALL");
+            String label = null;
+            List<Token> paramsList = new ArrayList<Token>(1);
+            paramsList.add(new IntegerToken("0"));
+
+            addInstruction(tmpInst, lastAddress+4, paramsList,label, instrName);
+        }
+    }
+
 	protected String readLines(Reader stream) throws IOException
 	{
 		String ret = "";

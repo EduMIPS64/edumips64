@@ -36,13 +36,13 @@ public abstract class Token{
     public Token(String buffer, int line){
         this.buffer = buffer;
         this.line = line;
-        this.column = -1;
+        this.column = 0;
     }
 
     public Token(String buffer){
         this.buffer = buffer;
-        this.line = -1;
-        this.column = -1;
+        this.line = 0;
+        this.column = 0;
     }
 
     public void setLine(int line){
