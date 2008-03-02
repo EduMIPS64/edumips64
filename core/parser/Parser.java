@@ -156,13 +156,17 @@ public class Parser {
         algorithms.get(directive).parse(scanner);
     }
 
-    // TODO: right now the addError method prints the error.
-    // It will use ParserMultiException to report errors to user.
     void addError(Token t, String error) {
-        edumips64.Main.logger.debug("************* " + error + ": " + t);
-        System.out.println("************* " + error + ": " + t);
+        edumips64.Main.logger.debug("ERR ************* " + error + ": " + t);
+        System.out.println("ERR ************* " + error + ": " + t);
         hasOnlyWarnings = false;
         exceptions.add(new ParserException(error, t.getLine(), t.getColumn(), t.toString(), true));
+    }
+
+    void addWarning(Token t, String error) {
+        edumips64.Main.logger.debug("WARN ************* " + error + ": " + t);
+        System.out.println("WARN ************* " + error + ": " + t);
+        exceptions.add(new ParserException(error, t.getLine(), t.getColumn(), t.toString(), false));
     }
 
     void addInstruction(Instruction instr, int address, List<Token> params, String label, Token instrToken) {
