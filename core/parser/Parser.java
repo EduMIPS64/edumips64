@@ -134,7 +134,7 @@ public class Parser {
 
         // Throw exception if needed
         if(exceptions.size() > 0)
-            throw new ParserErrorsException(exceptions, false);
+            throw new ParserErrorsException(exceptions, hasOnlyWarnings);
     }
 
     // Singleton design pattern
@@ -224,6 +224,7 @@ public class Parser {
             addWarning(new ErrorToken("HALT"), "HALT_NOT_PRESENT");
 
             Instruction tmpInst = Instruction.buildInstruction("SYSCALL");
+            tmpInst.setFullName("SYSCALL 0");
             Token instrName = new IdToken("SYSCALL");
             String label = null;
             List<Token> paramsList = new ArrayList<Token>(1);
