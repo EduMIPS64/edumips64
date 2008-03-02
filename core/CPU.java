@@ -25,6 +25,7 @@ package edumips64.core;
 import edumips64.core.fpu.*;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 import edumips64.core.is.*;
 import edumips64.utils.*;
 
@@ -123,6 +124,7 @@ public class CPU {
 		for(int i=0;i<32;i++)
 			fpr[i]=new RegisterFP();
 		FCSR = new FCSRRegister();
+		configFPExceptionsAndRM();
 		fpPipe= new FPPipeline();
 		fpPipe.reset();
 		
@@ -422,21 +424,7 @@ public class CPU {
 		boolean masked = (Boolean)Config.get("syncexc-masked");
 		boolean terminate = (Boolean)Config.get("syncexc-terminate");
 		
-		FCSR.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION,(Boolean)Config.get("INVALID_OPERATION"));
-		FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW,(Boolean)Config.get("OVERFLOW"));
-		FCSR.setFPExceptions(CPU.FPExceptions.UNDERFLOW,(Boolean)Config.get("UNDERFLOW"));
-		FCSR.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO,(Boolean)Config.get("DIVIDE_BY_ZERO"));
-if (getCycles()==29)
-	System.out.println();
-		//setting the rounding mode
-		if((Boolean)Config.get("NEAREST"))
-			FCSR.setFCSRRoundingMode(FPRoundingMode.TO_NEAREST);
-		else if((Boolean)Config.get("TOWARDZERO"))
-			FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARD_ZERO);
-		else if((Boolean)Config.get("TOWARDS_PLUS_INFINITY"))
-			FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_PLUS_INFINITY);
-		else if((Boolean)Config.get("TOWARDS_MINUS_INFINITY"))
-			FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_MINUS_INFINITY);
+		configFPExceptionsAndRM();
 		
 		String syncex = null;
 		
@@ -788,6 +776,29 @@ if (getCycles()==29)
 			s+= "Registro " + i++ + ":\t" + r.toString() + "\n";
 		return s;
 	}
+	
+    public void configFPExceptionsAndRM() {
+	try {
+	    FCSR.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, (Boolean) Config.get("INVALID_OPERATION"));
+	    FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW, (Boolean) Config.get("OVERFLOW"));
+	    FCSR.setFPExceptions(CPU.FPExceptions.UNDERFLOW, (Boolean) Config.get("UNDERFLOW"));
+	    FCSR.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO, (Boolean) Config.get("DIVIDE_BY_ZERO"));
+
+	    //setting the rounding mode
+	    if ((Boolean) Config.get("NEAREST")) {
+		FCSR.setFCSRRoundingMode(FPRoundingMode.TO_NEAREST);
+	    } else if ((Boolean) Config.get("TOWARDZERO")) {
+		FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARD_ZERO);
+	    } else if ((Boolean) Config.get("TOWARDS_PLUS_INFINITY")) {
+		FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_PLUS_INFINITY);
+	    } else if ((Boolean) Config.get("TOWARDS_MINUS_INFINITY")) {
+		FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_MINUS_INFINITY);
+	    }
+	} catch (IrregularStringOfBitsException ex) {
+	    Logger.getLogger(CPU.class.getName()).log(Level.SEVERE, null, ex);
+	}
+
+    }
 	
 	public String toString() {
 		String s = new String();
