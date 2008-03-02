@@ -49,6 +49,7 @@ public abstract class Instruction {
 	protected static boolean enableForwarding=(Boolean)Config.get("forwarding");
 	protected String label;
 	protected Long serialNumber;
+    protected int address;
 	
 	
 	/** Creates a new instance of Instruction */
@@ -426,5 +427,13 @@ public abstract class Instruction {
 		}
 		return false;
 	}
+
+    public void setAddress(int address) {
+        this.address = address;
+    }
+
+    public int getAddress() {
+        return address;
+    }
 	
 }

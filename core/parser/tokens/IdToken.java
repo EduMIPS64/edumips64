@@ -71,12 +71,18 @@ public class IdToken extends Token{
             edumips64.Main.logger.debug("IdToken::addToParametersList - Type = " + type);
             // Data label
             if(type == 'L') {
+                edumips64.Main.logger.debug("From .data");
                 MemoryElement elem = symTab.getCell(buffer);
                 instr.addParam(elem.getAddress());
             }
             // Instruction label
-            else {
+            else if(type == 'E') {
+                edumips64.Main.logger.debug("From .code");
                 instr.addParam(symTab.getInstructionAddress(buffer));
+            }
+            else if(type == 'B') {
+                edumips64.Main.logger.debug("From .code");
+                instr.addParam(symTab.getInstructionAddress(buffer) - instr.getAddress() - 4);
             }
         }
         catch(MemoryElementNotFoundException e){

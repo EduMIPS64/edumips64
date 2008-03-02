@@ -107,13 +107,8 @@ import edumips64.core.MemoryElementNotFoundException;
 
     public Integer getInstructionAddress(String label)
     {
-		try {
-        	return instr_labels.get(label);
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+        edumips64.Main.logger.debug("Requested address for " + label + ": " + instr_labels.get(label));
+        return instr_labels.get(label);
     }
 
 

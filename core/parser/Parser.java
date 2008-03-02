@@ -178,7 +178,7 @@ public class Parser {
     }
 
     void addInstruction(Instruction instr, int address, List<Token> params, String label, Token instrToken) {
-        //edumips64.Main.logger.debug("Adding " + instr + " to SymbolTable, label " + label + ", address " + address);
+        edumips64.Main.logger.debug("Adding " + instr + " to SymbolTable, label " + label + ", address " + address);
         if(label != null) {
             try {
                 symbols.setInstructionLabel(address, label);
@@ -190,6 +190,7 @@ public class Parser {
             }
         }
         // For later parameters processing
+        instr.setAddress(address);
         instructions.add(new InstructionData(instr, params, address, instrToken));
     }
 
