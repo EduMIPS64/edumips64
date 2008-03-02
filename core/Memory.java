@@ -246,7 +246,7 @@ public class Memory{
 
         else if(type.equalsIgnoreCase("WORD64") ||
             type.equalsIgnoreCase("WORD")) {
-            tmpMem.writeDoubleWord((int)value);
+            tmpMem.writeDoubleWord(value);
             return 8;
         }
 
