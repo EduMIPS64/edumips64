@@ -1,4 +1,4 @@
-#include pippo.s
+#include labels.s
         .data
 vec1:   .byte   1,2,3,4,5,6,7,8
 vec2:   .byte   1,2,3,4,5,6,7,8

@@ -89,7 +89,7 @@ public class Parser {
 
         String absolutePath = inputFile.getAbsolutePath();
 
-        int separator = new File(filename).getAbsolutePath().lastIndexOf(File.separator);
+        int separator = inputFile.getAbsolutePath().lastIndexOf(File.separator);
 
         edumips64.Main.logger.debug("Absolute path " + absolutePath);
         edumips64.Main.logger.debug("Separator: " + separator);
@@ -133,9 +133,8 @@ public class Parser {
             catch (SymbolTableOverflowException e) {
                 addError(i.token, "PARSER_OUT_OF_BOUNDS");
             }
-            // TODO: verificare il precedente try/catch
-            catch (Exception e) {
-                addError(i.token, "PARSER_UNKNOWN");
+            catch (IrregularStringOfBitsException e) {
+                addError(i.token, "PARSER_UNKNOWN_ERROR");
             }
         }
 
@@ -258,59 +257,49 @@ public class Parser {
 		return ret;
 	}
 
-    protected String processInclude(String filename, Set<String> alreadyIncluded) throws FileNotFoundException{
-        edumips64.Main.logger.debug("processInclude file " + filename);
-        edumips64.Main.logger.debug("Files already included: ");
-        for(String s : alreadyIncluded)
-            edumips64.Main.logger.debug(s);
-
+    protected String processInclude(String filename, Set<String> alreadyIncluded) throws IOException{
         BufferedReader reader;
         String code;
-        try{
-            File inputFile = new File(filename);
-            if(!inputFile.exists())
-                throw new FileNotFoundException(filename);
 
-            if(!inputFile.isAbsolute())
-                filename = this.path + File.separator + filename;
+        File inputFile = new File(filename);
 
-            if(alreadyIncluded.contains(filename)){
-                edumips64.Main.logger.debug("file " + filename + " already included");
-                return new String("");
-            }
+        if(!inputFile.isAbsolute())
+            filename = this.path + File.separator + filename;
 
-            alreadyIncluded.add(filename);
-            
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename),"ISO-8859-1"));
+        inputFile = new File(filename);
+        if(!inputFile.exists())
+            throw new FileNotFoundException(filename);
 
-            code = readLines(reader);
-            int i = 0;
-            while(true){
-                i = code.indexOf("#include", i);
-
-                if(i == -1)
-                    break;
-
-                int end = code.indexOf("\n", i);
-                if(end == -1)
-                    end = code.length();
-
-                String includedFileName = code.substring(i+9, end).split(";")[0].trim();
-                code = code.substring(0,i) + processInclude(includedFileName,alreadyIncluded) + code.substring(end);
-            }
-        }
-        catch(FileNotFoundException e){
-            throw e;
-        }
-        catch(IOException e){
+        if(alreadyIncluded.contains(filename)){
+            edumips64.Main.logger.debug("file " + filename + " already included");
             addError(new ErrorToken("#include"), "PARSER_WRONG_INCLUDE");
             return new String("");
+        }
+
+        alreadyIncluded.add(filename);
+
+        reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename),"ISO-8859-1"));
+
+        code = readLines(reader);
+        int i = 0;
+        while(true){
+            i = code.indexOf("#include", i);
+
+            if(i == -1)
+                break;
+
+            int end = code.indexOf("\n", i);
+            if(end == -1)
+                end = code.length();
+
+            String includedFileName = code.substring(i+9, end).split(";")[0].trim();
+            code = code.substring(0,i) + processInclude(includedFileName,alreadyIncluded) + code.substring(end);
         }
         
         return code;
     }
 
-    protected Reader preProcess(String fileName) throws FileNotFoundException{
+    protected Reader preProcess(String fileName) throws IOException{
         Set<String> included = new HashSet<String>();
         String code = processInclude(fileName,included);
         return new StringReader(code);
