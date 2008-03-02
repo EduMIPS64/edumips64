@@ -97,6 +97,7 @@ import edumips64.core.MemoryElementNotFoundException;
 		if(label != null && !label.equals("")) {
 			if(instr_labels.containsKey(label))
 				throw new SameLabelsException();
+            System.out.println("Settin label " + label + " at address " + address);
 			instr_labels.put(label, address);
 			//Instruction temp = mem.getInstruction(address);
 			// TODO: attualmente l'istruzione si prende l'ultima etichetta

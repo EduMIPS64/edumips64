@@ -139,6 +139,7 @@ public class Converter{
 			if( bits.charAt(0) == '0')
 				return Converter.binToLong(bits.substring(1), true);			
 			else if (bits.charAt(0) == '1'){
+                System.out.println("*****************************");
 				String s = Converter.twoComplement(bits);
 				return -1*Converter.binToLong(s, true);
 			}
@@ -393,7 +394,6 @@ public class Converter{
 				case 'F': ret += 15 * powLong(16,reversecont); break;
 				default: throw new IrregularStringOfHexException();
 			}
-		
 		}
 		return new String("" + ret);
 	}
@@ -457,8 +457,18 @@ public class Converter{
 	}		
 
     public static long parseInteger(String value){
+        System.out.println("Parsing value " + value);
         if( (value.length() >= 3) && value.substring(0,2).equalsIgnoreCase("0x"))  {
-            return Long.parseLong(value.substring(2),16);
+            System.out.println("Prefix " + value.substring(0,2));
+            System.out.println("Value " + value.substring(2));
+            try{
+                String bin = hexToBin(value.substring(2));
+                return binToLong(bin,false);
+            }
+            catch(Exception e){
+                //BOH!
+                e.printStackTrace();
+            }
         }
         return Long.parseLong(value);
     }

@@ -151,10 +151,9 @@ public class Scanner{
                 if( t == null)
                     t = new ErrorToken(""+token,currentLine, currentColumn);
                 
-                currentColumn++; //primo carattere del token
                 t.setLine(currentLine);
                 t.setColumn(currentColumn);
-                currentColumn += t.getBuffer().length()-1;
+                currentColumn += t.getBuffer().length();
                 return t;
             } catch (IOException e){
                 return new ErrorToken("I/O Error", currentLine);

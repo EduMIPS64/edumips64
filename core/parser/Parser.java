@@ -59,6 +59,8 @@ public class Parser {
     // List of instructions with parameters
     protected List<InstructionData> instructions;
 
+    // Set of deprecated instructions names
+    protected Set<String> deprecateInstruction;
     protected static Parser instance;
     protected Scanner scanner;
     protected ParsingAlgorithm default_alg;
@@ -81,7 +83,12 @@ public class Parser {
 	public void parse(String filename) throws FileNotFoundException, SecurityException, IOException,ParserErrorsException {
         edumips64.Main.logger.debug("Parse begins!");
 
-        String absolutePath = new File(filename).getAbsolutePath();
+        File inputFile = new File(filename);
+        if(! inputFile.exists())
+            throw new FileNotFoundException(filename);
+
+        String absolutePath = inputFile.getAbsolutePath();
+
         int separator = new File(filename).getAbsolutePath().lastIndexOf(File.separator);
 
         edumips64.Main.logger.debug("Absolute path " + absolutePath);
@@ -101,7 +108,7 @@ public class Parser {
 
         // Checking if HALT instruction is present
         // and adding it if it's not
-        checkAndAddHalt();
+        checkInstructions();
 
         // Packing instruction
         edumips64.Main.logger.debug("Will now pack the instructions");
@@ -208,14 +215,18 @@ public class Parser {
      * -----------------
      */ 
 
-    protected void checkAndAddHalt(){
+    protected void checkInstructions(){
         boolean halt = false;
+
         for(InstructionData i : instructions){
             String instrName = i.token.getBuffer();
+
+            if(deprecateInstruction.contains(instrName))
+                addWarning(i.token, "WINMIPS64_NOT_MIPS64");
+
             if(instrName.equalsIgnoreCase("HALT") || 
                     (instrName.equalsIgnoreCase("SYSCALL") && i.params.get(0).getBuffer().equals("0"))){
                 halt = true;
-                return;
             }
         }
 
@@ -246,7 +257,7 @@ public class Parser {
 		return ret;
 	}
 
-    protected String processInclude(String filename, Set<String> alreadyIncluded){
+    protected String processInclude(String filename, Set<String> alreadyIncluded) throws FileNotFoundException{
         edumips64.Main.logger.debug("processInclude file " + filename);
         edumips64.Main.logger.debug("Files already included: ");
         for(String s : alreadyIncluded)
@@ -255,7 +266,11 @@ public class Parser {
         BufferedReader reader;
         String code;
         try{
-            if(!(new File(filename)).isAbsolute())
+            File inputFile = new File(filename);
+            if(!inputFile.exists())
+                throw new FileNotFoundException(filename);
+
+            if(!inputFile.isAbsolute())
                 filename = this.path + File.separator + filename;
 
             if(alreadyIncluded.contains(filename)){
@@ -283,6 +298,9 @@ public class Parser {
                 code = code.substring(0,i) + processInclude(includedFileName,alreadyIncluded) + code.substring(end);
             }
         }
+        catch(FileNotFoundException e){
+            throw e;
+        }
         catch(IOException e){
             addError(new ErrorToken("#include"), "PARSER_WRONG_INCLUDE");
             return new String("");
@@ -291,7 +309,7 @@ public class Parser {
         return code;
     }
 
-    protected Reader preProcess(String fileName){
+    protected Reader preProcess(String fileName) throws FileNotFoundException{
         Set<String> included = new HashSet<String>();
         String code = processInclude(fileName,included);
         return new StringReader(code);
@@ -311,6 +329,14 @@ public class Parser {
         registerAlgorithm(".DATA", data_pa);
         registerAlgorithm(".CODE", code_pa);
         registerAlgorithm(".TEXT", code_pa);
+
+	    deprecateInstruction = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+        deprecateInstruction.add("BNEZ");
+        deprecateInstruction.add("BEQZ");
+        deprecateInstruction.add("HALT");
+        deprecateInstruction.add("DADDUI");
+        deprecateInstruction.add("L.D");
+        deprecateInstruction.add("S.D");
     }
 
     protected void registerAlgorithm(String directive, ParsingAlgorithm p) {

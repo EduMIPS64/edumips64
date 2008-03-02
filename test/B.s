@@ -1,14 +1,14 @@
 .code
 a: B d		; goto d
 n: B f		; goto f
-b: B g		; goto g
-d: B b		; goto b
+c: B g		; goto g
+d: B c		; goto b
 e: B i		; goto i
 f: B h		; goto h
-g: B Halt	; goto Halt
+g: B z  	; goto z
 h: B e		; goto e
 i: B c		; goto c
-halt: syscall 0
+z: syscall 0
 
 ; decomment the follow lines for testing parsing's errors
 ;   B unknow	; fake label

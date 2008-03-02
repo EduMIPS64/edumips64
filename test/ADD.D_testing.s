@@ -51,3 +51,5 @@ add.d f19,f8,f8 ; negative big number + negative big number = -Infinity(if FPOve
 ;//raising underflows  
 add.d f20,f9,f25 ; a positive small number +  a negative small number= +Zero(if FPUnderflowException disabled)       //Trap(if FPUnderflowException enabled)
 add.d f21,f26,f27 ; a negative small number + a positive small number= -Zero(if FPUnderflowException disabled)(non riesco a generare l'underflow,rivedere)      //Trap(if FPUnderflowException enabled)
+
+halt
