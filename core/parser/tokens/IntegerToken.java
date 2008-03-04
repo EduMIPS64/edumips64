@@ -47,8 +47,6 @@ public class IntegerToken extends Token{
     }
 
     public void addToParametersList(Instruction instr) {
-        System.out.println("IntegerToken: I'm about to add " + buffer);
-
         // We can explicitly cast to integer because we know that an
         // instruction will never hold a long in its parameters
         instr.addParam((int)Converter.parseInteger(buffer));
