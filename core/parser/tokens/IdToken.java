@@ -53,7 +53,7 @@ public class IdToken extends Token{
     }
 
     public boolean validate(char pattern){
-        return pattern == 'L' || pattern == 'B' || pattern == 'E';
+        return pattern == 'L' || pattern == 'B' || pattern == 'E' || pattern == 'I';
     }
 
     public void addToParametersList(Instruction instr) throws ParameterException{
@@ -70,7 +70,7 @@ public class IdToken extends Token{
 
             edumips64.Main.logger.debug("IdToken::addToParametersList - Type = " + type);
             // Data label
-            if(type == 'L') {
+            if(type == 'L' || type == 'I') {
                 edumips64.Main.logger.debug("From .data");
                 MemoryElement elem = symTab.getCell(buffer);
                 instr.addParam(elem.getAddress());
