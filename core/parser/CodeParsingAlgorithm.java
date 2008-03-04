@@ -79,7 +79,12 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                     else {
                         // Good label
                         label = data;
-                        token = s.next();
+
+                        // Eat newlines between label and instruction
+                        do {
+                            token = s.next();
+                        } while(token.validate('\n'));
+                        edumips64.Main.logger.debug("After label, building instruction for " + token.getBuffer());
                         tmpInstr = Instruction.buildInstruction(token.getBuffer());
                         instructionToken = token;
                         if(tmpInstr == null) {
@@ -95,6 +100,7 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                 int syntax_length = syntax.length();
                 String fullname = instructionToken.getBuffer() + " ";
                 List<Token> params = new LinkedList<Token>();
+                boolean err = false;
 
                 for(int i = 0; i < syntax_length; ++i) {
                     char c = syntax.charAt(i);
@@ -104,8 +110,11 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                     if(c == '%')
                         continue;
                     token = s.next();
-                    if(!token.validate(c))
+                    if(!token.validate(c)) {
                         parser.addError(token, "PARSER_UNEXPECTED");
+                        edumips64.Main.logger.debug(token.getBuffer() + " didn't validate against " + c);
+                        err = true;
+                    }
                     else {
                         params.add(token);
                         fullname += token.getBuffer();
@@ -113,10 +122,11 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                     }
                 }
 
-                tmpInstr.setFullName(fullname);
-                edumips64.Main.logger.debug("Added " + fullname);
-
-                parser.addInstruction(tmpInstr, address, params, label, instructionToken);
+                if(!err) {
+                    tmpInstr.setFullName(fullname);
+                    edumips64.Main.logger.debug("Added " + fullname);
+                    parser.addInstruction(tmpInstr, address, params, label, instructionToken);
+                }
 
 
                 token = s.next();
