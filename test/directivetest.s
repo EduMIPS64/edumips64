@@ -8,4 +8,3 @@ d:      .word 3, 2, 1
 d2:     .word 3, 2, 1
 
         .code
-        syscall 0

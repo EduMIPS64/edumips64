@@ -109,6 +109,7 @@ public class Parser {
 
         BufferedReader reader = new BufferedReader(preProcess(absolutePath));
         scanner = new Scanner(reader);
+        edumips64.Main.logger.debug("Scanner created, starting default parsing Algorithm");
         default_alg.parse(scanner);
 
         // Checking if HALT instruction is present

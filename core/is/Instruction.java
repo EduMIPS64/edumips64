@@ -435,5 +435,17 @@ public abstract class Instruction {
     public int getAddress() {
         return address;
     }
+
+    protected String[] syntaxElements;    
+    
+    public char getNextParameterType() {
+        // Lazy initialization
+        if(syntaxElements == null)
+            syntaxElements = syntax.replace("%", "").split("[(),]");
+        // Return the next parameter type
+        return syntaxElements[params.size()].charAt(0);
+    }
+
+
 	
 }

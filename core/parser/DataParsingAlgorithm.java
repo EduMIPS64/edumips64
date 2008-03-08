@@ -103,8 +103,8 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                     if( directiveName.equalsIgnoreCase(".SPACE")){
                         edumips64.Main.logger.debug("Ho validato .SPACE");
                         token = s.next();
-                        if( token.validate('I')){
-                            long spaces = Converter.parseInteger(token.getBuffer());
+                        if(token.validate('I')){
+                            long spaces = Converter.parseInteger(token.getBuffer(), 64, false);
                             edumips64.Main.logger.debug("Riservo "+spaces+" spazi in memoria");
 
                             for(int i = 0; i < spaces; ++i)
@@ -150,10 +150,10 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                         boolean error = false;
                         do{
                             token = s.next();
-                            if(token.validate('I')){
+                            if(token.validate('N')){
                                 //converti il numero e salvalo
                                 edumips64.Main.logger.debug("About to convert " + token.getBuffer());
-                                long value = Converter.parseInteger(token.getBuffer());
+                                long value = Converter.parseInteger(token.getBuffer(), 64, true);
                                 edumips64.Main.logger.debug("Writing to memory " + value);
 
                                 // Rememmber that Memory.writeInteger returns

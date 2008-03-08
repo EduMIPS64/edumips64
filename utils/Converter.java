@@ -456,17 +456,21 @@ public class Converter{
 		return ret;
 	}		
 
-    public static long parseInteger(String value){
-        System.out.println("Parsing value " + value);
+    public static long parseInteger(String value, int nbits, boolean sign){
+        System.out.println("Parsing value " + value + ", using " + nbits + " bits");
         if( (value.length() >= 3) && value.substring(0,2).equalsIgnoreCase("0x"))  {
             System.out.println("Prefix " + value.substring(0,2));
             System.out.println("Value " + value.substring(2));
             try{
+                // TODO check if value.length() > nbits
                 String bin = hexToBin(value.substring(2));
-                return binToLong(bin,false);
+                int diff = nbits - bin.length();
+                for(int i = 0; i < diff; ++i)
+                    bin = "0" + bin;
+
+                return binToLong(bin, sign);
             }
             catch(Exception e){
-                //BOH!
                 e.printStackTrace();
             }
         }

@@ -23,7 +23,37 @@ package edumips64.core.parser.tokens;
 import edumips64.core.is.Instruction;
 import edumips64.utils.Converter;
 
+import java.util.*;
+
 public class IntegerToken extends Token{
+
+    protected static class TypeInfo {
+        public TypeInfo(int dim, boolean sign) {
+            size = dim;
+            hasSign = sign;
+        }
+        int size;
+        boolean hasSign;
+    }
+
+    // Association between a type and its info
+    static protected Map<Character, TypeInfo> types; 
+
+    static {
+        types = new HashMap<Character, TypeInfo>();
+
+        // Types for instructions
+        types.put('C', new TypeInfo(3, false));
+        types.put('I', new TypeInfo(16, true));
+        types.put('U', new TypeInfo(16, false));
+
+        // Types for memory
+        types.put('L', new TypeInfo(64, false));
+        types.put('N', new TypeInfo(64, true));
+        types.put('G', new TypeInfo(64, true));
+    }
+
+
     public IntegerToken(String buffer, int line, int column){
         super(buffer, line, column);
     }
@@ -37,19 +67,36 @@ public class IntegerToken extends Token{
     }
 
     public boolean validate(char pattern){
-        long value = Converter.parseInteger(buffer);
-        if(pattern == 'C' && value >= 0 && value <= 7)
-            return true;
+        if(!types.containsKey(pattern))
+            return false;
+        
+        TypeInfo t = types.get(pattern);
+        long value = Converter.parseInteger(buffer, t.size, t.hasSign);
 
-        return (pattern == 'I') || (pattern == 'G')
-            || ( pattern == 'L')
-            || (pattern == 'U' && buffer.charAt(0) != '-');
+        edumips64.Main.logger.debug("Validating " + value + " against " + pattern);
+
+        if(t.size < 64) {
+            long min, max;
+
+            if(t.hasSign) {
+                min = 0;
+                max = Converter.powLong(2, t.size);
+            } else {
+                min = - Converter.powLong(2, t.size - 1);
+                max = Converter.powLong(2, t.size - 1) - 1;
+            }
+
+            return (value >= min) && (value <= max);
+        }
+
+        return true;
     }
 
     public void addToParametersList(Instruction instr) {
         // We can explicitly cast to integer because we know that an
         // instruction will never hold a long in its parameters
-        instr.addParam((int)Converter.parseInteger(buffer));
+
+        TypeInfo t = types.get(instr.getNextParameterType());
+        instr.addParam((int)Converter.parseInteger(buffer, t.size, t.hasSign));
     }
 }
-
