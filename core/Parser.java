@@ -1225,7 +1225,12 @@ public class Parser
 		}
 		for (int i=0; i< voidJump.size();i++)
 		{
-			Integer labelAddr = symTab.getInstructionAddress(voidJump.get(i).label.trim());
+			Integer labelAddr = null;
+            try {
+                labelAddr = symTab.getInstructionAddress(voidJump.get(i).label.trim());
+            }catch(Exception e) {
+                e.printStackTrace();
+            }
 			if (labelAddr != null)
 			{
 				if (voidJump.get(i).isBranch)

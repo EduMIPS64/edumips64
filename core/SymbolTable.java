@@ -105,10 +105,13 @@ import edumips64.core.MemoryElementNotFoundException;
 		}
 	}
 
-    public Integer getInstructionAddress(String label)
+    public Integer getInstructionAddress(String label) throws MemoryElementNotFoundException
     {
         edumips64.Main.logger.debug("Requested address for " + label + ": " + instr_labels.get(label));
-        return instr_labels.get(label);
+        Integer addr = instr_labels.get(label);
+        if(addr == null)
+            throw new MemoryElementNotFoundException();
+        return addr;
     }
 
 
