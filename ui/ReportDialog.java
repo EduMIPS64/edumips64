@@ -85,7 +85,7 @@ public class ReportDialog extends JDialog{
 		
 		//fill the Text Area whit Exception informations
 		String exmsg = new String();
-		exception.fillInStackTrace();	
+		//exception.fillInStackTrace();	
 		try {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
