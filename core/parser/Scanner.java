@@ -122,6 +122,7 @@ public class Scanner{
                         case ')': t = new RightParenToken(); break;      
                         case ',': t = new CommaToken(); break;
                         case ':': t = new ColonToken(); break;
+                        case '#': t = numRec.recognize(reader); break;
                         case ';': reader.reset();
                                   t = commentRec.recognize(reader);
                                   break;

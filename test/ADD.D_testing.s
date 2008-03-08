@@ -6,7 +6,18 @@ var4: .double NEGATIVEZERO           ;0x8000000000000000; MINUS INFINITY
 var5: .double SNAN                   ;0x7FFFFFFFFFFFFFFF; SNAN
 var6: .double QNAN                   ;0x7ff7ffffffffffff; QNAN
 
-var7: .word 3534535 ; a number
+;ciao
+
+; 
+
+;;;ciao
+
+
+var7: 
+
+;ciao
+
+.word 3534535 ; a number
 var8: .double 1.7E308 ; a positive big number
 var9: .double -1.7E308; a negative big number
 var10: .double 9.0E-324; a positive small number
@@ -17,7 +28,7 @@ var13: .double 5.0E-324; a positive small number
 .text
 ldc1 f0,var1(r0) ;dio
 ldc1 f1,var2(r0) ;buddha
-ldc1 f2,var3(r0) 
+;ldc1 f2,var3(r0) 
 ldc1 f3,var4(r0)
 ldc1 f4,var5(r0)
 ldc1 f5,var6(r0)
@@ -27,6 +38,7 @@ ldc1 f8,var9(r0)
 ldc1 f9,var10(r0)
 ldc1 f25,var11(r0)
 ldc1 f26,var12(r0)
+fine: ;ciao
 ldc1 f27,var13(r0)
 
 ;//operations between infinities
