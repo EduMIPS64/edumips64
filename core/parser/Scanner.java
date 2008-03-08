@@ -173,7 +173,10 @@ public class Scanner{
     }
 
     public String getLastCodeLine() {
-        return codeLines.get(codeLines.size() - 1);
+        int pos = codeLines.size() - 1;
+        if(pos >= 0)
+            return codeLines.get(pos);
+        return "";
     }
 
     public static void main(String[] args) throws Exception{
