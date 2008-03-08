@@ -33,6 +33,7 @@ import edumips64.utils.Converter;
 class DataParsingAlgorithm extends ParsingAlgorithm {
     protected Memory memory;
     protected SymbolTable symTab;
+    protected int address = 0;
     public DataParsingAlgorithm(Parser p) {
         super(p);
         memory = Memory.getInstance();
@@ -41,7 +42,6 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
 
     public void parse(Scanner s) {
         edumips64.Main.logger.debug("Starting DataParsingAlgorithm");
-        int address = 0;
         boolean memoryDirty = false;
 
         while(s.hasToken()) {

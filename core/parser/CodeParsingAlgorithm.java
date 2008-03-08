@@ -31,13 +31,13 @@ import java.util.*;
 
 class CodeParsingAlgorithm extends ParsingAlgorithm {
 
+    protected int address = 0;
     public CodeParsingAlgorithm(Parser p) {
         super(p);
     }
 
     public void parse(Scanner s) {
         edumips64.Main.logger.debug("Starting CodeParsingAlgorithm");
-        int address = 0;
         while(s.hasToken()) {
             edumips64.Main.logger.debug("Starting Instruction parsing cycle");
             String label = null;
