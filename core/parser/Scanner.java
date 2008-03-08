@@ -23,6 +23,7 @@ package edumips64.core.parser;
 
 import edumips64.core.parser.tokens.*;
 import java.io.*;
+import java.util.*;
 
 public class Scanner{
     private Reader reader;
@@ -32,8 +33,11 @@ public class Scanner{
     private RegisterRecognizer regRec = new RegisterRecognizer();
     //private FPRegisterRecognizer fpRegRec = new FPRegisterRecognizer();
     private IDRecognizer idRec = new IDRecognizer();
+    private StringBuilder tempRow = new StringBuilder();
     private int currentLine;
     private int currentColumn;
+
+    private List<String> codeLines = new ArrayList<String>();
     
     /** Constructor.
      * @param reader stream for consuming characters
@@ -98,8 +102,10 @@ public class Scanner{
             try{
                 reader.mark(1);
                 int r = reader.read();
-                if( r == -1)
+                if(r == -1) {
+                    codeLines.add(tempRow.toString());
                     return new EOFToken(currentLine, currentColumn);
+                }
 
                 char token = (char) r;
                 
@@ -107,11 +113,14 @@ public class Scanner{
                 //whitespace...!
                 if( token == '\n'){
                     currentColumn = 1;
+                    codeLines.add(tempRow.toString());
+                    tempRow.setLength(0);        // empty the StringBuilder
                     return getEOLToken();
                 }
 
                 if( Character.isWhitespace(token)){
                     currentColumn++;
+                    tempRow.append(token);
                     continue;
                 }
                 
@@ -150,6 +159,9 @@ public class Scanner{
                 if( t == null)
                     t = new ErrorToken(""+token,currentLine, currentColumn);
                 
+                tempRow.append(t.getBuffer());
+                System.out.println("Appending " + t.getBuffer() + " to tempRow, that now contains " + tempRow.toString());
+
                 t.setLine(currentLine);
                 t.setColumn(currentColumn);
                 currentColumn += t.getBuffer().length();
@@ -158,6 +170,10 @@ public class Scanner{
                 return new ErrorToken("I/O Error", currentLine);
             }
         }
+    }
+
+    public String getLastCodeLine() {
+        return codeLines.get(codeLines.size() - 1);
     }
 
     public static void main(String[] args) throws Exception{

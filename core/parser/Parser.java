@@ -218,6 +218,9 @@ public class Parser {
         return Instruction.buildInstruction(t.getBuffer()) != null;
     }
 
+    String getLastCodeLine() {
+        return scanner.getLastCodeLine();
+    }
 
     /* -----------------
      * Protected methods

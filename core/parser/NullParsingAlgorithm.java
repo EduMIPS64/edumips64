@@ -42,6 +42,12 @@ class NullParsingAlgorithm extends ParsingAlgorithm {
                 parser.switchParsingAlgorithm(data);
                 break;
             }
+
+            if(token.validate('\n')) {
+                Token err = new ErrorToken(parser.getLastCodeLine());
+                err.setLine(token.getLine());
+                parser.addWarning(err, "PARSER_IGNORED_ROW");
+            }
         }
     }
 }

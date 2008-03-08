@@ -54,26 +54,12 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
             }
             String label = null;
             Token token = s.next();
-            String data = token.getBuffer();
             
             // Error
             if(token.isErrorToken()) {
                 parser.addError(token, "PARSER_LEXICAL_ERROR");
                 continue;
             }
-            
-            // Parser change directive
-            if(token.validate('D') && parser.hasAlgorithm(data)) {
-                if(parser.hasAlgorithm(data)) {
-                    parser.switchParsingAlgorithm(data);
-                    break;
-                }
-                else {
-                    parser.addError(token, "PARSER_INVALID_DIRECTIVE");
-                    continue;
-                } 
-            }
-            
             // ID - optional label verification
             if(token.validate('L')) {
                 if(!parser.isInstruction(token)) {
@@ -96,11 +82,16 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                     //skip End-Of-Lines until fetching next data directive
                     do{
                         token = s.next();
-                    }while(token.validate('\n'));
+                    } while(token.validate('\n'));
                 }
             }
 
-
+            
+            // Parser change directive
+            if(token.validate('D') && parser.hasAlgorithm(token.getBuffer())) {
+                parser.switchParsingAlgorithm(token.getBuffer());
+                break;
+            }
 
             // Directive, all the operations that throw exceptions start here.
             try {
