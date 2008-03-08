@@ -1,12 +1,12 @@
 .data
 a:	.word64 -16	; -16 signed or (2^64)-17 (FFFFFFFFFFFFFFF0) unsigned
-b:	.word64 3	; 3
+c:	.word64 3	; 3
 max:	.word64 0xFFFFFFFFFFFFFFFF
 uno: 	.word64 1 
 
 .code
 ld	r1,a(r0) 	; r1 = FFFFFFFFFFFFFFF0
-ld	r2,b(r0)	; r2 = 0000000000000003
+ld	r2,c(r0)	; r2 = 0000000000000003
 DDIV	r1,r2		; execute division -16 / 3
 MFHI    r3		; r3 = r1 % r2 = FFFFFFFFFFFFFFFF
 MFLO    r4		; r4 = r1 / r3 = FFFFFFFFFFFFFFFB

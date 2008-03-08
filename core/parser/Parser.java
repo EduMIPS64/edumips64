@@ -115,32 +115,34 @@ public class Parser {
         // Checking if HALT instruction is present
         // and adding it if it's not
         checkInstructions();
+            
+        Token currentToken = null; // used for error reporting
 
         // Packing instruction
         edumips64.Main.logger.debug("Will now pack the instructions");
         for(InstructionData i : instructions) {
             edumips64.Main.logger.debug("Processing " + i.instr.getFullName());
-            for(Token t : i.params) {
-                edumips64.Main.logger.debug("Adding " + t + " to parameters list");
-                try {
+            try {
+                for(Token t : i.params) {
+                    currentToken = t;
+                    edumips64.Main.logger.debug("Adding " + t + " to parameters list");
                     t.addToParametersList(i.instr);
                 }
-                catch(ParameterException e) {
-                    // TODO: correzione addError
-                    addError(t, e.getMessage());
-                }
-            }
 
-            try {
+                currentToken = i.token;
                 i.instr.pack();
                 edumips64.Main.logger.debug("Instruction packed, adding to memory");
                 memory.addInstruction(i.instr, i.address);
             }
+            catch(ParameterException e) {
+                // TODO: correzione addError
+                addError(currentToken, e.getMessage());
+            }
             catch (SymbolTableOverflowException e) {
-                addError(i.token, "PARSER_OUT_OF_BOUNDS");
+                addError(currentToken, "PARSER_OUT_OF_BOUNDS");
             }
             catch (IrregularStringOfBitsException e) {
-                addError(i.token, "PARSER_UNKNOWN_ERROR");
+                addError(currentToken, "PARSER_UNKNOWN_ERROR");
             }
         }
 
