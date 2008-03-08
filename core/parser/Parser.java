@@ -37,6 +37,11 @@ public class Parser {
     // pattern)
     protected HashMap<String, ParsingAlgorithm> algorithms;
 
+    // This flag is set to true when we switch parsing algorithm.
+    // If in the end it's set to false, it means that we didn't do any real
+    // parsing.
+    protected boolean didSomeRealParsing = false;
+
     // List of parsing errors
     protected List<ParserException> exceptions;
     protected boolean hasOnlyWarnings = true;   // Set to false if the parser encounters errors
@@ -138,6 +143,10 @@ public class Parser {
             }
         }
 
+        if(!didSomeRealParsing) {
+            addWarning(new ErrorToken(""), "PARSER_NO_DATA_OR_CODE_DIRECTIVE");
+        }
+
         // Throw exception if needed
         if(exceptions.size() > 0)
             throw new ParserErrorsException(exceptions, hasOnlyWarnings);
@@ -205,7 +214,6 @@ public class Parser {
 
 
     static boolean isInstruction(Token t) {
-        // TODO: should we improve it?
         return Instruction.buildInstruction(t.getBuffer()) != null;
     }
 
@@ -231,8 +239,13 @@ public class Parser {
         }
 
         if(!halt){
-            int lastAddress = instructions.get(instructions.size()-1).address;
+            int haltAddress = 0;
+            if(instructions.size() > 0) {
+                haltAddress = instructions.get(instructions.size()-1).address + 4;
+            }
+            edumips64.Main.logger.debug("haltAddress = " + haltAddress);
             addWarning(new ErrorToken("HALT"), "HALT_NOT_PRESENT");
+            edumips64.Main.logger.debug("haltAddress = " + haltAddress);
 
             Instruction tmpInst = Instruction.buildInstruction("SYSCALL");
             tmpInst.setFullName("SYSCALL 0");
@@ -241,7 +254,7 @@ public class Parser {
             List<Token> paramsList = new ArrayList<Token>(1);
             paramsList.add(new IntegerToken("0"));
 
-            addInstruction(tmpInst, lastAddress+4, paramsList,label, instrName);
+            addInstruction(tmpInst, haltAddress, paramsList,label, instrName);
         }
     }
 

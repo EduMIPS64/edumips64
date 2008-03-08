@@ -89,7 +89,6 @@ public class Scanner{
     // Debug method, prints the actual token
     public Token next() {
         Token t = nextToken();
-        edumips64.Main.logger.debug(t.toString());
         return t;
     }
 

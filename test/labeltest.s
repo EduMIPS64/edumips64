@@ -1,4 +1,8 @@
 .code
 
-d:      daddi   r1, r0, 1
-s       syscall 0
+j fine
+daddi   r1, r0, 1
+daddi   r1, r0, 1
+fine:
+syscall 0
+

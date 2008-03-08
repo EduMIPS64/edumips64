@@ -40,16 +40,16 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
     }
 
     public void parse(Scanner s) {
-        System.out.println("Starting DataParsingAlgorithm");
+        edumips64.Main.logger.debug("Starting DataParsingAlgorithm");
         int address = 0;
         boolean memoryDirty = false;
 
         while(s.hasToken()) {
-            System.out.println("Starting Data parsing cycle");
+            edumips64.Main.logger.debug("Starting Data parsing cycle");
 
             // Alignment of memory address to 8 bytes
             if(address > 0 && (address % 8 != 0)) {
-                System.out.println("Address was " + address + ", aligned to " + (address + 8 - (address % 8)));
+                edumips64.Main.logger.debug("Address was " + address + ", aligned to " + (address + 8 - (address % 8)));
                 address += 8 - address % 8;
             }
             String label = null;
@@ -105,16 +105,16 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
             // Directive, all the operations that throw exceptions start here.
             try {
                 if(token.validate('D')) {
-                    System.out.println("** Data type: " + token.getBuffer());
+                    edumips64.Main.logger.debug("** Data type: " + token.getBuffer());
                     String directiveName = token.getBuffer();
                     //we have only 4 data types directive
                     // 1 - .space
                     if( directiveName.equalsIgnoreCase(".SPACE")){
-                        System.out.println("Ho validato .SPACE");
+                        edumips64.Main.logger.debug("Ho validato .SPACE");
                         token = s.next();
                         if( token.validate('I')){
                             long spaces = Converter.parseInteger(token.getBuffer());
-                            System.out.println("Riservo "+spaces+" spazi in memoria");
+                            edumips64.Main.logger.debug("Riservo "+spaces+" spazi in memoria");
 
                             for(int i = 0; i < spaces; ++i)
                                 memory.writeInteger(address++, 0, "BYTE");
@@ -129,13 +129,13 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                     }
                     // 2- .double
                     else if(directiveName.equalsIgnoreCase(".DOUBLE")){
-                        System.out.println("Ho validato .DOUBLE");
+                        edumips64.Main.logger.debug("Ho validato .DOUBLE");
                         boolean error = false;
                         do{
                             token = s.next();
                             if(token.validate('G')){
                                 //converti il numero e salvalo
-                                System.out.println("Float value: " + token.getBuffer());
+                                edumips64.Main.logger.debug("Float value: " + token.getBuffer());
                                 address += memory.writeDouble(address, token.getBuffer());
                             }
                             else{
@@ -155,15 +155,15 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                         (directiveName.equalsIgnoreCase(".WORD64")) ||
                         (directiveName.equalsIgnoreCase(".WORD"))) {
 
-                        System.out.println("Ho validato " + directiveName);
+                        edumips64.Main.logger.debug("Ho validato " + directiveName);
                         boolean error = false;
                         do{
                             token = s.next();
                             if(token.validate('I')){
                                 //converti il numero e salvalo
-                                System.out.println("About to convert " + token.getBuffer());
+                                edumips64.Main.logger.debug("About to convert " + token.getBuffer());
                                 long value = Converter.parseInteger(token.getBuffer());
-                                System.out.println("Writing to memory " + value);
+                                edumips64.Main.logger.debug("Writing to memory " + value);
 
                                 // Rememmber that Memory.writeInteger returns
                                 // the number of bytes written to memory, and
@@ -186,7 +186,7 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                     // 4 - string directive
                     else if(directiveName.equalsIgnoreCase(".ASCII") || 
                             directiveName.equalsIgnoreCase(".ASCIIZ")) {
-                        System.out.println("Ho validato " + directiveName);
+                        edumips64.Main.logger.debug("Ho validato " + directiveName);
                         boolean error = false;
                         boolean auto_terminate = directiveName.equalsIgnoreCase(".ASCIIZ"); // auto-append of '\0'
                         do{
