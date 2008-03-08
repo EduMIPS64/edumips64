@@ -169,6 +169,7 @@ public class Parser {
 
     void switchParsingAlgorithm(String directive) { 
         edumips64.Main.logger.debug("Switching parser due to directive " + directive);
+        didSomeRealParsing = true;
         algorithms.get(directive).parse(scanner);
     }
 
