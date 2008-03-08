@@ -30,8 +30,8 @@ public class Scanner{
     private DirectiveRecognizer directiveRec = new DirectiveRecognizer();
     private NumberRecognizer numRec = new NumberRecognizer();
     private StringRecognizer stringRec = new StringRecognizer();
+    private CommentRecognizer commentRec = new CommentRecognizer();
     private RegisterRecognizer regRec = new RegisterRecognizer();
-    //private FPRegisterRecognizer fpRegRec = new FPRegisterRecognizer();
     private IDRecognizer idRec = new IDRecognizer();
     private StringBuilder tempRow = new StringBuilder();
     private int currentLine;
@@ -66,27 +66,6 @@ public class Scanner{
             }
         } catch (IOException e){
             return false;
-        }
-    }
-
-    private Token skipComment(){
-        int r;
-        try{
-            do{
-                r = reader.read();
-                currentColumn++;
-            }while (r != -1 && (char)r != '\n');
-
-            //A comment line may end with EOL or with EOF
-            Token t;
-            if( r == -1)
-                t = new EOFToken(currentLine,currentColumn);
-            else
-                t = getEOLToken();
-            currentColumn = 1;
-            return t;
-        }catch(IOException e){
-            return new ErrorToken("I/O Error");
         }
     }
 
@@ -143,7 +122,9 @@ public class Scanner{
                         case ')': t = new RightParenToken(); break;      
                         case ',': t = new CommaToken(); break;
                         case ':': t = new ColonToken(); break;
-                        case ';': t = skipComment(); break;
+                        case ';': reader.reset();
+                                  t = commentRec.recognize(reader);
+                                  break;
                         case '$': reader.reset();
                                   t = regRec.recognize(reader);
                                   break;

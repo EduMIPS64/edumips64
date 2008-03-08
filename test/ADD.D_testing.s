@@ -15,8 +15,8 @@ var12: .double -7.0E-324; a negative small number
 var13: .double 5.0E-324; a positive small number
 
 .text
-ldc1 f0,var1(r0)
-ldc1 f1,var2(r0)
+ldc1 f0,var1(r0) ;dio
+ldc1 f1,var2(r0) ;buddha
 ldc1 f2,var3(r0) 
 ldc1 f3,var4(r0)
 ldc1 f4,var5(r0)

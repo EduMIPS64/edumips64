@@ -42,7 +42,7 @@ public abstract class Recognizer{
         char token;
             try{
                 while(true){
-                    stream.mark(2);
+                    stream.mark(1);
                     int r = stream.read();
                     if( r == -1) //end of stream
                         break;

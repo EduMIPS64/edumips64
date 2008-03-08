@@ -60,6 +60,10 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                 parser.addError(token, "PARSER_LEXICAL_ERROR");
                 continue;
             }
+            if(token.validate(';')){
+                continue;
+            }
+
             // ID - optional label verification
             if(token.validate('L')) {
                 if(!parser.isInstruction(token)) {
@@ -79,10 +83,10 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                         continue;
                     } 
 
-                    //skip End-Of-Lines until fetching next data directive
+                    //skip End-Of-Lines and comments until fetching next data directive
                     do{
                         token = s.next();
-                    } while(token.validate('\n'));
+                    } while(token.validate('\n') || token.validate(';'));
                 }
             }
 
@@ -207,6 +211,10 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                         token = s.next();
                     }
                 }
+                //before final EOL there can be some comments
+                while(token.validate(';'))
+                    token = s.next();
+
                 //every chunk of code exits with a token, that MUST BE EOL
                 if(!token.validate('\n'))
                     parser.addError(token, "PARSER_EOL_EXPECTED");

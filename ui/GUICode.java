@@ -167,7 +167,7 @@ public class GUICode extends GUIComponent{
 						return cpu.getMemory().getInstruction(row * 4).getFullName();
 					case 4:
 						if (cpu.getMemory().getInstruction(row * 4).getComment()!=null)
-							return ";"+cpu.getMemory().getInstruction(row * 4).getComment();
+							return ""+cpu.getMemory().getInstruction(row * 4).getComment();
 						else return "";
 					default:
 						return new Object();

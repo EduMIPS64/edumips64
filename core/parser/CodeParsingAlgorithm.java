@@ -64,6 +64,11 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                 } 
             }
 
+            else if(token.validate(';')) { //comment
+                continue;
+            }
+
+
             // ID
             else if(token.validate('L')) {
                 // Label?
@@ -80,10 +85,10 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                         // Good label
                         label = data;
 
-                        // Eat newlines between label and instruction
+                        // Eat newlines and comments between label and instruction
                         do {
                             token = s.next();
-                        } while(token.validate('\n'));
+                        } while(token.validate('\n') || token.validate(';'));
                         edumips64.Main.logger.debug("After label, building instruction for " + token.getBuffer());
                         tmpInstr = Instruction.buildInstruction(token.getBuffer());
                         instructionToken = token;
@@ -122,6 +127,13 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                     }
                 }
 
+                token = s.next();
+                if(token.validate(';')){
+                    tmpInstr.setComment(token.getBuffer());
+                    token = s.next();
+                }
+                    
+
                 if(!err) {
                     tmpInstr.setFullName(fullname);
                     edumips64.Main.logger.debug("Added " + fullname);
@@ -129,7 +141,6 @@ class CodeParsingAlgorithm extends ParsingAlgorithm {
                 }
 
 
-                token = s.next();
                 if(!token.validate('\n'))
                     parser.addError(token, "PARSER_EOL_EXPECTED");
 

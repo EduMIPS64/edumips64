@@ -73,7 +73,6 @@ public abstract class Token{
         return column;
     }
 
-    // TODO: abstract?
     public void addToParametersList(Instruction instr) throws ParameterException{}
 
     public String getBuffer() {
