@@ -160,7 +160,6 @@ public class Scanner{
                     t = new ErrorToken(""+token,currentLine, currentColumn);
                 
                 tempRow.append(t.getBuffer());
-                System.out.println("Appending " + t.getBuffer() + " to tempRow, that now contains " + tempRow.toString());
 
                 t.setLine(currentLine);
                 t.setColumn(currentColumn);
