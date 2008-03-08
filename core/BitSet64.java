@@ -177,6 +177,7 @@ public class BitSet64 extends FixedBitSet {
 	 * @throws IrregularWriteOperationException if value is not correct or anything else goes wrong during the operation
 	 */
 	public void writeHalf(int value) throws IrregularWriteOperationException {
+        System.out.println("WriteHalf " + value);
 		if( value < -32768 || value > 32767)
 			throw new IrregularWriteOperationException();
 		else{

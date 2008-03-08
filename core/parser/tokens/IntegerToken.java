@@ -78,7 +78,7 @@ public class IntegerToken extends Token{
         if(t.size < 64) {
             long min, max;
 
-            if(t.hasSign) {
+            if(!t.hasSign) {
                 min = 0;
                 max = Converter.powLong(2, t.size);
             } else {

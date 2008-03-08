@@ -468,7 +468,8 @@ public class Converter{
                 for(int i = 0; i < diff; ++i)
                     bin = "0" + bin;
 
-                return binToLong(bin, sign);
+                //binToLong wants an UNSIGNED flag, so we negate sign
+                return binToLong(bin, !sign);
             }
             catch(Exception e){
                 e.printStackTrace();

@@ -491,6 +491,7 @@ public class Main extends JApplet {
         catch (Exception e) {
 			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));				
             logger.debug("Error opening " + file);
+            edumips64.Main.logger.debug(e.getMessage());
             new ReportDialog(f,e,CurrentLocale.getString("ERROR"));
         }
     }
@@ -854,6 +855,7 @@ public class Main extends JApplet {
                 try{
                     edumips64.ui.GUIHelp.showHelp(null, "id");
                 } catch (Exception exx) {
+                    edumips64.Main.logger.debug(exx.getMessage());
                     new edumips64.ui.ReportDialog(null,exx,"MIAO");
                 }
             }

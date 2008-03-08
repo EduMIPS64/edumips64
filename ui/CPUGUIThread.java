@@ -179,6 +179,7 @@ public class CPUGUIThread extends Thread{
 						catch(Exception ex) {
                             Main.logger.debug("Exception in CPUGUIThread");
 							haltCPU();
+                            ex.printStackTrace();
 							new ReportDialog(f,ex,CurrentLocale.getString("GUI_STEP_ERROR"));
 							break;
 						}	
@@ -248,6 +249,7 @@ public class CPUGUIThread extends Thread{
                             break;
                         }
 						catch(Exception ex) {
+                            ex.printStackTrace();
 							new ReportDialog(f,ex,CurrentLocale.getString("GUI_STEP_ERROR"));
 							haltCPU();
 							break;
