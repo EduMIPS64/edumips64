@@ -144,7 +144,7 @@ public class Parser {
         }
 
         if(!didSomeRealParsing) {
-            addWarning(new ErrorToken(""), "PARSER_NO_DATA_OR_CODE_DIRECTIVE");
+            addError(new ErrorToken(""), "PARSER_NO_DATA_OR_CODE_DIRECTIVE");
         }
 
         // Throw exception if needed
