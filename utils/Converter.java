@@ -21,6 +21,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package edumips64.utils;
+import edumips64.core.IrregularWriteOperationException;
 
 /** This class provides a set of static method for numeric conversion.
  * NOTE: bit strings will be considered little-endian, that is to say that the right-most bit is the less significant one: this
@@ -456,24 +457,32 @@ public class Converter{
 		return ret;
 	}		
 
-    public static long parseInteger(String value, int nbits, boolean sign){
+    public static long parseInteger(String value, int nbits, boolean sign) throws IrregularWriteOperationException{
         System.out.println("Parsing value " + value + ", using " + nbits + " bits");
-        if( (value.length() >= 3) && value.substring(0,2).equalsIgnoreCase("0x"))  {
-            try{
+        try{
+            if( (value.length() >= 3) && value.substring(0,2).equalsIgnoreCase("0x"))  {
                 // TODO check if value.length() > nbits
                 String bin = hexToBin(value.substring(2));
                 int diff = nbits - bin.length();
+                if(diff < 0)
+                    throw new IrregularWriteOperationException();
+
                 for(int i = 0; i < diff; ++i)
                     bin = "0" + bin;
 
                 //binToLong wants an UNSIGNED flag, so we negate sign
                 return binToLong(bin, !sign);
             }
-            catch(Exception e){
-                e.printStackTrace();
-            }
+            return Long.parseLong(value);
         }
-        return Long.parseLong(value);
+        //we can NEVER catch these two exceptions
+        catch(IrregularStringOfBitsException e){
+            throw new NumberFormatException();
+        }
+        catch(IrregularStringOfHexException e){
+            throw new NumberFormatException();
+        }
+
     }
 
 }

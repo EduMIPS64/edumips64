@@ -20,6 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package edumips64.core.parser.tokens;
+import edumips64.core.IrregularWriteOperationException;
 import edumips64.core.is.Instruction;
 import edumips64.utils.Converter;
 
@@ -69,34 +70,46 @@ public class IntegerToken extends Token{
     public boolean validate(char pattern){
         if(!types.containsKey(pattern))
             return false;
-        
-        TypeInfo t = types.get(pattern);
-        long value = Converter.parseInteger(buffer, t.size, t.hasSign);
 
-        edumips64.Main.logger.debug("Validating " + value + " against " + pattern);
+        try{
+            TypeInfo t = types.get(pattern);
+            long value = Converter.parseInteger(buffer, t.size, t.hasSign);
 
-        if(t.size < 64) {
-            long min, max;
+            edumips64.Main.logger.debug("Using size " + t.size + " and hasSign " + t.hasSign);
+            edumips64.Main.logger.debug("Validating " + value + " against " + pattern);
 
-            if(!t.hasSign) {
-                min = 0;
-                max = Converter.powLong(2, t.size);
-            } else {
-                min = - Converter.powLong(2, t.size - 1);
-                max = Converter.powLong(2, t.size - 1) - 1;
+            if(t.size < 64) {
+                long min, max;
+
+                if(!t.hasSign) {
+                    min = 0;
+                    max = Converter.powLong(2, t.size);
+                } else {
+                    min = - Converter.powLong(2, t.size - 1);
+                    max = Converter.powLong(2, t.size - 1) - 1;
+                }
+
+                return (value >= min) && (value <= max);
             }
 
-            return (value >= min) && (value <= max);
+            return true;
         }
-
-        return true;
+        catch(IrregularWriteOperationException e){
+            return false;
+        }
     }
 
     public void addToParametersList(Instruction instr) {
         // We can explicitly cast to integer because we know that an
         // instruction will never hold a long in its parameters
 
-        TypeInfo t = types.get(instr.getNextParameterType());
-        instr.addParam((int)Converter.parseInteger(buffer, t.size, t.hasSign));
+        try{
+            TypeInfo t = types.get(instr.getNextParameterType());
+            instr.addParam((int)Converter.parseInteger(buffer, t.size, t.hasSign));
+        }
+        catch(IrregularWriteOperationException e){
+            //we can NEVER enter here!
+            throw new NumberFormatException();
+        }
     }
 }

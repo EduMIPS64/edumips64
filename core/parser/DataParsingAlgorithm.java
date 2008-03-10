@@ -221,13 +221,13 @@ class DataParsingAlgorithm extends ParsingAlgorithm {
                 
             }
             catch (IrregularWriteOperationException e) {
-                parser.addWarning(token, "PARSER_OUT_OF_BOUNDS");
+                parser.addError(token, "PARSER_OUT_OF_BOUNDS");
             }
             catch (NotAlingException e) {
-                parser.addWarning(token, "PARSER_NOT_ALIGN");
+                parser.addError(token, "PARSER_NOT_ALIGN");
             }
             catch (MemoryElementNotFoundException e) {
-                parser.addWarning(token, "PARSER_EXCEED_MEMORY");
+                parser.addError(token, "PARSER_EXCEED_MEMORY");
             }
 		    catch(edumips64.core.fpu.FPOverflowException ex)
 		    {
