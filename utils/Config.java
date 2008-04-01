@@ -73,13 +73,14 @@ public class Config{
 			config.put("DIVIDE_BY_ZERO",true);
 			//fpu rounding mode configuration
 			config.put("NEAREST",false);
-			config.put("TOWARDZERO",true);
+                        config.put("TOWARDZERO",true);
 			config.put("TOWARDS_PLUS_INFINITY",false);
 			config.put("TOWARDS_MINUS_INFINITY",false);
 			// seed to generate a serial number for instructions
 			config.put("serialNumber",(long)0);
 			// modality by which memory cells value are showed (long,double)
 			config.put("LONGDOUBLEVIEW",true); //long=true  double=false
+                        config.put("BRANCH",false);
 		}
 	}
 	public static void setMap(Map<String,Object> newConfig){

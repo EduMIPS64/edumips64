@@ -101,9 +101,10 @@ public class GUIConfig extends JDialog{
 		int row = 2;
 		
 		addRow(panel,row++, "forwarding",new JCheckBox());
+                
 		addRow(panel,row++, "n_step",new JNumberField());
 		addRow(panel,row++, "LONGDOUBLEVIEW",new JCheckBox());
-
+                addRow(panel,row++, "BRANCH",new JCheckBox());  
 		// fill remaining vertical space
 		grid_add(panel,new JPanel(),gbl,gbc,0,1,0,row,GridBagConstraints.REMAINDER,1);
 		//panel.setSize(width,height - buttonHeight);
@@ -224,7 +225,7 @@ public class GUIConfig extends JDialog{
 		addRow(panel,row++, "FPMultiplierColor",new JButton());
 		addRow(panel,row++, "FPDividerColor",new JButton());
 		addRow(panel,row++, "show_aliases",new JCheckBox());
-
+      
 
 		// fill remaining vertical space
 		grid_add(panel,new JPanel(),gbl,gbc,0,1,0,row,GridBagConstraints.REMAINDER,1);

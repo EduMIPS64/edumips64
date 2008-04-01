@@ -64,6 +64,29 @@ public abstract class FPConditionalBranchesInstructions extends FlowControlInstr
 	
 	public void WB() throws IrregularStringOfBitsException {
 	}
+                
+        public void jump(int i,String offset) throws IrregularStringOfBitsException,IrregularWriteOperationException{
+           
+            try{
+                        String pc_new="";
+			Register pc=cpu.getPC();
+			String pc_old=cpu.getPC().getBinString();
+			
+			//subtracting 4 to the pc_old temporary variable using bitset64 safe methods
+			BitSet64 bs_temp=new BitSet64();
+			bs_temp.writeDoubleWord(-i);
+			pc_old=InstructionsUtils.twosComplementSum(pc_old,bs_temp.getBinString());
+			
+			//updating program counter
+			pc_new=InstructionsUtils.twosComplementSum(pc_old,offset);
+			pc.setBits(pc_new,0);
+       
+            
+                }  
+                catch(TwosComplementSumException e){
+                  }
+		
+                }
 	
 	public void pack() throws IrregularStringOfBitsException {
 		repr.setBits(COP1_VALUE, COP1_FIELD_INIT);

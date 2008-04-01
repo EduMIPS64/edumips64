@@ -63,6 +63,16 @@ public class FlowControl_JType extends FlowControlInstructions {
 		repr.setBits(OPCODE_VALUE,OPCODE_VALUE_INIT);
 		repr.setBits(Converter.intToBin(INSTR_INDEX_LENGTH,params.get(INSTR_INDEX)/4),INSTR_INDEX_INIT);
 	}
-	
-	
+      
+      public void jump() throws IrregularStringOfBitsException,IrregularWriteOperationException{
+                    
+                        String instr_index=Converter.positiveIntToBin(28,params.get(INSTR_INDEX));
+        
+                        Register pc=cpu.getPC();
+                        String pc_all=pc.getBinString();
+                        String pc_significant=pc_all.substring(0,36);
+                        String pc_new=pc_significant+instr_index;
+                        pc.setBits(pc_new,0);
+		
+                }	
 }

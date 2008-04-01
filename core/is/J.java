@@ -46,18 +46,21 @@ public class J extends FlowControl_JType {
 	}
 	
 	public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException, JumpException {
-		//converting INSTR_INDEX into a bynary value of 26 bits in length
-		String instr_index=Converter.positiveIntToBin(28,params.get(INSTR_INDEX));
-		//appending the 35 most significant bits of the program counter on the left of "instr_index"
-		Register pc=cpu.getPC();
-		String pc_all=pc.getBinString();
-		String pc_significant=pc_all.substring(0,36);
-		String pc_new=pc_significant+instr_index;
-		pc.setBits(pc_new,0);
-		throw new JumpException();
+		if((Boolean)Config.get("BRANCH")){
+                    throw new JumpException();
+                }
+                else{
+                        jump();
+			throw new JumpException();
+                  }
 	}
 	
 	public void EX() throws IrregularStringOfBitsException,IntegerOverflowException {
+            try{  
+              if((Boolean)Config.get("BRANCH"))
+                      jump();
+              }
+            catch(IrregularWriteOperationException e){}
 	}
 	
 	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {

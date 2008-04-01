@@ -29,6 +29,8 @@ import edumips64.utils.*;
 
 //debug
 import edumips64.Main;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** This class models a MIPS CPU with 32 64-bit General Purpose Registers.
 *  @author Andrea Spadaccini, Simona Ullo, Antonella Scandura, Massimo Trubia (FPU modifications)
@@ -123,6 +125,7 @@ public class CPU {
 		for(int i=0;i<32;i++)
 			fpr[i]=new RegisterFP();
 		FCSR = new FCSRRegister();
+		configFPExceptionsAndRM();
 		fpPipe= new FPPipeline();
 		fpPipe.reset();
 		
@@ -421,21 +424,7 @@ public class CPU {
 		boolean masked = (Boolean)Config.get("syncexc-masked");
 		boolean terminate = (Boolean)Config.get("syncexc-terminate");
 		
-		FCSR.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION,(Boolean)Config.get("INVALID_OPERATION"));
-		FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW,(Boolean)Config.get("OVERFLOW"));
-		FCSR.setFPExceptions(CPU.FPExceptions.UNDERFLOW,(Boolean)Config.get("UNDERFLOW"));
-		FCSR.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO,(Boolean)Config.get("DIVIDE_BY_ZERO"));
-if (getCycles()==29)
-	System.out.println();
-		//setting the rounding mode
-		if((Boolean)Config.get("NEAREST"))
-			FCSR.setFCSRRoundingMode(FPRoundingMode.TO_NEAREST);
-		else if((Boolean)Config.get("TOWARDZERO"))
-			FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARD_ZERO);
-		else if((Boolean)Config.get("TOWARDS_PLUS_INFINITY"))
-			FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_PLUS_INFINITY);
-		else if((Boolean)Config.get("TOWARDS_MINUS_INFINITY"))
-			FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_MINUS_INFINITY);
+		configFPExceptionsAndRM();
 		
 		String syncex = null;
 		
@@ -611,6 +600,7 @@ if (getCycles()==29)
 
 		} catch(JumpException ex) {
             try {
+            
                 if(pipe.get(PipeStatus.IF) != null) //rispetto a dimips scambia le load con le IF
                         pipe.get(PipeStatus.IF).IF();
             }
@@ -618,14 +608,30 @@ if (getCycles()==29)
 				edumips64.Main.logger.debug("Caught a BREAK after a Jump: ignoring it.");
             }
 
-			// A J-Type instruction has just modified the Program Counter. We need to
+                        if((Boolean)Config.get("BRANCH")){
+                        
+                        pipe.put(PipeStatus.EX, pipe.get(PipeStatus.ID));
+                        pipe.put(PipeStatus.ID, pipe.get(PipeStatus.IF));
+			pipe.put(PipeStatus.IF, Instruction.buildInstruction("BUBBLE"));
+                        
+			
+			old_pc.writeDoubleWord((pc.getValue()));
+			pc.writeDoubleWord((pc.getValue())+4);
+                
+                        }
+                      
+                        else{
+                        // A J-Type instruction has just modified the Program Counter. We need to
 			// put in the IF state the instruction the PC points to
-			pipe.put(PipeStatus.IF, mem.getInstruction(pc));
+                        pipe.put(PipeStatus.IF, mem.getInstruction(pc));
 			pipe.put(PipeStatus.EX, pipe.get(PipeStatus.ID));
 			pipe.put(PipeStatus.ID, Instruction.buildInstruction("BUBBLE"));
 			old_pc.writeDoubleWord((pc.getValue()));
 			pc.writeDoubleWord((pc.getValue())+4);
+                        }
+			
 			if(syncex != null)
+                              
 				throw new SynchronousException(syncex);
 			
 		} catch(RAWException ex) {
@@ -796,6 +802,29 @@ if (getCycles()==29)
 			s+= "Registro " + i++ + ":\t" + r.toString() + "\n";
 		return s;
 	}
+	
+    public void configFPExceptionsAndRM() {
+	try {
+	    FCSR.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, (Boolean) Config.get("INVALID_OPERATION"));
+	    FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW, (Boolean) Config.get("OVERFLOW"));
+	    FCSR.setFPExceptions(CPU.FPExceptions.UNDERFLOW, (Boolean) Config.get("UNDERFLOW"));
+	    FCSR.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO, (Boolean) Config.get("DIVIDE_BY_ZERO"));
+
+	    //setting the rounding mode
+	    if ((Boolean) Config.get("NEAREST")) {
+		FCSR.setFCSRRoundingMode(FPRoundingMode.TO_NEAREST);
+	    } else if ((Boolean) Config.get("TOWARDZERO")) {
+		FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARD_ZERO);
+	    } else if ((Boolean) Config.get("TOWARDS_PLUS_INFINITY")) {
+		FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_PLUS_INFINITY);
+	    } else if ((Boolean) Config.get("TOWARDS_MINUS_INFINITY")) {
+		FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_MINUS_INFINITY);
+	    }
+	} catch (IrregularStringOfBitsException ex) {
+	    Logger.getLogger(CPU.class.getName()).log(Level.SEVERE, null, ex);
+	}
+
+    }
 	
 	public String toString() {
 		String s = new String();

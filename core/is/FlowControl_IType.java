@@ -60,12 +60,39 @@ public abstract class FlowControl_IType extends FlowControlInstructions {
 	
 	public void WB() throws IrregularStringOfBitsException {
 	}
-	
+                
+        public void jump(int i,String offset) throws IrregularStringOfBitsException,IrregularWriteOperationException{
+           
+            try{
+                        String pc_new="";
+			Register pc=cpu.getPC();
+			String pc_old=cpu.getPC().getBinString();
+			
+			//subtracting 4 to the pc_old temporary variable using bitset64 safe methods
+			BitSet64 bs_temp=new BitSet64();
+			bs_temp.writeDoubleWord(-i);
+			pc_old=InstructionsUtils.twosComplementSum(pc_old,bs_temp.getBinString());
+			
+			//updating program counter
+			pc_new=InstructionsUtils.twosComplementSum(pc_old,offset);
+			pc.setBits(pc_new,0);
+       
+            
+                }  
+                catch(TwosComplementSumException e){
+                  }
+		
+                }	
 	public void pack() throws IrregularStringOfBitsException {
 		repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);
 		repr.setBits(Converter.intToBin(RS_FIELD_LENGTH, params.get(RS_FIELD)), RS_FIELD_INIT);
 		repr.setBits(Converter.intToBin(RT_FIELD_LENGTH, params.get(RT_FIELD)), RT_FIELD_INIT);
 		repr.setBits(Converter.intToBin(OFFSET_FIELD_LENGTH, params.get(OFFSET_FIELD)/4), OFFSET_FIELD_INIT);
 	}
+  
+                
+		
+          }
+        
 	
-}
+

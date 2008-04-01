@@ -221,7 +221,7 @@ public class GUIPipeline extends GUIComponent{
 			
 			
 			Instruction i=pipeline.get(CPU.PipeStatus.IF);
-			if((i!=null)&&((i.getName()!=null))){//!i.getName().equals(" ")
+			if((i!=null)&&((i.getName()!=null) && !i.getName().equals(" "))){//!i.getName().equals(" ")
 				g.setColor((Color)Config.get("IFColor"));
 				g.fillRect(largh/20,(alt/2)-(alt/12),largh/10,alt/6);
 			}

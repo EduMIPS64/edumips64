@@ -43,11 +43,22 @@ public class JR extends FlowControl_RType {
 	}
 	
 	public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,JumpException {
+        
+        if((Boolean)Config.get("BRANCH")){
+                  
+                throw new JumpException();
+                
+                }
+        else{
 		cpu.getPC().setBits(cpu.getRegister(params.get(RS_FIELD)).getBinString(),0);
 		throw new JumpException();
+          }
 	}
 	
 	public void EX() throws IrregularStringOfBitsException,IntegerOverflowException, IrregularWriteOperationException {
+         if((Boolean)Config.get("BRANCH"))
+                  cpu.getPC().setBits(cpu.getRegister(params.get(RS_FIELD)).getBinString(),0);
+              
 	}
 	
 	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {

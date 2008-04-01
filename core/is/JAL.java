@@ -51,21 +51,32 @@ public class JAL extends FlowControl_JType {
 		cpu.getRegister(31).incrWriteSemaphore();  //deadlock !!!
 		TR[PC_VALUE].writeDoubleWord(cpu.getPC().getValue()-4);
 		//converting INSTR_INDEX into a bynary value of 26 bits in length
-		String instr_index=Converter.positiveIntToBin(28,params.get(INSTR_INDEX));
-		//appending the 35 most significant bits of the program counter on the left of "instr_index"
-		Register pc=cpu.getPC();
-		String pc_all=pc.getBinString();
-		String pc_significant=pc_all.substring(0,36);
-		String pc_new=pc_significant+instr_index;
-		pc.setBits(pc_new,0);
-		if(enableForwarding) {
+		if((Boolean)Config.get("BRANCH")){
+                    if(enableForwarding) {
 			doWB();
 		}
-		throw new JumpException();
+                    throw new JumpException();
+                }
+                else{
+                        jump();
+                        if(enableForwarding) {
+			doWB();
+		}
+			throw new JumpException();
+                  }
+                
+		
+		
 	}
 	
 	public void EX() throws IrregularStringOfBitsException,IntegerOverflowException, IrregularWriteOperationException {
+             try{  
+              if((Boolean)Config.get("BRANCH"))
+                      jump();
+              }
+            catch(IrregularWriteOperationException e){}
 	}
+	
 	
 	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
 	}
