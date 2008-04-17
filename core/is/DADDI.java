@@ -56,8 +56,14 @@ class DADDI extends ALU_IType
 		String outputstring=InstructionsUtils.twosComplementSum(rs,imm);
 		//comparison between the two most significant bits of the outputstring and 
 		//raising integer overflow if the first bit is different from the second one
-		if(outputstring.charAt(0) != outputstring.charAt(1))
-			throw new IntegerOverflowException();
+        if(outputstring.charAt(0)!=outputstring.charAt(1)){ 
+            //if the enable forwarding is turned on we have to ensure that registers 
+            //should be unlocked also if a synchronous exception occurs. This is performed 
+            //by executing the WB method before raising the trap 
+            if(enableForwarding) 
+                doWB(); 
+            throw new IntegerOverflowException(); 
+        }  
 		else
 			outputstring=outputstring.substring(1,65);
 		TR[RT_FIELD].setBits(outputstring,0);
