@@ -1,8 +1,11 @@
 EduMIPS64 ChangeLog
 ------------------- 
-0.5.2 ()
+0.5.2 (17/04/2008)
 	- Fixed a bug about a stall for synchronous exceptions and forwarding (max83t)
-	- Fixed Java 6 Swing bug
+	- Fixed Java 6 Swing bug (andrea)
+	- Fixed ReportDialog bug (mancausoft)
+	- Fixed aligned read/write with labels (andrea)
+	- Fixed MIPS32 alias visualization (thegoodgiant)
 
 0.5.1 (24/08/2007)
 	- Updated embedded manual with a SYSCALL page (jesky)
