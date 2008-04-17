@@ -890,7 +890,7 @@ public class Parser
 												else if(isNumber(param.substring(indPar,endPar).trim()))
 												{
 													int tmp = Integer.parseInt(param.substring(indPar,endPar).trim());
-													if (tmp<0 || tmp%8!=0 || tmp > edumips64.core.CPU.DATALIMIT)
+													if (tmp<0 || tmp%2!=0 || tmp > edumips64.core.CPU.DATALIMIT)
 													{   
 															numError++;
 															String er = "LABELADDRESSINVALID";
