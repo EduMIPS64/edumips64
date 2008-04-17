@@ -41,6 +41,9 @@ public class GUIFrontend {
 	GUIPipeline pipe;
 	GUIData data;
 	GUICode code;	
+
+    // Array containing the six components, useful to write more compact code
+    GUIComponent components[];
 	
 	/**Creates the six internal component
 	*/
@@ -52,6 +55,13 @@ public class GUIFrontend {
 		data=new GUIData();
 		code=new GUICode();
 		
+        components = new GUIComponent[6];
+        components[0] = cycles;
+        components[1] = regs;
+        components[2] = stats;
+        components[3] = pipe;
+        components[4] = data;
+        components[5] = code;
 	}
 	
 	/**Set the container for the Cycles component.
@@ -100,27 +110,50 @@ public class GUIFrontend {
 	/**
 	* This method call the six component's update methods.
 	*/
-	public synchronized void updateComponents(){
-		cycles.update();
-		regs.update();
-		stats.update();
-		pipe.update();
-		data.update();
-		code.update();
+	public void updateComponents(){
+        if(!SwingUtilities.isEventDispatchThread()) {
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        for(GUIComponent c : components)
+                            c.update();
+                    }
+                });
+            } catch (InterruptedException e) {
+                edumips64.Main.logger.debug("InterruptedException in GUIFrontend");
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                edumips64.Main.logger.debug("InvocationTargetException in GUIFrontend");
+            }
+        }
+        else {
+            for(GUIComponent c : components)
+                c.update();
+        }
 	}
 	
 	/**
 	* This method call the six component's draw methods.
 	*/
-	public synchronized void represent(){
-		cycles.draw();
-		regs.draw();
-		stats.draw();
-		pipe.draw();
-		data.draw();
-		code.draw();
+	public void represent(){
+        if(!SwingUtilities.isEventDispatchThread()) {
+            try {
+                SwingUtilities.invokeAndWait(new Runnable() {
+                    public void run() {
+                        for(GUIComponent c : components)
+                            c.draw();
+                    }
+                });
+            } catch (InterruptedException e) {
+                edumips64.Main.logger.debug("InterruptedException in GUIFrontend");
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                edumips64.Main.logger.debug("InvocationTargetException in GUIFrontend");
+            }
+        }
+        else {
+            for(GUIComponent c : components)
+                c.draw();
+        }
 	}
-
 	
 	public static void main(String []arg){
 		JFrame f = new JFrame("EduMIPS64");

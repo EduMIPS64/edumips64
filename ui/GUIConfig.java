@@ -299,7 +299,7 @@ public class GUIConfig extends JDialog{
 					// Let's verify that we have to reset the CPU
 					if(cpu.getStatus() == CPU.CPUStatus.RUNNING) {
 						System.out.println("Reset");
-						edumips64.Main.resetSimulator();
+						edumips64.Main.resetSimulator(true);
 					}
 				}
 				edumips64.Main.updateCGT();

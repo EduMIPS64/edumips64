@@ -106,8 +106,10 @@ public class CPUGUIThread extends Thread{
 		try {
 			while(true){
 				synchronized(this) {
+                    edumips64.Main.logger.debug("cgt is waiting");
 					wait();
 				}
+                edumips64.Main.logger.debug("cgt awoke");
 
 				// Let's disable the running menu items and enable the stop menu
 				// item

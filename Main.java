@@ -144,7 +144,7 @@ public class Main extends JApplet {
         logger.debug("Simulator started");
 
         if(toOpen != null) {
-            resetSimulator();
+            resetSimulator(false);
             openFile(toOpen);
         }
     }
@@ -422,8 +422,8 @@ public class Main extends JApplet {
             logger.debug("Set the status to RUNNING");
 
             // Let's fetch the first instruction
-            cgt.setSteps(1);
             synchronized(cgt) {
+                cgt.setSteps(1);
                 cgt.notify();
             }    
             openedFile = file;
@@ -440,7 +440,7 @@ public class Main extends JApplet {
             new ErrorDialog(f,ex.getExceptionList(),CurrentLocale.getString("GUI_PARSER_ERROR")); 
             openedFile = null;
             f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
-            resetSimulator();
+            resetSimulator(false);
         }
         catch (java.io.FileNotFoundException ex) {
 			String tmpfile;
@@ -523,7 +523,7 @@ public class Main extends JApplet {
             ((JInternalFrame)e.getValue()).setTitle(CurrentLocale.getString(((String)e.getKey()).toUpperCase()));
     }
 
-    public static void resetSimulator() {
+    public static void resetSimulator(boolean reopenFile) {
         cpu.reset();
         try {
             iom.reset();
@@ -534,7 +534,7 @@ public class Main extends JApplet {
         cpu.setStatus(CPU.CPUStatus.READY);
         front.updateComponents();
         front.represent();
-        if(openedFile != null)
+        if(openedFile != null && reopenFile)
             openFile(openedFile);
 
         changeShownMenuItems(cpu.getStatus());
@@ -639,7 +639,7 @@ public class Main extends JApplet {
                         listfiles.addFirst(filename);
                         addLastFile(filename,0);
                     }
-                    resetSimulator();
+                    resetSimulator(false);
                     openFile(filename);
                     changeShownMenuItems(cpu.getStatus());
                 }
@@ -667,7 +667,7 @@ public class Main extends JApplet {
         reset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
         reset.addActionListener(new ActionListener (){
             public void actionPerformed(ActionEvent e) {
-                resetSimulator();
+                resetSimulator(true);
             }
         });
 
@@ -973,7 +973,7 @@ public class Main extends JApplet {
         JMenuItem item = new JMenuItem(filename);
         item.addActionListener(new ActionListener (){
             public void actionPerformed(ActionEvent e){
-                resetSimulator();
+                resetSimulator(false);
                 openFile(filename);
                 changeShownMenuItems(cpu.getStatus());
             }
