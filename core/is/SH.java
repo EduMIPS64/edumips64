@@ -61,7 +61,7 @@ class SH extends Storing
                         
                          //MODIFICA
                        // memory.writeH((int)address,TR[RT_FIELD].readHalf(0));
-                         cache.writeH((int)address,TR[RT_FIELD].readHalf(0));
+                         cache.CwriteH((int)address,TR[RT_FIELD].readHalf(0));
                         //MODIFICA FINE
 			if(enableForwarding)
 			{

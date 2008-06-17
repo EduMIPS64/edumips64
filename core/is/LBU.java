@@ -61,7 +61,7 @@ class LBU extends Loading
             
                  /*MODIFICA*/
                 //int value=memory.readBU((int)address);
-                int value=cache.readBU((int)address);
+                int value=cache.CreadBU((int)address);
                 TR[LMD_REGISTER].writeByteUnsigned(value);
                 /*MODIFICA FINE*/
             

@@ -55,7 +55,7 @@ class SWC1 extends FPStoring {
                     
                           //MODIFICA
                        // memory.writeW((int)address,TR[RT_FIELD].readWord(0));
-                           cache.writeW((int)address,TR[RT_FIELD].readWord(0));
+                           cache.CwriteW((int)address,TR[RT_FIELD].readWord(0));
                         //MODIFICA FINE
 		} catch(NotAlingException er) {
 			throw new AddressErrorException();

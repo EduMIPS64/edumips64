@@ -61,7 +61,7 @@ class LWU extends Loading {
             /*MODIFICA*/
                 try{
                 //long value=memory.readWU((int)address);
-                 long value=cache.readWU((int)address);
+                 long value=cache.CreadWU((int)address);
                 TR[LMD_REGISTER].writeWordUnsigned(value);
                 if(enableForwarding) {
 				doWB();

@@ -211,6 +211,10 @@ public class CPU {
 	public Memory getMemory() {
 		return mem;
 	}
+    
+    public Cache getCache() {
+        return cache;
+    }
 	
 	public SymbolTable getSymbolTable() {
 		return symTable;

@@ -55,7 +55,7 @@ public class SDC1 extends FPStoring {
                          
                         //MODIFICA
                         //memory.writeD((int)address,TR[RT_FIELD].getBinString());
-                           cache.writeD((int)address,TR[RT_FIELD].getBinString());
+                           cache.CwriteD((int)address,TR[RT_FIELD].getBinString());
                         //MODIFICA FINE
 			if(enableForwarding)
 			{

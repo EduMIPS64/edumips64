@@ -63,7 +63,7 @@ class LWC1 extends FPLoading {
 	/*MODIFICA*/
                 try{
                 //int value=memory.readW((int)address);
-                int value=cache.readW((int)address);
+                int value=cache.CreadW((int)address);
                 TR[LMD_REGISTER].writeWord(value);
                 if(enableForwarding) {
 				doWB();

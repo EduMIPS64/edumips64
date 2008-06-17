@@ -57,7 +57,7 @@ class SB extends Storing {
 			*/
                         //MODIFICA
                         //memory.writeB((int)address,TR[RT_FIELD].readByte(0));
-                        cache.writeB((int)address,TR[RT_FIELD].readByte(0));
+                        cache.CwriteB((int)address,TR[RT_FIELD].readByte(0));
                         //MODIFICA FINE
                     
                         if(enableForwarding) {

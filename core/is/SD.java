@@ -60,7 +60,7 @@ public class SD extends Storing {
                          
                         //MODIFICA
                         //memory.writeD((int)address,TR[RT_FIELD].getBinString());
-                        cache.writeD((int)address,TR[RT_FIELD].getBinString());
+                        cache.CwriteD((int)address,TR[RT_FIELD].getBinString());
                         //MODIFICA FINE
 			if(enableForwarding) {
 				WB();

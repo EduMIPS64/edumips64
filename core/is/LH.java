@@ -63,7 +63,7 @@ class LH extends Loading {
             /*MODIFICA*/
                 try{
                 //int value=memory.readH((int)address);
-                int value=cache.readH((int)address);
+                int value=cache.CreadH((int)address);
                 TR[LMD_REGISTER].writeHalf(value);
                 if(enableForwarding) {
 				doWB();

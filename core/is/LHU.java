@@ -64,7 +64,7 @@ class LHU extends Loading {
                
                 try{
                 //int value=memory.readHU((int)address);   
-                int value=cache.readHU((int)address);
+                int value=cache.CreadHU((int)address);
                 TR[LMD_REGISTER].writeHalfUnsigned(value);
                 if(enableForwarding) {
 				doWB();

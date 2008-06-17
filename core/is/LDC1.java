@@ -55,7 +55,7 @@ class LDC1 extends FPLoading {
             
                  /*MODIFICA*/
                 //String value=memory.readD((int)address);
-                String value=cache.readD((int)address);
+                String value=cache.CreadD((int)address);
                 TR[LMD_REGISTER].setBits(value,0);
                 /*MODIFICA FINE*/
                 
