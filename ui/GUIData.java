@@ -65,12 +65,17 @@ public class GUIData extends GUIComponent
 	{
 		cont.repaint();
 	}
+
+    public void updateLanguageStrings() {
+        GUIFrontend.updateColumnHeaderNames(dataPanel.theTable);
+    }
 	
 	class DataPanel extends JPanel 
 	{
 		JTable theTable;
 		JScrollPane scrollTable;
 		public FileTableModel tableModel;
+
 
 		public DataPanel() 
 		{
@@ -79,12 +84,13 @@ public class GUIData extends GUIComponent
 			setLayout(new BorderLayout());
 			tableModel = new FileTableModel(memoryAddress);
 			theTable = new JTable(tableModel);
+			theTable.setCellSelectionEnabled(false);
 			theTable.getColumnModel().getColumn(0).setPreferredWidth(60);
 			theTable.getColumnModel().getColumn(1).setPreferredWidth(130);
 			theTable.getColumnModel().getColumn(2).setPreferredWidth(80);
 			theTable.getColumnModel().getColumn(3).setPreferredWidth(200);
 			theTable.getColumnModel().getColumn(4).setPreferredWidth(200);
-			theTable.setCellSelectionEnabled(false);
+        
 			//theTable.setTableHeader(null); //così visualizzo le intestazioni
 			theTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 			theTable.setShowGrid(false);
@@ -150,7 +156,7 @@ public class GUIData extends GUIComponent
 	
 		class FileTableModel extends AbstractTableModel 
 		{
-			private String[] columnNames = {CurrentLocale.getString("ADDRESS"), CurrentLocale.getString("HEXREPR"), CurrentLocale.getString("LABEL"), CurrentLocale.getString("DATA"), CurrentLocale.getString("COMMENT")};
+			private String[] columnLocaleStrings = {"ADDRESS", "HEXREPR", "LABEL", "DATA", "COMMENT"};
 			private Class[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
 			private String memoryAddress[];
 			
@@ -161,7 +167,7 @@ public class GUIData extends GUIComponent
 
 			public int getColumnCount() 
 			{
-				return columnNames.length;
+				return columnLocaleStrings.length;
 			}
     
 			public int getRowCount() 
@@ -171,7 +177,7 @@ public class GUIData extends GUIComponent
     
 			public String getColumnName(int col) 
 			{
-				return columnNames[col];
+				return CurrentLocale.getString(columnLocaleStrings[col]);
 			}
     
 			public Object getValueAt(int row, int col) 

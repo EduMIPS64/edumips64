@@ -55,4 +55,12 @@ public abstract class GUIComponent{
 	/**Draw the component.
 	*/
 	abstract public void draw();
+
+    /**
+     * Update language-dependent parts of the intrface
+     */
+
+    public void updateLanguageStrings() {
+        // By default, do nothing.
+    }
 }

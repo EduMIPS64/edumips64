@@ -93,6 +93,7 @@
 		<jar destfile="${jarFile}" basedir="edumips">
 			<manifest>
 				<attribute name="Main-Class" value="edumips64.Main"/>
+                <attribute name="SplashScreen-Image" value="edumips64/img/splash.png"/>
 			</manifest>
 		</jar>
 		<signjar jar="${jarFile}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />

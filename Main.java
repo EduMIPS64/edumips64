@@ -779,6 +779,7 @@ public class Main extends JApplet {
                 CurrentLocale.setLanguage("en");
                 initMenuItems();
                 setFrameTitles();
+                front.updateLanguageStrings();
                 // f.setVisible(true);
             }
         });
@@ -799,6 +800,7 @@ public class Main extends JApplet {
                 CurrentLocale.setLanguage("it");
                 initMenuItems();
                 setFrameTitles();
+                front.updateLanguageStrings();
                 // f.setVisible(true);
             }
         });

@@ -44,6 +44,10 @@ public class GUICode extends GUIComponent{
 		super.setContainer(co);
 		cont.add(codePanel);
 	}
+
+    public void updateLanguageStrings() {
+        GUIFrontend.updateColumnHeaderNames(codePanel.theTable);
+    }
 	
 	public void update() {
 		//codePanel.scrollTable.getViewport().setViewPosition(new Point(0,position+15));
@@ -106,7 +110,7 @@ public class GUICode extends GUIComponent{
 		}
 	
 	class MyTableModel extends AbstractTableModel {
-		private String[] columnNames = {CurrentLocale.getString("ADDRESS"), CurrentLocale.getString("HEXREPR"), CurrentLocale.getString("LABEL"), CurrentLocale.getString("INSTRUCTION"), CurrentLocale.getString("COMMENT")};
+        private String[] columnLocaleStrings = {"ADDRESS", "HEXREPR", "LABEL", "INSTRUCTION", "COMMENT"};
 		private Class[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
 		private String memoryAddress[];
 			
@@ -115,7 +119,7 @@ public class GUICode extends GUIComponent{
 		}
 
         	public int getColumnCount() {
-      			return columnNames.length;
+				return columnLocaleStrings.length;
     		}
     
 		public int getRowCount() {
@@ -123,7 +127,7 @@ public class GUICode extends GUIComponent{
 		}
     
 		public String getColumnName(int col) {
-      			return columnNames[col];
+				return CurrentLocale.getString(columnLocaleStrings[col]);
 		}
     
 			public Object getValueAt(int row, int col) {

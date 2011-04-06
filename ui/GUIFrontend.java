@@ -27,6 +27,7 @@ import edumips64.core.*;
 import edumips64.utils.*;
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.table.TableColumnModel;
 import java.util.*;
 
 /**
@@ -130,6 +131,14 @@ public class GUIFrontend {
                 c.update();
         }
 	}
+
+	/**
+	* This method call the six components' updateLanguageStrings methods.
+	*/
+    public void updateLanguageStrings() {
+        for(GUIComponent c : components)
+            c.updateLanguageStrings();
+    }
 	
 	/**
 	* This method call the six component's draw methods.
@@ -154,6 +163,31 @@ public class GUIFrontend {
                 c.draw();
         }
 	}
+
+    /**
+     * Static utility method that saves the column width of a table, redraws
+     * its header labels and then restores the widths
+     */
+    public static void updateColumnHeaderNames(JTable table) {
+        // We need to save and restore the column widths, because the
+        // createDeafultColumnsFromModel(), the method that we use to refresh
+        // the column names, restores the default width.
+        TableColumnModel tcm = table.getColumnModel();
+        int columnCount = tcm.getColumnCount();
+        int[] widths = new int[columnCount];
+
+        for(int i = 0; i < columnCount; ++i) {
+            widths[i] = tcm.getColumn(i).getWidth();
+        }
+
+        // This will update the table header names if the getColumnName method
+        // is dynamic, i.e., it queries the locale before returning the label.
+        table.createDefaultColumnsFromModel();
+
+        for(int i = 0; i < columnCount; ++i) {
+            tcm.getColumn(i).setPreferredWidth(widths[i]);
+        }
+    }
 	
 	public static void main(String []arg){
 		JFrame f = new JFrame("EduMIPS64");
