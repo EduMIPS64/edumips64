@@ -79,9 +79,9 @@ public class GUIData extends GUIComponent
 			setLayout(new BorderLayout());
 			tableModel = new FileTableModel(memoryAddress);
 			theTable = new JTable(tableModel);
-			theTable.getColumnModel().getColumn(0).setPreferredWidth(40);
-			theTable.getColumnModel().getColumn(1).setPreferredWidth(122);
-			theTable.getColumnModel().getColumn(2).setPreferredWidth(60);
+			theTable.getColumnModel().getColumn(0).setPreferredWidth(60);
+			theTable.getColumnModel().getColumn(1).setPreferredWidth(130);
+			theTable.getColumnModel().getColumn(2).setPreferredWidth(80);
 			theTable.getColumnModel().getColumn(3).setPreferredWidth(200);
 			theTable.getColumnModel().getColumn(4).setPreferredWidth(200);
 			theTable.setCellSelectionEnabled(false);
@@ -150,7 +150,7 @@ public class GUIData extends GUIComponent
 	
 		class FileTableModel extends AbstractTableModel 
 		{
-			private String[] columnNames = {" ", " ", " ", " ", " "};
+			private String[] columnNames = {CurrentLocale.getString("ADDRESS"), CurrentLocale.getString("HEXREPR"), CurrentLocale.getString("LABEL"), CurrentLocale.getString("DATA"), CurrentLocale.getString("COMMENT")};
 			private Class[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
 			private String memoryAddress[];
 			

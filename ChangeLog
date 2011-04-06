@@ -1,7 +1,8 @@
 EduMIPS64 ChangeLog
 ------------------- 
 0.5.3 (..)
-	- 
+	- Added labels to the GUIData frame; fixed GUIData and GUICode column
+      widths so that they can be read (andrea)
 
 0.5.2 (17/04/2008)
 	- Fixed a bug about a stall for synchronous exceptions and forwarding (max83t)

@@ -95,11 +95,11 @@ public class GUICode extends GUIComponent{
 			theTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 			theTable.setShowGrid(false);
 			
-			theTable.getColumnModel().getColumn(0).setPreferredWidth(50);
-			theTable.getColumnModel().getColumn(1).setPreferredWidth(90);
+			theTable.getColumnModel().getColumn(0).setPreferredWidth(60);
+			theTable.getColumnModel().getColumn(1).setPreferredWidth(130);
 			theTable.getColumnModel().getColumn(2).setPreferredWidth(80);
-			theTable.getColumnModel().getColumn(3).setPreferredWidth(150);
-			theTable.getColumnModel().getColumn(4).setPreferredWidth(500);
+			theTable.getColumnModel().getColumn(3).setPreferredWidth(200);
+			theTable.getColumnModel().getColumn(4).setPreferredWidth(200);
 			
 			scrollTable = new JScrollPane(theTable);
 			add(scrollTable, BorderLayout.CENTER);
