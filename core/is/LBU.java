@@ -54,7 +54,6 @@ class LBU extends Loading
 		MemoryElement memEl = memory.getCell((int)address);
 		//reading first 8 low bits from the memory element and saving values on LMD register with zero padding
 		int read = memEl.readByteUnsigned((int)(address%8));
-		edumips64.Main.logger.debug("LBU: read from address " + address + " the value " + read);
 		TR[LMD_REGISTER].writeByteUnsigned(read);
 		if(enableForwarding)
 		{

@@ -1,4 +1,4 @@
-/* GUIAbout.java
+/* Config.java
  *
  * This class manages the user settings.
  * (c) 2006 EduMIPS64 project - Rizzo Vanni G.

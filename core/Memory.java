@@ -26,6 +26,7 @@ package edumips64.core;
 import edumips64.utils.*;
 import java.util.*;
 import edumips64.core.is.*;
+import java.util.logging.Logger;
 
 /**  This class models the main memory of a computer, with 64-bit elements (that is 8 byte).
  * The Memory is composed of MemoryElement and its size is not limited.
@@ -39,9 +40,11 @@ public class Memory{
 
 	private int instr_num;
 	private static Memory memory = null;
+
+    private static final Logger logger = Logger.getLogger(Memory.class.getName());
 	
 	private Memory(){
-		edumips64.Main.logger.debug("Building Memory: " + this.hashCode());
+		logger.fine("Building Memory: " + this.hashCode());
 		mem_comments = new HashMap<Integer,String>();
 		cells = new ArrayList<MemoryElement>();
 		instr_num = 0;
@@ -50,7 +53,7 @@ public class Memory{
 			cells.add(new MemoryElement(i*8));
 		for(int i = 0; i < CPU.CODELIMIT; i++)
 			instructions.add(Instruction.buildInstruction("BUBBLE"));
-		edumips64.Main.logger.debug("Memory built: " + this.hashCode());
+		logger.fine("Memory built: " + this.hashCode());
 	}
 
 	/** Returns the maximum number of MemoryElement stored in Memory

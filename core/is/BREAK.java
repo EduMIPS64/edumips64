@@ -52,7 +52,6 @@ public class BREAK extends Instruction {
         {
             e.printStackTrace();
         }
-		edumips64.Main.logger.debug("BREAK exception is entering in ID stage: throwing BreakException");
 	  throw new BreakException();
     }
     public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException {

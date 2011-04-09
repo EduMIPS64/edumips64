@@ -29,6 +29,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.TableColumnModel;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
 *This class draws in a graphic console all information.
@@ -45,6 +46,8 @@ public class GUIFrontend {
 
     // Array containing the six components, useful to write more compact code
     GUIComponent components[];
+
+    private static final Logger logger = Logger.getLogger(GUIFrontend.class.getName());
 	
 	/**Creates the six internal component
 	*/
@@ -121,9 +124,9 @@ public class GUIFrontend {
                     }
                 });
             } catch (InterruptedException e) {
-                edumips64.Main.logger.debug("InterruptedException in GUIFrontend");
+                logger.fine("InterruptedException in GUIFrontend");
             } catch (java.lang.reflect.InvocationTargetException e) {
-                edumips64.Main.logger.debug("InvocationTargetException in GUIFrontend");
+                logger.fine("InvocationTargetException in GUIFrontend");
             }
         }
         else {
@@ -153,9 +156,9 @@ public class GUIFrontend {
                     }
                 });
             } catch (InterruptedException e) {
-                edumips64.Main.logger.debug("InterruptedException in GUIFrontend");
+                logger.fine("InterruptedException in GUIFrontend");
             } catch (java.lang.reflect.InvocationTargetException e) {
-                edumips64.Main.logger.debug("InvocationTargetException in GUIFrontend");
+                logger.fine("InvocationTargetException in GUIFrontend");
             }
         }
         else {

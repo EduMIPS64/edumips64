@@ -1,6 +1,6 @@
 /* IOManager.java
  * 
- * Class used as a proxy for I/O operations
+ * Proxy for I/O operations
  * (c) 2006 Andrea Spadaccini
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -24,6 +24,7 @@
 package edumips64.core;
 import java.util.*;
 import java.io.*;
+import java.util.logging.Logger;
 
 /** Class used as a proxy for I/O operations.
  *  This class handles input/output from/to files, including stdin, stdout and
@@ -66,12 +67,14 @@ public class IOManager {
 
 	private int next_descriptor;
 
+    private static final Logger logger = Logger.getLogger(IOManager.class.getName());
+
 	/** Closes all the open files */
 	public void reset() throws IOException {
-		edumips64.Main.logger.debug("IOManager: resetting... next_fd = " + next_descriptor);
+		logger.fine("IOManager: resetting... next_fd = " + next_descriptor);
 		while(next_descriptor > 3)
 			close(next_descriptor--);
-		edumips64.Main.logger.debug("IOManager: resetted. next_fd = " + next_descriptor);
+		logger.fine("IOManager: resetted. next_fd = " + next_descriptor);
 	}
 
 	public IOManager() {
@@ -87,19 +90,19 @@ public class IOManager {
 	 *  @param fd the file descriptor to close
 	 */
 	public int close(int fd) throws IOException,  java.io.FileNotFoundException {
-		edumips64.Main.logger.debug("call to close() with fd = " + fd);
+		logger.fine("call to close() with fd = " + fd);
 		int ret = -1;
 		boolean in = ins.containsKey(fd);
 		boolean out = outs.containsKey(fd);
 		if(in) {
-			edumips64.Main.logger.debug("found open input stream");
+			logger.fine("found open input stream");
 			Reader r = ins.get(fd);
 			r.close();
 			ins.remove(fd);
 			ret = 0;
 		}
 		if(out) {
-			edumips64.Main.logger.debug("found open output stream");
+			logger.fine("found open output stream");
 			Writer w = outs.get(fd);
 			w.close();
 			outs.remove(fd);
@@ -122,11 +125,11 @@ public class IOManager {
 		// O_WRONLY (or O_RDWR) and the file does't exist
 
 		if((flags & O_CREAT) == O_CREAT) {
-			edumips64.Main.logger.debug("flags & O_CREAT = " + O_CREAT );
+			logger.fine("flags & O_CREAT = " + O_CREAT );
 		}
 
 		if(((flags & O_CREAT) != O_CREAT) && ((flags & O_WRONLY) == O_WRONLY)) {
-			edumips64.Main.logger.debug("No O_CREAT, but O_WRONLY. We must check if the file exists");
+			logger.fine("No O_CREAT, but O_WRONLY. We must check if the file exists");
 			File temp = new File(pathname);
 			if(!temp.exists())
 				throw new FileNotFoundException();
@@ -135,7 +138,7 @@ public class IOManager {
         // The user can't open with the O_CREAT flag a file that could be read.
         
         if(((flags & O_CREAT) == O_CREAT) && ((flags & O_RDONLY) == O_RDONLY)) {
-			edumips64.Main.logger.debug("Trying to open in read mode a file that might not exist.");
+			logger.fine("Trying to open in read mode a file that might not exist.");
 			File temp = new File(pathname);
 			if(!temp.exists())
                 throw new IOManagerException("OPENREADANDCREATE");
@@ -144,18 +147,18 @@ public class IOManager {
 
 		boolean append = false;
 		if((flags & O_APPEND) == O_APPEND) {
-			edumips64.Main.logger.debug("flags & O_APPEND = " + O_APPEND );
+			logger.fine("flags & O_APPEND = " + O_APPEND );
 			append = true;
 		}
 
 		if((flags & O_RDONLY) == O_RDONLY) {
-			edumips64.Main.logger.debug("flags & O_RDONLY = " + O_RDONLY );
+			logger.fine("flags & O_RDONLY = " + O_RDONLY );
 			Reader r = new FileReader(pathname);
 			ins.put(next_descriptor, r);
 		}
 
 		if((flags & O_WRONLY) == O_WRONLY) {
-			edumips64.Main.logger.debug("flags & O_WRONLY = " + O_WRONLY);
+			logger.fine("flags & O_WRONLY = " + O_WRONLY);
 			Writer w = new FileWriter(pathname, append);
 			outs.put(next_descriptor, w);
 		}
@@ -173,11 +176,11 @@ public class IOManager {
 		// Let's verify if we've got a valid file descriptor
 		if(fd <= 2 && fd == 0) {
 			// We can write only to descriptors 1 (stdout) and 2 (stderr)
-			edumips64.Main.logger.debug("Attempt to write to stdin");
+			logger.fine("Attempt to write to stdin");
 			throw new IOManagerException("WRITETOSTDIN");
 		}
 		else if (fd > 2 && !outs.containsKey(fd)) {
-			edumips64.Main.logger.debug("File descriptor " + fd + " not valid.");
+			logger.fine("File descriptor " + fd + " not valid.");
 			throw new IOManagerException("FILENOTOPENED");
 		}
 
@@ -190,7 +193,7 @@ public class IOManager {
 			for(int i = 0; i < count; ++i) {
 				if(i % 8 == 0) {
 					posInWord = 0;
-					edumips64.Main.logger.debug("write(): getting a new cell at address " + address);
+					logger.fine("write(): getting a new cell at address " + address);
 					memEl = Memory.getInstance().getCell((int)address);
 					address += 8;
 				}
@@ -211,7 +214,7 @@ public class IOManager {
 			w.write(new String(bytes_array));
 		}
 
-		edumips64.Main.logger.debug("Wrote " + buff.toString() + " to fd " + fd);
+		logger.fine("Wrote " + buff.toString() + " to fd " + fd);
 		return buff.length();
 	}
 
@@ -223,11 +226,11 @@ public class IOManager {
 	public int read(int fd, long address, int count) throws IOManagerException, java.io.FileNotFoundException, IOException {
 		StringBuffer buff = new StringBuffer();
 		if(fd <= 2 && fd > 0) {
-			edumips64.Main.logger.debug("Attempt to read from stdout/stderr");
+			logger.fine("Attempt to read from stdout/stderr");
 			throw new IOManagerException("READFROMSTDOUT");
 		}
 		else if(fd > 2 && !ins.containsKey(fd)) {
-			edumips64.Main.logger.debug("File descriptor " + fd + " not valid.");
+			logger.fine("File descriptor " + fd + " not valid.");
 			throw new IOManagerException("FILENOTOPENED");
 		}
 
@@ -248,7 +251,7 @@ public class IOManager {
 			buff.setLength(0);
 		}
 
-		edumips64.Main.logger.debug("Read the string " + read_str + " from fd " + fd);
+		logger.fine("Read the string " + read_str + " from fd " + fd);
 
 		MemoryElement memEl = null;
 		try {
@@ -256,7 +259,7 @@ public class IOManager {
 			for(int i = 0; i < read_str.length(); ++i) {
 				if(i % 8 == 0) {
 					posInWord = 0;
-					edumips64.Main.logger.debug("read(): getting a new cell at address " + address);
+					logger.fine("read(): getting a new cell at address " + address);
 					memEl = Memory.getInstance().getCell((int)address);
 					address += 8;
 				}
@@ -265,7 +268,7 @@ public class IOManager {
 				memEl.writeByte(rb, posInWord++);
 				buff.append((char)rb);
 			}
-			edumips64.Main.logger.debug("Wrote " + buff.toString() + " to memory");
+			logger.fine("Wrote " + buff.toString() + " to memory");
 			return buff.length();
 		}
 		catch(MemoryElementNotFoundException e) {

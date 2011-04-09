@@ -22,10 +22,11 @@
  */
 
 package edumips64.core;
+
 import java.util.*;
+import java.util.logging.Logger;
 import edumips64.core.is.*;
 import edumips64.utils.*;
-import edumips64.Main;
 
 /** This class models a MIPS CPU with 32 64-bit General Purpose Registers.
 *  @author Andrea Spadaccini, Simona Ullo, Antonella Scandura
@@ -34,6 +35,7 @@ public class CPU
 {
 	private Memory mem;
 	private Register[] gpr;
+    private static final Logger logger = Logger.getLogger(CPU.class.getName());
 
 	
     /** Program Counter*/
@@ -89,13 +91,13 @@ public class CPU
 		// To avoid future singleton problems
 		Instruction dummy = Instruction.buildInstruction("BUBBLE");
 
-		edumips64.Main.logger.debug("Creating the CPU...");
+		logger.fine("Creating the CPU...");
 		cycles = 0;
 		status = CPUStatus.READY;
 		mem = Memory.getInstance();
-		edumips64.Main.logger.debug("Got Memory instance..");
+		logger.fine("Got Memory instance..");
 		symTable = SymbolTable.getInstance();
-		edumips64.Main.logger.debug("Got SymbolTable instance..");
+		logger.fine("Got SymbolTable instance..");
 
 		// Registers initialization
 		gpr = new Register[32];
@@ -111,7 +113,7 @@ public class CPU
 		pipe = new HashMap<PipeStatus, Instruction>();
 		clearPipe();
 		currentPipeStatus = PipeStatus.IF;
-		edumips64.Main.logger.debug("CPU Created.");
+		logger.fine("CPU Created.");
 	}
 
 	
@@ -216,7 +218,7 @@ public class CPU
 			throw new StoppedCPUException();
 		try
 		{
-			Main.logger.debug("Starting cycle " + ++cycles);
+			logger.fine("Starting cycle " + ++cycles);
 			currentPipeStatus = PipeStatus.WB; 
 
 			// Let's execute the WB() method of the instruction located in the 
@@ -247,10 +249,10 @@ public class CPU
 			}
 			catch (SynchronousException e) {
 				if(masked)
-					edumips64.Main.logger.exception("[MASKED] " + e.getCode());
+					logger.fine("[EXCEPTION] [MASKED] " + e.getCode());
 				else {
 					if(terminate) {
-						edumips64.Main.logger.log("Terminating due to an unmasked exception");
+						logger.info("Terminating due to an unmasked exception");
 						throw new SynchronousException(e.getCode());
 					}
 					else
@@ -280,7 +282,7 @@ public class CPU
 					}
 					catch (BreakException exc) {
 						breaking = 1;
-						edumips64.Main.logger.debug("breaking = 1");
+						logger.fine("breaking = 1");
 					}
 				}
 				pipe.put(PipeStatus.ID, pipe.get(PipeStatus.IF));
@@ -294,7 +296,7 @@ public class CPU
 			}
 			if(breaking == 1) {
 				breaking = 0;
-				edumips64.Main.logger.debug("Re-thrown the exception");
+				logger.fine("Re-thrown the exception");
 				throw new BreakException();
 			}
 			if(syncex != null)
@@ -307,7 +309,7 @@ public class CPU
                         pipe.get(PipeStatus.IF).IF();
             }
             catch(BreakException bex) {
-				edumips64.Main.logger.debug("Caught a BREAK after a Jump: ignoring it.");
+				logger.fine("Caught a BREAK after a Jump: ignoring it.");
             }
 
 			// A J-Type instruction has just modified the Program Counter. We need to
@@ -331,20 +333,9 @@ public class CPU
 
 		}
 		catch(SynchronousException ex) {
-			edumips64.Main.logger.exception(ex.getCode());
+			logger.fine("Exception: " + ex.getCode());
 			throw ex;
 		}
-		/*
-		catch(IntegerOverflowException ex) {
-			edumips64.Main.logger.exception("Integer overflow");
-			pipe.put(PipeStatus.WB, null);
-			throw ex;
-		}
-		catch(DivisionByZeroException ex) {
-			edumips64.Main.logger.exception("Division by zero");
-			//pipe.put(PipeStatus.WB, null);
-			throw ex;
-		}*/
 		catch(HaltException ex)
 		{
 			pipe.put(PipeStatus.WB, null);
@@ -415,7 +406,7 @@ public class CPU
 		// Reset tracefile
 		Dinero.getInstance().reset();
 
-		edumips64.Main.logger.debug("CPU Resetted");
+		logger.fine("CPU Resetted");
     }
 
 	/** Test method that returns a string containing the status of the pipeline.

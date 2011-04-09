@@ -23,6 +23,7 @@ package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
 import java.util.*;
+import java.util.logging.Logger;
 import java.io.IOException;
 import javax.swing.JOptionPane;
 
@@ -31,6 +32,8 @@ import javax.swing.JOptionPane;
  * @author Andrea Spadaccini
  */
 public class SYSCALL extends Instruction {
+    private static final Logger logger = Logger.getLogger(SYSCALL.class.getName());
+
     String OPCODE_VALUE="000000";
 	String FINAL_VALUE = "001100";
 	private java.util.List<String> syscall_params = new java.util.LinkedList<String>();
@@ -42,7 +45,7 @@ public class SYSCALL extends Instruction {
 
     public void IF()
     {
-		edumips64.Main.logger.log("SYSCALL (" + this.hashCode() + ") -> IF");
+		logger.fine("SYSCALL (" + this.hashCode() + ") -> IF");
         try
         {
             CPU cpu=CPU.getInstance();
@@ -63,9 +66,9 @@ public class SYSCALL extends Instruction {
 
 	public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
 		syscall_n = params.get(0);
-		edumips64.Main.logger.log("SYSCALL (" + this.hashCode() + ") n = " + syscall_n);
+		logger.fine("SYSCALL (" + this.hashCode() + ") n = " + syscall_n);
 		if(syscall_n == 0) {
-			edumips64.Main.logger.debug("Stopping CPU due to SYSCALL (" + this.hashCode() + ")");
+			logger.fine("Stopping CPU due to SYSCALL (" + this.hashCode() + ")");
 			CPU.getInstance().setStatus(CPU.CPUStatus.STOPPING);
 		}
 		else if((syscall_n > 0) && (syscall_n <= 5)) {
@@ -78,20 +81,20 @@ public class SYSCALL extends Instruction {
 			// In WB, R1 <- Return value
 			r1.incrWriteSemaphore();
 			address = r14.getValue();
-			edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + "): locked register R14. Value = " + address);
+			logger.fine("SYSCALL (" + this.hashCode() + "): locked register R14. Value = " + address);
 		}
 		else {
 			// TODO: invalid syscall
-			edumips64.Main.logger.debug("INVALID SYSCALL (" + this.hashCode() + ")");
+			logger.fine("INVALID SYSCALL (" + this.hashCode() + ")");
 		}
 	}
 
     public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException,IrregularWriteOperationException {
-		edumips64.Main.logger.log("SYSCALL (" + this.hashCode() + ") -> EX");
+		logger.fine("SYSCALL (" + this.hashCode() + ") -> EX");
     }
 
     public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
-		edumips64.Main.logger.log("SYSCALL (" + this.hashCode() + ") -> MEM");
+		logger.fine("SYSCALL (" + this.hashCode() + ") -> MEM");
 		if(syscall_n == 1) {
 			// int open(const char* filename, int flags)
 			String filename = fetchString(address);
@@ -105,7 +108,7 @@ public class SYSCALL extends Instruction {
 			for(int i = (int)address; i <= flags_address; i += 8)
 				din.Load(Converter.binToHex(Converter.positiveIntToBin(64,i)),8);
 
-			edumips64.Main.logger.debug("We must open " + filename + " with flags " + flags);
+			logger.fine("We must open " + filename + " with flags " + flags);
 
 			return_value = -1;
 			try {
@@ -126,13 +129,13 @@ public class SYSCALL extends Instruction {
 			// int close(int fd)
 			MemoryElement fd_cell = Memory.getInstance().getCell((int)address);
 			int fd = (int)fd_cell.getValue();
-			edumips64.Main.logger.debug("Closing fd " + fd);
+			logger.fine("Closing fd " + fd);
 			return_value = -1;
 			try {
 				return_value = edumips64.Main.iom.close(fd);
 			}
 			catch(IOException e1) {
-				edumips64.Main.logger.debug("Error in closing " + fd);
+				logger.fine("Error in closing " + fd);
 			}
 		}
 		else if((syscall_n == 3) || (syscall_n == 4)) {
@@ -156,11 +159,11 @@ public class SYSCALL extends Instruction {
 			return_value = -1;
 			try {
 				if(syscall_n == 3) {
-					edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + "): trying to read from fd " + fd + " " + count + " bytes, writing them to address " + buf_addr);
+					logger.fine("SYSCALL (" + this.hashCode() + "): trying to read from fd " + fd + " " + count + " bytes, writing them to address " + buf_addr);
 					return_value = edumips64.Main.iom.read(fd, buf_addr, count);
 				}
 				else {
-					edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + "): trying to write to fd " + fd + " " + count + " bytes, reading them from address " + buf_addr);
+					logger.fine("SYSCALL (" + this.hashCode() + "): trying to write to fd " + fd + " " + count + " bytes, reading them from address " + buf_addr);
 					return_value = edumips64.Main.iom.write(fd, buf_addr, count);
 				}
 			}
@@ -179,7 +182,7 @@ public class SYSCALL extends Instruction {
             
             // In the address variable (content of R14) we have the address of
             // the format string, that we get and put in the format_string_address variable
-			edumips64.Main.logger.debug("Reading memory cell at address " + address + ", searching for the address of the format string");
+			logger.fine("Reading memory cell at address " + address + ", searching for the address of the format string");
 			MemoryElement tempMemCell = memory.getCell((int)address);
             int format_string_address = (int)tempMemCell.getValue();
 
@@ -188,7 +191,7 @@ public class SYSCALL extends Instruction {
             
             // Fetching the format string
 			String format_string = fetchString(format_string_address);
-			edumips64.Main.logger.debug("Read " + format_string);
+			logger.fine("Read " + format_string);
 
             // Going to the next memory cell to start fetching parameters.
             int next_param_address = (int)address + 8;
@@ -204,13 +207,13 @@ public class SYSCALL extends Instruction {
 			int oldIndex = 0, newIndex = 0;
 			while((newIndex = format_string.indexOf('%', oldIndex)) >= 0) {
 				char type = format_string.charAt(newIndex + 1);
-				edumips64.Main.logger.debug("Found a placeholder... type " + type);
+				logger.fine("Found a placeholder... type " + type);
 				temp.append(format_string.substring(oldIndex, newIndex));
 				switch(type) {
 					case 's':		// %s
                         tempMemCell = memory.getCell(next_param_address);
                         int str_address = (int)tempMemCell.getValue();
-						edumips64.Main.logger.debug("Retrieving the string @ " + str_address + "...");
+						logger.fine("Retrieving the string @ " + str_address + "...");
 						String param = fetchString(str_address);
 
                         next_param_address += 8;
@@ -226,12 +229,12 @@ public class SYSCALL extends Instruction {
 						for(int i = str_address; i < t2; i += 8)
 							din.Load(Converter.binToHex(Converter.positiveIntToBin(64,i)),8);
 
-						edumips64.Main.logger.debug("Got " + param);
+						logger.fine("Got " + param);
 						temp.append(param);
 						break;
 					case 'i':		// %i
 					case 'd':		// %d
-						edumips64.Main.logger.debug("Retrieving the integer @ " + next_param_address + "...");
+						logger.fine("Retrieving the integer @ " + next_param_address + "...");
 						MemoryElement memCell = memory.getCell((int)next_param_address);
 						
 						// Tracefile entry for this memory access
@@ -240,20 +243,20 @@ public class SYSCALL extends Instruction {
 						Long val = memCell.getValue();
 						next_param_address += 8;
 						temp.append(val.toString());
-						edumips64.Main.logger.debug("Got " + val);
+						logger.fine("Got " + val);
 						break;
 					case '%':		// %%
-						edumips64.Main.logger.debug("Literal %...");
+						logger.fine("Literal %...");
 						temp.append('%');
 						break;
 					default:
-						edumips64.Main.logger.debug("Unknown placeholder");
+						logger.fine("Unknown placeholder");
 						break;
 				}
 				oldIndex = newIndex + 2;
 			}
 			temp.append(format_string.substring(oldIndex));
-			edumips64.Main.logger.debug("That became " + temp.toString());
+			logger.fine("That became " + temp.toString());
 			edumips64.Main.ioFrame.write(temp.toString());
 			return_value = temp.length();
 		}
@@ -281,22 +284,22 @@ public class SYSCALL extends Instruction {
     
     public void WB() throws IrregularStringOfBitsException, HaltException
     {
-		edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + ") -> WB. n = " + syscall_n);
+		logger.fine("SYSCALL (" + this.hashCode() + ") -> WB. n = " + syscall_n);
 		if(syscall_n == 0) {
-			edumips64.Main.logger.debug("Stopped CPU due to SYSCALL (" + this.hashCode() + ")");
+			logger.fine("Stopped CPU due to SYSCALL (" + this.hashCode() + ")");
 			CPU.getInstance().setStatus(CPU.CPUStatus.HALTED);
 			throw new HaltException();
 		}
 		else if(syscall_n > 0 && syscall_n <= 5) {
-			edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + "): setting R1 to " + return_value);
+			logger.fine("SYSCALL (" + this.hashCode() + "): setting R1 to " + return_value);
 			Register r1 = CPU.getInstance().getRegister(1);
-			edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + "): got R1");
+			logger.fine("SYSCALL (" + this.hashCode() + "): got R1");
 			r1.setBits(Converter.intToBin(64, return_value), 0);
-			edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + "): set R1 to " + return_value);
+			logger.fine("SYSCALL (" + this.hashCode() + "): set R1 to " + return_value);
 			r1.decrWriteSemaphore();
-			edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + "): decremented write semaphore");
+			logger.fine("SYSCALL (" + this.hashCode() + "): decremented write semaphore");
 		}
-		edumips64.Main.logger.debug("SYSCALL (" + this.hashCode() + ") exiting from WB. n = " + syscall_n);
+		logger.fine("SYSCALL (" + this.hashCode() + ") exiting from WB. n = " + syscall_n);
     }
     
     public void pack() throws IrregularStringOfBitsException {

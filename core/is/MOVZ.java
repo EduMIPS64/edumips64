@@ -66,7 +66,6 @@ class MOVZ extends ALU_RType
         }
         */
         if(TR[RT_FIELD].getValue() == 0) {
-            edumips64.Main.logger.debug("Executing MOVZ, rt == 0 => rd <- rs");
             TR[RD_FIELD].setBits(TR[RS_FIELD].getBinString(), 0);
         }
         if(enableForwarding)

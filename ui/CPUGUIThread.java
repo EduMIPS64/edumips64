@@ -30,7 +30,7 @@ import edumips64.core.is.*;
 import edumips64.ui.*;
 import edumips64.utils.*;
 
-
+import java.util.logging.Logger;
 import javax.swing.*;
 
 /** This class handles the multi-threaded CPU object, and acts as a proxy between
@@ -59,6 +59,8 @@ public class CPUGUIThread extends Thread{
 	private CPU cpu;
 	private GUIFrontend front;
 	private JFrame f;
+
+    private static final Logger logger = Logger.getLogger(CPUGUIThread.class.getName());
 	
 	public CPUGUIThread(){
 		externalStop = false;
@@ -76,7 +78,7 @@ public class CPUGUIThread extends Thread{
 		verbose = (Boolean)Config.get("verbose");
 		masked = (Boolean)Config.get("syncexc-masked");
 		terminate = (Boolean)Config.get("syncexc-terminate");
-		edumips64.Main.logger.debug("Terminate = " + terminate + "; masked = " + masked);
+		logger.fine("Terminate = " + terminate + "; masked = " + masked);
 	}
 	
 	/** Allows external classes to stop the execution. */
@@ -106,10 +108,10 @@ public class CPUGUIThread extends Thread{
 		try {
 			while(true){
 				synchronized(this) {
-                    edumips64.Main.logger.debug("cgt is waiting");
+                    logger.fine("cgt is waiting");
 					wait();
 				}
-                edumips64.Main.logger.debug("cgt awoke");
+                logger.fine("cgt awoke");
 
 				// Let's disable the running menu items and enable the stop menu
 				// item
@@ -122,7 +124,7 @@ public class CPUGUIThread extends Thread{
 				if(nStep < 0){
 					while(true){
 						if(verbose && (sleep_interval != 0)) {
-							// Main.logger.debug("Waiting for " + sleep_interval + " milliseconds...");
+							// logger.fine("Waiting for " + sleep_interval + " milliseconds...");
 							sleep(sleep_interval);
 						}
 						synchronized(this) {
@@ -139,7 +141,7 @@ public class CPUGUIThread extends Thread{
 							}
 						}
                         catch(StoppedCPUException ex) {
-							edumips64.Main.logger.debug("CPUGUIThread: CPU was stopped");
+							logger.fine("CPUGUIThread: CPU was stopped");
 							front.updateComponents();
 							if(verbose) {
 								front.represent();
@@ -163,7 +165,7 @@ public class CPUGUIThread extends Thread{
 						}
 						catch(HaltException ex) {
 							haltCPU();
-							edumips64.Main.logger.debug("CPUGUIThread: CPU Halted");
+							logger.fine("CPUGUIThread: CPU Halted");
 							front.updateComponents();
 							if(verbose) {
 								front.represent();
@@ -171,13 +173,13 @@ public class CPUGUIThread extends Thread{
 							break;
 						}
                         catch(MemoryElementNotFoundException ex) {
-                            Main.logger.debug("Attempt to read a non-existent cell");
+                            logger.fine("Attempt to read a non-existent cell");
 							haltCPU();
 				            JOptionPane.showMessageDialog(edumips64.Main.ioFrame, CurrentLocale.getString("ERROR_LABEL"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
                             break;
                         }
 						catch(Exception ex) {
-                            Main.logger.debug("Exception in CPUGUIThread");
+                            logger.fine("Exception in CPUGUIThread");
 							haltCPU();
 							new ReportDialog(f,ex,CurrentLocale.getString("GUI_STEP_ERROR"));
 							break;
@@ -187,13 +189,13 @@ public class CPUGUIThread extends Thread{
 				else{
 					for(int i=0 ; i<nStep; i++){
 						if(verbose && (sleep_interval != 0) && nStep > 1) {
-							// Main.logger.debug("Waiting for " + sleep_interval + " milliseconds...");
+							// logger.fine("Waiting for " + sleep_interval + " milliseconds...");
 							sleep(sleep_interval);
 						}
 						synchronized(this) {
 							if(externalStop == true) {
 								externalStop = false;
-								edumips64.Main.logger.debug("Stopping the CPU.");
+								logger.fine("Stopping the CPU.");
 								break;
 							}
 						}
@@ -205,7 +207,7 @@ public class CPUGUIThread extends Thread{
 							}
 						}
                         catch(StoppedCPUException ex) {
-							edumips64.Main.logger.debug("CPUGUIThread: CPU was stopped");
+							logger.fine("CPUGUIThread: CPU was stopped");
 							front.updateComponents();
 							if(verbose) {
 								front.represent();
@@ -213,7 +215,7 @@ public class CPUGUIThread extends Thread{
                             break;
                         }
 						catch(BreakException ex) {
-							edumips64.Main.logger.debug("Caught a BreakException.");
+							logger.fine("Caught a BreakException.");
 							front.updateComponents();
 							if(verbose) {
 								front.represent();
@@ -230,7 +232,7 @@ public class CPUGUIThread extends Thread{
 						}
 						catch(HaltException ex) {
 							haltCPU();
-							edumips64.Main.logger.debug("CPUGUIThread: CPU Halted");
+							logger.fine("CPUGUIThread: CPU Halted");
 							front.updateComponents();
 							if(verbose) {
 								front.represent();
@@ -238,7 +240,7 @@ public class CPUGUIThread extends Thread{
 							break;
 						}
                         catch(MemoryElementNotFoundException ex) {
-                            Main.logger.debug("Attempt to read a non-existent cell");
+                            logger.fine("Attempt to read a non-existent cell");
 							haltCPU();
 				            JOptionPane.showMessageDialog(edumips64.Main.ioFrame, CurrentLocale.getString("ERROR_LABEL"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
                             break;

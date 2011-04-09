@@ -22,10 +22,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
  
- package edumips64.core;
- import java.util.*;
- import edumips64.core.is.*;
- import edumips64.utils.*;
+package edumips64.core;
+
+import java.util.*;
+import java.util.logging.Logger;
+
+import edumips64.core.is.*;
+import edumips64.utils.*;
 import edumips64.core.MemoryElementNotFoundException;
  
  /** This class acts as a proxy to retrieve memory cells and instruction from
@@ -34,6 +37,7 @@ import edumips64.core.MemoryElementNotFoundException;
  */
  public class SymbolTable
  {
+    private static final Logger logger = Logger.getLogger(SymbolTable.class.getName());
     private static SymbolTable symTable = null;
 	private Map<String, Integer> mem_labels;
     private Map<String, Integer> instr_labels;
@@ -56,19 +60,19 @@ import edumips64.core.MemoryElementNotFoundException;
 			MemoryElement temp = mem.getCell(address);
 			// TODO: attualmente la cella  si prende l'ultima etichetta
 			temp.setLabel(label);
-			edumips64.Main.logger.debug("Added label " + label + " to address " + address);
+			logger.fine("Added label " + label + " to address " + address);
 		}
 	}
 
 	public Instruction getInstruction(String label) {
-		edumips64.Main.logger.debug("Request for instruction labelled " + label);
+		logger.fine("Request for instruction labelled " + label);
 		int address = instr_labels.get(label);
-		edumips64.Main.logger.debug("Label found at address " + address);
+		logger.fine("Label found at address " + address);
 		return mem.getInstruction(address);
 	}
 
 	public MemoryElement getCell(String label) throws MemoryElementNotFoundException {
-		edumips64.Main.logger.debug("Request for memory element labelled " + label);
+		logger.fine("Request for memory element labelled " + label);
 		if(label == null)
 			throw new MemoryElementNotFoundException();
 		label = label.toLowerCase();
@@ -76,7 +80,7 @@ import edumips64.core.MemoryElementNotFoundException;
 			throw new MemoryElementNotFoundException();
 
 		int address = mem_labels.get(label);
-		edumips64.Main.logger.debug("Label found at address " + address);
+		logger.fine("Label found at address " + address);
 		return mem.getCell(address);
 	}
     

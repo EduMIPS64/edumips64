@@ -22,21 +22,27 @@
  */
 package edumips64;
 
+import edumips64.ui.*;
 import edumips64.img.*;
+import edumips64.utils.*;
 import edumips64.core.*;
 import edumips64.core.is.*;
-import edumips64.utils.*;
-import edumips64.ui.*;
-import java.net.*;
-import java.util.*;
-import javax.swing.*;
-import java.io.File;
-import javax.swing.event.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.event.KeyEvent.*;
-import javax.swing.KeyStroke.*;
+import java.net.*;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.logging.Handler;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.SimpleFormatter;
+import java.io.File;
 import java.io.IOException;
+
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.KeyStroke.*;
 import javax.imageio.ImageIO;
 
 /** Entry point of EduMIPS64
@@ -69,9 +75,11 @@ public class Main extends JApplet {
     private static JFrame frameColorCh;
     private static String[] pipe = {"IF", "ID", "EX", "MEM", "WB"};
 
-    public static GUILog logger;
+    public static GUILog loggerFrame;
     public static GUIIO ioFrame;
     public static IOManager iom;
+
+    public final static Logger log = Logger.getLogger(Main.class.getName());
 
     private static JInternalFrame pipeFrame, registersFrame, memoryFrame, codeFrame, cyclesFrame, statsFrame;
     private static Map<String, JInternalFrame> mapped_frames;
@@ -141,7 +149,7 @@ public class Main extends JApplet {
         mm.init();
         f.setVisible(true);
         mm.start();
-        logger.debug("Simulator started");
+        log.fine("Simulator started");
 
         if(toOpen != null) {
             resetSimulator(false);
@@ -167,9 +175,22 @@ public class Main extends JApplet {
         JDialog.setDefaultLookAndFeelDecorated(true);
         iom = new IOManager();
 
+        // Clear up the default handlers of the edumips64 logger, parent of
+        // all the loggers used by EduMIPS64
+        Logger eduLogger = Logger.getLogger("edumips64");
+        for(Handler h : eduLogger.getHandlers()) {
+            eduLogger.removeHandler(h);
+        }
+
+        eduLogger.setLevel(java.util.logging.Level.FINE);
         // The logger is create before everything else because some classes call
         // it before it's displayed.
-        logger = new GUILog(CurrentLocale.getString("LOGGER"), true, false, true, true);
+        // Configure the root Logger, so that children loggers' behaviour is
+        // defined by us.
+        loggerFrame = new GUILog(CurrentLocale.getString("LOGGER"), true, false, true, true);
+        Handler guiHandler = new GUILoggingHandler(loggerFrame);
+        eduLogger.addHandler(guiHandler);
+        log.info("Ciao 'mbare");
         desk = new JDesktopPane();
         Container cp = (f==null)? getContentPane() : f.getContentPane();
         cp.setLayout(new BorderLayout());
@@ -244,7 +265,7 @@ public class Main extends JApplet {
         });
 
         if(debug_mode) {
-            logger.addInternalFrameListener(new InternalFrameAdapter() {
+            loggerFrame.addInternalFrameListener(new InternalFrameAdapter() {
                 public void internalFrameIconified(InternalFrameEvent e) {
                     loggerJCB.setState(false);
                 }
@@ -284,7 +305,7 @@ public class Main extends JApplet {
         addFrame("memory", memoryFrame);
         addFrame("code", codeFrame);
         if(debug_mode)
-            addFrame("logger", logger);
+            addFrame("logger", loggerFrame);
         addFrame("io", ioFrame);
 
         // Setting icons for the main frame and for the internal frames
@@ -368,22 +389,22 @@ public class Main extends JApplet {
      * */
     public static void changeShownMenuItems(CPU.CPUStatus s) {
         if(s == CPU.CPUStatus.READY) {
-            logger.debug("CPU Ready");
+            log.fine("CPU Ready");
             setCacheMenuItemsStatus(false);
             setRunningMenuItemsStatus(false);
         }
         else if (s == CPU.CPUStatus.RUNNING) {
-            logger.debug("CPU Running");
+            log.fine("CPU Running");
             setCacheMenuItemsStatus(false);
             setRunningMenuItemsStatus(true);
         }
         else if(s == CPU.CPUStatus.STOPPING) {
-            logger.debug("CPU Stopping");
+            log.fine("CPU Stopping");
             setCacheMenuItemsStatus(false);
             setRunningMenuItemsStatus(true);
         }
         else if (s == CPU.CPUStatus.HALTED) {
-            logger.debug("CPU Halted");
+            log.fine("CPU Halted");
             setCacheMenuItemsStatus(true);
             setRunningMenuItemsStatus(false);
         }
@@ -391,7 +412,7 @@ public class Main extends JApplet {
 
     /** Opens a file. */
     private static void openFile(String file) {
-        logger.debug("Trying to open " + file);
+        log.fine("Trying to open " + file);
         cpu.reset();
 
         try {
@@ -404,7 +425,7 @@ public class Main extends JApplet {
         }
 
         try {
-            logger.debug("Before parsing");
+            log.fine("Before parsing");
             try {
                 parser.parse(file);
             }
@@ -412,14 +433,14 @@ public class Main extends JApplet {
                 new ErrorDialog(f,pmwe.getExceptionList(),CurrentLocale.getString("GUI_PARSER_ERROR"));
             }
             catch (NullPointerException e) {
-                logger.debug("NullPointerException: " + e.toString());
+                log.fine("NullPointerException: " + e.toString());
                 e.printStackTrace();
             }
-            logger.debug("After parsing");
+            log.fine("After parsing");
 
             // The file has correctly been parsed
             cpu.setStatus(CPU.CPUStatus.RUNNING);
-            logger.debug("Set the status to RUNNING");
+            log.fine("Set the status to RUNNING");
 
             // Let's fetch the first instruction
             synchronized(cgt) {
@@ -427,7 +448,7 @@ public class Main extends JApplet {
                 cgt.notify();
             }    
             openedFile = file;
-            logger.debug("File " + file + " successfully opened");
+            log.fine("File " + file + " successfully opened");
 			StringTokenizer token = new StringTokenizer(file,File.separator,false);
 			String nome_file=null;
 			while (token.hasMoreElements()){
@@ -436,7 +457,7 @@ public class Main extends JApplet {
 			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
         }
         catch (ParserMultiException ex) {
-            logger.debug("Error opening " + file);
+            log.fine("Error opening " + file);
             new ErrorDialog(f,ex.getExceptionList(),CurrentLocale.getString("GUI_PARSER_ERROR")); 
             openedFile = null;
             f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
@@ -450,12 +471,12 @@ public class Main extends JApplet {
 				tmpfile=ex.getMessage();
 
 			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));		
-			logger.debug("File not found: " + tmpfile);
+			log.fine("File not found: " + tmpfile);
             JOptionPane.showMessageDialog(f, CurrentLocale.getString("FILE_NOT_FOUND") + ": " + tmpfile, "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
         }
         catch (Exception e) {
 			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));				
-            logger.debug("Error opening " + file);
+            log.fine("Error opening " + file);
             new ReportDialog(f,e,CurrentLocale.getString("ERROR"));
         }
     }
@@ -529,7 +550,7 @@ public class Main extends JApplet {
             iom.reset();
         }
         catch(IOException e1) {
-            logger.debug("I/O error while resetting IOManager");
+            log.fine("I/O error while resetting IOManager");
         }
         cpu.setStatus(CPU.CPUStatus.READY);
         front.updateComponents();
@@ -683,11 +704,11 @@ public class Main extends JApplet {
                     Dinero din = Dinero.getInstance();
                     try {
                         din.WriteXdinFile(filename);
-                        logger.debug("Wrote dinero tracefile");
+                        log.fine("Wrote dinero tracefile");
                     }
                     catch (Exception ex) {
                         ex.printStackTrace();
-                        logger.debug("Exception in DineroTracefile: " + ex);
+                        log.fine("Exception in DineroTracefile: " + ex);
                     }
                 }
             }
