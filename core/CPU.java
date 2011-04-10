@@ -132,7 +132,7 @@ public class CPU
 		return status;
 	}
 
-    private  void clearPipe()
+    private void clearPipe()
     {
         pipe.put(PipeStatus.IF, null);
         pipe.put(PipeStatus.ID, null);

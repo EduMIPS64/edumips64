@@ -1,5 +1,6 @@
 <project name="edumips64" default="jar" basedir=".">
 	<target name="init">
+        <!-- Set build file properties -->
 		<property name="sourceDir" value="." />
         <property name="helpClassesDir" value="./javahelp_classes" />
 		<property name="version" value="0.5.3" />
@@ -7,29 +8,44 @@
 		<property name="jarFile" value="edumips64-${version}.jar" />
 		<property name="tarbz2File" value="edumips64-${version}.tar.bz2" />
 		<property name="svnJarFile" value="edumips64-svn.jar" />
-	</target>
 
-	<target name="docs" depends="init">
-		<mkdir dir="${outputDir}/docs" />
-		<javadoc destdir="${outputDir}/docs" 
-				 author="true"
-				 version="true"
-				 use="true"
-				 sourcepath="."
-				 classpath="${sourceDir}/.."
-				 packagenames="edumips64.*"/>
-	</target>
-
-	<target name="clean">
-		<delete file="${jarFile}" />
-	</target>
-	<target name="svnjar" depends="init">
+        <!-- Create directories for the compilation process. -->
 		<mkdir dir="${outputDir}" />
-        <javac target="5" srcdir="${sourceDir}" classpath="${helpClassesDir}" destdir="${outputDir}" nowarn="yes" debug="on" debuglevel="lines,vars,source"/>
 		<mkdir dir="${outputDir}/edumips64/img" />
 		<mkdir dir="${outputDir}/edumips64/data" />
 		<mkdir dir="${outputDir}/edumips64/utils" />
 		<mkdir dir="${outputDir}/edumips64/help" />
+	</target>
+
+    <!-- *** clean *** target that cleans the built files and the build directory-->
+	<target name="clean">
+		<delete file="${jarFile}" />
+		<delete file="${svnJarFile}" />
+        <delete dir="${outputDir}" /> 
+	</target>
+
+    <!-- *** javadoc *** build the javadoc -->
+	<target name="javadoc" depends="init">
+		<mkdir dir="${outputDir}/docs" />
+        <javadoc 
+            destdir="${outputDir}/docs" 
+		    author="true"
+		    version="true"
+		    use="true"
+		    sourcepath="."
+		    classpath="${sourceDir}/.."
+		    packagenames="edumips64.*"/>
+	</target>
+
+	<target name="svnjar" depends="init">
+        <javac 
+            target="5" 
+            srcdir="${sourceDir}" 
+            classpath="${helpClassesDir}" 
+            destdir="${outputDir}" 
+            nowarn="yes" 
+            debug="on" 
+            debuglevel="lines,vars,source"/>
 
 		<copy todir="${outputDir}/edumips64/img">
 			<fileset dir="img">
@@ -49,32 +65,22 @@
 		<jar destfile="${svnJarFile}" basedir="edumips">
 			<manifest>
 				<attribute name="Main-Class" value="edumips64.Main"/>
+                <attribute name="SplashScreen-Image" value="edumips64/img/splash.png"/>
 			</manifest>
 		</jar>
 		<signjar jar="${svnJarFile}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
         <delete dir="${outputDir}" /> 
 	</target>
 
-    <target name="release" depends="init">
-        <mkdir dir="edumips64" />
-		<copy todir="edumips64/">
-			<fileset dir=".">
-				<include name="**/*" />
-			</fileset>
-		</copy>
-
-        <tar destfile="${tarbz2File}" basedir="." includes="edumips64/" compression="bzip2" />
-        <delete dir="edumips64" /> 
-    </target> 
-
 
 	<target name="jar" depends="init">
-		<mkdir dir="${outputDir}" />
-        <javac target="5" srcdir="${sourceDir}" classpath="${helpClassesDir}" destdir="${outputDir}" nowarn="yes"/>
-		<mkdir dir="${outputDir}/edumips64/img" />
-		<mkdir dir="${outputDir}/edumips64/data" />
-		<mkdir dir="${outputDir}/edumips64/utils" />
-		<mkdir dir="${outputDir}/edumips64/help" />
+        <javac 
+            target="5" 
+            srcdir="${sourceDir}" 
+            classpath="${helpClassesDir}" 
+            destdir="${outputDir}" 
+            nowarn="yes"/>
+
 		<copy todir="${outputDir}/edumips64/img">
 			<fileset dir="img">
 				<include name="**/*.png" />
@@ -99,4 +105,16 @@
 		<signjar jar="${jarFile}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
         <delete dir="${outputDir}" /> 
 	</target>
+
+    <target name="release" depends="init">
+        <mkdir dir="edumips64" />
+		<copy todir="edumips64/">
+			<fileset dir=".">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+
+        <tar destfile="${tarbz2File}" basedir="." includes="edumips64/" compression="bzip2" />
+        <delete dir="edumips64" /> 
+    </target> 
 </project>
