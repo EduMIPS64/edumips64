@@ -9,7 +9,6 @@
 ; Returns in r1 the length of the string.
 
                 .data
-str_address:    .space 8
 save_r2:        .space 8
 save_r3:        .space 8
 
