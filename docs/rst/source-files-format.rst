@@ -36,7 +36,7 @@ The `.data` section
 The *data* section contains commands that specify how the memory must be
 filled before program execution starts. The general form of a `.data` command
 is::
-    [label:] .datatype value1 [, value2 [, ...]]
+  [label:] .datatype value1 [, value2 [, ...]]
 
 EduMIPS64 supports different data types, that are described in the following
 table.
@@ -116,8 +116,7 @@ The `.code` section
 The *code* section contains commands that specify how the memory must be
 filled when the program will start. The general form of a `.code` command
 is::
-
-    [label:] instruction [param1 [, param2 [, param3]]]
+  [label:] instruction [param1 [, param2 [, param3]]]
 
 The *code* section can be specified with the `.text` alias.
 
@@ -196,3 +195,4 @@ effect of putting in place of the command row the content of the file
 It is useful if you want to include external routines, and it comes with a
 loop-detection algorithm that will warn you if you try to do something like
 "`\#include A.s`" in file `B.s` and "`\#include B.s`" in file `A.s`.
+
