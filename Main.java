@@ -135,6 +135,7 @@ public class Main extends JApplet {
                 Config.saveConfigFile();
             }
         });
+        // Maximizing the application
         Insets screenInsets = f.getToolkit().getScreenInsets(f.getGraphicsConfiguration());            
         Rectangle screenSize = f.getGraphicsConfiguration().getBounds();
         Rectangle maxBounds = new Rectangle(screenInsets.left + screenSize.x, 
@@ -155,6 +156,8 @@ public class Main extends JApplet {
             resetSimulator(false);
             openFile(toOpen);
         }
+
+        f.setExtendedState(f.getExtendedState() | JFrame.MAXIMIZED_BOTH);
     }
 
     private static void addFrame(String name, JInternalFrame f) {
