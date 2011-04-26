@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    introduction
+   source-files-format
 
 .. Indices and tables
    ==================
