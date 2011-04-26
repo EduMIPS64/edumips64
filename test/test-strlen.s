@@ -1,4 +1,5 @@
 ; test-strlen.s - tests for the strlen routine
+; (c) 2011 Andrea Spadaccini, licensed under the GNU GPL v2 or later
                 .data
 ; Parameter for strlen
 strlen_params:  .space 8
