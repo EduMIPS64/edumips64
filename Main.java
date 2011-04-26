@@ -173,23 +173,22 @@ public class Main extends JApplet {
     public void init() {
         JFrame.setDefaultLookAndFeelDecorated(true);
         JDialog.setDefaultLookAndFeelDecorated(true);
-        iom = new IOManager();
+        iom = IOManager.getInstance();
 
-        // Clear up the default handlers of the edumips64 logger, parent of
-        // all the loggers used by EduMIPS64
-        Logger eduLogger = Logger.getLogger("edumips64");
-        for(Handler h : eduLogger.getHandlers()) {
-            eduLogger.removeHandler(h);
+        // Clear up the default handlers of the root logger
+        Logger rootLogger = Logger.getLogger("");
+        for(Handler h : rootLogger.getHandlers()) {
+            rootLogger.removeHandler(h);
         }
 
-        eduLogger.setLevel(java.util.logging.Level.FINE);
+        rootLogger.setLevel(java.util.logging.Level.FINE);
         // The logger is create before everything else because some classes call
         // it before it's displayed.
         // Configure the root Logger, so that children loggers' behaviour is
         // defined by us.
         loggerFrame = new GUILog(CurrentLocale.getString("LOGGER"), true, false, true, true);
         Handler guiHandler = new GUILoggingHandler(loggerFrame);
-        eduLogger.addHandler(guiHandler);
+        rootLogger.addHandler(guiHandler);
         log.info("Ciao 'mbare");
         desk = new JDesktopPane();
         Container cp = (f==null)? getContentPane() : f.getContentPane();

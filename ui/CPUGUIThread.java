@@ -266,5 +266,3 @@ public class CPUGUIThread extends Thread{
 		}
 	}
 }
-
-

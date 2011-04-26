@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  *  stderr.
  *  @author Andrea Spadaccini */
 public class IOManager {
-	// Modes
+	// * File modes
 	// Five bits are used for the mode. The first two are used to understand if
 	// the file has to be opened read-only, write-only or read-write.
 	// The third bit is used to know if the file should be created if it
@@ -69,6 +69,9 @@ public class IOManager {
 
     private static final Logger logger = Logger.getLogger(IOManager.class.getName());
 
+    // Singleton
+    private static IOManager instance;
+
 	/** Closes all the open files */
 	public void reset() throws IOException {
 		logger.fine("IOManager: resetting... next_fd = " + next_descriptor);
@@ -77,7 +80,14 @@ public class IOManager {
 		logger.fine("IOManager: resetted. next_fd = " + next_descriptor);
 	}
 
-	public IOManager() {
+    public static IOManager getInstance() {
+        if(instance == null) {
+            instance = new IOManager();
+        }
+        return instance;
+    }
+
+	private IOManager() {
 		ins = new HashMap<Integer, Reader>();
 		outs = new HashMap<Integer, Writer>();
 

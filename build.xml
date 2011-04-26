@@ -1,13 +1,25 @@
-<project name="edumips64" default="jar" basedir=".">
+<!-- build.xml
+
+     ant build file for EduMIPS64.
+     (c) 2006-2011 Andrea Spadaccini and the EduMIPS64 dev team.
+
+     Useful targets:
+     - svnjar         builds the GUI version (edumips64-svn.jar) with debug symbols
+     - jar            builds the GUI version (edumips64-VERSION.jar) without debug symbols
+     - clijar         builds the CLI version
+     - clean          removes the jar file and the build dir
+-->
+<project name="edumips64" default="svnjar" basedir=".">
 	<target name="init">
         <!-- Set build file properties -->
 		<property name="sourceDir" value="." />
         <property name="helpClassesDir" value="./javahelp_classes" />
 		<property name="version" value="0.5.3" />
 		<property name="outputDir" value="edumips" />
-		<property name="jarFile" value="edumips64-${version}.jar" />
 		<property name="tarbz2File" value="edumips64-${version}.tar.bz2" />
-		<property name="svnJarFile" value="edumips64-svn.jar" />
+		<property name="svn_jar_filename" value="edumips64-svn.jar" />
+		<property name="release_jar_filename" value="edumips64-${version}.jar" />
+		<property name="cli_jar_filename" value="edumips64-${version}-cli.jar" />
 
         <!-- Create directories for the compilation process. -->
 		<mkdir dir="${outputDir}" />
@@ -19,8 +31,8 @@
 
     <!-- *** clean *** target that cleans the built files and the build directory-->
 	<target name="clean">
-		<delete file="${jarFile}" />
-		<delete file="${svnJarFile}" />
+		<delete file="${release_jar_filename}" />
+		<delete file="${svn_jar_filename}" />
         <delete dir="${outputDir}" /> 
 	</target>
 
@@ -37,6 +49,8 @@
 		    packagenames="edumips64.*"/>
 	</target>
 
+    <!-- *** svnjar *** compile with debug information and set the jar
+         filename to edumips64-svn.jar -->
 	<target name="svnjar" depends="init">
         <javac 
             target="5" 
@@ -46,33 +60,13 @@
             nowarn="yes" 
             debug="on" 
             debuglevel="lines,vars,source"/>
+        <property name="app_type" value="GUI" />
+        <property name="jar_filename" value="${svn_jar_filename}" />
+        <antcall target="makeGUIJar" />
+    </target>
 
-		<copy todir="${outputDir}/edumips64/img">
-			<fileset dir="img">
-				<include name="**/*.png" />
-			</fileset>
-		</copy>
-		<copy todir="${outputDir}/edumips64/data">
-			<fileset dir="data">
-				<include name="**/*.txt" />
-			</fileset>
-		</copy>
-		<copy todir="${outputDir}/edumips64/utils">
-			<fileset dir="utils">
-				<include name="**/*.properties" />
-			</fileset>
-		</copy>
-		<jar destfile="${svnJarFile}" basedir="edumips">
-			<manifest>
-				<attribute name="Main-Class" value="edumips64.Main"/>
-                <attribute name="SplashScreen-Image" value="edumips64/img/splash.png"/>
-			</manifest>
-		</jar>
-		<signjar jar="${svnJarFile}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
-        <delete dir="${outputDir}" /> 
-	</target>
-
-
+    <!-- *** jar *** compile without debug information and set the jar
+         filename to edumips64-VERSION.jar -->
 	<target name="jar" depends="init">
         <javac 
             target="5" 
@@ -81,6 +75,30 @@
             destdir="${outputDir}" 
             nowarn="yes"/>
 
+        <property name="app_type" value="GUI" />
+        <property name="jar_filename" value="${release_jar_filename}" />
+        <antcall target="makeGUIJar" />
+	</target>
+
+    <!-- *** clijar *** compile with debug information, set the CLI Main and set the jar
+         filename to edumips64-VERSION.jar -->
+	<target name="clijar" depends="init">
+        <javac 
+            target="5" 
+            srcdir="${sourceDir}" 
+            classpath="${helpClassesDir}" 
+            destdir="${outputDir}" 
+            nowarn="yes" 
+            debug="on" 
+            debuglevel="lines,vars,source"/>
+
+        <property name="app_type" value="CLI" />
+        <property name="jar_filename" value="${release_jar_filename}" />
+        <antcall target="makeCLIJar" />
+	</target>
+
+    <!-- TODO: remove duplicated code between makeCLIJar and makeGUIjar -->
+    <target name="makeCLIJar">
 		<copy todir="${outputDir}/edumips64/img">
 			<fileset dir="img">
 				<include name="**/*.png" />
@@ -96,17 +114,42 @@
 				<include name="**/*.properties" />
 			</fileset>
 		</copy>
-		<jar destfile="${jarFile}" basedir="edumips">
-			<manifest>
-				<attribute name="Main-Class" value="edumips64.Main"/>
-                <attribute name="SplashScreen-Image" value="edumips64/img/splash.png"/>
-			</manifest>
-		</jar>
-		<signjar jar="${jarFile}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
+        <jar destfile="${cli_jar_filename}" basedir="${outputDir}">
+            <manifest>
+                <attribute name="Main-Class" value="edumips64.MainCLI"/>
+            </manifest>
+        </jar>
+		<signjar jar="${cli_jar_filename}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
         <delete dir="${outputDir}" /> 
 	</target>
 
-    <target name="release" depends="init">
+    <target name="makeGUIJar">
+		<copy todir="${outputDir}/edumips64/img">
+			<fileset dir="img">
+				<include name="**/*.png" />
+			</fileset>
+		</copy>
+		<copy todir="${outputDir}/edumips64/data">
+			<fileset dir="data">
+				<include name="**/*.txt" />
+			</fileset>
+		</copy>
+		<copy todir="${outputDir}/edumips64/utils">
+			<fileset dir="utils">
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+        <jar destfile="${jar_filename}" basedir="${outputDir}">
+            <manifest>
+                <attribute name="Main-Class" value="edumips64.Main"/>
+                <attribute name="SplashScreen-Image" value="edumips64/img/splash.png"/>
+            </manifest>
+        </jar>
+		<signjar jar="${jar_filename}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
+        <delete dir="${outputDir}" /> 
+	</target>
+
+    <target name="src-release" depends="init">
         <mkdir dir="edumips64" />
 		<copy todir="edumips64/">
 			<fileset dir=".">

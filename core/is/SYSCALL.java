@@ -42,6 +42,7 @@ public class SYSCALL extends Instruction {
 	private long address;
 
 	private Dinero din;
+    private IOManager iom;
 
     public void IF()
     {
@@ -62,6 +63,7 @@ public class SYSCALL extends Instruction {
 		this.paramCount=1;
 		this.name = "SYSCALL";
 		din = Dinero.getInstance();
+        iom = IOManager.getInstance();
 	}
 
 	public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
@@ -112,7 +114,7 @@ public class SYSCALL extends Instruction {
 
 			return_value = -1;
 			try {
-				return_value = edumips64.Main.iom.open(filename, flags);
+				return_value = iom.open(filename, flags);
 			}
 			catch (java.io.FileNotFoundException e) {
 				JOptionPane.showMessageDialog(edumips64.Main.ioFrame, CurrentLocale.getString("FILE_NOT_FOUND"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
@@ -132,7 +134,7 @@ public class SYSCALL extends Instruction {
 			logger.fine("Closing fd " + fd);
 			return_value = -1;
 			try {
-				return_value = edumips64.Main.iom.close(fd);
+				return_value = iom.close(fd);
 			}
 			catch(IOException e1) {
 				logger.fine("Error in closing " + fd);
@@ -160,11 +162,11 @@ public class SYSCALL extends Instruction {
 			try {
 				if(syscall_n == 3) {
 					logger.fine("SYSCALL (" + this.hashCode() + "): trying to read from fd " + fd + " " + count + " bytes, writing them to address " + buf_addr);
-					return_value = edumips64.Main.iom.read(fd, buf_addr, count);
+					return_value = iom.read(fd, buf_addr, count);
 				}
 				else {
 					logger.fine("SYSCALL (" + this.hashCode() + "): trying to write to fd " + fd + " " + count + " bytes, reading them from address " + buf_addr);
-					return_value = edumips64.Main.iom.write(fd, buf_addr, count);
+					return_value = iom.write(fd, buf_addr, count);
 				}
 			}
 			catch (java.io.FileNotFoundException e) {

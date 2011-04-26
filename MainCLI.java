@@ -35,13 +35,16 @@ import java.io.*;
 
 public class MainCLI {
 	public static void main(String args[]) {
-		CurrentLocale.setLanguage("it");
+		CurrentLocale.setLanguage("en");
 		try {
 			Parser p = Parser.getInstance();
 			CPU c = CPU.getInstance();
+            c.setStatus(CPU.CPUStatus.READY);
 
-			if(args.length > 0)
+			if(args.length > 0) {
 				p.parse(args[0]);
+                c.setStatus(CPU.CPUStatus.RUNNING);
+            }
 
 			BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));			
 			System.out.println("Benvenuto nella shell di EduMIPS64!!");
