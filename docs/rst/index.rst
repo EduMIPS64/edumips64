@@ -35,6 +35,7 @@ This manual refers to EduMIPS64 version 0.5.3.
 
    source-files-format
    instructions
+   user-interface
 
 .. Indices and tables
    ==================
