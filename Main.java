@@ -841,7 +841,7 @@ public class Main extends JApplet {
                 try{
                     edumips64.ui.GUIHelp.showHelp(null, "id");
                 } catch (Exception exx) {
-                    new edumips64.ui.ReportDialog(null,exx,"STAMINCHIA");
+                    new edumips64.ui.ReportDialog(null,exx,"MIAO");
                 }
             }
         });

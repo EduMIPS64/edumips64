@@ -14,10 +14,10 @@ top
  </maps>
  <view>
   <name>
-TOC
+Contenuti
   </name>
   <label>
-TOC 
+Contenuti 
   </label>
   <type>
 javax.help.TOCView

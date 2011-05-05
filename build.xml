@@ -127,13 +127,23 @@
 
     <target name="makeGUIJar">
         <!-- Help -->
-        <copy todir="help/en/html">
+        <copy todir="${outputDir}/edumips64/help/en/html">
             <fileset dir="docs/en/output/html">
 				<include name="**/*.*" />
 			</fileset>
         </copy>
-        <copy todir="help/en">
+        <copy todir="${outputDir}/edumips64/help/en">
             <fileset dir="docs/en/javahelp">
+				<include name="**/*.*" />
+			</fileset>
+        </copy>
+        <copy todir="${outputDir}/edumips64/help/it/html">
+            <fileset dir="docs/it/output/html">
+				<include name="**/*.*" />
+			</fileset>
+        </copy>
+        <copy todir="${outputDir}/edumips64/help/it">
+            <fileset dir="docs/it/javahelp">
 				<include name="**/*.*" />
 			</fileset>
         </copy>
@@ -164,11 +174,11 @@
                 <include name="**/*.class" />
             </fileset>
         </copy>
-		<copy todir="${outputDir}/edumips64/help">
+        <!--<copy todir="${outputDir}/edumips64/help">
 			<fileset dir="help">
 				<include name="**/*.*" />
 			</fileset>
-		</copy>
+        </copy>-->
         <!--
 		<copy todir="${outputDir}/edumips64/help_it">
 			<fileset dir="help_it">
