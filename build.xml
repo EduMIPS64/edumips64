@@ -13,7 +13,7 @@
 	<target name="init">
         <!-- Set build file properties -->
 		<property name="sourceDir" value="." />
-        <property name="helpClassesDir" value="./javahelp_classes" />
+        <property name="helpClassesDir" value="./libs" />
 		<property name="version" value="0.5.3" />
 		<property name="outputDir" value="edumips" />
 		<property name="tarbz2File" value="edumips64-${version}.tar.bz2" />
@@ -27,6 +27,8 @@
 		<mkdir dir="${outputDir}/edumips64/data" />
 		<mkdir dir="${outputDir}/edumips64/utils" />
 		<mkdir dir="${outputDir}/edumips64/help" />
+		<mkdir dir="${outputDir}/edumips64/help_en" />
+		<mkdir dir="${outputDir}/edumips64/help_it" />
 	</target>
 
     <!-- *** clean *** target that cleans the built files and the build directory-->
@@ -139,6 +141,28 @@
 				<include name="**/*.properties" />
 			</fileset>
 		</copy>
+        <copy todir="${outputDir}/com">
+            <fileset dir="libs/com">
+                <include name="**/*.class" />
+            </fileset>
+        </copy>
+        <copy todir="${outputDir}/javax">
+            <fileset dir="libs/javax">
+                <include name="**/*.class" />
+            </fileset>
+        </copy>
+		<copy todir="${outputDir}/edumips64/help">
+			<fileset dir="help">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+        <!--
+		<copy todir="${outputDir}/edumips64/help_it">
+			<fileset dir="help_it">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+        -->
         <jar destfile="${jar_filename}" basedir="${outputDir}">
             <manifest>
                 <attribute name="Main-Class" value="edumips64.Main"/>

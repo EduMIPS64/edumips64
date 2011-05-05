@@ -835,14 +835,14 @@ public class Main extends JApplet {
         help.add(manual);
         manual.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                GUIManual man = new GUIManual(f, CurrentLocale.getString("INTRO_FILENAME"), CurrentLocale.getString("IS_FILENAME"), CurrentLocale.getString("GUI_FILENAME"),CurrentLocale.getString("SYSCALL_FILENAME"));
-                man.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);    // In order to avoid that closing the manual exits the program
-                man.setVisible(true);
-                /*try{
+                // GUIManual man = new GUIManual(f, CurrentLocale.getString("INTRO_FILENAME"), CurrentLocale.getString("IS_FILENAME"), CurrentLocale.getString("GUI_FILENAME"),CurrentLocale.getString("SYSCALL_FILENAME"));
+                // man.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);    // In order to avoid that closing the manual exits the program
+                // man.setVisible(true);
+                try{
                     edumips64.ui.GUIHelp.showHelp(null, "id");
                 } catch (Exception exx) {
-                    new edumips64.ui.ReportDialog(null,exx,"MIAO");
-                }*/
+                    new edumips64.ui.ReportDialog(null,exx,"STAMINCHIA");
+                }
             }
         });
 
