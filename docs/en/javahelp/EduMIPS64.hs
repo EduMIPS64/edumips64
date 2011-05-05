@@ -26,6 +26,7 @@ javax.help.TOCView
 EduMIPS64TOC.xml
   </data>
  </view>
+<!--
  <view>
   <name>
 Index
@@ -54,4 +55,5 @@ javax.help.SearchView
 JavaHelpSearch
   </data>
  </view>
+-->
 </helpset>
