@@ -126,6 +126,19 @@
 	</target>
 
     <target name="makeGUIJar">
+        <!-- Help -->
+        <copy todir="help/en/html">
+            <fileset dir="docs/en/output/html">
+				<include name="**/*.*" />
+			</fileset>
+        </copy>
+        <copy todir="help/en">
+            <fileset dir="docs/en/javahelp">
+				<include name="**/*.*" />
+			</fileset>
+        </copy>
+
+        <!-- Other things -->
 		<copy todir="${outputDir}/edumips64/img">
 			<fileset dir="img">
 				<include name="**/*.png" />
