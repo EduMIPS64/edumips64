@@ -1,252 +1,262 @@
-The user interface
-==================
-The GUI of EduMIPS64 is inspired to WinMIPS64 user interface. In fact, the main window
-is identical, except for some menus. 
+L'interfaccia utente
+====================
+L'interfaccia grafica EduMIPS64 si ispira a quella di WinMIPS64. Infatti, la
+finestra principale è identica, eccetto che per qualche menù. 
 
 .. Please refer to chapter~\ref{mips-simulators} for an overview of some MIPS and DLX simulators (including WinMIPS64), and to \cite{winmips-web} for more information about WinMIPS64.  %In figure~\ref{fig:edumips-main} you can see the main window of EduMIPS64, composed by
 
-The EduMIPS64 main window is composed by a menu bar and six frames, showing
-different aspects of the simulation. There's also a status bar, that has the
-double purpose to show the content of memory cells and registers when you
-click them and to notify the user that the simulator is running when the
-simulation has been started but verbose mode is not selected. There are more
-details in the following section.
+La finestra principale di EduMIPS64 è caratterizzata da sei frame, che
+mostrano i differenti aspetti della simulazione.  è inoltre presente una
+barra di stato, che ha il duplice scopo di mostrare il contenuto delle celle
+di memoria e dei registri quando vengono selezionati e di notificare
+all'utente che il simulatore è in esecuzione quando la simulazione è
+stata avviata ma la modalità verbose  non è stata attivata.  Maggiori
+dettagli sono descritti nelle sezioni a seguire.
 
-The menu bar
-------------
-The menu bar contains six menus:
+La barra dei menù
+-----------------
+La barra del menù contiene sei opzioni:
 
 File
 ~~~~
-The File menu contains menu items about opening files, resetting or shutting
-down the simulator, writing trace files.
+Il menù File contiene comandi per l'apertura dei file, per resettare o
+fermare il simulatore e per scrivere i trace file.
 
-* *Open...* Opens a dialog that allows the user to choose
-  a source file to open.
+* *Apri...* Apre una finestra che consente all'utente di scegliere un file
+  sorgente da aprire.
 
-* *Open recent* Shows the list of the recent files opened by the
-  simulator, from which the user can choose the file to open
+* *Apri recente* Mostra la lista dei file recentemente aperti dal simulatore,
+  dalla quale l'utente può scegliere il file da aprire.
 
-* *Reset* Resets the simulator, keeping open the file that was
-  loaded but resetting the execution.
+* *Resetta* Inizializza nuovamente il simulatore, mantenendo aperto il file
+  che era stato caricato ma facendone ripartire l'esecuzione.
 
-* *Write Dinero Tracefile...* Writes the memory access data to a
-  file, in xdin format.
+* *Scrivi Tracefile Dinero...* Scrive i dati di accesso alla memoria in un
+  file, nel formato xdin.
 
-* *Exit* Closes the simulator.
+* *Esci* Chiude il simulatore.
 
-The *Write Dinero Tracefile...* menu item is only available when a whole
-source file has been executed and the end has been already reached.
+La voce del menù *Scrivi Tracefile Dinero...* è disponibile solo quando un
+file sorgente è stato completamente eseguito ed è stata già raggiunta la fine
+dell'esecuzione.
 
-Execute
-~~~~~~~
-The Execute menu contains menu items regarding the execution flow of the
-simulation.
+Esegui
+~~~~~~
+Il menu Esegui contiene voci riguardanti il flusso di esecuzione della
+simulazione.
 
-* *Single Cycle* Executes a single simulation step
+* *Ciclo singolo* Esegue un singolo passo di simulazione.
 
-* *Run* Starts the execution, stopping when the simulator reaches
-  a `SYSCALL 0` (or equivalent) or a `BREAK` instruction, or
-  when the user clicks the Stop menu item (or presses F9).
+* *Completa* Inizia l'esecuzione, fermandosi quando il simulatore
+  raggiunge una SYSCALL 0 (o equivalente) o un'istruzione di `BREAK`,
+  oppure quando l'utente seleziona la voce Stop del menù (o preme F9).  
 
-* *Multi Cycle* Executes some simulation steps. The number of
-  steps executed can be configured through the Setting dialog.
+* *Cicli multipli* Esegue un certo numero di passi di simulazione, tale
+  valore può essere configurato attraverso la finestra di configurazione. 
+  
+.. Vedere la sezione~\ref{dialog-settings} per ulteriori dettagli.
 
-.. See~\ref{dialog-settings} for more details.
+* *Ferma* Ferma l'esecuzione quando il simulatore è in modalità
+  "Completa" o "Cicli multipli", come descritto precedentemente.
 
-* *Stop* Stops the execution when the simulator is in "Run"
-  or "Multi cycle" mode, as described previously.  
+Il menu è disponibile solo quando è stato caricato un file sorgente e
+non è ancora stato raggiunto il termine della simulazione.  La voce
+*Stop* del menù  disponibile solo in modalità "Completa" o
+"Cicli multipli" mode.
 
-This menu is only available when a source file is loaded and the end of the
-simulation is not reached. The *Stop* menu item is available only in
-"Run" or "Multi Cycle" mode.
-
-Configure
+Configura
 ~~~~~~~~~
-The Configure menu provides facilities for customizing EduMIPS64 appearance and
-behavior.
+Il menu Configura fornisce l'opportunità di personalizzare l'aspetto ed il
+funzionamento di EduMIPS64.
 
-* *Settings...* Opens the Settings dialog, described
-  in the next sections of this chapter;
+* *Impostazioni...* Apre la finestra di configurazione, descritta nella
+  prossima sezione di questo capitolo;
 
-* *Change Language* Allows the user to change the language used
-  by the user interface. Currently only English and Italian are supported.
-  This change affects every aspect of the GUI, from the title of the frames to
-  the online manual and warning/error messages.
+* *Selezione lingua* Consente di modificare la lingua usata
+  dall'interfaccia utente. Attualmente sono supportate solo inglese ed
+  italiano. Questa modifica riguarda ogni aspetto dell'interfaccia grafica,
+  dal titolo delle finestre al manuale in linea ed i messaggi di errore o le
+  notifiche.
 
-The `Settings...` menu item is not available when the simulator is in
-"Run" or "Multi Cycle" mode, because of potential race conditions.
+La voce di menù `Impostazioni...` non è disponibile quando il
+simulatore è in modalità "Completa" o "Cicli multipli", a causa di
+possibili race conditions.
 
-Tools
+Strumenti
+~~~~~~~~~
+Questo menù contiene solo una voce, utilizzata per aprire la finestra del
+Dinero frontend.
+
+* *Dinero Frontend...* Apre la finestra del Dinero Frontend..
+
+Questo menù non è disponibile finchè non è stata portata a
+termine l'esecuzione del programma
+
+Finestra
+~~~~~~~~
+Questo menù contiene voci relative alle operazioni con le finestre.
+
+* *Tile* Ordina le finestre visibili in modo tale che non vi siano
+  più di tre finestre in una riga, tentando di massimizzare lo spazio
+  occupato da ciascuna finestra.
+
+Le altre voci del menù modificano semplicemente lo stato di ciascuna
+finestra, rendendola visibile o riducendola ad icona.
+
+Aiuto
 ~~~~~
-This menu contains only an item, used to invoke the Dinero Frontend dialog.
+Questo menù contiene voci relative all'aiuto in linea.
 
-* *Dinero Frontend...* Opens the Dinero Frontend dialog.
+* *Manuale...* Mostra la finestra di help. 
+* *Informazioni su...* Mostra una finestra contenente i nomi di coloro
+  che hanno collaborato al progetto ed i loro ruoli.
 
-This menu is not available until you have not executed a program and the
-execution has reached its end.
+Finestre
+--------
+L'interfaccia grafica è composta da sette finestre, sei delle quali sono
+visibili per default, mentre una (la finestra di I/O) è nascosta.
 
-Window
-~~~~~~
-This menu contains items related to operations with frames.
+Cicli
+~~~~~
+La finestra Cicli mostra l'evoluzione del flusso di esecuzione nel tempo,
+visualizzando in ogni istante quali istruzioni sono nella pipeline, ed in
+quale stadio si trovano.
 
-* *Tile* Sorts the visible windows so that no more that three
-  frames are put in a row. It tries to maximize the space occupied by every
-  frame.
-
-The other menu items simply toggle the status of each frame, making them visible
-or minimizing them.
-
-Help
-~~~~
-This menu contains help-related menu items.
-
-* *Manual...* Shows the Help dialog. 
-
-* *About us...* Shows a cute dialog that contains the names of
-  the project contributors, along with their roles.
-
-Frames
-------
-The GUI is composed by seven frames, six of which are visible by default, and
-one (the I/O frame) is hidden.
-
-Cycles
-~~~~~~
-The Cycles frame shows the evolution of the execution flow during time, showing
-for each time slot which instructions are in the pipeline, and in which stage of
-the pipeline they are located.
-
-Registers
-~~~~~~~~~
-The Registers frame shows the content of each register. By left-clicking on them
-you can see in the status bar their decimal (signed) value, while
-double-clicking on them will pop up a dialog that allows the user to change the
-value of the register.
+Registri
+~~~~~~~~
+La finestra Registri mostra il contenuto di ciascun registro. Mediante un
+click col tasto sinistro del mouse è possibile vedere il loro valore
+decimale (con segno) nella barra di stato, mentre con un doppio click
+verrà aperta una finestra di dialogo che consentirà all'utente di
+cambiare il valore del registro
 
 Statistics
 ~~~~~~~~~~
-The Statistics frame shows some statistics about the program execution.
+La finestra Statistiche mostra alcune statistiche riguardanti l'esecuzione del
+programma.
 
 Pipeline
 ~~~~~~~~
-The Pipeline frame shows the actual status of the pipeline, showing which
-instruction is in which pipeline stage. Different colors highlight different
-pipeline stages.
+La finestra Pipeline mostra lo stato attuale della pipeline, visualizzando
+ciascuna istruzione con il suo stadio.  I differenti colori evidenziano i vari
+stadi della pipeline stessa.
 
-Memory
+Memoria
+~~~~~~~
+La finestra Memoria mostra il contenuto delle celle di memoria, insieme alle
+etichette ed i commenti, tratti dal codice sorgente. Il contenuto delle celle
+di memoria, come per i registri, può essere modificato con un doppio
+click, e mediante un singolo click del mouse verrà mostrato il loro valore
+decimale nella barra di stato.  La prima colonna mostra l'indirizzo
+esadecimale della cella di memoria, e la seconda il valore della cella stessa.
+Le altre colonne mostrano invece informazioni addizionali provenienti dal
+codice sorgente.
+
+Codice
 ~~~~~~
-The Memory frame shows memory cells content, along with labels and comments
-taken from the source code. Memory cells content, like registers, can be modified
-double-clicking on them, and clicking on them will show their decimal value in
-the status bar.
-The first column shows the hexadecimal address of the memory cell, and the
-second column shows the value of the cell. Other columns show additional info
-from the source code.
-
-Code
-~~~~
-The Code window shows the instructions loaded in memory. The first column shows
-the address of the instruction, while the second column shows the hexadecimal
-representation of the instructions. Other columns show additional info taken
-from the source code.
+La finestra Codice visualizza le istruzioni caricate in memoria.. La prima
+colonna mostra l'indirizzo dell'istruzione, mentre la seconda mostra la
+rappresentazione esadecimale dell'istruzione stessa. Le altre colonne mostrano
+infine informazioni addizionali provenienti dal codice sorgente.
 
 Input/Output
 ~~~~~~~~~~~~
-The Input/Output window provides an interface for the user to see the output
-that the program creates through the SYSCALLs 4 and 5. Actually it is not 
-used for input, as there's a dialog that pops up when a SYSCALL 3 tries to read
-from standard input, but future versions will include an input text box.
+La finestra Input/Output fornisce un'interfaccia all'utente per la
+visualizzazione dell'output creato dai programmi mediante le SYSCALL 4 e 5.
+Attualmente non è utilizzata per l'input di dati, ed al suo posto viene
+utilizzata una finestra di dialogo che viene mostrata quando una SYSCALL 3
+tenta di leggere dallo standard input, ma future versioni includeranno una
+casella di testo per l'input.
 
-Dialogs
--------
-Dialogs are used by EduMIPS64 to interact with the user in many ways. Here's a
-summary of the most important dialogs:
+Finestre di dialogo
+-------------------
+Le finestre di dialogo sono utilizzate da EduMIPS64 per interagire con l'utente
+in vari modi. Ecco un riassunto delle più importanti:
 
-Settings
-~~~~~~~~
-In the Settings dialog various aspects of the simulator can be configured.
+Impostazioni
+~~~~~~~~~~~~
+Nella finestra di configurazione possono essere configurati vari aspetti del
+simulatore.
 
-The Main Settings tab allow to configure forwarding and the number of steps in the
-Multi Cycle mode.
+La sezione "Impostazioni generali" consente di configurare il forwarding ed il
+numero di passi da effettuare nella modalità Cicli multipli.
 
-The Behavior tab allow to enable or disable warnings during the parsing phase,
-the "Sync graphics with CPU in multi-step execution" option, when checked,
-will synchronize the frames' graphical status with the internal status of the
-simulator. This means that the simulation will be slower, but you'll have an
-explicit graphical feedback of what is happening during the simulation. If this
-option is checked, the "Interval between cycles" option will influence how
-many milliseconds the simulator will wait before starting a new cycle.
-Those options are effective only when the simulation is run using the
-"Run" or the "Multi Cycle" options from the Execute menu.
+La sezione "Comportamento" permette di abilitare o disabilitare gli avvisi
+durante la fase di parsing, l'opzione "sincronizza la GUI con la CPU
+nell'esecuzione multi step", quando abilitata, sincronizzerà lo stato
+grafico delle finestre con lo stato interno del simulatore. Ciò
+implicherà una simulazione più lenta, ma con la possibilità di
+avere un resoconto grafico esplicito di ciò che sta avvenendo durante la
+simulazione.  L'opzione "intervallo tra i cicli", qualora sia abilitata,
+influenzerà il numero di millisecondi che il simulatore dovrà
+attendere prima di cominciare un nuovo ciclo. Tali opzioni hanno effetto solo
+quando la simulazione è avviata utilizzando le opzioni "Completa" o "Cicli
+multipli" dal menu Esegui.
 
-The last two options set the behavior of the simulator when a synchronous
-exception is raised. If the "Mask synchronous exceptions" option is checked,
-the simulator will ignore any Division by zero or Integer overflow exception. If
-the "Terminate on synchronous exception" option is checked, the simulation
-will be halted if a synchronous exception is raised. Please note that if
-synchronous exceptions are masked, nothing will happen, even if the termination
-option is checked. If exceptions are not masked and the termination option is not
-checked, a dialog will pop out, but the simulation will go on as soon as the
-dialog is closed. If exceptions are not masked and the termination option is
-checked, the dialog will pop out, and the simulation will be stopped as soon as
-the dialog is closed.
+Le ultime due opzioni stabiliscono il comportamento del simulatore quando si
+verifica un'eccezione sincrona.  è importante notare che se le eccezioni
+sincrone sono mascherate, non succederà nulla, anche se l'opzione "Termina
+se si verifica un'eccezione sincrona" è abilitata. Se le eccezioni non
+sono mascherate e tale opzione è abilitata, apparirà una finestra di
+dialogo, e la simulazione sarà fermata non appena tale finestra verrà
+chiusa.
 
-The last tab allows to change the colors that are associated to the different
-pipeline stages through the frames. It's pretty useless, but it's cute.
+L'ultima sezione permette di modificare i colori associati ai diversi stadi
+della pipeline. Abbastanza inutile, ma carino.  
 
 Dinero Frontend
 ~~~~~~~~~~~~~~~
-The Dinero Frontend dialog allows to feed a DineroIV process with the trace file
-internally generated by the execution of the program. In the first text box
-there is the path of the DineroIV executable, and in the second one there must
-be the parameters of DineroIV. 
+La finestra di dialogo Dinero Frontend consente di avviare un processo
+DineroIV con il trace file generato internamente mediante l'esecuzione del
+programma. Nella prima casella di testo c'è il percorso dell'eseguibile
+DineroIV, e nella seconda devono essere inseriti i parametri opportuni.
 
 .. % Please see~\cite{dinero-web} for further informations about the DineroIV cache simulator.
 
-The lower section contains the output of the DineroIV process, from which you
-can take the data that you need.
+La sezione più in basso contiene l'output del processo DineroIV, dal quale
+è possibile prelevare i dati di cui si necessita.
 
-Help
-~~~~
-The Help dialog contains three tabs with some indications on how to use the
-simulator. The first one is a brief introduction to EduMIPS64, the second one contains
-informations about the GUI and the third contains a summary of the supported
-instructions.
+Aiuto
+~~~~~
+La finestra di Aiuto contiene tre sezioni con qualche indicazione riguardo
+l'utilizzo del simulatore.  La prima è una breve introduzione ad
+EduMIPS64, la seconda contiene informazioni riguardanti l'interfaccia grafica
+e la terza contiene un riassunto delle istruzioni supportate.
 
 .. TODO: change
 
-Command line options
---------------------
-Three command line options are available. They are described in the following
-list, with the long name enclosed in round brackets. Long and short names can be
-used in the same way.
+Opzioni da riga di comando
+--------------------------
+Sono disponibili tre opzioni da linea di comando. Esse sono descritte di
+seguito, con il nome per esteso scritto tra parentesi.  Nomi abbreviati e per
+esteso possono essere utilizzati indifferentemente.
 
-* `-h (--help)` shows a help message containing the
-  simulator version and a brief summary of command line options
+* `-h (--help)` mostra un messaggio di aiuto contenente la versione del
+  simulatore ed un breve riassunto delle opzioni da linea di comando.
 
-* `-f (--file) filename` opens `filename` in the simulator
+* `-f (--file) filename` apre `filename` nel simulatore.
 
-* `-d (--debug)` enters Debug mode
+* `-d (--debug)` attiva la modalità di debugging.
 
-The `--debug` flag has the effect to activate Debug mode. In this mode, a
-new frame is available, the Debug frame, and it shows the log of internal
-activities of EduMIPS64. It is not useful for the end user, it is meant to be used by
-EduMIPS64 developers.
+Nella modalità di debugging è disponibile una nuova finestra, la finestra
+Debug, che mostra il resoconto delle attività interne di  EduMIPS64. Tale
+finestra non è utile per l'utente finale, è stata infatti ideata per
+poter essere utilizzata dagli sviluppatori di EduMIPS64.
 
-Running EduMIPS64
------------------
-The EduMIPS64 `.jar` file can act both as a stand-alone executable
-`.jar` file and as an applet, so it can be executed in both ways. Both
-methods need the Java Runtime Environment, version 5 or later.
+Eseguire EduMIPS64
+------------------
+Il file `.jar` di EduMIPS64 può funzionare sia come file .jar
+eseguibile che come applet, quindi può essere eseguito in entrambi i modi,
+che richiedono il Java Runtime Environment, versione 5 o successiva.
 
-To run it as a stand-alone application, the `java` executable must be
-issued in this way: `java -jar edumips64-version.jar`, where the
-`version` string must be replaced with the actual version of the
-simulator. On some systems, you may be able to execute it by just clicking on
-the `.jar` file.
+Per eseguire il file come applicazione a sè stante, l'eseguibile
+`java` deve essere avviato nel seguente modo: \texttt{java -jar
+edumips64-version.jar}, dove la stringa `version` deve essere
+sostituita con la versione attuale del simulatore.  Su alcuni sistemi,
+potrebbe essere possibile eseguire il programma semplicemente con un click sul
+file `.jar`.
 
-To embed it in an HTML, the `<applet>` tag must be used. The EduMIPS64 web
-site contains a page that already contains the applet, so
-that everyone can execute it without the hassle of using the command line.
-
+Per eseguire il file come applet deve essere utilizzato il tag
+`<applet>`. Il sito web di EduMIPS64 presenta una pagina già contenente
+l'applet, in modo tale che chiunque possa eseguire il programma senza il
+problema dell'utilizzo da linea di comando.

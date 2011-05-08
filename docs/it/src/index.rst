@@ -41,3 +41,4 @@ Questo manuale si riferisce ad EduMIPS64 versione 0.5.3.
 
    source-files-format
    instructions
+   user-interface
