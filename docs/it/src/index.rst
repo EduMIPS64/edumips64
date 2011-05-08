@@ -5,12 +5,12 @@
 
 Benvenuti nella documentazione di EduMIPS64!
 ============================================
-EduMIPS64 è un simulatore di Instruction Set Architecture (ISA) MIPS64. è stato
+EduMIPS64 è un simulatore di Instruction Set Architecture (ISA) MIPS64, 
 progettato per eseguire piccoli programmi che utilizzino il sottoinsieme
-dell'Instruction Set MIPS64 implementato dal simulatore stesso, permettendo
+dell'Instruction Set MIPS64 implementato dal simulatore stesso; permette
 all'utente di vedere come le istruzioni si comportino nella pipeline, come gli
 stalli siano gestiti dalla CPU, lo stato di registri e memoria e molto altro.
-è classificabile sia come simulatore, sia come debugger visuale.
+È classificabile sia come simulatore, sia come debugger visuale.
 
 EduMIPS64 è stato progettato e sviluppato da un gruppo di studenti
 dell'Università degli Studi di Catania, ed ha tratto spunto, come interfaccia
@@ -40,14 +40,3 @@ Questo manuale si riferisce ad EduMIPS64 versione 0.5.3.
    :maxdepth: 2
 
    source-files-format
-   instructions
-   user-interface
-   examples
-
-.. Indices and tables
-   ==================
-  
-   * :ref:`genindex`
-   * :ref:`modindex`
-   * :ref:`search`
- 
