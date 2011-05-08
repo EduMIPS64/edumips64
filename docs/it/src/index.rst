@@ -40,3 +40,4 @@ Questo manuale si riferisce ad EduMIPS64 versione 0.5.3.
    :maxdepth: 2
 
    source-files-format
+   instructions

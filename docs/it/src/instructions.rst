@@ -1,507 +1,613 @@
-The instruction set
-===================
+Il set di istruzioni
+====================
 
-In this section we will the subset of the MIPS64 instruction set that EduMIPS64
-recognizes. We can operate two different taxonomic classification: one based on
-the functionality of the instructions and one based on the type of the
-parameters of the instructions. 
+In questa sezione verrà illustrato il repertorio delle istruzioni MIPS64
+riconosciute da EduMIPS64. è possibile effettuare due differenti
+classificazioni: una basata sulla funzionalità delle istruzioni e l'altra
+basata sul tipo di parametri.
 
 .. Please refer to Section~\ref{mipsis} for more informations about those classifications.
 
-The first classification divides instruction into three categories:
-ALU instructions, Load/Store instructions, Flow control instructions. The next
-three subsections will describe each category and every instruction that belongs
-to those categories.
+La prima classificazione suddivide le istruzioni in tre categorie: istruzioni
+ALU, istruzioni Load/Store, istruzioni di controllo del flusso. I prossimi tre
+paragrafi descriveranno ciascuna categoria e le istruzioni che vi
+appartengono.
 
-The fourth subsection will describe instructions that do not fit in any of the
-three categories.
+Il quarto paragrafo descriverà le istruzioni che non rientrano in nessuna
+delle tre categorie sopraelencate.
 
 .. For a more complete MIPS64 instruction set reference, please refer to~\cite{mips-2}.
 
 
-ALU Instructions
-----------------
-The Arithmetic Logic Unit (in short, ALU) is a part of the execution unit of a
-CPU, that has the duty of doing arithmetical and logic operations. So in the ALU
-instructions group we will find those instructions that do this kind of
-operations.
+Le istruzioni ALU
+-----------------
+L'unità logico-aritmetica (ALU) fa parte dell'unità esecutiva di una
+CPU ed assume il ruolo di esecuzione di operazioni logiche ed aritmetiche. Il
+gruppo di istruzioni ALU conterrà quindi quelle istruzioni che effettuano
+questo tipo di operazioni.
 
-ALU Instructions can be divided in two groups: *R-Type* and *I-Type*. 
+Le istruzioni ALU possono essere suddivise in due gruppi: *tipo R* e
+*tipo I*. 
 
-Four of those instructions make use of two special registers: LO and HI. They
-are internal CPU registers, whose value can be accessed through the
-`MFLO` and `MFHI` instructions.
+Quattro di esse utilizzano due registri speciali: LO e HI. Tali registri sono
+interni alla CPU ed è possibile accedere al loro valore mediante le
+istruzioni `MFLO` e `MFHI`.
 
-Here's the list of R-Type ALU Instructions.
+Ecco la lista delle istruzioni ALU di tipo R.
 
 * `AND rd, rs, rt`
 
-  Executes a bitwise AND between rs and rt, and puts the result into rd.
+  Esegue un AND bit a bit tra rs ed rt, e pone il risultato in rd.
 
 * `ADD rd, rs, rt`
 
-  Sums the content of 32-bits registers rs and rt, considering them as signed values, and puts
-  the result into rd. If an overflow occurs then trap.
+  Somma il contenuto dei registri a 32-bit rs ed rt, considerandoli come
+  valori con segno, e pone il risultato in rd.  Lancia un'eccezione in caso di
+  overflow.
+
 
 * `ADDU rd, rs, rt`
 
-  Sums the content of 32-bits registers rs and rt, and puts the result into rd.
-  No integer overflow occurs under any circumstances.
+  Somma il contenuto dei registri a 32-bit rs ed rt, e pone il risultato in
+  rd. Non si verificano eccezioni di overflow.
 
 .. \MISN{}
 
 * `DADD rd, rs, rt`
 
-  Sums the content of 64-bits registers rs and rt, considering them as signed values, and puts
-  the result into rd. If an overflow occurs then trap.
+  Somma il contenuto dei registri a 64-bit rs ed rt, considerandoli come
+  valori con segno, e pone il risultato in rd.  Lancia un'eccezione in caso di
+  overflow.
 
 * `DADDU rd, rs, rt`
 
-  Sums the content of 64-bits registers rs and rt, and puts the result into rd.
-  No integer overflow occurs under any circumstances.
+  Somma il contenuto dei registri a 64-bit rs ed rt, e pone il risultato in rd.
+  Non si verificano eccezioni di overflow.
 
 .. \MISN{}
 
 * `DDIV rs, rt`
 
-  Executes the division between 64-bits registers rs and rt, putting the 64-bits quotient in LO and the
-  64-bits remainder in HI.
+  Esegue la divisione tra i registri a 64-bit rs ed rt, ponendo i 64-bit del
+  quoziente in LO ed i 64-bit del resto in HI.
 
 * `DDIVU rs, rt`
 
-  Executes the division between 64-bits registers rs and rt, considering them as unsigned values
-  and putting the 64-bits quotient in LO and the 64-bits remainder in HI.
-	
+  Esegue la divisione tra i registri a 64-bit rs ed rt, considerandoli come
+  valori senza segno e ponendo i 64-bit del quoziente in LO ed i 64-bit del
+  resto in HI.
+  
 * `DIV rs, rt`
 
-  Executes the division between 32-bits registers rs and rt, putting the 32-bits quotient in LO and the
-  32-bits remainder in HI.
+  Esegue la divisione tra i registri a 32-bit rs ed rt, ponendo i 32-bit del
+  quoziente in LO ed i 32-bit del resto in HI.
 
 * `DIVU rs, rt`
 
-  Executes the division between 32-bits registers rs and rt, considering them as unsigned values and putting the 32-bits quotient in LO and the 32-bits remainder in HI.
+  Esegue la divisione tra i registri a 32-bit rs ed rt, considerandoli come
+  valori senza segno e pone i 32-bit del quoziente in LO ed i 32-bit del resto
+  in HI.
 
 * `DMULT rs, rt`
 
-  Executes the multiplication between 64-bits registers rs and rt, putting the low-order 64-bits doubleword of the result into special register LO and the high-order 64-bits doubleword of the result into special register HI.
+  Esegue il prodotto tra i registri a 64-bit rs ed rt, ponendo i 64 bit bassi
+  del risultato nel registro speciale LO e i 64 bit alti del risultato nel
+  registro speciale HI.
 
 * `DMULTU rs, rt`
 
-  Executes the multiplication between 64-bits registers rs and rt, considering them as unsigned values and putting the low-order 64-bits doubleword of the result into special register LO and the high-order 64-bits doubleword of the result into special register HI.
-	
+  Esegue il prodotto tra i registri a 64-bit rs ed rt, considerandoli come
+  valori senza segno e ponendo i 64 bit bassi del risultato nel registro
+  speciale LO e i 64 bit alti del risultato nel registro speciale HI.
+  
 * `DSLL rd, rt, sa`
 
-  Does a left shift of 64-bits register rt, by the amount specified in the immediate (positive) value sa, and puts the result into 64-bits register rd. Empty bits are padded with zeros.
+  Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di
+  bit indicato nel valore immediato (positivo compreso tra 0 e 63) sa, e pone
+  il risultato in rd. I bit liberi vengono posti a zero.
 
 * `DSLLV rd, rt, rs`
 
-  Does a left shift of 64-bits register rt, by the amount specified in low-order 6-bits of rs threatd as unsigned value, and puts the result into 64-bits register rd. Empty bits are padded with zeros.
+  Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di
+  bit specificato nei 6 bit bassi del registro rs che verrà letto come valore
+  senza segno, e pone il risultato in rd. I bit liberi vengono posti a zero.
 
 * `DSRA rd, rt, sa`
 
-  Does a right shift of 64-bits register rt, by the amount specified in the immediate (positive) value sa, and puts the result into 64-bits register rd. Empty bits are padded with zeros if the leftmost bit of rt is zero, otherwise they are padded with ones.
+  Effettua uno shift verso destra del registro a 64-bit rt, di un numero di
+  bit specificato nel valore senza segno immediato (positivo compreso tra 0 e
+  63) sa, e pone il risultato in rd. I bit liberi vengono posti a zero se il
+  bit più a sinistra di rs è zero, altrimenti vengono posti a uno.
 
 * `DSRAV rd, rt, rs`
 
-  Does a right shift of 64-bits register rt, by the amount specified in low-order 6-bits of rs threatd as unsigned value, and puts the result into 64-bits register rd. Empty bits are padded with zeros if the leftmost bit of rt is zero, otherwise they are padded with ones.
+  Effettua uno shift verso destra del registro a 64-bit rt, di un numero di
+  bit specificato nei 6 bit bassi del registro rs che verrà letto come valore
+  senza segno,e pone il risultato in rd.  I bit liberi vengono posti a zero se
+  il bit più a sinistra di rs è zero, altrimenti vengono posti a uno.
 
 * `DSRL rd, rs, sa`
 
-  Does a right shift of 64-bits register rs, by the amount specified in the immediate (positive) value sa, and puts the result into 64-bits register rd. Empty bits are padded with zeros.
-	
+  Effettua uno shift verso destra del registro a 64-bit rt, di un numero di
+  bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, e
+  pone il risultato in rd. I bit liberi vengono posti a zero.
+  
 * `DSRLV rd, rt, rs`
 
-  Does a right shift of 64-bits register rt, by the amount specified in low-order 6-bits of rs threatd as unsigned value, and puts the result into 64-bits register rd. Empty bits are padded with zeros.
+  Effettua uno shift verso destra del registro a 64-bit rt, di un numero di
+  bit specificato nei 6 bit bassi del registro rs che verrà letto come valore
+  senza segno, e pone il risultato in rd. I bit liberi vengono posti a zero.
 
 * `DSUB rd, rs, rt`
 
-  Subtracts the value of 64-bits register rt to 64-bits register rs, considering them as signed values, and puts the result in rd. If an overflow occurs then trap.
+  Sottrae il valore del registro a 64-bit rt al valore del registro a 64-bit
+  rs, considerandoli come valori con segno, e pone il risultato in rd. Lancia
+  un'eccezione in caso di overflow.
 
 * `DSUBU rd, rs, rt`
 
-  Subtracts the value of 64-bits register rt to 64-bits register rs, and puts the result in rd.  No integer overflow occurs under any circumstances.
-	
+  Sottrae il valore del registro a 64-bit rt al valore del registro a 64-bit
+  rs, e pone il risultato in rd.  Non si verificano eccezioni di overflow.
+  
 .. \MISN{}
 
 * `MFLO rd`
 
-  Moves the content of the special register LO into rd.
+  Copia il contenuto del registro speciale LO in rd.
 
 * `MFHI rd`
 
-  Moves the content of the special register HI into rd.
+  Copia il contenuto del registro speciale HI in rd.
 
 * `MOVN rd, rs, rt`
 
-  If rt is different from zero, then moves the content of rs into rd.
+  Se rt è diverso da zero, copia il contenuto di rs in rd.
 
 * `MOVZ rd, rs, rt`
 
-  If rt is equal to zero, then moves the content of rs into rd.
+  Se rt è uguale a zero, copia il contenuto di rs in rd.
 
 * `MULT rs, rt`
 
-  Executes the multiplication between 32-bits registers rs and rt, putting the low-order 32-bits word of the result into special register LO and the high-order 32-bits word of the result into special register HI.
+  Esegue il prodotto tra i registri a 32-bit rs ed rt, ponendo i 32 bit bassi
+  del risultato nel registro speciale LO e i 32 bit alti del risultato nel
+  registro speciale HI.
 
 * `MULTU rs, rt`
 
-  Executes the multiplication between 32-bits registers rs and rt, considering them as unsigned values and putting the low-order 32-bits word of the result into special register LO and the high-order 32-bits word of the result into special register HI.
-	
+  Esegue il prodotto tra i registri a 32-bit rs ed rt, considerandoli come
+  valori senza segno e ponendo i 32 bit bassi del risultato nel registro
+  speciale LO e i 32 bit alti del risultato nel registro speciale HI.
+  
 * `OR rd, rs, rt`
 
-  Executes a bitwise OR between rs and rt, and puts the result into rd.
+  Esegue un OR bit a bit tra rs ed rt, e pone il risultato in rd.
 
 * `SLL rd, rt, sa`
 
-  Does a left shift of 32-bits register rt, by the amount specified in the immediate (positive) value sa, and puts the result into 32-bits register rd. Empty bits are padded with zeros.
+  Effettua uno shift verso sinistra del registro a 32-bit rt, di un numero di
+  bit indicati nel valore immediato (positivo compreso tra 0 e 63) sa, e pone
+  il risultato nel registro a 32-bit rd. I bit liberi vengono posti a zero.
 
 * `SLLV rd, rt, rs`
 
-  Does a left shift of 32-bits register rt, by the amount specified in low-order 5-bits of rs threatd as unsigned value, and puts the result into 32-bits register rd. Empty bits are padded with zeros.
+  Effettua uno shift verso sinistra del registro a 32-bit rt, di un numero di
+  bit specificato nei 5 bit bassi del registro rs che verrà letto come
+  valore senza segno, e pone il risultato nel registro a 32-bit rd. I bit
+  liberi vengono posti a zero.
 
 * `SRA rd, rt, sa`
 
-  Does a right shift of 32-bits register rt, by the amount specified in the immediate (positive) value sa, and puts the result into 32-bits register rd. Empty bits are padded with zeros if the leftmost bit of rt is zero, otherwise they are padded with ones.
+  Effettua uno shift verso destra del registro a 32-bit rt, di un numero di
+  bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, e
+  pone il risultato nel registro a 32-bit rd.  I bit liberi vengono posti a
+  zero se il bit più a sinistra di rs è zero, altrimenti vengono posti
+  a uno.
 
 * `SRAV rd, rt, rs`
 
-  Does a right shift of 32-bits register rt, by the amount specified in low-order 5-bits of rs threatd as unsigned value, and puts the result into 32-bits register rd. Empty bits are padded with zeros if the leftmost bit of rt is zero, otherwise they are padded with ones.
+  Effettua uno shift verso destra del registro a 32-bit rt, di un numero di
+  bit specificato nei 5 bit bassi del registro rs che verrà letto come
+  valore senza segno, e pone il risultato nel registro a 32-bit in rd.  I bit
+  liberi vengono posti a zero se il bit più a sinistra di rs è zero,
+  altrimenti vengono posti a uno.
 
 * `SRL rd, rs, sa`
 
-  Does a right shift of 32-bits register rs, by the amount specified in the immediate (positive) value sa, and puts the result into 32-bits register rd. Empty bits are padded with zeros.
-	
+  Effettua uno shift verso destra del registro a 32-bit rt, di un numero di
+  bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, e
+  pone il risultato nel registro a 32-bit rd. I bit liberi vengono posti a
+  zero.
+  
 * `SRLV rd, rt, rs`
 
-  Does a right shift of 32-bits register rt, by the amount specified in low-order 5-bits of rs threatd as unsigned value, and puts the result into 32-bits register rd. Empty bits are padded with zeros.
+  Effettua uno shift verso destra del registro a 32-bit rt, del numero di bit
+  specificato nei 5 bit bassi del registro rs che verrà letto come valore
+  senza segno, e pone il risultato nel registro a 32-bit rd. I bit liberi
+  vengono posti a zero.
 
 * `SUB rd, rs, rt`
 
-  Subtracts the value of 32-bits register rt to 32-bits register rs, considering them as signed values, and puts the result in rd. If an overflow occurs then trap.
+  Sottrae il valore del registro a 32-bit rt al valore del registro a 32-bit
+  rs, considerandoli come valori con segno, e pone il risultato in rd. Lancia
+  un'eccezione in caso di overflow.
 
 * `SUBU rd, rs, rt`
 
-  Subtracts the value of 32-bits register rt to 32-bits register rs, and puts the result in rd. No integer overflow occurs under any circumstances.
+  Sottrae il valore del registro a 32-bit rt al valore del registro a 32-bit
+  rs, e pone il risultato in rd.
+  Non si verificano eccezioni di overflow.
   
 .. \MISN{}
 
 * `SLT rd, rs, rt`
 
-  Sets the value of rd to 1 if the value of rs is less than the value of rt, otherwise sets it to 0. This instruction performs a signed comparison.
+  Pone il valore di rd ad 1 se il valore contenuto in rs è minore di
+  quello contenuto in rt, altrimenti pone rd a 0. Questa istruzione esegue un
+  confronto con segno.
 
 * `SLTU rd, rs, rt`
 
-  Sets the value of rd to 1 if the value of rs is less than the value of rt, otherwise sets it to 0. This instruction performs an unsigned comparison.
+  Pone il valore di rd ad 1 se il valore contenuto in rs è minore di
+  quello contenuto in rt, altrimenti pone rd a 0. Questa istruzione esegue un
+  confronto senza segno.
 
 * `XOR rd, rs, rt`
 
-  Executes a bitwise exclusive OR (XOR) between rs and rt, and puts the result into rd.
+  Esegue un OR esclusivo (XOR) bit a bit tra rs ed rt, e pone il risultato in
+  rd.
 
-Here's the list of I-Type ALU Instructions.
+Ecco la lista delle istruzioni ALU di tipo I.
 
 * `ADDI rt, rs, immediate`
 
-  Executes the sum between 32-bits register rs and the immediate value, putting the result in rt.  This instruction considers rs and the immediate value as signed values.  If an overflow occurs then trap.
+  Effettua la somma tra il registro a 32 bit rs ed il valore immediato,
+  ponendo il risultato in rt.  Questa istruzione considera gli operandi come
+  valori con segno.  Lancia un'eccezione in caso di overflow.
 
 * `ADDIU rt, rs, immediate`
 
-  Executes the sum between 32-bits register rs and the immediate value, putting the result in rt.  No integer overflow occurs under any circumstances.
+  Effettua la somma tra il registro a 32 bit rs ed il valore immediato,
+  ponendo il risultato in rt.  Non si verificano eccezioni di overflow.
 
 .. \MISN{}
 
 * `ANDI rt, rs, immediate`
 
-  Executes the bitwise AND between rs and the immediate value, putting the result in rt.
+  Esegue un AND bit a bit tra rs ed il valore immediato, ponendo il risultato
+  in rt.
 
 * `DADDI rt, rs, immediate`
 
-  Executes the sum between 64-bits register rs and the immediate value, putting the result in rt.  This instruction considers rs and the immediate value as signed values.  If an overflow occurs then trap.
+  Effettua la somma tra il registro a 64 bit rs ed il valore immediato,
+  ponendo il risultato in rt.  Questa istruzione considera gli operandi come
+  valori con segno.  Lancia un'eccezione in caso di overflow.
 
 * `DADDIU rt, rs, immediate`
 
-  Executes the sum between 64-bits register rs and the immediate value, putting the result in rt.  No integer overflow occurs under any circumstances.
+  Effettua la somma tra il registro a 64 bit rs ed il valore immediato,
+  ponendo il risultato in rt.  Non si verificano eccezioni di overflow.
 
 .. \MISN{}
 
 * `DADDUI rt, rs, immediate`
 
-  Executes the sum between 64-bits register rs and the immediate value, putting the result in rt.  No integer overflow occurs under any circumstances.
+  Effettua la somma tra il registro a 64 bit rs ed il valore immediato,
+  ponendo il risultato in rt.  Non si verificano eccezioni di overflow.
 
 .. \MISN{}
 .. \WARN{}
 
 * `LUI rt, immediate`
 
-  Loads the constant defined in the immediate value in the upper half (16 bit) of the lower 32 bits of rt, sign-extending the upper 32 bits of the register.
+  Carica la costante definita dal valore immediato nella metà superiore dei 32
+  bit inferiori di rt, effettuando l'estensione del segno sui 32 bit superiori
+  del registro. 
 
 * `ORI rt, rs, immediate`
 
-  Executes the bitwise OR between rs and the immediate value, putting the result in rt.
+  Effettua l'OR bit a bit tra rs ed il valore immediato, ponendo il risultato
+  in rt.
 
 * `SLTI rt, rs, immediate`
 
-  Sets the value of rt to 1 if the value of rs is less than the value of the immediate, otherwise sets it to 0. This instruction performs a signed comparison.
+  Pone il valore di rt ad 1 se il valore di rs è minore di quello
+  dell'immediato, altrimenti pone rt a 0. Questa operazione effettua un
+  confronto con segno.
 
 * `SLTUI rt, rs, immediate`
 
-  Sets the value of rt to 1 if the value of rs is less than the value of the immediate, otherwise sets it to 0. This instruction performs an unsigned comparison.
+  Pone il valore di rt ad 1 se il valore di rs è minore di quello
+  dell'immediato, altrimenti pone rt a 0. Questa operazione effettua un
+  confronto senza segno.
 
 * `XORI rt, rs, immediate`
 
-  Executes a bitwise exclusive OR (XOR) between rs and the immediate value, and puts the result into rt.
+  Effettua l'OR esclusivo bit a bit tra rs ed il valore immediato, ponendo il
+  risultato in rt.
 
+Istruzioni load/store
+---------------------
+Questa categoria contiene tutte le istruzioni che effettuano trasferimenti di
+dati tra i registri e la memoria. Ognuna di esse è espressa nella forma::
+    [etichetta] istruzione rt, offset(base)
 
-Load/Store instructions
------------------------
-This category contains all the instructions that operate transfers between
-registers and the memory. All of these instructions are in the form::
-  [label:] instruction rt, offset(base)
+In base all'utilizzo di un'istruzione load oppure store, rt rappresenterà di
+volta in volta il registro sorgente o destinazione; offset è un'etichetta o un
+valore immediato e base è un registro.  L'indirizzo è ottenuto sommando al
+valore del registro`base` il valore immediato di `offset`.
 
-Where rt is the source or destination register, depending if we are using a
-store or a load instruction; offset is a label or an immediate value and base is
-a register. The address is obtained by adding to the value of the register
-`base` the immediate value `offset`.
+L'indirizzo specificato deve essere allineato in base al tipo di dato che si
+sta trattando.  Le istruzioni di caricamento che terminano con "U" considerano
+il contenuto del registro rt come un valore senza segno.
 
-The address specified must be aligned according to the data type that is
-treated. Load instructions ending with "U" treat the content of the register
-rt as an unsigned value.
-
-List of load instructions:
+Ecco la lista delle istruzioni di caricamento (LOAD):
 
 * `LB rt, offset(base)`
 
-  Loads the content of the memory cell at address specified by offset and base in register rt, treating it as a signed byte.
+  Carica il contenuto della cella di memoria all'indirizzo specificato da
+  offset e base nel registro rt, considerando tale valore come byte con segno.
 
 * `LBU rt, offset(base)`
 
-  Loads the content of the memory cell at address specified by offset and base in register rt, treating it as an unsigned byte.
+  Carica il contenuto della cella di memoria all'indirizzo specificato da
+  offset e base nel registro rt, considerando tale valore come byte senza
+  segno.
 
 * `LD rt, offset(base)`
 
-  Loads the content of the memory cell at address specified by offset and base in register rt, treating it as a double word.
+  Carica il contenuto della cella di memoria all'indirizzo specificato da
+  offset e base nel registro rt, considerando tale valore come una double
+  word.
 
 * `LH rt, offset(base)`
 
-  Loads the content of the memory cell at address specified by offset and base in register rt, treating it as a signed half word.
+  Carica il contenuto della cella di memoria all'indirizzo specificato da
+  offset e base nel registro rt, considerando tale valore come una half word
+  con segno.
 
 * `LHU rt, offset(base)`
 
-  Loads the content of the memory cell at address specified by offset and base in register rt, treating it as an unsigned half word.
+  Carica il contenuto della cella di memoria all'indirizzo specificato da
+  offset e base nel registro rt, considerando tale valore come una half word
+  senza segno.
 
 * `LW rt, offset(base)`
 
-  Loads the content of the memory cell at address specified by offset and base in register rt, treating it as a signed word.
+  Carica il contenuto della cella di memoria all'indirizzo specificato da
+  offset e base nel registro rt, considerando tale valore come una word con
+  segno.
 
 * `LWU rt, offset(base)`
 
-  Loads the content of the memory cell at address specified by offset and base in register rt, treating it as a signed word.
+  Carica il contenuto della cella di memoria all'indirizzo specificato da
+  offset e base nel registro rt, considerando tale valore come una word senza
+  segno.
 
-List of store instructions:
+Ecco la lista delle istruzioni di memorizzazione (STORE):
 
 * `SB rt, offset(base)`
 
-  Stores the content of register rt in the memory cell specified by offset and base, treating it as a byte.
+  Memorizza il contenuto del registro rt nella cella di memoria specificata da
+  offset e base, considerando tale valore come un byte.
 
 * `SD rt, offset(base)`
 
-  Stores the content of register rt in the memory cell specified by offset and base, treating it as a double word.
+  Memorizza il contenuto del registro rt nella cella di memoria specificata da
+  offset e base, considerando tale valore come una double word.
 
 * `SH rt, offset(base)`
 
-  Stores the content of register rt in the memory cell specified by offset and base, treating it as a half word.
+  Memorizza il contenuto del registro rt nella cella di memoria specificata da
+  offset e base, considerando tale valore come una half word.
 
 * `SW rt, offset(base)`
 
-  Stores the content of register rt in the memory cell specified by offset and base, treating it as a word.
+  Memorizza il contenuto del registro rt nella cella di memoria specificata da
+  offset e base, considerando tale valore come una word.
 
-Flow control instructions
--------------------------
-Flow control instructions are used to alter the order of instructions that are
-fetched by the CPU. We can make a distinction between these instructions:
-R-Type, I-Type and J-Type.
+Istruzioni di controllo del flusso
+----------------------------------
+Le istruzioni di controllo del flusso sono utilizzate per alterare l'ordine
+delle istruzioni prelevate dalla CPU nella fase di fetch. è possibile fare una
+distinzione tra tali istruzioni: tipo R, tipo I e tipo J.
 
-Those instructions effectively executes the jump in the ID stage, so often an
-useless fetch is executed. In this case, two instructions are removed from the
-pipeline, and the branch taken stalls counter is incremented by two units.
+Tali istruzioni eseguono il salto alla fase di Instruction Decode (ID), ogni
+qual volta viene effettuato un fetch inutile. In tal caso, due istruzioni
+vengono rimosse dalla pipeline, ed il contatore degli stalli dovuti ai salti
+effettuati viene incrementato di due unità.
 
-List of R-Type flow control instructions:
+Ecco la lista delle istruzioni di controllo del flusso di tipo R:
 
 * `JALR rs`
 
-  Puts the content of rs into the program counter, and puts into R31 the address of the instruction that follows the JALR instruction, the return value.
+  Pone il contenuto di rs nel program counter, e salva in R31 l'indirizzo
+  dell'istruzione che segue l'istruzione JALR, che rappresenta il valore di
+  ritorno.
 
 * `JR rs`
 
-  Puts the content of rs into the program counter.
+  Pone il contenuto di rs nel program counter.
 
-List of I-Type flow control instructions:
+Ed ecco le istruzioni di controllo del flusso di tipo I:
 
 * `B offset`
 
-  Unconditionally jumps to offset
+  Salto incondizionato ad offset.
 
 * `BEQ rs, rt, offset`
 
-  Jumps to offset if rs is equal to rt.
+  Salta ad offset se rs è uguale ad rt.
 
 * `BEQZ rs, offset`
 
-  Jumps to offset if rs is equal to zero.
+  Salta ad offset se rs è uguale a zero.
 
-..	\WARN
+..  \WARN
 
 * `BGEZ rs, offset`
 
-  If rs is greather than zero, does a PC-relative jump to offset.
+  Effettua un salto relativo al PC ad offset se rs è maggiore di zero.
 
 * `BNE rs, rt, offset`
 
-  Jumps to offset if rs is not equal to rt.
+  Salta ad offset se rs non è uguale ad rt.
 
 * `BNEZ rs`
 
-  Jumps to offset if rs is not equal to zero.\\
+  Salta ad offset se rs non è uguale a zero.
 
-..	\WARN
+..  \WARN
 
-List of J-Type flow control instructions:
+Ecco la lista delle istruzioni di controllo del flusso di tipo J:
 
 * `J target`
 
-  Puts the immediate value target into the program counter.
+  Pone il valore immediato nel program counter
 
 * `JAL target`
 
-  Puts the immediate value target into the program counter, and puts into R31 the address of the instruction that follows the JAL instruction, the return value.
+  Pone il valore immediato nel program counter, e salva in R31 l'indirizzo
+  dell'istruzione che segue l'istruzione JAL, che rappresenta il valore di
+  ritorno.
 
-The `SYSCALL` instruction
--------------------------
-The SYSCALL instruction offers to the programmer an operating-system-like
-interface, making available six different system calls.
+L'istruzione `SYSCALL`
+----------------------
+L'istruzione SYSCALL offre al programmatore un'interfaccia simile a quella
+offerta da un sistema operativo, rendendo disponibili sei differenti chiamate
+di sistema (system call).
 
-System calls expect that the address of their parameters is stored in register
-R14, and will put their return value in register R1.
-
-System calls follow as much as possible the POSIX convention.
+Le system call richiedono che l'indirizzo dei loro parametri sia memorizzato
+nel registro R14, e pongono il loro valore di ritorno nel registro R1.  Tali
+system call sono il più possibile fedeli alla convenzione POSIX.
 
 `SYSCALL 0 - exit()`
 ~~~~~~~~~~~~~~~~~~~~
-SYSCALL 0 does not expect any parameter, nor it returns anything. It simply stops
-the simulator.
+SYSCALL 0 non richiede alcun parametro nè ritorna nulla, semplicemente ferma
+il simulatore.
 
-Note that if the simulator does not find SYSCALL 0 in the source code, or any of
-its equivalents (HALT - TRAP 0), it will be added automatically at the end of
-the source.
+è opportuno notare che se il simulatore non trova SYSCALL 0 nel codice
+sorgente, o una qualsiasi istruzione equivalente (HALT  TRAP 0), terminerà
+automaticamente alla fine del sorgente.
 
 `SYSCALL 1 - open()`
 ~~~~~~~~~~~~~~~~~~~~
-The SYSCALL 1 expects two parameters: a zero-terminated string that indicates
-the pathname of the file that must be opened, and a double word containing an
-integer that indicates the flags that must be used to specify how to open the
-file.
+SYSCALL 1 richiede due parametri: una stringa (che termini con valore zero) che
+indica il percorso del file che deve essere aperto, ed una double word
+contenente un intero che indica i parametri che devono essere usati per
+specificare come aprire il file.
 
-This integer must be built summing the flags that you want to use, choosing them
-from the following list:
+Tale intero può essere costruito sommando i parametri che si vogliono
+utilizzare, scelti dalla seguente lista:
 
-* `O_RDONLY (0x01)` Opens the file in read only mode;
-* `O_WRONLY (0x02)` Opens the file in write only mode;
-* `O_RDWR (0x03)` Opens the file in read/write mode;
-* `O_CREAT (0x04)` Creates the file if it does not exist;
-* `O_APPEND (0x08)` In write mode, appends written text at the end of the file;
-* `O_TRUNC (0x08)` In write mode, deletes the content of the file as soon as it is opened.
+* `O_RDONLY (0x01)` Apre il file in modalità sola lettura;
+* `O_WRONLY (0x02)` Apre il file in modalità sola scrittura;
+* `O_RDWR (0x03)` Apre il file in modalità di lettura/scrittura;
+* `O_CREAT (0x04)` Crea il file se non esiste;
+* `O_APPEND (0x08)` In modalità di scrittura, aggiunge il testo alla fine del file;
+* `O_TRUNC (0x08)` In modalità di scrittura, cancella il contenuto del file al momento della sua apertura.
 
-It is mandatory to specify one of the first three modes. The fourth and the
-fifth modes are exclusive, you can not specify O_APPEND if you specify O_TRUNC
-(and vice versa). 
+È obbligatorio specificare una delle prime tre modalità. La quinta e
+la sesta sono esclusive, non è possibile specificare O_APPEND se si
+specifica O_TRUNC (e viceversa).Inoltre non si puo' specificare O_CREAT se
+si specifica O_RDONLY (oppure O_RDWR).
 
-You can specify a combination of modes by simply adding the integer values of
-those flags. For instance, if you want to open a file in write only mode and
-append the written text to the end of file, you should specify the mode 2 + 8 = 10.
+È possibile specificare una combinazione di modalità semplicemente
+sommando i valori interi ad esse associati.  Ad esempio, se si vuole aprire un
+file in modalità di sola scrittura ed aggiungere il testo alla fine del
+file, si dovrà specificare la modalità 2 + 8 = 10.
 
-The return value of the system call is the new file descriptor associated with
-the file, that can be further used with the other system calls. If there is an
-error, the return value will be -1.
+Il valore di ritorno delle chiamate di sistema è il nuovo descrittore del
+file (file descriptor) associato al file, che potrà essere utilizzato con
+le altre chiamate di sistema. Qualora si verifichi un errore, il valore di
+ritorno sarà -1.
 
 `SYSCALL 2 - close()`
 ~~~~~~~~~~~~~~~~~~~~~
-SYSCALL 2 expects only one parameter, the file descriptor of the file that is
-closed.
+SYSCALL 2 richiede solo un parametro, il file descriptor del file che deve
+essere chiuso. 
 
-If the operation ends successfully, SYSCALL 2 will return 0, otherwise it will
-return -1. Possible causes of failure are the attempt to close a non-existent
-file descriptor or the attempt to close file descriptors 0, 1 or 2, that are
-associated respectively to standard input, standard output and standard error.
+Qualora l'operazione termini con successo, SYSCALL 2 ritornerà 0, altrimenti
+-1.  Possibili cause di errore sono il tentativo di chiudere un file
+inesistente, o di chiudere i file descriptor 0, 1 o 2, che sono associati
+rispettivamente allo standard input, allo standard output ed allo standard
+error.
 
 `SYSCALL 3 - read()`
 ~~~~~~~~~~~~~~~~~~~~
-SYSCALL 3 expects three parameters: the file descriptor to read from, the
-address where the read data must be put into, the number of bytes to read.
+SYSCALL 3 richiede tre parametri: il file descriptor da cui leggere, l'indirizzo
+nel quale i dati letti dovranno essere copiati, il numero di byte da leggere.
 
-If the first parameter is 0, the simulator will prompt the user for an input,
-via an input dialog. If the length of the input is greater than the number of
-bytes that have to be read, the simulator will show again the message dialog.
+Se il primo parametro è 0, il simulatore permetterà all'utente di
+inserire un valore mediante un'apposita finestra di dialogo.  Se la lunghezza
+del valore immesso è maggiore del numero di byte che devono essere letti,
+il simulatore mostrerà nuovamente la finestra.
 
-It returns the number of bytes that have effectively been read, or -1 if the
-read operation fails. Possible causes of failure are the attempt to read from a
-non-existent file descriptor, the attempt to read from file descriptors 1
-(standard output) or 2 (standard error) or the attempt to read from a write-only
-file descriptor.
+La chiamata di sistema ritorna il numero di byte effettivamente letti, o -1 se
+l'operazione di lettura fallisce. Possibili cause di errore sono il tentativo
+di leggere da un file inesistente, o di leggere dai file descriptor 1
+(standard output) o 2 (standard error), oppure il tentativo di leggere da un
+file di sola scrittura. 
 
 `SYSCALL 4 - write()`
 ~~~~~~~~~~~~~~~~~~~~~
-SYSCALL 4 expects three parameters: the file descriptor to write to, the address
-where the data must be read from, the number of bytes to write.
+SYSCALL 4 richiede tre parametri: il file descriptor su cui scrivere,
+l'indirizzo dal quale i dati dovranno essere letti, il numero di byte da
+scrivere.
 
-If the first parameter is two or three, the simulator will pop the input/output
-frame, and write there the read data.
+Se il primo parametro è 2 o 3, il simulatore mostrerà la finestra di
+input/output dove scriverà i dati letti.
 
-It returns the number of bytes that have been written, or -1 if the write
-operation fails. Possible causes of failure are the attempt to write to a
-non-existent file descriptor, the attempt to write to file descriptor 0
-(standard input) or the attempt to write to a read-only file descriptor.
+Questa chiamata di sistema ritorna il numero di byte che sono stati scritti, o
+-1 se l'operazione di scrittura fallisce.  Possibili cause di errore sono il
+tentativo di scrivere su un file inesistente, o sul file descriptor 0
+(standard input), oppure il tentativo di scrivere su un file di sola lettura.
 
 `SYSCALL 5 - printf()`
 ~~~~~~~~~~~~~~~~~~~~~~
-SYSCALL 5 expects a variable number of parameters, the first being the address
-of the so-called "format string". In the format string can be included some
-placeholders, described in the following list:
-* `%s` indicates a string parameter;
-* `%i` indicates an integer parameter;
-* `%d` behaves like `%i`;
-* `%%` literal `%`
+SYSCALL 5 richiede un numero variabile di parametri, il primo è la
+cosiddetta "format string" o stringa di formato. Nella stringa di formato
+possono essere inseriti alcuni segnaposto, descritti nella seguente lista:
+* `%s` parametro di tipo stringa;
+* `%i` parametro di tipo intero;
+* `%d` si comporta come `%i`;
+* `%%` carattere `%`
 
-For each `%s`, `%d` or `%i` placeholder, SYSCALL 5 expects a parameter,
-starting from the address of the previous one.
+Per ciascuno dei segnaposto `\%s`, `\%d` o `\%i` la SYSCALL 5
+si aspetta un parametro, partendo dall'indirizzo del precedente.
 
-When the SYSCALL finds a placeholder for an integer parameter, it expects that
-the corresponding parameter is an integer value, when if it finds a placeholder
-for a string parameter, it expects as a parameter the address of the string.
+Quando la SYSCALL trova un segnaposto per un parametro intero, si aspetta che
+il corrispondente parametro sia un valore intero, quando trova un segnaposto
+per un parametro stringa, si aspetta come parametro l'indirizzo della stringa
+stessa.
 
-The result is printed in the input/output frame, and the number of bytes
-written is put into R1.
+Il risultato  visualizzato nella finestra di input/output, ed il numero di
+byte scritti posto in R1.
 
-If there's an error, -1 is written to R1.
+Qualora si verifichi un errore, R1 avrà valore -1.
 
-Other instructions
-------------------
-In this section there are instructions that do not fit in the previous 
-categories.
+Altre istruzioni
+----------------
+In questa sezione sono descritte istruzioni che non rientrano nelle precedenti
+categorie.
 
 `BREAK`
 ~~~~~~~
-The BREAK instruction throws an exception that has the effect to stop the
-execution if the simulator is running. It can be used for debugging purposes.
+L'istruzione BREAK solleva un'eccezione che ha l'effetto di fermare
+l'esecuzione se il simulatore è in esecuzione. Può essere utilizzata per
+il debugging.
 
 `NOP`
 ~~~~~
-The NOP instruction does not do anything, and it's used to create gaps in the
-source code.
+L'istruzione NOP non fa nulla, ed è utilizzata per creare pause nel codice
+sorgente.
 
 `TRAP`
 ~~~~~~
-The TRAP instruction is a deprecated alias for the SYSCALL instruction.
+L'istruzione TRAP è deprecated, rappresenta un'alternativa all'istruzione
+SYSCALL.
 
 `HALT`
 ~~~~~~
-The HALT instruction is a deprecated alias for the SYSCALL 0 instruction, that
-halts the simulator.
+L'istruzione HALT è deprecated, rappresenta un'alternativa all'istruzione
+SYSCALL 0, che ferma il simulatore.
