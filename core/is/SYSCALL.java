@@ -46,7 +46,7 @@ public class SYSCALL extends Instruction {
 
     public void IF()
     {
-		logger.fine("SYSCALL (" + this.hashCode() + ") -> IF");
+		logger.info("SYSCALL (" + this.hashCode() + ") -> IF");
         try
         {
             CPU cpu=CPU.getInstance();
@@ -68,9 +68,9 @@ public class SYSCALL extends Instruction {
 
 	public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
 		syscall_n = params.get(0);
-		logger.fine("SYSCALL (" + this.hashCode() + ") n = " + syscall_n);
+		logger.info("SYSCALL (" + this.hashCode() + ") n = " + syscall_n);
 		if(syscall_n == 0) {
-			logger.fine("Stopping CPU due to SYSCALL (" + this.hashCode() + ")");
+			logger.info("Stopping CPU due to SYSCALL (" + this.hashCode() + ")");
 			CPU.getInstance().setStatus(CPU.CPUStatus.STOPPING);
 		}
 		else if((syscall_n > 0) && (syscall_n <= 5)) {
@@ -83,20 +83,20 @@ public class SYSCALL extends Instruction {
 			// In WB, R1 <- Return value
 			r1.incrWriteSemaphore();
 			address = r14.getValue();
-			logger.fine("SYSCALL (" + this.hashCode() + "): locked register R14. Value = " + address);
+			logger.info("SYSCALL (" + this.hashCode() + "): locked register R14. Value = " + address);
 		}
 		else {
 			// TODO: invalid syscall
-			logger.fine("INVALID SYSCALL (" + this.hashCode() + ")");
+			logger.info("INVALID SYSCALL (" + this.hashCode() + ")");
 		}
 	}
 
     public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException,IrregularWriteOperationException {
-		logger.fine("SYSCALL (" + this.hashCode() + ") -> EX");
+		logger.info("SYSCALL (" + this.hashCode() + ") -> EX");
     }
 
     public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
-		logger.fine("SYSCALL (" + this.hashCode() + ") -> MEM");
+		logger.info("SYSCALL (" + this.hashCode() + ") -> MEM");
 		if(syscall_n == 1) {
 			// int open(const char* filename, int flags)
 			String filename = fetchString(address);
@@ -110,7 +110,7 @@ public class SYSCALL extends Instruction {
 			for(int i = (int)address; i <= flags_address; i += 8)
 				din.Load(Converter.binToHex(Converter.positiveIntToBin(64,i)),8);
 
-			logger.fine("We must open " + filename + " with flags " + flags);
+			logger.info("We must open " + filename + " with flags " + flags);
 
 			return_value = -1;
 			try {
@@ -131,13 +131,13 @@ public class SYSCALL extends Instruction {
 			// int close(int fd)
 			MemoryElement fd_cell = Memory.getInstance().getCell((int)address);
 			int fd = (int)fd_cell.getValue();
-			logger.fine("Closing fd " + fd);
+			logger.info("Closing fd " + fd);
 			return_value = -1;
 			try {
 				return_value = iom.close(fd);
 			}
 			catch(IOException e1) {
-				logger.fine("Error in closing " + fd);
+				logger.info("Error in closing " + fd);
 			}
 		}
 		else if((syscall_n == 3) || (syscall_n == 4)) {
@@ -161,11 +161,11 @@ public class SYSCALL extends Instruction {
 			return_value = -1;
 			try {
 				if(syscall_n == 3) {
-					logger.fine("SYSCALL (" + this.hashCode() + "): trying to read from fd " + fd + " " + count + " bytes, writing them to address " + buf_addr);
+					logger.info("SYSCALL (" + this.hashCode() + "): trying to read from fd " + fd + " " + count + " bytes, writing them to address " + buf_addr);
 					return_value = iom.read(fd, buf_addr, count);
 				}
 				else {
-					logger.fine("SYSCALL (" + this.hashCode() + "): trying to write to fd " + fd + " " + count + " bytes, reading them from address " + buf_addr);
+					logger.info("SYSCALL (" + this.hashCode() + "): trying to write to fd " + fd + " " + count + " bytes, reading them from address " + buf_addr);
 					return_value = iom.write(fd, buf_addr, count);
 				}
 			}
@@ -184,7 +184,7 @@ public class SYSCALL extends Instruction {
             
             // In the address variable (content of R14) we have the address of
             // the format string, that we get and put in the format_string_address variable
-			logger.fine("Reading memory cell at address " + address + ", searching for the address of the format string");
+			logger.info("Reading memory cell at address " + address + ", searching for the address of the format string");
 			MemoryElement tempMemCell = memory.getCell((int)address);
             int format_string_address = (int)tempMemCell.getValue();
 
@@ -193,7 +193,7 @@ public class SYSCALL extends Instruction {
             
             // Fetching the format string
 			String format_string = fetchString(format_string_address);
-			logger.fine("Read " + format_string);
+			logger.info("Read " + format_string);
 
             // Going to the next memory cell to start fetching parameters.
             int next_param_address = (int)address + 8;
@@ -209,13 +209,13 @@ public class SYSCALL extends Instruction {
 			int oldIndex = 0, newIndex = 0;
 			while((newIndex = format_string.indexOf('%', oldIndex)) >= 0) {
 				char type = format_string.charAt(newIndex + 1);
-				logger.fine("Found a placeholder... type " + type);
+				logger.info("Found a placeholder... type " + type);
 				temp.append(format_string.substring(oldIndex, newIndex));
 				switch(type) {
 					case 's':		// %s
                         tempMemCell = memory.getCell(next_param_address);
                         int str_address = (int)tempMemCell.getValue();
-						logger.fine("Retrieving the string @ " + str_address + "...");
+						logger.info("Retrieving the string @ " + str_address + "...");
 						String param = fetchString(str_address);
 
                         next_param_address += 8;
@@ -231,12 +231,12 @@ public class SYSCALL extends Instruction {
 						for(int i = str_address; i < t2; i += 8)
 							din.Load(Converter.binToHex(Converter.positiveIntToBin(64,i)),8);
 
-						logger.fine("Got " + param);
+						logger.info("Got " + param);
 						temp.append(param);
 						break;
 					case 'i':		// %i
 					case 'd':		// %d
-						logger.fine("Retrieving the integer @ " + next_param_address + "...");
+						logger.info("Retrieving the integer @ " + next_param_address + "...");
 						MemoryElement memCell = memory.getCell((int)next_param_address);
 						
 						// Tracefile entry for this memory access
@@ -245,20 +245,20 @@ public class SYSCALL extends Instruction {
 						Long val = memCell.getValue();
 						next_param_address += 8;
 						temp.append(val.toString());
-						logger.fine("Got " + val);
+						logger.info("Got " + val);
 						break;
 					case '%':		// %%
-						logger.fine("Literal %...");
+						logger.info("Literal %...");
 						temp.append('%');
 						break;
 					default:
-						logger.fine("Unknown placeholder");
+						logger.info("Unknown placeholder");
 						break;
 				}
 				oldIndex = newIndex + 2;
 			}
 			temp.append(format_string.substring(oldIndex));
-			logger.fine("That became " + temp.toString());
+			logger.info("That became " + temp.toString());
 			edumips64.Main.ioFrame.write(temp.toString());
 			return_value = temp.length();
 		}
@@ -286,22 +286,22 @@ public class SYSCALL extends Instruction {
     
     public void WB() throws IrregularStringOfBitsException, HaltException
     {
-		logger.fine("SYSCALL (" + this.hashCode() + ") -> WB. n = " + syscall_n);
+		logger.info("SYSCALL (" + this.hashCode() + ") -> WB. n = " + syscall_n);
 		if(syscall_n == 0) {
-			logger.fine("Stopped CPU due to SYSCALL (" + this.hashCode() + ")");
+			logger.info("Stopped CPU due to SYSCALL (" + this.hashCode() + ")");
 			CPU.getInstance().setStatus(CPU.CPUStatus.HALTED);
 			throw new HaltException();
 		}
 		else if(syscall_n > 0 && syscall_n <= 5) {
-			logger.fine("SYSCALL (" + this.hashCode() + "): setting R1 to " + return_value);
+			logger.info("SYSCALL (" + this.hashCode() + "): setting R1 to " + return_value);
 			Register r1 = CPU.getInstance().getRegister(1);
-			logger.fine("SYSCALL (" + this.hashCode() + "): got R1");
+			logger.info("SYSCALL (" + this.hashCode() + "): got R1");
 			r1.setBits(Converter.intToBin(64, return_value), 0);
-			logger.fine("SYSCALL (" + this.hashCode() + "): set R1 to " + return_value);
+			logger.info("SYSCALL (" + this.hashCode() + "): set R1 to " + return_value);
 			r1.decrWriteSemaphore();
-			logger.fine("SYSCALL (" + this.hashCode() + "): decremented write semaphore");
+			logger.info("SYSCALL (" + this.hashCode() + "): decremented write semaphore");
 		}
-		logger.fine("SYSCALL (" + this.hashCode() + ") exiting from WB. n = " + syscall_n);
+		logger.info("SYSCALL (" + this.hashCode() + ") exiting from WB. n = " + syscall_n);
     }
     
     public void pack() throws IrregularStringOfBitsException {

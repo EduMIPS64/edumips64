@@ -124,9 +124,9 @@ public class GUIFrontend {
                     }
                 });
             } catch (InterruptedException e) {
-                logger.fine("InterruptedException in GUIFrontend");
+                logger.info("InterruptedException in GUIFrontend");
             } catch (java.lang.reflect.InvocationTargetException e) {
-                logger.fine("InvocationTargetException in GUIFrontend");
+                logger.info("InvocationTargetException in GUIFrontend");
             }
         }
         else {
@@ -156,9 +156,9 @@ public class GUIFrontend {
                     }
                 });
             } catch (InterruptedException e) {
-                logger.fine("InterruptedException in GUIFrontend");
+                logger.info("InterruptedException in GUIFrontend");
             } catch (java.lang.reflect.InvocationTargetException e) {
-                logger.fine("InvocationTargetException in GUIFrontend");
+                logger.info("InvocationTargetException in GUIFrontend");
             }
         }
         else {

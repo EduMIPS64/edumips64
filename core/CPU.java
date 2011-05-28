@@ -91,13 +91,13 @@ public class CPU
 		// To avoid future singleton problems
 		Instruction dummy = Instruction.buildInstruction("BUBBLE");
 
-		logger.fine("Creating the CPU...");
+		logger.info("Creating the CPU...");
 		cycles = 0;
 		status = CPUStatus.READY;
 		mem = Memory.getInstance();
-		logger.fine("Got Memory instance..");
+		logger.info("Got Memory instance..");
 		symTable = SymbolTable.getInstance();
-		logger.fine("Got SymbolTable instance..");
+		logger.info("Got SymbolTable instance..");
 
 		// Registers initialization
 		gpr = new Register[32];
@@ -113,7 +113,7 @@ public class CPU
 		pipe = new HashMap<PipeStatus, Instruction>();
 		clearPipe();
 		currentPipeStatus = PipeStatus.IF;
-		logger.fine("CPU Created.");
+		logger.info("CPU Created.");
 	}
 
 	
@@ -218,7 +218,7 @@ public class CPU
 			throw new StoppedCPUException();
 		try
 		{
-			logger.fine("Starting cycle " + ++cycles);
+			logger.info("Starting cycle " + ++cycles);
 			currentPipeStatus = PipeStatus.WB; 
 
 			// Let's execute the WB() method of the instruction located in the 
@@ -249,7 +249,7 @@ public class CPU
 			}
 			catch (SynchronousException e) {
 				if(masked)
-					logger.fine("[EXCEPTION] [MASKED] " + e.getCode());
+					logger.info("[EXCEPTION] [MASKED] " + e.getCode());
 				else {
 					if(terminate) {
 						logger.info("Terminating due to an unmasked exception");
@@ -282,7 +282,7 @@ public class CPU
 					}
 					catch (BreakException exc) {
 						breaking = 1;
-						logger.fine("breaking = 1");
+						logger.info("breaking = 1");
 					}
 				}
 				pipe.put(PipeStatus.ID, pipe.get(PipeStatus.IF));
@@ -296,7 +296,7 @@ public class CPU
 			}
 			if(breaking == 1) {
 				breaking = 0;
-				logger.fine("Re-thrown the exception");
+				logger.info("Re-thrown the exception");
 				throw new BreakException();
 			}
 			if(syncex != null)
@@ -309,7 +309,7 @@ public class CPU
                         pipe.get(PipeStatus.IF).IF();
             }
             catch(BreakException bex) {
-				logger.fine("Caught a BREAK after a Jump: ignoring it.");
+				logger.info("Caught a BREAK after a Jump: ignoring it.");
             }
 
 			// A J-Type instruction has just modified the Program Counter. We need to
@@ -333,7 +333,7 @@ public class CPU
 
 		}
 		catch(SynchronousException ex) {
-			logger.fine("Exception: " + ex.getCode());
+			logger.info("Exception: " + ex.getCode());
 			throw ex;
 		}
 		catch(HaltException ex)
@@ -406,7 +406,7 @@ public class CPU
 		// Reset tracefile
 		Dinero.getInstance().reset();
 
-		logger.fine("CPU Resetted");
+		logger.info("CPU Resetted");
     }
 
 	/** Test method that returns a string containing the status of the pipeline.

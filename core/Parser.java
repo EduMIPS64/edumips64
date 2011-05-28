@@ -165,7 +165,7 @@ public class Parser
 				{
 					end = filetmp.length();
 				}
-				logger.fine("Open by #include: " + filetmp.substring(i+9, end).trim());
+				logger.info("Open by #include: " + filetmp.substring(i+9, end).trim());
 				String filename = filetmp.substring(i+9, end).split(";")[0].trim();
 				if (!(new File(filename)).isAbsolute())
 					filename = path + filename;
@@ -259,7 +259,7 @@ public class Parser
 				try {
 					if (line.charAt(i)=='.')
 					{
-						logger.fine("Processing " + instr);
+						logger.info("Processing " + instr);
 						if(instr.compareToIgnoreCase(".DATA")==0)
 						{
 							status = 1;
@@ -282,12 +282,12 @@ public class Parser
 									parameters = cleanFormat(line.substring(end+2));
 									parameters = parameters.toUpperCase();
 									parameters = parameters.split(";")[0];
-									logger.fine("parameters: " + parameters);
+									logger.info("parameters: " + parameters);
 								}
 								else
 									parameters = line.substring(end + 2);
 									parameters = parameters.split(";")[0].trim();
-									logger.fine("parameters: " + parameters);
+									logger.info("parameters: " + parameters);
 							}
 							catch (StringIndexOutOfBoundsException e) {
 								numWarning++;
@@ -307,25 +307,25 @@ public class Parser
 							}
 							MemoryElement tmpMem = null;
 							tmpMem = mem.getCell(memoryCount * 8);
-							logger.fine("line: "+line);
+							logger.info("line: "+line);
 							String[] comment = (line.substring(i)).split(";",2);
 							if (Array.getLength(comment) == 2)
 							{
-								logger.fine("found comments: "+comment[1]);
+								logger.info("found comments: "+comment[1]);
 								tmpMem.setComment(comment[1]);
 							}
 							tmpMem.setCode(comment[0]);
 
 							if(instr.compareToIgnoreCase(".ASCII") == 0 || instr.compareToIgnoreCase(".ASCIIZ") == 0) {
-								logger.fine(".ascii(z): parameters = " + parameters);
+								logger.info(".ascii(z): parameters = " + parameters);
 								boolean auto_terminate = false;
 								if(instr.compareToIgnoreCase(".ASCIIZ") == 0)
 									auto_terminate = true;
 								try {
 									List<String> pList = splitStringParameters(parameters, auto_terminate);
 									for(String current_string : pList) {
-										logger.fine("Current string: [" + current_string + "]");
-										logger.fine(".ascii(z): requested new memory cell (" + memoryCount + ")");
+										logger.info("Current string: [" + current_string + "]");
+										logger.info(".ascii(z): requested new memory cell (" + memoryCount + ")");
 										tmpMem = mem.getCell(memoryCount * 8);
 										memoryCount++;
 										int posInWord = 0;
@@ -336,14 +336,14 @@ public class Parser
 										int escaped = 0;		// to avoid escape sequences to count as two bytes
 										for(int tmpi = 0; tmpi < num; tmpi++) {
 											if((tmpi - escaped) % 8 == 0 && (tmpi - escaped) != 0 && !escape) {
-												logger.fine(".ascii(z): requested new memory cell (" + memoryCount + ")");
+												logger.info(".ascii(z): requested new memory cell (" + memoryCount + ")");
 												tmpMem = mem.getCell(memoryCount * 8);
 												memoryCount++;
 												posInWord = 0;
 											}
 											char c = current_string.charAt(tmpi);
 											int to_write = (int)c;
-											logger.fine("Char: " + c + " (" + to_write + ") [" + Integer.toHexString(to_write) + "]");
+											logger.info("Char: " + c + " (" + to_write + ") [" + Integer.toHexString(to_write) + "]");
 											if(escape) {
 												switch(c) {
 													case '0':
@@ -364,20 +364,20 @@ public class Parser
 													default:
 														throw new StringFormatException();
 												}
-												logger.fine("(escaped to [" + Integer.toHexString(to_write) + "])");
+												logger.info("(escaped to [" + Integer.toHexString(to_write) + "])");
 												escape = false;
 												c = 0;	// to avoid re-entering the escape if branch.
 											}
 											if(placeholder) {
 												if(c != '%' && c != 's' && c != 'd' && c != 'i') {
-													logger.fine("Invalid placeholder: %" + c);
+													logger.info("Invalid placeholder: %" + c);
 													// Invalid placeholder
 													throw new StringFormatException();
 												}
 												placeholder = false;
 											}
 											if(c == '%' && !placeholder) {
-												logger.fine("Expecting on next step a valid placeholder...");
+												logger.info("Expecting on next step a valid placeholder...");
 												placeholder = true;
 											}
 											if(c == '\\') {
@@ -390,7 +390,7 @@ public class Parser
 									}
 								}
 								catch(StringFormatException ex) {
-									logger.fine("Badly formed string list");
+									logger.info("Badly formed string list");
 									numError++;
 									// TODO: more descriptive error message
 									error.add("INVALIDVALUE",row,0,line);
@@ -436,7 +436,7 @@ public class Parser
 							}
 							else if(instr.compareToIgnoreCase(".WORD")==0 || instr.compareToIgnoreCase(".WORD64")==0)
 							{
-								logger.fine("pamword: "+parameters);
+								logger.info("pamword: "+parameters);
 								writeIntegerInMemory(row, i, end, line, parameters, 64, "WORD");
 								end = line.length();
 							}
@@ -471,10 +471,10 @@ public class Parser
 					}
 					else if(line.charAt(end)==':')
 					{
-						logger.fine("Processing a label..");
+						logger.info("Processing a label..");
 						if(status==1)
 						{
-							logger.fine("in .data section");
+							logger.info("in .data section");
 							MemoryElement tmpMem = null;
 							tmpMem = mem.getCell(memoryCount * 8);
 							try {
@@ -482,15 +482,15 @@ public class Parser
 							}
 							catch (SameLabelsException e) {
 								// TODO: errore del parser
-								logger.fine("Label " + line.substring(i, end) + " is already assigned");
+								logger.info("Label " + line.substring(i, end) + " is already assigned");
 							}
 						}
 						else if(status==2)
 						{
-							logger.fine("in .text section");
+							logger.info("in .text section");
 							lastLabel = line.substring(i,end);
 						}
-						logger.fine("done");
+						logger.info("done");
 					}
 					else
 					{
@@ -548,7 +548,7 @@ public class Parser
 								String param = cleanFormat(line.substring(end+1));
 								param = param.toUpperCase();
 								param = param.split(";")[0].trim();
-									logger.fine("param: " + param);
+									logger.info("param: " + param);
 								int indPar=0;
 								for(int z=0; z < syntax.length(); z++)
 								{
@@ -630,7 +630,7 @@ public class Parser
 														try
 														{
 															imm = (int) Long.parseLong(Converter.hexToShort(param.substring(indPar,endPar)));
-											logger.fine("imm = "+ imm);
+											logger.info("imm = "+ imm);
 															if( imm < -32768 || imm > 32767)
 																throw new NumberFormatException();
 														}
@@ -1040,7 +1040,7 @@ public class Parser
 								}
 							}
 							
-							logger.fine("line: "+line);
+							logger.info("line: "+line);
 							String comment[] = line.split(";",2);
 							tmpInst.setFullName(replaceTab(comment[0].substring(i)));
 							tmpInst.setFullName(replaceTab(comment[0].substring(i)));
@@ -1496,9 +1496,9 @@ register
 	private List<String> splitStringParameters(String params, boolean auto_terminate) throws StringFormatException {
 		List<String> pList = new LinkedList<String>();
 		StringBuffer temp = new StringBuffer();
-		logger.fine("Params: " + params);
+		logger.info("Params: " + params);
 		params = params.trim();
-		logger.fine("After trimming: " + params);
+		logger.info("After trimming: " + params);
 		int length = params.length();
 		boolean in_string = false;
 		boolean escaping = false;
@@ -1531,10 +1531,10 @@ register
 				else if(!escaping && c == '"') {
 					if(temp.length() > 0) {
 						if(auto_terminate) {
-							logger.fine("Behaving like .asciiz.");
+							logger.info("Behaving like .asciiz.");
 							temp.append((char)0);
 						}
-						logger.fine("Added to pList string " + temp.toString());
+						logger.info("Added to pList string " + temp.toString());
 						pList.add(temp.toString());
 						temp.setLength(0);
 					}

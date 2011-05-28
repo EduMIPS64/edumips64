@@ -44,7 +44,7 @@ public class Memory{
     private static final Logger logger = Logger.getLogger(Memory.class.getName());
 	
 	private Memory(){
-		logger.fine("Building Memory: " + this.hashCode());
+		logger.info("Building Memory: " + this.hashCode());
 		mem_comments = new HashMap<Integer,String>();
 		cells = new ArrayList<MemoryElement>();
 		instr_num = 0;
@@ -53,7 +53,7 @@ public class Memory{
 			cells.add(new MemoryElement(i*8));
 		for(int i = 0; i < CPU.CODELIMIT; i++)
 			instructions.add(Instruction.buildInstruction("BUBBLE"));
-		logger.fine("Memory built: " + this.hashCode());
+		logger.info("Memory built: " + this.hashCode());
 	}
 
 	/** Returns the maximum number of MemoryElement stored in Memory

@@ -39,6 +39,7 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.SimpleFormatter;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -64,7 +65,7 @@ public class Main extends JApplet {
     private static StatusBar sb;
     private static JMenu file, lastfiles, exec, config, window, help, lang, tools;
     private static JCheckBoxMenuItem lang_en,lang_it, pipeFrameMI, codeFrameMI;
-    private static JCheckBoxMenuItem pipelineJCB, registersJCB, memoryJCB, codeJCB, cyclesJCB, statsJCB, loggerJCB, ioJCB;
+    private static JCheckBoxMenuItem pipelineJCB, registersJCB, memoryJCB, codeJCB, cyclesJCB, statsJCB, ioJCB;
     private static java.util.List<JCheckBoxMenuItem> frames_menu_items;
 
     // Stuff for choosing colors
@@ -75,7 +76,6 @@ public class Main extends JApplet {
     private static JFrame frameColorCh;
     private static String[] pipe = {"IF", "ID", "EX", "MEM", "WB"};
 
-    public static GUILog loggerFrame;
     public static GUIIO ioFrame;
     public static IOManager iom;
 
@@ -125,6 +125,18 @@ public class Main extends JApplet {
             return;
         }
 
+        Logger rootLogger = Logger.getLogger("");
+	
+        if(!debug_mode) {
+            // Clear up the default handlers of the root logger
+            for(Handler h : rootLogger.getHandlers()) {
+                rootLogger.removeHandler(h);
+            }
+        }
+        rootLogger.setLevel(java.util.logging.Level.FINE);
+
+        log.info("EduMIPS64 version " + VERSION + " - Ciao 'mbare");
+
         // Creating the main JFrame
         JFrame.setDefaultLookAndFeelDecorated(true);
         JDialog.setDefaultLookAndFeelDecorated(true);
@@ -150,7 +162,7 @@ public class Main extends JApplet {
         mm.init();
         f.setVisible(true);
         mm.start();
-        log.fine("Simulator started");
+        log.info("Simulator started");
 
         if(toOpen != null) {
             resetSimulator(false);
@@ -178,21 +190,6 @@ public class Main extends JApplet {
         JDialog.setDefaultLookAndFeelDecorated(true);
         iom = IOManager.getInstance();
 
-        // Clear up the default handlers of the root logger
-        Logger rootLogger = Logger.getLogger("");
-        for(Handler h : rootLogger.getHandlers()) {
-            rootLogger.removeHandler(h);
-        }
-
-        rootLogger.setLevel(java.util.logging.Level.FINE);
-        // The logger is create before everything else because some classes call
-        // it before it's displayed.
-        // Configure the root Logger, so that children loggers' behaviour is
-        // defined by us.
-        loggerFrame = new GUILog(CurrentLocale.getString("LOGGER"), true, false, true, true);
-        Handler guiHandler = new GUILoggingHandler(loggerFrame);
-        rootLogger.addHandler(guiHandler);
-        log.info("Ciao 'mbare");
         desk = new JDesktopPane();
         Container cp = (f==null)? getContentPane() : f.getContentPane();
         cp.setLayout(new BorderLayout());
@@ -266,17 +263,6 @@ public class Main extends JApplet {
             }
         });
 
-        if(debug_mode) {
-            loggerFrame.addInternalFrameListener(new InternalFrameAdapter() {
-                public void internalFrameIconified(InternalFrameEvent e) {
-                    loggerJCB.setState(false);
-                }
-                public void internalFrameDeiconified(InternalFrameEvent e) {
-                    loggerJCB.setState(true);
-                }
-            });
-        }
-
         ioFrame = new GUIIO(CurrentLocale.getString("IO"), true, false, true, true);
         ioFrame.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameIconified(InternalFrameEvent e) {
@@ -306,8 +292,6 @@ public class Main extends JApplet {
         addFrame("pipeline", pipeFrame);
         addFrame("memory", memoryFrame);
         addFrame("code", codeFrame);
-        if(debug_mode)
-            addFrame("logger", loggerFrame);
         addFrame("io", ioFrame);
 
         // Setting icons for the main frame and for the internal frames
@@ -391,22 +375,22 @@ public class Main extends JApplet {
      * */
     public static void changeShownMenuItems(CPU.CPUStatus s) {
         if(s == CPU.CPUStatus.READY) {
-            log.fine("CPU Ready");
+            log.info("CPU Ready");
             setCacheMenuItemsStatus(false);
             setRunningMenuItemsStatus(false);
         }
         else if (s == CPU.CPUStatus.RUNNING) {
-            log.fine("CPU Running");
+            log.info("CPU Running");
             setCacheMenuItemsStatus(false);
             setRunningMenuItemsStatus(true);
         }
         else if(s == CPU.CPUStatus.STOPPING) {
-            log.fine("CPU Stopping");
+            log.info("CPU Stopping");
             setCacheMenuItemsStatus(false);
             setRunningMenuItemsStatus(true);
         }
         else if (s == CPU.CPUStatus.HALTED) {
-            log.fine("CPU Halted");
+            log.info("CPU Halted");
             setCacheMenuItemsStatus(true);
             setRunningMenuItemsStatus(false);
         }
@@ -414,7 +398,7 @@ public class Main extends JApplet {
 
     /** Opens a file. */
     private static void openFile(String file) {
-        log.fine("Trying to open " + file);
+        log.info("Trying to open " + file);
         cpu.reset();
 
         try {
@@ -427,7 +411,7 @@ public class Main extends JApplet {
         }
 
         try {
-            log.fine("Before parsing");
+            log.info("Before parsing");
             try {
                 parser.parse(file);
             }
@@ -435,14 +419,14 @@ public class Main extends JApplet {
                 new ErrorDialog(f,pmwe.getExceptionList(),CurrentLocale.getString("GUI_PARSER_ERROR"));
             }
             catch (NullPointerException e) {
-                log.fine("NullPointerException: " + e.toString());
+                log.info("NullPointerException: " + e.toString());
                 e.printStackTrace();
             }
-            log.fine("After parsing");
+            log.info("After parsing");
 
             // The file has correctly been parsed
             cpu.setStatus(CPU.CPUStatus.RUNNING);
-            log.fine("Set the status to RUNNING");
+            log.info("Set the status to RUNNING");
 
             // Let's fetch the first instruction
             synchronized(cgt) {
@@ -450,7 +434,7 @@ public class Main extends JApplet {
                 cgt.notify();
             }    
             openedFile = file;
-            log.fine("File " + file + " successfully opened");
+            log.info("File " + file + " successfully opened");
 			StringTokenizer token = new StringTokenizer(file,File.separator,false);
 			String nome_file=null;
 			while (token.hasMoreElements()){
@@ -459,7 +443,7 @@ public class Main extends JApplet {
 			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
         }
         catch (ParserMultiException ex) {
-            log.fine("Error opening " + file);
+            log.info("Error opening " + file);
             new ErrorDialog(f,ex.getExceptionList(),CurrentLocale.getString("GUI_PARSER_ERROR")); 
             openedFile = null;
             f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
@@ -473,12 +457,12 @@ public class Main extends JApplet {
 				tmpfile=ex.getMessage();
 
 			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));		
-			log.fine("File not found: " + tmpfile);
+			log.info("File not found: " + tmpfile);
             JOptionPane.showMessageDialog(f, CurrentLocale.getString("FILE_NOT_FOUND") + ": " + tmpfile, "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
         }
         catch (Exception e) {
 			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));				
-            log.fine("Error opening " + file);
+            log.info("Error opening " + file);
             new ReportDialog(f,e,CurrentLocale.getString("ERROR"));
         }
     }
@@ -552,7 +536,7 @@ public class Main extends JApplet {
             iom.reset();
         }
         catch(IOException e1) {
-            log.fine("I/O error while resetting IOManager");
+            log.info("I/O error while resetting IOManager");
         }
         cpu.setStatus(CPU.CPUStatus.READY);
         front.updateComponents();
@@ -593,7 +577,6 @@ public class Main extends JApplet {
         setMenuItem(memoryJCB, "MEMORY");
         setMenuItem(statsJCB, "STATS");
         setMenuItem(registersJCB, "REGISTERS");
-        setMenuItem(loggerJCB, "LOGGER");
         setMenuItem(ioJCB, "IO");
     }
 
@@ -635,7 +618,6 @@ public class Main extends JApplet {
         registersJCB = new JCheckBoxMenuItem();
         statsJCB = new JCheckBoxMenuItem();
         cyclesJCB = new JCheckBoxMenuItem();
-        loggerJCB = new JCheckBoxMenuItem();
         ioJCB = new JCheckBoxMenuItem();
 
         // Adding menus to the menu bar
@@ -706,11 +688,11 @@ public class Main extends JApplet {
                     Dinero din = Dinero.getInstance();
                     try {
                         din.WriteXdinFile(filename);
-                        log.fine("Wrote dinero tracefile");
+                        log.info("Wrote dinero tracefile");
                     }
                     catch (Exception ex) {
                         ex.printStackTrace();
-                        log.fine("Exception in DineroTracefile: " + ex);
+                        log.info("Exception in DineroTracefile: " + ex);
                     }
                 }
             }
@@ -960,22 +942,6 @@ public class Main extends JApplet {
         });
         frames_menu_items.add(codeJCB);
         window.add(codeJCB);
-
-        loggerJCB.setText(CurrentLocale.getString("log".toUpperCase()));
-        loggerJCB.setState(true);
-        loggerJCB.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                boolean cur_state = ((JInternalFrame)mapped_frames.get("logger")).isIcon();
-                try {
-                    ((JInternalFrame)mapped_frames.get("logger")).setIcon(!cur_state);
-                }
-                catch(java.beans.PropertyVetoException ex) {}
-            }
-        });
-        if(debug_mode) {
-            frames_menu_items.add(loggerJCB);
-            window.add(loggerJCB);
-        }
 
         ioJCB.setText(CurrentLocale.getString("log".toUpperCase()));
         ioJCB.setState(true);
