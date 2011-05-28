@@ -1,12 +1,16 @@
 EduMIPS64 ChangeLog
 ------------------- 
-0.5.3 (..)
+0.5.3 (*unreleased*)
 	- Added labels to the GUIData frame; fixed GUIData and GUICode default column
       widths so that they can be read (andrea)
 	- Added GUIData/GUICode column labels update on language change (andrea)
 	- Added Splash Screen (visible with Java6+, not shown with Java5) (andrea,
 	  vanni)
 	- Changed logging mechanism to use java.util.logging (andrea)
+	- Removed GUI Log viewer, the debug messages now go to stdout (andrea)
+	- Embedded JavaHelp viewer (andrea)
+	- Converted the TeX docs to RST, so that the same sources can be used for
+	  the PDF manual and for the newly-embedded JavaHelp viewer (andrea)
 
 0.5.2 (17/04/2008)
 	- Fixed a bug about a stall for synchronous exceptions and forwarding (max83t)

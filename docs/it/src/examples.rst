@@ -1,35 +1,35 @@
-Code Examples
-=============
-In this chapter you'll find some sample listings that will be useful in
-order to understand how EduMIPS64 (version 0.5.3) works.
+Listati di esempio
+==================
+In questo capitolo sono presenti degli esemi di codice utili per comprendere
+il funzionamento del simulatore.
 
 SYSCALL
 -------
+Gli esempi per le SYSCALL 1-4 si riferiscono al file `print.s`, che è
+l'esempio per la SYSCALL 5. Se si desidera eseguire gli esempi, è prima
+necessario copiare il contenuto di quell'esempio in un file denominato
+`print.s`, e salvarlo nella stessa directory contenente l'esempio che si sta
+eseguendo.
 
-It's important to understand that examples for SYSCALL 1-4 refer to the
-`print.s` file, that is the example for SYSCALL 5. If you want to run the
-examples, you should copy the content of that example in a file named
-`print.s` and include it in your code.
-
-Some examples use an already existing file descriptor, even if it doesn't truly
-exist. If you want to run those examples, use the SYSCALL 1 example to open a
-file.
+Alcuni esempi si aspettano che esista un file descriptor, e non contengono il
+codice per aprire alcun file. Per eseguire questi esempi, eseguire prima la
+SYSCALL 1.
 
 SYSCALL 0
 ~~~~~~~~~
-When SYSCALL 0 is called, it stops the execution of the program.
-Example::
+L'effetto dell'esecuzione della SYSCALL 0 è l'interruzione dell'esecuzione del programma.
+Esempio::
   .code
-  daddi   r1, r0, 0    ; saves 0 in R1
-  syscall 0            ; exits
+  daddi   r1, r0, 0    ; salva il valore 0 in R1
+  syscall 0            ; termina l'esecuzione
 
 SYSCALL 1
 ~~~~~~~~~
-Example program that opens a file::
+Programma d'esempio che apre un file::
 
                   .data 
-  error_op:       .asciiz     "Error opening the file"    
-  ok_message:     .asciiz     "All right"
+  error_op:       .asciiz     "Errore durante l'apertura del file"    
+  ok_message:     .asciiz     "Tutto ok."
   params_sys1:    .asciiz     "filename.txt"
                   .word64     0xF                    
 
@@ -47,41 +47,43 @@ Example program that opens a file::
           
                   #include    print.s      
 
-In the first two rows we write to memory the strings containing the error
-message and the success message that we will pass to print_string function, and
-we give them two labels. The print_string function is included in the print.s
-file.
+Nelle prime due righe, vengono salvate in memoria le stringhe che contengono
+i messaggi di errore e di successo, che saranno poi passati come parametri
+alla funzione `print_string`, ed a ciascuno di essi viene associata
+un'etichetta. La funzione `print_string` è presente nel file `print.s`.
 
-Next, we write to memory the data required from SYSCALL 1 (row 4, 5), the path of
-the file to be opened (that must exist if we work in read or read/write mode)
-and, in the next memory cell, an integer that defines the opening mode. 
+Successivamente, vengono salvati in memoria i dati richiesti dalla SYSCALL 1,
+il percorso del file da aprire (che deve esistere se si apre il file in
+modalità sola lettura o lettura/scrittura) e, nella cella successiva, un
+intero che definisce la modalità di apertura.
 
 .. For more info about the opening mode of a file, please refer to \ref{sys1}.
 
-In this example, the file was opened using the following modes: 
-`O_RDWR` \textbar{} `O_CREAT` \textbar{} `O_APPEND`. The
-number 15 (0xF in base 16) comes from the sum of the values of these three
-modes (3 + 4 + 8).
+In questo esempio, il file è stato aerto utilizzando la seguente modalità:
+`O_RDWR` | `O_CREAT` | `O_APPEND`. Il numero 15 (0xF in base 16) deriva dalla
+somma dei valori di queste tre modalità modes (3 + 4 + 8).
 
-We give a label to this data so that we can use it later.
+Questi due parametri hanno un'etichetta, in modo che in seguito possano essere
+utilizzati.
 
-In the .text section, we save the address of params_sys1 (that for the compiler
-is a number) in register r14; next we can call SYSCALL 1 and save the content of
-r1 in $s2, so that we can use it in the rest of the program (for instance, with
-other SYSCALL).
+Nella sezione .text, come prima cosa l'indirizzo di `param_sys1` - che per il
+compilatore è un numero - viene salvato in r14; successivamente viene chiamata
+la SYSCALL 1, ed il contenuto di R1 viene salvato nel registro $s2, in modo
+che possa essere utilizzato nel resto del programma (ad esempio, con un'altra
+SYSCALL).
 
-Then the print_string function is called, passing error_op as an argument if
-r1 is equal to -1 (rows 13-14) or else passing ok_message as an argument if
-everything went smoothly (rows 12 and 16).
+Infine viene chiamata la funzione `print_string`, passando come parametro
+`error_op` se R1 contiene il valore -1 (righe 13-14), altrimenti utlizzando
+`ok_message` (righe 12-16).
 
 SYSCALL 2
 ~~~~~~~~~
-Example program that closes a file::
+Programma di esempio che chiude un file::
 
                   .data
   params_sys2:    .space 8
-  error_cl:       .asciiz     "Error closing the file"
-  ok_message:     .asciiz     "All right"
+  error_cl:       .asciiz     "Errore durante la chiususra del file"
+  ok_message:     .asciiz     "Tutto a posto"
 
                   .text
   close:          daddi       r14, r0, params_sys2        
@@ -97,33 +99,33 @@ Example program that closes a file::
       
                   #include    print.s         
 
-First we save some memory for the only argument of SYSCALL 2, the file descriptor
-of the file that must be closed (row 2), and we give it a label so that we can
-access it later.
+**Nota:** Questo esempio richiede che in $s2 ci sia il file descriptor del
+file da chiudere.
 
-Next we put in memory the strings containing the error message and the success
-message, that will be passed to the print_string function (rows 3, 4).
+Come prima cosa viene allocata della memoria per l'unico parametro di SYSCALL
+2, il file descriptor del file da chiudere, e a questo spazio viene associata
+un'etichetta in modo da potervicisi riferire successivamente.
 
-In the .text section, we save the address of params_sys2 in r14; then we can
-call SYSCALL 2.
+Successivamente vengono salvate in memoria le stringhe contenenti i messaggi
+di successo e di errore.
 
-Now we call the print_string function using error_cl as a parameter if r1
-yields -1 (row 13), or we call it using ok_message as a parameter if all went
-smoothly (row 11).
+Nella sezione .text, l'indirizzo di `param_sys2` viene salvato in R14;
+successivamente viene chiamata la SYSCALL 2.
 
-**Note:** This listing needs that registry $s2 contains the
-file descriptor of the file to use.
+Infine viene chiamata la funzione `print_string`, stampando il messaggio
+d'errore se ci sono problemi (riga 13) o, se tutto è andato a buon fine, il
+messaggio di successo (riga 11).
 
 SYSCALL 3
 ~~~~~~~~~
-Example program that reads 16 bytes from a file and saves them to memory::
+Programma di esempio che legge 16 byte da un file e li salva in memoria::
 
                   .data
   params_sys3:    .space      8                
   ind_value:      .space      8            
                   .word64     16        
-  error_3:        .asciiz     "Error while reading from file"    
-  ok_message:     .asciiz     "All right"    
+  error_3:        .asciiz     "Errore durante la lettura da file."    
+  ok_message:     .asciiz     "Tutto ok."    
 
   value:          .space      30                    
 
@@ -143,30 +145,30 @@ Example program that reads 16 bytes from a file and saves them to memory::
           
                   #include    print.s 
 
-The first 4 rows of the .data section contain the arguments of SYSCALL 3, the file
-descriptor of the from which we must read, the memory address where the SYSCALL
-must save the read data, the number of bytes to read. We give labels to those
-parameters that must be accessed later.  Next we put, as usual, the strings
-containing the error message and the success message.
+Le prime 4 righe della sezione .data contengono i parametri della SYSCALL 3,
+il file descriptor da cui si devono leggere i dati, l'indirizzo della cella di
+memoria dove la SYSCALL deve salvare i dati letti, il numero di byte da
+leggere. Successivamente sono presenti in memoria i messaggi di successo e di
+errore.
 
-In the .text section, we save the params_sys3 address to register r14, we save
-in the memory cells for the SYSCALL parameters the file descriptor (that we
-suppose to have in $s2) and the address that we want to use to save the read
-bytes.
+Nella sezione .text, come prima cosa viene salvato l'indirizzo di `param_sys3`
+in r14, il file descriptor viene salvato nell'area di memoria dedicata ai
+parametri della SYSCALL, ed a seguire lo stesso destino tocca all'indirizzo
+dell'area di memoria adibita a contenere i dati letti.
 
-Next we can call SYSCALL 3, and then we call the print_string function passing as
-argument error_3 or ok_message, according to the success of the operation.
+Successivamente viene chiamata la SYSCALL 3 e viene stampato un messaggio di
+successo o di errore, a seconda dell'esito della SYSCALL.
 
 SYSCALL 4
 ~~~~~~~~~
-Example program that writes to a file a string::
+Programma di esempio che scrive su file una stringa::
 
                   .data
   params_sys4:    .space      8                
   ind_value:      .space      8            
                   .word64     16        
-  error_4:        .asciiz     "Error writing to file"    
-  ok_message:     .asciiz     "All right"    
+  error_4:        .asciiz     "Errore durante la scrittura su stringa."    
+  ok_message:     .asciiz     "Tutto ok."    
   value:          .space      30                    
 
                   .text
@@ -186,24 +188,12 @@ Example program that writes to a file a string::
           
                   #include    print.s 
 
-The first 4 rows of the .data section contain the arguments of SYSCALL 4, the file
-descriptor of the from which we must read, the memory address from where the SYSCALL
-must read the bytes to write, the number of bytes to write. We give labels to those
-parameters that must be accessed later.  Next we put, as usual, the strings
-containing the error message and the success message.
-
-In the .text section, we save the params_sys4 address to register r14, we save
-in the memory cells for the SYSCALL parameters the file descriptor (that we
-suppose to have in $s2) and the address from where we must take the bytes to
-weite.
-
-Next we can call SYSCALL 3, and then we call the print_string function passing as
-argument error_3 or ok_message, according to the success of the operation.
+La struttura di quest'esempio è identica a quella dell'esempio di SYSCALL 3.
 
 SYSCALL 5
 ~~~~~~~~~
-Example program that contains a function that prints to standard output the
-string contained in $a0::
+Programma di esempio che contiene una funzione che stampa su standard output la
+stringa contenuta nell'indirizzo di memoria a cui punta $a0::
 
                   .data
   params_sys5:    .space  8
@@ -215,22 +205,25 @@ string contained in $a0::
                   syscall 5
                   jr      r31
 
-The second row is used to save space for the string that must be printed by the
-SYSCALL, that is filled by the first instruction of the .text section, that
-assumes that in \$a0 there's the address of the string to be printed.
+La seconda riga alloca spazio per la stringa che sarà stampata dalla SYSCALL,
+che è riempito dalla prima istruzione della sezione .text, che assume che
+l'indirizzo della stringa da stampare sia in $a0.
 
-The next instruction puts in r14 the address of this string, and then we can
-call SYSCALL 5 and print the string. The last instruction sets the program counter
-to the content of r31, as the usual MIPS calling convention states.
+L'istruzione successiva salva in r14 l'indirizzo di questa stringa, e
+successivamente la SYSCALL 5 viene chiamata, stampando quindi la stringa.
+L'ultima istruzione varia il program counter, impostandolo al valore di r31 -
+che secondo le convenzioni di chiamata di funzione MIPS contiene l'indirizzo
+dell'istruzione successiva alla chiamata di funzione.
 
-A more complex usage example of SYSCALL 5
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-SYSCALL 5 uses a not-so-simple arguments passing mechanism, that will be shown in
-the following example::
+
+Un esempio di utilizzo della SYSCALL 5 più complesso
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+La SYSCALL 5 utilizza un meccanismo di passaggio parametri non semplicissimo,
+che sarà illustrato nel seguente esempio::
 
                   .data
-  format_str:     .asciiz   "%dth of %s:\n%s version %i.%i is being tested!"
-  s1:             .asciiz   "June"
+  format_str:     .asciiz   "%d %s:\nTest di %s versione %i.%i!"
+  s1:             .asciiz   "Giugno"
   s2:             .asciiz   "EduMIPS64"
   fs_addr:        .space    4
                   .word     5    
@@ -250,16 +243,12 @@ the following example::
                   syscall   5
                   syscall   0
 
-The address of the format string is put into R5, whose content is then saved to
-memory at address fs_addr. The string parameters' addresses are saved into
-s1_addr and s2_addr. Those two string parameters are the ones that match the
-two %s placeholders in the format string.
+L'indirizzo di memoria della stringa di formato viene inserito in R5, il cui
+contenuto viene quindi salvato in memoria all'indirizzo `fs_addr`. Gli
+indirizzi dei parametri di tipo stringa sono salvato in `s1_addr` ed
+`s2_addr`. Questi due parametri saranno inseriti al posto dei due segnaposto
+`%s` all'interno della stringa di formato.
 
-Looking at the memory, it's obvious that the parameters matching the
-placeholders are stored immediately after the address of the format string:
-numbers match integer parameters, while addresses match string parameters. In
-the s1_addr and s2_addr locations there are the addresses of the two strings
-that we want to print instead of the %s placeholders.
-
-The execution of the example will show how SYSCALL 5 can handle complex format
-strings like the one stored at format_str.
+Nel caso di stringhe di formato complesse, come mostrato da questo esempio, le
+word che corrispondono ai segnaposto vanno inserite in memoria subito dopo
+l'indirizzo della stringa di formato.

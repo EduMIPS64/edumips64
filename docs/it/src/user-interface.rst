@@ -250,8 +250,8 @@ eseguibile che come applet, quindi può essere eseguito in entrambi i modi,
 che richiedono il Java Runtime Environment, versione 5 o successiva.
 
 Per eseguire il file come applicazione a sè stante, l'eseguibile
-`java` deve essere avviato nel seguente modo: \texttt{java -jar
-edumips64-version.jar}, dove la stringa `version` deve essere
+`java` deve essere avviato nel seguente modo: `java -jar
+edumips64-version.jar`, dove la stringa `version` deve essere
 sostituita con la versione attuale del simulatore.  Su alcuni sistemi,
 potrebbe essere possibile eseguire il programma semplicemente con un click sul
 file `.jar`.
