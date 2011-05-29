@@ -99,6 +99,7 @@ public class GUIHelp {
             catch(HelpSetException helpsetexception)
             {
                 System.err.println("Could not create HelpSet for " + url);
+                System.err.println(helpsetexception);
             }
             catch (BadIDException bie) {
                 helpBroker.setCurrentID(HELP_DEFAULT);

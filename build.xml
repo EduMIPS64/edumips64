@@ -142,6 +142,16 @@
 				<include name="**/*.*" />
 			</fileset>
         </copy>
+        <copy todir="${outputDir}/edumips64/help/it/img">
+            <fileset dir="docs/img">
+				<include name="**/*.*" />
+			</fileset>
+        </copy>
+        <copy todir="${outputDir}/edumips64/help/en/img">
+            <fileset dir="docs/img">
+				<include name="**/*.*" />
+			</fileset>
+        </copy>
         <copy todir="${outputDir}/edumips64/help/it">
             <fileset dir="docs/it/javahelp">
 				<include name="**/*.*" />
