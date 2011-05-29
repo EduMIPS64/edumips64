@@ -1,0 +1,301 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>L’interfaccia utente &mdash; EduMIPS64 v0.5.3 documentation</title>
+    <link rel="stylesheet" href="_static/epub.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.5.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigazione</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Indice generale"
+             accesskey="I">indice</a></li>
+        <li class="right" >
+          <a href="examples.html" title="Listati di esempio"
+             accesskey="N">successivo</a> |</li>
+        <li class="right" >
+          <a href="instructions.html" title="Il set di istruzioni"
+             accesskey="P">precedente</a> |</li>
+        <li><a href="index.html">EduMIPS64 v0.5.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="l-interfaccia-utente">
+<h1>L&#8217;interfaccia utente<a class="headerlink" href="#l-interfaccia-utente" title="link permanente per questa intestazione">¶</a></h1>
+<p>L&#8217;interfaccia grafica EduMIPS64 si ispira a quella di WinMIPS64. Infatti, la
+finestra principale è identica, eccetto che per qualche menù.</p>
+<p>La finestra principale di EduMIPS64 è caratterizzata da sei frame, che
+mostrano i differenti aspetti della simulazione.  è inoltre presente una
+barra di stato, che ha il duplice scopo di mostrare il contenuto delle celle
+di memoria e dei registri quando vengono selezionati e di notificare
+all&#8217;utente che il simulatore è in esecuzione quando la simulazione è
+stata avviata ma la modalità verbose  non è stata attivata.  Maggiori
+dettagli sono descritti nelle sezioni a seguire.</p>
+<div class="section" id="la-barra-dei-menu">
+<h2>La barra dei menù<a class="headerlink" href="#la-barra-dei-menu" title="link permanente per questa intestazione">¶</a></h2>
+<p>La barra del menù contiene sei opzioni:</p>
+<div class="section" id="file">
+<h3>File<a class="headerlink" href="#file" title="link permanente per questa intestazione">¶</a></h3>
+<p>Il menù File contiene comandi per l&#8217;apertura dei file, per resettare o
+fermare il simulatore e per scrivere i trace file.</p>
+<ul class="simple">
+<li><em>Apri...</em> Apre una finestra che consente all&#8217;utente di scegliere un file
+sorgente da aprire.</li>
+<li><em>Apri recente</em> Mostra la lista dei file recentemente aperti dal simulatore,
+dalla quale l&#8217;utente può scegliere il file da aprire.</li>
+<li><em>Resetta</em> Inizializza nuovamente il simulatore, mantenendo aperto il file
+che era stato caricato ma facendone ripartire l&#8217;esecuzione.</li>
+<li><em>Scrivi Tracefile Dinero...</em> Scrive i dati di accesso alla memoria in un
+file, nel formato xdin.</li>
+<li><em>Esci</em> Chiude il simulatore.</li>
+</ul>
+<p>La voce del menù <em>Scrivi Tracefile Dinero...</em> è disponibile solo quando un
+file sorgente è stato completamente eseguito ed è stata già raggiunta la fine
+dell&#8217;esecuzione.</p>
+</div>
+<div class="section" id="esegui">
+<h3>Esegui<a class="headerlink" href="#esegui" title="link permanente per questa intestazione">¶</a></h3>
+<p>Il menu Esegui contiene voci riguardanti il flusso di esecuzione della
+simulazione.</p>
+<ul class="simple">
+<li><em>Ciclo singolo</em> Esegue un singolo passo di simulazione.</li>
+<li><em>Completa</em> Inizia l&#8217;esecuzione, fermandosi quando il simulatore
+raggiunge una SYSCALL 0 (o equivalente) o un&#8217;istruzione di <cite>BREAK</cite>,
+oppure quando l&#8217;utente seleziona la voce Stop del menù (o preme F9).</li>
+<li><em>Cicli multipli</em> Esegue un certo numero di passi di simulazione, tale
+valore può essere configurato attraverso la finestra di configurazione.</li>
+</ul>
+<ul class="simple">
+<li><em>Ferma</em> Ferma l&#8217;esecuzione quando il simulatore è in modalità
+&#8220;Completa&#8221; o &#8220;Cicli multipli&#8221;, come descritto precedentemente.</li>
+</ul>
+<p>Il menu è disponibile solo quando è stato caricato un file sorgente e
+non è ancora stato raggiunto il termine della simulazione.  La voce
+<em>Stop</em> del menù  disponibile solo in modalità &#8220;Completa&#8221; o
+&#8220;Cicli multipli&#8221; mode.</p>
+</div>
+<div class="section" id="configura">
+<h3>Configura<a class="headerlink" href="#configura" title="link permanente per questa intestazione">¶</a></h3>
+<p>Il menu Configura fornisce l&#8217;opportunità di personalizzare l&#8217;aspetto ed il
+funzionamento di EduMIPS64.</p>
+<ul class="simple">
+<li><em>Impostazioni...</em> Apre la finestra di configurazione, descritta nella
+prossima sezione di questo capitolo;</li>
+<li><em>Selezione lingua</em> Consente di modificare la lingua usata
+dall&#8217;interfaccia utente. Attualmente sono supportate solo inglese ed
+italiano. Questa modifica riguarda ogni aspetto dell&#8217;interfaccia grafica,
+dal titolo delle finestre al manuale in linea ed i messaggi di errore o le
+notifiche.</li>
+</ul>
+<p>La voce di menù <cite>Impostazioni...</cite> non è disponibile quando il
+simulatore è in modalità &#8220;Completa&#8221; o &#8220;Cicli multipli&#8221;, a causa di
+possibili race conditions.</p>
+</div>
+<div class="section" id="strumenti">
+<h3>Strumenti<a class="headerlink" href="#strumenti" title="link permanente per questa intestazione">¶</a></h3>
+<p>Questo menù contiene solo una voce, utilizzata per aprire la finestra del
+Dinero frontend.</p>
+<ul class="simple">
+<li><em>Dinero Frontend...</em> Apre la finestra del Dinero Frontend..</li>
+</ul>
+<p>Questo menù non è disponibile finchè non è stata portata a
+termine l&#8217;esecuzione del programma</p>
+</div>
+<div class="section" id="finestra">
+<h3>Finestra<a class="headerlink" href="#finestra" title="link permanente per questa intestazione">¶</a></h3>
+<p>Questo menù contiene voci relative alle operazioni con le finestre.</p>
+<ul class="simple">
+<li><em>Tile</em> Ordina le finestre visibili in modo tale che non vi siano
+più di tre finestre in una riga, tentando di massimizzare lo spazio
+occupato da ciascuna finestra.</li>
+</ul>
+<p>Le altre voci del menù modificano semplicemente lo stato di ciascuna
+finestra, rendendola visibile o riducendola ad icona.</p>
+</div>
+<div class="section" id="aiuto">
+<h3>Aiuto<a class="headerlink" href="#aiuto" title="link permanente per questa intestazione">¶</a></h3>
+<p>Questo menù contiene voci relative all&#8217;aiuto in linea.</p>
+<ul class="simple">
+<li><em>Manuale...</em> Mostra la finestra di help.</li>
+<li><em>Informazioni su...</em> Mostra una finestra contenente i nomi di coloro
+che hanno collaborato al progetto ed i loro ruoli.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="finestre">
+<h2>Finestre<a class="headerlink" href="#finestre" title="link permanente per questa intestazione">¶</a></h2>
+<p>L&#8217;interfaccia grafica è composta da sette finestre, sei delle quali sono
+visibili per default, mentre una (la finestra di I/O) è nascosta.</p>
+<div class="section" id="cicli">
+<h3>Cicli<a class="headerlink" href="#cicli" title="link permanente per questa intestazione">¶</a></h3>
+<p>La finestra Cicli mostra l&#8217;evoluzione del flusso di esecuzione nel tempo,
+visualizzando in ogni istante quali istruzioni sono nella pipeline, ed in
+quale stadio si trovano.</p>
+</div>
+<div class="section" id="registri">
+<h3>Registri<a class="headerlink" href="#registri" title="link permanente per questa intestazione">¶</a></h3>
+<p>La finestra Registri mostra il contenuto di ciascun registro. Mediante un
+click col tasto sinistro del mouse è possibile vedere il loro valore
+decimale (con segno) nella barra di stato, mentre con un doppio click
+verrà aperta una finestra di dialogo che consentirà all&#8217;utente di
+cambiare il valore del registro</p>
+</div>
+<div class="section" id="statistics">
+<h3>Statistics<a class="headerlink" href="#statistics" title="link permanente per questa intestazione">¶</a></h3>
+<p>La finestra Statistiche mostra alcune statistiche riguardanti l&#8217;esecuzione del
+programma.</p>
+</div>
+<div class="section" id="pipeline">
+<h3>Pipeline<a class="headerlink" href="#pipeline" title="link permanente per questa intestazione">¶</a></h3>
+<p>La finestra Pipeline mostra lo stato attuale della pipeline, visualizzando
+ciascuna istruzione con il suo stadio.  I differenti colori evidenziano i vari
+stadi della pipeline stessa.</p>
+</div>
+<div class="section" id="memoria">
+<h3>Memoria<a class="headerlink" href="#memoria" title="link permanente per questa intestazione">¶</a></h3>
+<p>La finestra Memoria mostra il contenuto delle celle di memoria, insieme alle
+etichette ed i commenti, tratti dal codice sorgente. Il contenuto delle celle
+di memoria, come per i registri, può essere modificato con un doppio
+click, e mediante un singolo click del mouse verrà mostrato il loro valore
+decimale nella barra di stato.  La prima colonna mostra l&#8217;indirizzo
+esadecimale della cella di memoria, e la seconda il valore della cella stessa.
+Le altre colonne mostrano invece informazioni addizionali provenienti dal
+codice sorgente.</p>
+</div>
+<div class="section" id="codice">
+<h3>Codice<a class="headerlink" href="#codice" title="link permanente per questa intestazione">¶</a></h3>
+<p>La finestra Codice visualizza le istruzioni caricate in memoria.. La prima
+colonna mostra l&#8217;indirizzo dell&#8217;istruzione, mentre la seconda mostra la
+rappresentazione esadecimale dell&#8217;istruzione stessa. Le altre colonne mostrano
+infine informazioni addizionali provenienti dal codice sorgente.</p>
+</div>
+<div class="section" id="input-output">
+<h3>Input/Output<a class="headerlink" href="#input-output" title="link permanente per questa intestazione">¶</a></h3>
+<p>La finestra Input/Output fornisce un&#8217;interfaccia all&#8217;utente per la
+visualizzazione dell&#8217;output creato dai programmi mediante le SYSCALL 4 e 5.
+Attualmente non è utilizzata per l&#8217;input di dati, ed al suo posto viene
+utilizzata una finestra di dialogo che viene mostrata quando una SYSCALL 3
+tenta di leggere dallo standard input, ma future versioni includeranno una
+casella di testo per l&#8217;input.</p>
+</div>
+</div>
+<div class="section" id="finestre-di-dialogo">
+<h2>Finestre di dialogo<a class="headerlink" href="#finestre-di-dialogo" title="link permanente per questa intestazione">¶</a></h2>
+<p>Le finestre di dialogo sono utilizzate da EduMIPS64 per interagire con l&#8217;utente
+in vari modi. Ecco un riassunto delle più importanti:</p>
+<div class="section" id="impostazioni">
+<h3>Impostazioni<a class="headerlink" href="#impostazioni" title="link permanente per questa intestazione">¶</a></h3>
+<p>Nella finestra di configurazione possono essere configurati vari aspetti del
+simulatore.</p>
+<p>La sezione &#8220;Impostazioni generali&#8221; consente di configurare il forwarding ed il
+numero di passi da effettuare nella modalità Cicli multipli.</p>
+<p>La sezione &#8220;Comportamento&#8221; permette di abilitare o disabilitare gli avvisi
+durante la fase di parsing, l&#8217;opzione &#8220;sincronizza la GUI con la CPU
+nell&#8217;esecuzione multi step&#8221;, quando abilitata, sincronizzerà lo stato
+grafico delle finestre con lo stato interno del simulatore. Ciò
+implicherà una simulazione più lenta, ma con la possibilità di
+avere un resoconto grafico esplicito di ciò che sta avvenendo durante la
+simulazione.  L&#8217;opzione &#8220;intervallo tra i cicli&#8221;, qualora sia abilitata,
+influenzerà il numero di millisecondi che il simulatore dovrà
+attendere prima di cominciare un nuovo ciclo. Tali opzioni hanno effetto solo
+quando la simulazione è avviata utilizzando le opzioni &#8220;Completa&#8221; o &#8220;Cicli
+multipli&#8221; dal menu Esegui.</p>
+<p>Le ultime due opzioni stabiliscono il comportamento del simulatore quando si
+verifica un&#8217;eccezione sincrona.  è importante notare che se le eccezioni
+sincrone sono mascherate, non succederà nulla, anche se l&#8217;opzione &#8220;Termina
+se si verifica un&#8217;eccezione sincrona&#8221; è abilitata. Se le eccezioni non
+sono mascherate e tale opzione è abilitata, apparirà una finestra di
+dialogo, e la simulazione sarà fermata non appena tale finestra verrà
+chiusa.</p>
+<p>L&#8217;ultima sezione permette di modificare i colori associati ai diversi stadi
+della pipeline. Abbastanza inutile, ma carino.</p>
+</div>
+<div class="section" id="dinero-frontend">
+<h3>Dinero Frontend<a class="headerlink" href="#dinero-frontend" title="link permanente per questa intestazione">¶</a></h3>
+<p>La finestra di dialogo Dinero Frontend consente di avviare un processo
+DineroIV con il trace file generato internamente mediante l&#8217;esecuzione del
+programma. Nella prima casella di testo c&#8217;è il percorso dell&#8217;eseguibile
+DineroIV, e nella seconda devono essere inseriti i parametri opportuni.</p>
+<p>La sezione più in basso contiene l&#8217;output del processo DineroIV, dal quale
+è possibile prelevare i dati di cui si necessita.</p>
+</div>
+<div class="section" id="id1">
+<h3>Aiuto<a class="headerlink" href="#id1" title="link permanente per questa intestazione">¶</a></h3>
+<p>La finestra di Aiuto contiene tre sezioni con qualche indicazione riguardo
+l&#8217;utilizzo del simulatore.  La prima è una breve introduzione ad
+EduMIPS64, la seconda contiene informazioni riguardanti l&#8217;interfaccia grafica
+e la terza contiene un riassunto delle istruzioni supportate.</p>
+</div>
+</div>
+<div class="section" id="opzioni-da-riga-di-comando">
+<h2>Opzioni da riga di comando<a class="headerlink" href="#opzioni-da-riga-di-comando" title="link permanente per questa intestazione">¶</a></h2>
+<p>Sono disponibili tre opzioni da linea di comando. Esse sono descritte di
+seguito, con il nome per esteso scritto tra parentesi.  Nomi abbreviati e per
+esteso possono essere utilizzati indifferentemente.</p>
+<ul class="simple">
+<li><cite>-h (&#8211;help)</cite> mostra un messaggio di aiuto contenente la versione del
+simulatore ed un breve riassunto delle opzioni da linea di comando.</li>
+<li><cite>-f (&#8211;file) filename</cite> apre <cite>filename</cite> nel simulatore.</li>
+<li><cite>-d (&#8211;debug)</cite> attiva la modalità di debugging.</li>
+</ul>
+<p>Nella modalità di debugging è disponibile una nuova finestra, la finestra
+Debug, che mostra il resoconto delle attività interne di  EduMIPS64. Tale
+finestra non è utile per l&#8217;utente finale, è stata infatti ideata per
+poter essere utilizzata dagli sviluppatori di EduMIPS64.</p>
+</div>
+<div class="section" id="eseguire-edumips64">
+<h2>Eseguire EduMIPS64<a class="headerlink" href="#eseguire-edumips64" title="link permanente per questa intestazione">¶</a></h2>
+<p>Il file <cite>.jar</cite> di EduMIPS64 può funzionare sia come file .jar
+eseguibile che come applet, quindi può essere eseguito in entrambi i modi,
+che richiedono il Java Runtime Environment, versione 5 o successiva.</p>
+<p>Per eseguire il file come applicazione a sè stante, l&#8217;eseguibile
+<cite>java</cite> deve essere avviato nel seguente modo: <cite>java -jar
+edumips64-version.jar</cite>, dove la stringa <cite>version</cite> deve essere
+sostituita con la versione attuale del simulatore.  Su alcuni sistemi,
+potrebbe essere possibile eseguire il programma semplicemente con un click sul
+file <cite>.jar</cite>.</p>
+<p>Per eseguire il file come applet deve essere utilizzato il tag
+<cite>&lt;applet&gt;</cite>. Il sito web di EduMIPS64 presenta una pagina già contenente
+l&#8217;applet, in modo tale che chiunque possa eseguire il programma senza il
+problema dell&#8217;utilizzo da linea di comando.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Andrea Spadaccini ed il team di sviluppo di EduMIPS64.
+      Creato con <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

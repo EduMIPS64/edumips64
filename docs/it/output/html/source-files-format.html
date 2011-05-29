@@ -1,0 +1,419 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Formato dei file sorgenti &mdash; EduMIPS64 v0.5.3 documentation</title>
+    <link rel="stylesheet" href="_static/epub.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.5.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigazione</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Indice generale"
+             accesskey="I">indice</a></li>
+        <li class="right" >
+          <a href="instructions.html" title="Il set di istruzioni"
+             accesskey="N">successivo</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Benvenuti nella documentazione di EduMIPS64!"
+             accesskey="P">precedente</a> |</li>
+        <li><a href="index.html">EduMIPS64 v0.5.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="formato-dei-file-sorgenti">
+<h1>Formato dei file sorgenti<a class="headerlink" href="#formato-dei-file-sorgenti" title="link permanente per questa intestazione">¶</a></h1>
+<p>EduMIPS64 si propone di seguire le convenzioni usate negli altri simulatori
+MIPS64 e DLX, in modo tale da non creare confusione riguardante la sintassi
+per i vecchi utenti.</p>
+<p>All&#8217;interno di un file sorgente sono presenti due sezioni: quella dedicata ai
+<em>dati</em> e quella in cui è contenuto il <em>codice</em>, introdotte rispettivamente
+dalle direttive <em>.data</em> e <em>.code</em>. Nel seguente listato è possibile vedere un
+semplice programma:</p>
+<div class="highlight-python"><pre>; Questo è un commento
+          .data
+  label:  .word   15     ; Questo è un commento in linea
+
+          .code
+          daddi   r1, r0, 0
+          syscall 0</pre>
+</div>
+<p>Per distinguere le varie parti di ciascuna linea di codice, può essere
+utilizzata una qualunque combinazione di spazi e tabulazioni, visto che il
+parser ignora spazi multipli.</p>
+<p>I commenti possono essere introdotti utilizzando il carattere &#8221;;&#8221; qualsiasi
+cosa venga scritta successivamente ad esso verrà ignorata.  Un commento
+può quindi essere usato &#8220;inline&#8221; (dopo una direttiva) oppure in una riga a
+sè stante.</p>
+<p>Le etichette possono essere usate nel codice per fare riferimento ad una cella
+di memoria o ad un&#8217;istruzione.  Esse sono case insensitive. Per ciascuna linea
+di codice può essere utilizzata un&#8217;unica etichetta. Quest&#8217;ultima può essere
+inserita una o più righe al di sopra dell&#8217;effettiva dichiarazione del dato
+o dell&#8217;istruzione, facendo in modo che non ci sia nulla, eccetto commenti e
+linee vuote, tra l&#8217;etichetta stessa e la dichiarazione.</p>
+<div class="section" id="la-sezione-data">
+<h2>La sezione <cite>.data</cite><a class="headerlink" href="#la-sezione-data" title="link permanente per questa intestazione">¶</a></h2>
+<p>La sezione <em>data</em> contiene i comandi che specificano il modo in cui la
+memoria deve essere riempita prima dell&#8217;inizio dell&#8217;esecuzione del programma. La
+forma generale di un comando <cite>.data</cite> è:</p>
+<div class="highlight-python"><pre>[etichetta:] .tipo-dato valore1 [, valore2 [, ...]]</pre>
+</div>
+<p>EduMIPS64 supporta diversi tipi di dato, che sono descritti nella seguente
+tabella.</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="45%" />
+<col width="30%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Tipo</th>
+<th class="head">Direttiva</th>
+<th class="head">Bit richiesti</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>Byte</td>
+<td><cite>.byte</cite></td>
+<td>8</td>
+</tr>
+<tr><td>Half word</td>
+<td><cite>.word16</cite></td>
+<td>16</td>
+</tr>
+<tr><td>Word</td>
+<td><cite>.word32</cite></td>
+<td>32</td>
+</tr>
+<tr><td>Double Word</td>
+<td><cite>.word</cite> or <cite>.word64</cite></td>
+<td>64</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Dati di tipo doubleword possono essere introdotti sia dalla direttiva
+<cite>.word</cite> che dalla direttiva <cite>.word64</cite>.</p>
+<p>Esiste una differenza sostanziale tra la dichiarazione di una lista di dati
+utilizzando un&#8217;unica direttiva oppure direttive multiple dello stesso tipo.
+EduMIPS64 inizia la scrittura a partire dalla successiva double word a 64 bit non appena
+trova un identificatore del tipo di dato, in tal modo la prima istruzione <cite>.byte</cite>
+del seguente listato inserirà i numeri 1, 2, 3 e 4 nello spazio di 4 byte,
+occupando 32 bit, mentre il codice delle successive quattro righe inserirà ciascun numero
+in una differente cella di memoria, occupando 32 byte:</p>
+<div class="highlight-python"><pre>.data
+.byte    1, 2, 3, 4
+.byte    1
+.byte    2
+.byte    3
+.byte    4</pre>
+</div>
+<p>Nella seguente tabella, la memoria è rappresentata utilizzando celle di dimensione pari
+ad 1 byte e ciascuna riga è lunga 64 bit. L&#8217;indirizzo posto alla sinistra di ogni riga della tabella è
+riferito alla cella di memoria più a destra, che possiede l&#8217;indirizzo più basso rispetto alle otto celle in ciascuna linea.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+</colgroup>
+<tbody valign="top">
+<tr><td><em>0</em></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr><td><em>8</em></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr><td><em>16</em></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>2</td>
+</tr>
+<tr><td><em>24</em></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>3</td>
+</tr>
+<tr><td><em>36</em></td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>Ci sono alcune direttive speciali che devono essere discusse: <cite>.space</cite>,
+<cite>.ascii</cite> e <cite>.asciiz</cite>.</p>
+<p>La direttiva <cite>.space</cite> è usata per lasciare dello spazio vuoto in memoria.
+Essa accetta un intero come parametro, che indica il numero di byte che devono
+essere lasciati liberi.  Tale direttiva è utile quando è necessario conservare
+dello spazio in memoria per i risultati dei propri calcoli.</p>
+<p>La direttiva <cite>.ascii</cite> accetta stringhe contenenti un qualunque carattere
+ASCII, ed alcune &#8220;sequenze di escape&#8221;, simili a quelle presenti nel linguaggio
+C, che sono descritte nella seguente tabella, ed inserisce tali stringhe in
+memoria.</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="30%" />
+<col width="51%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Sequenza di escape</th>
+<th class="head">Significato</th>
+<th class="head">Codice ASCII</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>\0</td>
+<td>Byte nullo</td>
+<td>0</td>
+</tr>
+<tr><td>\t</td>
+<td>Tabulazione orizzontale</td>
+<td>9</td>
+</tr>
+<tr><td>\n</td>
+<td>Carattere di inizio nuova linea</td>
+<td>10</td>
+</tr>
+<tr><td>\&#8221;</td>
+<td>Doppi apici</td>
+<td>34</td>
+</tr>
+<tr><td>&nbsp;</td>
+<td>Backslash</td>
+<td>92</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>La direttiva <cite>.asciiz</cite> si comporta esattamente come il comando <cite>.ascii</cite>, con
+la differenza che essa pone automaticamente alla fine della stringa un byte
+nullo.</p>
+</div>
+<div class="section" id="la-sezione-code">
+<h2>La sezione <cite>.code</cite><a class="headerlink" href="#la-sezione-code" title="link permanente per questa intestazione">¶</a></h2>
+<p>La sezione <em>code</em> contiene le istruzioni che saranno eseguite dal
+simulatore a run-time. La forma generale di un comando <cite>.code</cite> è:</p>
+<div class="highlight-python"><pre>[etichetta:] istruzione [param1 [, param2 [, param3]]]</pre>
+</div>
+<p>Essa può essere indicata anche con la direttiva <cite>.text</cite>.</p>
+<p>Il numero e il tipo di parametri dipendono dall&#8217;istruzione stessa.</p>
+<p>Le istruzioni possono accettare tre tipi di parametri:</p>
+<ul class="simple">
+<li><em>Registri</em> un parametro di tipo registro è indicato da una
+&#8220;r&#8221; maiuscola o minuscola, o da un carattere &#8220;$&#8221;, a fianco del numero
+di registro (tra 0 e 31). Ad esempio, le scritture &#8220;r4&#8221;, &#8220;R4&#8221; e &#8220;$4&#8221;
+identificano tutt&#8217;e tre il quarto registro;</li>
+<li><em>Valori immediati</em> un valore immediato pu`o essere un numero o
+un&#8217;etichetta; il numero può essere specificato in base 10 o in base 16. I
+numeri in base 10 sono inseriti semplicemente scrivendo il numero
+utilizzando l&#8217;usuale notazione decimale; i numeri in base 16 si inseriscono
+aggiungendo all&#8217;inizio del numero il prefisso &#8220;0x&#8221;;</li>
+<li><em>Indirizzi</em> un indirizzo è composto da un valore immediato
+seguito dal nome di un registro tra parentesi. Il valore del registro sarà
+usato come base, quello dell&#8217;immediato come offset.</li>
+</ul>
+<p>La dimensione dei valori immediati è limitata al numero di bit disponibili
+nella codifica associata all&#8217;istruzione.</p>
+<p>è possibile utilizzare gli alias standard MIPS per i primi 32 registri,
+mettendo in coda ai prefissi standard per i registri (&#8220;r&#8221;, &#8220;$&#8221;, &#8220;R&#8221;) uno
+degli alias indicati nella seguente tabella.</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="57%" />
+<col width="43%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Registro</th>
+<th class="head">Alias</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>0</td>
+<td><cite>zero</cite></td>
+</tr>
+<tr><td>1</td>
+<td><cite>at</cite></td>
+</tr>
+<tr><td>2</td>
+<td><cite>v0</cite></td>
+</tr>
+<tr><td>3</td>
+<td><cite>v1</cite></td>
+</tr>
+<tr><td>4</td>
+<td><cite>a0</cite></td>
+</tr>
+<tr><td>5</td>
+<td><cite>a1</cite></td>
+</tr>
+<tr><td>6</td>
+<td><cite>a2</cite></td>
+</tr>
+<tr><td>7</td>
+<td><cite>a3</cite></td>
+</tr>
+<tr><td>8</td>
+<td><cite>t0</cite></td>
+</tr>
+<tr><td>9</td>
+<td><cite>t1</cite></td>
+</tr>
+<tr><td>10</td>
+<td><cite>t2</cite></td>
+</tr>
+<tr><td>11</td>
+<td><cite>t3</cite></td>
+</tr>
+<tr><td>12</td>
+<td><cite>t4</cite></td>
+</tr>
+<tr><td>13</td>
+<td><cite>t5</cite></td>
+</tr>
+<tr><td>14</td>
+<td><cite>t6</cite></td>
+</tr>
+<tr><td>15</td>
+<td><cite>t7</cite></td>
+</tr>
+<tr><td>16</td>
+<td><cite>s0</cite></td>
+</tr>
+<tr><td>17</td>
+<td><cite>s1</cite></td>
+</tr>
+<tr><td>18</td>
+<td><cite>s2</cite></td>
+</tr>
+<tr><td>19</td>
+<td><cite>s3</cite></td>
+</tr>
+<tr><td>20</td>
+<td><cite>s4</cite></td>
+</tr>
+<tr><td>21</td>
+<td><cite>s5</cite></td>
+</tr>
+<tr><td>22</td>
+<td><cite>s6</cite></td>
+</tr>
+<tr><td>23</td>
+<td><cite>s7</cite></td>
+</tr>
+<tr><td>24</td>
+<td><cite>t8</cite></td>
+</tr>
+<tr><td>25</td>
+<td><cite>t9</cite></td>
+</tr>
+<tr><td>26</td>
+<td><cite>k0</cite></td>
+</tr>
+<tr><td>27</td>
+<td><cite>k1</cite></td>
+</tr>
+<tr><td>28</td>
+<td><cite>gp</cite></td>
+</tr>
+<tr><td>29</td>
+<td><cite>sp</cite></td>
+</tr>
+<tr><td>30</td>
+<td><cite>fp</cite></td>
+</tr>
+<tr><td>31</td>
+<td><cite>ra</cite></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="il-comando-include">
+<h2>Il comando <cite>#include</cite><a class="headerlink" href="#il-comando-include" title="link permanente per questa intestazione">¶</a></h2>
+<p>Nei sorgenti può essere utilizzato il comando <cite>*#include* nomefile</cite>, che ha
+l&#8217;effetto di inserire, al posto della riga contenente questo comando, il
+contenuto del file <cite>nomefile</cite>.
+Questo comando è utile se si vogliono includere delle funzioni esterne, ed è
+dotato di un algoritmo di rilevamento dei cicli, che impedisce di eseguire
+inclusioni circolari tipo &#8220;<cite>#include A.s</cite>&#8221; nel file <cite>B.s</cite> e
+&#8220;<cite>#include B.s</cite>&#8221; nel file <cite>A.s</cite>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Andrea Spadaccini ed il team di sviluppo di EduMIPS64.
+      Creato con <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

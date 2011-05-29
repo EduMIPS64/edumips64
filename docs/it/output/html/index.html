@@ -1,0 +1,114 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Benvenuti nella documentazione di EduMIPS64! &mdash; EduMIPS64 v0.5.3 documentation</title>
+    <link rel="stylesheet" href="_static/epub.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.5.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigazione</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Indice generale"
+             accesskey="I">indice</a></li>
+        <li class="right" >
+          <a href="source-files-format.html" title="Formato dei file sorgenti"
+             accesskey="N">successivo</a> |</li>
+        <li><a href="#">EduMIPS64 v0.5.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="benvenuti-nella-documentazione-di-edumips64">
+<h1>Benvenuti nella documentazione di EduMIPS64!<a class="headerlink" href="#benvenuti-nella-documentazione-di-edumips64" title="link permanente per questa intestazione">¶</a></h1>
+<p>EduMIPS64 è un simulatore di Instruction Set Architecture (ISA) MIPS64,
+progettato per eseguire piccoli programmi che utilizzino il sottoinsieme
+dell&#8217;Instruction Set MIPS64 implementato dal simulatore stesso; permette
+all&#8217;utente di vedere come le istruzioni si comportino nella pipeline, come gli
+stalli siano gestiti dalla CPU, lo stato di registri e memoria e molto altro.
+È classificabile sia come simulatore, sia come debugger visuale.</p>
+<p>EduMIPS64 è stato progettato e sviluppato da un gruppo di studenti
+dell&#8217;Università degli Studi di Catania, ed ha tratto spunto, come interfaccia
+e come funzionamento, dal simulatore WinMIPS64, sebbene vi siano alcune
+differenze importanti con quest&#8217;ultimo.</p>
+<p>Questo manuale vi introdurrà ad EduMIPS64, e spiegherà come utilizzarlo.</p>
+<p>Il primo capitolo del manuale riguarda il formato dei file sorgente accettato
+dal simulatore, descrivendo i tipi di dato e le direttive, oltre ai parametri da
+linea di comando.</p>
+<p>Nel secondo capitolo è presentata una panoramica del set di istruzioni
+MIPS64 utilizzato da EduMIPS64, con tutti i parametri richiesti e le indicazioni per
+il loro utilizzo.</p>
+<p>Il terzo capitolo è una descrizione dell&#8217;interfaccia utente di EduMIPS64, che
+espone lo scopo di ciascuna finestra e di ciascun menù, insieme ad una
+descrizione delle finestre di configurazione, del Dinero frontend, del manuale e
+delle opzioni da linea di comando.</p>
+<p>Il quarto capitolo contiene alcune esempi pratici di utilizzo del simulatore.</p>
+<p>Questo manuale si riferisce ad EduMIPS64 versione 0.5.3.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="source-files-format.html">Formato dei file sorgenti</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-files-format.html#la-sezione-data">La sezione <cite>.data</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-files-format.html#la-sezione-code">La sezione <cite>.code</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-files-format.html#il-comando-include">Il comando <cite>#include</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="instructions.html">Il set di istruzioni</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#le-istruzioni-alu">Le istruzioni ALU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#istruzioni-load-store">Istruzioni load/store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#istruzioni-di-controllo-del-flusso">Istruzioni di controllo del flusso</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#l-istruzione-syscall">L&#8217;istruzione <cite>SYSCALL</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#altre-istruzioni">Altre istruzioni</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user-interface.html">L&#8217;interfaccia utente</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user-interface.html#la-barra-dei-menu">La barra dei menù</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-interface.html#finestre">Finestre</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-interface.html#finestre-di-dialogo">Finestre di dialogo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-interface.html#opzioni-da-riga-di-comando">Opzioni da riga di comando</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-interface.html#eseguire-edumips64">Eseguire EduMIPS64</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Listati di esempio</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#syscall">SYSCALL</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Andrea Spadaccini ed il team di sviluppo di EduMIPS64.
+      Creato con <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
