@@ -1,0 +1,55 @@
+EduMIPS64 README
+================
+
+EduMIPS64 is a cross-platform visual MIPS64 CPU simulator written in
+Java/swing. To learn how it works and how to use it, please refer to the
+EduMIPS64 User Manual (in the docs/{en,it}/output/latex directory). This file
+is a short guide for developers.
+
+Requirements
+------------
+
+In order to compile EduMIPS64, you need the following tools:
+- Java JDK version 1.5 or above (tested only with Sun JDK)
+- Apache Ant
+
+If you need to compile the in-application help, you need:
+- Sphinx (http://sphinx.pocoo.org/) versione 1.0.7 or above
+- GNU Make
+
+If you need to compile the PDF manual, you will also need:
+- latex / pdflatex
+
+Main Ant targets
+----------------
+
+* `jar` build the EduMIPS64 jar package named edumips64-`version`.jar
+
+* `svnjar` build the SVN jar package, named edumips64-svn.jar, that differs
+   from the previous one because it contains debug information
+
+* `clijar` build a jar package containing an experimental CLI front-end to
+  EduMIPS64
+
+* `src-release` builds a tar.bz2 file containing the source distribution of
+  EduMIPS64
+
+* `clean` removes the jar files and the build directory
+
+Building the documentation
+--------------------------
+
+To build the documentation, as stated before, you need sphinx >= 1.0.7,
+GNU/Make and a working installation of latex and pdflatex.
+
+The docs come in two different languages: english (en) and italian (it).
+
+First, cd to the directory containing the sources of the doc to rebuild:
+
+$ cd docs/en/src # or docs/it/src for italian
+
+Then use the following make targets:
+
+* `html` to build the in-app help
+
+* `latexpdf` to build the pdf manual.
