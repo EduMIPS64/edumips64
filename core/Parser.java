@@ -895,10 +895,13 @@ public class Parser
 													{   
 															numError++;
 															String er = "LABELADDRESSINVALID";
-															if (tmp > edumips64.core.CPU.DATALIMIT)
+															if (tmp > edumips64.core.CPU.DATALIMIT) {
 															    er = "LABELTOOLARGE";
 															    error.add(er,row,line.indexOf(param.substring(indPar,endPar))+1,line);
-															error.add("LABELADDRESSINVALID",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+                                                            }
+                                                            else {
+                                                                error.add("LABELADDRESSINVALID",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+                                                            }
 															i = line.length();
 															indPar = endPar+1;
 															tmpInst.getParams().add(0);
