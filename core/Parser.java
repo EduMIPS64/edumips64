@@ -891,17 +891,15 @@ public class Parser
 												else if(isNumber(param.substring(indPar,endPar).trim()))
 												{
 													int tmp = Integer.parseInt(param.substring(indPar,endPar).trim());
-													if (tmp<0 || tmp%2!=0 || tmp > edumips64.core.CPU.DATALIMIT)
+													//if (tmp<0 || tmp%2!=0 || tmp > edumips64.core.CPU.DATALIMIT)
+													if (tmp<0 || tmp > edumips64.core.CPU.DATALIMIT)
 													{   
 															numError++;
 															String er = "LABELADDRESSINVALID";
 															if (tmp > edumips64.core.CPU.DATALIMIT) {
 															    er = "LABELTOOLARGE";
-															    error.add(er,row,line.indexOf(param.substring(indPar,endPar))+1,line);
                                                             }
-                                                            else {
-                                                                error.add("LABELADDRESSINVALID",row,line.indexOf(param.substring(indPar,endPar))+1,line);
-                                                            }
+                                                            error.add(er,row,line.indexOf(param.substring(indPar,endPar))+1,line);
 															i = line.length();
 															indPar = endPar+1;
 															tmpInst.getParams().add(0);

@@ -24,6 +24,7 @@ package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
 import java.util.*;
+import java.util.logging.Logger;
 import java.lang.Enum.*;
 /**Abstract class: it provides all methods and attributes for each instruction type
  * 
@@ -42,6 +43,7 @@ public abstract class Instruction {
     protected String fullname;
     protected static boolean enableForwarding=(Boolean)Config.get("forwarding");
     protected String label;
+    protected static final Logger logger = Logger.getLogger(Instruction.class.getName());
     
     /** Creates a new instance of Instruction */
     public Instruction() {
