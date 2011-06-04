@@ -18,7 +18,7 @@ If you need to compile the in-application help, you need:
 - GNU Make
 
 If you need to compile the PDF manual, you will also need:
-- latex / pdflatex 
+- latex / pdflatex
 
 Main Ant targets
 ----------------
