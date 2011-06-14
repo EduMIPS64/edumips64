@@ -218,7 +218,7 @@ public class CPU
 			throw new StoppedCPUException();
 		try
 		{
-			logger.info("Starting cycle " + ++cycles);
+			logger.info("Starting cycle " + ++cycles + "\n---------------------------------------------");
 			currentPipeStatus = PipeStatus.WB; 
 
 			// Let's execute the WB() method of the instruction located in the 

@@ -28,6 +28,8 @@ package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
 
+import java.util.logging.Logger;
+
 /**
  * <pre>
  * Format:      MOVN rd, rs, rt  
@@ -41,6 +43,7 @@ import edumips64.utils.*;
 class MOVN extends ALU_RType
 {
     final String OPCODE_VALUE="001011";
+    private static final Logger logger = Logger.getLogger(MOVN.class.getName());
     
     
     public MOVN()
@@ -69,6 +72,8 @@ class MOVN extends ALU_RType
         }
         */
 
+        logger.info("RD = " + TR[RD_FIELD].getValue() + "; RS = " + TR[RS_FIELD].getValue() + "; RT = " + TR[RT_FIELD].getValue() + ";");
+        logger.info("if RT != 0, RD = RS");
         if(TR[RT_FIELD].getValue() != 0) {
             TR[RD_FIELD].setBits(TR[RS_FIELD].getBinString(), 0);
         }

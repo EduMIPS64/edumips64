@@ -26,6 +26,7 @@ import edumips64.core.*;
 import edumips64.utils.*;
 //per diagnostica
 import java.util.*;
+import java.util.logging.Logger;
 
 /** This is the base class for all the immediate ALU instructions
  *
@@ -42,6 +43,8 @@ public class ALU_IType extends ALUInstructions {
     final static int RS_FIELD_LENGTH=5;
     final static int IMM_FIELD_LENGTH=16;
     String OPCODE_VALUE="";
+    
+    private static final Logger logger = Logger.getLogger(ALU_IType.class.getName());
 
     public ALU_IType() {
 	this.syntax="%R,%R,%I";
@@ -80,6 +83,7 @@ public class ALU_IType extends ALUInstructions {
     public void doWB() throws IrregularStringOfBitsException 
     {
 	//passing result from temporary register to destination register and unlocking it
+        logger.info("WB of the ALU I-Type instruction. Writing " + TR[RT_FIELD].getValue() + " to R" + params.get(RT_FIELD));
         cpu.getRegister(params.get(RT_FIELD)).setBits(TR[RT_FIELD].getBinString(),0);
         cpu.getRegister(params.get(RT_FIELD)).decrWriteSemaphore();
    }

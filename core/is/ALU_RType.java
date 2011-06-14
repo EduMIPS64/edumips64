@@ -29,6 +29,7 @@ import edumips64.core.*;
 import edumips64.utils.*;
 //per diagnostica
 import java.util.*;
+import java.util.logging.Logger;
 
 /**This is the base class for the R-Type instructions
  *
@@ -46,6 +47,7 @@ public abstract class ALU_RType extends ALUInstructions {
     final static int RT_FIELD_LENGTH=5; 
     String OPCODE_VALUE="";
     final static int OPCODE_VALUE_INIT=26;
+    private static final Logger logger = Logger.getLogger(ALU_RType.class.getName());
     public ALU_RType() 
     {
         syntax="%R,%R,%R";
@@ -54,16 +56,28 @@ public abstract class ALU_RType extends ALUInstructions {
 
     public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
         //if source registers are valid passing their own values into temporary registers
+        logger.info("Executing step ID of " + fullname);
+        logger.info("RD is R" + params.get(RD_FIELD) + "; RS is R" + params.get(RS_FIELD) + "; RT is R" + params.get(RT_FIELD) + ";");
         Register rs=cpu.getRegister(params.get(RS_FIELD));
         Register rt=cpu.getRegister(params.get(RT_FIELD));
-        if(rs.getWriteSemaphore()>0 || rt.getWriteSemaphore()>0)
+        //if(rs.getWriteSemaphore()>0 || rt.getWriteSemaphore()>0)
+        //    throw new RAWException();
+        if(rs.getWriteSemaphore() > 0) {
+            logger.info("RAW on RS");
             throw new RAWException();
+        }
+        if(rt.getWriteSemaphore() > 0) {
+            logger.info("RAW on RT");
+            throw new RAWException();
+        }
+
         TR[RS_FIELD].setBits(rs.getBinString(),0); 
         TR[RT_FIELD].setBits(rt.getBinString(),0); 
         //locking the destination register
         Register rd=cpu.getRegister(params.get(RD_FIELD));
         TR[RD_FIELD].setBits(rd.getBinString(),0); 
         rd.incrWriteSemaphore(); 
+        logger.info("RD = " + TR[RD_FIELD].getValue() + "; RS = " + TR[RS_FIELD].getValue() + "; RT = " + TR[RT_FIELD].getValue() + ";");
     }
 
     public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException,IrregularWriteOperationException,DivisionByZeroException {
