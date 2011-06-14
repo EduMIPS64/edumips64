@@ -52,8 +52,8 @@ public class GUIAbout extends JDialog implements Runnable  {
 		"Developers:", " ",
 						
 		"Andrea Spadaccini",
-		 	"andrea@edumips.org",
-			"Project Leader - Main GUI",
+		 	"andrea.spadaccini@gmail.com",
+			"Project Leader - Mantainer",
 		"Antonella Scandura",
 			"anto.tuny@hotmail.it",
 			"Main GUI - Documentation",
