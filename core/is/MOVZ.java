@@ -23,10 +23,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
+import java.util.logging.Logger;
 
 /**
  * <pre>
@@ -40,6 +40,11 @@ import edumips64.utils.*;
 class MOVZ extends ALU_RType
 {
     final String OPCODE_VALUE="001010";
+    private static final Logger logger = Logger.getLogger(MOVZ.class.getName());
+
+    // Skip the Write Back if the predicate (RT == 0) is false
+    private boolean skipWB = false;
+
     public MOVZ()
     {
     	super.OPCODE_VALUE = OPCODE_VALUE;
@@ -47,26 +52,10 @@ class MOVZ extends ALU_RType
     }
     public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException 
     {
-        /*
-        //getting strings from temporary registers
-        String rs=TR[RS_FIELD].getBinString();
-        String rt=TR[RT_FIELD].getBinString();
-        //if the move test will be true the rs value must be written in rd register
-        TR[RD_FIELD].setBits(rs,0);
-        boolean rtbit,diff=false;
-        for(int i=0;i<64;i++)
-        {
-        rtbit=rt.charAt(i)=='1'?true:false;
-        if(diff=rtbit^false)
-        {
-        //the move test is false because strings are different, the old value must be rewritten in rd
-        TR[RD_FIELD].setBits(cpu.getRegister(params.get(RD_FIELD)).getBinString(),0);                   
-        break;
-        }
-        }
-        */
         if(TR[RT_FIELD].getValue() == 0) {
             TR[RD_FIELD].setBits(TR[RS_FIELD].getBinString(), 0);
+        } else {
+            skipWB = true;
         }
         if(enableForwarding)
         {
@@ -74,9 +63,15 @@ class MOVZ extends ALU_RType
         }
 
     }
-    
+    public void doWB() throws IrregularStringOfBitsException {
+        // The doWB() method is overridden because it must check if the write
+        // on the registers must be done, checking the skipWB variable.
+        if(!skipWB) {
+            logger.info("Skipping WB as the predicate is false");
+            cpu.getRegister(params.get(RD_FIELD)).setBits(TR[RD_FIELD].getBinString(),0);
+        }
 
-
-
-   
+        // We must unlock the register in both cases.
+        cpu.getRegister(params.get(RD_FIELD)).decrWriteSemaphore();    
+    }
 }

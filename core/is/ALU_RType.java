@@ -73,9 +73,16 @@ public abstract class ALU_RType extends ALUInstructions {
 
         TR[RS_FIELD].setBits(rs.getBinString(),0); 
         TR[RT_FIELD].setBits(rt.getBinString(),0); 
-        //locking the destination register
+
+        // Get the Destination Register value.
+        // BE CAREFUL! If the instruction does not use RD (like MOVN and MOVZ
+        // if the condition is false), and someone changes the value of RD
+        // between the ID and the WB stage of the current instruction, the old
+        // value of RD, read during ID, will be written to RD during WB.
         Register rd=cpu.getRegister(params.get(RD_FIELD));
         TR[RD_FIELD].setBits(rd.getBinString(),0); 
+
+        // Lock RD
         rd.incrWriteSemaphore(); 
         logger.info("RD = " + TR[RD_FIELD].getValue() + "; RS = " + TR[RS_FIELD].getValue() + "; RT = " + TR[RT_FIELD].getValue() + ";");
     }

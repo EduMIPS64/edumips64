@@ -44,6 +44,9 @@ class MOVN extends ALU_RType
 {
     final String OPCODE_VALUE="001011";
     private static final Logger logger = Logger.getLogger(MOVN.class.getName());
+
+    // Skip the Write Back if the predicate (RT != 0) is false
+    private boolean skipWB = false;
     
     
     public MOVN()
@@ -54,39 +57,26 @@ class MOVN extends ALU_RType
 
     public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException 
     {
-        /*
-        //getting strings from temporary registers
-        String rs=TR[RS_FIELD].getBinString();
-        String rt=TR[RT_FIELD].getBinString();
-        //saving rd value because, if the move test is false, the old value must be rewritten in rd
-        TR[RD_FIELD].setBits(cpu.getRegister(params.get(RD_FIELD)).getBinString(),0);
-        boolean rtbit,diff=false;
-        for(int i=0;i<64;i++)
-        {
-            rtbit=rt.charAt(i)=='1'?true:false;
-            if(diff=rtbit^false)
-            {
-                TR[RD_FIELD].setBits(rs,0);
-                break;
-            }
-        }
-        */
-
-        logger.info("RD = " + TR[RD_FIELD].getValue() + "; RS = " + TR[RS_FIELD].getValue() + "; RT = " + TR[RT_FIELD].getValue() + ";");
-        logger.info("if RT != 0, RD = RS");
         if(TR[RT_FIELD].getValue() != 0) {
             TR[RD_FIELD].setBits(TR[RS_FIELD].getBinString(), 0);
+        } else {
+            skipWB = true;
         }
-
         if(enableForwarding)
         {
             doWB();
         }
-
     }
-    
 
+    public void doWB() throws IrregularStringOfBitsException {
+        // The doWB() method is overridden because it must check if the write
+        // on the registers must be done, checking the skipWB variable.
+        if(!skipWB) {
+            logger.info("Skipping WB as the predicate is false");
+            cpu.getRegister(params.get(RD_FIELD)).setBits(TR[RD_FIELD].getBinString(),0);
+        }
 
-
-   
+        // We must unlock the register in both cases.
+        cpu.getRegister(params.get(RD_FIELD)).decrWriteSemaphore();    
+    }
 }
