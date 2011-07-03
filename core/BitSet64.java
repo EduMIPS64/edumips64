@@ -215,15 +215,15 @@ public class BitSet64 extends FixedBitSet {
 	 * @param value number to be written: must be <CODE>-32768 &lt;= value &lt;= 65536</CODE>
 	 * @param offset position to write the HalfWord 
 	 * @throws IrregularWriteOperationException if value is not correct or anything else goes wrong during the operation
-	 * @throws NotAlingException if offset is not aling to 16 bit	
+	 * @throws NotAlignException if offset is not aling to 16 bit	
 	 */
-	public void writeHalf(int value, int offset) throws IrregularWriteOperationException, NotAlingException {
+	public void writeHalf(int value, int offset) throws IrregularWriteOperationException, NotAlignException {
 		offset *=8;
 		offset = 48 - offset;
 		if( value < -32768 || value > 65536)
 			throw new IrregularWriteOperationException();
 		else if (offset%16 !=  0)
-			throw new NotAlingException(); 
+			throw new NotAlignException(); 
 		else{
 			String bits = new String();
 			if( value >= 0){
@@ -258,7 +258,7 @@ public class BitSet64 extends FixedBitSet {
 	 * @param value number to be written: must be <CODE>0 &lt;= value &lt;= 4294967295</CODE>
 	 * @throws IrregularWriteOperationException if value is not correct or anything else goes wrong during the operation
 	 */
-	public void writeWordUnsigned(long value) throws IrregularWriteOperationException, NotAlingException {
+	public void writeWordUnsigned(long value) throws IrregularWriteOperationException, NotAlignException {
 		if( value < 0 || value > 4294967295L)
 			throw new IrregularWriteOperationException();
 		else{
@@ -320,15 +320,15 @@ public class BitSet64 extends FixedBitSet {
 	 * @param value number to be written: must be <CODE>-2147483648 &lt;= value &lt;= 4294967296</CODE>
 	 * @param offset position to write the Word
 	 * @throws IrregularWriteOperationException if value is not correct or anything else goes wrong during the operation
-	 * @throws NotAlingException if offset is not aling to 32 bit
+	 * @throws NotAlignException if offset is not aling to 32 bit
 	 */
-	public void writeWord(long value,int offset) throws IrregularWriteOperationException,NotAlingException {
+	public void writeWord(long value,int offset) throws IrregularWriteOperationException,NotAlignException {
 		offset *= 8;
 		offset = 32 - offset;
 		if( value < -2147483648 || value > 4294967295L)
 			throw new IrregularWriteOperationException();
 		else if (offset%32 !=  0)
-			throw new NotAlingException(); 
+			throw new NotAlignException(); 
 		String bits = new String();
 		if( value >= 0){
 			try{
@@ -460,12 +460,12 @@ public class BitSet64 extends FixedBitSet {
 	/** Get the value of the one HalfWord of bitset by position
 	 *  @param offset position to read the byte
 	 *  @return the value of the byte
-	 * @throws NotAlingException if offset is not aling to 16 bit	
+	 * @throws NotAlignException if offset is not aling to 16 bit	
 	 */
-	public int readHalf (int offset) throws IrregularStringOfBitsException,NotAlingException
+	public int readHalf (int offset) throws IrregularStringOfBitsException,NotAlignException
 	{
 		if (offset%2!=0)
-			throw new NotAlingException();
+			throw new NotAlignException();
 		offset *=8;
 		offset = 48 - offset;
 		String val = getBinString().substring(offset, offset+16);
@@ -485,12 +485,12 @@ public class BitSet64 extends FixedBitSet {
 	/** Get the value Unsigned of the one HalfWord of bitset by position
 	 *  @param offset position to read the byte
 	 *  @return the value Unsigned of the byte
-	 * @throws NotAlingException if offset is not aling to 16 bit	
+	 * @throws NotAlignException if offset is not aling to 16 bit	
 	 */
-	public int readHalfUnsigned (int offset) throws NotAlingException
+	public int readHalfUnsigned (int offset) throws NotAlignException
 	{
 		if (offset%2!=0)
-			throw new NotAlingException();
+			throw new NotAlignException();
 		offset *=8;
 		offset = 48 - offset;
 		String val = getBinString().substring(offset, offset+16);
@@ -509,12 +509,12 @@ public class BitSet64 extends FixedBitSet {
 	/** Get the value of the one Word of bitset by position
 	 *  @param offset position to read the byte
 	 *  @return the value of the byte
-	 * @throws NotAlingException if offset is not aling to 32 bit	
+	 * @throws NotAlignException if offset is not aling to 32 bit	
 	 */
-	public int readWord (int offset) throws NotAlingException
+	public int readWord (int offset) throws NotAlignException
 	{
 		if (offset%4!=0)
-			throw new NotAlingException();
+			throw new NotAlignException();
 				offset *=8;
 		offset = 32 - offset;
 		String val = getBinString().substring(offset, offset+32);
@@ -534,12 +534,12 @@ public class BitSet64 extends FixedBitSet {
 	/** Get the value Unsigned of the one Word of bitset by position
 	 *  @param offset position to read the byte
 	 *  @return the value Unsigned of the byte
-	 * @throws NotAlingException if offset is not aling to 32 bit	
+	 * @throws NotAlignException if offset is not aling to 32 bit	
 	 */
-	public long readWordUnsigned (int offset) throws NotAlingException
+	public long readWordUnsigned (int offset) throws NotAlignException
 	{
 		if (offset%4!=0)
-			throw new NotAlingException();
+			throw new NotAlignException();
 				offset *=8;
 		offset = 32 - offset;
 		String val = getBinString().substring(offset, offset+32);

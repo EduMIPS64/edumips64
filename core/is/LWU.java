@@ -61,7 +61,7 @@ class LWU extends Loading
 			doWB();
 		}
         }
-	catch(NotAlingException er)
+	catch(NotAlignException er)
 	{
 	    throw new AddressErrorException();
 	}

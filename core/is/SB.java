@@ -62,7 +62,7 @@ class SB extends Storing
 			WB();
 		}
 	}
-/*	catch(NotAlingException er)     //DICHIARARE QUESTA ECCEZIONE NEL METODO WRITEHALF
+/*	catch(NotAlignException er)     //DICHIARARE QUESTA ECCEZIONE NEL METODO WRITEHALF
 	{
 	    throw new AddressErrorException();
 	}*/

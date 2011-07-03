@@ -59,7 +59,7 @@ class SW extends Storing
             //writing on the memory element the RT register
 	    memEl.writeWord(TR[RT_FIELD].readWord(0), (int) (address%8));
 	}
-	catch(NotAlingException er)
+	catch(NotAlignException er)
 	{
 	    throw new AddressErrorException();
 	}

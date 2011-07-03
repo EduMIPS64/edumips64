@@ -63,7 +63,7 @@ class SH extends Storing
 				WB();
 			}
 		}
-		catch(NotAlingException er)
+		catch(NotAlignException er)
 		{
 			throw new AddressErrorException();
 		}

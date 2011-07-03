@@ -62,7 +62,7 @@ class LHU extends Loading
 	}
 	
         }
-	catch(NotAlingException er)
+	catch(NotAlignException er)
 	{
 	    throw new AddressErrorException();
 	}

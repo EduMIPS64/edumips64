@@ -1,4 +1,4 @@
-/* NotAlingException.java
+/* NotAlignException.java
  * 
  * Exception thrown when trying to write an irregular value in a bitset, i.e. an overflow value.
  * (c) 2006 Salvatore Scellato
@@ -23,4 +23,4 @@
 
 package edumips64.core;
 
-public class NotAlingException extends Exception{}
+public class NotAlignException extends Exception{}
