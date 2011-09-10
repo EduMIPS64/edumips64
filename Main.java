@@ -125,7 +125,7 @@ public class Main extends JApplet {
             return;
         }
 
-        Logger rootLogger = Logger.getLogger("");
+        Logger rootLogger = Logger.getLogger("inucus");
 	
         if(!debug_mode) {
             // Clear up the default handlers of the root logger
