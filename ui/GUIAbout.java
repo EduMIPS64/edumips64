@@ -58,7 +58,7 @@ public class GUIAbout extends JDialog implements Runnable  {
 			"anto.tuny@hotmail.it",
 			"Main GUI - Documentation",
 		"Salvatore Scellato",
-			"thetarro@hotmail.com",
+			"salvo.scellato@gmail.com",
 			"CPU - Core classes",
 		"Simona Ullo",
 			"simonat.u@gmail.com",
