@@ -1,21 +1,22 @@
 EduMIPS64 ChangeLog
-------------------- 
-0.5.3 (*unreleased*)
+-------------------
+0.5.3 (19/09/2011)
 	Features:
-	- Added labels to the GUIData frame; fixed GUIData and GUICode default column
-      widths so that they can be read (andrea)
-	- Added Splash Screen (visible with Java6+, not shown with Java5) (andrea,
-	  vanni)
 	- Embedded JavaHelp viewer (andrea)
 	- Converted the TeX docs to RST, so that the same sources can be used for
 	  the PDF manual and for the newly-embedded JavaHelp viewer (andrea)
+	- Added Splash Screen (visible with Java6+, not shown with Java5) (andrea,
+	  vanni)
+	- Added labels to the GUIData frame; fixed GUIData and GUICode default column
+      widths so that they can be read (andrea)
 
 	Bugs fixed:
-    - Fixed bug #9 (Incorrect behavior of MOVN and MOVZ)
+  - Fixed bugs #8 (Weird GUI under Mac OS X) and #9 (Incorrect behavior of
+	  MOVN and MOVZ)
 	- Added GUIData/GUICode column labels update on language change (andrea)
 	- Fixed a bug that disallowed access to odd memory locations from the code
 	  (odd labels were not correctly parsed).
-	
+
 	Various changes:
 	- Changed logging mechanism to use java.util.logging (andrea)
 	- Removed GUI Log viewer, the debug messages now go to stdout (andrea)
@@ -121,7 +122,7 @@ EduMIPS64 ChangeLog
 	  -h (--help) 				shows a little help
 	  -f (--file) filename		opens a new file
 	  -d (--debug) 				enters debug mode
-	- SYSCALL 1, 2, 3, 4 implemented! 
+	- SYSCALL 1, 2, 3, 4 implemented!
 	  They are the EduMIPS64 equivalent of the open(), close(), read() and write()
 	  POSIX syscalls. More documentation will follow (andrea).
 	- Makefile updated with the I/O icon (mancausoft)
@@ -130,7 +131,7 @@ EduMIPS64 ChangeLog
 	- The HALT instruction is added to the list of deprecated instruction (mancausoft)
 
 0.3.3 (09/09/2006)
-	- The SYSCALL instruction is born! Right now only SYSCALL 0 and 5 work: 
+	- The SYSCALL instruction is born! Right now only SYSCALL 0 and 5 work:
 	  . SYSCALL 0: acts exactly like the HALT instruction. [exit()]
 	  . SYSCALL 5: roughly acts like printf(), supporting only the following
 		placeholders: %s (string), %d (integer), %i (same as %d), %% (literal %)
@@ -158,9 +159,9 @@ EduMIPS64 ChangeLog
 	- Parser code improvements and cleanups (mancausoft + andrea)
 	- Corrected a bug that made fatal errors send the CPU in an infinite loop.
 	  At least, now we can read the log when there's a fatal error. (andrea)
-	
+
 0.3.2 (08/09/2006)
-	- Integer overflow and division by zero exception handling. 
+	- Integer overflow and division by zero exception handling.
 	  The execution is stopped if one of these exceptions is raised. This solved
 	  a previously unknown bug: after an integer overflow, EduMIPS64 entered in
 	  an infinite loop. Now it works (andrea)
@@ -213,7 +214,7 @@ EduMIPS64 ChangeLog
 0.2.2 (06/07/2006)
 	- Improved error and crash window (vanni)
 
-0.2.1 (29/06/2006) 
+0.2.1 (29/06/2006)
 	- Better About Window (vanni)
 	- Fixed the "negative memory address" bug (mancausoft)
 	- Added the Dinero Path to the Preferences (vanni)
@@ -225,7 +226,7 @@ EduMIPS64 ChangeLog
 	- Now in the titlebar there's the version number (andrea)
 	- Fixed Dinero Frontend font that in some PCs wasn't monospaced. (andrea)
 	- Changed DineroIV default options (andrea)
-	- Fixed a DDIV bug: semaphores where wrongly decremented if there was a	
+	- Fixed a DDIV bug: semaphores where wrongly decremented if there was a
 	  division by zero and forwarding was disabled (mancausoft)
 	- Fixed a micro-bug in the translations (andrea)
 

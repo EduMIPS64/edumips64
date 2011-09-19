@@ -14,7 +14,7 @@
         <!-- Set build file properties -->
 		<property name="sourceDir" value="." />
         <property name="helpClassesDir" value="./libs" />
-		<property name="version" value="0.5.3-rc3" />
+		<property name="version" value="0.5.3" />
 		<property name="outputDir" value="edumips" />
 		<property name="tarbz2File" value="edumips64-${version}.tar.bz2" />
 		<property name="svn_jar_filename" value="edumips64-svn.jar" />
@@ -35,14 +35,14 @@
 	<target name="clean">
 		<delete file="${release_jar_filename}" />
 		<delete file="${svn_jar_filename}" />
-        <delete dir="${outputDir}" /> 
+        <delete dir="${outputDir}" />
 	</target>
 
     <!-- *** javadoc *** build the javadoc -->
 	<target name="javadoc" depends="init">
 		<mkdir dir="${outputDir}/docs" />
-        <javadoc 
-            destdir="${outputDir}/docs" 
+        <javadoc
+            destdir="${outputDir}/docs"
 		    author="true"
 		    version="true"
 		    use="true"
@@ -54,13 +54,13 @@
     <!-- *** svnjar *** compile with debug information and set the jar
          filename to edumips64-svn.jar -->
 	<target name="svnjar" depends="init">
-        <javac 
-            target="5" 
-            srcdir="${sourceDir}" 
-            classpath="${helpClassesDir}" 
-            destdir="${outputDir}" 
-            nowarn="yes" 
-            debug="on" 
+        <javac
+            target="5"
+            srcdir="${sourceDir}"
+            classpath="${helpClassesDir}"
+            destdir="${outputDir}"
+            nowarn="yes"
+            debug="on"
             debuglevel="lines,vars,source"/>
         <property name="app_type" value="GUI" />
         <property name="jar_filename" value="${svn_jar_filename}" />
@@ -70,11 +70,11 @@
     <!-- *** jar *** compile without debug information and set the jar
          filename to edumips64-VERSION.jar -->
 	<target name="jar" depends="init">
-        <javac 
-            target="5" 
-            srcdir="${sourceDir}" 
-            classpath="${helpClassesDir}" 
-            destdir="${outputDir}" 
+        <javac
+            target="5"
+            srcdir="${sourceDir}"
+            classpath="${helpClassesDir}"
+            destdir="${outputDir}"
             nowarn="yes"/>
 
         <property name="app_type" value="GUI" />
@@ -85,13 +85,13 @@
     <!-- *** clijar *** compile with debug information, set the CLI Main and set the jar
          filename to edumips64-VERSION.jar -->
 	<target name="clijar" depends="init">
-        <javac 
-            target="5" 
-            srcdir="${sourceDir}" 
-            classpath="${helpClassesDir}" 
-            destdir="${outputDir}" 
-            nowarn="yes" 
-            debug="on" 
+        <javac
+            target="5"
+            srcdir="${sourceDir}"
+            classpath="${helpClassesDir}"
+            destdir="${outputDir}"
+            nowarn="yes"
+            debug="on"
             debuglevel="lines,vars,source"/>
 
         <property name="app_type" value="CLI" />
@@ -122,7 +122,7 @@
             </manifest>
         </jar>
 		<signjar jar="${cli_jar_filename}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
-        <delete dir="${outputDir}" /> 
+        <delete dir="${outputDir}" />
 	</target>
 
     <target name="makeGUIJar">
@@ -203,7 +203,7 @@
             </manifest>
         </jar>
 		<signjar jar="${jar_filename}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
-        <delete dir="${outputDir}" /> 
+        <delete dir="${outputDir}" />
 	</target>
 
     <target name="src-release" depends="init">
@@ -215,6 +215,6 @@
 		</copy>
 
         <tar destfile="${tarbz2File}" basedir="." includes="edumips64/" compression="bzip2" />
-        <delete dir="edumips64" /> 
-    </target> 
+        <delete dir="edumips64" />
+    </target>
 </project>

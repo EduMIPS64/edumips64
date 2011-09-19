@@ -52,7 +52,7 @@ import javax.imageio.ImageIO;
 
 public class Main extends JApplet {
 
-    public static final String VERSION = "0.5.3-rc3";
+    public static final String VERSION = "0.5.3";
     static CPU cpu;
     public static CPUGUIThread cgt;
     static Parser parser;
@@ -126,7 +126,7 @@ public class Main extends JApplet {
         }
 
         Logger rootLogger = Logger.getLogger("inucus");
-	
+
         if(!debug_mode) {
             // Clear up the default handlers of the root logger
             for(Handler h : rootLogger.getHandlers()) {
@@ -148,15 +148,15 @@ public class Main extends JApplet {
             }
         });
         // Maximizing the application
-        Insets screenInsets = f.getToolkit().getScreenInsets(f.getGraphicsConfiguration());            
+        Insets screenInsets = f.getToolkit().getScreenInsets(f.getGraphicsConfiguration());
         Rectangle screenSize = f.getGraphicsConfiguration().getBounds();
-        Rectangle maxBounds = new Rectangle(screenInsets.left + screenSize.x, 
-                                screenInsets.top + screenSize.y, 
+        Rectangle maxBounds = new Rectangle(screenInsets.left + screenSize.x,
+                                screenInsets.top + screenSize.y,
                                 screenSize.x + screenSize.width - screenInsets.right - screenInsets.left,
                                 screenSize.y + screenSize.height - screenInsets.bottom - screenInsets.top);
         f.setMaximizedBounds(maxBounds);
         f.setBounds(maxBounds);
-        
+
         f.setLocation(0,0);
         Main mm = new Main();
         mm.init();
@@ -298,11 +298,11 @@ public class Main extends JApplet {
         try{
             if(f!=null)
                 f.setIconImage(IMGLoader.getImage("ico.png"));
-    
+
         }catch(IOException e){
             e.printStackTrace();
         }
-        
+
         front.setPipelineContainer(pipeFrame.getContentPane());
         front.setRegistersContainer(registersFrame.getContentPane());
         front.setDataContainer(memoryFrame.getContentPane());
@@ -370,7 +370,7 @@ public class Main extends JApplet {
      *    running menu items but cache menu items should be hidden; in the HALTED
      *    state, only cache-related menu items must be shown, while running menu
      *    items must be hidden.
-     *    
+     *
      *    @param s the new CPU status
      * */
     public static void changeShownMenuItems(CPU.CPUStatus s) {
@@ -432,7 +432,7 @@ public class Main extends JApplet {
             synchronized(cgt) {
                 cgt.setSteps(1);
                 cgt.notify();
-            }    
+            }
             openedFile = file;
             log.info("File " + file + " successfully opened");
 			StringTokenizer token = new StringTokenizer(file,File.separator,false);
@@ -444,7 +444,7 @@ public class Main extends JApplet {
         }
         catch (ParserMultiException ex) {
             log.info("Error opening " + file);
-            new ErrorDialog(f,ex.getExceptionList(),CurrentLocale.getString("GUI_PARSER_ERROR")); 
+            new ErrorDialog(f,ex.getExceptionList(),CurrentLocale.getString("GUI_PARSER_ERROR"));
             openedFile = null;
             f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
             resetSimulator(false);
@@ -456,12 +456,12 @@ public class Main extends JApplet {
 			else
 				tmpfile=ex.getMessage();
 
-			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));		
+			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
 			log.info("File not found: " + tmpfile);
             JOptionPane.showMessageDialog(f, CurrentLocale.getString("FILE_NOT_FOUND") + ": " + tmpfile, "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
         }
         catch (Exception e) {
-			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));				
+			f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
             log.info("Error opening " + file);
             new ReportDialog(f,e,CurrentLocale.getString("ERROR"));
         }
@@ -588,7 +588,7 @@ public class Main extends JApplet {
      *  @return the menu bar
      */
     private static JMenuBar createMenuBar(){
-        JMenuBar mb = new JMenuBar();        
+        JMenuBar mb = new JMenuBar();
 
         // Creation of all menus and menu items
         file = new JMenu();
@@ -652,7 +652,7 @@ public class Main extends JApplet {
         });
 
         // Open recent files
-        @SuppressWarnings("unchecked")    
+        @SuppressWarnings("unchecked")
         LinkedList<String> files = (LinkedList<String>)Config.get("files");
         if(files.size()>0){
             int i = 0;
@@ -711,26 +711,26 @@ public class Main extends JApplet {
 
         // ---------------- EXECUTE MENU
         // Execute a single simulation step
-        exec.add(single_cycle);  
+        exec.add(single_cycle);
         single_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F7,0));
         single_cycle.addActionListener(new ActionListener (){
             public void actionPerformed(ActionEvent e){
                 cgt.setSteps(1);
                 synchronized(cgt) {
                     cgt.notify();
-                }    
+                }
             }
         });
 
         // Execute the whole program
-        exec.add(run_to);  
+        exec.add(run_to);
         run_to.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4,0));
         run_to.addActionListener(new ActionListener (){
             public void actionPerformed(ActionEvent e){
                 cgt.setSteps(-1);
                 synchronized(cgt) {
                     cgt.notify();
-                }    
+                }
             }
         });
 
@@ -745,7 +745,7 @@ public class Main extends JApplet {
                 }
             }
         });
-        
+
         // Stops the execution
         exec.add(stop);
         stop.setEnabled(false);
@@ -763,7 +763,7 @@ public class Main extends JApplet {
             public void actionPerformed(ActionEvent e){
                 new GUIConfig(f);
             }
-        });    
+        });
         // ---------------- LANGUAGE MENU
         Toolkit tk  = lang.getToolkit();
         config.add(lang);
@@ -776,7 +776,7 @@ public class Main extends JApplet {
             e.printStackTrace();
         }
         lang.add(lang_en);
-        
+
         lang_en.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 lang_en.setState(true);
@@ -809,10 +809,10 @@ public class Main extends JApplet {
                 // f.setVisible(true);
             }
         });
-        
+
 
         // ---------------- HELP MENU
-        
+
         manual = new JMenuItem();
         help.add(manual);
         manual.addActionListener(new ActionListener() {
@@ -832,7 +832,7 @@ public class Main extends JApplet {
         help.add(aboutUs);
         aboutUs.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
-                GUIAbout ab = new GUIAbout(null);    
+                GUIAbout ab = new GUIAbout(null);
                 //ab.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
                 ab.setVisible(true);
             }
@@ -978,8 +978,8 @@ public class Main extends JApplet {
         int pos = localCaption.indexOf("_");
         if(pos >= 0) {
             char mnemonic = localCaption.charAt(pos + 1);
-            
-            // The KeyEvent.VK_* constants refer to uppercase letters, so we 
+
+            // The KeyEvent.VK_* constants refer to uppercase letters, so we
             // need to make the mnemonic uppercase.
             mnemonic = Character.toUpperCase(mnemonic);
             item.setMnemonic((int)mnemonic);
@@ -1007,11 +1007,11 @@ public class Main extends JApplet {
         frameColorCh.pack();
         frameColorCh.setVisible(true);
     }
-    
+
     public static GUIFrontend getGUIFrontend() {
         return front;
     }
-    
+
     public static JFrame getMainFrame() {
         return f;
     }
