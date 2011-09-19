@@ -211,6 +211,10 @@
 		<copy todir="edumips64/">
 			<fileset dir=".">
 				<include name="**/*" />
+				<exclude name="**/*.jar" />
+				<exclude name="${outputDir}" />
+				<exclude name="edumips64" />
+				<exclude name="**/*.tbz2" />
 			</fileset>
 		</copy>
 
