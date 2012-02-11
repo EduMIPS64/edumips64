@@ -11,6 +11,10 @@
 -->
 <project name="edumips64" default="svnjar" basedir=".">
 	<target name="init">
+        <!-- Access the environment -->
+        <property environment="env" />
+        <property name="base.classpath" value="${env.CLASSPATH}" />
+
         <!-- Set build file properties -->
 		<property name="sourceDir" value="." />
         <property name="helpClassesDir" value="./libs" />
@@ -51,12 +55,37 @@
 		    packagenames="edumips64.*"/>
 	</target>
 
+    <target name="tests" depends="init">
+        <javac
+            target="5"
+            srcdir="${sourceDir}"
+            classpath="${base.classpath}:${helpClassesDir}"
+            destdir="${outputDir}"
+            nowarn="yes"
+            debug="on"
+            debuglevel="lines,vars,source"/>
+
+        <junit printsummary="true">
+            <classpath>
+                <pathelement path="${base.classpath}"/>
+            </classpath>
+            <classpath>
+                <pathelement path="${outputDir}"/>
+            </classpath>
+            <test name="edumips64.tests.CpuTests">
+                <formatter type="plain" usefile="false"/>
+            </test>
+        </junit>
+    </target>
+
+
     <!-- *** svnjar *** compile with debug information and set the jar
          filename to edumips64-svn.jar -->
 	<target name="svnjar" depends="init">
         <javac
             target="5"
             srcdir="${sourceDir}"
+            excludes="tests/**"
             classpath="${helpClassesDir}"
             destdir="${outputDir}"
             nowarn="yes"
@@ -73,6 +102,7 @@
         <javac
             target="5"
             srcdir="${sourceDir}"
+            excludes="${sourceDir}/tests/**"
             classpath="${helpClassesDir}"
             destdir="${outputDir}"
             nowarn="yes"/>
@@ -88,6 +118,7 @@
         <javac
             target="5"
             srcdir="${sourceDir}"
+            excludes="${sourceDir}/tests/**"
             classpath="${helpClassesDir}"
             destdir="${outputDir}"
             nowarn="yes"
