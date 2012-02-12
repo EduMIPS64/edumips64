@@ -57,6 +57,19 @@ public class CpuTests {
             cpu.reset();
         }
     }
+
+    /* Test for utils/strlen.s */
+    @Test(expected = HaltException.class)
+    public void testStrlen() throws Exception {
+        runMipsTest("tests/data/test-strlen.s");
+    }
+
+    /* Test for utils/strcmp.s */
+    @Test(expected = HaltException.class)
+    public void testStrcmp() throws Exception {
+        runMipsTest("tests/data/test-strcmp.s");
+    }
+
     /* ------- REGRESSION TESTS -------- */
     /* Issue #7 */
     @Test(expected = HaltException.class)

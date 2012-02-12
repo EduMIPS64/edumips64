@@ -1,4 +1,6 @@
 ; test-strcmp.s - tests for the strcmp routine
+; (c) 2012 Andrea Spadaccini, licensed under the GNU GPL v2 or later
+; Executes a break instruction if the test fails
 
                 .data
 ; Area for storing parameters for strcmp
@@ -95,6 +97,8 @@ error:
     sd          r1, error_addr(r0)
     daddi       r14, r0, error_params
     syscall     4 
-    syscall     0
+
+; Execute a break instruction, so that the unit test fails
+    break
     
 #include utils/strcmp.s;
