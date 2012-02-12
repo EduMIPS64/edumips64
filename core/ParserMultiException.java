@@ -53,6 +53,19 @@ public class ParserMultiException extends Exception
 		this.exception = exception;
 	} */
 
+    /** Checks if the exception contains any errors.
+     *
+     * The exception might be empty or contain only warnings.
+     */
+    public boolean hasErrors() {
+        for(ParserException e : exception) {
+            if(e.isError()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 	/** Add an error in the list
 	 * @param description the String with description of the error
 	 * @param row the row number of the error

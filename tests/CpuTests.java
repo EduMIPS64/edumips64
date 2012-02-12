@@ -48,7 +48,15 @@ public class CpuTests {
      */
     protected void runMipsTest(String testPath) throws Exception {
         try {
-            parser.parse(testPath);
+            try {
+                parser.parse(testPath);
+            } catch (ParserMultiWarningException e) {
+                // This exception is raised even if there are only warnings.
+                // We must raise it only if there are actual errors.
+                if(e.hasErrors()) {
+                    throw e;
+                }
+            }
             cpu.setStatus(CPU.CPUStatus.RUNNING);
             while(true) {
                 cpu.step();
