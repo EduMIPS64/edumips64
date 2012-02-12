@@ -84,6 +84,12 @@ public class CpuTests {
         runMipsTest("tests/data/b.s");
     }
 
+    /* Tests for the memory */
+    @Test(expected = HaltException.class)
+    public void testMemory() throws Exception {
+        runMipsTest("tests/data/memtest.s");
+    }
+
     /* ------- REGRESSION TESTS -------- */
     /* Issue #7 */
     @Test(expected = HaltException.class)
