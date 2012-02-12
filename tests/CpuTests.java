@@ -70,6 +70,12 @@ public class CpuTests {
         runMipsTest("tests/data/test-strcmp.s");
     }
 
+    /* Test for instruction B */
+    @Test(expected = HaltException.class)
+    public void testB() throws Exception {
+        runMipsTest("tests/data/b.s");
+    }
+
     /* ------- REGRESSION TESTS -------- */
     /* Issue #7 */
     @Test(expected = HaltException.class)
