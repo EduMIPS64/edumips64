@@ -63,6 +63,7 @@
             destdir="${outputDir}"
             nowarn="yes"
             debug="on"
+            includeantruntime="false"
             debuglevel="lines,vars,source"/>
 
         <junit printsummary="true">
@@ -90,6 +91,7 @@
             destdir="${outputDir}"
             nowarn="yes"
             debug="on"
+            includeantruntime="false"
             debuglevel="lines,vars,source"/>
         <property name="app_type" value="GUI" />
         <property name="jar_filename" value="${svn_jar_filename}" />
@@ -105,6 +107,7 @@
             excludes="${sourceDir}/tests/**"
             classpath="${helpClassesDir}"
             destdir="${outputDir}"
+            includeantruntime="false"
             nowarn="yes"/>
 
         <property name="app_type" value="GUI" />
@@ -123,6 +126,7 @@
             destdir="${outputDir}"
             nowarn="yes"
             debug="on"
+            includeantruntime="false"
             debuglevel="lines,vars,source"/>
 
         <property name="app_type" value="CLI" />
