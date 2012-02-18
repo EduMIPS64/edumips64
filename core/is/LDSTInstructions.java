@@ -45,6 +45,10 @@ import edumips64.utils.*;
     final static int RT_FIELD_LENGTH=5;
     final static int OFFSET_FIELD_LENGTH=16;
     final static int BASE_FIELD_LENGTH=5;
+
+    // Size of the read/write operations. Must be set by derived classes
+    protected byte memoryOpSize;
+
     String OPCODE_VALUE="";
     public LDSTInstructions()
     {	

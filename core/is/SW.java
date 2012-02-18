@@ -40,8 +40,9 @@ class SW extends Storing
     final String OPCODE_VALUE="101011";
     public SW()
     {
-	super.OPCODE_VALUE = OPCODE_VALUE;
+        super.OPCODE_VALUE = OPCODE_VALUE;
         this.name="SW";
+        this.memoryOpSize = 4;
     }
     
                      
@@ -54,7 +55,7 @@ class SW extends Storing
             long address=TR[OFFSET_PLUS_BASE].getValue();
             //For the trace file
             Dinero din=Dinero.getInstance();
-            din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),4);
+            din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
 	    MemoryElement memEl = memory.getCellByAddress(address);
             //writing on the memory element the RT register
 	    memEl.writeWord(TR[RT_FIELD].readWord(0), (int) (address%8));
@@ -77,10 +78,4 @@ class SW extends Storing
     public void WB() throws IrregularStringOfBitsException
     {
     }
-    
-
-
-  
-
 }
-

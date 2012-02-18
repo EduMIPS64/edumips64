@@ -42,6 +42,7 @@ class LBU extends Loading
 	{
 		super.OPCODE_VALUE = OPCODE_VALUE;
 		this.name="LBU";
+        this.memoryOpSize = 1;
 	}
 
 	public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
@@ -50,7 +51,7 @@ class LBU extends Loading
 		long address=TR[OFFSET_PLUS_BASE].getValue();
 		//For the trace file
 		Dinero din=Dinero.getInstance();
-		din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),1);
+		din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
 		MemoryElement memEl = memory.getCellByAddress(address);
 		//reading first 8 low bits from the memory element and saving values on LMD register with zero padding
 		int read = memEl.readByteUnsigned((int)(address%8));

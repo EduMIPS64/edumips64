@@ -42,6 +42,7 @@ class LHU extends Loading
     {
     	super.OPCODE_VALUE = OPCODE_VALUE;	
         this.name="LHU";
+        this.memoryOpSize = 2;
     }
     
     public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
@@ -50,7 +51,7 @@ class LHU extends Loading
         long address=TR[OFFSET_PLUS_BASE].getValue();
         //For the trace file
         Dinero din=Dinero.getInstance();
-        din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),2);
+        din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
         MemoryElement memEl = memory.getCellByAddress(address);
         try
         {

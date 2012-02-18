@@ -42,6 +42,7 @@ class LD extends Loading
     {
     	super.OPCODE_VALUE = OPCODE_VALUE;
         this.name="LD";
+        this.memoryOpSize = 8;
     }
     public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException 
 	{ 
@@ -49,7 +50,7 @@ class LD extends Loading
 		long address=TR[OFFSET_PLUS_BASE].getValue();
 		//For the trace file
 		Dinero din=Dinero.getInstance();
-		din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),8);
+		din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
 
 		MemoryElement memEl = memory.getCellByAddress(address);
 		//reading from the memory element and saving values on LMD register
