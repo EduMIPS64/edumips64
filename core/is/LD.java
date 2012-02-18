@@ -48,9 +48,7 @@ class LD extends Loading
     { 
         //restoring the address from the temporary register
         long address=TR[OFFSET_PLUS_BASE].getValue();
-        //For the trace file
-        Dinero din=Dinero.getInstance();
-        din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
+        dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
 
         MemoryElement memEl = memory.getCellByAddress(address);
         //reading from the memory element and saving values on LMD register

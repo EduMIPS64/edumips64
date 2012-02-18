@@ -52,9 +52,7 @@ class SW extends Storing
         {
             //restoring the address from the temporary register
             long address=TR[OFFSET_PLUS_BASE].getValue();
-            //For the trace file
-            Dinero din=Dinero.getInstance();
-            din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
+            dinero.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
             MemoryElement memEl = memory.getCellByAddress(address);
             //writing on the memory element the RT register
             memEl.writeWord(TR[RT_FIELD].readWord(0), (int) (address%8));

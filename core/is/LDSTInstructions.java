@@ -49,6 +49,9 @@ public abstract class LDSTInstructions extends Instruction {
     // Size of the read/write operations. Must be set by derived classes
     protected byte memoryOpSize;
 
+    // Dinero instance
+    protected Dinero dinero = Dinero.getInstance();
+
     String OPCODE_VALUE="";
     public LDSTInstructions()
     {	
@@ -61,10 +64,9 @@ public abstract class LDSTInstructions extends Instruction {
     }
     public void IF()
     {
-        Dinero din=Dinero.getInstance();
         try
         {
-            din.IF(Converter.binToHex(Converter.intToBin(64,cpu.getLastPC().getValue())));
+            dinero.IF(Converter.binToHex(Converter.intToBin(64,cpu.getLastPC().getValue())));
         }
         catch(IrregularStringOfBitsException e)
         {
