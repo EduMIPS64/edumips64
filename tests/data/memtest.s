@@ -1,6 +1,9 @@
 ; memtest.s
 ;
-; tests the behaviour of load/store instructions.
+; Tests the behaviour of load/store instructions.
+; 
+; Errors are handled by calling BREAK, that in the unit tests running code is
+; treated as an error.
 ;
 ; Author: Andrea Spadaccini <andrea.spadaccini@gmail.com>
 
