@@ -47,7 +47,7 @@ class SH extends Storing
         this.memoryOpSize = 2;
 	}
 
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException
+	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
 	{ 
 		try
 		{
@@ -67,10 +67,6 @@ class SH extends Storing
 		catch(NotAlignException er)
 		{
 			throw new AddressErrorException();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
 		}
 	}
 }

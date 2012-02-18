@@ -61,12 +61,10 @@ class LHU extends Loading
             {
                 doWB();
             }
-
         }
         catch(NotAlignException er)
         {
             throw new AddressErrorException();
         }
     }        
-
 }

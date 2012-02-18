@@ -44,26 +44,19 @@ class SB extends Storing
         this.memoryOpSize = 1;
     }
 
-    public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException
+    public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
     {
-        try
+        //restoring the address from the temporary register
+        long address=TR[OFFSET_PLUS_BASE].getValue();
+        //For the trace file
+        Dinero din=Dinero.getInstance();
+        din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
+        MemoryElement memEl = memory.getCellByAddress(address);
+        //writing on the memory element the RT register
+        memEl.writeByte(TR[RT_FIELD].readByte(0), (int) (address%8));
+        if(enableForwarding)
         {
-            //restoring the address from the temporary register
-            long address=TR[OFFSET_PLUS_BASE].getValue();
-            //For the trace file
-            Dinero din=Dinero.getInstance();
-            din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
-            MemoryElement memEl = memory.getCellByAddress(address);
-            //writing on the memory element the RT register
-            memEl.writeByte(TR[RT_FIELD].readByte(0), (int) (address%8));
-            if(enableForwarding)
-            {
-                WB();
-            }
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
+            WB();
         }
     }
 }

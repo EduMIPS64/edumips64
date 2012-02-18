@@ -46,7 +46,7 @@ class SW extends Storing
     }
 
 
-    public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
+    public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
     { 
         try
         {
@@ -63,10 +63,5 @@ class SW extends Storing
         {
             throw new AddressErrorException();
         }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-
     }
 }
