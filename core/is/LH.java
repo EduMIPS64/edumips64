@@ -51,7 +51,7 @@ class LH extends Loading
         //For the trace file
         Dinero din=Dinero.getInstance();
         din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),2);
-        MemoryElement memEl = memory.getCell((int)address);
+        MemoryElement memEl = memory.getCellByAddress(address);
         try
         {
             //reading from the memory element and saving values on LMD register

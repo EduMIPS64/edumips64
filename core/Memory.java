@@ -94,14 +94,23 @@ public class Memory{
 	 * @return MemoryElement with address equals to index*8
 	 * @throws MemoryElementNotFoundException if given index is too large for this memory.
 	 */
-	public MemoryElement getCell(int address) throws MemoryElementNotFoundException{
-		int index = address / 8;
-		
-		if(index >= CPU.DATALIMIT || index < 0 || address < 0)
+	public MemoryElement getCellByAddress(long address) throws MemoryElementNotFoundException{
+		int index = (int) (address / 8);
+        return getCellByIndex(index);
+	}
+
+    /** Returns the MemoryElement with the given index.
+     * @param index index of the requested element
+     * @return MemoryElement
+     * @throws MemoryElementNotFoundException if the given index is out of
+     * bounds
+     */
+    public MemoryElement getCellByIndex(int index) throws MemoryElementNotFoundException {
+		if(index >= CPU.DATALIMIT || index < 0)
 			throw new MemoryElementNotFoundException();
 
 		return cells.get(index);
-	}
+    }
 
 	/** This method resets the memory*/
 	public void reset()

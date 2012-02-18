@@ -55,7 +55,7 @@ class SW extends Storing
             //For the trace file
             Dinero din=Dinero.getInstance();
             din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),4);
-	    MemoryElement memEl = memory.getCell((int)address);
+	    MemoryElement memEl = memory.getCellByAddress(address);
             //writing on the memory element the RT register
 	    memEl.writeWord(TR[RT_FIELD].readWord(0), (int) (address%8));
 	}

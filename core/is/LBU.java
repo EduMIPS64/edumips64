@@ -51,7 +51,7 @@ class LBU extends Loading
 		//For the trace file
 		Dinero din=Dinero.getInstance();
 		din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),1);
-		MemoryElement memEl = memory.getCell((int)address);
+		MemoryElement memEl = memory.getCellByAddress(address);
 		//reading first 8 low bits from the memory element and saving values on LMD register with zero padding
 		int read = memEl.readByteUnsigned((int)(address%8));
 		TR[LMD_REGISTER].writeByteUnsigned(read);

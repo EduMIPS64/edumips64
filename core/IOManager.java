@@ -204,7 +204,7 @@ public class IOManager {
 				if(i % 8 == 0) {
 					posInWord = 0;
 					logger.info("write(): getting a new cell at address " + address);
-					memEl = Memory.getInstance().getCell((int)address);
+					memEl = Memory.getInstance().getCellByAddress(address);
 					address += 8;
 				}
 				byte rb = (byte)memEl.readByte(posInWord++);
@@ -270,7 +270,7 @@ public class IOManager {
 				if(i % 8 == 0) {
 					posInWord = 0;
 					logger.info("read(): getting a new cell at address " + address);
-					memEl = Memory.getInstance().getCell((int)address);
+					memEl = Memory.getInstance().getCellByAddress(address);
 					address += 8;
 				}
 

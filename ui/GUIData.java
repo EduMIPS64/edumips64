@@ -187,7 +187,7 @@ public class GUIData extends GUIComponent
 					case 0:
 						try 
 						{
-							long address = cpu.getMemory().getCell(row * 8).getAddress();
+							long address = cpu.getMemory().getCellByIndex(row).getAddress();
 							return Converter.binToHex(Converter.positiveIntToBin(16,address));
 						}
 						catch(IrregularStringOfBitsException ex) { }
@@ -195,26 +195,26 @@ public class GUIData extends GUIComponent
 					case 1:
 						try 
 						{
-							return cpu.getMemory().getCell(row * 8).getHexString();
+							return cpu.getMemory().getCellByIndex(row).getHexString();
 						}
 						catch(IrregularStringOfBitsException ex) { }
 						catch(MemoryElementNotFoundException ex) { }
 					case 2:
 						try 
 						{
-							return cpu.getMemory().getCell(row * 8).getLabel();
+							return cpu.getMemory().getCellByIndex(row).getLabel();
 						}
 						catch(MemoryElementNotFoundException ex) { }
 					case 3:
 						try  
 						{
-							return cpu.getMemory().getCell(row * 8).getCode();
+							return cpu.getMemory().getCellByIndex(row).getCode();
 						}
 						catch(MemoryElementNotFoundException ex) { }
 					case 4:
 						try 
 						{
-							return cpu.getMemory().getCell(row * 8).getComment();
+							return cpu.getMemory().getCellByIndex(row).getComment();
 						}
 						catch(MemoryElementNotFoundException ex) { }
 					default:
@@ -319,8 +319,8 @@ public class GUIData extends GUIComponent
 					{
 						String hexAddress = (String) tableModel.getValueAt(row,0);
 						String binAddress = Converter.hexToBin(hexAddress);
-						int index = Converter.binToInt(binAddress,true);
-						memoryElement = memory.getCell(index);
+						int address = Converter.binToInt(binAddress,true);
+						memoryElement = memory.getCellByAddress(address);
 						memoryElement.setBits(Converter.hexToBin(banana),0);
 					}
 					catch (Exception e)
@@ -336,8 +336,8 @@ public class GUIData extends GUIComponent
 					{
 						String hexAddress = (String) tableModel.getValueAt(row,0);
 						String binAddress = Converter.hexToBin(hexAddress);
-						int index = Converter.binToInt(binAddress,true);
-						memoryElement = memory.getCell(index);
+						int address = Converter.binToInt(binAddress,true);
+						memoryElement = memory.getCellByAddress(address);
 						memoryElement.setBits(Converter.hexToBin(banana),0);
 					}
 					catch (Exception e)

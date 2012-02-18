@@ -306,7 +306,7 @@ public class Parser
 								continue;
 							}
 							MemoryElement tmpMem = null;
-							tmpMem = mem.getCell(memoryCount * 8);
+							tmpMem = mem.getCellByIndex(memoryCount);
 							logger.info("line: "+line);
 							String[] comment = (line.substring(i)).split(";",2);
 							if (Array.getLength(comment) == 2)
@@ -326,7 +326,7 @@ public class Parser
 									for(String current_string : pList) {
 										logger.info("Current string: [" + current_string + "]");
 										logger.info(".ascii(z): requested new memory cell (" + memoryCount + ")");
-										tmpMem = mem.getCell(memoryCount * 8);
+										tmpMem = mem.getCellByIndex(memoryCount);
 										memoryCount++;
 										int posInWord = 0;
 										// TODO: Controllo sui parametri (es. virgolette?)
@@ -337,7 +337,7 @@ public class Parser
 										for(int tmpi = 0; tmpi < num; tmpi++) {
 											if((tmpi - escaped) % 8 == 0 && (tmpi - escaped) != 0 && !escape) {
 												logger.info(".ascii(z): requested new memory cell (" + memoryCount + ")");
-												tmpMem = mem.getCell(memoryCount * 8);
+												tmpMem = mem.getCellByIndex(memoryCount);
 												memoryCount++;
 												posInWord = 0;
 											}
@@ -408,7 +408,7 @@ public class Parser
 										int num = Integer.parseInt(parameters);
 										for(int tmpi = 0; tmpi < num; tmpi++) {
 											if(tmpi % 8 == 0 && tmpi != 0) {
-												tmpMem = mem.getCell(memoryCount * 8);
+												tmpMem = mem.getCellByIndex(memoryCount);
 												memoryCount++;
 												posInWord = 0;
 											}
@@ -476,7 +476,7 @@ public class Parser
 						{
 							logger.info("in .data section");
 							MemoryElement tmpMem = null;
-							tmpMem = mem.getCell(memoryCount * 8);
+							tmpMem = mem.getCellByIndex(memoryCount);
 							try {
 								symTab.setCellLabel(memoryCount * 8, line.substring(i, end));
 							}
@@ -1324,7 +1324,7 @@ register
 
 	    for(int j=0; j< Array.getLength(value);j++)
 	    {
-		tmpMem = mem.getCell(memoryCount * 8);
+		tmpMem = mem.getCellByIndex(memoryCount);
 		memoryCount++;
 		Pattern p = Pattern.compile("-?[0-9]+.[0-9]+");
 		Matcher m = p.matcher(value[j]);
@@ -1417,7 +1417,7 @@ register
 			if(j%(64/numBit)==0)
 			{
 				posInWord = 0;
-				tmpMem = mem.getCell(memoryCount * 8);
+				tmpMem = mem.getCellByIndex(memoryCount);
 				memoryCount++;
 			}
 			if(isNumber(value[j]))

@@ -56,7 +56,7 @@ public class SD extends Storing {
 			//For the trace file
 			Dinero din=Dinero.getInstance();
 			din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),8);
-			MemoryElement memEl = memory.getCell((int)address);
+			MemoryElement memEl = memory.getCellByAddress(address);
 			//writing on the memory element the RT register
 			//memEl.writeDoubleWord(TR[RT_FIELD].getValue());
 			memEl.setBits(TR[RT_FIELD].getBinString(),0);

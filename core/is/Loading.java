@@ -84,7 +84,7 @@ public abstract class Loading extends LDSTInstructions{
 			inst.params.add(0); //base
 			//R1=43524464456523452L
 			int address=(inst.params.get(BASE_FIELD)+inst.params.get(OFFSET_FIELD));
-			MemoryElement me= memory.getCell(address);
+			MemoryElement me= memory.getCellByAddress(address);
 			me.writeDoubleWord(12341234214312L);
 			//me.setBits("01010101",56);
 			inst.pack();

@@ -103,7 +103,7 @@ public class SYSCALL extends Instruction {
 			int flags_address = (int)address + filename.length();
 			flags_address += 8 - (flags_address % 8);
 
-			MemoryElement flags_m = Memory.getInstance().getCell((int)flags_address);
+			MemoryElement flags_m = Memory.getInstance().getCellByAddress(flags_address);
 			int flags = (int)flags_m.getValue();
 
 			// Memory access for the string and the flags (note the <=)
@@ -129,7 +129,7 @@ public class SYSCALL extends Instruction {
 		}
 		else if(syscall_n == 2) {
 			// int close(int fd)
-			MemoryElement fd_cell = Memory.getInstance().getCell((int)address);
+			MemoryElement fd_cell = Memory.getInstance().getCellByAddress(address);
 			int fd = (int)fd_cell.getValue();
 			logger.info("Closing fd " + fd);
 			return_value = -1;
@@ -146,15 +146,15 @@ public class SYSCALL extends Instruction {
 			int fd, count;
 			long buf_addr;
 
-			MemoryElement temp = Memory.getInstance().getCell((int)address);
+			MemoryElement temp = Memory.getInstance().getCellByAddress(address);
 			fd = (int)temp.getValue();
 			address += 8;
 
-			temp = Memory.getInstance().getCell((int)address);
+			temp = Memory.getInstance().getCellByAddress(address);
 			buf_addr = temp.getValue();
 			address += 8;
 
-			temp = Memory.getInstance().getCell((int)address);
+			temp = Memory.getInstance().getCellByAddress(address);
 			count = (int)temp.getValue();
 			address += 8;
 			
@@ -185,7 +185,7 @@ public class SYSCALL extends Instruction {
             // In the address variable (content of R14) we have the address of
             // the format string, that we get and put in the format_string_address variable
 			logger.info("Reading memory cell at address " + address + ", searching for the address of the format string");
-			MemoryElement tempMemCell = memory.getCell((int)address);
+			MemoryElement tempMemCell = memory.getCellByAddress(address);
             int format_string_address = (int)tempMemCell.getValue();
 
             // Recording in the tracefile the last memory access
@@ -213,7 +213,7 @@ public class SYSCALL extends Instruction {
 				temp.append(format_string.substring(oldIndex, newIndex));
 				switch(type) {
 					case 's':		// %s
-                        tempMemCell = memory.getCell(next_param_address);
+                        tempMemCell = memory.getCellByAddress(next_param_address);
                         int str_address = (int)tempMemCell.getValue();
 						logger.info("Retrieving the string @ " + str_address + "...");
 						String param = fetchString(str_address);
@@ -237,7 +237,7 @@ public class SYSCALL extends Instruction {
 					case 'i':		// %i
 					case 'd':		// %d
 						logger.info("Retrieving the integer @ " + next_param_address + "...");
-						MemoryElement memCell = memory.getCell((int)next_param_address);
+						MemoryElement memCell = memory.getCellByAddress(next_param_address);
 						
 						// Tracefile entry for this memory access
 						din.Load(Converter.binToHex(Converter.positiveIntToBin(64,next_param_address)),8);
@@ -269,7 +269,7 @@ public class SYSCALL extends Instruction {
 		boolean end_of_string = false;
 
 		while(!end_of_string) {
-			MemoryElement memEl = memory.getCell((int)address);
+			MemoryElement memEl = memory.getCellByAddress(address);
 			for(int i = 0; i < 8; ++i) {
 				int tempInt = memEl.readByte(i);
 				if(tempInt == 0) {
