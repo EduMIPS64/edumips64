@@ -28,6 +28,7 @@ import edumips64.core.is.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Assert;
 import static org.junit.Assert.assertTrue;
 
 
@@ -103,6 +104,21 @@ public class CpuTests {
     @Test
     public void testMemory() throws Exception {
         runMipsTest("tests/data/memtest.s");
+    }
+
+    /* Forwarding test. The number of cycles is hardcoded and depends on the
+     * contents of forwarding.s */
+    @Test
+    public void testForwarding() throws Exception {
+        CpuTestStatus temp;
+
+        Instruction.setEnableForwarding(true);
+        temp = runMipsTest("tests/data/forwarding.s");
+        Assert.assertEquals(temp.cycles, 16);
+
+        Instruction.setEnableForwarding(false);
+        temp = runMipsTest("tests/data/forwarding.s");
+        Assert.assertEquals(temp.cycles, 19);
     }
 
     /* ------- REGRESSION TESTS -------- */
