@@ -35,6 +35,17 @@ public class CpuTests {
     protected CPU cpu;
     protected Parser parser;
 
+    /** Class that holds the parts of the CPU status that need to be tested
+     * after the execution of a test case.
+     */
+    class CpuTestStatus {
+        int cycles;
+
+        public CpuTestStatus(CPU cpu) {
+            cycles = cpu.getCycles();
+        }
+    }
+
     @Before
     public void setUp() {
         cpu = CPU.getInstance();
@@ -46,7 +57,7 @@ public class CpuTests {
      *
      * @param testPath path of the test code.
      */
-    protected void runMipsTest(String testPath) throws Exception {
+    protected CpuTestStatus runMipsTest(String testPath) throws Exception {
         try {
             try {
                 parser.parse(testPath);
@@ -61,43 +72,47 @@ public class CpuTests {
             while(true) {
                 cpu.step();
             }
+        }
+        catch (HaltException e) {
+            CpuTestStatus cts = new CpuTestStatus(cpu);
+            return cts;
         } finally {
             cpu.reset();
         }
     }
 
     /* Test for utils/strlen.s */
-    @Test(expected = HaltException.class)
+    @Test
     public void testStrlen() throws Exception {
         runMipsTest("tests/data/test-strlen.s");
     }
 
     /* Test for utils/strcmp.s */
-    @Test(expected = HaltException.class)
+    @Test
     public void testStrcmp() throws Exception {
         runMipsTest("tests/data/test-strcmp.s");
     }
 
     /* Test for instruction B */
-    @Test(expected = HaltException.class)
+    @Test
     public void testB() throws Exception {
         runMipsTest("tests/data/b.s");
     }
 
     /* Tests for the memory */
-    @Test(expected = HaltException.class)
+    @Test
     public void testMemory() throws Exception {
         runMipsTest("tests/data/memtest.s");
     }
 
     /* ------- REGRESSION TESTS -------- */
     /* Issue #7 */
-    @Test(expected = HaltException.class)
+    @Test
     public void testMovnIssue7() throws Exception {
         runMipsTest("tests/data/movn-issue-7.s");
     }
 
-    @Test(expected = HaltException.class)
+    @Test
     public void testMovzIssue7() throws Exception {
         runMipsTest("tests/data/movz-issue-7.s");
     }
