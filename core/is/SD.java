@@ -39,47 +39,36 @@ import edumips64.utils.*;
  */
 public class SD extends Storing {
 
-	final String OPCODE_VALUE="111111";
-	public SD()
-	{
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		this.name="SD";
+    final String OPCODE_VALUE="111111";
+    public SD()
+    {
+        super.OPCODE_VALUE = OPCODE_VALUE;
+        this.name="SD";
         this.memoryOpSize = 8;
-	}
+    }
 
-
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException
-	{
-		try
-		{
-			//restoring the address from the temporary register
-			long address=TR[OFFSET_PLUS_BASE].getValue();
-			//For the trace file
-			Dinero din=Dinero.getInstance();
-			din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
-			MemoryElement memEl = memory.getCellByAddress(address);
-			//writing on the memory element the RT register
-			//memEl.writeDoubleWord(TR[RT_FIELD].getValue());
-			memEl.setBits(TR[RT_FIELD].getBinString(),0);
-			if(enableForwarding)
-			{
-				WB();
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
-
-	}
-
-	public void WB() throws IrregularStringOfBitsException
-	{
-
-	}
-
+    public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException
+    {
+        try
+        {
+            //restoring the address from the temporary register
+            long address=TR[OFFSET_PLUS_BASE].getValue();
+            //For the trace file
+            Dinero din=Dinero.getInstance();
+            din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
+            MemoryElement memEl = memory.getCellByAddress(address);
+            //writing on the memory element the RT register
+            //memEl.writeDoubleWord(TR[RT_FIELD].getValue());
+            memEl.setBits(TR[RT_FIELD].getBinString(),0);
+            if(enableForwarding)
+            {
+                WB();
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }
     

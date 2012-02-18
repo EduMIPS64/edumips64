@@ -37,29 +37,28 @@ import edumips64.utils.*;
  */
 class LBU extends Loading
 {
-	final String OPCODE_VALUE="100100";
-	public LBU()
-	{
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		this.name="LBU";
+    final String OPCODE_VALUE="100100";
+    public LBU()
+    {
+        super.OPCODE_VALUE = OPCODE_VALUE;
+        this.name="LBU";
         this.memoryOpSize = 1;
-	}
+    }
 
-	public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
-	{ 
-		//restoring the address from the temporary register
-		long address=TR[OFFSET_PLUS_BASE].getValue();
-		//For the trace file
-		Dinero din=Dinero.getInstance();
-		din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
-		MemoryElement memEl = memory.getCellByAddress(address);
-		//reading first 8 low bits from the memory element and saving values on LMD register with zero padding
-		int read = memEl.readByteUnsigned((int)(address%8));
-		TR[LMD_REGISTER].writeByteUnsigned(read);
-		if(enableForwarding)
-		{
-			doWB();
-		}
-
-	}        
+    public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
+    { 
+        //restoring the address from the temporary register
+        long address=TR[OFFSET_PLUS_BASE].getValue();
+        //For the trace file
+        Dinero din=Dinero.getInstance();
+        din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
+        MemoryElement memEl = memory.getCellByAddress(address);
+        //reading first 8 low bits from the memory element and saving values on LMD register with zero padding
+        int read = memEl.readByteUnsigned((int)(address%8));
+        TR[LMD_REGISTER].writeByteUnsigned(read);
+        if(enableForwarding)
+        {
+            doWB();
+        }
+    }        
 }

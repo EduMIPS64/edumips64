@@ -44,10 +44,10 @@ class LB extends Loading
         this.name="LB";
         this.memoryOpSize = 1;
     }
-    
+
     public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
     { 
-  
+
         //restoring the address from the temporary register
         long address=TR[OFFSET_PLUS_BASE].getValue();
         //For the trace file
@@ -56,10 +56,9 @@ class LB extends Loading
         MemoryElement memEl = memory.getCellByAddress(address);
         //reading from the memory element and saving values on LMD register
         TR[LMD_REGISTER].writeByte(memEl.readByte((int)(address%8)));
-	if(enableForwarding)
-	{
-		doWB();
-	}
+        if(enableForwarding)
+        {
+            doWB();
+        }
     }        
-
 }

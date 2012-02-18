@@ -32,7 +32,7 @@ import edumips64.utils.*;
  * @author Trubia Massimo, Russo Daniele
  */
 
- public abstract class LDSTInstructions extends Instruction {
+public abstract class LDSTInstructions extends Instruction {
     protected static CPU cpu=CPU.getInstance();
     final static int RT_FIELD=0; 
     final static int OFFSET_FIELD=1;
@@ -57,11 +57,11 @@ import edumips64.utils.*;
     }
     public void setOpcode(String opcode)
     {
-    	
+
     }
     public void IF()
     {
-	Dinero din=Dinero.getInstance();
+        Dinero din=Dinero.getInstance();
         try
         {
             din.IF(Converter.binToHex(Converter.intToBin(64,cpu.getLastPC().getValue())));
@@ -71,23 +71,16 @@ import edumips64.utils.*;
             e.printStackTrace();
         }
     }   
-    public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException;
-    public abstract void EX() throws IrregularStringOfBitsException,IntegerOverflowException;
-    public abstract void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
-    public abstract void WB() throws IrregularStringOfBitsException;
+    public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException {};
+    public void EX() throws IrregularStringOfBitsException,IntegerOverflowException {};
+    public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {};
+    public void WB() throws IrregularStringOfBitsException {};
     public void pack() throws IrregularStringOfBitsException
     {
-       //conversion of instruction parameters of params list to the "repr" 32 binary value
+        //conversion of instruction parameters of params list to the "repr" 32 binary value
         repr.setBits(OPCODE_VALUE,0);
         repr.setBits(Converter.intToBin(BASE_FIELD_LENGTH,params.get(BASE_FIELD)),BASE_FIELD_INIT);
         repr.setBits(Converter.intToBin(RT_FIELD_LENGTH,params.get(RT_FIELD)),RT_FIELD_INIT);
         repr.setBits(Converter.intToBin(OFFSET_FIELD_LENGTH,params.get(OFFSET_FIELD)),OFFSET_FIELD_INIT);
     }
-     
 }
-
- 
-
-
-
-

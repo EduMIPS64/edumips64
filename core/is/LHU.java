@@ -40,11 +40,11 @@ class LHU extends Loading
     final String OPCODE_VALUE="100101";
     public LHU()
     {
-    	super.OPCODE_VALUE = OPCODE_VALUE;	
+        super.OPCODE_VALUE = OPCODE_VALUE;	
         this.name="LHU";
         this.memoryOpSize = 2;
     }
-    
+
     public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
     { 
         //restoring the address from the temporary register
@@ -57,16 +57,16 @@ class LHU extends Loading
         {
             //reading from the memory element and saving values on LMD register
             TR[LMD_REGISTER].writeHalfUnsigned(memEl.readHalfUnsigned((int)(address%8)));
-	if(enableForwarding)
-	{
-		doWB();
-	}
-	
+            if(enableForwarding)
+            {
+                doWB();
+            }
+
         }
-	catch(NotAlignException er)
-	{
-	    throw new AddressErrorException();
-	}
+        catch(NotAlignException er)
+        {
+            throw new AddressErrorException();
+        }
     }        
 
 }

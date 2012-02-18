@@ -44,7 +44,7 @@ class LWU extends Loading
         this.name="LWU";
         this.memoryOpSize = 4;
     }
-    
+
     public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
     { 
         //restoring the address from the temporary register
@@ -57,15 +57,14 @@ class LWU extends Loading
         {
             //reading from the memory element and saving values on LMD register
             TR[LMD_REGISTER].writeWordUnsigned(memEl.readWordUnsigned((int)(address%8)));
-		if(enableForwarding)
-		{
-			doWB();
-		}
+            if(enableForwarding)
+            {
+                doWB();
+            }
         }
-	catch(NotAlignException er)
-	{
-	    throw new AddressErrorException();
-	}
+        catch(NotAlignException er)
+        {
+            throw new AddressErrorException();
+        }
     }        
-
 }
