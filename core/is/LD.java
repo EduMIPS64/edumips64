@@ -46,11 +46,8 @@ class LD extends Loading
     }
     public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException 
     { 
-        //restoring the address from the temporary register
-        long address=TR[OFFSET_PLUS_BASE].getValue();
-        dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
+        MemoryElement memEl = memory.getCellByAddress(address); 
 
-        MemoryElement memEl = memory.getCellByAddress(address);
         //reading from the memory element and saving values on LMD register
         TR[LMD_REGISTER].setBits(memEl.getBinString(),0);
         if(enableForwarding)

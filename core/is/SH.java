@@ -49,10 +49,8 @@ class SH extends Storing
 
 	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, NotAlignException, AddressErrorException, IrregularWriteOperationException
 	{ 
-        //restoring the address from the temporary register
-        long address=TR[OFFSET_PLUS_BASE].getValue();
-        dinero.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
-        MemoryElement memEl = memory.getCellByAddress(address);
+        MemoryElement memEl = memory.getCellByAddress(address); 
+        
         //writing on the memory element the RT register
         memEl.writeHalf(TR[RT_FIELD].readHalf(0), (int) (address%8));
         if(enableForwarding)

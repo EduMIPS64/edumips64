@@ -52,12 +52,16 @@ public abstract class LDSTInstructions extends Instruction {
     // Dinero instance
     protected Dinero dinero = Dinero.getInstance();
 
+    // Memory address with which the instruction is operating
+    protected long address;
+
     String OPCODE_VALUE="";
     public LDSTInstructions()
     {	
         this.syntax="%R,%L(%R)";
         this.paramCount=3;
     }
+
     public void setOpcode(String opcode)
     {
 
@@ -74,7 +78,14 @@ public abstract class LDSTInstructions extends Instruction {
         }
     }   
     public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException {};
-    public void EX() throws IrregularStringOfBitsException,IntegerOverflowException {};
+
+    public void EX() throws IrregularStringOfBitsException,IntegerOverflowException {
+        // Compute the address
+        address = TR[OFFSET_PLUS_BASE].getValue();
+
+        dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)), memoryOpSize);
+    };
+
     public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {};
     public void WB() throws IrregularStringOfBitsException {};
     public void pack() throws IrregularStringOfBitsException
