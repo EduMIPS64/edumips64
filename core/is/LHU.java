@@ -45,24 +45,17 @@ class LHU extends Loading
         this.memoryOpSize = 2;
     }
 
-    public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
+    public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
     { 
         //restoring the address from the temporary register
         long address=TR[OFFSET_PLUS_BASE].getValue();
         dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),memoryOpSize);
         MemoryElement memEl = memory.getCellByAddress(address);
-        try
+        //reading from the memory element and saving values on LMD register
+        TR[LMD_REGISTER].writeHalfUnsigned(memEl.readHalfUnsigned((int)(address%8)));
+        if(enableForwarding)
         {
-            //reading from the memory element and saving values on LMD register
-            TR[LMD_REGISTER].writeHalfUnsigned(memEl.readHalfUnsigned((int)(address%8)));
-            if(enableForwarding)
-            {
-                doWB();
-            }
-        }
-        catch(NotAlignException er)
-        {
-            throw new AddressErrorException();
+            doWB();
         }
     }        
 }

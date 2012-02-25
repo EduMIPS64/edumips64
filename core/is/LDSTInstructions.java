@@ -75,7 +75,7 @@ public abstract class LDSTInstructions extends Instruction {
     }   
     public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException {};
     public void EX() throws IrregularStringOfBitsException,IntegerOverflowException {};
-    public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {};
+    public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {};
     public void WB() throws IrregularStringOfBitsException {};
     public void pack() throws IrregularStringOfBitsException
     {

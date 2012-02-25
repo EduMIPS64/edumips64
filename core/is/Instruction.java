@@ -217,7 +217,7 @@ public abstract class Instruction {
      * In this stage all Load and Store instructions access memory for getting or putting data
      * </pre>
      **/
-    public abstract void MEM() throws HaltException, IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
+    public abstract void MEM() throws HaltException, IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
     
     /**
      * <pre>
