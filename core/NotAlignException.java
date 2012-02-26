@@ -23,4 +23,10 @@
 
 package edumips64.core;
 
-public class NotAlignException extends Exception{}
+public class NotAlignException extends Exception{
+    public NotAlignException() {}
+
+    public NotAlignException(String message) {
+        super(message);
+    }
+}

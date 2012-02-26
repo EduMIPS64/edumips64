@@ -90,8 +90,10 @@ public abstract class LDSTInstructions extends Instruction {
 
         // Check alignment
         if(address % memoryOpSize != 0) {
-            logger.info("Alignment error in instruction " + fullname + ": address " + address + " is not aligned to " + memoryOpSize + " bytes");
-            throw new NotAlignException();
+            String message = CurrentLocale.getString("ALIGNERR") + " " + fullname + ": " + 
+                             CurrentLocale.getString("THEADDRESS") + " " + address + " " + 
+                             CurrentLocale.getString("ISNOTALIGNED") + " " + memoryOpSize + " bytes";
+            throw new NotAlignException(message);
         }
         
         // Save memory access for Dinero trace file
