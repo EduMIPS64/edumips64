@@ -132,4 +132,50 @@ public class CpuTests {
     public void testMovzIssue7() throws Exception {
         runMipsTest("tests/data/movz-issue-7.s");
     }
+
+    /* Issue #2: Misaligned memory operations are not handled correctly */
+    @Test(expected = NotAlignException.class)
+    public void testMisalignLD() throws Exception {
+        runMipsTest("tests/data/misaligned-ld.s");
+    }
+
+    @Test(expected = NotAlignException.class)
+    public void testMisalignSD() throws Exception {
+        runMipsTest("tests/data/misaligned-sd.s");
+    }
+
+    @Test(expected = NotAlignException.class)
+    public void testMisalignLW() throws Exception {
+        runMipsTest("tests/data/misaligned-lw.s");
+    }
+
+    @Test(expected = NotAlignException.class)
+    public void testMisalignLWU() throws Exception {
+        runMipsTest("tests/data/misaligned-lwu.s");
+    }
+
+    @Test(expected = NotAlignException.class)
+    public void testMisalignSW() throws Exception {
+        runMipsTest("tests/data/misaligned-sw.s");
+    }
+
+    @Test(expected = NotAlignException.class)
+    public void testMisalignLH() throws Exception {
+        runMipsTest("tests/data/misaligned-lh.s");
+    }
+
+    @Test(expected = NotAlignException.class)
+    public void testMisalignLHU() throws Exception {
+        runMipsTest("tests/data/misaligned-lhu.s");
+    }
+
+    @Test(expected = NotAlignException.class)
+    public void testMisalignSH() throws Exception {
+        runMipsTest("tests/data/misaligned-sh.s");
+    }
+
+    @Test
+    public void testAligned() throws Exception {
+        runMipsTest("tests/data/aligned.s");
+    }
 }
