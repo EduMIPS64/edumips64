@@ -1,5 +1,9 @@
 EduMIPS64 ChangeLog
 -------------------
+0.5.4 (xx/xx/2012)
+	Bugs fixed:
+	- Fixed issue #2 (Misaligned memory operations are not handled correctly)
+
 0.5.3 (19/09/2011)
 	Features:
 	- Embedded JavaHelp viewer (andrea)
