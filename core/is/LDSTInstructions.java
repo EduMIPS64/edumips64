@@ -27,6 +27,8 @@ package edumips64.core.is;
 import edumips64.core.*;
 import edumips64.utils.*;
 
+import java.util.logging.Logger;
+
 /**This is the base class of Load store instructions
  *
  * @author Trubia Massimo, Russo Daniele
@@ -45,6 +47,9 @@ public abstract class LDSTInstructions extends Instruction {
     final static int RT_FIELD_LENGTH=5;
     final static int OFFSET_FIELD_LENGTH=16;
     final static int BASE_FIELD_LENGTH=5;
+
+    // Logger instance
+    private static final Logger logger = Logger.getLogger(LDSTInstructions.class.getName());
 
     // Size of the read/write operations. Must be set by derived classes
     protected byte memoryOpSize;
@@ -79,10 +84,17 @@ public abstract class LDSTInstructions extends Instruction {
     }   
     public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException {};
 
-    public void EX() throws IrregularStringOfBitsException,IntegerOverflowException {
+    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException {
         // Compute the address
         address = TR[OFFSET_PLUS_BASE].getValue();
 
+        // Check alignment
+        if(address % memoryOpSize != 0) {
+            logger.info("Alignment error in instruction " + fullname + ": address " + address + " is not aligned to " + memoryOpSize + " bytes");
+            throw new NotAlignException();
+        }
+        
+        // Save memory access for Dinero trace file
         dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)), memoryOpSize);
     };
 

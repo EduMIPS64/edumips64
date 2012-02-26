@@ -209,7 +209,7 @@ public abstract class Instruction {
      * </pre>
      **/
     
-    public abstract void EX() throws HaltException, IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException,IrregularWriteOperationException,IrregularWriteOperationException,DivisionByZeroException;
+    public abstract void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, IrregularWriteOperationException, DivisionByZeroException, NotAlignException;
     
     /**
      * <pre>
