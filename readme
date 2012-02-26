@@ -28,8 +28,7 @@ Main Ant targets
 
 * `jar` build the EduMIPS64 jar package named edumips64-`version`.jar
 
-* `svnjar` build the SVN jar package, named edumips64-svn.jar, that differs
-   from the previous one because it contains debug information
+* `debugjar` build a jar package that contains more debug information
 
 * `clijar` build a jar package containing an experimental CLI front-end to
   EduMIPS64

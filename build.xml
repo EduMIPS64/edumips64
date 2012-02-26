@@ -4,12 +4,12 @@
      (c) 2006-2011 Andrea Spadaccini and the EduMIPS64 dev team.
 
      Useful targets:
-     - svnjar         builds the GUI version (edumips64-svn.jar) with debug symbols
-     - jar            builds the GUI version (edumips64-VERSION.jar) without debug symbols
-     - clijar         builds the CLI version
-     - clean          removes the jar file and the build dir
+     - debugjar         builds the GUI version (edumips64-debug.jar) with debug symbols
+     - jar              builds the GUI version (edumips64-VERSION.jar) without debug symbols
+     - clijar           builds the CLI version
+     - clean            removes the jar file and the build dir
 -->
-<project name="edumips64" default="svnjar" basedir=".">
+<project name="edumips64" default="debugjar" basedir=".">
 	<target name="init">
         <!-- Access the environment -->
         <property environment="env" />
@@ -21,7 +21,7 @@
 		<property name="version" value="0.5.3" />
 		<property name="outputDir" value="edumips" />
 		<property name="tarbz2File" value="edumips64-${version}.tar.bz2" />
-		<property name="svn_jar_filename" value="edumips64-svn.jar" />
+		<property name="debug_jar_filename" value="edumips64-debug.jar" />
 		<property name="release_jar_filename" value="edumips64-${version}.jar" />
 		<property name="cli_jar_filename" value="edumips64-${version}-cli.jar" />
 
@@ -38,7 +38,7 @@
     <!-- *** clean *** target that cleans the built files and the build directory-->
 	<target name="clean">
 		<delete file="${release_jar_filename}" />
-		<delete file="${svn_jar_filename}" />
+		<delete file="${debug_jar_filename}" />
         <delete dir="${outputDir}" />
 	</target>
 
@@ -80,9 +80,9 @@
     </target>
 
 
-    <!-- *** svnjar *** compile with debug information and set the jar
-         filename to edumips64-svn.jar -->
-	<target name="svnjar" depends="init">
+    <!-- *** debugjar *** compile with debug information and set the jar
+         filename to edumips64-debug.jar -->
+	<target name="debugjar" depends="init">
         <javac
             target="5"
             srcdir="${sourceDir}"
@@ -94,7 +94,7 @@
             includeantruntime="false"
             debuglevel="lines,vars,source"/>
         <property name="app_type" value="GUI" />
-        <property name="jar_filename" value="${svn_jar_filename}" />
+        <property name="jar_filename" value="${debug_jar_filename}" />
         <antcall target="makeGUIJar" />
     </target>
 
