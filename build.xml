@@ -18,13 +18,16 @@
         <!-- Set build file properties -->
 		<property name="sourceDir" value="." />
         <property name="helpClassesDir" value="./libs" />
-		<property name="version" value="0.5.3" />
+		<property name="version" value="0.5.4" />
 		<property name="outputDir" value="edumips" />
 		<property name="tarbz2File" value="edumips64-${version}.tar.bz2" />
 		<property name="debug_jar_filename" value="edumips64-debug.jar" />
 		<property name="release_jar_filename" value="edumips64-${version}.jar" />
 		<property name="cli_jar_filename" value="edumips64-${version}-cli.jar" />
 
+	</target>
+
+    <target name="mkdirs" depends="init">
         <!-- Create directories for the compilation process. -->
 		<mkdir dir="${outputDir}" />
 		<mkdir dir="${outputDir}/edumips64/img" />
@@ -33,7 +36,7 @@
 		<mkdir dir="${outputDir}/edumips64/help" />
 		<mkdir dir="${outputDir}/edumips64/help_en" />
 		<mkdir dir="${outputDir}/edumips64/help_it" />
-	</target>
+    </target>
 
     <!-- *** clean *** target that cleans the built files and the build directory-->
 	<target name="clean">
@@ -43,7 +46,7 @@
 	</target>
 
     <!-- *** javadoc *** build the javadoc -->
-	<target name="javadoc" depends="init">
+	<target name="javadoc" depends="mkdirs">
 		<mkdir dir="${outputDir}/docs" />
         <javadoc
             destdir="${outputDir}/docs"
@@ -55,7 +58,7 @@
 		    packagenames="edumips64.*"/>
 	</target>
 
-    <target name="tests" depends="init">
+    <target name="tests" depends="mkdirs">
         <javac
             target="5"
             srcdir="${sourceDir}"
@@ -82,7 +85,7 @@
 
     <!-- *** debugjar *** compile with debug information and set the jar
          filename to edumips64-debug.jar -->
-	<target name="debugjar" depends="init">
+	<target name="debugjar" depends="mkdirs">
         <javac
             target="5"
             srcdir="${sourceDir}"
@@ -100,7 +103,7 @@
 
     <!-- *** jar *** compile without debug information and set the jar
          filename to edumips64-VERSION.jar -->
-	<target name="jar" depends="init">
+	<target name="jar" depends="mkdirs">
         <javac
             target="5"
             srcdir="${sourceDir}"
@@ -117,7 +120,7 @@
 
     <!-- *** clijar *** compile with debug information, set the CLI Main and set the jar
          filename to edumips64-VERSION.jar -->
-	<target name="clijar" depends="init">
+	<target name="clijar" depends="mkdirs">
         <javac
             target="5"
             srcdir="${sourceDir}"

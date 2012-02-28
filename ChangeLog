@@ -1,8 +1,13 @@
 EduMIPS64 ChangeLog
 -------------------
-0.5.4 (xx/xx/2012)
+0.5.4 (28/02/2012)
 	Bugs fixed:
-	- Fixed issue #2 (Misaligned memory operations are not handled correctly)
+	- Issue #2 (Misaligned memory operations are not handled correctly)
+	- Issue #10 (Random freeze when executing SYSCALL 5 under Java 7)
+
+	Various changes
+	- added unit testing code; added some unit tests
+	- added regression tests for issues #2 and #7.
 
 0.5.3 (19/09/2011)
 	Features:
