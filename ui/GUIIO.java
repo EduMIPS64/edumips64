@@ -42,16 +42,33 @@ public class GUIIO extends JInternalFrame {
 	private JTextArea output_area;
     private JButton clear;
 
+    private class OutputTask implements Runnable {
+        public String message;
+        public OutputTask(String message) {
+            this.message = message;
+        }
+
+        public void run() {
+            output_area.append(message);
+            output_area.setCaretPosition(output_area.getText().length());
+            if(GUIIO.this.isIcon()) {
+                try {
+                    GUIIO.this.setIcon(false);
+                }
+                catch(java.beans.PropertyVetoException e) {}
+            }
+        }
+    }
+
+
 	/** Writes a message to the output area. */
 	public void write(String message) {
-		output_area.append(message);
-		output_area.setCaretPosition(output_area.getText().length());
-		if(this.isIcon()) {
-			try {
-				this.setIcon(false);
-			}
-			catch(java.beans.PropertyVetoException e) {}
-		}
+        // Append text to the JTextArea using the Event Dispatch Thread. This
+        // is the correct way of doing it, but since JTextArea.append() was
+        // thread safe before Java 7, we simply invoked the append() method;
+        // now that there are users that adopted Java 7, we need to use the
+        // EDT to interact with the JTextArea.
+        SwingUtilities.invokeLater(new OutputTask(message));
 	}
 	
 	public void write(byte[] bytes_array) {
