@@ -104,7 +104,7 @@
         <javac
             target="5"
             srcdir="${sourceDir}"
-            excludes="${sourceDir}/tests/**"
+            excludes="tests/**"
             classpath="${helpClassesDir}"
             destdir="${outputDir}"
             includeantruntime="false"
