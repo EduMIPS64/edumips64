@@ -39,7 +39,7 @@
     </target>
 
     <!-- *** clean *** target that cleans the built files and the build directory-->
-	<target name="clean">
+	<target name="clean" depends="init">
 		<delete file="${release_jar_filename}" />
 		<delete file="${debug_jar_filename}" />
         <delete dir="${outputDir}" />
