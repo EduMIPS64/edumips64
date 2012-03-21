@@ -46,8 +46,8 @@
 	</target>
 
     <!-- *** javadoc *** build the javadoc -->
-	<target name="javadoc" depends="mkdirs">
 		<mkdir dir="${outputDir}/docs" />
+	<target name="javadoc" depends="init">
         <javadoc
             destdir="${outputDir}/docs"
 		    author="true"
