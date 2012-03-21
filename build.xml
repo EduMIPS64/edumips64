@@ -55,6 +55,7 @@
 		    author="true"
 		    version="true"
 		    use="true"
+		    additionalparam=" -encoding ISO-8859-1"
 		    sourcepath="${sourceDir}/.."
             	    classpath="${base.classpath}:${helpClassesDir}"
 		    packagenames="edumips64.*"/>
