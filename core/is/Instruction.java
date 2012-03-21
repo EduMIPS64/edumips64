@@ -299,7 +299,7 @@ public abstract class Instruction {
     
     /** Sets the comment of the instruction as string. The comment is the text
      *  after every semicolon in the file .s
-     * @params value the full name of the instruction  (e.g. "DADD R1,R2,R3") 
+     * @param comment the comment associated with the instruction
      */
     public void setComment(String comment){this.comment=comment;}
     

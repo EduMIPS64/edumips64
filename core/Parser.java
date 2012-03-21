@@ -1167,7 +1167,7 @@ public class Parser
 	}
 
 	/** Clean multiple tab or spaces in a bad format String //and converts  this String to upper case
-	 *   @param the bad format String
+	 *  @param s the bad format String
 	 *  @return the cleaned String
 	 */
 	public String cleanFormat(String s){

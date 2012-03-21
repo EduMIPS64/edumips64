@@ -33,7 +33,7 @@ public class InstructionsUtils
      *  of the same length
      *  @param r1 first binary value
      *  @param r2 second binary value
-     *  @throw TwosComplementSumException	
+     *  @throws TwosComplementSumException	
      *  @return result of two's complement addition as string
      */  
     public static String twosComplementSum(String r1,String r2) throws TwosComplementSumException

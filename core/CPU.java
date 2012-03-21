@@ -198,7 +198,7 @@ public class CPU
 	}
 
     /** This method performs a single pipeline step
-    * @throw RAWHazardException when a RAW hazard is detected
+    * @throws RAWHazardException when a RAW hazard is detected
     */
     public void step() throws IntegerOverflowException, AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException
 	{
@@ -410,7 +410,7 @@ public class CPU
     }
 
 	/** Test method that returns a string containing the status of the pipeline.
-	 * @returns a string
+	 * @return string representation of the pipeline status
 	 */
 	public String pipeLineString() {
 		String s = new String();
@@ -425,14 +425,14 @@ public class CPU
 
 	/** Test method that returns a string containing the values of every
 	 * register.
-	 * @returns a string
+	 * @return string representation of the register file contents
 	 */
 	public String gprString() {
 		String s = new String();
 		
 		int i = 0;
 		for(Register r : gpr) 
-			s += "Registro " + i++ + ":\t" + r.toString() + "\n";
+			s += "Register " + i++ + ":\t" + r.toString() + "\n";
 		
 		return s;
 	}
