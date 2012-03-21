@@ -53,8 +53,8 @@
 		    author="true"
 		    version="true"
 		    use="true"
-		    sourcepath="."
-		    classpath="${sourceDir}/.."
+		    sourcepath="${sourceDir}/.."
+            	    classpath="${base.classpath}:${helpClassesDir}"
 		    packagenames="edumips64.*"/>
 	</target>
 
