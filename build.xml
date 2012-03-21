@@ -20,6 +20,7 @@
         <property name="helpClassesDir" value="./libs" />
 		<property name="version" value="0.5.4" />
 		<property name="outputDir" value="edumips" />
+		<property name="javadocDir" value="javadoc" />
 		<property name="tarbz2File" value="edumips64-${version}.tar.bz2" />
 		<property name="debug_jar_filename" value="edumips64-debug.jar" />
 		<property name="release_jar_filename" value="edumips64-${version}.jar" />
@@ -43,13 +44,14 @@
 		<delete file="${release_jar_filename}" />
 		<delete file="${debug_jar_filename}" />
         <delete dir="${outputDir}" />
+        <delete dir="${javadocDir}" />
 	</target>
 
     <!-- *** javadoc *** build the javadoc -->
-		<mkdir dir="${outputDir}/docs" />
 	<target name="javadoc" depends="init">
+	<mkdir dir="${javadocDir}" />
         <javadoc
-            destdir="${outputDir}/docs"
+            destdir="${javadocDir}"
 		    author="true"
 		    version="true"
 		    use="true"
