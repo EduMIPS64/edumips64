@@ -41,13 +41,13 @@ Main Ant targets
 
 * `clean` removes the jar files and the build directory
 
-Building the documentation
---------------------------
+Building the user documentation
+-------------------------------
 
 To build the documentation, as stated before, you need sphinx >= 1.0.7,
 GNU/Make and a working installation of latex and pdflatex.
 
-The docs come in two different languages: english (en) and italian (it).
+The user docs come in two different languages: english (en) and italian (it).
 
 First, cd to the directory containing the sources of the doc to rebuild:
 
@@ -58,3 +58,10 @@ Then use the following make targets:
 * `html` to build the in-app help
 
 * `latexpdf` to build the pdf manual.
+
+Building the developer documentation
+------------------------------------
+
+To build the javadoc documentation, use the `javadoc` target. It also depends
+on junit being in the CLASSPATH, and will store the resulting HTML javadoc in
+the `javadoc` directory.
