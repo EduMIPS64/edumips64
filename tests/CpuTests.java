@@ -82,6 +82,24 @@ public class CpuTests {
         }
     }
 
+    /* Test for the instruction BREAK */
+    @Test(expected = BreakException.class)
+    public void testBREAK() throws Exception {
+        runMipsTest("tests/data/break.s");
+    }
+
+    /* Test for instruction B */
+    @Test
+    public void testB() throws Exception {
+        runMipsTest("tests/data/b.s");
+    }
+
+    /* Test for the instruction JAL */
+    @Test
+    public void testJAL() throws Exception {
+        runMipsTest("tests/data/jal.s");
+    }
+
     /* Test for utils/strlen.s */
     @Test
     public void testStrlen() throws Exception {
@@ -92,12 +110,6 @@ public class CpuTests {
     @Test
     public void testStrcmp() throws Exception {
         runMipsTest("tests/data/test-strcmp.s");
-    }
-
-    /* Test for instruction B */
-    @Test
-    public void testB() throws Exception {
-        runMipsTest("tests/data/b.s");
     }
 
     /* Tests for the memory */
