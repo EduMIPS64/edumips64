@@ -39,25 +39,9 @@ Main Ant targets
 * `tests` runs unit tests; it depends on junit4.jar being added to the
   CLASSPATH environment variable
 
+* `docs` builds the user documentation (both in-app HTML and PDF)
+
 * `clean` removes the jar files and the build directory
-
-Building the user documentation
--------------------------------
-
-To build the documentation, as stated before, you need sphinx >= 1.0.7,
-GNU/Make and a working installation of latex and pdflatex.
-
-The user docs come in two different languages: english (en) and italian (it).
-
-First, cd to the directory containing the sources of the doc to rebuild:
-
-$ cd docs/en/src # or docs/it/src for italian
-
-Then use the following make targets:
-
-* `html` to build the in-app help
-
-* `latexpdf` to build the pdf manual.
 
 Building the developer documentation
 ------------------------------------
