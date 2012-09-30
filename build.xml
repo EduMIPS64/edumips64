@@ -70,7 +70,9 @@
             nowarn="yes"
             debug="on"
             includeantruntime="false"
-            debuglevel="lines,vars,source"/>
+            debuglevel="lines,vars,source">
+            <compilerarg value="-Xlint"/>
+        </javac>
 
         <junit printsummary="true">
             <classpath>
