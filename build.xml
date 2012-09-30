@@ -26,6 +26,9 @@
 		<property name="release_jar_filename" value="edumips64-${version}.jar" />
 		<property name="cli_jar_filename" value="edumips64-${version}-cli.jar" />
 
+        <!-- Docs directories -->
+        <property name="docs_src_it" value="docs/it/src" />
+        <property name="docs_src_en" value="docs/en/src" />
 	</target>
 
     <target name="mkdirs" depends="init">
@@ -40,12 +43,17 @@
     </target>
 
     <!-- *** clean *** target that cleans the built files and the build directory-->
-	<target name="clean" depends="init">
+	<target name="clean" depends="init,cleandocs">
 		<delete file="${release_jar_filename}" />
 		<delete file="${debug_jar_filename}" />
         <delete dir="${outputDir}" />
         <delete dir="${javadocDir}" />
 	</target>
+
+    <target name="cleandocs" depends="init">
+        <delete dir="${docs_src_it}/../output" />
+        <delete dir="${docs_src_en}/../output" />
+    </target>
 
     <!-- *** javadoc *** build the javadoc -->
 	<target name="javadoc" depends="init">
@@ -61,6 +69,40 @@
 		    packagenames="edumips64.*"/>
 	</target>
 
+    <!-- *** docs *** builds all the docs (html, pdf in both languages) -->
+    <target name="docs" depends="htmldoc,pdfdoc" />
+    <target name="docs_it" depends="html_it,pdf_it" />
+    <target name="docs_en" depends="html_en,pdf_en" />
+    <target name="htmldoc" depends="html_it,html_en" />
+    <target name="pdfdoc" depends="pdf_it,pdf_en" />
+
+    <target name="html_it" depends="init">
+        <exec executable="make" failonerror="true" dir="${docs_src_it}">
+            <arg line="html"/>
+        </exec>
+    </target>
+
+    <target name="html_en" depends="init">
+        <exec executable="make" failonerror="true" dir="${docs_src_en}">
+            <arg line="html"/>
+        </exec>
+    </target>
+
+
+    <target name="pdf_it" depends="init">
+        <exec executable="make" failonerror="true" dir="${docs_src_it}">
+            <arg line="latexpdf"/>
+        </exec>
+    </target>
+
+    <target name="pdf_en" depends="init">
+        <exec executable="make" failonerror="true" dir="${docs_src_en}">
+            <arg line="latexpdf"/>
+        </exec>
+    </target>
+
+
+    <!-- *** tests *** run unit tests-->
     <target name="tests" depends="mkdirs">
         <javac
             target="5"
