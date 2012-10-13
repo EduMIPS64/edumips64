@@ -31,7 +31,7 @@
         <property name="docs_src_en" value="docs/en/src" />
 	</target>
 
-    <target name="mkdirs" depends="init">
+    <target name="mkdirs" depends="init,htmldoc">
         <!-- Create directories for the compilation process. -->
 		<mkdir dir="${outputDir}" />
 		<mkdir dir="${outputDir}/edumips64/img" />
