@@ -27,12 +27,14 @@ Nel secondo capitolo è presentata una panoramica del set di istruzioni
 MIPS64 utilizzato da EduMIPS64, con tutti i parametri richiesti e le indicazioni per
 il loro utilizzo.
 
-Il terzo capitolo è una descrizione dell'interfaccia utente di EduMIPS64, che
+Il terzo capitolo descrive la Floating Point Unit ed il suo insieme di istruzioni.
+
+Il quarto capitolo è una descrizione dell'interfaccia utente di EduMIPS64, che
 espone lo scopo di ciascuna finestra e di ciascun menù, insieme ad una
 descrizione delle finestre di configurazione, del Dinero frontend, del manuale e
 delle opzioni da linea di comando. 
 
-Il quarto capitolo contiene alcune esempi pratici di utilizzo del simulatore.
+Il quinto capitolo contiene alcune esempi pratici di utilizzo del simulatore.
 
 Questo manuale si riferisce ad EduMIPS64 versione 0.5.3.
 
@@ -41,5 +43,6 @@ Questo manuale si riferisce ad EduMIPS64 versione 0.5.3.
 
    source-files-format
    instructions
+   fpu
    user-interface
    examples
