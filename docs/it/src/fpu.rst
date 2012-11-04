@@ -363,7 +363,7 @@ possono essere scaricati dal link
 .. figure:: ../../../img/fpu_rounding.png
    :scale: 50%
 
-   Finestra che notifica la trap
+   Arrotondamento FPU
 
 .. table:: Esempi sui tipi di arrotondamento
 
@@ -418,7 +418,7 @@ possono essere scaricati dal link
 
 * `L.D ft, offset(base)`
  
-  *Descrizione:* ``memory[GPR[base] + offset]``
+  *Descrizione:* ``ft = memory[GPR[base] + offset]``
 
   Carica una doubleword (64 bit) dalla memoria all'FPR ft. Questa istruzione
   non appartiene all'ISA MIPS64; si consiglia l'utilizzo di ``LDC1``.
@@ -428,15 +428,15 @@ possono essere scaricati dal link
 
 * `LDC1 ft, offset(base)`
 
-  *Descrizione:* ``memory[GPR[base] + offset]``
+  *Descrizione:* ``ft = memory[GPR[base] + offset]``
 
   Carica una doubleword (64 bit) dalla memoria all'FPR ft
 
 * `LWC1 ft, offset(base)`
 
-  *Descrizione:* ``memory[GPR[base] + offset]``
+  *Descrizione:* ``ft = memory[GPR[base] + offset]``
 
-  Carica una doubleword (64 bit) dalla memoria all'FPR ft
+  Carica una word (32 bit) dalla memoria all'FPR ft
   
 * `MFC1 rt, fs`
 
