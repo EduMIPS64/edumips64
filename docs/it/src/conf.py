@@ -33,7 +33,7 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 
 # The encoding of source files.
-#source_encoding = 'utf-8-sig'
+source_encoding = 'utf-8'
 
 # The master toctree document.
 master_doc = 'index'
@@ -198,7 +198,11 @@ latex_documents = [
 #latex_show_urls = False
 
 # Additional stuff for the LaTeX preamble.
-#latex_preamble = ''
+latex_preamble = u'''
+\DeclareUnicodeCharacter{22C3}{$\cup$}
+\DeclareUnicodeCharacter{2208}{$\in$}
+\DeclareUnicodeCharacter{221E}{$\infty$}
+'''
 
 # Documents to append as an appendix to all manuals.
 #latex_appendices = []

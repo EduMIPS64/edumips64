@@ -21,11 +21,15 @@
 
 package edumips64.core.is;
 
+
 import edumips64.core.*;
+import edumips64.core.fpu.*;
 import edumips64.utils.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.lang.Enum.*;
+//debug
+import edumips64.Main;
 /**Abstract class: it provides all methods and attributes for each instruction type
  * 
  * @author Trubia Massimo, Russo Daniele
@@ -39,23 +43,32 @@ public abstract class Instruction {
     protected String name;
     protected String comment;
     protected static Memory memory=Memory.getInstance();
+    //protected static CPU cpu;
     protected Register[] TR; //is not static because each instruction has got its own registers
+    protected RegisterFP[] TRfp;
     protected String fullname;
     protected static boolean enableForwarding=(Boolean)Config.get("forwarding");
     protected String label;
     protected static final Logger logger = Logger.getLogger(Instruction.class.getName());
+    protected Long serialNumber;
+    
     
     /** Creates a new instance of Instruction */
     public Instruction() {
-        params=new LinkedList<Integer>();
+	params=new LinkedList<Integer>();
         TR=new Register[5];
+	TRfp=new RegisterFP[5];
         repr=new BitSet32();
         repr.reset(false);
         syntax=new String();
+	//generating a serial number for the current instruction
+	serialNumber=(Long)Config.get("serialNumber");;
+	Config.set("serialNumber",serialNumber+1);
 	//initialization of temporary registers
 	for(int i=0;i<TR.length;i++)
 	{
 		TR[i]=new Register();
+		TRfp[i]=new RegisterFP();
 	}
     }
     
@@ -72,20 +85,22 @@ public abstract class Instruction {
     
     /** 
      * Creates a new instance of an Instruction's subclass 
-    @param name string value to pass in order to instanciate an instruction object 
-    @return the instruction object 
+     * @param name string value to pass in order to instanciate an instruction object 
+     * @return the instruction object 
      *
      */
      public static Instruction buildInstruction(String name){
         Instruction returnedObject=null;
-	for (InstructionEnumerator op : InstructionEnumerator.values())
-	{
-	    if (op.name().equals(name)==true)
-	    {		    
+	//If the name of the requested instruction has got a dot, the istruction is FP and an
+	//underscore takes the place of the dot because classes names cannot contain dots
+	name=name.replaceAll("\\.","_");
+	for (InstructionEnumerator op : InstructionEnumerator.values()) {
+	    if (op.name().equals(name)==true) {		    
 		returnedObject=op.getObject();
                 return returnedObject;
 	    }
         }
+	
         return returnedObject;
     }
     public enum InstructionEnumerator {
@@ -181,9 +196,43 @@ public abstract class Instruction {
                         HALT  { Instruction getObject() {HALT newObject=new HALT(); return newObject; } },
                         TRAP  { Instruction getObject() {TRAP newObject=new TRAP(); return newObject; } },
                         SYSCALL  { Instruction getObject() {SYSCALL newObject=new SYSCALL(); return newObject; } },
-                        BREAK  { Instruction getObject() {BREAK newObject=new BREAK(); return newObject; } };
-                      
-
+                        BREAK  { Instruction getObject() {BREAK newObject=new BREAK(); return newObject; } },
+			//Floating point instructions
+			//Arithmetic
+			ADD_D {Instruction getObject() {ADD_D newObject=new ADD_D(); return newObject; } },
+			SUB_D {Instruction getObject() {SUB_D newObject=new SUB_D();return newObject; } },
+			MUL_D { Instruction getObject() {MUL_D newObject=new MUL_D();return newObject;}},
+			DIV_D { Instruction getObject() {DIV_D newObject=new DIV_D(); return newObject;}},
+			//Load store
+			LDC1 {Instruction getObject() {LDC1 newObject=new LDC1(); return newObject;}},
+		L_D {Instruction getObject() {L_D newObject=new L_D(); return newObject;}},
+			SDC1 {Instruction getObject() {SDC1 newObject=new SDC1(); return newObject;}},
+		S_D {Instruction getObject() {S_D newObject=new S_D(); return newObject;}},
+		LWC1 {Instruction getObject() {LWC1 newObject=new LWC1(); return newObject;}},
+		SWC1 {Instruction getObject() {SWC1 newObject=new SWC1(); return newObject;}},
+			//Move to and from
+			DMTC1 {Instruction getObject() {DMTC1 newObject=new DMTC1(); return newObject;}},
+			DMFC1 {Instruction getObject() {DMFC1 newObject=new DMFC1(); return newObject;}},
+		MTC1 {Instruction getObject() {MTC1 newObject=new MTC1(); return newObject;}},
+		MFC1 {Instruction getObject() {MFC1 newObject=new MFC1(); return newObject;}},
+			//Formatted operand move
+			MOV_D {Instruction getObject() {MOV_D newObject=new MOV_D(); return newObject;}},
+		MOVZ_D {Instruction getObject() {MOVZ_D newObject=new MOVZ_D(); return newObject;}},
+		MOVN_D {Instruction getObject() {MOVN_D newObject=new MOVN_D(); return newObject;}},
+		//Special arithmetic instructions
+		C_LT_D {Instruction getObject() {C_LT_D newObject = new C_LT_D(); return newObject; }},
+		C_EQ_D {Instruction getObject() {C_EQ_D newObject = new C_EQ_D(); return newObject; }},
+		//Conditional branches instructions
+		BC1T {Instruction getObject() { BC1T newObject =new BC1T(); return newObject; }},
+		BC1F {Instruction getObject() { BC1F newObject =new BC1F(); return newObject; }},
+		//Conditional move on CC instructions
+		MOVT_D {Instruction getObject() { MOVT_D newObject =new MOVT_D(); return newObject; }},
+		MOVF_D {Instruction getObject() { MOVF_D newObject =new MOVF_D(); return newObject; }},
+		//Conversion instructions
+		CVT_L_D {Instruction getObject() { CVT_L_D newObject= new CVT_L_D(); return newObject; }},
+		CVT_D_L {Instruction getObject() { CVT_D_L newObject=new CVT_D_L(); return newObject; }},
+		CVT_W_D {Instruction getObject() { CVT_W_D newObject=new CVT_W_D(); return newObject; }},
+		CVT_D_W {Instruction getObject() { CVT_D_W newObject=new CVT_D_W(); return newObject; }};
 		abstract Instruction getObject();
     }
     /**
@@ -200,7 +249,7 @@ public abstract class Instruction {
      * In this method all instructions that modify GPRs lock the involved register
      *</pre>
      **/
-    public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException,HaltException,JumpException, BreakException;
+    public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException,HaltException,JumpException, BreakException,WAWException, FPInvalidOperationException;
     
     /**
      * <pre>
@@ -209,7 +258,7 @@ public abstract class Instruction {
      * </pre>
      **/
     
-    public abstract void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, IrregularWriteOperationException, DivisionByZeroException, NotAlignException;
+    public abstract void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, NotAlignException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException;
     
     /**
      * <pre>
@@ -316,49 +365,62 @@ public abstract class Instruction {
      */    
     public String getFullName(){return fullname;}
     
+   /** Gets the serial number of this instruction */
+    public long getSerialNumber() { return serialNumber;}
     
-    public String toString() 
-    {
+    public String toString() {
 		return fullname;
-    }
-    
-    /** 
-     * Enable forwarding mode
-     * @param value This variable enable the forwarding modality if it is true
-      * */
-    public static void setEnableForwarding(boolean value)
-    {
-	enableForwarding = value;
-    }
-
-    /** Gets the state of EnableForwarding. This modality anticipates writing on registers
-     * at EX stage for Alu instructions or at MEM stage for Load-Store instructions
-     * @return The forwarding state
-     * */	
-    public static boolean getEnableForwarding()
-    {
-	return enableForwarding;
-    }
-    
-    /**<pre>
-     * Gets the label of the instruction. Labels may be assigned to instructions
-     * when they are inserted in the symbol table
-     *</pre>
-     * @return label of the instruction
-     */
-    public String getLabel()
-    {
-        return label;
-    }
-    
-    /**<pre>
-     * Sets the label of the instruction. Labels may be assigned to instructions
-     * when they are inserted in the symbol table
-     *</pre>
-     * @value label of the instruction
-     */
-    public void setLabel(String value)
-    {
-       label=value;
-    }
+	}
+	
+	/**
+	 * Enable forwarding mode
+	 * @param value This variable enable the forwarding modality if it is true
+	 * */
+	public static void setEnableForwarding(boolean value) {
+		enableForwarding = value;
+	}
+	
+	/** Gets the state of EnableForwarding. This modality anticipates writing on registers
+	 * at EX stage for Alu instructions or at MEM stage for Load-Store instructions
+	 * @return The forwarding state
+	 * */
+	public static boolean getEnableForwarding() {
+		return enableForwarding;
+	}
+	
+	/**<pre>
+	 * Gets the label of the instruction. Labels may be assigned to instructions
+	 * when they are inserted in the symbol table
+	 *</pre>
+	 * @return label of the instruction
+	 */
+	public String getLabel() {
+		return label;
+	}
+	
+	/**<pre>
+	 * Sets the label of the instruction. Labels may be assigned to instructions
+	 * when they are inserted in the symbol table
+	 *</pre>
+	 * @value label of the instruction
+	 */
+	public void setLabel(String value) {
+		label=value;
+	}
+	
+	/**<pre>
+	 * The repr field of the passed instruction is compared with the repr field
+	 * of this instruction. If they are identical then true is returned else false is returned
+	 * </pre>
+	 * @instr instruction to compare with this
+	 * return the result of the comparison
+	 */
+	public boolean equals(Instruction instr) {
+		if(instr!=null) {
+			if(instr.getRepr().getBinString().equalsIgnoreCase(this.repr.getBinString()))
+				return true;
+		}
+		return false;
+	}
+	
 }

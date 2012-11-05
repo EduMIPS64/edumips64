@@ -29,29 +29,26 @@
  */
 package edumips64.core.is;
 import edumips64.core.*;
+import edumips64.core.fpu.*;
 import edumips64.utils.*;
 
 public abstract class ALUInstructions extends Instruction {
-    protected static CPU cpu=CPU.getInstance();
-    public void IF()
-    {
-        Dinero din=Dinero.getInstance();
-        try
-        {
-            din.IF(Converter.binToHex(Converter.intToBin(64,cpu.getLastPC().getValue())));
-        }
-        catch(IrregularStringOfBitsException e)
-        {
-            e.printStackTrace();
-        }
-    }
-    public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException;
-    public abstract void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException,IrregularWriteOperationException,DivisionByZeroException;
-    public abstract void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException;
-    public abstract void WB() throws IrregularStringOfBitsException;
-    public abstract void pack() throws IrregularStringOfBitsException;
-
- 
+	protected static CPU cpu=CPU.getInstance();
+	public void IF() {
+		Dinero din=Dinero.getInstance();
+		try {
+			din.IF(Converter.binToHex(Converter.intToBin(64,cpu.getLastPC().getValue())));
+		} catch(IrregularStringOfBitsException e) {
+			e.printStackTrace();
+		}
+	}
+	public abstract void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,WAWException;
+	public abstract void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException,IrregularWriteOperationException,DivisionByZeroException,FPInvalidOperationException,FPUnderflowException,FPOverflowException, FPDivideByZeroException,FPInvalidOperationException;
+	public abstract void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException;
+	public abstract void WB() throws IrregularStringOfBitsException;
+	public abstract void pack() throws IrregularStringOfBitsException;
+	
+	
 }
 
 

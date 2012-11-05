@@ -24,9 +24,11 @@ the simulator, describing the data types and the directives, in addition to
 command line parameters. In the second chapter there's an overview of the subset
 of the MIPS64 instruction set that is accepted by EduMIPS64, with all the needed
 parameters and indications to use them. The third chapter is a description of
-the user interface of EduMIPS64, that explains the purpose of each frame and menu,
-along with a description of the configuration dialog, the Dinero frontend
-dialog, the Manual dialog and command line options. The fourth chapter contains some useful examples.
+the Floating Point Unit and its instruction set.
+The fourth chapter is a description of the user interface of EduMIPS64, that
+explains the purpose of each frame and menu, along with a description of the
+configuration dialog, the Dinero frontend dialog, the Manual dialog and
+command line options. The fifth chapter contains some useful examples.
 
 This manual refers to EduMIPS64 version 0.5.3.
 
@@ -35,6 +37,7 @@ This manual refers to EduMIPS64 version 0.5.3.
 
    source-files-format
    instructions
+   fpu
    user-interface
    examples
 

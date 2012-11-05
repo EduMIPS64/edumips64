@@ -82,7 +82,7 @@ public abstract class LDSTInstructions extends Instruction {
             e.printStackTrace();
         }
     }   
-    public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException {};
+    public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException,WAWException {};
 
     public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException {
         // Compute the address

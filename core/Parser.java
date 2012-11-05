@@ -31,8 +31,10 @@ package edumips64.core;
 
 import edumips64.utils.*;
 import edumips64.core.is.*;
+import edumips64.core.fpu.*;
 import java.util.regex.*;
 import java.util.logging.Logger;
+
 
 import java.io.*;
 import java.util.*;
@@ -43,7 +45,8 @@ public class Parser
     private static final Logger logger = Logger.getLogger(Parser.class.getName());
 	private enum AliasRegister 
     {zero,at,v0,v1,a0,a1,a2,a3,t0,t1,t2,t3,t4,t5,t6,t7,s0,s1,s2,s3,s4,s5,s6,s7,t8,t9,k0,k1,gp,sp,fp,ra};
-	private static final String deprecateInstruction[] = {"BNEZ","BEQZ", "HALT", "DADDUI"};
+	private static final String deprecateInstruction[] = {"BNEZ","BEQZ", "HALT", "DADDUI","L.D","S.D"};
+	private CPU cpu;
 	private class VoidJump
 	{
 		public Instruction instr;
@@ -77,6 +80,7 @@ public class Parser
 	*/
 	private Parser () {
 		symTab = SymbolTable.getInstance();
+		cpu=CPU.getInstance();
 	}
 	/** Singleton Pattern implementation
 	 *  @return get the Singleton instance of the Parser
@@ -585,6 +589,37 @@ public class Parser
 												continue;
 											}
 										}
+										else if(syntax.charAt(z)=='F') //floating point register
+										{
+											int endPar;
+											if(z!=syntax.length()-1)
+												endPar = param.indexOf(syntax.charAt(++z),indPar);
+											else
+												endPar = param.length();
+											if (endPar==-1)
+											{
+												numError++;
+												error.add("SEPARATORMISS",row,indPar,line);
+												i = line.length();
+												tmpInst.getParams().add(0);
+												continue;
+											}
+											int reg;
+											if ((reg = isRegisterFP(param.substring(indPar,endPar).trim()))>=0)
+											{
+												tmpInst.getParams().add(reg);
+												indPar = endPar+1;
+											}
+											else
+											{
+												numError++;
+												error.add("INVALIDREGISTER",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+												tmpInst.getParams().add(0);
+												i = line.length();
+												continue;
+											}
+										}
+										
 										else if(syntax.charAt(z)=='I') //immediate
 										{
 											int endPar;
@@ -868,6 +903,95 @@ public class Parser
 												continue;
 											}
 										}
+										else if(syntax.charAt(z)=='C') //Unsigned Immediate (3 bit)
+										{
+											int endPar;
+											if(z!=syntax.length()-1)
+												endPar = param.indexOf(syntax.charAt(++z),indPar);
+											else
+												endPar = param.length();
+											if (endPar==-1)
+											{
+												numError++;
+												error.add("SEPARATORMISS",row,indPar,line);
+												i = line.length();
+												tmpInst.getParams().add(0);
+												continue;
+											}
+											int imm;
+											if (isImmediate(param.substring(indPar,endPar)))
+											{
+												if (param.charAt(indPar)=='#')
+													indPar++;
+												if (isNumber(param.substring(indPar,endPar)))
+												{
+													try{
+														imm = Integer.parseInt(param.substring(indPar,endPar).trim());
+														if (imm < 0)
+														{
+															numError++;
+															error.add("VALUEISNOTUNSIGNED",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+															i = line.length();
+															tmpInst.getParams().add(0);
+															continue;
+														}
+														if( imm < 0 || imm > 7)
+															throw new NumberFormatException();
+													}
+													catch(NumberFormatException ex)
+													{
+														imm=0;
+														numError++;
+														error.add("3BIT_IMMEDIATE_TOO_LARGE",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+													}
+													tmpInst.getParams().add(imm);
+													indPar = endPar+1;
+												}
+												else if (isHexNumber(param.substring(indPar,endPar).trim()))
+												{
+													try
+													{
+														imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar,endPar)));
+														if (imm < 0)
+														{
+															numError++;
+															error.add("VALUEISNOTUNSIGNED",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+															i = line.length();
+															tmpInst.getParams().add(0);
+															continue;
+														}
+														tmpInst.getParams().add(imm);
+														indPar = endPar+1;
+														if( imm < 0 || imm > 31)
+															throw new NumberFormatException();
+													}
+													catch(NumberFormatException ex)
+													{
+														imm=0;
+														numError++;
+														error.add("3BIT_IMMEDIATE_TOO_LARGE",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+
+														tmpInst.getParams().add(imm);
+														indPar = endPar+1;
+
+													}
+													catch(IrregularStringOfHexException ex)
+													{
+														//non ci dovrebbe mai arrivare
+													}
+												}
+
+											}
+											else
+											{
+												numError++;
+												error.add("INVALIDIMMEDIATE",row,line.indexOf(param.substring(indPar,endPar))+1,line);
+												i = line.length();
+												tmpInst.getParams().add(0);
+												continue;
+											}
+										}
+					
 										else if(syntax.charAt(z)=='L') //Memory Label
 										{
 											int endPar;
@@ -1209,6 +1333,31 @@ public class Parser
 		return -1;
 	}
 
+	/** Check if is a valid string for a floating point register
+	 *  @param reg the string to validate
+	 *  @return -1 if reg isn't a valid register, else a number of register
+	 */
+	private int isRegisterFP(String reg)
+	{
+
+		try
+		{
+			int num;
+			if(reg.charAt(0)=='f' || reg.charAt(0)=='F' || reg.charAt(0)=='$')
+				if(isNumber(reg.substring(1)))
+				{
+					num = Integer.parseInt(reg.substring(1));
+					if (num<32 && num>=0)
+						return num;
+				}
+				if(reg.charAt(0)=='$' && (num=isAlias(reg.substring(1)))!=-1)
+					return num;
+		}
+		catch(Exception e){}
+		return -1;
+	}
+	
+	
 	/** Check if the parameter is a valid string for an alias-register
 	 *  @param reg the string to validate
 	 *  @return -1 if reg isn't a valid alias-register, else a number of 
@@ -1332,7 +1481,12 @@ register
 		p = Pattern.compile("-?[0-9]+.[0-9]+E-?[0-9]+");
 		m = p.matcher(value[j]);
 		b = b || m.matches();
-
+		
+		//checking for floating point special values
+		value[j]=value[j].trim();
+		boolean b2;
+		b2=FPInstructionUtils.isFPKeyword(value[j]);
+		b= b || b2;	
 
 		/*if(isHexNumber(value[j]))
 		{
@@ -1356,14 +1510,14 @@ register
 		{
 		    try
 		    {
-		        tmpMem.setBits (edumips64.core.fpu.FPInstructionUtils.doubleToBin(value[j] ,true),0);
+		        tmpMem.setBits (edumips64.core.fpu.FPInstructionUtils.doubleToBin(value[j]),0);
 		    }
-		    catch(edumips64.core.fpu.FPExponentTooLargeException ex)
+		   /* catch(edumips64.core.fpu.FPExponentTooLargeException ex)
 		    {
 			numError++;
 			error.add("DOUBLE_EXT_TOO_LARGE",row,i+1,line);
 			continue;
-		    }
+		    }*/
 		    catch(edumips64.core.fpu.FPOverflowException ex)
 		    {
 			numError++;
@@ -1374,10 +1528,15 @@ register
 		    catch(edumips64.core.fpu.FPUnderflowException ex)
 		    {
 			numError++;
-			//error.add("MINUS_DOUBLE_TOO_LARGE",row,i+1,line);
 			error.add("FP_UNDERFLOW",row,i+1,line);
 			continue;
 		    }
+		    /*catch(edumips64.core.fpu.FPInvalidOperationException ex)
+		    {
+			numError++;
+			error.add("FP_INVALID_OPERATION",row,i+1,line);
+			continue;			
+		    }*/
 		    catch(Exception e)
 		    {
 			e.printStackTrace();

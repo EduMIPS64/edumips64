@@ -1,7 +1,7 @@
 /* GUIRegisters.java
  *
  * This class shows the values stored in the registers.
- * (c) 2006 Carmelo Mirko Musumeci
+ * (c) 2006 Carmelo Mirko Musumeci, Massimo Trubia (FPU modifications)
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -35,27 +35,37 @@ import javax.swing.table.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 
+//diagnostics
+import edumips64.core.fpu.*;
+
 /**
 * This class shows the values stored in the registers.
 */
 
 public class GUIRegisters extends GUIComponent 
 { 	
-    Register registers[];
+	Register registers[];
+	RegisterFP registersFP[];
 	RegPanel regPanel;
 	JTextArea text;
 	String oldValue;
 	String value[] = new String[34];
+	String valueFP[]=new String[32];
 	int rowCurrent;
 	String valueCurrent[];
 	private enum AliasRegister 
 		{zero,at,v0,v1,a0,a1,a2,a3,t0,t1,t2,t3,t4,t5,t6,t7,s0,s1,s2,s3,s4,s5,s6,s7,t8,t9,k0,k1,gp,sp,fp,ra};
+	public int xprLastDoubleClick; //used for instanciating an InsertValueDialog if a double click on gpr or fpr is performed 
+				//(i want to avoid to modify the class constructor) the value is zero if a gpr is double clicked
+				//1 if an fpr is double clicked
 	
 	public GUIRegisters()
 	{
 		super();
 		registers = cpu.getRegisters();
+		registersFP=cpu.getRegistersFP();
 		regPanel = new RegPanel();
+		xprLastDoubleClick=0;
 	}
 
 	public void setContainer (Container co) 
@@ -67,9 +77,34 @@ public class GUIRegisters extends GUIComponent
 	public void update() 
 	{
 		regPanel.updateRegistersNames(); 
+
+/*
+//DEBUG: writing test on FPR 0
+	CPU cpu=CPU.getInstance();
+	cpu.setFPExceptions(CPU.FPExceptions.OVERFLOW,false);
+		try {
+			cpu.getRegisterFP(0).writeDouble("54E38");
+		} catch (IrregularWriteOperationException ex) {
+			ex.printStackTrace();
+		} catch (FPOverflowException ex) {
+			ex.printStackTrace();
+		} catch (FPInvalidOperationException ex) {
+			ex.printStackTrace();
+		} catch (FPExponentTooLargeException ex) {
+			ex.printStackTrace();
+		} catch (FPUnderflowException ex) {
+			ex.printStackTrace();
+		}
+		System.out.println(cpu.fprString());
+// fine debug	
+*/		
 		registers = cpu.getRegisters();
+		registersFP=cpu.getRegistersFP();
 		for (int i = 0; i < 32; i++) {
 			value[i] = registers[i].toString();
+		}
+		for(int i=0;i<32;i++){
+			valueFP[i]=registersFP[i].toString();
 		}
 		value[32]=cpu.getLO().toString();
 		value[33]=cpu.getHI().toString();
@@ -158,6 +193,8 @@ public class GUIRegisters extends GUIComponent
 				numR[i] = fillFirstColumn(i); 
 				numRF[i] = "F" + i + " =";
 				value[i] = "0000000000000000";
+//FPU
+				valueFP[i]="0000000000000000";
 			}
 			numR[32] = "LO =";
 			value[32] = "0000000000000000";
@@ -165,7 +202,8 @@ public class GUIRegisters extends GUIComponent
 			value[33] = "0000000000000000";
 		}	
 
-         public String fillFirstColumn(int i) { 
+         public String fillFirstColumn(int i)
+         {
              if((Boolean) Config.get("show_aliases")) {
                  return registerToAlias(" " + i) + "="; 
              } else {
@@ -185,27 +223,41 @@ public class GUIRegisters extends GUIComponent
 		{
     		public void mouseClicked (MouseEvent e){
     			Object premuto = e.getSource();
-      			if ((premuto == theTable) && (theTable.getSelectedColumn() == 1)){
+      			if ((premuto == theTable)){
 				try{
-					if(theTable.getSelectedRow()==32)
+					//click on LO register
+					if(theTable.getSelectedRow()==32 && theTable.getSelectedColumn()==1)
 					{
 					
 					edumips64.Main.getSB().setText(
-							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +	"LO" +
-              " : " +
-							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
+					    CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " + "LO" + " : " +
+						Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
 	
 					}
-					else if (theTable.getSelectedRow()==33)
+					//click on HI register
+					else if (theTable.getSelectedRow()==33  && theTable.getSelectedColumn()==1)
 					{
-					edumips64.Main.getSB().setText(
+						edumips64.Main.getSB().setText(
 							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
 							"HI" + " : " +
 							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
-					}	
-					else
+					}
+			//FPU		//click on generic fpr
+					else if(theTable.getSelectedColumn()==3 && theTable.getSelectedRow()<32)
 					{
-					edumips64.Main.getSB().setText(
+						CPU cpu=CPU.getInstance();
+						edumips64.Main.getSB().setText(
+							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
+							CurrentLocale.getString("StatusBar.OFREGISTERFP") +
+							theTable.getSelectedRow() +
+							" : " +
+							cpu.getRegisterFP(theTable.getSelectedRow()).readDouble());
+					
+					}
+					//click on generic gpr
+					else if(theTable.getSelectedColumn()==1)
+					{
+							edumips64.Main.getSB().setText(
 							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
 							CurrentLocale.getString("StatusBar.OFREGISTER") +
 							theTable.getSelectedRow() +
@@ -213,10 +265,22 @@ public class GUIRegisters extends GUIComponent
 							Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));					
 					}
 				}catch(IrregularStringOfHexException hex) { hex.printStackTrace();}
-        			if (theTable.getSelectedRow() != 0 && e.getClickCount() == 2) {
+        			
+				
+				//double click on the generic gpr 
+				if (theTable.getSelectedColumn()==1 &&  theTable.getSelectedRow() != 0 && e.getClickCount() == 2) {
+					xprLastDoubleClick=0;
 					int row = theTable.getSelectedRow();
 					oldValue = value[row]; //estraggo il valore corrente dal registro
 					JDialog IVD = new InsertValueDialog(row,oldValue,value); 
+				}
+				//double click on the generic fpr
+				else if(theTable.getSelectedColumn()==3 && theTable.getSelectedRow()<32 && e.getClickCount()==2)
+				{
+					xprLastDoubleClick=1;
+					int row=theTable.getSelectedRow();
+					oldValue = valueFP[row];
+					JDialog IVD = new InsertValueDialog(row,oldValue,valueFP);
 				}
       			}
     		}
@@ -268,7 +332,8 @@ public class GUIRegisters extends GUIComponent
 ///
 			case 3:
 				if(row!=32 && row!=33)
-					return "0000000000000000";
+//FPU					//return "0000000000000000";
+					return valueFP[row];
 				else
 					return "";
             		default:
@@ -294,7 +359,7 @@ public class GUIRegisters extends GUIComponent
 				
 		public InsertValueDialog (int row, String oldValue, String value[]) 
 		{
-			super();
+			super();			
 			rowCurrent = row;
 			valueCurrent = value;
 			JFrame frameDialog = new JFrame();
@@ -304,7 +369,13 @@ public class GUIRegisters extends GUIComponent
 			Dimension d = new Dimension(150,20);
 			Container c = getContentPane();
 			c.setLayout(GBL);
-			JLabel label = new JLabel("R"+rowCurrent+" ( "+registerToAlias("R"+rowCurrent)+" ) = ");
+			JLabel label=null;
+		//double click on generic gpr
+			if(xprLastDoubleClick==0)
+				label = new JLabel("R"+rowCurrent+" ( "+registerToAlias("R"+rowCurrent)+" ) = ");
+		//double click on generic fpr	
+			else if(xprLastDoubleClick==1)
+				label = new JLabel("F" + rowCurrent + "=");
 			c.add(label);
 			GBC.gridx = 0;
 			GBC.gridy = 0;
@@ -370,7 +441,10 @@ public class GUIRegisters extends GUIComponent
 					try
 					{
 						String bin = Converter.hexToBin(valueCurrent[rowCurrent]);
-						registers[rowCurrent].setBits(bin,0);
+						if(xprLastDoubleClick==0)
+							registers[rowCurrent].setBits(bin,0);
+						else if(xprLastDoubleClick==1)
+							registersFP[rowCurrent].setBits(bin,0);
 					}
 					catch (Exception e)
 					{
@@ -385,14 +459,18 @@ public class GUIRegisters extends GUIComponent
 					{
 						CPU cpu=CPU.getInstance();
 						String bin = Converter.hexToBin(valueCurrent[rowCurrent]);
-						//writing generic gpr
-						if(rowCurrent<32)
+					//writing labels on registers	
+						//writing gprs
+						if(xprLastDoubleClick==0 && rowCurrent<32)
 							registers[rowCurrent].setBits(bin,0);
+						//writing fprs
+						else if(xprLastDoubleClick==1 && rowCurrent<32)
+							registersFP[rowCurrent].setBits(bin,0);
+						
 						//writing LO
-						else if(rowCurrent==32)
+						if(xprLastDoubleClick==0 && rowCurrent==32)
 							cpu.getLO().setBits(bin,0);
-						//writing HI
-						else if(rowCurrent==33)
+						else if(xprLastDoubleClick==0 && rowCurrent==33)
 							cpu.getHI().setBits(bin,0);
 					}
 					catch (Exception e)

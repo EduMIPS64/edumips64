@@ -32,7 +32,7 @@ import java.util.logging.Logger;
  *
  * @author Trubia Massimo, Russo Daniele
  */
-public class ALU_IType extends ALUInstructions {
+public class ALU_IType extends ComputationalInstructions {
     final static int RT_FIELD=0; 
     final static int RS_FIELD=1;
     final static int IMM_FIELD=2;
@@ -54,11 +54,10 @@ public class ALU_IType extends ALUInstructions {
     public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
 	//if the source register is valid passing its own values into a temporary register
         Register rs=cpu.getRegister(params.get(RS_FIELD));
-        if(rs.getWriteSemaphore()>0)
-        {
+        if(rs.getWriteSemaphore()>0) {
             throw new RAWException();
         }
-        TR[RS_FIELD]=rs;        
+        TR[RS_FIELD].setBits(rs.getBinString(),0);        
         //locking the target register
         Register rt=cpu.getRegister(params.get(RT_FIELD));
         rt.incrWriteSemaphore();
@@ -74,14 +73,12 @@ public class ALU_IType extends ALUInstructions {
     }
 
     
-    public void WB() throws IrregularStringOfBitsException 
-    {
+    public void WB() throws IrregularStringOfBitsException {
 	if(!enableForwarding)
 	    doWB();
     }
 
-    public void doWB() throws IrregularStringOfBitsException 
-    {
+    public void doWB() throws IrregularStringOfBitsException {
 	//passing result from temporary register to destination register and unlocking it
         logger.info("WB of the ALU I-Type instruction. Writing " + TR[RT_FIELD].getValue() + " to R" + params.get(RT_FIELD));
         cpu.getRegister(params.get(RT_FIELD)).setBits(TR[RT_FIELD].getBinString(),0);
@@ -94,8 +91,7 @@ public class ALU_IType extends ALUInstructions {
 	repr.setBits(Converter.intToBin(RT_FIELD_LENGTH, params.get(RT_FIELD)), RT_FIELD_INIT);
 	repr.setBits(Converter.intToBin(IMM_FIELD_LENGTH, params.get(IMM_FIELD)), IMM_FIELD_INIT);        
     }
-        public static void main(String[] args)
-    {
+        public static void main(String[] args) {
  //DEBUGGING DADDI DADDUI ANDI
         //ANDI ins =new ANDI();
         DADDI ins=new DADDI();
@@ -112,24 +108,12 @@ public class ALU_IType extends ALUInstructions {
         params.add(rt);  //destinazione R2
         params.add(rs);  //sorgente1 R3
         params.add((int)imm);  //immediato R4
-        try
-        {
+        try {
            cpu.getRegister(rs).writeDoubleWord(337236854775807L); //rs register
            ins.setParams(params);
-        }
-        catch(IrregularWriteOperationException e)
-        {
+        } catch(IrregularWriteOperationException e) {
 			e.printStackTrace();
-        }
-        
-        try {
-            ins.pack();
-            ins.ID();
-            ins.EX();
-            ins.WB();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }        
-    }
-    
+		}
+	}
+	
 }

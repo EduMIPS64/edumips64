@@ -39,7 +39,7 @@ public class Storing extends LDSTInstructions {
         Register rt=cpu.getRegister(params.get(RT_FIELD));
         if(base.getWriteSemaphore()>0 || rt.getWriteSemaphore()>0)
             throw new RAWException();
-        TR[RT_FIELD]=rt;
+        TR[RT_FIELD].setBits(rt.getBinString(),0);
         //calculating  address (base+offset)
         long address = base.getValue() + params.get(OFFSET_FIELD);
         //saving address into a temporary register

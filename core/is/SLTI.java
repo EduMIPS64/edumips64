@@ -36,29 +36,25 @@ import edumips64.utils.*;
  * @author Trubia Massimo, Russo Daniele
  */
 
-class SLTI extends ALU_IType
-{
-     final String OPCODE_VALUE="001010";
-   SLTI()
-    {
-	super.OPCODE_VALUE = OPCODE_VALUE;
-	this.name="SLTI";
-    }
-    
-    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException,IrregularWriteOperationException
-    {
-	//getting values from temporary registers
-	long imm=TR[IMM_FIELD].getValue();
-        long rs=TR[RS_FIELD].getValue();
-        //comparing values without to control integer overflow
-        if(rs<imm)
-            TR[RT_FIELD].writeDoubleWord(1);
-        else
-            TR[RT_FIELD].writeDoubleWord(0);
-	if(enableForwarding)
-	{
-		doWB();
+class SLTI extends ALU_IType {
+	final String OPCODE_VALUE="001010";
+	SLTI() {
+		super.OPCODE_VALUE = OPCODE_VALUE;
+		this.name="SLTI";
 	}
-		    
-    }
+	
+	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException,IrregularWriteOperationException {
+		//getting values from temporary registers
+		long imm=TR[IMM_FIELD].getValue();
+		long rs=TR[RS_FIELD].getValue();
+		//comparing values without to control integer overflow
+		if(rs<imm)
+			TR[RT_FIELD].writeDoubleWord(1);
+		else
+			TR[RT_FIELD].writeDoubleWord(0);
+		if(enableForwarding) {
+			doWB();
+		}
+		
+	}
 }

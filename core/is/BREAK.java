@@ -71,5 +71,5 @@ public class BREAK extends Instruction {
 		/* The MIPS64 ISA specification requires the last 6 bits to be 01101 in
 		 * the BREAK instruction. */
 		repr.setBits("001101", 25);
-    }
+	}
 }

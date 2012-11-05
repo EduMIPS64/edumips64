@@ -130,12 +130,27 @@ public class GUIData extends GUIComponent
 				Object premuto = e.getSource();
 				if ((premuto == theTable) && (theTable.getSelectedColumn() == 1)){
 					try{
-					edumips64.Main.getSB().setText(
-							CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
-							CurrentLocale.getString("StatusBar.MEMORYCELL") +
-							" " + tableModel.getValueAt(theTable.getSelectedRow(),0) +
-							" : " +
-							Converter.hexToLong("0X" + tableModel.getValueAt(theTable.getSelectedRow(),1)));
+						String value=CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
+								CurrentLocale.getString("StatusBar.MEMORYCELL") +
+								" " + tableModel.getValueAt(theTable.getSelectedRow(),0) + " : ";
+						
+						//if the current memory cell visualization is long
+						if((Boolean)Config.get("LONGDOUBLEVIEW")) {
+							value+=Converter.hexToLong("0X" + tableModel.getValueAt(theTable.getSelectedRow(),1));
+						}
+						else //the current memory cell visualization in the status bar is double, we build a temp. bitset in order to read the double value
+						{
+							BitSet64FP bs=new BitSet64FP();
+							try {
+								bs.setBits(Converter.hexToBin(""+tableModel.getValueAt(theTable.getSelectedRow(),1)),0);
+							} catch (IrregularStringOfHexException ex) {
+								ex.printStackTrace();
+							} catch (IrregularStringOfBitsException ex) {
+								ex.printStackTrace();
+							}
+							value+=bs.readDouble();
+						}
+						edumips64.Main.getSB().setText(value);
 					}catch(IrregularStringOfHexException hex) { hex.printStackTrace();}
 
 					if (e.getClickCount() == 2){

@@ -31,15 +31,12 @@
         <property name="docs_src_en" value="docs/en/src" />
 	</target>
 
-    <target name="mkdirs" depends="init">
+    <target name="mkdirs" depends="init,htmldoc">
         <!-- Create directories for the compilation process. -->
 		<mkdir dir="${outputDir}" />
 		<mkdir dir="${outputDir}/edumips64/img" />
-		<mkdir dir="${outputDir}/edumips64/data" />
 		<mkdir dir="${outputDir}/edumips64/utils" />
 		<mkdir dir="${outputDir}/edumips64/help" />
-		<mkdir dir="${outputDir}/edumips64/help_en" />
-		<mkdir dir="${outputDir}/edumips64/help_it" />
     </target>
 
     <!-- *** clean *** target that cleans the built files and the build directory-->
@@ -191,11 +188,6 @@
 				<include name="**/*.png" />
 			</fileset>
 		</copy>
-		<copy todir="${outputDir}/edumips64/data">
-			<fileset dir="data">
-				<include name="**/*.txt" />
-			</fileset>
-		</copy>
 		<copy todir="${outputDir}/edumips64/utils">
 			<fileset dir="utils">
 				<include name="**/*.properties" />
@@ -249,11 +241,6 @@
 				<include name="**/*.png" />
 			</fileset>
 		</copy>
-		<copy todir="${outputDir}/edumips64/data">
-			<fileset dir="data">
-				<include name="**/*.txt" />
-			</fileset>
-		</copy>
 		<copy todir="${outputDir}/edumips64/utils">
 			<fileset dir="utils">
 				<include name="**/*.properties" />
@@ -269,18 +256,6 @@
                 <include name="**/*.class" />
             </fileset>
         </copy>
-        <!--<copy todir="${outputDir}/edumips64/help">
-			<fileset dir="help">
-				<include name="**/*.*" />
-			</fileset>
-        </copy>-->
-        <!--
-		<copy todir="${outputDir}/edumips64/help_it">
-			<fileset dir="help_it">
-				<include name="**/*.*" />
-			</fileset>
-		</copy>
-        -->
         <jar destfile="${jar_filename}" basedir="${outputDir}">
             <manifest>
                 <attribute name="Main-Class" value="edumips64.Main"/>

@@ -34,35 +34,35 @@ import edumips64.utils.*;
  * @author Massimo
  */
 public class FlowControl_JType extends FlowControlInstructions {
-    final static int INSTR_INDEX=0;
-    final static int OPCODE_VALUE_INIT=0;
-    final static int INSTR_INDEX_INIT=6;
-    final static int INSTR_INDEX_LENGTH=26; 
-    final static int OPCODE_VALUE_LENGTH=6;
-    String OPCODE_VALUE="";
-    /** Creates a new instance of FlowControl_JType */
-    public FlowControl_JType() {
-        this.syntax="%E";
-        this.paramCount=1;
-    }
-
-    public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException,JumpException {
-    }
-
-    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException,IrregularWriteOperationException {
-    }
-
-    public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
-    }
-
-    public void WB() throws IrregularStringOfBitsException {
-    }
-
-    public void pack() throws IrregularStringOfBitsException {
-         //conversion of instruction parameters of "params" list to the "repr" form (32 binary value) 
-        repr.setBits(OPCODE_VALUE,OPCODE_VALUE_INIT);
-        repr.setBits(Converter.intToBin(INSTR_INDEX_LENGTH,params.get(INSTR_INDEX)/4),INSTR_INDEX_INIT);
-    }
-    
-  
+	final static int INSTR_INDEX=0;
+	final static int OPCODE_VALUE_INIT=0;
+	final static int INSTR_INDEX_INIT=6;
+	final static int INSTR_INDEX_LENGTH=26;
+	final static int OPCODE_VALUE_LENGTH=6;
+	String OPCODE_VALUE="";
+	/** Creates a new instance of FlowControl_JType */
+	public FlowControl_JType() {
+		this.syntax="%E";
+		this.paramCount=1;
+	}
+	
+	public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException,JumpException {
+	}
+	
+	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException,IrregularWriteOperationException {
+	}
+	
+	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
+	}
+	
+	public void WB() throws IrregularStringOfBitsException {
+	}
+	
+	public void pack() throws IrregularStringOfBitsException {
+		//conversion of instruction parameters of "params" list to the "repr" form (32 binary value)
+		repr.setBits(OPCODE_VALUE,OPCODE_VALUE_INIT);
+		repr.setBits(Converter.intToBin(INSTR_INDEX_LENGTH,params.get(INSTR_INDEX)/4),INSTR_INDEX_INIT);
+	}
+	
+	
 }

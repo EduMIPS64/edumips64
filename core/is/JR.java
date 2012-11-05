@@ -35,31 +35,28 @@ import edumips64.utils.*;
  */
 
 public class JR extends FlowControl_RType {
-    final  String OPCODE_VALUE ="001000";
-    public JR()
-    {
-	super.OPCODE_VALUE = OPCODE_VALUE;
-	this.name="JR";
-        
-    }
-    
-    public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,JumpException
-    {
-        cpu.getPC().setBits(cpu.getRegister(params.get(RS_FIELD)).getBinString(),0);
-        throw new JumpException();
-    }
-    
-    public void EX() throws IrregularStringOfBitsException,IntegerOverflowException, IrregularWriteOperationException 
-    {
-    }
-
-    public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
-    }
-
-    public void WB() throws IrregularStringOfBitsException {
-    }
-
-    
+	final  String OPCODE_VALUE ="001000";
+	public JR() {
+		super.OPCODE_VALUE = OPCODE_VALUE;
+		this.name="JR";
+		
+	}
+	
+	public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,JumpException {
+		cpu.getPC().setBits(cpu.getRegister(params.get(RS_FIELD)).getBinString(),0);
+		throw new JumpException();
+	}
+	
+	public void EX() throws IrregularStringOfBitsException,IntegerOverflowException, IrregularWriteOperationException {
+	}
+	
+	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
+	}
+	
+	public void WB() throws IrregularStringOfBitsException {
+	}
+	
+	
 }
 
 

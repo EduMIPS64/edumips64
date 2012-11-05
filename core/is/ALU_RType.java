@@ -35,7 +35,7 @@ import java.util.logging.Logger;
  *
  * @author Trubia Massimo, Russo Daniele
  */
-public abstract class ALU_RType extends ALUInstructions {
+public abstract class ALU_RType extends ComputationalInstructions {
     final static int RD_FIELD=0;
     final static int RS_FIELD=1;
     final static int RT_FIELD=2;
@@ -48,8 +48,7 @@ public abstract class ALU_RType extends ALUInstructions {
     String OPCODE_VALUE="";
     final static int OPCODE_VALUE_INIT=26;
     private static final Logger logger = Logger.getLogger(ALU_RType.class.getName());
-    public ALU_RType() 
-    {
+    public ALU_RType() {
         syntax="%R,%R,%R";
         paramCount=3;         
     }
@@ -149,16 +148,7 @@ public abstract class ALU_RType extends ALUInstructions {
         catch(IrregularWriteOperationException e)
         {
 			e.printStackTrace();
-        }
-        
-        try {
-            ins.pack();
-            ins.ID();
-            ins.EX();
-            ins.WB();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }        
-    }
-    
+		}
+	}
+	
 }
