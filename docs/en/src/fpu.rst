@@ -84,29 +84,31 @@ Exception configuration
 EduMIPS64 allows the user to enable or disable the traps for 4 of the 5 IEEE
 exceptions, through the *FPU Exceptions* tab in the *Configure* → *Settings*
 window. If any of them is disabled, the respective special value will be
-returned (as described in :ref:`special-values`). In the situation depicted in
-Figure :ref:`fig-exception_cfg`, in which some checkbox are selected, if the
-CPU does not mask synchronous exceptions (Figure
-:ref:`fig-exception_mask_cfg`) the selected traps will be raised if the IEEE
-exceptional condition is encountered (Figure :ref:`fig-invalid_operation_trap`).
+returned (as described in :ref:`special-values`). 
+.. In the situation depicted in
+.. Figure :ref:`fig-exception_cfg`, in which some checkbox are selected, if the
+.. CPU does not mask synchronous exceptions (Figure
+.. :ref:`fig-exception_mask_cfg`) the selected traps will be raised if the IEEE
+.. exceptional condition is encountered (Figure :ref:`fig-invalid_operation_trap`).
 
-.. _fig-exception_cfg:
-.. figure:: ../../../img/exception_cfg.png
-   :scale: 50%
-
-   Trap configuration for IEEE exceptions
-
-.. _fig-exception_mask_cfg:
-.. figure:: ../../../img/exception_mask_cfg.png
-   :scale: 50%
-
-   Option that masks all the synchronous exceptions
-
-.. _fig-invalid_operation_trap:
-.. figure:: ../../../img/invalid_operation_trap.png
-   :scale: 50%
-
-   Trap notification window
+.. TODO: see how to include it in the resulting in-app help
+.. .. _fig-exception_cfg:
+   .. figure:: ../../../img/exception_cfg.png
+      :scale: 50%
+   
+      Trap configuration for IEEE exceptions
+   
+   .. _fig-exception_mask_cfg:
+   .. figure:: ../../../img/exception_mask_cfg.png
+      :scale: 50%
+   
+      Option that masks all the synchronous exceptions
+   
+   .. _fig-invalid_operation_trap:
+   .. figure:: ../../../img/invalid_operation_trap.png
+      :scale: 50%
+   
+      Trap notification window
 
 
 .. _double-directive:
@@ -133,10 +135,10 @@ The FCSR (Floating point Control Status Register) is the register that
 controls several functional aspects of the FPU. It is 32 bits long and it is
 represented in the statistics window.
 
-.. figure:: ../../../img/fcsr_register.png
-   :scale: 50%
-
-   FCSR register in EduMIPS64
+.. .. figure:: ../../../img/fcsr_register.png
+..    :scale: 50%
+.. 
+..    FCSR register in EduMIPS64
 
 The **FCC** field is 8 bits wide, from 0 to 7. The conditional instructions
 (``C.EQ.D,C.LT.D``) use it to save the boolean result of comparisons between
@@ -150,9 +152,9 @@ described in :ref:`special-values`. Each of them is composed of 5 bits, V
 The **Clause** field bits are set if the corresponding IEEE exceptions occur
 during the execution of a program.
 
-The **Enable** field bits are set through the configuration window shown in
-Figure :ref:`fig-exception_cfg`, and show the IEEE exceptions for which traps
-are enabled.
+The **Enable** field bits are set through the configuration window and show
+the IEEE exceptions for which traps are enabled.
+.. shown in Figure :ref:`fig-exception_cfg`, 
 
 The **Flag** field shows the exceptions that have happened but, since the trap
 is not enabled for that particular exception, have returned special values
@@ -309,18 +311,19 @@ Some examples for the FPU instructions are available at
   ``CVT.L.D`` the double value in f5 to a long; then ``DMFC1`` copies f5 to
   r6; the result of this operation depends on the current rounding modality,
   that can be set in the *FPU Rounding* tab of the *Configure* →  *Settings*
-  window, as depicted in Figure :ref:`fig:fpu_rounding`.
+  window.
+.. , as depicted in Figure :ref:`fig:fpu_rounding`.
 
   *Exceptions:* Invalid Operation is thrown if fs contains an infinite value,
   any NaN or the results is outside the long domain [-2 :sup:`63`, 2 :sup:`63`
   -1]
 
 
-.. _fig-fpu_rounding:
-.. figure:: ../../../img/fpu_rounding.png
-   :scale: 50%
-
-   FPU Rounding
+.. .. _fig-fpu_rounding:
+.. .. figure:: ../../../img/fpu_rounding.png
+..    :scale: 50%
+.. 
+..    FPU Rounding
 
 .. table:: Rounding examples
 

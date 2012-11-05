@@ -97,30 +97,31 @@ EduMIPS64 consente di abilitare o disabilitare le trap relative alle 4 delle 5
 condizioni di eccezione IEEE, implementate dalla scheda *Eccezioni FPU*
 della finestra *Configura* → *Impostazioni*. Se esse
 sono disabilitate, verrà fornito un risultato per qualunque operazione
-speciale la FPU effettui (si veda il Paragrafo :ref:`special-values`. Nel
-caso illustrato in Figura :ref:`fig-exception_cfg`, in cui alcune
-caselle di controllo sono spuntate, se la CPU non maschera le eccezioni
-sincrone nel simulatore (Figura :ref:`fig-exception_mask_cfg`),
-verrà simulata una trap relativa alla condizione di eccezione IEEE che si è
-verificata (Figura :ref:`fig-invalid_operation_trap`).
-
-.. _fig-exception_cfg:
-.. figure:: ../../../img/exception_cfg.png
-   :scale: 50%
-
-   Configurazione delle trap per le eccezioni IEEE
-
-.. _fig-exception_mask_cfg:
-.. figure:: ../../../img/exception_mask_cfg.png
-   :scale: 50%
-
-   Opzione che maschera le eccezioni sincrone (disabilita tutte le trap)
-
-.. _fig-invalid_operation_trap:
-.. figure:: ../../../img/invalid_operation_trap.png
-   :scale: 50%
-
-   Finestra che notifica la trap
+speciale la FPU effettui (si veda il Paragrafo :ref:`special-values`. 
+.. Nel
+.. caso illustrato in Figura :ref:`fig-exception_cfg`, in cui alcune
+.. caselle di controllo sono spuntate, se la CPU non maschera le eccezioni
+.. sincrone nel simulatore (Figura :ref:`fig-exception_mask_cfg`),
+.. verrà simulata una trap relativa alla condizione di eccezione IEEE che si è
+.. verificata (Figura :ref:`fig-invalid_operation_trap`).
+.. 
+.. .. _fig-exception_cfg:
+.. .. figure:: ../../../img/exception_cfg.png
+..    :scale: 50%
+.. 
+..    Configurazione delle trap per le eccezioni IEEE
+.. 
+.. .. _fig-exception_mask_cfg:
+.. .. figure:: ../../../img/exception_mask_cfg.png
+..    :scale: 50%
+.. 
+..    Opzione che maschera le eccezioni sincrone (disabilita tutte le trap)
+.. 
+.. .. _fig-invalid_operation_trap:
+.. .. figure:: ../../../img/invalid_operation_trap.png
+..    :scale: 50%
+.. 
+..    Finestra che notifica la trap
 
 
 .. _double-directive:
@@ -148,10 +149,10 @@ L'FCSR (Floating point Control Status Register) è il registro che controlla i
 diversi aspetti funzionali della FPU. Esso è lungo 32 bit e, fino alla
 ridisegnazione grafica di EduMIPS64, sarà posto nella finestra delle statistiche.
 
-.. figure:: ../../../img/fcsr_register.png
-   :scale: 50%
-
-   Registro FCSR in EduMIPS64
+.. .. figure:: ../../../img/fcsr_register.png
+..    :scale: 50%
+.. 
+..    Registro FCSR in EduMIPS64
 
 Il campo **FCC** è costituito da 8 bit, identificati con numeri da 0 a 7. Le
 istruzioni condizionali (``C.EQ.D,C.LT.D``) lo utilizzano per memorizzare il
@@ -170,8 +171,8 @@ si è verificata una qualunque eccezione.
 
 Il campo **Enable** mostra le eccezioni IEEE per le quali è attiva la trap. I
 bit di questo campo vengono modificati, anche senza resettare il simulatore,
-dalla finestra di configurazione della Figura
-:ref:`fig-exception_cfg`.
+dalla finestra di configurazione.
+.. della Figura :ref:`fig-exception_cfg`.
 
 Il campo **Flag** mostra le eccezioni IEEE che si sono verificate ma, non
 avendo la relativa trap attivata, hanno fornito come risultato dei valori
@@ -353,17 +354,18 @@ possono essere scaricati dal link
   Dopodichè, ``DMFC1`` copia l'FPR f5 nel GPR r6. Il risultato di questa
   istruzione dipende dalla modalità di arrotondamento corrente, che viene
   impostata dalla scheda *Arrotondamenti FPU* della finestra *Configura* →
-  *Impostazioni*, come in Figura :ref:`fig:fpu_rounding`.
+  *Impostazioni*.
+.. , come in Figura :ref:`fig:fpu_rounding`.
 
   *Eccezioni:* Invalid Operation è lanciata quando fs vale Infinito, XNaN, o
   il risultato è fuori dall'intervallo dei long [-2 :sup:`63`, 2 :sup:`63` -1]
 
 
-.. _fig-fpu_rounding:
-.. figure:: ../../../img/fpu_rounding.png
-   :scale: 50%
-
-   Arrotondamento FPU
+.. .. _fig-fpu_rounding:
+.. .. figure:: ../../../img/fpu_rounding.png
+..    :scale: 50%
+.. 
+..    Arrotondamento FPU
 
 .. table:: Esempi sui tipi di arrotondamento
 
