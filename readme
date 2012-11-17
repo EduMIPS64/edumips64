@@ -28,6 +28,13 @@ Main Ant targets
 
 * `jar` build the EduMIPS64 jar package named edumips64-`version`.jar
 
+* `docs` builds the user documentation (both in-app HTML and PDF)
+
+* `clean` removes the jar files and the build directory
+
+* `tests` runs unit tests; it depends on junit4.jar being added to the
+  CLASSPATH environment variable
+
 * `debugjar` build a jar package that contains more debug information
 
 * `clijar` build a jar package containing an experimental CLI front-end to
@@ -35,13 +42,6 @@ Main Ant targets
 
 * `src-release` builds a tar.bz2 file containing the source distribution of
   EduMIPS64
-
-* `tests` runs unit tests; it depends on junit4.jar being added to the
-  CLASSPATH environment variable
-
-* `docs` builds the user documentation (both in-app HTML and PDF)
-
-* `clean` removes the jar files and the build directory
 
 Building the developer documentation
 ------------------------------------
