@@ -171,7 +171,7 @@ public class CPU {
 	
 	/** Sets the selected FCC bit of the FCSR 
 	 * @param cc condition code is an int value in the range [0,7]
-	 * @condition the binary value of the relative bit
+	 * @param condition the binary value of the relative bit
 	 */
 	public void setFCSRConditionCode(int cc, int condition) throws IrregularStringOfBitsException
 	{
@@ -318,28 +318,28 @@ public class CPU {
 	}
 	
 	/** Returns the number of Structural Stalls (Divider not available) that happened inside the pipeline
-	 * @ return an integer
+	 * @return an integer
 	 */
 	public int getStructuralStallsDivider(){
 		return dividerStalls;
 	}
 	
 	/** Returns the number of Structural Stalls (Memory not available) that happened inside the pipeline
-	 * @ return an integer
+	 * @return an integer
 	 */
 	public int getStructuralStallsMemory(){
 		return memoryStalls;
 	}
 	
 	/** Returns the number of Structural Stalls (EX not available) that happened inside the pipeline
-	 * @ return an integer
+	 * @return an integer
 	 */
 	public int getStructuralStallsEX(){
 		return exStalls;
 	}
 	
 	/** Returns the number of Structural Stalls (FP Adder and FP Multiplier not available) that happened inside the pipeline
-	 * @ return an integer
+	 * @return an integer
 	 */
 	public int getStructuralStallsFuncUnit(){
 		return funcUnitStalls;
@@ -767,7 +767,7 @@ public class CPU {
 	
 	/** Test method that returns a string containing the values of every
 	 * FPR.
-	 * @returns a string
+	 * @return a string
 	 */
 	public String fprString() {
 		String s = new String();

@@ -245,7 +245,7 @@ public class FPPipeline {
 	}
 	
 	/** Returns the FPPipeline status, index must be one between the status constants
-	 * @returns the value of the status vector. 0 means the status is false, 1 the contrary . -1 if the status doesn't exist
+	 * @return the value of the status vector. 0 means the status is false, 1 the contrary . -1 if the status doesn't exist
 	 *
 	 **/
 	public int getStatus(int index) {

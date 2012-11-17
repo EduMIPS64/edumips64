@@ -61,7 +61,6 @@ public class FPInstructionUtils {
 	/** Converts a double value passed as string to a 64 bit binary string according with IEEE754 standard for double precision floating point numbers
 	*  @param value the double value in the format "123.213" or "1.23213E2"
 	*		    value belongs to [-1.797693134862315708145274237317E308,-4.9406564584124654417656879286822E-324] U [4.9406564584124654417656879286822E-324, 1.797693134862315708145274237317E308]
-	*  @param exceptionEnabled if this boolean is true  ExponentTooLargeException,FPOverflowException,FPUnderflowException may happen
 	*  @throws ExponentTooLargeException,FPOverflowException,FPUnderflowException
 	*  @return the binary string
 	*/    

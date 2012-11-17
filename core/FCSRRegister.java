@@ -87,7 +87,7 @@ public class FCSRRegister extends BitSet32 {
 	
 	/** Sets the selected condition bit of the FCSR 
 	 * @param cc condition code is an int value in the range [0,7]
-	 * @condition the binary value of the relative bit
+	 * @param condition the binary value of the relative bit
 	 */
 	public void setFCSRConditionCode(int cc, int condition) throws IrregularStringOfBitsException
 	{
@@ -121,8 +121,8 @@ public class FCSRRegister extends BitSet32 {
 	}
 	
 	/** Sets the floating point unit enabled exceptions
-	 *  @param the exception name to set
-	 *  @param boolean that is true in order to enable that exception or false for disabling it
+	 *  @param exceptionName the exception name to set
+	 *  @param value boolean that is true in order to enable that exception or false for disabling it
 	 */
 	public  void setFPExceptions(CPU.FPExceptions exceptionName, boolean value) throws IrregularStringOfBitsException {
 		switch(exceptionName){

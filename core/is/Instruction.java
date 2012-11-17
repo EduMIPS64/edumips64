@@ -402,7 +402,7 @@ public abstract class Instruction {
 	 * Sets the label of the instruction. Labels may be assigned to instructions
 	 * when they are inserted in the symbol table
 	 *</pre>
-	 * @value label of the instruction
+	 * @param value label of the instruction
 	 */
 	public void setLabel(String value) {
 		label=value;
@@ -412,8 +412,8 @@ public abstract class Instruction {
 	 * The repr field of the passed instruction is compared with the repr field
 	 * of this instruction. If they are identical then true is returned else false is returned
 	 * </pre>
-	 * @instr instruction to compare with this
-	 * return the result of the comparison
+	 * @param instr instruction to compare with this
+	 * @return the result of the comparison
 	 */
 	public boolean equals(Instruction instr) {
 		if(instr!=null) {
