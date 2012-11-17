@@ -20,32 +20,27 @@ If you need to compile the in-application help, you need:
 If you need to compile the PDF manual, you will also need:
 - latex / pdflatex
 
-If you need to run unit tests, you will also need:
+If you need to run unit tests, or build the javadoc, you will also need:
 - JUnit version 4
 
 Main Ant targets
 ----------------
 
-* `jar` build the EduMIPS64 jar package named edumips64-`version`.jar
+* `jar` builds the jar package named edumips64-`version`.jar
 
 * `docs` builds the user documentation (both in-app HTML and PDF)
 
-* `clean` removes the jar files and the build directory
+* `clean` removes the jar files, the build directory and the compiled
+  documentation
 
 * `tests` runs unit tests; it depends on junit4.jar being added to the
   CLASSPATH environment variable
 
-* `debugjar` build a jar package that contains more debug information
+* `debugjar` builds a jar package that contains more debug information
 
-* `clijar` build a jar package containing an experimental CLI front-end to
-  EduMIPS64
+* `clijar` build a jar package containing an experimental CLI front-end
 
-* `src-release` builds a tar.bz2 file containing the source distribution of
-  EduMIPS64
+* `src-release` builds a tar.bz2 file containing the source distribution
 
-Building the developer documentation
-------------------------------------
-
-To build the javadoc documentation, use the `javadoc` target. It also depends
-on junit being in the CLASSPATH, and will store the resulting HTML javadoc in
-the `javadoc` directory.
+* `javadoc` builds the javadoc documentation (depends on junit4.jar being
+  in CLASSPATH); will store it in the `javadoc` directory.
