@@ -97,39 +97,46 @@ public class Main extends JApplet {
 
     private static JDesktopPane desk;
 
+    private static void usage() {
+        System.out.println("EduMIPS64 v. " + VERSION + " (codename: " + CODENAME + ")");
+        System.out.println(CurrentLocale.getString("HT.Options"));
+        System.out.println(CurrentLocale.getString("HT.File"));
+        System.out.println(CurrentLocale.getString("HT.Debug"));
+        System.out.println(CurrentLocale.getString("HT.Help"));
+    }
+
     public static void main(String args[]) {
         // Checking CLI parameters...
         // TODO: internationalized messages
         String toOpen = null;
-        try {
-            if(args.length > 0) {
-                for(int i = 0; i < args.length; ++i) {
-                    if(args[i].compareTo("-f") == 0 || args[i].compareTo("--file") == 0) {
-                        if(toOpen == null)
-                            toOpen = args[++i];
-                        else {
-                            // TODO: messaggio d'errore pertinente
-                            throw new IndexOutOfBoundsException();
-                        }
+        boolean printUsageAndExit = false;
+        if(args.length > 0) {
+            for(int i = 0; i < args.length; ++i) {
+                if(args[i].compareTo("-f") == 0 || args[i].compareTo("--file") == 0) {
+                    if(toOpen == null && ++i == args.length) {
+                        System.err.println(CurrentLocale.getString("HT.MissingFile") + "\n");
+                        printUsageAndExit = true;
+                    } else if(toOpen != null) {
+                        System.err.println(CurrentLocale.getString("HT.MultipleFile") + "\n");
+                        printUsageAndExit = true;
+                    } else {
+                        toOpen = args[i];
                     }
-                    else if(args[i].compareTo("-d") == 0 || args[i].compareTo("--debug") == 0)
-                        debug_mode = true;
-                    else if(args[i].compareTo("-h") == 0 || args[i].compareTo("--help") == 0) {
-                        System.out.println("EduMIPS64 v. " + VERSION);
-                        System.out.println(CurrentLocale.getString("HT.Options"));
-                        System.out.println(CurrentLocale.getString("HT.File"));
-                        System.out.println(CurrentLocale.getString("HT.Debug"));
-                        System.out.println(CurrentLocale.getString("HT.Help"));
-                        return;
-                    }
-                    else
-                        throw new IndexOutOfBoundsException();
+                }
+                else if(args[i].compareTo("-d") == 0 || args[i].compareTo("--debug") == 0)
+                    debug_mode = true;
+                else if(args[i].compareTo("-h") == 0 || args[i].compareTo("--help") == 0) {
+                    printUsageAndExit = true;
+                }
+                else {
+                    System.err.println(CurrentLocale.getString("HT.UnrecognizedArgs") + ": " + args[i] + "\n");
+                    printUsageAndExit = true;
+                }
+                if(printUsageAndExit) {
+                    usage();
+                    return;
                 }
             }
-        }
-        catch(IndexOutOfBoundsException e) {
-            System.err.println("Invalid parameters");
-            return;
         }
 
         Logger rootLogger = Logger.getLogger("inucus");
