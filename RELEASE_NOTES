@@ -1,7 +1,7 @@
-11th of November, 2012                                             EduMIPS64 1.0
+24th of November, 2012                                             EduMIPS64 1.0
 
-				     EduMIPS64 RELEASE NOTES	
-				     http://www.edumips.org
+                           EduMIPS64 RELEASE NOTES	
+                           http://www.edumips.org
 
 EduMIPS64 is a GPL MIPS64 Instruction Set Architecture (ISA) simulator and
 graphical debugger.
@@ -9,7 +9,9 @@ graphical debugger.
 Notes for this release:
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This is version 1.0 of EduMIPS64, the first major one since 2007. 
+This is version 1.0 of EduMIPS64, the first major one since 2007. The codename
+for this release is "Philadelphia", since it is being released from
+Philadelphia (PA), in the USA.
 
 The simulator has proven to be quite stable in the last years, and only 4
 bugfix releases have been necessary (less than one per year) despite the

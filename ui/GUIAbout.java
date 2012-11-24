@@ -204,7 +204,7 @@ public class GUIAbout extends JDialog implements Runnable  {
 			//HEAD: the width value of the logo image. I use it to know when the text must disappear
 			G.setColor(new Color(0,0,0));
 			G.setFont(new Font("Verdana",Font.BOLD, 15));
-			G.drawString("Version " + edumips64.Main.VERSION,150,92);
+			G.drawString("Version " + edumips64.Main.VERSION + " (" + edumips64.Main.CODENAME + ")",150,92);
 			head = logo.getHeight(this);
 			G.setTransform(new AffineTransform(1,0,0,1,0,0));
 			//inizio stringhe
