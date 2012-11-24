@@ -149,7 +149,7 @@ public class Main extends JApplet {
         }
         rootLogger.setLevel(java.util.logging.Level.FINE);
 
-        log.info("EduMIPS64 version " + VERSION + " (codename: " + CODENAME + ") - Ciao 'mbare.");
+        System.out.println("EduMIPS64 version " + VERSION + " (codename: " + CODENAME + ") - Ciao 'mbare.\n");
 
         // Creating the main JFrame
         JFrame.setDefaultLookAndFeelDecorated(true);
