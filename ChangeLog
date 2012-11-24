@@ -1,6 +1,6 @@
 EduMIPS64 ChangeLog
 -------------------
-1.0 (17/11/2012)
+1.0 (24/11/2012)
 	Bugs fixed:
 	- Issue #14 (ant javadoc not working)
 	- Issue #15 (Make debug mode change verbosity)
