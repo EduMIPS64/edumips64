@@ -6,6 +6,7 @@
     <mapID target="index" url="html/index.html"/>
     <mapID target="user-interface" url="html/user-interface.html"/>
     <mapID target="instructions" url="html/instructions.html"/>
+    <mapID target="fpu" url="html/fpu.html"/>
     <mapID target="search" url="html/search.html"/>
     <mapID target="source-files-format" url="html/source-files-format.html"/>
     <mapID target="genindex" url="html/genindex.html"/>

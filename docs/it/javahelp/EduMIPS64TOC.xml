@@ -8,6 +8,8 @@
 
  <tocitem text="Il set di istruzioni " target="instructions"/>
 
+ <tocitem text="Floating Point Unit" target="fpu"/>
+
  <tocitem text="L'interfaccia utente " target="user-interface"/>
 
  <tocitem text="Esempi " target="examples"/>
