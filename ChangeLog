@@ -1,5 +1,12 @@
 EduMIPS64 ChangeLog
 -------------------
+1.0 (17/11/2012)
+	Bugs fixed:
+	- Issue #14 (ant javadoc not working)
+
+	New features:
+	- Floating Point Unit support (developed by max83t)
+
 0.5.4 (28/02/2012)
 	Bugs fixed:
 	- Issue #2 (Misaligned memory operations are not handled correctly)
@@ -20,7 +27,7 @@ EduMIPS64 ChangeLog
       widths so that they can be read (andrea)
 
 	Bugs fixed:
-  - Fixed bugs #8 (Weird GUI under Mac OS X) and #9 (Incorrect behavior of
+	- Fixed bugs #8 (Weird GUI under Mac OS X) and #9 (Incorrect behavior of
 	  MOVN and MOVZ)
 	- Added GUIData/GUICode column labels update on language change (andrea)
 	- Fixed a bug that disallowed access to odd memory locations from the code

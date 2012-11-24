@@ -1,4 +1,4 @@
-5th June, 2007                                                    EduMIPS64 0.5
+11th of November, 2012                                             EduMIPS64 1.0
 
 				     EduMIPS64 RELEASE NOTES	
 				     http://www.edumips.org
@@ -9,59 +9,79 @@ graphical debugger.
 Notes for this release:
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This is version 0.5 of EduMIPS64. Many bug fixes occurred since version 0.4, but
-the most significant improvement is the implementation of a big subset of the
-MIPS32 ISA that is contained in the MIPS64 ISA.
+This is version 1.0 of EduMIPS64, the first major one since 2007. 
 
-EduMIPS64 0.5 is far stabler than 0.4, and the new instructions have been tested
-and should work correctly.
+The simulator has proven to be quite stable in the last years, and only 4
+bugfix releases have been necessary (less than one per year) despite the
+simulator is being used yearly by a few hundred people.
+
+The 2 big new features since 0.5 are the Floating Point Unit (FPU) support,
+written by Massimo Trubia (max83t) and the new help system based on RST, that
+allows to create both in-app HTML-based help and PDF documentation from a
+single source.
+
+These new features and the demonstrated stability led us to dare to use the
+dreaded 1.0 version number. To keep the software stable, unit tests have been
+added, and even if the coverage is not great the framework will help us to
+keep improving the quality of the code.
 
 Please keep in mind that this is still EXPERIMENTAL SOFTWARE. It may
 BURN YOUR HARD DISK, DESTROY ALL YOUR DATA and even GO OUT WITH YOUR
 WIFE/HUSBAND. :)
 
-If you find a bug, please send us a bug report to
+If you find a bug, please send us a bug report to bugs@edumips.org.
 
-	edumips64-devel@lists.sourceforge.net (requires subscription)
+If you use the simulator, please consider subscribing to the low-traffic
+mailing-list edumips64-devel@lists.sourceforge.net, and help us by giving us
+suggestions and sending bug reports. Thanks!
 
-If you don't want to subscribe, send the bug report to bugs@edumips.org.
-But if you use EduMIPS64, please consider subscribing and helping us with
-testing and bug reports. Thanks!
+EduMIPS64 is now hosted on GitHub (www.github.com/lupino3/edumips64), and we
+have a git mirror (that lags a bit) on Google Code
+(http://code.google.com/p/edumips64/). Our web site is www.edumips.org and we
+still use it to communicate with our users. Releases are done on Sourceforge
+(http://sourceforge.net/projects/edumips64) and we also have a development
+blog on http://edumips64.blogspot.com.
 
-New in this release:
-~~~~~~~~~~~~~~~~~~~~
+New in this release since last major version (0.5):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 New functionalities:
 --------------------
-
-- New instructions:
-  * ADD, ADDI, ADDIU, ADDU
-  * DIV, DIVU
-  * MULT, MULTU
-  * SLL, SLLV, SRA, SRAV, SRL, SRLV
-  * SUB, SUBU
-  * B, BGEZ
-  * DADDIU, DMULTU, DDIVU
-- Standard MIPS aliases for the first 32 registers
-- Visualization of LO and HI registers
-- Jarfile compiled under Java 6 works with Java 5
-- Clear button for the I/O window
+- Floating Point Unit support (max83t)
+- Added unit test framework and some unit tests and regression tests (andrea)
+- Embedded JavaHelp viewer (andrea)
+- Added Splash Screen (visible with Java6+, not shown with Java5) (andrea,
+  vanni)
+- Added the MIPS alias to each register's name in the Registers window (andrea)
 
 Fixed bugs:
 -----------
+- Issue #2 (Misaligned memory operations are not handled correctly) (andrea)
+- Issue #8 (Weird GUI under Mac OS X) and #9 (Incorrect behavior of
+  MOVN and MOVZ) (andrea)
+- Issue #10 (Random freeze when executing SYSCALL 5 under Java 7) (andrea)
+- Issue #14 (ant javadoc not working) (andrea)
+- Data/code window label fixes (andrea):
+  . added labels to the Data frame; 
+  . fixed Data and Code default column widths so that they can be read;
+  . added real-time language change support for Data/Code column labels.
+- Fixed a bug that disallowed access to odd memory locations from the code
+  (odd labels were not correctly parsed). (andrea)
+- Fixed a bug about a stall for synchronous exceptions and forwarding (max83t)
+- Fixed Java 6 Swing bug (andrea)
+- Fixed ReportDialog bug (mancausoft)
+- Fixed aligned read/write with labels (andrea)
+- Fixed MIPS32 alias visualization (thegoodgiant)
+- Updated embedded manual with a SYSCALL page (jesky)
+- Parser bug fixes (mancausoft)
+- Memory bug fixes (mancausoft)
+- Fixed Jump-after-Break bug (andrea)
+- Fixed OSX issues (mancausoft)
 
-- Dinero Tracefile is correctly saved
-- LUI bug
-- Out-of-sync GUI in the last execution step
-- Locale bugfixes
-- DSRAV bug
-- Error dialog bug
-- Parser bugs
-- SYSCALL various bugs
-
-Known bugs:
------------
-Changing the language, you may notice that some labels aren't updated correctly.
-
-Maybe the parser will have problems if it gets as its input a file that is not
-encoded using ISO-8859-1
+Misc improvements:
+------------------
+- Converted the TeX docs to RST, so that the same sources can be used for
+  the PDF manual and for the newly-embedded JavaHelp viewer (andrea)
+- Manual fixes (jesky)
+- Added debug info to svnjar (mancausoft)
+- Removed GUI Log viewer, the debug messages now go to stdout (andrea)

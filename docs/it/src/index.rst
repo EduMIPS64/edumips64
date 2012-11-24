@@ -36,7 +36,7 @@ delle opzioni da linea di comando.
 
 Il quinto capitolo contiene alcune esempi pratici di utilizzo del simulatore.
 
-Questo manuale si riferisce ad EduMIPS64 versione 0.5.3.
+Questo manuale si riferisce ad EduMIPS64 versione 1.0.
 
 .. toctree::
    :maxdepth: 2
