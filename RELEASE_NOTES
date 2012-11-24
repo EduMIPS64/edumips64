@@ -63,6 +63,7 @@ Fixed bugs:
   MOVN and MOVZ) (andrea)
 - Issue #10 (Random freeze when executing SYSCALL 5 under Java 7) (andrea)
 - Issue #14 (ant javadoc not working) (andrea)
+- Issue #15 (Make debug mode change verbosity)
 - Data/code window label fixes (andrea):
   . added labels to the Data frame; 
   . fixed Data and Code default column widths so that they can be read;

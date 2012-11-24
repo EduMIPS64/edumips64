@@ -139,16 +139,14 @@ public class Main extends JApplet {
             }
         }
 
-        Logger rootLogger = Logger.getLogger("inucus");
 
         if(!debug_mode) {
-            // Clear up the default handlers of the root logger
+            // Disable logging by manipulating the root logger.
+            Logger rootLogger = log.getParent();
             for(Handler h : rootLogger.getHandlers()) {
-                rootLogger.removeHandler(h);
+                h.setLevel(java.util.logging.Level.OFF);
             }
         }
-        rootLogger.setLevel(java.util.logging.Level.FINE);
-
         System.out.println("EduMIPS64 version " + VERSION + " (codename: " + CODENAME + ") - Ciao 'mbare.\n");
 
         // Creating the main JFrame
