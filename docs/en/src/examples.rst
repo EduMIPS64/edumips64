@@ -1,7 +1,7 @@
 Code Examples
 =============
 In this chapter you'll find some sample listings that will be useful in
-order to understand how EduMIPS64 (version 0.5.3) works.
+order to understand how EduMIPS64 works.
 
 SYSCALL
 -------
