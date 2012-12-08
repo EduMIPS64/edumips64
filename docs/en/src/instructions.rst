@@ -358,9 +358,9 @@ List of I-Type flow control instructions:
 
   Jumps to offset if rs is not equal to rt.
 
-* `BNEZ rs`
+* `BNEZ rs, offset`
 
-  Jumps to offset if rs is not equal to zero.\\
+  Jumps to offset if rs is not equal to zero.
 
 ..	\WARN
 

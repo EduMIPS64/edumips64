@@ -453,7 +453,7 @@ Ed ecco le istruzioni di controllo del flusso di tipo I:
 
   Salta ad offset se rs non è uguale ad rt.
 
-* `BNEZ rs`
+* `BNEZ rs, offset`
 
   Salta ad offset se rs non è uguale a zero.
 
