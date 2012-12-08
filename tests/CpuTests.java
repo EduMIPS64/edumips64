@@ -88,6 +88,12 @@ public class CpuTests {
         runMipsTest("tests/data/break.s");
     }
 
+    /* Test for r0 */
+    @Test
+    public void testR0() throws Exception {
+        runMipsTest("tests/data/zero.s");
+    }
+
     /* Test for instruction B */
     @Test
     public void testB() throws Exception {
