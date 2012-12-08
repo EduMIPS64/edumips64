@@ -66,7 +66,7 @@ class CVT_L_D extends FPConversionFCSRInstructions {
 			}
 		}
 		//writing the long value into a temporary integer register in order to obtain the binary value
-		Register tmp= new Register();
+		Register tmp= new Register("tmp-CVT.L.D");
 		tmp.writeDoubleWord(bi.longValue());
 		TRfp[FD_FIELD].setBits(tmp.getBinString(),0);
 		if(enableForwarding) {

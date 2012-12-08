@@ -25,6 +25,8 @@
 
 package edumips64.core.is;
 
+import java.util.logging.Logger;
+
 import edumips64.core.*;
 import edumips64.utils.*;
 
@@ -33,12 +35,15 @@ import edumips64.utils.*;
  * @author  Trubia Massimo, Russo Daniele
  */
 public abstract class Loading extends LDSTInstructions {
+    protected static final Logger logger = Logger.getLogger(Loading.class.getName());
 
     public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException {
         //if the base register is valid ...
         Register base=cpu.getRegister(params.get(BASE_FIELD));
-        if(base.getWriteSemaphore()>0)
+        if(base.getWriteSemaphore()>0) {
+            logger.info("RAW in " + fullname + ": base register still needs to be written to.");
             throw new RAWException();
+        }
         //calculating  address (base+offset)
         long address = base.getValue() + params.get(OFFSET_FIELD);
         //saving address into a temporary register

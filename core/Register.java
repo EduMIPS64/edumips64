@@ -25,6 +25,8 @@
  */
 package edumips64.core;
 
+import java.util.logging.Logger;
+
 import edumips64.utils.*;
 
 
@@ -34,11 +36,17 @@ import edumips64.utils.*;
 public class Register extends BitSet64 {
 	private int writeSemaphore;
 	private int readSemaphore;
+    private String reg_name;
 
-	/** Creates a default new instance of Register. */
-	public Register(){
+    public final static Logger logger = Logger.getLogger(Register.class.getName());
+
+	/** Creates a new instance of Register. 
+     *  @param name name of the register (for debugging purposes).
+     */
+	public Register(String name){
 		writeSemaphore = 0;
 		readSemaphore = 0;
+        reg_name = name;
 	}
 	
 	/** Returns the value of the semaphore
@@ -59,12 +67,14 @@ public class Register extends BitSet64 {
 	 */
 	public void incrReadSemaphore() {
 		readSemaphore++;
+        logger.info("Incremented read semaphore for " + reg_name + ": " + readSemaphore);
 	}
 	
 	/** Increments the value of the semaphore
 	 */
 	public void incrWriteSemaphore() {
 		writeSemaphore++;
+        logger.info("Incremented write semaphore for " + reg_name + ": " + writeSemaphore);
 	}
 
 	/** Decrements the value of the semaphore.
@@ -75,6 +85,7 @@ public class Register extends BitSet64 {
 	public void decrWriteSemaphore() {
 		if(--writeSemaphore < 0)
 			throw new RuntimeException();
+        logger.info("Decremented write semaphore for " + reg_name + ": " + writeSemaphore);
 	}
 
 	/** Decrements the value of the semaphore.
@@ -85,6 +96,7 @@ public class Register extends BitSet64 {
 	public void decrReadSemaphore() {
 		if(--readSemaphore < 0)
 			throw new RuntimeException();
+        logger.info("Decremented read semaphore for " + reg_name + ": " + writeSemaphore);
 	}
 
 	/** Returns the signed numeric decimal value stored in this register.
@@ -127,10 +139,10 @@ public class Register extends BitSet64 {
 		java.math.BigInteger big = new java.math.BigInteger("1001", 2);
 		System.out.println(big);
 		for(Register r : reg){
-			r = new Register();
+			r = new Register("test");
 		}
 	
-		Register r1 = new Register();
+		Register r1 = new Register("test");
 		long v = -1*(long)(Math.pow(2.0, 63.0));
 		r1.writeDoubleWord(v);
 		System.out.println("String: " + r1.getBinString());

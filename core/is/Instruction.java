@@ -67,7 +67,7 @@ public abstract class Instruction {
 	//initialization of temporary registers
 	for(int i=0;i<TR.length;i++)
 	{
-		TR[i]=new Register();
+		TR[i]=new Register("TR " + i + "(Instruction " + serialNumber +")");
 		TRfp[i]=new RegisterFP();
 	}
     }

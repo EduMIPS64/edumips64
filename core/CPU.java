@@ -113,11 +113,11 @@ public class CPU {
 		gpr = new Register[32];
 		gpr[0] = new R0();
 		for(int i=1;i<32;i++)
-			gpr[i] = new Register();
-		pc = new Register();
-		old_pc = new Register();
-		LO=new Register();
-		HI=new Register();
+			gpr[i] = new Register("R" + i);
+		pc = new Register("PC");
+		old_pc = new Register("Old PC");
+		LO=new Register("LO");
+		HI=new Register("HI");
 		
 		//Floating point registers initialization
 		fpr=new RegisterFP[32];
@@ -432,6 +432,7 @@ public class CPU {
 			throw new StoppedCPUException();
 		try {
 			logger.info("Starting cycle " + ++cycles + "\n---------------------------------------------");
+			logger.info("WB STAGE: " + pipe.get(PipeStatus.WB) + "\n================================");
 			currentPipeStatus = PipeStatus.WB; 
 
 			// Let's execute the WB() method of the instruction located in the 
@@ -461,18 +462,22 @@ public class CPU {
 			// We put null in WB, in order to avoid that an exception thrown in
 			// the next instruction leaves the already completed instruction in
 			// the WB pipeline state
+            logger.info("Instruction " + pipe.get(PipeStatus.WB) + " has been completed");
 			pipe.put(PipeStatus.WB, null);
 			
 			// MEM
+			logger.info("MEM STAGE: " + pipe.get(PipeStatus.MEM) + "\n================================");
 			currentPipeStatus = PipeStatus.MEM;
 			if(pipe.get(PipeStatus.MEM)!=null)
 				pipe.get(PipeStatus.MEM).MEM();
+            logger.info("Moving " + pipe.get(PipeStatus.MEM) + " to WB");
 			pipe.put(PipeStatus.WB, pipe.get(PipeStatus.MEM));
 			pipe.put(PipeStatus.MEM,null);
 			
 			//if there will be a stall because a lot of instructions would fill the MEM stage, the EX() method cannot be called
 			//because the integer instruction in EX cannot be moved
 			// EX
+			logger.info("EX STAGE: " + pipe.get(PipeStatus.EX) + "\n================================");
 		if(fpPipe.getInstruction(SIMUL_MODE_ENABLED)==null) {
 			try {
 				// Handling synchronous exceptions
@@ -493,6 +498,7 @@ public class CPU {
                         syncex = e.getCode();
 				}
 			}
+            logger.info("Moving " + pipe.get(PipeStatus.EX) + " to MEM");
 			pipe.put(PipeStatus.MEM, pipe.get(PipeStatus.EX));
 			pipe.put(PipeStatus.EX,null);
 		} else {
@@ -523,6 +529,7 @@ public class CPU {
                         syncex = e.getCode();
 					}
 				}
+                logger.info("Moving " + instr + " to MEM");
 				pipe.put(PipeStatus.MEM, instr);
 			}
 			
@@ -530,6 +537,7 @@ public class CPU {
 			fpPipe.step();
 			
 			// ID
+			logger.info("ID STAGE: " + pipe.get(PipeStatus.ID) + "\n================================");
 			currentPipeStatus = PipeStatus.ID;
 			if(pipe.get(PipeStatus.ID)!=null) {
 				//if an FP instruction fills the ID stage a checking for InputStructuralStall must be performed before the ID() invocation.
@@ -556,6 +564,7 @@ public class CPU {
 					if(pipe.get(PipeStatus.EX)==null || /*testing*/ pipe.get(PipeStatus.EX).getName().compareTo(" ")==0) {
 						if(fpPipe.isEmpty() || (!fpPipe.isEmpty()/* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/))
 							pipe.get(PipeStatus.ID).ID();
+                        logger.info("Moving " + pipe.get(PipeStatus.ID) + " to EX");
 						pipe.put(PipeStatus.EX,pipe.get(PipeStatus.ID));
 						pipe.put(PipeStatus.ID,null);
 					}
@@ -570,6 +579,7 @@ public class CPU {
 			}
 			
 			// IF
+			logger.info("IF STAGE: " + pipe.get(PipeStatus.IF) + "\n================================");
 			// We don't have to execute any methods, but we must get the new
 			// instruction from the symbol table.
 			currentPipeStatus = PipeStatus.IF;
@@ -583,7 +593,9 @@ public class CPU {
 						logger.info("breaking = 1");
 					}
 				}
+                logger.info("Moving " + pipe.get(PipeStatus.IF) + " to ID");
 				pipe.put(PipeStatus.ID, pipe.get(PipeStatus.IF));
+                logger.info("Fetched new instruction " + mem.getInstruction(pc) + " into IF");
 				pipe.put(PipeStatus.IF, mem.getInstruction(pc));
 				old_pc.writeDoubleWord((pc.getValue()));
 				pc.writeDoubleWord((pc.getValue())+4);
@@ -597,9 +609,6 @@ public class CPU {
 			}
 			if(syncex != null)
 				throw new SynchronousException(syncex);
-			
-			logger.info("\n"+cpu.getStatus());
-
 		} catch(JumpException ex) {
             try {
                 if(pipe.get(PipeStatus.IF) != null) //rispetto a dimips scambia le load con le IF
@@ -812,6 +821,9 @@ public class CPU {
 	/** Private class, representing the R0 register */
 	// TODO: DEVE IMPOSTARE I SEMAFORI?????
 	private class R0 extends Register {
+        public R0() {
+            super("R0");
+        }
 		public long getValue() {
 			return (long)0;
 		}

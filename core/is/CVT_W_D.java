@@ -66,7 +66,7 @@ class CVT_W_D extends FPConversionFCSRInstructions {
 			}
 		}
 		//writing the int value into a temporary integer register in order to obtain the binary value
-		Register tmp= new Register();
+		Register tmp= new Register("tmp-CVT.W.D");
 		tmp.writeWord(bi.intValue());
 		TRfp[FD_FIELD].setBits(tmp.getBinString(),0);
 		if(enableForwarding) {
