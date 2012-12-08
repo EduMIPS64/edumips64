@@ -29,6 +29,7 @@ import edumips64.core.is.Instruction;
 import edumips64.core.CPU;
 
 import java.util.*;
+import java.util.logging.Logger;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
@@ -39,6 +40,7 @@ import java.awt.event.*;
 */
 public class GUIConfig extends JDialog{
 
+    private static final Logger logger = Logger.getLogger(GUIConfig.class.getName());
 	String MAIN;
 	String APPEARANCE;
 	String FPUEXCEPTIONS;
@@ -304,13 +306,13 @@ public class GUIConfig extends JDialog{
 
 			text.addFocusListener(new FocusAdapter() {
 				public void focusLost(FocusEvent e) {
-					System.out.println("focus");
+					logger.info("focus");
 					updatedMap.put(key,text.getText());
 				}
 			});
 			text.setAction(new AbstractAction() {
 				public void actionPerformed(ActionEvent e) {
-					System.out.println("abstract");
+					logger.info("abstract");
 					updatedMap.put(key,text.getText());
 				}
 			});
@@ -390,7 +392,7 @@ public class GUIConfig extends JDialog{
 					
 					// Let's verify that we have to reset the CPU
 					if(cpu.getStatus() == CPU.CPUStatus.RUNNING) {
-						System.out.println("Reset");
+						logger.info("Reset");
 						edumips64.Main.resetSimulator(true);
 					}
 				}
