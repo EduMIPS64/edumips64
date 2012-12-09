@@ -54,11 +54,25 @@ public class CpuTests {
         parser = Parser.getInstance();
     }
 
-    /** Runs a MIPS64 test program, raising an exception if it does not succeed.
+    /** Runs a MIPS64 test program with and without forwarding, raising an
+     *  exception if it does not succeed.
      *
      * @param testPath path of the test code.
      */
-    protected CpuTestStatus runMipsTest(String testPath) throws Exception {
+    protected void runMipsTest(String testPath) throws Exception {
+        Instruction.setEnableForwarding(true);
+        executeMipsTest(testPath);
+
+        Instruction.setEnableForwarding(false);
+        executeMipsTest(testPath);
+    }
+
+    /** Executes a MIPS64 program, raising an exception if it does not
+     * succeed.
+     *
+     * @param testPath path of the test code.
+     */
+    protected CpuTestStatus executeMipsTest(String testPath) throws Exception {
         try {
             try {
                 parser.parse(testPath);
@@ -129,11 +143,11 @@ public class CpuTests {
         CpuTestStatus temp;
 
         Instruction.setEnableForwarding(true);
-        temp = runMipsTest(path);
+        temp = executeMipsTest(path);
         Assert.assertEquals(cycles_with_forwarding, temp.cycles);
 
         Instruction.setEnableForwarding(false);
-        temp = runMipsTest(path);
+        temp = executeMipsTest(path);
         Assert.assertEquals(cycles_without_forwarding, temp.cycles);
     }
 
