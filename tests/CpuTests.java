@@ -162,6 +162,7 @@ public class CpuTests {
         
         // Tests taken from Hennessy & Patterson, Appendix A
         runForwardingTest("tests/data/forwarding-hp-pA16.s", 11, 13);
+        runForwardingTest("tests/data/forwarding-hp-pA18.s", 9, 13);
     }
 
     @Test

@@ -35,20 +35,25 @@ import java.util.logging.Logger;
  */
 public class Storing extends LDSTInstructions {
     protected static final Logger logger = Logger.getLogger(Storing.class.getName());
+    protected Register rt;
 
     public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException 
     {
         //if the base register and the rt register are valid passing value of rt register into a temporary register
         Register base=cpu.getRegister(params.get(BASE_FIELD));
-        Register rt=cpu.getRegister(params.get(RT_FIELD));
+        rt=cpu.getRegister(params.get(RT_FIELD));
         if(base.getWriteSemaphore()>0) {
             logger.info("RAW in " + fullname + ": base register still needs to be written to.");
             throw new RAWException();
-        } else if (rt.getWriteSemaphore()>0) {
-            logger.info("RAW in " + fullname + ": rt register still needs to be written to.");
-            throw new RAWException();
+        } 
+        
+        if (!enableForwarding) { 
+            if (rt.getWriteSemaphore()>0) {
+                logger.info("RAW in " + fullname + ": rt register still needs to be written to.");
+                throw new RAWException();
+            }
+            TR[RT_FIELD].setBits(rt.getBinString(),0);
         }
-        TR[RT_FIELD].setBits(rt.getBinString(),0);
         //calculating  address (base+offset)
         long address = base.getValue() + params.get(OFFSET_FIELD);
         //saving address into a temporary register

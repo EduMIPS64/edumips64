@@ -47,6 +47,9 @@ class SB extends Storing
     public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
     {
         MemoryElement memEl = memory.getCellByAddress(address); 
+        if (enableForwarding) {
+            TR[RT_FIELD].setBits(rt.getBinString(),0);
+        }
         
         //writing on the memory element the RT register
         memEl.writeByte(TR[RT_FIELD].readByte(0), (int) (address%8));

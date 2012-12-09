@@ -50,6 +50,9 @@ class SH extends Storing
 	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, NotAlignException, AddressErrorException, IrregularWriteOperationException
 	{ 
         MemoryElement memEl = memory.getCellByAddress(address); 
+        if (enableForwarding) {
+            TR[RT_FIELD].setBits(rt.getBinString(),0);
+        }
         
         //writing on the memory element the RT register
         memEl.writeHalf(TR[RT_FIELD].readHalf(0), (int) (address%8));
