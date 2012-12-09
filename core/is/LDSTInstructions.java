@@ -60,6 +60,8 @@ public abstract class LDSTInstructions extends Instruction {
     // Memory address with which the instruction is operating
     protected long address;
 
+    protected MemoryElement memEl;
+
     String OPCODE_VALUE="";
     public LDSTInstructions()
     {	
@@ -100,7 +102,13 @@ public abstract class LDSTInstructions extends Instruction {
         dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)), memoryOpSize);
     };
 
-    public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {};
+    // This is the method that actually stores/loads data to/from memory, and
+    // that is different for each concrete sub-class
+    public abstract void doMEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
+
+    // Does the necessary operations (e.g., forwarding) before and after the
+    // execution of doMEM();
+    public abstract void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
     public void WB() throws IrregularStringOfBitsException {};
     public void pack() throws IrregularStringOfBitsException
     {

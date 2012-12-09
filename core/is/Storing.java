@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  *
  * @author Massimo
  */
-public class Storing extends LDSTInstructions {
+public abstract class Storing extends LDSTInstructions {
     protected static final Logger logger = Logger.getLogger(Storing.class.getName());
     protected Register rt;
 
@@ -59,6 +59,21 @@ public class Storing extends LDSTInstructions {
         //saving address into a temporary register
         TR[OFFSET_PLUS_BASE].writeDoubleWord(address);        
     }
+
+	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, NotAlignException, AddressErrorException, IrregularWriteOperationException
+	{ 
+        memEl = memory.getCellByAddress(address); 
+        if (enableForwarding) {
+            TR[RT_FIELD].setBits(rt.getBinString(),0);
+        }
+
+        doMEM();
+        
+        if(enableForwarding)
+        {
+            WB();
+        }
+	}
 
     public static void main (String args[])
     {

@@ -45,16 +45,9 @@ class LBU extends Loading
         this.memoryOpSize = 1;
     }
 
-    public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
+    public void doMEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
     { 
-        MemoryElement memEl = memory.getCellByAddress(address); 
-
         //reading first 8 low bits from the memory element and saving values on LMD register with zero padding
-        int read = memEl.readByteUnsigned((int)(address%8));
-        TR[LMD_REGISTER].writeByteUnsigned(read);
-        if(enableForwarding)
-        {
-            doWB();
-        }
+        TR[LMD_REGISTER].writeByteUnsigned(memEl.readByteUnsigned((int)(address%8)));
     }        
 }

@@ -46,14 +46,8 @@ class SW extends Storing
     }
 
 
-    public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, NotAlignException, AddressErrorException, IrregularWriteOperationException
+    public void doMEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, NotAlignException, AddressErrorException, IrregularWriteOperationException
     { 
-        MemoryElement memEl = memory.getCellByAddress(address); 
-        if (enableForwarding) {
-            TR[RT_FIELD].setBits(rt.getBinString(),0);
-        }
-        
-        //writing on the memory element the RT register
         memEl.writeWord(TR[RT_FIELD].readWord(0), (int) (address%8));
     }
 }

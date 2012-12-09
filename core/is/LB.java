@@ -45,15 +45,8 @@ class LB extends Loading
         this.memoryOpSize = 1;
     }
 
-    public  void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
+    public void doMEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
     { 
-        MemoryElement memEl = memory.getCellByAddress(address); 
-
-        //reading from the memory element and saving values on LMD register
         TR[LMD_REGISTER].writeByte(memEl.readByte((int)(address%8)));
-        if(enableForwarding)
-        {
-            doWB();
-        }
     }        
 }

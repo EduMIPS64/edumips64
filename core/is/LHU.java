@@ -45,15 +45,9 @@ class LHU extends Loading
         this.memoryOpSize = 2;
     }
 
-    public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
+    public void doMEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
     { 
-        MemoryElement memEl = memory.getCellByAddress(address); 
-
         //reading from the memory element and saving values on LMD register
         TR[LMD_REGISTER].writeHalfUnsigned(memEl.readHalfUnsigned((int)(address%8)));
-        if(enableForwarding)
-        {
-            doWB();
-        }
     }        
 }

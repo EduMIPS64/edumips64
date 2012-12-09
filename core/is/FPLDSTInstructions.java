@@ -52,6 +52,10 @@ import edumips64.utils.*;
         repr.setBits(Converter.intToBin(FT_FIELD_LENGTH,params.get(FT_FIELD)),FT_FIELD_INIT);
         repr.setBits(Converter.intToBin(OFFSET_FIELD_LENGTH,params.get(OFFSET_FIELD)),OFFSET_FIELD_INIT);
     }
+
+    // FP Instructions don't use the doMEM method, let's provide an empty
+    // implementation.
+    public void doMEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {};
      
 }
 

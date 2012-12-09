@@ -59,6 +59,15 @@ public abstract class Loading extends LDSTInstructions {
             doWB();
     }
 
+    public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+        memEl = memory.getCellByAddress(address); 
+        doMEM();
+        if(enableForwarding)
+        {
+            doWB();
+        }
+    }
+
     public void doWB() throws IrregularStringOfBitsException
     {
         //passing memory value from temporary LMD register to the destination register and unlocking it
