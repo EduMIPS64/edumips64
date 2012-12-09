@@ -124,19 +124,35 @@ public class CpuTests {
         runMipsTest("tests/data/memtest.s");
     }
 
+    private void runForwardingTest(String path, int cycles_with_forwarding, 
+                                   int cycles_without_forwarding) throws Exception {
+        CpuTestStatus temp;
+
+        Instruction.setEnableForwarding(true);
+        temp = runMipsTest(path);
+        Assert.assertEquals(cycles_with_forwarding, temp.cycles);
+
+        Instruction.setEnableForwarding(false);
+        temp = runMipsTest(path);
+        Assert.assertEquals(cycles_without_forwarding, temp.cycles);
+    }
+
     /* Forwarding test. The number of cycles is hardcoded and depends on the
      * contents of forwarding.s */
     @Test
     public void testForwarding() throws Exception {
         CpuTestStatus temp;
 
-        Instruction.setEnableForwarding(true);
-        temp = runMipsTest("tests/data/forwarding.s");
-        Assert.assertEquals(temp.cycles, 16);
+        // Simple test.
+        runForwardingTest("tests/data/forwarding.s", 16, 19);
+        
+        // Tests taken from Hennessy & Patterson, Appendix A
+        runForwardingTest("tests/data/forwarding-hp-pA16.s", 11, 13);
+    }
 
-        Instruction.setEnableForwarding(false);
-        temp = runMipsTest("tests/data/forwarding.s");
-        Assert.assertEquals(temp.cycles, 19);
+    @Test
+    public void storeAfterLoad() throws Exception {
+        runMipsTest("tests/data/store-after-load.s");
     }
 
     /* ------- REGRESSION TESTS -------- */
