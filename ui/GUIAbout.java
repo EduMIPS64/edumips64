@@ -45,7 +45,7 @@ public class GUIAbout extends JDialog implements Runnable  {
 
 	static String members[] = 
 	{ 
-		"EduMips64 Project",
+		"EduMIPS64 Project",
 			"http://www.edumips.org",
 			"MIPS64 Instruction set simulator",
 		" ",	
