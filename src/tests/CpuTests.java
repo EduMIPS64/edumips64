@@ -26,6 +26,8 @@ package edumips64.tests;
 import edumips64.core.*;
 import edumips64.core.is.*;
 
+import java.util.Map;
+import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
@@ -53,19 +55,7 @@ public class CpuTests {
         cpu = CPU.getInstance();
         cpu.setStatus(CPU.CPUStatus.READY);
         parser = Parser.getInstance();
-    }
-
-    /** Runs a MIPS64 test program with and without forwarding, raising an
-     *  exception if it does not succeed.
-     *
-     * @param testPath path of the test code.
-     */
-    protected void runMipsTest(String testPath) throws Exception {
         Instruction.setEnableForwarding(true);
-        executeMipsTest(testPath);
-
-        Instruction.setEnableForwarding(false);
-        executeMipsTest(testPath);
     }
 
     /** Executes a MIPS64 program, raising an exception if it does not
@@ -73,7 +63,7 @@ public class CpuTests {
      *
      * @param testPath path of the test code.
      */
-    protected CpuTestStatus executeMipsTest(String testPath) throws Exception {
+    protected CpuTestStatus runMipsTest(String testPath) throws Exception {
         testPath = testsLocation + testPath;
         try {
             try {
@@ -97,6 +87,36 @@ public class CpuTests {
             cpu.reset();
         }
     }
+
+    /** Runs a MIPS64 test program with and without forwarding, raising an
+     *  exception if it does not succeed.
+     *
+     * @param testPath path of the test code.
+     * @return a dictionary that maps the forwarding status to the
+     * corresponding CpuTestStatus object.
+     */
+    protected Map<Boolean, CpuTestStatus> runMipsTestWithAndWithoutForwarding(String testPath) throws Exception {
+        boolean forwardingStatus = Instruction.getEnableForwarding();
+        Map<Boolean, CpuTestStatus> statuses = new HashMap<Boolean, CpuTestStatus>();
+
+        Instruction.setEnableForwarding(true);
+        statuses.put(true, runMipsTest(testPath));
+
+        Instruction.setEnableForwarding(false);
+        statuses.put(false, runMipsTest(testPath));
+
+        Instruction.setEnableForwarding(forwardingStatus);
+        return statuses;
+    }
+
+    private void runForwardingTest(String path, int cycles_with_forwarding, 
+                                   int cycles_without_forwarding) throws Exception {
+        Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding(path);
+
+        Assert.assertEquals(cycles_with_forwarding, statuses.get(true).cycles);
+        Assert.assertEquals(cycles_without_forwarding, statuses.get(false).cycles);
+    }
+
 
     /* Test for the instruction BREAK */
     @Test(expected = BreakException.class)
@@ -138,19 +158,6 @@ public class CpuTests {
     @Test
     public void testMemory() throws Exception {
         runMipsTest("memtest.s");
-    }
-
-    private void runForwardingTest(String path, int cycles_with_forwarding, 
-                                   int cycles_without_forwarding) throws Exception {
-        CpuTestStatus temp;
-
-        Instruction.setEnableForwarding(true);
-        temp = executeMipsTest(path);
-        Assert.assertEquals(cycles_with_forwarding, temp.cycles);
-
-        Instruction.setEnableForwarding(false);
-        temp = executeMipsTest(path);
-        Assert.assertEquals(cycles_without_forwarding, temp.cycles);
     }
 
     /* Forwarding test. The number of cycles is hardcoded and depends on the
