@@ -26,7 +26,14 @@ If you need to run unit tests, or build the javadoc, you will also need:
 Main Ant targets
 ----------------
 
-* `jar` builds the jar package named edumips64-`version`.jar
+* `standalone-jar` builds the jar package named edumips64-`version`.jar, that
+  embeds the JavaHelp libraries, and is oriented towards users downloading the
+  JAR archive from the website (not through package managers).
+
+* `slim-jar` builds the jar package named edumips64-`version`-nodeps.jar, that
+  does not embed the JavaHelp libraries and is oriented towards distribution
+  package creators, that should add a dependency on JavaHelp and appropriately
+  set the classpath in their scripts.
 
 * `docs` builds the user documentation (both in-app HTML and PDF)
 
@@ -36,9 +43,9 @@ Main Ant targets
 * `tests` runs unit tests; it depends on junit4.jar being added to the
   CLASSPATH environment variable
 
-* `debugjar` builds a jar package that contains more debug information
+* `debug-jar` builds a jar package that contains more debug information
 
-* `clijar` build a jar package containing an experimental CLI front-end
+* `cli-jar` build a jar package containing an experimental CLI front-end
 
 * `src-release` builds a tar.bz2 file containing the source distribution
 
