@@ -21,7 +21,7 @@
         <!-- Set build file properties -->
         <property name="sourceDir" value="src/" />
 		<property name="version" value="1.0" />
-		<property name="outputDir" value="edumips" />
+		<property name="outputDir" value="build" />
 		<property name="javadocDir" value="javadoc" />
 
         <!-- Access the environment -->
@@ -112,7 +112,7 @@
         </exec>
     </target>
 
-    <!-- *** tests *** run unit tests-->
+    <!-- *** test *** run unit tests-->
     <target name="test" depends="mkdirs">
         <javac
             target="5"
@@ -137,6 +137,7 @@
                 <formatter type="plain" usefile="false"/>
             </test>
         </junit>
+        <delete dir="${outputDir}" />
     </target>
 
     <!-- *** standalone-jar *** compile without debug information, with embedded javahelp -->
