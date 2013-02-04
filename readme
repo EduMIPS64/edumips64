@@ -40,8 +40,8 @@ Main Ant targets
 * `clean` removes the jar files, the build directory and the compiled
   documentation
 
-* `tests` runs unit tests; it depends on junit4.jar being added to the
-  CLASSPATH environment variable
+* `test` runs unit tests; it depends on junit4.jar being added to the
+  classpath
 
 * `debug-jar` builds a jar package that contains more debug information
 

@@ -19,7 +19,7 @@
 <project name="edumips64" default="standalone-jar" basedir=".">
 	<target name="init">
         <!-- Set build file properties -->
-		<property name="sourceDir" value="." />
+        <property name="sourceDir" value="src/" />
 		<property name="version" value="1.0" />
 		<property name="outputDir" value="edumips" />
 		<property name="javadocDir" value="javadoc" />
@@ -113,7 +113,7 @@
     </target>
 
     <!-- *** tests *** run unit tests-->
-    <target name="tests" depends="mkdirs">
+    <target name="test" depends="mkdirs">
         <javac
             target="5"
             srcdir="${sourceDir}"
@@ -152,7 +152,7 @@
 
         <property name="jar_filename" value="${standalone_jar_filename}" />
         <property name="main_class" value="edumips64.Main" />
-        <property name="splash_img" value="edumips64/img/splash.png"/>
+        <property name="splash_img" value="${sourceDir}/img/splash.png"/>
 
         <antcall target="copy-base-files" />
         <antcall target="copy-help-files" />
@@ -173,13 +173,13 @@
 
         <property name="jar_filename" value="${applet_jar_filename}" />
         <property name="main_class" value="edumips64.Main" />
-        <property name="splash_img" value="edumips64/img/splash.png"/>
+        <property name="splash_img" value="${sourceDir}/img/splash.png"/>
 
         <antcall target="copy-base-files" />
         <antcall target="copy-help-files" />
         <antcall target="copy-help-libs" />
         <antcall target="make-jarfile" />
-        <signjar jar="${applet_jar_filename}" keystore="key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
+        <signjar jar="${applet_jar_filename}" keystore="utils/key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
 	</target>
 
     <!-- *** slim-jar *** compile without debug information and without javahelp. -->
@@ -195,7 +195,7 @@
 
         <property name="jar_filename" value="${slim_jar_filename}" />
         <property name="main_class" value="edumips64.Main" />
-        <property name="splash_img" value="edumips64/img/splash.png"/>
+        <property name="splash_img" value="${sourceDir}/img/splash.png"/>
 
         <antcall target="copy-help-files" />
         <antcall target="make-jarfile" />
@@ -216,7 +216,7 @@
 
         <property name="jar_filename" value="${debug_jar_filename}" />
         <property name="main_class" value="edumips64.Main" />
-        <property name="splash_img" value="edumips64/img/splash.png"/>
+        <property name="splash_img" value="${sourceDir}/img/splash.png"/>
 
         <antcall target="copy-help-files" />
         <antcall target="copy-help-libs" />
@@ -288,12 +288,12 @@
     </target>
     <target name="copy-base-files">
 		<copy todir="${outputDir}/edumips64/img">
-			<fileset dir="img">
+            <fileset dir="${sourceDir}/img">
 				<include name="**/*.png" />
 			</fileset>
 		</copy>
 		<copy todir="${outputDir}/edumips64/utils">
-			<fileset dir="utils">
+            <fileset dir="${sourceDir}/utils">
 				<include name="**/*.properties" />
 			</fileset>
 		</copy>

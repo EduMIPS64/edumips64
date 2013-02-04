@@ -35,6 +35,7 @@ import static org.junit.Assert.assertTrue;
 public class CpuTests {
     protected CPU cpu;
     protected Parser parser;
+    public static String testsLocation = "src/tests/data/";
 
     /** Class that holds the parts of the CPU status that need to be tested
      * after the execution of a test case.
@@ -73,6 +74,7 @@ public class CpuTests {
      * @param testPath path of the test code.
      */
     protected CpuTestStatus executeMipsTest(String testPath) throws Exception {
+        testPath = testsLocation + testPath;
         try {
             try {
                 parser.parse(testPath);
@@ -99,43 +101,43 @@ public class CpuTests {
     /* Test for the instruction BREAK */
     @Test(expected = BreakException.class)
     public void testBREAK() throws Exception {
-        runMipsTest("tests/data/break.s");
+        runMipsTest("break.s");
     }
 
     /* Test for r0 */
     @Test
     public void testR0() throws Exception {
-        runMipsTest("tests/data/zero.s");
+        runMipsTest("zero.s");
     }
 
     /* Test for instruction B */
     @Test
     public void testB() throws Exception {
-        runMipsTest("tests/data/b.s");
+        runMipsTest("b.s");
     }
 
     /* Test for the instruction JAL */
     @Test
     public void testJAL() throws Exception {
-        runMipsTest("tests/data/jal.s");
+        runMipsTest("jal.s");
     }
 
     /* Test for utils/strlen.s */
     @Test
     public void testStrlen() throws Exception {
-        runMipsTest("tests/data/test-strlen.s");
+        runMipsTest("test-strlen.s");
     }
 
     /* Test for utils/strcmp.s */
     @Test
     public void testStrcmp() throws Exception {
-        runMipsTest("tests/data/test-strcmp.s");
+        runMipsTest("test-strcmp.s");
     }
 
     /* Tests for the memory */
     @Test
     public void testMemory() throws Exception {
-        runMipsTest("tests/data/memtest.s");
+        runMipsTest("memtest.s");
     }
 
     private void runForwardingTest(String path, int cycles_with_forwarding, 
@@ -158,73 +160,73 @@ public class CpuTests {
         CpuTestStatus temp;
 
         // Simple test.
-        runForwardingTest("tests/data/forwarding.s", 16, 19);
+        runForwardingTest("forwarding.s", 16, 19);
         
         // Tests taken from Hennessy & Patterson, Appendix A
-        runForwardingTest("tests/data/forwarding-hp-pA16.s", 11, 13);
-        runForwardingTest("tests/data/forwarding-hp-pA18.s", 9, 13);
+        runForwardingTest("forwarding-hp-pA16.s", 11, 13);
+        runForwardingTest("forwarding-hp-pA18.s", 9, 13);
     }
 
     @Test
     public void storeAfterLoad() throws Exception {
-        runMipsTest("tests/data/store-after-load.s");
+        runMipsTest("store-after-load.s");
     }
 
     /* ------- REGRESSION TESTS -------- */
     /* Issue #7 */
     @Test
     public void testMovnIssue7() throws Exception {
-        runMipsTest("tests/data/movn-issue-7.s");
+        runMipsTest("movn-issue-7.s");
     }
 
     @Test
     public void testMovzIssue7() throws Exception {
-        runMipsTest("tests/data/movz-issue-7.s");
+        runMipsTest("movz-issue-7.s");
     }
 
     /* Issue #2: Misaligned memory operations are not handled correctly */
     @Test(expected = NotAlignException.class)
     public void testMisalignLD() throws Exception {
-        runMipsTest("tests/data/misaligned-ld.s");
+        runMipsTest("misaligned-ld.s");
     }
 
     @Test(expected = NotAlignException.class)
     public void testMisalignSD() throws Exception {
-        runMipsTest("tests/data/misaligned-sd.s");
+        runMipsTest("misaligned-sd.s");
     }
 
     @Test(expected = NotAlignException.class)
     public void testMisalignLW() throws Exception {
-        runMipsTest("tests/data/misaligned-lw.s");
+        runMipsTest("misaligned-lw.s");
     }
 
     @Test(expected = NotAlignException.class)
     public void testMisalignLWU() throws Exception {
-        runMipsTest("tests/data/misaligned-lwu.s");
+        runMipsTest("misaligned-lwu.s");
     }
 
     @Test(expected = NotAlignException.class)
     public void testMisalignSW() throws Exception {
-        runMipsTest("tests/data/misaligned-sw.s");
+        runMipsTest("misaligned-sw.s");
     }
 
     @Test(expected = NotAlignException.class)
     public void testMisalignLH() throws Exception {
-        runMipsTest("tests/data/misaligned-lh.s");
+        runMipsTest("misaligned-lh.s");
     }
 
     @Test(expected = NotAlignException.class)
     public void testMisalignLHU() throws Exception {
-        runMipsTest("tests/data/misaligned-lhu.s");
+        runMipsTest("misaligned-lhu.s");
     }
 
     @Test(expected = NotAlignException.class)
     public void testMisalignSH() throws Exception {
-        runMipsTest("tests/data/misaligned-sh.s");
+        runMipsTest("misaligned-sh.s");
     }
 
     @Test
     public void testAligned() throws Exception {
-        runMipsTest("tests/data/aligned.s");
+        runMipsTest("aligned.s");
     }
 }
