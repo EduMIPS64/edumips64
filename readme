@@ -12,10 +12,10 @@ Requirements
 In order to compile EduMIPS64, you need the following tools:
 - Java JDK version 1.5 or above (tested only with Sun JDK)
 - Apache Ant version 1.8 or above (needed for JUnit 4 tests)
-
-If you need to compile the in-application help, you need:
 - Sphinx (http://sphinx.pocoo.org/) versione 1.0.7 or above
 - GNU Make
+
+The two latter dependencies are needed for the in-application help.
 
 If you need to compile the PDF manual, you will also need:
 - latex / pdflatex
@@ -51,3 +51,9 @@ Main Ant targets
 
 * `javadoc` builds the javadoc documentation (depends on junit4.jar being
   in CLASSPATH); will store it in the `javadoc` directory.
+
+Example
+-------
+
+$ ant jar
+$ java -jar edumips64-1.0.jar
