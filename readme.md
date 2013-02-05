@@ -2,9 +2,15 @@ EduMIPS64 README
 ================
 
 EduMIPS64 is a cross-platform visual MIPS64 CPU simulator written in
-Java/swing. To learn how it works and how to use it, please refer to the
+Java/swing. 
+
+The EduMIPS64 web site is http://www.edumips.org. There is also a 
+developers' blog at http://edumips64.blogspot.com.
+
+To learn how it works and how to use it, please refer to the
 EduMIPS64 User Manual (in the docs/{en,it}/output/latex directory). This file
-is a short guide for developers.
+is a short guide for developers who are interested in compiling the
+simulator from scratch and/or modifying its source code.
 
 Requirements
 ------------
@@ -55,5 +61,6 @@ Main Ant targets
 Example
 -------
 
-$ ant jar
-$ java -jar edumips64-1.0.jar
+    $ ant
+    [... compilation output omitted ...]
+    $ java -jar edumips64-1.0.jar
