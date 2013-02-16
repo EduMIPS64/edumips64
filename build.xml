@@ -19,7 +19,7 @@
 <project name="edumips64" default="standalone-jar" basedir=".">
 	<target name="init">
         <!-- Set build file properties -->
-        <property name="sourceDir" value="src/" />
+        <property name="sourceDir" value="src/org/edumips64/" />
 		<property name="version" value="1.0" />
 		<property name="outputDir" value="build" />
 		<property name="javadocDir" value="javadoc" />
@@ -76,7 +76,7 @@
 		    additionalparam=" -encoding ISO-8859-1"
 		    sourcepath="${sourceDir}/.."
             	    classpath="${base.classpath}:${base.classpath}"
-		    packagenames="edumips64.*"/>
+		    packagenames="org.edumips64.*"/>
 	</target>
 
     <!-- *** docs *** builds all the docs (html, pdf in both languages) -->
@@ -129,7 +129,7 @@
         <junit printsummary="true" haltonfailure="yes" haltonerror="yes">
             <classpath location="${base.classpath}"/>
             <classpath location="${outputDir}"/>
-            <test name="edumips64.tests.CpuTests">
+            <test name="org.edumips64.tests.CpuTests">
                 <formatter type="plain" usefile="false"/>
             </test>
         </junit>
@@ -148,7 +148,7 @@
             nowarn="yes"/>
 
         <property name="jar_filename" value="${standalone_jar_filename}" />
-        <property name="main_class" value="edumips64.Main" />
+        <property name="main_class" value="org.edumips64.Main" />
         <property name="splash_img" value="${sourceDir}/img/splash.png"/>
 
         <antcall target="copy-base-files" />
@@ -169,7 +169,7 @@
             nowarn="yes"/>
 
         <property name="jar_filename" value="${applet_jar_filename}" />
-        <property name="main_class" value="edumips64.Main" />
+        <property name="main_class" value="org.edumips64.Main" />
         <property name="splash_img" value="${sourceDir}/img/splash.png"/>
 
         <antcall target="copy-base-files" />
@@ -191,7 +191,7 @@
             nowarn="yes"/>
 
         <property name="jar_filename" value="${slim_jar_filename}" />
-        <property name="main_class" value="edumips64.Main" />
+        <property name="main_class" value="org.edumips64.Main" />
         <property name="splash_img" value="${sourceDir}/img/splash.png"/>
 
         <antcall target="copy-help-files" />
@@ -212,7 +212,7 @@
             debuglevel="lines,vars,source"/>
 
         <property name="jar_filename" value="${debug_jar_filename}" />
-        <property name="main_class" value="edumips64.Main" />
+        <property name="main_class" value="org.edumips64.Main" />
         <property name="splash_img" value="${sourceDir}/img/splash.png"/>
 
         <antcall target="copy-help-files" />
@@ -220,7 +220,7 @@
         <antcall target="make-jarfile" />
     </target>
 
-    <!-- *** cli-jar *** runs edumips64.MainCLI, with debug info. -->
+    <!-- *** cli-jar *** runs org.edumips64.MainCLI, with debug info. -->
 	<target name="cli-jar" depends="mkdirs,htmldoc">
         <javac
             target="5"
@@ -234,7 +234,7 @@
             debuglevel="lines,vars,source"/>
 
         <property name="jar_filename" value="${cli_jar_filename}" />
-        <property name="main_class" value="edumips64.MainCLI" />
+        <property name="main_class" value="org.edumips64.MainCLI" />
 
         <antcall target="make-jarfile" />
 	</target>
@@ -252,44 +252,44 @@
 
     <!-- Utility targets to copy files. -->
     <target name="copy-help-files">
-        <copy todir="${outputDir}/edumips64/help/en/html">
+        <copy todir="${outputDir}/org/edumips64/help/en/html">
             <fileset dir="docs/en/output/html">
 				<include name="**/*.*" />
 			</fileset>
         </copy>
-        <copy todir="${outputDir}/edumips64/help/en">
+        <copy todir="${outputDir}/org/edumips64/help/en">
             <fileset dir="docs/en/javahelp">
 				<include name="**/*.*" />
 			</fileset>
         </copy>
-        <copy todir="${outputDir}/edumips64/help/it/html">
+        <copy todir="${outputDir}/org/edumips64/help/it/html">
             <fileset dir="docs/it/output/html">
 				<include name="**/*.*" />
 			</fileset>
         </copy>
-        <copy todir="${outputDir}/edumips64/help/it/img">
+        <copy todir="${outputDir}/org/edumips64/help/it/img">
             <fileset dir="docs/img">
 				<include name="**/*.*" />
 			</fileset>
         </copy>
-        <copy todir="${outputDir}/edumips64/help/en/img">
+        <copy todir="${outputDir}/org/edumips64/help/en/img">
             <fileset dir="docs/img">
 				<include name="**/*.*" />
 			</fileset>
         </copy>
-        <copy todir="${outputDir}/edumips64/help/it">
+        <copy todir="${outputDir}/org/edumips64/help/it">
             <fileset dir="docs/it/javahelp">
 				<include name="**/*.*" />
 			</fileset>
         </copy>
     </target>
     <target name="copy-base-files">
-		<copy todir="${outputDir}/edumips64/img">
+        <copy todir="${outputDir}/org/edumips64/img">
             <fileset dir="${sourceDir}/img">
 				<include name="**/*.png" />
 			</fileset>
 		</copy>
-		<copy todir="${outputDir}/edumips64/utils">
+        <copy todir="${outputDir}/org/edumips64/utils">
             <fileset dir="${sourceDir}/utils">
 				<include name="**/*.properties" />
 			</fileset>
