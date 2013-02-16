@@ -26,21 +26,30 @@ import edumips64.Main;
 import java.util.*;
 import java.io.*;
 import java.net.URL;
+import java.util.logging.Logger;
 public class FPUConfigurator{
 	static LinkedList<String> fparithmetic,terminating;
-	public FPUConfigurator(){
+    private static final Logger logger = Logger.getLogger(FPUConfigurator.class.getName());
+
+	public FPUConfigurator() {
 		fparithmetic = new LinkedList<String>();
 		terminating = new LinkedList<String>();
 		try{
 			//the pattern of the line to parse is    <tag>any character(at least one)</tag> any character (zero or more) 
 			loadData("I","<I>.+</I>.*",fparithmetic);
 			loadData("O","<O>.+</O>.*",terminating);
-		}catch(Exception e){
-			e.printStackTrace();
+		} catch(ConfigFileNotFoundException e) {
+            logger.info("Configuration file not found, using defaults.");
+            fparithmetic.add("ADD.D");
+            fparithmetic.add("SUB.D");
+            fparithmetic.add("DIV.D");
+            fparithmetic.add("MUL.D");
+            terminating.add("0000000C");
+            terminating.add("04000000");
 		}
 	}
 	
-	public static void loadData(String tag,String regex, LinkedList<String> data)throws  ConfigFileNotFoundException{
+	public static void loadData(String tag, String regex, LinkedList<String> data) throws ConfigFileNotFoundException{
 		String line;
 		String splitted[];
 		InputStream configfile=null;
@@ -63,6 +72,8 @@ public class FPUConfigurator{
 			br.close();
 			isr.close();			
 		} catch (IOException ex) {
+			throw new ConfigFileNotFoundException();
+		} catch (NullPointerException ex) {
 			throw new ConfigFileNotFoundException();
 		}
 	}
