@@ -26,7 +26,7 @@
 
         <!-- Access the environment -->
         <property environment="env" />
-        <property name="base.classpath" value="${sourceDir}/libs:${env.CLASSPATH}" />
+        <property name="base.classpath" value="libs:${env.CLASSPATH}" />
 
         <!-- File names -->
 		<property name="standalone_jar_filename" value="edumips64-${version}.jar" />
@@ -126,13 +126,9 @@
             <compilerarg value="-Xlint"/>
         </javac>
 
-        <junit printsummary="true">
-            <classpath>
-                <pathelement path="${base.classpath}"/>
-            </classpath>
-            <classpath>
-                <pathelement path="${outputDir}"/>
-            </classpath>
+        <junit printsummary="true" haltonfailure="yes" haltonerror="yes">
+            <classpath location="${base.classpath}"/>
+            <classpath location="${outputDir}"/>
             <test name="edumips64.tests.CpuTests">
                 <formatter type="plain" usefile="false"/>
             </test>
@@ -229,7 +225,7 @@
         <javac
             target="5"
             srcdir="${sourceDir}"
-            excludes="${sourceDir}/tests/**"
+            excludes="tests/**"
             destdir="${outputDir}"
             nowarn="yes"
             debug="on"
