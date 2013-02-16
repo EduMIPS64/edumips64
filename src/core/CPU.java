@@ -632,6 +632,7 @@ public class CPU {
 			if(currentPipeStatus == PipeStatus.ID)
 				pipe.put(PipeStatus.EX, Instruction.buildInstruction("BUBBLE"));
 			RAWStalls++;
+            logger.info("RAW stalls incremented to " + RAWStalls);
 			if(syncex != null)
 				throw new SynchronousException(syncex);
 			
@@ -642,6 +643,7 @@ public class CPU {
 				pipe.put(PipeStatus.EX, Instruction.buildInstruction("BUBBLE"));
 			
 			WAWStalls++;
+            logger.info("WAW stalls incremented to " + RAWStalls);
 			if(syncex != null)
 				throw new SynchronousException(syncex);
 		} catch(FPDividerNotAvailableException ex) {

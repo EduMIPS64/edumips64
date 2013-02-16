@@ -191,6 +191,7 @@ public class Parser
 	public void parse(String filename) throws FileNotFoundException, SecurityException, IOException,ParserMultiException
 
 	{
+		logger.info("About to parse " + filename);
 		in = new BufferedReader(new InputStreamReader(new FileInputStream(filename),"ISO-8859-1"));
 		this.filename = filename;
 		int oldindex = 0;
@@ -205,7 +206,7 @@ public class Parser
 		path = filename.substring(0,oldindex+1);
 		String code = preprocessor();
 		parse(code.toCharArray());
-
+		logger.info(filename + " correctly parsed.");
 	}
 	/** Loading from buffer
 	 * @param buffer An Array of char with the MIPS code
