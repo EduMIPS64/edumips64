@@ -2,7 +2,7 @@
  *
  * Tests for the EduMIPS64 CPU.
  *
- * (c) 2012 Andrea Spadaccini
+ * (c) 2012-2013 Andrea Spadaccini
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -44,9 +44,14 @@ public class CpuTests {
      */
     class CpuTestStatus {
         int cycles;
+        int wawStalls;
+        int rawStalls;
 
         public CpuTestStatus(CPU cpu) {
             cycles = cpu.getCycles();
+            wawStalls = cpu.getWAWStalls();
+            rawStalls = cpu.getRAWStalls();
+            System.err.println("Got " + cycles + " cycles, " + rawStalls + " RAW Stalls and " + wawStalls + " WAW stalls.");
         }
     }
 
@@ -64,6 +69,8 @@ public class CpuTests {
      * @param testPath path of the test code.
      */
     protected CpuTestStatus runMipsTest(String testPath) throws Exception {
+        System.err.println("================================= Starting test " + testPath);
+        cpu.reset();
         testPath = testsLocation + testPath;
         try {
             try {
@@ -82,6 +89,7 @@ public class CpuTests {
         }
         catch (HaltException e) {
             CpuTestStatus cts = new CpuTestStatus(cpu);
+            System.err.println("================================= Finished test " + testPath);
             return cts;
         } finally {
             cpu.reset();
@@ -177,6 +185,22 @@ public class CpuTests {
     @Test
     public void storeAfterLoad() throws Exception {
         runMipsTest("store-after-load.s");
+    }
+
+    /* ------- FPU TESTS -------- */
+    @Test
+    public void testFPUStalls() throws Exception {
+        Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-waw.s");
+
+        // With forwarding
+        Assert.assertEquals(20, statuses.get(true).cycles);
+        Assert.assertEquals(7, statuses.get(true).wawStalls);
+        Assert.assertEquals(1, statuses.get(true).rawStalls);
+
+        // Without forwarding
+        Assert.assertEquals(21, statuses.get(false).cycles);
+        Assert.assertEquals(7, statuses.get(false).wawStalls);
+        Assert.assertEquals(2, statuses.get(false).rawStalls);
     }
 
     /* ------- REGRESSION TESTS -------- */
