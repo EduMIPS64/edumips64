@@ -26,7 +26,7 @@
 
         <!-- Access the environment -->
         <property environment="env" />
-        <property name="base.classpath" value="libs:${env.CLASSPATH}" />
+        <property name="base.classpath" value="libs:libs/junit-4.10.jar:libs/hamcrest-core-1.3.jar:${env.CLASSPATH}" />
 
         <!-- File names -->
 		<property name="standalone_jar_filename" value="edumips64-${version}.jar" />
@@ -115,7 +115,7 @@
     <!-- *** test *** run unit tests-->
     <target name="test" depends="mkdirs">
         <javac
-            target="5"
+            target="6"
             srcdir="${sourceDir}"
             destdir="${outputDir}"
             nowarn="yes"
@@ -127,8 +127,10 @@
         </javac>
 
         <junit printsummary="true" haltonfailure="yes" haltonerror="yes">
-            <classpath location="${base.classpath}"/>
-            <classpath location="${outputDir}"/>
+            <classpath>
+                <pathelement path="${base.classpath}"/>
+                <pathelement path="${outputDir}"/>
+            </classpath>
             <test name="org.edumips64.tests.CpuTests">
                 <formatter type="plain" usefile="false"/>
             </test>
@@ -139,7 +141,7 @@
     <!-- *** standalone-jar *** compile without debug information, with embedded javahelp -->
 	<target name="standalone-jar" depends="mkdirs,htmldoc">
         <javac
-            target="5"
+            target="6"
             srcdir="${sourceDir}"
             excludes="tests/**"
             destdir="${outputDir}"
@@ -160,7 +162,7 @@
     <!-- *** applet-jar *** like standalone-jar, but sign it at the end. -->
 	<target name="applet-jar" depends="mkdirs,htmldoc">
         <javac
-            target="5"
+            target="6"
             srcdir="${sourceDir}"
             excludes="tests/**"
             destdir="${outputDir}"
@@ -182,7 +184,7 @@
     <!-- *** slim-jar *** compile without debug information and without javahelp. -->
 	<target name="slim-jar" depends="mkdirs,htmldoc">
         <javac
-            target="5"
+            target="6"
             srcdir="${sourceDir}"
             excludes="tests/**"
             destdir="${outputDir}"
@@ -201,7 +203,7 @@
     <!-- *** debug-jar *** compile with debug information and embeds javahelp. -->
 	<target name="debug-jar" depends="mkdirs,htmldoc">
         <javac
-            target="5"
+            target="6"
             srcdir="${sourceDir}"
             excludes="tests/**"
             destdir="${outputDir}"
@@ -223,7 +225,7 @@
     <!-- *** cli-jar *** runs org.edumips64.MainCLI, with debug info. -->
 	<target name="cli-jar" depends="mkdirs,htmldoc">
         <javac
-            target="5"
+            target="6"
             srcdir="${sourceDir}"
             excludes="tests/**"
             destdir="${outputDir}"
