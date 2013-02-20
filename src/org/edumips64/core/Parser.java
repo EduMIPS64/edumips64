@@ -1196,7 +1196,7 @@ public class Parser
 								error.add("SAMELABEL", row, 1, line);
 								i = line.length();
 							}
-							// Il finally e' totalmente inutile, ma è bello utilizzarlo per la
+							// Il finally e' totalmente inutile, ma Ãš bello utilizzarlo per la
 							// prima volta in un programma ;)
 							finally {
 								lastLabel = "";

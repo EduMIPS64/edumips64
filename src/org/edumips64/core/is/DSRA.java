@@ -30,7 +30,7 @@ import org.edumips64.utils.*;
 /**
  * <pre>
  *      Format: DSRA rd, rt, sa
- * Description: To execute an arithmetic right-shift of a doubleword by a fixed amount�0 to 31 bits
+ * Description: To execute an arithmetic right-shift of a doubleword by a fixed amountÂ0 to 31 bits
  *</pre>
  * @author Trubia Massimo, Russo Daniele
  */

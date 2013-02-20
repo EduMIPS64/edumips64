@@ -47,11 +47,11 @@ public class Converter{
 			throw new IrregularStringOfBitsException();
 
 
-		//se la stringa di bits � lunga 32 bit
-		//ed � composta da uno 1 e 31 0
+		//se la stringa di bits Ãš lunga 32 bit
+		//ed Ãš composta da uno 1 e 31 0
 		//allora la conversione si deve fare a mano
-		//perch� il numero da ritornare � -(2^32)
-		//e non si pu� utilizzare il valore positivo (2^32)
+		//perchÃš il numero da ritornare Ãš -(2^32)
+		//e non si puÃ² utilizzare il valore positivo (2^32)
 		//con il tipo int :-(
 		if( !unsignd && bits.length() == 32 && bits.charAt(0) == '1'){
 			boolean overflow = true;
@@ -104,11 +104,11 @@ public class Converter{
 		if( unsignd && bits.length() == 64 && bits.charAt(0) == '1')
 			throw new IrregularStringOfBitsException();
 
-		//se la stringa di bits � lunga 64 bit
-		//ed � composta da uno 1 e 63 0
+		//se la stringa di bits Ãš lunga 64 bit
+		//ed Ãš composta da uno 1 e 63 0
 		//allora la conversione si deve fare a mano
-		//perch� il numero da ritornare � -(2^63)
-		//e non si pu� utilizzare il valore positivo (2^63)
+		//perchÃš il numero da ritornare Ãš -(2^63)
+		//e non si puÃ² utilizzare il valore positivo (2^63)
 		//con il tipo long :-(
 		if( !unsignd && bits.length() == 64 && bits.charAt(0) == '1'){
 			boolean overflow = true;

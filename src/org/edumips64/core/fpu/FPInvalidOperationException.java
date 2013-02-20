@@ -26,8 +26,8 @@ package org.edumips64.core.fpu;
  * give as a result a QNaN string and that signal a QNaN exception:
  * 1) Any operation on a NaN
  * 2) Addition or subtraction: ? + (??)
- * 3) Multiplication: � 0 � � ?
- * 4) Division: � 0/ � 0 or � ?/ � ?
+ * 3) Multiplication: Â± 0 Ã Â± ?
+ * 4) Division: Â± 0/ Â± 0 or Â± ?/ Â± ?
  */
 public class FPInvalidOperationException  extends org.edumips64.core.SynchronousException{
 	public FPInvalidOperationException() {

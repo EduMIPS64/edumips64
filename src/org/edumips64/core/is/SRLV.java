@@ -3,7 +3,7 @@
  *
  * 18th may 2007
  * Instruction SRLV of the MIPS64 Instruction Set
- * (c) 2006 EduMips64 project - Urz� Erik - Sciuto Lorenzo - Giorgio Scibilia
+ * (c) 2006 EduMips64 project - UrzÃ¬ Erik - Sciuto Lorenzo - Giorgio Scibilia
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -34,7 +34,7 @@ import org.edumips64.utils.*;
  *              The word contents of GPR rt are shifted right, inserting zeros 
  *              into the emptied bits; the result is sign extended and placed in GPR rd.
  *</pre>
- * @author Urz� Erik - Sciuto Lorenzo - Giorgio Scibilia
+ * @author UrzÃ¬ Erik - Sciuto Lorenzo - Giorgio Scibilia
  */
 public class SRLV extends ALU_RType {
     final int RD_FIELD=0;

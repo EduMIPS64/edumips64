@@ -194,7 +194,7 @@ public class GUIPipeline extends GUIComponent{
 			
 		}
 	
-		/*Per ogni blocco della pipeline, all'interno di questa funzione dovr� controllare se c'�
+		/*Per ogni blocco della pipeline, all'interno di questa funzione dovrÃ² controllare se c'Ãš
 		qualche istruzione, e in tal caso colorare il blocco e scrivere il nome dell'istruzione
 		*/
 		public void riempiBlocchi(Graphics g){
@@ -323,7 +323,7 @@ public class GUIPipeline extends GUIComponent{
 		}
 		
 		/**
-		*Questo metodo stampa all'interno di ogni blocco della pipeline il nome dell'istruzione che vi� all'interno.
+		*Questo metodo stampa all'interno di ogni blocco della pipeline il nome dell'istruzione che viÃš all'interno.
 		*/
 		public void riempiStringhe(Graphics g){
 			Font f1 = new Font("Arial", Font.PLAIN, dimCar-3); 

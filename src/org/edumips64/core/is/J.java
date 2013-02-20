@@ -30,7 +30,7 @@ import org.edumips64.utils.*;
  *      Syntax: J targetJ
  * Description: To branch within the current 256 MB-aligned region
  *               This is a PC-region branch (not PC-relative); the effective 
- *              target address is in the �current� 256 MB-aligned region. 
+ *              target address is in the ÂcurrentÂ 256 MB-aligned region. 
  *</pre>
  * @author Trubia Massimo, Russo Daniele
  *

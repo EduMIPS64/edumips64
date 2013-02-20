@@ -3,7 +3,7 @@
  *
  * 18th may 2007
  * Instruction SRA of the MIPS64 Instruction Set
- * (c) 2006 EduMips64 project - Urz� Erik - Sciuto Lorenzo - Giorgio Scibilia
+ * (c) 2006 EduMips64 project - UrzÃ¬ Erik - Sciuto Lorenzo - Giorgio Scibilia
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -34,7 +34,7 @@ import org.edumips64.utils.*;
  *              The contents of the low-order 32-bit word of GPR rt are shifted right, duplicating the sign-bit (bit 31) in the emptied
  *		bits; the word result is sign-extended and placed in GPR rd. The bit-shift amount is specified by sa.
  *</pre>
- * @author Urz� Erik - Sciuto Lorenzo - Giorgio Scibilia
+ * @author UrzÃ¬ Erik - Sciuto Lorenzo - Giorgio Scibilia
  */
 public class SRA extends ALU_RType {
     final int RD_FIELD=0;

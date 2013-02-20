@@ -211,7 +211,7 @@ public class GUIFrontend {
 		Container comp=frame1.getContentPane();
 		front.setPipelineContainer(comp);
 				
-		f.getLayeredPane().add(frame1); //LE JInternalFrame VANNO AGGIUNTE NO ALLA FRAME PRINCIPALE, MA AD UNA JDesktopPane (che � figlia delle JLayeredPane)
+		f.getLayeredPane().add(frame1); //LE JInternalFrame VANNO AGGIUNTE NO ALLA FRAME PRINCIPALE, MA AD UNA JDesktopPane (che Ãš figlia delle JLayeredPane)
 		//for(int J=0;J<1000000000;J++);
 		
 		//front.prova();

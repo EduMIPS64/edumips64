@@ -3,7 +3,7 @@
  *
  * 18th may 2007
  * Instruction SUBU of the MIPS64 Instruction Set
- * (c) 2006 EduMips64 project - Sciuto Lorenzo - Urzì Erik - Giorgio Scibilia
+ * (c) 2006 EduMips64 project - Sciuto Lorenzo - UrzÃ¬ Erik - Giorgio Scibilia
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -34,7 +34,7 @@ import org.edumips64.utils.*;
  *              the 32-bit value in GPR rs and the 32-bit arithmetic result 
  *              is sign-extended and placed into GPR rd.
  *</pre>
- * @author Sciuto Lorenzo - Urzì Erik - Giorgio Scibilia
+ * @author Sciuto Lorenzo - UrzÃ¬ Erik - Giorgio Scibilia
  */
 public class SUBU extends ALU_RType{   
     final String OPCODE_VALUE="100011"; 

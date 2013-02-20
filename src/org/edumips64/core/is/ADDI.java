@@ -3,7 +3,7 @@
  *
  * 18th may 2007
  * Instruction ADDI of the MIPS64 Instruction Set
- * (c) 2006 EduMips64 project - Lorenzo Sciuto - Giorgio Scibilia - Erik Urzì
+ * (c) 2006 EduMips64 project - Lorenzo Sciuto - Giorgio Scibilia - Erik UrzÃ¬
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -34,7 +34,7 @@ import org.edumips64.utils.*;
  *  Description:  To add a constant to a 32-bit integer. If overflow occurs, then trap.
  *		  If the addition does not overflow, the 32-bit result is sign-extended and placed into GPR rt.
  * </pre>
- * @author Lorenzo Sciuto - Giorgio Scibilia - Erik Urzì
+ * @author Lorenzo Sciuto - Giorgio Scibilia - Erik UrzÃ¬
  */
 
 class ADDI extends ALU_IType

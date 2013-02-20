@@ -3,7 +3,7 @@
  *
  * 18th may 2007
  * Instruction ADDIU of the MIPS64 Instruction Set
- * (c) 2006 EduMips64 project - Lorenzo Sciuto - Giorgio Scibilia - Erik Urzì
+ * (c) 2006 EduMips64 project - Lorenzo Sciuto - Giorgio Scibilia - Erik UrzÃ¬
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -36,7 +36,7 @@ import org.edumips64.utils.*;
  *                in GPR rs and the 32-bit arithmetic result is sign extended and placed into
  *                GPR rt. No Integer Overflow exception occurs under any circumstances.
  * </pre>
- * @author Lorenzo Sciuto - Giorgio Scibilia - Erik Urzì
+ * @author Lorenzo Sciuto - Giorgio Scibilia - Erik UrzÃ¬
  */
 
 class ADDIU extends ALU_IType

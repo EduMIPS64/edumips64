@@ -3,7 +3,7 @@
  *
  * 18th may 2007
  * Instruction SLLV of the MIPS64 Instruction Set
- * (c) 2006 EduMips64 project - Erik Urz� - Giorgio Scibilia - Sciuto Lorenzo
+ * (c) 2006 EduMips64 project - Erik UrzÃ¬ - Giorgio Scibilia - Sciuto Lorenzo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -35,7 +35,7 @@ import org.edumips64.utils.*;
  *              inserting zeros into the emptied bits; the result is sign-extended and placed in GPR rd. 
  *              The bit-shift amount is specified by the low-order 5 bits of GPR rs.
  *</pre>
- * @author Erik Urz� - Giorgio Scibilia - Sciuto Lorenzo
+ * @author Erik UrzÃ¬ - Giorgio Scibilia - Sciuto Lorenzo
  */
 public class SLLV extends ALU_RType {
     final int RD_FIELD=0;

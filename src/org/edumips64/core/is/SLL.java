@@ -3,7 +3,7 @@
  *
  * 18th may 2007
  * Instruction SLL of the MIPS64 Instruction Set
- * (c) 2006 EduMips64 project - Erik Urz� - Giorgio Scibilia - Sciuto Lorenzo
+ * (c) 2006 EduMips64 project - Erik UrzÃ¬ - Giorgio Scibilia - Sciuto Lorenzo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -35,7 +35,7 @@ import org.edumips64.utils.*;
  *              inserting zeros into the emptied bits; the word result is sign-extended and placed in GPR rd. 
  *              The bit-shift amount in the range 0 to 31 is specified by sa.
  *</pre>
- * @author Erik Urz� - Giorgio Scibilia - Sciuto Lorenzo
+ * @author Erik UrzÃ¬ - Giorgio Scibilia - Sciuto Lorenzo
  */
 public class SLL extends ALU_RType {
     final int RD_FIELD=0;

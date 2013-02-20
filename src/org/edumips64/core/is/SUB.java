@@ -3,7 +3,7 @@
  *
  * 18th may 2007
  * Instruction SUB of the MIPS64 Instruction Set
- * (c) 2006 EduMips64 project - Sciuto Lorenzo - Urzì Erik - Giorgio Scibilia
+ * (c) 2006 EduMips64 project - Sciuto Lorenzo - UrzÃ¬ Erik - Giorgio Scibilia
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -35,7 +35,7 @@ import org.edumips64.utils.*;
  *              the 32-bit value in GPR rs to produce a 32-bit result. 
  *		If it does not overflow, the 32-bit result is sign-extended and placed into GPR rd.
  *</pre>
- * @author Sciuto Lorenzo - Urzì Erik - Giorgio Scibilia
+ * @author Sciuto Lorenzo - UrzÃ¬ Erik - Giorgio Scibilia
  */
 public class SUB extends ALU_RType {
     final String OPCODE_VALUE="100010";

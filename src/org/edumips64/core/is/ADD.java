@@ -3,7 +3,7 @@
  *
  * 18th may 2007
  * Instruction ADD of the MIPS64 Instruction Set
- * (c) 2006 EduMips64 project - Lorenzo Sciuto - Erik Urzì - Giorgio Scibilia
+ * (c) 2006 EduMips64 project - Lorenzo Sciuto - Erik UrzÃ¬ - Giorgio Scibilia
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -34,7 +34,7 @@ import org.edumips64.utils.*;
  * Description: To add 32-bit integers. If overflow occurs, then trap.
  *		If the addition does not overflow, the 32-bit result is sign-extended and placed into GPR rd.
  *</pre>
- * @author Lorenzo Sciuto - Erik Urzì - Giorgio Scibilia
+ * @author Lorenzo Sciuto - Erik UrzÃ¬ - Giorgio Scibilia
  *
  */
 class ADD extends ALU_RType

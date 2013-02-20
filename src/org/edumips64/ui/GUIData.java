@@ -46,7 +46,7 @@ public class GUIData extends GUIComponent
 	public GUIData()
 	{
 		super();
-		memory = cpu.getMemory();        //INIT OGGETTO MEMORIA!!!!!!!!!!!!!!! ^_^ � qui, � proprio qui!!!! NdR!!
+		memory = cpu.getMemory();        //INIT OGGETTO MEMORIA!!!!!!!!!!!!!!! ^_^ Ãš qui, Ãš proprio qui!!!! NdR!!
 		dataPanel = new DataPanel();
 	}
 	
@@ -91,7 +91,7 @@ public class GUIData extends GUIComponent
 			theTable.getColumnModel().getColumn(3).setPreferredWidth(200);
 			theTable.getColumnModel().getColumn(4).setPreferredWidth(200);
         
-			//theTable.setTableHeader(null); //cos� visualizzo le intestazioni
+			//theTable.setTableHeader(null); //cosÃ¬ visualizzo le intestazioni
 			theTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 			theTable.setShowGrid(false);
 			Font f = new Font("Monospaced", Font.PLAIN, 12);

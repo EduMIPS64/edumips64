@@ -30,7 +30,7 @@ import org.edumips64.utils.*;
 /**
  * <pre>
  *      Syntax: DSRL rd, rt, sa
- * Description: To execute a logical right-shift of a doubleword by a fixed amount�0 to 31 bits
+ * Description: To execute a logical right-shift of a doubleword by a fixed amountÅž0 to 31 bits
  *              The doubleword contents of GPR rt are shifted right, inserting zeros 
  *              into the emptied bits; the result is placed in GPR rd.
  *</pre>

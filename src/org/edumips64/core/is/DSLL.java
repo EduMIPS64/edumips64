@@ -30,7 +30,7 @@ import org.edumips64.utils.*;
 /**
  * <pre>
  *      Syntax: DSLL rd, rt, sa Doubleword shift left logical
- * Description: To execute a left-shift of a doubleword by a fixed amount�0 to 31 bits
+ * Description: To execute a left-shift of a doubleword by a fixed amountÂ0 to 31 bits
  *              The 64-bit doubleword contents of GPR rt are shifted left, 
  *              inserting zeros into the emptied bits; the result is placed in GPR rd. 
  *              The bit-shift amount in the range 0 to 31 is specified by sa.

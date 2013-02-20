@@ -86,13 +86,13 @@ public class BitSet64 extends FixedBitSet {
 					throw new IrregularWriteOperationException();
 				}
 			}
-			else{ //il numero � negativo
+			else{ //il numero Ãš negativo
 				value = -value;
 				try{
 					bits = Converter.positiveIntToBin(value);
 					bits = Converter.twoComplement(bits);
 					//estensione del segno
-					this.reset(true); //il numero � negativo, ci vogliono tutti '1'
+					this.reset(true); //il numero Ãš negativo, ci vogliono tutti '1'
 					this.setBits(bits,size-bits.length());
 				}
 				catch(IrregularStringOfBitsException e){
@@ -128,7 +128,7 @@ public class BitSet64 extends FixedBitSet {
 					throw new IrregularWriteOperationException();
 				}
 			}
-			else{ //il numero � negativo
+			else{ //il numero Ãš negativo
 				value = -value;
 				try{
 					bits = Converter.positiveIntToBin(8,value);	
@@ -193,13 +193,13 @@ public class BitSet64 extends FixedBitSet {
 					throw new IrregularWriteOperationException();
 				}
 			}
-			else{ //il numero � negativo
+			else{ //il numero Ãš negativo
 				value = -value;
 				try{
 					bits = Converter.positiveIntToBin(value);
 					bits = Converter.twoComplement(bits);
 					//estensione del segno
-					this.reset(true); //il numero � negativo, ci vogliono tutti '1'
+					this.reset(true); //il numero Ãš negativo, ci vogliono tutti '1'
 					this.setBits(bits,size-bits.length());
 				}
 				catch(IrregularStringOfBitsException e){
@@ -237,7 +237,7 @@ public class BitSet64 extends FixedBitSet {
 					throw new IrregularWriteOperationException();
 				}
 			}
-			else{ //il numero � negativo
+			else{ //il numero Ãš negativo
 				value = -value;
 				try{
 					bits = Converter.positiveIntToBin(16, value);
@@ -297,13 +297,13 @@ public class BitSet64 extends FixedBitSet {
 				throw new IrregularWriteOperationException();
 			}
 		}
-		else{ //il numero � negativo
+		else{ //il numero Ãš negativo
 			value = -value;
 			try{
 				bits = Converter.positiveIntToBin(value);
 				bits = Converter.twoComplement(bits);
 				//estensione del segno
-				this.reset(true); //il numero � negativo, ci vogliono tutti '1'
+				this.reset(true); //il numero Ãš negativo, ci vogliono tutti '1'
 				this.setBits(bits,size-bits.length());
 			}
 			catch(IrregularStringOfBitsException e){
@@ -341,7 +341,7 @@ public class BitSet64 extends FixedBitSet {
 				throw new IrregularWriteOperationException();
 			}
 		}
-		else{ //il numero � negativo
+		else{ //il numero Ãš negativo
 			value = -value;
 			try{
 				bits = Converter.positiveIntToBin(32,value);
@@ -386,16 +386,16 @@ public class BitSet64 extends FixedBitSet {
 				throw new IrregularWriteOperationException();
 			}
 		}
-		else{ //il numero � negativo
+		else{ //il numero Ãš negativo
 			if( value == -9223372036854775808L){
-				//questo numero non pu� essere convertito dalla positiveIntToBin
+				//questo numero non puÃ² essere convertito dalla positiveIntToBin
 				//occorre fare a mano
 				//e mettere il valore "1000000....0000" (tutti zero nel mezzo)
 				this.reset(false);
 				try{
 					this.setBits("1",0);
 				}
-				catch(IrregularStringOfBitsException e){} //non pu� accadere :-)
+				catch(IrregularStringOfBitsException e){} //non puÃ² accadere :-)
 				return;
 			}
 			value = -value;
@@ -403,7 +403,7 @@ public class BitSet64 extends FixedBitSet {
 				bits = Converter.positiveIntToBin(value);
 				bits = Converter.twoComplement(bits);
 				//estensione del segno
-				this.reset(true); //il numero � negativo, ci vogliono tutti '1'
+				this.reset(true); //il numero Ãš negativo, ci vogliono tutti '1'
 				this.setBits(bits,size-bits.length());
 			}
 			catch(IrregularStringOfBitsException e){
