@@ -48,10 +48,10 @@ public class MultiLineBasicTableUI extends javax.swing.plaf.basic.BasicTableUI {
 		int[] height = new int[numRows];
 		for (int i=0; i<numRows; i++) height[i] = fontHeight; // init to font height as minimum
 
-		Enumeration cols = table.getColumnModel().getColumns();
+		Enumeration<TableColumn> cols = table.getColumnModel().getColumns();
 		int i = 0;
 		while(cols.hasMoreElements()) {
-			TableColumn col = (TableColumn) cols.nextElement();
+			TableColumn col = cols.nextElement();
 			TableCellRenderer tcr = col.getCellRenderer();
 			int colWidth = col.getWidth();
 			for (int j=0; j<numRows; j++) {
@@ -77,9 +77,9 @@ public class MultiLineBasicTableUI extends javax.swing.plaf.basic.BasicTableUI {
 
 	public Dimension getMinimumSize(JComponent c) {
 		long width = 0;
-		Enumeration enumeration = table.getColumnModel().getColumns();
+		Enumeration<TableColumn> enumeration = table.getColumnModel().getColumns();
 		while (enumeration.hasMoreElements()) {
-			TableColumn aColumn = (TableColumn)enumeration.nextElement();
+			TableColumn aColumn = enumeration.nextElement();
 			width = width + aColumn.getMinWidth();
 		}
 		return createTableSize(width);
@@ -93,9 +93,9 @@ public class MultiLineBasicTableUI extends javax.swing.plaf.basic.BasicTableUI {
 	 */
 	public Dimension getPreferredSize(JComponent c) {
 		long width = 0;
-		Enumeration enumeration = table.getColumnModel().getColumns();
+		Enumeration<TableColumn> enumeration = table.getColumnModel().getColumns();
 		while (enumeration.hasMoreElements()) {
-			TableColumn aColumn = (TableColumn)enumeration.nextElement();
+			TableColumn aColumn = enumeration.nextElement();
 			width = width + aColumn.getPreferredWidth();
 		}
 		return createTableSize(width);
@@ -109,9 +109,9 @@ public class MultiLineBasicTableUI extends javax.swing.plaf.basic.BasicTableUI {
 	 */
 	public Dimension getMaximumSize(JComponent c) {
 		long width = 0;
-		Enumeration enumeration = table.getColumnModel().getColumns();
+		Enumeration<TableColumn> enumeration = table.getColumnModel().getColumns();
 		while (enumeration.hasMoreElements()) {
-			TableColumn aColumn = (TableColumn)enumeration.nextElement();
+			TableColumn aColumn = enumeration.nextElement();
 			width = width + aColumn.getMaxWidth();
 		}
 		return createTableSize(width);
@@ -223,11 +223,11 @@ public class MultiLineBasicTableUI extends javax.swing.plaf.basic.BasicTableUI {
       cellRect.y += ((MultiLineTable)table).getRowHeight(i) + spacing.height;
     }
 
-    Enumeration enumeration = table.getColumnModel().getColumns();
+    Enumeration<TableColumn> enumeration = table.getColumnModel().getColumns();
 
     // Paint the non-dragged table cells first
     while (enumeration.hasMoreElements()) {
-      TableColumn aColumn = (TableColumn)enumeration.nextElement();
+      TableColumn aColumn = enumeration.nextElement();
 
       cellRect.width = aColumn.getWidth() + spacing.width;
       if (cellRect.intersects(rect)) {

@@ -250,7 +250,7 @@ public class DineroFrontend extends JDialog {
  */
 class DineroSingleCachePanel extends JPanel {
 	private DineroCacheOptions dco;
-	private JComboBox size, sizeUnit, bsize, bsizeUnit;
+	private JComboBox<String> size, sizeUnit, bsize, bsizeUnit;
 	private JTextField assoc;
 	private JCheckBox ccc;
 	public DineroSingleCachePanel(char type, int level) {
@@ -259,11 +259,11 @@ class DineroSingleCachePanel extends JPanel {
 		String[] sizes = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "512"};
 		String[] units = {" ", "k", "M", "G"};
 
-		size = new JComboBox(sizes);
-		bsize = new JComboBox(sizes);
+		size = new JComboBox<String>(sizes);
+		bsize = new JComboBox<String>(sizes);
 
-		sizeUnit = new JComboBox(units);
-		bsizeUnit = new JComboBox(units);
+		sizeUnit = new JComboBox<String>(units);
+		bsizeUnit = new JComboBox<String>(units);
 
 		assoc = new JTextField();
 		ccc = new JCheckBox();

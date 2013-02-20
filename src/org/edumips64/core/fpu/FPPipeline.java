@@ -170,7 +170,7 @@ public class FPPipeline {
 	public int putInstruction(Instruction instr,boolean simulation) //throws InputStructuralHazardException
 	{
 		cpu=CPU.getInstance();
-		if(cpu.knownFPInstructions.contains(instr.getName()) && instr!=null) {
+		if(CPU.knownFPInstructions.contains(instr.getName()) && instr!=null) {
 			String instrName=instr.getName();
 			if((instrName.compareToIgnoreCase("ADD.D")==0) || (instrName.compareToIgnoreCase("SUB.D")==0))
 				if(adder.putInstruction(instr,simulation)==-1)
@@ -261,9 +261,7 @@ public class FPPipeline {
 	/* Resets the fp pipeline */
 	public void reset() {
 		nInstructions=0;
-		for(Iterator it=entryQueue.iterator();it.hasNext();) {
-			entryQueue.poll();
-		}
+        entryQueue.clear();
 		multiplier.reset();
 		adder.reset();
 		divider.reset();
@@ -338,8 +336,8 @@ public class FPPipeline {
 		}
 		
 		/** Remove the last instruction in the functional unit*/
-		public void removeLast() {
-			multiplier.put(FPPipeline.Costanti.FPMultiplierStatus.M7,null);
+		public void removeLast() {
+			multiplier.put(FPPipeline.Costanti.FPMultiplierStatus.M7,null);
 		}
 		
 		/* Shifts instructions into the functional unit and calls the EX() method for instructions in the secondary step
@@ -424,8 +422,8 @@ public class FPPipeline {
 		}
 		
 		/** Remove the last instruction in the functional unit*/
-		public void removeLast() {
-			adder.put(FPPipeline.Costanti.FPAdderStatus.A4,null);
+		public void removeLast() {
+			adder.put(FPPipeline.Costanti.FPAdderStatus.A4,null);
 		}
 		
 		/* Shifts instructions into the functional unit and calls the EX() method for the instruction in the secondary step

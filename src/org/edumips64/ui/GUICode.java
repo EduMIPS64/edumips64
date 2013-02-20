@@ -179,6 +179,7 @@ public class GUICode extends GUIComponent{
 				return new Object();
 			}
     
+            @SuppressWarnings("rawtypes")
 			public Class getColumnClass(int c) {
 				return columnClasses[c];
 			}	  

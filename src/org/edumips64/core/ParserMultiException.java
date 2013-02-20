@@ -95,13 +95,9 @@ public class ParserMultiException extends Exception
 	public String toString()
 	{
 		String ret="";
-		ListIterator i = exception.listIterator();
-		while (i.hasNext()){
-
-			ret += i.next().toString();
-			ret +="\n\n";
-
-		}
+        for (ParserException e : exception) {
+			ret += e + "\n\n";
+        }
 		return ret;
 	}
 

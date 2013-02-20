@@ -79,8 +79,6 @@ public class ErrorDialog extends JDialog{
 		
 		//DefaultTableCellRenderer dftcr =new DefaultTableCellRenderer();
 
-	
-
 		table.setCellSelectionEnabled(false);
 		table.setFocusable(false);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -101,26 +99,20 @@ public class ErrorDialog extends JDialog{
 		table.getColumnModel().getColumn(3).setCellRenderer(renderer);
 		
 		int i = 0;
-		for(Iterator it = peList.iterator() ; it.hasNext() ; ){
-
-			final ParserException tmp = (ParserException)it.next();
-			
-			
-			lineIsError[i] = tmp.isError();
-			if(lineIsError[i]) numError++;
-			//if(!lineIsError[i] && !((Boolean)Config.get("warnings")))
-		
-				final String[] array = tmp.getStringArray();
+        for(ParserException e : peList) {
+            lineIsError[i] = e.isError();
+            if (lineIsError[i]) {
+                numError++;
+            }
 
 			if(lineIsError[i] || (Boolean)Config.get("warnings")){
-				dft.addRow(array);
+				dft.addRow(e.getStringArray());
 				i++;
 			}
-		}
-			
+        }
+
 		JScrollPane scrollTable = new JScrollPane(table);
-		String msg = 
-			CurrentLocale.getString("ErrorDialog.MSG0") + " " + numError + " " +
+		String msg = CurrentLocale.getString("ErrorDialog.MSG0") + " " + numError + " " +
 		      	CurrentLocale.getString("ErrorDialog.MSG1") + " " +  (peList.size()-numError) + " " +
 		       	CurrentLocale.getString("ErrorDialog.MSG2");
 		JLabel label = new JLabel(msg);

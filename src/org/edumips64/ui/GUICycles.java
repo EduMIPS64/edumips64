@@ -41,28 +41,25 @@ import java.util.*;
 */
 public class GUICycles extends GUIComponent {
 		
-	Panel1 pannello;
-	Panel2 pannello2;
+	Panel1 rightPanel;
+	Panel2 leftPanel;
 	
 	JScrollPane jsp1,jsp2;
 	private JSplitPane splitPane;
-	int conta,tempo,oldTime,n_instr;
+	int conta,curTime,oldTime,n_instr;
 	Instruction [] instr;
 	int memoryStalls; // used for understanding if the EX instruction is in structural stall (memory)
-	int inputStructuralStalls; // groups five stalls (EXNotAvailable, FuncUnitNotAvailable, DividerNotAvailable, RAW, WAW) in order to understand if a new instruction has to be added to "lista"
+	int inputStructuralStalls; // groups five stalls (EXNotAvailable, FuncUnitNotAvailable, DividerNotAvailable, RAW, WAW) in order to understand if a new instruction has to be added to "elementsList"
 	int RAWStalls, WAWStalls, structStallsEX, structStallsDivider,structStallsFuncUnit;
-	JButton bottone;
-
 
 	Map <CPU.PipeStatus,Instruction> pipeline;
-	Map<CPU.PipeStatus,Color> colore;
 	Dimension dim,dim2;
 	
-	java.util.List<ElementoCiclo> lista;
+	java.util.List<ElementoCiclo> elementsList;
 	
 	public GUICycles(){
 		super();
-		lista=Collections.synchronizedList(new LinkedList<ElementoCiclo>());
+		elementsList=Collections.synchronizedList(new LinkedList<ElementoCiclo>());
 		memoryStalls=cpu.getMemoryStalls();
 		inputStructuralStalls=cpu.getStructuralStallsDivider()+cpu.getStructuralStallsEX()+cpu.getStructuralStallsFuncUnit();
 		RAWStalls=cpu.getRAWStalls();
@@ -70,17 +67,17 @@ public class GUICycles extends GUIComponent {
 		structStallsEX=cpu.getStructuralStallsEX();
 		structStallsDivider =cpu.getStructuralStallsDivider();
 		structStallsFuncUnit= cpu.getStructuralStallsFuncUnit();
-		pannello=new Panel1();
+		rightPanel=new Panel1();
 		
-		jsp1=new JScrollPane(pannello);//pannello di destra
+		jsp1=new JScrollPane(rightPanel);
 		dim=new Dimension(20,30);
-		pannello.setPreferredSize(dim);
+		rightPanel.setPreferredSize(dim);
 		
-		pannello2=new Panel2();
+		leftPanel=new Panel2();
 		
-		jsp2=new JScrollPane(pannello2);//pannello di sinistra
+		jsp2=new JScrollPane(leftPanel);
 		dim2=new Dimension(10,30);
-		pannello2.setPreferredSize(dim2);
+		leftPanel.setPreferredSize(dim2);
 		
 		jsp1.setVerticalScrollBar(jsp2.getVerticalScrollBar());
 
@@ -93,7 +90,7 @@ public class GUICycles extends GUIComponent {
 		splitPane.setDividerLocation(150);
 		
 		pipeline=new HashMap<CPU.PipeStatus,Instruction>();
-		tempo=0;
+		curTime=0;
 		n_instr=0;
 		oldTime=0;
 		instr=new Instruction[5];
@@ -107,60 +104,58 @@ public class GUICycles extends GUIComponent {
 	
 	
 	public synchronized void update(){
-		synchronized(pannello) {
-			synchronized(pannello2) {
+		synchronized(rightPanel) {
+			synchronized(leftPanel) {
 				pipeline=cpu.getPipeline();
-				tempo=cpu.getCycles();
-				if(oldTime!=tempo){
-					if(tempo>0){
-						int index; //used for searching instructions by serial number into "lista"
+				curTime=cpu.getCycles();
+				if(oldTime!=curTime){
+					if(curTime>0){
+						int index; //used for searching instructions by serial number into "elementsList"
 						instr[0]=pipeline.get(CPU.PipeStatus.IF);
 						instr[1]=pipeline.get(CPU.PipeStatus.ID);
 						instr[2]=pipeline.get(CPU.PipeStatus.EX);
 						instr[3]=pipeline.get(CPU.PipeStatus.MEM);
 						instr[4]=pipeline.get(CPU.PipeStatus.WB);
 
-						if( (tempo>4) && (instr[4]!=null) ){
-
-							if(instr[4].getName()!=" "){
-								index= searchListaBySerialNumber(instr[4].getSerialNumber());
-								if(index!=-1)
-									lista.get(index).addStato("WB");
+						if(instr[4] != null) {
+							if(instr[4].getName()!=" ") {
+								index = getLastELBySerialNumber(instr[4].getSerialNumber());
+								if(index != -1) {
+									elementsList.get(index).addStato("WB");
+                                }
 							}
 						}
 
-						if((tempo>3)&&(instr[3] != null)){
-							if(instr[3].getName()!=" "){
-								index= searchListaBySerialNumber(instr[3].getSerialNumber());
-								if(index!=-1)
-								{
-									//the instruction has to be tagged as "MEM" 
-									lista.get(index).addStato("MEM");
+						if(instr[3] != null){
+							if(instr[3].getName()!=" ") {
+								index = getLastELBySerialNumber(instr[3].getSerialNumber());
+								if(index != -1) {
+									elementsList.get(index).addStato("MEM");
 								}
 							}
 						}
 
-						if( (tempo>2) && (instr[2]!=null) ){
-
-							if(instr[2].getName()!=" "){
-								index= searchListaBySerialNumber(instr[2].getSerialNumber());
-								boolean exTagged=false; //if a structural stall(memory) occurs the instruction in EX has to be tagged with "EX" and succefully with "StEx"
-								if(index!=-1)
-								{
-									if(lista.get(index).getStato().getLast()=="ID" || lista.get(index).getStato().getLast()=="RAW" ||  lista.get(index).getStato().getLast()=="WAW" || lista.get(index).getStato().getLast()=="StEx"){
-										lista.get(index).addStato("EX");
+						if(instr[2] != null) {
+							if(instr[2].getName() != " ") {
+								index = getLastELBySerialNumber(instr[2].getSerialNumber());
+                                //if a structural stall(memory) occurs the instruction in EX has to be tagged with "EX" and succefully with "StEx"
+								boolean exTagged = false;
+								if(index != -1) {
+									if(elementsList.get(index).getStato().getLast()=="ID" || elementsList.get(index).getStato().getLast()=="RAW" ||  elementsList.get(index).getStato().getLast()=="WAW" || elementsList.get(index).getStato().getLast()=="StEx"){
+										elementsList.get(index).addStato("EX");
 										exTagged=true;
 									}
 									//we check if a structural hazard  occurred if there's a difference between the previous value of memoryStall counter and the current one
-									if(memoryStalls!=cpu.getMemoryStalls() && !exTagged)
-										lista.get(index).addStato("Str");
+									if(memoryStalls!=cpu.getMemoryStalls() && !exTagged) {
+										elementsList.get(index).addStato("Str");
+                                    }
 								}
 								exTagged=false;
 							}
 						}
 
 						//if there was stalls as RAW,WAW,EXNotAvailable,DividerNotAvailable, FuncUnitNotAvailable
-						//we cannot add  a new ElementoCiclo in "lista" and we must add tags as RAW, WAW, StEx,StDiv,StFun into the right instruction's state list
+						//we cannot add  a new ElementoCiclo in "elementsList" and we must add tags as RAW, WAW, StEx,StDiv,StFun into the right instruction's state list
 						
 						//EX stage stalls
 						boolean RAWStallOccurred =(RAWStalls!=cpu.getRAWStalls());
@@ -170,61 +165,45 @@ public class GUICycles extends GUIComponent {
 						boolean structStallsFuncUnitOccurred=(structStallsFuncUnit!=cpu.getStructuralStallsFuncUnit());
 						boolean inputStallOccurred=(inputStructuralStalls!=cpu.getStructuralStallsDivider()+cpu.getStructuralStallsEX()+cpu.getStructuralStallsFuncUnit() + cpu.getRAWStalls() + cpu.getWAWStalls());						
 						
-						if( (tempo>1) && (instr[1]!= null) ){
-							
-							if(instr[1].getName()!=" "){
-								index= searchListaBySerialNumber(instr[1].getSerialNumber());		
-								if(!inputStallOccurred)
-									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-										lista.get(index).addStato("ID");
-								if(RAWStallOccurred)
-								{
-									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-										lista.get(index).addStato("RAW");
+						if(instr[1]!= null) {
+							if(instr[1].getName() != " " && cpu.getStatus() == CPU.CPUStatus.RUNNING) {
+								index= getLastELBySerialNumber(instr[1].getSerialNumber());		
+								if(!inputStallOccurred) {
+                                    elementsList.get(index).addStato("ID");
+                                }
+								if(RAWStallOccurred) {
+                                    elementsList.get(index).addStato("RAW");
 								}
-								if(WAWStallOccurred)
-								{
-									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-										lista.get(index).addStato("WAW");
+								if(WAWStallOccurred) {
+                                    elementsList.get(index).addStato("WAW");
 								}
-								if(structStallDividerOccured)
-								{
-									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-										lista.get(index).addStato("StDiv");
+								if(structStallDividerOccured) {
+                                    elementsList.get(index).addStato("StDiv");
 								}
-								if(structStallEXOccurred)
-								{
-									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-										lista.get(index).addStato("StEx");
+								if(structStallEXOccurred) {
+                                    elementsList.get(index).addStato("StEx");
 								}
-								if(structStallsFuncUnitOccurred)
-								{
-									if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
-										lista.get(index).addStato("StFun");
+								if(structStallsFuncUnitOccurred) {
+                                    elementsList.get(index).addStato("StFun");
 								}
 							}	
 							
 						}
 
-						if(instr[0]!=null){
-							if(!inputStallOccurred)
-							{
-								//we must instanciate a new ElementoCiclo only if the CPU is running or there was a JumpException and the the IF instruction was changed
+						if(instr[0]!=null) { 
+                            if(!inputStallOccurred) {
+								//we must instantiate a new ElementoCiclo only if the CPU is running or there was a JumpException and the the IF instruction was changed
 								if(cpu.getStatus()==CPU.CPUStatus.RUNNING)
 								{
-									lista.add(new ElementoCiclo(instr[0].getFullName(),tempo,instr[0].getSerialNumber()));
+									elementsList.add(new ElementoCiclo(instr[0].getFullName(),curTime,instr[0].getSerialNumber()));
 									n_instr++;
 								}
-							}
-							else
-							{
-								index= searchListaBySerialNumber(instr[0].getSerialNumber());
-								if(index!=-1)
-								{
-									lista.get(index).addStato(" ");
+							} else {
+								index= getLastELBySerialNumber(instr[0].getSerialNumber());
+								if(index!=-1) {
+									elementsList.get(index).addStato(" ");
 								}
 							}
-							
 						}
 						
 						//we have to check instructions in the FP pipeline
@@ -233,41 +212,41 @@ public class GUICycles extends GUIComponent {
 						Instruction instrSearched;
 						if(cpu.getInstructionByFuncUnit("ADDER",1)!=null)
 						{
-							index= searchListaBySerialNumber(cpu.getInstructionByFuncUnit("ADDER",1).getSerialNumber());
+							index= getLastELBySerialNumber(cpu.getInstructionByFuncUnit("ADDER",1).getSerialNumber());
 							if(index!=-1)
-								lista.get(index).addStato("A1");
+								elementsList.get(index).addStato("A1");
 						}						
 						
 						if(cpu.getInstructionByFuncUnit("ADDER",2)!=null)
 						{
 
-							index= searchListaBySerialNumber(cpu.getInstructionByFuncUnit("ADDER",2).getSerialNumber());
+							index= getLastELBySerialNumber(cpu.getInstructionByFuncUnit("ADDER",2).getSerialNumber());
 							if(index!=-1)
-								lista.get(index).addStato("A2");
+								elementsList.get(index).addStato("A2");
 						}						
 						if(cpu.getInstructionByFuncUnit("ADDER",3)!=null)
 						{
 
-							index= searchListaBySerialNumber(cpu.getInstructionByFuncUnit("ADDER",3).getSerialNumber());
+							index= getLastELBySerialNumber(cpu.getInstructionByFuncUnit("ADDER",3).getSerialNumber());
 							if(index!=-1)
-								lista.get(index).addStato("A3");
+								elementsList.get(index).addStato("A3");
 						}
 						
 						if(cpu.getInstructionByFuncUnit("ADDER",4)!=null)
 						{
 
-							index= searchListaBySerialNumber(cpu.getInstructionByFuncUnit("ADDER",4).getSerialNumber());
+							index= getLastELBySerialNumber(cpu.getInstructionByFuncUnit("ADDER",4).getSerialNumber());
 							boolean A4tagged=false;
 							if(index!=-1)
 							{
-								if(lista.get(index).getStato().getLast()=="A3")
+								if(elementsList.get(index).getStato().getLast()=="A3")
 								{
-									lista.get(index).addStato("A4");
+									elementsList.get(index).addStato("A4");
 									A4tagged=true;
 								}
 								//we have to check if a structural hazard  occurred and it involved the divider or the multiplier (it is sufficient to control if the "A4" o "StAdd" tag was added to the instruction
-								if(!A4tagged && (lista.get(index).getStato().getLast()=="A4" || lista.get(index).getStato().getLast()=="StAdd"))
-									lista.get(index).addStato("StAdd");
+								if(!A4tagged && (elementsList.get(index).getStato().getLast()=="A4" || elementsList.get(index).getStato().getLast()=="StAdd"))
+									elementsList.get(index).addStato("StAdd");
 							}
 							A4tagged=false;
 						}
@@ -275,61 +254,61 @@ public class GUICycles extends GUIComponent {
 						//MULTIPLIER ----------------------------------------------------------------
 						if((instrSearched=cpu.getInstructionByFuncUnit("MULTIPLIER",1))!=null)
 						{
-							index= searchListaBySerialNumber(instrSearched.getSerialNumber());
+							index= getLastELBySerialNumber(instrSearched.getSerialNumber());
 							if(index!=-1)
-								lista.get(index).addStato("M1");
+								elementsList.get(index).addStato("M1");
 						}
 						
 						if((instrSearched=cpu.getInstructionByFuncUnit("MULTIPLIER",2))!=null)
 						{
-							index= searchListaBySerialNumber(instrSearched.getSerialNumber());
+							index= getLastELBySerialNumber(instrSearched.getSerialNumber());
 							if(index!=-1)
-								lista.get(index).addStato("M2");
+								elementsList.get(index).addStato("M2");
 						}
 						
 						if((instrSearched=cpu.getInstructionByFuncUnit("MULTIPLIER",3))!=null)
 						{
-							index= searchListaBySerialNumber(instrSearched.getSerialNumber());
+							index= getLastELBySerialNumber(instrSearched.getSerialNumber());
 							if(index!=-1)
-								lista.get(index).addStato("M3");
+								elementsList.get(index).addStato("M3");
 						}
 						
 						if((instrSearched=cpu.getInstructionByFuncUnit("MULTIPLIER",4))!=null)
 						{
-							index= searchListaBySerialNumber(instrSearched.getSerialNumber());
+							index= getLastELBySerialNumber(instrSearched.getSerialNumber());
 							if(index!=-1)
-								lista.get(index).addStato("M4");
+								elementsList.get(index).addStato("M4");
 						}
 						
 						if((instrSearched=cpu.getInstructionByFuncUnit("MULTIPLIER",5))!=null)
 						{
-							index= searchListaBySerialNumber(instrSearched.getSerialNumber());
+							index= getLastELBySerialNumber(instrSearched.getSerialNumber());
 							if(index!=-1)
-								lista.get(index).addStato("M5");
+								elementsList.get(index).addStato("M5");
 						}
 
 						if((instrSearched=cpu.getInstructionByFuncUnit("MULTIPLIER",6))!=null)
 						{
-							index= searchListaBySerialNumber(instrSearched.getSerialNumber());
+							index= getLastELBySerialNumber(instrSearched.getSerialNumber());
 							if(index!=-1)
-								lista.get(index).addStato("M6");
+								elementsList.get(index).addStato("M6");
 						}
 								
 						if((instrSearched=cpu.getInstructionByFuncUnit("MULTIPLIER",7))!=null)
 						{
 
-							index= searchListaBySerialNumber(instrSearched.getSerialNumber());
+							index= getLastELBySerialNumber(instrSearched.getSerialNumber());
 							boolean M7tagged=false;
 							if(index!=-1)
 							{
-								if(lista.get(index).getStato().getLast()=="M6")
+								if(elementsList.get(index).getStato().getLast()=="M6")
 								{
-									lista.get(index).addStato("M7");
+									elementsList.get(index).addStato("M7");
 									M7tagged=true;
 								}
 								//we check if a structural hazard  occurred and involved the divider 
-								if(!M7tagged && (lista.get(index).getStato().getLast()=="M7" || lista.get(index).getStato().getLast()=="StMul"))
-									lista.get(index).addStato("StMul");
+								if(!M7tagged && (elementsList.get(index).getStato().getLast()=="M7" || elementsList.get(index).getStato().getLast()=="StMul"))
+									elementsList.get(index).addStato("StMul");
 							}
 							M7tagged=false;
 						}
@@ -338,20 +317,20 @@ public class GUICycles extends GUIComponent {
 						if((instrSearched=cpu.getInstructionByFuncUnit("DIVIDER",0))!=null)
 						{
 							boolean DIVtagged=false;
-							index= searchListaBySerialNumber(instrSearched.getSerialNumber());
-							stage=lista.get(index).getStato().getLast();
+							index= getLastELBySerialNumber(instrSearched.getSerialNumber());
+							stage=elementsList.get(index).getStato().getLast();
 							if(index!=-1)
 							{
 								if(stage!="DIV" && !stage.matches("D[0-2][0-9]"))
 								{
-									lista.get(index).addStato("DIV");
+									elementsList.get(index).addStato("DIV");
 									DIVtagged=true;
 								}
 								if(!DIVtagged)
 								{
 									int divCount=cpu.getDividerCounter();
 									String divCountStr=String.valueOf(divCount); //divCount in the format DXX (XX belongs to [00  24])
-									lista.get(index).addStato((divCount<10) ? "D0"+divCountStr : "D"+ divCountStr);
+									elementsList.get(index).addStato((divCount<10) ? "D0"+divCountStr : "D"+ divCountStr);
 								}								
 							}
 							DIVtagged=false;
@@ -359,11 +338,11 @@ public class GUICycles extends GUIComponent {
 					}
 					else
 					{
-						lista.clear();
+						elementsList.clear();
 						oldTime=0;
 						n_instr=0;
 					}
-					oldTime=tempo;
+					oldTime=curTime;
 				}
 				memoryStalls=cpu.getMemoryStalls();
 				inputStructuralStalls=cpu.getStructuralStallsDivider()+cpu.getStructuralStallsEX()+cpu.getStructuralStallsFuncUnit()+ cpu.getRAWStalls() + cpu.getWAWStalls();
@@ -378,35 +357,32 @@ public class GUICycles extends GUIComponent {
 	}
 	
 	
-	public int searchListaBySerialNumber(long serialNumber)
-	{
-		ElementoCiclo ec;
-		for(ListIterator it=lista.listIterator(lista.size());it.hasPrevious();)
-		{
-			ec=(ElementoCiclo)it.previous();
-			if(ec.getSerialNumber()==serialNumber)
+	public int getLastELBySerialNumber(long serialNumber) {
+		for(ListIterator<ElementoCiclo> it=elementsList.listIterator(elementsList.size());it.hasPrevious();) {
+			if(it.previous().getSerialNumber()==serialNumber) {
 				return it.previousIndex()+1;
+            }
 		}
 		return -1;
 	}
 	
-	public synchronized void draw(){
+	public synchronized void draw() {
 
-		dim.setSize(20 + tempo*30,30+n_instr*15);
-		if(30+n_instr*15>pannello2.getHeight())
+		dim.setSize(20 + curTime*30,30+n_instr*15);
+		if(30+n_instr*15>leftPanel.getHeight())
 		dim2.setSize(splitPane.getDividerLocation(),30+n_instr*15);
 		else
-		dim2.setSize(splitPane.getDividerLocation(),pannello2.getHeight());
+		dim2.setSize(splitPane.getDividerLocation(),leftPanel.getHeight());
 /*
-jsp1.setViewportView(pannello);	
-Main.logger.debug("altezza" + pannello.getBounds().height);
-Main.logger.debug("larghezza " +pannello.getBounds().width);
-jsp1.getViewport().setViewPosition(new Point(pannello.getBounds().width,pannello.getBounds().height));
+jsp1.setViewportView(rightPanel);	
+Main.logger.debug("altezza" + rightPanel.getBounds().height);
+Main.logger.debug("larghezza " +rightPanel.getBounds().width);
+jsp1.getViewport().setViewPosition(new Point(rightPanel.getBounds().width,rightPanel.getBounds().height));
 */
 		jsp1.getViewport().setViewSize(dim);
 		jsp2.getViewport().setViewSize(dim2);
 		jsp2.getViewport().setViewPosition(new Point(0,n_instr*15));
-		jsp1.getViewport().setViewPosition(new Point(tempo*30,n_instr*15));
+		jsp1.getViewport().setViewPosition(new Point(curTime*30,n_instr*15));
 
 		cont.repaint();
 	}
@@ -424,18 +400,17 @@ jsp1.getViewport().setViewPosition(new Point(pannello.getBounds().width,pannello
 			FontMetrics fm1 = g.getFontMetrics(f1); 
 			g.setFont(f1); 
 			
-			riempi(g);
-			
+			fill(g);
 		}	
 		
 		
-		public synchronized void riempi(Graphics g){
+		public synchronized void fill(Graphics g){
 			int i=0;
-			for(ElementoCiclo el:lista){
+			for(ElementoCiclo el:elementsList){
 				int j=0;
 				String pre="IF";
 				String ext_st="";
-				int tempo=el.getTime();
+				int curTime=el.getTime();
 				for(String st:el.getStato()){
 
 					ext_st="";
@@ -468,10 +443,10 @@ jsp1.getViewport().setViewPosition(new Point(pannello.getBounds().width,pannello
 							g.setColor((Color)Config.get("IFColor"));
 						}
 					}
-					g.fillRect(10+(tempo+j-1)*30,9+i*15,30,13);
+					g.fillRect(10+(curTime+j-1)*30,9+i*15,30,13);
 					g.setColor(Color.black);
-					g.drawRect(10+(tempo+j-1)*30,9+i*15,30,13);
-					g.drawString(st, 15+(tempo+j-1)*30,20+i*15);
+					g.drawRect(10+(curTime+j-1)*30,9+i*15,30,13);
+					g.drawString(st, 15+(curTime+j-1)*30,20+i*15);
 					j++;
 					if((!st.equals(" "))&&(!st.equals("RAW")))
 						pre=st;
@@ -496,7 +471,7 @@ jsp1.getViewport().setViewPosition(new Point(pannello.getBounds().width,pannello
 			g.setFont(f1); 
 			
 			int i=0;
-			for(ElementoCiclo el:lista){
+			for(ElementoCiclo el:elementsList){
 				g.drawString(el.getName(), 5,20+i*15);
 				i++;
 			}

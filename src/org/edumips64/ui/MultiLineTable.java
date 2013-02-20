@@ -172,10 +172,10 @@ public class MultiLineTable extends JTable {
 		TableModel tm = getModel();
 		int fontHeight = getFontMetrics(getFont()).getHeight();
 		int height = fontHeight;
-		Enumeration cols = getColumnModel().getColumns();
+		Enumeration<TableColumn> cols = getColumnModel().getColumns();
 		int i = 0;
 		while(cols.hasMoreElements()) {
-			TableColumn col = (TableColumn) cols.nextElement();
+			TableColumn col = cols.nextElement();
 			TableCellRenderer tcr = col.getCellRenderer();
 			// without the revalidate hack above, the call th getWidth does not give the
 			// right value at the right time. Take out the revalidate and uncomment the
@@ -206,9 +206,9 @@ public class MultiLineTable extends JTable {
 
 		int index = 0;
 		int columnMargin = getColumnModel().getColumnMargin();
-		Enumeration enumeration = getColumnModel().getColumns();
+		Enumeration<TableColumn> enumeration = getColumnModel().getColumns();
 		while (enumeration.hasMoreElements()) {
-			aColumn = (TableColumn)enumeration.nextElement();
+			aColumn = enumeration.nextElement();
 			cellFrame.width = aColumn.getWidth() + columnMargin;
 
 			if (index == column)

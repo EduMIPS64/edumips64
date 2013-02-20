@@ -158,7 +158,7 @@ public class GUIRegisters extends GUIComponent
 			theTable.setShowGrid(false);
 			Font f = new Font("Monospaced", Font.PLAIN, 12);
 			theTable.setFont(f);
-			theTable.setAutoResizeMode(theTable.AUTO_RESIZE_OFF);
+			theTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
 			//ascoltatore della tabella
 			theTable.addFocusListener(new FocusAdapter() {
@@ -341,6 +341,7 @@ public class GUIRegisters extends GUIComponent
       			}
 			}
     
+            @SuppressWarnings("rawtypes")
     		public Class getColumnClass(int c) 
 			{
      	 		return columnClasses[c];

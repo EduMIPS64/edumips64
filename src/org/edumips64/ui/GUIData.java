@@ -100,7 +100,7 @@ public class GUIData extends GUIComponent
 			theTable.setShowGrid(false);
 			Font f = new Font("Monospaced", Font.PLAIN, 12);
 			theTable.setFont(f);
-			theTable.setAutoResizeMode(theTable.AUTO_RESIZE_OFF);
+			theTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 			theTable.addFocusListener(new FocusAdapter() {
 				public void focusGained(FocusEvent e) {
@@ -231,6 +231,7 @@ public class GUIData extends GUIComponent
                 return toReturn;
 			}
     
+            @SuppressWarnings("rawtypes")
 			public Class getColumnClass(int c) 
 			{
 				return columnClasses[c];

@@ -76,7 +76,6 @@ public class Main extends JApplet {
     private static java.util.List<JCheckBoxMenuItem> frames_menu_items;
 
     // Stuff for choosing colors
-    private static JList pipeStatus;
     private static JColorChooser colorCh;
     private static JButton applyColor;
     private static JLabel label;
@@ -543,8 +542,8 @@ public class Main extends JApplet {
             else
                 f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
         }
-        for(Map.Entry e : mapped_frames.entrySet())
-            ((JInternalFrame)e.getValue()).setTitle(CurrentLocale.getString(((String)e.getKey()).toUpperCase()));
+        for(Map.Entry<String, JInternalFrame>e : mapped_frames.entrySet())
+            e.getValue().setTitle(CurrentLocale.getString(e.getKey().toUpperCase()));
     }
 
     public static void resetSimulator(boolean reopenFile) {
@@ -673,11 +672,13 @@ public class Main extends JApplet {
         LinkedList<String> files = (LinkedList<String>)Config.get("files");
         if(files.size()>0){
             int i = 0;
-            for(Iterator it = files.iterator(); it.hasNext(); i++ ){
-                if(i < 6 ){
-                    final String filename = (String)it.next();
+            for(String filename : files) {
+                if(i < 6) {
                     addLastFile(filename,i);
-                }else files.removeLast();
+                } else {
+                    files.removeLast();
+                }
+                i++;
             }
         }
 
