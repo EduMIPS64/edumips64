@@ -30,7 +30,7 @@ If you need to compile the PDF manual, you will also need:
 
 A distribution of JUnit 4 is included in the libs/ directory, since it is
 needed for unit test and this project uses Travis CI for continuous
-integration.
+integration (https://travis-ci.org/lupino3/edumips64).
 
 Main Ant targets
 ----------------
