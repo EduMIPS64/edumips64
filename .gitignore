@@ -3,3 +3,4 @@
 *.sw*
 build
 build/*
+docs/*/output
