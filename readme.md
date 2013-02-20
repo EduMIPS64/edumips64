@@ -16,9 +16,9 @@ Requirements
 ------------
 
 In order to compile EduMIPS64, you need the following tools:
-- Java JDK version 6 or above. The simulator has been originally developed
-  using Java 5, but since version 5 has reached EOL and modern distributions
-  don't supply it anymore, the current target is version 6.
+- Java JDK version 6 or above. The simulator should be compilable with version
+  5, just change the src_java_version and dst_java_version variables in the
+  build.xml file to "5" if you need it.
 - Apache Ant version 1.8 or above (needed for JUnit 4 tests)
 - Sphinx (http://sphinx.pocoo.org/) versione 1.0.7 or above
 - GNU Make
