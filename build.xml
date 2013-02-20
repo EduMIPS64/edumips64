@@ -39,6 +39,10 @@
         <!-- Docs directories -->
         <property name="docs_src_it" value="docs/it/src" />
         <property name="docs_src_en" value="docs/en/src" />
+
+        <!-- Compilation options -->
+        <property name="src_java_version" value="6" />
+        <property name="dst_java_version" value="6" />
 	</target>
 
     <target name="mkdirs" depends="init">
@@ -115,7 +119,8 @@
     <!-- *** test *** run unit tests-->
     <target name="test" depends="mkdirs">
         <javac
-            target="6"
+            source="${src_java_version}"
+            target="${dst_java_version}"
             srcdir="${sourceDir}"
             destdir="${outputDir}"
             nowarn="yes"
@@ -141,7 +146,8 @@
     <!-- *** standalone-jar *** compile without debug information, with embedded javahelp -->
 	<target name="standalone-jar" depends="mkdirs,htmldoc">
         <javac
-            target="6"
+            source="${src_java_version}"
+            target="${dst_java_version}"
             srcdir="${sourceDir}"
             excludes="tests/**"
             destdir="${outputDir}"
@@ -162,7 +168,8 @@
     <!-- *** applet-jar *** like standalone-jar, but sign it at the end. -->
 	<target name="applet-jar" depends="mkdirs,htmldoc">
         <javac
-            target="6"
+            source="${src_java_version}"
+            target="${dst_java_version}"
             srcdir="${sourceDir}"
             excludes="tests/**"
             destdir="${outputDir}"
@@ -184,7 +191,8 @@
     <!-- *** slim-jar *** compile without debug information and without javahelp. -->
 	<target name="slim-jar" depends="mkdirs,htmldoc">
         <javac
-            target="6"
+            source="${src_java_version}"
+            target="${dst_java_version}"
             srcdir="${sourceDir}"
             excludes="tests/**"
             destdir="${outputDir}"
@@ -203,7 +211,8 @@
     <!-- *** debug-jar *** compile with debug information and embeds javahelp. -->
 	<target name="debug-jar" depends="mkdirs,htmldoc">
         <javac
-            target="6"
+            source="${src_java_version}"
+            target="${dst_java_version}"
             srcdir="${sourceDir}"
             excludes="tests/**"
             destdir="${outputDir}"
@@ -225,7 +234,8 @@
     <!-- *** cli-jar *** runs org.edumips64.MainCLI, with debug info. -->
 	<target name="cli-jar" depends="mkdirs,htmldoc">
         <javac
-            target="6"
+            source="${src_java_version}"
+            target="${dst_java_version}"
             srcdir="${sourceDir}"
             excludes="tests/**"
             destdir="${outputDir}"
