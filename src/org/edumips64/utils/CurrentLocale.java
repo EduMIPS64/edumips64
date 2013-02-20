@@ -25,57 +25,64 @@ package org.edumips64.utils;
 import java.util.*;
 import java.io.*;
 import java.net.URL;
-public class CurrentLocale{
-	
-	static HashMap<String,String> en,it;
+import java.util.logging.Logger;
 
-	//static String currentLocale;
-	
-	/* Static initializer. Needed because we don't have a constructor */
-	static {
-		//Config.set("language","en");//"en";
-		en = new HashMap<String,String>();
-		it = new HashMap<String,String>();
-		try{
-			loadMessages("en",en);
-			loadMessages("it",it);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+public class CurrentLocale {
+    
+    static Map<String, Map<String, String>> languages;
 
-		
-	}
-	public static void loadMessages(String filename,Map<String,String> map)throws FileNotFoundException, IOException{
-		String line;
-		//BufferedReader in;
-		
-		URL url = CurrentLocale.class.getResource("MessagesBundle_" + 
-				filename + ".properties");
-            	InputStreamReader isr = new InputStreamReader (url.openStream ());
-            	BufferedReader br = new BufferedReader (isr);
-				
-		while ((line = br.readLine())!=null){
-			String[] l = line.split("=",2);	
-			map.put(l[0].trim(),l[1].trim());
-		}
-		br.close();
-		isr.close();
-		//System.out.println(map);
-		
-	}
-	
-	public static void setLanguage(String language){
-		
-		Config.set("language",language);
-	}
-	
+    private static final Logger logger = Logger.getLogger(CurrentLocale.class.getName());
+    
+    static {
+        languages = new HashMap<String, Map<String, String>>();
+        languages.put("en", new HashMap<String, String>());
+        languages.put("it", new HashMap<String, String>());
 
-	public static String getString(String key){
-		return Config.get("language").equals("it") ? 
-			it.get(key) 
-			: en.get(key);
-	}
-	public static boolean isSelected(String lan){
-		return (Config.get("language").equals(lan));
-	}		
+        try{
+            loadMessages("en", languages.get("en"));
+        } catch(Exception e) {
+            logger.severe("Could not load the English localization: " + e);
+        }
+
+        try {
+            loadMessages("it", languages.get("it"));
+        } catch(Exception e) {
+            logger.severe("Could not load the Italian localization: " + e);
+        }
+    }
+
+    public static void loadMessages(String filename, Map<String, String> map) throws FileNotFoundException, IOException {
+        String line;
+        
+        URL url = CurrentLocale.class.getResource("MessagesBundle_" + filename + ".properties");
+        InputStreamReader isr = new InputStreamReader (url.openStream ());
+        BufferedReader br = new BufferedReader (isr);
+                
+        while ((line = br.readLine())!=null){
+            String[] l = line.split("=",2);    
+            map.put(l[0].trim(),l[1].trim());
+        }
+        br.close();
+        isr.close();
+    }
+    
+    public static void setLanguage(String language) {
+        Config.set("language", language);
+    }
+    
+
+    public static String getString(String key){
+        String lang_name = (String)Config.get("language");
+        try {
+            Map<String, String> lang = languages.get(lang_name);
+            return lang.get(key);
+        } catch (Exception e) {
+            logger.severe("Could not look up find language " + lang_name + "; key: " + key);
+            return key;
+        }
+    }
+
+    public static boolean isSelected(String lan) {
+        return Config.get("language").equals(lan);
+    }        
 }
