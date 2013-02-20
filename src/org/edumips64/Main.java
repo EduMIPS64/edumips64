@@ -880,9 +880,9 @@ public class Main extends JApplet {
         pipelineJCB.setState(true);
         pipelineJCB.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                boolean cur_state = ((JInternalFrame)mapped_frames.get("pipeline")).isIcon();
+                boolean cur_state = mapped_frames.get("pipeline").isIcon();
                 try {
-                    ((JInternalFrame)mapped_frames.get("pipeline")).setIcon(!cur_state);
+                    mapped_frames.get("pipeline").setIcon(!cur_state);
                 }
                 catch(java.beans.PropertyVetoException ex) {}
             }
@@ -894,9 +894,9 @@ public class Main extends JApplet {
         cyclesJCB.setState(true);
         cyclesJCB.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                boolean cur_state = ((JInternalFrame)mapped_frames.get("cycles")).isIcon();
+                boolean cur_state = mapped_frames.get("cycles").isIcon();
                 try {
-                    ((JInternalFrame)mapped_frames.get("cycles")).setIcon(!cur_state);
+                    mapped_frames.get("cycles").setIcon(!cur_state);
                 }
                 catch(java.beans.PropertyVetoException ex) {}
             }
@@ -908,9 +908,9 @@ public class Main extends JApplet {
         registersJCB.setState(true);
         registersJCB.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                boolean cur_state = ((JInternalFrame)mapped_frames.get("registers")).isIcon();
+                boolean cur_state = mapped_frames.get("registers").isIcon();
                 try {
-                    ((JInternalFrame)mapped_frames.get("registers")).setIcon(!cur_state);
+                    mapped_frames.get("registers").setIcon(!cur_state);
                 }
                 catch(java.beans.PropertyVetoException ex) {}
             }
@@ -922,9 +922,9 @@ public class Main extends JApplet {
         statsJCB.setState(true);
         statsJCB.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                boolean cur_state = ((JInternalFrame)mapped_frames.get("stats")).isIcon();
+                boolean cur_state = mapped_frames.get("stats").isIcon();
                 try {
-                    ((JInternalFrame)mapped_frames.get("stats")).setIcon(!cur_state);
+                    mapped_frames.get("stats").setIcon(!cur_state);
                 }
                 catch(java.beans.PropertyVetoException ex) {}
             }
@@ -936,9 +936,9 @@ public class Main extends JApplet {
         memoryJCB.setState(true);
         memoryJCB.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                boolean cur_state = ((JInternalFrame)mapped_frames.get("memory")).isIcon();
+                boolean cur_state = mapped_frames.get("memory").isIcon();
                 try {
-                    ((JInternalFrame)mapped_frames.get("memory")).setIcon(!cur_state);
+                    mapped_frames.get("memory").setIcon(!cur_state);
                 }
                 catch(java.beans.PropertyVetoException ex) {}
             }
@@ -950,9 +950,9 @@ public class Main extends JApplet {
         codeJCB.setState(true);
         codeJCB.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                boolean cur_state = ((JInternalFrame)mapped_frames.get("code")).isIcon();
+                boolean cur_state = mapped_frames.get("code").isIcon();
                 try {
-                    ((JInternalFrame)mapped_frames.get("code")).setIcon(!cur_state);
+                    mapped_frames.get("code").setIcon(!cur_state);
                 }
                 catch(java.beans.PropertyVetoException ex) {}
             }
@@ -964,9 +964,9 @@ public class Main extends JApplet {
         ioJCB.setState(true);
         ioJCB.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                boolean cur_state = ((JInternalFrame)mapped_frames.get("io")).isIcon();
+                boolean cur_state = mapped_frames.get("io").isIcon();
                 try {
-                    ((JInternalFrame)mapped_frames.get("io")).setIcon(!cur_state);
+                    mapped_frames.get("io").setIcon(!cur_state);
                 }
                 catch(java.beans.PropertyVetoException ex) {}
             }

@@ -201,9 +201,9 @@ public class SYSCALL extends Instruction {
 			// Let's record in the tracefile the format string's memory access
             // t1 will hold the address of the last memory cell accessed
             // while we were reading format_string.
-            int t1 = (int)format_string_address + format_string.length();
+            int t1 = format_string_address + format_string.length();
             t1 += 8 - (t1 % 8);
-			for(int i = (int)format_string_address; i < t1; i += 8)
+			for(int i = format_string_address; i < t1; i += 8)
 				din.Load(Converter.binToHex(Converter.positiveIntToBin(64,i)),8);
 			
 			int oldIndex = 0, newIndex = 0;

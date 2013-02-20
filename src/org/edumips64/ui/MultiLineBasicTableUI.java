@@ -201,9 +201,9 @@ public class MultiLineBasicTableUI extends javax.swing.plaf.basic.BasicTableUI {
 				g.drawLine(x - 1, rect.y, x - 1, rect.y + rect.height - 1);
 			}
 
-			if (index < count)
-				x += ((TableColumn)table.getColumnModel().getColumn(index)).
-					getWidth() + horizontalSpacing;
+			if (index < count) {
+				x += table.getColumnModel().getColumn(index).getWidth() + horizontalSpacing;
+            }
 		}
 	}
   private void paintRow(Graphics g, int row) {

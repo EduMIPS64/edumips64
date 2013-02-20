@@ -378,13 +378,12 @@ public class GUIConfig extends JDialog{
 		});
 		okButton.addActionListener(new ActionListener() {
 			public void actionPerformed(final ActionEvent e) {
-				if( (Boolean) Config.get("show_aliases")  !=  updatedMap.get("show_aliases")) 	
-				{
-                           Config.setMap(updatedMap); 
-                                     ((GUIFrontend) org.edumips64.Main.getGUIFrontend()).updateComponents(); 
-                             } 
-                             else 
-                                     Config.setMap(updatedMap); 
+                if((Boolean) Config.get("show_aliases")  !=  updatedMap.get("show_aliases")) {
+                    Config.setMap(updatedMap); 
+                    org.edumips64.Main.getGUIFrontend().updateComponents(); 
+                } else {
+                    Config.setMap(updatedMap); 
+                }
 				setVisible(false);
 				if(Instruction.getEnableForwarding() != (Boolean)Config.get("forwarding")) {
 					CPU cpu = CPU.getInstance();

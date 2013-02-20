@@ -24,12 +24,14 @@ package org.edumips64.ui;
 
 import org.edumips64.core.*;
 import org.edumips64.utils.*;
+
 import java.awt.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.table.*;
 import java.awt.event.*;
+import java.util.*;
+import java.util.logging.Logger;
+import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.table.*;
 
 /**
 * This class draw the data memory representation.
@@ -42,6 +44,8 @@ public class GUIData extends GUIComponent
 	String memoryAddress[] = new String[CPU.DATALIMIT];	
 	JTextArea text;
 	int row;
+
+    private static final Logger logger = Logger.getLogger(CPU.class.getName());
 	
 	public GUIData()
 	{
@@ -197,44 +201,34 @@ public class GUIData extends GUIComponent
     
 			public Object getValueAt(int row, int col) 
 			{
-				switch(col) 
-				{
-					case 0:
-						try 
-						{
-							long address = cpu.getMemory().getCellByIndex(row).getAddress();
-							return Converter.binToHex(Converter.positiveIntToBin(16,address));
-						}
-						catch(IrregularStringOfBitsException ex) { }
-						catch(MemoryElementNotFoundException ex) { }
-					case 1:
-						try 
-						{
-							return cpu.getMemory().getCellByIndex(row).getHexString();
-						}
-						catch(IrregularStringOfBitsException ex) { }
-						catch(MemoryElementNotFoundException ex) { }
-					case 2:
-						try 
-						{
-							return cpu.getMemory().getCellByIndex(row).getLabel();
-						}
-						catch(MemoryElementNotFoundException ex) { }
-					case 3:
-						try  
-						{
-							return cpu.getMemory().getCellByIndex(row).getCode();
-						}
-						catch(MemoryElementNotFoundException ex) { }
-					case 4:
-						try 
-						{
-							return cpu.getMemory().getCellByIndex(row).getComment();
-						}
-						catch(MemoryElementNotFoundException ex) { }
-					default:
-						return new Object();
-				}
+                Object toReturn = new Object();
+                try {
+                    switch(col) {
+                        case 0:
+                            long address = cpu.getMemory().getCellByIndex(row).getAddress();
+                            toReturn = Converter.binToHex(Converter.positiveIntToBin(16,address));
+                            break;
+                        case 1:
+                            toReturn = cpu.getMemory().getCellByIndex(row).getHexString();
+                            break;
+                        case 2:
+                            toReturn = cpu.getMemory().getCellByIndex(row).getLabel();
+                            break;
+                        case 3:
+                            toReturn = cpu.getMemory().getCellByIndex(row).getCode();
+                            break;
+                        case 4:
+                            toReturn = cpu.getMemory().getCellByIndex(row).getComment();
+                            break;
+                    }
+                }
+                catch(IrregularStringOfBitsException ex) {
+                    logger.warning(ex.toString());
+                }
+                catch(MemoryElementNotFoundException ex) { 
+                    logger.warning(ex.toString());
+                }
+                return toReturn;
 			}
     
 			public Class getColumnClass(int c) 

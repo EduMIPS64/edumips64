@@ -252,9 +252,9 @@ public class GUIAbout extends JDialog implements Runnable  {
 			return (line <= head || line >= height)?		 	// we are out of border?
 				0 							//  nothing to draw
 				: (line> head && line <=border +  head)?		// else, under text but over the upper border?
-					(int)((line -head)*255/border) 			// the transparency depends of the posizion
+					((line -head)*255/border) 			// the transparency depends of the posizion
 					: (line>=height-border && line<height) ? 	// on the down border?
-						(int)((height-line) * 255 / border) 	// the transparency depends of the posizion
+						((height-line) * 255 / border) 	// the transparency depends of the posizion
 						:255;					// in the borders: the text must be visible		
 		}
 	}
