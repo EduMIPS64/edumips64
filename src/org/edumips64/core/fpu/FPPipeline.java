@@ -176,7 +176,7 @@ public class FPPipeline {
   public int putInstruction(Instruction instr, boolean simulation) {  //throws InputStructuralHazardException
     cpu = CPU.getInstance();
 
-    if (CPU.knownFPInstructions.contains(instr.getName()) && instr != null) {
+    if (instr != null && CPU.knownFPInstructions.contains(instr.getName())) {
       String instrName = instr.getName();
 
       if ((instrName.compareToIgnoreCase("ADD.D") == 0) || (instrName.compareToIgnoreCase("SUB.D") == 0))
