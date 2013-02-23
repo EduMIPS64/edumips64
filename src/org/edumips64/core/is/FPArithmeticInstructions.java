@@ -80,7 +80,41 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
   }
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException {
+    //getting values from temporary registers
+    String operand1 = TRfp[FS_FIELD].getBinString();
+    String operand2 = TRfp[FT_FIELD].getBinString();
+    String outputstring = null;
+
+    try {
+      outputstring = doFPArith(operand1, operand2);
+      TRfp[FD_FIELD].setBits(outputstring, 0);
+    } catch (Exception ex) {
+      //if the enable forwarding is turned on we have to ensure that registers
+      //should be unlocked also if a synchronous exception occurs. This is performed
+      //by executing the WB method before raising the trap
+      if (enableForwarding) {
+        doWB();
+      }
+
+      if (ex instanceof FPInvalidOperationException) {
+        throw new FPInvalidOperationException();
+      } else if (ex instanceof FPUnderflowException) {
+        throw new FPUnderflowException();
+      } else if (ex instanceof FPOverflowException) {
+        throw new FPOverflowException();
+      } else if (ex instanceof FPDivideByZeroException) {
+        throw new FPDivideByZeroException();
+      } else if (ex instanceof IrregularStringOfBitsException) {
+        throw new IrregularStringOfBitsException();
+      }
+    }
+
+    if (enableForwarding) {
+      doWB();
+    }
   }
+
+  protected abstract String doFPArith(String operand1, String operand2) throws FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, IrregularStringOfBitsException;
 
   public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
     cpu.getRegisterFP(params.get(FD_FIELD)).decrWAWSemaphore();

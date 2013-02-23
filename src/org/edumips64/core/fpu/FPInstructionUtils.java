@@ -298,12 +298,8 @@ public class FPInstructionUtils {
       BigDecimal operand1 = null;
       BigDecimal operand2 = null;
 
-      try {
-        operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false)));
-        operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false)));
-      } catch (IrregularStringOfBitsException ex) {
-        ex.printStackTrace();
-      }
+      operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false)));
+      operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false)));
 
       BigDecimal result = operand1.add(operand2, mc);
 
@@ -418,12 +414,8 @@ public class FPInstructionUtils {
       BigDecimal operand1 = null;
       BigDecimal operand2 = null;
 
-      try {
-        operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false)));
-        operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false)));
-      } catch (IrregularStringOfBitsException ex) {
-        ex.printStackTrace();
-      }
+      operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false)));
+      operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false)));
 
       BigDecimal result = operand1.subtract(operand2, mc);
 
@@ -435,8 +427,6 @@ public class FPInstructionUtils {
     }
 
     return null;
-
-
   }
 
   /** This method performs the multiplication between two double values, if  the passed values are Snan or Qnan
@@ -533,12 +523,8 @@ public class FPInstructionUtils {
       BigDecimal operand1 = null;
       BigDecimal operand2 = null;
 
-      try {
-        operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false)));
-        operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false)));
-      } catch (IrregularStringOfBitsException ex) {
-        ex.printStackTrace();
-      }
+      operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false)));
+      operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false)));
 
       BigDecimal result = operand1.multiply(operand2, mc);
 
@@ -550,10 +536,6 @@ public class FPInstructionUtils {
     }
 
     return null;
-
-
-
-
   }
 
 
@@ -655,20 +637,14 @@ public class FPInstructionUtils {
 
       }
 
-
-
       //at this point operands can be divided and if an  underflow occurs
       //and if exceptions are activated then a trap happens else results are returned
       MathContext mc = new MathContext(1000, RoundingMode.HALF_EVEN);
       BigDecimal operand1 = null;
       BigDecimal operand2 = null;
 
-      try {
-        operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false)));
-        operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false)));
-      } catch (IrregularStringOfBitsException ex) {
-        ex.printStackTrace();
-      }
+      operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false)));
+      operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false)));
 
       BigDecimal result = operand1.divide(operand2, mc);
 
@@ -679,13 +655,7 @@ public class FPInstructionUtils {
     }
 
     return null;
-
-
-
-
   }
-
-
 
   /**Returns a string with a double value or the name of a special value
     * it is recommended the use of this method only for the visualisation of the double value because it may return an alphanumeric value
