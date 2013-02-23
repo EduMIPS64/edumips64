@@ -247,7 +247,7 @@ public class DineroFrontend extends JDialog {
 
 /** Panel with all the necessary controls to modify the options of a Cache.
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings( {"rawtypes", "unchecked"})
 class DineroSingleCachePanel extends JPanel {
   private DineroCacheOptions dco;
   private JComboBox size, sizeUnit, bsize, bsizeUnit;

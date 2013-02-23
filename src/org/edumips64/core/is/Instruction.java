@@ -951,12 +951,15 @@ public abstract class Instruction {
     if (instr == null) {
       return false;
     }
+
     if (instr == this) {
       return true;
     }
+
     if (!(instr instanceof Instruction)) {
       return false;
     }
+
     Instruction i = (Instruction) instr;
     return i.getRepr().getBinString().equalsIgnoreCase(this.repr.getBinString());
   }

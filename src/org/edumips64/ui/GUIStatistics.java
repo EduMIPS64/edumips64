@@ -49,7 +49,7 @@ public class GUIStatistics extends GUIComponent {
 
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
+  @SuppressWarnings( {"rawtypes", "unchecked"})
   class StatPanel extends JPanel {
     JList statList;
     String [] statistics = {" Execution", " 0 Cycles", " 0 Instructions", " ", " Stalls", " 0 RAW Stalls", " 0 WAW Stalls",
@@ -91,7 +91,7 @@ public class GUIStatistics extends GUIComponent {
     cont.repaint();
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
+  @SuppressWarnings( {"rawtypes", "unchecked"})
   class MyListCellRenderer implements ListCellRenderer {
     private JLabel label;
 
