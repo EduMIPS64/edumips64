@@ -895,7 +895,6 @@ public class CPU {
     public void setBits(String bits, int start) {
     }
     public void writeByteUnsigned(int value) {}
-    public void writebyte(int value) {}
     public void writeByte(int value, int offset) {}
     public void writeHalfUnsigned(int value) {}
     public void writeHalf(int value) {}
