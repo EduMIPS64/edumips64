@@ -16,9 +16,7 @@ Requirements
 ------------
 
 In order to compile EduMIPS64, you need the following tools:
-- Java JDK version 6 or above. The simulator should be compilable with version
-  5, just change the src_java_version and dst_java_version variables in the
-  build.xml file to "5" if you need it.
+- Java JDK version 6 or above. 
 - Apache Ant version 1.8 or above (needed for JUnit 4 tests)
 - Sphinx (http://sphinx.pocoo.org/) versione 1.0.7 or above
 - GNU Make
@@ -52,8 +50,6 @@ Main Ant targets
 * `test` runs unit tests; it depends on junit4.jar being added to the
   classpath
 
-* `debug-jar` builds a jar package that contains more debug information
-
 * `cli-jar` build a jar package containing an experimental CLI front-end
 
 * `src-release` builds a tar.bz2 file containing the source distribution
@@ -61,9 +57,15 @@ Main Ant targets
 * `javadoc` builds the javadoc documentation (depends on junit4.jar being
   in CLASSPATH); will store it in the `javadoc` directory.
 
-Example
--------
+Compilation options
+-------------------
 
-    $ ant
-    [... compilation output omitted ...]
-    $ java -jar edumips64-1.0.jar
+Set those variables to modify some compile-time options:
+
+* src_java_version (default: 6): Java version of source code;
+
+* dst_java_version (default: 6): bytecode target version;
+
+* debug (default: off): whether to compile with debugging info;
+
+To set any variable, use the -D option of ant.
