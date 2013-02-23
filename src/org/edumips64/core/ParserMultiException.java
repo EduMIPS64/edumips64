@@ -1,6 +1,5 @@
 package org.edumips64.core;
 import java.util.*;
-import org.edumips64.utils.ErrorOutput;
 /*
  * ParserMultiException.java
  *
