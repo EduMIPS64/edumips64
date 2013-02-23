@@ -31,41 +31,43 @@ import java.math.*;
 
 /**
  *<pre>
- *	Format: CVT.D.W fd, fs
+ *  Format: CVT.D.W fd, fs
  * Description: To convert a word fixed point value to double FP
  *   Operation: fd = convert_and_round(fs.readword,FCSR[CURRENT_ROUND_MODE])
  *</pre>
  */
 class CVT_D_W extends FPConversionFCSRInstructions {
-	static String OPCODE_VALUE="100101";
-	static String FMT_FIELD="10100"; //WORD IS 20
-	static String NAME = "CVT.D.W";
-	
-	public CVT_D_W() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		super.FMT_FIELD = FMT_FIELD;
-		super.name=NAME;
-	}
-	
-	public void EX() throws IrregularStringOfBitsException, FPInvalidOperationException, IrregularWriteOperationException, FPUnderflowException, FPOverflowException {
-		//getting values from temporary registers
-		BigDecimal bd;
-		String fs=TRfp[FS_FIELD].getBinString();
-		if((bd=FPInstructionUtils.intToDouble(fs))==null){
-			//before raising the trap or return the special value we modify the cause bit
-			cpu.setFCSRCause("V",1);			
-			if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
-				throw new FPInvalidOperationException();
-			else{
-				cpu.setFCSRFlags("V",1);
-				TRfp[FD_FIELD].setBits("0000000000000000000000000000000000000000000000000000000000000000",0);
-			}
-		}
-		else{
-			TRfp[FD_FIELD].writeDouble(bd.doubleValue());
-		}
-		if(enableForwarding) {
-			doWB();
-		}
-	}
+  static String OPCODE_VALUE = "100101";
+  static String FMT_FIELD = "10100"; //WORD IS 20
+  static String NAME = "CVT.D.W";
+
+  public CVT_D_W() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.FMT_FIELD = FMT_FIELD;
+    super.name = NAME;
+  }
+
+  public void EX() throws IrregularStringOfBitsException, FPInvalidOperationException, IrregularWriteOperationException, FPUnderflowException, FPOverflowException {
+    //getting values from temporary registers
+    BigDecimal bd;
+    String fs = TRfp[FS_FIELD].getBinString();
+
+    if ((bd = FPInstructionUtils.intToDouble(fs)) == null) {
+      //before raising the trap or return the special value we modify the cause bit
+      cpu.setFCSRCause("V", 1);
+
+      if (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
+        throw new FPInvalidOperationException();
+      } else {
+        cpu.setFCSRFlags("V", 1);
+        TRfp[FD_FIELD].setBits("0000000000000000000000000000000000000000000000000000000000000000", 0);
+      }
+    } else {
+      TRfp[FD_FIELD].writeDouble(bd.doubleValue());
+    }
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
 }

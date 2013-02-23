@@ -28,61 +28,63 @@ import java.net.URL;
 import java.util.logging.Logger;
 
 public class CurrentLocale {
-    
-    static Map<String, Map<String, String>> languages;
 
-    private static final Logger logger = Logger.getLogger(CurrentLocale.class.getName());
-    
-    static {
-        languages = new HashMap<String, Map<String, String>>();
-        languages.put("en", new HashMap<String, String>());
-        languages.put("it", new HashMap<String, String>());
+  static Map<String, Map<String, String>> languages;
 
-        try{
-            loadMessages("en", languages.get("en"));
-        } catch(Exception e) {
-            logger.severe("Could not load the English localization: " + e);
-        }
+  private static final Logger logger = Logger.getLogger(CurrentLocale.class.getName());
 
-        try {
-            loadMessages("it", languages.get("it"));
-        } catch(Exception e) {
-            logger.severe("Could not load the Italian localization: " + e);
-        }
+  static {
+    languages = new HashMap<String, Map<String, String>>();
+    languages.put("en", new HashMap<String, String>());
+    languages.put("it", new HashMap<String, String>());
+
+    try {
+      loadMessages("en", languages.get("en"));
+    } catch (Exception e) {
+      logger.severe("Could not load the English localization: " + e);
     }
 
-    public static void loadMessages(String filename, Map<String, String> map) throws FileNotFoundException, IOException {
-        String line;
-        
-        URL url = CurrentLocale.class.getResource("MessagesBundle_" + filename + ".properties");
-        InputStreamReader isr = new InputStreamReader (url.openStream ());
-        BufferedReader br = new BufferedReader (isr);
-                
-        while ((line = br.readLine())!=null){
-            String[] l = line.split("=",2);    
-            map.put(l[0].trim(),l[1].trim());
-        }
-        br.close();
-        isr.close();
+    try {
+      loadMessages("it", languages.get("it"));
+    } catch (Exception e) {
+      logger.severe("Could not load the Italian localization: " + e);
     }
-    
-    public static void setLanguage(String language) {
-        Config.set("language", language);
-    }
-    
+  }
 
-    public static String getString(String key){
-        String lang_name = (String)Config.get("language");
-        try {
-            Map<String, String> lang = languages.get(lang_name);
-            return lang.get(key);
-        } catch (Exception e) {
-            logger.severe("Could not look up find language " + lang_name + "; key: " + key);
-            return key;
-        }
+  public static void loadMessages(String filename, Map<String, String> map) throws FileNotFoundException, IOException {
+    String line;
+
+    URL url = CurrentLocale.class.getResource("MessagesBundle_" + filename + ".properties");
+    InputStreamReader isr = new InputStreamReader(url.openStream());
+    BufferedReader br = new BufferedReader(isr);
+
+    while ((line = br.readLine()) != null) {
+      String[] l = line.split("=", 2);
+      map.put(l[0].trim(), l[1].trim());
     }
 
-    public static boolean isSelected(String lan) {
-        return Config.get("language").equals(lan);
-    }        
+    br.close();
+    isr.close();
+  }
+
+  public static void setLanguage(String language) {
+    Config.set("language", language);
+  }
+
+
+  public static String getString(String key) {
+    String lang_name = (String) Config.get("language");
+
+    try {
+      Map<String, String> lang = languages.get(lang_name);
+      return lang.get(key);
+    } catch (Exception e) {
+      logger.severe("Could not look up find language " + lang_name + "; key: " + key);
+      return key;
+    }
+  }
+
+  public static boolean isSelected(String lan) {
+    return Config.get("language").equals(lan);
+  }
 }

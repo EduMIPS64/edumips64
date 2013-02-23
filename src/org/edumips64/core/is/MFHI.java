@@ -42,44 +42,48 @@ import java.util.*;
  *
  */
 class MFHI extends ALU_RType {
-	final int RD_FIELD=0;
-	final int HI_REG=1;
-	final String OPCODE_VALUE="010000";
-	
-	public MFHI() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		syntax="%R";
-		name="MFHI";
-	}
-	public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
-		//if the HI register is valid passing his own value into temporary register
-		Register hi_reg=cpu.getHI();
-		if(hi_reg.getWriteSemaphore()>0)
-			throw new RAWException();
-		TR[HI_REG]=hi_reg;
-		//locking the destination register
-		Register rd=cpu.getRegister(params.get(RD_FIELD));
-		rd.incrWriteSemaphore();
-	}
-	public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException {
-		if(enableForwarding) {
-			doWB();
-		}
-	}
-	
-	public void WB() throws IrregularStringOfBitsException {
-		if(!enableForwarding)
-			doWB();
-	}
-	
-	public void doWB() throws IrregularStringOfBitsException {
-		cpu.getRegister(params.get(RD_FIELD)).setBits(TR[HI_REG].getBinString(),0);
-		cpu.getRegister(params.get(RD_FIELD)).decrWriteSemaphore();
-	}
-	public void pack() throws IrregularStringOfBitsException {
-		//conversion of instruction parameters of "params" list to the "repr" form (32 binary value)
-		repr.setBits(OPCODE_VALUE,OPCODE_VALUE_INIT);
-		repr.setBits(Converter.intToBin(RD_FIELD_LENGTH,params.get(RD_FIELD)),RD_FIELD_INIT);
-	}
-	
+  final int RD_FIELD = 0;
+  final int HI_REG = 1;
+  final String OPCODE_VALUE = "010000";
+
+  public MFHI() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    syntax = "%R";
+    name = "MFHI";
+  }
+  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+    //if the HI register is valid passing his own value into temporary register
+    Register hi_reg = cpu.getHI();
+
+    if (hi_reg.getWriteSemaphore() > 0) {
+      throw new RAWException();
+    }
+
+    TR[HI_REG] = hi_reg;
+    //locking the destination register
+    Register rd = cpu.getRegister(params.get(RD_FIELD));
+    rd.incrWriteSemaphore();
+  }
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+    if (enableForwarding) {
+      doWB();
+    }
+  }
+
+  public void WB() throws IrregularStringOfBitsException {
+    if (!enableForwarding) {
+      doWB();
+    }
+  }
+
+  public void doWB() throws IrregularStringOfBitsException {
+    cpu.getRegister(params.get(RD_FIELD)).setBits(TR[HI_REG].getBinString(), 0);
+    cpu.getRegister(params.get(RD_FIELD)).decrWriteSemaphore();
+  }
+  public void pack() throws IrregularStringOfBitsException {
+    //conversion of instruction parameters of "params" list to the "repr" form (32 binary value)
+    repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);
+    repr.setBits(Converter.intToBin(RD_FIELD_LENGTH, params.get(RD_FIELD)), RD_FIELD_INIT);
+  }
+
 }

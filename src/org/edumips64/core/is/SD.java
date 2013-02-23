@@ -39,17 +39,15 @@ import org.edumips64.utils.*;
  */
 public class SD extends Storing {
 
-    final String OPCODE_VALUE="111111";
-    public SD()
-    {
-        super.OPCODE_VALUE = OPCODE_VALUE;
-        this.name="SD";
-        this.memoryOpSize = 8;
-    }
+  final String OPCODE_VALUE = "111111";
+  public SD() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "SD";
+    this.memoryOpSize = 8;
+  }
 
-    public void doMEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
-    {
-        memEl.setBits(TR[RT_FIELD].getBinString(),0);
-    }
+  public void doMEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+    memEl.setBits(TR[RT_FIELD].getBinString(), 0);
+  }
 }
- 
+

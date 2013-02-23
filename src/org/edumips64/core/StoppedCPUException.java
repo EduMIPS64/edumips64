@@ -3,7 +3,7 @@
  *
  * (c) Andrea Spadaccini, 2006
  *
- * Exception thrown when the CPU.step() method is invoked when the CPU is in the 
+ * Exception thrown when the CPU.step() method is invoked when the CPU is in the
  * STOPPED state.
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -26,7 +26,7 @@
 
 package org.edumips64.core;
 
-/** Exception thrown when the CPU.step() method is invoked when the CPU is in 
+/** Exception thrown when the CPU.step() method is invoked when the CPU is in
  * the STOPPED state.
  *
  * @author Andrea Spadaccini

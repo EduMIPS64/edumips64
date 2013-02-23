@@ -33,33 +33,34 @@ import org.edumips64.utils.IrregularStringOfBitsException;
  *          Syntax: DADDU rd, rs, rt
  *     Description: rd = rs + rt
  *                  To add 64-bit integers
- *		    The 64-bit doubleword value in GPR rt is added to the 64-bit value 
- *		    in GPR rs and the 64-bit arithmetic result is placed into GPR rd.
- *		    No Integer Overflow exception occurs under any circumstances.
+ *        The 64-bit doubleword value in GPR rt is added to the 64-bit value
+ *        in GPR rs and the 64-bit arithmetic result is placed into GPR rd.
+ *        No Integer Overflow exception occurs under any circumstances.
  * </pre>
  * @author Trubia Massimo, Russo Daniele
  */
 public class DADDU extends ALU_RType {
-	final String OPCODE_VALUE = "101101";
-	public DADDU() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		name = "DADDU";
-	}
-	
-	public void EX()
-	throws IrregularStringOfBitsException, IntegerOverflowException,TwosComplementSumException {
-		//getting String from temporary register
-		String rs = TR[RS_FIELD].getBinString();
-		String rt = TR[RT_FIELD].getBinString();
-		
-		long rs_int = Converter.binToLong(rs,false);
-		long rt_int = Converter.binToLong(rt,false);
-		
-		String outputstring = InstructionsUtils.twosComplementSum(rs, rt);
-		//There isn't IntegerOverflow cases
-		TR[RD_FIELD].setBits(outputstring, 0);
-		if(enableForwarding) {
-			doWB();
-		}
-	}
+  final String OPCODE_VALUE = "101101";
+  public DADDU() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    name = "DADDU";
+  }
+
+  public void EX()
+  throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+    //getting String from temporary register
+    String rs = TR[RS_FIELD].getBinString();
+    String rt = TR[RT_FIELD].getBinString();
+
+    long rs_int = Converter.binToLong(rs, false);
+    long rt_int = Converter.binToLong(rt, false);
+
+    String outputstring = InstructionsUtils.twosComplementSum(rs, rt);
+    //There isn't IntegerOverflow cases
+    TR[RD_FIELD].setBits(outputstring, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
 }

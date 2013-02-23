@@ -37,108 +37,107 @@ import java.util.*;
  *      Syntax: MULT rs, rt
  * Description: (LO,HI) = rs * rt
  *              To multiply 32-bit signed integers
- *              The 32-bit word value in GPR rt is multiplied by the 32-bit 
+ *              The 32-bit word value in GPR rt is multiplied by the 32-bit
  *              value in GPR rs, treating both operands as signed values.
- *		The low-order 32-bit word of the result is sign-extended and placed into special register
- *		LO, and the high-order 32-bit word is sign-extended and placed into special register HI.
+ *    The low-order 32-bit word of the result is sign-extended and placed into special register
+ *    LO, and the high-order 32-bit word is sign-extended and placed into special register HI.
  * </pre>
- * 
+ *
  * @author Giorgio Scibilia - Erik Urzi'- Sciuto Lorenzo
  */
-class MULT extends ALU_RType
-{
-	final int RS_FIELD=0;
-	final int RT_FIELD=1;
-	final String OPCODE_VALUE="011000";
+class MULT extends ALU_RType {
+  final int RS_FIELD = 0;
+  final int RT_FIELD = 1;
+  final String OPCODE_VALUE = "011000";
 
-	String lo;
-	String hi;
+  String lo;
+  String hi;
 
-	public MULT()
-	{
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		syntax="%R,%R";
-		name="MULT";
-	}
-	public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
-	        //if source registers are valid passing their own values into temporary registers
-	        Register rs=cpu.getRegister(params.get(RS_FIELD));
-	        Register rt=cpu.getRegister(params.get(RT_FIELD));
-	        if(rs.getWriteSemaphore()>0 || rt.getWriteSemaphore()>0)
-	            throw new RAWException();
-	        TR[RS_FIELD]=rs;
-	        TR[RT_FIELD]=rt;
-	        //locking the destination register 
-	  
-	        cpu.getLO().incrWriteSemaphore();
-	        cpu.getHI().incrWriteSemaphore();
-	}
+  public MULT() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    syntax = "%R,%R";
+    name = "MULT";
+  }
+  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+    //if source registers are valid passing their own values into temporary registers
+    Register rs = cpu.getRegister(params.get(RS_FIELD));
+    Register rt = cpu.getRegister(params.get(RT_FIELD));
 
-	
-	public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException 
-	{
-		//getting registers' values and cutting the first 32-bits
-		String str_rs=TR[RS_FIELD].getBinString();
-	        String str_rt=TR[RT_FIELD].getBinString();
-		//cutting the high part of registers
-		str_rs=str_rs.substring(32,64);
-		str_rt=str_rt.substring(32,64);
-		
-		long rs = Converter.binToLong(str_rs,false);
-		long rt = Converter.binToLong(str_rt,false);				
-		long result = rs * rt;
+    if (rs.getWriteSemaphore() > 0 || rt.getWriteSemaphore() > 0) {
+      throw new RAWException();
+    }
 
-		//converting result to a String of 64-bit 
-		String tmp = Long.toString(result,2);
-		char first = '0';
-		if (tmp.charAt(0)=='-'){
-			first = '1';
-			tmp=tmp.substring(1);
-			tmp=Converter.twoComplement(tmp);
-		}
-		for (int i=tmp.length();i<64;i++){
-			tmp=first+tmp;		
-		}	
-		hi = tmp.substring(0,32);
-		lo = tmp.substring(32);
-		//performing sign extension		
-		for(int i=0; i<32; i++){
-			hi = hi.charAt(0)+hi;
-			lo = lo.charAt(0)+lo;
-		}
+    TR[RS_FIELD] = rs;
+    TR[RT_FIELD] = rt;
+    //locking the destination register
 
-		if(enableForwarding)
-		{
-			doWB();
-		}    
-	}
+    cpu.getLO().incrWriteSemaphore();
+    cpu.getHI().incrWriteSemaphore();
+  }
 
 
-	public void WB() throws IrregularStringOfBitsException 
-	{
-		if(!enableForwarding)
-		{
-			doWB();
-		}
-	}
-	public void doWB() throws IrregularStringOfBitsException 
-	{
-	        //passing results from temporary registers to destination registers and unlocking them
-	        Register lo = cpu.getLO();
-		Register hi = cpu.getHI();
-	        lo.setBits(this.lo,0);
-		hi.setBits(this.hi,0);
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+    //getting registers' values and cutting the first 32-bits
+    String str_rs = TR[RS_FIELD].getBinString();
+    String str_rt = TR[RT_FIELD].getBinString();
+    //cutting the high part of registers
+    str_rs = str_rs.substring(32, 64);
+    str_rt = str_rt.substring(32, 64);
 
-	        lo.decrWriteSemaphore();
-	        hi.decrWriteSemaphore();
-	}
-	public void pack() throws IrregularStringOfBitsException 
-	{
-	        //conversion of instruction parameters of "params" list to the "repr" form (32 binary value) 
-	        repr.setBits(OPCODE_VALUE,OPCODE_VALUE_INIT);
-	        repr.setBits(Converter.intToBin(RS_FIELD_LENGTH,params.get(RS_FIELD)),RS_FIELD_INIT);
-	        repr.setBits(Converter.intToBin(RT_FIELD_LENGTH,params.get(RT_FIELD)),RT_FIELD_INIT);
-	}   
-   
-    
+    long rs = Converter.binToLong(str_rs, false);
+    long rt = Converter.binToLong(str_rt, false);
+    long result = rs * rt;
+
+    //converting result to a String of 64-bit
+    String tmp = Long.toString(result, 2);
+    char first = '0';
+
+    if (tmp.charAt(0) == '-') {
+      first = '1';
+      tmp = tmp.substring(1);
+      tmp = Converter.twoComplement(tmp);
+    }
+
+    for (int i = tmp.length(); i < 64; i++) {
+      tmp = first + tmp;
+    }
+
+    hi = tmp.substring(0, 32);
+    lo = tmp.substring(32);
+
+    //performing sign extension
+    for (int i = 0; i < 32; i++) {
+      hi = hi.charAt(0) + hi;
+      lo = lo.charAt(0) + lo;
+    }
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
+
+
+  public void WB() throws IrregularStringOfBitsException {
+    if (!enableForwarding) {
+      doWB();
+    }
+  }
+  public void doWB() throws IrregularStringOfBitsException {
+    //passing results from temporary registers to destination registers and unlocking them
+    Register lo = cpu.getLO();
+    Register hi = cpu.getHI();
+    lo.setBits(this.lo, 0);
+    hi.setBits(this.hi, 0);
+
+    lo.decrWriteSemaphore();
+    hi.decrWriteSemaphore();
+  }
+  public void pack() throws IrregularStringOfBitsException {
+    //conversion of instruction parameters of "params" list to the "repr" form (32 binary value)
+    repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);
+    repr.setBits(Converter.intToBin(RS_FIELD_LENGTH, params.get(RS_FIELD)), RS_FIELD_INIT);
+    repr.setBits(Converter.intToBin(RT_FIELD_LENGTH, params.get(RT_FIELD)), RT_FIELD_INIT);
+  }
+
+
 }

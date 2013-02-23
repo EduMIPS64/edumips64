@@ -35,19 +35,16 @@ import org.edumips64.utils.*;
   * </pre>
  * @author Trubia Massimo, Russo Daniele
  */
-class LBU extends Loading
-{
-    final String OPCODE_VALUE="100100";
-    public LBU()
-    {
-        super.OPCODE_VALUE = OPCODE_VALUE;
-        this.name="LBU";
-        this.memoryOpSize = 1;
-    }
+class LBU extends Loading {
+  final String OPCODE_VALUE = "100100";
+  public LBU() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "LBU";
+    this.memoryOpSize = 1;
+  }
 
-    public void doMEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
-    { 
-        //reading first 8 low bits from the memory element and saving values on LMD register with zero padding
-        TR[LMD_REGISTER].writeByteUnsigned(memEl.readByteUnsigned((int)(address%8)));
-    }        
+  public void doMEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+    //reading first 8 low bits from the memory element and saving values on LMD register with zero padding
+    TR[LMD_REGISTER].writeByteUnsigned(memEl.readByteUnsigned((int)(address % 8)));
+  }
 }

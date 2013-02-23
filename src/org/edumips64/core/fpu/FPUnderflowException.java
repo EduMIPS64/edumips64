@@ -26,10 +26,10 @@ package org.edumips64.core.fpu;
 /** Exception thrown when a small double number cannot be represented on 64 bit according to IEEE754 standard
  * @author Trubia Massimo
  */
-public class FPUnderflowException extends org.edumips64.core.SynchronousException{
-	public FPUnderflowException() {
-		super("FPUNDERFLOW");
-	}
-	
+public class FPUnderflowException extends org.edumips64.core.SynchronousException {
+  public FPUnderflowException() {
+    super("FPUNDERFLOW");
+  }
+
 }
 

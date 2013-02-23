@@ -1,6 +1,6 @@
 /*ElementoCiclo.java
  *
- * This class represents the single element that is then drawn in the cycles 
+ * This class represents the single element that is then drawn in the cycles
  * component.
  * (c) 2006 Filippo Mondello
  *
@@ -26,76 +26,75 @@ package org.edumips64.ui;
 import java.util.*;
 
 /**
-* This class represents the single element that is then drawn in the cycles 
+* This class represents the single element that is then drawn in the cycles
 * component.
 * @author Filippo Mondello
 */
-public class ElementoCiclo{
-	
-	boolean flagCancella;
-	int tempoInizio;
-	private String nome;
-	private LinkedList<String> stato;
-	private Long serialNumber; //instruction serial number
-	
-	/**
-	* A new element of this class is created.
-	* @param nom the name of the instruction
-	* @param tempo the time in which the element is entered in pipeline
-	*/
-	public ElementoCiclo(String nom,int tempo,long serialNumber){
-		stato=new LinkedList<String>();
-		nome=nom;
-		tempoInizio=tempo;
-		stato.add("IF");
-		flagCancella=false;
-		this.serialNumber=serialNumber;
-		
-	}
-	/**
-	* @return the name of the instruction
-	*/
-	public String getName(){
-		return nome;
-	}
-	
-	/**
-	* This method is called for every clock cycle.
-	* @param stat the current stage in pipeline of the instruction.
-	*/
-	public void addStato(String stat){
-		stato.add(stat);
-	}
-	
-	/**
-	* @return the whole list of stages in pipeline 
-	*/
-	public LinkedList<String> getStato(){
-		return stato;
-	}
-	
-	/**
-	* @return the initial time in which the instruction occuped the IF stage in pipeline.
-	*/
-	public int getTime(){
-		return tempoInizio;
-	}
-	
-	public void setFlagCancella(boolean f){
-		flagCancella=f;
-	}
-	
-	/**
-	* @return the value of the flag that indicate if an instruction has been aborted.
-	*/
-	public boolean getFlagCancella(){
-		return flagCancella;
-	}
-	
-	/** Returns the serial number of the referred instruction*/
-	public long getSerialNumber()
-	{
-		return serialNumber;
-	}
-	
+public class ElementoCiclo {
+
+  boolean flagCancella;
+  int tempoInizio;
+  private String nome;
+  private LinkedList<String> stato;
+  private Long serialNumber; //instruction serial number
+
+  /**
+  * A new element of this class is created.
+  * @param nom the name of the instruction
+  * @param tempo the time in which the element is entered in pipeline
+  */
+  public ElementoCiclo(String nom, int tempo, long serialNumber) {
+    stato = new LinkedList<String>();
+    nome = nom;
+    tempoInizio = tempo;
+    stato.add("IF");
+    flagCancella = false;
+    this.serialNumber = serialNumber;
+
+  }
+  /**
+  * @return the name of the instruction
+  */
+  public String getName() {
+    return nome;
+  }
+
+  /**
+  * This method is called for every clock cycle.
+  * @param stat the current stage in pipeline of the instruction.
+  */
+  public void addStato(String stat) {
+    stato.add(stat);
+  }
+
+  /**
+  * @return the whole list of stages in pipeline
+  */
+  public LinkedList<String> getStato() {
+    return stato;
+  }
+
+  /**
+  * @return the initial time in which the instruction occuped the IF stage in pipeline.
+  */
+  public int getTime() {
+    return tempoInizio;
+  }
+
+  public void setFlagCancella(boolean f) {
+    flagCancella = f;
+  }
+
+  /**
+  * @return the value of the flag that indicate if an instruction has been aborted.
+  */
+  public boolean getFlagCancella() {
+    return flagCancella;
+  }
+
+  /** Returns the serial number of the referred instruction*/
+  public long getSerialNumber() {
+    return serialNumber;
+  }
+
 }

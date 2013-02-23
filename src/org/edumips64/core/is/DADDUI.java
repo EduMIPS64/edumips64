@@ -32,7 +32,7 @@ import org.edumips64.utils.*;
  * <pre>
  *        Syntax: DADDUI rt, rs, immediate
  *   Description: To add a constant to a 64-bit integer
- *                The 16-bit signed immediate is added to the 64-bit value 
+ *                The 16-bit signed immediate is added to the 64-bit value
  *                in GPR rs and the 64-bit arithmetic result is placed into
  *                GPR rt. No Integer Overflow exception occurs under any circumstances.
  * </pre>

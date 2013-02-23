@@ -33,42 +33,41 @@ import org.edumips64.utils.IrregularStringOfBitsException;
  *          Syntax: ADDU rd, rs, rt
  *     Description: rd = rs + rt
  *                  To add 32-bit integers
- *		    The 32-bit word value in GPR rt is added to the 32-bit value 
- *		    in GPR rs and the 32-bit arithmetic result is sign-extended and placed into GPR rd.
- *		    No Integer Overflow exception occurs under any circumstances.
+ *        The 32-bit word value in GPR rt is added to the 32-bit value
+ *        in GPR rs and the 32-bit arithmetic result is sign-extended and placed into GPR rd.
+ *        No Integer Overflow exception occurs under any circumstances.
  * </pre>
  * @author Lorenzo Sciuto - Erik UrzÃ¬ - Giorgio Scibilia
  */
-public class ADDU extends ALU_RType
-{
-    final String OPCODE_VALUE = "100001";
-    public ADDU()
-    {
-    	super.OPCODE_VALUE = OPCODE_VALUE;
-        name = "ADDU";
-    }
-	
-    public void EX() 
-    throws IrregularStringOfBitsException, IntegerOverflowException,TwosComplementSumException
-    {
-        //getting String from temporary register
-        String rs = TR[RS_FIELD].getBinString();
-        String rt = TR[RT_FIELD].getBinString();
-        //cutting the high part of registers
-        rs=rs.substring(32,64);
-        rt=rt.substring(32,64);
-        String outputstring = InstructionsUtils.twosComplementSum(rs, rt);
-        //There isn't IntegerOverflow cases
-        //performing sign extension
-	outputstring=outputstring.substring(0,32);
-	String filledOutputstring=outputstring;
-	for(int i=0; i<32; i++)
-		filledOutputstring = filledOutputstring.charAt(0)+filledOutputstring;
+public class ADDU extends ALU_RType {
+  final String OPCODE_VALUE = "100001";
+  public ADDU() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    name = "ADDU";
+  }
 
-       	TR[RD_FIELD].setBits(filledOutputstring,0);
-	if(enableForwarding)
-	{
-		doWB();
-	}
+  public void EX()
+  throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+    //getting String from temporary register
+    String rs = TR[RS_FIELD].getBinString();
+    String rt = TR[RT_FIELD].getBinString();
+    //cutting the high part of registers
+    rs = rs.substring(32, 64);
+    rt = rt.substring(32, 64);
+    String outputstring = InstructionsUtils.twosComplementSum(rs, rt);
+    //There isn't IntegerOverflow cases
+    //performing sign extension
+    outputstring = outputstring.substring(0, 32);
+    String filledOutputstring = outputstring;
+
+    for (int i = 0; i < 32; i++) {
+      filledOutputstring = filledOutputstring.charAt(0) + filledOutputstring;
     }
+
+    TR[RD_FIELD].setBits(filledOutputstring, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
 }

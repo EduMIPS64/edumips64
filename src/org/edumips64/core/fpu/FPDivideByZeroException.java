@@ -19,15 +19,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */ 
+ */
 package org.edumips64.core.fpu;
- 
-/** The division of any number by zero other than zero itself gives infinity as a result. 
- *  The addition or multiplication of two numbers may also give infinity as a result. 
+
+/** The division of any number by zero other than zero itself gives infinity as a result.
+ *  The addition or multiplication of two numbers may also give infinity as a result.
  *  So to differentiate between the two cases, a divide-by-zero exception was implemented.
  */
-public class FPDivideByZeroException extends org.edumips64.core.SynchronousException{
-	public FPDivideByZeroException() {
-		super("FPDIVBYZERO");
-	}
+public class FPDivideByZeroException extends org.edumips64.core.SynchronousException {
+  public FPDivideByZeroException() {
+    super("FPDIVBYZERO");
+  }
 }

@@ -37,44 +37,44 @@ import org.edumips64.utils.*;
  */
 
 public class StatusBar {
-	private JLabel statusLabel;
-	private JProgressBar pb;
-	private Box box;
-	private Component sbComponent;
+  private JLabel statusLabel;
+  private JProgressBar pb;
+  private Box box;
+  private Component sbComponent;
 
-	public StatusBar() {
-		statusLabel = new JLabel();
-		statusLabel.setText(CurrentLocale.getString("StatusBar.WELCOME") + " " + org.edumips64.Main.VERSION);
+  public StatusBar() {
+    statusLabel = new JLabel();
+    statusLabel.setText(CurrentLocale.getString("StatusBar.WELCOME") + " " + org.edumips64.Main.VERSION);
 
-		pb = new JProgressBar(0, 10);
-		pb.setMaximumSize(new Dimension(30, 10));
-		//pb.setIndeterminate(true);
+    pb = new JProgressBar(0, 10);
+    pb.setMaximumSize(new Dimension(30, 10));
+    //pb.setIndeterminate(true);
 
-		//statusLabel.setBorder(BorderFactory.createLoweredBevelBorder());
-		box = Box.createHorizontalBox();
-		box.setBorder(BorderFactory.createLoweredBevelBorder());
-		box.add(statusLabel);
-		box.add(Box.createHorizontalGlue());
-		box.add(pb);
+    //statusLabel.setBorder(BorderFactory.createLoweredBevelBorder());
+    box = Box.createHorizontalBox();
+    box.setBorder(BorderFactory.createLoweredBevelBorder());
+    box.add(statusLabel);
+    box.add(Box.createHorizontalGlue());
+    box.add(pb);
 
-		//sbComponent = statusLabel;
-		sbComponent = box;
-	}
+    //sbComponent = statusLabel;
+    sbComponent = box;
+  }
 
-	public Component getComponent() {
-		return sbComponent;
-	}
+  public Component getComponent() {
+    return sbComponent;
+  }
 
-	public void startPB() {
-		pb.setIndeterminate(true);
-	}
+  public void startPB() {
+    pb.setIndeterminate(true);
+  }
 
-	public void stopPB() {
-		pb.setIndeterminate(false);
-	}
+  public void stopPB() {
+    pb.setIndeterminate(false);
+  }
 
-	public void setText(String text) {
-		statusLabel.setText(text);
-	}
+  public void setText(String text) {
+    statusLabel.setText(text);
+  }
 }
 

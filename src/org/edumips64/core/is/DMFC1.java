@@ -31,29 +31,30 @@ import java.math.*;
 
 /**
  *<pre>
- *	Format: DMFC1 rt,fs
+ *  Format: DMFC1 rt,fs
  * Description: To move a doubleword from an FPR to a GPR.
  *   Operation: rt=fs
  *</pre>
  */
 class DMFC1 extends FPMoveFromInstructions {
-	String OPCODE_VALUE="00001";
-	String NAME = "DMFC1";
-	
-	public DMFC1() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		super.name=NAME;
-	}
-	
-	
-	public void EX() throws IrregularStringOfBitsException {
-		//getting values from temporary registers
-		String value=TRfp[FS_FIELD].getBinString();
-		TR[RT_FIELD].setBits(value,0);
-		if(enableForwarding) {
-			doWB();
-		}
-	}
-	
-		
+  String OPCODE_VALUE = "00001";
+  String NAME = "DMFC1";
+
+  public DMFC1() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.name = NAME;
+  }
+
+
+  public void EX() throws IrregularStringOfBitsException {
+    //getting values from temporary registers
+    String value = TRfp[FS_FIELD].getBinString();
+    TR[RT_FIELD].setBits(value, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
+
+
 }

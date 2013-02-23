@@ -29,48 +29,50 @@ import org.edumips64.utils.*;
  * <pre>
  *      Syntax: JALR rs
  *     Purpose: To execute a procedure call to an instruction address in a register
- *              Place the return address link in GPR 31. 
+ *              Place the return address link in GPR 31.
  *</pre>
  * @author Trubia Massimo, Russo Daniele
  *
  */
 
 public class JALR extends FlowControl_RType {
-	final int PC_VALUE=0;
-	final String OPCODE_VALUE="001001";
-	public JALR() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		this.name="JALR";
-	}
-	
-	public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,JumpException {
-		//saving PC value into a temporary register
-		cpu.getRegister(31).incrWriteSemaphore();  //deadlock !!!
-		TR[PC_VALUE].writeDoubleWord(cpu.getPC().getValue()-4);
-		cpu.getPC().setBits(cpu.getRegister(params.get(RS_FIELD)).getBinString(),0);
-		if(enableForwarding) {
-			doWB();
-		}
-		throw new JumpException();
-	}
-	
-	public void EX() throws IrregularStringOfBitsException,IntegerOverflowException, IrregularWriteOperationException {
-	}
-	
-	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
-	}
-	
-	
-	public void WB() throws IrregularStringOfBitsException {
-		if(!enableForwarding) {
-			doWB();
-		}
-	}
-	public void doWB() throws IrregularStringOfBitsException {
-		cpu.getRegister(31).setBits(TR[PC_VALUE].getBinString(),0);
-		cpu.getRegister(31).decrWriteSemaphore();  //deadlock!!!
-	}
-	
+  final int PC_VALUE = 0;
+  final String OPCODE_VALUE = "001001";
+  public JALR() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "JALR";
+  }
+
+  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException {
+    //saving PC value into a temporary register
+    cpu.getRegister(31).incrWriteSemaphore();  //deadlock !!!
+    TR[PC_VALUE].writeDoubleWord(cpu.getPC().getValue() - 4);
+    cpu.getPC().setBits(cpu.getRegister(params.get(RS_FIELD)).getBinString(), 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+
+    throw new JumpException();
+  }
+
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, IrregularWriteOperationException {
+  }
+
+  public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
+  }
+
+
+  public void WB() throws IrregularStringOfBitsException {
+    if (!enableForwarding) {
+      doWB();
+    }
+  }
+  public void doWB() throws IrregularStringOfBitsException {
+    cpu.getRegister(31).setBits(TR[PC_VALUE].getBinString(), 0);
+    cpu.getRegister(31).decrWriteSemaphore();  //deadlock!!!
+  }
+
 }
 
 

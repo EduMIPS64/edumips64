@@ -1,7 +1,7 @@
 /*
  * ParserException.java
  *
- * Single Exception not throwable 
+ * Single Exception not throwable
  *
  * (c) 2006 mancausoft, Vanni
  *
@@ -31,46 +31,44 @@ import org.edumips64.utils.*;
  * @author mancausoft, Vanni
  */
 
-public class ParserException 
-{
-	
-	private int row, column;
-	private String line,description;
-	private boolean isError;
-	
-	/** Create a new instance of ParserException
-	 *  @param description The Description of exception
-	 *  @param row The row where there are a error
-	 *  @param column The column where there are a error
-	 *  @param line A String with bad code 
-	 */
-	public ParserException(String description,int row,int column,String line)
-	{
-		this.row = row;
-		this.column = column;
-		this.line = line;
-		this.description = CurrentLocale.getString(description);
+public class ParserException {
 
-	}
+  private int row, column;
+  private String line, description;
+  private boolean isError;
 
-	public void setError(boolean iserror){
-		isError = iserror;
-	}
-	public boolean isError(){
-		return isError;
-	}
-	/** Returns a string representation of the ParserException
-	 * @return a string representation of the ParserException
-	 */
-	public String toString()
-	{
-		String tmp = new String(CurrentLocale.getString("ROW") + " " + row + ", " + CurrentLocale.getString("COLUMN") + " " + column + ": " + line + "\n" + description);
-		return tmp;
-	}
-	public String[] getStringArray(){
-		return new String[]{	"" + row,
-					"" + column,
-					line,
-					description };
-	}
+  /** Create a new instance of ParserException
+   *  @param description The Description of exception
+   *  @param row The row where there are a error
+   *  @param column The column where there are a error
+   *  @param line A String with bad code
+   */
+  public ParserException(String description, int row, int column, String line) {
+    this.row = row;
+    this.column = column;
+    this.line = line;
+    this.description = CurrentLocale.getString(description);
+
+  }
+
+  public void setError(boolean iserror) {
+    isError = iserror;
+  }
+  public boolean isError() {
+    return isError;
+  }
+  /** Returns a string representation of the ParserException
+   * @return a string representation of the ParserException
+   */
+  public String toString() {
+    String tmp = new String(CurrentLocale.getString("ROW") + " " + row + ", " + CurrentLocale.getString("COLUMN") + " " + column + ": " + line + "\n" + description);
+    return tmp;
+  }
+  public String[] getStringArray() {
+    return new String[] {  "" + row,
+                           "" + column,
+                           line,
+                           description
+                        };
+  }
 }

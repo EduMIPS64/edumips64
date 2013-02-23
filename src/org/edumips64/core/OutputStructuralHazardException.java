@@ -23,6 +23,6 @@ package org.edumips64.core;
  * (for example when two FP instructions finished at the same time or an FP instruction
  * finish when an integer instruction is passing from the EX to the MEM stage)
  *
- * @author Massimo Trubia 
+ * @author Massimo Trubia
  */
-public class OutputStructuralHazardException extends Exception{}
+public class OutputStructuralHazardException extends Exception {}

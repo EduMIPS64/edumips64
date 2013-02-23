@@ -29,9 +29,9 @@ package org.edumips64.core.is;
  *Exception thrown when there's an integer overflow
  * @author Trubia Massimo, Russo Daniele, Andrea Spadaccini
  */
-public class IntegerOverflowException extends org.edumips64.core.SynchronousException{
-	public IntegerOverflowException() {
-		super("INTOVERFLOW");
-	}
+public class IntegerOverflowException extends org.edumips64.core.SynchronousException {
+  public IntegerOverflowException() {
+    super("INTOVERFLOW");
+  }
 }
 

@@ -33,37 +33,33 @@ import org.edumips64.utils.*;
  *  Description: writewordmemory[base+offset] = ft
  *               To store a word from an FPR to memory
  */
-class SWC1 extends FPStoring
-{
-    final String OPCODE_VALUE="111001";
-    public SWC1()
-    {
-        super.OPCODE_VALUE = OPCODE_VALUE;
-        this.name="SWC1";
-    }
+class SWC1 extends FPStoring {
+  final String OPCODE_VALUE = "111001";
+  public SWC1() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "SWC1";
+  }
 
 
-    public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
-    { 
+  public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
 
-        //restoring the address from the temporary register
-        long address=TR[OFFSET_PLUS_BASE].getValue();
-        //For the trace file
-        Dinero din=Dinero.getInstance();
-        din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),4);
-        MemoryElement memEl = memory.getCellByAddress(address);
-        //writing on the memory element the RT register
-        memEl.writeWord(TR[RT_FIELD].readWord(0), (int) (address%8));
+    //restoring the address from the temporary register
+    long address = TR[OFFSET_PLUS_BASE].getValue();
+    //For the trace file
+    Dinero din = Dinero.getInstance();
+    din.Store(Converter.binToHex(Converter.positiveIntToBin(64, address)), 4);
+    MemoryElement memEl = memory.getCellByAddress(address);
+    //writing on the memory element the RT register
+    memEl.writeWord(TR[RT_FIELD].readWord(0), (int)(address % 8));
 
-    }
+  }
 
-    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
 
-    }
+  }
 
-    public void WB() throws IrregularStringOfBitsException
-    {
-    }
+  public void WB() throws IrregularStringOfBitsException {
+  }
 
 
 

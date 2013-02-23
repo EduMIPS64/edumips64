@@ -1,7 +1,7 @@
 /*
  * ParserWarning.java
  *
- * Single Error not throwable 
+ * Single Error not throwable
  *
  * (c) 2006 mancausoft, Vanni
  *
@@ -31,11 +31,9 @@ import org.edumips64.utils.CurrentLocale;
  * @author mancausoft, Vanni
  */
 
-public class ParserWarning extends ParserException 
-{
-	ParserWarning(String description,int row,int column,String line)	
-	{
-		super(description, row, column, line);
-		super.setError(false);	
-	}
+public class ParserWarning extends ParserException {
+  ParserWarning(String description, int row, int column, String line) {
+    super(description, row, column, line);
+    super.setError(false);
+  }
 }

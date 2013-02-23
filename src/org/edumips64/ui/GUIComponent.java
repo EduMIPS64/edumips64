@@ -30,37 +30,37 @@ import java.awt.*;
 * This abstract class is implemented by every graphics component class.
 * @author Filippo Mondello
 */
-public abstract class GUIComponent{
-	Container cont;
-	CPU cpu;
-	
-	public GUIComponent(){
-		cont=null;
-		cpu=CPU.getInstance();
-	}
-	
-	/**Set the container of the component class.
-	@param co the container sent by GUIFrontend class.
-	*/
-	public void setContainer(Container co){
-		cont=co;
-	}
-		
-	/**
-	* Update the component. All variables are up-to-date to current value, calling the required CPU methods.
-	* This method is called for every clock cycle.
-	*/
-	abstract public void update();
-	
-	/**Draw the component.
-	*/
-	abstract public void draw();
+public abstract class GUIComponent {
+  Container cont;
+  CPU cpu;
 
-    /**
-     * Update language-dependent parts of the intrface
-     */
+  public GUIComponent() {
+    cont = null;
+    cpu = CPU.getInstance();
+  }
 
-    public void updateLanguageStrings() {
-        // By default, do nothing.
-    }
+  /**Set the container of the component class.
+  @param co the container sent by GUIFrontend class.
+  */
+  public void setContainer(Container co) {
+    cont = co;
+  }
+
+  /**
+  * Update the component. All variables are up-to-date to current value, calling the required CPU methods.
+  * This method is called for every clock cycle.
+  */
+  abstract public void update();
+
+  /**Draw the component.
+  */
+  abstract public void draw();
+
+  /**
+   * Update language-dependent parts of the intrface
+   */
+
+  public void updateLanguageStrings() {
+    // By default, do nothing.
+  }
 }

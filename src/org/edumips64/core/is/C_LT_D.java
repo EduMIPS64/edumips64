@@ -31,19 +31,19 @@ import java.math.*;
 
 /**
   *<pre>
- *	Format: C.LT.D cc, fs, ft
+ *  Format: C.LT.D cc, fs, ft
  * Description: To compare FP values (less than) and record the Boolean result in a condition code in the range [0,7] stored on the FCSR as binary value
  *   Operation: if fs<ft FCSR[cc]=1 else FCSR[cc]=0
  *</pre>
 
  */
 class C_LT_D extends FPC_cond_DInstructions {
-	String COND_VALUE="0100"; // the first bit doesn't mean anything into this simulator
-				// (100)bin=(4)dec is the condition code assigned to the predicate less than in a MIPS64 processor
-	String NAME = "C.LT.D";
-	
-	public C_LT_D() {
-		super.COND_VALUE = COND_VALUE;
-		super.name=NAME;
-	}
+  String COND_VALUE = "0100"; // the first bit doesn't mean anything into this simulator
+  // (100)bin=(4)dec is the condition code assigned to the predicate less than in a MIPS64 processor
+  String NAME = "C.LT.D";
+
+  public C_LT_D() {
+    super.COND_VALUE = COND_VALUE;
+    super.name = NAME;
+  }
 }

@@ -31,31 +31,33 @@ import java.math.*;
 
 /**
  *<pre>
- *	Format: MOVZ.D fd, fs, rt
+ *  Format: MOVZ.D fd, fs, rt
  * Description: To test a GPR then conditionally move an FP value
  *   Operation: if rt = 0 then fd=fs
  *</pre>
  */
 class MOVZ_D extends FPConditionalZerosMoveInstructions {
-	String OPCODE_VALUE="010010";
-	String FMT_FIELD="10001"; //DOUBLE IS 17
-	String NAME = "MOVZ.D";
-	
-	public MOVZ_D() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		super.FMT_FIELD = FMT_FIELD;
-		super.name=NAME;
-	}
-	
-	public void EX() throws IrregularStringOfBitsException {
-		//getting values from temporary registers
-		String rt=TR[RT_FIELD].getBinString();
-		String fs=TRfp[FS_FIELD].getBinString();
-		
-		if(rt.matches("[0]{64}"))
-			TRfp[FD_FIELD].setBits(fs,0);
-		if(enableForwarding) {
-			doWB();
-		}
-	}
+  String OPCODE_VALUE = "010010";
+  String FMT_FIELD = "10001"; //DOUBLE IS 17
+  String NAME = "MOVZ.D";
+
+  public MOVZ_D() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.FMT_FIELD = FMT_FIELD;
+    super.name = NAME;
+  }
+
+  public void EX() throws IrregularStringOfBitsException {
+    //getting values from temporary registers
+    String rt = TR[RT_FIELD].getBinString();
+    String fs = TRfp[FS_FIELD].getBinString();
+
+    if (rt.matches("[0]{64}")) {
+      TRfp[FD_FIELD].setBits(fs, 0);
+    }
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
 }

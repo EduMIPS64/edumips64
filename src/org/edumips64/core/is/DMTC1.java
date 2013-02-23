@@ -37,21 +37,22 @@ import java.math.*;
  *</pre>
  */
 class DMTC1 extends FPMoveToInstructions {
-	String OPCODE_VALUE="00101";
-	String NAME = "DMTC1";
-	
-	public DMTC1() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		super.name=NAME;
-	}	
-	
-	public void EX() throws IrregularStringOfBitsException {
-		//getting values from temporary registers
-		String value=TR[RT_FIELD].getBinString();
-		TRfp[FS_FIELD].setBits(value,0);
-		if(enableForwarding) {
-			doWB();
-		}
-	}
-	
+  String OPCODE_VALUE = "00101";
+  String NAME = "DMTC1";
+
+  public DMTC1() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.name = NAME;
+  }
+
+  public void EX() throws IrregularStringOfBitsException {
+    //getting values from temporary registers
+    String value = TR[RT_FIELD].getBinString();
+    TRfp[FS_FIELD].setBits(value, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
+
 }

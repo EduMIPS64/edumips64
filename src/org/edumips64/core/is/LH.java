@@ -35,18 +35,15 @@ import org.edumips64.utils.*;
  * </pre>
  * @author Trubia Massimo, Russo Daniele
  */
-class LH extends Loading
-{
-    final String OPCODE_VALUE="100001";
-    public LH()
-    {
-        super.OPCODE_VALUE = OPCODE_VALUE;
-        this.name="LH";
-        this.memoryOpSize = 2;
-    }
+class LH extends Loading {
+  final String OPCODE_VALUE = "100001";
+  public LH() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "LH";
+    this.memoryOpSize = 2;
+  }
 
-    public void doMEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
-    { 
-        TR[LMD_REGISTER].writeHalf(memEl.readHalf((int)(address%8)));
-    }        
+  public void doMEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+    TR[LMD_REGISTER].writeHalf(memEl.readHalf((int)(address % 8)));
+  }
 }

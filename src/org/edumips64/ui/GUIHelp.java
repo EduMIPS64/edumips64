@@ -42,67 +42,66 @@ import org.edumips64.utils.CurrentLocale;
 
 
 /**
- * This class controls the Edumips64 user guide.  
+ * This class controls the Edumips64 user guide.
  */
 public class GUIHelp {
-        public final static String HELP_DEFAULT = "EduMIPS64Help";
-        
-        /**
-         * The help broker used to display Edumips's help.
-         */
-        private static HelpBroker helpBroker;
-        private static URL url,HSurl;
+  public final static String HELP_DEFAULT = "EduMIPS64Help";
 
-        private static URL[] parseURLs(String s){
-        	Vector<URL> vector = new Vector<URL>();
-        	try{
-        		URL url = new URL(s);
-        		vector.addElement(url);
-        	}
-        	catch(Exception exception){
-        		System.err.println("cannot create URL for " + s);
-        	}
-        	URL aurl[] = new URL[vector.size()];
-        	vector.copyInto(aurl);
-        	return aurl;
-        }
+  /**
+   * The help broker used to display Edumips's help.
+   */
+  private static HelpBroker helpBroker;
+  private static URL url, HSurl;
 
- 
-        /**
-         * Shows the Edumips64 help window. If the help system was not initialized properly, shows an error dialog
-         * instead.
-         * 
-         * @param parent
-         *            the parent that owns this help dialog
-         * @param helpId
-         *            the help ID to display (an invalid ID will result in the top level help topic being
-         *            displayed)
-         */
-        public static void showHelp(Window parent, String helpId) {
-        	HSurl = Main.class.getResource(CurrentLocale.getString("HELPDIR") + "/");
-        	String s = HSurl.getProtocol()+ ":" + HSurl.getPath().replace("%20", " ");
-            String s1 = CurrentLocale.getString("HELPSET");
-            try {
-            	URL aurl[] = GUIHelp.parseURLs(s);
-            	URLClassLoader urlclassloader = new URLClassLoader(aurl);
-            	url = HelpSet.findHelpSet(urlclassloader, s1);
-            	
-            	HelpSet helpset = new HelpSet(urlclassloader, url);
-                helpBroker = helpset.createHelpBroker();                
-                helpBroker.initPresentation();
-                helpBroker.setSize(new Dimension(800,600));
-                ((DefaultHelpBroker) helpBroker).setActivationWindow(parent);
-                helpBroker.initPresentation();
-                helpBroker.setSize(helpBroker.getSize());
-                helpBroker.setDisplayed(true);
-            }
-            catch(HelpSetException helpsetexception)
-            {
-                System.err.println("Could not create HelpSet for " + url);
-                System.err.println(helpsetexception);
-            }
-            catch (BadIDException bie) {
-                helpBroker.setCurrentID(HELP_DEFAULT);
-            }
-        }
+  private static URL[] parseURLs(String s) {
+    Vector<URL> vector = new Vector<URL>();
+
+    try {
+      URL url = new URL(s);
+      vector.addElement(url);
+    } catch (Exception exception) {
+      System.err.println("cannot create URL for " + s);
     }
+
+    URL aurl[] = new URL[vector.size()];
+    vector.copyInto(aurl);
+    return aurl;
+  }
+
+
+  /**
+   * Shows the Edumips64 help window. If the help system was not initialized properly, shows an error dialog
+   * instead.
+   *
+   * @param parent
+   *            the parent that owns this help dialog
+   * @param helpId
+   *            the help ID to display (an invalid ID will result in the top level help topic being
+   *            displayed)
+   */
+  public static void showHelp(Window parent, String helpId) {
+    HSurl = Main.class.getResource(CurrentLocale.getString("HELPDIR") + "/");
+    String s = HSurl.getProtocol() + ":" + HSurl.getPath().replace("%20", " ");
+    String s1 = CurrentLocale.getString("HELPSET");
+
+    try {
+      URL aurl[] = GUIHelp.parseURLs(s);
+      URLClassLoader urlclassloader = new URLClassLoader(aurl);
+      url = HelpSet.findHelpSet(urlclassloader, s1);
+
+      HelpSet helpset = new HelpSet(urlclassloader, url);
+      helpBroker = helpset.createHelpBroker();
+      helpBroker.initPresentation();
+      helpBroker.setSize(new Dimension(800, 600));
+      ((DefaultHelpBroker) helpBroker).setActivationWindow(parent);
+      helpBroker.initPresentation();
+      helpBroker.setSize(helpBroker.getSize());
+      helpBroker.setDisplayed(true);
+    } catch (HelpSetException helpsetexception) {
+      System.err.println("Could not create HelpSet for " + url);
+      System.err.println(helpsetexception);
+    } catch (BadIDException bie) {
+      helpBroker.setCurrentID(HELP_DEFAULT);
+    }
+  }
+}

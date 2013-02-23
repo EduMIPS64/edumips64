@@ -27,7 +27,7 @@ import org.edumips64.core.*;
 import org.edumips64.utils.*;
 
 
-/** 
+/**
  * <pre>
  *      Format: LDC1 ft, offset(base)
  * Description: To load a doubleword from memory to an FPR
@@ -35,28 +35,26 @@ import org.edumips64.utils.*;
  *</pre>
 
  */
-class LDC1 extends FPLoading
-{
-    String OPCODE_VALUE="110111";
-    public LDC1()
-    {
-    	super.OPCODE_VALUE = OPCODE_VALUE;
-        this.name="LDC1";
-    }
-    public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException 
-	{ 
-		super.MEM(); //unlock the fp register in order to avoid WAW hazards
-		//restoring the address from the temporary register
-		long address=TR[OFFSET_PLUS_BASE].getValue();
-		//For the trace file
-		Dinero din=Dinero.getInstance();
-		din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),8);
+class LDC1 extends FPLoading {
+  String OPCODE_VALUE = "110111";
+  public LDC1() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "LDC1";
+  }
+  public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+    super.MEM(); //unlock the fp register in order to avoid WAW hazards
+    //restoring the address from the temporary register
+    long address = TR[OFFSET_PLUS_BASE].getValue();
+    //For the trace file
+    Dinero din = Dinero.getInstance();
+    din.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), 8);
 
-        MemoryElement memEl = memory.getCellByAddress(address); 
-		//reading from the memory element and saving values on LMD register
-		TR[LMD_REGISTER].setBits(memEl.getBinString(),0);
-		if(enableForwarding) {
-			doWB();
-		}
-	}
+    MemoryElement memEl = memory.getCellByAddress(address);
+    //reading from the memory element and saving values on LMD register
+    TR[LMD_REGISTER].setBits(memEl.getBinString(), 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
 }

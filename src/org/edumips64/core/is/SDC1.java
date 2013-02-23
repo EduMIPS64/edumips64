@@ -33,35 +33,30 @@ import org.edumips64.utils.*;
  */
 public class SDC1 extends FPStoring {
 
-	String OPCODE_VALUE="111101";
-	public SDC1()
-	{
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		this.name="SDC1";
-	}
+  String OPCODE_VALUE = "111101";
+  public SDC1() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "SDC1";
+  }
 
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException
-	{
-		try
-		{
-			//restoring the address from the temporary register
-			long address=TR[OFFSET_PLUS_BASE].getValue();
-			//For the trace file
-			Dinero din=Dinero.getInstance();
-			din.Store(Converter.binToHex(Converter.positiveIntToBin(64,address)),8);
-            MemoryElement memEl = memory.getCellByAddress(address); 
-			//writing on the memory element the RT register
-			memEl.setBits(TR[RT_FIELD].getBinString(),0);
-			if(enableForwarding)
-			{
-				WB();
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+  public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException {
+    try {
+      //restoring the address from the temporary register
+      long address = TR[OFFSET_PLUS_BASE].getValue();
+      //For the trace file
+      Dinero din = Dinero.getInstance();
+      din.Store(Converter.binToHex(Converter.positiveIntToBin(64, address)), 8);
+      MemoryElement memEl = memory.getCellByAddress(address);
+      //writing on the memory element the RT register
+      memEl.setBits(TR[RT_FIELD].getBinString(), 0);
+
+      if (enableForwarding) {
+        WB();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
 }
-    
+

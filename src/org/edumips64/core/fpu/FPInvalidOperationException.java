@@ -19,18 +19,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */ 
+ */
 package org.edumips64.core.fpu;
- 
-/** Exception thrown in some arithmetic operations which are invalid operations and that 
+
+/** Exception thrown in some arithmetic operations which are invalid operations and that
  * give as a result a QNaN string and that signal a QNaN exception:
  * 1) Any operation on a NaN
  * 2) Addition or subtraction: ? + (??)
  * 3) Multiplication: Â± 0 Ã Â± ?
  * 4) Division: Â± 0/ Â± 0 or Â± ?/ Â± ?
  */
-public class FPInvalidOperationException  extends org.edumips64.core.SynchronousException{
-	public FPInvalidOperationException() {
-		super("FPINVALID");
-	}
+public class FPInvalidOperationException  extends org.edumips64.core.SynchronousException {
+  public FPInvalidOperationException() {
+    super("FPINVALID");
+  }
 }

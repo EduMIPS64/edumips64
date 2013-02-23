@@ -28,7 +28,7 @@ import org.edumips64.core.*;
 import org.edumips64.utils.*;
 
 
-/** 
+/**
   * <pre>
  *      Format: LWC1 ft, offset(base)
  * Description: To load a word from memory to an FPR
@@ -36,30 +36,27 @@ import org.edumips64.utils.*;
  *</pre>
 
  */
-class LWC1 extends FPLoading
-{
-    final String OPCODE_VALUE="110001";
-    public LWC1()
-    {
-        super.OPCODE_VALUE = OPCODE_VALUE;
-        this.name="LWC1";
-    }
-    
+class LWC1 extends FPLoading {
+  final String OPCODE_VALUE = "110001";
+  public LWC1() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "LWC1";
+  }
 
-    public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
-    { 
-		super.MEM(); //unlock the fp register in order to avoid WAW hazards
-        //restoring the address from the temporary register
-        long address=TR[OFFSET_PLUS_BASE].getValue();
-        //For the trace file
-        Dinero din=Dinero.getInstance();
-        din.Load(Converter.binToHex(Converter.positiveIntToBin(64,address)),4);
-        MemoryElement memEl = memory.getCellByAddress(address);
-        //reading from the memory element and saving values on LMD register
-        TR[LMD_REGISTER].writeWord(memEl.readWord((int)(address%8)));
-        if(enableForwarding)
-        {
-            doWB();
-        }
+
+  public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+    super.MEM(); //unlock the fp register in order to avoid WAW hazards
+    //restoring the address from the temporary register
+    long address = TR[OFFSET_PLUS_BASE].getValue();
+    //For the trace file
+    Dinero din = Dinero.getInstance();
+    din.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), 4);
+    MemoryElement memEl = memory.getCellByAddress(address);
+    //reading from the memory element and saving values on LMD register
+    TR[LMD_REGISTER].writeWord(memEl.readWord((int)(address % 8)));
+
+    if (enableForwarding) {
+      doWB();
     }
-}        
+  }
+}

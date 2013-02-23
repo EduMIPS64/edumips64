@@ -31,42 +31,42 @@ import org.edumips64.utils.*;
  * @author Trubia Massimo
  */
 
-public abstract class FPMoveToAndFromInstructions extends ComputationalInstructions{
-	final static int RT_FIELD=0;
-	final static int RT_FIELD_INIT=11;
-	final static int RT_FIELD_LENGTH=5;
-	final static int FS_FIELD=1;
-	final static int FS_FIELD_INIT=16;
-	final static int FS_FIELD_LENGTH=5;
-	static String ZERO_FIELD="00000000000";
-	final static int ZERO_FIELD_INIT=21;
-	static String COP1_FIELD="010001";
-	static int COP1_FIELD_INIT=0;
-	static int OPCODE_VALUE_INIT=6;
-	String OPCODE_VALUE="";
-	CPU cpu=CPU.getInstance();
-	
-	public FPMoveToAndFromInstructions() {
-		this.syntax="%R,%F";
-		this.paramCount=2;
-	}
-	public abstract void ID() throws RAWException, WAWException, IrregularStringOfBitsException;
-	public abstract void EX() throws IrregularStringOfBitsException,IrregularWriteOperationException;
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException{};
-	public abstract void WB() throws IrregularStringOfBitsException;
-	
-	public void pack() throws IrregularStringOfBitsException {
-		//conversion of instruction parameters of params list to the "repr" 32 binary value
-		repr.setBits(COP1_FIELD,COP1_FIELD_INIT);
-		repr.setBits(OPCODE_VALUE,OPCODE_VALUE_INIT);
-		repr.setBits(Converter.intToBin(RT_FIELD_LENGTH,params.get(RT_FIELD)),RT_FIELD_INIT);
-		repr.setBits(Converter.intToBin(FS_FIELD_LENGTH,params.get(FS_FIELD)),FS_FIELD_INIT);
-		repr.setBits(ZERO_FIELD,ZERO_FIELD_INIT);
-	}
-	
+public abstract class FPMoveToAndFromInstructions extends ComputationalInstructions {
+  final static int RT_FIELD = 0;
+  final static int RT_FIELD_INIT = 11;
+  final static int RT_FIELD_LENGTH = 5;
+  final static int FS_FIELD = 1;
+  final static int FS_FIELD_INIT = 16;
+  final static int FS_FIELD_LENGTH = 5;
+  static String ZERO_FIELD = "00000000000";
+  final static int ZERO_FIELD_INIT = 21;
+  static String COP1_FIELD = "010001";
+  static int COP1_FIELD_INIT = 0;
+  static int OPCODE_VALUE_INIT = 6;
+  String OPCODE_VALUE = "";
+  CPU cpu = CPU.getInstance();
+
+  public FPMoveToAndFromInstructions() {
+    this.syntax = "%R,%F";
+    this.paramCount = 2;
+  }
+  public abstract void ID() throws RAWException, WAWException, IrregularStringOfBitsException;
+  public abstract void EX() throws IrregularStringOfBitsException, IrregularWriteOperationException;
+  public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {};
+  public abstract void WB() throws IrregularStringOfBitsException;
+
+  public void pack() throws IrregularStringOfBitsException {
+    //conversion of instruction parameters of params list to the "repr" 32 binary value
+    repr.setBits(COP1_FIELD, COP1_FIELD_INIT);
+    repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);
+    repr.setBits(Converter.intToBin(RT_FIELD_LENGTH, params.get(RT_FIELD)), RT_FIELD_INIT);
+    repr.setBits(Converter.intToBin(FS_FIELD_LENGTH, params.get(FS_FIELD)), FS_FIELD_INIT);
+    repr.setBits(ZERO_FIELD, ZERO_FIELD_INIT);
+  }
+
 }
 
- 
+
 
 
 

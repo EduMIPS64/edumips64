@@ -31,21 +31,18 @@ import org.edumips64.utils.*;
 /** <pre>
  *         Format: LD rt, offset(base)
  *    Description: rt = memory[base+offset]
- *                 To load a doubleword from memory 
+ *                 To load a doubleword from memory
  * </pre>
  * @author Trubia Massimo, Russo Daniele
  */
-class LD extends Loading
-{
-    final String OPCODE_VALUE="110111";
-    public LD()
-    {
-        super.OPCODE_VALUE = OPCODE_VALUE;
-        this.name="LD";
-        this.memoryOpSize = 8;
-    }
-    public void doMEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException 
-    { 
-        TR[LMD_REGISTER].setBits(memEl.getBinString(),0);
-    }        
+class LD extends Loading {
+  final String OPCODE_VALUE = "110111";
+  public LD() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "LD";
+    this.memoryOpSize = 8;
+  }
+  public void doMEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+    TR[LMD_REGISTER].setBits(memEl.getBinString(), 0);
+  }
 }

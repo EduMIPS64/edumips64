@@ -1,7 +1,7 @@
 /*
  * ParserError.java
  *
- * Single Error not throwable 
+ * Single Error not throwable
  *
  * (c) 2006 mancausoft, Vanni
  *
@@ -31,10 +31,8 @@ import org.edumips64.utils.CurrentLocale;
  * @author mancausoft, Vanni
  */
 
-public class ParserError extends ParserException 
-{
-	ParserError(String description,int row,int column,String line)	
-	{
-		super(description, row, column, Parser.replaceTab(line));
-	}
+public class ParserError extends ParserException {
+  ParserError(String description, int row, int column, String line) {
+    super(description, row, column, Parser.replaceTab(line));
+  }
 }

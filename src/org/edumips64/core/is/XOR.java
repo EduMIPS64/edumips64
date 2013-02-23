@@ -38,29 +38,26 @@ import org.edumips64.utils.IrregularStringOfBitsException;
  * @author Trubia Massimo, Russo Daniele
  * </pre>
  */
-public class XOR extends ALU_RType
-{
-	public String OPCODE_VALUE = "100110";
+public class XOR extends ALU_RType {
+  public String OPCODE_VALUE = "100110";
 
-	/** Creates a new instance of XOR */
-	public XOR() 
-	{
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		name = "XOR";
-	}
+  /** Creates a new instance of XOR */
+  public XOR() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    name = "XOR";
+  }
 
-	public void EX()throws IrregularStringOfBitsException
-	{
-		String rs = TR[RS_FIELD].getBinString();
-		String rt = TR[RT_FIELD].getBinString();
-		String rd = "";
+  public void EX() throws IrregularStringOfBitsException {
+    String rs = TR[RS_FIELD].getBinString();
+    String rt = TR[RT_FIELD].getBinString();
+    String rd = "";
 
-		rd = InstructionsUtils.xorOperation(rs,rt);
-		TR[RD_FIELD].setBits(rd,0);
-		if(enableForwarding)
-		{
-			doWB();
-		}
+    rd = InstructionsUtils.xorOperation(rs, rt);
+    TR[RD_FIELD].setBits(rd, 0);
 
-	}
+    if (enableForwarding) {
+      doWB();
+    }
+
+  }
 }

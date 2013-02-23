@@ -32,17 +32,17 @@ import org.edumips64.core.fpu.*;
  * @author Trubia Massimo
  */
 
-public abstract class FPConversionFCSRInstructions extends FPFormattedOperandMoveInstructions{
-	String OPCODE_VALUE="";
-	String FMT_FIELD="";
-	public FPConversionFCSRInstructions() {
-		this.syntax="%F,%F";
-		this.paramCount=2;
-	}
-	public abstract void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,IrregularWriteOperationException,FPUnderflowException,FPOverflowException;
+public abstract class FPConversionFCSRInstructions extends FPFormattedOperandMoveInstructions {
+  String OPCODE_VALUE = "";
+  String FMT_FIELD = "";
+  public FPConversionFCSRInstructions() {
+    this.syntax = "%F,%F";
+    this.paramCount = 2;
+  }
+  public abstract void EX() throws IrregularStringOfBitsException, FPInvalidOperationException, IrregularWriteOperationException, FPUnderflowException, FPOverflowException;
 }
 
- 
+
 
 
 

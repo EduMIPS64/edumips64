@@ -31,24 +31,21 @@ import org.edumips64.utils.*;
 /** <pre>
  *       Syntax: SH rt, offset(base)
  *  Description: Stores the halfword in rt to memory
- *   		 i.e: memory[base+offset] = rt
- *               
- *  
+ *       i.e: memory[base+offset] = rt
+ *
+ *
  * </pre>
  * @author IS Group
  */
-class SH extends Storing
-{
-	final String OPCODE_VALUE="101001";
-	public SH()
-	{
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		this.name="SH";
-        this.memoryOpSize = 2;
-	}
+class SH extends Storing {
+  final String OPCODE_VALUE = "101001";
+  public SH() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "SH";
+    this.memoryOpSize = 2;
+  }
 
-	public void doMEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, NotAlignException, AddressErrorException, IrregularWriteOperationException
-	{ 
-        memEl.writeHalf(TR[RT_FIELD].readHalf(0), (int) (address%8));
-	}
+  public void doMEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, NotAlignException, AddressErrorException, IrregularWriteOperationException {
+    memEl.writeHalf(TR[RT_FIELD].readHalf(0), (int)(address % 8));
+  }
 }

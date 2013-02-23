@@ -30,24 +30,21 @@ import org.edumips64.utils.*;
 
 /** <pre>
  *  Syntax:       LHU rt, offset(base)
- *  Description:  rt = memory[base+offset]    
- *                To load a halfword from memory as an unsigned value  
+ *  Description:  rt = memory[base+offset]
+ *                To load a halfword from memory as an unsigned value
  * </pre>
  * @author Trubia Massimo, Russo Daniele
  */
-class LHU extends Loading
-{
-    final String OPCODE_VALUE="100101";
-    public LHU()
-    {
-        super.OPCODE_VALUE = OPCODE_VALUE;	
-        this.name="LHU";
-        this.memoryOpSize = 2;
-    }
+class LHU extends Loading {
+  final String OPCODE_VALUE = "100101";
+  public LHU() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "LHU";
+    this.memoryOpSize = 2;
+  }
 
-    public void doMEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
-    { 
-        //reading from the memory element and saving values on LMD register
-        TR[LMD_REGISTER].writeHalfUnsigned(memEl.readHalfUnsigned((int)(address%8)));
-    }        
+  public void doMEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+    //reading from the memory element and saving values on LMD register
+    TR[LMD_REGISTER].writeHalfUnsigned(memEl.readHalfUnsigned((int)(address % 8)));
+  }
 }

@@ -25,24 +25,24 @@ package org.edumips64.ui;
 
 import javax.swing.*;
 
-public class JNumberField extends JTextField{
-	public void setNumber(Integer number){
-		super.setText(number.toString());
-	}
+public class JNumberField extends JTextField {
+  public void setNumber(Integer number) {
+    super.setText(number.toString());
+  }
 
-	/**
-	 * @return the number contained in the field, null if not a number
-	 */
-	public int getNumber(){
-		return Integer.parseInt(super.getText());
-	}
-	public boolean isNumber(){
-		try {
-			Integer.parseInt(super.getText());
-		}
-		catch(NumberFormatException ex) {
-			return false;
-		}
-		return true;
-	}
+  /**
+   * @return the number contained in the field, null if not a number
+   */
+  public int getNumber() {
+    return Integer.parseInt(super.getText());
+  }
+  public boolean isNumber() {
+    try {
+      Integer.parseInt(super.getText());
+    } catch (NumberFormatException ex) {
+      return false;
+    }
+
+    return true;
+  }
 }

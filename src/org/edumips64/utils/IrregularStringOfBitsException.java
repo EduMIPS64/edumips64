@@ -23,7 +23,7 @@
 package org.edumips64.utils;
 
 /** Exception thrown when trying to use an irregular string of bits to set a bitset.
- * @author Salvatore Scellato 
+ * @author Salvatore Scellato
  * */
 
-public class IrregularStringOfBitsException extends Exception{}
+public class IrregularStringOfBitsException extends Exception {}

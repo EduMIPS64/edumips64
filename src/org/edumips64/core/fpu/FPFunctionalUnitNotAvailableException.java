@@ -19,9 +19,9 @@
  */
 package org.edumips64.core.fpu;
 
-/* This exception is launched when we would insert an FPArithmetic instruction different from DIV.fmt 
+/* This exception is launched when we would insert an FPArithmetic instruction different from DIV.fmt
  *  into the fp pipeline  when the right functional unit is not available
  *
- * @author Massimo Trubia 
+ * @author Massimo Trubia
  */
-public class FPFunctionalUnitNotAvailableException extends Exception{}
+public class FPFunctionalUnitNotAvailableException extends Exception {}

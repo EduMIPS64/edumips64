@@ -35,19 +35,16 @@ import org.edumips64.utils.*;
  * </pre>
  * @author Trubia Massimo, Russo Daniele
  */
-class SW extends Storing
-{
-    final String OPCODE_VALUE="101011";
-    public SW()
-    {
-        super.OPCODE_VALUE = OPCODE_VALUE;
-        this.name="SW";
-        this.memoryOpSize = 4;
-    }
+class SW extends Storing {
+  final String OPCODE_VALUE = "101011";
+  public SW() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "SW";
+    this.memoryOpSize = 4;
+  }
 
 
-    public void doMEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, NotAlignException, AddressErrorException, IrregularWriteOperationException
-    { 
-        memEl.writeWord(TR[RT_FIELD].readWord(0), (int) (address%8));
-    }
+  public void doMEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, NotAlignException, AddressErrorException, IrregularWriteOperationException {
+    memEl.writeWord(TR[RT_FIELD].readWord(0), (int)(address % 8));
+  }
 }

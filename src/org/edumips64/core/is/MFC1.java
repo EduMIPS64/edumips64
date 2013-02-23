@@ -31,29 +31,30 @@ import java.math.*;
 
 /**
  *<pre>
- *	Format: MFC1 rt,fs
+ *  Format: MFC1 rt,fs
  * Description: To copy a word from an FPU general register to a GPR
  *   Operation: rt.writeword_signextend(fs.readword)
  *</pre>
  */
 class MFC1 extends FPMoveFromInstructions {
-	String OPCODE_VALUE="00000";
-	String NAME = "MFC1";
-	
-	public MFC1() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		super.name=NAME;
-	}
-	
-	
-	public void EX() throws IrregularStringOfBitsException, IrregularWriteOperationException {
-		//getting values from temporary registers
-		String value=TRfp[FS_FIELD].getBinString();
-		TR[RT_FIELD].writeWord(Converter.binToInt(value.substring(32,64),false));
-		if(enableForwarding) {
-			doWB();
-		}
-	}
-	
-		
+  String OPCODE_VALUE = "00000";
+  String NAME = "MFC1";
+
+  public MFC1() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.name = NAME;
+  }
+
+
+  public void EX() throws IrregularStringOfBitsException, IrregularWriteOperationException {
+    //getting values from temporary registers
+    String value = TRfp[FS_FIELD].getBinString();
+    TR[RT_FIELD].writeWord(Converter.binToInt(value.substring(32, 64), false));
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
+
+
 }

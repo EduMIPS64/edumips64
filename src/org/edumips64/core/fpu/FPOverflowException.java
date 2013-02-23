@@ -19,14 +19,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */ 
+ */
 package org.edumips64.core.fpu;
- 
+
 /** Exception thrown when a big double number cannot be represented on 64 bit according to IEEE754 standard
  * @author Trubia Massimo
  */
-public class FPOverflowException extends org.edumips64.core.SynchronousException{
-	public FPOverflowException() {
-		super("FPOVERFLOW");
-	}
+public class FPOverflowException extends org.edumips64.core.SynchronousException {
+  public FPOverflowException() {
+    super("FPOVERFLOW");
+  }
 }

@@ -28,7 +28,7 @@ import org.edumips64.utils.*;
  * @author Andrea Spadaccini
  */
 public class TRAP extends SYSCALL {
-	public TRAP() {
-		this.name = "TRAP";
-	}
+  public TRAP() {
+    this.name = "TRAP";
+  }
 }

@@ -31,18 +31,18 @@ import java.math.*;
 
 /**
  *<pre>
- *	Format: MOVT.D fd, fs, cc
+ *  Format: MOVT.D fd, fs, cc
  * Description: To test an FP condition code then conditionally move an FP value
  *   Operation: if FCSR[cc] = 1 then fd = fs
  *</pre>
  */
 class MOVT_D extends FPConditionalCC_DMoveInstructions {
-	String NAME = "MOVT.D";
-	int TF_FIELD_VALUE=1;
-	
-	public MOVT_D() {
-		super.TF_FIELD_VALUE = TF_FIELD_VALUE;
-		super.name=NAME;
-	}
-	
+  String NAME = "MOVT.D";
+  int TF_FIELD_VALUE = 1;
+
+  public MOVT_D() {
+    super.TF_FIELD_VALUE = TF_FIELD_VALUE;
+    super.name = NAME;
+  }
+
 }

@@ -29,41 +29,41 @@ import org.edumips64.utils.*;
  * <pre>
  *      Syntax: J targetJ
  * Description: To branch within the current 256 MB-aligned region
- *               This is a PC-region branch (not PC-relative); the effective 
- *              target address is in the ÂcurrentÂ 256 MB-aligned region. 
+ *               This is a PC-region branch (not PC-relative); the effective
+ *              target address is in the ÂcurrentÂ 256 MB-aligned region.
  *</pre>
  * @author Trubia Massimo, Russo Daniele
  *
  */
 
 public class J extends FlowControl_JType {
-	final String OPCODE_VALUE="000010";
-	
-	/** Creates a new instance of J */
-	public J() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		this.name="J";
-	}
-	
-	public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException, JumpException {
-		//converting INSTR_INDEX into a bynary value of 26 bits in length
-		String instr_index=Converter.positiveIntToBin(28,params.get(INSTR_INDEX));
-		//appending the 35 most significant bits of the program counter on the left of "instr_index"
-		Register pc=cpu.getPC();
-		String pc_all=pc.getBinString();
-		String pc_significant=pc_all.substring(0,36);
-		String pc_new=pc_significant+instr_index;
-		pc.setBits(pc_new,0);
-		throw new JumpException();
-	}
-	
-	public void EX() throws IrregularStringOfBitsException,IntegerOverflowException {
-	}
-	
-	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
-	}
-	
-	public void WB() throws IrregularStringOfBitsException {
-	}
-	
+  final String OPCODE_VALUE = "000010";
+
+  /** Creates a new instance of J */
+  public J() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "J";
+  }
+
+  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException {
+    //converting INSTR_INDEX into a bynary value of 26 bits in length
+    String instr_index = Converter.positiveIntToBin(28, params.get(INSTR_INDEX));
+    //appending the 35 most significant bits of the program counter on the left of "instr_index"
+    Register pc = cpu.getPC();
+    String pc_all = pc.getBinString();
+    String pc_significant = pc_all.substring(0, 36);
+    String pc_new = pc_significant + instr_index;
+    pc.setBits(pc_new, 0);
+    throw new JumpException();
+  }
+
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
+  }
+
+  public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
+  }
+
+  public void WB() throws IrregularStringOfBitsException {
+  }
+
 }

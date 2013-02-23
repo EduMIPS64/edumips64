@@ -30,41 +30,42 @@ import org.edumips64.utils.*;
 /**<pre>
  *      Syntax: SUBU rd, rs, rt
  * Description: To subtract 32-bit integers;
- *              The 32-bit word value in GPR rt is subtracted from 
- *              the 32-bit value in GPR rs and the 32-bit arithmetic result 
+ *              The 32-bit word value in GPR rt is subtracted from
+ *              the 32-bit value in GPR rs and the 32-bit arithmetic result
  *              is sign-extended and placed into GPR rd.
  *</pre>
  * @author Sciuto Lorenzo - UrzÃ¬ Erik - Giorgio Scibilia
  */
-public class SUBU extends ALU_RType{   
-    final String OPCODE_VALUE="100011"; 
-    public SUBU() 
-    {
-        super.OPCODE_VALUE = OPCODE_VALUE;
-	name="SUBU";
-    }    
+public class SUBU extends ALU_RType {
+  final String OPCODE_VALUE = "100011";
+  public SUBU() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    name = "SUBU";
+  }
 
-    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException,TwosComplementSumException
-   {
-        //getting strings from temporary registers
-        String rs=TR[RS_FIELD].getBinString();
-        String rt=TR[RT_FIELD].getBinString();
-        //cutting the high part of registers
-        rs=rs.substring(32,64);
-        rt=rt.substring(32,64);
-        String outputstring=InstructionsUtils.twosComplementSubstraction(rs,rt);
-	//performing sign extension
-	outputstring=outputstring.substring(0,32);
-	String filledOutputstring=outputstring;
-	for(int i=0; i<32; i++)
-		filledOutputstring = outputstring.charAt(0)+filledOutputstring;
-       	TR[RD_FIELD].setBits(filledOutputstring,0);
-	if(enableForwarding)
-	{
-		doWB();
-	}
-	
-   }    
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+    //getting strings from temporary registers
+    String rs = TR[RS_FIELD].getBinString();
+    String rt = TR[RT_FIELD].getBinString();
+    //cutting the high part of registers
+    rs = rs.substring(32, 64);
+    rt = rt.substring(32, 64);
+    String outputstring = InstructionsUtils.twosComplementSubstraction(rs, rt);
+    //performing sign extension
+    outputstring = outputstring.substring(0, 32);
+    String filledOutputstring = outputstring;
 
-    
+    for (int i = 0; i < 32; i++) {
+      filledOutputstring = outputstring.charAt(0) + filledOutputstring;
+    }
+
+    TR[RD_FIELD].setBits(filledOutputstring, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+
+  }
+
+
 }

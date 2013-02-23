@@ -2,7 +2,7 @@
  *
  * Exception thrown when config file is incorrect or not exists.
  * (c) 2006 Rizzo Vanni Giuseppe
- * 
+ *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
  *
@@ -23,7 +23,7 @@
 package org.edumips64.utils;
 
 /** Exception thrown when config file is incorrect or not exists.
- * @author Rizzo Vanni G. 
+ * @author Rizzo Vanni G.
  * */
 
-public class ConfigFileNotFoundException extends Exception{}
+public class ConfigFileNotFoundException extends Exception {}

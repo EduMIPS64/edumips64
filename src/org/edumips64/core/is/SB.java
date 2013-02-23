@@ -29,23 +29,20 @@ import org.edumips64.utils.*;
 
 /** <pre>
  *       Syntax: SB rt, offset(base)
- *  Description: Stores the least-significant 8 bit of rt in memory 
- *  		 i.e: memory[base+offset] = rt
+ *  Description: Stores the least-significant 8 bit of rt in memory
+ *       i.e: memory[base+offset] = rt
  * </pre>
  * @author Trubia Massimo, Russo Daniele
  */
-class SB extends Storing
-{
-    final String OPCODE_VALUE="101000";
-    public SB()
-    {
-        super.OPCODE_VALUE = OPCODE_VALUE;
-        this.name="SB";
-        this.memoryOpSize = 1;
-    }
+class SB extends Storing {
+  final String OPCODE_VALUE = "101000";
+  public SB() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "SB";
+    this.memoryOpSize = 1;
+  }
 
-    public void doMEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
-    {
-        memEl.writeByte(TR[RT_FIELD].readByte(0), (int) (address%8));
-    }
+  public void doMEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+    memEl.writeByte(TR[RT_FIELD].readByte(0), (int)(address % 8));
+  }
 }

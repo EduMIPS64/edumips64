@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * 18/05/2006 - Andrea Spadaccini:
- * 	* Removed lock-related functions, in order to add read and write semaphores
+ *  * Removed lock-related functions, in order to add read and write semaphores
  */
 package org.edumips64.core;
 
@@ -32,86 +32,90 @@ import org.edumips64.utils.*;
  * @author Massimo Trubia
  */
 public class RegisterFP extends BitSet64FP {
-	private int writeSemaphore;
-	private int WAWSemaphore;
+  private int writeSemaphore;
+  private int WAWSemaphore;
 
-	/** Creates a default new instance of Register. */
-	public RegisterFP(){
-		writeSemaphore = 0;
-		WAWSemaphore = 0;
-	}
-	
-	/** Returns the value of the semaphore
-	 *  @return the numerical value of the semaphore
-	 */
-	public int getWriteSemaphore() {
-		return writeSemaphore;
-	}
+  /** Creates a default new instance of Register. */
+  public RegisterFP() {
+    writeSemaphore = 0;
+    WAWSemaphore = 0;
+  }
 
-	/** Returns the value of the semaphore
-	 *  @return the numerical value of the semaphore
-	 */
-	public int getWAWSemaphore() {
-		return WAWSemaphore;
-	}
+  /** Returns the value of the semaphore
+   *  @return the numerical value of the semaphore
+   */
+  public int getWriteSemaphore() {
+    return writeSemaphore;
+  }
 
-	/** Increments the value of the semaphore
-	 */
-	public void incrWAWSemaphore() {
-		WAWSemaphore++;
-	}
-	
-	/** Increments the value of the semaphore
-	 */
-	public void incrWriteSemaphore() {
-		writeSemaphore++;
-	}
+  /** Returns the value of the semaphore
+   *  @return the numerical value of the semaphore
+   */
+  public int getWAWSemaphore() {
+    return WAWSemaphore;
+  }
 
-	/** Decrements the value of the semaphore.
-	 *  It throws a <code>RuntimeException</code> if the semaphore value gets below zero, because
-	 *  the value becomes negative only in case of programming errors, and the EduMIPS64 team
-	 *  doesn't make any programming error.
-	 */
-	public void decrWriteSemaphore() {
-		if(--writeSemaphore < 0)
-			throw new RuntimeException();
-	}
+  /** Increments the value of the semaphore
+   */
+  public void incrWAWSemaphore() {
+    WAWSemaphore++;
+  }
 
-	/** Decrements the value of the semaphore.
-	 *  It throws a <code>RuntimeException</code> if the semaphore value gets below zero, because
-	 *  the value becomes negative only in case of programming errors, and the EduMIPS64 team
-	 *  doesn't make any programming error.
-	 */
-	public void decrWAWSemaphore() {
-		if(--WAWSemaphore < 0)
-			throw new RuntimeException();
-	}
+  /** Increments the value of the semaphore
+   */
+  public void incrWriteSemaphore() {
+    writeSemaphore++;
+  }
 
-	/**Returns a string with a double value or the name of a special value
-	  * it is recommended the use of this method only for the visualisation of the double value because it may return an alphanumeric value
-	  * @return the double value or the special values "Quiet NaN","Signaling NaN", "Positive infinity", "Negative infinity","Positive zero","Negative zero"
-	  */
-	public String getValue(){
-			return super.readDouble();
-	}
+  /** Decrements the value of the semaphore.
+   *  It throws a <code>RuntimeException</code> if the semaphore value gets below zero, because
+   *  the value becomes negative only in case of programming errors, and the EduMIPS64 team
+   *  doesn't make any programming error.
+   */
+  public void decrWriteSemaphore() {
+    if (--writeSemaphore < 0) {
+      throw new RuntimeException();
+    }
+  }
 
-	/** Reset the register and its associated semaphores
-	 */
-	public void reset() {
-		super.reset(false);
-		writeSemaphore = 0;
-		WAWSemaphore = 0;
-	}
-		
+  /** Decrements the value of the semaphore.
+   *  It throws a <code>RuntimeException</code> if the semaphore value gets below zero, because
+   *  the value becomes negative only in case of programming errors, and the EduMIPS64 team
+   *  doesn't make any programming error.
+   */
+  public void decrWAWSemaphore() {
+    if (--WAWSemaphore < 0) {
+      throw new RuntimeException();
+    }
+  }
 
-	public String toString() {
-		String s = new String();
-		try {
-			s = getHexString();
-		} catch (IrregularStringOfBitsException e) {
-			e.printStackTrace();
-		} //Impossibile che si verifichi
-		return s;
-	}
+  /**Returns a string with a double value or the name of a special value
+    * it is recommended the use of this method only for the visualisation of the double value because it may return an alphanumeric value
+    * @return the double value or the special values "Quiet NaN","Signaling NaN", "Positive infinity", "Negative infinity","Positive zero","Negative zero"
+    */
+  public String getValue() {
+    return super.readDouble();
+  }
+
+  /** Reset the register and its associated semaphores
+   */
+  public void reset() {
+    super.reset(false);
+    writeSemaphore = 0;
+    WAWSemaphore = 0;
+  }
+
+
+  public String toString() {
+    String s = new String();
+
+    try {
+      s = getHexString();
+    } catch (IrregularStringOfBitsException e) {
+      e.printStackTrace();
+    } //Impossibile che si verifichi
+
+    return s;
+  }
 
 }

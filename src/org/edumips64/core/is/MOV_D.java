@@ -31,29 +31,30 @@ import java.math.*;
 
 /**
  *<pre>
- *	Format: MOV.D fd, fs
+ *  Format: MOV.D fd, fs
  * Description: To move an FP value between FPRs
  *   Operation: fd=fs
  *</pre>
  */
 class MOV_D extends FPFormattedOperandMoveInstructions {
-	String OPCODE_VALUE="000110";
-	String NAME = "MOV.D";
-	String FMT_FIELD="10001";
-	
-	public MOV_D() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		super.name=NAME;
-		super.FMT_FIELD=FMT_FIELD;
-	}	
+  String OPCODE_VALUE = "000110";
+  String NAME = "MOV.D";
+  String FMT_FIELD = "10001";
 
-	public void EX() throws IrregularStringOfBitsException {
-		//moving values from the source temporary register to the destination one
-		String value=TRfp[FS_FIELD].getBinString();
-		TRfp[FD_FIELD].setBits(value,0);
-		if(enableForwarding) {
-			doWB();
-		}
-	}
-	
-}	
+  public MOV_D() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.name = NAME;
+    super.FMT_FIELD = FMT_FIELD;
+  }
+
+  public void EX() throws IrregularStringOfBitsException {
+    //moving values from the source temporary register to the destination one
+    String value = TRfp[FS_FIELD].getBinString();
+    TRfp[FD_FIELD].setBits(value, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
+
+}

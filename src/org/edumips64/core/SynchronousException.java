@@ -25,16 +25,16 @@ package org.edumips64.core;
 
 /** Models a synchronous exception*/
 public class SynchronousException extends Exception {
-	private String errcode;
+  private String errcode;
 
-	/** Gets the error code */
-	public String getCode() {
-		return errcode;
-	}
+  /** Gets the error code */
+  public String getCode() {
+    return errcode;
+  }
 
-	public SynchronousException(String errcode) {
-		this.errcode = errcode;
-	}
+  public SynchronousException(String errcode) {
+    this.errcode = errcode;
+  }
 }
 
 

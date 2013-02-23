@@ -37,46 +37,49 @@ import java.math.*;
  *</pre>
  */
 class DIV_D extends FPArithmeticInstructions {
-	final String OPCODE_VALUE="000011";
-	String FMT_FIELD="10001"; //DOUBLE IS 17
-	String NAME = "DIV.D";
-	
-	
-	public DIV_D() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		super.FMT_FIELD = FMT_FIELD;
-		name=NAME;
-	}
-	
-	public void EX() throws IrregularStringOfBitsException,FPInvalidOperationException,FPUnderflowException,FPOverflowException, FPDivideByZeroException {
-		//getting values from temporary registers
-		String operand1=TRfp[FS_FIELD].getBinString();
-		String operand2=TRfp[FT_FIELD].getBinString();
-		String outputstring=null;
-		try{
-			outputstring=FPInstructionUtils.doubleDivision(operand1,operand2);
-		}
-		catch(Exception ex){
-			//if the enable forwarding is turned on we have to ensure that registers
-			//should be unlocked also if a synchronous exception occurs. This is performed
-			//by executing the WB method before raising the trap
-			if(enableForwarding){
-				doWB();
-			}
-			if(ex instanceof FPInvalidOperationException){
-				throw new FPInvalidOperationException();
-			}else if(ex instanceof FPUnderflowException){
-				throw new FPUnderflowException();
-			}else if(ex instanceof FPOverflowException){
-				throw new FPOverflowException();
-			}else if(ex instanceof FPDivideByZeroException){
-				throw new FPDivideByZeroException();
-			}
-		}
-		TRfp[FD_FIELD].setBits(outputstring,0);
-		if(enableForwarding) {
-			doWB();
-		}
-		
-	}
+  final String OPCODE_VALUE = "000011";
+  String FMT_FIELD = "10001"; //DOUBLE IS 17
+  String NAME = "DIV.D";
+
+
+  public DIV_D() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.FMT_FIELD = FMT_FIELD;
+    name = NAME;
+  }
+
+  public void EX() throws IrregularStringOfBitsException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException {
+    //getting values from temporary registers
+    String operand1 = TRfp[FS_FIELD].getBinString();
+    String operand2 = TRfp[FT_FIELD].getBinString();
+    String outputstring = null;
+
+    try {
+      outputstring = FPInstructionUtils.doubleDivision(operand1, operand2);
+    } catch (Exception ex) {
+      //if the enable forwarding is turned on we have to ensure that registers
+      //should be unlocked also if a synchronous exception occurs. This is performed
+      //by executing the WB method before raising the trap
+      if (enableForwarding) {
+        doWB();
+      }
+
+      if (ex instanceof FPInvalidOperationException) {
+        throw new FPInvalidOperationException();
+      } else if (ex instanceof FPUnderflowException) {
+        throw new FPUnderflowException();
+      } else if (ex instanceof FPOverflowException) {
+        throw new FPOverflowException();
+      } else if (ex instanceof FPDivideByZeroException) {
+        throw new FPDivideByZeroException();
+      }
+    }
+
+    TRfp[FD_FIELD].setBits(outputstring, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+
+  }
 }

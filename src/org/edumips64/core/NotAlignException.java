@@ -1,5 +1,5 @@
 /* NotAlignException.java
- * 
+ *
  * Exception thrown when trying to write an irregular value in a bitset, i.e. an overflow value.
  * (c) 2006 Salvatore Scellato
  *
@@ -23,10 +23,10 @@
 
 package org.edumips64.core;
 
-public class NotAlignException extends Exception{
-    public NotAlignException() {}
+public class NotAlignException extends Exception {
+  public NotAlignException() {}
 
-    public NotAlignException(String message) {
-        super(message);
-    }
+  public NotAlignException(String message) {
+    super(message);
+  }
 }

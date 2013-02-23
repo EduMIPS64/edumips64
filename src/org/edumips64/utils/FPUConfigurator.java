@@ -27,62 +27,64 @@ import java.util.*;
 import java.io.*;
 import java.net.URL;
 import java.util.logging.Logger;
-public class FPUConfigurator{
-	static LinkedList<String> fparithmetic,terminating;
-    private static final Logger logger = Logger.getLogger(FPUConfigurator.class.getName());
+public class FPUConfigurator {
+  static LinkedList<String> fparithmetic, terminating;
+  private static final Logger logger = Logger.getLogger(FPUConfigurator.class.getName());
 
-	public FPUConfigurator() {
-		fparithmetic = new LinkedList<String>();
-		terminating = new LinkedList<String>();
-		try{
-			//the pattern of the line to parse is    <tag>any character(at least one)</tag> any character (zero or more) 
-			loadData("I","<I>.+</I>.*",fparithmetic);
-			loadData("O","<O>.+</O>.*",terminating);
-		} catch(ConfigFileNotFoundException e) {
-            logger.info("Configuration file not found, using defaults.");
-            fparithmetic.add("ADD.D");
-            fparithmetic.add("SUB.D");
-            fparithmetic.add("DIV.D");
-            fparithmetic.add("MUL.D");
-            terminating.add("0000000C");
-            terminating.add("04000000");
-		}
-	}
-	
-	public static void loadData(String tag, String regex, LinkedList<String> data) throws ConfigFileNotFoundException{
-		String line;
-		String splitted[];
-		InputStream configfile=null;
-		InputStreamReader isr=null;
-		
-		try {
-			URL url = FPUConfigurator.class.getResource("fpu.properties");
-			isr = new InputStreamReader (url.openStream ());
-			BufferedReader br = new BufferedReader (isr);
-					
-			//we add into the data list tagged values (es.)  <tag>valueToAddIntoData</tag>
-			while ((line = br.readLine())!=null){
-				if(line.matches(regex)){
-					splitted=line.split("<"+tag+">");
-					splitted=splitted[1].split("</" + tag + ">");
-					splitted[0]=splitted[0].trim();
-					data.add(splitted[0]);
-				}
-			}
-			br.close();
-			isr.close();			
-		} catch (IOException ex) {
-			throw new ConfigFileNotFoundException();
-		} catch (NullPointerException ex) {
-			throw new ConfigFileNotFoundException();
-		}
-	}
+  public FPUConfigurator() {
+    fparithmetic = new LinkedList<String>();
+    terminating = new LinkedList<String>();
 
-	public LinkedList<String> getFPArithmeticInstructions(){
-		return fparithmetic;
-	}
+    try {
+      //the pattern of the line to parse is    <tag>any character(at least one)</tag> any character (zero or more)
+      loadData("I", "<I>.+</I>.*", fparithmetic);
+      loadData("O", "<O>.+</O>.*", terminating);
+    } catch (ConfigFileNotFoundException e) {
+      logger.info("Configuration file not found, using defaults.");
+      fparithmetic.add("ADD.D");
+      fparithmetic.add("SUB.D");
+      fparithmetic.add("DIV.D");
+      fparithmetic.add("MUL.D");
+      terminating.add("0000000C");
+      terminating.add("04000000");
+    }
+  }
 
-	public LinkedList<String> getTerminatingInstructions(){
-		return terminating;
-	}
+  public static void loadData(String tag, String regex, LinkedList<String> data) throws ConfigFileNotFoundException {
+    String line;
+    String splitted[];
+    InputStream configfile = null;
+    InputStreamReader isr = null;
+
+    try {
+      URL url = FPUConfigurator.class.getResource("fpu.properties");
+      isr = new InputStreamReader(url.openStream());
+      BufferedReader br = new BufferedReader(isr);
+
+      //we add into the data list tagged values (es.)  <tag>valueToAddIntoData</tag>
+      while ((line = br.readLine()) != null) {
+        if (line.matches(regex)) {
+          splitted = line.split("<" + tag + ">");
+          splitted = splitted[1].split("</" + tag + ">");
+          splitted[0] = splitted[0].trim();
+          data.add(splitted[0]);
+        }
+      }
+
+      br.close();
+      isr.close();
+    } catch (IOException ex) {
+      throw new ConfigFileNotFoundException();
+    } catch (NullPointerException ex) {
+      throw new ConfigFileNotFoundException();
+    }
+  }
+
+  public LinkedList<String> getFPArithmeticInstructions() {
+    return fparithmetic;
+  }
+
+  public LinkedList<String> getTerminatingInstructions() {
+    return terminating;
+  }
 }

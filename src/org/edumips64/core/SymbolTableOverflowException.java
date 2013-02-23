@@ -22,4 +22,4 @@
  */
 package org.edumips64.core;
 
-public class SymbolTableOverflowException extends Exception{}
+public class SymbolTableOverflowException extends Exception {}

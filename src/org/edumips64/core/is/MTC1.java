@@ -31,27 +31,28 @@ import java.math.*;
 
 /**
  *<pre>
- *	Format: MTC1 rt, fs
+ *  Format: MTC1 rt, fs
  * Description: To copy a word from a GPR to an FPR
  *   Operation: fs.writeword_nosignextend(readword(rt))
  *</pre>
  */
 class MTC1 extends FPMoveToInstructions {
-	String OPCODE_VALUE="00100";
-	String NAME = "MTC1";
-	
-	public MTC1() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		super.name=NAME;
-	}	
-	
-	public void EX() throws IrregularStringOfBitsException {
-		//getting values from temporary registers
-		String value=TR[RT_FIELD].getBinString();
-		TRfp[FS_FIELD].setBits(value.substring(32,64),32);
-		if(enableForwarding) {
-			doWB();
-		}
-	}
-	
+  String OPCODE_VALUE = "00100";
+  String NAME = "MTC1";
+
+  public MTC1() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.name = NAME;
+  }
+
+  public void EX() throws IrregularStringOfBitsException {
+    //getting values from temporary registers
+    String value = TR[RT_FIELD].getBinString();
+    TRfp[FS_FIELD].setBits(value.substring(32, 64), 32);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
+
 }

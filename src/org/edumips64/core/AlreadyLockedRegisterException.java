@@ -22,4 +22,4 @@
  */
 package org.edumips64.core;
 
-public class AlreadyLockedRegisterException extends Exception{}
+public class AlreadyLockedRegisterException extends Exception {}

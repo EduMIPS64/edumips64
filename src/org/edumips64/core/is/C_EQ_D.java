@@ -31,20 +31,20 @@ import java.math.*;
 
 /**
   *<pre>
- *	Format: C.EQ.D cc, fs, ft
+ *  Format: C.EQ.D cc, fs, ft
  * Description: To compare FP values and record the Boolean result in a condition code in the range [0,7] stored on the FCSR as binary value
  *   Operation: if fs=ft FCSR[cc]=1 else FCSR[cc]=0
  *</pre>
 
  */
 class C_EQ_D extends FPC_cond_DInstructions {
-	String COND_VALUE="0010"; // the first bit doesn't mean anything into this simulator
-				// (010)bin=(2)dec is the condition code assigned to the predicate equal in a MIPS64 processor
-	String NAME = "C.EQ.D";
-	
-	public C_EQ_D() {
-		super.COND_VALUE = COND_VALUE;
-		super.name=NAME;
-	}
+  String COND_VALUE = "0010"; // the first bit doesn't mean anything into this simulator
+  // (010)bin=(2)dec is the condition code assigned to the predicate equal in a MIPS64 processor
+  String NAME = "C.EQ.D";
+
+  public C_EQ_D() {
+    super.COND_VALUE = COND_VALUE;
+    super.name = NAME;
+  }
 
 }

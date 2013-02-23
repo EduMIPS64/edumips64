@@ -1,5 +1,5 @@
 /* IrregularWriteOperationException.java
- * 
+ *
  * Exception thrown when trying to write an irregular value in a bitset, i.e. an overflow value.
  * (c) 2006 Salvatore Scellato
  *
@@ -23,6 +23,6 @@
 
 package org.edumips64.core;
 
-public class IrregularWriteOperationException extends Exception{}
+public class IrregularWriteOperationException extends Exception {}
 
 

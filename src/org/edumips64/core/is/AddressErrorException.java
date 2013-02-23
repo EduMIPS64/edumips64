@@ -29,5 +29,5 @@ package org.edumips64.core.is;
  *Exception thrown when a load/store instaction try to access in a not aling area of memory
  * @author Massimo
  */
-public class AddressErrorException extends Exception{}
+public class AddressErrorException extends Exception {}
 

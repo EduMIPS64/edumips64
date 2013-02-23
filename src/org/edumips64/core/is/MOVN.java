@@ -32,51 +32,48 @@ import java.util.logging.Logger;
 
 /**
  * <pre>
- * Format:      MOVN rd, rs, rt  
+ * Format:      MOVN rd, rs, rt
  * Description: if rt != 0 then rd = rs
- *              If the value in GPR rt is not equal to zero, then the contents 
+ *              If the value in GPR rt is not equal to zero, then the contents
  *              of GPR rs are placed into GPR rd.
   *</pre>
  * @author Trubia Massimo, Russo Daniele
  *
  */
-class MOVN extends ALU_RType
-{
-    final String OPCODE_VALUE="001011";
-    private static final Logger logger = Logger.getLogger(MOVN.class.getName());
+class MOVN extends ALU_RType {
+  final String OPCODE_VALUE = "001011";
+  private static final Logger logger = Logger.getLogger(MOVN.class.getName());
 
-    // Skip the Write Back if the predicate (RT != 0) is false
-    private boolean skipWB = false;
-    
-    
-    public MOVN()
-    {
-    	super.OPCODE_VALUE = OPCODE_VALUE;
-        name="MOVN";
+  // Skip the Write Back if the predicate (RT != 0) is false
+  private boolean skipWB = false;
+
+
+  public MOVN() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    name = "MOVN";
+  }
+
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+    if (TR[RT_FIELD].getValue() != 0) {
+      TR[RD_FIELD].setBits(TR[RS_FIELD].getBinString(), 0);
+    } else {
+      skipWB = true;
     }
 
-    public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException 
-    {
-        if(TR[RT_FIELD].getValue() != 0) {
-            TR[RD_FIELD].setBits(TR[RS_FIELD].getBinString(), 0);
-        } else {
-            skipWB = true;
-        }
-        if(enableForwarding)
-        {
-            doWB();
-        }
+    if (enableForwarding) {
+      doWB();
+    }
+  }
+
+  public void doWB() throws IrregularStringOfBitsException {
+    // The doWB() method is overridden because it must check if the write
+    // on the registers must be done, checking the skipWB variable.
+    if (!skipWB) {
+      logger.info("Skipping WB as the predicate is false");
+      cpu.getRegister(params.get(RD_FIELD)).setBits(TR[RD_FIELD].getBinString(), 0);
     }
 
-    public void doWB() throws IrregularStringOfBitsException {
-        // The doWB() method is overridden because it must check if the write
-        // on the registers must be done, checking the skipWB variable.
-        if(!skipWB) {
-            logger.info("Skipping WB as the predicate is false");
-            cpu.getRegister(params.get(RD_FIELD)).setBits(TR[RD_FIELD].getBinString(),0);
-        }
-
-        // We must unlock the register in both cases.
-        cpu.getRegister(params.get(RD_FIELD)).decrWriteSemaphore();    
-    }
+    // We must unlock the register in both cases.
+    cpu.getRegister(params.get(RD_FIELD)).decrWriteSemaphore();
+  }
 }

@@ -35,18 +35,15 @@ import org.edumips64.utils.*;
  * </pre>
  * @author Trubia Massimo, Russo Daniele
  */
-class LB extends Loading
-{
-    final String OPCODE_VALUE="100000";
-    public LB()
-    {
-        super.OPCODE_VALUE = OPCODE_VALUE; 
-        this.name="LB";
-        this.memoryOpSize = 1;
-    }
+class LB extends Loading {
+  final String OPCODE_VALUE = "100000";
+  public LB() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "LB";
+    this.memoryOpSize = 1;
+  }
 
-    public void doMEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException
-    { 
-        TR[LMD_REGISTER].writeByte(memEl.readByte((int)(address%8)));
-    }        
+  public void doMEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+    TR[LMD_REGISTER].writeByte(memEl.readByte((int)(address % 8)));
+  }
 }

@@ -31,41 +31,44 @@ import org.edumips64.utils.*;
  * @author Trubia Massimo
  */
 
-public abstract class FPMoveFromInstructions extends FPMoveToAndFromInstructions{
+public abstract class FPMoveFromInstructions extends FPMoveToAndFromInstructions {
 
-	public FPMoveFromInstructions() {
-	}
-	public void ID() throws RAWException, WAWException, IrregularStringOfBitsException {
-		//if the source register is valid we pass its own value into a temporary register
-		RegisterFP fs=cpu.getRegisterFP(params.get(FS_FIELD));
-		Register rt=cpu.getRegister(params.get(RT_FIELD));
-		if(fs.getWriteSemaphore()>0)
-			throw new RAWException();
-		TRfp[FS_FIELD].setBits(fs.getBinString(),0);
-		TR[RT_FIELD].setBits(rt.getBinString(),0);
-		//locking the destination register
-		
-		// it is not necessary because no one long latency instruction writes an integer register
-		/*if(rt.getWriteSemaphore()>0)
-			throw new WAWException();*/
-		rt.incrWriteSemaphore();
-	}
-	public abstract void EX() throws IrregularStringOfBitsException,IrregularWriteOperationException;
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException{};
-	public void WB() throws IrregularStringOfBitsException
-	{
-		if(!enableForwarding)
-			doWB();
-	}
-	
-	public void doWB() throws IrregularStringOfBitsException {
-		//passing result from temporary register to destination register and unlocking it
-		cpu.getRegister(params.get(RT_FIELD)).setBits(TR[RT_FIELD].getBinString(),0);
-		cpu.getRegister(params.get(RT_FIELD)).decrWriteSemaphore();
-	}
+  public FPMoveFromInstructions() {
+  }
+  public void ID() throws RAWException, WAWException, IrregularStringOfBitsException {
+    //if the source register is valid we pass its own value into a temporary register
+    RegisterFP fs = cpu.getRegisterFP(params.get(FS_FIELD));
+    Register rt = cpu.getRegister(params.get(RT_FIELD));
+
+    if (fs.getWriteSemaphore() > 0) {
+      throw new RAWException();
+    }
+
+    TRfp[FS_FIELD].setBits(fs.getBinString(), 0);
+    TR[RT_FIELD].setBits(rt.getBinString(), 0);
+    //locking the destination register
+
+    // it is not necessary because no one long latency instruction writes an integer register
+    /*if(rt.getWriteSemaphore()>0)
+      throw new WAWException();*/
+    rt.incrWriteSemaphore();
+  }
+  public abstract void EX() throws IrregularStringOfBitsException, IrregularWriteOperationException;
+  public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {};
+  public void WB() throws IrregularStringOfBitsException {
+    if (!enableForwarding) {
+      doWB();
+    }
+  }
+
+  public void doWB() throws IrregularStringOfBitsException {
+    //passing result from temporary register to destination register and unlocking it
+    cpu.getRegister(params.get(RT_FIELD)).setBits(TR[RT_FIELD].getBinString(), 0);
+    cpu.getRegister(params.get(RT_FIELD)).decrWriteSemaphore();
+  }
 }
 
- 
+
 
 
 

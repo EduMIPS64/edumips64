@@ -37,64 +37,63 @@ import java.io.Serializable;
 
 public class MultiLineCellRenderer extends JTextArea implements TableCellRenderer, Serializable {
 
-	protected static Border noFocusBorder; 
+  protected static Border noFocusBorder;
 
-	boolean[] lineIsError; 
-	private Color errorForeground = Color.white;
-	private Color errorBackground = Color.red;
-	private Color warningForeground = new Color(0,0,85);
-	private Color warningBackground =  Color.yellow;
+  boolean[] lineIsError;
+  private Color errorForeground = Color.white;
+  private Color errorBackground = Color.red;
+  private Color warningForeground = new Color(0, 0, 85);
+  private Color warningBackground =  Color.yellow;
 
-	public MultiLineCellRenderer() {
-		super();
-		noFocusBorder = new EmptyBorder(1, 2, 1, 2);
-		setLineWrap(true);
-		setWrapStyleWord(true);
-		setOpaque(true);
-		setEditable(false);
-		setBorder(noFocusBorder);
-	}
+  public MultiLineCellRenderer() {
+    super();
+    noFocusBorder = new EmptyBorder(1, 2, 1, 2);
+    setLineWrap(true);
+    setWrapStyleWord(true);
+    setOpaque(true);
+    setEditable(false);
+    setBorder(noFocusBorder);
+  }
 
-	public MultiLineCellRenderer(boolean[] lineIsError) {
-		super();
-		noFocusBorder = new EmptyBorder(1, 2, 1, 2);
-		setLineWrap(true);
-		setWrapStyleWord(true);
-		setOpaque(true);
-		setBorder(noFocusBorder);
-		
-		this.lineIsError = lineIsError;
-	}
+  public MultiLineCellRenderer(boolean[] lineIsError) {
+    super();
+    noFocusBorder = new EmptyBorder(1, 2, 1, 2);
+    setLineWrap(true);
+    setWrapStyleWord(true);
+    setOpaque(true);
+    setBorder(noFocusBorder);
 
-	public Component getTableCellRendererComponent(JTable table, Object value,
-			boolean isSelected, boolean hasFocus, 
-			int row, int column) {
-		
-		if (lineIsError[row]) {
-			super.setForeground(errorForeground);
-			super.setBackground(errorBackground);
-		}
-		else {
-			super.setForeground(warningForeground);
-			super.setBackground(warningBackground);
-		}
+    this.lineIsError = lineIsError;
+  }
 
-		setFont(table.getFont());
+  public Component getTableCellRendererComponent(JTable table, Object value,
+      boolean isSelected, boolean hasFocus,
+      int row, int column) {
 
-		setBorder(noFocusBorder);
-		
-		setValue(value);
+    if (lineIsError[row]) {
+      super.setForeground(errorForeground);
+      super.setBackground(errorBackground);
+    } else {
+      super.setForeground(warningForeground);
+      super.setBackground(warningBackground);
+    }
 
-		return this;
-	}
+    setFont(table.getFont());
 
-	protected void setValue(Object value) {
-		setText((value == null) ? "" : (value.toString()).trim());
-	}
+    setBorder(noFocusBorder);
+
+    setValue(value);
+
+    return this;
+  }
+
+  protected void setValue(Object value) {
+    setText((value == null) ? "" : (value.toString()).trim());
+  }
 
 
-	public static class UIResource extends MultiLineCellRenderer implements javax.swing.plaf.UIResource {
-	}
+  public static class UIResource extends MultiLineCellRenderer implements javax.swing.plaf.UIResource {
+  }
 
 }
 

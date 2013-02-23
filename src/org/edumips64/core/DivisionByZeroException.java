@@ -23,10 +23,10 @@
 
 package org.edumips64.core;
 
-/** Exception thrown when a number is divided by zero 
+/** Exception thrown when a number is divided by zero
  *  @author Andrea Spadaccini */
-public class DivisionByZeroException extends SynchronousException{
-	public DivisionByZeroException() {
-		super("DIVZERO");
-	}
+public class DivisionByZeroException extends SynchronousException {
+  public DivisionByZeroException() {
+    super("DIVZERO");
+  }
 }

@@ -36,212 +36,211 @@ import java.io.*;
  */
 
 public class DineroFrontend extends JDialog {
-	// Attributes are static in order to make them accessible from
-	// the nested anonymous classes. They can be static, because at most
-	// one instance of DineroFrame will be created in EduMIPS64
-	private static JLabel pathLabel, paramsLabel;
-	private static JTextField path, params;
-	private static JButton browse, execute;
-	private static JTextArea result;
-	private static Container cp;
-	private class ReadStdOut extends Thread
-	{
-	    public boolean finish = false;
-	    private BufferedReader stdOut; 
-	    private BufferedReader stdErr;
-	    public ReadStdOut (	BufferedReader stdOut, BufferedReader stdErr, JTextArea result) 
-	    {
-		this.stdOut = stdOut;
-		this.stdErr = stdErr;
-	    }
-	    public void run()
-		{
-			boolean found = false;
-			String s;
+  // Attributes are static in order to make them accessible from
+  // the nested anonymous classes. They can be static, because at most
+  // one instance of DineroFrame will be created in EduMIPS64
+  private static JLabel pathLabel, paramsLabel;
+  private static JTextField path, params;
+  private static JButton browse, execute;
+  private static JTextArea result;
+  private static Container cp;
+  private class ReadStdOut extends Thread {
+    public boolean finish = false;
+    private BufferedReader stdOut;
+    private BufferedReader stdErr;
+    public ReadStdOut(BufferedReader stdOut, BufferedReader stdErr, JTextArea result) {
+      this.stdOut = stdOut;
+      this.stdErr = stdErr;
+    }
+    public void run() {
+      boolean found = false;
+      String s;
 
-			try
-			{
-				while (!finish)
-				{
-					if(stdOut.ready())
-						while ((s = stdOut.readLine()) != null) {
-							if(s.equals("---Simulation complete."))
-								found = true;
-							if(found)
-								result.append(s + "\n");
-						} 
-					if(stdErr.ready())
-						while ((s = stdErr.readLine()) != null) 
-						{
-							result.append(">> Dinero error: " + s + "\n");
-						}
-				}
-			}
-			catch (java.io.IOException ioe) 
-			{
-				result.append(">> ERROR: " + ioe);
-			}
-    	}
-	
-	}
+      try {
+        while (!finish) {
+          if (stdOut.ready())
+            while ((s = stdOut.readLine()) != null) {
+              if (s.equals("---Simulation complete.")) {
+                found = true;
+              }
 
-	public DineroFrontend(Frame owner) {
-		super(owner);
-		setTitle("Dinero frontend");
-		cp = rootPane.getContentPane();
-		cp.setLayout(new BoxLayout(cp, BoxLayout.PAGE_AXIS));
+              if (found) {
+                result.append(s + "\n");
+              }
+            }
 
-		Dimension hSpace = new Dimension(5, 0);
-		Dimension vSpace = new Dimension(0, 5);
+          if (stdErr.ready())
+            while ((s = stdErr.readLine()) != null) {
+              result.append(">> Dinero error: " + s + "\n");
+            }
+        }
+      } catch (java.io.IOException ioe) {
+        result.append(">> ERROR: " + ioe);
+      }
+    }
 
-		pathLabel = new JLabel("DineroIV executable path:");
-		paramsLabel = new JLabel("Command line parameters:");
+  }
 
-		path = new JTextField((String)Config.get("dineroIV"));
-		params = new JTextField("-l1-usize 512 -l1-ubsize 64");
+  public DineroFrontend(Frame owner) {
+    super(owner);
+    setTitle("Dinero frontend");
+    cp = rootPane.getContentPane();
+    cp.setLayout(new BoxLayout(cp, BoxLayout.PAGE_AXIS));
 
-		path.setPreferredSize(new Dimension(400, 26));
-		path.setMaximumSize(new Dimension(1000, 26));
-		path.setMinimumSize(new Dimension(50, 25));
+    Dimension hSpace = new Dimension(5, 0);
+    Dimension vSpace = new Dimension(0, 5);
 
-		params.setPreferredSize(new Dimension(400, 26));
-		params.setMaximumSize(new Dimension(1000, 26));
-		params.setMinimumSize(new Dimension(50, 26));
+    pathLabel = new JLabel("DineroIV executable path:");
+    paramsLabel = new JLabel("Command line parameters:");
 
-		params.addKeyListener(new KeyAdapter() {
-			public void keyReleased(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-					execute.doClick();
-				}
-			}
-		});
+    path = new JTextField((String) Config.get("dineroIV"));
+    params = new JTextField("-l1-usize 512 -l1-ubsize 64");
 
-		browse = new JButton("Browse...");
-		browse.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		execute = new JButton("Execute");
-		execute.setAlignmentX(Component.CENTER_ALIGNMENT);
+    path.setPreferredSize(new Dimension(400, 26));
+    path.setMaximumSize(new Dimension(1000, 26));
+    path.setMinimumSize(new Dimension(50, 25));
 
-		browse.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e){
-			JFileChooser jfc = new JFileChooser();
-				int val = jfc.showOpenDialog(null);
-				if(val == JFileChooser.APPROVE_OPTION){
-					Config.set("dineroIV",jfc.getSelectedFile().getPath());
-					path.setText(jfc.getSelectedFile().getPath());
-				}
-			}
-		});
-		
-		execute.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					// Process representing Dinero
-					String dineroPath = path.getText();
-					String paramString = params.getText();
+    params.setPreferredSize(new Dimension(400, 26));
+    params.setMaximumSize(new Dimension(1000, 26));
+    params.setMinimumSize(new Dimension(50, 26));
 
-					// Cleaning the JTextArea
-					result.setText("");
-					result.append(">> Dinero path: " + dineroPath + "\n");
-					result.append(">> Dinero parameters: " + paramString + "\n");
+    params.addKeyListener(new KeyAdapter() {
+      public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+          execute.doClick();
+        }
+      }
+    });
 
-					Process dinero = Runtime.getRuntime().exec(dineroPath + " " + paramString);
-					result.append(">> Simulation results:\n");
-					// Readers associated with Dinero output streams
-					BufferedReader stdErr = new BufferedReader(new InputStreamReader(dinero.getErrorStream()));
-					BufferedReader stdOut = new BufferedReader(new InputStreamReader(dinero.getInputStream()));
-				        ReadStdOut th = null;
-					if(org.edumips64.Main.isWindows())
-					{
-					    th = new ReadStdOut(stdOut,stdErr,result);
-					    th.start();
-					}
+    browse = new JButton("Browse...");
+    browse.setAlignmentX(Component.RIGHT_ALIGNMENT);
+    execute = new JButton("Execute");
+    execute.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-					// Writer associated with Dinero input streams
-					PrintWriter dineroIn = new PrintWriter(dinero.getOutputStream());
+    browse.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        JFileChooser jfc = new JFileChooser();
+        int val = jfc.showOpenDialog(null);
 
-					String s = new String();
+        if (val == JFileChooser.APPROVE_OPTION) {
+          Config.set("dineroIV", jfc.getSelectedFile().getPath());
+          path.setText(jfc.getSelectedFile().getPath());
+        }
+      }
+    });
 
-					// Let's send the tracefile to Dinero
-					org.edumips64.core.Dinero.getInstance().writeTraceData(dineroIn);
-					dineroIn.flush();
-					dineroIn.close();
+    execute.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        try {
+          // Process representing Dinero
+          String dineroPath = path.getText();
+          String paramString = params.getText();
 
-					try {
-						// Well, wait for Dinero to terminate
-						dinero.waitFor();
-					}
-					catch (InterruptedException ie) {
-						ie.printStackTrace();
-					}
-					if(org.edumips64.Main.isWindows())
-					    th.finish = true;	
-					else
-					{
-					    boolean found = false;
+          // Cleaning the JTextArea
+          result.setText("");
+          result.append(">> Dinero path: " + dineroPath + "\n");
+          result.append(">> Dinero parameters: " + paramString + "\n");
 
-					    // Let's get the results
-					    if(stdOut.ready())
-						while ((s = stdOut.readLine()) != null) {
-						    if(s.equals("---Simulation complete."))
-							found = true;
-						    if(found)
-							result.append(s + "\n");
-						} 
-					    if(stdErr.ready())
-						while ((s = stdErr.readLine()) != null) {
-						    result.append(">> Dinero error: " + s + "\n");
-						}
-					}
+          Process dinero = Runtime.getRuntime().exec(dineroPath + " " + paramString);
+          result.append(">> Simulation results:\n");
+          // Readers associated with Dinero output streams
+          BufferedReader stdErr = new BufferedReader(new InputStreamReader(dinero.getErrorStream()));
+          BufferedReader stdOut = new BufferedReader(new InputStreamReader(dinero.getInputStream()));
+          ReadStdOut th = null;
 
-				}
-				catch (java.io.IOException ioe) {
-					result.append(">> ERROR: " + ioe);
-				}
-			}
-		});
+          if (org.edumips64.Main.isWindows()) {
+            th = new ReadStdOut(stdOut, stdErr, result);
+            th.start();
+          }
 
-		Box dineroEx = Box.createHorizontalBox();
-		dineroEx.add(Box.createHorizontalGlue());
-		dineroEx.add(pathLabel);
-		dineroEx.add(Box.createRigidArea(hSpace));
-		dineroEx.add(path);
-		dineroEx.add(Box.createRigidArea(hSpace));
-		dineroEx.add(browse);
-		cp.add(dineroEx);
-		
-		cp.add(Box.createRigidArea(vSpace));
+          // Writer associated with Dinero input streams
+          PrintWriter dineroIn = new PrintWriter(dinero.getOutputStream());
 
-		Box cmdLine = Box.createHorizontalBox();
-		cmdLine.add(Box.createHorizontalGlue());
-		cmdLine.add(paramsLabel);
-		cmdLine.add(Box.createRigidArea(hSpace));
-		cmdLine.add(params);
-		cmdLine.add(Box.createRigidArea(hSpace));
-		cp.add(cmdLine);
-		cp.add(Box.createRigidArea(vSpace));
+          String s = new String();
 
-		result = new JTextArea();
-		result.setBorder(BorderFactory.createTitledBorder("Messages"));
-		result.setEditable(false);
-		result.setFont(new Font("Monospaced", Font.PLAIN, 12));
+          // Let's send the tracefile to Dinero
+          org.edumips64.core.Dinero.getInstance().writeTraceData(dineroIn);
+          dineroIn.flush();
+          dineroIn.close();
 
-		cp.add(execute);
-		cp.add(Box.createRigidArea(vSpace));
-		cp.add(new JScrollPane(result));
+          try {
+            // Well, wait for Dinero to terminate
+            dinero.waitFor();
+          } catch (InterruptedException ie) {
+            ie.printStackTrace();
+          }
 
-		setSize(850, 500);
-	}
-	public static void main(String[] args) {
-		DineroCacheOptions dco = new DineroCacheOptions('u', 1);
-		dco.size = "256k";
-		dco.bsize = "256";
+          if (org.edumips64.Main.isWindows()) {
+            th.finish = true;
+          } else {
+            boolean found = false;
 
-		System.out.println(dco);
+            // Let's get the results
+            if (stdOut.ready())
+              while ((s = stdOut.readLine()) != null) {
+                if (s.equals("---Simulation complete.")) {
+                  found = true;
+                }
 
-		JDialog f = new DineroFrontend(null);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setVisible(true);
-	}
+                if (found) {
+                  result.append(s + "\n");
+                }
+              }
+
+            if (stdErr.ready())
+              while ((s = stdErr.readLine()) != null) {
+                result.append(">> Dinero error: " + s + "\n");
+              }
+          }
+
+        } catch (java.io.IOException ioe) {
+          result.append(">> ERROR: " + ioe);
+        }
+      }
+    });
+
+    Box dineroEx = Box.createHorizontalBox();
+    dineroEx.add(Box.createHorizontalGlue());
+    dineroEx.add(pathLabel);
+    dineroEx.add(Box.createRigidArea(hSpace));
+    dineroEx.add(path);
+    dineroEx.add(Box.createRigidArea(hSpace));
+    dineroEx.add(browse);
+    cp.add(dineroEx);
+
+    cp.add(Box.createRigidArea(vSpace));
+
+    Box cmdLine = Box.createHorizontalBox();
+    cmdLine.add(Box.createHorizontalGlue());
+    cmdLine.add(paramsLabel);
+    cmdLine.add(Box.createRigidArea(hSpace));
+    cmdLine.add(params);
+    cmdLine.add(Box.createRigidArea(hSpace));
+    cp.add(cmdLine);
+    cp.add(Box.createRigidArea(vSpace));
+
+    result = new JTextArea();
+    result.setBorder(BorderFactory.createTitledBorder("Messages"));
+    result.setEditable(false);
+    result.setFont(new Font("Monospaced", Font.PLAIN, 12));
+
+    cp.add(execute);
+    cp.add(Box.createRigidArea(vSpace));
+    cp.add(new JScrollPane(result));
+
+    setSize(850, 500);
+  }
+  public static void main(String[] args) {
+    DineroCacheOptions dco = new DineroCacheOptions('u', 1);
+    dco.size = "256k";
+    dco.bsize = "256";
+
+    System.out.println(dco);
+
+    JDialog f = new DineroFrontend(null);
+    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    f.setVisible(true);
+  }
 
 }
 
@@ -249,60 +248,63 @@ public class DineroFrontend extends JDialog {
 /** Panel with all the necessary controls to modify the options of a Cache.
  */
 class DineroSingleCachePanel extends JPanel {
-	private DineroCacheOptions dco;
-	private JComboBox<String> size, sizeUnit, bsize, bsizeUnit;
-	private JTextField assoc;
-	private JCheckBox ccc;
-	public DineroSingleCachePanel(char type, int level) {
-		dco = new DineroCacheOptions(type, level);
+  private DineroCacheOptions dco;
+  private JComboBox<String> size, sizeUnit, bsize, bsizeUnit;
+  private JTextField assoc;
+  private JCheckBox ccc;
+  public DineroSingleCachePanel(char type, int level) {
+    dco = new DineroCacheOptions(type, level);
 
-		String[] sizes = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "512"};
-		String[] units = {" ", "k", "M", "G"};
+    String[] sizes = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "512"};
+    String[] units = {" ", "k", "M", "G"};
 
-		size = new JComboBox<String>(sizes);
-		bsize = new JComboBox<String>(sizes);
+    size = new JComboBox<String> (sizes);
+    bsize = new JComboBox<String> (sizes);
 
-		sizeUnit = new JComboBox<String>(units);
-		bsizeUnit = new JComboBox<String>(units);
+    sizeUnit = new JComboBox<String> (units);
+    bsizeUnit = new JComboBox<String> (units);
 
-		assoc = new JTextField();
-		ccc = new JCheckBox();
-		ccc.setEnabled(false);
+    assoc = new JTextField();
+    ccc = new JCheckBox();
+    ccc.setEnabled(false);
 
-		//setBorder(BorderFactory.createTitledBorder("Level " + level + " cache 
-		//(" + type + ")"));
-		//setLayout(new GridLayout(1, 3));
-	}
+    //setBorder(BorderFactory.createTitledBorder("Level " + level + " cache
+    //(" + type + ")"));
+    //setLayout(new GridLayout(1, 3));
+  }
 }
 
 /** Class holding the config options for a Cache.
- *  Its attributes are public because this class has package visibility, and so 
+ *  Its attributes are public because this class has package visibility, and so
  *  it's used only by the DineroFrontend and the DineroCachePanel classes.
  */
 class DineroCacheOptions {
-	public String size, bsize;
-	public int assoc = 0;
-	public boolean ccc = false;
-	
-	private char type;
-	private int level;
-	
-	public DineroCacheOptions(char type, int level) {
-		this.type = type;
-		this.level = level;
-	}
-	
-	public String toString() {
-		String prefix = "-l" + level + "-" + type;
-		String cmdline = prefix + "size" + " " + size + " ";
-		cmdline += prefix + "bsize" + " " + bsize + " ";
+  public String size, bsize;
+  public int assoc = 0;
+  public boolean ccc = false;
 
-		if(assoc > 0)
-			cmdline += prefix + "assoc" + " " + assoc + " ";
-		if(ccc)
-			cmdline += prefix + "ccc" + " ";
+  private char type;
+  private int level;
 
-		return cmdline;
-	}
+  public DineroCacheOptions(char type, int level) {
+    this.type = type;
+    this.level = level;
+  }
+
+  public String toString() {
+    String prefix = "-l" + level + "-" + type;
+    String cmdline = prefix + "size" + " " + size + " ";
+    cmdline += prefix + "bsize" + " " + bsize + " ";
+
+    if (assoc > 0) {
+      cmdline += prefix + "assoc" + " " + assoc + " ";
+    }
+
+    if (ccc) {
+      cmdline += prefix + "ccc" + " ";
+    }
+
+    return cmdline;
+  }
 }
 

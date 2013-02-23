@@ -22,4 +22,4 @@
  */
 package org.edumips64.core;
 
-public class MemoryElementNotFoundException extends Exception{}
+public class MemoryElementNotFoundException extends Exception {}

@@ -22,4 +22,4 @@
  */
 package org.edumips64.core;
 
-public class SameLabelsException extends Exception{}
+public class SameLabelsException extends Exception {}

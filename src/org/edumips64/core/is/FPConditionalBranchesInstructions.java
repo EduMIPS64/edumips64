@@ -33,45 +33,45 @@ import org.edumips64.utils.*;
  * @author Trubia Massimo
  */
 public abstract class FPConditionalBranchesInstructions extends FlowControlInstructions {
-	final static int CC_FIELD=0;
-	final static int CC_FIELD_INIT=11;
-	final static int CC_FIELD_LENGTH=3;
-	final static int OFFSET_FIELD=1;
-	final static int OFFSET_FIELD_INIT=16;
-	final static int OFFSET_FIELD_LENGTH=16;
-	static String COP1_VALUE="010001";
-	final static int COP1_FIELD_INIT=0;
-	static String BC_VALUE="01000";
-	final static int BC_FIELD_INIT=6;
-	final static int ND_FIELD_INIT=14;
-	final static int TF_FIELD_INIT=15;
-	
-	String ND_FIELD="";
-	String TF_FIELD="";
-	String CC_FIELD_VALUE="";
-	public FPConditionalBranchesInstructions() {
-		this.syntax="%C,%B";
-		this.paramCount=2;
-	}
-	
-	public abstract void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException,JumpException,TwosComplementSumException;
-	
-	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException,IrregularWriteOperationException {
-	}
-	
-	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
-	}
-	
-	public void WB() throws IrregularStringOfBitsException {
-	}
-	
-	public void pack() throws IrregularStringOfBitsException {
-		repr.setBits(COP1_VALUE, COP1_FIELD_INIT);
-		repr.setBits(BC_VALUE,BC_FIELD_INIT);
-		repr.setBits(Converter.intToBin(CC_FIELD_LENGTH, params.get(CC_FIELD)), CC_FIELD_INIT);
-		repr.setBits(ND_FIELD, ND_FIELD_INIT);
-		repr.setBits(TF_FIELD, TF_FIELD_INIT);
-		repr.setBits(Converter.intToBin(OFFSET_FIELD_LENGTH, params.get(OFFSET_FIELD)/4), OFFSET_FIELD_INIT);
-	}
-	
+  final static int CC_FIELD = 0;
+  final static int CC_FIELD_INIT = 11;
+  final static int CC_FIELD_LENGTH = 3;
+  final static int OFFSET_FIELD = 1;
+  final static int OFFSET_FIELD_INIT = 16;
+  final static int OFFSET_FIELD_LENGTH = 16;
+  static String COP1_VALUE = "010001";
+  final static int COP1_FIELD_INIT = 0;
+  static String BC_VALUE = "01000";
+  final static int BC_FIELD_INIT = 6;
+  final static int ND_FIELD_INIT = 14;
+  final static int TF_FIELD_INIT = 15;
+
+  String ND_FIELD = "";
+  String TF_FIELD = "";
+  String CC_FIELD_VALUE = "";
+  public FPConditionalBranchesInstructions() {
+    this.syntax = "%C,%B";
+    this.paramCount = 2;
+  }
+
+  public abstract void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException, TwosComplementSumException;
+
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, IrregularWriteOperationException {
+  }
+
+  public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
+  }
+
+  public void WB() throws IrregularStringOfBitsException {
+  }
+
+  public void pack() throws IrregularStringOfBitsException {
+    repr.setBits(COP1_VALUE, COP1_FIELD_INIT);
+    repr.setBits(BC_VALUE, BC_FIELD_INIT);
+    repr.setBits(Converter.intToBin(CC_FIELD_LENGTH, params.get(CC_FIELD)), CC_FIELD_INIT);
+    repr.setBits(ND_FIELD, ND_FIELD_INIT);
+    repr.setBits(TF_FIELD, TF_FIELD_INIT);
+    repr.setBits(Converter.intToBin(OFFSET_FIELD_LENGTH, params.get(OFFSET_FIELD) / 4), OFFSET_FIELD_INIT);
+  }
+
 }

@@ -22,6 +22,6 @@
  */
 package org.edumips64.utils;
 
-public class IrregularStringOfHexException extends Exception{}
+public class IrregularStringOfHexException extends Exception {}
 
 

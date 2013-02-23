@@ -32,7 +32,7 @@ import org.edumips64.utils.*;
  * <pre>
  *        Syntax: DADDIU rt, rs, immediate
  *   Description: To add a constant to a 64-bit integer
- *                The 16-bit signed immediate is added to the 64-bit value 
+ *                The 16-bit signed immediate is added to the 64-bit value
  *                in GPR rs and the 64-bit arithmetic result is placed into
  *                GPR rt. No Integer Overflow exception occurs under any circumstances.
  * </pre>
@@ -40,21 +40,22 @@ import org.edumips64.utils.*;
  */
 
 class DADDIU extends ALU_IType {
-	final String OPCODE_VALUE="011001";
-	DADDIU() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		this.name="DADDIU";
-	}
-	
-	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException,IrregularWriteOperationException {
-		//getting values from temporary registers
-		long imm=TR[IMM_FIELD].getValue();
-		long rs=TR[RS_FIELD].getValue();
-		//adding values without to control integer overflow
-		long result=imm+rs;
-		TR[RT_FIELD].writeDoubleWord(result);
-		if(enableForwarding) {
-			doWB();
-		}
-	}
+  final String OPCODE_VALUE = "011001";
+  DADDIU() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "DADDIU";
+  }
+
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException {
+    //getting values from temporary registers
+    long imm = TR[IMM_FIELD].getValue();
+    long rs = TR[RS_FIELD].getValue();
+    //adding values without to control integer overflow
+    long result = imm + rs;
+    TR[RT_FIELD].writeDoubleWord(result);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
 }

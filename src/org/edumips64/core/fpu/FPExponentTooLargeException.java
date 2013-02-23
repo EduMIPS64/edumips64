@@ -20,13 +20,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */  
+ */
 
 package org.edumips64.core.fpu;
 /* Exception thrown when a double number with an exponent larger than 32 bit is encountered
 * @author Trubia Massimo
 */
-public class FPExponentTooLargeException extends Exception{
-	public FPExponentTooLargeException() {}
-	
+public class FPExponentTooLargeException extends Exception {
+  public FPExponentTooLargeException() {}
+
 }

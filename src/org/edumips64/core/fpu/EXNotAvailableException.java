@@ -22,6 +22,6 @@ package org.edumips64.core.fpu;
 /* This exception is launched when multiple instructions would fill the MEM stage instead
  * of the fact only one can fill it
  *
- * @author Massimo Trubia 
+ * @author Massimo Trubia
  */
-public class EXNotAvailableException extends Exception{}
+public class EXNotAvailableException extends Exception {}

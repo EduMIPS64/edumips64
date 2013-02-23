@@ -32,46 +32,43 @@ import org.edumips64.utils.IrregularStringOfBitsException;
 * <pre>
 *      Syntax: SLT rd, rs, rt
 * Description: Records the result of a less-than comparison
-* 	       i.e: rd = (rs < rt)
-*              
+*          i.e: rd = (rs < rt)
+*
 * </pre>
 * @author Trubia Massimo, Russo Daniele
 */
-public class SLT extends ALU_RType
-{
-	final String OPCODE_VALUE = "101010";
-	public SLT()
-	{
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		name="SLT";
-	}
-	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException
-	{
-		String rs = TR[RS_FIELD].getBinString();
-		String rt = TR[RT_FIELD].getBinString();
+public class SLT extends ALU_RType {
+  final String OPCODE_VALUE = "101010";
+  public SLT() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    name = "SLT";
+  }
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {
+    String rs = TR[RS_FIELD].getBinString();
+    String rt = TR[RT_FIELD].getBinString();
 
-		long rs_value = Converter.binToLong(rs,false);
-		long rt_value = Converter.binToLong(rt,false);
+    long rs_value = Converter.binToLong(rs, false);
+    long rt_value = Converter.binToLong(rt, false);
 
-		String rd = "";
+    String rd = "";
 
-		if(rs_value < rt_value)
-		{
-			for(int i = 0;i < 63; i++)
-				rd +='0';
-			rd = rd + '1';
-		}
-		else
-		{
-			for(int i = 0;i < 64; i ++)
-				rd += '0';
-		}
+    if (rs_value < rt_value) {
+      for (int i = 0; i < 63; i++) {
+        rd += '0';
+      }
 
-		TR[RD_FIELD].setBits(rd,0);
-		if(enableForwarding)
-		{
-			doWB();
-		}
+      rd = rd + '1';
+    } else {
+      for (int i = 0; i < 64; i ++) {
+        rd += '0';
+      }
+    }
 
-	}
+    TR[RD_FIELD].setBits(rd, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+
+  }
 }

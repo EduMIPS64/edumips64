@@ -32,67 +32,70 @@ import org.edumips64.utils.*;
  *      Syntax: SRA rd, rt, sa
  * Description: To execute an arithmetic right-shift of a word by a fixed number of bits
  *              The contents of the low-order 32-bit word of GPR rt are shifted right, duplicating the sign-bit (bit 31) in the emptied
- *		bits; the word result is sign-extended and placed in GPR rd. The bit-shift amount is specified by sa.
+ *    bits; the word result is sign-extended and placed in GPR rd. The bit-shift amount is specified by sa.
  *</pre>
  * @author UrzÃ¬ Erik - Sciuto Lorenzo - Giorgio Scibilia
  */
 public class SRA extends ALU_RType {
-    final int RD_FIELD=0;
-    final int RT_FIELD=1;
-    final int SA_FIELD=2;
-    final int RD_FIELD_INIT=16;
-    final int RT_FIELD_INIT=11;
-    final int SA_FIELD_INIT=21;
-    final int RD_FIELD_LENGTH=5;
-    final int RT_FIELD_LENGTH=5;
-    final int SA_FIELD_LENGTH=5;
-    final String OPCODE_VALUE="000011";
+  final int RD_FIELD = 0;
+  final int RT_FIELD = 1;
+  final int SA_FIELD = 2;
+  final int RD_FIELD_INIT = 16;
+  final int RT_FIELD_INIT = 11;
+  final int SA_FIELD_INIT = 21;
+  final int RD_FIELD_LENGTH = 5;
+  final int RT_FIELD_LENGTH = 5;
+  final int SA_FIELD_LENGTH = 5;
+  final String OPCODE_VALUE = "000011";
 
-   SRA()
-   {
-   	super.OPCODE_VALUE = OPCODE_VALUE;
-	name="SRA";
-        syntax="%R,%R,%U";
-   }    
-   //since this operation is carried out writing sa value as unsigned value, it is necessary 
-   //the overriding of ID method
-   public void ID() throws RAWException,IrregularWriteOperationException
-   {
-        //if the source register is valid passing his own value into a temporary register
-        Register rt=cpu.getRegister(params.get(RT_FIELD));
-        if(rt.getWriteSemaphore()>0)
-            throw new RAWException();
-        TR[RT_FIELD]=rt;
-        //writing on a temporary register the sa field as unsigned value
-        TR[SA_FIELD].writeDoubleWord(params.get(SA_FIELD));
-        //increment the semaphore of the destination register
-        Register rd=cpu.getRegister(params.get(RD_FIELD));
-        rd.incrWriteSemaphore();        
-   }
-    
-    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException 
-    {
-	//getting strings from temporary registers
-	int sa=(int)TR[SA_FIELD].getValue();
-	String rt=TR[RT_FIELD].getBinString();
-	//cutting the high part of register
-	rt=rt.substring(32,64);
-	//composing new shifted value and performing sign extension
-	StringBuffer sb=new StringBuffer();
-	for(int i=0; i<32+sa; i++)
-		sb.append(rt.charAt(0));
-	sb.append(rt.substring(0,32-sa));
-	TR[RD_FIELD].setBits(sb.substring(0),0);
-	if(enableForwarding)
-	{
-		doWB();
-	}
+  SRA() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    name = "SRA";
+    syntax = "%R,%R,%U";
+  }
+  //since this operation is carried out writing sa value as unsigned value, it is necessary
+  //the overriding of ID method
+  public void ID() throws RAWException, IrregularWriteOperationException {
+    //if the source register is valid passing his own value into a temporary register
+    Register rt = cpu.getRegister(params.get(RT_FIELD));
+
+    if (rt.getWriteSemaphore() > 0) {
+      throw new RAWException();
     }
-    public void pack() throws IrregularStringOfBitsException {
-        //conversion of instruction parameters of "params" list to the "repr" form (32 binary value) 
-        repr.setBits(OPCODE_VALUE,OPCODE_VALUE_INIT);
-        repr.setBits(Converter.intToBin(SA_FIELD_LENGTH,params.get(SA_FIELD)),SA_FIELD_INIT);
-        repr.setBits(Converter.intToBin(RT_FIELD_LENGTH,params.get(RT_FIELD)),RT_FIELD_INIT);
-        repr.setBits(Converter.intToBin(RD_FIELD_LENGTH,params.get(RD_FIELD)),RD_FIELD_INIT);        
+
+    TR[RT_FIELD] = rt;
+    //writing on a temporary register the sa field as unsigned value
+    TR[SA_FIELD].writeDoubleWord(params.get(SA_FIELD));
+    //increment the semaphore of the destination register
+    Register rd = cpu.getRegister(params.get(RD_FIELD));
+    rd.incrWriteSemaphore();
+  }
+
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+    //getting strings from temporary registers
+    int sa = (int) TR[SA_FIELD].getValue();
+    String rt = TR[RT_FIELD].getBinString();
+    //cutting the high part of register
+    rt = rt.substring(32, 64);
+    //composing new shifted value and performing sign extension
+    StringBuffer sb = new StringBuffer();
+
+    for (int i = 0; i < 32 + sa; i++) {
+      sb.append(rt.charAt(0));
     }
+
+    sb.append(rt.substring(0, 32 - sa));
+    TR[RD_FIELD].setBits(sb.substring(0), 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
+  public void pack() throws IrregularStringOfBitsException {
+    //conversion of instruction parameters of "params" list to the "repr" form (32 binary value)
+    repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);
+    repr.setBits(Converter.intToBin(SA_FIELD_LENGTH, params.get(SA_FIELD)), SA_FIELD_INIT);
+    repr.setBits(Converter.intToBin(RT_FIELD_LENGTH, params.get(RT_FIELD)), RT_FIELD_INIT);
+    repr.setBits(Converter.intToBin(RD_FIELD_LENGTH, params.get(RD_FIELD)), RD_FIELD_INIT);
+  }
 }

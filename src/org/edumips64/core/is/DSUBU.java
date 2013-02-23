@@ -30,36 +30,37 @@ import org.edumips64.utils.*;
 /**<pre>
  *      Syntax: DSUBU rd, rs, rt
  * Description: To subtract 64-bit integers;
- *              The 64-bit doubleword value in GPR rt is subtracted from 
- *              the 64-bit value in GPR rs and the 64-bit arithmetic result 
+ *              The 64-bit doubleword value in GPR rt is subtracted from
+ *              the 64-bit value in GPR rs and the 64-bit arithmetic result
  *              is placed into GPR rd.
  *</pre>
  * @author Trubia Massimo, Russo Daniele
  */
-public class DSUBU extends ALU_RType{
-	final String OPCODE_VALUE="101111";
-	public DSUBU() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		name="DSUBU";
-	}
-	
-	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException,TwosComplementSumException {
-		//getting strings from temporary registers
-		String rs=TR[RS_FIELD].getBinString();
-		String rt=TR[RT_FIELD].getBinString();
-		
-		long rs_int = Converter.binToLong(rs,false);
-		long rt_int = Converter.binToLong(rt,false);
-		
-		String outputstring=InstructionsUtils.twosComplementSubstraction(rs,rt);
-		
-		//There isn't IntegerOverflow cases
-		TR[RD_FIELD].setBits(outputstring, 0);
-		if(enableForwarding) {
-			doWB();
-		}
-		
-	}
-	
-	
+public class DSUBU extends ALU_RType {
+  final String OPCODE_VALUE = "101111";
+  public DSUBU() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    name = "DSUBU";
+  }
+
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+    //getting strings from temporary registers
+    String rs = TR[RS_FIELD].getBinString();
+    String rt = TR[RT_FIELD].getBinString();
+
+    long rs_int = Converter.binToLong(rs, false);
+    long rt_int = Converter.binToLong(rt, false);
+
+    String outputstring = InstructionsUtils.twosComplementSubstraction(rs, rt);
+
+    //There isn't IntegerOverflow cases
+    TR[RD_FIELD].setBits(outputstring, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+
+  }
+
+
 }

@@ -34,49 +34,52 @@ import org.edumips64.utils.*;
  */
 
 public class BGEZ extends FlowControl_IType {
-	final String OPCODE_VALUE="000001";
-	final static int OFFSET_FIELD=1;
-	final String RT_VALUE="00001";
-	
-	/** Creates a new instance of BGEZ */
-	public BGEZ() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		syntax="%R,%B";
-		name="BGEZ";
-	}
-	
-	public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException,TwosComplementSumException {
-		if(cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore()>0 )
-			throw new RAWException();
-		//getting register rs
-		String rs=cpu.getRegister(params.get(RS_FIELD)).getBinString();
-		//converting offset into a signed binary value of 64 bits in length
-		BitSet64 bs=new BitSet64();
-		bs.writeHalf(params.get(OFFSET_FIELD));
-		String offset=bs.getBinString();
-		boolean condition= rs.charAt(0)=='0';
-		if(condition) {
-			String pc_new="";
-			Register pc=cpu.getPC();
-			String pc_old=cpu.getPC().getBinString();
-			
-			//subtracting 4 to the pc_old temporary variable using bitset64 safe methods
-			BitSet64 bs_temp=new BitSet64();
-			bs_temp.writeDoubleWord(-4);
-			pc_old=InstructionsUtils.twosComplementSum(pc_old,bs_temp.getBinString());
-			
-			//updating program counter
-			pc_new=InstructionsUtils.twosComplementSum(pc_old,offset);
-			pc.setBits(pc_new,0);
-			
-			throw new JumpException();
-		}
-	}
-	public void pack() throws IrregularStringOfBitsException {
-		repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);
-		repr.setBits(Converter.intToBin(RS_FIELD_LENGTH, params.get(RS_FIELD)), RS_FIELD_INIT);
-		repr.setBits(RT_VALUE, RT_FIELD_INIT);
-		repr.setBits(Converter.intToBin(OFFSET_FIELD_LENGTH, params.get(OFFSET_FIELD)/4), OFFSET_FIELD_INIT);
-	}
-	
+  final String OPCODE_VALUE = "000001";
+  final static int OFFSET_FIELD = 1;
+  final String RT_VALUE = "00001";
+
+  /** Creates a new instance of BGEZ */
+  public BGEZ() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    syntax = "%R,%B";
+    name = "BGEZ";
+  }
+
+  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException, TwosComplementSumException {
+    if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0) {
+      throw new RAWException();
+    }
+
+    //getting register rs
+    String rs = cpu.getRegister(params.get(RS_FIELD)).getBinString();
+    //converting offset into a signed binary value of 64 bits in length
+    BitSet64 bs = new BitSet64();
+    bs.writeHalf(params.get(OFFSET_FIELD));
+    String offset = bs.getBinString();
+    boolean condition = rs.charAt(0) == '0';
+
+    if (condition) {
+      String pc_new = "";
+      Register pc = cpu.getPC();
+      String pc_old = cpu.getPC().getBinString();
+
+      //subtracting 4 to the pc_old temporary variable using bitset64 safe methods
+      BitSet64 bs_temp = new BitSet64();
+      bs_temp.writeDoubleWord(-4);
+      pc_old = InstructionsUtils.twosComplementSum(pc_old, bs_temp.getBinString());
+
+      //updating program counter
+      pc_new = InstructionsUtils.twosComplementSum(pc_old, offset);
+      pc.setBits(pc_new, 0);
+
+      throw new JumpException();
+    }
+  }
+  public void pack() throws IrregularStringOfBitsException {
+    repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);
+    repr.setBits(Converter.intToBin(RS_FIELD_LENGTH, params.get(RS_FIELD)), RS_FIELD_INIT);
+    repr.setBits(RT_VALUE, RT_FIELD_INIT);
+    repr.setBits(Converter.intToBin(OFFSET_FIELD_LENGTH, params.get(OFFSET_FIELD) / 4), OFFSET_FIELD_INIT);
+  }
+
 }

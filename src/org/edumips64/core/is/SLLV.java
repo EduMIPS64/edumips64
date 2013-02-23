@@ -31,55 +31,59 @@ import org.edumips64.utils.*;
  * <pre>
  *      Syntax: SLLV rd, rt, rs word shift left logical
  * Description: To execute a left-shift of a word by a fixed amount of 0 to 31 bits
- *              The 32-bit word contents of GPR rt are shifted left, 
- *              inserting zeros into the emptied bits; the result is sign-extended and placed in GPR rd. 
+ *              The 32-bit word contents of GPR rt are shifted left,
+ *              inserting zeros into the emptied bits; the result is sign-extended and placed in GPR rd.
  *              The bit-shift amount is specified by the low-order 5 bits of GPR rs.
  *</pre>
  * @author Erik UrzÃ¬ - Giorgio Scibilia - Sciuto Lorenzo
  */
 public class SLLV extends ALU_RType {
-    final int RD_FIELD=0;
-    final int RT_FIELD=1;
-    final int RS_FIELD=2;
-    final int RD_FIELD_INIT=11;
-    final int RT_FIELD_INIT=16;
-    final int RS_FIELD_INIT=21;
-    final int RD_FIELD_LENGTH=5;
-    final int RT_FIELD_LENGTH=5;
-    final int RS_FIELD_LENGTH=5;
-    final String OPCODE_VALUE="000100";
-    SLLV()
-    {
-	super.OPCODE_VALUE = OPCODE_VALUE;
-	name="SLLV";
-        syntax="%R,%R,%R";
-    }    
+  final int RD_FIELD = 0;
+  final int RT_FIELD = 1;
+  final int RS_FIELD = 2;
+  final int RD_FIELD_INIT = 11;
+  final int RT_FIELD_INIT = 16;
+  final int RS_FIELD_INIT = 21;
+  final int RD_FIELD_LENGTH = 5;
+  final int RT_FIELD_LENGTH = 5;
+  final int RS_FIELD_LENGTH = 5;
+  final String OPCODE_VALUE = "000100";
+  SLLV() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    name = "SLLV";
+    syntax = "%R,%R,%R";
+  }
 
-	public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException 
-	{
-		//getting strings from temporary registers
-		String rt = TR[RT_FIELD].getBinString();
-		String rs = TR[RS_FIELD].getBinString();
-		String shift = "",rd;
-		//getting the low order 5 bits from rs register
-		shift=rs.substring(59);
-		//cutting the high part of register
-		rt = rt.substring(32,64);
-		int shift_value = Converter.binToInt(shift,true);
-		//composing new shifted value and performing sign extension
-                StringBuffer buf = new StringBuffer();
-		for(int i=0; i<32; i++)
-			buf.append(rt.charAt(0));
-		buf.append(rt.substring(shift_value));
-		//filling the remaining bits with 0                
-		for(int i = 0; i < shift_value; i++)
-                    buf.append('0');
-                String target = new String(buf);
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+    //getting strings from temporary registers
+    String rt = TR[RT_FIELD].getBinString();
+    String rs = TR[RS_FIELD].getBinString();
+    String shift = "", rd;
+    //getting the low order 5 bits from rs register
+    shift = rs.substring(59);
+    //cutting the high part of register
+    rt = rt.substring(32, 64);
+    int shift_value = Converter.binToInt(shift, true);
+    //composing new shifted value and performing sign extension
+    StringBuffer buf = new StringBuffer();
 
-		TR[RD_FIELD].setBits(target,0);
-		if(enableForwarding)
-		{
-			doWB();
-		}
-	}
+    for (int i = 0; i < 32; i++) {
+      buf.append(rt.charAt(0));
+    }
+
+    buf.append(rt.substring(shift_value));
+
+    //filling the remaining bits with 0
+    for (int i = 0; i < shift_value; i++) {
+      buf.append('0');
+    }
+
+    String target = new String(buf);
+
+    TR[RD_FIELD].setBits(target, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
 }

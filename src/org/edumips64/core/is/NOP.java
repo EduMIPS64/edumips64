@@ -33,34 +33,35 @@ import org.edumips64.utils.*;
  * @author Trubia Massimo, Russo Daniele
  */
 public class NOP extends Instruction {
-	protected static CPU cpu=CPU.getInstance();
-	
-	/** Creates a new instance of HALT */
-	public NOP() {
-		name="NOP";
-	}
-	public void IF() {
-		Dinero din=Dinero.getInstance();
-		try {
-			din.IF(Converter.binToHex(Converter.intToBin(64,cpu.getLastPC().getValue())));
-		} catch(IrregularStringOfBitsException e) {
-			e.printStackTrace();
-		}
-	}
-	public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException {
-		
-	}
-	
-	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
-	}
-	
-	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
-	}
-	
-	public void WB() throws IrregularStringOfBitsException {
-	}
-	
-	public void pack() throws IrregularStringOfBitsException {
-	}
-	
+  protected static CPU cpu = CPU.getInstance();
+
+  /** Creates a new instance of HALT */
+  public NOP() {
+    name = "NOP";
+  }
+  public void IF() {
+    Dinero din = Dinero.getInstance();
+
+    try {
+      din.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+    } catch (IrregularStringOfBitsException e) {
+      e.printStackTrace();
+    }
+  }
+  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException {
+
+  }
+
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+  }
+
+  public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+  }
+
+  public void WB() throws IrregularStringOfBitsException {
+  }
+
+  public void pack() throws IrregularStringOfBitsException {
+  }
+
 }

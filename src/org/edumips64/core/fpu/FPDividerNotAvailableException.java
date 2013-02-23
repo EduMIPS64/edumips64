@@ -22,6 +22,6 @@ package org.edumips64.core.fpu;
 /* This exception is launched when we would insert a DIV.fmt into the divider
  * when it is filled by another DIV.fmt instruction
  *
- * @author Massimo Trubia 
+ * @author Massimo Trubia
  */
-public class FPDividerNotAvailableException extends Exception{}
+public class FPDividerNotAvailableException extends Exception {}

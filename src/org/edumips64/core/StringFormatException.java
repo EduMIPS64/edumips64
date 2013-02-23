@@ -29,6 +29,6 @@ package org.edumips64.core;
  * @author Andrea Spadaccini
  */
 public class StringFormatException extends Exception {
-	public StringFormatException() {}
+  public StringFormatException() {}
 }
 

@@ -32,41 +32,40 @@ import org.edumips64.utils.*;
  * <pre>
  *        Syntax: ADDIU rt, rs, immediate
  *   Description: To add a constant to a 32-bit integer
- *                The 16-bit signed immediate is added to the 32-bit value 
+ *                The 16-bit signed immediate is added to the 32-bit value
  *                in GPR rs and the 32-bit arithmetic result is sign extended and placed into
  *                GPR rt. No Integer Overflow exception occurs under any circumstances.
  * </pre>
  * @author Lorenzo Sciuto - Giorgio Scibilia - Erik UrzÃ¬
  */
 
-class ADDIU extends ALU_IType
-{
-	final String OPCODE_VALUE="001001";
-	ADDIU()
-	{
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		this.name="ADDIU";
-	}
-    
-    public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException,IrregularWriteOperationException
-    {
-      		//getting values from temporary registers
-		String imm=TR[IMM_FIELD].getBinString();
-		String rs=TR[RS_FIELD].getBinString();
-		//cutting the high part of registers
-		imm=imm.substring(32,64);
-		rs=rs.substring(32,64);
-		String outputstring=InstructionsUtils.twosComplementSum(rs,imm);
-		//performing sign extension
-        	outputstring=outputstring.substring(0,32);
-		String filledOutputstring=outputstring;
-		for(int i=0; i<32; i++)
-			filledOutputstring = filledOutputstring.charAt(0)+filledOutputstring;
+class ADDIU extends ALU_IType {
+  final String OPCODE_VALUE = "001001";
+  ADDIU() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "ADDIU";
+  }
 
-		TR[RT_FIELD].setBits(filledOutputstring,0);
-		if(enableForwarding)
-		{
-			doWB();
-		}
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException {
+    //getting values from temporary registers
+    String imm = TR[IMM_FIELD].getBinString();
+    String rs = TR[RS_FIELD].getBinString();
+    //cutting the high part of registers
+    imm = imm.substring(32, 64);
+    rs = rs.substring(32, 64);
+    String outputstring = InstructionsUtils.twosComplementSum(rs, imm);
+    //performing sign extension
+    outputstring = outputstring.substring(0, 32);
+    String filledOutputstring = outputstring;
+
+    for (int i = 0; i < 32; i++) {
+      filledOutputstring = filledOutputstring.charAt(0) + filledOutputstring;
     }
+
+    TR[RT_FIELD].setBits(filledOutputstring, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
 }

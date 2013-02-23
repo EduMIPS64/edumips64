@@ -33,39 +33,39 @@ import org.edumips64.utils.*;
  * @author Trubia Massimo, Russo Daniele
  */
 public abstract class FlowControl_IType extends FlowControlInstructions {
-	final static int RS_FIELD=0;
-	final static int RT_FIELD=1;
-	final static int OFFSET_FIELD=2;
-	final static int RT_FIELD_INIT=11;
-	final static int RS_FIELD_INIT=6;
-	final static int OFFSET_FIELD_INIT=16;
-	final static int RT_FIELD_LENGTH=5;
-	final static int RS_FIELD_LENGTH=5;
-	final static int OFFSET_FIELD_LENGTH=16;
-	String OPCODE_VALUE="";
-	final static int OPCODE_VALUE_INIT=0;
-	public FlowControl_IType() {
-		this.syntax="%R,%R,%E";
-		this.paramCount=3;
-	}
-	
-	public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException,JumpException,TwosComplementSumException {
-	}
-	
-	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException,IrregularWriteOperationException {
-	}
-	
-	public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
-	}
-	
-	public void WB() throws IrregularStringOfBitsException {
-	}
-	
-	public void pack() throws IrregularStringOfBitsException {
-		repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);
-		repr.setBits(Converter.intToBin(RS_FIELD_LENGTH, params.get(RS_FIELD)), RS_FIELD_INIT);
-		repr.setBits(Converter.intToBin(RT_FIELD_LENGTH, params.get(RT_FIELD)), RT_FIELD_INIT);
-		repr.setBits(Converter.intToBin(OFFSET_FIELD_LENGTH, params.get(OFFSET_FIELD)/4), OFFSET_FIELD_INIT);
-	}
-	
+  final static int RS_FIELD = 0;
+  final static int RT_FIELD = 1;
+  final static int OFFSET_FIELD = 2;
+  final static int RT_FIELD_INIT = 11;
+  final static int RS_FIELD_INIT = 6;
+  final static int OFFSET_FIELD_INIT = 16;
+  final static int RT_FIELD_LENGTH = 5;
+  final static int RS_FIELD_LENGTH = 5;
+  final static int OFFSET_FIELD_LENGTH = 16;
+  String OPCODE_VALUE = "";
+  final static int OPCODE_VALUE_INIT = 0;
+  public FlowControl_IType() {
+    this.syntax = "%R,%R,%E";
+    this.paramCount = 3;
+  }
+
+  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException, TwosComplementSumException {
+  }
+
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, IrregularWriteOperationException {
+  }
+
+  public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
+  }
+
+  public void WB() throws IrregularStringOfBitsException {
+  }
+
+  public void pack() throws IrregularStringOfBitsException {
+    repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);
+    repr.setBits(Converter.intToBin(RS_FIELD_LENGTH, params.get(RS_FIELD)), RS_FIELD_INIT);
+    repr.setBits(Converter.intToBin(RT_FIELD_LENGTH, params.get(RT_FIELD)), RT_FIELD_INIT);
+    repr.setBits(Converter.intToBin(OFFSET_FIELD_LENGTH, params.get(OFFSET_FIELD) / 4), OFFSET_FIELD_INIT);
+  }
+
 }

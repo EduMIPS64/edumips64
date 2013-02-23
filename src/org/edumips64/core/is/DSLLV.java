@@ -32,50 +32,50 @@ import org.edumips64.utils.*;
  * <pre>
  *      Syntax: DSLLV rd, rt, rs
  * Description: To execute a left-shift of a doubleword by a variable number of bits.
- *              The 64-bit doubleword contents of GPR rt are shifted left, inserting 
+ *              The 64-bit doubleword contents of GPR rt are shifted left, inserting
  *              zeros into the emptied bits. The bit-shift amount in the range 0 to 63 is specified by the low-order 6 bits in GPR rs.
- *	       The result is placed in GPR rd. 
+ *         The result is placed in GPR rd.
  *</pre>
  * @author Trubia Massimo, Russo Daniele
  **/
-public class DSLLV extends ALU_RType
-{
-    final int RD_FIELD=0;
-    final int RT_FIELD=1;
-    final int RS_FIELD=2;
-    final int RD_FIELD_INIT=11;
-    final int RT_FIELD_INIT=16;
-    final int RS_FIELD_INIT=21;
-    final int RD_FIELD_LENGTH=5;
-    final int RT_FIELD_LENGTH=5;
-    final int RS_FIELD_LENGTH=5;
-    final String OPCODE_VALUE="010100";
-	/** Creates a new instance of DSLLV */
-	public DSLLV()
-	{
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		name = "DSLLV";
-	}
-	
-	public void EX() 
-		throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException 
-	{
-		String rt = TR[RT_FIELD].getBinString();
-		String rs = TR[RS_FIELD].getBinString();
-		String shift = "",rd;
-		int nbits;
-		shift=rs.substring(58);
-		int shift_value = Converter.binToInt(shift,true);
-                StringBuffer buf = new StringBuffer(rt);
-                for(int i = 0; i  < shift_value; i++)
-                    buf.append('0');
-                String target = buf.substring(shift_value);
+public class DSLLV extends ALU_RType {
+  final int RD_FIELD = 0;
+  final int RT_FIELD = 1;
+  final int RS_FIELD = 2;
+  final int RD_FIELD_INIT = 11;
+  final int RT_FIELD_INIT = 16;
+  final int RS_FIELD_INIT = 21;
+  final int RD_FIELD_LENGTH = 5;
+  final int RT_FIELD_LENGTH = 5;
+  final int RS_FIELD_LENGTH = 5;
+  final String OPCODE_VALUE = "010100";
+  /** Creates a new instance of DSLLV */
+  public DSLLV() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    name = "DSLLV";
+  }
 
-		TR[RD_FIELD].setBits(target,0);
-		if(enableForwarding)
-		{
-			doWB();
-		}
-	}
-	
+  public void EX()
+  throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+    String rt = TR[RT_FIELD].getBinString();
+    String rs = TR[RS_FIELD].getBinString();
+    String shift = "", rd;
+    int nbits;
+    shift = rs.substring(58);
+    int shift_value = Converter.binToInt(shift, true);
+    StringBuffer buf = new StringBuffer(rt);
+
+    for (int i = 0; i  < shift_value; i++) {
+      buf.append('0');
+    }
+
+    String target = buf.substring(shift_value);
+
+    TR[RD_FIELD].setBits(target, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
+
 }

@@ -31,45 +31,51 @@ import org.edumips64.utils.*;
  * @author Trubia Massimo
  */
 
-public abstract class FPMoveToInstructions extends FPMoveToAndFromInstructions{
+public abstract class FPMoveToInstructions extends FPMoveToAndFromInstructions {
 
-	public FPMoveToInstructions() {
-	}
-	
-	public void ID() throws RAWException, WAWException, IrregularStringOfBitsException {
-		//if source registers are valid we pass their own values into temporary registers
-		RegisterFP fs=cpu.getRegisterFP(params.get(FS_FIELD));
-		Register rt=cpu.getRegister(params.get(RT_FIELD));
-		if(rt.getWriteSemaphore()>0)
-			throw new RAWException();
-		TRfp[FS_FIELD].setBits(fs.getBinString(),0);
-		TR[RT_FIELD].setBits(rt.getBinString(),0);
-		//locking the destination register
-		if(fs.getWAWSemaphore()>0)
-			throw new WAWException();
-		fs.incrWriteSemaphore();
-		fs.incrWAWSemaphore();
-	}
-	public abstract void EX() throws IrregularStringOfBitsException;
-	public void MEM() throws IrregularStringOfBitsException,MemoryElementNotFoundException{
-		cpu.getRegisterFP(params.get(FS_FIELD)).decrWAWSemaphore();
-	}
-	
-	public void WB() throws IrregularStringOfBitsException
-	{
-		if(!enableForwarding)
-			doWB();
-	}
-	
-	public void doWB() throws IrregularStringOfBitsException {
-		//passing result from temporary register to destination register and unlocking it
-		cpu.getRegisterFP(params.get(FS_FIELD)).setBits(TRfp[FS_FIELD].getBinString(),0);
-		cpu.getRegisterFP(params.get(FS_FIELD)).decrWriteSemaphore();
-		
-	}	
+  public FPMoveToInstructions() {
+  }
+
+  public void ID() throws RAWException, WAWException, IrregularStringOfBitsException {
+    //if source registers are valid we pass their own values into temporary registers
+    RegisterFP fs = cpu.getRegisterFP(params.get(FS_FIELD));
+    Register rt = cpu.getRegister(params.get(RT_FIELD));
+
+    if (rt.getWriteSemaphore() > 0) {
+      throw new RAWException();
+    }
+
+    TRfp[FS_FIELD].setBits(fs.getBinString(), 0);
+    TR[RT_FIELD].setBits(rt.getBinString(), 0);
+
+    //locking the destination register
+    if (fs.getWAWSemaphore() > 0) {
+      throw new WAWException();
+    }
+
+    fs.incrWriteSemaphore();
+    fs.incrWAWSemaphore();
+  }
+  public abstract void EX() throws IrregularStringOfBitsException;
+  public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {
+    cpu.getRegisterFP(params.get(FS_FIELD)).decrWAWSemaphore();
+  }
+
+  public void WB() throws IrregularStringOfBitsException {
+    if (!enableForwarding) {
+      doWB();
+    }
+  }
+
+  public void doWB() throws IrregularStringOfBitsException {
+    //passing result from temporary register to destination register and unlocking it
+    cpu.getRegisterFP(params.get(FS_FIELD)).setBits(TRfp[FS_FIELD].getBinString(), 0);
+    cpu.getRegisterFP(params.get(FS_FIELD)).decrWriteSemaphore();
+
+  }
 }
 
- 
+
 
 
 

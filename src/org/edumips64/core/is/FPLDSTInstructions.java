@@ -31,35 +31,33 @@ import org.edumips64.utils.*;
  * @author Trubia Massimo
  */
 
- public abstract class FPLDSTInstructions extends LDSTInstructions {
-    final static int FT_FIELD=0;
-    final static int FT_FIELD_INIT=11;
-    final static int FT_FIELD_LENGTH=5;
-    public FPLDSTInstructions()
-    {	
-        this.syntax="%F,%L(%R)";
-        this.paramCount=3;
-    }
-    public void ID() throws RAWException,IrregularWriteOperationException,IrregularStringOfBitsException,TwosComplementSumException, WAWException {}
-    public void EX() throws IrregularStringOfBitsException,IntegerOverflowException {}
-    public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {}
-    public void WB() throws IrregularStringOfBitsException {}
-    public void pack() throws IrregularStringOfBitsException
-    {
-       //conversion of instruction parameters of params list to the "repr" 32 binary value
-        repr.setBits(OPCODE_VALUE,0);
-        repr.setBits(Converter.intToBin(BASE_FIELD_LENGTH,params.get(BASE_FIELD)),BASE_FIELD_INIT);
-        repr.setBits(Converter.intToBin(FT_FIELD_LENGTH,params.get(FT_FIELD)),FT_FIELD_INIT);
-        repr.setBits(Converter.intToBin(OFFSET_FIELD_LENGTH,params.get(OFFSET_FIELD)),OFFSET_FIELD_INIT);
-    }
+public abstract class FPLDSTInstructions extends LDSTInstructions {
+  final static int FT_FIELD = 0;
+  final static int FT_FIELD_INIT = 11;
+  final static int FT_FIELD_LENGTH = 5;
+  public FPLDSTInstructions() {
+    this.syntax = "%F,%L(%R)";
+    this.paramCount = 3;
+  }
+  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, WAWException {}
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {}
+  public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {}
+  public void WB() throws IrregularStringOfBitsException {}
+  public void pack() throws IrregularStringOfBitsException {
+    //conversion of instruction parameters of params list to the "repr" 32 binary value
+    repr.setBits(OPCODE_VALUE, 0);
+    repr.setBits(Converter.intToBin(BASE_FIELD_LENGTH, params.get(BASE_FIELD)), BASE_FIELD_INIT);
+    repr.setBits(Converter.intToBin(FT_FIELD_LENGTH, params.get(FT_FIELD)), FT_FIELD_INIT);
+    repr.setBits(Converter.intToBin(OFFSET_FIELD_LENGTH, params.get(OFFSET_FIELD)), OFFSET_FIELD_INIT);
+  }
 
-    // FP Instructions don't use the doMEM method, let's provide an empty
-    // implementation.
-    public void doMEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {};
-     
+  // FP Instructions don't use the doMEM method, let's provide an empty
+  // implementation.
+  public void doMEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {};
+
 }
 
- 
+
 
 
 

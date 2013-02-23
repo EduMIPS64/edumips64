@@ -1,5 +1,5 @@
 /* IOManagerException.java
- * 
+ *
  * Exception thrown when an I/O operation goes wrong
  * (c) 2006 Andrea Spadaccini
  *
@@ -25,14 +25,14 @@ package org.edumips64.core;
 
 /** Exception thrown when an I/O operation goes wrong.
  *  @author Andrea Spadaccini */
-public class IOManagerException extends Exception{
-	private String errcode;
+public class IOManagerException extends Exception {
+  private String errcode;
 
-	public IOManagerException(String code) {
-		errcode = code;
-	}
+  public IOManagerException(String code) {
+    errcode = code;
+  }
 
-	public String getMessage() {
-		return errcode;
-	}
+  public String getMessage() {
+    return errcode;
+  }
 }

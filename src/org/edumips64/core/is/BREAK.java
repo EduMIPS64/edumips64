@@ -36,40 +36,38 @@ import org.edumips64.utils.*;
  * @author Andrea Spadaccini
  */
 public class BREAK extends Instruction {
-    final String OPCODE_VALUE="000000";		// SPECIAL
-    public BREAK() {
-        name = "BREAK";
-    }
-    public void IF() throws BreakException
-    {
-	Dinero din=Dinero.getInstance();
-        try
-        {
-            CPU cpu=CPU.getInstance();
-            din.IF(Converter.binToHex(Converter.intToBin(64,cpu.getLastPC().getValue())));
-        }
-        catch(IrregularStringOfBitsException e)
-        {
-            e.printStackTrace();
-        }
-	  throw new BreakException();
-    }
-    public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException {
+  final String OPCODE_VALUE = "000000"; // SPECIAL
+  public BREAK() {
+    name = "BREAK";
+  }
+  public void IF() throws BreakException {
+    Dinero din = Dinero.getInstance();
+
+    try {
+      CPU cpu = CPU.getInstance();
+      din.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+    } catch (IrregularStringOfBitsException e) {
+      e.printStackTrace();
     }
 
-    public void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
-    }
+    throw new BreakException();
+  }
+  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException {
+  }
 
-    public void MEM() throws HaltException, IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
-    }
+  public void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+  }
 
-    public void WB() throws HaltException, IrregularStringOfBitsException {
-    }
+  public void MEM() throws HaltException, IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+  }
 
-    public void pack() throws IrregularStringOfBitsException {
-        repr.setBits(OPCODE_VALUE,0);
-		/* The MIPS64 ISA specification requires the last 6 bits to be 01101 in
-		 * the BREAK instruction. */
-		repr.setBits("001101", 25);
-	}
+  public void WB() throws HaltException, IrregularStringOfBitsException {
+  }
+
+  public void pack() throws IrregularStringOfBitsException {
+    repr.setBits(OPCODE_VALUE, 0);
+    /* The MIPS64 ISA specification requires the last 6 bits to be 01101 in
+     * the BREAK instruction. */
+    repr.setBits("001101", 25);
+  }
 }

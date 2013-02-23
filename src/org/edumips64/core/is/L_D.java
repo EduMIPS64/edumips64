@@ -27,7 +27,7 @@ import org.edumips64.core.*;
 import org.edumips64.utils.*;
 
 
-/** 
+/**
  * <pre>
  *DEPRECATED INSTRUCTION (LDC1 is to be used against L.D)
  *      Format: L.D ft, offset(base)
@@ -37,9 +37,9 @@ import org.edumips64.utils.*;
 
  */
 class L_D extends LDC1 {
-	final String OPCODE_VALUE="110111";
-	public L_D() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		this.name="L.D";
-	}
+  final String OPCODE_VALUE = "110111";
+  public L_D() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "L.D";
+  }
 }

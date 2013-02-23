@@ -33,44 +33,46 @@ import org.edumips64.utils.IrregularStringOfBitsException;
 
 /**
  * <pre>
- * Syntax:	 OR rd, rs, rt
- * Description:	 rd = rs or rt 
+ * Syntax:   OR rd, rs, rt
+ * Description:  rd = rs or rt
  *               To do a bitwise logical OR
- *               The contents of GPR rs are combined with the contents of 
+ *               The contents of GPR rs are combined with the contents of
  *               GPR rt in a bitwise logical OR operation.
  * </pre>
  * @author Trubia Massimo, Russo Daniele
  */
 public class OR extends ALU_RType {
-	public String OPCODE_VALUE = "100101";
-	/** Creates a new instance of OR */
-	public OR() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		name="OR";
-	}
-	
-	
-	public void EX()
-	throws IrregularStringOfBitsException, IntegerOverflowException,TwosComplementSumException {
-		//getting strings from temporary registers
-		String rs = TR[RS_FIELD].getBinString();
-		String rt = TR[RT_FIELD].getBinString();
-		//performing bitwise OR between string values
-		boolean rsbit,rtbit,resbit;
-		String outputstring = "";
-		
-		for(int i = 0; i < 64; i ++ ) {
-			rsbit = rs.charAt(i) == '1' ? true:false;
-			rtbit = rt.charAt(i) == '1' ? true:false;
-			
-			resbit = rsbit || rtbit;
-			outputstring += (resbit == true?1:0);
-		}
-		//saving bitwise AND result into a temporary register
-		TR[RD_FIELD].setBits(outputstring, 0);
-		if(enableForwarding) {
-			doWB();
-		}
-		
-	}
+  public String OPCODE_VALUE = "100101";
+  /** Creates a new instance of OR */
+  public OR() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    name = "OR";
+  }
+
+
+  public void EX()
+  throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+    //getting strings from temporary registers
+    String rs = TR[RS_FIELD].getBinString();
+    String rt = TR[RT_FIELD].getBinString();
+    //performing bitwise OR between string values
+    boolean rsbit, rtbit, resbit;
+    String outputstring = "";
+
+    for (int i = 0; i < 64; i ++) {
+      rsbit = rs.charAt(i) == '1' ? true : false;
+      rtbit = rt.charAt(i) == '1' ? true : false;
+
+      resbit = rsbit || rtbit;
+      outputstring += (resbit == true ? 1 : 0);
+    }
+
+    //saving bitwise AND result into a temporary register
+    TR[RD_FIELD].setBits(outputstring, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+
+  }
 }

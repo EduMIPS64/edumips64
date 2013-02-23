@@ -32,54 +32,56 @@ import org.edumips64.utils.*;
  * <pre>
  *       Format: ADDI rt, rs, immediate
  *  Description:  To add a constant to a 32-bit integer. If overflow occurs, then trap.
- *		  If the addition does not overflow, the 32-bit result is sign-extended and placed into GPR rt.
+ *      If the addition does not overflow, the 32-bit result is sign-extended and placed into GPR rt.
  * </pre>
  * @author Lorenzo Sciuto - Giorgio Scibilia - Erik UrzÃ¬
  */
 
-class ADDI extends ALU_IType
-{
-	final String OPCODE_VALUE="001000";
-	ADDI()
-	{
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		this.name="ADDI";
-	}
+class ADDI extends ALU_IType {
+  final String OPCODE_VALUE = "001000";
+  ADDI() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    this.name = "ADDI";
+  }
 
-	public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException
-	{
-		//getting strings from temporary registers
-		String imm=TR[IMM_FIELD].getBinString();
-		String rs=TR[RS_FIELD].getBinString();
-		//cutting the high part of registers
-		imm=imm.substring(32,64);
-		rs=rs.substring(32,64);
-		//performing mips operations to detect IntegerOverflow
-		imm = imm.charAt(0)+imm;
-		rs = rs.charAt(0)+rs;
-		String outputstring=InstructionsUtils.twosComplementSum(rs,imm);
-        //comparison between the two most significant bits of the outputstring and 
-        //raising integer overflow if the first bit is different from the second one
-        if(outputstring.charAt(0)!=outputstring.charAt(1)){ 
-            //if the enable forwarding is turned on we have to ensure that registers 
-            //should be unlocked also if a synchronous exception occurs. This is performed 
-            //by executing the WB method before raising the trap 
-            if(enableForwarding) 
-                doWB(); 
-            throw new IntegerOverflowException(); 
-        }  
-		else{
-			//performing sign extension
-			outputstring=outputstring.substring(1,33);
-			String filledOutputstring=outputstring;
-			for(int i=0; i<32; i++)
-				filledOutputstring = filledOutputstring.charAt(0)+filledOutputstring;
-			TR[RT_FIELD].setBits(filledOutputstring,0);
-		}
-		if(enableForwarding)
-		{
-			doWB();
-		}
-	}
-	
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+    //getting strings from temporary registers
+    String imm = TR[IMM_FIELD].getBinString();
+    String rs = TR[RS_FIELD].getBinString();
+    //cutting the high part of registers
+    imm = imm.substring(32, 64);
+    rs = rs.substring(32, 64);
+    //performing mips operations to detect IntegerOverflow
+    imm = imm.charAt(0) + imm;
+    rs = rs.charAt(0) + rs;
+    String outputstring = InstructionsUtils.twosComplementSum(rs, imm);
+
+    //comparison between the two most significant bits of the outputstring and
+    //raising integer overflow if the first bit is different from the second one
+    if (outputstring.charAt(0) != outputstring.charAt(1)) {
+      //if the enable forwarding is turned on we have to ensure that registers
+      //should be unlocked also if a synchronous exception occurs. This is performed
+      //by executing the WB method before raising the trap
+      if (enableForwarding) {
+        doWB();
+      }
+
+      throw new IntegerOverflowException();
+    } else {
+      //performing sign extension
+      outputstring = outputstring.substring(1, 33);
+      String filledOutputstring = outputstring;
+
+      for (int i = 0; i < 32; i++) {
+        filledOutputstring = filledOutputstring.charAt(0) + filledOutputstring;
+      }
+
+      TR[RT_FIELD].setBits(filledOutputstring, 0);
+    }
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
+
 }

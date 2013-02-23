@@ -31,46 +31,50 @@ import java.math.*;
 
 /**
  *<pre>
- *	Format: CVT.W.D fd, fs
+ *  Format: CVT.W.D fd, fs
  * Description: To convert an FP value to 32-bit fixed point
  *   Operation: fd = convert_and_round(fs.readdouble,FCSR[CURRENT_ROUND_MODE])
  *</pre>
  */
 class CVT_W_D extends FPConversionFCSRInstructions {
-	static String OPCODE_VALUE="100100";
-	static String FMT_FIELD="10001"; //DOUBLE IS 17
-	static String NAME = "CVT.W.D";
-	
-	public CVT_W_D() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		super.FMT_FIELD = FMT_FIELD;
-		super.name=NAME;
-	}
-	
-	public void EX() throws IrregularStringOfBitsException, FPInvalidOperationException, IrregularWriteOperationException {
-		//getting values from temporary registers
-		String fs=TRfp[FS_FIELD].getBinString();
-		BigInteger bi=FPInstructionUtils.doubleToBigInteger(fs,cpu.getFCSRRoundingMode());
-		BigInteger biggest=new BigInteger("2147483647"); //2^31-1
-		BigInteger smallest=new BigInteger("-2147483648"); //-2^31
-		//if the value is larger than an int an exception may occur
-		if(bi==null || bi.compareTo(biggest)==1 || bi.compareTo(smallest)==-1){
-			//before raising the trap or return the special value we modify the cause bit
-			cpu.setFCSRCause("V",1);			
-			if(cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION))
-				throw new FPInvalidOperationException();
-			else{
-				cpu.setFCSRFlags("V",1);
-				//if an exception occured without a trap the biggest value is returned
-				bi=new BigInteger("2147483648");//2^31-1
-			}
-		}
-		//writing the int value into a temporary integer register in order to obtain the binary value
-		Register tmp= new Register("tmp-CVT.W.D");
-		tmp.writeWord(bi.intValue());
-		TRfp[FD_FIELD].setBits(tmp.getBinString(),0);
-		if(enableForwarding) {
-			doWB();
-		}
-	}
+  static String OPCODE_VALUE = "100100";
+  static String FMT_FIELD = "10001"; //DOUBLE IS 17
+  static String NAME = "CVT.W.D";
+
+  public CVT_W_D() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.FMT_FIELD = FMT_FIELD;
+    super.name = NAME;
+  }
+
+  public void EX() throws IrregularStringOfBitsException, FPInvalidOperationException, IrregularWriteOperationException {
+    //getting values from temporary registers
+    String fs = TRfp[FS_FIELD].getBinString();
+    BigInteger bi = FPInstructionUtils.doubleToBigInteger(fs, cpu.getFCSRRoundingMode());
+    BigInteger biggest = new BigInteger("2147483647");  //2^31-1
+    BigInteger smallest = new BigInteger("-2147483648");  //-2^31
+
+    //if the value is larger than an int an exception may occur
+    if (bi == null || bi.compareTo(biggest) == 1 || bi.compareTo(smallest) == -1) {
+      //before raising the trap or return the special value we modify the cause bit
+      cpu.setFCSRCause("V", 1);
+
+      if (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
+        throw new FPInvalidOperationException();
+      } else {
+        cpu.setFCSRFlags("V", 1);
+        //if an exception occured without a trap the biggest value is returned
+        bi = new BigInteger("2147483648");  //2^31-1
+      }
+    }
+
+    //writing the int value into a temporary integer register in order to obtain the binary value
+    Register tmp = new Register("tmp-CVT.W.D");
+    tmp.writeWord(bi.intValue());
+    TRfp[FD_FIELD].setBits(tmp.getBinString(), 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
 }

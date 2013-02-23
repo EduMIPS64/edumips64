@@ -35,144 +35,140 @@ import java.util.*;
  *      Syntax: DIVU rs, rt
  * Description: (LO, HI) = rs / rt
  *              To divide 32-bit unsigned integers
- *  *           The 32-bit word in GPR rs is divided by the 32-bit 
+ *  *           The 32-bit word in GPR rs is divided by the 32-bit
  *              word in GPR rt, treating both operands as unsigned values.
- *              The 32-bit quotient is sign-extended and placed into special register LO and the 
+ *              The 32-bit quotient is sign-extended and placed into special register LO and the
  *              32-bit remainder is sign-extended and placed into special register HI.
  *              No arithmetic exception occurs under any circumstances.
  *</pre>
  * @author Giorgio Scibilia - Lorenzo Sciuto - Erik Urzi'
  */
-class DIVU extends ALU_RType
-{
-    final static int RS_FIELD=0;
-    final static int RT_FIELD=1;
-    final static int LO_REG=2;
-    final static int HI_REG=3;
-    final String OPCODE_VALUE="011011";
-    
-    public DIVU()
-    {
-	super.OPCODE_VALUE = OPCODE_VALUE;
-        syntax="%R,%R";
-        name="DIVU";
-    }
-    public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
-        //if source registers are valid passing their own values into temporary registers
-        Register rs=cpu.getRegister(params.get(RS_FIELD));
-        Register rt=cpu.getRegister(params.get(RT_FIELD));
-        if(rs.getWriteSemaphore()>0 || rt.getWriteSemaphore()>0)
-            throw new RAWException();
-        TR[RS_FIELD]=rs;
-        TR[RT_FIELD]=rt;
-        //locking the destination registers (quotient and remainder)
-        cpu.getLO().incrWriteSemaphore();
-        cpu.getHI().incrWriteSemaphore();
-  
-    }
-    public void EX() throws IrregularStringOfBitsException,IntegerOverflowException,TwosComplementSumException, DivisionByZeroException
-    {
-	//getting String from temporary register
-        String rt = TR[RT_FIELD].getBinString();
-        String rs = TR[RS_FIELD].getBinString();
-	//cutting the high part of registers
-	rt=rt.substring(32,64);
-	rs=rs.substring(32,64);
-	long l_rt=Converter.binToLong(rt,true);
-	long l_rs=Converter.binToLong(rs,true);
-	//performing operations
-        long quotient=0;
-        try
-        {
-            quotient= l_rs/l_rt;
-        }
-        catch(ArithmeticException e)
-        {
-			if(enableForwarding) {
-				cpu.getLO().decrWriteSemaphore();
-				cpu.getHI().decrWriteSemaphore();            
-			}
-			throw new DivisionByZeroException();
-        }
-        long remainder=l_rs%l_rt;
+class DIVU extends ALU_RType {
+  final static int RS_FIELD = 0;
+  final static int RT_FIELD = 1;
+  final static int LO_REG = 2;
+  final static int HI_REG = 3;
+  final String OPCODE_VALUE = "011011";
 
-	String str_quotient = Long.toString(quotient,2);
-	String str_remainder = Long.toString(remainder,2);
-	//performing sign extension
-	for(int i = str_quotient.length();i<32;i++)
-		str_quotient ='0' + str_quotient;
+  public DIVU() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    syntax = "%R,%R";
+    name = "DIVU";
+  }
+  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+    //if source registers are valid passing their own values into temporary registers
+    Register rs = cpu.getRegister(params.get(RS_FIELD));
+    Register rt = cpu.getRegister(params.get(RT_FIELD));
 
-	for(int i = str_remainder.length();i<32;i++)
-		str_remainder = '0' + str_remainder;
+    if (rs.getWriteSemaphore() > 0 || rt.getWriteSemaphore() > 0) {
+      throw new RAWException();
+    }
 
-	for(int i=0; i<32; i++){
-		str_quotient = '0'+str_quotient;
-		str_remainder = '0'+str_remainder;
-	}
-	//writing result in temporary registers
-	//the result will never have more than 32-bits
-	TR[LO_REG].setBits(str_quotient,0);
-	TR[HI_REG].setBits(str_remainder,0);
-        
-        if(enableForwarding)
-        {
-            doWB();
-        }    
-    }
-    
-    public void WB() throws IrregularStringOfBitsException 
-    {
-	if(!enableForwarding)
-	{
-	    doWB();
-	}
-    }
-    public void doWB() throws IrregularStringOfBitsException 
-    {
-        //passing results from temporary registers to destination registers and unlocking them
-        Register lo=cpu.getLO();
-        Register hi=cpu.getHI();
-        lo.setBits(TR[LO_REG].getBinString(),0);
-        hi.setBits(TR[HI_REG].getBinString(),0);
-        lo.decrWriteSemaphore();
-        hi.decrWriteSemaphore();
-    }
-    public void pack() throws IrregularStringOfBitsException 
-    {
-        //conversion of instruction parameters of "params" list to the "repr" form (32 binary value) 
-        repr.setBits(OPCODE_VALUE,OPCODE_VALUE_INIT);
-        repr.setBits(Converter.intToBin(RS_FIELD_LENGTH,params.get(RS_FIELD)),RS_FIELD_INIT);
-        repr.setBits(Converter.intToBin(RT_FIELD_LENGTH,params.get(RT_FIELD)),RT_FIELD_INIT);
-    }   
-    
-    
+    TR[RS_FIELD] = rs;
+    TR[RT_FIELD] = rt;
+    //locking the destination registers (quotient and remainder)
+    cpu.getLO().incrWriteSemaphore();
+    cpu.getHI().incrWriteSemaphore();
 
-        public static void main(String[] args)
-    {
-        DDIV ins=new DDIV();
-        List<Integer>params=new Vector<Integer>();
-        int rs=1;
-        int rt=2;
-        params.add(rs);  //dividendo
-        params.add(rt);  //divisore
-        try
-        {
-           cpu.getRegister(rs).writeDoubleWord(-9223372036854775807L); //rs register
-           cpu.getRegister(rt).writeDoubleWord(922);     //rt register
-           ins.setParams(params);
-        }
-        catch(IrregularWriteOperationException e)
-        {
-			e.printStackTrace();
-        }
-        
-        try {
-            ins.pack();
-            ins.ID();
-            ins.EX();
-            ins.WB();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }        
+  }
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, DivisionByZeroException {
+    //getting String from temporary register
+    String rt = TR[RT_FIELD].getBinString();
+    String rs = TR[RS_FIELD].getBinString();
+    //cutting the high part of registers
+    rt = rt.substring(32, 64);
+    rs = rs.substring(32, 64);
+    long l_rt = Converter.binToLong(rt, true);
+    long l_rs = Converter.binToLong(rs, true);
+    //performing operations
+    long quotient = 0;
+
+    try {
+      quotient = l_rs / l_rt;
+    } catch (ArithmeticException e) {
+      if (enableForwarding) {
+        cpu.getLO().decrWriteSemaphore();
+        cpu.getHI().decrWriteSemaphore();
+      }
+
+      throw new DivisionByZeroException();
     }
+
+    long remainder = l_rs % l_rt;
+
+    String str_quotient = Long.toString(quotient, 2);
+    String str_remainder = Long.toString(remainder, 2);
+
+    //performing sign extension
+    for (int i = str_quotient.length(); i < 32; i++) {
+      str_quotient = '0' + str_quotient;
+    }
+
+    for (int i = str_remainder.length(); i < 32; i++) {
+      str_remainder = '0' + str_remainder;
+    }
+
+    for (int i = 0; i < 32; i++) {
+      str_quotient = '0' + str_quotient;
+      str_remainder = '0' + str_remainder;
+    }
+
+    //writing result in temporary registers
+    //the result will never have more than 32-bits
+    TR[LO_REG].setBits(str_quotient, 0);
+    TR[HI_REG].setBits(str_remainder, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+  }
+
+  public void WB() throws IrregularStringOfBitsException {
+    if (!enableForwarding) {
+      doWB();
+    }
+  }
+  public void doWB() throws IrregularStringOfBitsException {
+    //passing results from temporary registers to destination registers and unlocking them
+    Register lo = cpu.getLO();
+    Register hi = cpu.getHI();
+    lo.setBits(TR[LO_REG].getBinString(), 0);
+    hi.setBits(TR[HI_REG].getBinString(), 0);
+    lo.decrWriteSemaphore();
+    hi.decrWriteSemaphore();
+  }
+  public void pack() throws IrregularStringOfBitsException {
+    //conversion of instruction parameters of "params" list to the "repr" form (32 binary value)
+    repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);
+    repr.setBits(Converter.intToBin(RS_FIELD_LENGTH, params.get(RS_FIELD)), RS_FIELD_INIT);
+    repr.setBits(Converter.intToBin(RT_FIELD_LENGTH, params.get(RT_FIELD)), RT_FIELD_INIT);
+  }
+
+
+
+  public static void main(String[] args) {
+    DDIV ins = new DDIV();
+    List<Integer>params = new Vector<Integer>();
+    int rs = 1;
+    int rt = 2;
+    params.add(rs);  //dividendo
+    params.add(rt);  //divisore
+
+    try {
+      cpu.getRegister(rs).writeDoubleWord(-9223372036854775807L);   //rs register
+      cpu.getRegister(rt).writeDoubleWord(922);     //rt register
+      ins.setParams(params);
+    } catch (IrregularWriteOperationException e) {
+      e.printStackTrace();
+    }
+
+    try {
+      ins.pack();
+      ins.ID();
+      ins.EX();
+      ins.WB();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 }

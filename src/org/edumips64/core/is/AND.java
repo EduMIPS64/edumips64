@@ -30,43 +30,45 @@ import org.edumips64.utils.*;
 
 /**
  * <pre>
- *      Syntax: AND rd, rs, rt 
+ *      Syntax: AND rd, rs, rt
  * Description: rd = rs and rt
- *              Does a bitwise logical AND, the contents of GPR rs are combined 
+ *              Does a bitwise logical AND, the contents of GPR rs are combined
  *              with the contents of GPR rt in a bitwise logical AND operation.
  *              The result is placed into GPR rd.
  * </pre>
  * @author  Trubia Massimo, Russo Daniele
  */
 public class AND extends ALU_RType {
-	public String OPCODE_VALUE = "100100";
-	
-	public AND() {
-		super.OPCODE_VALUE = OPCODE_VALUE;
-		name="AND";
-	}
-	
-	public void EX()
-	throws IrregularStringOfBitsException {
-		//getting strings from temporary registers
-		String rs = TR[RS_FIELD].getBinString();
-		String rt = TR[RT_FIELD].getBinString();
-		//performing bitwise OR between string values
-		boolean rsbit,rtbit,resbit;
-		String outputstring = "";
-		
-		for(int i = 0; i < 64; i ++ ) {
-			rsbit = rs.charAt(i) == '1' ? true:false;
-			rtbit = rt.charAt(i) == '1' ? true:false;
-			
-			resbit = rsbit && rtbit;
-			outputstring += (resbit == true?1:0);
-		}
-		//saving bitwise AND result into a temporary register
-		TR[RD_FIELD].setBits(outputstring, 0);
-		if(enableForwarding) {
-			doWB();
-		}
-		
-	}
+  public String OPCODE_VALUE = "100100";
+
+  public AND() {
+    super.OPCODE_VALUE = OPCODE_VALUE;
+    name = "AND";
+  }
+
+  public void EX()
+  throws IrregularStringOfBitsException {
+    //getting strings from temporary registers
+    String rs = TR[RS_FIELD].getBinString();
+    String rt = TR[RT_FIELD].getBinString();
+    //performing bitwise OR between string values
+    boolean rsbit, rtbit, resbit;
+    String outputstring = "";
+
+    for (int i = 0; i < 64; i ++) {
+      rsbit = rs.charAt(i) == '1' ? true : false;
+      rtbit = rt.charAt(i) == '1' ? true : false;
+
+      resbit = rsbit && rtbit;
+      outputstring += (resbit == true ? 1 : 0);
+    }
+
+    //saving bitwise AND result into a temporary register
+    TR[RD_FIELD].setBits(outputstring, 0);
+
+    if (enableForwarding) {
+      doWB();
+    }
+
+  }
 }

@@ -25,78 +25,91 @@ package org.edumips64.core;
 
 import java.util.BitSet;
 import org.edumips64.utils.*;
-/** Abstract class: it contains a fixed-size BitSet instance. 
+/** Abstract class: it contains a fixed-size BitSet instance.
  * @author Salvatore Scellato
  * */
 public abstract class FixedBitSet {
-	private BitSet bitset;
-	protected int size;
+  private BitSet bitset;
+  protected int size;
 
-	/** Creates a default new instance of FixedBitSet with zero size. */
-	public FixedBitSet(){
-		bitset = new BitSet();
-		size = 0;
-	}
+  /** Creates a default new instance of FixedBitSet with zero size. */
+  public FixedBitSet() {
+    bitset = new BitSet();
+    size = 0;
+  }
 
-	/** Resets this FixedBitSet, setting all bits to one if value is true and setting all bits to zero
-	 * if value is false
-	 * @param value if true bits will be set to '1', if false bits will be set to '0'
-	 * */
-	public void reset(boolean value){
-		if(!value)
-			bitset.clear();
-		else
-			bitset.set(0,size); //imposta tutto a true
-	}
-	
-	/** Using a string containg binary digits (bits) this method sets the bit
-	 * of the FixedBitSet starting from the <code>start</code> position until reaching
-	 * the end of the string or the end of the FixedBitSet.
-	 * @param bits string made of "0" and "1" chars
-	 * @param start index of the first bit to be set
-	 * @throws IrregularStringOfBitsException if the String bits does not contain only "0" and "1" chars
-	 */
-	public void setBits(String bits, int start) throws IrregularStringOfBitsException{
-		//System.err.println("setBits() " + bits + ", " + start);
-		int index = 0;
-		for(int i = 0; i < bits.length(); i++){
-			index = i + start;
-			if( index >= size )
-				return;
-			char c = bits.charAt(i);
-			switch(c){
-				case '1': bitset.set(index, true); break;
-				case '0': bitset.set(index,false); break;
-				default: throw new IrregularStringOfBitsException(); 
-			}
-		}
-	}
+  /** Resets this FixedBitSet, setting all bits to one if value is true and setting all bits to zero
+   * if value is false
+   * @param value if true bits will be set to '1', if false bits will be set to '0'
+   * */
+  public void reset(boolean value) {
+    if (!value) {
+      bitset.clear();
+    } else {
+      bitset.set(0, size);   //imposta tutto a true
+    }
+  }
 
-	/** Returns the bit sequence of this FixedBitSet as a string containing "0"s and "1"s.
-	 * @return string form of the bit sequence stored in this FixedBitSet
-	 */
-	public String getBinString(){
-		StringBuffer buf = new StringBuffer(size);
-		for(int i = 0; i < size; i++)
-			if(bitset.get(i))
-				buf.append("1");
-			else
-				buf.append("0");
-		
-		return new String(buf);
-	}		
+  /** Using a string containg binary digits (bits) this method sets the bit
+   * of the FixedBitSet starting from the <code>start</code> position until reaching
+   * the end of the string or the end of the FixedBitSet.
+   * @param bits string made of "0" and "1" chars
+   * @param start index of the first bit to be set
+   * @throws IrregularStringOfBitsException if the String bits does not contain only "0" and "1" chars
+   */
+  public void setBits(String bits, int start) throws IrregularStringOfBitsException {
+    //System.err.println("setBits() " + bits + ", " + start);
+    int index = 0;
 
-	/** Returns the bit sequence of this FixedBitSet as a string containing hexadecimal
-	 * digits.
-	 * @return string form of the bit sequence stored in this FixedBitSet as hexadecimal digits
-	 * @throws IrregularStringOfBitsException if the bit sequence is not well-formed
-	 */
-	public String getHexString() throws IrregularStringOfBitsException{
-		return Converter.binToHex(this.getBinString());
-	}
+    for (int i = 0; i < bits.length(); i++) {
+      index = i + start;
 
-	//public void setBits(String string) {
-	//	throw new UnsupportedOperationException("Not yet implemented");
-	//}
+      if (index >= size) {
+        return;
+      }
+
+      char c = bits.charAt(i);
+
+      switch (c) {
+      case '1':
+        bitset.set(index, true);
+        break;
+      case '0':
+        bitset.set(index, false);
+        break;
+      default:
+        throw new IrregularStringOfBitsException();
+      }
+    }
+  }
+
+  /** Returns the bit sequence of this FixedBitSet as a string containing "0"s and "1"s.
+   * @return string form of the bit sequence stored in this FixedBitSet
+   */
+  public String getBinString() {
+    StringBuffer buf = new StringBuffer(size);
+
+    for (int i = 0; i < size; i++)
+      if (bitset.get(i)) {
+        buf.append("1");
+      } else {
+        buf.append("0");
+      }
+
+    return new String(buf);
+  }
+
+  /** Returns the bit sequence of this FixedBitSet as a string containing hexadecimal
+   * digits.
+   * @return string form of the bit sequence stored in this FixedBitSet as hexadecimal digits
+   * @throws IrregularStringOfBitsException if the bit sequence is not well-formed
+   */
+  public String getHexString() throws IrregularStringOfBitsException {
+    return Converter.binToHex(this.getBinString());
+  }
+
+  //public void setBits(String string) {
+  //  throw new UnsupportedOperationException("Not yet implemented");
+  //}
 }
 

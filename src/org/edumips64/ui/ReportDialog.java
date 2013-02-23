@@ -41,86 +41,88 @@ import java.text.*;
 /**
  * This class provides a window for configuration options.
 */
-public class ReportDialog extends JDialog{
+public class ReportDialog extends JDialog {
 
 
-	JButton okButton;
-	int width = 450, height = 400;	
-	public ReportDialog(final JFrame owner,Exception exception,String title){
-	
-		super(owner, title, true);
-		
-		JPanel buttonPanel = new JPanel();
-		
-			JButton okButton = new JButton(CurrentLocale.getString("ReportDialog.BUTTON"));
-			buttonPanel.add(okButton);
+  JButton okButton;
+  int width = 450, height = 400;
+  public ReportDialog(final JFrame owner, Exception exception, String title) {
 
-			okButton.addActionListener(new ActionListener() {
-				public void actionPerformed(final ActionEvent e) {
-					setVisible(false);
-					dispose();
-				}
-			});
-			buttonPanel.add(okButton);
-		
-		//Title's Icon and Text
-		JPanel titlePanel = new JPanel();
-		titlePanel.setLayout(new BorderLayout());
-		String msg = CurrentLocale.getString("ReportDialog.MSG");
-		JTextArea textArea = new JTextArea(msg);
-		textArea.setFont(new Font("Verdana",0,20));
-		textArea.setForeground(new Color(0,0,85));
-		try{
-			JLabel label = new JLabel(new ImageIcon(org.edumips64.img.IMGLoader.getImage("fatal.png")),SwingConstants.LEFT);	
-			titlePanel.add("West",label);
-		}catch(java.io.IOException e){}
-		titlePanel.add("Center",textArea);
-		//label style in TextArea
-			textArea.setLineWrap (true);
-			textArea.setWrapStyleWord (true);
-			textArea.setEditable (false);
-			textArea.setBackground ((Color)UIManager.get ("Label.background"));
-			textArea.setForeground ((Color)UIManager.get ("Label.foreground"));
-			textArea.setBorder (null);
-		
-		//fill the Text Area whit Exception informations
-		String exmsg = new String();
-		try {
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			exception.printStackTrace(pw);
-			exmsg = "------\r\n" + sw.toString() + "------\r\n";
-		}
-		catch(Exception exc) {
-			exmsg = "fatal error";
-		} 
-		
-			
-		JTextArea ta = new JTextArea(exmsg);
+    super(owner, title, true);
 
-		JScrollPane scrollTable = new JScrollPane(ta);
+    JPanel buttonPanel = new JPanel();
+
+    JButton okButton = new JButton(CurrentLocale.getString("ReportDialog.BUTTON"));
+    buttonPanel.add(okButton);
+
+    okButton.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        setVisible(false);
+        dispose();
+      }
+    });
+    buttonPanel.add(okButton);
+
+    //Title's Icon and Text
+    JPanel titlePanel = new JPanel();
+    titlePanel.setLayout(new BorderLayout());
+    String msg = CurrentLocale.getString("ReportDialog.MSG");
+    JTextArea textArea = new JTextArea(msg);
+    textArea.setFont(new Font("Verdana", 0, 20));
+    textArea.setForeground(new Color(0, 0, 85));
+
+    try {
+      JLabel label = new JLabel(new ImageIcon(org.edumips64.img.IMGLoader.getImage("fatal.png")), SwingConstants.LEFT);
+      titlePanel.add("West", label);
+    } catch (java.io.IOException e) {}
+
+    titlePanel.add("Center", textArea);
+    //label style in TextArea
+    textArea.setLineWrap(true);
+    textArea.setWrapStyleWord(true);
+    textArea.setEditable(false);
+    textArea.setBackground((Color) UIManager.get("Label.background"));
+    textArea.setForeground((Color) UIManager.get("Label.foreground"));
+    textArea.setBorder(null);
+
+    //fill the Text Area whit Exception informations
+    String exmsg = new String();
+
+    try {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      exception.printStackTrace(pw);
+      exmsg = "------\r\n" + sw.toString() + "------\r\n";
+    } catch (Exception exc) {
+      exmsg = "fatal error";
+    }
 
 
-		getRootPane().setDefaultButton(okButton);
-		getContentPane().setLayout(new BorderLayout());
+    JTextArea ta = new JTextArea(exmsg);
 
-		getContentPane().add("North", titlePanel);
-		getContentPane().add("Center", scrollTable);
-		getContentPane().add("South", buttonPanel);
-		
-		setSize(width,height);
-		setLocation((getScreenWidth() - getWidth()) / 2, (getScreenHeight() - getHeight()) / 2);
-		setVisible(true);	
+    JScrollPane scrollTable = new JScrollPane(ta);
 
-	}
-	
-	public static int getScreenWidth() {
-		return (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-	}
 
-	public static int getScreenHeight() {
-		return (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
-	}
+    getRootPane().setDefaultButton(okButton);
+    getContentPane().setLayout(new BorderLayout());
+
+    getContentPane().add("North", titlePanel);
+    getContentPane().add("Center", scrollTable);
+    getContentPane().add("South", buttonPanel);
+
+    setSize(width, height);
+    setLocation((getScreenWidth() - getWidth()) / 2, (getScreenHeight() - getHeight()) / 2);
+    setVisible(true);
+
+  }
+
+  public static int getScreenWidth() {
+    return (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+  }
+
+  public static int getScreenHeight() {
+    return (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+  }
 
 }
 
