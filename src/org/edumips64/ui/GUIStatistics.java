@@ -49,8 +49,9 @@ public class GUIStatistics extends GUIComponent {
 
   }
 
+  @SuppressWarnings({"rawtypes", "unchecked"})
   class StatPanel extends JPanel {
-    JList <? extends String > statList;
+    JList statList;
     String [] statistics = {" Execution", " 0 Cycles", " 0 Instructions", " ", " Stalls", " 0 RAW Stalls", " 0 WAW Stalls",
                             " 0 WAR Stalls", " 0 Structural Stalls(Divider not available)", "0 Structural Stalls (Memory not available)", " 0 Branch Taken Stalls", " 0 Branch Misprediction Stalls",
                             " Code Size", " 0 Bytes", "FPU info", "FCSR", "FCSRGroups", "FCSRMnemonics", "FCSRValues"
@@ -59,7 +60,7 @@ public class GUIStatistics extends GUIComponent {
       super();
       setLayout(new BorderLayout());
       setBackground(Color.WHITE);
-      statList = new JList<String> (statistics);
+      statList = new JList(statistics);
       statList.setFixedCellWidth(400) ;
       statList.setCellRenderer(new MyListCellRenderer());
       add(statList, BorderLayout.WEST);
@@ -90,14 +91,15 @@ public class GUIStatistics extends GUIComponent {
     cont.repaint();
   }
 
-  class MyListCellRenderer implements ListCellRenderer<String> {
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  class MyListCellRenderer implements ListCellRenderer {
     private JLabel label;
 
     public MyListCellRenderer() {
     }
 
     @Override
-    public Component getListCellRendererComponent(JList <? extends String > list, String value, int index, boolean isSelected, boolean cellHasFocus) {
+    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
       statPanel.statList = list;
       label = new JLabel();
       Font f = new Font("Monospaced", Font.PLAIN, 12);

@@ -247,9 +247,10 @@ public class DineroFrontend extends JDialog {
 
 /** Panel with all the necessary controls to modify the options of a Cache.
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 class DineroSingleCachePanel extends JPanel {
   private DineroCacheOptions dco;
-  private JComboBox<String> size, sizeUnit, bsize, bsizeUnit;
+  private JComboBox size, sizeUnit, bsize, bsizeUnit;
   private JTextField assoc;
   private JCheckBox ccc;
   public DineroSingleCachePanel(char type, int level) {
@@ -258,11 +259,11 @@ class DineroSingleCachePanel extends JPanel {
     String[] sizes = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "512"};
     String[] units = {" ", "k", "M", "G"};
 
-    size = new JComboBox<String> (sizes);
-    bsize = new JComboBox<String> (sizes);
+    size = new JComboBox(sizes);
+    bsize = new JComboBox(sizes);
 
-    sizeUnit = new JComboBox<String> (units);
-    bsizeUnit = new JComboBox<String> (units);
+    sizeUnit = new JComboBox(units);
+    bsizeUnit = new JComboBox(units);
 
     assoc = new JTextField();
     ccc = new JCheckBox();
