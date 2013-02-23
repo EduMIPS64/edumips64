@@ -26,6 +26,9 @@ The two latter dependencies are needed for the in-application help.
 If you need to compile the PDF manual, you will also need:
 - latex / pdflatex
 
+If you want to use the automatic style checks (pre-commit hook), then you
+should have Automatic Style (astyle) installed.
+
 A distribution of JUnit 4 is included in the libs/ directory, since it is
 needed for unit test and this project uses Travis CI for continuous
 integration (https://travis-ci.org/lupino3/edumips64).

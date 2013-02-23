@@ -6,7 +6,7 @@ ASTYLE=$(which astyle)
 
 if [ "$ASTYLE" == "" ]; then
   echo "The astyle binary cannot be found. Exiting."
-  exit 1
+  exit 0
 fi
 
 case $# in
