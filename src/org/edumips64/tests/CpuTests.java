@@ -32,11 +32,9 @@ import java.util.Map;
 import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.*;
 
 @RunWith(JUnit4.class)
 public class CpuTests {
@@ -128,8 +126,8 @@ public class CpuTests {
                                  int cycles_without_forwarding) throws Exception {
     Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding(path);
 
-    Assert.assertEquals(cycles_with_forwarding, statuses.get(true).cycles);
-    Assert.assertEquals(cycles_without_forwarding, statuses.get(false).cycles);
+    assertEquals(cycles_with_forwarding, statuses.get(true).cycles);
+    assertEquals(cycles_without_forwarding, statuses.get(false).cycles);
   }
 
 
@@ -200,14 +198,14 @@ public class CpuTests {
     Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-waw.s");
 
     // With forwarding
-    Assert.assertEquals(20, statuses.get(true).cycles);
-    Assert.assertEquals(7, statuses.get(true).wawStalls);
-    Assert.assertEquals(1, statuses.get(true).rawStalls);
+    assertEquals(20, statuses.get(true).cycles);
+    assertEquals(7, statuses.get(true).wawStalls);
+    assertEquals(1, statuses.get(true).rawStalls);
 
     // Without forwarding
-    Assert.assertEquals(21, statuses.get(false).cycles);
-    Assert.assertEquals(7, statuses.get(false).wawStalls);
-    Assert.assertEquals(2, statuses.get(false).rawStalls);
+    assertEquals(21, statuses.get(false).cycles);
+    assertEquals(7, statuses.get(false).wawStalls);
+    assertEquals(2, statuses.get(false).rawStalls);
   }
 
   /* ------- REGRESSION TESTS -------- */
