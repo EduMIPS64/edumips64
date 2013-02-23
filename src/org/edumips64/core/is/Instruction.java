@@ -946,14 +946,18 @@ public abstract class Instruction {
    * @param instr instruction to compare with this
    * @return the result of the comparison
    */
-  public boolean equals(Instruction instr) {
-    if (instr != null) {
-      if (instr.getRepr().getBinString().equalsIgnoreCase(this.repr.getBinString())) {
-        return true;
-      }
+  @Override
+  public boolean equals(Object instr) {
+    if (instr == null) {
+      return false;
     }
-
-    return false;
+    if (instr == this) {
+      return true;
+    }
+    if (!(instr instanceof Instruction)) {
+      return false;
+    }
+    Instruction i = (Instruction) instr;
+    return i.getRepr().getBinString().equalsIgnoreCase(this.repr.getBinString());
   }
-
 }

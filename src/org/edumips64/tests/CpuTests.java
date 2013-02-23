@@ -1,6 +1,8 @@
 /* CpuTests.java
  *
- * Tests for the EduMIPS64 CPU.
+ * Tests for the EduMIPS64 CPU. These test focus on running MIPS64 programs,
+ * treating the CPU as a black box and analyzing the correctness of its
+ * outputs.
  *
  * (c) 2012-2013 Andrea Spadaccini
  *
