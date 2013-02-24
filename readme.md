@@ -69,6 +69,6 @@ Set those variables to modify some compile-time options:
 
 * dst_java_version (default: 6): bytecode target version;
 
-* debug (default: off): whether to compile with debugging info;
+* debug (default: on): whether to compile with debugging info;
 
 To set any variable, use the -D option of ant.

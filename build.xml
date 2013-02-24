@@ -40,7 +40,7 @@
         <!-- Compilation options -->
         <property name="src_java_version" value="6" />
         <property name="dst_java_version" value="6" />
-        <property name="debug" value="off" />
+        <property name="debug" value="on" />
 	</target>
 
     <target name="mkdirs" depends="init">
