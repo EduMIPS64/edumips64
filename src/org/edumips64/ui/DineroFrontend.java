@@ -93,7 +93,7 @@ public class DineroFrontend extends JDialog {
     pathLabel = new JLabel("DineroIV executable path:");
     paramsLabel = new JLabel("Command line parameters:");
 
-    path = new JTextField((String) Config.get("dineroIV"));
+    path = new JTextField(Config.getString("dineroIV"));
     params = new JTextField("-l1-usize 512 -l1-ubsize 64");
 
     path.setPreferredSize(new Dimension(400, 26));
@@ -123,7 +123,7 @@ public class DineroFrontend extends JDialog {
         int val = jfc.showOpenDialog(null);
 
         if (val == JFileChooser.APPROVE_OPTION) {
-          Config.set("dineroIV", jfc.getSelectedFile().getPath());
+          Config.putString("dineroIV", jfc.getSelectedFile().getPath());
           path.setText(jfc.getSelectedFile().getPath());
         }
       }

@@ -68,12 +68,11 @@ public class CurrentLocale {
   }
 
   public static void setLanguage(String language) {
-    Config.set("language", language);
+    Config.putString("language", language);
   }
 
-
   public static String getString(String key) {
-    String lang_name = (String) Config.get("language");
+    String lang_name = Config.getString("language");
 
     try {
       Map<String, String> lang = languages.get(lang_name);
@@ -85,6 +84,6 @@ public class CurrentLocale {
   }
 
   public static boolean isSelected(String lan) {
-    return Config.get("language").equals(lan);
+    return Config.getString("language").equals(lan);
   }
 }

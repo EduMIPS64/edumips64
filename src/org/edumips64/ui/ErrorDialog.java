@@ -107,7 +107,7 @@ public class ErrorDialog extends JDialog {
         numError++;
       }
 
-      if (lineIsError[i] || (Boolean) Config.get("warnings")) {
+      if (lineIsError[i] || Config.getBoolean("warnings")) {
         dft.addRow(e.getStringArray());
         i++;
       }
@@ -139,7 +139,7 @@ public class ErrorDialog extends JDialog {
     setSize(width, height);
     setLocation((getScreenWidth() - getWidth()) / 2, (getScreenHeight() - getHeight()) / 2);
 
-    if (!((Boolean) Config.get("warnings")) && numError == 0) {
+    if (!(Config.getBoolean("warnings")) && numError == 0) {
       setVisible(false);
       dispose();
     } else {

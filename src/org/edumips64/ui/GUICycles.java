@@ -376,10 +376,8 @@ public class GUICycles extends GUIComponent {
         structStallsDivider = cpu.getStructuralStallsDivider();
         structStallsFuncUnit = cpu.getStructuralStallsFuncUnit();
       }
-
     }
   }
-
 
   public int getLastELBySerialNumber(long serialNumber) {
     for (ListIterator<ElementoCiclo> it = elementsList.listIterator(elementsList.size()); it.hasPrevious();) {
@@ -446,31 +444,31 @@ public class GUICycles extends GUIComponent {
           ext_st = "";
 
           if (st.equals("IF")) {
-            g.setColor((Color) Config.get("IFColor"));
+            g.setColor(Config.getColor("IFColor"));
           } else if (st.equals("ID")) {
-            g.setColor((Color) Config.get("IDColor"));
+            g.setColor(Config.getColor("IDColor"));
           } else if (st.equals("EX")) {
-            g.setColor((Color) Config.get("EXColor"));
+            g.setColor(Config.getColor("EXColor"));
           } else if (st.equals("MEM")) {
-            g.setColor((Color) Config.get("MEMColor"));
+            g.setColor(Config.getColor("MEMColor"));
           } else if (st.equals("WB")) {
-            g.setColor((Color) Config.get("WBColor"));
+            g.setColor(Config.getColor("WBColor"));
           } else if (st.equals("Str")) {
-            g.setColor((Color) Config.get("EXColor"));
+            g.setColor(Config.getColor("EXColor"));
           } else if (st.equals("A1") || st.equals("A2") || st.equals("A3") || st.equals("A4") || st.equals("StAdd")) {
-            g.setColor((Color) Config.get("FPAdderColor"));
+            g.setColor(Config.getColor("FPAdderColor"));
           } else if (st.equals("M1") || st.equals("M2") || st.equals("M3") || st.equals("M4") || st.equals("M5") || st.equals("M6") || st.equals("M7") || st.equals("StMul")) {
-            g.setColor((Color) Config.get("FPMultiplierColor"));
+            g.setColor(Config.getColor("FPMultiplierColor"));
           } else if (st.matches("D[0-2][0-9]") || st.matches("DIV")) {
-            g.setColor((Color) Config.get("FPDividerColor"));
+            g.setColor(Config.getColor("FPDividerColor"));
           } else if (st.equals("RAW")) {
-            g.setColor((Color) Config.get("IDColor"));
+            g.setColor(Config.getColor("IDColor"));
           } else if (st.equals("WAW") || st.equals("StDiv") || st.equals("StEx") || st.equals("StFun")) {
-            g.setColor((Color) Config.get("IDColor"));
+            g.setColor(Config.getColor("IDColor"));
           } else if (st.equals(" ")) {
             if (pre.equals("IF")) {
               ext_st = " ";
-              g.setColor((Color) Config.get("IFColor"));
+              g.setColor(Config.getColor("IFColor"));
             }
           }
 

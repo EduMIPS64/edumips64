@@ -49,8 +49,8 @@ public class GUIConfig extends JDialog {
 
   JTabbedPane tabPanel;
   JButton okButton;
-  HashMap<String, Object> updatedMap;
   int width = 500, height = 270;
+
   public GUIConfig(final JFrame owner) {
     super(owner, CurrentLocale.getString("Config.ITEM"), true);
     MAIN = CurrentLocale.getString("Config.MAIN");
@@ -58,8 +58,6 @@ public class GUIConfig extends JDialog {
     BEHAVIOR = CurrentLocale.getString("Config.BEHAVIOR");
     FPUEXCEPTIONS = CurrentLocale.getString("Config.FPUEXCEPTIONS");
     FPUROUNDING = CurrentLocale.getString("Config.FPUROUNDING");
-    updatedMap = new HashMap<String, Object>();
-    updatedMap.putAll(Config.getMap());
 
     tabPanel = new JTabbedPane();
     tabPanel.addTab(MAIN, makeMainPanel());
@@ -249,20 +247,20 @@ public class GUIConfig extends JDialog {
       //Setting Component
       cbox.setHorizontalAlignment(SwingConstants.LEFT);
       cbox.setVerticalAlignment(SwingConstants.CENTER);
-      cbox.setSelected((Boolean) Config.get(key));
+      cbox.setSelected(Config.getBoolean(key));
 
       cbox.setAction(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
-          updatedMap.put(key, cbox.getModel().isSelected());
+          Config.putBoolean(key, cbox.getModel().isSelected());
         }
       });
     } else if (comp instanceof JRadioButton) {
       final JRadioButton rbut = (JRadioButton) comp;
       rbut.setHorizontalAlignment(SwingConstants.LEFT);
       rbut.setVerticalAlignment(SwingConstants.CENTER);
-      rbut.setSelected((Boolean) Config.get(key));
+      rbut.setSelected(Config.getBoolean(key));
 
-      //when a radio button is clicked, the other buttons in the updatedMap must be deselected
+      // When a radio button is clicked, the other buttons must be deselected.
       rbut.setAction(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
           LinkedList<String> keys = new LinkedList<String>();
@@ -270,26 +268,23 @@ public class GUIConfig extends JDialog {
           keys.add("TOWARDZERO");
           keys.add("TOWARDS_PLUS_INFINITY");
           keys.add("TOWARDS_MINUS_INFINITY");
-          updatedMap.put(key, true);
+
+          Config.putBoolean(key, true);
           keys.remove(key);
-          //the other flags for not selected radio buttons are false
-          String currentKey;
 
-          for (ListIterator it = keys.listIterator(); it.hasNext();) {
-            currentKey = (String) it.next();
-            updatedMap.put(currentKey, false);
+          for (String k : keys) {
+            Config.putBoolean(k, false);
           }
-
         }
       });
     } else if (comp instanceof JNumberField) {
       final JNumberField number = (JNumberField) comp;
-      number.setNumber((Integer) Config.get(key));
+      number.setNumber(Config.getInt(key));
 
       number.addFocusListener(new FocusAdapter() {
         public void focusLost(FocusEvent e) {
           if (number.isNumber()) {
-            updatedMap.put(key, number.getNumber());
+            Config.putInt(key, number.getNumber());
           } else {
             JOptionPane.showMessageDialog(GUIConfig.this, CurrentLocale.getString("INT_FORMAT_EXCEPTION"), CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
           }
@@ -298,7 +293,7 @@ public class GUIConfig extends JDialog {
       number.setAction(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
           if (number.isNumber()) {
-            updatedMap.put(key, number.getNumber());
+            Config.putInt(key, number.getNumber());
           } else {
             JOptionPane.showMessageDialog(GUIConfig.this, CurrentLocale.getString("INT_FORMAT_EXCEPTION"), CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
           }
@@ -306,24 +301,24 @@ public class GUIConfig extends JDialog {
       });
     } else if (comp instanceof JTextField) {
       final JTextField text = (JTextField) comp;
-      text.setText(Config.get(key).toString());
+      text.setText(Config.getString(key));
 
       text.addFocusListener(new FocusAdapter() {
         public void focusLost(FocusEvent e) {
           logger.info("focus");
-          updatedMap.put(key, text.getText());
+          Config.putString(key, text.getText());
         }
       });
       text.setAction(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
           logger.info("abstract");
-          updatedMap.put(key, text.getText());
+          Config.putString(key, text.getText());
         }
       });
     } else if (comp instanceof JButton) {
       final JButton button = (JButton) comp;
       button.setBounds(0, 0, 50, 10);
-      button.setBackground((Color) Config.get(key));
+      button.setBackground(Config.getColor(key));
       button.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           Color color = JColorChooser.showDialog(
@@ -333,16 +328,13 @@ public class GUIConfig extends JDialog {
 
           if (color != null) {
             button.setBackground(color);
-            updatedMap.put(key, button.getBackground());
+            Config.putColor(key, button.getBackground());
           }
         }
       });
     }
 
-
-
     grid_add(panel, comp, gbl, gbc, .2, 0, 1, row, 1, 1);
-
     panel.setMinimumSize(new java.awt.Dimension(10, 10));
   }
 
@@ -382,18 +374,13 @@ public class GUIConfig extends JDialog {
     });
     okButton.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        if ((Boolean) Config.get("show_aliases")  !=  updatedMap.get("show_aliases")) {
-          Config.setMap(updatedMap);
-          org.edumips64.Main.getGUIFrontend().updateComponents();
-        } else {
-          Config.setMap(updatedMap);
-        }
-
+        // Might be needed if show_alias is changed.
+        org.edumips64.Main.getGUIFrontend().updateComponents();
         setVisible(false);
 
-        if (Instruction.getEnableForwarding() != (Boolean) Config.get("forwarding")) {
+        if (Instruction.getEnableForwarding() != Config.getBoolean("forwarding")) {
           CPU cpu = CPU.getInstance();
-          Instruction.setEnableForwarding((Boolean) Config.get("forwarding"));
+          Instruction.setEnableForwarding(Config.getBoolean("forwarding"));
 
           // Let's verify that we have to reset the CPU
           if (cpu.getStatus() == CPU.CPUStatus.RUNNING) {

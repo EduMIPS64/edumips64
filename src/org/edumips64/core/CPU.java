@@ -426,8 +426,8 @@ public class CPU {
     boolean SIMUL_MODE_DISABLED = false;
     int breaking = 0;
     // Used for exception handling
-    boolean masked = (Boolean) Config.get("syncexc-masked");
-    boolean terminate = (Boolean) Config.get("syncexc-terminate");
+    boolean masked = Config.getBoolean("syncexc-masked");
+    boolean terminate = Config.getBoolean("syncexc-terminate");
 
     configFPExceptionsAndRM();
 
@@ -847,19 +847,19 @@ public class CPU {
 
   public void configFPExceptionsAndRM() {
     try {
-      FCSR.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, (Boolean) Config.get("INVALID_OPERATION"));
-      FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW, (Boolean) Config.get("OVERFLOW"));
-      FCSR.setFPExceptions(CPU.FPExceptions.UNDERFLOW, (Boolean) Config.get("UNDERFLOW"));
-      FCSR.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO, (Boolean) Config.get("DIVIDE_BY_ZERO"));
+      FCSR.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, Config.getBoolean("INVALID_OPERATION"));
+      FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW, Config.getBoolean("OVERFLOW"));
+      FCSR.setFPExceptions(CPU.FPExceptions.UNDERFLOW, Config.getBoolean("UNDERFLOW"));
+      FCSR.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO, Config.getBoolean("DIVIDE_BY_ZERO"));
 
       //setting the rounding mode
-      if ((Boolean) Config.get("NEAREST")) {
+      if (Config.getBoolean("NEAREST")) {
         FCSR.setFCSRRoundingMode(FPRoundingMode.TO_NEAREST);
-      } else if ((Boolean) Config.get("TOWARDZERO")) {
+      } else if (Config.getBoolean("TOWARDZERO")) {
         FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARD_ZERO);
-      } else if ((Boolean) Config.get("TOWARDS_PLUS_INFINITY")) {
+      } else if (Config.getBoolean("TOWARDS_PLUS_INFINITY")) {
         FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_PLUS_INFINITY);
-      } else if ((Boolean) Config.get("TOWARDS_MINUS_INFINITY")) {
+      } else if (Config.getBoolean("TOWARDS_MINUS_INFINITY")) {
         FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_MINUS_INFINITY);
       }
     } catch (IrregularStringOfBitsException ex) {

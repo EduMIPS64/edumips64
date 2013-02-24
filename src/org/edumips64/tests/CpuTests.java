@@ -66,6 +66,7 @@ public class CpuTests {
   public void setUp() {
     // Disable logs of level lesser than WARNING.
     Logger rootLogger = log.getParent();
+
     for (Handler h : rootLogger.getHandlers()) {
       h.setLevel(java.util.logging.Level.WARNING);
     }

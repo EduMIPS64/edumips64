@@ -74,10 +74,10 @@ public class CPUGUIThread extends Thread {
    * configuration values from the configuration file.
    */
   public void updateConfigValues() {
-    sleep_interval = (Integer) Config.get("sleep_interval");
-    verbose = (Boolean) Config.get("verbose");
-    masked = (Boolean) Config.get("syncexc-masked");
-    terminate = (Boolean) Config.get("syncexc-terminate");
+    sleep_interval = Config.getInt("sleep_interval");
+    verbose = Config.getBoolean("verbose");
+    masked = Config.getBoolean("syncexc-masked");
+    terminate = Config.getBoolean("syncexc-terminate");
     logger.info("Terminate = " + terminate + "; masked = " + masked);
   }
 

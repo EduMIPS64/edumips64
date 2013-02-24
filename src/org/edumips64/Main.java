@@ -64,7 +64,7 @@ public class Main extends JApplet {
   public static CPUGUIThread cgt;
   static Parser parser;
   static GUIFrontend front;
-  static JFileChooser jfc = new JFileChooser((File) Config.get("lastdir"));
+  static JFileChooser jfc = new JFileChooser(new File(Config.getString("lastdir")));
   static Config cfg;
 
   static JFrame f = null;
@@ -155,11 +155,6 @@ public class Main extends JApplet {
     JDialog.setDefaultLookAndFeelDecorated(true);
     f = new JFrame("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
     f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    f.addWindowListener(new WindowAdapter() {
-      public void windowClosing(WindowEvent e) {
-        Config.saveConfigFile();
-      }
-    });
     // Maximizing the application
     Insets screenInsets = f.getToolkit().getScreenInsets(f.getGraphicsConfiguration());
     Rectangle screenSize = f.getGraphicsConfiguration().getBounds();
@@ -673,14 +668,8 @@ public class Main extends JApplet {
 
         if (val == JFileChooser.APPROVE_OPTION) {
           String filename = jfc.getSelectedFile().getPath();
-          Config.set("lastdir", jfc.getCurrentDirectory());
-          @SuppressWarnings("unchecked")
-          LinkedList<String> listfiles = (LinkedList<String>) Config.get("files");
-
-          if (!listfiles.contains(filename)) {
-            listfiles.addFirst(filename);
-            addLastFile(filename, 0);
-          }
+          Config.putString("lastdir", jfc.getCurrentDirectory().getAbsolutePath());
+          addFileToRecentMenu(filename);
 
           resetSimulator(false);
           openFile(filename);
@@ -689,21 +678,11 @@ public class Main extends JApplet {
       }
     });
 
-    // Open recent files
-    @SuppressWarnings("unchecked")
-    LinkedList<String> files = (LinkedList<String>) Config.get("files");
-
-    if (files.size() > 0) {
-      int i = 0;
-
-      for (String filename : files) {
-        if (i < 6) {
-          addLastFile(filename, i);
-        } else {
-          files.removeLast();
-        }
-
-        i++;
+    // Add recently opened files menu items to the recent files submenu.
+    for (String filename : Arrays.asList(Config.getString("files").split(File.pathSeparator))) {
+      if (filename.length() > 0) {
+        log.info("Adding '" + filename + "' to recently opened files.");
+        addFileToRecentMenu(filename);
       }
     }
 
@@ -747,7 +726,6 @@ public class Main extends JApplet {
     file.add(exit);
     exit.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        Config.saveConfigFile();
         System.exit(0);
       }
     });
@@ -785,7 +763,7 @@ public class Main extends JApplet {
     multi_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
     multi_cycle.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        cgt.setSteps((Integer) Config.get("n_step"));
+        cgt.setSteps(Config.getInt("n_step"));
 
         synchronized (cgt) {
           cgt.notify();
@@ -1011,7 +989,7 @@ public class Main extends JApplet {
     return mb;
   }
   /** add a new JMenuItem in recent file menu at the position pos for the file "namefile"*/
-  private static void addLastFile(final String filename, int pos) {
+  private static void addFileToRecentMenu(final String filename) {
     JMenuItem item = new JMenuItem(filename);
     item.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -1020,7 +998,26 @@ public class Main extends JApplet {
         changeShownMenuItems(cpu.getStatus());
       }
     });
-    lastfiles.insert(item, pos);
+
+    // Add item to the end of the menu, and remove excess items from the
+    // start (LIFO).
+    lastfiles.add(item);
+
+    while (lastfiles.getItemCount() > 6) {
+      lastfiles.remove(0);
+    }
+
+    // Update configuration
+    String files = new String();
+
+    for (Component c : lastfiles.getMenuComponents()) {
+      if (c instanceof JMenuItem) {
+        files += ((JMenuItem)c).getText() + File.pathSeparator;
+      }
+    }
+
+    files = files.substring(0, files.length() - 2);
+    Config.putString("files", files);
   }
 
   /** Sets the caption of the menu item, adding, if possible, the mnemonic */

@@ -247,42 +247,42 @@ public class GUICode extends GUIComponent {
 
       if (rowTable == ifIndex) {
         label.setOpaque(true);
-        label.setBackground((Color) Config.get("IFColor"));
+        label.setBackground(Config.getColor("IFColor"));
       }
 
       if (rowTable == idIndex) {
         label.setOpaque(true);
-        label.setBackground((Color) Config.get("IDColor"));
+        label.setBackground(Config.getColor("IDColor"));
       }
 
       if (rowTable == exIndex) {
         label.setOpaque(true);
-        label.setBackground((Color) Config.get("EXColor"));
+        label.setBackground(Config.getColor("EXColor"));
       }
 
       if (rowTable == memIndex) {
         label.setOpaque(true);
-        label.setBackground((Color) Config.get("MEMColor"));
+        label.setBackground(Config.getColor("MEMColor"));
       }
 
       if (rowTable == wbIndex) {
         label.setOpaque(true);
-        label.setBackground((Color) Config.get("WBColor"));
+        label.setBackground(Config.getColor("WBColor"));
       }
 
       if (rowTable == M1Index || rowTable == M2Index || rowTable == M3Index || rowTable == M4Index || rowTable == M5Index || rowTable == M6Index || rowTable == M7Index) {
         label.setOpaque(true);
-        label.setBackground((Color) Config.get("FPMultiplierColor"));
+        label.setBackground(Config.getColor("FPMultiplierColor"));
       }
 
       if (rowTable == A1Index || rowTable == A2Index || rowTable == A3Index || rowTable == A4Index) {
         label.setOpaque(true);
-        label.setBackground((Color) Config.get("FPAdderColor"));
+        label.setBackground(Config.getColor("FPAdderColor"));
       }
 
       if (rowTable == DIVIndex) {
         label.setOpaque(true);
-        label.setBackground((Color) Config.get("FPDividerColor"));
+        label.setBackground(Config.getColor("FPDividerColor"));
       }
 
       return label;
