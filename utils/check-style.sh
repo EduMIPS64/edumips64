@@ -17,10 +17,10 @@ case $# in
     DIR=$1
     VERIFY=true ;;
   *)
-    echo "Wrong number of arguments. The first argument is mandatory, and is \
-          the root of the edumips64 source code; if a second argument is \
-          passed, the script will exit with a non-zero status if any style \
-          error is found."
+    echo "Wrong number of arguments. The first argument is mandatory, and is"
+    echo "the root of the edumips64 source code; if a second argument is"
+    echo "passed, the script will exit with a non-zero status if any style"
+    echo "error is found."
     exit 2 ;;
 esac
 
@@ -29,6 +29,7 @@ for f in $FILES; do
   $ASTYLE $ARTISTIC_STYLE_OPTIONS < $f > $f.fixed
   if ! diff $f $f.fixed; then
     if [ "$VERIFY" == "true" ]; then
+      echo $f
       rm -f $f.fixed $f.patch
       exit 1;
     fi
