@@ -28,6 +28,7 @@ package org.edumips64.ui;
 
 import org.edumips64.core.*;
 import org.edumips64.utils.*;
+import org.edumips64.Main;
 
 import java.util.*;
 import java.awt.*;
@@ -42,16 +43,13 @@ import java.text.*;
  * This class provides a window for configuration options.
 */
 public class ReportDialog extends JDialog {
-
-
   JButton okButton;
   int width = 450, height = 400;
-  public ReportDialog(final JFrame owner, Exception exception, String title) {
 
+  public ReportDialog(final JFrame owner, Exception exception, String title) {
     super(owner, title, true);
 
     JPanel buttonPanel = new JPanel();
-
     JButton okButton = new JButton(CurrentLocale.getString("ReportDialog.BUTTON"));
     buttonPanel.add(okButton);
 
@@ -97,11 +95,11 @@ public class ReportDialog extends JDialog {
       exmsg = "fatal error";
     }
 
+    exmsg += "Version " + Main.VERSION + "\r\n";
 
     JTextArea ta = new JTextArea(exmsg);
 
     JScrollPane scrollTable = new JScrollPane(ta);
-
 
     getRootPane().setDefaultButton(okButton);
     getContentPane().setLayout(new BorderLayout());
@@ -123,6 +121,4 @@ public class ReportDialog extends JDialog {
   public static int getScreenHeight() {
     return (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
   }
-
 }
-
