@@ -961,6 +961,6 @@ public abstract class Instruction {
     }
 
     Instruction i = (Instruction) instr;
-    return i.getRepr().getBinString().equalsIgnoreCase(this.repr.getBinString());
+    return i.getSerialNumber() == serialNumber;
   }
 }

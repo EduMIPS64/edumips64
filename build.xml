@@ -136,9 +136,6 @@
             <test name="org.edumips64.tests.CpuTests">
                 <formatter type="plain" usefile="false"/>
             </test>
-            <test name="org.edumips64.tests.InstructionTests">
-                <formatter type="plain" usefile="false"/>
-            </test>
         </junit>
         <delete dir="${outputDir}" />
     </target>
