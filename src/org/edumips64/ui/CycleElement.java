@@ -1,4 +1,4 @@
-/*ElementoCiclo.java
+/* CycleElement.java
  *
  * This class represents the single element that is then drawn in the cycles
  * component.
@@ -24,31 +24,32 @@
 package org.edumips64.ui;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
 * This class represents the single element that is then drawn in the cycles
 * component.
 * @author Filippo Mondello
 */
-public class ElementoCiclo {
+public class CycleElement {
 
-  boolean flagCancella;
-  int tempoInizio;
-  private String nome;
-  private LinkedList<String> stato;
+  int startTime;
+  private String name;
+  private LinkedList<String> states;
   private Long serialNumber; //instruction serial number
+
+  private static final Logger logger = Logger.getLogger(CycleElement.class.getName());
 
   /**
   * A new element of this class is created.
   * @param nom the name of the instruction
   * @param tempo the time in which the element is entered in pipeline
   */
-  public ElementoCiclo(String nom, int tempo, long serialNumber) {
-    stato = new LinkedList<String>();
-    nome = nom;
-    tempoInizio = tempo;
-    stato.add("IF");
-    flagCancella = false;
+  public CycleElement(String nom, int tempo, long serialNumber) {
+    states = new LinkedList<String>();
+    name = nom;
+    startTime = tempo;
+    states.add("IF");
     this.serialNumber = serialNumber;
 
   }
@@ -56,45 +57,37 @@ public class ElementoCiclo {
   * @return the name of the instruction
   */
   public String getName() {
-    return nome;
+    return name;
   }
 
   /**
   * This method is called for every clock cycle.
   * @param stat the current stage in pipeline of the instruction.
   */
-  public void addStato(String stat) {
-    stato.add(stat);
+  public void addState(String newState) {
+    states.add(newState);
   }
 
   /**
   * @return the whole list of stages in pipeline
   */
-  public LinkedList<String> getStato() {
-    return stato;
+  public LinkedList<String> getStates() {
+    return states;
+  }
+
+  public String getLastState() {
+    return states.getLast();
   }
 
   /**
   * @return the initial time in which the instruction occuped the IF stage in pipeline.
   */
   public int getTime() {
-    return tempoInizio;
-  }
-
-  public void setFlagCancella(boolean f) {
-    flagCancella = f;
-  }
-
-  /**
-  * @return the value of the flag that indicate if an instruction has been aborted.
-  */
-  public boolean getFlagCancella() {
-    return flagCancella;
+    return startTime;
   }
 
   /** Returns the serial number of the referred instruction*/
   public long getSerialNumber() {
     return serialNumber;
   }
-
 }
