@@ -28,8 +28,10 @@ package org.edumips64.tests;
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.logging.Handler;
+import java.util.logging.Logger;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +43,7 @@ public class CpuTests {
   protected CPU cpu;
   protected Parser parser;
   public static String testsLocation = "src/org/edumips64/tests/data/";
+  private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
 
   /** Class that holds the parts of the CPU status that need to be tested
    * after the execution of a test case.
@@ -54,12 +57,19 @@ public class CpuTests {
       cycles = cpu.getCycles();
       wawStalls = cpu.getWAWStalls();
       rawStalls = cpu.getRAWStalls();
-      System.err.println("Got " + cycles + " cycles, " + rawStalls + " RAW Stalls and " + wawStalls + " WAW stalls.");
+
+      log.warning("Got " + cycles + " cycles, " + rawStalls + " RAW Stalls and " + wawStalls + " WAW stalls.");
     }
   }
 
   @Before
   public void setUp() {
+    // Disable logs of level lesser than WARNING.
+    Logger rootLogger = log.getParent();
+    for (Handler h : rootLogger.getHandlers()) {
+      h.setLevel(java.util.logging.Level.WARNING);
+    }
+
     cpu = CPU.getInstance();
     cpu.setStatus(CPU.CPUStatus.READY);
     parser = Parser.getInstance();
@@ -72,7 +82,7 @@ public class CpuTests {
    * @param testPath path of the test code.
    */
   protected CpuTestStatus runMipsTest(String testPath) throws Exception {
-    System.err.println("================================= Starting test " + testPath);
+    log.warning("================================= Starting test " + testPath);
     cpu.reset();
     testPath = testsLocation + testPath;
 
@@ -94,7 +104,7 @@ public class CpuTests {
       }
     } catch (HaltException e) {
       CpuTestStatus cts = new CpuTestStatus(cpu);
-      System.err.println("================================= Finished test " + testPath);
+      log.warning("================================= Finished test " + testPath);
       return cts;
     } finally {
       cpu.reset();
