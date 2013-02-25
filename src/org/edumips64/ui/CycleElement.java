@@ -72,6 +72,10 @@ public class CycleElement {
   * @param stat the current stage in pipeline of the instruction.
   */
   public void addState(String newState) {
+    String lastState = states.getLast();
+    if(!validateStateTransition(lastState, newState)) {
+      logger.warning("State " + newState + " is not allowed after state " + lastState);
+    }
     states.add(newState);
   }
 
@@ -96,5 +100,29 @@ public class CycleElement {
   /** Returns the serial number of the referred instruction*/
   public long getSerialNumber() {
     return serialNumber;
+  }
+
+  // Map that associates to a given state the set of allowed successor states.
+  // The states that are not added in the list are not checked.
+  // TODO: complete the map (it does not contain all possible transitions).
+  private static Map<String, Set<String>> allowedTransitions;
+  static {
+    allowedTransitions = new HashMap<String, Set<String>>();
+    allowedTransitions.put("IF", new HashSet<String>(Arrays.asList("ID", " ")));
+    allowedTransitions.put("ID", new HashSet<String>(Arrays.asList("ID", "EX", "RAW", "WAW", "DIV", "StDiv", "StEx", "StFun", "A1", "M1")));
+    allowedTransitions.put("RAW", new HashSet<String>(Arrays.asList("RAW", "EX", "M1", "A1")));
+    allowedTransitions.put("WAW", new HashSet<String>(Arrays.asList("WAW", "EX", "M1", "A1")));
+
+    allowedTransitions.put("EX", new HashSet<String>(Arrays.asList("MEM", "Str")));
+    allowedTransitions.put("MEM", new HashSet<String>(Arrays.asList("WB")));
+    allowedTransitions.put("WB", new HashSet<String>(Arrays.asList(" ")));
+  }
+
+  private static boolean validateStateTransition(String curState, String nextState) {
+    if (!allowedTransitions.containsKey(curState)) {
+      // Don't check states that are not in the map.
+      return true;
+    }
+    return allowedTransitions.get(curState).contains(nextState);
   }
 }
