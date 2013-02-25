@@ -140,11 +140,11 @@ public class Main extends JApplet {
 
 
     if (!debug_mode) {
-      // Disable logging by manipulating the root logger.
+      // Disable logging message whose level is less than WARNING.
       Logger rootLogger = log.getParent();
 
       for (Handler h : rootLogger.getHandlers()) {
-        h.setLevel(java.util.logging.Level.OFF);
+        h.setLevel(java.util.logging.Level.WARNING);
       }
     }
 
