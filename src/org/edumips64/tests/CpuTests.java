@@ -27,6 +27,7 @@ package org.edumips64.tests;
 
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
+import org.edumips64.ui.CycleBuilder;
 
 import java.util.HashMap;
 import java.util.logging.Handler;
@@ -86,6 +87,7 @@ public class CpuTests {
     log.warning("================================= Starting test " + testPath);
     cpu.reset();
     testPath = testsLocation + testPath;
+    CycleBuilder builder = new CycleBuilder();
 
     try {
       try {
@@ -102,6 +104,7 @@ public class CpuTests {
 
       while (true) {
         cpu.step();
+        builder.step();
       }
     } catch (HaltException e) {
       CpuTestStatus cts = new CpuTestStatus(cpu);
