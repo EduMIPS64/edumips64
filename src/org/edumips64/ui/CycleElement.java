@@ -60,6 +60,13 @@ public class CycleElement {
     return name;
   }
 
+  public int getUpdateTime() {
+    return startTime + states.size() - 1;
+  }
+  public boolean isFinalized() {
+    return states.getLast() == "WB";
+  }
+
   /**
   * This method is called for every clock cycle.
   * @param stat the current stage in pipeline of the instruction.

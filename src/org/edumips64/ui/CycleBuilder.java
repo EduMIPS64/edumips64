@@ -59,10 +59,15 @@ public class CycleBuilder {
   public int getInstructionsCount() {
     return instructionsCount;
   }
-  public int getLastELBySerialNumber(long serialNumber) {
-    for (ListIterator<CycleElement> it = elementsList.listIterator(elementsList.size()); it.hasPrevious();) {
-      if (it.previous().getSerialNumber() == serialNumber) {
-        return it.previousIndex() + 1;
+
+  // Does a chronological search in the list of CycleElements, finding the
+  // next CycleElement belonging to the given instruction serial number that
+  // is not finalized (i.e., past WB) and has not been updated yet.
+  public int getInstructionToUpdate(long serialNumber) {
+    for (int i = 0; i < elementsList.size(); ++i) {
+      CycleElement tmp = elementsList.get(i);
+      if (tmp.getSerialNumber() == serialNumber && tmp.getUpdateTime() < curTime && !tmp.isFinalized()) {
+        return i;
       }
     }
     return -1;
@@ -88,7 +93,7 @@ public class CycleBuilder {
 
         // WB
         if (instr[4] != null && instr[4].getName() != " ") {
-          index = getLastELBySerialNumber(instr[4].getSerialNumber());
+          index = getInstructionToUpdate(instr[4].getSerialNumber());
 
           if (index != -1) {
             elementsList.get(index).addState("WB");
@@ -97,7 +102,7 @@ public class CycleBuilder {
 
         // MEM
         if (instr[3] != null && instr[3].getName() != " ") {
-          index = getLastELBySerialNumber(instr[3].getSerialNumber());
+          index = getInstructionToUpdate(instr[3].getSerialNumber());
 
           if (index != -1) {
             elementsList.get(index).addState("MEM");
@@ -106,7 +111,7 @@ public class CycleBuilder {
 
         // EX
         if (instr[2] != null && instr[2].getName() != " ") {
-          index = getLastELBySerialNumber(instr[2].getSerialNumber());
+          index = getInstructionToUpdate(instr[2].getSerialNumber());
           // If a structural stall(memory) occurs, the instruction in EX has to be tagged first with "EX" and then with "StEx"
           boolean exTagged = false;
 
@@ -143,7 +148,7 @@ public class CycleBuilder {
 
         // ID
         if (instr[1] != null && instr[1].getName() != " " && cpu.getStatus() == CPU.CPUStatus.RUNNING) {
-          index = getLastELBySerialNumber(instr[1].getSerialNumber());
+          index = getInstructionToUpdate(instr[1].getSerialNumber());
 
           if (!inputStallOccurred) {
             elementsList.get(index).addState("ID");
@@ -179,7 +184,7 @@ public class CycleBuilder {
               instructionsCount++;
             }
           } else {
-            index = getLastELBySerialNumber(instr[0].getSerialNumber());
+            index = getInstructionToUpdate(instr[0].getSerialNumber());
 
             if (index != -1) {
               elementsList.get(index).addState(" ");
@@ -193,7 +198,7 @@ public class CycleBuilder {
         Instruction instrSearched;
 
         if (cpu.getInstructionByFuncUnit("ADDER", 1) != null) {
-          index = getLastELBySerialNumber(cpu.getInstructionByFuncUnit("ADDER", 1).getSerialNumber());
+          index = getInstructionToUpdate(cpu.getInstructionByFuncUnit("ADDER", 1).getSerialNumber());
 
           if (index != -1) {
             elementsList.get(index).addState("A1");
@@ -202,7 +207,7 @@ public class CycleBuilder {
 
         if (cpu.getInstructionByFuncUnit("ADDER", 2) != null) {
 
-          index = getLastELBySerialNumber(cpu.getInstructionByFuncUnit("ADDER", 2).getSerialNumber());
+          index = getInstructionToUpdate(cpu.getInstructionByFuncUnit("ADDER", 2).getSerialNumber());
 
           if (index != -1) {
             elementsList.get(index).addState("A2");
@@ -211,7 +216,7 @@ public class CycleBuilder {
 
         if (cpu.getInstructionByFuncUnit("ADDER", 3) != null) {
 
-          index = getLastELBySerialNumber(cpu.getInstructionByFuncUnit("ADDER", 3).getSerialNumber());
+          index = getInstructionToUpdate(cpu.getInstructionByFuncUnit("ADDER", 3).getSerialNumber());
 
           if (index != -1) {
             elementsList.get(index).addState("A3");
@@ -220,7 +225,7 @@ public class CycleBuilder {
 
         if (cpu.getInstructionByFuncUnit("ADDER", 4) != null) {
 
-          index = getLastELBySerialNumber(cpu.getInstructionByFuncUnit("ADDER", 4).getSerialNumber());
+          index = getInstructionToUpdate(cpu.getInstructionByFuncUnit("ADDER", 4).getSerialNumber());
           boolean A4tagged = false;
 
           if (index != -1) {
@@ -240,7 +245,7 @@ public class CycleBuilder {
 
         //MULTIPLIER ----------------------------------------------------------------
         if ((instrSearched = cpu.getInstructionByFuncUnit("MULTIPLIER", 1)) != null) {
-          index = getLastELBySerialNumber(instrSearched.getSerialNumber());
+          index = getInstructionToUpdate(instrSearched.getSerialNumber());
 
           if (index != -1) {
             elementsList.get(index).addState("M1");
@@ -248,7 +253,7 @@ public class CycleBuilder {
         }
 
         if ((instrSearched = cpu.getInstructionByFuncUnit("MULTIPLIER", 2)) != null) {
-          index = getLastELBySerialNumber(instrSearched.getSerialNumber());
+          index = getInstructionToUpdate(instrSearched.getSerialNumber());
 
           if (index != -1) {
             elementsList.get(index).addState("M2");
@@ -256,7 +261,7 @@ public class CycleBuilder {
         }
 
         if ((instrSearched = cpu.getInstructionByFuncUnit("MULTIPLIER", 3)) != null) {
-          index = getLastELBySerialNumber(instrSearched.getSerialNumber());
+          index = getInstructionToUpdate(instrSearched.getSerialNumber());
 
           if (index != -1) {
             elementsList.get(index).addState("M3");
@@ -264,7 +269,7 @@ public class CycleBuilder {
         }
 
         if ((instrSearched = cpu.getInstructionByFuncUnit("MULTIPLIER", 4)) != null) {
-          index = getLastELBySerialNumber(instrSearched.getSerialNumber());
+          index = getInstructionToUpdate(instrSearched.getSerialNumber());
 
           if (index != -1) {
             elementsList.get(index).addState("M4");
@@ -272,7 +277,7 @@ public class CycleBuilder {
         }
 
         if ((instrSearched = cpu.getInstructionByFuncUnit("MULTIPLIER", 5)) != null) {
-          index = getLastELBySerialNumber(instrSearched.getSerialNumber());
+          index = getInstructionToUpdate(instrSearched.getSerialNumber());
 
           if (index != -1) {
             elementsList.get(index).addState("M5");
@@ -280,7 +285,7 @@ public class CycleBuilder {
         }
 
         if ((instrSearched = cpu.getInstructionByFuncUnit("MULTIPLIER", 6)) != null) {
-          index = getLastELBySerialNumber(instrSearched.getSerialNumber());
+          index = getInstructionToUpdate(instrSearched.getSerialNumber());
 
           if (index != -1) {
             elementsList.get(index).addState("M6");
@@ -288,7 +293,7 @@ public class CycleBuilder {
         }
 
         if ((instrSearched = cpu.getInstructionByFuncUnit("MULTIPLIER", 7)) != null) {
-          index = getLastELBySerialNumber(instrSearched.getSerialNumber());
+          index = getInstructionToUpdate(instrSearched.getSerialNumber());
           boolean M7tagged = false;
 
           if (index != -1) {
@@ -309,7 +314,7 @@ public class CycleBuilder {
         //DIVIDER ------------------------------------------------------
         if ((instrSearched = cpu.getInstructionByFuncUnit("DIVIDER", 0)) != null) {
           boolean DIVtagged = false;
-          index = getLastELBySerialNumber(instrSearched.getSerialNumber());
+          index = getInstructionToUpdate(instrSearched.getSerialNumber());
           stage = elementsList.get(index).getLastState();
 
           if (index != -1) {
