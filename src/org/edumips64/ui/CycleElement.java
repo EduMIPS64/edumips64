@@ -73,9 +73,11 @@ public class CycleElement {
   */
   public void addState(String newState) {
     String lastState = states.getLast();
-    if(!validateStateTransition(lastState, newState)) {
+
+    if (!validateStateTransition(lastState, newState)) {
       logger.severe("State " + newState + " is not allowed after state " + lastState);
     }
+
     states.add(newState);
   }
 
@@ -123,6 +125,7 @@ public class CycleElement {
       // Don't check states that are not in the map.
       return true;
     }
+
     return allowedTransitions.get(curState).contains(nextState);
   }
 }

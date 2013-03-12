@@ -45,7 +45,7 @@ public class CycleBuilder {
   // Groups five stalls (EXNotAvailable, FuncUnitNotAvailable,
   // DividerNotAvailable, RAW, WAW), in order to understand if a new
   // instruction has to be added to "elementsList"
-  int inputStructuralStalls; 
+  int inputStructuralStalls;
 
   public CycleBuilder() {
     cpu = CPU.getInstance();
@@ -66,10 +66,12 @@ public class CycleBuilder {
   public int getInstructionToUpdate(long serialNumber) {
     for (int i = 0; i < elementsList.size(); ++i) {
       CycleElement tmp = elementsList.get(i);
+
       if (tmp.getSerialNumber() == serialNumber && tmp.getUpdateTime() < curTime && !tmp.isFinalized()) {
         return i;
       }
     }
+
     return -1;
   }
 
@@ -122,7 +124,7 @@ public class CycleBuilder {
                 elementsList.get(index).getLastState() == "StEx") {
               elementsList.get(index).addState("EX");
               exTagged = true;
-                }
+            }
 
             //we check if a structural hazard  occurred if there's a difference between the previous value of memoryStall counter and the current one
             if (memoryStalls != cpu.getMemoryStalls() && !exTagged) {
@@ -329,6 +331,7 @@ public class CycleBuilder {
               elementsList.get(index).addState((divCount < 10) ? "D0" + divCountStr : "D" + divCountStr);
             }
           }
+
           DIVtagged = false;
         }
       } else {
@@ -336,8 +339,10 @@ public class CycleBuilder {
         oldTime = 0;
         instructionsCount = 0;
       }
+
       oldTime = curTime;
     }
+
     updateStalls();
   }
 

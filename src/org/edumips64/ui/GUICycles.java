@@ -100,6 +100,7 @@ public class GUICycles extends GUIComponent {
     } else {
       dim2.setSize(splitPane.getDividerLocation(), leftPanel.getHeight());
     }
+
     jsp1.getViewport().setViewSize(dim);
     jsp2.getViewport().setViewSize(dim2);
     jsp2.getViewport().setViewPosition(new Point(0, instrCount * 15));
@@ -108,6 +109,7 @@ public class GUICycles extends GUIComponent {
   }
 
   class RightPanel extends JPanel {
+
     public synchronized void paintComponent(Graphics g) {
       super.paintComponent(g);
       setBackground(Color.white);
@@ -121,13 +123,16 @@ public class GUICycles extends GUIComponent {
 
     public synchronized void fill(Graphics g) {
       int i = 0;
+
       for (CycleElement el: builder.getElementsList()) {
         int j = 0;
         String pre = "IF";
         String ext_st = "";
         int elementTime = el.getTime();
+
         for (String st: el.getStates()) {
           ext_st = "";
+
           if (st.equals("IF")) {
             g.setColor(Config.getColor("IFColor"));
           } else if (st.equals("ID")) {
@@ -162,16 +167,19 @@ public class GUICycles extends GUIComponent {
           g.drawRect(10 + (elementTime + j - 1) * 30, 9 + i * 15, 30, 13);
           g.drawString(st, 15 + (elementTime + j - 1) * 30, 20 + i * 15);
           j++;
+
           if ((!st.equals(" ")) && (!st.equals("RAW"))) {
             pre = st;
           }
         }
+
         i++;
       }
     }
   }
 
   class LeftPanel extends JPanel {
+
     public synchronized void paintComponent(Graphics g) {
       super.paintComponent(g);
       setBackground(Color.white);
@@ -180,6 +188,7 @@ public class GUICycles extends GUIComponent {
       FontMetrics fm1 = g.getFontMetrics(f1);
       g.setFont(f1);
       int i = 0;
+
       for (CycleElement el: builder.getElementsList()) {
         g.drawString(el.getName(), 5, 20 + i * 15);
         i++;
