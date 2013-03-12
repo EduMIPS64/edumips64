@@ -1,5 +1,35 @@
 EduMIPS64 ChangeLog
 -------------------
+1.1 (16/03/2013)
+	New features:
+	- New configuration preference storage system: cross-platform and based on a
+		standard Java feature (Issue #27) (andrea).
+	- New Ant targets to build JAR files with no embedded libraries, useful for
+		distro packagers (andrea)
+
+	Bugs fixed:
+	- Issue #9 (Handle the JavaHelp dependency in a better way) (andrea)
+	- Issue #13 (Fix src-release ant target) (andrea)
+	- Issue #20 (Forwarding error with a H&P example) (andrea)
+	- Issue #21 (Add contact information in the first page of the help) (andrea)
+	- Issue #24 (Mention github issues link in the bugs report dialog) (andrea)
+	- Issue #25 (Resource mechanism doesn't work when the app is not inside a JAR
+		file) (andrea)
+	- GUICycles window was not behaving correctly when the same instruction was
+		present multiple times in the pipeline. (andrea)
+
+
+	Various changes
+	- added several unit tests, including some for the forwarding feature;
+	- better source code organization, with directories that match the package
+	  hierarchy;
+	- source code moved to the org.edumips64 package;
+	- general code clean-up:
+	  * fixed the style, by using an external linter;
+	  * enabled compilation warnings and fixed all of them;
+		* refactored the GUICycle code;
+		* converted everything that needed conversion to UTF-8.
+
 1.0 (24/11/2012)
 	Bugs fixed:
 	- Issue #14 (ant javadoc not working)

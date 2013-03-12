@@ -35,7 +35,7 @@ explains the purpose of each frame and menu, along with a description of the
 configuration dialog, the Dinero frontend dialog, the Manual dialog and
 command line options. The fifth chapter contains some useful examples.
 
-This manual describes EduMIPS64 version 1.0.
+This manual describes EduMIPS64 version 1.1.
 
 .. toctree::
    :maxdepth: 2

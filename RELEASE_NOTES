@@ -1,4 +1,4 @@
-24th of November, 2012                                             EduMIPS64 1.0
+16th of March, 2013                                                EduMIPS64 1.1
 
                            EduMIPS64 RELEASE NOTES	
                            http://www.edumips.org
@@ -9,82 +9,63 @@ graphical debugger.
 Notes for this release:
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This is version 1.0 of EduMIPS64, the first major one since 2007. The codename
-for this release is "Philadelphia", since it is being released from
-Philadelphia (PA), in the USA.
+This is version 1.1 of EduMIPS64, a bug-fix release that follows up on
+version 1.0, that was released almost 4 months ago. The codename for this
+release is "Charleroi", since a good part of the code has been written in the
+Charleroi airport, in Belgium.
 
-The simulator has proven to be quite stable in the last years, and only 4
-bugfix releases have been necessary (less than one per year) despite the
-simulator is being used yearly by a few hundred people.
-
-The 2 big new features since 0.5 are the Floating Point Unit (FPU) support,
-written by Massimo Trubia (max83t) and the new help system based on RST, that
-allows to create both in-app HTML-based help and PDF documentation from a
-single source.
-
-These new features and the demonstrated stability led us to dare to use the
-dreaded 1.0 version number. To keep the software stable, unit tests have been
-added, and even if the coverage is not great the framework will help us to
-keep improving the quality of the code.
+The main areas of improvement for this version are correctness, internal
+cleanliness and packageability.
 
 Please keep in mind that this is still EXPERIMENTAL SOFTWARE. It may
 BURN YOUR HARD DISK, DESTROY ALL YOUR DATA and even GO OUT WITH YOUR
 WIFE/HUSBAND. :)
 
-If you find a bug, please send us a bug report to bugs@edumips.org.
+If you find a bug, please send us a bug report to bugs@edumips.org or open an
+issue on GitHub.
 
 If you use the simulator, please consider subscribing to the low-traffic
 mailing-list edumips64-devel@lists.sourceforge.net, and help us by giving us
 suggestions and sending bug reports. Thanks!
 
-EduMIPS64 is now hosted on GitHub (www.github.com/lupino3/edumips64), and we
-have a git mirror (that lags a bit) on Google Code
+EduMIPS64 is hosted on GitHub (www.github.com/lupino3/edumips64), and we have
+a git mirror (that lags a bit) on Google Code
 (http://code.google.com/p/edumips64/). Our web site is www.edumips.org and we
 still use it to communicate with our users. Releases are done on Sourceforge
 (http://sourceforge.net/projects/edumips64) and we also have a development
 blog on http://edumips64.blogspot.com.
 
-New in this release since last major version (0.5):
+New in this release since last major version (1.0)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 New functionalities:
 --------------------
-- Floating Point Unit support (max83t)
-- Added unit test framework and some unit tests and regression tests (andrea)
-- Embedded JavaHelp viewer (andrea)
-- Added Splash Screen (visible with Java6+, not shown with Java5) (andrea,
-  vanni)
-- Added the MIPS alias to each register's name in the Registers window (andrea)
+- New configuration preference storage system: cross-platform and based on a
+  standard Java feature (Issue #27) (andrea).
+- New Ant targets to build JAR files with no embedded libraries, useful for
+  distro packagers (andrea)
 
-Fixed bugs:
+Bugs fixed:
 -----------
-- Issue #2 (Misaligned memory operations are not handled correctly) (andrea)
-- Issue #8 (Weird GUI under Mac OS X) and #9 (Incorrect behavior of
-  MOVN and MOVZ) (andrea)
-- Issue #10 (Random freeze when executing SYSCALL 5 under Java 7) (andrea)
-- Issue #14 (ant javadoc not working) (andrea)
-- Issue #15 (Make debug mode change verbosity)
-- Data/code window label fixes (andrea):
-  . added labels to the Data frame; 
-  . fixed Data and Code default column widths so that they can be read;
-  . added real-time language change support for Data/Code column labels.
-- Fixed a bug that disallowed access to odd memory locations from the code
-  (odd labels were not correctly parsed). (andrea)
-- Fixed a bug about a stall for synchronous exceptions and forwarding (max83t)
-- Fixed Java 6 Swing bug (andrea)
-- Fixed ReportDialog bug (mancausoft)
-- Fixed aligned read/write with labels (andrea)
-- Fixed MIPS32 alias visualization (thegoodgiant)
-- Updated embedded manual with a SYSCALL page (jesky)
-- Parser bug fixes (mancausoft)
-- Memory bug fixes (mancausoft)
-- Fixed Jump-after-Break bug (andrea)
-- Fixed OSX issues (mancausoft)
+- Issue #9 (Handle the JavaHelp dependency in a better way) (andrea)
+- Issue #13 (Fix src-release ant target) (andrea)
+- Issue #20 (Forwarding error with a H&P example) (andrea)
+- Issue #21 (Add contact information in the first page of the help) (andrea)
+- Issue #24 (Mention github issues link in the bugs report dialog) (andrea)
+- Issue #25 (Resource mechanism doesn't work when the app is not inside a JAR
+  file) (andrea)
+- GUICycles window was not behaving correctly when the same instruction was
+  present multiple times in the pipeline. (andrea)
 
 Misc improvements:
 ------------------
-- Converted the TeX docs to RST, so that the same sources can be used for
-  the PDF manual and for the newly-embedded JavaHelp viewer (andrea)
-- Manual fixes (jesky)
-- Added debug info to svnjar (mancausoft)
-- Removed GUI Log viewer, the debug messages now go to stdout (andrea)
+- Added several unit tests, including some for forwarding and for the FPU
+  (andrea)
+- Better source code organization, with directories that match the package
+  hierarchy (andrea)
+- Source code moved to the org.edumips64 package (andrea)
+- General code clean-up:
+  * fixed the style, by using an external linter (Artistic Style);
+  * enabled compilation warnings and fixed all of them;
+  * refactored the GUICycle code;
+  * converted everything that needed conversion to UTF-8.
