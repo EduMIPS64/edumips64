@@ -28,12 +28,15 @@ package org.edumips64.tests;
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
 import org.edumips64.ui.CycleBuilder;
+import org.edumips64.utils.Config;
 
 import java.util.HashMap;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.Map;
+import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -51,31 +54,64 @@ public class CpuTests {
    */
   class CpuTestStatus {
     int cycles;
-    int wawStalls;
-    int rawStalls;
+    int rawStalls, wawStalls, memStalls;
 
     public CpuTestStatus(CPU cpu) {
       cycles = cpu.getCycles();
       wawStalls = cpu.getWAWStalls();
       rawStalls = cpu.getRAWStalls();
+      memStalls = cpu.getStructuralStallsMemory();
 
       log.warning("Got " + cycles + " cycles, " + rawStalls + " RAW Stalls and " + wawStalls + " WAW stalls.");
     }
   }
 
-  @Before
-  public void setUp() {
+  /** Class to hold the FPU exceptions configuration.
+   */
+  class FPUExceptionsConfig {
+    boolean invalidOperation, overflow, underflow, divideByZero;
+
+    // Constructor, initializes the values from the Config store.
+    public FPUExceptionsConfig() {
+      invalidOperation = Config.getBoolean("INVALID_OPERATION");
+      overflow = Config.getBoolean("OVERFLOW");
+      underflow = Config.getBoolean("UNDERFLOW");
+      divideByZero = Config.getBoolean("DIVIDE_BY_ZERO");
+    }
+
+    // Restore values to the config Store.
+    public void restore() {
+      Config.putBoolean("INVALID_OPERATION", invalidOperation);
+      Config.putBoolean("OVERFLOW", overflow);
+      Config.putBoolean("UNDERFLOW", underflow);
+      Config.putBoolean("DIVIDE_BY_ZERO", divideByZero);
+    }
+  }
+
+  protected FPUExceptionsConfig fec;
+
+  @BeforeClass
+  public static void setup() {
     // Disable logs of level lesser than WARNING.
     Logger rootLogger = log.getParent();
 
     for (Handler h : rootLogger.getHandlers()) {
       h.setLevel(java.util.logging.Level.SEVERE);
     }
+  }
 
+  @Before
+  public void testSetup() {
     cpu = CPU.getInstance();
     cpu.setStatus(CPU.CPUStatus.READY);
     parser = Parser.getInstance();
     Instruction.setEnableForwarding(true);
+    fec = new FPUExceptionsConfig();
+  }
+
+  @After
+  public void testTearDown() {
+    fec.restore();
   }
 
   /** Executes a MIPS64 program, raising an exception if it does not
@@ -220,6 +256,22 @@ public class CpuTests {
     assertEquals(21, statuses.get(false).cycles);
     assertEquals(7, statuses.get(false).wawStalls);
     assertEquals(2, statuses.get(false).rawStalls);
+  }
+
+  @Test
+  public void testFPUMul() throws Exception {
+    // This test contains code that raises exceptions, let's disable them.
+    Config.putBoolean("INVALID_OPERATION", false);
+    Config.putBoolean("OVERFLOW", false);
+    Config.putBoolean("UNDERFLOW", false);
+    Config.putBoolean("DIVIDE_BY_ZERO", false);
+    Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-mul.s");
+
+    // Same behaviour with and without forwarding.
+    assertEquals(43, statuses.get(true).cycles);
+    assertEquals(43, statuses.get(false).cycles);
+    assertEquals(6, statuses.get(true).memStalls);
+    assertEquals(6, statuses.get(false).memStalls);
   }
 
   /* ------- REGRESSION TESTS -------- */
