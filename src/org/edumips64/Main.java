@@ -176,6 +176,7 @@ public class Main extends JApplet {
     if (toOpen != null) {
       resetSimulator(false);
       openFile(toOpen);
+      addFileToRecentMenu(toOpen);
     }
 
     f.setExtendedState(f.getExtendedState() | JFrame.MAXIMIZED_BOTH);
@@ -989,6 +990,7 @@ public class Main extends JApplet {
     initMenuItems();
     return mb;
   }
+
   /** add a new JMenuItem in recent file menu at the position pos for the file "namefile"*/
   private static void addFileToRecentMenu(final String filename) {
     JMenuItem item = new JMenuItem(filename);
@@ -996,19 +998,29 @@ public class Main extends JApplet {
       public void actionPerformed(ActionEvent e) {
         resetSimulator(false);
         openFile(filename);
+        addFileToRecentMenu(filename);
         changeShownMenuItems(cpu.getStatus());
       }
     });
 
-    // Add item to the end of the menu, and remove excess items from the
-    // start (LIFO).
-    lastfiles.add(item);
+    // Add at the top of the list.
+    lastfiles.insert(item, 0);
 
-    while (lastfiles.getItemCount() > 6) {
-      lastfiles.remove(0);
+    // Remove, if present, the old entry pointing to the file just opened.
+    for (int i = 1; i < lastfiles.getItemCount(); ++i) {
+      String cur = ((JMenuItem)lastfiles.getMenuComponent(i)).getText();
+
+      if (cur.equals(item.getText())) {
+        lastfiles.remove(i);
+      }
     }
 
-    // Update configuration
+    // Trim length.
+    if (lastfiles.getItemCount() > 6) {
+      lastfiles.remove(6);
+    }
+
+    // Update configuration.
     String files = new String();
 
     for (Component c : lastfiles.getMenuComponents()) {
@@ -1017,7 +1029,7 @@ public class Main extends JApplet {
       }
     }
 
-    files = files.substring(0, files.length() - 2);
+    files = files.substring(0, files.length() - 1);
     Config.putString("files", files);
   }
 
