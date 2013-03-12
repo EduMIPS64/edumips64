@@ -227,6 +227,8 @@ used in the same way.
 
 * `-f (--file) filename` opens `filename` in the simulator
 
+* `-r (--reset)` resets the stored configuration to the default values
+
 * `-d (--debug)` enters Debug mode
 
 The `--debug` flag has the effect to activate Debug mode. In this mode, a

@@ -93,7 +93,6 @@ public class Main extends JApplet {
 
   private static String openedFile = null;
   public static boolean debug_mode = false;
-
   private static JDesktopPane desk;
 
   private static void usage() {
@@ -126,6 +125,8 @@ public class Main extends JApplet {
           debug_mode = true;
         } else if (args[i].compareTo("-h") == 0 || args[i].compareTo("--help") == 0) {
           printUsageAndExit = true;
+        } else if (args[i].compareTo("-r") == 0 || args[i].compareTo("--reset") == 0) {
+          Config.resetConfiguration();
         } else {
           System.err.println(CurrentLocale.getString("HT.UnrecognizedArgs") + ": " + args[i] + "\n");
           printUsageAndExit = true;

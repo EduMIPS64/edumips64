@@ -148,4 +148,24 @@ public class Config {
   public static Color getColor(String key) {
     return new Color(getInt(key));
   }
+
+  // Reset configuration.
+  public static void resetConfiguration() {
+    for (Map.Entry<String, Object> item : defaults.entrySet()) {
+      String key = item.getKey();
+      Object value = item.getValue();
+
+      if (value instanceof String) {
+        putString(key, (String) value);
+      } else if (value instanceof Integer) {
+        putInt(key, (Integer) value);
+      } else if (value instanceof Boolean) {
+        putBoolean(key, (Boolean) value);
+      } else if (value instanceof Color) {
+        putColor(key, (Color) value);
+      } else {
+        logger.severe("Unknown type for default value " + value + " (" + key + ")");
+      }
+    }
+  }
 }

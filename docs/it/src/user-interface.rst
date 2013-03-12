@@ -236,6 +236,9 @@ esteso possono essere utilizzati indifferentemente.
 
 * `-f (--file) filename` apre `filename` nel simulatore.
 
+* `-r (--reset)` ripristina i valori predefiniti per tutti i parametri di
+  configurazione
+
 * `-d (--debug)` attiva la modalità di debugging.
 
 Nella modalità di debugging è disponibile una nuova finestra, la finestra
