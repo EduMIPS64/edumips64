@@ -69,7 +69,7 @@ public class CpuTests {
     Logger rootLogger = log.getParent();
 
     for (Handler h : rootLogger.getHandlers()) {
-      h.setLevel(java.util.logging.Level.WARNING);
+      h.setLevel(java.util.logging.Level.SEVERE);
     }
 
     cpu = CPU.getInstance();

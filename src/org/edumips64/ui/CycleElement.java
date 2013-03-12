@@ -74,7 +74,7 @@ public class CycleElement {
   public void addState(String newState) {
     String lastState = states.getLast();
     if(!validateStateTransition(lastState, newState)) {
-      logger.warning("State " + newState + " is not allowed after state " + lastState);
+      logger.severe("State " + newState + " is not allowed after state " + lastState);
     }
     states.add(newState);
   }
