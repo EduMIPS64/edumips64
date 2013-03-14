@@ -4,8 +4,8 @@
      (c) 2006-2013 Andrea Spadaccini and the EduMIPS64 dev team.
 
      Useful targets:
-     - standalone-jar   builds the GUI version, with embedded javahelp libraries.
      - slim-jar         builds the GUI version, with no javahelp libraries.
+     - standalone-jar   builds the GUI version, with embedded javahelp libraries.
      - applet-jar       builds the standalone-jar version and signs it, making
                         it suitable for use as a web applet.
      - clean            removes the jar file and the build dir
@@ -14,7 +14,7 @@
 
     The output file names are in the init target.
 -->
-<project name="edumips64" default="standalone-jar" basedir=".">
+<project name="edumips64" default="slim-jar" basedir=".">
 	<target name="init">
         <!-- Set build file properties -->
         <property name="sourceDir" value="src/org/edumips64/" />
@@ -43,17 +43,15 @@
         <property name="debug" value="on" />
 	</target>
 
-    <target name="mkdirs" depends="init">
-        <!-- Create directories for the compilation process. -->
+  <target name="mkdirs" depends="init">
+    <!-- Create directories for the compilation process. -->
 		<mkdir dir="${outputDir}" />
-		<mkdir dir="${outputDir}/edumips64/img" />
-		<mkdir dir="${outputDir}/edumips64/utils" />
-		<mkdir dir="${outputDir}/edumips64/help" />
-    </target>
+  </target>
 
     <!-- *** clean *** target that cleans the built files and the build directory-->
 	<target name="clean" depends="init,cleandocs">
 		<delete file="${standalone_jar_filename}" />
+		<delete file="${tarbz2File}" />
 		<delete file="${applet_jar_filename}" />
 		<delete file="${slim_jar_filename}" />
 		<delete file="${cli_jar_filename}" />
@@ -61,22 +59,22 @@
         <delete dir="${javadocDir}" />
 	</target>
 
-    <target name="cleandocs" depends="init">
-        <delete dir="${docs_src_it}/../output" />
-        <delete dir="${docs_src_en}/../output" />
-    </target>
+  <target name="cleandocs" depends="init">
+      <delete dir="${docs_src_it}/../output" />
+      <delete dir="${docs_src_en}/../output" />
+  </target>
 
     <!-- *** javadoc *** build the javadoc -->
 	<target name="javadoc" depends="init">
-        <mkdir dir="${javadocDir}" />
-        <javadoc
-            destdir="${javadocDir}"
+    <mkdir dir="${javadocDir}" />
+      <javadoc
+        destdir="${javadocDir}"
 		    author="true"
 		    version="true"
 		    use="true"
 		    additionalparam=" -encoding ISO-8859-1"
-		    sourcepath="${sourceDir}/.."
-            	    classpath="${base.classpath}:${base.classpath}"
+        sourcepath="${sourceDir}/../../"
+        classpath="${base.classpath}:${base.classpath}"
 		    packagenames="org.edumips64.*"/>
 	</target>
 
@@ -307,19 +305,29 @@
     </target>
 
     <!-- Source release -->
-    <target name="src-release" depends="init">
-        <mkdir dir="edumips64" />
-		<copy todir="edumips64/">
-			<fileset dir=".">
-				<include name="**/*" />
-				<exclude name="**/*.jar" />
-				<exclude name="${outputDir}" />
-				<exclude name="edumips64" />
-				<exclude name="**/*.tbz2" />
-			</fileset>
-		</copy>
+    <target name="src-release" depends="clean,init">
+      <mkdir dir="edumips64-${version}" />
+      <copy todir="edumips64-${version}/">
+        <fileset dir=".">
+          <include name="authors" />
+          <include name="build.xml" />
+          <include name="ChangeLog" />
+          <include name="LICENSE" />
+          <include name="readme.md" />
+          <include name="RELEASE_NOTES" />
+          <include name="docs/**/*" />
+          <include name="src/**/*" />
+          <include name="utils/**/*" />
+        </fileset>
+      </copy>
+      <mkdir dir="edumips64-${version}/libs" />
+      <copy todir="edumips64-${version}/libs">
+        <fileset dir="misc">
+          <include name="README.libs" />
+        </fileset>
+      </copy>
 
-        <tar destfile="${tarbz2File}" basedir="." includes="edumips64/" compression="bzip2" />
-        <delete dir="edumips64" />
+      <tar destfile="${tarbz2File}" basedir="." includes="edumips64-${version}/" compression="bzip2" />
+      <delete dir="edumips64-${version}" />
     </target>
 </project>
