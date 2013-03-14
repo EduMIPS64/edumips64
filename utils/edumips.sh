@@ -2,14 +2,15 @@
 #
 # Quick and dirty launcher script for edumips64 with external JavaHelp JAR
 # file. This needs to be personalized by packagers. It assumes Debian's
-# locations for Javahelp now, and that edumips64-${VERSION}.jar is in the
-# current directory.
+# locations for Javahelp now, and that it is being run from the source code
+# top-level directory.
 #
 # Author: Andrea Spadaccini <andrea.spadaccini@gmail.com>
 
 JH_JAR=/usr/share/java/jhbasic.jar
-VERSION=1.0
+VERSION=1.1
 EDUMIPS_JAR=edumips64-${VERSION}-nodeps.jar
+SPLASH_IMAGE=src/org/edumips64/img/splash.png
 
 if [ ! -f ${EDUMIPS_JAR} ]; then
     echo "The EduMIPS64 JAR file (${EDUMIPS_JAR}) could not be found."
@@ -21,5 +22,4 @@ if [ ! -f ${JH_JAR} ]; then
     exit 1
 fi
 
-# TODO(andrea): use the splash image specified in the jar manifest.
-java -cp ${EDUMIPS_JAR}:${JH_JAR} edumips64.Main
+java -splash:${SPLASH_IMAGE} -cp ${EDUMIPS_JAR}:${JH_JAR} org.edumips64.Main
