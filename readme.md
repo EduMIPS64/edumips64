@@ -20,6 +20,7 @@ In order to compile EduMIPS64, you need the following tools:
 - Apache Ant version 1.8 or above (needed for JUnit 4 tests)
 - Sphinx (http://sphinx.pocoo.org/) versione 1.0.7 or above
 - GNU Make
+- JavaHelp
 
 The two latter dependencies are needed for the in-application help.
 
@@ -29,9 +30,11 @@ If you need to compile the PDF manual, you will also need:
 If you want to use the automatic style checks (pre-commit hook), then you
 should have Automatic Style (astyle) installed.
 
-A distribution of JUnit 4 is included in the libs/ directory, since it is
-needed for unit test and this project uses Travis CI for continuous
-integration (https://travis-ci.org/lupino3/edumips64).
+A distribution of JUnit 4 and JavaHelp is included in the libs/ directory of
+the git reposiory, but not in the source tarball.
+
+this project uses Travis CI for continuous integration
+(https://travis-ci.org/lupino3/edumips64).
 
 Main Ant targets
 ----------------
@@ -50,15 +53,26 @@ Main Ant targets
 * `clean` removes the jar files, the build directory and the compiled
   documentation
 
-* `test` runs unit tests; it depends on junit4.jar being added to the
-  classpath
+* `test` runs unit tests;
 
 * `cli-jar` build a jar package containing an experimental CLI front-end
 
 * `src-release` builds a tar.bz2 file containing the source distribution
 
-* `javadoc` builds the javadoc documentation (depends on junit4.jar being
-  in CLASSPATH); will store it in the `javadoc` directory.
+* `javadoc` builds the javadoc documentation; will store it in the `javadoc`
+   directory.
+
+Setting the CLASSPATH
+---------------------
+
+Any ant target that requires the compilation of the source code (i.e.,
+creation of application JARs or running unit tests) require that the JavaHelp
+jar is in the CLASSPATH; in addition to this, running unit tests and building
+the javodc require the JUnit 4 jar to be in the classpath. Example::
+
+  CLASSPATH=/usr/share/java/jhall.jar ant
+  CLASSPATH=/usr/share/java/junit4.jar:/usr/share/java/jhall.jar ant test
+  CLASSPATH=/usr/share/java/junit4.jar:/usr/share/java/jhall.jar ant javadoc
 
 Compilation options
 -------------------
