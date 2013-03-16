@@ -1,6 +1,6 @@
 EduMIPS64 ChangeLog
 -------------------
-1.1 (16/03/2013)
+1.1 (16/03/2013) - Charleroi
 	New features:
 	- New configuration preference storage system: cross-platform and based on a
 		standard Java feature (Issue #27) (andrea).
@@ -30,7 +30,7 @@ EduMIPS64 ChangeLog
 		* refactored the GUICycle code;
 		* converted everything that needed conversion to UTF-8.
 
-1.0 (24/11/2012)
+1.0 (24/11/2012) - Philadelphia
 	Bugs fixed:
 	- Issue #14 (ant javadoc not working)
 	- Issue #15 (Make debug mode change verbosity)
