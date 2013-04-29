@@ -24,12 +24,14 @@
 package org.edumips64.ui;
 
 import org.edumips64.utils.Config;
-import javax.swing.*;
-import javax.swing.border.*;
+
 import java.awt.*;
-import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.LinkedList;
+import javax.swing.*;
+import javax.swing.*;
+import javax.swing.border.*;
 
 /** Graphical frontend for DineroIV
  *  @author Andrea Spadaccini
@@ -141,7 +143,14 @@ public class DineroFrontend extends JDialog {
           result.append(">> Dinero path: " + dineroPath + "\n");
           result.append(">> Dinero parameters: " + paramString + "\n");
 
-          Process dinero = Runtime.getRuntime().exec(dineroPath + " " + paramString);
+          LinkedList<String> paramsList = new LinkedList<String>();
+          paramsList.add(dineroPath);
+
+          for (String p : paramString.split(" ")) {
+            paramsList.add(p);
+          }
+
+          Process dinero = Runtime.getRuntime().exec(paramsList.toArray(new String[0]));
           result.append(">> Simulation results:\n");
           // Readers associated with Dinero output streams
           BufferedReader stdErr = new BufferedReader(new InputStreamReader(dinero.getErrorStream()));
