@@ -55,6 +55,14 @@ public abstract class Loading extends LDSTInstructions {
     rt.incrWriteSemaphore();
   }
 
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException {
+    // Will fill in the address variable.
+    super.EX();
+
+    // Save memory access for Dinero trace file
+    dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), memoryOpSize);
+  }
+
   public void WB() throws IrregularStringOfBitsException {
     if (!enableForwarding) {
       doWB();

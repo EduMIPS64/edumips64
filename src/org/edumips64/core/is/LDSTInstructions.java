@@ -92,8 +92,6 @@ public abstract class LDSTInstructions extends Instruction {
       throw new NotAlignException(message);
     }
 
-    // Save memory access for Dinero trace file
-    dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), memoryOpSize);
   };
 
   // This is the method that actually stores/loads data to/from memory, and

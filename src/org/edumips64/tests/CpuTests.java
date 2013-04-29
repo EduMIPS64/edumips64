@@ -30,10 +30,12 @@ import org.edumips64.core.is.*;
 import org.edumips64.ui.CycleBuilder;
 import org.edumips64.utils.Config;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.Map;
+import java.util.Scanner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -48,6 +50,7 @@ public class CpuTests {
   protected Parser parser;
   public static String testsLocation = "src/org/edumips64/tests/data/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
+  protected Dinero dinero = Dinero.getInstance();
 
   /** Class that holds the parts of the CPU status that need to be tested
    * after the execution of a test case.
@@ -55,12 +58,14 @@ public class CpuTests {
   class CpuTestStatus {
     int cycles;
     int rawStalls, wawStalls, memStalls;
+    String traceFile;
 
-    public CpuTestStatus(CPU cpu) {
+    public CpuTestStatus(CPU cpu, String dineroTrace) {
       cycles = cpu.getCycles();
       wawStalls = cpu.getWAWStalls();
       rawStalls = cpu.getRAWStalls();
       memStalls = cpu.getStructuralStallsMemory();
+      traceFile = dineroTrace;
 
       log.warning("Got " + cycles + " cycles, " + rawStalls + " RAW Stalls and " + wawStalls + " WAW stalls.");
     }
@@ -143,8 +148,13 @@ public class CpuTests {
         builder.step();
       }
     } catch (HaltException e) {
-      CpuTestStatus cts = new CpuTestStatus(cpu);
       log.warning("================================= Finished test " + testPath);
+
+      File tmp = File.createTempFile("edumips64", "xdin");
+      tmp.deleteOnExit();
+      dinero.WriteXdinFile(tmp.getAbsolutePath());
+
+      CpuTestStatus cts = new CpuTestStatus(cpu, tmp.getAbsolutePath());
       return cts;
     } finally {
       cpu.reset();
@@ -180,6 +190,14 @@ public class CpuTests {
     assertEquals(cycles_without_forwarding, statuses.get(false).cycles);
   }
 
+  private void runTestAndCompareTracefileWithGolden(String path) throws Exception {
+    CpuTestStatus s = runMipsTest(path);
+    String goldenTrace = testsLocation + path + ".xdin.golden";
+
+    String golden = new Scanner(new File(goldenTrace)).useDelimiter("\\A").next();
+    String trace = new Scanner(new File(s.traceFile)).useDelimiter("\\A").next();
+    assertEquals(golden, trace);
+  }
 
   /* Test for the instruction BREAK */
   @Test(expected = BreakException.class)
@@ -330,5 +348,15 @@ public class CpuTests {
   @Test
   public void testAligned() throws Exception {
     runMipsTest("aligned.s");
+  }
+
+  /* Issue #28: Dinero tracefile tracks both Load and Store memory accesses as
+   * read. */
+  @Test
+  public void testTracefile() throws Exception {
+    runTestAndCompareTracefileWithGolden("tracefile-ld.s");
+    runTestAndCompareTracefileWithGolden("tracefile-ldst.s");
+    runTestAndCompareTracefileWithGolden("tracefile-noldst.s");
+    runTestAndCompareTracefileWithGolden("tracefile-st.s");
   }
 }

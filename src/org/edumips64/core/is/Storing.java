@@ -62,6 +62,14 @@ public abstract class Storing extends LDSTInstructions {
     TR[OFFSET_PLUS_BASE].writeDoubleWord(address);
   }
 
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException {
+    // Will fill in the address variable.
+    super.EX();
+
+    // Save memory access for Dinero trace file
+    dinero.Store(Converter.binToHex(Converter.positiveIntToBin(64, address)), memoryOpSize);
+  }
+
   public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, NotAlignException, AddressErrorException, IrregularWriteOperationException {
     memEl = memory.getCellByAddress(address);
 
