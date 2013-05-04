@@ -213,6 +213,8 @@ public class GUIAbout extends JDialog implements Runnable  {
       G.setColor(new Color(0, 0, 0));
       G.setFont(new Font("Verdana", Font.BOLD, 15));
       G.drawString("Version " + org.edumips64.Main.VERSION + " (" + org.edumips64.Main.CODENAME + ")", 150, 92);
+      G.setFont(new Font("Verdana", Font.PLAIN, 12));
+      G.drawString("Built on " + org.edumips64.Main.build_date + ", git rev " + org.edumips64.Main.git_revision, 150, 112);
       head = logo.getHeight(this);
       G.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
       //inizio stringhe
@@ -258,7 +260,7 @@ public class GUIAbout extends JDialog implements Runnable  {
      */
     public int getAlpha(int line) {
       //border is the value of the height of you wrap of passage from visible to transparent
-      int border = 100;
+      int border = 120;
       return (line <= head || line >= height) ?     // we are out of border?
              0               //  nothing to draw
              : (line > head && line <= border +  head) ? // else, under text but over the upper border?
