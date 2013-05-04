@@ -104,6 +104,8 @@ public class Main extends JApplet {
     System.out.println(CurrentLocale.getString("HT.File"));
     System.out.println(CurrentLocale.getString("HT.Debug"));
     System.out.println(CurrentLocale.getString("HT.Help"));
+    System.out.println(CurrentLocale.getString("HT.Reset"));
+    System.out.println(CurrentLocale.getString("HT.Version"));
   }
 
   private static void showVersion() {
