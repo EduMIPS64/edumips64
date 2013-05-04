@@ -222,8 +222,10 @@ Three command line options are available. They are described in the following
 list, with the long name enclosed in round brackets. Long and short names can be
 used in the same way.
 
-* `-h (--help)` shows a help message containing the
-  simulator version and a brief summary of command line options
+* `-v (--version)` prints the simulator version and exits.
+
+* `-h (--help)` prints a help message with a brief summary of command line
+  options, then exits.
 
 * `-f (--file) filename` opens `filename` in the simulator
 

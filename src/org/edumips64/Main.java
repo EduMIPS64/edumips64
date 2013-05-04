@@ -58,8 +58,11 @@ import java.math.BigInteger;
 
 public class Main extends JApplet {
 
-  public static final String VERSION = "1.1";
-  public static final String CODENAME = "Charleroi";
+  public static String VERSION;
+  public static String CODENAME;
+  public static String build_date;
+  public static String git_revision;
+
   static CPU cpu;
   public static CPUGUIThread cgt;
   static Parser parser;
@@ -96,18 +99,28 @@ public class Main extends JApplet {
   private static JDesktopPane desk;
 
   private static void usage() {
-    System.out.println("EduMIPS64 v. " + VERSION + " (codename: " + CODENAME + ")");
+    showVersion();
     System.out.println(CurrentLocale.getString("HT.Options"));
     System.out.println(CurrentLocale.getString("HT.File"));
     System.out.println(CurrentLocale.getString("HT.Debug"));
     System.out.println(CurrentLocale.getString("HT.Help"));
   }
 
+  private static void showVersion() {
+    System.out.println("EduMIPS64 version " + VERSION + " (codename: " + CODENAME + ", git revision " + git_revision + ", built on " + build_date + ") - Ciao 'mbare.");
+  }
+
   public static void main(String args[]) {
     // Checking CLI parameters...
     // TODO: internationalized messages
     String toOpen = null;
-    boolean printUsageAndExit = false;
+    boolean printUsageAndExit = false, printVersionAndExit = false;
+
+    // Meta properties.
+    VERSION = MetaInfo.get("Signature-Version");
+    CODENAME = MetaInfo.get("Codename");
+    build_date = MetaInfo.get("Build-Date");
+    git_revision = MetaInfo.get("Git-Revision");
 
     if (args.length > 0) {
       for (int i = 0; i < args.length; ++i) {
@@ -125,6 +138,8 @@ public class Main extends JApplet {
           debug_mode = true;
         } else if (args[i].compareTo("-h") == 0 || args[i].compareTo("--help") == 0) {
           printUsageAndExit = true;
+        } else if (args[i].compareTo("-v") == 0 || args[i].compareTo("--version") == 0) {
+          printVersionAndExit = true;
         } else if (args[i].compareTo("-r") == 0 || args[i].compareTo("--reset") == 0) {
           Config.resetConfiguration();
         } else {
@@ -134,6 +149,11 @@ public class Main extends JApplet {
 
         if (printUsageAndExit) {
           usage();
+          return;
+        }
+
+        if (printVersionAndExit) {
+          showVersion();
           return;
         }
       }
@@ -149,7 +169,7 @@ public class Main extends JApplet {
       }
     }
 
-    System.out.println("EduMIPS64 version " + VERSION + " (codename: " + CODENAME + ") - Ciao 'mbare.\n");
+    showVersion();
 
     // Creating the main JFrame
     JFrame.setDefaultLookAndFeelDecorated(true);

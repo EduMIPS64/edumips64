@@ -231,8 +231,10 @@ Sono disponibili tre opzioni da linea di comando. Esse sono descritte di
 seguito, con il nome per esteso scritto tra parentesi.  Nomi abbreviati e per
 esteso possono essere utilizzati indifferentemente.
 
-* `-h (--help)` mostra un messaggio di aiuto contenente la versione del
-  simulatore ed un breve riassunto delle opzioni da linea di comando.
+* `-v (--version)` stampa la versione del simulatore ed esce.
+
+* `-h (--help)` mostra un messaggio di aiuto per le opzioni da linea di
+  comando ed esce.
 
 * `-f (--file) filename` apre `filename` nel simulatore.
 
