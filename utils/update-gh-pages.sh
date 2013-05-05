@@ -5,7 +5,12 @@ set -e
 set -u
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-  echo "Starting to update gh-pages"
+  if [[ "$JAVA_HOME" == *java-6* ]]; then
+    echo "Java 6 worker, updating JAR on GitHub pages"
+  else
+    echo "Non-java 6 worker. Not updating JAR"
+    exit 0
+  fi
 
   echo -n "Building JAR.. "
   ant latest-jar > /dev/null
@@ -29,5 +34,3 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   git push -fq origin gh-pages > /dev/null
   echo "done."
 fi
-
-echo "JDK: ${jdk}"
