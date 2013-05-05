@@ -235,7 +235,7 @@
 
         <property name="jar_filename" value="${slim_jar_filename}" />
         <property name="main_class" value="org.edumips64.Main" />
-        <property name="splash_img" value="${sourceDir}/img/splash.png"/>
+        <property name="splash_img" value="org/edumips64/img/splash.png"/>
 
         <antcall target="copy-help-files" />
         <antcall target="make-jarfile" />
