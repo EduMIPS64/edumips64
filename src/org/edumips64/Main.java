@@ -113,16 +113,15 @@ public class Main extends JApplet {
   }
 
   public static void main(String args[]) {
-    // Checking CLI parameters...
-    // TODO: internationalized messages
-    String toOpen = null;
-    boolean printUsageAndExit = false, printVersionAndExit = false;
-
     // Meta properties.
     VERSION = MetaInfo.get("Signature-Version");
     CODENAME = MetaInfo.get("Codename");
     build_date = MetaInfo.get("Build-Date");
     git_revision = MetaInfo.get("Git-Revision");
+
+    // Checking CLI parameters.
+    String toOpen = null;
+    boolean printUsageAndExit = false, printVersionAndExit = false;
 
     if (args.length > 0) {
       for (int i = 0; i < args.length; ++i) {
