@@ -7,10 +7,6 @@ set -u
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   echo "Starting to update gh-pages"
 
-  echo -n "Installing Sphinx.."
-  pip install Sphinx==1.1.3 --use-mirrors
-  echo "done."
-
   echo -n "Building JAR.. "
   ant latest-jar > /dev/null
   cp edumips64-latest.jar $HOME > /dev/null
