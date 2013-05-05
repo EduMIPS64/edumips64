@@ -34,6 +34,7 @@
     <property name="slim_jar_filename" value="edumips64-${version}-nodeps.jar" />
     <property name="applet_jar_filename" value="edumips64-${version}-applet.jar" />
     <property name="cli_jar_filename" value="edumips64-${version}-cli.jar" />
+    <property name="latest_jar_filename" value="edumips64-latest.jar" />
     <property name="tarbz2File" value="edumips64-${version}.tar.bz2" />
 
     <!-- Docs directories -->
@@ -190,6 +191,30 @@
         <antcall target="copy-help-libs" />
         <antcall target="make-jarfile" />
         <signjar jar="${applet_jar_filename}" keystore="utils/key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
+  </target>
+
+  <!-- *** latest-jar *** like standalone-jar, but with a version-independent filename -->
+  <target name="latest-jar" depends="mkdirs,htmldoc">
+        <javac
+            source="${src_java_version}"
+            target="${dst_java_version}"
+            srcdir="${sourceDir}"
+            excludes="tests/**"
+            destdir="${outputDir}"
+            includeantruntime="false"
+            classpath="${base.classpath}">
+            <compilerarg value="-Xlint"/>
+            <compilerarg value="-Xlint:-serial"/>
+        </javac>
+
+        <property name="jar_filename" value="${latest_jar_filename}" />
+        <property name="main_class" value="org.edumips64.Main" />
+        <property name="splash_img" value="org/edumips64/img/splash.png"/>
+
+        <antcall target="copy-base-files" />
+        <antcall target="copy-help-files" />
+        <antcall target="copy-help-libs" />
+        <antcall target="make-jarfile" />
   </target>
 
     <!-- *** slim-jar *** compile without javahelp. -->
