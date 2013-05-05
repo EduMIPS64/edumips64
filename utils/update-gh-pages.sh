@@ -8,7 +8,7 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   echo "Starting to update gh-pages"
 
   echo -n "Building JAR.. "
-  ant latest-jar > /dev/null
+  ant -v latest-jar
   cp edumips64-latest.jar $HOME > /dev/null
   echo "done."
 
