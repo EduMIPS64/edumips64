@@ -6,19 +6,20 @@ set -u
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   echo "Starting to update gh-pages"
-  echo -n "Building JAR.. "
 
+  echo -n "Installing Sphinx.."
+  pip install Sphinx==1.1.3 --use-mirrors
+  echo "done."
+
+  echo -n "Building JAR.. "
   ant latest-jar > /dev/null
   cp edumips64-latest.jar $HOME > /dev/null
-
   echo "done."
 
   echo -n "Cloning git repo.. "
   cd $HOME
   git config --global user.email "travis@travis-ci.org"
   git config --global user.name "Travis"
-
-  # Use token to clone gh-pages branch
   git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/lupino3/edumips64.git gh-pages > /dev/null
   echo "done."
 
