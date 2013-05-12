@@ -29,6 +29,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -41,6 +42,7 @@ public class DineroFrontend extends JDialog {
   // Attributes are static in order to make them accessible from
   // the nested anonymous classes. They can be static, because at most
   // one instance of DineroFrame will be created in EduMIPS64
+  private static final Logger logger = Logger.getLogger(DineroFrontend.class.getName());
   private static JLabel pathLabel, paramsLabel;
   private static JTextField path, params;
   private static JButton browse, execute;
@@ -55,12 +57,17 @@ public class DineroFrontend extends JDialog {
       this.stdErr = stdErr;
     }
     public void run() {
+      logger.info("Stdout reader is starting now.");
       boolean found = false;
       String s;
 
       try {
         while (!finish) {
-          if (stdOut.ready())
+          logger.info("Waiting for stdout..");
+
+          if (stdOut.ready()) {
+            logger.info("There's data to read.");
+
             while ((s = stdOut.readLine()) != null) {
               if (s.equals("---Simulation complete.")) {
                 found = true;
@@ -70,17 +77,23 @@ public class DineroFrontend extends JDialog {
                 result.append(s + "\n");
               }
             }
+          }
 
-          if (stdErr.ready())
+          logger.info("Waiting for stderr..");
+
+          if (stdErr.ready()) {
+            logger.info("There's data to read.");
+
             while ((s = stdErr.readLine()) != null) {
               result.append(">> Dinero error: " + s + "\n");
             }
+          }
         }
       } catch (java.io.IOException ioe) {
+        logger.info("IOException while reading stdout: " + ioe);
         result.append(">> ERROR: " + ioe);
       }
     }
-
   }
 
   public DineroFrontend(Frame owner) {
@@ -150,6 +163,7 @@ public class DineroFrontend extends JDialog {
             paramsList.add(p);
           }
 
+          logger.info("Starting the Dinero process.");
           Process dinero = Runtime.getRuntime().exec(paramsList.toArray(new String[0]));
           result.append(">> Simulation results:\n");
           // Readers associated with Dinero output streams
@@ -158,13 +172,14 @@ public class DineroFrontend extends JDialog {
           ReadStdOut th = null;
 
           if (org.edumips64.Main.isWindows()) {
+            logger.info("Under Windows, starting the external stdout/stderr reader.");
             th = new ReadStdOut(stdOut, stdErr, result);
             th.start();
           }
 
+          logger.info("Sending the tracefile to Dinero via stdin..");
           // Writer associated with Dinero input streams
           PrintWriter dineroIn = new PrintWriter(dinero.getOutputStream());
-
           String s = new String();
 
           // Let's send the tracefile to Dinero
@@ -174,18 +189,25 @@ public class DineroFrontend extends JDialog {
 
           try {
             // Well, wait for Dinero to terminate
+            logger.info("Data sent. Waiting for Dinero to terminate.");
             dinero.waitFor();
+            logger.info("Dinero terminated.");
           } catch (InterruptedException ie) {
-            ie.printStackTrace();
+            logger.severe("InterruptedException: " + ie);
           }
 
           if (org.edumips64.Main.isWindows()) {
+            logger.severe("Signaling to the thread that Dinero has terminated.");
             th.finish = true;
           } else {
             boolean found = false;
 
             // Let's get the results
-            if (stdOut.ready())
+            logger.info("Waiting for stdout..");
+
+            if (stdOut.ready()) {
+              logger.info("There's data to read.");
+
               while ((s = stdOut.readLine()) != null) {
                 if (s.equals("---Simulation complete.")) {
                   found = true;
@@ -195,14 +217,21 @@ public class DineroFrontend extends JDialog {
                   result.append(s + "\n");
                 }
               }
+            }
 
-            if (stdErr.ready())
+            logger.info("Waiting for stderr..");
+
+            if (stdErr.ready()) {
+              logger.info("There's data to read.");
+
               while ((s = stdErr.readLine()) != null) {
                 result.append(">> Dinero error: " + s + "\n");
               }
+            }
           }
 
         } catch (java.io.IOException ioe) {
+          logger.severe("IOException: " + ioe);
           result.append(">> ERROR: " + ioe);
         }
       }
@@ -239,82 +268,4 @@ public class DineroFrontend extends JDialog {
 
     setSize(850, 500);
   }
-  public static void main(String[] args) {
-    DineroCacheOptions dco = new DineroCacheOptions('u', 1);
-    dco.size = "256k";
-    dco.bsize = "256";
-
-    System.out.println(dco);
-
-    JDialog f = new DineroFrontend(null);
-    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    f.setVisible(true);
-  }
-
 }
-
-
-/** Panel with all the necessary controls to modify the options of a Cache.
- */
-@SuppressWarnings( {"rawtypes", "unchecked"})
-class DineroSingleCachePanel extends JPanel {
-  private DineroCacheOptions dco;
-  private JComboBox size, sizeUnit, bsize, bsizeUnit;
-  private JTextField assoc;
-  private JCheckBox ccc;
-  public DineroSingleCachePanel(char type, int level) {
-    dco = new DineroCacheOptions(type, level);
-
-    String[] sizes = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "512"};
-    String[] units = {" ", "k", "M", "G"};
-
-    size = new JComboBox(sizes);
-    bsize = new JComboBox(sizes);
-
-    sizeUnit = new JComboBox(units);
-    bsizeUnit = new JComboBox(units);
-
-    assoc = new JTextField();
-    ccc = new JCheckBox();
-    ccc.setEnabled(false);
-
-    //setBorder(BorderFactory.createTitledBorder("Level " + level + " cache
-    //(" + type + ")"));
-    //setLayout(new GridLayout(1, 3));
-  }
-}
-
-/** Class holding the config options for a Cache.
- *  Its attributes are public because this class has package visibility, and so
- *  it's used only by the DineroFrontend and the DineroCachePanel classes.
- */
-class DineroCacheOptions {
-  public String size, bsize;
-  public int assoc = 0;
-  public boolean ccc = false;
-
-  private char type;
-  private int level;
-
-  public DineroCacheOptions(char type, int level) {
-    this.type = type;
-    this.level = level;
-  }
-
-  public String toString() {
-    String prefix = "-l" + level + "-" + type;
-    String cmdline = prefix + "size" + " " + size + " ";
-    cmdline += prefix + "bsize" + " " + bsize + " ";
-
-    if (assoc > 0) {
-      cmdline += prefix + "assoc" + " " + assoc + " ";
-    }
-
-    if (ccc) {
-      cmdline += prefix + "ccc" + " ";
-    }
-
-    return cmdline;
-  }
-}
-
