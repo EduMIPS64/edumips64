@@ -48,52 +48,62 @@ public class DineroFrontend extends JDialog {
   private static JButton browse, execute;
   private static JTextArea result;
   private static Container cp;
-  private class ReadStdOut extends Thread {
-    public boolean finish = false;
-    private BufferedReader stdOut;
-    private BufferedReader stdErr;
-    public ReadStdOut(BufferedReader stdOut, BufferedReader stdErr, JTextArea result) {
-      this.stdOut = stdOut;
-      this.stdErr = stdErr;
+
+  private class StreamReader extends Thread {
+    private InputStream stream;
+    private String name;
+    private LinkedList<String> contents;
+    private boolean finished = false;
+    public StreamReader(InputStream stream, String name) {
+      this.stream = stream;
+      this.name = name;
+      this.contents = new LinkedList<String>();
+      this.finished = false;
     }
+
     public void run() {
-      logger.info("Stdout reader is starting now.");
-      boolean found = false;
-      String s;
+      logger.info("Starting the " + name + " StreamReader");
+      BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+      String line;
 
       try {
-        while (!finish) {
-          logger.info("Waiting for stdout..");
-
-          if (stdOut.ready()) {
-            logger.info("There's data to read.");
-
-            while ((s = stdOut.readLine()) != null) {
-              if (s.equals("---Simulation complete.")) {
-                found = true;
-              }
-
-              if (found) {
-                result.append(s + "\n");
-              }
-            }
-          }
-
-          logger.info("Waiting for stderr..");
-
-          if (stdErr.ready()) {
-            logger.info("There's data to read.");
-
-            while ((s = stdErr.readLine()) != null) {
-              result.append(">> Dinero error: " + s + "\n");
-            }
-          }
+        while ((line = br.readLine()) != null) {
+          contents.add(line);
         }
-      } catch (java.io.IOException ioe) {
-        logger.info("IOException while reading stdout: " + ioe);
-        result.append(">> ERROR: " + ioe);
+
+        logger.info("Finished reading from the " + name + " StreamReader");
+      } catch (IOException e) {
+        logger.severe("Exception while reading from the " + name + " StreamReader: " + e);
+      }
+
+      finished = true;
+    }
+
+    public LinkedList<String> getContents() {
+      return contents;
+    }
+
+    // Will always be called after join()
+    public boolean isFinished() {
+      return finished;
+    }
+  }
+
+  private LinkedList<String> extractSimulationResults(LinkedList<String> stdout) {
+    LinkedList<String> result = new LinkedList<String>();
+    boolean found = false;
+
+    for (String line : stdout) {
+      if (line.equals("---Simulation complete.")) {
+        found = true;
+      }
+
+      if (found) {
+        result.add(line + "\n");
       }
     }
+
+    return result;
   }
 
   public DineroFrontend(Frame owner) {
@@ -147,14 +157,8 @@ public class DineroFrontend extends JDialog {
     execute.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         try {
-          // Process representing Dinero
           String dineroPath = path.getText();
           String paramString = params.getText();
-
-          // Cleaning the JTextArea
-          result.setText("");
-          result.append(">> Dinero path: " + dineroPath + "\n");
-          result.append(">> Dinero parameters: " + paramString + "\n");
 
           LinkedList<String> paramsList = new LinkedList<String>();
           paramsList.add(dineroPath);
@@ -163,76 +167,61 @@ public class DineroFrontend extends JDialog {
             paramsList.add(p);
           }
 
+          // Clean up the JTextArea
+          result.setText("");
+
           logger.info("Starting the Dinero process.");
           Process dinero = Runtime.getRuntime().exec(paramsList.toArray(new String[0]));
-          result.append(">> Simulation results:\n");
-          // Readers associated with Dinero output streams
-          BufferedReader stdErr = new BufferedReader(new InputStreamReader(dinero.getErrorStream()));
-          BufferedReader stdOut = new BufferedReader(new InputStreamReader(dinero.getInputStream()));
-          ReadStdOut th = null;
 
-          if (org.edumips64.Main.isWindows()) {
-            logger.info("Under Windows, starting the external stdout/stderr reader.");
-            th = new ReadStdOut(stdOut, stdErr, result);
-            th.start();
-          }
+          logger.info("Creating and starting reader threads for stdout and stderr");
+          StreamReader stdoutReader = new StreamReader(dinero.getInputStream(), "stdout");
+          StreamReader stderrReader = new StreamReader(dinero.getErrorStream(), "stderr");
+          stdoutReader.start();
+          stderrReader.start();
 
-          logger.info("Sending the tracefile to Dinero via stdin..");
-          // Writer associated with Dinero input streams
-          PrintWriter dineroIn = new PrintWriter(dinero.getOutputStream());
-          String s = new String();
-
+          logger.info("Sending the tracefile to Dinero via stdin");
           // Let's send the tracefile to Dinero
+          PrintWriter dineroIn = new PrintWriter(dinero.getOutputStream());
           org.edumips64.core.Dinero.getInstance().writeTraceData(dineroIn);
           dineroIn.flush();
           dineroIn.close();
 
-          try {
-            // Well, wait for Dinero to terminate
-            logger.info("Data sent. Waiting for Dinero to terminate.");
-            dinero.waitFor();
-            logger.info("Dinero terminated.");
-          } catch (InterruptedException ie) {
-            logger.severe("InterruptedException: " + ie);
-          }
+          // Well, wait for Dinero to terminate
+          logger.info("Data sent. Waiting for Dinero to terminate.");
+          dinero.waitFor();
+          logger.info("Dinero terminated.");
+          stdoutReader.join(10000);
+          stderrReader.join(10000);
+          logger.info("Reader threads have been joined. Results: " + stdoutReader.isFinished() + ", " + stderrReader.isFinished());
 
-          if (org.edumips64.Main.isWindows()) {
-            logger.severe("Signaling to the thread that Dinero has terminated.");
-            th.finish = true;
+          // Debug info
+          logger.info("STDOUT: " + stdoutReader.getContents());
+          logger.info("STDERR: " + stderrReader.getContents());
+
+          logger.info("Writing data to the JTextArea..");
+          LinkedList<String> simulationResults = extractSimulationResults(stdoutReader.getContents());
+
+          if (simulationResults.isEmpty()) {
+            result.append(">> Errors while retrieving the simulation results.");
+            result.append(">> STDOUT: " + stdoutReader.getContents());
+            result.append(">> STDERR: " + stderrReader.getContents());
           } else {
-            boolean found = false;
+            result.append(">> Dinero path: " + dineroPath + "\n");
+            result.append(">> Dinero parameters: " + paramString + "\n");
+            result.append(">> Simulation results:\n");
 
-            // Let's get the results
-            logger.info("Waiting for stdout..");
-
-            if (stdOut.ready()) {
-              logger.info("There's data to read.");
-
-              while ((s = stdOut.readLine()) != null) {
-                if (s.equals("---Simulation complete.")) {
-                  found = true;
-                }
-
-                if (found) {
-                  result.append(s + "\n");
-                }
-              }
-            }
-
-            logger.info("Waiting for stderr..");
-
-            if (stdErr.ready()) {
-              logger.info("There's data to read.");
-
-              while ((s = stdErr.readLine()) != null) {
-                result.append(">> Dinero error: " + s + "\n");
-              }
+            for (String line : simulationResults) {
+              result.append(line);
             }
           }
 
+          logger.info("DineroFrontend: all done.");
+        } catch (InterruptedException ie) {
+          result.append(">> ERROR: " + ie);
+          logger.severe("InterruptedException: " + ie);
         } catch (java.io.IOException ioe) {
-          logger.severe("IOException: " + ioe);
           result.append(">> ERROR: " + ioe);
+          logger.severe("IOException: " + ioe);
         }
       }
     });
