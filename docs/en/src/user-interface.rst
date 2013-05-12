@@ -166,6 +166,9 @@ summary of the most important dialogs:
 Settings
 ~~~~~~~~
 In the Settings dialog various aspects of the simulator can be configured.
+Clicking on the "OK" button will cause the options to be saved, while clicking
+on "Cancel" (or simply closing the window) will cause the changes to be
+ignored. Don't forget to click "OK" if you want to save your changes.
 
 The Main Settings tab allow to configure forwarding and the number of steps in the
 Multi Cycle mode.

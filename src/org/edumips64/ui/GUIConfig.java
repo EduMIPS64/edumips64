@@ -49,15 +49,22 @@ public class GUIConfig extends JDialog {
 
   JTabbedPane tabPanel;
   JButton okButton;
-  int width = 500, height = 270;
+  int width = 700, height = 300;
+
+  // Local cache of the configuration values that will need to be applied to
+  // the configuration backend.
+  Map<String, Object> cache;
 
   public GUIConfig(final JFrame owner) {
     super(owner, CurrentLocale.getString("Config.ITEM"), true);
+    logger.info("Building a new GUIConfig instance.");
     MAIN = CurrentLocale.getString("Config.MAIN");
     APPEARANCE = CurrentLocale.getString("Config.APPEARANCE");
     BEHAVIOR = CurrentLocale.getString("Config.BEHAVIOR");
     FPUEXCEPTIONS = CurrentLocale.getString("Config.FPUEXCEPTIONS");
     FPUROUNDING = CurrentLocale.getString("Config.FPUROUNDING");
+
+    cache = new HashMap<String, Object>();
 
     tabPanel = new JTabbedPane();
     tabPanel.addTab(MAIN, makeMainPanel());
@@ -78,15 +85,12 @@ public class GUIConfig extends JDialog {
     setSize(width, height);
     setLocation((getScreenWidth() - getWidth()) / 2, (getScreenHeight() - getHeight()) / 2);
     setVisible(true);
-
   }
 
   GridBagLayout gbl;
   GridBagConstraints gbc;
 
-  //INIZIA ZTUDIO
   private JPanel makeMainPanel() {
-
     gbl = new GridBagLayout();
     gbc = new GridBagConstraints();
 
@@ -105,11 +109,10 @@ public class GUIConfig extends JDialog {
 
     // fill remaining vertical space
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
-    //panel.setSize(width,height - buttonHeight);
     return panel;
   }
-  private JPanel makeBehaviorPanel() {
 
+  private JPanel makeBehaviorPanel() {
     gbl = new GridBagLayout();
     gbc = new GridBagConstraints();
 
@@ -158,7 +161,6 @@ public class GUIConfig extends JDialog {
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
 
     return panel;
-
   }
 
   private JPanel makeRoundingPanel() {
@@ -195,12 +197,9 @@ public class GUIConfig extends JDialog {
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
 
     return panel;
-
   }
 
-
   private JPanel makeAppearancePanel() {
-
     gbl = new GridBagLayout();
     gbc = new GridBagConstraints();
 
@@ -225,12 +224,13 @@ public class GUIConfig extends JDialog {
     addRow(panel, row++, "LONGDOUBLEVIEW", new JCheckBox());
     addRow(panel, row++, "show_aliases", new JCheckBox());
 
-
     // fill remaining vertical space
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
-    //panel.setSize(width,height - buttonHeight);
     return panel;
   }
+
+  // Monster function that adds a given row (label + control) to a given
+  // JPanel, and sets its behaviour according to the type of control.
   public void addRow(JPanel panel, final int row, final String key, final JComponent comp) {
     String title = CurrentLocale.getString("Config." + key.toUpperCase());
     String tip = CurrentLocale.getString("Config." + key.toUpperCase() + ".tip");
@@ -251,7 +251,8 @@ public class GUIConfig extends JDialog {
 
       cbox.setAction(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
-          Config.putBoolean(key, cbox.getModel().isSelected());
+          logger.info("Changing " + key + " to " + cbox.getModel().isSelected());
+          cache.put(key, cbox.getModel().isSelected());
         }
       });
     } else if (comp instanceof JRadioButton) {
@@ -261,6 +262,8 @@ public class GUIConfig extends JDialog {
       rbut.setSelected(Config.getBoolean(key));
 
       // When a radio button is clicked, the other buttons must be deselected.
+      // TODO: more generic handling of radio buttons: currently we have only
+      // one and this code is tailored for it.
       rbut.setAction(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
           LinkedList<String> keys = new LinkedList<String>();
@@ -269,11 +272,11 @@ public class GUIConfig extends JDialog {
           keys.add("TOWARDS_PLUS_INFINITY");
           keys.add("TOWARDS_MINUS_INFINITY");
 
-          Config.putBoolean(key, true);
+          cache.put(key, true);
           keys.remove(key);
 
           for (String k : keys) {
-            Config.putBoolean(k, false);
+            cache.put(k, false);
           }
         }
       });
@@ -284,8 +287,9 @@ public class GUIConfig extends JDialog {
       number.addFocusListener(new FocusAdapter() {
         public void focusLost(FocusEvent e) {
           if (number.isNumber()) {
-            Config.putInt(key, number.getNumber());
+            cache.put(key, number.getNumber());
           } else {
+            logger.info("Error, the specified value is not a number.");
             JOptionPane.showMessageDialog(GUIConfig.this, CurrentLocale.getString("INT_FORMAT_EXCEPTION"), CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
           }
         }
@@ -293,8 +297,9 @@ public class GUIConfig extends JDialog {
       number.setAction(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
           if (number.isNumber()) {
-            Config.putInt(key, number.getNumber());
+            cache.put(key, number.getNumber());
           } else {
+            logger.info("Error, the specified value is not a number.");
             JOptionPane.showMessageDialog(GUIConfig.this, CurrentLocale.getString("INT_FORMAT_EXCEPTION"), CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
           }
         }
@@ -306,13 +311,13 @@ public class GUIConfig extends JDialog {
       text.addFocusListener(new FocusAdapter() {
         public void focusLost(FocusEvent e) {
           logger.info("focus");
-          Config.putString(key, text.getText());
+          cache.put(key, text.getText());
         }
       });
       text.setAction(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
           logger.info("abstract");
-          Config.putString(key, text.getText());
+          cache.put(key, text.getText());
         }
       });
     } else if (comp instanceof JButton) {
@@ -328,7 +333,7 @@ public class GUIConfig extends JDialog {
 
           if (color != null) {
             button.setBackground(color);
-            Config.putColor(key, button.getBackground());
+            cache.put(key, button.getBackground());
           }
         }
       });
@@ -376,6 +381,8 @@ public class GUIConfig extends JDialog {
       public void actionPerformed(final ActionEvent e) {
         // Might be needed if show_alias is changed.
         org.edumips64.Main.getGUIFrontend().updateComponents();
+        // Flush the cache to the actual configuration.
+        Config.mergeFromGenericMap(cache);
         setVisible(false);
 
         if (Instruction.getEnableForwarding() != Config.getBoolean("forwarding")) {

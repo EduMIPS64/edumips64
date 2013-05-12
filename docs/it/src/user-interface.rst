@@ -176,7 +176,9 @@ in vari modi. Ecco un riassunto delle più importanti:
 Impostazioni
 ~~~~~~~~~~~~
 Nella finestra di configurazione possono essere configurati vari aspetti del
-simulatore.
+simulatore. La selezione del tasto "OK" causa il salvataggio delle modifiche
+apportate alla configurazione, mentre il tasto "Cancel" (o la semplice
+chiusura della finestra) comporta il mancato salvataggiu delle stesse.
 
 La sezione "Impostazioni generali" consente di configurare il forwarding ed il
 numero di passi da effettuare nella modalità Cicli multipli.

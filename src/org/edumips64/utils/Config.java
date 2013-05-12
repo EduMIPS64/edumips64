@@ -151,7 +151,11 @@ public class Config {
 
   // Reset configuration.
   public static void resetConfiguration() {
-    for (Map.Entry<String, Object> item : defaults.entrySet()) {
+    mergeFromGenericMap(defaults);
+  }
+
+  public static void mergeFromGenericMap(Map<String, Object> values) {
+    for (Map.Entry<String, Object> item : values.entrySet()) {
       String key = item.getKey();
       Object value = item.getValue();
 
@@ -164,7 +168,7 @@ public class Config {
       } else if (value instanceof Color) {
         putColor(key, (Color) value);
       } else {
-        logger.severe("Unknown type for default value " + value + " (" + key + ")");
+        logger.severe("Unknown type for value " + value + " (" + key + ")");
       }
     }
   }
