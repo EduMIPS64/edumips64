@@ -62,7 +62,7 @@ public abstract class Storing extends LDSTInstructions {
     TR[OFFSET_PLUS_BASE].writeDoubleWord(address);
   }
 
-  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException {
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException, AddressErrorException {
     // Will fill in the address variable.
     super.EX();
 

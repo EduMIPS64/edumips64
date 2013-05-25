@@ -187,6 +187,10 @@ public class CPUGUIThread extends Thread {
               haltCPU();
               logger.info(ex.getMessage());
               JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, ex.getMessage(), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
+            } catch (AddressErrorException ex) {
+              haltCPU();
+              logger.info(ex.getMessage());
+              JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, ex.getMessage(), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
             } catch (MemoryElementNotFoundException ex) {
               logger.info("Attempt to read a non-existent cell");
               haltCPU();
@@ -264,6 +268,10 @@ public class CPUGUIThread extends Thread {
 
               break;
             } catch (NotAlignException ex) {
+              haltCPU();
+              logger.info(ex.getMessage());
+              JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, ex.getMessage(), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
+            } catch (AddressErrorException ex) {
               haltCPU();
               logger.info(ex.getMessage());
               JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, ex.getMessage(), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);

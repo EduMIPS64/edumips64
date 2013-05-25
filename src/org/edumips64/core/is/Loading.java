@@ -55,7 +55,7 @@ public abstract class Loading extends LDSTInstructions {
     rt.incrWriteSemaphore();
   }
 
-  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException {
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException, AddressErrorException {
     // Will fill in the address variable.
     super.EX();
 

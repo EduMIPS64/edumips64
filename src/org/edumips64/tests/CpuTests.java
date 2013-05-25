@@ -359,4 +359,10 @@ public class CpuTests {
     runTestAndCompareTracefileWithGolden("tracefile-noldst.s");
     runTestAndCompareTracefileWithGolden("tracefile-st.s");
   }
+
+  /* Issue #36: StringIndexOutOfBoundsException raised at run-time. */
+  @Test(expected = AddressErrorException.class)
+  public void testNegativeAddress() throws Exception {
+    runMipsTest("negative-address-issue-36.s");
+  }
 }

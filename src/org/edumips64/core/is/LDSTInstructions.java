@@ -80,9 +80,16 @@ public abstract class LDSTInstructions extends Instruction {
   }
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, WAWException {};
 
-  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException {
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException, AddressErrorException {
     // Compute the address
     address = TR[OFFSET_PLUS_BASE].getValue();
+
+    // Address must be >= 0
+    if (address < 0) {
+      String message = CurrentLocale.getString("NEGADDRERR") + " " + fullname + ". " +
+                       CurrentLocale.getString("ADDRESS") + ": " + address + ".";
+      throw new AddressErrorException(message);
+    }
 
     // Check alignment
     if (address % memoryOpSize != 0) {
