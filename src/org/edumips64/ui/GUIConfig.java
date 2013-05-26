@@ -74,12 +74,14 @@ public class GUIConfig extends JDialog {
     tabPanel.addTab(APPEARANCE, makeAppearancePanel());
 
     final JPanel buttonPanel = new JPanel();
+    buttonPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
     addButtons(buttonPanel);
 
     getRootPane().setDefaultButton(okButton);
-    getContentPane().setLayout(new BorderLayout());
-    getContentPane().add("North", tabPanel);
-    getContentPane().add("South", buttonPanel);
+    Container content = getContentPane();
+
+    content.add(tabPanel, BorderLayout.CENTER);
+    content.add(buttonPanel, BorderLayout.PAGE_END);
 
     //pack();
     setSize(width, height);
