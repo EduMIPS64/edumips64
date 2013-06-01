@@ -1,19 +1,18 @@
 EduMIPS64 ChangeLog
 -------------------
 1.2 (01/06/2013) - Ringsend
-
   Bugs fixed:
-	- Settings window's buttons are often hidden bug (Issue #38)
-	- StringIndexOutOfBoundsException raised at run-time bug (Issue #36)
-  - The Dinero frontend sometimes hangs while running Dinero under Windows bug
+	- Settings window's buttons are often hidden (Issue #38)
+	- StringIndexOutOfBoundsException raised at run-time (Issue #36)
+  - The Dinero frontend sometimes hangs while running Dinero under Windows
     (Issue #35)
   - Consistency issues between the Settings window and the actual options' value
     (Issue #34)
-  - Missing Italian strings for --help bug (Issue #33)
-  - Splash screen not working for "slim" jar bug (Issue #31)
+  - Missing Italian strings for --help (Issue #33)
+  - Splash screen not working for "slim" jar (Issue #31)
   - Dinero Frontend does not support paths containing spaces for the DineroIV
-    executable bug (Issue #29)
-  - Dinero tracefile tracks both Load and Store memory accesses as read bug (Issue
+    executable (Issue #29)
+  - Dinero tracefile tracks both Load and Store memory accesses as read (Issue
     #28)
 
   Internal cleanup:
