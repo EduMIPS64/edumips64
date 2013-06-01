@@ -107,12 +107,14 @@
         <exec executable="make" failonerror="true" dir="${docs_src_it}">
             <arg line="latexpdf"/>
         </exec>
+        <copy file="docs/it/output/latex/EduMIPS64.pdf" tofile="edumips64-${version}-manual-it.pdf"/>
     </target>
 
     <target name="pdf_en" depends="init">
         <exec executable="make" failonerror="true" dir="${docs_src_en}">
             <arg line="latexpdf"/>
         </exec>
+        <copy file="docs/en/output/latex/EduMIPS64.pdf" tofile="edumips64-${version}-manual-en.pdf"/>
     </target>
 
     <!-- *** test *** run unit tests-->
