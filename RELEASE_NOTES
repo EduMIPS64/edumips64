@@ -1,4 +1,4 @@
-16th of March, 2013                                                EduMIPS64 1.1
+1st of June, 2013                                                  EduMIPS64 1.1
 
                            EduMIPS64 RELEASE NOTES	
                            http://www.edumips.org
@@ -9,13 +9,14 @@ graphical debugger.
 Notes for this release:
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This is version 1.1 of EduMIPS64, a bug-fix release that follows up on
-version 1.0, that was released almost 4 months ago. The codename for this
-release is "Charleroi", since a good part of the code has been written in the
-Charleroi airport, in Belgium.
+This is version 1.2 of EduMIPS64, a bug-fix release that follows up on
+version 1.1, that was released almost 3 months ago. The codename for this
+release is "Ringsend", since most of the code has been written in the
+beautiful neighborhood of Ringsend, in Dublin 4.
 
-The main areas of improvement for this version are correctness, internal
-cleanliness and packageability.
+This release mainly fixes bugs in the Dinero Frontend, plus another critical
+bug (access to negative memory addresses would just raise a
+StringIndexOutOfBoundException) and includes some internal cleanups.
 
 Please keep in mind that this is still EXPERIMENTAL SOFTWARE. It may
 BURN YOUR HARD DISK, DESTROY ALL YOUR DATA and even GO OUT WITH YOUR
@@ -47,15 +48,31 @@ New functionalities:
 
 Bugs fixed:
 -----------
-- Issue #9 (Handle the JavaHelp dependency in a better way) (andrea)
-- Issue #13 (Fix src-release ant target) (andrea)
-- Issue #20 (Forwarding error with a H&P example) (andrea)
-- Issue #21 (Add contact information in the first page of the help) (andrea)
-- Issue #24 (Mention github issues link in the bugs report dialog) (andrea)
-- Issue #25 (Resource mechanism doesn't work when the app is not inside a JAR
-  file) (andrea)
+- Build JAR for every master push and make it available at a known location
+(Issue #30)
+- Refactor sphinx conf.py code internal-cleanup (Issue #18)
+- Automatically populate version fields throughout the code/docs (Issue #17)
+- Settings window's buttons are often hidden (Issue #38)
+- StringIndexOutOfBoundsException raised at run-time (Issue #36)
+- The Dinero frontend sometimes hangs while running Dinero under Windows
+  (Issue #35)
+- Consistency issues between the Settings window and the actual options' value
+  (Issue #34)
+- Missing Italian strings for --help (Issue #33)
+- Splash screen not working for "slim" jar (Issue #31)
+- Dinero Frontend does not support paths containing spaces for the DineroIV
+  executable (Issue #29)
+- Dinero tracefile tracks both Load and Store memory accesses as read (Issue
+  #28)
+- Handle the JavaHelp dependency in a better way (Issue #9)
+- Fix src-release ant target (Issue #13)
+- Forwarding error with a H&P example (Issue #20)
+- Add contact information in the first page of the help (Issue #21)
+- Mention github issues link in the bugs report dialog (Issue #24)
+- Resource mechanism doesn't work when the app is not inside a JAR
+  file (Issue #25)
 - GUICycles window was not behaving correctly when the same instruction was
-  present multiple times in the pipeline. (andrea)
+  present multiple times in the pipeline.
 
 Misc improvements:
 ------------------
