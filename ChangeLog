@@ -1,5 +1,27 @@
 EduMIPS64 ChangeLog
 -------------------
+1.2 (01/06/2013) - Ringsend
+
+  Bugs fixed:
+	- Settings window's buttons are often hidden bug (Issue #38)
+	- StringIndexOutOfBoundsException raised at run-time bug (Issue #36)
+  - The Dinero frontend sometimes hangs while running Dinero under Windows bug
+    (Issue #35)
+  - Consistency issues between the Settings window and the actual options' value
+    (Issue #34)
+  - Missing Italian strings for --help bug (Issue #33)
+  - Splash screen not working for "slim" jar bug (Issue #31)
+  - Dinero Frontend does not support paths containing spaces for the DineroIV
+    executable bug (Issue #29)
+  - Dinero tracefile tracks both Load and Store memory accesses as read bug (Issue
+    #28)
+
+  Internal cleanup:
+	- Build JAR for every master push and make it available at a known location
+	(Issue #30)
+	- Refactor sphinx conf.py code internal-cleanup (Issue #18)
+	- Automatically populate version fields throughout the code/docs (Issue #17)
+
 1.1 (16/03/2013) - Charleroi
 	New features:
 	- New configuration preference storage system: cross-platform and based on a
