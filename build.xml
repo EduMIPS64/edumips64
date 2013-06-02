@@ -6,8 +6,6 @@
      Useful targets:
      - slim-jar         builds the GUI version, with no javahelp libraries.
      - standalone-jar   builds the GUI version, with embedded javahelp libraries.
-     - applet-jar       builds the standalone-jar version and signs it, making
-                        it suitable for use as a web applet.
      - clean            removes the jar file and the build dir
      - docs             builds the HTML and PDF docs, both in english and in 
                         italian
@@ -32,7 +30,6 @@
     <!-- File names -->
     <property name="standalone_jar_filename" value="edumips64-${version}.jar" />
     <property name="slim_jar_filename" value="edumips64-${version}-nodeps.jar" />
-    <property name="applet_jar_filename" value="edumips64-${version}-applet.jar" />
     <property name="cli_jar_filename" value="edumips64-${version}-cli.jar" />
     <property name="latest_jar_filename" value="edumips64-latest.jar" />
     <property name="tarbz2File" value="edumips64-${version}.tar.bz2" />
@@ -56,7 +53,6 @@
   <target name="clean" depends="init,cleandocs">
     <delete file="${standalone_jar_filename}" />
     <delete file="${tarbz2File}" />
-    <delete file="${applet_jar_filename}" />
     <delete file="${slim_jar_filename}" />
     <delete file="${cli_jar_filename}" />
         <delete dir="${outputDir}" />
@@ -168,33 +164,6 @@
         <antcall target="make-jarfile" />
   </target>
 
-    <!-- *** applet-jar *** like standalone-jar, but sign it at the end. -->
-  <target name="applet-jar" depends="mkdirs,htmldoc">
-        <javac
-            source="${src_java_version}"
-            target="${dst_java_version}"
-            srcdir="${sourceDir}"
-            excludes="tests/**"
-            destdir="${outputDir}"
-            includeantruntime="false"
-            debug="${debug}"
-            classpath="${base.classpath}"
-            debuglevel="lines,vars,source">
-            <compilerarg value="-Xlint"/>
-            <compilerarg value="-Xlint:-serial"/>
-        </javac>
-
-        <property name="jar_filename" value="${applet_jar_filename}" />
-        <property name="main_class" value="org.edumips64.Main" />
-        <property name="splash_img" value="${sourceDir}/img/splash.png"/>
-
-        <antcall target="copy-base-files" />
-        <antcall target="copy-help-files" />
-        <antcall target="copy-help-libs" />
-        <antcall target="make-jarfile" />
-        <signjar jar="${applet_jar_filename}" keystore="utils/key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
-  </target>
-
   <!-- *** latest-jar *** like standalone-jar, but with a version-independent filename -->
   <target name="latest-jar" depends="mkdirs,htmldoc">
         <javac
@@ -279,6 +248,7 @@
             </manifest>
         </jar>
         <delete dir="${outputDir}" />
+        <signjar jar="${jar_filename}" keystore="utils/key-edumips" storepass="123456" keypass="123456" alias="edumips64" />
   </target>
 
     <!-- Utility targets to copy files. -->
