@@ -150,6 +150,7 @@
             srcdir="${sourceDir}"
             excludes="tests/**"
             destdir="${outputDir}"
+            debug="${debug}"
             includeantruntime="false"
             classpath="${base.classpath}">
             <compilerarg value="-Xlint"/>
@@ -174,6 +175,7 @@
             srcdir="${sourceDir}"
             excludes="tests/**"
             destdir="${outputDir}"
+            debug="${debug}"
             includeantruntime="false"
             classpath="${base.classpath}">
             <compilerarg value="-Xlint"/>
