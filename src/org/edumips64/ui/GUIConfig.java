@@ -22,11 +22,13 @@
  */
 package org.edumips64.ui;
 
-import org.edumips64.utils.Config;
-import org.edumips64.utils.CurrentLocale;
-import org.edumips64.Main;
-import org.edumips64.core.is.Instruction;
 import org.edumips64.core.CPU;
+import org.edumips64.core.is.Instruction;
+import org.edumips64.Main;
+import org.edumips64.utils.ConfigBuilder;
+import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.ConfigStoreTypeException;
+import org.edumips64.utils.CurrentLocale;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -41,6 +43,7 @@ import java.awt.event.*;
 public class GUIConfig extends JDialog {
 
   private static final Logger logger = Logger.getLogger(GUIConfig.class.getName());
+  private static ConfigStore config = ConfigBuilder.getConfig();
   String MAIN;
   String APPEARANCE;
   String FPUEXCEPTIONS;
@@ -249,7 +252,7 @@ public class GUIConfig extends JDialog {
       //Setting Component
       cbox.setHorizontalAlignment(SwingConstants.LEFT);
       cbox.setVerticalAlignment(SwingConstants.CENTER);
-      cbox.setSelected(Config.getBoolean(key));
+      cbox.setSelected(config.getBoolean(key));
 
       cbox.setAction(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
@@ -261,7 +264,7 @@ public class GUIConfig extends JDialog {
       final JRadioButton rbut = (JRadioButton) comp;
       rbut.setHorizontalAlignment(SwingConstants.LEFT);
       rbut.setVerticalAlignment(SwingConstants.CENTER);
-      rbut.setSelected(Config.getBoolean(key));
+      rbut.setSelected(config.getBoolean(key));
 
       // When a radio button is clicked, the other buttons must be deselected.
       // TODO: more generic handling of radio buttons: currently we have only
@@ -284,7 +287,7 @@ public class GUIConfig extends JDialog {
       });
     } else if (comp instanceof JNumberField) {
       final JNumberField number = (JNumberField) comp;
-      number.setNumber(Config.getInt(key));
+      number.setNumber(config.getInt(key));
 
       number.addFocusListener(new FocusAdapter() {
         public void focusLost(FocusEvent e) {
@@ -308,7 +311,7 @@ public class GUIConfig extends JDialog {
       });
     } else if (comp instanceof JTextField) {
       final JTextField text = (JTextField) comp;
-      text.setText(Config.getString(key));
+      text.setText(config.getString(key));
 
       text.addFocusListener(new FocusAdapter() {
         public void focusLost(FocusEvent e) {
@@ -325,7 +328,7 @@ public class GUIConfig extends JDialog {
     } else if (comp instanceof JButton) {
       final JButton button = (JButton) comp;
       button.setBounds(0, 0, 50, 10);
-      button.setBackground(Config.getColor(key));
+      button.setBackground(config.getColor(key));
       button.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           Color color = JColorChooser.showDialog(
@@ -381,25 +384,30 @@ public class GUIConfig extends JDialog {
     });
     okButton.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        // Might be needed if show_alias is changed.
-        org.edumips64.Main.getGUIFrontend().updateComponents();
-        // Flush the cache to the actual configuration.
-        Config.mergeFromGenericMap(cache);
-        setVisible(false);
 
-        if (Instruction.getEnableForwarding() != Config.getBoolean("forwarding")) {
-          CPU cpu = CPU.getInstance();
-          Instruction.setEnableForwarding(Config.getBoolean("forwarding"));
+        try {
+          // Flush the cache to the actual configuration.
+          config.mergeFromGenericMap(cache);
+          // Might be needed if show_alias is changed.
+          org.edumips64.Main.getGUIFrontend().updateComponents();
 
-          // Let's verify that we have to reset the CPU
-          if (cpu.getStatus() == CPU.CPUStatus.RUNNING) {
-            logger.info("Reset");
-            org.edumips64.Main.resetSimulator(true);
+          if (Instruction.getEnableForwarding() != config.getBoolean("forwarding")) {
+            CPU cpu = CPU.getInstance();
+            Instruction.setEnableForwarding(config.getBoolean("forwarding"));
+
+            // Let's verify that we have to reset the CPU
+            if (cpu.getStatus() == CPU.CPUStatus.RUNNING) {
+              logger.info("Reset");
+              org.edumips64.Main.resetSimulator(true);
+            }
           }
+
+          org.edumips64.Main.updateCGT();
+        } catch (ConfigStoreTypeException ex) {
+          logger.severe("Unknown type encountered while storing the configuration.");
         }
 
-        org.edumips64.Main.updateCGT();
-
+        setVisible(false);
       }
     });
   }

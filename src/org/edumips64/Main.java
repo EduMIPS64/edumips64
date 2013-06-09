@@ -67,8 +67,8 @@ public class Main extends JApplet {
   public static CPUGUIThread cgt;
   static Parser parser;
   static GUIFrontend front;
-  static JFileChooser jfc = new JFileChooser(new File(Config.getString("lastdir")));
-  static Config cfg;
+  static ConfigStore configStore = ConfigBuilder.getConfig();
+  static JFileChooser jfc = new JFileChooser(new File(configStore.getString("lastdir")));
 
   static JFrame f = null;
   private static JMenuItem open, reset, exit, single_cycle, run_to, multi_cycle, aboutUs, dinero_tracefile, tile, dinFrontend, manual, settings, stop;
@@ -142,7 +142,7 @@ public class Main extends JApplet {
         } else if (args[i].compareTo("-v") == 0 || args[i].compareTo("--version") == 0) {
           printVersionAndExit = true;
         } else if (args[i].compareTo("-r") == 0 || args[i].compareTo("--reset") == 0) {
-          Config.resetConfiguration();
+          configStore.resetConfiguration();
         } else {
           System.err.println(CurrentLocale.getString("HT.UnrecognizedArgs") + ": " + args[i] + "\n");
           printUsageAndExit = true;
@@ -691,7 +691,7 @@ public class Main extends JApplet {
 
         if (val == JFileChooser.APPROVE_OPTION) {
           String filename = jfc.getSelectedFile().getPath();
-          Config.putString("lastdir", jfc.getCurrentDirectory().getAbsolutePath());
+          configStore.putString("lastdir", jfc.getCurrentDirectory().getAbsolutePath());
           addFileToRecentMenu(filename);
 
           resetSimulator(false);
@@ -702,7 +702,7 @@ public class Main extends JApplet {
     });
 
     // Add recently opened files menu items to the recent files submenu.
-    for (String filename : Arrays.asList(Config.getString("files").split(File.pathSeparator))) {
+    for (String filename : Arrays.asList(configStore.getString("files").split(File.pathSeparator))) {
       if (filename.length() > 0) {
         log.info("Adding '" + filename + "' to recently opened files.");
         addFileToRecentMenu(filename);
@@ -786,7 +786,7 @@ public class Main extends JApplet {
     multi_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
     multi_cycle.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        cgt.setSteps(Config.getInt("n_step"));
+        cgt.setSteps(configStore.getInt("n_step"));
 
         synchronized (cgt) {
           cgt.notify();
@@ -1051,7 +1051,7 @@ public class Main extends JApplet {
     }
 
     files = files.substring(0, files.length() - 1);
-    Config.putString("files", files);
+    configStore.putString("files", files);
   }
 
   /** Sets the caption of the menu item, adding, if possible, the mnemonic */

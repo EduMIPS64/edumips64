@@ -28,7 +28,8 @@ package org.edumips64.tests;
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
 import org.edumips64.ui.CycleBuilder;
-import org.edumips64.utils.Config;
+import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.ConfigBuilder;
 
 import java.io.File;
 import java.util.HashMap;
@@ -51,6 +52,7 @@ public class CpuTests {
   public static String testsLocation = "src/org/edumips64/tests/data/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
   protected Dinero dinero = Dinero.getInstance();
+  protected ConfigStore config = ConfigBuilder.getConfig();
 
   /** Class that holds the parts of the CPU status that need to be tested
    * after the execution of a test case.
@@ -78,18 +80,18 @@ public class CpuTests {
 
     // Constructor, initializes the values from the Config store.
     public FPUExceptionsConfig() {
-      invalidOperation = Config.getBoolean("INVALID_OPERATION");
-      overflow = Config.getBoolean("OVERFLOW");
-      underflow = Config.getBoolean("UNDERFLOW");
-      divideByZero = Config.getBoolean("DIVIDE_BY_ZERO");
+      invalidOperation = config.getBoolean("INVALID_OPERATION");
+      overflow = config.getBoolean("OVERFLOW");
+      underflow = config.getBoolean("UNDERFLOW");
+      divideByZero = config.getBoolean("DIVIDE_BY_ZERO");
     }
 
     // Restore values to the config Store.
     public void restore() {
-      Config.putBoolean("INVALID_OPERATION", invalidOperation);
-      Config.putBoolean("OVERFLOW", overflow);
-      Config.putBoolean("UNDERFLOW", underflow);
-      Config.putBoolean("DIVIDE_BY_ZERO", divideByZero);
+      config.putBoolean("INVALID_OPERATION", invalidOperation);
+      config.putBoolean("OVERFLOW", overflow);
+      config.putBoolean("UNDERFLOW", underflow);
+      config.putBoolean("DIVIDE_BY_ZERO", divideByZero);
     }
   }
 
@@ -279,10 +281,10 @@ public class CpuTests {
   @Test
   public void testFPUMul() throws Exception {
     // This test contains code that raises exceptions, let's disable them.
-    Config.putBoolean("INVALID_OPERATION", false);
-    Config.putBoolean("OVERFLOW", false);
-    Config.putBoolean("UNDERFLOW", false);
-    Config.putBoolean("DIVIDE_BY_ZERO", false);
+    config.putBoolean("INVALID_OPERATION", false);
+    config.putBoolean("OVERFLOW", false);
+    config.putBoolean("UNDERFLOW", false);
+    config.putBoolean("DIVIDE_BY_ZERO", false);
     Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-mul.s");
 
     // Same behaviour with and without forwarding.

@@ -99,6 +99,7 @@ public class ErrorDialog extends JDialog {
     table.getColumnModel().getColumn(3).setCellRenderer(renderer);
 
     int i = 0;
+    boolean warnings = ConfigBuilder.getConfig().getBoolean("warnings");
 
     for (ParserException e : peList) {
       lineIsError[i] = e.isError();
@@ -107,7 +108,7 @@ public class ErrorDialog extends JDialog {
         numError++;
       }
 
-      if (lineIsError[i] || Config.getBoolean("warnings")) {
+      if (lineIsError[i] || warnings) {
         dft.addRow(e.getStringArray());
         i++;
       }
@@ -139,7 +140,7 @@ public class ErrorDialog extends JDialog {
     setSize(width, height);
     setLocation((getScreenWidth() - getWidth()) / 2, (getScreenHeight() - getHeight()) / 2);
 
-    if (!(Config.getBoolean("warnings")) && numError == 0) {
+    if (!warnings && numError == 0) {
       setVisible(false);
       dispose();
     } else {

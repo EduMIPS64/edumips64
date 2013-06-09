@@ -23,7 +23,6 @@
 
 package org.edumips64.ui;
 
-import org.edumips64.utils.Config;
 import org.edumips64.utils.*;
 import javax.swing.*;
 import javax.swing.border.*;

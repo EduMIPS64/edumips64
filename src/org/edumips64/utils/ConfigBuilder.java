@@ -1,28 +1,5 @@
-/* Config.java
- *
- * This class manages the user settings.
- * (c) 2006-2013 EduMIPS64 project - Rizzo Vanni G., Andrea Spadaccini
- *
- * This file is part of the EduMIPS64 project, and is released under the GNU
- * General Public License.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
-package org.edumips64.utils;
 
-import org.edumips64.Main;
+package org.edumips64.utils;
 
 import java.awt.Color;
 import java.io.*;
@@ -31,16 +8,15 @@ import java.util.jar.*;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
-/** This class manage the org.edumips64.config file
- * used for saving user preferences (like language, etc)
- */
-public class Config {
-  private static Map<String, Object> defaults;
-  private static Preferences prefs;
-  private static final Logger logger = Logger.getLogger(Config.class.getName());
+// Configuration builder, to be used by client code to obtain an instance of
+// ConfigStore.
+public class ConfigBuilder {
+  private static final Logger logger = Logger.getLogger(ConfigBuilder.class.getName());
+  private static ConfigStore instance;
+
+  static final Map<String, Object> defaults;
 
   static {
-    prefs = Preferences.userRoot().node("edumips64.config");
     defaults = new HashMap<String, Object>();
 
     // Global parameters.
@@ -86,16 +62,32 @@ public class Config {
 
     // How to show memory cells containing floating point values.
     defaults.put("LONGDOUBLEVIEW", true);  // long=true  double=false
+
+    instance = new JavaPrefsConfigStore(defaults);
+    // TODO: Choose which implementation to use. If the one based on the Java
   }
 
-  // Getter/setter for each type.
+  public static ConfigStore getConfig() {
+    return instance;
+  }
 
-  // ---- String
-  public static void putString(String key, String value) {
+}
+
+class JavaPrefsConfigStore extends ConfigStore {
+  private static final Logger logger = Logger.getLogger(JavaPrefsConfigStore.class.getName());
+  private Preferences prefs;
+  private Map<String, Object> defaults;
+
+  public JavaPrefsConfigStore(Map<String, Object> defaults) {
+    prefs = Preferences.userRoot().node("edumips64.config");
+    this.defaults = defaults;
+  }
+
+  public void putString(String key, String value) {
     prefs.put(key, value);
   }
 
-  public static String getString(String key) {
+  public String getString(String key) {
     String default_value = "";
 
     if (defaults.containsKey(key)) {
@@ -107,12 +99,11 @@ public class Config {
     return prefs.get(key, default_value);
   }
 
-  // ---- Integer
-  public static void putInt(String key, int value) {
+  public void putInt(String key, int value) {
     prefs.putInt(key, value);
   }
 
-  public static int getInt(String key) {
+  public int getInt(String key) {
     int default_value = 0;
 
     if (defaults.containsKey(key)) {
@@ -124,12 +115,11 @@ public class Config {
     return prefs.getInt(key, default_value);
   }
 
-  // ---- Boolean
-  public static void putBoolean(String key, boolean value) {
+  public void putBoolean(String key, boolean value) {
     prefs.putBoolean(key, value);
   }
 
-  public static boolean getBoolean(String key) {
+  public boolean getBoolean(String key) {
     boolean default_value = false;
 
     if (defaults.containsKey(key)) {
@@ -139,37 +129,5 @@ public class Config {
     }
 
     return prefs.getBoolean(key, default_value);
-  }
-
-  // ---- Color. Serialized as an int.
-  public static void putColor(String key, Color value) {
-    putInt(key, value.getRGB());
-  }
-  public static Color getColor(String key) {
-    return new Color(getInt(key));
-  }
-
-  // Reset configuration.
-  public static void resetConfiguration() {
-    mergeFromGenericMap(defaults);
-  }
-
-  public static void mergeFromGenericMap(Map<String, Object> values) {
-    for (Map.Entry<String, Object> item : values.entrySet()) {
-      String key = item.getKey();
-      Object value = item.getValue();
-
-      if (value instanceof String) {
-        putString(key, (String) value);
-      } else if (value instanceof Integer) {
-        putInt(key, (Integer) value);
-      } else if (value instanceof Boolean) {
-        putBoolean(key, (Boolean) value);
-      } else if (value instanceof Color) {
-        putColor(key, (Color) value);
-      } else {
-        logger.severe("Unknown type for value " + value + " (" + key + ")");
-      }
-    }
   }
 }

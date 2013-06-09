@@ -85,6 +85,8 @@ public class CPU {
   public static final int CODELIMIT = 1024; // bus da 12 bit (2^12 / 4)
   public static final int DATALIMIT = 512;  // bus da 12 bit (2^12 / 8)
 
+  /** Simulator configuration */
+  private ConfigStore config;
 
   private static CPU cpu;
 
@@ -96,6 +98,7 @@ public class CPU {
     cpu = null;
   }
   private CPU() {
+    config = ConfigBuilder.getConfig();
     //instructions enumerating
     serialNumberSeed = 0;
     // To avoid future singleton problems
@@ -147,7 +150,6 @@ public class CPU {
     terminatingInstructionsOPCodes = conf.getTerminatingInstructions();
 
     logger.info("CPU Created.");
-
   }
 
 
@@ -426,8 +428,8 @@ public class CPU {
     boolean SIMUL_MODE_DISABLED = false;
     int breaking = 0;
     // Used for exception handling
-    boolean masked = Config.getBoolean("syncexc-masked");
-    boolean terminate = Config.getBoolean("syncexc-terminate");
+    boolean masked = config.getBoolean("syncexc-masked");
+    boolean terminate = config.getBoolean("syncexc-terminate");
 
     configFPExceptionsAndRM();
 
@@ -847,19 +849,19 @@ public class CPU {
 
   public void configFPExceptionsAndRM() {
     try {
-      FCSR.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, Config.getBoolean("INVALID_OPERATION"));
-      FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW, Config.getBoolean("OVERFLOW"));
-      FCSR.setFPExceptions(CPU.FPExceptions.UNDERFLOW, Config.getBoolean("UNDERFLOW"));
-      FCSR.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO, Config.getBoolean("DIVIDE_BY_ZERO"));
+      FCSR.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, config.getBoolean("INVALID_OPERATION"));
+      FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW, config.getBoolean("OVERFLOW"));
+      FCSR.setFPExceptions(CPU.FPExceptions.UNDERFLOW, config.getBoolean("UNDERFLOW"));
+      FCSR.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO, config.getBoolean("DIVIDE_BY_ZERO"));
 
       //setting the rounding mode
-      if (Config.getBoolean("NEAREST")) {
+      if (config.getBoolean("NEAREST")) {
         FCSR.setFCSRRoundingMode(FPRoundingMode.TO_NEAREST);
-      } else if (Config.getBoolean("TOWARDZERO")) {
+      } else if (config.getBoolean("TOWARDZERO")) {
         FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARD_ZERO);
-      } else if (Config.getBoolean("TOWARDS_PLUS_INFINITY")) {
+      } else if (config.getBoolean("TOWARDS_PLUS_INFINITY")) {
         FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_PLUS_INFINITY);
-      } else if (Config.getBoolean("TOWARDS_MINUS_INFINITY")) {
+      } else if (config.getBoolean("TOWARDS_MINUS_INFINITY")) {
         FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_MINUS_INFINITY);
       }
     } catch (IrregularStringOfBitsException ex) {

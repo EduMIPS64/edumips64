@@ -209,6 +209,7 @@ public class GUICode extends GUIComponent {
       label = new JLabel();
       Font f = new Font("Monospaced", Font.PLAIN, 12);
       int rowTable = row;
+      ConfigStore config = ConfigBuilder.getConfig();
 
       if (column == 0) {
         try {
@@ -247,42 +248,42 @@ public class GUICode extends GUIComponent {
 
       if (rowTable == ifIndex) {
         label.setOpaque(true);
-        label.setBackground(Config.getColor("IFColor"));
+        label.setBackground(config.getColor("IFColor"));
       }
 
       if (rowTable == idIndex) {
         label.setOpaque(true);
-        label.setBackground(Config.getColor("IDColor"));
+        label.setBackground(config.getColor("IDColor"));
       }
 
       if (rowTable == exIndex) {
         label.setOpaque(true);
-        label.setBackground(Config.getColor("EXColor"));
+        label.setBackground(config.getColor("EXColor"));
       }
 
       if (rowTable == memIndex) {
         label.setOpaque(true);
-        label.setBackground(Config.getColor("MEMColor"));
+        label.setBackground(config.getColor("MEMColor"));
       }
 
       if (rowTable == wbIndex) {
         label.setOpaque(true);
-        label.setBackground(Config.getColor("WBColor"));
+        label.setBackground(config.getColor("WBColor"));
       }
 
       if (rowTable == M1Index || rowTable == M2Index || rowTable == M3Index || rowTable == M4Index || rowTable == M5Index || rowTable == M6Index || rowTable == M7Index) {
         label.setOpaque(true);
-        label.setBackground(Config.getColor("FPMultiplierColor"));
+        label.setBackground(config.getColor("FPMultiplierColor"));
       }
 
       if (rowTable == A1Index || rowTable == A2Index || rowTable == A3Index || rowTable == A4Index) {
         label.setOpaque(true);
-        label.setBackground(Config.getColor("FPAdderColor"));
+        label.setBackground(config.getColor("FPAdderColor"));
       }
 
       if (rowTable == DIVIndex) {
         label.setOpaque(true);
-        label.setBackground(Config.getColor("FPDividerColor"));
+        label.setBackground(config.getColor("FPDividerColor"));
       }
 
       return label;

@@ -21,7 +21,6 @@
 
 package org.edumips64.core.is;
 
-
 import org.edumips64.core.*;
 import org.edumips64.core.fpu.*;
 import org.edumips64.utils.*;
@@ -46,7 +45,7 @@ public abstract class Instruction {
   protected Register[] TR; //is not static because each instruction has got its own registers
   protected RegisterFP[] TRfp;
   protected String fullname;
-  protected static boolean enableForwarding = Config.getBoolean("forwarding");
+  protected static boolean enableForwarding = ConfigBuilder.getConfig().getBoolean("forwarding");
   protected String label;
   protected static final Logger logger = Logger.getLogger(Instruction.class.getName());
   protected Integer serialNumber;
@@ -61,8 +60,8 @@ public abstract class Instruction {
     repr.reset(false);
     syntax = new String();
     //generating a serial number for the current instruction
-    serialNumber = Config.getInt("serialNumber");;
-    Config.putInt("serialNumber", serialNumber + 1);
+    serialNumber = ConfigBuilder.getConfig().getInt("serialNumber");;
+    ConfigBuilder.getConfig().putInt("serialNumber", serialNumber + 1);
 
     //initialization of temporary registers
     for (int i = 0; i < TR.length; i++) {

@@ -1,6 +1,6 @@
-/* Locale.java
+/* CurrentLocale.java
  *
- * This class gives the current Local settings.
+ * This class gives the current locale settings.
  * (c) 2006
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 public class CurrentLocale {
 
   static Map<String, Map<String, String>> languages;
+  private static ConfigStore config = ConfigBuilder.getConfig();
 
   private static final Logger logger = Logger.getLogger(CurrentLocale.class.getName());
 
@@ -68,11 +69,11 @@ public class CurrentLocale {
   }
 
   public static void setLanguage(String language) {
-    Config.putString("language", language);
+    config.putString("language", language);
   }
 
   public static String getString(String key) {
-    String lang_name = Config.getString("language");
+    String lang_name = config.getString("language");
 
     try {
       Map<String, String> lang = languages.get(lang_name);
@@ -84,6 +85,6 @@ public class CurrentLocale {
   }
 
   public static boolean isSelected(String lan) {
-    return Config.getString("language").equals(lan);
+    return config.getString("language").equals(lan);
   }
 }

@@ -24,7 +24,8 @@
 
 package org.edumips64.ui;
 
-import org.edumips64.utils.Config;
+import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.ConfigBuilder;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -46,6 +47,7 @@ public class GUICycles extends GUIComponent {
   Dimension dim, dim2;
 
   CycleBuilder builder;
+  static ConfigStore config = ConfigBuilder.getConfig();
 
   public GUICycles() {
     super();
@@ -134,31 +136,31 @@ public class GUICycles extends GUIComponent {
           ext_st = "";
 
           if (st.equals("IF")) {
-            g.setColor(Config.getColor("IFColor"));
+            g.setColor(config.getColor("IFColor"));
           } else if (st.equals("ID")) {
-            g.setColor(Config.getColor("IDColor"));
+            g.setColor(config.getColor("IDColor"));
           } else if (st.equals("EX")) {
-            g.setColor(Config.getColor("EXColor"));
+            g.setColor(config.getColor("EXColor"));
           } else if (st.equals("MEM")) {
-            g.setColor(Config.getColor("MEMColor"));
+            g.setColor(config.getColor("MEMColor"));
           } else if (st.equals("WB")) {
-            g.setColor(Config.getColor("WBColor"));
+            g.setColor(config.getColor("WBColor"));
           } else if (st.equals("Str")) {
-            g.setColor(Config.getColor("EXColor"));
+            g.setColor(config.getColor("EXColor"));
           } else if (st.equals("A1") || st.equals("A2") || st.equals("A3") || st.equals("A4") || st.equals("StAdd")) {
-            g.setColor(Config.getColor("FPAdderColor"));
+            g.setColor(config.getColor("FPAdderColor"));
           } else if (st.equals("M1") || st.equals("M2") || st.equals("M3") || st.equals("M4") || st.equals("M5") || st.equals("M6") || st.equals("M7") || st.equals("StMul")) {
-            g.setColor(Config.getColor("FPMultiplierColor"));
+            g.setColor(config.getColor("FPMultiplierColor"));
           } else if (st.matches("D[0-2][0-9]") || st.matches("DIV")) {
-            g.setColor(Config.getColor("FPDividerColor"));
+            g.setColor(config.getColor("FPDividerColor"));
           } else if (st.equals("RAW")) {
-            g.setColor(Config.getColor("IDColor"));
+            g.setColor(config.getColor("IDColor"));
           } else if (st.equals("WAW") || st.equals("StDiv") || st.equals("StEx") || st.equals("StFun")) {
-            g.setColor(Config.getColor("IDColor"));
+            g.setColor(config.getColor("IDColor"));
           } else if (st.equals(" ")) {
             if (pre.equals("IF")) {
               ext_st = " ";
-              g.setColor(Config.getColor("IFColor"));
+              g.setColor(config.getColor("IFColor"));
             }
           }
 
