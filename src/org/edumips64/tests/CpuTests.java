@@ -52,7 +52,7 @@ public class CpuTests {
   public static String testsLocation = "src/org/edumips64/tests/data/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
   protected Dinero dinero = Dinero.getInstance();
-  protected ConfigStore config = ConfigBuilder.getConfig();
+  protected ConfigStore config = ConfigBuilder.getTmpConfig();
 
   /** Class that holds the parts of the CPU status that need to be tested
    * after the execution of a test case.
