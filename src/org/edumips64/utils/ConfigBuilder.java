@@ -1,4 +1,3 @@
-
 package org.edumips64.utils;
 
 import java.awt.Color;
@@ -8,8 +7,7 @@ import java.util.jar.*;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
-// Configuration builder, to be used by client code to obtain an instance of
-// ConfigStore.
+/** Configuration builder, to be used to obtain an instance of ConfigStore. */
 public class ConfigBuilder {
   private static final Logger logger = Logger.getLogger(ConfigBuilder.class.getName());
   private static ConfigStore instance;
@@ -22,6 +20,8 @@ public class ConfigBuilder {
     // Global parameters.
     defaults.put("language", "en");
     defaults.put("files", "");
+    // TODO(andrea): this will create problems in the applet, and needs to be
+    // encapsulated in some way.
     defaults.put("lastdir", System.getProperty("user.dir"));
     defaults.put("dineroIV", "dineroIV");
     defaults.put("serialNumber", 0);
@@ -63,16 +63,37 @@ public class ConfigBuilder {
     // How to show memory cells containing floating point values.
     defaults.put("LONGDOUBLEVIEW", true);  // long=true  double=false
 
-    instance = new JavaPrefsConfigStore(defaults);
-    // TODO: Choose which implementation to use. If the one based on the Java
+    try {
+      instance = new JavaPrefsConfigStore(defaults);
+    } catch (Exception e) {
+      logger.warning("Could not access the Java Preferences API. Using in-memory configuration storage. Error: " + e);
+      instance = new InMemoryConfigStore(defaults);
+    }
   }
 
+  /** Factory method for ConfigStore instances.
+   *
+   * The class tries to build and return a ConfigStore object backed by
+   * persistent storage. If it fails (e.g., because we are in a context were
+   * our backends don't work) it will return an ephemeral ConfigStore
+   * instance, stored in memory.
+   *
+   * @return an instance of a class derived by ConfigStore.
+   */
   public static ConfigStore getConfig() {
     return instance;
   }
 
+  /** Factory method for temporary ConfigStore instances.
+   *
+   * @return a memory-backed ConfigStore instance.
+   */
+  public static ConfigStore getTmpConfig() {
+    return new InMemoryConfigStore(defaults);
+  }
 }
 
+/** ConfigStore implementation based on the Java Preferences API */
 class JavaPrefsConfigStore extends ConfigStore {
   private static final Logger logger = Logger.getLogger(JavaPrefsConfigStore.class.getName());
   private Preferences prefs;
@@ -132,6 +153,7 @@ class JavaPrefsConfigStore extends ConfigStore {
   }
 }
 
+/** ConfigStore implementation based on in-memory storage. */
 class InMemoryConfigStore extends ConfigStore {
   private static final Logger logger = Logger.getLogger(InMemoryConfigStore.class.getName());
   private Map<String, Object> data;
