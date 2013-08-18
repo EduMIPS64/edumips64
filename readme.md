@@ -72,7 +72,7 @@ Setting the CLASSPATH
 Any ant target that requires the compilation of the source code (i.e.,
 creation of application JARs or running unit tests) require that the JavaHelp
 jar is in the CLASSPATH; in addition to this, running unit tests and building
-the javodc require the JUnit 4 jar to be in the classpath. Example::
+the javadoc require the JUnit 4 jar to be in the classpath. Example::
 
   CLASSPATH=/usr/share/java/jhall.jar ant
   CLASSPATH=/usr/share/java/junit4.jar:/usr/share/java/jhall.jar ant test
