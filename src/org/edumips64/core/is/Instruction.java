@@ -28,8 +28,7 @@ import org.edumips64.utils.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.lang.Enum.*;
-//debug
-import org.edumips64.Main;
+
 /**Abstract class: it provides all methods and attributes for each instruction type
  *
  * @author Trubia Massimo, Russo Daniele
