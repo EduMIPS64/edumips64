@@ -800,6 +800,7 @@ public class CPU {
     Dinero.getInstance().reset();
 
     logger.info("CPU Resetted");
+    config = ConfigManager.getConfig();
   }
 
   /** Test method that returns a string containing the status of the pipeline.
