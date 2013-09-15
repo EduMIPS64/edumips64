@@ -22,7 +22,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.edumips64.ui;
-import org.edumips64.utils.ConfigBuilder;
+import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
@@ -43,7 +43,7 @@ public class GUIPipeline extends GUIComponent {
 
   Map <CPU.PipeStatus, Instruction> pipeline;
 
-  private ConfigStore config = ConfigBuilder.getConfig();
+  private ConfigStore config = ConfigManager.getConfig();
 
   /**
   * Set the number of multiplier latency stages.

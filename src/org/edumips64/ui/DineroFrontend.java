@@ -23,7 +23,7 @@
 
 package org.edumips64.ui;
 
-import org.edumips64.utils.ConfigBuilder;
+import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;
 
 import java.awt.*;
@@ -113,7 +113,7 @@ public class DineroFrontend extends JDialog {
     cp = rootPane.getContentPane();
     cp.setLayout(new BoxLayout(cp, BoxLayout.PAGE_AXIS));
 
-    final ConfigStore config = ConfigBuilder.getConfig();
+    final ConfigStore config = ConfigManager.getConfig();
 
     Dimension hSpace = new Dimension(5, 0);
     Dimension vSpace = new Dimension(0, 5);

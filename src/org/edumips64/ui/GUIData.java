@@ -135,7 +135,7 @@ public class GUIData extends GUIComponent {
                            " " + tableModel.getValueAt(theTable.getSelectedRow(), 0) + " : ";
 
             //if the current memory cell visualization is long
-            if (ConfigBuilder.getConfig().getBoolean("LONGDOUBLEVIEW")) {
+            if (ConfigManager.getConfig().getBoolean("LONGDOUBLEVIEW")) {
               value += Converter.hexToLong("0X" + tableModel.getValueAt(theTable.getSelectedRow(), 1));
             } else { //the current memory cell visualization in the status bar is double, we build a temp. bitset in order to read the double value
               BitSet64FP bs = new BitSet64FP();

@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 /** Interface representing a configuration store for the currently running
  * instance of EduMIPS64. Users of the interface should get the configuration
- * storage object by calling the getConfig method of ConfigBuilder.
+ * storage object by calling the getConfig method of ConfigManager.
  * */
 public abstract class ConfigStore {
   // The interface exposes getter and setter methods for all the supported
@@ -77,7 +77,7 @@ public abstract class ConfigStore {
   // Reset configuration.
   public void resetConfiguration() {
     try {
-      mergeFromGenericMap(ConfigBuilder.defaults);
+      mergeFromGenericMap(ConfigManager.defaults);
     } catch (ConfigStoreTypeException e) {
       // This should never happen, as the defaults are static and defined at
       // compile time.

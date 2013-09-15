@@ -208,7 +208,7 @@ public class GUIRegisters extends GUIComponent {
     }
 
     public String fillFirstColumn(int i) {
-      if (ConfigBuilder.getConfig().getBoolean("show_aliases")) {
+      if (ConfigManager.getConfig().getBoolean("show_aliases")) {
         return registerToAlias(" " + i) + "=";
       } else {
         return "R" + i + " =";

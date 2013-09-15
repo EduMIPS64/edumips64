@@ -98,7 +98,7 @@ public class CPU {
     cpu = null;
   }
   private CPU() {
-    config = ConfigBuilder.getConfig();
+    config = ConfigManager.getConfig();
     //instructions enumerating
     serialNumberSeed = 0;
     // To avoid future singleton problems

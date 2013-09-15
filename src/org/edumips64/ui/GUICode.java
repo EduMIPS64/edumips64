@@ -209,7 +209,7 @@ public class GUICode extends GUIComponent {
       label = new JLabel();
       Font f = new Font("Monospaced", Font.PLAIN, 12);
       int rowTable = row;
-      ConfigStore config = ConfigBuilder.getConfig();
+      ConfigStore config = ConfigManager.getConfig();
 
       if (column == 0) {
         try {

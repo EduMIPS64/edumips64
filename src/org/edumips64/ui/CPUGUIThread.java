@@ -74,7 +74,7 @@ public class CPUGUIThread extends Thread {
    * configuration values from the configuration file.
    */
   public void updateConfigValues() {
-    ConfigStore config = ConfigBuilder.getConfig();
+    ConfigStore config = ConfigManager.getConfig();
     sleep_interval = config.getInt("sleep_interval");
     verbose = config.getBoolean("verbose");
     masked = config.getBoolean("syncexc-masked");

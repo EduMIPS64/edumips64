@@ -8,8 +8,8 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 /** Configuration builder, to be used to obtain an instance of ConfigStore. */
-public class ConfigBuilder {
-  private static final Logger logger = Logger.getLogger(ConfigBuilder.class.getName());
+public class ConfigManager {
+  private static final Logger logger = Logger.getLogger(ConfigManager.class.getName());
   private static ConfigStore instance;
 
   static final Map<String, Object> defaults;

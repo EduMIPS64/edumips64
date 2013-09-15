@@ -25,7 +25,7 @@
 package org.edumips64.ui;
 
 import org.edumips64.utils.ConfigStore;
-import org.edumips64.utils.ConfigBuilder;
+import org.edumips64.utils.ConfigManager;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -47,7 +47,7 @@ public class GUICycles extends GUIComponent {
   Dimension dim, dim2;
 
   CycleBuilder builder;
-  static ConfigStore config = ConfigBuilder.getConfig();
+  static ConfigStore config = ConfigManager.getConfig();
 
   public GUICycles() {
     super();

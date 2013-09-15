@@ -45,7 +45,7 @@ public abstract class Instruction {
   protected Register[] TR; //is not static because each instruction has got its own registers
   protected RegisterFP[] TRfp;
   protected String fullname;
-  protected static boolean enableForwarding = ConfigBuilder.getConfig().getBoolean("forwarding");
+  protected static boolean enableForwarding = ConfigManager.getConfig().getBoolean("forwarding");
   protected String label;
   protected static final Logger logger = Logger.getLogger(Instruction.class.getName());
   protected Integer serialNumber;
@@ -60,8 +60,8 @@ public abstract class Instruction {
     repr.reset(false);
     syntax = new String();
     //generating a serial number for the current instruction
-    serialNumber = ConfigBuilder.getConfig().getInt("serialNumber");;
-    ConfigBuilder.getConfig().putInt("serialNumber", serialNumber + 1);
+    serialNumber = ConfigManager.getConfig().getInt("serialNumber");;
+    ConfigManager.getConfig().putInt("serialNumber", serialNumber + 1);
 
     //initialization of temporary registers
     for (int i = 0; i < TR.length; i++) {

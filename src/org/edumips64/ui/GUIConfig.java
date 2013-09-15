@@ -25,7 +25,7 @@ package org.edumips64.ui;
 import org.edumips64.core.CPU;
 import org.edumips64.core.is.Instruction;
 import org.edumips64.Main;
-import org.edumips64.utils.ConfigBuilder;
+import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigStoreTypeException;
 import org.edumips64.utils.CurrentLocale;
@@ -43,7 +43,7 @@ import java.awt.event.*;
 public class GUIConfig extends JDialog {
 
   private static final Logger logger = Logger.getLogger(GUIConfig.class.getName());
-  private static ConfigStore config = ConfigBuilder.getConfig();
+  private static ConfigStore config = ConfigManager.getConfig();
   String MAIN;
   String APPEARANCE;
   String FPUEXCEPTIONS;

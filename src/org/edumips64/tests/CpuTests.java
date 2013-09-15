@@ -29,7 +29,7 @@ import org.edumips64.core.*;
 import org.edumips64.core.is.*;
 import org.edumips64.ui.CycleBuilder;
 import org.edumips64.utils.ConfigStore;
-import org.edumips64.utils.ConfigBuilder;
+import org.edumips64.utils.ConfigManager;
 
 import java.io.File;
 import java.util.HashMap;
@@ -52,7 +52,7 @@ public class CpuTests {
   public static String testsLocation = "src/org/edumips64/tests/data/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
   protected Dinero dinero = Dinero.getInstance();
-  protected ConfigStore config = ConfigBuilder.getTmpConfig();
+  protected ConfigStore config = ConfigManager.getTmpConfig();
 
   /** Class that holds the parts of the CPU status that need to be tested
    * after the execution of a test case.
@@ -114,7 +114,7 @@ public class CpuTests {
     parser = Parser.getInstance();
     Instruction.setEnableForwarding(true);
     fec = new FPUExceptionsConfig();
-    ConfigBuilder.setConfig(config);
+    ConfigManager.setConfig(config);
   }
 
   @After

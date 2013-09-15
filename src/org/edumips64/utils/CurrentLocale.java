@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 public class CurrentLocale {
 
   static Map<String, Map<String, String>> languages;
-  private static ConfigStore config = ConfigBuilder.getConfig();
+  private static ConfigStore config = ConfigManager.getConfig();
 
   private static final Logger logger = Logger.getLogger(CurrentLocale.class.getName());
 

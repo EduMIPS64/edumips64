@@ -99,7 +99,7 @@ public class ErrorDialog extends JDialog {
     table.getColumnModel().getColumn(3).setCellRenderer(renderer);
 
     int i = 0;
-    boolean warnings = ConfigBuilder.getConfig().getBoolean("warnings");
+    boolean warnings = ConfigManager.getConfig().getBoolean("warnings");
 
     for (ParserException e : peList) {
       lineIsError[i] = e.isError();

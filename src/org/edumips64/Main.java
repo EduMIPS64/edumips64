@@ -67,7 +67,7 @@ public class Main extends JApplet {
   public static CPUGUIThread cgt;
   static Parser parser;
   static GUIFrontend front;
-  static ConfigStore configStore = ConfigBuilder.getConfig();
+  static ConfigStore configStore = ConfigManager.getConfig();
   static JFileChooser jfc = new JFileChooser(new File(configStore.getString("lastdir")));
 
   static JFrame f = null;
