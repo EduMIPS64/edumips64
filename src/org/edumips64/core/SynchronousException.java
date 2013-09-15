@@ -33,6 +33,7 @@ public class SynchronousException extends Exception {
   }
 
   public SynchronousException(String errcode) {
+    super(errcode);
     this.errcode = errcode;
   }
 }
