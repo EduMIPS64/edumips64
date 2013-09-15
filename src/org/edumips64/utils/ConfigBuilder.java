@@ -91,6 +91,12 @@ public class ConfigBuilder {
   public static ConfigStore getTmpConfig() {
     return new InMemoryConfigStore(defaults);
   }
+
+  /** Sets the global configuration object.
+   */
+  public static void setConfig(ConfigStore config) {
+    instance = config;
+  }
 }
 
 /** ConfigStore implementation based on the Java Preferences API */

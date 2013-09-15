@@ -114,6 +114,7 @@ public class CpuTests {
     parser = Parser.getInstance();
     Instruction.setEnableForwarding(true);
     fec = new FPUExceptionsConfig();
+    ConfigBuilder.setConfig(config);
   }
 
   @After
