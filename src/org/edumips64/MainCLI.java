@@ -58,11 +58,11 @@ public class MainCLI {
 
       while (true) {
 
-    	String read = keyboard.readLine();
-    	
-    	if (read == null || read.equals("exit")) {
-    		break;
-    	}
+        String read = keyboard.readLine();
+
+        if (read == null || read.equals("exit")) {
+            break;
+        }
         String[] tokens = read.split(" ");
 
         if (tokens[0].compareToIgnoreCase("help") == 0) {
