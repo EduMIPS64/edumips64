@@ -56,10 +56,13 @@ public class MainCLI {
 
       System.out.print("> ");
 
-      String read = new String();
+      while (true) {
 
-      while ((read = keyboard.readLine()).compareTo("exit") != 0) {
-
+    	String read = keyboard.readLine();
+    	
+    	if (read == null || read.equals("exit")) {
+    		break;
+    	}
         String[] tokens = read.split(" ");
 
         if (tokens[0].compareToIgnoreCase("help") == 0) {
