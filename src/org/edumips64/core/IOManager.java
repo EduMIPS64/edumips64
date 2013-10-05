@@ -94,7 +94,7 @@ public class IOManager {
   private IOManager() {
     ins = new HashMap<Integer, Reader>();
     outs = new HashMap<Integer, Writer>();
-
+    
     // We set the next descriptor to 3, because 0 is stdin, 1 is stdout and
     // 2 is stderr
     next_descriptor = 3;
@@ -231,15 +231,23 @@ public class IOManager {
     }
 
     // Write to stdout or to a classic file
-    if (fd <= 2) {
-      org.edumips64.Main.ioFrame.write(bytes_array);
-    } else {
-      Writer w = outs.get(fd);
-      w.write(new String(bytes_array));
-    }
-
+    write(fd,new String(bytes_array));
     logger.info("Wrote " + buff.toString() + " to fd " + fd);
     return buff.length();
+  }
+  
+  /** Writes a string to a file.
+   * @param fd
+   * @param textToBeWritten
+   * @throws IOException
+   */
+  public void write(int fd, String textToBeWritten)  throws IOException{
+      if (fd <= 2) {
+          org.edumips64.Main.ioFrame.write(textToBeWritten);
+      } else {
+          Writer w = outs.get(fd);
+          w.write(textToBeWritten); 
+      }
   }
 
   /** Reads some bytes from a file, writing them to memory.
