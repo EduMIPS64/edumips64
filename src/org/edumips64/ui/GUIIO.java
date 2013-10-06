@@ -75,17 +75,20 @@ public class GUIIO extends JInternalFrame {
     String s = new String(bytes_array);
     write(s);
   }
-  
+
   /*
    * This method forces the user to introduce  a number of characters that not exceed count.
   */
   public String read(int count) {
     String read_s = null;
+
     do {
       read_s = JOptionPane.showInputDialog(this, CurrentLocale.getString("ENTERINPUT"), "EduMIPS64 - Input", JOptionPane.PLAIN_MESSAGE);
+
       if (read_s == null) {
         read_s = new String();
       }
+
       if (read_s.length() > count) {
         JOptionPane.showMessageDialog(this, CurrentLocale.getString("INPUTNOTEXCEED") + " " + count + " " + CurrentLocale.getString("CHARACTERS"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.INFORMATION_MESSAGE);
       }
@@ -121,7 +124,7 @@ public class GUIIO extends JInternalFrame {
     cp.add(lowerbox);
     setSize(650, 300);
   }
-  
+
   public Writer getWriter() {
     return new WriterProxy(this);
   }
@@ -129,16 +132,16 @@ public class GUIIO extends JInternalFrame {
   public Reader getReader() {
     return new ReaderProxy(this);
   }
-  
+
   /*
    * Proxy Object used by the Main class in order to decouple the GUI from the logic.
    */
-  
-  private class WriterProxy extends Writer{
+
+  private class WriterProxy extends Writer {
 
     public GUIIO guiio;
 
-    public WriterProxy(GUIIO guiio){
+    public WriterProxy(GUIIO guiio) {
 
       this.guiio = guiio;
     }
@@ -155,39 +158,43 @@ public class GUIIO extends JInternalFrame {
     @Override
     public void write(char[] cbuf, int off, int len) throws IOException {
       StringBuffer stringToBeWritten = new StringBuffer();
+
       for (int i = 0; i < len; i++) {
         stringToBeWritten.append(cbuf[off + i]);
       }
-      guiio.write(stringToBeWritten.toString());   
-    }    
+
+      guiio.write(stringToBeWritten.toString());
+    }
 
   }
-  
+
   /*
    * Proxy Object used by the Main class in order to decouple the GUI from the logic.
    */
-  
-  private class ReaderProxy extends Reader{
+
+  private class ReaderProxy extends Reader {
 
     public GUIIO guiio;
 
-    public ReaderProxy(GUIIO guiio){
+    public ReaderProxy(GUIIO guiio) {
 
       this.guiio = guiio;
     }
 
     @Override
     public void close() throws IOException {}
-    
+
     /*
      * @see java.io.Reader#read(char[], int, int)
      */
     @Override
     public int read(char[] cbuf, int off, int len) throws IOException {
       String input = guiio.read(len);
+
       for (int i = 0; i < input.length(); i++) {
         cbuf[off + i] = input.charAt(i);
       }
+
       return input.length();
     }
   }

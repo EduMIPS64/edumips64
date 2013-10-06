@@ -61,8 +61,9 @@ public class MainCLI {
         String read = keyboard.readLine();
 
         if (read == null || read.equals("exit")) {
-            break;
+          break;
         }
+
         String[] tokens = read.split(" ");
 
         if (tokens[0].compareToIgnoreCase("help") == 0) {

@@ -94,7 +94,7 @@ public class IOManager {
   private IOManager() {
     ins = new HashMap<Integer, Reader>();
     outs = new HashMap<Integer, Writer>();
-    
+
     // We set the next descriptor to 3, because 0 is stdin, 1 is stdout and
     // 2 is stderr
     next_descriptor = 3;
@@ -231,15 +231,15 @@ public class IOManager {
     logger.info("Wrote " + buff.toString() + " to fd " + fd);
     return buff.length();
   }
-  
+
   /** Writes a string to a file.
    * @param fd the file descriptor identifying the file
    * @param textToBeWritten text to be written
    * @throws IOException
    */
   public void write(int fd, String textToBeWritten) throws IOException {
-      Writer w = outs.get(fd);
-      w.write(textToBeWritten); 
+    Writer w = outs.get(fd);
+    w.write(textToBeWritten);
   }
 
   /** Reads some bytes from a file, writing them to memory.
@@ -260,6 +260,7 @@ public class IOManager {
 
     logger.info("Read the string " + read_str + " from fd " + fd);
     MemoryElement memEl = null;
+
     try {
       int posInWord = 0;
 
@@ -287,15 +288,15 @@ public class IOManager {
   }
 
   public void setStdOutput(Writer writer) {
-      outs.put(1, writer);
+    outs.put(1, writer);
   }
-  
+
   public void setStdError(Writer writer) {
-      outs.put(2, writer);
+    outs.put(2, writer);
   }
-  
+
   public void setStdInput(Reader reader) {
-      ins.put(0, reader);
+    ins.put(0, reader);
   }
-  
+
 }
