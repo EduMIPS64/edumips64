@@ -197,12 +197,8 @@ public class IOManager {
    */
   public int write(int fd, long address, int count) throws IOManagerException, IOException {
     // Let's verify if we've got a valid file descriptor
-    if (fd <= 2 && fd == 0) {
-      // We can write only to descriptors 1 (stdout) and 2 (stderr)
-      logger.info("Attempt to write to stdin");
-      throw new IOManagerException("WRITETOSTDIN");
-    } else if (fd > 2 && !outs.containsKey(fd)) {
-      logger.info("File descriptor " + fd + " not valid.");
+    if (!outs.containsKey(fd)) {
+      logger.info("File descriptor " + fd + " not valid for writing.");
       throw new IOManagerException("FILENOTOPENED");
     }
 
@@ -231,23 +227,19 @@ public class IOManager {
     }
 
     // Write to stdout or to a classic file
-    write(fd,new String(bytes_array));
+    write(fd, new String(bytes_array));
     logger.info("Wrote " + buff.toString() + " to fd " + fd);
     return buff.length();
   }
   
   /** Writes a string to a file.
-   * @param fd
-   * @param textToBeWritten
+   * @param fd the file descriptor identifying the file
+   * @param textToBeWritten text to be written
    * @throws IOException
    */
-  public void write(int fd, String textToBeWritten)  throws IOException{
-      if (fd <= 2) {
-          org.edumips64.Main.ioFrame.write(textToBeWritten);
-      } else {
-          Writer w = outs.get(fd);
-          w.write(textToBeWritten); 
-      }
+  public void write(int fd, String textToBeWritten) throws IOException {
+      Writer w = outs.get(fd);
+      w.write(textToBeWritten); 
   }
 
   /** Reads some bytes from a file, writing them to memory.
@@ -258,11 +250,8 @@ public class IOManager {
   public int read(int fd, long address, int count) throws IOManagerException, java.io.FileNotFoundException, IOException {
     StringBuffer buff = new StringBuffer();
 
-    if (fd <= 2 && fd > 0) {
-      logger.info("Attempt to read from stdout/stderr");
-      throw new IOManagerException("READFROMSTDOUT");
-    } else if (fd > 2 && !ins.containsKey(fd)) {
-      logger.info("File descriptor " + fd + " not valid.");
+    if (!ins.containsKey(fd)) {
+      logger.info("File descriptor " + fd + " not valid for reading");
       throw new IOManagerException("FILENOTOPENED");
     }
 
@@ -320,4 +309,13 @@ public class IOManager {
 
     return -1;
   }
+
+  public void setStdOutput(Writer writerProxy) {
+      outs.put(1, writerProxy);
+  }
+  
+  public void setStdError(Writer writerProxy) {
+      outs.put(2, writerProxy);
+  }
+  
 }

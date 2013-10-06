@@ -226,7 +226,7 @@ public class Main extends JApplet {
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
     iom = IOManager.getInstance();
-
+    
     desk = new JDesktopPane();
     Container cp = (f == null) ? getContentPane() : f.getContentPane();
     cp.setLayout(new BorderLayout());
@@ -310,8 +310,12 @@ public class Main extends JApplet {
       }
     });
 
-
-
+    // Set the IOManager StdOutput with a Proxy writer from GUIIO
+    iom.setStdOutput(ioFrame.getWriter());
+    
+    // Set the IOManager StdError with a Proxy writer from GUIIO
+    iom.setStdError(ioFrame.getWriter());
+    
     // Needed for internal frames handling
     // TODO: The actual approach is a workaround. To do things in the right
     // way, a new class that derives from JInternalFrame should be created,

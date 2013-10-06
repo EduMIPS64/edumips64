@@ -120,4 +120,37 @@ public class GUIIO extends JInternalFrame {
     cp.add(lowerbox);
     setSize(650, 300);
   }
+  
+  public Writer getWriter() {
+    return new WriterProxy(this);
+  }
+  
+  /*
+   * Proxy Object used by the Main class in order to decouple the GUI from the logic.
+  */
+  private class WriterProxy extends Writer{
+
+    public GUIIO guiio;
+
+    public WriterProxy(GUIIO guiio){
+
+      this.guiio = guiio;
+    }
+
+    @Override
+    public void close() throws IOException {}
+
+    @Override
+    public void flush() throws IOException {}
+
+    @Override
+    public void write(char[] cbuf, int off, int len) throws IOException {}
+
+    public void write(String textToBeWritten){
+      guiio.write(textToBeWritten);
+    }     
+
+  }
+  
+    
 }
