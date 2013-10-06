@@ -260,7 +260,13 @@ public class SYSCALL extends Instruction {
 
       temp.append(format_string.substring(oldIndex));
       logger.info("That became " + temp.toString());
-      org.edumips64.Main.ioFrame.write(temp.toString());
+      //This prints to StdOutput.
+      try {
+        iom.write(1, temp.toString());
+      } catch (IOException e) {
+          JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, CurrentLocale.getString("SYSCALL5_ERROR"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
+      }
+
       return_value = temp.length();
     }
   }

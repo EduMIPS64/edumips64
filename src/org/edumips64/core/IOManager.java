@@ -94,7 +94,7 @@ public class IOManager {
   private IOManager() {
     ins = new HashMap<Integer, Reader>();
     outs = new HashMap<Integer, Writer>();
-
+    
     // We set the next descriptor to 3, because 0 is stdin, 1 is stdout and
     // 2 is stderr
     next_descriptor = 3;
@@ -197,12 +197,8 @@ public class IOManager {
    */
   public int write(int fd, long address, int count) throws IOManagerException, IOException {
     // Let's verify if we've got a valid file descriptor
-    if (fd <= 2 && fd == 0) {
-      // We can write only to descriptors 1 (stdout) and 2 (stderr)
-      logger.info("Attempt to write to stdin");
-      throw new IOManagerException("WRITETOSTDIN");
-    } else if (fd > 2 && !outs.containsKey(fd)) {
-      logger.info("File descriptor " + fd + " not valid.");
+    if (!outs.containsKey(fd)) {
+      logger.info("File descriptor " + fd + " not valid for writing.");
       throw new IOManagerException("FILENOTOPENED");
     }
 
@@ -231,15 +227,19 @@ public class IOManager {
     }
 
     // Write to stdout or to a classic file
-    if (fd <= 2) {
-      org.edumips64.Main.ioFrame.write(bytes_array);
-    } else {
-      Writer w = outs.get(fd);
-      w.write(new String(bytes_array));
-    }
-
+    write(fd, new String(bytes_array));
     logger.info("Wrote " + buff.toString() + " to fd " + fd);
     return buff.length();
+  }
+  
+  /** Writes a string to a file.
+   * @param fd the file descriptor identifying the file
+   * @param textToBeWritten text to be written
+   * @throws IOException
+   */
+  public void write(int fd, String textToBeWritten) throws IOException {
+      Writer w = outs.get(fd);
+      w.write(textToBeWritten); 
   }
 
   /** Reads some bytes from a file, writing them to memory.
@@ -248,44 +248,18 @@ public class IOManager {
    *  @param count the number of bytes to read
    */
   public int read(int fd, long address, int count) throws IOManagerException, java.io.FileNotFoundException, IOException {
-    StringBuffer buff = new StringBuffer();
-
-    if (fd <= 2 && fd > 0) {
-      logger.info("Attempt to read from stdout/stderr");
-      throw new IOManagerException("READFROMSTDOUT");
-    } else if (fd > 2 && !ins.containsKey(fd)) {
-      logger.info("File descriptor " + fd + " not valid.");
+    if (!ins.containsKey(fd)) {
+      logger.info("File descriptor " + fd + " not valid for reading");
       throw new IOManagerException("FILENOTOPENED");
     }
 
-    String read_str = null;
-
-    // Different behaviour for stdin and a normal file
-    if (fd == 0) {
-      read_str = org.edumips64.Main.ioFrame.read(count);
-    } else {
-      Reader r = ins.get(fd);
-
-      for (int i = 0; i < count; ++i) {
-        int read_byte = r.read();
-
-        if (read_byte < 0)
-          // EOF reached
-        {
-          break;
-        }
-
-        buff.append((char) read_byte);
-      }
-
-      read_str = buff.toString();
-      buff.setLength(0);
-    }
+    Reader r = ins.get(fd);
+    char buffer[] = new char[count];
+    int read_byte = r.read(buffer, 0, count);
+    String read_str = new String(buffer);
 
     logger.info("Read the string " + read_str + " from fd " + fd);
-
     MemoryElement memEl = null;
-
     try {
       int posInWord = 0;
 
@@ -299,11 +273,10 @@ public class IOManager {
 
         int rb = (int) read_str.charAt(i);
         memEl.writeByte(rb, posInWord++);
-        buff.append((char) rb);
       }
 
-      logger.info("Wrote " + buff.toString() + " to memory");
-      return buff.length();
+      logger.info("Wrote " + read_str + " to memory");
+      return read_byte;
     } catch (MemoryElementNotFoundException e) {
       throw new IOManagerException("OUTOFMEMORY");
     } catch (IrregularWriteOperationException e) {
@@ -312,4 +285,17 @@ public class IOManager {
 
     return -1;
   }
+
+  public void setStdOutput(Writer writer) {
+      outs.put(1, writer);
+  }
+  
+  public void setStdError(Writer writer) {
+      outs.put(2, writer);
+  }
+  
+  public void setStdInput(Reader reader) {
+      ins.put(0, reader);
+  }
+  
 }
