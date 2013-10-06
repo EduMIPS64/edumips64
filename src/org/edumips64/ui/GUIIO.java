@@ -133,6 +133,7 @@ public class GUIIO extends JInternalFrame {
   /*
    * Proxy Object used by the Main class in order to decouple the GUI from the logic.
    */
+  
   private class WriterProxy extends Writer{
 
     public GUIIO guiio;
@@ -148,12 +149,17 @@ public class GUIIO extends JInternalFrame {
     @Override
     public void flush() throws IOException {}
 
+    /*
+     * @see java.io.Writer#write(char[], int, int)
+     */
     @Override
-    public void write(char[] cbuf, int off, int len) throws IOException {}
-
-    public void write(String textToBeWritten){
-      guiio.write(textToBeWritten);
-    }     
+    public void write(char[] cbuf, int off, int len) throws IOException {
+      StringBuffer stringToBeWritten = new StringBuffer();
+      for (int i = 0; i < len; i++) {
+        stringToBeWritten.append(cbuf[off + i]);
+      }
+      guiio.write(stringToBeWritten.toString());   
+    }    
 
   }
   
