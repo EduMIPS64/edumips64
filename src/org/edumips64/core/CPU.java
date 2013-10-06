@@ -716,9 +716,7 @@ public class CPU {
       if (syncex != null) {
         throw new SynchronousException(syncex);
       }
-    }
-
-    catch (SynchronousException ex) {
+    } catch (SynchronousException ex) {
       logger.info("Exception: " + ex.getCode());
       throw ex;
     } catch (HaltException ex) {
