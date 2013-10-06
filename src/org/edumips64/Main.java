@@ -315,6 +315,9 @@ public class Main extends JApplet {
     
     // Set the IOManager StdError with a Proxy writer from GUIIO
     iom.setStdError(ioFrame.getWriter());
+
+    // Set the IOManager StdInput with a Proxy reader from GUIIO
+    iom.setStdInput(ioFrame.getReader());
     
     // Needed for internal frames handling
     // TODO: The actual approach is a workaround. To do things in the right

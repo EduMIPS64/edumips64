@@ -248,41 +248,18 @@ public class IOManager {
    *  @param count the number of bytes to read
    */
   public int read(int fd, long address, int count) throws IOManagerException, java.io.FileNotFoundException, IOException {
-    StringBuffer buff = new StringBuffer();
-
     if (!ins.containsKey(fd)) {
       logger.info("File descriptor " + fd + " not valid for reading");
       throw new IOManagerException("FILENOTOPENED");
     }
 
-    String read_str = null;
-
-    // Different behaviour for stdin and a normal file
-    if (fd == 0) {
-      read_str = org.edumips64.Main.ioFrame.read(count);
-    } else {
-      Reader r = ins.get(fd);
-
-      for (int i = 0; i < count; ++i) {
-        int read_byte = r.read();
-
-        if (read_byte < 0)
-          // EOF reached
-        {
-          break;
-        }
-
-        buff.append((char) read_byte);
-      }
-
-      read_str = buff.toString();
-      buff.setLength(0);
-    }
+    Reader r = ins.get(fd);
+    char buffer[] = new char[count];
+    int read_byte = r.read(buffer, 0, count);
+    String read_str = new String(buffer);
 
     logger.info("Read the string " + read_str + " from fd " + fd);
-
     MemoryElement memEl = null;
-
     try {
       int posInWord = 0;
 
@@ -296,11 +273,10 @@ public class IOManager {
 
         int rb = (int) read_str.charAt(i);
         memEl.writeByte(rb, posInWord++);
-        buff.append((char) rb);
       }
 
-      logger.info("Wrote " + buff.toString() + " to memory");
-      return buff.length();
+      logger.info("Wrote " + read_str + " to memory");
+      return read_byte;
     } catch (MemoryElementNotFoundException e) {
       throw new IOManagerException("OUTOFMEMORY");
     } catch (IrregularWriteOperationException e) {
@@ -310,12 +286,16 @@ public class IOManager {
     return -1;
   }
 
-  public void setStdOutput(Writer writerProxy) {
-      outs.put(1, writerProxy);
+  public void setStdOutput(Writer writer) {
+      outs.put(1, writer);
   }
   
-  public void setStdError(Writer writerProxy) {
-      outs.put(2, writerProxy);
+  public void setStdError(Writer writer) {
+      outs.put(2, writer);
+  }
+  
+  public void setStdInput(Reader reader) {
+      ins.put(0, reader);
   }
   
 }

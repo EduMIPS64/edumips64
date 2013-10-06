@@ -37,6 +37,7 @@ import java.text.*;
  *  @author Andrea Spadaccini
  */
 
+
 public class GUIIO extends JInternalFrame {
   private JTextArea output_area;
   private JButton clear;
@@ -74,17 +75,17 @@ public class GUIIO extends JInternalFrame {
     String s = new String(bytes_array);
     write(s);
   }
-
+  
+  /*
+   * This method forces the user to introduce  a number of characters that not exceed count.
+  */
   public String read(int count) {
     String read_s = null;
-
     do {
       read_s = JOptionPane.showInputDialog(this, CurrentLocale.getString("ENTERINPUT"), "EduMIPS64 - Input", JOptionPane.PLAIN_MESSAGE);
-
       if (read_s == null) {
         read_s = new String();
       }
-
       if (read_s.length() > count) {
         JOptionPane.showMessageDialog(this, CurrentLocale.getString("INPUTNOTEXCEED") + " " + count + " " + CurrentLocale.getString("CHARACTERS"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.INFORMATION_MESSAGE);
       }
@@ -124,10 +125,14 @@ public class GUIIO extends JInternalFrame {
   public Writer getWriter() {
     return new WriterProxy(this);
   }
+
+  public Reader getReader() {
+    return new ReaderProxy(this);
+  }
   
   /*
    * Proxy Object used by the Main class in order to decouple the GUI from the logic.
-  */
+   */
   private class WriterProxy extends Writer{
 
     public GUIIO guiio;
@@ -152,5 +157,32 @@ public class GUIIO extends JInternalFrame {
 
   }
   
+  /*
+   * Proxy Object used by the Main class in order to decouple the GUI from the logic.
+   */
+  
+  private class ReaderProxy extends Reader{
+
+    public GUIIO guiio;
+
+    public ReaderProxy(GUIIO guiio){
+
+      this.guiio = guiio;
+    }
+
+    @Override
+    public void close() throws IOException {}
     
+    /*
+     * @see java.io.Reader#read(char[], int, int)
+     */
+    @Override
+    public int read(char[] cbuf, int off, int len) throws IOException {
+      String input = guiio.read(len);
+      for (int i = 0; i < input.length(); i++) {
+        cbuf[off + i] = input.charAt(i);
+      }
+      return input.length();
+    }
+  }
 }
