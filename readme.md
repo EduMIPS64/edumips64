@@ -39,7 +39,7 @@ should have Automatic Style (astyle) installed.
 A distribution of JUnit 4 and JavaHelp is included in the libs/ directory of
 the git reposiory, but not in the source tarball.
 
-this project uses Travis CI for continuous integration
+This project uses Travis CI for continuous integration
 (https://travis-ci.org/lupino3/edumips64).
 
 Main Ant targets
