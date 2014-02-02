@@ -22,7 +22,6 @@
  */
 package org.edumips64.utils;
 
-import org.edumips64.Main;
 import java.util.*;
 import java.io.*;
 import java.net.URL;
