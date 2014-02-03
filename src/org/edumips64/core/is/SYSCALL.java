@@ -25,7 +25,6 @@ import org.edumips64.utils.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.io.IOException;
-import javax.swing.JOptionPane;
 
 /** SYSCALL instruction, used to issue system calls.
  *
@@ -117,12 +116,9 @@ public class SYSCALL extends Instruction {
 
       try {
         return_value = iom.open(filename, flags);
-      } catch (java.io.FileNotFoundException e) {
-        JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, CurrentLocale.getString("FILE_NOT_FOUND"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
-      } catch (IOManagerException e) {
-        JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, CurrentLocale.getString(e.getMessage()), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
-      } catch (IOException e) {
-        JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, CurrentLocale.getString("IOEXCEPTION"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
+      } catch (Exception e) {
+        logger.info("Error in executing the open(), the syscall will fail.");
+        logger.info(e.toString());
       }
 
     } else if (syscall_n == 2) {
@@ -165,12 +161,9 @@ public class SYSCALL extends Instruction {
           logger.info("SYSCALL (" + this.hashCode() + "): trying to write to fd " + fd + " " + count + " bytes, reading them from address " + buf_addr);
           return_value = iom.write(fd, buf_addr, count);
         }
-      } catch (java.io.FileNotFoundException e) {
-        JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, CurrentLocale.getString("FILE_NOT_FOUND"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
-      } catch (IOManagerException e) {
-        JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, CurrentLocale.getString(e.getMessage()), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
-      } catch (IOException e) {
-        JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, CurrentLocale.getString("IOEXCEPTION"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
+      } catch (Exception e) {
+        logger.info("Error in executing the read(), the syscall will fail.");
+        logger.info(e.toString());
       }
     } else if (syscall_n == 5) {
       StringBuffer temp = new StringBuffer();
@@ -265,7 +258,8 @@ public class SYSCALL extends Instruction {
       try {
         iom.write(1, temp.toString());
       } catch (IOException e) {
-        JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, CurrentLocale.getString("SYSCALL5_ERROR"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
+        logger.info("Error in executing the printf(), the syscall will fail.");
+        logger.info(e.toString());
       }
 
       return_value = temp.length();

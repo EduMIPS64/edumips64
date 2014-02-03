@@ -214,6 +214,17 @@ public class CpuTests {
     runMipsTest("zero.s");
   }
 
+  /* Tests for instruction SYSCALL. */
+  @Test(expected = BreakException.class)
+  public void testOpenNonExistent() throws Exception {
+    runMipsTest("test-open-nonexistent.s");
+  }
+
+  @Test
+  public void testOpenExistent() throws Exception {
+    runMipsTest("test-open-existent.s");
+  }
+
   /* Test for instruction B */
   @Test
   public void testB() throws Exception {
