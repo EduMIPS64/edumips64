@@ -97,6 +97,7 @@ public class CPUGUIThread extends Thread {
   }
 
   private synchronized void haltCPU() {
+    logger.info("Halting the CPU.");
     front.updateComponents();
     cpu.setStatus(CPU.CPUStatus.HALTED);
     Main.changeShownMenuItems(CPU.CPUStatus.HALTED);
@@ -164,6 +165,7 @@ public class CPUGUIThread extends Thread {
 
               break;
             } catch (SynchronousException ex) {
+              logger.info("Caught a synchronous exception.");
               JOptionPane.showMessageDialog(f, CurrentLocale.getString(ex.getCode() + ".Message"), "EduMIPS64 - " + CurrentLocale.getString("EXCEPTION"), JOptionPane.ERROR_MESSAGE);
               front.updateComponents();
               front.represent();
@@ -176,7 +178,7 @@ public class CPUGUIThread extends Thread {
               continue;
             } catch (HaltException ex) {
               haltCPU();
-              logger.info("CPUGUIThread: CPU Halted");
+              logger.info("CPUGUIThread: CPU Halted because of HaltException.");
               front.updateComponents();
 
               if (verbose) {
@@ -185,20 +187,23 @@ public class CPUGUIThread extends Thread {
 
               break;
             } catch (NotAlignException ex) {
+              logger.info("NotAlignException.");
               haltCPU();
               logger.info(ex.getMessage());
               JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, ex.getMessage(), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
             } catch (AddressErrorException ex) {
+              logger.info("AddressErrorException.");
               haltCPU();
               logger.info(ex.getMessage());
               JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, ex.getMessage(), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
             } catch (MemoryElementNotFoundException ex) {
-              logger.info("Attempt to read a non-existent cell");
+              logger.info("Attempt to read a non-existent cell (MemoryElementNotFoundException).");
               haltCPU();
               JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, CurrentLocale.getString("ERROR_LABEL"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
               break;
             } catch (Exception ex) {
               logger.info("Exception in CPUGUIThread");
+              logger.warning(ex.toString());
               haltCPU();
               new ReportDialog(f, ex, CurrentLocale.getString("GUI_STEP_ERROR"));
               break;
