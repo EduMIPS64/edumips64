@@ -26,6 +26,8 @@ package org.edumips64.ui;
 import java.util.*;
 import java.util.logging.Logger;
 
+import org.edumips64.core.is.Instruction;
+
 /**
 * This class represents the single element that is then drawn in the cycles
 * component.
@@ -34,36 +36,36 @@ import java.util.logging.Logger;
 public class CycleElement {
 
   int startTime;
-  private String name;
   private LinkedList<String> states;
-  private Long serialNumber; //instruction serial number
+  private Instruction instruction;
 
   private static final Logger logger = Logger.getLogger(CycleElement.class.getName());
 
   /**
   * A new element of this class is created.
   * @param nom the name of the instruction
-  * @param tempo the time in which the element is entered in pipeline
+  * @param startTime the time in which the element is entered in pipeline
   */
-  public CycleElement(String nom, int tempo, long serialNumber) {
+  public CycleElement(Instruction instruction, int startTime) {
+    this.startTime = startTime;
+    this.instruction = instruction;
     states = new LinkedList<String>();
-    name = nom;
-    startTime = tempo;
     states.add("IF");
-    this.serialNumber = serialNumber;
-
   }
+
   /**
   * @return the name of the instruction
   */
   public String getName() {
-    return name;
+    return instruction.getFullName();
   }
 
   public int getUpdateTime() {
     return startTime + states.size() - 1;
   }
   public boolean isFinalized() {
+    // TODO(lupino): make this check if the instruction has been discarded
+    // because of a jump.
     return states.getLast() == "WB";
   }
 
@@ -101,7 +103,7 @@ public class CycleElement {
 
   /** Returns the serial number of the referred instruction*/
   public long getSerialNumber() {
-    return serialNumber;
+    return instruction.getSerialNumber();
   }
 
   // Map that associates to a given state the set of allowed successor states.

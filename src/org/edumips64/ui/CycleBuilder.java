@@ -182,7 +182,7 @@ public class CycleBuilder {
           if (!inputStallOccurred) {
             // We must instantiate a new CycleElement only if the CPU is running or there was a JumpException and the the IF instruction was changed.
             if (cpu.getStatus() == CPU.CPUStatus.RUNNING) {
-              elementsList.add(new CycleElement(instr[0].getFullName(), curTime, instr[0].getSerialNumber()));
+              elementsList.add(new CycleElement(instr[0], curTime));
               instructionsCount++;
             }
           } else {
