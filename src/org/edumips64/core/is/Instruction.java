@@ -26,7 +26,6 @@ import org.edumips64.core.fpu.*;
 import org.edumips64.utils.*;
 import java.util.*;
 import java.util.logging.Logger;
-import java.lang.Enum.*;
 
 /**Abstract class: it provides all methods and attributes for each instruction type
  *
@@ -57,10 +56,10 @@ public abstract class Instruction {
     TR = new Register[5];
     TRfp = new RegisterFP[5];
     repr = new BitSet32();
+    syntax = "";
     repr.reset(false);
-    syntax = new String();
     //generating a serial number for the current instruction
-    serialNumber = ConfigManager.getConfig().getInt("serialNumber");;
+    serialNumber = ConfigManager.getConfig().getInt("serialNumber");
     ConfigManager.getConfig().putInt("serialNumber", serialNumber + 1);
 
     //initialization of temporary registers
@@ -89,12 +88,12 @@ public abstract class Instruction {
    */
   public static Instruction buildInstruction(String name) {
     Instruction returnedObject = null;
-    //If the name of the requested instruction has got a dot, the istruction is FP and an
+    //If the name of the requested instruction has got a dot, the instruction is FP and an
     //underscore takes the place of the dot because classes names cannot contain dots
     name = name.replaceAll("\\.", "_");
 
     for (InstructionEnumerator op : InstructionEnumerator.values()) {
-      if (op.name().equals(name) == true) {
+      if (op.name().equals(name)) {
         returnedObject = op.getObject();
         return returnedObject;
       }
@@ -102,647 +101,546 @@ public abstract class Instruction {
 
     return returnedObject;
   }
-  public enum InstructionEnumerator {
 
+  public enum InstructionEnumerator {
     //ALU R-Type 32-bits
-    ADD  {
+    ADD {
       Instruction getObject() {
-        ADD newObject = new ADD();
-        return newObject;
+        return new ADD();
       }
     },
     ADDU {
       Instruction getObject() {
-        ADDU newObject = new ADDU();
-        return newObject;
+        return new ADDU();
       }
     },
-    SUB  {
+    SUB {
       Instruction getObject() {
-        SUB newObject = new SUB();
-        return newObject;
+        return new SUB();
       }
     },
     SUBU {
       Instruction getObject() {
-        SUBU newObject = new SUBU();
-        return newObject;
+        return new SUBU();
       }
     },
     DIV {
       Instruction getObject() {
-        DIV newObject = new DIV();
-        return newObject;
+        return new DIV();
       }
     },
     DIVU {
       Instruction getObject() {
-        DIVU newObject = new DIVU();
-        return newObject;
+        return new DIVU();
       }
     },
     MULT {
       Instruction getObject() {
-        MULT newObject = new MULT();
-        return newObject;
+        return new MULT();
       }
     },
     MULTU {
       Instruction getObject() {
-        MULTU newObject = new MULTU();
-        return newObject;
+        return new MULTU();
       }
     },
 
     //ALU I-Type 32-bits
     ADDI {
       Instruction getObject() {
-        ADDI newObject = new ADDI();
-        return newObject;
+        return new ADDI();
       }
     },
-    ADDIU{
+    ADDIU {
       Instruction getObject() {
-        ADDIU newObject = new ADDIU();
-        return newObject;
+        return new ADDIU();
       }
     },
 
     //ALU Shifting 32-bits
     SLL {
       Instruction getObject() {
-        SLL newObject = new SLL();
-        return newObject;
+        return new SLL();
       }
     },
     SLLV {
       Instruction getObject() {
-        SLLV newObject = new SLLV();
-        return newObject;
+        return new SLLV();
       }
     },
     SRA {
       Instruction getObject() {
-        SRA newObject = new SRA();
-        return newObject;
+        return new SRA();
       }
     },
     SRAV {
       Instruction getObject() {
-        SRAV newObject = new SRAV();
-        return newObject;
+        return new SRAV();
       }
     },
     SRL {
       Instruction getObject() {
-        SRL newObject = new SRL();
-        return newObject;
+        return new SRL();
       }
     },
     SRLV {
       Instruction getObject() {
-        SRLV newObject = new SRLV();
-        return newObject;
+        return new SRLV();
       }
     },
 
     //ALU R-Type
-    AND   {
+    AND {
       Instruction getObject() {
-        AND newObject = new AND();
-        return newObject;
+        return new AND();
       }
     },
-    DADD  {
+    DADD {
       Instruction getObject() {
-        DADD newObject = new DADD();
-        return newObject;
+        return new DADD();
       }
     },
     DADDU {
       Instruction getObject() {
-        DADDU newObject = new DADDU();
-        return newObject;
+        return new DADDU();
       }
     },
-    DSUB  {
+    DSUB {
       Instruction getObject() {
-        DSUB newObject = new DSUB();
-        return newObject;
+        return new DSUB();
       }
     },
     DSUBU {
       Instruction getObject() {
-        DSUBU newObject = new DSUBU();
-        return newObject;
+        return new DSUBU();
       }
     },
-    OR    {
+    OR {
       Instruction getObject() {
-        OR newObject = new OR();
-        return newObject;
+        return new OR();
       }
     },
-    SLT  {
+    SLT {
       Instruction getObject() {
-        SLT newObject = new SLT();
-        return newObject;
+        return new SLT();
       }
     },
     SLTU {
       Instruction getObject() {
-        SLTU newObject = new SLTU();
-        return newObject;
+        return new SLTU();
       }
     },
-    XOR  {
+    XOR {
       Instruction getObject() {
-        XOR newObject = new XOR();
-        return newObject;
+        return new XOR();
       }
     },
     MOVN {
       Instruction getObject() {
-        MOVN newObject = new MOVN();
-        return newObject;
+        return new MOVN();
       }
     },
     MOVZ {
       Instruction getObject() {
-        MOVZ newObject = new MOVZ();
-        return newObject;
+        return new MOVZ();
       }
     },
     DDIV {
       Instruction getObject() {
-        DDIV newObject = new DDIV();
-        return newObject;
+        return new DDIV();
       }
     },
     DDIVU {
       Instruction getObject() {
-        DDIVU newObject = new DDIVU();
-        return newObject;
+        return new DDIVU();
       }
     },
     DMULT {
       Instruction getObject() {
-        DMULT newObject = new DMULT();
-        return newObject;
+        return new DMULT();
       }
     },
     DMULTU {
       Instruction getObject() {
-        DMULTU newObject = new DMULTU();
-        return newObject;
+        return new DMULTU();
       }
     },
     MFLO {
       Instruction getObject() {
-        MFLO newObject = new MFLO();
-        return newObject;
+        return new MFLO();
       }
     },
     MFHI {
       Instruction getObject() {
-        MFHI newObject = new MFHI();
-        return newObject;
+        return new MFHI();
       }
     },
 
 
     //ALU I-Type
-    ANDI  {
+    ANDI {
       Instruction getObject() {
-        ANDI newObject = new ANDI();
-        return newObject;
+        return new ANDI();
       }
     },
     DADDI {
       Instruction getObject() {
-        DADDI newObject = new DADDI();
-        return newObject;
+        return new DADDI();
       }
     },
-    DADDUI{
+    DADDUI {
       Instruction getObject() {
-        DADDUI newObject = new DADDUI();
-        return newObject;
+        return new DADDUI();
       }
     },
-    DADDIU{
+    DADDIU {
       Instruction getObject() {
-        DADDIU newObject = new DADDIU();
-        return newObject;
+        return new DADDIU();
       }
     },
-    LUI   {
+    LUI {
       Instruction getObject() {
-        LUI newObject = new LUI();
-        return newObject;
+        return new LUI();
       }
     },
-    ORI   {
+    ORI {
       Instruction getObject() {
-        ORI newObject = new ORI();
-        return newObject;
+        return new ORI();
       }
     },
-    SLTI  {
+    SLTI {
       Instruction getObject() {
-        SLTI newObject = new SLTI();
-        return newObject;
+        return new SLTI();
       }
     },
     SLTIU {
       Instruction getObject() {
-        SLTIU newObject = new SLTIU();
-        return newObject;
+        return new SLTIU();
       }
     },
-    XORI  {
+    XORI {
       Instruction getObject() {
-        XORI newObject = new XORI();
-        return newObject;
+        return new XORI();
       }
     },
     //ALU Shifting
     DSLL {
       Instruction getObject() {
-        DSLL newObject = new DSLL();
-        return newObject;
+        return new DSLL();
       }
     },
     DSLLV {
       Instruction getObject() {
-        DSLLV newObject = new DSLLV();
-        return newObject;
+        return new DSLLV();
       }
     },
     DSRA {
       Instruction getObject() {
-        DSRA newObject = new DSRA();
-        return newObject;
+        return new DSRA();
       }
     },
     DSRAV {
       Instruction getObject() {
-        DSRAV newObject = new DSRAV();
-        return newObject;
+        return new DSRAV();
       }
     },
     DSRL {
       Instruction getObject() {
-        DSRL newObject = new DSRL();
-        return newObject;
+        return new DSRL();
       }
     },
     DSRLV {
       Instruction getObject() {
-        DSRLV newObject = new DSRLV();
-        return newObject;
+        return new DSRLV();
       }
     },
     //Load-Signed
-    LB    {
+    LB {
       Instruction getObject() {
-        LB newObject = new LB();
-        return newObject;
+        return new LB();
       }
     },
-    LH    {
+    LH {
       Instruction getObject() {
-        LH newObject = new LH();
-        return newObject;
+        return new LH();
       }
     },
-    LW    {
+    LW {
       Instruction getObject() {
-        LW newObject = new LW();
-        return newObject;
+        return new LW();
       }
     },
-    LD    {
+    LD {
       Instruction getObject() {
-        LD newObject = new LD();
-        return newObject;
+        return new LD();
       }
     },
     //Load-Unsigned
     LBU {
       Instruction getObject() {
-        LBU newObject = new LBU();
-        return newObject;
+        return new LBU();
       }
     },
     LHU {
       Instruction getObject() {
-        LHU newObject = new LHU();
-        return newObject;
+        return new LHU();
       }
     },
     LWU {
       Instruction getObject() {
-        LWU newObject = new LWU();
-        return newObject;
+        return new LWU();
       }
     },
     //Store
-    SB    {
+    SB {
       Instruction getObject() {
-        SB newObject = new SB();
-        return newObject;
+        return new SB();
       }
     },
-    SH    {
+    SH {
       Instruction getObject() {
-        SH newObject = new SH();
-        return newObject;
+        return new SH();
       }
     },
-    SW    {
+    SW {
       Instruction getObject() {
-        SW newObject = new SW();
-        return newObject;
+        return new SW();
       }
     },
-    SD    {
+    SD {
       Instruction getObject() {
-        SD newObject = new SD();
-        return newObject;
+        return new SD();
       }
     },
     //Unconditional branches
-    J     {
+    J {
       Instruction getObject() {
-        J newObject = new J();
-        return newObject;
+        return new J();
       }
     },
-    JAL   {
+    JAL {
       Instruction getObject() {
-        JAL newObject = new JAL();
-        return newObject;
+        return new JAL();
       }
     },
-    JALR  {
+    JALR {
       Instruction getObject() {
-        JALR newObject = new JALR();
-        return newObject;
+        return new JALR();
       }
     },
-    JR    {
+    JR {
       Instruction getObject() {
-        JR newObject = new JR();
-        return newObject;
+        return new JR();
       }
     },
-    BNE   {
+    BNE {
       Instruction getObject() {
-        BNE newObject = new BNE();
-        return newObject;
+        return new BNE();
       }
     },
-    B     {
+    B {
       Instruction getObject() {
-        B newObject = new B();
-        return newObject;
+        return new B();
       }
     },
     //Conditional branches
-    BEQ   {
+    BEQ {
       Instruction getObject() {
-        BEQ newObject = new BEQ();
-        return newObject;
+        return new BEQ();
       }
     },
-    BNEZ   {
+    BNEZ {
       Instruction getObject() {
-        BNEZ newObject = new BNEZ();
-        return newObject;
+        return new BNEZ();
       }
     },
-    BEQZ   {
+    BEQZ {
       Instruction getObject() {
-        BEQZ newObject = new BEQZ();
-        return newObject;
+        return new BEQZ();
       }
     },
-    BGEZ   {
+    BGEZ {
       Instruction getObject() {
-        BGEZ newObject = new BGEZ();
-        return newObject;
+        return new BGEZ();
       }
     },
     //Special instructions
-    NOP   {
+    NOP {
       Instruction getObject() {
-        NOP newObject = new NOP();
-        return newObject;
+        return new NOP();
       }
     },
-    BUBBLE{
+    BUBBLE {
       Instruction getObject() {
-        BUBBLE newObject = new BUBBLE();
-        return newObject;
+        return new BUBBLE();
       }
     },
-    HALT  {
+    HALT {
       Instruction getObject() {
-        HALT newObject = new HALT();
-        return newObject;
+        return new HALT();
       }
     },
-    TRAP  {
+    TRAP {
       Instruction getObject() {
-        TRAP newObject = new TRAP();
-        return newObject;
+        return new TRAP();
       }
     },
-    SYSCALL  {
+    SYSCALL {
       Instruction getObject() {
-        SYSCALL newObject = new SYSCALL();
-        return newObject;
+        return new SYSCALL();
       }
     },
-    BREAK  {
+    BREAK {
       Instruction getObject() {
-        BREAK newObject = new BREAK();
-        return newObject;
+        return new BREAK();
       }
     },
     //Floating point instructions
     //Arithmetic
     ADD_D {
       Instruction getObject() {
-        ADD_D newObject = new ADD_D();
-        return newObject;
+        return new ADD_D();
       }
     },
     SUB_D {
       Instruction getObject() {
-        SUB_D newObject = new SUB_D();
-        return newObject;
+        return new SUB_D();
       }
     },
     MUL_D {
       Instruction getObject() {
-        MUL_D newObject = new MUL_D();
-        return newObject;
+        return new MUL_D();
       }
     },
     DIV_D {
       Instruction getObject() {
-        DIV_D newObject = new DIV_D();
-        return newObject;
+        return new DIV_D();
       }
     },
     //Load store
     LDC1 {
       Instruction getObject() {
-        LDC1 newObject = new LDC1();
-        return newObject;
+        return new LDC1();
       }
     },
     L_D {
       Instruction getObject() {
-        L_D newObject = new L_D();
-        return newObject;
+        return new L_D();
       }
     },
     SDC1 {
       Instruction getObject() {
-        SDC1 newObject = new SDC1();
-        return newObject;
+        return new SDC1();
       }
     },
     S_D {
       Instruction getObject() {
-        S_D newObject = new S_D();
-        return newObject;
+        return new S_D();
       }
     },
     LWC1 {
       Instruction getObject() {
-        LWC1 newObject = new LWC1();
-        return newObject;
+        return new LWC1();
       }
     },
     SWC1 {
       Instruction getObject() {
-        SWC1 newObject = new SWC1();
-        return newObject;
+        return new SWC1();
       }
     },
     //Move to and from
     DMTC1 {
       Instruction getObject() {
-        DMTC1 newObject = new DMTC1();
-        return newObject;
+        return new DMTC1();
       }
     },
     DMFC1 {
       Instruction getObject() {
-        DMFC1 newObject = new DMFC1();
-        return newObject;
+        return new DMFC1();
       }
     },
     MTC1 {
       Instruction getObject() {
-        MTC1 newObject = new MTC1();
-        return newObject;
+        return new MTC1();
       }
     },
     MFC1 {
       Instruction getObject() {
-        MFC1 newObject = new MFC1();
-        return newObject;
+        return new MFC1();
       }
     },
     //Formatted operand move
     MOV_D {
       Instruction getObject() {
-        MOV_D newObject = new MOV_D();
-        return newObject;
+        return new MOV_D();
       }
     },
     MOVZ_D {
       Instruction getObject() {
-        MOVZ_D newObject = new MOVZ_D();
-        return newObject;
+        return new MOVZ_D();
       }
     },
     MOVN_D {
       Instruction getObject() {
-        MOVN_D newObject = new MOVN_D();
-        return newObject;
+        return new MOVN_D();
       }
     },
     //Special arithmetic instructions
     C_LT_D {
       Instruction getObject() {
-        C_LT_D newObject = new C_LT_D();
-        return newObject;
+        return new C_LT_D();
       }
     },
     C_EQ_D {
       Instruction getObject() {
-        C_EQ_D newObject = new C_EQ_D();
-        return newObject;
+        return new C_EQ_D();
       }
     },
     //Conditional branches instructions
     BC1T {
       Instruction getObject() {
-        BC1T newObject = new BC1T();
-        return newObject;
+        return new BC1T();
       }
     },
     BC1F {
       Instruction getObject() {
-        BC1F newObject = new BC1F();
-        return newObject;
+        return new BC1F();
       }
     },
     //Conditional move on CC instructions
     MOVT_D {
       Instruction getObject() {
-        MOVT_D newObject = new MOVT_D();
-        return newObject;
+        return new MOVT_D();
       }
     },
     MOVF_D {
       Instruction getObject() {
-        MOVF_D newObject = new MOVF_D();
-        return newObject;
+        return new MOVF_D();
       }
     },
     //Conversion instructions
     CVT_L_D {
       Instruction getObject() {
-        CVT_L_D newObject = new CVT_L_D();
-        return newObject;
+        return new CVT_L_D();
       }
     },
     CVT_D_L {
       Instruction getObject() {
-        CVT_D_L newObject = new CVT_D_L();
-        return newObject;
+        return new CVT_D_L();
       }
     },
     CVT_W_D {
       Instruction getObject() {
-        CVT_W_D newObject = new CVT_W_D();
-        return newObject;
+        return new CVT_W_D();
       }
     },
     CVT_D_W {
       Instruction getObject() {
-        CVT_D_W newObject = new CVT_D_W();
-        return newObject;
+       return new CVT_D_W();
       }
     };
-    abstract Instruction getObject();
+
+  abstract Instruction getObject();
   }
   /**
    * <pre>
@@ -792,14 +690,6 @@ public abstract class Instruction {
    * </pre>
    **/
   public abstract void pack() throws IrregularStringOfBitsException;
-
-  /**
-   * Gets the number of params to pass at the instruction object
-   * @return number of params
-   **/
-  public int getNParams() {
-    return paramCount;
-  };
 
   /**
    * <pre>
