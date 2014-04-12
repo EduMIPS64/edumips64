@@ -440,7 +440,7 @@ public class CPU {
     }
 
     try {
-      logger.info("Starting cycle " + ++cycles + "\n---------------------------------------------");
+      logger.info("\n\nStarting cycle " + ++cycles + "\n---------------------------------------------");
       logger.info("WB STAGE: " + pipe.get(PipeStatus.WB) + "\n================================");
       currentPipeStatus = PipeStatus.WB;
 
@@ -455,12 +455,12 @@ public class CPU {
         //the current instruction in WB is a terminating instruction, the fpPipe doesn't work because it has just issued an instruction and it is in the MEM stage
         notWBable = notWBable || (terminatorInstrInWB && fpPipe.isEmpty() && pipe.get(PipeStatus.MEM).getName() != " ");
 
-        if (!notWBable) {
-          pipe.get(PipeStatus.WB).WB();
-        }
-
         if (!pipe.get(PipeStatus.WB).getName().equals(" ")) {
           instructions++;
+        }
+
+        if (!notWBable) {
+          pipe.get(PipeStatus.WB).WB();
         }
 
         //if the pipeline is empty and it is into the stopping state (because a long latency instruction was executed) we can halt the cpu when computations finished
