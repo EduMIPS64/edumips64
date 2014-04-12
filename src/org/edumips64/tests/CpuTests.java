@@ -59,17 +59,19 @@ public class CpuTests {
    */
   class CpuTestStatus {
     int cycles;
+    int instructions;
     int rawStalls, wawStalls, memStalls;
     String traceFile;
 
     public CpuTestStatus(CPU cpu, String dineroTrace) {
       cycles = cpu.getCycles();
+      instructions = cpu.getInstructions();
       wawStalls = cpu.getWAWStalls();
       rawStalls = cpu.getRAWStalls();
       memStalls = cpu.getStructuralStallsMemory();
       traceFile = dineroTrace;
 
-      log.warning("Got " + cycles + " cycles, " + rawStalls + " RAW Stalls and " + wawStalls + " WAW stalls.");
+      log.warning("Got " + cycles + " cycles, " + instructions + " instructions, " + rawStalls + " RAW Stalls and " + wawStalls + " WAW stalls.");
     }
   }
 
@@ -281,11 +283,13 @@ public class CpuTests {
 
     // With forwarding
     assertEquals(20, statuses.get(true).cycles);
+    assertEquals(5, statuses.get(true).instructions);
     assertEquals(7, statuses.get(true).wawStalls);
     assertEquals(1, statuses.get(true).rawStalls);
 
     // Without forwarding
     assertEquals(21, statuses.get(false).cycles);
+    assertEquals(5, statuses.get(true).instructions);
     assertEquals(7, statuses.get(false).wawStalls);
     assertEquals(2, statuses.get(false).rawStalls);
   }
@@ -302,6 +306,8 @@ public class CpuTests {
     // Same behaviour with and without forwarding.
     assertEquals(43, statuses.get(true).cycles);
     assertEquals(43, statuses.get(false).cycles);
+    assertEquals(32, statuses.get(true).instructions);
+    assertEquals(32, statuses.get(false).instructions);
     assertEquals(6, statuses.get(true).memStalls);
     assertEquals(6, statuses.get(false).memStalls);
   }
