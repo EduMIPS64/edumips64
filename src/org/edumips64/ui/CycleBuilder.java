@@ -67,7 +67,7 @@ public class CycleBuilder {
     for (int i = 0; i < elementsList.size(); ++i) {
       CycleElement tmp = elementsList.get(i);
 
-      if (tmp.getSerialNumber() == serialNumber && tmp.getUpdateTime() < curTime && !tmp.isFinalized()) {
+      if (tmp.getSerialNumber() == serialNumber && tmp.getUpdateTime() == curTime - 1 && !tmp.isFinalized()) {
         return i;
       }
     }
