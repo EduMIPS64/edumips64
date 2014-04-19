@@ -61,16 +61,17 @@ public class SYSCALL extends Instruction {
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }
-  }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
-    syscall_n = params.get(0);
     logger.info("SYSCALL (" + this.hashCode() + ") n = " + syscall_n);
 
     if (syscall_n == 0) {
       logger.info("Stopping CPU due to SYSCALL (" + this.hashCode() + ")");
       CPU.getInstance().setStatus(CPU.CPUStatus.STOPPING);
-    } else if ((syscall_n > 0) && (syscall_n <= 5)) {
+    }
+  }
+
+  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+    if ((syscall_n > 0) && (syscall_n <= 5)) {
       CPU cpu = CPU.getInstance();
       Register r14 = cpu.getRegister(14);
 
@@ -84,7 +85,7 @@ public class SYSCALL extends Instruction {
       r1.incrWriteSemaphore();
       address = r14.getValue();
       logger.info("SYSCALL (" + this.hashCode() + "): locked register R14. Value = " + address);
-    } else {
+    } else if (syscall_n != 0) {
       // TODO: invalid syscall
       logger.info("INVALID SYSCALL (" + this.hashCode() + ")");
     }

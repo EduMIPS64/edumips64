@@ -620,6 +620,7 @@ public class CPU {
       if (status == CPUStatus.RUNNING) {
         if (pipe.get(PipeStatus.IF) != null) {  //rispetto a dinmips scambia le load con le IF
           try {
+            // Can change the CPU status from RUNNING to STOPPING.
             pipe.get(PipeStatus.IF).IF();
           } catch (BreakException exc) {
             breaking = 1;
@@ -629,10 +630,18 @@ public class CPU {
 
         logger.info("Moving " + pipe.get(PipeStatus.IF) + " to ID");
         pipe.put(PipeStatus.ID, pipe.get(PipeStatus.IF));
-        logger.info("Fetched new instruction " + mem.getInstruction(pc) + " into IF");
-        pipe.put(PipeStatus.IF, mem.getInstruction(pc));
-        old_pc.writeDoubleWord((pc.getValue()));
-        pc.writeDoubleWord((pc.getValue()) + 4);
+        Instruction next_if;
+        if (status != CPUStatus.STOPPING){
+           next_if = mem.getInstruction(pc);
+           logger.info("Fetched new instruction " + next_if);
+           old_pc.writeDoubleWord((pc.getValue()));
+           pc.writeDoubleWord((pc.getValue()) + 4);
+           logger.info("New Program Counter value: " + pc.toString());
+        } else {
+           next_if = null;
+        }
+        logger.info("Putting " + next_if + "in IF.");
+        pipe.put(PipeStatus.IF, next_if);
       } else {
         pipe.put(PipeStatus.ID, Instruction.buildInstruction("BUBBLE"));
       }
