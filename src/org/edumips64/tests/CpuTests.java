@@ -195,8 +195,8 @@ public class CpuTests {
 
     collector.checkThat("Cycles with forwarding", cycles_with_forwarding, equalTo(statuses.get(true).cycles));
     collector.checkThat("Cycles without forwarding", cycles_without_forwarding, equalTo(statuses.get(false).cycles));
-    collector.checkThat("Instructions with forwarding", instructions, CoreMatchers.equalTo(statuses.get(true).instructions));
-    collector.checkThat("Instructions without forwarding", instructions, CoreMatchers.equalTo(statuses.get(false).instructions));
+    collector.checkThat("Instructions with forwarding", instructions, equalTo(statuses.get(true).instructions));
+    collector.checkThat("Instructions without forwarding", instructions, equalTo(statuses.get(false).instructions));
   }
 
   private void runTestAndCompareTracefileWithGolden(String path) throws Exception {
