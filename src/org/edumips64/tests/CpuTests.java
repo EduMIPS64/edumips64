@@ -37,13 +37,13 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Scanner;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import org.junit.*;
+import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import static org.junit.Assert.*;
+import org.hamcrest.CoreMatchers;
+import static org.hamcrest.CoreMatchers.*;
 
 @RunWith(JUnit4.class)
 public class CpuTests {
@@ -53,6 +53,9 @@ public class CpuTests {
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
   protected Dinero dinero = Dinero.getInstance();
   protected ConfigStore config = ConfigManager.getTmpConfig();
+
+  @Rule
+  public ErrorCollector collector = new ErrorCollector();
 
   /** Class that holds the parts of the CPU status that need to be tested
    * after the execution of a test case.
@@ -159,8 +162,7 @@ public class CpuTests {
       tmp.deleteOnExit();
       dinero.WriteXdinFile(tmp.getAbsolutePath());
 
-      CpuTestStatus cts = new CpuTestStatus(cpu, tmp.getAbsolutePath());
-      return cts;
+      return new CpuTestStatus(cpu, tmp.getAbsolutePath());
     } finally {
       cpu.reset();
     }
@@ -191,8 +193,8 @@ public class CpuTests {
                                  int cycles_without_forwarding) throws Exception {
     Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding(path);
 
-    assertEquals(cycles_with_forwarding, statuses.get(true).cycles);
-    assertEquals(cycles_without_forwarding, statuses.get(false).cycles);
+    collector.checkThat("Cycles with forwarding", cycles_with_forwarding, CoreMatchers.equalTo(statuses.get(true).cycles));
+    collector.checkThat("Cycles without forwarding", cycles_without_forwarding, CoreMatchers.equalTo(statuses.get(false).cycles));
   }
 
   private void runTestAndCompareTracefileWithGolden(String path) throws Exception {
@@ -201,7 +203,7 @@ public class CpuTests {
 
     String golden = new Scanner(new File(goldenTrace)).useDelimiter("\\A").next();
     String trace = new Scanner(new File(s.traceFile)).useDelimiter("\\A").next();
-    assertEquals(golden, trace);
+    collector.checkThat("Dinero trace file differs from the golden one.", trace, is(golden));
   }
 
   /* Test for the instruction BREAK */
@@ -282,16 +284,16 @@ public class CpuTests {
     Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-waw.s");
 
     // With forwarding
-    assertEquals(20, statuses.get(true).cycles);
-    assertEquals(5, statuses.get(true).instructions);
-    assertEquals(7, statuses.get(true).wawStalls);
-    assertEquals(1, statuses.get(true).rawStalls);
+    collector.checkThat(statuses.get(true).cycles, is(20));
+    collector.checkThat(statuses.get(true).instructions, is(5));
+    collector.checkThat(statuses.get(true).wawStalls, is(7));
+    collector.checkThat(statuses.get(true).rawStalls, is(1));
 
     // Without forwarding
-    assertEquals(21, statuses.get(false).cycles);
-    assertEquals(5, statuses.get(true).instructions);
-    assertEquals(7, statuses.get(false).wawStalls);
-    assertEquals(2, statuses.get(false).rawStalls);
+    collector.checkThat(statuses.get(false).cycles, is(21));
+    collector.checkThat(statuses.get(true).instructions, is(5));
+    collector.checkThat(statuses.get(false).wawStalls, is(7));
+    collector.checkThat(statuses.get(false).rawStalls, is(2));
   }
 
   @Test
@@ -304,12 +306,13 @@ public class CpuTests {
     Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-mul.s");
 
     // Same behaviour with and without forwarding.
-    assertEquals(43, statuses.get(true).cycles);
-    assertEquals(43, statuses.get(false).cycles);
-    assertEquals(32, statuses.get(true).instructions);
-    assertEquals(32, statuses.get(false).instructions);
-    assertEquals(6, statuses.get(true).memStalls);
-    assertEquals(6, statuses.get(false).memStalls);
+    int expected_cycles = 43, expected_instructions = 32, expected_mem_stalls = 6;
+    collector.checkThat(statuses.get(true).cycles, is(expected_cycles));
+    collector.checkThat(statuses.get(false).cycles, is(expected_cycles));
+    collector.checkThat(statuses.get(true).instructions, is(expected_instructions));
+    collector.checkThat(statuses.get(false).instructions, is(expected_instructions));
+    collector.checkThat(statuses.get(true).memStalls, is(expected_mem_stalls));
+    collector.checkThat(statuses.get(false).memStalls, is(expected_mem_stalls));
   }
 
   /* ------- REGRESSION TESTS -------- */
