@@ -71,7 +71,7 @@ public class CPU {
    *  HALTED - the HALT instruction has passed the WB state, and the step()
    *  method can't be executed.
    * */
-  public enum CPUStatus {READY, RUNNING, STOPPING, HALTED};
+  public enum CPUStatus {READY, RUNNING, STOPPING, HALTED}
   private CPUStatus status;
 
   /** CPU pipeline, each status contains an Instruction object*/
@@ -158,6 +158,7 @@ public class CPU {
    *  @param status a CPUStatus value
    */
   public  void setStatus(CPUStatus status) {
+    logger.info("Changing CPU status to " + status.name());
     this.status = status;
   }
 
@@ -613,6 +614,8 @@ public class CPU {
       // We don't have to execute any methods, but we must get the new
       // instruction from the symbol table.
       currentPipeStatus = PipeStatus.IF;
+
+      logger.info("CPU Status: " + status.name());
 
       if (status == CPUStatus.RUNNING) {
         if (pipe.get(PipeStatus.IF) != null) {  //rispetto a dinmips scambia le load con le IF
