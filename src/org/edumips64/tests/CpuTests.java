@@ -168,6 +168,8 @@ public class CpuTests {
     }
   }
 
+  enum ForwardingStatus {ENABLED, DISABLED};
+
   /** Runs a MIPS64 test program with and without forwarding, raising an
    *  exception if it does not succeed.
    *
@@ -175,15 +177,15 @@ public class CpuTests {
    * @return a dictionary that maps the forwarding status to the
    * corresponding CpuTestStatus object.
    */
-  protected Map<Boolean, CpuTestStatus> runMipsTestWithAndWithoutForwarding(String testPath) throws Exception {
+  protected Map<ForwardingStatus, CpuTestStatus> runMipsTestWithAndWithoutForwarding(String testPath) throws Exception {
     boolean forwardingStatus = Instruction.getEnableForwarding();
-    Map<Boolean, CpuTestStatus> statuses = new HashMap<Boolean, CpuTestStatus>();
+    Map<ForwardingStatus, CpuTestStatus> statuses = new HashMap<ForwardingStatus, CpuTestStatus>();
 
     Instruction.setEnableForwarding(true);
-    statuses.put(true, runMipsTest(testPath));
+    statuses.put(ForwardingStatus.ENABLED, runMipsTest(testPath));
 
     Instruction.setEnableForwarding(false);
-    statuses.put(false, runMipsTest(testPath));
+    statuses.put(ForwardingStatus.DISABLED, runMipsTest(testPath));
 
     Instruction.setEnableForwarding(forwardingStatus);
     return statuses;
@@ -191,12 +193,12 @@ public class CpuTests {
 
   private void runForwardingTest(String path, int cycles_with_forwarding,
                                  int cycles_without_forwarding, int instructions) throws Exception {
-    Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding(path);
+    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding(path);
 
-    collector.checkThat("Cycles with forwarding", cycles_with_forwarding, equalTo(statuses.get(true).cycles));
-    collector.checkThat("Cycles without forwarding", cycles_without_forwarding, equalTo(statuses.get(false).cycles));
-    collector.checkThat("Instructions with forwarding", instructions, equalTo(statuses.get(true).instructions));
-    collector.checkThat("Instructions without forwarding", instructions, equalTo(statuses.get(false).instructions));
+    collector.checkThat("Cycles with forwarding", cycles_with_forwarding, equalTo(statuses.get(ForwardingStatus.ENABLED).cycles));
+    collector.checkThat("Cycles without forwarding", cycles_without_forwarding, equalTo(statuses.get(ForwardingStatus.DISABLED).cycles));
+    collector.checkThat("Instructions with forwarding", instructions, equalTo(statuses.get(ForwardingStatus.ENABLED).instructions));
+    collector.checkThat("Instructions without forwarding", instructions, equalTo(statuses.get(ForwardingStatus.DISABLED).instructions));
   }
 
   private void runTestAndCompareTracefileWithGolden(String path) throws Exception {
@@ -294,19 +296,19 @@ public class CpuTests {
   /* ------- FPU TESTS -------- */
   @Test
   public void testFPUStalls() throws Exception {
-    Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-waw.s");
+    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-waw.s");
 
     // With forwarding
-    collector.checkThat(statuses.get(true).cycles, equalTo(20));
-    collector.checkThat(statuses.get(true).instructions, equalTo(5));
-    collector.checkThat(statuses.get(true).wawStalls, equalTo(7));
-    collector.checkThat(statuses.get(true).rawStalls, equalTo(1));
+    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).cycles, equalTo(20));
+    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).instructions, equalTo(5));
+    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).wawStalls, equalTo(7));
+    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(1));
 
     // Without forwarding
-    collector.checkThat(statuses.get(false).cycles, equalTo(21));
-    collector.checkThat(statuses.get(true).instructions, equalTo(5));
-    collector.checkThat(statuses.get(false).wawStalls, equalTo(7));
-    collector.checkThat(statuses.get(false).rawStalls, equalTo(2));
+    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).cycles, equalTo(21));
+    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).instructions, equalTo(5));
+    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).wawStalls, equalTo(7));
+    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(2));
   }
 
   @Test
@@ -316,16 +318,16 @@ public class CpuTests {
     config.putBoolean("OVERFLOW", false);
     config.putBoolean("UNDERFLOW", false);
     config.putBoolean("DIVIDE_BY_ZERO", false);
-    Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-mul.s");
+    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-mul.s");
 
     // Same behaviour with and without forwarding.
     int expected_cycles = 43, expected_instructions = 32, expected_mem_stalls = 6;
-    collector.checkThat(statuses.get(true).cycles, equalTo(expected_cycles));
-    collector.checkThat(statuses.get(false).cycles, equalTo(expected_cycles));
-    collector.checkThat(statuses.get(true).instructions, equalTo(expected_instructions));
-    collector.checkThat(statuses.get(false).instructions, equalTo(expected_instructions));
-    collector.checkThat(statuses.get(true).memStalls, equalTo(expected_mem_stalls));
-    collector.checkThat(statuses.get(false).memStalls, equalTo(expected_mem_stalls));
+    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).cycles, equalTo(expected_cycles));
+    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).instructions, equalTo(expected_instructions));
+    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).memStalls, equalTo(expected_mem_stalls));
+    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).cycles, equalTo(expected_cycles));
+    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).instructions, equalTo(expected_instructions));
+    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).memStalls, equalTo(expected_mem_stalls));
   }
 
   /* ------- REGRESSION TESTS -------- */
