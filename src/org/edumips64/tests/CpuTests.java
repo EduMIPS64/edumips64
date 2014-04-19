@@ -190,11 +190,13 @@ public class CpuTests {
   }
 
   private void runForwardingTest(String path, int cycles_with_forwarding,
-                                 int cycles_without_forwarding) throws Exception {
+                                 int cycles_without_forwarding, int instructions) throws Exception {
     Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding(path);
 
-    collector.checkThat("Cycles with forwarding", cycles_with_forwarding, CoreMatchers.equalTo(statuses.get(true).cycles));
-    collector.checkThat("Cycles without forwarding", cycles_without_forwarding, CoreMatchers.equalTo(statuses.get(false).cycles));
+    collector.checkThat("Cycles with forwarding", cycles_with_forwarding, equalTo(statuses.get(true).cycles));
+    collector.checkThat("Cycles without forwarding", cycles_without_forwarding, equalTo(statuses.get(false).cycles));
+    collector.checkThat("Instructions with forwarding", instructions, CoreMatchers.equalTo(statuses.get(true).instructions));
+    collector.checkThat("Instructions without forwarding", instructions, CoreMatchers.equalTo(statuses.get(false).instructions));
   }
 
   private void runTestAndCompareTracefileWithGolden(String path) throws Exception {
@@ -266,11 +268,11 @@ public class CpuTests {
     CpuTestStatus temp;
 
     // Simple test.
-    runForwardingTest("forwarding.s", 16, 19);
+    runForwardingTest("forwarding.s", 16, 19, 10);
 
     // Tests taken from Hennessy & Patterson, Appendix A
-    runForwardingTest("forwarding-hp-pA16.s", 11, 13);
-    runForwardingTest("forwarding-hp-pA18.s", 9, 13);
+    runForwardingTest("forwarding-hp-pA16.s", 11, 13, 6);
+    runForwardingTest("forwarding-hp-pA18.s", 9, 13, 4);
   }
 
   @Test
