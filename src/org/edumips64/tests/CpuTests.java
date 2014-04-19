@@ -203,7 +203,7 @@ public class CpuTests {
 
     String golden = new Scanner(new File(goldenTrace)).useDelimiter("\\A").next();
     String trace = new Scanner(new File(s.traceFile)).useDelimiter("\\A").next();
-    collector.checkThat("Dinero trace file differs from the golden one.", trace, is(golden));
+    collector.checkThat("Dinero trace file differs from the golden one.", trace, equalTo(golden));
   }
 
   /* Test for the instruction BREAK */
@@ -284,16 +284,16 @@ public class CpuTests {
     Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-waw.s");
 
     // With forwarding
-    collector.checkThat(statuses.get(true).cycles, is(20));
-    collector.checkThat(statuses.get(true).instructions, is(5));
-    collector.checkThat(statuses.get(true).wawStalls, is(7));
-    collector.checkThat(statuses.get(true).rawStalls, is(1));
+    collector.checkThat(statuses.get(true).cycles, equalTo(20));
+    collector.checkThat(statuses.get(true).instructions, equalTo(5));
+    collector.checkThat(statuses.get(true).wawStalls, equalTo(7));
+    collector.checkThat(statuses.get(true).rawStalls, equalTo(1));
 
     // Without forwarding
-    collector.checkThat(statuses.get(false).cycles, is(21));
-    collector.checkThat(statuses.get(true).instructions, is(5));
-    collector.checkThat(statuses.get(false).wawStalls, is(7));
-    collector.checkThat(statuses.get(false).rawStalls, is(2));
+    collector.checkThat(statuses.get(false).cycles, equalTo(21));
+    collector.checkThat(statuses.get(true).instructions, equalTo(5));
+    collector.checkThat(statuses.get(false).wawStalls, equalTo(7));
+    collector.checkThat(statuses.get(false).rawStalls, equalTo(2));
   }
 
   @Test
@@ -307,12 +307,12 @@ public class CpuTests {
 
     // Same behaviour with and without forwarding.
     int expected_cycles = 43, expected_instructions = 32, expected_mem_stalls = 6;
-    collector.checkThat(statuses.get(true).cycles, is(expected_cycles));
-    collector.checkThat(statuses.get(false).cycles, is(expected_cycles));
-    collector.checkThat(statuses.get(true).instructions, is(expected_instructions));
-    collector.checkThat(statuses.get(false).instructions, is(expected_instructions));
-    collector.checkThat(statuses.get(true).memStalls, is(expected_mem_stalls));
-    collector.checkThat(statuses.get(false).memStalls, is(expected_mem_stalls));
+    collector.checkThat(statuses.get(true).cycles, equalTo(expected_cycles));
+    collector.checkThat(statuses.get(false).cycles, equalTo(expected_cycles));
+    collector.checkThat(statuses.get(true).instructions, equalTo(expected_instructions));
+    collector.checkThat(statuses.get(false).instructions, equalTo(expected_instructions));
+    collector.checkThat(statuses.get(true).memStalls, equalTo(expected_mem_stalls));
+    collector.checkThat(statuses.get(false).memStalls, equalTo(expected_mem_stalls));
   }
 
   /* ------- REGRESSION TESTS -------- */
