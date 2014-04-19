@@ -43,7 +43,16 @@ public class SYSCALL extends Instruction {
   private Dinero din;
   private IOManager iom;
 
+    public SYSCALL() {
+      this.syntax = "%U";
+      this.paramCount = 1;
+      this.name = "SYSCALL";
+      din = Dinero.getInstance();
+      iom = IOManager.getInstance();
+    }
+
   public void IF() {
+    syscall_n = params.get(0);
     logger.info("SYSCALL (" + this.hashCode() + ") -> IF");
 
     try {
@@ -52,14 +61,6 @@ public class SYSCALL extends Instruction {
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }
-  }
-
-  public SYSCALL() {
-    this.syntax = "%U";
-    this.paramCount = 1;
-    this.name = "SYSCALL";
-    din = Dinero.getInstance();
-    iom = IOManager.getInstance();
   }
 
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
