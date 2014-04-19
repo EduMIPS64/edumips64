@@ -195,10 +195,10 @@ public class CpuTests {
                                  int cycles_without_forwarding, int instructions) throws Exception {
     Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding(path);
 
-    collector.checkThat("Cycles with forwarding", cycles_with_forwarding, equalTo(statuses.get(ForwardingStatus.ENABLED).cycles));
-    collector.checkThat("Cycles without forwarding", cycles_without_forwarding, equalTo(statuses.get(ForwardingStatus.DISABLED).cycles));
-    collector.checkThat("Instructions with forwarding", instructions, equalTo(statuses.get(ForwardingStatus.ENABLED).instructions));
-    collector.checkThat("Instructions without forwarding", instructions, equalTo(statuses.get(ForwardingStatus.DISABLED).instructions));
+    collector.checkThat("Cycles with forwarding (" + path + ")", cycles_with_forwarding, equalTo(statuses.get(ForwardingStatus.ENABLED).cycles));
+    collector.checkThat("Cycles without forwarding (" + path + ")", cycles_without_forwarding, equalTo(statuses.get(ForwardingStatus.DISABLED).cycles));
+    collector.checkThat("Instructions with forwarding (" + path + ")", instructions, equalTo(statuses.get(ForwardingStatus.ENABLED).instructions));
+    collector.checkThat("Instructions without forwarding (" + path + ")", instructions, equalTo(statuses.get(ForwardingStatus.DISABLED).instructions));
   }
 
   private void runTestAndCompareTracefileWithGolden(String path) throws Exception {
