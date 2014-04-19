@@ -220,6 +220,17 @@ public class CpuTests {
     runMipsTest("zero.s");
   }
 
+  /* Test instruction and cycle count for the simplest valid program. */
+  @Test
+  public void testHalt() throws Exception {
+      CpuTestStatus status = runMipsTest("halt.s");
+      collector.checkThat(status.cycles, equalTo(6));
+      collector.checkThat(status.instructions, equalTo(1));
+      collector.checkThat(status.memStalls, equalTo(0));
+      collector.checkThat(status.rawStalls, equalTo(0));
+      collector.checkThat(status.wawStalls, equalTo(0));
+  }
+
   /* Tests for instruction SYSCALL. */
   @Test(expected = BreakException.class)
   public void testOpenNonExistent() throws Exception {

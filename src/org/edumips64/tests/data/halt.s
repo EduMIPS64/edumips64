@@ -1,0 +1,2 @@
+.code
+syscall 0
