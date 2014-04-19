@@ -149,7 +149,7 @@ public class CycleBuilder {
         boolean inputStallOccurred = (inputStructuralStalls != cpu.getStructuralStallsDivider() + cpu.getStructuralStallsEX() + cpu.getStructuralStallsFuncUnit() + cpu.getRAWStalls() + cpu.getWAWStalls());
 
         // ID
-        if (instr[1] != null && instr[1].getName() != " " && cpu.getStatus() == CPU.CPUStatus.RUNNING) {
+        if (instr[1] != null && instr[1].getName() != " ") {
           index = getInstructionToUpdate(instr[1].getSerialNumber());
 
           if (!inputStallOccurred) {
@@ -181,10 +181,8 @@ public class CycleBuilder {
         if (instr[0] != null) {
           if (!inputStallOccurred) {
             // We must instantiate a new CycleElement only if the CPU is running or there was a JumpException and the the IF instruction was changed.
-            if (cpu.getStatus() == CPU.CPUStatus.RUNNING) {
-              elementsList.add(new CycleElement(instr[0], curTime));
-              instructionsCount++;
-            }
+            elementsList.add(new CycleElement(instr[0], curTime));
+            instructionsCount++;
           } else {
             index = getInstructionToUpdate(instr[0].getSerialNumber());
 
