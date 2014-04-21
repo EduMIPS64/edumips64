@@ -43,9 +43,9 @@ import java.lang.reflect.Array;
 public class Parser {
   private static final Logger logger = Logger.getLogger(Parser.class.getName());
   private enum AliasRegister
-  {zero, at, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, k0, k1, gp, sp, fp, ra};
+  {zero, at, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, k0, k1, gp, sp, fp, ra}
   private static final String deprecateInstruction[] = {"BNEZ", "BEQZ", "HALT", "DADDUI", "L.D", "S.D"};
-  private CPU cpu;
+
   private class VoidJump {
     public Instruction instr;
     public String label;
@@ -78,7 +78,7 @@ public class Parser {
   */
   private Parser() {
     symTab = SymbolTable.getInstance();
-    cpu = CPU.getInstance();
+    CPU.getInstance();
   }
   /** Singleton Pattern implementation
    *  @return get the Singleton instance of the Parser
@@ -730,7 +730,7 @@ public class Parser {
                                 tmpInst.getParams().add(tmpMem.getAddress() + imm);
                                 indPar = endPar + 1;
                               } catch (IrregularStringOfHexException ex) {
-                                //non ci dovrebbe mai arrivare
+                                logger.severe("Irregular string of bits: " + ex.getMessage());
                               }
                             } else {
                               MemoryElement tmpMem1 = symTab.getCell(param.substring(cc + 1, endPar).trim());
@@ -1119,7 +1119,7 @@ public class Parser {
                     tmpInst.pack();
                   }
                 } catch (IrregularStringOfBitsException ex) {
-                  //ISGROUP HA SBAGLIATO QUALCOSA
+                  logger.severe("Irregular string of bits: " + ex.getMessage());
                 }
               } else {
                 try {
@@ -1196,7 +1196,7 @@ public class Parser {
         try {
           voidJump.get(i).instr.pack();
         } catch (IrregularStringOfBitsException ex) {
-          //ISGROUP HA SBAGLIATO QUALCOSA
+          logger.severe("Irregular string of bits: " + ex.getMessage());
         }
       } else {
         numError++;
@@ -1213,6 +1213,7 @@ public class Parser {
       error.addWarning("HALT_NOT_PRESENT", row, 0, "");
 
       try {
+        logger.warning("No terminating instruction detected, adding one.");
         Instruction tmpInst = Instruction.buildInstruction("SYSCALL");
         tmpInst.getParams().add(0);
         tmpInst.setFullName("SYSCALL 0");
@@ -1220,7 +1221,7 @@ public class Parser {
         try {
           tmpInst.pack();
         } catch (IrregularStringOfBitsException ex) {
-          //ISGROUP HA SBAGLIATO QUALCOSA
+          logger.severe("Irregular string of bits: " + ex.getMessage());
         }
 
         mem.addInstruction(tmpInst, (instrCount + 4));
@@ -1231,7 +1232,9 @@ public class Parser {
           numError++;
           error.add("OUTOFINSTRUCTIONMEMORY", row, 0, "Halt");
         }
-      } catch (SameLabelsException ex) {} // impossible
+      } catch (SameLabelsException ex) {
+        logger.severe("Same labels: " + ex);
+      } // impossible
     }
 
     if (numError > 0) {
