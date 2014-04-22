@@ -296,19 +296,20 @@ public class CpuTests {
   /* ------- FPU TESTS -------- */
   @Test
   public void testFPUStalls() throws Exception {
-    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-waw.s");
+    String filename = "fpu-waw.s";
+    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding(filename);
 
     // With forwarding
-    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).cycles, equalTo(20));
-    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).instructions, equalTo(5));
-    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).wawStalls, equalTo(7));
-    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(1));
+    collector.checkThat(filename + ": cycles with forwarding.", statuses.get(ForwardingStatus.ENABLED).cycles, equalTo(20));
+    collector.checkThat(filename + ": instructions with forwarding.", statuses.get(ForwardingStatus.ENABLED).instructions, equalTo(5));
+    collector.checkThat(filename + ": WAW stalls with forwarding." ,statuses.get(ForwardingStatus.ENABLED).wawStalls, equalTo(7));
+    collector.checkThat(filename + ": RAW stalls with forwarding.", statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(1));
 
     // Without forwarding
-    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).cycles, equalTo(21));
-    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).instructions, equalTo(5));
-    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).wawStalls, equalTo(7));
-    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(2));
+    collector.checkThat(filename + ": cycles without forwarding.", statuses.get(ForwardingStatus.DISABLED).cycles, equalTo(21));
+    collector.checkThat(filename + ": instructions without forwarding.", statuses.get(ForwardingStatus.DISABLED).instructions, equalTo(5));
+    collector.checkThat(filename + ": WAW stalls without forwarding." ,statuses.get(ForwardingStatus.DISABLED).wawStalls, equalTo(7));
+    collector.checkThat(filename + ": RAW stalls without forwarding.", statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(2));
   }
 
   @Test
