@@ -22,7 +22,6 @@ package org.edumips64.core.is;
 
 import org.edumips64.core.*;
 import org.edumips64.utils.*;
-import java.util.*;
 import java.util.logging.Logger;
 import java.io.IOException;
 
@@ -35,7 +34,6 @@ public class SYSCALL extends Instruction {
 
   String OPCODE_VALUE = "000000";
   String FINAL_VALUE = "001100";
-  private java.util.List<String> syscall_params = new java.util.LinkedList<String>();
   private int syscall_n;
   private int return_value;
   private long address;
@@ -168,7 +166,7 @@ public class SYSCALL extends Instruction {
         logger.info(e.toString());
       }
     } else if (syscall_n == 5) {
-      StringBuffer temp = new StringBuffer();
+      StringBuilder temp = new StringBuilder();
 
       // In the address variable (content of R14) we have the address of
       // the format string, that we get and put in the format_string_address variable
@@ -196,7 +194,8 @@ public class SYSCALL extends Instruction {
         din.Load(Converter.binToHex(Converter.positiveIntToBin(64, i)), 8);
       }
 
-      int oldIndex = 0, newIndex = 0;
+      int oldIndex = 0;
+      int newIndex = 0;
 
       while ((newIndex = format_string.indexOf('%', oldIndex)) >= 0) {
         char type = format_string.charAt(newIndex + 1);
@@ -269,7 +268,7 @@ public class SYSCALL extends Instruction {
   }
 
   private String fetchString(long address) throws MemoryElementNotFoundException {
-    StringBuffer temp = new StringBuffer();
+    StringBuilder temp = new StringBuilder();
     boolean end_of_string = false;
 
     while (!end_of_string) {
