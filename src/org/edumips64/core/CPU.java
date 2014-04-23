@@ -39,20 +39,19 @@ public class CPU {
 
   /** FPU Elements*/
   private RegisterFP[] fpr;
-  public static enum FPExceptions {INVALID_OPERATION, DIVIDE_BY_ZERO, UNDERFLOW, OVERFLOW};
-  public static enum FPRoundingMode { TO_NEAREST, TOWARD_ZERO, TOWARDS_PLUS_INFINITY, TOWARDS_MINUS_INFINITY};
+  public static enum FPExceptions {INVALID_OPERATION, DIVIDE_BY_ZERO, UNDERFLOW, OVERFLOW}
+  public static enum FPRoundingMode { TO_NEAREST, TOWARD_ZERO, TOWARDS_PLUS_INFINITY, TOWARDS_MINUS_INFINITY}
   private FCSRRegister FCSR;
   public static List<String> knownFPInstructions; // set of Floating point instructions that must pass through the FPU pipeline
   private FPPipeline fpPipe;
   private List<String> terminatingInstructionsOPCodes;
-  private long serialNumberSeed; //is used for numerating instructions so that they are unambiguous into the pipelines
 
   /** Program Counter*/
   private Register pc, old_pc;
   private Register LO, HI;
 
   /** Pipeline status*/
-  public enum PipeStatus {IF, ID, EX, MEM, WB};
+  public enum PipeStatus {IF, ID, EX, MEM, WB}
 
   /** CPU status.
    *  READY - the CPU has been initialized but the symbol table hasn't been
@@ -99,10 +98,8 @@ public class CPU {
   }
   private CPU() {
     config = ConfigManager.getConfig();
-    //instructions enumerating
-    serialNumberSeed = 0;
     // To avoid future singleton problems
-    Instruction dummy = Instruction.buildInstruction("BUBBLE");
+    Instruction.buildInstruction("BUBBLE");
 
     logger.info("Creating the CPU...");
     cycles = 0;
@@ -251,8 +248,7 @@ public class CPU {
    *  we can halt the pipeline. The sufficient condition in order to return true is that fpPipe doesn't work
    *  and it hadn't issued any instrution now in the MEM stage */
   public boolean isPipelinesEmpty() {
-    boolean empty = true;
-    empty = empty && (pipe.get(PipeStatus.ID) == null || pipe.get(PipeStatus.ID).getName().equals(" "));
+    boolean empty = pipe.get(PipeStatus.ID) == null || pipe.get(PipeStatus.ID).getName().equals(" ");
     empty = empty && (pipe.get(PipeStatus.EX) == null || pipe.get(PipeStatus.EX).getName().equals(" "));
     empty = empty && (pipe.get(PipeStatus.MEM) == null || pipe.get(PipeStatus.MEM).getName().equals(" "));
     // WB is not checked because currently this method is called before the
@@ -357,22 +353,6 @@ public class CPU {
     return funcUnitStalls;
   }
 
-  /** Returns a legal serial number in order to numerate a new instruction
-   */
-  public long getSerialNumber() {
-    serialNumberSeed++;
-    return serialNumberSeed - 1;
-  }
-
-
-  /* Gets the stage's name of the instruction passed as serialNumber between this values
-   * A1,A2,A3,A4,M1,M2,M3,M4,M5,M6,M7,DIVXX in which XX means the FP Divider Counter.
-   * If the fpPipe doesn't contain that instruction null is returned
-  public String getFPInstructionStage(long serialNumber) {
-    return fpPipe.getInstructionStage(serialNumber);
-  }
-  */
-
   /** Gets the floating point unit enabled exceptions
    *  @return true if exceptionName is enabled, false in the other case
    */
@@ -414,23 +394,15 @@ public class CPU {
     return memoryStalls;
   }
 
-  /** Gets the list of terminating instructions*/
-  public List<String> getTerminatingInstructions() {
-    return terminatingInstructionsOPCodes;
-  }
-
   /** This method performs a single pipeline step
-  * @throws RAWHazardException when a RAW hazard is detected
   */
-  public void step() throws IntegerOverflowException, AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, WAWException, MemoryNotAvailableException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException {
+  public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, WAWException, MemoryNotAvailableException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException {
     /* The integer "breaking" is used to keep track of the BREAK
      * instruction. When the BREAK instruction enters ID, the BreakException
      * is thrown. We continue the normal cpu step flow, and at the end of
      * this flow the BreakException is re-thrown.
      */
 
-    boolean SIMUL_MODE_ENABLED = true;
-    boolean SIMUL_MODE_DISABLED = false;
     int breaking = 0;
     // Used for exception handling
     boolean masked = config.getBoolean("syncexc-masked");
@@ -454,11 +426,10 @@ public class CPU {
       if (pipe.get(PipeStatus.WB) != null) {
         boolean terminatorInstrInWB = terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.WB).getRepr().getHexString());
         //we have to execute the WB method only if some conditions occur
-        boolean notWBable = false;
         //the current instruction in WB is a terminating instruction and the fpPipe is working
-        notWBable = notWBable || (terminatorInstrInWB && !fpPipe.isEmpty());
+        boolean notWBable = terminatorInstrInWB && !fpPipe.isEmpty();
         //the current instruction in WB is a terminating instruction, the fpPipe doesn't work because it has just issued an instruction and it is in the MEM stage
-        notWBable = notWBable || (terminatorInstrInWB && fpPipe.isEmpty() && pipe.get(PipeStatus.MEM).getName() != " ");
+        notWBable = notWBable || (terminatorInstrInWB && !pipe.get(PipeStatus.MEM).getName().equals(" "));
 
         if (!pipe.get(PipeStatus.WB).getName().equals(" ")) {
           instructions++;
@@ -500,7 +471,7 @@ public class CPU {
       // EX
       logger.info("EX STAGE: " + pipe.get(PipeStatus.EX) + "\n================================");
 
-      if (fpPipe.getInstruction(SIMUL_MODE_ENABLED) == null) {
+      if (fpPipe.getInstruction(true) == null) {
         try {
           // Handling synchronous exceptions
           currentPipeStatus = PipeStatus.EX;
@@ -537,7 +508,7 @@ public class CPU {
         //the fpPipe is issuing an instruction and the EX method has to be called on it
         Instruction instr;
         //call EX
-        instr = fpPipe.getInstruction(SIMUL_MODE_DISABLED);
+        instr = fpPipe.getInstruction(false);
 
         try {
           // Handling synchronous exceptions
@@ -577,12 +548,12 @@ public class CPU {
         if (knownFPInstructions.contains(pipe.get(PipeStatus.ID).getName())) {
           //it is an FPArithmetic and it must be inserted in the fppipe
           //the fu is free
-          if (fpPipe.putInstruction(pipe.get(PipeStatus.ID), SIMUL_MODE_ENABLED) == 0) {
+          if (fpPipe.putInstruction(pipe.get(PipeStatus.ID), true) == 0) {
             if (fpPipe.isEmpty() || (!fpPipe.isEmpty() /* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/)) {
               pipe.get(PipeStatus.ID).ID();
             }
 
-            fpPipe.putInstruction(pipe.get(PipeStatus.ID), SIMUL_MODE_DISABLED);
+            fpPipe.putInstruction(pipe.get(PipeStatus.ID), false);
             pipe.put(PipeStatus.ID, null);
           } else { //the fu is filled by another instruction
             if (pipe.get(PipeStatus.ID).getName().compareToIgnoreCase("DIV.D") == 0) {
@@ -652,7 +623,6 @@ public class CPU {
       }
 
       if (breaking == 1) {
-        breaking = 0;
         logger.info("Re-thrown the exception");
         throw new BreakException();
       }
@@ -751,7 +721,7 @@ public class CPU {
    *   CPU.
    */
   public void reset() {
-    // Reset stati della CPU
+    // Reset CPU state.
     status = CPUStatus.READY;
     cycles = 0;
     instructions = 0;
@@ -761,9 +731,8 @@ public class CPU {
     funcUnitStalls = 0;
     exStalls = 0;
     memoryStalls = 0;
-    serialNumberSeed = 0;
 
-    // Reset dei registri
+    // Reset registers.
     for (int i = 0; i < 32; i++) {
       gpr[i].reset();
     }
@@ -775,17 +744,18 @@ public class CPU {
 
 
     try {
-      //reset the FCSR (only condition codes)
+      // Reset the FCSR condition codes.
       for (int cc = 0; cc < 8; cc++) {
         setFCSRConditionCode(cc, 0);
       }
 
-      //reset the FCSR flags
+      // Reset the FCSR flags.
       setFCSRFlags("V", 0);
       setFCSRFlags("O", 0);
       setFCSRFlags("U", 0);
       setFCSRFlags("Z", 0);
-      //reset the FCSR cause bits
+
+      // Reset the FCSR cause bits.
       setFCSRCause("V", 0);
       setFCSRCause("O", 0);
       setFCSRCause("U", 0);
@@ -802,7 +772,7 @@ public class CPU {
     pc.reset();
     old_pc.reset();
 
-    // Reset memoria
+    // Reset the memory.
     mem.reset();
 
     // Reset pipeline
@@ -824,7 +794,7 @@ public class CPU {
    * @return string representation of the pipeline status
    */
   public String pipeLineString() {
-    String s = new String();
+    String s = "";
     s += "IF:\t" + pipe.get(PipeStatus.IF) + "\n";
     s += "ID:\t" + pipe.get(PipeStatus.ID) + "\n";
     s += "EX:\t" + pipe.get(PipeStatus.EX) + "\n";
@@ -839,7 +809,7 @@ public class CPU {
    * @return string representation of the register file contents
    */
   public String gprString() {
-    String s = new String();
+    String s = "";
 
     int i = 0;
 
@@ -855,11 +825,11 @@ public class CPU {
    * @return a string
    */
   public String fprString() {
-    String s = new String();
+    String s = "";
     int i = 0;
 
     for (RegisterFP r: fpr) {
-      s += "Registro " + i++ + ":\t" + r.toString() + "\n";
+      s += "FP Register " + i++ + ":\t" + r.toString() + "\n";
     }
 
     return s;
@@ -889,7 +859,7 @@ public class CPU {
   }
 
   public String toString() {
-    String s = new String();
+    String s = "";
     s += mem.toString() + "\n";
     s += pipeLineString();
     s += gprString();

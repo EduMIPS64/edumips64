@@ -204,7 +204,7 @@ public class FPPipeline {
     return 3;
   }
 
-  public Instruction getInstruction(boolean simulation) {
+  public Instruction getInstruction(boolean simulation_enabled) {
     //checking if multiple FP instructions are leaving at the same time the FPPipeline
     readyToExit = 0;
     Instruction instr_mult = multiplier.getInstruction();
@@ -225,7 +225,7 @@ public class FPPipeline {
 
     if (readyToExit > 0) {
       if (instr_div != null) {
-        if (!simulation) {
+        if (!simulation_enabled) {
           divider.removeLast();
           nInstructions--;
         }
@@ -234,7 +234,7 @@ public class FPPipeline {
       }
 
       if (instr_mult != null) {
-        if (!simulation) {
+        if (!simulation_enabled) {
           multiplier.removeLast();
           nInstructions--;
         }
@@ -243,7 +243,7 @@ public class FPPipeline {
       }
 
       if (instr_adder != null) {
-        if (!simulation) {
+        if (!simulation_enabled) {
           adder.removeLast();
           nInstructions--;
         }
@@ -348,9 +348,9 @@ public class FPPipeline {
 
     /** Inserts the passed instruction in the first position of the functional unit
      * if another instruction holds that position a negative number is returned*/
-    public int putInstruction(Instruction instr, boolean simulation) {
+    public int putInstruction(Instruction instr, boolean simulation_enabled) {
       if (multiplier.get(FPPipeline.Costanti.FPMultiplierStatus.M1) == null) {
-        if (!simulation) {
+        if (!simulation_enabled) {
           multiplier.put(FPPipeline.Costanti.FPMultiplierStatus.M1, instr);
         }
 
