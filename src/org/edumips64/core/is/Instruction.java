@@ -788,7 +788,7 @@ public abstract class Instruction {
   }
 
   public String toString() {
-    return fullname;
+    return "(" + fullname + ")";
   }
 
   /**
