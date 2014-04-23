@@ -23,34 +23,20 @@
 package org.edumips64;
 
 import org.edumips64.core.*;
-import org.edumips64.core.fpu.*;
-import org.edumips64.core.is.*;
 import org.edumips64.img.*;
 import org.edumips64.ui.*;
 import org.edumips64.utils.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.event.KeyEvent.*;
-import java.net.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Handler;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.SimpleFormatter;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.KeyStroke.*;
-import javax.imageio.ImageIO;
-
-//FPU diagnostics
-import java.io.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 /** Entry point of EduMIPS64
  * @author Andrea Spadaccini, Antonella Scandura, Vanni Rizzo
@@ -71,26 +57,32 @@ public class Main extends JApplet {
   static JFileChooser jfc = new JFileChooser(new File(configStore.getString("lastdir")));
 
   static JFrame f = null;
-  private static JMenuItem open, reset, exit, single_cycle, run_to, multi_cycle, aboutUs, dinero_tracefile, tile, dinFrontend, manual, settings, stop;
+  private static JMenuItem open;
+  private static JMenuItem reset;
+  private static JMenuItem exit;
+  private static JMenuItem single_cycle;
+  private static JMenuItem run_to;
+  private static JMenuItem multi_cycle;
+  private static JMenuItem aboutUs;
+  private static JMenuItem dinero_tracefile;
+  private static JMenuItem dinFrontend;
+  private static JMenuItem manual;
+  private static JMenuItem settings;
+  private static JMenuItem stop;
   private static StatusBar sb;
   private static JMenu file, lastfiles, exec, config, window, help, lang, tools;
-  private static JCheckBoxMenuItem lang_en, lang_it, pipeFrameMI, codeFrameMI;
+  private static JCheckBoxMenuItem lang_en, lang_it;
   private static JCheckBoxMenuItem pipelineJCB, registersJCB, memoryJCB, codeJCB, cyclesJCB, statsJCB, ioJCB;
-  private static java.util.List<JCheckBoxMenuItem> frames_menu_items;
-
-  // Stuff for choosing colors
-  private static JColorChooser colorCh;
-  private static JButton applyColor;
-  private static JLabel label;
-  private static JFrame frameColorCh;
-  private static String[] pipe = {"IF", "ID", "EX", "MEM", "WB"};
 
   public static GUIIO ioFrame;
   public static IOManager iom;
 
   public final static Logger log = Logger.getLogger(Main.class.getName());
 
-  private static JInternalFrame pipeFrame, registersFrame, memoryFrame, codeFrame, cyclesFrame, statsFrame;
+  private static JInternalFrame memoryFrame;
+  private static JInternalFrame codeFrame;
+  private static JInternalFrame cyclesFrame;
+  private static JInternalFrame statsFrame;
   private static Map<String, JInternalFrame> mapped_frames;
   private static java.util.List<JInternalFrame> ordered_frames;
 
@@ -230,10 +222,8 @@ public class Main extends JApplet {
     desk = new JDesktopPane();
     Container cp = (f == null) ? getContentPane() : f.getContentPane();
     cp.setLayout(new BorderLayout());
-    frames_menu_items = new ArrayList<JCheckBoxMenuItem>();
     cp.add(createMenuBar(), BorderLayout.NORTH);
 
-    Toolkit tk = (f == null) ? getToolkit() : f.getToolkit();
     cpu = CPU.getInstance();
     cpu.setStatus(CPU.CPUStatus.READY);
 
@@ -245,20 +235,22 @@ public class Main extends JApplet {
     parser = Parser.getInstance();
 
     // Internal Frames
-    pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);
+    JInternalFrame pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);
     pipeFrame.addInternalFrameListener(new InternalFrameAdapter() {
       public void internalFrameIconified(InternalFrameEvent e) {
         pipelineJCB.setState(false);
       }
+
       public void internalFrameDeiconified(InternalFrameEvent e) {
         pipelineJCB.setState(true);
       }
     });
-    registersFrame = new JInternalFrame(CurrentLocale.getString("REGISTERS"), true, false, true, true);
+    JInternalFrame registersFrame = new JInternalFrame(CurrentLocale.getString("REGISTERS"), true, false, true, true);
     registersFrame.addInternalFrameListener(new InternalFrameAdapter() {
       public void internalFrameIconified(InternalFrameEvent e) {
         registersJCB.setState(false);
       }
+
       public void internalFrameDeiconified(InternalFrameEvent e) {
         registersJCB.setState(true);
       }
@@ -493,7 +485,7 @@ public class Main extends JApplet {
     } catch (java.io.FileNotFoundException ex) {
       String tmpfile;
 
-      if (ex.getMessage().indexOf("(") != -1) {
+      if (ex.getMessage().contains("(")) {
         tmpfile = ex.getMessage().substring(0, ex.getMessage().indexOf("("));
       } else {
         tmpfile = ex.getMessage();
@@ -640,10 +632,6 @@ public class Main extends JApplet {
     setMenuItem(ioJCB, "IO");
   }
 
-  public static boolean isWindows() {
-    return System.getProperty("os.name").substring(0, 3).equalsIgnoreCase("win");
-  }
-
   /** Creates a new menu bar.
    *  @return the menu bar
    */
@@ -668,7 +656,7 @@ public class Main extends JApplet {
     run_to = new JMenuItem();
     multi_cycle = new JMenuItem();
     stop = new JMenuItem();
-    tile = new JMenuItem();
+    JMenuItem tile = new JMenuItem();
     dinFrontend = new JMenuItem();
     manual = new JMenuItem();
     settings = new JMenuItem();
@@ -926,10 +914,10 @@ public class Main extends JApplet {
 
         try {
           mapped_frames.get("pipeline").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {}
+        } catch (java.beans.PropertyVetoException ex) {
+        }
       }
     });
-    frames_menu_items.add(pipelineJCB);
     window.add(pipelineJCB);
 
     cyclesJCB.setText(CurrentLocale.getString("cycles".toUpperCase()));
@@ -940,10 +928,10 @@ public class Main extends JApplet {
 
         try {
           mapped_frames.get("cycles").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {}
+        } catch (java.beans.PropertyVetoException ex) {
+        }
       }
     });
-    frames_menu_items.add(cyclesJCB);
     window.add(cyclesJCB);
 
     registersJCB.setText(CurrentLocale.getString("registers".toUpperCase()));
@@ -954,10 +942,10 @@ public class Main extends JApplet {
 
         try {
           mapped_frames.get("registers").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {}
+        } catch (java.beans.PropertyVetoException ex) {
+        }
       }
     });
-    frames_menu_items.add(registersJCB);
     window.add(registersJCB);
 
     statsJCB.setText(CurrentLocale.getString("stats".toUpperCase()));
@@ -968,10 +956,10 @@ public class Main extends JApplet {
 
         try {
           mapped_frames.get("stats").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {}
+        } catch (java.beans.PropertyVetoException ex) {
+        }
       }
     });
-    frames_menu_items.add(statsJCB);
     window.add(statsJCB);
 
     memoryJCB.setText(CurrentLocale.getString("memory".toUpperCase()));
@@ -982,10 +970,10 @@ public class Main extends JApplet {
 
         try {
           mapped_frames.get("memory").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {}
+        } catch (java.beans.PropertyVetoException ex) {
+        }
       }
     });
-    frames_menu_items.add(memoryJCB);
     window.add(memoryJCB);
 
     codeJCB.setText(CurrentLocale.getString("code".toUpperCase()));
@@ -996,10 +984,10 @@ public class Main extends JApplet {
 
         try {
           mapped_frames.get("code").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {}
+        } catch (java.beans.PropertyVetoException ex) {
+        }
       }
     });
-    frames_menu_items.add(codeJCB);
     window.add(codeJCB);
 
     ioJCB.setText(CurrentLocale.getString("log".toUpperCase()));
@@ -1010,10 +998,10 @@ public class Main extends JApplet {
 
         try {
           mapped_frames.get("io").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {}
+        } catch (java.beans.PropertyVetoException ex) {
+        }
       }
     });
-    frames_menu_items.add(ioJCB);
     window.add(ioJCB);
     initMenuItems();
     return mb;
@@ -1049,7 +1037,7 @@ public class Main extends JApplet {
     }
 
     // Update configuration.
-    String files = new String();
+    String files = "";
 
     for (Component c : lastfiles.getMenuComponents()) {
       if (c instanceof JMenuItem) {
@@ -1075,7 +1063,7 @@ public class Main extends JApplet {
       item.setMnemonic((int) mnemonic);
 
       // Deleting the _ character
-      StringBuffer newLocalCaption = new StringBuffer();
+      StringBuilder newLocalCaption = new StringBuilder();
 
       for (int i = 0; i < localCaption.length(); ++i)
         if (localCaption.charAt(i) != '_') {
@@ -1086,19 +1074,6 @@ public class Main extends JApplet {
     }
 
     item.setText(localCaption);
-  }
-  private static void openColorChooser(Color col) {
-    frameColorCh = new JFrame();
-    frameColorCh.setTitle(CurrentLocale.getString("CHOOSE_COLOR"));
-    frameColorCh.setLocation(400, 200);
-    Container c = frameColorCh.getContentPane();
-    colorCh = new JColorChooser();
-    colorCh.setColor(col);
-    applyColor = new JButton("applica");
-    c.add(applyColor, BorderLayout.SOUTH);
-    c.add(colorCh, BorderLayout.CENTER);
-    frameColorCh.pack();
-    frameColorCh.setVisible(true);
   }
 
   public static GUIFrontend getGUIFrontend() {
