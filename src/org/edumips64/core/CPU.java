@@ -252,7 +252,11 @@ public class CPU {
    *  and it hadn't issued any instrution now in the MEM stage */
   public boolean isPipelinesEmpty() {
     boolean empty = true;
-    empty = empty && (pipe.get(PipeStatus.MEM) == null || pipe.get(PipeStatus.MEM).getName() == " ");
+    empty = empty && (pipe.get(PipeStatus.ID) == null || pipe.get(PipeStatus.ID).getName().equals(" "));
+    empty = empty && (pipe.get(PipeStatus.EX) == null || pipe.get(PipeStatus.EX).getName().equals(" "));
+    empty = empty && (pipe.get(PipeStatus.MEM) == null || pipe.get(PipeStatus.MEM).getName().equals(" "));
+    // WB is not checked because currently this method is called before the
+    // instruction in WB is removed from the pipeline.
     empty = empty && fpPipe.isEmpty();
     return empty;
   }
@@ -466,6 +470,7 @@ public class CPU {
 
         //if the pipeline is empty and it is into the stopping state (because a long latency instruction was executed) we can halt the cpu when computations finished
         if (isPipelinesEmpty() && getStatus() == CPUStatus.STOPPING) {
+          logger.info("Pipeline is empty and we are in STOPPING --> going to HALTED.");
           setStatus(CPU.CPUStatus.HALTED);
           throw new HaltException();
         }
@@ -734,6 +739,8 @@ public class CPU {
     } catch (HaltException ex) {
       pipe.put(PipeStatus.WB, null);
       throw ex;
+    } finally {
+      logger.info("End of cycle " + cycles + "\n---------------------------------------------\n");
     }
   }
 
