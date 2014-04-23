@@ -42,7 +42,6 @@ import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.*;
 
 @RunWith(JUnit4.class)
@@ -168,7 +167,7 @@ public class CpuTests {
     }
   }
 
-  enum ForwardingStatus {ENABLED, DISABLED};
+  enum ForwardingStatus {ENABLED, DISABLED}
 
   /** Runs a MIPS64 test program with and without forwarding, raising an
    *  exception if it does not succeed.
@@ -278,8 +277,6 @@ public class CpuTests {
    * contents of forwarding.s */
   @Test
   public void testForwarding() throws Exception {
-    CpuTestStatus temp;
-
     // Simple test.
     runForwardingTest("forwarding.s", 16, 19, 10);
 
