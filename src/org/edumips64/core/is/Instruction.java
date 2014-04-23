@@ -95,7 +95,7 @@ public abstract class Instruction {
     for (InstructionEnumerator op : InstructionEnumerator.values()) {
       if (op.name().equals(name)) {
         returnedObject = op.getObject();
-        return returnedObject;
+        break;
       }
     }
 
