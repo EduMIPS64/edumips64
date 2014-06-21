@@ -36,7 +36,11 @@ public class MetaInfo {
       String decodedPath = URLDecoder.decode(path, "UTF-8");
       JarFile myJar = new JarFile(decodedPath);
       Manifest manifest = myJar.getManifest();
-      attributes = manifest.getMainAttributes();
+      if (manifest != null) {
+        attributes = manifest.getMainAttributes();
+      } else {
+        System.err.println("Error while getting the manifest from the JAR file.");
+      }
     } catch (Exception e) {
       System.err.println("Error while fetching version info from the jar file.");
     }
@@ -44,6 +48,9 @@ public class MetaInfo {
 
   // Returns the attribute value, or an empty string if it isn't found.
   public static String get(String attribute) {
+    if (attributes == null) {
+      return "";
+    }
     return attributes.getValue(attribute);
   }
 }
