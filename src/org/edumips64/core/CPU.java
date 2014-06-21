@@ -417,12 +417,16 @@ public class CPU {
     }
 
     try {
+      // Stages are executed from the last one (WB) to the first one (IF). After the
+      // logic for the given stage is executed, the instruction is moved to the next
+      // stage (except for WB, where the instruction is discarded.
       logger.info("\n\nStarting cycle " + ++cycles + "\n---------------------------------------------");
       logger.info("WB STAGE: " + pipe.get(PipeStatus.WB) + "\n================================");
       currentPipeStatus = PipeStatus.WB;
 
-      // Let's execute the WB() method of the instruction located in the
-      // WB pipeline status
+      // *************************
+      // *** WB: write-back stage
+      // *************************
       if (pipe.get(PipeStatus.WB) != null) {
         boolean terminatorInstrInWB = terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.WB).getRepr().getHexString());
         //we have to execute the WB method only if some conditions occur
@@ -436,8 +440,13 @@ public class CPU {
         }
 
         if (!notWBable) {
+          logger.info("Executing WB() for " + pipe.get(PipeStatus.MEM));
           pipe.get(PipeStatus.WB).WB();
         }
+
+        // Move the instruction in WB out of the pipeline.
+        logger.info("Instruction " + pipe.get(PipeStatus.WB) + " has been completed. Removing it.");
+        pipe.put(PipeStatus.WB, null);
 
         //if the pipeline is empty and it is into the stopping state (because a long latency instruction was executed) we can halt the cpu when computations finished
         if (isPipelinesEmpty() && getStatus() == CPUStatus.STOPPING) {
@@ -445,20 +454,16 @@ public class CPU {
           setStatus(CPU.CPUStatus.HALTED);
           throw new HaltException();
         }
-
       }
 
-      // We put null in WB, in order to avoid that an exception thrown in
-      // the next instruction leaves the already completed instruction in
-      // the WB pipeline state
-      logger.info("Instruction " + pipe.get(PipeStatus.WB) + " has been completed");
-      pipe.put(PipeStatus.WB, null);
-
-      // MEM
+      // ****************************
+      // *** MEM: memory access stage
+      // ****************************
       logger.info("MEM STAGE: " + pipe.get(PipeStatus.MEM) + "\n================================");
       currentPipeStatus = PipeStatus.MEM;
 
       if (pipe.get(PipeStatus.MEM) != null) {
+        logger.info("Executing MEM() for " + pipe.get(PipeStatus.MEM));
         pipe.get(PipeStatus.MEM).MEM();
       }
 
@@ -466,10 +471,13 @@ public class CPU {
       pipe.put(PipeStatus.WB, pipe.get(PipeStatus.MEM));
       pipe.put(PipeStatus.MEM, null);
 
-      //if there will be a stall because a lot of instructions would fill the MEM stage, the EX() method cannot be called
-      //because the integer instruction in EX cannot be moved
-      // EX
+      // *****************************************
+      // *** EX: execution/effective address stage
+      // *****************************************
       logger.info("EX STAGE: " + pipe.get(PipeStatus.EX) + "\n================================");
+
+      // if there will be a stall because a lot of instructions would fill the MEM stage, the EX()
+      // method cannot be called because the integer instruction in EX cannot be moved.
 
       if (fpPipe.getInstruction(true) == null) {
         try {
@@ -477,6 +485,7 @@ public class CPU {
           currentPipeStatus = PipeStatus.EX;
 
           if (pipe.get(PipeStatus.EX) != null) {
+            logger.info("Executing EX() for " + pipe.get(PipeStatus.EX));
             pipe.get(PipeStatus.EX).EX();
           }
         } catch (SynchronousException e) {
@@ -513,6 +522,7 @@ public class CPU {
         try {
           // Handling synchronous exceptions
           currentPipeStatus = PipeStatus.EX;
+          logger.info("Executing EX() for " + instr);
           instr.EX();
         } catch (SynchronousException e) {
           if (masked) {
@@ -538,7 +548,10 @@ public class CPU {
       //shifting instructions in the fpPipe
       fpPipe.step();
 
-      // ID
+      // *************************************************
+      // *** ID: instruction decode / register fetch stage
+      // *************************************************
+      // Jump instrucions throw JumpException in ID.
       logger.info("ID STAGE: " + pipe.get(PipeStatus.ID) + "\n================================");
       currentPipeStatus = PipeStatus.ID;
 
@@ -550,6 +563,7 @@ public class CPU {
           //the fu is free
           if (fpPipe.putInstruction(pipe.get(PipeStatus.ID), true) == 0) {
             if (fpPipe.isEmpty() || (!fpPipe.isEmpty() /* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/)) {
+              logger.info("Executing ID() for " + pipe.get(PipeStatus.ID));
               pipe.get(PipeStatus.ID).ID();
             }
 
@@ -568,6 +582,7 @@ public class CPU {
         else {
           if (pipe.get(PipeStatus.EX) == null || /*testing*/ pipe.get(PipeStatus.EX).getName().compareTo(" ") == 0) {
             if (fpPipe.isEmpty() || (!fpPipe.isEmpty() /* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/)) {
+              logger.info("Executing ID() for " + pipe.get(PipeStatus.ID));
               pipe.get(PipeStatus.ID).ID();
             }
 
@@ -579,13 +594,12 @@ public class CPU {
           else {
             throw new EXNotAvailableException();
           }
-
-
         }
-
       }
 
-      // IF
+      // *******************************
+      // *** IF: instruction fetch stage
+      // *******************************
       logger.info("IF STAGE: " + pipe.get(PipeStatus.IF) + "\n================================");
       // We don't have to execute any methods, but we must get the new
       // instruction from the symbol table.
@@ -597,6 +611,7 @@ public class CPU {
         if (pipe.get(PipeStatus.IF) != null) {  //rispetto a dinmips scambia le load con le IF
           try {
             // Can change the CPU status from RUNNING to STOPPING.
+            logger.info("Executing IF() for " + pipe.get(PipeStatus.IF));
             pipe.get(PipeStatus.IF).IF();
           } catch (BreakException exc) {
             breaking = 1;
@@ -630,9 +645,12 @@ public class CPU {
       if (syncex != null) {
         throw new SynchronousException(syncex);
       }
+      // ********************************************
+      // **** END OF THE BODY OF THE MAIN step() CODE
+      // ********************************************
     } catch (JumpException ex) {
       try {
-        if (pipe.get(PipeStatus.IF) != null) {  //rispetto a dimips scambia le load con le IF
+        if (pipe.get(PipeStatus.IF) != null) {
           pipe.get(PipeStatus.IF).IF();
         }
       } catch (BreakException bex) {
