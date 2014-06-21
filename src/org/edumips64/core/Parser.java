@@ -91,6 +91,16 @@ public class Parser {
     return instance;
   }
 
+  private String fileToString(String filename) throws IOException {
+    String tmp;
+    try (BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "ISO-8859-1"))) {
+      tmp = fileToString(r);
+    } catch (IOException e) {
+      throw e;
+    }
+    return tmp;
+  }
+
   private String fileToString(BufferedReader in) throws IOException {
     String ret = "";
 
@@ -141,8 +151,8 @@ public class Parser {
         if (!(new File(filename)).isAbsolute()) {
           filename = path + filename;
         }
-
-        String filetmp = fileToString(new BufferedReader(new InputStreamReader(new FileInputStream(filename), "ISO-8859-1")));
+        
+        String filetmp = fileToString(filename);
         checkLoop(filetmp , included);
         i ++;
       }
@@ -182,8 +192,8 @@ public class Parser {
           filename = path + filename;
         }
 
-        filetmp = filetmp.substring(0, i) + fileToString(new BufferedReader(new InputStreamReader(new FileInputStream(filename)
-                  , "ISO-8859-1"))) + filetmp.substring(end);
+        String fileContents = fileToString(filename);
+        filetmp = filetmp.substring(0, i) + fileContents + filetmp.substring(end);
       }
 
     } while (i != -1);
