@@ -39,8 +39,8 @@
     <property name="docs_src_en" value="docs/en/src" />
 
     <!-- Compilation options -->
-    <property name="src_java_version" value="6" />
-    <property name="dst_java_version" value="6" />
+    <property name="src_java_version" value="7" />
+    <property name="dst_java_version" value="7" />
     <property name="debug" value="on" />
   </target>
 
