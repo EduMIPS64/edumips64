@@ -103,8 +103,6 @@ public class Parser {
 
   private String fileToString(BufferedReader in) throws IOException {
     String ret = "";
-
-    int charRead = 0;
     String line;
 
     while ((line = in.readLine()) != null) {
@@ -113,10 +111,6 @@ public class Parser {
       if (tmp != null) {
         ret += tmp + "\n";
       }
-    }
-
-    while (charRead == 1024) {
-      ;
     }
 
     return ret;
