@@ -774,8 +774,7 @@ public abstract class Instruction {
     return comment;
   }
 
-  /** Gets the comment of the instruction as string. The comment is the text
-    *  after every semicolon in the file .s
+  /** Gets the full name of the instruction as string.
     * @return the full name of the instruction  (e.g. "DADD R1,R2,R3")
     */
   public String getFullName() {
@@ -788,7 +787,11 @@ public abstract class Instruction {
   }
 
   public String toString() {
-    return "(" + fullname + ")";
+    String repr = name + " (" + fullname + ") [# " + serialNumber + "]";
+    if (label != null && label.length() > 0) {
+      repr += " {label: " + label + "}";
+    }
+    return repr;
   }
 
   /**
