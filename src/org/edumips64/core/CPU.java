@@ -728,7 +728,7 @@ public class CPU {
       pipe.put(PipeStatus.WB, null);
       throw ex;
     } finally {
-      logger.info("End of cycle " + cycles + "\n---------------------------------------------\n");
+      logger.info("End of cycle " + cycles + "\n---------------------------------------------\n" + pipeLineString() + "\n");
     }
   }
 
