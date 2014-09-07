@@ -69,7 +69,11 @@ public class GUICode extends GUIComponent {
     TableColumn column4 = codePanel.theTable.getColumnModel().getColumn(4);
     column4.setCellRenderer(new MyTableCellRenderer());
 
-    ifIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStatus.IF));
+    Instruction ifInstruction = cpu.getPipeline().get(CPU.PipeStatus.IF);
+    ifIndex = cpu.getMemory().getInstructionIndex(ifInstruction);
+    if ((ifInstruction != null) && ifInstruction.isBubble()) {
+      ifIndex = -1;
+    }
     idIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStatus.ID));
     exIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStatus.EX));
     memIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStatus.MEM));

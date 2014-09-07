@@ -124,6 +124,10 @@ public class GUICycles extends GUIComponent {
       int row = 0;
 
       for (CycleElement el: builder.getElementsList()) {
+        // TODO: verify rendering for other cases.
+        if (!el.shouldRender()) {
+          continue;
+        }
         int column = 0;
         String pre = "IF";
         int elementTime = el.getTime();

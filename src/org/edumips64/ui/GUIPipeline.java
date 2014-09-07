@@ -235,35 +235,35 @@ public class GUIPipeline extends GUIComponent {
 
       Instruction i = pipeline.get(CPU.PipeStatus.IF);
 
-      if ((i != null) && ((i.getName() != null))) {   //!i.getName().equals(" ")
+      if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(config.getColor("IFColor"));
         g.fillRect(largh / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(CPU.PipeStatus.ID);
 
-      if ((i != null) && ((i.getName() != null) && !i.getName().equals(" "))) {
+      if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(config.getColor("IDColor"));
         g.fillRect(largh * 4 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(CPU.PipeStatus.EX);
 
-      if ((i != null) && ((i.getName() != null) && !i.getName().equals(" "))) {
+      if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(config.getColor("EXColor"));
         g.fillRect(largh * 9 / 20, (alt / 2) - (alt * 5 / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(CPU.PipeStatus.MEM);
 
-      if ((i != null) && ((i.getName() != null) && !i.getName().equals(" "))) {
+      if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(config.getColor("MEMColor"));
         g.fillRect(largh * 14 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(CPU.PipeStatus.WB);
 
-      if ((i != null) && ((i.getName() != null) && !i.getName().equals(" "))) {
+      if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(config.getColor("WBColor"));
         g.fillRect(largh * 17 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }

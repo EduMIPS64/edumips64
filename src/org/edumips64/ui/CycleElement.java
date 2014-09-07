@@ -106,6 +106,10 @@ public class CycleElement {
     return instruction.getSerialNumber();
   }
 
+  public boolean shouldRender() {
+    return !instruction.isBubble();
+  }
+
   // Map that associates to a given state the set of allowed successor states.
   // The states that are not added in the list are not checked.
   // TODO: complete the map (it does not contain all possible transitions).

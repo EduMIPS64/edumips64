@@ -854,4 +854,15 @@ public abstract class Instruction {
     Instruction i = (Instruction) instr;
     return i.getSerialNumber() == serialNumber;
   }
+
+  /**<pre>
+   * Returns true if the instruction is a BUBBLE, false otherwise. BUBBLE is used to fill
+   * the pipeline and is not a real instruction, so some parts of the UI code need to know
+   * if the instruction is a BUBBLE or not. This method abstracts the details of how to check
+   * if an instruction is a BUBBLE.
+   * </pre>
+   */
+  public boolean isBubble() {
+    return name == " ";
+  }
 }
