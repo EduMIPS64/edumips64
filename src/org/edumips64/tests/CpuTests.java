@@ -401,4 +401,11 @@ public class CpuTests {
   public void testNegativeAddress() throws Exception {
     runMipsTest("negative-address-issue-36.s");
   }
+
+  /* Issue #51: Problem with SYSCALL 0 after branch. */
+  @Test
+  public void testTerminationInID() throws Exception {
+    runForwardingTest("issue51-halt.s", 12, 18, 6);
+    runForwardingTest("issue51-syscall0.s", 12, 18, 6);
+  }
 }

@@ -564,6 +564,7 @@ public class CPU {
           if (fpPipe.putInstruction(pipe.get(PipeStatus.ID), true) == 0) {
             if (fpPipe.isEmpty() || (!fpPipe.isEmpty() /* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/)) {
               logger.info("Executing ID() for " + pipe.get(PipeStatus.ID));
+              // Can change the CPU status from RUNNING to STOPPING.
               pipe.get(PipeStatus.ID).ID();
             }
 
@@ -583,6 +584,7 @@ public class CPU {
           if (pipe.get(PipeStatus.EX) == null || /*testing*/ pipe.get(PipeStatus.EX).getName().compareTo(" ") == 0) {
             if (fpPipe.isEmpty() || (!fpPipe.isEmpty() /* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/)) {
               logger.info("Executing ID() for " + pipe.get(PipeStatus.ID));
+              // Can change the CPU status from RUNNING to STOPPING.
               pipe.get(PipeStatus.ID).ID();
             }
 
@@ -610,7 +612,6 @@ public class CPU {
       if (status == CPUStatus.RUNNING) {
         if (pipe.get(PipeStatus.IF) != null) {  //rispetto a dinmips scambia le load con le IF
           try {
-            // Can change the CPU status from RUNNING to STOPPING.
             logger.info("Executing IF() for " + pipe.get(PipeStatus.IF));
             pipe.get(PipeStatus.IF).IF();
           } catch (BreakException exc) {

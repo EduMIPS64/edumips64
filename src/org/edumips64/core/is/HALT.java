@@ -51,9 +51,9 @@ public class HALT extends Instruction {
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }
-    CPU.getInstance().setStatus(CPU.CPUStatus.STOPPING);
   }
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException {
+    CPU.getInstance().setStatus(CPU.CPUStatus.STOPPING);
   }
 
   public void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
