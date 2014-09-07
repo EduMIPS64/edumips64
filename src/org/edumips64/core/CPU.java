@@ -623,16 +623,14 @@ public class CPU {
         pipe.put(PipeStatus.ID, pipe.get(PipeStatus.IF));
         Instruction next_if;
         if (status != CPUStatus.STOPPING){
-           next_if = mem.getInstruction(pc);
-           logger.info("Fetched new instruction " + next_if);
-           old_pc.writeDoubleWord((pc.getValue()));
-           pc.writeDoubleWord((pc.getValue()) + 4);
-           logger.info("New Program Counter value: " + pc.toString());
-        } else {
-           next_if = null;
+          next_if = mem.getInstruction(pc);
+          logger.info("Fetched new instruction " + next_if);
+          old_pc.writeDoubleWord((pc.getValue()));
+          pc.writeDoubleWord((pc.getValue()) + 4);
+          logger.info("New Program Counter value: " + pc.toString());
+          logger.info("Putting " + next_if + "in IF.");
+          pipe.put(PipeStatus.IF, next_if);
         }
-        logger.info("Putting " + next_if + "in IF.");
-        pipe.put(PipeStatus.IF, next_if);
       } else {
         pipe.put(PipeStatus.ID, Instruction.buildInstruction("BUBBLE"));
       }
