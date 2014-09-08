@@ -440,7 +440,7 @@ public class CPU {
         }
 
         if (!notWBable) {
-          logger.info("Executing WB() for " + pipe.get(PipeStatus.MEM));
+          logger.info("Executing WB() for " + pipe.get(PipeStatus.WB));
           pipe.get(PipeStatus.WB).WB();
         }
 
