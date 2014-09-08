@@ -5,10 +5,11 @@ set -e
 set -u
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-  if [[ "$JAVA_HOME" == *java-6* ]]; then
-    echo "Java 6 worker, updating JAR on GitHub pages"
+  if [[ "$JAVA_HOME" == *java-8* ]]; then
+    echo "Java 8 worker, updating JAR on GitHub pages"
   else
-    echo "Non-java 6 worker. Not updating JAR"
+    echo "Non-java 8 worker. Not updating JAR"
+    echo "JAVA_HOME=${JAVA_HOME}"
     exit 0
   fi
 
