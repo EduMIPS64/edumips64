@@ -47,10 +47,10 @@ public class BitSet64 extends FixedBitSet {
     if (value < 0 || value > 255) {
       throw new IrregularWriteOperationException();
     } else {
-      String bits = new String();
+      String bits = Converter.positiveIntToBin(value);
 
       try {
-        bits = Converter.positiveIntToBin(value);
+
         this.reset(false);
         //dobbiamo scrivere solo negli ultimi 8 bit
         //ma considerando la dimensione della nuova stringa di bit!!
@@ -73,11 +73,10 @@ public class BitSet64 extends FixedBitSet {
     if (value < -128 || value > 127) {
       throw new IrregularWriteOperationException();
     } else {
-      String bits = new String();
+      String bits = Converter.positiveIntToBin(value);
 
       if (value >= 0) {
         try {
-          bits = Converter.positiveIntToBin(value);
           this.reset(false);
           this.setBits(bits, size - bits.length());
         } catch (IrregularStringOfBitsException e) {
@@ -89,7 +88,6 @@ public class BitSet64 extends FixedBitSet {
         value = -value;
 
         try {
-          bits = Converter.positiveIntToBin(value);
           bits = Converter.twoComplement(bits);
           //estensione del segno
           this.reset(true);  //il numero Ãš negativo, ci vogliono tutti '1'
@@ -116,11 +114,10 @@ public class BitSet64 extends FixedBitSet {
     if (value < -128 || value > 255) {
       throw new IrregularWriteOperationException();
     } else {
-      String bits = new String();
+      String bits = Converter.positiveIntToBin(8, value);
 
       if (value >= 0) {
         try {
-          bits = Converter.positiveIntToBin(8, value);
           this.setBits(bits, offset);
         } catch (IrregularStringOfBitsException e) {
           System.err.println("stringa errata: " + bits);
@@ -131,7 +128,6 @@ public class BitSet64 extends FixedBitSet {
         value = -value;
 
         try {
-          bits = Converter.positiveIntToBin(8, value);
           bits = Converter.twoComplement(bits);
           this.setBits(bits, offset);
         } catch (IrregularStringOfBitsException e) {
@@ -153,10 +149,9 @@ public class BitSet64 extends FixedBitSet {
     if (value < 0 || value > 65535) {
       throw new IrregularWriteOperationException();
     } else {
-      String bits = new String();
+      String bits = Converter.positiveIntToBin(value);
 
       try {
-        bits = Converter.positiveIntToBin(value);
         this.reset(false);
         //dobbiamo scrivere solo negli ultimi 16 bit
         this.setBits(bits, size - bits.length());
@@ -179,11 +174,10 @@ public class BitSet64 extends FixedBitSet {
     if (value < -32768 || value > 32767) {
       throw new IrregularWriteOperationException();
     } else {
-      String bits = new String();
+      String bits = Converter.positiveIntToBin(value);
 
       if (value >= 0) {
         try {
-          bits = Converter.positiveIntToBin(value);
           this.reset(false);
           this.setBits(bits, size - bits.length());
         } catch (IrregularStringOfBitsException e) {
@@ -195,7 +189,6 @@ public class BitSet64 extends FixedBitSet {
         value = -value;
 
         try {
-          bits = Converter.positiveIntToBin(value);
           bits = Converter.twoComplement(bits);
           //estensione del segno
           this.reset(true);  //il numero Ãš negativo, ci vogliono tutti '1'
@@ -224,11 +217,10 @@ public class BitSet64 extends FixedBitSet {
     } else if (offset % 16 !=  0) {
       throw new NotAlignException();
     } else {
-      String bits = new String();
+      String bits = Converter.positiveIntToBin(16, value);
 
       if (value >= 0) {
         try {
-          bits = Converter.positiveIntToBin(16, value);
           this.setBits(bits, offset);
         } catch (IrregularStringOfBitsException e) {
           System.err.println("stringa errata: " + bits);
@@ -239,7 +231,6 @@ public class BitSet64 extends FixedBitSet {
         value = -value;
 
         try {
-          bits = Converter.positiveIntToBin(16, value);
           bits = Converter.twoComplement(bits);
           this.setBits(bits, offset);
         } catch (IrregularStringOfBitsException e) {
@@ -260,10 +251,9 @@ public class BitSet64 extends FixedBitSet {
     if (value < 0 || value > 4294967295L) {
       throw new IrregularWriteOperationException();
     } else {
-      String bits = new String();
+      String bits = Converter.positiveIntToBin(value);
 
       try {
-        bits = Converter.positiveIntToBin(value);
         this.reset(false);
         //dobbiamo scrivere solo negli ultimi 32 bit
         this.setBits(bits, size - bits.length());
@@ -284,11 +274,10 @@ public class BitSet64 extends FixedBitSet {
       throw new IrregularWriteOperationException();
     }
 
-    String bits = new String();
+    String bits = Converter.positiveIntToBin(value);
 
     if (value >= 0) {
       try {
-        bits = Converter.positiveIntToBin(value);
         this.reset(false);
         this.setBits(bits, size - bits.length());
       } catch (IrregularStringOfBitsException e) {
@@ -300,7 +289,6 @@ public class BitSet64 extends FixedBitSet {
       value = -value;
 
       try {
-        bits = Converter.positiveIntToBin(value);
         bits = Converter.twoComplement(bits);
         //estensione del segno
         this.reset(true);  //il numero Ãš negativo, ci vogliono tutti '1'
@@ -331,11 +319,10 @@ public class BitSet64 extends FixedBitSet {
       throw new NotAlignException();
     }
 
-    String bits = new String();
+    String bits = Converter.positiveIntToBin(32, value);
 
     if (value >= 0) {
       try {
-        bits = Converter.positiveIntToBin(32, value);
         this.setBits(bits, offset);
       } catch (IrregularStringOfBitsException e) {
         System.err.println("stringa errata: " + bits);
@@ -346,7 +333,6 @@ public class BitSet64 extends FixedBitSet {
       value = -value;
 
       try {
-        bits = Converter.positiveIntToBin(32, value);
         bits = Converter.twoComplement(bits);
         this.setBits(bits, offset);
       } catch (IrregularStringOfBitsException e) {
@@ -375,11 +361,10 @@ public class BitSet64 extends FixedBitSet {
       //throw new IrregularWriteOperationException();
     }
 
-    String bits = new String();
+    String bits = Converter.positiveIntToBin(value);
 
     if (value >= 0) {
       try {
-        bits = Converter.positiveIntToBin(value);
         this.reset(false);
         this.setBits(bits, size - bits.length());
       } catch (IrregularStringOfBitsException e) {
