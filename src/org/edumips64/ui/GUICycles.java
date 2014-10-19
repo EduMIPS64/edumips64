@@ -114,7 +114,6 @@ public class GUICycles extends GUIComponent {
       setBackground(Color.white);
       g.setColor(Color.black);
       Font f1 = new Font("Arial", Font.PLAIN, 11);
-      FontMetrics fm1 = g.getFontMetrics(f1);
       g.setFont(f1);
 
       fill(g);
@@ -191,7 +190,6 @@ public class GUICycles extends GUIComponent {
       setBackground(Color.white);
       g.setColor(Color.black);
       Font f1 = new Font("Arial", Font.PLAIN, 11);
-      FontMetrics fm1 = g.getFontMetrics(f1);
       g.setFont(f1);
       int i = 0;
 

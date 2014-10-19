@@ -83,28 +83,5 @@ public abstract class Loading extends LDSTInstructions {
     cpu.getRegister(params.get(RT_FIELD)).setBits(TR[LMD_REGISTER].getBinString(), 0);
     cpu.getRegister(params.get(RT_FIELD)).decrWriteSemaphore();
   }
-  public static void main(String args[]) {
-    try {
-      //LD inst=new LD();
-      //LB inst=new LB();
-      //LH inst=new LH();
-      LW inst = new LW();
-      CPU cpu = CPU.getInstance();
-      inst.params.add(1);
-      inst.params.add(4);  //offset    // (OFFSET+BASE) OCCHIO ALL'ALLINEAMENTO A SECONDA DEL TIPO DI ISTRUZIONE USATA
-      inst.params.add(0);  //base
-      //R1=43524464456523452L
-      int address = (inst.params.get(BASE_FIELD) + inst.params.get(OFFSET_FIELD));
-      MemoryElement me = memory.getCellByAddress(address);
-      me.writeDoubleWord(12341234214312L);
-      //me.setBits("01010101",56);
-      inst.pack();
-      inst.ID();
-      inst.MEM();
-      inst.WB();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
 }
 

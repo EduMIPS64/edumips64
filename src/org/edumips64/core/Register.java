@@ -136,23 +136,4 @@ public class Register extends BitSet64 {
 
     return s;
   }
-
-  public static void main(String[] args) throws Exception {
-    Register reg[] = new Register[32];
-    java.util.Random rand = new java.util.Random();
-    int index = 0;
-    java.math.BigInteger big = new java.math.BigInteger("1001", 2);
-    System.out.println(big);
-
-    for (Register r : reg) {
-      r = new Register("test");
-    }
-
-    Register r1 = new Register("test");
-    long v = -1 * (long)(Math.pow(2.0, 63.0));
-    r1.writeDoubleWord(v);
-    System.out.println("String: " + r1.getBinString());
-    System.out.println("big value = " + v);
-    System.out.println("Signed value: " + r1.getValue());
-  }
 }

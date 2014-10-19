@@ -249,6 +249,18 @@ public class CpuTests {
     runMipsTest("b.s");
   }
 
+  /* Test for instruction DADDU */
+  @Test
+  public void testDADDU() throws Exception {
+    runMipsTest("daddu-simple-test.s");
+}
+
+  /* Test for instruction DSUBU */
+  @Test
+  public void testDSUBU() throws Exception {
+        runMipsTest("dsubu-simple-test.s");
+    }
+
   /* Test for the instruction JAL */
   @Test
   public void testJAL() throws Exception {

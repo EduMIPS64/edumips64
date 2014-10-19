@@ -62,7 +62,6 @@ public class ErrorDialog extends JDialog {
       }
     });
     buttonPanel.add(okButton);
-    String[] columnnames = {"error1"};
 
     String[] columnNames = {
       CurrentLocale.getString("ErrorDialog.ROW"),

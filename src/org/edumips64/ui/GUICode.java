@@ -155,7 +155,7 @@ public class GUICode extends GUIComponent {
         case 0:
 
           try {
-            return Converter.binToHex(Converter.positiveIntToBin(16, row++ * 4));
+            return Converter.binToHex(Converter.positiveIntToBin(16, row * 4));
           } catch (IrregularStringOfBitsException ex) {
             ex.printStackTrace();
           }
