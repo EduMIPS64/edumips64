@@ -48,9 +48,6 @@ public class DSUBU extends ALU_RType {
     String rs = TR[RS_FIELD].getBinString();
     String rt = TR[RT_FIELD].getBinString();
 
-    long rs_int = Converter.binToLong(rs, false);
-    long rt_int = Converter.binToLong(rt, false);
-
     String outputstring = InstructionsUtils.twosComplementSubstraction(rs, rt);
 
     //There isn't IntegerOverflow cases
