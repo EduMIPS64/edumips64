@@ -808,7 +808,6 @@ public class Main extends JApplet {
       }
     });
     // ---------------- LANGUAGE MENU
-    Toolkit tk  = lang.getToolkit();
     config.add(lang);
 
     try {
