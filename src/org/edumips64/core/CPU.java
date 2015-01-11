@@ -602,19 +602,20 @@ public class CPU {
     // Code of the synchronous exception that happens in EX.
     String syncex = null;
 
+    Instruction completedFpInstruction = fpPipe.getCompletedInstruction();
     Instruction instruction;
-    boolean isFP = fpPipe.getInstruction(true) != null;
+    boolean shouldExecuteFP = completedFpInstruction != null;
 
     // if there will be a stall because a lot of instructions would fill the MEM stage, the EX()
     // method cannot be called because the integer instruction in EX cannot be moved.
-    if (!isFP) {
+    if (!shouldExecuteFP) {
       instruction = pipe.get(PipeStage.EX);
     } else {
       //a structural stall has to be raised if the EX stage contains an instruction different from a bubble or other fu's contain instructions (counter of structural stalls must be incremented)
       if ((pipe.get(PipeStage.EX) != null && !(pipe.get(PipeStage.EX).getName().compareTo(" ") == 0)) || fpPipe.getNReadyToExitInstr() > 1) {
         memoryStalls++;
       }
-      instruction = fpPipe.getInstruction(false);
+      instruction = completedFpInstruction;
     }
 
     // Execute the instruction, and handle synchronous exceptions.
@@ -641,7 +642,7 @@ public class CPU {
 
     logger.info("Moving " + instruction + " to MEM");
     pipe.put(PipeStage.MEM, instruction);
-    if (!isFP) {
+    if (!shouldExecuteFP) {
       pipe.put(PipeStage.EX, null);
     }
 

@@ -63,7 +63,7 @@ public class FPPipeline {
     adder.reset();
     entryQueue = new LinkedList<Instruction>();
     pipeStatus = new int[1];
-    pipeStatus[STRUCT_HAZARD] = 0; // 0 means that any structural hazard at the last getInstruction() call
+    pipeStatus[STRUCT_HAZARD] = 0; // 0 means that any structural hazard at the last getCompletedInstruction() call
     // happened. 1 means the contrary.
     readyToExit = 0;
   }
@@ -204,59 +204,37 @@ public class FPPipeline {
     return 3;
   }
 
-  public Instruction getInstruction(boolean simulation_enabled) {
-    //checking if multiple FP instructions are leaving at the same time the FPPipeline
-    readyToExit = 0;
-    Instruction instr_mult = multiplier.getInstruction();
-    Instruction instr_adder = adder.getInstruction();
-    Instruction instr_div = divider.getInstruction();
+  // Returns the completed FP instruction. If more than one instruction completed, it will return them in the following
+  // order: 1. divider; 2. multiplier; 3. adder. If no instruction is complete, it'll return null.
+  // The returned instruction will be removed from the corresponding FPU unit.
+  public Instruction getCompletedInstruction() {
+    Instruction dividerInstruction = divider.getInstruction();
+    Instruction multiplierInstruction = multiplier.getInstruction();
+    Instruction adderInstruction = adder.getInstruction();
 
-    if (instr_mult != null) {
-      readyToExit++;
+    if (dividerInstruction != null) {
+      divider.removeLast();
+      nInstructions--;
+      return dividerInstruction;
     }
 
-    if (instr_adder != null) {
-      readyToExit++;
+    if (multiplierInstruction != null) {
+      multiplier.removeLast();
+      nInstructions--;
+      return multiplierInstruction;
     }
 
-    if (instr_div != null) {
-      readyToExit++;
-    }
-
-    if (readyToExit > 0) {
-      if (instr_div != null) {
-        if (!simulation_enabled) {
-          divider.removeLast();
-          nInstructions--;
-        }
-
-        return instr_div;
-      }
-
-      if (instr_mult != null) {
-        if (!simulation_enabled) {
-          multiplier.removeLast();
-          nInstructions--;
-        }
-
-        return instr_mult;
-      }
-
-      if (instr_adder != null) {
-        if (!simulation_enabled) {
-          adder.removeLast();
-          nInstructions--;
-        }
-
-        return instr_adder;
-      }
+    if (adderInstruction != null) {
+      adder.removeLast();
+      nInstructions--;
+      return adderInstruction;
     }
 
     return null;
   }
 
   /* Shifts instructions into the functional units and calls the EX() method for instructions in the first step
-   * this method is called from getInstruction in order to prepare the pipeline for a new instruction entrance  */
+   * this method is called from getCompletedInstruction in order to prepare the pipeline for a new instruction entrance  */
   public void step() {
     //try catch is necessary for handling structural stalls and  stalls coming from the EX() method
 
@@ -378,7 +356,7 @@ public class FPPipeline {
     }
 
     /* Shifts instructions into the functional unit and calls the EX() method for instructions in the secondary step
-     * this method is called from getInstruction in order to prepare the pipeline for a new instruction entrance  */
+     * this method is called from getCompletedInstruction in order to prepare the pipeline for a new instruction entrance  */
     public void step() {
       if (multiplier.get(FPPipeline.Costanti.FPMultiplierStatus.M7) == null) {
         multiplier.put(FPPipeline.Costanti.FPMultiplierStatus.M7, multiplier.get(FPPipeline.Costanti.FPMultiplierStatus.M6));
@@ -475,7 +453,7 @@ public class FPPipeline {
     }
 
     /* Shifts instructions into the functional unit and calls the EX() method for the instruction in the secondary step
-     * this method is called from getInstruction in order to prepare the pipeline for a new instruction entrance  */
+     * this method is called from getCompletedInstruction in order to prepare the pipeline for a new instruction entrance  */
     public void step() {
       if (adder.get(FPPipeline.Costanti.FPAdderStatus.A4) == null) {
         adder.put(FPPipeline.Costanti.FPAdderStatus.A4, adder.get(FPPipeline.Costanti.FPAdderStatus.A3));
@@ -543,9 +521,9 @@ public class FPPipeline {
 
 
     /* Shifts instructions into the functional unit and calls the EX() method for the instruction in the secondary step
-     * this method is called from getInstruction in order to prepare the pipeline for a new instruction entrance  */
+     * this method is called from getCompletedInstruction in order to prepare the pipeline for a new instruction entrance  */
     public void step() {
-      //if counter has reached 0 the instruction was removed by the previous getInstruction invocation wich called removeLast()
+      //if counter has reached 0 the instruction was removed by the previous getCompletedInstruction invocation wich called removeLast()
       //if counter is a number between 0 and 24 it must be decremented by 1
       if (this.instr != null && counter > 0 && counter < 25) {
         counter--;
