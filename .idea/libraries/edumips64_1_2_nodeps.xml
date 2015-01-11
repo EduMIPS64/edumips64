@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="edumips64-1.2-nodeps">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/edumips64-1.2-nodeps.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

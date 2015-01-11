@@ -5,3 +5,5 @@
 build
 build/*
 docs/*/output
+.idea/workspace.iml
+.idea/tasks.iml
