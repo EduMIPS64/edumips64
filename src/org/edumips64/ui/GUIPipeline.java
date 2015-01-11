@@ -41,7 +41,7 @@ public class GUIPipeline extends GUIComponent {
   private int numMultiplier;
   private int numAdder;
 
-  Map <CPU.PipeStatus, Instruction> pipeline;
+  Map <CPU.PipeStage, Instruction> pipeline;
 
   private ConfigStore config = ConfigManager.getConfig();
 
@@ -77,7 +77,7 @@ public class GUIPipeline extends GUIComponent {
     numMultiplier = 7;
     numAdder = 4;
     pannello = new Pannello1();
-    pipeline = new HashMap<CPU.PipeStatus, Instruction>();
+    pipeline = new HashMap<CPU.PipeStage, Instruction>();
     CPU.getInstance();
   }
 
@@ -90,11 +90,11 @@ public class GUIPipeline extends GUIComponent {
   public void update() {
     pipeline = cpu.getPipeline();
 
-    Instruction i = pipeline.get(CPU.PipeStatus.IF);
-    i = pipeline.get(CPU.PipeStatus.ID);
-    i = pipeline.get(CPU.PipeStatus.EX);
-    i = pipeline.get(CPU.PipeStatus.MEM);
-    i = pipeline.get(CPU.PipeStatus.WB);
+    Instruction i = pipeline.get(CPU.PipeStage.IF);
+    i = pipeline.get(CPU.PipeStage.ID);
+    i = pipeline.get(CPU.PipeStage.EX);
+    i = pipeline.get(CPU.PipeStage.MEM);
+    i = pipeline.get(CPU.PipeStage.WB);
   }
 
   public void draw() {
@@ -233,35 +233,35 @@ public class GUIPipeline extends GUIComponent {
 
 
 
-      Instruction i = pipeline.get(CPU.PipeStatus.IF);
+      Instruction i = pipeline.get(CPU.PipeStage.IF);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(config.getColor("IFColor"));
         g.fillRect(largh / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
-      i = pipeline.get(CPU.PipeStatus.ID);
+      i = pipeline.get(CPU.PipeStage.ID);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(config.getColor("IDColor"));
         g.fillRect(largh * 4 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
-      i = pipeline.get(CPU.PipeStatus.EX);
+      i = pipeline.get(CPU.PipeStage.EX);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(config.getColor("EXColor"));
         g.fillRect(largh * 9 / 20, (alt / 2) - (alt * 5 / 12), largh / 10, alt / 6);
       }
 
-      i = pipeline.get(CPU.PipeStatus.MEM);
+      i = pipeline.get(CPU.PipeStage.MEM);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(config.getColor("MEMColor"));
         g.fillRect(largh * 14 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
-      i = pipeline.get(CPU.PipeStatus.WB);
+      i = pipeline.get(CPU.PipeStage.WB);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(config.getColor("WBColor"));
@@ -350,7 +350,7 @@ public class GUIPipeline extends GUIComponent {
       FontMetrics fm1 = g.getFontMetrics(f1);
       g.setFont(f1);
       g.setColor(Color.blue);
-      Instruction i = pipeline.get(CPU.PipeStatus.IF);
+      Instruction i = pipeline.get(CPU.PipeStage.IF);
 
       if (i != null) {
         if (i.getName() != null && !i.getName().equals(" ")) {
@@ -358,7 +358,7 @@ public class GUIPipeline extends GUIComponent {
         }
       }
 
-      i = pipeline.get(CPU.PipeStatus.ID);
+      i = pipeline.get(CPU.PipeStage.ID);
 
       if (i != null) {
         if (i.getName() != null && !i.getName().equals(" ")) {
@@ -366,7 +366,7 @@ public class GUIPipeline extends GUIComponent {
         }
       }
 
-      i = pipeline.get(CPU.PipeStatus.EX);
+      i = pipeline.get(CPU.PipeStage.EX);
 
       if (i != null) {
         if (i.getName() != null && !i.getName().equals(" ")) {
@@ -374,7 +374,7 @@ public class GUIPipeline extends GUIComponent {
         }
       }
 
-      i = pipeline.get(CPU.PipeStatus.MEM);
+      i = pipeline.get(CPU.PipeStage.MEM);
 
       if (i != null) {
         if (i.getName() != null && !i.getName().equals(" ")) {
@@ -382,7 +382,7 @@ public class GUIPipeline extends GUIComponent {
         }
       }
 
-      i = pipeline.get(CPU.PipeStatus.WB);
+      i = pipeline.get(CPU.PipeStage.WB);
 
       if (i != null) {
         if (i.getName() != null && !i.getName().equals(" ")) {

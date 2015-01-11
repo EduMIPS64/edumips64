@@ -21,12 +21,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.edumips64.ui;
-import org.edumips64.Main;
 import org.edumips64.core.*;
 import org.edumips64.core.is.Instruction;
 import org.edumips64.utils.*;
 import java.awt.*;
-import java.util.*;
 import javax.swing.*;
 import javax.swing.table.*;
 /**
@@ -69,15 +67,15 @@ public class GUICode extends GUIComponent {
     TableColumn column4 = codePanel.theTable.getColumnModel().getColumn(4);
     column4.setCellRenderer(new MyTableCellRenderer());
 
-    Instruction ifInstruction = cpu.getPipeline().get(CPU.PipeStatus.IF);
+    Instruction ifInstruction = cpu.getPipeline().get(CPU.PipeStage.IF);
     ifIndex = cpu.getMemory().getInstructionIndex(ifInstruction);
     if ((ifInstruction != null) && ifInstruction.isBubble()) {
       ifIndex = -1;
     }
-    idIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStatus.ID));
-    exIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStatus.EX));
-    memIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStatus.MEM));
-    wbIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStatus.WB));
+    idIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.ID));
+    exIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.EX));
+    memIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.MEM));
+    wbIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.WB));
 
     A1Index = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 1));
     A2Index = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 2));
