@@ -95,8 +95,6 @@ public class Parser {
     String tmp;
     try (BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "ISO-8859-1"))) {
       tmp = fileToString(r);
-    } catch (IOException e) {
-      throw e;
     }
     return tmp;
   }
