@@ -54,8 +54,14 @@ public class CurrentLocale {
 
   public static void loadMessages(String filename, Map<String, String> map) throws FileNotFoundException, IOException {
     String line;
+    URL url;
+    String name = "MessagesBundle_" + filename + ".properties";
 
-    URL url = CurrentLocale.class.getResource("MessagesBundle_" + filename + ".properties");
+    url = CurrentLocale.class.getResource(name);
+    if (url == null) {
+      // Hacky work-around to run EduMIPS64 in a debugger, out of a JAR.
+      url = new File("../src/org/edumips64/utils/" + name).toURI().toURL();
+    }
     InputStreamReader isr = new InputStreamReader(url.openStream());
     BufferedReader br = new BufferedReader(isr);
 
