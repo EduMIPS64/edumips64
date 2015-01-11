@@ -516,13 +516,17 @@ public class CPU {
     }
   }
 
+  public void changeStage(PipeStatus newStatus) {
+    logger.info(newStatus.toString() + " STAGE: " + pipe.get(newStatus) + "\n================================");
+    currentPipeStatus = newStatus;
+  }
+
   // Individual stages.
 
   public void stepIF() throws IrregularStringOfBitsException, HaltException, IrregularWriteOperationException, BreakException {
-    logger.info("IF STAGE: " + pipe.get(PipeStatus.IF) + "\n================================");
     // We don't have to execute any methods, but we must get the new
     // instruction from the symbol table.
-    currentPipeStatus = PipeStatus.IF;
+    changeStage(PipeStatus.IF);
 
     logger.info("CPU Status: " + status.name());
 
@@ -557,8 +561,7 @@ public class CPU {
   }
 
   public void stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, HaltException, RAWException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
-    logger.info("ID STAGE: " + pipe.get(PipeStatus.ID) + "\n================================");
-    currentPipeStatus = PipeStatus.ID;
+    changeStage(PipeStatus.ID);
 
     if (pipe.get(PipeStatus.ID) != null) {
       boolean isFP = knownFPInstructions.contains(pipe.get(PipeStatus.ID).getName());
@@ -590,8 +593,7 @@ public class CPU {
   }
 
   public String stepEX() throws SynchronousException, HaltException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
-    logger.info("EX STAGE: " + pipe.get(PipeStatus.EX) + "\n================================");
-    currentPipeStatus = PipeStatus.EX;
+    changeStage(PipeStatus.EX);
 
     // Used for exception handling
     boolean masked = config.getBoolean("syncexc-masked");
@@ -651,8 +653,7 @@ public class CPU {
   }
 
   public void stepMEM() throws HaltException, NotAlignException, IrregularWriteOperationException, MemoryElementNotFoundException, AddressErrorException, IrregularStringOfBitsException {
-    logger.info("MEM STAGE: " + pipe.get(PipeStatus.MEM) + "\n================================");
-    currentPipeStatus = PipeStatus.MEM;
+    changeStage(PipeStatus.MEM);
 
     if (pipe.get(PipeStatus.MEM) != null) {
       logger.info("Executing MEM() for " + pipe.get(PipeStatus.MEM));
@@ -665,8 +666,7 @@ public class CPU {
   }
 
   public void stepWB() throws IrregularStringOfBitsException, HaltException {
-    logger.info("WB STAGE: " + pipe.get(PipeStatus.WB) + "\n================================");
-    currentPipeStatus = PipeStatus.WB;
+    changeStage(PipeStatus.WB);
 
     if (pipe.get(PipeStatus.WB) != null) {
       boolean terminatorInstrInWB = terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.WB).getRepr().getHexString());
