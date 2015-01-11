@@ -592,27 +592,35 @@ public class CPU {
 
   public String stepEX() throws SynchronousException, HaltException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
     logger.info("EX STAGE: " + pipe.get(PipeStatus.EX) + "\n================================");
+    currentPipeStatus = PipeStatus.EX;
 
     // Used for exception handling
     boolean masked = config.getBoolean("syncexc-masked");
     boolean terminate = config.getBoolean("syncexc-terminate");
 
-
     // Code of the synchronous exception that happens in EX.
     String syncex = null;
 
+    Instruction instruction;
+    boolean isFP = fpPipe.getInstruction(true) != null;
+
     // if there will be a stall because a lot of instructions would fill the MEM stage, the EX()
     // method cannot be called because the integer instruction in EX cannot be moved.
+    if (!isFP) {
+      instruction = pipe.get(PipeStatus.EX);
+    } else {
+      //a structural stall has to be raised if the EX stage contains an instruction different from a bubble or other fu's contain instructions (counter of structural stalls must be incremented)
+      if ((pipe.get(PipeStatus.EX) != null && !(pipe.get(PipeStatus.EX).getName().compareTo(" ") == 0)) || fpPipe.getNReadyToExitInstr() > 1) {
+        memoryStalls++;
+      }
+      instruction = fpPipe.getInstruction(false);
+    }
 
-    if (fpPipe.getInstruction(true) == null) {
+    // Execute the instruction, and handle synchronous exceptions.
+    if (instruction != null) {
       try {
-        // Handling synchronous exceptions
-        currentPipeStatus = PipeStatus.EX;
-
-        if (pipe.get(PipeStatus.EX) != null) {
-          logger.info("Executing EX() for " + pipe.get(PipeStatus.EX));
-          pipe.get(PipeStatus.EX).EX();
-        }
+        logger.info("Executing EX() for " + instruction);
+        instruction.EX();
       } catch (SynchronousException e) {
         if (masked) {
           logger.info("[EXCEPTION] [MASKED] " + e.getCode());
@@ -620,57 +628,23 @@ public class CPU {
           if (terminate) {
             logger.info("Terminating due to an unmasked exception");
             throw new SynchronousException(e.getCode());
-          } else
-          // We must complete this cycle, but we must notify the user.
-          // If the syncex string is not null, the CPU code will throw
-          // the exception at the end of the step
-          {
+          } else {
+            // We must complete this cycle, but we must notify the user.
+            // If the syncex string is not null, the CPU code will throw
+            // the exception at the end of the step
             syncex = e.getCode();
           }
         }
       }
-
-      logger.info("Moving " + pipe.get(PipeStatus.EX) + " to MEM");
-      pipe.put(PipeStatus.MEM, pipe.get(PipeStatus.EX));
-      pipe.put(PipeStatus.EX, null);
-    } else {
-      //a structural stall has to be raised if the EX stage contains an instruction different from a bubble or other fu's contain instructions (counter of structural stalls must be incremented)
-      if ((pipe.get(PipeStatus.EX) != null && !(pipe.get(PipeStatus.EX).getName().compareTo(" ") == 0)) || fpPipe.getNReadyToExitInstr() > 1) {
-        memoryStalls++;
-      }
-
-      //the fpPipe is issuing an instruction and the EX method has to be called on it
-      Instruction instr;
-      //call EX
-      instr = fpPipe.getInstruction(false);
-
-      try {
-        // Handling synchronous exceptions
-        currentPipeStatus = PipeStatus.EX;
-        logger.info("Executing EX() for " + instr);
-        instr.EX();
-      } catch (SynchronousException e) {
-        if (masked) {
-          logger.info("[MASKED] " + e.getCode());
-        } else {
-          if (terminate) {
-            logger.info("Terminating due to an unmasked exception");
-            throw new SynchronousException(e.getCode());
-          } else
-          // We must complete this cycle, but we must notify the user.
-          // If the syncex string is not null, the CPU code will throw
-          // the exception at the end of the step
-          {
-            syncex = e.getCode();
-          }
-        }
-      }
-
-      logger.info("Moving " + instr + " to MEM");
-      pipe.put(PipeStatus.MEM, instr);
     }
 
-    //shifting instructions in the fpPipe
+    logger.info("Moving " + instruction + " to MEM");
+    pipe.put(PipeStatus.MEM, instruction);
+    if (!isFP) {
+      pipe.put(PipeStatus.EX, null);
+    }
+
+    // Shift instructions in the fpPipe.
     fpPipe.step();
 
     // Return the code of the synchronous exception (if any).
