@@ -193,7 +193,7 @@
   </target>
 
     <!-- *** slim-jar *** compile without javahelp. -->
-  <target name="slim-jar" depends="mkdirs,htmldoc">
+  <target name="slim-jar" depends="mkdirs">
         <javac
             source="${src_java_version}"
             target="${dst_java_version}"
@@ -212,7 +212,6 @@
         <property name="main_class" value="org.edumips64.Main" />
         <property name="splash_img" value="org/edumips64/img/splash.png"/>
 
-        <antcall target="copy-help-files" />
         <antcall target="make-jarfile" />
   </target>
 

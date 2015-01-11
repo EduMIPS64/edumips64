@@ -4,9 +4,9 @@ EduMIPS64 README
 [![Build Status](https://secure.travis-ci.org/lupino3/edumips64.png)](http://travis-ci.org/lupino3/edumips64)
 
 EduMIPS64 is a cross-platform visual MIPS64 CPU simulator written in
-Java/swing. 
+Java/swing.
 
-The EduMIPS64 web site is http://www.edumips.org. There is also a 
+The EduMIPS64 web site is http://www.edumips.org. There is also a
 developers' blog at http://edumips64.blogspot.com.
 
 To learn how it works and how to use it, please refer to the
@@ -28,7 +28,7 @@ In order to compile EduMIPS64, you need the following tools:
 - GNU Make
 - JavaHelp
 
-The two latter dependencies are needed for the in-application help.
+The latter three dependencies are needed for the in-application help.
 
 If you need to compile the PDF manual, you will also need:
 - latex / pdflatex
