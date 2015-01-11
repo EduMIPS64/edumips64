@@ -562,47 +562,31 @@ public class CPU {
     currentPipeStatus = PipeStatus.ID;
 
     if (pipe.get(PipeStatus.ID) != null) {
-      //if an FP instruction fills the ID stage a checking for InputStructuralStall must be performed before the ID() invocation.
-      //This operation is carried out by checking if the fpPipe could accept the instruction we would insert in it (2nd condition)
-      if (knownFPInstructions.contains(pipe.get(PipeStatus.ID).getName())) {
-        //it is an FPArithmetic and it must be inserted in the fppipe
-        //the fu is free
-        if (fpPipe.putInstruction(pipe.get(PipeStatus.ID), true) == 0) {
-          if (fpPipe.isEmpty() || (!fpPipe.isEmpty() /* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/)) {
-            logger.info("Executing ID() for " + pipe.get(PipeStatus.ID));
-            // Can change the CPU status from RUNNING to STOPPING.
-            pipe.get(PipeStatus.ID).ID();
-          }
+      boolean isFP = knownFPInstructions.contains(pipe.get(PipeStatus.ID).getName());
 
-          fpPipe.putInstruction(pipe.get(PipeStatus.ID), false);
-          pipe.put(PipeStatus.ID, null);
-        } else { //the fu is filled by another instruction
-          if (pipe.get(PipeStatus.ID).getName().compareToIgnoreCase("DIV.D") == 0) {
-            throw new FPDividerNotAvailableException();
-          } else {
-            throw new FPFunctionalUnitNotAvailableException();
-          }
+      // Check if the desired unit (FP or not) is available.
+      if (isFP && (fpPipe.putInstruction(pipe.get(PipeStatus.ID), true) != 0)) {
+        if (pipe.get(PipeStatus.ID).getName().compareToIgnoreCase("DIV.D") == 0) {
+          throw new FPDividerNotAvailableException();
+        } else {
+          throw new FPFunctionalUnitNotAvailableException();
         }
-      }
-      //if an integer instruction or an FP instruction that will not pass through the FP pipeline fills the ID stage a checking for
-      //InputStructuralStall (second type) must be performed. We must control if the EX stage is filled by another instruction, in this case we have to raise a stall
-      else {
-        if (pipe.get(PipeStatus.EX) == null || /*testing*/ pipe.get(PipeStatus.EX).getName().compareTo(" ") == 0) {
-          if (fpPipe.isEmpty() || (!fpPipe.isEmpty() /* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/)) {
-            logger.info("Executing ID() for " + pipe.get(PipeStatus.ID));
-            // Can change the CPU status from RUNNING to STOPPING.
-            pipe.get(PipeStatus.ID).ID();
-          }
-
-          logger.info("Moving " + pipe.get(PipeStatus.ID) + " to EX");
-          pipe.put(PipeStatus.EX, pipe.get(PipeStatus.ID));
-          pipe.put(PipeStatus.ID, null);
-        }
-        //the EX stage is full
-        else {
+      } else if (!isFP && (pipe.get(PipeStatus.EX) != null && pipe.get(PipeStatus.EX).getName().compareTo(" ") != 0)) {
           throw new EXNotAvailableException();
-        }
       }
+
+      logger.info("Executing ID() for " + pipe.get(PipeStatus.ID));
+      // Can change the CPU status from RUNNING to STOPPING.
+      pipe.get(PipeStatus.ID).ID();
+
+      if (isFP) {
+        logger.info("Moving " + pipe.get(PipeStatus.ID) + " to the FP pipeline.");
+        fpPipe.putInstruction(pipe.get(PipeStatus.ID), false);
+      } else {
+        logger.info("Moving " + pipe.get(PipeStatus.ID) + " to EX");
+        pipe.put(PipeStatus.EX, pipe.get(PipeStatus.ID));
+      }
+      pipe.put(PipeStatus.ID, null);
     }
   }
 
