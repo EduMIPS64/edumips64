@@ -39,6 +39,9 @@ public class CPU {
 
   /** FPU Elements*/
   private RegisterFP[] fpr;
+  private boolean lastExWasFP;
+  private Instruction lastFPInstructionInEx;
+
   public static enum FPExceptions {INVALID_OPERATION, DIVIDE_BY_ZERO, UNDERFLOW, OVERFLOW}
   public static enum FPRoundingMode { TO_NEAREST, TOWARD_ZERO, TOWARDS_PLUS_INFINITY, TOWARDS_MINUS_INFINITY}
   private FCSRRegister FCSR;
@@ -606,6 +609,9 @@ public class CPU {
     Instruction instruction;
     boolean shouldExecuteFP = completedFpInstruction != null;
 
+    // Keep track that we last executed a FP instruction in EX.
+    lastExWasFP = shouldExecuteFP;
+
     // if there will be a stall because a lot of instructions would fill the MEM stage, the EX()
     // method cannot be called because the integer instruction in EX cannot be moved.
     if (!shouldExecuteFP) {
@@ -616,6 +622,9 @@ public class CPU {
         memoryStalls++;
       }
       instruction = completedFpInstruction;
+
+      // Keep track of the last FP instruction in EX.
+      lastFPInstructionInEx = instruction;
     }
 
     // Execute the instruction, and handle synchronous exceptions.
@@ -640,11 +649,15 @@ public class CPU {
       }
     }
 
-    logger.info("Moving " + instruction + " to MEM");
-    pipe.put(PipeStage.MEM, instruction);
-    if (!shouldExecuteFP) {
+    Instruction toMove = lastExWasFP ? lastFPInstructionInEx : pipe.get(PipeStage.EX);
+    logger.info("Moving " + toMove + " to MEM");
+    pipe.put(PipeStage.MEM, toMove);
+    if (!lastExWasFP) {
+
       pipe.put(PipeStage.EX, null);
     }
+    // Reset lastExWasFP.
+    lastExWasFP = false;
 
     // Shift instructions in the fpPipe.
     fpPipe.step();
