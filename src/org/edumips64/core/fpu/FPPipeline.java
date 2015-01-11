@@ -88,39 +88,36 @@ public class FPPipeline {
   public boolean isFuncUnitFilled(String funcUnit, int stage) {
     if (funcUnit.compareToIgnoreCase("ADDER") == 0)
       switch (stage) {
-      case 1:
-        return (adder.getFuncUnit().get(Costanti.FPAdderStatus.A1) != null) ? true : false;
-      case 2:
-        return (adder.getFuncUnit().get(Costanti.FPAdderStatus.A2) != null) ? true : false;
-      case 3:
-        return (adder.getFuncUnit().get(Costanti.FPAdderStatus.A3) != null) ? true : false;
-      case 4:
-        return (adder.getFuncUnit().get(Costanti.FPAdderStatus.A4) != null) ? true : false;
+        case 1:
+          return (adder.getFuncUnit().get(Costanti.FPAdderStatus.A1) != null);
+        case 2:
+          return (adder.getFuncUnit().get(Costanti.FPAdderStatus.A2) != null);
+        case 3:
+          return (adder.getFuncUnit().get(Costanti.FPAdderStatus.A3) != null);
+        case 4:
+          return (adder.getFuncUnit().get(Costanti.FPAdderStatus.A4) != null);
       }
 
     if (funcUnit.compareToIgnoreCase("MULTIPLIER") == 0)
       switch (stage) {
-      case 1:
-        return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M1) != null) ? true : false;
-      case 2:
-        return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M2) != null) ? true : false;
-      case 3:
-        return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M3) != null) ? true : false;
-      case 4:
-        return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M4) != null) ? true : false;
-      case 5:
-        return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M5) != null) ? true : false;
-      case 6:
-        return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M6) != null) ? true : false;
-      case 7:
-        return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M7) != null) ? true : false;
+        case 1:
+          return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M1) != null);
+        case 2:
+          return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M2) != null);
+        case 3:
+          return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M3) != null);
+        case 4:
+          return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M4) != null);
+        case 5:
+          return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M5) != null);
+        case 6:
+          return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M6) != null);
+        case 7:
+          return (multiplier.getFuncUnit().get(Costanti.FPMultiplierStatus.M7) != null);
       }
 
-    if (funcUnit.compareToIgnoreCase("DIVIDER") == 0) {
-      return (divider.getFuncUnit() != null) ? true : false;
-    }
+    return funcUnit.compareToIgnoreCase("DIVIDER") == 0 && (divider.getFuncUnit() != null);
 
-    return false;
   }
   /** Returns the instruction of the specified functional unit , null if it is empty.
    *  No controls are carried out on the legality of parameters, for mistaken parameters null is returned
