@@ -397,17 +397,6 @@ public class CPU {
   /** This method performs a single pipeline step
   */
   public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, WAWException, MemoryNotAvailableException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException {
-    /* The integer "breaking" is used to keep track of the BREAK
-     * instruction. When the BREAK instruction enters ID, the BreakException
-     * is thrown. We continue the normal cpu step flow, and at the end of
-     * this flow the BreakException is re-thrown.
-     */
-
-    int breaking = 0;
-    // Used for exception handling
-    boolean masked = config.getBoolean("syncexc-masked");
-    boolean terminate = config.getBoolean("syncexc-terminate");
-
     configFPExceptionsAndRM();
 
     String syncex = null;
@@ -421,229 +410,28 @@ public class CPU {
       // logic for the given stage is executed, the instruction is moved to the next
       // stage (except for WB, where the instruction is discarded.
       logger.info("\n\nStarting cycle " + ++cycles + "\n---------------------------------------------");
-      logger.info("WB STAGE: " + pipe.get(PipeStatus.WB) + "\n================================");
-      currentPipeStatus = PipeStatus.WB;
 
-      // *************************
-      // *** WB: write-back stage
-      // *************************
-      if (pipe.get(PipeStatus.WB) != null) {
-        boolean terminatorInstrInWB = terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.WB).getRepr().getHexString());
-        //we have to execute the WB method only if some conditions occur
-        //the current instruction in WB is a terminating instruction and the fpPipe is working
-        boolean notWBable = terminatorInstrInWB && !fpPipe.isEmpty();
-        //the current instruction in WB is a terminating instruction, the fpPipe doesn't work because it has just issued an instruction and it is in the MEM stage
-        notWBable = notWBable || (terminatorInstrInWB && !pipe.get(PipeStatus.MEM).getName().equals(" "));
+      // WB: Write-back stage.
+      stepWB();
 
-        if (!pipe.get(PipeStatus.WB).getName().equals(" ")) {
-          instructions++;
-        }
+      // MEM: Memory access stage.
+      stepMEM();
 
-        if (!notWBable) {
-          logger.info("Executing WB() for " + pipe.get(PipeStatus.WB));
-          pipe.get(PipeStatus.WB).WB();
-        }
+      // EX: Execution/effective address stage.
+      // Returns the code of the synchronous exception that can happen at this
+      // stage, so the rest of the step can continue and, at the end, the
+      // exception can be thrown.
+      syncex = stepEX();
 
-        // Move the instruction in WB out of the pipeline.
-        logger.info("Instruction " + pipe.get(PipeStatus.WB) + " has been completed. Removing it.");
-        pipe.put(PipeStatus.WB, null);
+      // ID: instruction decode / register fetch stage
+      stepID();
 
-        //if the pipeline is empty and it is into the stopping state (because a long latency instruction was executed) we can halt the cpu when computations finished
-        if (isPipelinesEmpty() && getStatus() == CPUStatus.STOPPING) {
-          logger.info("Pipeline is empty and we are in STOPPING --> going to HALTED.");
-          setStatus(CPU.CPUStatus.HALTED);
-          throw new HaltException();
-        }
-      }
-
-      // ****************************
-      // *** MEM: memory access stage
-      // ****************************
-      logger.info("MEM STAGE: " + pipe.get(PipeStatus.MEM) + "\n================================");
-      currentPipeStatus = PipeStatus.MEM;
-
-      if (pipe.get(PipeStatus.MEM) != null) {
-        logger.info("Executing MEM() for " + pipe.get(PipeStatus.MEM));
-        pipe.get(PipeStatus.MEM).MEM();
-      }
-
-      logger.info("Moving " + pipe.get(PipeStatus.MEM) + " to WB");
-      pipe.put(PipeStatus.WB, pipe.get(PipeStatus.MEM));
-      pipe.put(PipeStatus.MEM, null);
-
-      // *****************************************
-      // *** EX: execution/effective address stage
-      // *****************************************
-      logger.info("EX STAGE: " + pipe.get(PipeStatus.EX) + "\n================================");
-
-      // if there will be a stall because a lot of instructions would fill the MEM stage, the EX()
-      // method cannot be called because the integer instruction in EX cannot be moved.
-
-      if (fpPipe.getInstruction(true) == null) {
-        try {
-          // Handling synchronous exceptions
-          currentPipeStatus = PipeStatus.EX;
-
-          if (pipe.get(PipeStatus.EX) != null) {
-            logger.info("Executing EX() for " + pipe.get(PipeStatus.EX));
-            pipe.get(PipeStatus.EX).EX();
-          }
-        } catch (SynchronousException e) {
-          if (masked) {
-            logger.info("[EXCEPTION] [MASKED] " + e.getCode());
-          } else {
-            if (terminate) {
-              logger.info("Terminating due to an unmasked exception");
-              throw new SynchronousException(e.getCode());
-            } else
-              // We must complete this cycle, but we must notify the user.
-              // If the syncex string is not null, the CPU code will throw
-              // the exception at the end of the step
-            {
-              syncex = e.getCode();
-            }
-          }
-        }
-
-        logger.info("Moving " + pipe.get(PipeStatus.EX) + " to MEM");
-        pipe.put(PipeStatus.MEM, pipe.get(PipeStatus.EX));
-        pipe.put(PipeStatus.EX, null);
-      } else {
-        //a structural stall has to be raised if the EX stage contains an instruction different from a bubble or other fu's contain instructions (counter of structural stalls must be incremented)
-        if ((pipe.get(PipeStatus.EX) != null && !(pipe.get(PipeStatus.EX).getName().compareTo(" ") == 0)) || fpPipe.getNReadyToExitInstr() > 1) {
-          memoryStalls++;
-        }
-
-        //the fpPipe is issuing an instruction and the EX method has to be called on it
-        Instruction instr;
-        //call EX
-        instr = fpPipe.getInstruction(false);
-
-        try {
-          // Handling synchronous exceptions
-          currentPipeStatus = PipeStatus.EX;
-          logger.info("Executing EX() for " + instr);
-          instr.EX();
-        } catch (SynchronousException e) {
-          if (masked) {
-            logger.info("[MASKED] " + e.getCode());
-          } else {
-            if (terminate) {
-              logger.info("Terminating due to an unmasked exception");
-              throw new SynchronousException(e.getCode());
-            } else
-              // We must complete this cycle, but we must notify the user.
-              // If the syncex string is not null, the CPU code will throw
-              // the exception at the end of the step
-            {
-              syncex = e.getCode();
-            }
-          }
-        }
-
-        logger.info("Moving " + instr + " to MEM");
-        pipe.put(PipeStatus.MEM, instr);
-      }
-
-      //shifting instructions in the fpPipe
-      fpPipe.step();
-
-      // *************************************************
-      // *** ID: instruction decode / register fetch stage
-      // *************************************************
-      // Jump instrucions throw JumpException in ID.
-      logger.info("ID STAGE: " + pipe.get(PipeStatus.ID) + "\n================================");
-      currentPipeStatus = PipeStatus.ID;
-
-      if (pipe.get(PipeStatus.ID) != null) {
-        //if an FP instruction fills the ID stage a checking for InputStructuralStall must be performed before the ID() invocation.
-        //This operation is carried out by checking if the fpPipe could accept the instruction we would insert in it (2nd condition)
-        if (knownFPInstructions.contains(pipe.get(PipeStatus.ID).getName())) {
-          //it is an FPArithmetic and it must be inserted in the fppipe
-          //the fu is free
-          if (fpPipe.putInstruction(pipe.get(PipeStatus.ID), true) == 0) {
-            if (fpPipe.isEmpty() || (!fpPipe.isEmpty() /* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/)) {
-              logger.info("Executing ID() for " + pipe.get(PipeStatus.ID));
-              // Can change the CPU status from RUNNING to STOPPING.
-              pipe.get(PipeStatus.ID).ID();
-            }
-
-            fpPipe.putInstruction(pipe.get(PipeStatus.ID), false);
-            pipe.put(PipeStatus.ID, null);
-          } else { //the fu is filled by another instruction
-            if (pipe.get(PipeStatus.ID).getName().compareToIgnoreCase("DIV.D") == 0) {
-              throw new FPDividerNotAvailableException();
-            } else {
-              throw new FPFunctionalUnitNotAvailableException();
-            }
-          }
-        }
-        //if an integer instruction or an FP instruction that will not pass through the FP pipeline fills the ID stage a checking for
-        //InputStructuralStall (second type) must be performed. We must control if the EX stage is filled by another instruction, in this case we have to raise a stall
-        else {
-          if (pipe.get(PipeStatus.EX) == null || /*testing*/ pipe.get(PipeStatus.EX).getName().compareTo(" ") == 0) {
-            if (fpPipe.isEmpty() || (!fpPipe.isEmpty() /* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/)) {
-              logger.info("Executing ID() for " + pipe.get(PipeStatus.ID));
-              // Can change the CPU status from RUNNING to STOPPING.
-              pipe.get(PipeStatus.ID).ID();
-            }
-
-            logger.info("Moving " + pipe.get(PipeStatus.ID) + " to EX");
-            pipe.put(PipeStatus.EX, pipe.get(PipeStatus.ID));
-            pipe.put(PipeStatus.ID, null);
-          }
-          //the EX stage is full
-          else {
-            throw new EXNotAvailableException();
-          }
-        }
-      }
-
-      // *******************************
-      // *** IF: instruction fetch stage
-      // *******************************
-      logger.info("IF STAGE: " + pipe.get(PipeStatus.IF) + "\n================================");
-      // We don't have to execute any methods, but we must get the new
-      // instruction from the symbol table.
-      currentPipeStatus = PipeStatus.IF;
-
-      logger.info("CPU Status: " + status.name());
-
-      if (status == CPUStatus.RUNNING) {
-        if (pipe.get(PipeStatus.IF) != null) {  //rispetto a dinmips scambia le load con le IF
-          try {
-            logger.info("Executing IF() for " + pipe.get(PipeStatus.IF));
-            pipe.get(PipeStatus.IF).IF();
-          } catch (BreakException exc) {
-            breaking = 1;
-            logger.info("breaking = 1");
-          }
-        }
-
-        logger.info("Moving " + pipe.get(PipeStatus.IF) + " to ID");
-        pipe.put(PipeStatus.ID, pipe.get(PipeStatus.IF));
-        Instruction next_if = mem.getInstruction(pc);
-        logger.info("Fetched new instruction " + next_if);
-        old_pc.writeDoubleWord((pc.getValue()));
-        pc.writeDoubleWord((pc.getValue()) + 4);
-        logger.info("New Program Counter value: " + pc.toString());
-        logger.info("Putting " + next_if + "in IF.");
-        pipe.put(PipeStatus.IF, next_if);
-      } else {
-        pipe.put(PipeStatus.ID, Instruction.buildInstruction("BUBBLE"));
-      }
-
-      if (breaking == 1) {
-        logger.info("Re-thrown the exception");
-        throw new BreakException();
-      }
+      // IF: instruction fetch stage.
+      stepIF();
 
       if (syncex != null) {
         throw new SynchronousException(syncex);
       }
-      // ********************************************
-      // **** END OF THE BODY OF THE MAIN step() CODE
-      // ********************************************
     } catch (JumpException ex) {
       try {
         if (pipe.get(PipeStatus.IF) != null) {
@@ -728,6 +516,230 @@ public class CPU {
     }
   }
 
+  // Individual stages.
+
+  public void stepIF() throws IrregularStringOfBitsException, HaltException, IrregularWriteOperationException, BreakException {
+    logger.info("IF STAGE: " + pipe.get(PipeStatus.IF) + "\n================================");
+    // We don't have to execute any methods, but we must get the new
+    // instruction from the symbol table.
+    currentPipeStatus = PipeStatus.IF;
+
+    logger.info("CPU Status: " + status.name());
+
+    int breaking = 0;
+    if (status == CPUStatus.RUNNING) {
+      if (pipe.get(PipeStatus.IF) != null) {  //rispetto a dinmips scambia le load con le IF
+        try {
+          logger.info("Executing IF() for " + pipe.get(PipeStatus.IF));
+          pipe.get(PipeStatus.IF).IF();
+        } catch (BreakException exc) {
+          breaking = 1;
+          logger.info("breaking = 1");
+        }
+      }
+
+      logger.info("Moving " + pipe.get(PipeStatus.IF) + " to ID");
+      pipe.put(PipeStatus.ID, pipe.get(PipeStatus.IF));
+      Instruction next_if = mem.getInstruction(pc);
+      logger.info("Fetched new instruction " + next_if);
+      old_pc.writeDoubleWord((pc.getValue()));
+      pc.writeDoubleWord((pc.getValue()) + 4);
+      logger.info("New Program Counter value: " + pc.toString());
+      logger.info("Putting " + next_if + "in IF.");
+      pipe.put(PipeStatus.IF, next_if);
+    } else {
+      pipe.put(PipeStatus.ID, Instruction.buildInstruction("BUBBLE"));
+    }
+
+    if (breaking == 1) {
+      logger.info("Re-thrown the exception");
+      throw new BreakException();
+    }
+  }
+
+  public void stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, HaltException, RAWException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
+    logger.info("ID STAGE: " + pipe.get(PipeStatus.ID) + "\n================================");
+    currentPipeStatus = PipeStatus.ID;
+
+    if (pipe.get(PipeStatus.ID) != null) {
+      //if an FP instruction fills the ID stage a checking for InputStructuralStall must be performed before the ID() invocation.
+      //This operation is carried out by checking if the fpPipe could accept the instruction we would insert in it (2nd condition)
+      if (knownFPInstructions.contains(pipe.get(PipeStatus.ID).getName())) {
+        //it is an FPArithmetic and it must be inserted in the fppipe
+        //the fu is free
+        if (fpPipe.putInstruction(pipe.get(PipeStatus.ID), true) == 0) {
+          if (fpPipe.isEmpty() || (!fpPipe.isEmpty() /* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/)) {
+            logger.info("Executing ID() for " + pipe.get(PipeStatus.ID));
+            // Can change the CPU status from RUNNING to STOPPING.
+            pipe.get(PipeStatus.ID).ID();
+          }
+
+          fpPipe.putInstruction(pipe.get(PipeStatus.ID), false);
+          pipe.put(PipeStatus.ID, null);
+        } else { //the fu is filled by another instruction
+          if (pipe.get(PipeStatus.ID).getName().compareToIgnoreCase("DIV.D") == 0) {
+            throw new FPDividerNotAvailableException();
+          } else {
+            throw new FPFunctionalUnitNotAvailableException();
+          }
+        }
+      }
+      //if an integer instruction or an FP instruction that will not pass through the FP pipeline fills the ID stage a checking for
+      //InputStructuralStall (second type) must be performed. We must control if the EX stage is filled by another instruction, in this case we have to raise a stall
+      else {
+        if (pipe.get(PipeStatus.EX) == null || /*testing*/ pipe.get(PipeStatus.EX).getName().compareTo(" ") == 0) {
+          if (fpPipe.isEmpty() || (!fpPipe.isEmpty() /* && !terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.ID).getRepr().getHexString())*/)) {
+            logger.info("Executing ID() for " + pipe.get(PipeStatus.ID));
+            // Can change the CPU status from RUNNING to STOPPING.
+            pipe.get(PipeStatus.ID).ID();
+          }
+
+          logger.info("Moving " + pipe.get(PipeStatus.ID) + " to EX");
+          pipe.put(PipeStatus.EX, pipe.get(PipeStatus.ID));
+          pipe.put(PipeStatus.ID, null);
+        }
+        //the EX stage is full
+        else {
+          throw new EXNotAvailableException();
+        }
+      }
+    }
+  }
+
+  public String stepEX() throws SynchronousException, HaltException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
+    logger.info("EX STAGE: " + pipe.get(PipeStatus.EX) + "\n================================");
+
+    // Used for exception handling
+    boolean masked = config.getBoolean("syncexc-masked");
+    boolean terminate = config.getBoolean("syncexc-terminate");
+
+
+    // Code of the synchronous exception that happens in EX.
+    String syncex = null;
+
+    // if there will be a stall because a lot of instructions would fill the MEM stage, the EX()
+    // method cannot be called because the integer instruction in EX cannot be moved.
+
+    if (fpPipe.getInstruction(true) == null) {
+      try {
+        // Handling synchronous exceptions
+        currentPipeStatus = PipeStatus.EX;
+
+        if (pipe.get(PipeStatus.EX) != null) {
+          logger.info("Executing EX() for " + pipe.get(PipeStatus.EX));
+          pipe.get(PipeStatus.EX).EX();
+        }
+      } catch (SynchronousException e) {
+        if (masked) {
+          logger.info("[EXCEPTION] [MASKED] " + e.getCode());
+        } else {
+          if (terminate) {
+            logger.info("Terminating due to an unmasked exception");
+            throw new SynchronousException(e.getCode());
+          } else
+          // We must complete this cycle, but we must notify the user.
+          // If the syncex string is not null, the CPU code will throw
+          // the exception at the end of the step
+          {
+            syncex = e.getCode();
+          }
+        }
+      }
+
+      logger.info("Moving " + pipe.get(PipeStatus.EX) + " to MEM");
+      pipe.put(PipeStatus.MEM, pipe.get(PipeStatus.EX));
+      pipe.put(PipeStatus.EX, null);
+    } else {
+      //a structural stall has to be raised if the EX stage contains an instruction different from a bubble or other fu's contain instructions (counter of structural stalls must be incremented)
+      if ((pipe.get(PipeStatus.EX) != null && !(pipe.get(PipeStatus.EX).getName().compareTo(" ") == 0)) || fpPipe.getNReadyToExitInstr() > 1) {
+        memoryStalls++;
+      }
+
+      //the fpPipe is issuing an instruction and the EX method has to be called on it
+      Instruction instr;
+      //call EX
+      instr = fpPipe.getInstruction(false);
+
+      try {
+        // Handling synchronous exceptions
+        currentPipeStatus = PipeStatus.EX;
+        logger.info("Executing EX() for " + instr);
+        instr.EX();
+      } catch (SynchronousException e) {
+        if (masked) {
+          logger.info("[MASKED] " + e.getCode());
+        } else {
+          if (terminate) {
+            logger.info("Terminating due to an unmasked exception");
+            throw new SynchronousException(e.getCode());
+          } else
+          // We must complete this cycle, but we must notify the user.
+          // If the syncex string is not null, the CPU code will throw
+          // the exception at the end of the step
+          {
+            syncex = e.getCode();
+          }
+        }
+      }
+
+      logger.info("Moving " + instr + " to MEM");
+      pipe.put(PipeStatus.MEM, instr);
+    }
+
+    //shifting instructions in the fpPipe
+    fpPipe.step();
+
+    // Return the code of the synchronous exception (if any).
+    return syncex;
+  }
+
+  public void stepMEM() throws HaltException, NotAlignException, IrregularWriteOperationException, MemoryElementNotFoundException, AddressErrorException, IrregularStringOfBitsException {
+    logger.info("MEM STAGE: " + pipe.get(PipeStatus.MEM) + "\n================================");
+    currentPipeStatus = PipeStatus.MEM;
+
+    if (pipe.get(PipeStatus.MEM) != null) {
+      logger.info("Executing MEM() for " + pipe.get(PipeStatus.MEM));
+      pipe.get(PipeStatus.MEM).MEM();
+    }
+
+    logger.info("Moving " + pipe.get(PipeStatus.MEM) + " to WB");
+    pipe.put(PipeStatus.WB, pipe.get(PipeStatus.MEM));
+    pipe.put(PipeStatus.MEM, null);
+  }
+
+  public void stepWB() throws IrregularStringOfBitsException, HaltException {
+    logger.info("WB STAGE: " + pipe.get(PipeStatus.WB) + "\n================================");
+    currentPipeStatus = PipeStatus.WB;
+
+    if (pipe.get(PipeStatus.WB) != null) {
+      boolean terminatorInstrInWB = terminatingInstructionsOPCodes.contains(pipe.get(PipeStatus.WB).getRepr().getHexString());
+      //we have to execute the WB method only if some conditions occur
+      //the current instruction in WB is a terminating instruction and the fpPipe is working
+      boolean notWBable = terminatorInstrInWB && !fpPipe.isEmpty();
+      //the current instruction in WB is a terminating instruction, the fpPipe doesn't work because it has just issued an instruction and it is in the MEM stage
+      notWBable = notWBable || (terminatorInstrInWB && !pipe.get(PipeStatus.MEM).getName().equals(" "));
+
+      if (!pipe.get(PipeStatus.WB).getName().equals(" ")) {
+        instructions++;
+      }
+
+      if (!notWBable) {
+        logger.info("Executing WB() for " + pipe.get(PipeStatus.WB));
+        pipe.get(PipeStatus.WB).WB();
+      }
+
+      // Move the instruction in WB out of the pipeline.
+      logger.info("Instruction " + pipe.get(PipeStatus.WB) + " has been completed. Removing it.");
+      pipe.put(PipeStatus.WB, null);
+
+      //if the pipeline is empty and it is into the stopping state (because a long latency instruction was executed) we can halt the cpu when computations finished
+      if (isPipelinesEmpty() && getStatus() == CPUStatus.STOPPING) {
+        logger.info("Pipeline is empty and we are in STOPPING --> going to HALTED.");
+        setStatus(CPU.CPUStatus.HALTED);
+        throw new HaltException();
+      }
+    }
+  }
 
   /** This method resets the CPU components (GPRs, memory,statistics,
    *   PC, pipeline and Symbol table).
