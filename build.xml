@@ -7,7 +7,7 @@
      - slim-jar         builds the GUI version, with no javahelp libraries.
      - standalone-jar   builds the GUI version, with embedded javahelp libraries.
      - clean            removes the jar file and the build dir
-     - docs             builds the HTML and PDF docs, both in english and in 
+     - docs             builds the HTML and PDF docs, both in english and in
                         italian
 
     The output file names are in the init target.
