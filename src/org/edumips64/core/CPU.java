@@ -526,15 +526,14 @@ public class CPU {
 
     logger.info("CPU Status: " + status.name());
 
-    int breaking = 0;
+    boolean breaking = false;
     if (status == CPUStatus.RUNNING) {
       if (pipe.get(PipeStatus.IF) != null) {  //rispetto a dinmips scambia le load con le IF
         try {
           logger.info("Executing IF() for " + pipe.get(PipeStatus.IF));
           pipe.get(PipeStatus.IF).IF();
         } catch (BreakException exc) {
-          breaking = 1;
-          logger.info("breaking = 1");
+          breaking = true;
         }
       }
 
@@ -551,8 +550,8 @@ public class CPU {
       pipe.put(PipeStatus.ID, Instruction.buildInstruction("BUBBLE"));
     }
 
-    if (breaking == 1) {
-      logger.info("Re-thrown the exception");
+    if (breaking) {
+      logger.info("Re-throwing the BREAK exception");
       throw new BreakException();
     }
   }
