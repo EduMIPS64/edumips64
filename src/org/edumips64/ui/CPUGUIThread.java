@@ -265,7 +265,7 @@ public class CPUGUIThread extends Thread {
               continue;
             } catch (HaltException ex) {
               haltCPU();
-              logger.info("CPUGUIThread: CPU Halted");
+              logger.info("CPUGUIThread: CPU Halted because of HaltException");
               front.updateComponents();
 
               if (verbose) {
