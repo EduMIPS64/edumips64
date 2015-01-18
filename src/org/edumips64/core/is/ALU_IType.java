@@ -94,30 +94,4 @@ public class ALU_IType extends ComputationalInstructions {
     repr.setBits(Converter.intToBin(RT_FIELD_LENGTH, params.get(RT_FIELD)), RT_FIELD_INIT);
     repr.setBits(Converter.intToBin(IMM_FIELD_LENGTH, params.get(IMM_FIELD)), IMM_FIELD_INIT);
   }
-  public static void main(String[] args) {
-//DEBUGGING DADDI DADDUI ANDI
-    //ANDI ins =new ANDI();
-    DADDI ins = new DADDI();
-    //DADDUI ins=new DADDUI();
-    //ORI ins=new ORI();
-    //LUI ins=new LUI();
-    //SLTI ins=new SLTI();
-    //SLTIU ins=new SLTIU();
-    //XORI ins=new XORI();
-    List<Integer>params = new Vector<Integer>();
-    int rt = 2;
-    int rs = 3;
-    int imm = -223;
-    params.add(rt);  //destinazione R2
-    params.add(rs);  //sorgente1 R3
-    params.add(imm);  //immediato R4
-
-    try {
-      cpu.getRegister(rs).writeDoubleWord(337236854775807L);   //rs register
-      ins.setParams(params);
-    } catch (IrregularWriteOperationException e) {
-      e.printStackTrace();
-    }
-  }
-
 }
