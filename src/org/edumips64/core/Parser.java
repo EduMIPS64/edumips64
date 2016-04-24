@@ -492,22 +492,21 @@ public class Parser {
               }
             }
           } else if (line.charAt(end) == ':') {
-            logger.info("Processing a label..");
+            String label = line.substring(i, end);
+            logger.info("Processing label " + label);
 
             if (status == 1) {
               logger.info("in .data section");
-              MemoryElement tmpMem = null;
-              tmpMem = mem.getCellByIndex(memoryCount);
 
               try {
-                symTab.setCellLabel(memoryCount * 8, line.substring(i, end));
+                symTab.setCellLabel(memoryCount * 8, label);
               } catch (SameLabelsException e) {
                 // TODO: errore del parser
-                logger.info("Label " + line.substring(i, end) + " is already assigned");
+                logger.warning("Label " + label + " is already assigned");
               }
             } else if (status == 2) {
               logger.info("in .text section");
-              lastLabel = line.substring(i, end);
+              lastLabel = label;
             }
 
             logger.info("done");
@@ -1043,7 +1042,9 @@ public class Parser {
                         continue;
                       }
 
-                      Integer labelAddr = symTab.getInstructionAddress(param.substring(indPar, endPar).trim());
+                      String label = param.substring(indPar, endPar).trim();
+                      Integer labelAddr = symTab.getInstructionAddress(label);
+                      logger.info("Label " + label + " at address " + labelAddr);
 
                       if (labelAddr != null) {
                         tmpInst.getParams().add(labelAddr);
@@ -1053,7 +1054,7 @@ public class Parser {
                         tmpVoid.row = row;
                         tmpVoid.line = line;
                         tmpVoid.column = indPar;
-                        tmpVoid.label = param.substring(indPar, endPar);
+                        tmpVoid.label = label;
                         voidJump.add(tmpVoid);
                         doPack = false;
                       }
@@ -1127,6 +1128,7 @@ public class Parser {
                 try {
                   tmpInst.pack();
                 } catch (IrregularStringOfBitsException e) {
+                  logger.severe("Irregular string of bits: " + e.getMessage());
                 }
               }
 
@@ -1144,7 +1146,10 @@ public class Parser {
 
               try {
                 mem.addInstruction(tmpInst, instrCount);
-                symTab.setInstructionLabel(instrCount, lastLabel.toUpperCase());
+                if (lastLabel != null && !lastLabel.equals("")) {
+                  logger.info("About to add label: " + lastLabel);
+                  symTab.setInstructionLabel(instrCount, lastLabel.toUpperCase());
+                }
               } catch (SymbolTableOverflowException ex) {
                 if (isFirstOutOfInstructionMemory) { //is first out of memory?
                   isFirstOutOfInstructionMemory = false;
