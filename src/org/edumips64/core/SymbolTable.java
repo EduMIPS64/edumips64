@@ -61,7 +61,7 @@ public class SymbolTable {
       MemoryElement temp = mem.getCellByAddress(address);
       // TODO: attualmente la cella  si prende l'ultima etichetta
       temp.setLabel(label);
-      logger.info("Added label " + label + " to address " + address);
+      logger.info("Added memory label " + label + " to address " + address);
     }
   }
 
@@ -114,6 +114,7 @@ public class SymbolTable {
       Instruction temp = mem.getInstruction(address);
       // TODO: attualmente l'istruzione si prende l'ultima etichetta
       temp.setLabel(label);
+      logger.info("Added instruction label " + label + " to address " + address);
     }
   }
 
@@ -138,14 +139,14 @@ public class SymbolTable {
 
   public String toString() {
     String output = new String();
-    /*int i = 0;
-    try {
-      for(Instruction instr : instructions)
-        output += Converter.binToHex(Converter.positiveIntToBin(32, i++ * 4)) + ": " + instr.getFullName() + "\n";
+    output += "\nInstructions:\n";
+    for(Map.Entry<String, Integer> entry : instr_labels.entrySet()) {
+      output += entry.getKey() + ": " + entry.getValue() + "\n";
     }
-    catch(IrregularStringOfBitsException e) {
-      e.printStackTrace();
-    }*/
+    output += "\nMemory:\n";
+    for(Map.Entry<String, Integer> entry : mem_labels.entrySet()) {
+      output += entry.getKey() + ": " + entry.getValue() + "\n";
+    }
     return output;
   }
 }

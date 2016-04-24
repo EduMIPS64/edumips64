@@ -454,6 +454,8 @@ public class Main extends JApplet {
       } catch (NullPointerException e) {
         log.info("NullPointerException: " + e.toString());
         e.printStackTrace();
+      } finally {
+        log.info(SymbolTable.getInstance().toString());
       }
 
       log.info("After parsing");
