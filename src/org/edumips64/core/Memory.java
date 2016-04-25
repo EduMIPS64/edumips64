@@ -154,6 +154,7 @@ public class Memory {
     instr_num++;
 
     if (address > CPU.CODELIMIT) {
+      logger.warning("Address exceeding the CPU code limit: " + address + " > " + CPU.CODELIMIT);
       throw new SymbolTableOverflowException();
     }
 

@@ -231,7 +231,7 @@ public class Parser {
   */
   private void doParsing() throws IOException, ParserMultiException {
 
-    boolean isFirstOutOfInstructionMemory = false;
+    boolean isFirstOutOfInstructionMemory = true;
     isFirstOutOfMemory = true;
     boolean halt = false;
     int row = 0;
@@ -252,6 +252,7 @@ public class Parser {
 
     while ((line = in.readLine()) != null) {  //read all file
       row++;
+      logger.info("-- Processing line " + row);
 
       for (int i = 0; i < line.length(); i++) {
         if (line.charAt(i) == ';') {  //comments
@@ -1132,7 +1133,7 @@ public class Parser {
                 }
               }
 
-              logger.info("line: " + line);
+              logger.info("row: " + line);
               String comment[] = line.split(";", 2);
               tmpInst.setFullName(replaceTab(comment[0].substring(i)));
               tmpInst.setFullName(replaceTab(comment[0].substring(i)));
