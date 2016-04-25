@@ -32,44 +32,29 @@ import java.util.logging.Logger;
  * The Memory is composed of MemoryElement and its size is not limited.
  */
 public class Memory {
-  // cancellabile?
-  private List<MemoryElement> cells;
-  private List<Instruction> instructions;
+  // Data structures for the data and code memory. In both maps, the key is represented by the index of the element.
+  // The index is derived by taking the address of the given element and dividing it by its width (8 for the memory,
+  // 4 for the code).
+  // SortedMaps are used to have the map entries sorted by key (useful for string representation).
+  private SortedMap<Integer, MemoryElement> cells;
+  private SortedMap<Integer, Instruction> instructions;
 
-  private int instr_num;
   private static Memory memory = null;
 
   private static final Logger logger = Logger.getLogger(Memory.class.getName());
 
   private Memory() {
     logger.info("Building Memory: " + this.hashCode());
-    cells = new ArrayList<>();
-    instr_num = 0;
-    instructions = new LinkedList<>();
-
-    for (int i = 0; i < CPU.DATALIMIT; i++) {
-      cells.add(new MemoryElement(i * 8));
-    }
-
-    for (int i = 0; i < CPU.CODELIMIT; i++) {
-      instructions.add(Instruction.buildInstruction("BUBBLE"));
-    }
-
+    cells = new TreeMap<>();
+    instructions = new TreeMap<>();
     logger.info("Memory built: " + this.hashCode());
   }
 
-  /** Returns the maximum number of MemoryElement stored in Memory
-   * @return size of the memory
-   */
-  public int getMemorySize() {
-    return CPU.DATALIMIT;
-  }
-
-  /** Gets the instr_num of the Symbol Table.
+  /** Gets the number of instructions of the Symbol Table.
    *  @return an integer
    */
   public int getInstructionsNumber() {
-    return instr_num;
+    return cells.size();
   }
 
   /** Singleton pattern: since the unique constructor of this class is private, this static method
@@ -88,8 +73,15 @@ public class Memory {
   /** Gets the index of the given instruction
    * @return the position of the instruction in the list, or -1 if the instruction doesn't exist.
    */
-  public int getInstructionIndex(Instruction i) {
-    return instructions.indexOf(i);
+  public int getInstructionIndex(Instruction to_find) {
+    int pos = 0;
+    for(Instruction i : instructions.values()) {
+      if (i.equals(to_find)) {
+        return pos;
+      }
+      pos++;
+    }
+    return -1;
   }
 
   /** Returns the MemoryElement at given address.
@@ -103,7 +95,8 @@ public class Memory {
     return getCellByIndex(index);
   }
 
-  /** Returns the MemoryElement with the given index.
+  /** Returns the MemoryElement with the given index. If there is no MemoryElement at the given index, create one,
+   * add it to the map and return it.
    * @param index index of the requested element
    * @return MemoryElement
    * @throws MemoryElementNotFoundException if the given index is out of
@@ -114,51 +107,50 @@ public class Memory {
       throw new MemoryElementNotFoundException();
     }
 
+    if (!cells.containsKey(index)) {
+      cells.put(index, new MemoryElement(index * 8));
+    }
+
     return cells.get(index);
   }
 
   /** This method resets the memory*/
   public void reset() {
-    for (int i = 0; i < CPU.DATALIMIT; i++) {
-      cells.get(i).reset(false);
-      cells.get(i).setComment("");
-      cells.get(i).setCode("");
-      cells.get(i).setLabel("");
-    }
-
+    cells.clear();
     instructions.clear();
-
-    for (int i = 0; i < CPU.CODELIMIT; i++) {
-      instructions.add(Instruction.buildInstruction("BUBBLE"));
-    }
-
-    instr_num = 0;
-    // TODO sistemare il reset
   }
 
   public String toString() {
-    String tmp = "";
+    String tmp = "Data:\n";
 
-    for (int i = 0; i < CPU.DATALIMIT; i++) {
-      tmp += cells.get(i).toString() + "\n";
+    for(MemoryElement m : cells.values()) {
+      tmp += m.toString() + "\n";
+    }
+
+    tmp += "\nCode:\n";
+    for (Instruction i : instructions.values()) {
+      tmp += i.toString() + "\n";
     }
 
     return tmp;
   }
 
   public void addInstruction(Instruction i, int address) throws SymbolTableOverflowException {
-    instr_num++;
-
+    // TODO(lupino3): remove the limit.
     if (address > CPU.CODELIMIT) {
       logger.warning("Address exceeding the CPU code limit: " + address + " > " + CPU.CODELIMIT);
       throw new SymbolTableOverflowException();
     }
 
     int listIndex = address / 4;
-    instructions.set(listIndex, i);
+    instructions.put(listIndex, i);
   }
 
-  public Instruction getInstruction(int address) {
+  public Instruction getInstruction(int address) throws SymbolTableOverflowException {
+    int index = address / 4;
+    if (!instructions.containsKey(index)) {
+      addInstruction(Instruction.buildInstruction("BUBBLE"), address);
+    }
     return instructions.get(address / 4);
   }
 

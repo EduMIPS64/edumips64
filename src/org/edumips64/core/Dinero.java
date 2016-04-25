@@ -111,8 +111,13 @@ public class Dinero {
     int i;
 
     for (i = 0; i < CPU.CODELIMIT; i++) {
-      if (cpu.getMemory().getInstruction(i * 4).getName().equals(" ")) {
-        break;
+      try {
+        if (cpu.getMemory().getInstruction(i * 4).getName().equals(" ")) {
+          break;
+        }
+      } catch (SymbolTableOverflowException ex) {
+        // This should never happen, since the bounds checked in getInstruction are upper-limited by CPU.CODELIMIT.
+        ex.printStackTrace();
       }
     }
 

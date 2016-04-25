@@ -149,40 +149,44 @@ public class GUICode extends GUIComponent {
       }
 
       public Object getValueAt(int row, int col) {
-        switch (col) {
-        case 0:
+        try {
+          switch (col) {
+          case 0:
 
-          try {
-            return Converter.binToHex(Converter.positiveIntToBin(16, row * 4));
-          } catch (IrregularStringOfBitsException ex) {
-            ex.printStackTrace();
+            try {
+              return Converter.binToHex(Converter.positiveIntToBin(16, row * 4));
+            } catch (IrregularStringOfBitsException ex) {
+              ex.printStackTrace();
+            }
+
+            break;
+          case 1:
+
+            try {
+              return cpu.getMemory().getInstruction(row * 4).getRepr().getHexString();
+            } catch (IrregularStringOfBitsException ex) {
+              ex.printStackTrace();
+            }
+
+            break;
+          case 2:
+            String label = cpu.getMemory().getInstruction(row * 4).getLabel();
+            return label;
+          case 3:
+            return cpu.getMemory().getInstruction(row * 4).getFullName();
+          case 4:
+
+            if (cpu.getMemory().getInstruction(row * 4).getComment() != null) {
+              return ";" + cpu.getMemory().getInstruction(row * 4).getComment();
+            } else {
+              return "";
+            }
+
+          default:
+            return new Object();
           }
-
-          break;
-        case 1:
-
-          try {
-            return cpu.getMemory().getInstruction(row * 4).getRepr().getHexString();
-          } catch (IrregularStringOfBitsException ex) {
-            ex.printStackTrace();
-          }
-
-          break;
-        case 2:
-          String label = cpu.getMemory().getInstruction(row * 4).getLabel();
-          return label;
-        case 3:
-          return cpu.getMemory().getInstruction(row * 4).getFullName();
-        case 4:
-
-          if (cpu.getMemory().getInstruction(row * 4).getComment() != null) {
-            return ";" + cpu.getMemory().getInstruction(row * 4).getComment();
-          } else {
-            return "";
-          }
-
-        default:
-          return new Object();
+        } catch (SymbolTableOverflowException ex) {
+          ex.printStackTrace();
         }
 
         return new Object();

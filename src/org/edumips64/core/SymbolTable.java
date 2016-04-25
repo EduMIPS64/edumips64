@@ -65,13 +65,6 @@ public class SymbolTable {
     }
   }
 
-  public Instruction getInstruction(String label) {
-    logger.info("Request for instruction labelled " + label);
-    int address = instr_labels.get(label);
-    logger.info("Label found at address " + address);
-    return mem.getInstruction(address);
-  }
-
   public MemoryElement getCell(String label) throws MemoryElementNotFoundException {
     logger.info("Request for memory element labelled " + label);
 
@@ -104,7 +97,7 @@ public class SymbolTable {
   /** Adds to the Symbol Table, at the specified address, the given
    * instruction with the given label.
    */
-  public void setInstructionLabel(int address, String label) throws SameLabelsException {
+  public void setInstructionLabel(int address, String label) throws SameLabelsException, SymbolTableOverflowException {
     if (label != null && !label.equals("")) {
       if (instr_labels.containsKey(label)) {
         throw new SameLabelsException();
