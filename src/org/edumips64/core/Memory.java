@@ -36,8 +36,6 @@ public class Memory {
   private List<MemoryElement> cells;
   private List<Instruction> instructions;
 
-  private Map<Integer, String> mem_comments;
-
   private int instr_num;
   private static Memory memory = null;
 
@@ -45,10 +43,9 @@ public class Memory {
 
   private Memory() {
     logger.info("Building Memory: " + this.hashCode());
-    mem_comments = new HashMap<Integer, String>();
-    cells = new ArrayList<MemoryElement>();
+    cells = new ArrayList<>();
     instr_num = 0;
-    instructions = new LinkedList<Instruction>();
+    instructions = new LinkedList<>();
 
     for (int i = 0; i < CPU.DATALIMIT; i++) {
       cells.add(new MemoryElement(i * 8));
@@ -135,7 +132,6 @@ public class Memory {
       instructions.add(Instruction.buildInstruction("BUBBLE"));
     }
 
-    mem_comments.clear();
     instr_num = 0;
     // TODO sistemare il reset
   }
@@ -176,11 +172,5 @@ public class Memory {
     } catch (IndexOutOfBoundsException e) {
       throw new HaltException();
     }
-  }
-
-  /** This method returns the list of instructions in memory in order to be showed in the GUICode
-   */
-  public List<Instruction> getInstructions() {
-    return instructions;
   }
 }
