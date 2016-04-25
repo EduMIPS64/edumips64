@@ -84,8 +84,8 @@ public class CPU {
   private PipeStage currentPipeStage;
 
   /** The code and data sections limits*/
-  public static final int CODELIMIT = 1024; // bus da 12 bit (2^12 / 4)
-  public static final int DATALIMIT = 512;  // bus da 12 bit (2^12 / 8)
+  public static final int CODELIMIT = 16384; // 16 bit bus (2^12 / 4)
+  public static final int DATALIMIT = 8192;  // 16 bit bus (2^12 / 8)
 
   /** Simulator configuration */
   private ConfigStore config;
