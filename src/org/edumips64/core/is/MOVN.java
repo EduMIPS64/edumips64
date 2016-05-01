@@ -44,8 +44,8 @@ class MOVN extends ALU_RType {
   final String OPCODE_VALUE = "001011";
   private static final Logger logger = Logger.getLogger(MOVN.class.getName());
 
-  // Skip the Write Back if the predicate (RT != 0) is false
-  private boolean skipWB = false;
+  // Set to true if the Write Back stage should write data.
+  private boolean should_write = false;
 
 
   public MOVN() {
@@ -56,8 +56,7 @@ class MOVN extends ALU_RType {
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
     if (TR[RT_FIELD].getValue() != 0) {
       TR[RD_FIELD].setBits(TR[RS_FIELD].getBinString(), 0);
-    } else {
-      skipWB = true;
+      should_write = true;
     }
 
     if (enableForwarding) {
@@ -67,9 +66,9 @@ class MOVN extends ALU_RType {
 
   public void doWB() throws IrregularStringOfBitsException {
     // The doWB() method is overridden because it must check if the write
-    // on the registers must be done, checking the skipWB variable.
-    if (!skipWB) {
-      logger.info("Skipping WB as the predicate is false");
+    // on the registers must be done, checking the should_write variable.
+    if (should_write) {
+      logger.info("Writing to the dest register, since the condition is true.");
       cpu.getRegister(params.get(RD_FIELD)).setBits(TR[RD_FIELD].getBinString(), 0);
     }
 
