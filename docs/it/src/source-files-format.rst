@@ -136,7 +136,7 @@ Le istruzioni possono accettare tre tipi di parametri:
   "r" maiuscola o minuscola, o da un carattere "\$", a fianco del numero
   di registro (tra 0 e 31). Ad esempio, le scritture "r4", "R4" e "\$4"
   identificano tutt'e tre il quarto registro;
-* *Valori immediati* un valore immediato pu\`o essere un numero o
+* *Valori immediati* un valore immediato può essere un numero o
   un'etichetta; il numero può essere specificato in base 10 o in base 16. I
   numeri in base 10 sono inseriti semplicemente scrivendo il numero
   utilizzando l'usuale notazione decimale; i numeri in base 16 si inseriscono

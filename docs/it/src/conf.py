@@ -29,3 +29,6 @@ latex_documents = [
   ('index', 'EduMIPS64.tex', u'Manuale di EduMIPS64',
       u'Andrea Spadaccini ed il team di sviluppo di EduMIPS64\\\\(traduzione italiana di Simona Ullo)', 'manual'),
 ]
+latex_elements = {
+   'babel':'\\usepackage[shorthands=off]{babel}'
+}
