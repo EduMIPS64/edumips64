@@ -2,6 +2,7 @@
 *.jar
 *.pyc
 *.sw*
+*.zip
 build
 build/*
 docs/*/output
