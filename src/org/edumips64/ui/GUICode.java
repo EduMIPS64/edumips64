@@ -127,6 +127,7 @@ public class GUICode extends GUIComponent {
       add(scrollTable, BorderLayout.CENTER);
     }
 
+    @SuppressWarnings("rawtypes")
     class MyTableModel extends AbstractTableModel {
       private String[] columnLocaleStrings = {"ADDRESS", "HEXREPR", "LABEL", "INSTRUCTION", "COMMENT"};
       private Class[] columnClasses = {String.class, String.class, String.class, String.class, String.class};

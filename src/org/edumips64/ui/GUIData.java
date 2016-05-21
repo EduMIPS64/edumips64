@@ -172,6 +172,7 @@ public class GUIData extends GUIComponent {
       public void mouseReleased(MouseEvent e) { }
     }
 
+    @SuppressWarnings("rawtypes")
     class FileTableModel extends AbstractTableModel {
       private String[] columnLocaleStrings = {"ADDRESS", "HEXREPR", "LABEL", "DATA", "COMMENT"};
       private Class[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
