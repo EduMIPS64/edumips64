@@ -1,4 +1,4 @@
-1st of June, 2013                                                  EduMIPS64 1.1
+21st of May, 2015                                                EduMIPS64 1.2.1
 
                            EduMIPS64 RELEASE NOTES	
                            http://www.edumips.org
@@ -9,80 +9,35 @@ graphical debugger.
 Notes for this release:
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This is version 1.2 of EduMIPS64, a bug-fix release that follows up on
-version 1.1, that was released almost 3 months ago. The codename for this
-release is "Ringsend", since most of the code has been written in the
-beautiful neighborhood of Ringsend, in Dublin 4.
+This is version 1.2.1 of EduMIPS64, a bug-fix release that follows up on
+version 1.2, that was released almost 3 years ago. The codename for this
+release is "IFSC", since it is being released from a nice apartment in IFSC,
+Dublin 1.
 
-This release mainly fixes bugs in the Dinero Frontend, plus another critical
-bug (access to negative memory addresses would just raise a
-StringIndexOutOfBoundException) and includes some internal cleanups.
+Most of the code was written in Portobello, Dublin 8, a few airports around
+the world and - of course - IFSC.
+
+This release mostly fixes minor issues, listed later, and contains several
+internal changes made in these 3 years to improve the code quality.
 
 Please keep in mind that this is still EXPERIMENTAL SOFTWARE. It may
 BURN YOUR HARD DISK, DESTROY ALL YOUR DATA and even GO OUT WITH YOUR
 WIFE/HUSBAND. :)
 
-If you find a bug, please send us a bug report to bugs@edumips.org or open an
-issue on GitHub.
+If you find a bug, please open an issue on GitHub.
 
-If you use the simulator, please consider subscribing to the low-traffic
-mailing-list edumips64-devel@lists.sourceforge.net, and help us by giving us
-suggestions and sending bug reports. Thanks!
+EduMIPS64 is hosted on GitHub: www.github.com/lupino3/edumips64.
+Our web site is www.edumips.org, and our development blog is
+http://edumips64.blogspot.com.
 
-EduMIPS64 is hosted on GitHub (www.github.com/lupino3/edumips64), and we have
-a git mirror (that lags a bit) on Google Code
-(http://code.google.com/p/edumips64/). Our web site is www.edumips.org and we
-still use it to communicate with our users. Releases are done on Sourceforge
-(http://sourceforge.net/projects/edumips64) and we also have a development
-blog on http://edumips64.blogspot.com.
-
-New in this release since last major version (1.0)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-New functionalities:
---------------------
-- New configuration preference storage system: cross-platform and based on a
-  standard Java feature (Issue #27) (andrea).
-- New Ant targets to build JAR files with no embedded libraries, useful for
-  distro packagers (andrea)
+New in this release since version 1.2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Bugs fixed:
 -----------
-- Build JAR for every master push and make it available at a known location
-(Issue #30)
-- Refactor sphinx conf.py code internal-cleanup (Issue #18)
-- Automatically populate version fields throughout the code/docs (Issue #17)
-- Settings window's buttons are often hidden (Issue #38)
-- StringIndexOutOfBoundsException raised at run-time (Issue #36)
-- The Dinero frontend sometimes hangs while running Dinero under Windows
-  (Issue #35)
-- Consistency issues between the Settings window and the actual options' value
-  (Issue #34)
-- Missing Italian strings for --help (Issue #33)
-- Splash screen not working for "slim" jar (Issue #31)
-- Dinero Frontend does not support paths containing spaces for the DineroIV
-  executable (Issue #29)
-- Dinero tracefile tracks both Load and Store memory accesses as read (Issue
-  #28)
-- Handle the JavaHelp dependency in a better way (Issue #9)
-- Fix src-release ant target (Issue #13)
-- Forwarding error with a H&P example (Issue #20)
-- Add contact information in the first page of the help (Issue #21)
-- Mention github issues link in the bugs report dialog (Issue #24)
-- Resource mechanism doesn't work when the app is not inside a JAR
-  file (Issue #25)
-- GUICycles window was not behaving correctly when the same instruction was
-  present multiple times in the pipeline.
-
-Misc improvements:
-------------------
-- Added several unit tests, including some for forwarding and for the FPU
-  (andrea)
-- Better source code organization, with directories that match the package
-  hierarchy (andrea)
-- Source code moved to the org.edumips64 package (andrea)
-- General code clean-up:
-  * fixed the style, by using an external linter (Artistic Style);
-  * enabled compilation warnings and fixed all of them;
-  * refactored the GUICycle code;
-  * converted everything that needed conversion to UTF-8.
+- Ghost instruction fetched at the end of program (Issue #50)
+- Problem with syscall 0 after branch (Issue #51)
+- Movn and movz problem after branches (Issue #63)
+- Limited number of labels (Issue #64)
+- Several issues related to code quality (Issues #41, #42, plus several other
+  small problems not listed in the issue tracker)
