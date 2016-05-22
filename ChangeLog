@@ -1,5 +1,14 @@
 EduMIPS64 ChangeLog
 -------------------
+1.2.1 (21/05/2016) - IFSC
+  Bugs fixed:
+  - Ghost instruction fetched at the end of program (Issue #50)
+  - Problem with syscall 0 after branch (Issue #51)
+  - Movn and movz problem after branches (Issue #63)
+  - Limited number of labels (Issue #64)
+  - Several issues related to code quality (Issues #41, #42, plus several other
+    small problems not listed in the issue tracker)
+
 1.2 (01/06/2013) - Ringsend
   Bugs fixed:
   - Settings window's buttons are often hidden (Issue #38)
