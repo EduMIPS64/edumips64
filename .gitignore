@@ -8,6 +8,5 @@ build/*
 docs/*/output
 .idea/workspace.xml
 .idea/tasks.xml
-*.s
 cov-int
 out

@@ -23,7 +23,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.edumips64.tests;
+package org.edumips64;
 
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
@@ -48,7 +48,7 @@ import static org.hamcrest.CoreMatchers.*;
 public class CpuTests {
   protected CPU cpu;
   protected Parser parser;
-  public static String testsLocation = "src/org/edumips64/tests/data/";
+  public static String testsLocation = "test/org/edumips64/data/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
   protected Dinero dinero = Dinero.getInstance();
   protected ConfigStore config = ConfigManager.getTmpConfig();

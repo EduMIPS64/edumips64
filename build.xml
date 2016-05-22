@@ -20,6 +20,7 @@
 
     <!-- Set build file properties -->
     <property name="sourceDir" value="src/org/edumips64/" />
+    <property name="testDir" value="test/org/edumips64/" />
     <property name="outputDir" value="build" />
     <property name="javadocDir" value="javadoc" />
 
@@ -121,7 +122,6 @@
         source="${src_java_version}"
         target="${dst_java_version}"
         srcdir="${sourceDir}"
-        excludes="tests/**"
         destdir="${outputDir}"
         debug="${debug}"
         debuglevel="lines,vars,source"
@@ -133,13 +133,13 @@
   </target>
 
   <!-- *** test *** run unit tests-->
-  <target name="test" depends="mkdirs">
+  <target name="test" depends="mkdirs,compile">
       <!-- cannot use the compile target since we'll need to compile test code
            as well. -->
       <javac
           source="${src_java_version}"
           target="${dst_java_version}"
-          srcdir="${sourceDir}"
+          srcdir="${testDir}"
           destdir="${outputDir}"
           debug="${debug}"
           includeantruntime="false"
@@ -154,7 +154,7 @@
               <pathelement path="${base.classpath}"/>
               <pathelement path="${outputDir}"/>
           </classpath>
-          <test name="org.edumips64.tests.CpuTests">
+          <test name="org.edumips64.CpuTests">
               <formatter type="plain" usefile="false"/>
           </test>
       </junit>
