@@ -107,9 +107,5 @@ public abstract class FixedBitSet {
   public String getHexString() throws IrregularStringOfBitsException {
     return Converter.binToHex(this.getBinString());
   }
-
-  //public void setBits(String string) {
-  //  throw new UnsupportedOperationException("Not yet implemented");
-  //}
 }
 
