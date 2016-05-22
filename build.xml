@@ -157,6 +157,9 @@
           <test name="org.edumips64.CpuTests">
               <formatter type="plain" usefile="false"/>
           </test>
+          <test name="org.edumips64.core.FixedBitSetTest">
+              <formatter type="plain" usefile="false"/>
+          </test>
       </junit>
       <delete dir="${outputDir}" />
   </target>
