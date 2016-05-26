@@ -46,12 +46,12 @@ import static org.hamcrest.CoreMatchers.*;
 
 @RunWith(JUnit4.class)
 public class CpuTests {
-  protected CPU cpu;
-  protected Parser parser;
-  public static String testsLocation = "test/org/edumips64/data/";
+  private CPU cpu;
+  private Parser parser;
+  private static String testsLocation = "test/org/edumips64/data/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
-  protected Dinero dinero = Dinero.getInstance();
-  protected ConfigStore config = ConfigManager.getTmpConfig();
+  private Dinero dinero = Dinero.getInstance();
+  private ConfigStore config = ConfigManager.getTmpConfig();
 
   @Rule
   public ErrorCollector collector = new ErrorCollector();
@@ -65,7 +65,7 @@ public class CpuTests {
     int rawStalls, wawStalls, memStalls;
     String traceFile;
 
-    public CpuTestStatus(CPU cpu, String dineroTrace) {
+    CpuTestStatus(CPU cpu, String dineroTrace) {
       cycles = cpu.getCycles();
       instructions = cpu.getInstructions();
       wawStalls = cpu.getWAWStalls();
@@ -91,7 +91,7 @@ public class CpuTests {
     }
 
     // Restore values to the config Store.
-    public void restore() {
+    void restore() {
       config.putBoolean("INVALID_OPERATION", invalidOperation);
       config.putBoolean("OVERFLOW", overflow);
       config.putBoolean("UNDERFLOW", underflow);
@@ -99,7 +99,7 @@ public class CpuTests {
     }
   }
 
-  protected FPUExceptionsConfig fec;
+  private FPUExceptionsConfig fec;
 
   @BeforeClass
   public static void setup() {
@@ -131,7 +131,7 @@ public class CpuTests {
    *
    * @param testPath path of the test code.
    */
-  protected CpuTestStatus runMipsTest(String testPath) throws Exception {
+  private CpuTestStatus runMipsTest(String testPath) throws Exception {
     log.warning("================================= Starting test " + testPath);
     cpu.reset();
     testPath = testsLocation + testPath;
@@ -176,9 +176,9 @@ public class CpuTests {
    * @return a dictionary that maps the forwarding status to the
    * corresponding CpuTestStatus object.
    */
-  protected Map<ForwardingStatus, CpuTestStatus> runMipsTestWithAndWithoutForwarding(String testPath) throws Exception {
+  private Map<ForwardingStatus, CpuTestStatus> runMipsTestWithAndWithoutForwarding(String testPath) throws Exception {
     boolean forwardingStatus = Instruction.getEnableForwarding();
-    Map<ForwardingStatus, CpuTestStatus> statuses = new HashMap<ForwardingStatus, CpuTestStatus>();
+    Map<ForwardingStatus, CpuTestStatus> statuses = new HashMap<>();
 
     Instruction.setEnableForwarding(true);
     statuses.put(ForwardingStatus.ENABLED, runMipsTest(testPath));
