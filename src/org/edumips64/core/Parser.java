@@ -30,6 +30,7 @@
 package org.edumips64.core;
 
 import org.edumips64.utils.*;
+
 import org.edumips64.core.is.*;
 import org.edumips64.core.fpu.*;
 import java.util.regex.*;
@@ -40,27 +41,29 @@ import java.io.*;
 import java.util.*;
 import java.lang.reflect.Array;
 
+class VoidJump {
+  Instruction instr;
+  String label;
+  int row;
+  int column;
+  int instrCount;
+  String line;
+  boolean isBranch = false;
+}
+
 public class Parser {
+  /** Instance variables */
   private static final Logger logger = Logger.getLogger(Parser.class.getName());
   private enum AliasRegister
   {zero, at, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, k0, k1, gp, sp, fp, ra}
   private static final String deprecateInstruction[] = {"BNEZ", "BEQZ", "HALT", "DADDUI", "L.D", "S.D"};
 
-  private class VoidJump {
-    public Instruction instr;
-    public String label;
-    int row;
-    int column;
-    int instrCount;
-    String line;
-    boolean isBranch = false;
-  }
-  ParserMultiWarningException warning;
-  ParserMultiException error;
-  boolean isFirstOutOfMemory;
-  String path;
-  int numError;
-  int numWarning;
+  private ParserMultiWarningException warning;
+  private ParserMultiException error;
+  private boolean isFirstOutOfMemory;
+  private String path;
+  private int numError;
+  private int numWarning;
   /** Instance of Parser
   */
   private static Parser instance = null;
@@ -70,16 +73,12 @@ public class Parser {
   /** File to be parsed
   */
   private BufferedReader in;
-  int memoryCount;
-  String filename;
+  private int memoryCount;
+  private String filename;
   private SymbolTable symTab;
 
-  /** Singleton pattern constructor
-  */
-  private Parser() {
-    symTab = SymbolTable.getInstance();
-    CPU.getInstance();
-  }
+  /** Public methods */
+
   /** Singleton Pattern implementation
    *  @return get the Singleton instance of the Parser
    */
@@ -87,8 +86,50 @@ public class Parser {
     if (instance == null) {
       instance = new Parser();
     }
-
     return instance;
+  }
+
+  /** Loading from File
+   * @param filename A String with the system-dependent file name
+   * @throws SecurityException if a security manager exists and its checkRead method denies read access to the file.
+   */
+  public void parse(String filename) throws SecurityException, IOException, ParserMultiException
+
+  {
+    logger.info("About to parse " + filename);
+    in = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "ISO-8859-1"));
+    this.filename = filename;
+    int oldindex = 0;
+    int index = 0;
+
+    filename = new File(filename).getAbsolutePath() ;
+
+    while ((index = filename.indexOf(File.separator, index)) != -1) {
+      oldindex = index;
+      index ++;
+    }
+
+    path = filename.substring(0, oldindex + 1);
+    String code = preprocessor();
+    parse(code.toCharArray());
+    logger.info(filename + " correctly parsed.");
+  }
+
+  /** Replace all Tabulator with space
+   * @param text the string to replace
+   * @return a new String
+   */
+  static String replaceTab(String text) {
+    return text.replace("\t", " ");
+  }
+
+  /** Private methods */
+
+  /** Singleton pattern constructor
+   */
+  private Parser() {
+    symTab = SymbolTable.getInstance();
+    CPU.getInstance();
   }
 
   private String fileToString(String filename) throws IOException {
@@ -114,9 +155,6 @@ public class Parser {
     return ret;
   }
 
-  /**
-   *
-   */
   private void checkLoop(String data, Stack<String> included) throws IOException, ParserMultiException {
     int i = 0;
 
@@ -193,37 +231,10 @@ public class Parser {
     return filetmp;
   }
 
-
-  /** Loading from File
-   * @param filename A String with the system-dependent file name
-   * @throws FileNotFoundException if the file does not exist, is a directory rather than a regular file, or for some other reason cannot be opened for reading
-   * @throws SecurityException if a security manager exists and its checkRead method denies read access to the file.
-   */
-  public void parse(String filename) throws FileNotFoundException, SecurityException, IOException, ParserMultiException
-
-  {
-    logger.info("About to parse " + filename);
-    in = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "ISO-8859-1"));
-    this.filename = filename;
-    int oldindex = 0;
-    int index = 0;
-
-    filename = new File(filename).getAbsolutePath() ;
-
-    while ((index = filename.indexOf(File.separator, index)) != -1) {
-      oldindex = index;
-      index ++;
-    }
-
-    path = filename.substring(0, oldindex + 1);
-    String code = preprocessor();
-    parse(code.toCharArray());
-    logger.info(filename + " correctly parsed.");
-  }
   /** Loading from buffer
    * @param buffer An Array of char with the MIPS code
    * */
-  public void parse(char[] buffer)  throws  IOException, ParserMultiException {
+  private void parse(char[] buffer)  throws  IOException, ParserMultiException {
     in = new BufferedReader(new CharArrayReader(buffer));
     doParsing();
   }
@@ -1256,7 +1267,7 @@ public class Parser {
    *  @param s the bad format String
    *  @return the cleaned String
    */
-  public String cleanFormat(String s) {
+  private String cleanFormat(String s) {
     if (s.length() > 0 && s.charAt(0) != ';' &&  s.charAt(0) != '\n') {
       //String[] nocomment=s.split(";");
       //s=nocomment[0];//.toUpperCase();
@@ -1383,18 +1394,6 @@ public class Parser {
     }
 
   }
-  /** Check if a number is a valid .byte
-   *  @param num the value to validate
-   *  @return true if num is a valid .byte, else false
-   */
-  private boolean isValidByte(long num) {
-    if (num > 255 || num < -127) {
-      return false;
-    }
-
-    return true;
-
-  }
 
   /** Check if is a valid string for a register
    *  @param imm the string to validate
@@ -1418,14 +1417,6 @@ public class Parser {
     } catch (Exception e) {
       return false;
     }
-
-  }
-  /** Replace all Tabulator with space
-   * @param text the string to replace
-   * @return a new String
-   */
-  protected static String replaceTab(String text) {
-    return text.replace("\t", " ");
 
   }
 
@@ -1517,7 +1508,6 @@ public class Parser {
     }
 
   }
-
 
   /** Write an integer in memory
    *  @param row number of row
