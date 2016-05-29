@@ -61,15 +61,15 @@ public class Parser {
   private ParserMultiWarningException warning;
   private ParserMultiException error;
   private boolean isFirstOutOfMemory;
-  private String path;
+  /** Base basePath to use for further #include directives. */
+  private String basePath;
   private int numError;
   private int numWarning;
   /** Instance of Parser
   */
   private static Parser instance = null;
-  /** 0 null, 1 .data, 2 .text or .code
-  */
-  private int status;
+  private enum FileSection {NONE, DATA, TEXT};
+  private FileSection section;
   /** File to be parsed
   */
   private BufferedReader in;
@@ -109,7 +109,7 @@ public class Parser {
       index ++;
     }
 
-    path = filename.substring(0, oldindex + 1);
+    basePath = filename.substring(0, oldindex + 1);
     String code = preprocessor();
     parse(code.toCharArray());
     logger.info(filename + " correctly parsed.");
@@ -179,7 +179,7 @@ public class Parser {
         String filename = data.substring(i + 9, end).split(";") [0].trim();
 
         if (!(new File(filename)).isAbsolute()) {
-          filename = path + filename;
+          filename = basePath + filename;
         }
         
         String filetmp = fileToString(filename);
@@ -219,7 +219,7 @@ public class Parser {
         String filename = filetmp.substring(i + 9, end).split(";") [0].trim();
 
         if (!(new File(filename)).isAbsolute()) {
-          filename = path + filename;
+          filename = basePath + filename;
         }
 
         String fileContents = fileToString(filename);
@@ -295,13 +295,13 @@ public class Parser {
             logger.info("Processing " + instr);
 
             if (instr.compareToIgnoreCase(".DATA") == 0) {
-              status = 1;
+              section = FileSection.DATA;
             } else if (instr.compareToIgnoreCase(".TEXT") == 0 || instr.compareToIgnoreCase(".CODE") == 0) {
-              status = 2;
+              section = FileSection.TEXT;
             } else {
               String name = instr.substring(1);   // The name, without the dot.
 
-              if (status != 1) {
+              if (section != FileSection.DATA) {
                 numError++;
                 error.add(name.toUpperCase() + "INCODE", row, i + 1, line);
                 i = line.length();
@@ -507,7 +507,7 @@ public class Parser {
             String label = line.substring(i, end);
             logger.info("Processing label " + label);
 
-            if (status == 1) {
+            if (section == FileSection.DATA) {
               logger.info("in .data section");
 
               try {
@@ -516,20 +516,20 @@ public class Parser {
                 // TODO: errore del parser
                 logger.warning("Label " + label + " is already assigned");
               }
-            } else if (status == 2) {
+            } else if (section == FileSection.TEXT) {
               logger.info("in .text section");
               lastLabel = label;
             }
 
             logger.info("done");
           } else {
-            if (status != 2) {
+            if (section != FileSection.TEXT) {
               numError++;
               error.add("INVALIDCODEFORDATA", row, i + 1, line);
               i = line.length();
               continue;
 
-            } else if (status == 2) {
+            } else if (section == FileSection.TEXT) {
               boolean doPack = true;
               end++;
               Instruction tmpInst;
