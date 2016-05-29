@@ -415,10 +415,8 @@ public class BitSet64 extends FixedBitSet {
     } catch (IrregularStringOfBitsException e) {
       System.err.println(e);
       e.printStackTrace();
-      System.exit(1);
+      throw new RuntimeException(e);
     }
-
-    return 0;
   }
 
   /** Get the value Unsigned of the one Byte of bitset by position
@@ -435,10 +433,8 @@ public class BitSet64 extends FixedBitSet {
     } catch (IrregularStringOfBitsException e) {
       System.err.println(e);
       e.printStackTrace();
-      System.exit(1);
+      throw new RuntimeException(e);
     }
-
-    return 0;
   }
   /** Get the value of the one HalfWord of bitset by position
    *  @param offset position to read the byte
@@ -459,10 +455,8 @@ public class BitSet64 extends FixedBitSet {
     } catch (IrregularStringOfBitsException e) {
       System.err.println(e);
       e.printStackTrace();
-      System.exit(1);
+      throw new RuntimeException(e);
     }
-
-    return 0;
   }
 
   /** Get the value Unsigned of the one HalfWord of bitset by position
@@ -484,10 +478,8 @@ public class BitSet64 extends FixedBitSet {
     } catch (IrregularStringOfBitsException e) {
       System.err.println(e);
       e.printStackTrace();
-      System.exit(1);
+      throw new RuntimeException(e);
     }
-
-    return 0;
   }
   /** Get the value of the one Word of bitset by position
    *  @param offset position to read the byte
@@ -508,10 +500,8 @@ public class BitSet64 extends FixedBitSet {
     } catch (IrregularStringOfBitsException e) {
       System.err.println(e);
       e.printStackTrace();
-      System.exit(1);
+      throw new RuntimeException(e);
     }
-
-    return 0;
   }
 
   /** Get the value Unsigned of the one Word of bitset by position
@@ -533,10 +523,8 @@ public class BitSet64 extends FixedBitSet {
     } catch (IrregularStringOfBitsException e) {
       System.err.println(e);
       e.printStackTrace();
-      System.exit(1);
+      throw new RuntimeException(e);
     }
-
-    return 0;
   }
   public static void main(String[] args) throws Exception {
 
