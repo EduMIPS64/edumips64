@@ -34,8 +34,7 @@ public class BitSet32 extends FixedBitSet {
 
   /** Creates a default new instance of BitSet32 */
   public BitSet32() {
-    super();
-    size = 32;
+    super(32);
   }
 
   public static void main(String[] args) throws Exception {

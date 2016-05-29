@@ -34,8 +34,7 @@ public class BitSet64 extends FixedBitSet {
 //  public final long MAX_DOUBLE = 9223372036854775808L;
   /** Creates a default new instance of BitSet64. */
   public BitSet64() {
-    super();
-    size = 64;
+    super(64);
   }
 
   /** Writes an unsigned byte value into this FixedBitSet: the value to be written must be in the range [0, 255],

@@ -23,20 +23,20 @@
  */
 package org.edumips64.core;
 
-import java.util.BitSet;
 import org.edumips64.utils.*;
 /** Abstract class: it contains a fixed-size BitSet instance.
  * @author Salvatore Scellato
  * */
 abstract class FixedBitSet {
 
-  private BitSet bitset;
+  private char[] bitset;
   protected int size;
 
-  /** Creates a default new instance of FixedBitSet with zero size. */
-  FixedBitSet() {
-    bitset = new BitSet();
-    size = 0;
+  /** Creates a default new instance of FixedBitSet with a given size. */
+  FixedBitSet(int desiredSize) {
+    size = desiredSize;
+    bitset = new char[size];
+    reset(false);
   }
 
   /** Resets this FixedBitSet, setting all bits to one if value is true and setting all bits to zero
@@ -44,10 +44,8 @@ abstract class FixedBitSet {
    * @param value if true bits will be set to '1', if false bits will be set to '0'
    * */
   public void reset(boolean value) {
-    if (!value) {
-      bitset.clear();
-    } else {
-      bitset.set(0, size);   //imposta tutto a true
+    for (int i = 0; i < size; ++i) {
+      bitset[i] = value ? '1' : '0';
     }
   }
 
@@ -72,10 +70,10 @@ abstract class FixedBitSet {
 
       switch (c) {
       case '1':
-        bitset.set(index, true);
+        bitset[index] = '1';
         break;
       case '0':
-        bitset.set(index, false);
+        bitset[index] = '0';
         break;
       default:
         throw new IrregularStringOfBitsException();
@@ -88,17 +86,7 @@ abstract class FixedBitSet {
    * @return string form of the bit sequence stored in this FixedBitSet
    */
   public String getBinString() {
-    StringBuffer buf = new StringBuffer(size);
-
-    for (int i = 0; i < size; i++) {
-      if (bitset.get(i)) {
-        buf.append("1");
-      } else {
-        buf.append("0");
-      }
-    }
-
-    return new String(buf);
+    return new String(bitset);
   }
 
   /** Returns the bit sequence of this FixedBitSet as a string containing hexadecimal

@@ -36,8 +36,7 @@ public class BitSet64FP extends FixedBitSet {
 
   /** Creates a default new instance of BitSet64FP. */
   public BitSet64FP() {
-    super();
-    size = 64;
+    super(64);
   }
 
   /** Writes a floating point double precision number into this FixedBitSet: the value to be written must be in the range
