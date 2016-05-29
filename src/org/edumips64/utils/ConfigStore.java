@@ -23,7 +23,6 @@
  */
 package org.edumips64.utils;
 
-import java.awt.Color;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -43,14 +42,6 @@ public abstract class ConfigStore {
   public abstract void putBoolean(String key, boolean value);
   public abstract boolean getBoolean(String key);
 
-  public void putColor(String key, Color value) {
-    putInt(key, value.getRGB());
-  }
-
-  public Color getColor(String key) {
-    return new Color(getInt(key));
-  }
-
   protected static final Logger logger = Logger.getLogger(ConfigStore.class.getName());
 
   // Generic utility function to populate a ConfigStore object from a set of
@@ -66,8 +57,6 @@ public abstract class ConfigStore {
         putInt(key, (Integer) value);
       } else if (value instanceof Boolean) {
         putBoolean(key, (Boolean) value);
-      } else if (value instanceof Color) {
-        putColor(key, (Color) value);
       } else {
         throw new ConfigStoreTypeException(); //"Unknown type for value " + value + " (" + key + ")");
       }

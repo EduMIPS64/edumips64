@@ -153,30 +153,30 @@ public class GUICycles extends GUIComponent {
 
     private Color getColorByState(String st, String pre) {
       if (st.equals("IF")) {
-        return config.getColor("IFColor");
+        return new Color(config.getInt("IFColor"));
       } else if (st.equals("ID")) {
-        return config.getColor("IDColor");
+        return new Color(config.getInt("IDColor"));
       } else if (st.equals("EX")) {
-        return config.getColor("EXColor");
+        return new Color(config.getInt("EXColor"));
       } else if (st.equals("MEM")) {
-        return config.getColor("MEMColor");
+        return new Color(config.getInt("MEMColor"));
       } else if (st.equals("WB")) {
-        return config.getColor("WBColor");
+        return new Color(config.getInt("WBColor"));
       } else if (st.equals("Str")) {
-        return config.getColor("EXColor");
+        return new Color(config.getInt("EXColor"));
       } else if (st.equals("A1") || st.equals("A2") || st.equals("A3") || st.equals("A4") || st.equals("StAdd")) {
-        return config.getColor("FPAdderColor");
+        return new Color(config.getInt("FPAdderColor"));
       } else if (st.equals("M1") || st.equals("M2") || st.equals("M3") || st.equals("M4") || st.equals("M5") || st.equals("M6") || st.equals("M7") || st.equals("StMul")) {
-        return config.getColor("FPMultiplierColor");
+        return new Color(config.getInt("FPMultiplierColor"));
       } else if (st.matches("D[0-2][0-9]") || st.matches("DIV")) {
-        return config.getColor("FPDividerColor");
+        return new Color(config.getInt("FPDividerColor"));
       } else if (st.equals("RAW")) {
-        return config.getColor("IDColor");
+        return new Color(config.getInt("IDColor"));
       } else if (st.equals("WAW") || st.equals("StDiv") || st.equals("StEx") || st.equals("StFun")) {
-        return config.getColor("IDColor");
+        return new Color(config.getInt("IDColor"));
       } else if (st.equals(" ")) {
         if (pre.equals("IF")) {
-          return config.getColor("IFColor");
+          return new Color(config.getInt("IFColor"));
         }
       }
       return null;

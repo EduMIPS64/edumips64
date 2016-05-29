@@ -24,7 +24,6 @@ package org.edumips64.ui;
 
 import org.edumips64.core.CPU;
 import org.edumips64.core.is.Instruction;
-import org.edumips64.Main;
 import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigStoreTypeException;
@@ -33,7 +32,6 @@ import org.edumips64.utils.CurrentLocale;
 import java.util.*;
 import java.util.logging.Logger;
 import java.awt.*;
-import java.io.*;
 import javax.swing.*;
 import java.awt.event.*;
 
@@ -328,7 +326,7 @@ public class GUIConfig extends JDialog {
     } else if (comp instanceof JButton) {
       final JButton button = (JButton) comp;
       button.setBounds(0, 0, 50, 10);
-      button.setBackground(config.getColor(key));
+      button.setBackground(new Color(config.getInt(key)));
       button.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           Color color = JColorChooser.showDialog(
@@ -338,7 +336,7 @@ public class GUIConfig extends JDialog {
 
           if (color != null) {
             button.setBackground(color);
-            cache.put(key, button.getBackground());
+            cache.put(key, button.getBackground().getRGB());
           }
         }
       });

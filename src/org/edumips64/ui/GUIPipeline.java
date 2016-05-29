@@ -236,42 +236,42 @@ public class GUIPipeline extends GUIComponent {
       Instruction i = pipeline.get(CPU.PipeStage.IF);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(config.getColor("IFColor"));
+        g.setColor(new Color(config.getInt("IFColor")));
         g.fillRect(largh / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(CPU.PipeStage.ID);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(config.getColor("IDColor"));
+        g.setColor(new Color(config.getInt("IDColor")));
         g.fillRect(largh * 4 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(CPU.PipeStage.EX);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(config.getColor("EXColor"));
+        g.setColor(new Color(config.getInt("EXColor")));
         g.fillRect(largh * 9 / 20, (alt / 2) - (alt * 5 / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(CPU.PipeStage.MEM);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(config.getColor("MEMColor"));
+        g.setColor(new Color(config.getInt("MEMColor")));
         g.fillRect(largh * 14 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(CPU.PipeStage.WB);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(config.getColor("WBColor"));
+        g.setColor(new Color(config.getInt("WBColor")));
         g.fillRect(largh * 17 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
 
       //filling FPU elements
       //ADDER
-      g.setColor(config.getColor("FPAdderColor"));
+      g.setColor(new Color(config.getInt("FPAdderColor")));
       spiazzAdd = (largh * 20 / 60) / numAdder;
       int j;
 
@@ -296,7 +296,7 @@ public class GUIPipeline extends GUIComponent {
       }
 
 //MULTIPLIER
-      g.setColor(config.getColor("FPMultiplierColor"));
+      g.setColor(new Color(config.getInt("FPMultiplierColor")));
       spiazzMul = (largh * 20 / 60) / numMultiplier;
 
       if (cpu.isFuncUnitFilled("MULTIPLIER", 1)) {
@@ -335,7 +335,7 @@ public class GUIPipeline extends GUIComponent {
       }
 
       //DIVIDER
-      g.setColor(config.getColor("FPDividerColor"));
+      g.setColor(new Color(config.getInt("FPDividerColor")));
 
       if (cpu.isFuncUnitFilled("DIVIDER", 0)) {
         g.fillRect(largh * 8 / 20, (alt / 2) + (alt * 3 / 12), largh * 2 / 10, alt / 6);
