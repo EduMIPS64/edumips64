@@ -29,17 +29,18 @@
 
 package org.edumips64.core;
 
-import org.edumips64.utils.*;
+import org.edumips64.core.fpu.FPInstructionUtils;
+import org.edumips64.core.is.Instruction;
+import org.edumips64.utils.Converter;
+import org.edumips64.utils.IrregularStringOfBitsException;
+import org.edumips64.utils.IrregularStringOfHexException;
 
-import org.edumips64.core.is.*;
-import org.edumips64.core.fpu.*;
-import java.util.regex.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
 import java.util.logging.Logger;
-
-
-import java.io.*;
-import java.util.*;
-import java.lang.reflect.Array;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class VoidJump {
   Instruction instr;
@@ -72,10 +73,10 @@ public class Parser {
   private FileSection section;
   /** File to be parsed
   */
-  private BufferedReader in;
   private int memoryCount;
   private String filename;
   private SymbolTable symTab;
+  private FileReader reader;
 
   /** Public methods */
 
@@ -84,34 +85,23 @@ public class Parser {
    */
   public static Parser getInstance() {
     if (instance == null) {
-      instance = new Parser();
+      instance = new Parser(new LocalFileReader());
     }
     return instance;
   }
 
   /** Loading from File
-   * @param filename A String with the system-dependent file name
+   * @param filename A String with the system-dependent file name. It should be an absolute file name.
    * @throws SecurityException if a security manager exists and its checkRead method denies read access to the file.
    */
-  public void parse(String filename) throws SecurityException, IOException, ParserMultiException
-
-  {
+  public void parse(String filename) throws ParserMultiException, FileReader.ReadException {
     logger.info("About to parse " + filename);
-    in = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "ISO-8859-1"));
     this.filename = filename;
     int oldindex = 0;
     int index = 0;
-
-    filename = new File(filename).getAbsolutePath() ;
-
-    while ((index = filename.indexOf(File.separator, index)) != -1) {
-      oldindex = index;
-      index ++;
-    }
-
-    basePath = filename.substring(0, oldindex + 1);
-    String code = preprocessor();
-    parse(code.toCharArray());
+    basePath = reader.GetBasePath(filename);
+    String code = preprocessor(filename);
+    doParsing(code);
     logger.info(filename + " correctly parsed.");
   }
 
@@ -127,35 +117,17 @@ public class Parser {
 
   /** Singleton pattern constructor
    */
-  private Parser() {
+  private Parser(FileReader reader) {
     symTab = SymbolTable.getInstance();
     CPU.getInstance();
+    this.reader = reader;
   }
 
-  private String fileToString(String filename) throws IOException {
-    String tmp;
-    try (BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "ISO-8859-1"))) {
-      tmp = fileToString(r);
-    }
-    return tmp;
+  private String fileToString(String filename) throws FileReader.ReadException {
+    return reader.ReadFile(filename);
   }
 
-  private String fileToString(BufferedReader in) throws IOException {
-    String ret = "";
-    String line;
-
-    while ((line = in.readLine()) != null) {
-      String tmp = cleanFormat(line);
-
-      if (tmp != null) {
-        ret += tmp + "\n";
-      }
-    }
-
-    return ret;
-  }
-
-  private void checkLoop(String data, Stack<String> included) throws IOException, ParserMultiException {
+  private void checkLoop(String data, Stack<String> included) throws ParserMultiException, FileReader.ReadException {
     int i = 0;
 
     do {
@@ -178,10 +150,10 @@ public class Parser {
 
         String filename = data.substring(i + 9, end).split(";") [0].trim();
 
-        if (!(new File(filename)).isAbsolute()) {
+        if (!reader.isAbsolute(filename)) {
           filename = basePath + filename;
         }
-        
+
         String filetmp = fileToString(filename);
         checkLoop(filetmp , included);
         i ++;
@@ -191,10 +163,10 @@ public class Parser {
 
   /** Process the #include (Syntax #include file.ext )
    */
-  private String preprocessor() throws IOException, ParserMultiException {
-    String filetmp = "";
+  private String preprocessor(String filename) throws ParserMultiException, FileReader.ReadException {
+    String filetmp;
 
-    filetmp = fileToString(in);
+    filetmp = fileToString(filename);
 
     int i = 0;
 
@@ -216,13 +188,13 @@ public class Parser {
         }
 
         logger.info("Open by #include: " + filetmp.substring(i + 9, end).trim());
-        String filename = filetmp.substring(i + 9, end).split(";") [0].trim();
+        String includedFilename = filetmp.substring(i + 9, end).split(";") [0].trim();
 
-        if (!(new File(filename)).isAbsolute()) {
-          filename = basePath + filename;
+        if (!reader.isAbsolute(includedFilename)) {
+          includedFilename = basePath + includedFilename;
         }
 
-        String fileContents = fileToString(filename);
+        String fileContents = fileToString(includedFilename);
         filetmp = filetmp.substring(0, i) + fileContents + filetmp.substring(end);
       }
 
@@ -231,17 +203,9 @@ public class Parser {
     return filetmp;
   }
 
-  /** Loading from buffer
-   * @param buffer An Array of char with the MIPS code
-   * */
-  private void parse(char[] buffer)  throws  IOException, ParserMultiException {
-    in = new BufferedReader(new CharArrayReader(buffer));
-    doParsing();
-  }
   /** commit the parsing (public or private?)
   */
-  private void doParsing() throws IOException, ParserMultiException {
-
+  private void doParsing(String code) throws ParserMultiException {
     boolean isFirstOutOfInstructionMemory = true;
     isFirstOutOfMemory = true;
     boolean halt = false;
@@ -250,7 +214,6 @@ public class Parser {
     numError = 0;
     numWarning = 0;
     int instrCount = -4;    // Hack fituso by Andrea
-    String line;
     error = new ParserMultiException();
     warning = new ParserMultiWarningException();
 
@@ -261,7 +224,7 @@ public class Parser {
     memoryCount = 0;
     String lastLabel = "";
 
-    while ((line = in.readLine()) != null) {  //read all file
+    for (String line : code.split("\n")) {
       row++;
       logger.info("-- Processing line " + row);
 
@@ -344,7 +307,7 @@ public class Parser {
               logger.info("line: " + line);
               String[] comment = (line.substring(i)).split(";", 2);
 
-              if (Array.getLength(comment) == 2) {
+              if (comment.length == 2) {
                 logger.info("found comments: " + comment[1]);
                 tmpMem.setComment(comment[1]);
               }
@@ -542,7 +505,7 @@ public class Parser {
               }
 
               //timmy
-              for (int timmy = 0; timmy < Array.getLength(deprecateInstruction); timmy++) {
+              for (int timmy = 0; timmy < deprecateInstruction.length; timmy++) {
                 if (deprecateInstruction[timmy].toUpperCase().equals(line.substring(i, end).toUpperCase())) {
                   warning.add("WINMIPS64_NOT_MIPS64", row, i + 1, line);
                   error.addWarning("WINMIPS64_NOT_MIPS64", row, i + 1, line);
@@ -1151,10 +1114,9 @@ public class Parser {
               tmpInst.setFullName(replaceTab(comment[0].substring(i)));
               tmpInst.setFullName(replaceTab(comment[0].substring(i)));
 
-              if (Array.getLength(comment) == 2)
-                if (Array.getLength(comment) == 2) {
-                  tmpInst.setComment(comment[1]);
-                }
+              if (comment.length == 2) {
+                tmpInst.setComment(comment[1]);
+              }
 
               try {
                 mem.addInstruction(tmpInst, instrCount);
@@ -1223,8 +1185,6 @@ public class Parser {
         continue;
       }
     }
-
-    in.close();
 
     if (!halt) { //if Halt is not present in code
       numWarning++;
@@ -1432,7 +1392,7 @@ public class Parser {
     String value[] = instr.split(",");
     MemoryElement tmpMem = null;
 
-    for (int j = 0; j < Array.getLength(value); j++) {
+    for (int j = 0; j < value.length; j++) {
       tmpMem = mem.getCellByIndex(memoryCount);
       memoryCount++;
       Pattern p = Pattern.compile("-?[0-9]+.[0-9]+");
@@ -1524,7 +1484,7 @@ public class Parser {
     String value[] = instr.split(",");
     MemoryElement tmpMem = null;
 
-    for (int j = 0; j < Array.getLength(value); j++) {
+    for (int j = 0; j < value.length; j++) {
       if (j % (64 / numBit) == 0) {
         posInWord = 0;
         tmpMem = mem.getCellByIndex(memoryCount);

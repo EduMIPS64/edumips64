@@ -43,7 +43,8 @@ public class MainCLI {
       c.setStatus(CPU.CPUStatus.READY);
 
       if (args.length > 0) {
-        p.parse(args[0]);
+        String absoluteFilename = new File(args[0]).getAbsolutePath();
+        p.parse(absoluteFilename);
         c.setStatus(CPU.CPUStatus.RUNNING);
       }
 

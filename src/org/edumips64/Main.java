@@ -29,6 +29,7 @@ import org.edumips64.utils.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Handler;
@@ -448,7 +449,8 @@ public class Main extends JApplet {
       log.info("Before parsing");
 
       try {
-        parser.parse(file);
+        String absoluteFilename = new File(file).getAbsolutePath();
+        parser.parse(absoluteFilename);
       } catch (ParserMultiWarningException pmwe) {
         new ErrorDialog(f, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"));
       } catch (NullPointerException e) {
@@ -486,7 +488,7 @@ public class Main extends JApplet {
       openedFile = null;
       f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
       resetSimulator(false);
-    } catch (java.io.FileNotFoundException ex) {
+    } catch (FileReader.ReadException ex) {
       String tmpfile;
 
       if (ex.getMessage().contains("(")) {

@@ -22,8 +22,9 @@
  */
 
 package org.edumips64.core;
-import java.util.*;
 import java.io.*;
+import java.io.FileReader;
+import java.util.*;
 import java.util.logging.Logger;
 
 /** Class used as a proxy for I/O operations.

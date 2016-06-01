@@ -139,7 +139,8 @@ public class CpuTests {
 
     try {
       try {
-        parser.parse(testPath);
+        String absoluteFilename = new File(testPath).getAbsolutePath();
+        parser.parse(absoluteFilename);
       } catch (ParserMultiWarningException e) {
         // This exception is raised even if there are only warnings.
         // We must raise it only if there are actual errors.
