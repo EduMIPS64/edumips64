@@ -20,6 +20,7 @@
 
     <!-- Set build file properties -->
     <property name="sourceDir" value="src/org/edumips64/" />
+    <property name="webDir" value="src/org/edumips64/client/" />
     <property name="testDir" value="test/org/edumips64/" />
     <property name="outputDir" value="build" />
     <property name="javadocDir" value="javadoc" />
@@ -43,11 +44,81 @@
     <property name="src_java_version" value="8" />
     <property name="dst_java_version" value="8" />
     <property name="debug" value="on" />
+
+    <!-- Arguments to gwtc and devmode targets -->
+    <property name="gwt.args" value="" />
+
+    <!-- Configure path to GWT SDK. TODO: make this auto-discovered or
+         something, it's not good to point to /home/andrea.-->
+    <property name="gwt.sdk" location="/home/andrea/gwt-2.7.0" />
+    <path id="project.class.path">
+      <pathelement location="war/WEB-INF/classes"/>
+      <pathelement location="${gwt.sdk}/gwt-user.jar"/>
+      <pathelement location="${gwt.sdk}/gwt-dev.jar"/>
+      <pathelement location="${gwt.sdk}/validation-api-1.0.0.GA.jar"/>
+      <pathelement location="${gwt.sdk}/validation-api-1.0.0.GA-sources.jar"/>
+      <fileset dir="war/WEB-INF/lib" includes="**/*.jar"/>
+      <!-- Add any additional non-server libs (such as JUnit) here -->
+      <pathelement location="libs/jhall.jar"/>
+    </path>
+  </target>
+
+  <target name="webLibs" depends="init" description="Copy libs to WEB-INF/lib">
+    <mkdir dir="war/WEB-INF/lib" />
+    <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet.jar" />
+    <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet-deps.jar" />
+    <!-- Add any additional server libs that need to be copied -->
+  </target>
+
+  <target name="compileWeb" depends="webLibs" description="Compile java source to bytecode">
+    <mkdir dir="war/WEB-INF/classes"/>
+    <javac srcdir="src" includes="**" encoding="utf-8"
+        destdir="war/WEB-INF/classes"
+        source="1.7" target="1.7" nowarn="true"
+        debug="true" debuglevel="lines,vars,source">
+      <classpath refid="project.class.path"/>
+    </javac>
+    <copy todir="war/WEB-INF/classes">
+      <fileset dir="src" excludes="**/*.java"/>
+    </copy>
   </target>
 
   <target name="mkdirs" depends="init">
     <!-- Create directories for the compilation process. -->
     <mkdir dir="${outputDir}" />
+  </target>
+
+  <target name="gwtc" depends="compileWeb" description="GWT compile to JavaScript (production mode)">
+    <java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler" maxmemory="256m">
+      <classpath>
+        <pathelement location="src"/>
+        <path refid="project.class.path"/>
+      </classpath>
+      <arg line="-war"/>
+      <arg value="war"/>
+      <!-- Additional arguments like -style PRETTY or -logLevel DEBUG -->
+      <arg line="${gwt.args}"/>
+      <arg value="org.edumips64.webclient"/>
+      <arg line="-strict"/>
+    </java>
+  </target>
+
+  <target name="devmode" depends="compileWeb" description="Run development mode (pass -Dgwt.args=-nosuperDevMode to fallback to classic DevMode)">
+    <java failonerror="true" fork="true" classname="com.google.gwt.dev.DevMode" maxmemory="1g">
+      <classpath>
+        <pathelement location="src"/>
+        <path refid="project.class.path"/>
+        <pathelement location="${gwt.sdk}/gwt-codeserver.jar"/>
+      </classpath>
+      <arg value="-startupUrl"/>
+      <arg value="edumips64.html"/>
+      <arg line="-war"/>
+      <arg value="war"/>
+      <!-- Additional arguments like -style PRETTY, -logLevel DEBUG or -nosuperDevMode -->
+      <arg line="${gwt.args}"/>
+      <arg value="org.edumips64.web.WebUi"/>
+      <arg value="org.edumips64.web.WebUi"/>
+    </java>
   </target>
 
   <!-- *** clean *** target that cleans the built files and the build directory-->
@@ -125,6 +196,7 @@
         destdir="${outputDir}"
         debug="${debug}"
         debuglevel="lines,vars,source"
+        excludes="client/**"
         includeantruntime="false"
         classpath="${base.classpath}">
         <compilerarg value="-Xlint"/>
