@@ -22,10 +22,17 @@
  */
 
 package org.edumips64.core;
-import java.io.*;
-import java.io.FileReader;
-import java.util.*;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
+
+import org.edumips64.utils.FileUtils;
+import org.edumips64.utils.LocalFileUtils;
 
 /** Class used as a proxy for I/O operations.
  *  This class handles input/output from/to files, including stdin, stdout and
@@ -73,6 +80,9 @@ public class IOManager {
   // Singleton
   private static IOManager instance;
 
+  // FileUtils instance.
+  FileUtils fileUtils;
+
   /** Closes all the open files */
   public void reset() throws IOException {
     logger.info("IOManager: resetting... next_fd = " + next_descriptor);
@@ -99,12 +109,14 @@ public class IOManager {
     // We set the next descriptor to 3, because 0 is stdin, 1 is stdout and
     // 2 is stderr
     next_descriptor = 3;
+
+    fileUtils = new LocalFileUtils();
   }
 
   /** Closes the specified file descriptor.
    *  @param fd the file descriptor to close
    */
-  public int close(int fd) throws IOException,  java.io.FileNotFoundException {
+  public int close(int fd) throws IOException, java.io.FileNotFoundException {
     logger.info("call to close() with fd = " + fd);
     int ret = -1;
     boolean in = ins.containsKey(fd);
@@ -133,7 +145,7 @@ public class IOManager {
    *  @param pathname pathname of the file to open
    *  @param flags combination of the flags O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_APPEND, O_TRUNC
    */
-  public int open(String pathname, int flags) throws java.io.FileNotFoundException, IOException, IOManagerException {
+  public int open(String pathname, int flags) throws FileUtils.OpenException, IOManagerException {
     // TODO: gestire combinazioni non valide tipo O_RDONLY || O_APPEND?
     if (((flags & O_RDONLY) != O_RDONLY) && (flags & O_WRONLY) != O_WRONLY) {
       throw new IOManagerException("NOOPENMODESPECIFIED");
@@ -149,10 +161,8 @@ public class IOManager {
 
     if (((flags & O_CREAT) != O_CREAT) && ((flags & O_WRONLY) == O_WRONLY)) {
       logger.info("No O_CREAT, but O_WRONLY. We must check if the file exists");
-      File temp = new File(pathname);
-
-      if (!temp.exists()) {
-        throw new FileNotFoundException();
+      if (!fileUtils.Exists(pathname)) {
+        throw new FileUtils.OpenException();
       }
     }
 
@@ -160,9 +170,7 @@ public class IOManager {
 
     if (((flags & O_CREAT) == O_CREAT) && ((flags & O_RDONLY) == O_RDONLY)) {
       logger.info("Trying to open in read mode a file that might not exist.");
-      File temp = new File(pathname);
-
-      if (!temp.exists()) {
+      if (!fileUtils.Exists(pathname)) {
         throw new IOManagerException("OPENREADANDCREATE");
       }
     }
@@ -177,13 +185,13 @@ public class IOManager {
 
     if ((flags & O_RDONLY) == O_RDONLY) {
       logger.info("flags & O_RDONLY = " + O_RDONLY);
-      Reader r = new FileReader(pathname);
+      Reader r = fileUtils.openReadOnly(pathname);
       ins.put(next_descriptor, r);
     }
 
     if ((flags & O_WRONLY) == O_WRONLY) {
       logger.info("flags & O_WRONLY = " + O_WRONLY);
-      Writer w = new FileWriter(pathname, append);
+      Writer w = fileUtils.openWriteOnly(pathname, append);
       outs.put(next_descriptor, w);
     }
 

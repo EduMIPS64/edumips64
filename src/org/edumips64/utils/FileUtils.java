@@ -24,20 +24,20 @@ public abstract class FileUtils {
   public abstract Reader openReadOnly(String pathname) throws OpenException;
   public abstract Writer openWriteOnly(String pathname, boolean append) throws OpenException;
 
-  public class ReadException extends Exception {
-    ReadException(Exception e) {
+  public static class ReadException extends Exception {
+    public ReadException(Exception e) {
       super(e);
     }
 
-    ReadException() {}
+    public ReadException() {}
   }
 
-  public class OpenException extends Exception {
-    OpenException(Exception e) {
+  public static class OpenException extends Exception {
+    public OpenException(Exception e) {
       super(e);
     }
 
-    OpenException() {}
+    public OpenException() {}
   }
 
   /** Clean multiple tab or spaces in a bad format String //and converts  this String to upper case
