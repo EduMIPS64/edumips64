@@ -10,3 +10,5 @@ docs/*/output
 .idea/tasks.xml
 cov-int
 out
+gwt-unitCache/
+war/WEB-INF/
