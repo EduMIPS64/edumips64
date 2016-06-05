@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
+import org.edumips64.utils.io.OpenException;
 
 /** Class used as a proxy for I/O operations.
  *  This class handles input/output from/to files, including stdin, stdout and
@@ -145,7 +146,7 @@ public class IOManager {
    *  @param pathname pathname of the file to open
    *  @param flags combination of the flags O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_APPEND, O_TRUNC
    */
-  public int open(String pathname, int flags) throws FileUtils.OpenException, IOManagerException {
+  public int open(String pathname, int flags) throws OpenException, IOManagerException {
     // TODO: gestire combinazioni non valide tipo O_RDONLY || O_APPEND?
     if (((flags & O_RDONLY) != O_RDONLY) && (flags & O_WRONLY) != O_WRONLY) {
       throw new IOManagerException("NOOPENMODESPECIFIED");
@@ -162,7 +163,7 @@ public class IOManager {
     if (((flags & O_CREAT) != O_CREAT) && ((flags & O_WRONLY) == O_WRONLY)) {
       logger.info("No O_CREAT, but O_WRONLY. We must check if the file exists");
       if (!fileUtils.Exists(pathname)) {
-        throw new FileUtils.OpenException();
+        throw new OpenException();
       }
     }
 

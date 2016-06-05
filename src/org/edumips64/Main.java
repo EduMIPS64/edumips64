@@ -489,7 +489,7 @@ public class Main extends JApplet {
       openedFile = null;
       f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
       resetSimulator(false);
-    } catch (FileUtils.ReadException ex) {
+    } catch (ReadException ex) {
       String tmpfile;
 
       if (ex.getMessage().contains("(")) {

@@ -36,6 +36,7 @@ import org.edumips64.utils.IrregularStringOfBitsException;
 import org.edumips64.utils.IrregularStringOfHexException;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
+import org.edumips64.utils.io.ReadException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -96,7 +97,7 @@ public class Parser {
    * @param filename A String with the system-dependent file name. It should be an absolute file name.
    * @throws SecurityException if a security manager exists and its checkRead method denies read access to the file.
    */
-  public void parse(String filename) throws ParserMultiException, FileUtils.ReadException {
+  public void parse(String filename) throws ParserMultiException, ReadException {
     logger.info("About to parse " + filename);
     this.filename = filename;
     int oldindex = 0;
@@ -125,11 +126,11 @@ public class Parser {
     this.fileUtils = utils;
   }
 
-  private String fileToString(String filename) throws FileUtils.ReadException {
+  private String fileToString(String filename) throws ReadException {
     return fileUtils.ReadFile(filename);
   }
 
-  private void checkLoop(String data, Stack<String> included) throws ParserMultiException, FileUtils.ReadException {
+  private void checkLoop(String data, Stack<String> included) throws ParserMultiException, ReadException {
     int i = 0;
 
     do {
@@ -165,7 +166,7 @@ public class Parser {
 
   /** Process the #include (Syntax #include file.ext )
    */
-  private String preprocessor(String filename) throws ParserMultiException, FileUtils.ReadException {
+  private String preprocessor(String filename) throws ParserMultiException, ReadException {
     String filetmp;
 
     filetmp = fileToString(filename);
