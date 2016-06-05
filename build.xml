@@ -23,6 +23,7 @@
     <property name="webDir" value="src/org/edumips64/client/" />
     <property name="testDir" value="test/org/edumips64/" />
     <property name="outputDir" value="build" />
+    <property name="webOutputDir" value="war/WEB-INF/classes" />
     <property name="javadocDir" value="javadoc" />
 
     <!-- Access the environment -->
@@ -50,7 +51,7 @@
 
     <!-- Configure path to GWT SDK. TODO: make this auto-discovered or
          something, it's not good to point to /home/andrea.-->
-    <property name="gwt.sdk" location="/home/andrea/gwt-2.7.0" />
+    <property name="gwt.sdk" location="${env.HOME}/gwt-2.7.0" />
     <path id="project.class.path">
       <pathelement location="war/WEB-INF/classes"/>
       <pathelement location="${gwt.sdk}/gwt-user.jar"/>
@@ -130,6 +131,7 @@
     <delete file="${cli_jar_filename}" />
         <delete dir="${outputDir}" />
         <delete dir="${javadocDir}" />
+        <delete dir="${webOutputDir}" />
   </target>
 
   <target name="cleandocs" depends="init">
