@@ -32,6 +32,8 @@ package org.edumips64.core;
 import org.edumips64.core.fpu.FPInstructionUtils;
 import org.edumips64.core.is.Instruction;
 import org.edumips64.utils.Converter;
+import org.edumips64.utils.FileUtils;
+import org.edumips64.utils.LocalFileUtils;
 import org.edumips64.utils.IrregularStringOfBitsException;
 import org.edumips64.utils.IrregularStringOfHexException;
 
@@ -76,7 +78,7 @@ public class Parser {
   private int memoryCount;
   private String filename;
   private SymbolTable symTab;
-  private FileReader reader;
+  private FileUtils fileUtils;
 
   /** Public methods */
 
@@ -85,7 +87,7 @@ public class Parser {
    */
   public static Parser getInstance() {
     if (instance == null) {
-      instance = new Parser(new LocalFileReader());
+      instance = new Parser(new LocalFileUtils());
     }
     return instance;
   }
@@ -94,12 +96,12 @@ public class Parser {
    * @param filename A String with the system-dependent file name. It should be an absolute file name.
    * @throws SecurityException if a security manager exists and its checkRead method denies read access to the file.
    */
-  public void parse(String filename) throws ParserMultiException, FileReader.ReadException {
+  public void parse(String filename) throws ParserMultiException, FileUtils.ReadException {
     logger.info("About to parse " + filename);
     this.filename = filename;
     int oldindex = 0;
     int index = 0;
-    basePath = reader.GetBasePath(filename);
+    basePath = fileUtils.GetBasePath(filename);
     String code = preprocessor(filename);
     doParsing(code);
     logger.info(filename + " correctly parsed.");
@@ -117,17 +119,17 @@ public class Parser {
 
   /** Singleton pattern constructor
    */
-  private Parser(FileReader reader) {
+  private Parser(FileUtils utils) {
     symTab = SymbolTable.getInstance();
     CPU.getInstance();
-    this.reader = reader;
+    this.fileUtils = utils;
   }
 
-  private String fileToString(String filename) throws FileReader.ReadException {
-    return reader.ReadFile(filename);
+  private String fileToString(String filename) throws FileUtils.ReadException {
+    return fileUtils.ReadFile(filename);
   }
 
-  private void checkLoop(String data, Stack<String> included) throws ParserMultiException, FileReader.ReadException {
+  private void checkLoop(String data, Stack<String> included) throws ParserMultiException, FileUtils.ReadException {
     int i = 0;
 
     do {
@@ -150,7 +152,7 @@ public class Parser {
 
         String filename = data.substring(i + 9, end).split(";") [0].trim();
 
-        if (!reader.isAbsolute(filename)) {
+        if (!fileUtils.isAbsolute(filename)) {
           filename = basePath + filename;
         }
 
@@ -163,7 +165,7 @@ public class Parser {
 
   /** Process the #include (Syntax #include file.ext )
    */
-  private String preprocessor(String filename) throws ParserMultiException, FileReader.ReadException {
+  private String preprocessor(String filename) throws ParserMultiException, FileUtils.ReadException {
     String filetmp;
 
     filetmp = fileToString(filename);
@@ -190,7 +192,7 @@ public class Parser {
         logger.info("Open by #include: " + filetmp.substring(i + 9, end).trim());
         String includedFilename = filetmp.substring(i + 9, end).split(";") [0].trim();
 
-        if (!reader.isAbsolute(includedFilename)) {
+        if (!fileUtils.isAbsolute(includedFilename)) {
           includedFilename = basePath + includedFilename;
         }
 

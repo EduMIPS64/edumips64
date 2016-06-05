@@ -1,18 +1,28 @@
-package org.edumips64.core;
-
 /**
- * An interface to read files.
+ * FileUtils
+ *
+ * Abstract class that encapsulates interaction with the filesystem without
+ * using the java.io package.
  */
-public abstract class FileReader {
+package org.edumips64.utils;
+
+import java.io.Reader;
+import java.io.Writer;
+
+public abstract class FileUtils {
   /** Reads the file specified in 'filename' and returns its contents as a list of strings, one for each line.
    *
    * @param filename the file to open and read
    * @return a list of strings, one for each line in the file.
    */
-  abstract String ReadFile(String filename) throws ReadException;
-  abstract String GetAbsoluteFilename(String filename);
-  abstract String GetBasePath(String filename);
-  abstract boolean isAbsolute(String filename);
+  public abstract String ReadFile(String filename) throws ReadException;
+  public abstract String GetAbsoluteFilename(String filename);
+  public abstract String GetBasePath(String filename);
+  public abstract boolean isAbsolute(String filename);
+  public abstract boolean Exists(String filename);
+
+  public abstract Reader openReadOnly(String pathname) throws OpenException;
+  public abstract Writer openWriteOnly(String pathname, boolean append) throws OpenException;
 
   public class ReadException extends Exception {
     ReadException(Exception e) {
@@ -20,6 +30,14 @@ public abstract class FileReader {
     }
 
     ReadException() {}
+  }
+
+  public class OpenException extends Exception {
+    OpenException(Exception e) {
+      super(e);
+    }
+
+    OpenException() {}
   }
 
   /** Clean multiple tab or spaces in a bad format String //and converts  this String to upper case
