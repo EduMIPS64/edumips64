@@ -26,6 +26,7 @@ import org.edumips64.core.*;
 import org.edumips64.img.*;
 import org.edumips64.ui.*;
 import org.edumips64.utils.*;
+import org.edumips64.utils.io.*;
 
 import java.awt.*;
 import java.awt.event.*;

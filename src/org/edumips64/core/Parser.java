@@ -32,10 +32,10 @@ package org.edumips64.core;
 import org.edumips64.core.fpu.FPInstructionUtils;
 import org.edumips64.core.is.Instruction;
 import org.edumips64.utils.Converter;
-import org.edumips64.utils.FileUtils;
-import org.edumips64.utils.LocalFileUtils;
 import org.edumips64.utils.IrregularStringOfBitsException;
 import org.edumips64.utils.IrregularStringOfHexException;
+import org.edumips64.utils.io.FileUtils;
+import org.edumips64.utils.io.LocalFileUtils;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -31,8 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.edumips64.utils.FileUtils;
-import org.edumips64.utils.LocalFileUtils;
+import org.edumips64.utils.io.FileUtils;
+import org.edumips64.utils.io.LocalFileUtils;
 
 /** Class used as a proxy for I/O operations.
  *  This class handles input/output from/to files, including stdin, stdout and

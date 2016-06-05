@@ -1,4 +1,4 @@
-package org.edumips64.utils;
+package org.edumips64.utils.io;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

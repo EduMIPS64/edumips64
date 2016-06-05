@@ -4,7 +4,7 @@
  * Abstract class that encapsulates interaction with the filesystem without
  * using the java.io package.
  */
-package org.edumips64.utils;
+package org.edumips64.utils.io;
 
 import java.io.Reader;
 import java.io.Writer;
