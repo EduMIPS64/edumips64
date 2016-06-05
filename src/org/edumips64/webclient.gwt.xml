@@ -3,5 +3,7 @@
   <entry-point class="org.edumips64.client.WebUi"/>
   <source path="client" />
   <source path="core" />
-  <source path="utils" />
+  <source path="utils">
+    <exclude name="LocalFileUtils.java" />
+  </source>
 </module>
