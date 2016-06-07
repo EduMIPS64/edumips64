@@ -26,6 +26,7 @@ package org.edumips64;
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
 import org.edumips64.utils.*;
+import org.edumips64.utils.io.LocalFileUtils;
 
 import java.io.*;
 
@@ -38,6 +39,8 @@ public class MainCLI {
     CurrentLocale.setLanguage("en");
 
     try {
+      LocalFileUtils lfu = new LocalFileUtils();
+      Parser.createInstance(lfu);
       Parser p = Parser.getInstance();
       CPU c = CPU.getInstance();
       c.setStatus(CPU.CPUStatus.READY);

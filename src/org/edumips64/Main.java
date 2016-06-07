@@ -53,6 +53,7 @@ public class Main extends JApplet {
 
   static CPU cpu;
   public static CPUGUIThread cgt;
+  static LocalFileUtils lfu;
   static Parser parser;
   static GUIFrontend front;
   static ConfigStore configStore = ConfigManager.getConfig();
@@ -236,6 +237,8 @@ public class Main extends JApplet {
     cgt = new CPUGUIThread();
     cgt.start();
 
+    lfu = new LocalFileUtils();
+    Parser.createInstance(lfu);
     parser = Parser.getInstance();
 
     // Internal Frames

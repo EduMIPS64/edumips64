@@ -35,7 +35,6 @@ import org.edumips64.utils.Converter;
 import org.edumips64.utils.IrregularStringOfBitsException;
 import org.edumips64.utils.IrregularStringOfHexException;
 import org.edumips64.utils.io.FileUtils;
-import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.ReadException;
 
 import java.util.LinkedList;
@@ -83,13 +82,18 @@ public class Parser {
 
   /** Public methods */
 
+  /** Initializes the Parser with a given FileUtils instance.
+   *
+   * MUST be used before calling getInstance().
+   * TODO(andrea): use proper dependency injection. */
+  public static void createInstance(FileUtils f) {
+    instance = new Parser(f);
+  }
+
   /** Singleton Pattern implementation
    *  @return get the Singleton instance of the Parser
    */
   public static Parser getInstance() {
-    if (instance == null) {
-      instance = new Parser(new LocalFileUtils());
-    }
     return instance;
   }
 
