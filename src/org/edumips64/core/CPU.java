@@ -436,8 +436,10 @@ public class CPU {
         throw new SynchronousException(syncex);
       }
     } catch (JumpException ex) {
+      logger.info("Executing a Jump.");
       try {
         if (pipe.get(PipeStage.IF) != null) {
+          logger.info("Executing the IF() method of the instruction in IF.");
           pipe.get(PipeStage.IF).IF();
         }
       } catch (BreakException bex) {

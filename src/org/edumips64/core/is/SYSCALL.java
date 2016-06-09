@@ -51,7 +51,7 @@ public class SYSCALL extends Instruction {
 
   public void IF() {
     syscall_n = params.get(0);
-    logger.info("SYSCALL (" + this.hashCode() + ") -> IF");
+    logger.info("SYSCALL " + syscall_n + " (" + this.hashCode() + ") is in IF");
 
     try {
       CPU cpu = CPU.getInstance();
@@ -59,8 +59,6 @@ public class SYSCALL extends Instruction {
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }
-
-    logger.info("SYSCALL (" + this.hashCode() + ") n = " + syscall_n);
   }
 
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
