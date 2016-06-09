@@ -6,7 +6,6 @@
  */
 package org.edumips64.utils.io;
 
-import java.io.Reader;
 import java.io.Writer;
 
 public abstract class FileUtils {

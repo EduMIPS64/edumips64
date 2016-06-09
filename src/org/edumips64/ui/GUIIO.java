@@ -24,12 +24,15 @@
 package org.edumips64.ui;
 
 import org.edumips64.utils.*;
+import org.edumips64.utils.io.Reader;
+import org.edumips64.utils.io.ReadException;
+import java.io.Writer;
+import java.io.IOException;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.*;
 import java.text.*;
 
@@ -172,7 +175,7 @@ public class GUIIO extends JInternalFrame {
    * Proxy Object used by the Main class in order to decouple the GUI from the logic.
    */
 
-  private class ReaderProxy extends Reader {
+  private class ReaderProxy implements Reader {
 
     public GUIIO guiio;
 
@@ -181,18 +184,13 @@ public class GUIIO extends JInternalFrame {
       this.guiio = guiio;
     }
 
-    @Override
-    public void close() throws IOException {}
+    public void close() {}
 
-    /*
-     * @see java.io.Reader#read(char[], int, int)
-     */
-    @Override
-    public int read(char[] cbuf, int off, int len) throws IOException {
+    public int read(char[] cbuf, int len) throws ReadException {
       String input = guiio.read(len);
 
       for (int i = 0; i < input.length(); i++) {
-        cbuf[off + i] = input.charAt(i);
+        cbuf[i] = input.charAt(i);
       }
 
       return input.length();

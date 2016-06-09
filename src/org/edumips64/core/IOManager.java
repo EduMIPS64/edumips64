@@ -24,7 +24,6 @@
 package org.edumips64.core;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -34,6 +33,8 @@ import java.util.logging.Logger;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.OpenException;
+import org.edumips64.utils.io.ReadException;
+import org.edumips64.utils.io.Reader;
 
 /** Class used as a proxy for I/O operations.
  *  This class handles input/output from/to files, including stdin, stdout and
@@ -188,12 +189,14 @@ public class IOManager {
       logger.info("flags & O_RDONLY = " + O_RDONLY);
       Reader r = fileUtils.openReadOnly(pathname);
       ins.put(next_descriptor, r);
+      logger.info("Opened " + pathname + " as read-only with file descriptor " + next_descriptor);
     }
 
     if ((flags & O_WRONLY) == O_WRONLY) {
       logger.info("flags & O_WRONLY = " + O_WRONLY);
       Writer w = fileUtils.openWriteOnly(pathname, append);
       outs.put(next_descriptor, w);
+      logger.info("Opened " + pathname + " as write-only (append = " + append + ") with file descriptor " + next_descriptor);
     }
 
     // TODO: gestire creat, trunc
@@ -257,7 +260,7 @@ public class IOManager {
    *  @param address the address to write the data to
    *  @param count the number of bytes to read
    */
-  public int read(int fd, long address, int count) throws IOManagerException, java.io.FileNotFoundException, IOException {
+  public int read(int fd, long address, int count) throws IOManagerException, java.io.FileNotFoundException, IOException, ReadException {
     if (!ins.containsKey(fd)) {
       logger.info("File descriptor " + fd + " not valid for reading");
       throw new IOManagerException("FILENOTOPENED");
@@ -265,7 +268,7 @@ public class IOManager {
 
     Reader r = ins.get(fd);
     char buffer[] = new char[count];
-    int read_byte = r.read(buffer, 0, count);
+    int read_byte = r.read(buffer, count);
     String read_str = new String(buffer);
 
     logger.info("Read the string " + read_str + " from fd " + fd);

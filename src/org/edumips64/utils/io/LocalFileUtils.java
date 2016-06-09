@@ -2,19 +2,17 @@ package org.edumips64.utils.io;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 
 public class LocalFileUtils extends FileUtils {
   @Override
   public Reader openReadOnly(String pathname) throws OpenException {
     try {
-      return new FileReader(pathname);
+      return new LocalReader(pathname);
     } catch (Exception e) {
       throw new OpenException(e);
     }
