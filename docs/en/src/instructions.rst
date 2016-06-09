@@ -380,7 +380,7 @@ The SYSCALL instruction offers to the programmer an operating-system-like
 interface, making available six different system calls.
 
 System calls expect that the address of their parameters is stored in register
-R14, and will put their return value in register R1.
+R14 ($t6), and will put their return value in register R1 ($at).
 
 System calls follow as much as possible the POSIX convention.
 

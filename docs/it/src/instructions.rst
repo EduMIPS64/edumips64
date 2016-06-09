@@ -478,8 +478,8 @@ offerta da un sistema operativo, rendendo disponibili sei differenti chiamate
 di sistema (system call).
 
 Le system call richiedono che l'indirizzo dei loro parametri sia memorizzato
-nel registro R14, e pongono il loro valore di ritorno nel registro R1.  Tali
-system call sono il più possibile fedeli alla convenzione POSIX.
+nel registro R14 ($t6), e pongono il loro valore di ritorno nel registro R1
+($at). Tali system call sono il più possibile fedeli alla convenzione POSIX.
 
 `SYSCALL 0 - exit()`
 ~~~~~~~~~~~~~~~~~~~~
