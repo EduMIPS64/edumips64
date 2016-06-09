@@ -248,6 +248,11 @@ public class CpuTests {
     runMipsTest("test-open-existent.s");
   }
 
+  @Test
+  public void testReadFile() throws Exception {
+    runMipsTest("syscall-read.s");
+  }
+
   /* Test for instruction B */
   @Test
   public void testB() throws Exception {
