@@ -43,6 +43,9 @@ public class JR extends FlowControl_RType {
   }
 
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException {
+    if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0) {
+      throw new RAWException();
+    }
     cpu.getPC().setBits(cpu.getRegister(params.get(RS_FIELD)).getBinString(), 0);
     throw new JumpException();
   }

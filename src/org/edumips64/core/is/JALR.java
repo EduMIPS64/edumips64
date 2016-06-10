@@ -44,6 +44,10 @@ public class JALR extends FlowControl_RType {
   }
 
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException {
+    // TODO(andrea): we should probably WAW on R31.
+    if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0) {
+      throw new RAWException();
+    }
     //saving PC value into a temporary register
     cpu.getRegister(31).incrWriteSemaphore();  //deadlock !!!
     TR[PC_VALUE].writeDoubleWord(cpu.getPC().getValue() - 4);

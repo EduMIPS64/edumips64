@@ -430,4 +430,11 @@ public class CpuTests {
     runForwardingTest("issue51-halt.s", 12, 18, 6);
     runForwardingTest("issue51-syscall0.s", 12, 18, 6);
   }
+
+  /* Issue #68: JR does not respect RAW stalls. */
+  @Test
+  public void testRAWForRTypeFlowControl() throws Exception {
+    runMipsTestWithAndWithoutForwarding("jr-raw.s");
+    runMipsTestWithAndWithoutForwarding("jalr-raw.s");
+  }
 }
