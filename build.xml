@@ -15,8 +15,8 @@
 <project name="edumips64" default="slim-jar" basedir=".">
   <target name="init">
     <!-- Meta info about the simulator -->
-    <property name="version" value="1.2.1" />
-    <property name="codename" value="IFSC" />
+    <property name="version" value="1.2.2" />
+    <property name="codename" value="Contrada Fumata" />
 
     <!-- Set build file properties -->
     <property name="sourceDir" value="src/org/edumips64/" />

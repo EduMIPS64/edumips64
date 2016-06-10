@@ -1,4 +1,4 @@
-21st of May, 2015                                                EduMIPS64 1.2.1
+10th of June, 2015                                              EduMIPS64 1.2.2
 
                            EduMIPS64 RELEASE NOTES	
                            http://www.edumips.org
@@ -9,16 +9,13 @@ graphical debugger.
 Notes for this release:
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This is version 1.2.1 of EduMIPS64, a bug-fix release that follows up on
-version 1.2, that was released almost 3 years ago. The codename for this
-release is "IFSC", since it is being released from a nice apartment in IFSC,
-Dublin 1.
+This is version 1.2.2 of EduMIPS64, a bug-fix release that follows up on
+version 1.2.1, that was released a few weeks ago. The codename for this
+release is "Contrada Fumata", since it is being released from a nice country
+house in Contrada Fumata, near Adrano.
 
-Most of the code was written in Portobello, Dublin 8, a few airports around
-the world and - of course - IFSC.
-
-This release mostly fixes minor issues, listed later, and contains several
-internal changes made in these 3 years to improve the code quality.
+This release mostly fixes one bug with the JR/JALR instructions, that didn't
+properly respect RAW stalls.
 
 Please keep in mind that this is still EXPERIMENTAL SOFTWARE. It may
 BURN YOUR HARD DISK, DESTROY ALL YOUR DATA and even GO OUT WITH YOUR
@@ -30,14 +27,9 @@ EduMIPS64 is hosted on GitHub: www.github.com/lupino3/edumips64.
 Our web site is www.edumips.org, and our development blog is
 http://edumips64.blogspot.com.
 
-New in this release since version 1.2
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+New in this release since version 1.2.1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Bugs fixed:
 -----------
-- Ghost instruction fetched at the end of program (Issue #50)
-- Problem with syscall 0 after branch (Issue #51)
-- Movn and movz problem after branches (Issue #63)
-- Limited number of labels (Issue #64)
-- Several issues related to code quality (Issues #41, #42, plus several other
-  small problems not listed in the issue tracker)
+- JR does not respect RAW stalls (Issue #68)

@@ -1,5 +1,9 @@
 EduMIPS64 ChangeLog
 -------------------
+1.2.2 (10/06/2016) - Contrada Fumata
+  Bugs fixed:
+  - JR does not respect RAW stalls (Issue #68)
+
 1.2.1 (21/05/2016) - IFSC
   Bugs fixed:
   - Ghost instruction fetched at the end of program (Issue #50)
