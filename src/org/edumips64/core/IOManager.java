@@ -24,7 +24,6 @@
 package org.edumips64.core;
 
 import java.io.IOException;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -261,7 +260,7 @@ public class IOManager {
    *  @param address the address to write the data to
    *  @param count the number of bytes to read
    */
-  public int read(int fd, long address, int count) throws IOManagerException, java.io.FileNotFoundException, IOException, ReadException {
+  public int read(int fd, long address, int count) throws IOManagerException, IOException, ReadException {
     if (!ins.containsKey(fd)) {
       logger.info("File descriptor " + fd + " not valid for reading");
       throw new IOManagerException("FILENOTOPENED");
