@@ -3,10 +3,8 @@ package org.edumips64.utils.io;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.Writer;
 
 public class LocalFileUtils extends FileUtils {
   @Override
@@ -21,7 +19,7 @@ public class LocalFileUtils extends FileUtils {
   @Override
   public Writer openWriteOnly(String pathname, boolean append) throws OpenException {
     try {
-      return new FileWriter(pathname, append);
+      return new LocalWriter(pathname, append);
     } catch (Exception e) {
       throw new OpenException(e);
     }

@@ -26,8 +26,8 @@ package org.edumips64.ui;
 import org.edumips64.utils.*;
 import org.edumips64.utils.io.Reader;
 import org.edumips64.utils.io.ReadException;
-import java.io.Writer;
-import java.io.IOException;
+import org.edumips64.utils.io.Writer;
+import org.edumips64.utils.io.WriteException;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
@@ -140,7 +140,7 @@ public class GUIIO extends JInternalFrame {
    * Proxy Object used by the Main class in order to decouple the GUI from the logic.
    */
 
-  private class WriterProxy extends Writer {
+  private class WriterProxy implements Writer {
 
     public GUIIO guiio;
 
@@ -150,23 +150,14 @@ public class GUIIO extends JInternalFrame {
     }
 
     @Override
-    public void close() throws IOException {}
-
-    @Override
-    public void flush() throws IOException {}
+    public void close() {}
 
     /*
      * @see java.io.Writer#write(char[], int, int)
      */
     @Override
-    public void write(char[] cbuf, int off, int len) throws IOException {
-      StringBuffer stringToBeWritten = new StringBuffer();
-
-      for (int i = 0; i < len; i++) {
-        stringToBeWritten.append(cbuf[off + i]);
-      }
-
-      guiio.write(stringToBeWritten.toString());
+    public void write(String s) throws WriteException {
+      guiio.write(s);
     }
 
   }

@@ -6,8 +6,6 @@
  */
 package org.edumips64.utils.io;
 
-import java.io.Writer;
-
 public abstract class FileUtils {
   /** Reads the file specified in 'filename' and returns its contents as a list of strings, one for each line.
    *

@@ -22,8 +22,8 @@ package org.edumips64.core.is;
 
 import org.edumips64.core.*;
 import org.edumips64.utils.*;
+import org.edumips64.utils.io.*;
 import java.util.logging.Logger;
-import java.io.IOException;
 
 /** SYSCALL instruction, used to issue system calls.
  *
@@ -122,13 +122,7 @@ public class SYSCALL extends Instruction {
       MemoryElement fd_cell = Memory.getInstance().getCellByAddress(address);
       int fd = (int) fd_cell.getValue();
       logger.info("Closing fd " + fd);
-      return_value = -1;
-
-      try {
-        return_value = iom.close(fd);
-      } catch (IOException e1) {
-        logger.info("Error in closing " + fd);
-      }
+      return_value = iom.close(fd);
     } else if ((syscall_n == 3) || (syscall_n == 4)) {
       // int read(int fd, void* buf, int count)
       // int write(int fd, void* buf, int count)
@@ -254,7 +248,7 @@ public class SYSCALL extends Instruction {
       //This prints to StdOutput.
       try {
         iom.write(1, temp.toString());
-      } catch (IOException e) {
+      } catch (WriteException e) {
         logger.info("Error in executing the printf(), the syscall will fail.");
         logger.info(e.toString());
       }

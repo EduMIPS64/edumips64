@@ -253,6 +253,12 @@ public class CpuTests {
     runMipsTest("syscall-read.s");
   }
 
+  @Test
+  public void testReadWriteFile() throws Exception {
+    // TODO(andrea): clean up the test file.
+    runMipsTest("read-write.s");
+  }
+
   /* Test for instruction B */
   @Test
   public void testB() throws Exception {

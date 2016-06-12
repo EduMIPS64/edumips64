@@ -24,7 +24,6 @@
 package org.edumips64.core;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +33,9 @@ import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.OpenException;
 import org.edumips64.utils.io.ReadException;
+import org.edumips64.utils.io.WriteException;
 import org.edumips64.utils.io.Reader;
+import org.edumips64.utils.io.Writer;
 
 /** Class used as a proxy for I/O operations.
  *  This class handles input/output from/to files, including stdin, stdout and
@@ -118,7 +119,7 @@ public class IOManager {
   /** Closes the specified file descriptor.
    *  @param fd the file descriptor to close
    */
-  public int close(int fd) throws IOException, java.io.FileNotFoundException {
+  public int close(int fd) {
     logger.info("call to close() with fd = " + fd);
     int ret = -1;
     boolean in = ins.containsKey(fd);
@@ -208,7 +209,7 @@ public class IOManager {
    *  @param address the address to read the data from
    *  @param count the number of bytes to write
    */
-  public int write(int fd, long address, int count) throws IOManagerException, IOException {
+  public int write(int fd, long address, int count) throws IOManagerException, WriteException {
     // Let's verify if we've got a valid file descriptor
     if (!outs.containsKey(fd)) {
       logger.info("File descriptor " + fd + " not valid for writing.");
@@ -248,9 +249,9 @@ public class IOManager {
   /** Writes a string to a file.
    * @param fd the file descriptor identifying the file
    * @param textToBeWritten text to be written
-   * @throws IOException
+   * @throws WriteException
    */
-  public void write(int fd, String textToBeWritten) throws IOException {
+  public void write(int fd, String textToBeWritten) throws WriteException {
     Writer w = outs.get(fd);
     w.write(textToBeWritten);
   }
