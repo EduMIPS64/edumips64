@@ -41,8 +41,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 class VoidJump {
   Instruction instr;
@@ -1402,78 +1400,27 @@ public class Parser {
     for (int j = 0; j < value.length; j++) {
       tmpMem = mem.getCellByIndex(memoryCount);
       memoryCount++;
-      Pattern p = Pattern.compile("-?[0-9]+.[0-9]+");
-      Matcher m = p.matcher(value[j]);
-      boolean b = m.matches();
-      p = Pattern.compile("-?[0-9]+.[0-9]+E-?[0-9]+");
-      m = p.matcher(value[j]);
-      b = b || m.matches();
 
-      //checking for floating point special values
-      value[j] = value[j].trim();
-      boolean b2;
-      b2 = FPInstructionUtils.isFPKeyword(value[j]);
-      b = b || b2;
-
-      /*if(isHexNumber(value[j]))
-      {
-          try
-          {
-        //insert here support for exadecimal
-          }
-          catch(NumberFormatException ex)
-          {
-        numError++;
-        error.add("DOUBLE_TOO_LARGE",row,i+1,line);
-        continue;
-          }
-          catch( Exception e)//modificare in un altro modo
-          {
-        e.printStackTrace();
-          }
-
+      // TODO(andrea): unit tests for those 3 cases.
+      try {
+        tmpMem.setBits(org.edumips64.core.fpu.FPInstructionUtils.doubleToBin(value[j].trim()), 0);
       }
-      else*/
-
-      if (b) {
-        try {
-          tmpMem.setBits(org.edumips64.core.fpu.FPInstructionUtils.doubleToBin(value[j]), 0);
-        }
-        /* catch(org.edumips64.core.fpu.FPExponentTooLargeException ex)
-         {
+      catch (org.edumips64.core.fpu.FPOverflowException ex) {
         numError++;
-        error.add("DOUBLE_EXT_TOO_LARGE",row,i+1,line);
+        //error.add("DOUBLE_TOO_LARGE",row,i+1,line);
+        error.add("FP_OVERFLOW", row, i + 1, line);
         continue;
-         }*/
-        catch (org.edumips64.core.fpu.FPOverflowException ex) {
-          numError++;
-          //error.add("DOUBLE_TOO_LARGE",row,i+1,line);
-          error.add("FP_OVERFLOW", row, i + 1, line);
-          continue;
-        } catch (org.edumips64.core.fpu.FPUnderflowException ex) {
-          numError++;
-          error.add("FP_UNDERFLOW", row, i + 1, line);
-          continue;
-        }
-        /*catch(org.edumips64.core.fpu.FPInvalidOperationException ex)
-        {
+      } catch (org.edumips64.core.fpu.FPUnderflowException ex) {
         numError++;
-        error.add("FP_INVALID_OPERATION",row,i+1,line);
+        error.add("FP_UNDERFLOW", row, i + 1, line);
         continue;
-        }*/
-        catch (Exception e) {
-          e.printStackTrace();
-          //non ci dovrebbe arrivare mai ma se per caso ci arriva che faccio?
-        }
-      } else {
-        //manca riempimento errore
+      } catch (IrregularStringOfBitsException e) {
         numError++;
         error.add("INVALIDVALUE", row, i + 1, line);
         i = line.length();
         continue;
       }
     }
-
   }
 
   /** Write an integer in memory
