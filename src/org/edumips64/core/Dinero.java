@@ -28,8 +28,10 @@
 package org.edumips64.core;
 
 import org.edumips64.utils.*;
+import org.edumips64.utils.io.Writer;
+import org.edumips64.utils.io.WriteException;
 import java.util.*;
-import java.io.*;
+import java.io.IOException;
 
 public class Dinero {
 
@@ -97,14 +99,6 @@ public class Dinero {
     }
 
   }
-  /** Write a file comatible with DineroIV cache simulator
-   * @param filename A String with the system-dependent file name
-   */
-  public void WriteXdinFile(String filename) throws java.io.IOException {
-    BufferedWriter out = new BufferedWriter(new FileWriter(filename));
-    writeTraceData(out);
-    out.close();
-  }
   /** Calculate the offset */
   public void findOffset() {
     CPU cpu = CPU.getInstance();
@@ -129,10 +123,10 @@ public class Dinero {
   /** Writes the trace data to a Writer
    *  @param buff the Writer to output the data to
    */
-  public void writeTraceData(Writer buff) throws java.io.IOException {
+  public void writeTraceData(Writer buff) throws java.io.IOException, WriteException {
     for (int i = 0; i < dineroData.size(); i++) {
       String tmp = dineroData.get(i) + "\n";
-      buff.write(tmp, 0, tmp.length());
+      buff.write(tmp);
     }
   }
 }

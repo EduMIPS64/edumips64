@@ -31,6 +31,7 @@ import org.edumips64.ui.CycleBuilder;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.io.LocalFileUtils;
+import org.edumips64.utils.io.LocalWriter;
 
 import java.io.File;
 import java.util.HashMap;
@@ -164,7 +165,9 @@ public class CpuTests {
 
       File tmp = File.createTempFile("edumips64", "xdin");
       tmp.deleteOnExit();
-      dinero.WriteXdinFile(tmp.getAbsolutePath());
+      LocalWriter w = new LocalWriter(tmp.getAbsolutePath(), false);
+      dinero.writeTraceData(w);
+      w.close();
 
       return new CpuTestStatus(cpu, tmp.getAbsolutePath());
     } finally {
