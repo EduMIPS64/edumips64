@@ -4,6 +4,6 @@
   <source path="client" />
   <source path="core" />
   <source path="utils">
-    <exclude name="io/LocalFileUtils.java" />
+    <exclude name="io/Local*.java" />
   </source>
 </module>
