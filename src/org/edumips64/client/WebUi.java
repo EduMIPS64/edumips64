@@ -7,6 +7,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.RootPanel;
 
+import com.google.gwt.user.client.ui.TextArea;
 import org.edumips64.core.CPU;
 import org.edumips64.core.Parser;
 import org.edumips64.core.is.HaltException;
@@ -21,34 +22,47 @@ public class WebUi implements EntryPoint {
   private ConfigStore config;
   private FileUtils fu;
 
-  private final String code = ".code\ndaddi r1, r0, 42\nsyscall 0";
+  private TextArea code, registers;
+  private Button b;
 
   public void onModuleLoad() {
+    // Simulator initialization.
     config = ConfigManager.getTmpConfig();
     ConfigManager.setConfig(config);
-
     fu = new NullFileUtils();
     Parser.createInstance(fu);
     parser = Parser.getInstance();
-
     cpu = CPU.getInstance();
 
-    Button b = new Button("Start", new ClickHandler() {
+    // Web UI initialization.
+    code = new TextArea();
+    code.setCharacterWidth(100);
+    code.setVisibleLines(20);
+    code.setText(".data\n.word64 10\n.code\nlw r1, 0(r0)\nSYSCALL 0");
+
+    registers = new TextArea();
+    registers.setCharacterWidth(100);
+    registers.setVisibleLines(20);
+
+    b = new Button("Run", new ClickHandler() {
       public void onClick(ClickEvent event) {
         try {
-          parser.doParsing(code);
+          cpu.reset();
+          parser.doParsing(code.getText());
           cpu.setStatus(CPU.CPUStatus.RUNNING);
           while (true) {
             cpu.step();
           }
         } catch (HaltException e) {
-          Window.alert("ALL DONE. R1 = " + cpu.getRegister(1).getValue());
+          registers.setText(cpu.gprString());
         } catch (Exception e) {
           Window.alert("PROBLEM: " + e.toString());
         }
       }
     });
 
+    RootPanel.get().add(code);
     RootPanel.get().add(b);
+    RootPanel.get().add(registers);
   }
 }
