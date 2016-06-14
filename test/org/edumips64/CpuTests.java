@@ -119,6 +119,7 @@ public class CpuTests {
     cpu = CPU.getInstance();
     cpu.setStatus(CPU.CPUStatus.READY);
     lfu = new LocalFileUtils();
+    IOManager.createInstance(lfu);
     Parser.createInstance(lfu);
     parser = Parser.getInstance();
     Instruction.setEnableForwarding(true);

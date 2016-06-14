@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.edumips64.utils.io.FileUtils;
-import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.OpenException;
 import org.edumips64.utils.io.ReadException;
 import org.edumips64.utils.io.WriteException;
@@ -96,15 +95,15 @@ public class IOManager {
     logger.info("IOManager: resetted. next_fd = " + next_descriptor);
   }
 
-  public static IOManager getInstance() {
-    if (instance == null) {
-      instance = new IOManager();
-    }
+  public static void createInstance(FileUtils fu) {
+    instance = new IOManager(fu);
+  }
 
+  public static IOManager getInstance() {
     return instance;
   }
 
-  private IOManager() {
+  private IOManager(FileUtils fu) {
     ins = new HashMap<Integer, Reader>();
     outs = new HashMap<Integer, Writer>();
 
@@ -112,7 +111,7 @@ public class IOManager {
     // 2 is stderr
     next_descriptor = 3;
 
-    fileUtils = new LocalFileUtils();
+    fileUtils = fu;
   }
 
   /** Closes the specified file descriptor.

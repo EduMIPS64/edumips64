@@ -222,6 +222,8 @@ public class Main extends JApplet {
   public void init() {
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
+    lfu = new LocalFileUtils();
+    IOManager.createInstance(lfu);
     iom = IOManager.getInstance();
 
     desk = new JDesktopPane();
@@ -237,7 +239,6 @@ public class Main extends JApplet {
     cgt = new CPUGUIThread();
     cgt.start();
 
-    lfu = new LocalFileUtils();
     Parser.createInstance(lfu);
     parser = Parser.getInstance();
 

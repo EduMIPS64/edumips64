@@ -25,7 +25,7 @@ package org.edumips64.ui;
 
 import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;
-import org.edumips64.utils.io.WriterAdapter;
+import org.edumips64.utils.io.LocalWriterAdapter;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -33,8 +33,6 @@ import java.io.*;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 import javax.swing.*;
-import javax.swing.*;
-import javax.swing.border.*;
 
 /** Graphical frontend for DineroIV
  *  @author Andrea Spadaccini
@@ -186,7 +184,7 @@ public class DineroFrontend extends JDialog {
           logger.info("Sending the tracefile to Dinero via stdin");
           // Let's send the tracefile to Dinero
           PrintWriter dineroIn = new PrintWriter(dinero.getOutputStream());
-          org.edumips64.core.Dinero.getInstance().writeTraceData(new WriterAdapter(dineroIn));
+          org.edumips64.core.Dinero.getInstance().writeTraceData(new LocalWriterAdapter(dineroIn));
           dineroIn.flush();
           dineroIn.close();
 
