@@ -1,8 +1,6 @@
 package org.edumips64.utils;
 
-import java.awt.Color;
 import java.util.*;
-import java.util.logging.Logger;
 
 /** Configuration builder, to be used to obtain an instance of ConfigStore. */
 public class ConfigManager {
@@ -23,16 +21,16 @@ public class ConfigManager {
     defaults.put("serialNumber", 0);
 
     // Colors.
-    defaults.put("IFColor", Color.yellow.getRGB());
-    defaults.put("IDColor", new Color(0, 120, 240).getRGB());
-    defaults.put("EXColor", Color.red.getRGB());
-    defaults.put("MEMColor", Color.green.getRGB());
-    defaults.put("FPAdderColor", new Color(0, 128, 0).getRGB());
-    defaults.put("FPMultiplierColor", new Color(0, 128, 128).getRGB());
-    defaults.put("FPDividerColor", new Color(128, 128, 0).getRGB());
-    defaults.put("WBColor", Color.magenta.darker().getRGB());
-    defaults.put("RAWColor", Color.blue.brighter().getRGB());
-    defaults.put("SAMEIFColor", new Color(150, 150, 180).getRGB());
+    defaults.put("IFColor", -256);                // Color.yellow.getRGB())
+    defaults.put("IDColor", -16746256);           // Color(0, 120, 240).getRGB());
+    defaults.put("EXColor", -65536);              // Color.red.getRGB());
+    defaults.put("MEMColor", -16711936);          // Color.green.getRGB());
+    defaults.put("FPAdderColor", -16744448);      // Color(0, 128, 0).getRGB());
+    defaults.put("FPMultiplierColor",-16744320);  // Color(0, 128, 128).getRGB());
+    defaults.put("FPDividerColor", -8355840);     // Color(128, 128, 0).getRGB());
+    defaults.put("WBColor", -5111630);            // Color.magenta.darker().getRGB());
+    defaults.put("RAWColor", -16776961);          // Color.blue.brighter().getRGB());
+    defaults.put("SAMEIFColor", -6908236);        // Color(150, 150, 180).getRGB());
 
     // Simulation parameters.
     defaults.put("forwarding", false);
