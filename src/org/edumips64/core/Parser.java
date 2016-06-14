@@ -208,7 +208,7 @@ public class Parser {
     return filetmp;
   }
 
-  void doParsing(String code) throws ParserMultiException {
+  public void doParsing(String code) throws ParserMultiException {
     boolean isFirstOutOfInstructionMemory = true;
     isFirstOutOfMemory = true;
     boolean halt = false;

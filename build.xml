@@ -118,8 +118,7 @@
       <arg value="war"/>
       <!-- Additional arguments like -style PRETTY, -logLevel DEBUG or -nosuperDevMode -->
       <arg line="${gwt.args}"/>
-      <arg value="org.edumips64.web.WebUi"/>
-      <arg value="org.edumips64.web.WebUi"/>
+      <arg value="org.edumips64.webclient"/>
     </java>
   </target>
 
