@@ -1,9 +1,7 @@
 package org.edumips64.utils;
 
 import java.awt.Color;
-import java.io.*;
 import java.util.*;
-import java.util.jar.*;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
@@ -15,14 +13,14 @@ public class ConfigManager {
   static final Map<String, Object> defaults;
 
   static {
-    defaults = new HashMap<String, Object>();
+    defaults = new HashMap<>();
 
     // Global parameters.
     defaults.put("language", "en");
     defaults.put("files", "");
     // TODO(andrea): this will create problems in the applet, and needs to be
     // encapsulated in some way.
-    defaults.put("lastdir", System.getProperty("user.dir"));
+    defaults.put("lastdir", System.getProperty("user.dir", ""));
     defaults.put("dineroIV", "dineroIV");
     defaults.put("serialNumber", 0);
 
