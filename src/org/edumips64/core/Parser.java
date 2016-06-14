@@ -102,8 +102,6 @@ public class Parser {
   public void parse(String filename) throws ParserMultiException, ReadException {
     logger.info("About to parse " + filename);
     this.filename = filename;
-    int oldindex = 0;
-    int index = 0;
     basePath = fileUtils.GetBasePath(filename);
     String code = preprocessor(filename);
     doParsing(code);
