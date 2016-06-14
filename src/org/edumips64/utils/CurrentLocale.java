@@ -29,13 +29,13 @@ import java.util.logging.Logger;
 
 public class CurrentLocale {
 
-  static Map<String, Map<String, String>> languages;
+  private static Map<String, Map<String, String>> languages;
   private static ConfigStore config = ConfigManager.getConfig();
 
   private static final Logger logger = Logger.getLogger(CurrentLocale.class.getName());
 
   static {
-    languages = new HashMap<String, Map<String, String>>();
+    languages = new HashMap<>();
     languages.put("en", new HashMap<String, String>());
     languages.put("it", new HashMap<String, String>());
 
@@ -52,7 +52,7 @@ public class CurrentLocale {
     }
   }
 
-  public static void loadMessages(String filename, Map<String, String> map) throws FileNotFoundException, IOException {
+  public static void loadMessages(String filename, Map<String, String> map) throws IOException {
     String line;
     URL url;
     String name = "MessagesBundle_" + filename + ".properties";
