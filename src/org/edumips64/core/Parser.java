@@ -30,6 +30,8 @@
 package org.edumips64.core;
 
 import org.edumips64.core.fpu.FPInstructionUtils;
+import org.edumips64.core.fpu.FPOverflowException;
+import org.edumips64.core.fpu.FPUnderflowException;
 import org.edumips64.core.is.Instruction;
 import org.edumips64.utils.Converter;
 import org.edumips64.utils.IrregularStringOfBitsException;
@@ -1393,30 +1395,26 @@ public class Parser {
   private void writeDoubleInMemory(int row,  int i, int end, String line, String instr) throws MemoryElementNotFoundException {
     Memory mem = Memory.getInstance();
     String value[] = instr.split(",");
-    MemoryElement tmpMem = null;
+    MemoryElement tmpMem;
 
-    for (int j = 0; j < value.length; j++) {
+    for (String aValue : value) {
       tmpMem = mem.getCellByIndex(memoryCount);
       memoryCount++;
 
       // TODO(andrea): unit tests for those 3 cases.
       try {
-        tmpMem.setBits(org.edumips64.core.fpu.FPInstructionUtils.doubleToBin(value[j].trim()), 0);
-      }
-      catch (org.edumips64.core.fpu.FPOverflowException ex) {
+        tmpMem.setBits(FPInstructionUtils.doubleToBin(aValue.trim()), 0);
+      } catch (FPOverflowException ex) {
         numError++;
         //error.add("DOUBLE_TOO_LARGE",row,i+1,line);
         error.add("FP_OVERFLOW", row, i + 1, line);
-        continue;
-      } catch (org.edumips64.core.fpu.FPUnderflowException ex) {
+      } catch (FPUnderflowException ex) {
         numError++;
         error.add("FP_UNDERFLOW", row, i + 1, line);
-        continue;
       } catch (IrregularStringOfBitsException e) {
         numError++;
         error.add("INVALIDVALUE", row, i + 1, line);
         i = line.length();
-        continue;
       }
     }
   }
