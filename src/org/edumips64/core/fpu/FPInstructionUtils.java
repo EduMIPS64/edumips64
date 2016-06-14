@@ -131,6 +131,8 @@ public class FPInstructionUtils {
     } catch (NumberFormatException e) {
       if (cpu.getFPExceptions(CPU.FPExceptions.OVERFLOW)) {
         cpu.setFCSRCause("O", 1);
+        // TODO(Issue #77): this should raise IrregularStringOfBitsException in case
+        // the string does not represent a valid number.
         throw new FPOverflowException();
       } else {
         cpu.setFCSRFlags("V", 1);
