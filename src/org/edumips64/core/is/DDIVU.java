@@ -83,7 +83,7 @@ class DDIVU extends ALU_RType {
     try {
       result = rs.divideAndRemainder(rt);
     } catch (ArithmeticException e) {
-      if (enableForwarding) {
+      if (isEnableForwarding()) {
         cpu.getLO().decrWriteSemaphore();
         cpu.getHI().decrWriteSemaphore();
       }
@@ -108,13 +108,13 @@ class DDIVU extends ALU_RType {
 
     TR[HI_REG].setBits(tmp, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!enableForwarding) {
+    if (!isEnableForwarding()) {
       doWB();
     }
   }

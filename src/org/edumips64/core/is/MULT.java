@@ -30,7 +30,7 @@ import org.edumips64.utils.*;
 
 
 //per diagnostica
-import java.util.*;
+
 
 /**
  * <pre>
@@ -111,14 +111,14 @@ class MULT extends ALU_RType {
       lo = lo.charAt(0) + lo;
     }
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }
 
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!enableForwarding) {
+    if (!isEnableForwarding()) {
       doWB();
     }
   }

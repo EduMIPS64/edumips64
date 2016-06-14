@@ -66,7 +66,7 @@ public class SLT extends ALU_RType {
 
     TR[RD_FIELD].setBits(rd, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
 

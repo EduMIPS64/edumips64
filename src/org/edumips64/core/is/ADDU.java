@@ -25,7 +25,6 @@
 
 package org.edumips64.core.is;
 
-import org.edumips64.utils.Converter;
 import org.edumips64.utils.IrregularStringOfBitsException;
 
 /**
@@ -66,7 +65,7 @@ public class ADDU extends ALU_RType {
 
     TR[RD_FIELD].setBits(filledOutputstring, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

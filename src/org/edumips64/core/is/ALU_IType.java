@@ -25,7 +25,6 @@ package org.edumips64.core.is;
 import org.edumips64.core.*;
 import org.edumips64.utils.*;
 //per diagnostica
-import java.util.*;
 import java.util.logging.Logger;
 
 /** This is the base class for all the immediate ALU instructions
@@ -76,7 +75,7 @@ public class ALU_IType extends ComputationalInstructions {
 
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!enableForwarding) {
+    if (!isEnableForwarding()) {
       doWB();
     }
   }

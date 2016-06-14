@@ -25,7 +25,6 @@
 
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
 import org.edumips64.utils.*;
 
 import java.util.logging.Logger;
@@ -59,7 +58,7 @@ class MOVN extends ALU_RType {
       should_write = true;
     }
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

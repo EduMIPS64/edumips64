@@ -24,10 +24,7 @@
 
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
-import org.edumips64.core.fpu.*;
 import org.edumips64.utils.*;
-import java.math.*;
 
 /**
  *<pre>
@@ -56,7 +53,7 @@ class MOVZ_D extends FPConditionalZerosMoveInstructions {
       TRfp[FD_FIELD].setBits(fs, 0);
     }
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

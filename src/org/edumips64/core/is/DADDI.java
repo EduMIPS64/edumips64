@@ -25,7 +25,6 @@
 
 package org.edumips64.core.is;
 
-import org.edumips64.core.*;
 import org.edumips64.utils.*;
 
 /**
@@ -58,7 +57,7 @@ class DADDI extends ALU_IType {
       //if the enable forwarding is turned on we have to ensure that registers
       //should be unlocked also if a synchronous exception occurs. This is performed
       //by executing the WB method before raising the trap
-      if (enableForwarding) {
+      if (isEnableForwarding()) {
         doWB();
       }
 
@@ -69,7 +68,7 @@ class DADDI extends ALU_IType {
 
     TR[RT_FIELD].setBits(outputstring, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

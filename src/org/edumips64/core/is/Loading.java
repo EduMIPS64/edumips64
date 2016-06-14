@@ -64,7 +64,7 @@ public abstract class Loading extends LDSTInstructions {
   }
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!enableForwarding) {
+    if (!isEnableForwarding()) {
       doWB();
     }
   }
@@ -73,7 +73,7 @@ public abstract class Loading extends LDSTInstructions {
     memEl = memory.getCellByAddress(address);
     doMEM();
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

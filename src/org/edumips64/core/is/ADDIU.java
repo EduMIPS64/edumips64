@@ -64,7 +64,7 @@ class ADDIU extends ALU_IType {
 
     TR[RT_FIELD].setBits(filledOutputstring, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

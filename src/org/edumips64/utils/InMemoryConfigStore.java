@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /** ConfigStore implementation based on in-memory storage. */
-class InMemoryConfigStore extends ConfigStore {
+public class InMemoryConfigStore extends ConfigStore {
   private static final Logger logger = Logger.getLogger(InMemoryConfigStore.class.getName());
   private Map<String, Object> data;
   private Map<String, Object> defaults;

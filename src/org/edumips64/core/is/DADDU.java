@@ -25,7 +25,6 @@
 
 package org.edumips64.core.is;
 
-import org.edumips64.utils.Converter;
 import org.edumips64.utils.IrregularStringOfBitsException;
 
 /**
@@ -56,7 +55,7 @@ public class DADDU extends ALU_RType {
     //There isn't IntegerOverflow cases
     TR[RD_FIELD].setBits(outputstring, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

@@ -24,7 +24,6 @@
  */
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
 import org.edumips64.utils.*;
 
 /**<pre>
@@ -61,7 +60,7 @@ public class SUBU extends ALU_RType {
 
     TR[RD_FIELD].setBits(filledOutputstring, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
 

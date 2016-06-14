@@ -24,7 +24,6 @@
  */
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
 import org.edumips64.utils.*;
 
 /**
@@ -82,7 +81,7 @@ public class SLLV extends ALU_RType {
 
     TR[RD_FIELD].setBits(target, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

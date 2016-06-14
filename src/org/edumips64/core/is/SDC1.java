@@ -50,7 +50,7 @@ public class SDC1 extends FPStoring {
       //writing on the memory element the RT register
       memEl.setBits(TR[RT_FIELD].getBinString(), 0);
 
-      if (enableForwarding) {
+      if (isEnableForwarding()) {
         WB();
       }
     } catch (Exception e) {

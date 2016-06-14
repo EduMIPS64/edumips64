@@ -47,7 +47,7 @@ public abstract class Storing extends LDSTInstructions {
       throw new RAWException();
     }
 
-    if (!enableForwarding) {
+    if (!isEnableForwarding()) {
       if (rt.getWriteSemaphore() > 0) {
         logger.info("RAW in " + fullname + ": rt register still needs to be written to.");
         throw new RAWException();
@@ -73,13 +73,13 @@ public abstract class Storing extends LDSTInstructions {
   public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, NotAlignException, AddressErrorException, IrregularWriteOperationException {
     memEl = memory.getCellByAddress(address);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       TR[RT_FIELD].setBits(rt.getBinString(), 0);
     }
 
     doMEM();
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       WB();
     }
   }

@@ -84,7 +84,7 @@ class DDIV extends ALU_RType {
     try {
       quozient = rs / rt;
     } catch (ArithmeticException e) {
-      if (enableForwarding) {
+      if (isEnableForwarding()) {
         cpu.getLO().decrWriteSemaphore();
         cpu.getHI().decrWriteSemaphore();
       }
@@ -102,13 +102,13 @@ class DDIV extends ALU_RType {
       e.printStackTrace();
     }
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!enableForwarding) {
+    if (!isEnableForwarding()) {
       doWB();
     }
   }

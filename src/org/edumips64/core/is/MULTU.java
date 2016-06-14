@@ -30,7 +30,7 @@ import org.edumips64.utils.*;
 import java.math.BigInteger;
 
 //per diagnostica
-import java.util.*;
+
 
 /**
  * <pre>
@@ -106,14 +106,14 @@ class MULTU extends ALU_RType {
       lo = '0' + lo;
     }
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }
 
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!enableForwarding) {
+    if (!isEnableForwarding()) {
       doWB();
     }
   }

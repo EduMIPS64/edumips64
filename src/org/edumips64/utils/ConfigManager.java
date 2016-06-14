@@ -3,14 +3,12 @@ package org.edumips64.utils;
 import java.awt.Color;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 /** Configuration builder, to be used to obtain an instance of ConfigStore. */
 public class ConfigManager {
-  private static final Logger logger = Logger.getLogger(ConfigManager.class.getName());
   private static ConfigStore instance;
 
-  static final Map<String, Object> defaults;
+  public static final Map<String, Object> defaults;
 
   static {
     defaults = new HashMap<>();
@@ -60,13 +58,6 @@ public class ConfigManager {
 
     // How to show memory cells containing floating point values.
     defaults.put("LONGDOUBLEVIEW", true);  // long=true  double=false
-
-    try {
-      instance = new JavaPrefsConfigStore(defaults);
-    } catch (Exception e) {
-      logger.warning("Could not access the Java Preferences API. Using in-memory configuration storage. Error: " + e);
-      instance = new InMemoryConfigStore(defaults);
-    }
   }
 
   /** Factory method for ConfigStore instances.

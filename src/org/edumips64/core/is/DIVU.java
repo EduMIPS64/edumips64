@@ -86,7 +86,7 @@ class DIVU extends ALU_RType {
     try {
       quotient = l_rs / l_rt;
     } catch (ArithmeticException e) {
-      if (enableForwarding) {
+      if (isEnableForwarding()) {
         cpu.getLO().decrWriteSemaphore();
         cpu.getHI().decrWriteSemaphore();
       }
@@ -118,13 +118,13 @@ class DIVU extends ALU_RType {
     TR[LO_REG].setBits(str_quotient, 0);
     TR[HI_REG].setBits(str_remainder, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!enableForwarding) {
+    if (!isEnableForwarding()) {
       doWB();
     }
   }

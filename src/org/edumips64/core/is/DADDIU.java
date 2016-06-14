@@ -54,7 +54,7 @@ class DADDIU extends ALU_IType {
     long result = imm + rs;
     TR[RT_FIELD].writeDoubleWord(result);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

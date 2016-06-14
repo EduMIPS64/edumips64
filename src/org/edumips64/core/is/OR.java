@@ -25,10 +25,6 @@
 
 package org.edumips64.core.is;
 
-import org.edumips64.core.AlreadyLockedRegisterException;
-import org.edumips64.core.IrregularWriteOperationException;
-import org.edumips64.core.Register;
-import org.edumips64.utils.Converter;
 import org.edumips64.utils.IrregularStringOfBitsException;
 
 /**
@@ -70,7 +66,7 @@ public class OR extends ALU_RType {
     //saving bitwise AND result into a temporary register
     TR[RD_FIELD].setBits(outputstring, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
 

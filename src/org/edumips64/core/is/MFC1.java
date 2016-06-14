@@ -25,9 +25,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
-import org.edumips64.core.fpu.*;
 import org.edumips64.utils.*;
-import java.math.*;
 
 /**
  *<pre>
@@ -51,7 +49,7 @@ class MFC1 extends FPMoveFromInstructions {
     String value = TRfp[FS_FIELD].getBinString();
     TR[RT_FIELD].writeWord(Converter.binToInt(value.substring(32, 64), false));
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

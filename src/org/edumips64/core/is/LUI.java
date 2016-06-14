@@ -67,7 +67,7 @@ class LUI extends ALU_IType {
     long imm_shift_lng = Converter.binToLong(imm_shift, false);
     TR[RT_FIELD].writeDoubleWord(imm_shift_lng);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

@@ -24,7 +24,6 @@
  */
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
 import org.edumips64.utils.*;
 
 /**
@@ -75,7 +74,7 @@ public class DSRAV extends ALU_RType {
     sb.append(rt.substring(0, 64 - shift_value));
     TR[RD_FIELD].setBits(sb.substring(0), 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

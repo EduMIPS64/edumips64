@@ -28,7 +28,7 @@ import org.edumips64.core.*;
 import org.edumips64.utils.*;
 import org.edumips64.core.fpu.*;
 //per diagnostica
-import java.util.*;
+
 
 /**This is the base class for the floatiing point arithmetic instructions
  *
@@ -92,7 +92,7 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
       //if the enable forwarding is turned on we have to ensure that registers
       //should be unlocked also if a synchronous exception occurs. This is performed
       //by executing the WB method before raising the trap
-      if (enableForwarding) {
+      if (isEnableForwarding()) {
         doWB();
       }
 
@@ -109,7 +109,7 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
       }
     }
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }
@@ -121,7 +121,7 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
   }
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!enableForwarding) {
+    if (!isEnableForwarding()) {
       doWB();
     }
   }

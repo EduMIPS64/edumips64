@@ -116,6 +116,7 @@ public class CpuTests {
 
   @Before
   public void testSetup() {
+    ConfigManager.setConfig(config);
     cpu = CPU.getInstance();
     cpu.setStatus(CPU.CPUStatus.READY);
     lfu = new LocalFileUtils();
@@ -124,7 +125,6 @@ public class CpuTests {
     parser = Parser.getInstance();
     Instruction.setEnableForwarding(true);
     fec = new FPUExceptionsConfig();
-    ConfigManager.setConfig(config);
   }
 
   @After

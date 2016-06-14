@@ -87,7 +87,7 @@ public class SRA extends ALU_RType {
     sb.append(rt.substring(0, 32 - sa));
     TR[RD_FIELD].setBits(sb.substring(0), 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

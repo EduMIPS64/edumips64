@@ -29,7 +29,7 @@ import org.edumips64.core.*;
 import org.edumips64.utils.*;
 
 //per diagnostica
-import java.util.*;
+
 
 /**
  * <pre>
@@ -64,12 +64,12 @@ class MFLO extends ALU_RType {
     rd.incrWriteSemaphore();
   }
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }
   public void WB() throws IrregularStringOfBitsException {
-    if (!enableForwarding) {
+    if (!isEnableForwarding()) {
       doWB();
     }
   }

@@ -44,7 +44,6 @@ public abstract class Instruction {
   protected Register[] TR; //is not static because each instruction has got its own registers
   protected RegisterFP[] TRfp;
   protected String fullname;
-  protected static boolean enableForwarding = ConfigManager.getConfig().getBoolean("forwarding");
   protected String label;
   protected static final Logger logger = Logger.getLogger(Instruction.class.getName());
   protected Integer serialNumber;
@@ -52,7 +51,7 @@ public abstract class Instruction {
 
   /** Creates a new instance of Instruction */
   public Instruction() {
-    params = new LinkedList<Integer>();
+    params = new LinkedList<>();
     TR = new Register[5];
     TRfp = new RegisterFP[5];
     repr = new BitSet32();
@@ -69,6 +68,9 @@ public abstract class Instruction {
     }
   }
 
+  public static boolean isEnableForwarding() {
+    return ConfigManager.getConfig().getBoolean("forwarding");
+  }
 
   /** <pre>
    *  Returns a BitSet32 holding the binary representation of the Instruction
@@ -799,7 +801,7 @@ public abstract class Instruction {
    * @param value This variable enable the forwarding modality if it is true
    * */
   public static void setEnableForwarding(boolean value) {
-    enableForwarding = value;
+    ConfigManager.getConfig().putBoolean("forwarding", value);
   }
 
   /** Gets the state of EnableForwarding. This modality anticipates writing on registers
@@ -807,7 +809,7 @@ public abstract class Instruction {
    * @return The forwarding state
    * */
   public static boolean getEnableForwarding() {
-    return enableForwarding;
+    return isEnableForwarding();
   }
 
   /**<pre>

@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 /** ConfigStore implementation based on the Java Preferences API */
-class JavaPrefsConfigStore extends ConfigStore {
+public class JavaPrefsConfigStore extends ConfigStore {
   private static final Logger logger = Logger.getLogger(JavaPrefsConfigStore.class.getName());
   private Preferences prefs;
   private Map<String, Object> defaults;

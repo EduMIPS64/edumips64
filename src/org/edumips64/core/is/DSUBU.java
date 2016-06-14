@@ -24,7 +24,6 @@
  */
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
 import org.edumips64.utils.*;
 
 /**<pre>
@@ -53,7 +52,7 @@ public class DSUBU extends ALU_RType {
     //There isn't IntegerOverflow cases
     TR[RD_FIELD].setBits(outputstring, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
 

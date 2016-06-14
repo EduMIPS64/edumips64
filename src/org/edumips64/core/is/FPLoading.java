@@ -69,7 +69,7 @@ public abstract class FPLoading extends FPLDSTInstructions {
   }
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!enableForwarding) {
+    if (!isEnableForwarding()) {
       doWB();
     }
   }

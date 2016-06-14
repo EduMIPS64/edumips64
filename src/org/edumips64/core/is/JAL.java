@@ -59,7 +59,7 @@ public class JAL extends FlowControl_JType {
     String pc_new = pc_significant + instr_index;
     pc.setBits(pc_new, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
 
@@ -74,7 +74,7 @@ public class JAL extends FlowControl_JType {
 
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!enableForwarding) {
+    if (!isEnableForwarding()) {
       doWB();
     }
   }

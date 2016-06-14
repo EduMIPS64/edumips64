@@ -56,8 +56,8 @@ public class Main extends JApplet {
   static LocalFileUtils lfu;
   static Parser parser;
   static GUIFrontend front;
-  static ConfigStore configStore = ConfigManager.getConfig();
-  static JFileChooser jfc = new JFileChooser(new File(configStore.getString("lastdir")));
+  static ConfigStore configStore;
+  static JFileChooser jfc;
 
   static JFrame f = null;
   private static JMenuItem open;
@@ -172,7 +172,7 @@ public class Main extends JApplet {
     // Creating the main JFrame
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
-    f = new JFrame("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
+    f = new JFrame();
     f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     // Maximizing the application
     Insets screenInsets = f.getToolkit().getScreenInsets(f.getGraphicsConfiguration());
@@ -187,6 +187,7 @@ public class Main extends JApplet {
     f.setLocation(0, 0);
     Main mm = new Main();
     mm.init();
+    f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
     f.setVisible(true);
     mm.start();
     log.info("Simulator started");
@@ -225,6 +226,15 @@ public class Main extends JApplet {
     lfu = new LocalFileUtils();
     IOManager.createInstance(lfu);
     iom = IOManager.getInstance();
+
+    try {
+      ConfigManager.setConfig(new JavaPrefsConfigStore(ConfigManager.defaults));
+    } catch (Exception e) {
+      log.warning("Could not access the Java Preferences API. Using in-memory configuration storage. Error: " + e);
+      ConfigManager.setConfig(new InMemoryConfigStore(ConfigManager.defaults));
+    }
+    configStore = ConfigManager.getConfig();
+    jfc = new JFileChooser(new File(configStore.getString("lastdir")));
 
     desk = new JDesktopPane();
     Container cp = (f == null) ? getContentPane() : f.getContentPane();

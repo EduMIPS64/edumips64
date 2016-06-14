@@ -24,10 +24,7 @@
 
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
-import org.edumips64.core.fpu.*;
 import org.edumips64.utils.*;
-import java.math.*;
 
 /**
  *<pre>
@@ -52,7 +49,7 @@ class MOV_D extends FPFormattedOperandMoveInstructions {
     String value = TRfp[FS_FIELD].getBinString();
     TRfp[FD_FIELD].setBits(value, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

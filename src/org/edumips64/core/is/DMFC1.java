@@ -24,10 +24,7 @@
 
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
-import org.edumips64.core.fpu.*;
 import org.edumips64.utils.*;
-import java.math.*;
 
 /**
  *<pre>
@@ -51,7 +48,7 @@ class DMFC1 extends FPMoveFromInstructions {
     String value = TRfp[FS_FIELD].getBinString();
     TR[RT_FIELD].setBits(value, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

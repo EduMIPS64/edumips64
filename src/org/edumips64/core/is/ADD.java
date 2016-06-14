@@ -25,7 +25,6 @@
 
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
 import org.edumips64.utils.*;
 
 /**
@@ -64,7 +63,7 @@ class ADD extends ALU_RType {
       //if the enable forwarding is turned on we have to ensure that registers
       //should be unlocked also if a synchronous exception occurs. This is performed
       //by executing the WB method before raising the trap
-      if (enableForwarding) {
+      if (isEnableForwarding()) {
         doWB();
       }
 
@@ -83,7 +82,7 @@ class ADD extends ALU_RType {
       TR[RD_FIELD].setBits(filledOutputstring, 0);
     }
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
   }

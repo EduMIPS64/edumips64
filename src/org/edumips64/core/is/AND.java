@@ -25,7 +25,6 @@
 
 package org.edumips64.core.is;
 
-import org.edumips64.core.*;
 import org.edumips64.utils.*;
 
 /**
@@ -66,7 +65,7 @@ public class AND extends ALU_RType {
     //saving bitwise AND result into a temporary register
     TR[RD_FIELD].setBits(outputstring, 0);
 
-    if (enableForwarding) {
+    if (isEnableForwarding()) {
       doWB();
     }
 
