@@ -5,6 +5,7 @@
   <source path="core" />
   <source path="utils">
     <exclude name="io/Local*.java" />
+    <exclude name="MetaInfo.java" />
     <exclude name="JavaPrefsConfigStore.java" />
   </source>
 </module>
