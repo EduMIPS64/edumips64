@@ -208,9 +208,7 @@ public class Parser {
     return filetmp;
   }
 
-  /** commit the parsing (public or private?)
-  */
-  private void doParsing(String code) throws ParserMultiException {
+  void doParsing(String code) throws ParserMultiException {
     boolean isFirstOutOfInstructionMemory = true;
     isFirstOutOfMemory = true;
     boolean halt = false;
