@@ -2,12 +2,10 @@
 
 package org.edumips64.utils.io;
 
-import java.io.Writer;
-
-public class WriterAdapter implements org.edumips64.utils.io.Writer {
+public class LocalWriterAdapter implements org.edumips64.utils.io.Writer {
   private java.io.Writer writer;
 
-  public WriterAdapter(java.io.Writer writer) {
+  public LocalWriterAdapter(java.io.Writer writer) {
     this.writer = writer;
   }
 
