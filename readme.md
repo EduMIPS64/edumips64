@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/lupino3/edumips64.png?label=ready&title=Ready)](https://waffle.io/lupino3/edumips64)
 EduMIPS64 README
 ================
 
