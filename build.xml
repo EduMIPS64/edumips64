@@ -223,7 +223,7 @@
           <compilerarg value="-Xlint:-serial"/>
       </javac>
 
-      <junit printsummary="true" haltonfailure="yes" haltonerror="yes">
+      <junit printsummary="true" haltonfailure="yes" haltonerror="yes" fork="true">
           <classpath>
               <pathelement path="${base.classpath}"/>
               <pathelement path="${outputDir}"/>
