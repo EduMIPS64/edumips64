@@ -50,25 +50,17 @@
     <!-- Arguments to gwtc and devmode targets -->
     <property name="gwt.args" value="" />
 
-    <!-- Configure path to GWT SDK. TODO: make this auto-discovered or
-         something, it's not good to point to /home/andrea.-->
-    <property name="gwt.sdk" location="${env.HOME}/gwt-2.7.0" />
+    <property name="gwt.sdk" location="libs" />
     <path id="project.class.path">
+      <fileset dir="libs" includes="**/*.jar"/>
       <pathelement location="war/WEB-INF/classes"/>
-      <pathelement location="${gwt.sdk}/gwt-user.jar"/>
-      <pathelement location="${gwt.sdk}/gwt-dev.jar"/>
-      <pathelement location="${gwt.sdk}/validation-api-1.0.0.GA.jar"/>
-      <pathelement location="${gwt.sdk}/validation-api-1.0.0.GA-sources.jar"/>
       <fileset dir="war/WEB-INF/lib" includes="**/*.jar"/>
-      <!-- Add any additional non-server libs (such as JUnit) here -->
-      <pathelement location="libs/javahelp-2.0.05.jar"/>
     </path>
   </target>
 
   <target name="webLibs" depends="init" description="Copy libs to WEB-INF/lib">
     <mkdir dir="war/WEB-INF/lib" />
-    <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet.jar" />
-    <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet-deps.jar" />
+    <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet-2.7.0.jar" />
     <!-- Add any additional server libs that need to be copied -->
   </target>
 
@@ -109,7 +101,7 @@
   <target name="devmode" depends="compileWeb" description="Run development mode (pass -Dgwt.args=-nosuperDevMode to fallback to classic DevMode)">
     <java failonerror="true" fork="true" classname="com.google.gwt.dev.DevMode" maxmemory="1g">
       <classpath>
-        <pathelement location="src"/>
+        <pathelement location="src/main/java"/>
         <path refid="project.class.path"/>
         <pathelement location="${gwt.sdk}/gwt-codeserver.jar"/>
       </classpath>

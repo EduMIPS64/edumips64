@@ -6,8 +6,10 @@ repositories {
 
 dependencies {
   compile 'javax.help:javahelp:2.0.05'
-  compile 'com.google.gwt:gwt-user:2.7.0'
   compile 'com.google.gwt:gwt-dev:2.7.0'
+  compile 'com.google.gwt:gwt-servlet:2.7.0'
+  compile 'com.google.gwt:gwt-user:2.7.0'
+  compile 'com.google.gwt:gwt-codeserver:2.7.0'
 
   testCompile 'junit:junit:4.10'
 }
