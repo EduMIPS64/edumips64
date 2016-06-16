@@ -68,6 +68,10 @@ public class ConfigManager {
    * @return an instance of a class derived by ConfigStore.
    */
   public static ConfigStore getConfig() {
+    if (instance == null) {
+      // TODO: a custom exception time would be nice, but this will do.
+      throw new RuntimeException("The default ConfigStore was not initialized.");
+    }
     return instance;
   }
 

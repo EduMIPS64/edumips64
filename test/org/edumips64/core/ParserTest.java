@@ -1,14 +1,19 @@
 package org.edumips64.core;
 
 import org.edumips64.utils.io.LocalFileUtils;
+import org.edumips64.utils.ConfigManager;
+import org.edumips64.utils.ConfigStore;
 import org.junit.Before;
 import org.junit.Test;
 
 public class ParserTest {
   private Parser parser;
+  private ConfigStore config = ConfigManager.getTmpConfig();
 
   @Before
   public void setUp() throws Exception {
+     ConfigManager.setConfig(config);
+     
      // Refresh the Parser instance.
      Parser.createInstance(new LocalFileUtils());
      parser = Parser.getInstance();
