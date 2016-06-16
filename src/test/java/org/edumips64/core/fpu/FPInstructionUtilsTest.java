@@ -1,5 +1,8 @@
 package org.edumips64.core.fpu;
 
+import org.edumips64.core.fpu.FPInstructionUtils;
+import org.edumips64.core.fpu.FPUnderflowException;
+import org.edumips64.core.fpu.FPOverflowException;
 import org.edumips64.utils.IrregularStringOfBitsException;
 import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;

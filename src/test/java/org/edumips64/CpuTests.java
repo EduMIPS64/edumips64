@@ -51,7 +51,7 @@ public class CpuTests {
   private CPU cpu;
   private LocalFileUtils lfu;
   private Parser parser;
-  private static String testsLocation = "test/org/edumips64/data/";
+  private static String testsLocation = "build/resources/test/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
   private Dinero dinero = Dinero.getInstance();
   private ConfigStore config = ConfigManager.getTmpConfig();
@@ -250,11 +250,6 @@ public class CpuTests {
   @Test
   public void testOpenExistent() throws Exception {
     runMipsTest("test-open-existent.s");
-  }
-
-  @Test
-  public void testReadFile() throws Exception {
-    runMipsTest("syscall-read.s");
   }
 
   @Test
