@@ -31,14 +31,15 @@ In order to compile EduMIPS64, you need the following tools:
 
 The latter three dependencies are needed for the in-application help.
 
+To download the Java dependencies (Javahelp, JUnit), use the `gradle getDeps`
+command. This is necessary to execute unit tests and to compile the standalone
+jar.
+
 If you need to compile the PDF manual, you will also need:
 - latex / pdflatex
 
 If you want to use the automatic style checks (pre-commit hook), then you
 should have Automatic Style (astyle) installed.
-
-A distribution of JUnit 4 and JavaHelp is included in the libs/ directory of
-the git reposiory, but not in the source tarball.
 
 This project uses Travis CI for continuous integration
 (https://travis-ci.org/lupino3/edumips64).
@@ -69,17 +70,6 @@ Main Ant targets
 * `javadoc` builds the javadoc documentation; will store it in the `javadoc`
    directory.
 
-Setting the CLASSPATH
----------------------
-
-Any ant target that requires the compilation of the source code (i.e.,
-creation of application JARs or running unit tests) require that the JavaHelp
-jar is in the CLASSPATH; in addition to this, running unit tests and building
-the javadoc require the JUnit 4 jar to be in the classpath. Example::
-
-  CLASSPATH=/usr/share/java/jhall.jar ant
-  CLASSPATH=/usr/share/java/junit4.jar:/usr/share/java/jhall.jar ant test
-  CLASSPATH=/usr/share/java/junit4.jar:/usr/share/java/jhall.jar ant javadoc
 
 Compilation options
 -------------------
