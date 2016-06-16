@@ -31,7 +31,7 @@ In order to compile EduMIPS64, you need the following tools:
 
 The latter three dependencies are needed for the in-application help.
 
-To download the Java dependencies (Javahelp, JUnit), use the `gradle getDeps`
+To download the Java dependencies (Javahelp, JUnit), use the `gradle getLibs`
 command. This is necessary to execute unit tests and to compile the standalone
 jar.
 
