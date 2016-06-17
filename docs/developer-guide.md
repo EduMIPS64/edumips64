@@ -82,7 +82,7 @@ Server means that it is not possible to:
  * use GWT's devmode;
 
 To test GWT changes, use the `ant gwtc` target, and then right-click on
-war/edumips64.html in the menu and then choose "Preview".
+`war/edumips64.html` in the Workspace panel and then choose "Preview".
 
 It should be possible to test the Swing UI by doing the same with
 `utils/test-applet.html`.
