@@ -72,7 +72,7 @@ compiled code (HTML + JS) will be stored in the `war` directory.
 
 # A note on the Cloud9 web IDE
 
-[Cloud9](c9.io) is a nice Web IDE that provides GitHub integration and a Linux
+[Cloud9](http://c9.io) is a nice Web IDE that provides GitHub integration and a Linux
 container that can be used for development.
 
 The Cloud9 IDE can be used for development of EduMIPS64, but its lack of X
