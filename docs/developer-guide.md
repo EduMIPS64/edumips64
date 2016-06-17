@@ -1,4 +1,13 @@
-# Requirements
+### Table of Contents
+[Requirements](#requirements)
+
+[Main Ant targets](#main-ant-targets)
+
+[Working on the GWT frontend](#working-on-the-gwt-frontend)
+
+[A note on the Cloud9 web IDE](#a-note-on-the-cloud9-web-ide)
+
+### Requirements
 
 In order to compile EduMIPS64, you need the following tools:
 - Java JDK version 7 or above.
@@ -24,7 +33,7 @@ should have Automatic Style (astyle) installed.
 This project uses Travis CI for continuous integration
 (https://travis-ci.org/lupino3/edumips64).
 
-# Main Ant targets
+### Main Ant targets
 
 The default action is `slim-jar`.
 
@@ -53,7 +62,7 @@ The default action is `slim-jar`.
 
 * `devmode` and `gwtc` are related to the GWT frontend, see below.
 
-# Working on the GWT frontend
+### Working on the GWT frontend
 
 An experimental web frontend, based on GWT, is being developed right now.
 Currently, only a prototype is available. The GWT code for it is in the
@@ -70,7 +79,7 @@ frontend code.
 To create a releasable version of the JS code, use the `gwtc` target. The
 compiled code (HTML + JS) will be stored in the `war` directory.
 
-# A note on the Cloud9 web IDE
+### A note on the Cloud9 web IDE
 
 [Cloud9](http://c9.io) is a nice Web IDE that provides GitHub integration and a Linux
 container that can be used for development.
