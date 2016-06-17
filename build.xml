@@ -39,8 +39,8 @@
     <property name="tarbz2File" value="edumips64-${version}.tar.bz2" />
 
     <!-- Docs directories -->
-    <property name="docs_src_it" value="docs/it/src" />
-    <property name="docs_src_en" value="docs/en/src" />
+    <property name="docs_src_it" value="docs/user/it/src" />
+    <property name="docs_src_en" value="docs/user/en/src" />
 
     <!-- Compilation options -->
     <property name="src_java_version" value="7" />
@@ -177,14 +177,14 @@
       <exec executable="make" failonerror="true" dir="${docs_src_it}">
           <arg line="latexpdf"/>
       </exec>
-      <copy file="docs/it/output/latex/EduMIPS64.pdf" tofile="edumips64-${version}-manual-it.pdf"/>
+      <copy file="docs/user/it/output/latex/EduMIPS64.pdf" tofile="edumips64-${version}-manual-it.pdf"/>
   </target>
 
   <target name="pdf_en" depends="init">
       <exec executable="make" failonerror="true" dir="${docs_src_en}">
           <arg line="latexpdf"/>
       </exec>
-      <copy file="docs/en/output/latex/EduMIPS64.pdf" tofile="edumips64-${version}-manual-en.pdf"/>
+      <copy file="docs/user/en/output/latex/EduMIPS64.pdf" tofile="edumips64-${version}-manual-en.pdf"/>
   </target>
 
   <!-- *** compile *** compiles the code -->
@@ -310,32 +310,32 @@
   <!-- Utility targets to copy files. -->
   <target name="copy-help-files">
       <copy todir="${outputDir}/org/edumips64/help/en/html">
-          <fileset dir="docs/en/output/html">
+        <fileset dir="docs/user/en/output/html">
       <include name="**/*.*" />
     </fileset>
       </copy>
       <copy todir="${outputDir}/org/edumips64/help/en">
-          <fileset dir="docs/en/javahelp">
+        <fileset dir="docs/user/en/javahelp">
       <include name="**/*.*" />
     </fileset>
       </copy>
       <copy todir="${outputDir}/org/edumips64/help/it/html">
-          <fileset dir="docs/it/output/html">
+        <fileset dir="docs/user/it/output/html">
       <include name="**/*.*" />
     </fileset>
       </copy>
       <copy todir="${outputDir}/org/edumips64/help/it/img">
-          <fileset dir="docs/img">
+        <fileset dir="docs/user/img">
       <include name="**/*.*" />
     </fileset>
       </copy>
       <copy todir="${outputDir}/org/edumips64/help/en/img">
-          <fileset dir="docs/img">
+        <fileset dir="docs/user/img">
       <include name="**/*.*" />
     </fileset>
       </copy>
       <copy todir="${outputDir}/org/edumips64/help/it">
-          <fileset dir="docs/it/javahelp">
+        <fileset dir="docs/user/it/javahelp">
       <include name="**/*.*" />
     </fileset>
       </copy>

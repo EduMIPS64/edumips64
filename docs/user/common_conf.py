@@ -2,7 +2,7 @@
 
 # Import version from build.xml (hacky)
 from xml.dom.minidom import parse
-dom = parse('../../../build.xml')
+dom = parse('../../../../build.xml')
 init_node = [x for x in dom.getElementsByTagName('target') if x.getAttribute('name') == u'init'][0]
 version_node = [x for x in init_node.childNodes if x.nodeName == u'property' and x.getAttribute('name') == u'version'][0]
 version = version_node.getAttribute('value')
