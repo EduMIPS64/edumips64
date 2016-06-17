@@ -43,10 +43,12 @@ public class WebUi implements EntryPoint {
     registers = new TextArea();
     registers.setCharacterWidth(100);
     registers.setVisibleLines(20);
+    registers.setReadOnly(true);
 
     memory = new TextArea();
     memory.setCharacterWidth(100);
     memory.setVisibleLines(20);
+    memory.setReadOnly(true);
 
     b = new Button("Run", new ClickHandler() {
       public void onClick(ClickEvent event) {
