@@ -24,7 +24,7 @@
     <property name="testDir" value="src/test/java/org/edumips64/" />
     <property name="testResourcesDir" value="build/resources/test" />
     <property name="outputDir" value="build" />
-    <property name="webOutputDir" value="war/WEB-INF/classes" />
+    <property name="webOutputDir" value="war/" />
     <property name="javadocDir" value="javadoc" />
 
     <!-- Access the environment -->
@@ -76,6 +76,11 @@
     <copy todir="war/WEB-INF/classes">
       <fileset dir="src/main/java" excludes="**/*.java"/>
     </copy>
+    <copy todir="war/">
+      <fileset dir="utils">
+        <include name="edumips64.html" />
+      </fileset>
+    </copy>
   </target>
 
   <target name="mkdirs" depends="init">
@@ -121,9 +126,9 @@
     <delete file="${tarbz2File}" />
     <delete file="${slim_jar_filename}" />
     <delete file="${cli_jar_filename}" />
-        <delete dir="${outputDir}" />
-        <delete dir="${javadocDir}" />
-        <delete dir="${webOutputDir}" />
+    <delete dir="${outputDir}" />
+    <delete dir="${javadocDir}" />
+    <delete dir="${webOutputDir}" />
   </target>
 
   <target name="cleandocs" depends="init">
