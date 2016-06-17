@@ -22,7 +22,7 @@ public class WebUi implements EntryPoint {
   private ConfigStore config;
   private FileUtils fu;
 
-  private TextArea code, registers;
+  private TextArea code, registers, memory;
   private Button b;
 
   public void onModuleLoad() {
@@ -44,6 +44,10 @@ public class WebUi implements EntryPoint {
     registers.setCharacterWidth(100);
     registers.setVisibleLines(20);
 
+    memory = new TextArea();
+    memory.setCharacterWidth(100);
+    memory.setVisibleLines(20);
+
     b = new Button("Run", new ClickHandler() {
       public void onClick(ClickEvent event) {
         try {
@@ -55,6 +59,7 @@ public class WebUi implements EntryPoint {
           }
         } catch (HaltException e) {
           registers.setText(cpu.gprString());
+          memory.setText(cpu.getMemory().toString());
         } catch (Exception e) {
           Window.alert("PROBLEM: " + e.toString());
         }
@@ -64,5 +69,6 @@ public class WebUi implements EntryPoint {
     RootPanel.get().add(code);
     RootPanel.get().add(b);
     RootPanel.get().add(registers);
+    RootPanel.get().add(memory);
   }
 }
