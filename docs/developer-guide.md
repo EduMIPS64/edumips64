@@ -69,3 +69,20 @@ frontend code.
 
 To create a releasable version of the JS code, use the `gwtc` target. The
 compiled code (HTML + JS) will be stored in the `war` directory.
+
+# A note on the Cloud9 web IDE
+
+[Cloud9](c9.io) is a nice Web IDE that provides GitHub integration and a Linux
+container that can be used for development.
+
+The Cloud9 IDE can be used for development of EduMIPS64, but its lack of X
+Server means that it is not possible to:
+
+ * run the Swing UI JAR;
+ * use GWT's devmode;
+
+To test GWT changes, use the `ant gwtc` target, and then right-click on
+war/edumips64.html in the menu and then choose "Preview".
+
+It should be possible to test the Swing UI by doing the same with
+`utils/test-applet.html`.
