@@ -16,7 +16,7 @@ In order to compile EduMIPS64, you need the following tools:
 
 To build the user documentation, you'll need:
 - GNU Make
-- Sphinx (http://sphinx.pocoo.org/) versione 1.0.7 or above
+- Sphinx (http://sphinx.pocoo.org/) version 1.0.7 or above
 - latex / pdflatex
 
 Gradle will help you download the following dependencies:
