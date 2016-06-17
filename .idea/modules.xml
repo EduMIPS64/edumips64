@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/edumips64.iml" filepath="$PROJECT_DIR$/edumips64.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/edumips64.iml" filepath="$PROJECT_DIR$/.idea/modules/edumips64.iml" />
     </modules>
   </component>
 </project>

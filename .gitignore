@@ -8,9 +8,11 @@ build/*
 docs/*/output
 .idea/workspace.xml
 .idea/tasks.xml
+.idea/libraries/*
 cov-int
 out
 gwt-unitCache/
 war/WEB-INF/
 .gradle
-war/edumips64
+war/
+gradle/*
