@@ -379,12 +379,6 @@
         <include name="utils/**/*" />
       </fileset>
     </copy>
-    <mkdir dir="edumips64-${version}/libs" />
-    <copy todir="edumips64-${version}/libs">
-      <fileset dir="misc">
-        <include name="README.libs" />
-      </fileset>
-    </copy>
 
     <tar destfile="${tarbz2File}" basedir="." includes="edumips64-${version}/" compression="bzip2" />
     <delete dir="edumips64-${version}" />
