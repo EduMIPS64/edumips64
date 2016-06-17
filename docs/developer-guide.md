@@ -1,6 +1,4 @@
-
-Requirements
-------------
+# Requirements
 
 In order to compile EduMIPS64, you need the following tools:
 - Java JDK version 7 or above.
@@ -26,8 +24,7 @@ should have Automatic Style (astyle) installed.
 This project uses Travis CI for continuous integration
 (https://travis-ci.org/lupino3/edumips64).
 
-Main Ant targets
-----------------
+# Main Ant targets
 
 The default action is `slim-jar`.
 
@@ -53,3 +50,22 @@ The default action is `slim-jar`.
 
 * `javadoc` builds the javadoc documentation; will store it in the `javadoc`
    directory.
+
+* `devmode` and `gwtc` are related to the GWT frontend, see below.
+
+# Working on the GWT frontend
+
+An experimental web frontend, based on GWT, is being developed right now.
+Currently, only a prototype is available. The GWT code for it is in the
+`org.edumips64.client` package. The HTML file is in `contrib/edumips64.html`.
+
+To work on it, run the `ant devmode` ANT target, which will fire up the GWT
+developer console for you. Once the console is available, you'll be given a
+local URL where the frontend will be available.
+
+Every time you change the GWT frontend, reloading that web page will cause the
+GWT console to recompile the code, thus allowing quick iteration on the web
+frontend code.
+
+To create a releasable version of the JS code, use the `gwtc` target. The
+compiled code (HTML + JS) will be stored in the `war` directory.
