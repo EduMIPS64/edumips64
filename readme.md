@@ -17,7 +17,7 @@ simulator from scratch and/or modifying its source code.
 
 The JAR for the latest development version is available at
 http://lupino3.github.io/edumips64/edumips64-latest.jar (built by Travis CI
-every time a new revision is pushed).
+every time a new revision is pushed and passes unit tests).
 
 Requirements
 ------------
