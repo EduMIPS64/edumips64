@@ -26,6 +26,7 @@
     <property name="outputDir" value="build" />
     <property name="webOutputDir" value="war/" />
     <property name="javadocDir" value="javadoc" />
+    <property name="gwtVersion" value="2.8.0-SNAPSHOT" />
 
     <!-- Access the environment -->
     <property environment="env" />
@@ -43,8 +44,8 @@
     <property name="docs_src_en" value="docs/user/en/src" />
 
     <!-- Compilation options -->
-    <property name="src_java_version" value="7" />
-    <property name="dst_java_version" value="7" />
+    <property name="src_java_version" value="8" />
+    <property name="dst_java_version" value="8" />
     <property name="debug" value="on" />
 
     <!-- Arguments to gwtc and devmode targets -->
@@ -60,7 +61,7 @@
 
   <target name="webLibs" depends="init" description="Copy libs to WEB-INF/lib">
     <mkdir dir="war/WEB-INF/lib" />
-    <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet-2.7.0.jar" />
+    <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet-2.8.0-SNAPSHOT.jar" />
     <!-- Add any additional server libs that need to be copied -->
   </target>
 
