@@ -6,9 +6,7 @@
 build
 build/*
 docs/*/output
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/libraries/*
+.idea
 cov-int
 out
 gwt-unitCache/
@@ -16,3 +14,4 @@ war/WEB-INF/
 .gradle
 war/
 gradle/*
+gradlew*
