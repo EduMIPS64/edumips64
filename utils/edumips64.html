@@ -3,6 +3,16 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>EduMIPS64</title>
   <script type="text/javascript" language="javascript" src="edumips64/edumips64.nocache.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+  <script type="text/javascript" language="javascript">
+    function run() {
+        var simulator = new jsedumips64.WebUi();
+        simulator.init();
+        var registers = simulator.runAndGetRegisters();
+        $("#registers").html(registers);
+    }
+  </script>
   </head>
   <body bgcolor="white"> 
     <noscript>
@@ -11,5 +21,7 @@
         in order for this application to display correctly.
       </div>
     </noscript>
+  <div id="codeContainer"><input id="code" type="text"></input></div>
+  <div id="registersContainer"><p id="registers"></p></div>
   </body>
 </html>

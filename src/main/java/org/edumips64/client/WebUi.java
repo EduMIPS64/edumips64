@@ -12,10 +12,9 @@ import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.NullFileUtils;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@JsType(namespace = "blah")
+@JsType(namespace = "jsedumips64")
 public class WebUi implements EntryPoint {
   private CPU cpu;
   private Parser parser;
@@ -39,7 +38,16 @@ public class WebUi implements EntryPoint {
     }
   }
 
+  private native void runSimulatorJS() /*-{
+    $wnd.run();
+  }-*/;
+
+  @Override
   public void onModuleLoad() {
+    runSimulatorJS();
+  }
+
+  public void init() {
     // Simulator initialization.
     Logger logger = Logger.getLogger("NameOfYourLogger");
     config = ConfigManager.getTmpConfig();
@@ -48,8 +56,5 @@ public class WebUi implements EntryPoint {
     Parser.createInstance(fu);
     parser = Parser.getInstance();
     cpu = CPU.getInstance();
-
-    // Run the code and log registers.
-    logger.log(Level.SEVERE, runAndGetRegisters());
   }
 }
