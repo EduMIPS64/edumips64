@@ -43,6 +43,9 @@ public class Memory {
 
   private static final Logger logger = Logger.getLogger(Memory.class.getName());
 
+  // Keep track of non-BUBBLE instructions for code size purposes.
+  private int instructionCount = 0;
+
   private Memory() {
     logger.info("Building Memory: " + this.hashCode());
     cells = new TreeMap<>();
@@ -54,7 +57,7 @@ public class Memory {
    *  @return an integer
    */
   public int getInstructionsNumber() {
-    return cells.size();
+    return instructionCount;
   }
 
   /** Singleton pattern: since the unique constructor of this class is private, this static method
@@ -118,6 +121,7 @@ public class Memory {
   public void reset() {
     cells.clear();
     instructions.clear();
+    instructionCount = 0;
   }
 
   public String toString() {
@@ -143,6 +147,9 @@ public class Memory {
     }
 
     int listIndex = address / 4;
+    if (!i.isBubble() && !instructions.containsKey(listIndex)) {
+      instructionCount++;
+    }
     instructions.put(listIndex, i);
   }
 
