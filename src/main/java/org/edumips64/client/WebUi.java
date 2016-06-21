@@ -51,6 +51,17 @@ public class WebUi implements EntryPoint {
     return cpu.gprString();
   }
 
+  public String getStatistics() {
+    // Ugly, but GWT does not support String.format.
+    return cpu.getCycles() + " cycles executed\n" +
+        cpu.getInstructions() + " instructions executed\n" +
+        cpu.getRAWStalls() + " RAW Stalls\n" +
+        cpu.getWAWStalls() + " WAW Stalls\n" +
+        cpu.getStructuralStallsDivider() + " structural stalls (divider not available)\n" +
+        cpu.getStructuralStallsMemory() + " structural stalls (Memory not available)\n" +
+        "Code Size: " + (cpu.getMemory().getInstructionsNumber() * 4) + " Bytes";
+  }
+
  @Override
  public void onModuleLoad() {
  }
