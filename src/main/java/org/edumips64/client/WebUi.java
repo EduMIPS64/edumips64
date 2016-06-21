@@ -21,35 +21,42 @@ public class WebUi implements EntryPoint {
   private ConfigStore config;
   private FileUtils fu;
 
-  private final String defaultCode = ".data\n.word64 10\n.code\nlw r1, 0(r0)\nSYSCALL 0";
-
-  public String runAndGetRegisters() {
+  // Executes the program. Returns an empty string on success, or an error message.
+  public String runProgram(String code) {
+    Logger logger = Logger.getLogger("simulator");
+    logger.info("Running program: " + code);
     try {
       cpu.reset();
-      parser.doParsing(defaultCode);
+      logger.info("About to parse it.");
+      parser.doParsing(code);
+      logger.info("Parsed. Running.");
       cpu.setStatus(CPU.CPUStatus.RUNNING);
       while (true) {
         cpu.step();
       }
     } catch (HaltException e) {
-      return cpu.gprString();
+      logger.info("All done.");
+      return "";
     } catch (Exception e) {
-      return "ERROR";
+      logger.warning("Error: " + e.toString());
+      return e.toString();
     }
   }
 
-  private native void runSimulatorJS() /*-{
-    $wnd.run();
-  }-*/;
-
-  @Override
-  public void onModuleLoad() {
-    runSimulatorJS();
+  public String getMemory() {
+    return cpu.getMemory().toString();
   }
+
+  public String getRegisters() {
+    return cpu.gprString();
+  }
+
+ @Override
+ public void onModuleLoad() {
+ }
 
   public void init() {
     // Simulator initialization.
-    Logger logger = Logger.getLogger("NameOfYourLogger");
     config = ConfigManager.getTmpConfig();
     ConfigManager.setConfig(config);
     fu = new NullFileUtils();
