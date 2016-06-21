@@ -6,10 +6,17 @@ set -u
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   if [[ "$JAVA_HOME" == *java-8* ]]; then
-    echo "Java 8 worker, updating JAR on GitHub pages"
+    echo "Java 8 worker, should update JAR on GitHub pages"
   else
     echo "Non-java 8 worker. Not updating JAR"
     echo "JAVA_HOME=${JAVA_HOME}"
+    exit 0
+  fi
+
+  GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+  if [ "$GIT_BRANCH" != "master" ]; then 
+    echo "Non-master branch: $GIT_BRANCH. Not updating the JAR."
     exit 0
   fi
 

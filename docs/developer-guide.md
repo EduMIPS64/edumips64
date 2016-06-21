@@ -10,7 +10,7 @@
 ### Requirements
 
 In order to compile EduMIPS64, you need the following tools:
-- Java JDK version 7 or above.
+- Java JDK version 8 or above.
 - Apache Ant version 1.8 or above (needed for JUnit 4 tests)
 - Gradle
 
