@@ -19,3 +19,5 @@ http://lupino3.github.io/edumips64/edumips64-latest.jar (built by Travis CI
 every time a new revision is pushed and passes unit tests).
 
 To contribute to EduMIPS64, please start by reading the [developer guide](docs/developer-guide.md).
+
+The proof-of-concept JS web application being developed in the [jsinterop branch](https://github.com/lupino3/edumips64/tree/jsinterop) (GWT compilation + JS UI) is available at www.edumips.org/edumips64.html. It is currently manually pushed.
