@@ -62,9 +62,8 @@ public class WebUi implements EntryPoint {
         "Code Size: " + (cpu.getMemory().getInstructionsNumber() * 4) + " Bytes";
   }
 
- @Override
- public void onModuleLoad() {
- }
+  @Override
+  public void onModuleLoad() {}
 
   public void init() {
     // Simulator initialization.
