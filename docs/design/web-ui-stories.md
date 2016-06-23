@@ -1,13 +1,14 @@
-# Web UI User Stories (draft)
+# Web UI User Stories
 
-This is just a brainstorming of some user stories for the web UI, to be further 
-refined, categorized and prioritized.
+This is a work-in-progress brainstorming of some user stories for the web UI,
+to be further refined, categorized and prioritized. Work is tracked in
+Issue #85.
 
 The user here is just the student or enthusiast interested in playing with a
 MIPS64 simulator. The context is always a desktop web interface, unless
 specified.
 
-# Compatibility
+## Compatibility
 
 1. open a MIPS64 assembly program from disk, or input it in a text area
 1. parsing a MIPS64 assembly program, having clear indications of errors
@@ -32,7 +33,7 @@ specified.
 1. Setting options related to exceptions
 1. Setting options related to the FPU
 
-# New features
+## New features
 
 1. online warnings/errors in the code window
 1. open from URL (?)
