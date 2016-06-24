@@ -7,6 +7,10 @@
 
 [A note on the Cloud9 web IDE](#a-note-on-the-cloud9-web-ide)
 
+[Source code structure](#source-code-structure)
+
+[Submitting code](#submitting-code)
+
 ### Requirements
 
 In order to compile EduMIPS64, you need the following tools:
@@ -115,3 +119,13 @@ contains an experimental CLI front-end.
 * The `utils` package contains miscellaneous code, including abstractions needed
   to decouple the core code from packages that are not available in the GWT
   JRE emulation (such as `java.io`).
+
+### Submitting code
+
+Code should be submitted as pull requests. The `master` branch is protected,
+meaning that pull requests can be merged only if they pass the status checks.
+Currently, the only status check is the Travis CI continuous integration.
+
+If this proves to be too inconvenient, it might be better to split out a
+protected `stable` branch to use for releases and have `master` unprotected.
+We'll see how this fares as more people start contributing to the project.
