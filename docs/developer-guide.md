@@ -95,3 +95,23 @@ To test GWT changes, use the `ant gwtc` target, and then right-click on
 
 It should be possible to test the Swing UI by doing the same with
 `utils/test-applet.html`.
+
+### Source code structure
+
+The source code structure follows the [Gradle project layout conventions](https://docs.gradle.org/current/userguide/java_plugin.html#N152C8).
+The main package for the simulator is `org.edumips64`, therefore the Java code
+resides in `src/main/java/org/edumips64`, and contains 5 sub-packages, plus
+the entry points.
+
+`Main.java` is the code for the main Swing frontend entry point, while `MainCLI.java`
+contains an experimental CLI front-end.
+
+* The `client` package contains Java code for the Web UI. 
+* The `core` package contains all the core classes for the simulator, including
+  important bits such as the CPU, the Memory, instructions and the Parser.
+* The `img` package contains a class to load images and the actual images used
+  in the simulator.
+* The `ui` package contains the code for the Swing UI.
+* The `utils` package contains miscellaneous code, including abstractions needed
+  to decouple the core code from packages that are not available in the GWT
+  JRE emulation (such as `java.io`).
