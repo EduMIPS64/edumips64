@@ -5,6 +5,7 @@ import com.google.gwt.core.client.EntryPoint;
 import jsinterop.annotations.JsType;
 
 import org.edumips64.core.CPU;
+import org.edumips64.core.Memory;
 import org.edumips64.core.Parser;
 import org.edumips64.core.is.HaltException;
 import org.edumips64.utils.ConfigStore;
@@ -44,7 +45,7 @@ public class WebUi implements EntryPoint {
   }
 
   public String getMemory() {
-    return cpu.getMemory().toString();
+    return Memory.getInstance().toString();
   }
 
   public String getRegisters() {
@@ -59,7 +60,7 @@ public class WebUi implements EntryPoint {
         cpu.getWAWStalls() + " WAW Stalls\n" +
         cpu.getStructuralStallsDivider() + " structural stalls (divider not available)\n" +
         cpu.getStructuralStallsMemory() + " structural stalls (Memory not available)\n" +
-        "Code Size: " + (cpu.getMemory().getInstructionsNumber() * 4) + " Bytes";
+        "Code Size: " + (Memory.getInstance().getInstructionsNumber() * 4) + " Bytes";
   }
 
  @Override

@@ -219,10 +219,6 @@ public class CPU {
     return fpr;
   }
 
-  public Memory getMemory() {
-    return mem;
-  }
-
   public SymbolTable getSymbolTable() {
     return symTable;
   }

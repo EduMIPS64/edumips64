@@ -101,12 +101,11 @@ public class Dinero {
   }
   /** Calculate the offset */
   public void findOffset() {
-    CPU cpu = CPU.getInstance();
     int i;
 
     for (i = 0; i < CPU.CODELIMIT; i++) {
       try {
-        if (cpu.getMemory().getInstruction(i * 4).getName().equals(" ")) {
+        if (Memory.getInstance().getInstruction(i * 4).getName().equals(" ")) {
           break;
         }
       } catch (SymbolTableOverflowException ex) {

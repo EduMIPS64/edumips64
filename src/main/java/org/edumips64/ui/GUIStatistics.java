@@ -22,6 +22,7 @@
  */
 
 package org.edumips64.ui;
+import org.edumips64.core.Memory;
 import org.edumips64.utils.*;
 
 import java.awt.BorderLayout;
@@ -41,10 +42,12 @@ public class GUIStatistics extends GUIComponent {
   JScrollPane jsp;
   private int nCycles, nInstructions, rawStalls, codeSize, WAWStalls, dividerStalls, memoryStalls;
   private float cpi;
+  private Memory memory;
 
   public GUIStatistics() {
     super();
     statPanel = new StatPanel();
+    memory = Memory.getInstance();
 
     jsp = new JScrollPane(statPanel);
     jsp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -84,7 +87,7 @@ public class GUIStatistics extends GUIComponent {
     }
 
     rawStalls = cpu.getRAWStalls();
-    codeSize = (cpu.getMemory().getInstructionsNumber()) * 4;
+    codeSize = (memory.getInstructionsNumber()) * 4;
     WAWStalls = cpu.getWAWStalls();
     dividerStalls = cpu.getStructuralStallsDivider();
     memoryStalls = cpu.getStructuralStallsMemory();

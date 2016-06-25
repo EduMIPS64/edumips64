@@ -33,11 +33,13 @@ import javax.swing.table.*;
 public class GUICode extends GUIComponent {
   CodePanel codePanel;
   String memoryAddress[] = new String[CPU.CODELIMIT];
+  Memory memory;
   private static int ifIndex, idIndex, exIndex, memIndex, wbIndex, A1Index, A2Index, A3Index, A4Index, M1Index, M2Index, M3Index, M4Index, M5Index, M6Index, M7Index, DIVIndex;
 
   public GUICode() {
     super();
     codePanel = new CodePanel();
+    memory = Memory.getInstance();
   }
 
   public void setContainer(Container co) {
@@ -68,27 +70,27 @@ public class GUICode extends GUIComponent {
     column4.setCellRenderer(new MyTableCellRenderer());
 
     Instruction ifInstruction = cpu.getPipeline().get(CPU.PipeStage.IF);
-    ifIndex = cpu.getMemory().getInstructionIndex(ifInstruction);
+    ifIndex = memory.getInstructionIndex(ifInstruction);
     if ((ifInstruction != null) && ifInstruction.isBubble()) {
       ifIndex = -1;
     }
-    idIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.ID));
-    exIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.EX));
-    memIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.MEM));
-    wbIndex = cpu.getMemory().getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.WB));
+    idIndex = memory.getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.ID));
+    exIndex = memory.getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.EX));
+    memIndex = memory.getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.MEM));
+    wbIndex = memory.getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.WB));
 
-    A1Index = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 1));
-    A2Index = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 2));
-    A3Index = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 3));
-    A4Index = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 4));
-    M1Index = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 1));
-    M2Index = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 2));
-    M3Index = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 3));
-    M4Index = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 4));
-    M5Index = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 5));
-    M6Index = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 6));
-    M7Index = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 7));
-    DIVIndex = cpu.getMemory().getInstructionIndex(cpu.getInstructionByFuncUnit("DIVIDER", 0));
+    A1Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 1));
+    A2Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 2));
+    A3Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 3));
+    A4Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 4));
+    M1Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 1));
+    M2Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 2));
+    M3Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 3));
+    M4Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 4));
+    M5Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 5));
+    M6Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 6));
+    M7Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 7));
+    DIVIndex = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("DIVIDER", 0));
 
   }
 
@@ -164,21 +166,21 @@ public class GUICode extends GUIComponent {
           case 1:
 
             try {
-              return cpu.getMemory().getInstruction(row * 4).getRepr().getHexString();
+              return memory.getInstruction(row * 4).getRepr().getHexString();
             } catch (IrregularStringOfBitsException ex) {
               ex.printStackTrace();
             }
 
             break;
           case 2:
-            String label = cpu.getMemory().getInstruction(row * 4).getLabel();
+            String label = memory.getInstruction(row * 4).getLabel();
             return label;
           case 3:
-            return cpu.getMemory().getInstruction(row * 4).getFullName();
+            return memory.getInstruction(row * 4).getFullName();
           case 4:
 
-            if (cpu.getMemory().getInstruction(row * 4).getComment() != null) {
-              return ";" + cpu.getMemory().getInstruction(row * 4).getComment();
+            if (memory.getInstruction(row * 4).getComment() != null) {
+              return ";" + memory.getInstruction(row * 4).getComment();
             } else {
               return "";
             }
