@@ -37,6 +37,10 @@ public abstract class Storing extends LDSTInstructions {
   protected static final Logger logger = Logger.getLogger(Storing.class.getName());
   protected Register rt;
 
+  public Storing(Memory memory) {
+    super(memory);
+  }
+
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException {
     //if the base register and the rt register are valid passing value of rt register into a temporary register
     Register base = cpu.getRegister(params.get(BASE_FIELD));
@@ -81,28 +85,6 @@ public abstract class Storing extends LDSTInstructions {
 
     if (isEnableForwarding()) {
       WB();
-    }
-  }
-
-  public static void main(String args[]) {
-    try {
-      SD inst = new SD();
-      //SH inst = new SH();
-      //SW inst=new SW();
-      //SB inst=new SB();
-      CPU cpu = CPU.getInstance();
-      inst.params.add(1);
-      inst.params.add(8);
-      inst.params.add(0);
-      //R1=43524464456523452L
-      cpu.getRegister(inst.params.get(RT_FIELD)).writeDoubleWord(9223372036854775807L);
-      inst.pack();
-      inst.ID();
-      inst.MEM();
-      System.out.println(memory);
-    } catch (Exception e) {
-      System.out.println("Eccezion: " + e);
-      e.printStackTrace();
     }
   }
 }

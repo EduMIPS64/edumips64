@@ -37,7 +37,9 @@ import org.edumips64.utils.*;
  */
 class LH extends Loading {
   final String OPCODE_VALUE = "100001";
-  public LH() {
+
+  public LH(Memory memory) {
+    super(memory);
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "LH";
     this.memoryOpSize = 2;

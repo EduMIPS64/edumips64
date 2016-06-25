@@ -1,5 +1,7 @@
 package org.edumips64.core.is;
 
+import org.edumips64.core.Memory;
+
 public class InstructionBuilder {
   /**
    * Creates a new instance of an Instruction's subclass
@@ -11,6 +13,8 @@ public class InstructionBuilder {
     // If the name of the requested instruction has got a dot, the instruction is FP and an
     // underscore takes the place of the dot because classes names cannot contain dots
     String name = instructionName.replaceAll("\\.", "_");
+
+    Memory memory = Memory.getInstance();
 
     switch(name) {
       //ALU R-Type 32-bits
@@ -123,31 +127,31 @@ public class InstructionBuilder {
 
       //Load-Signed
       case "LB":
-        return new LB();
+        return new LB(memory);
       case "LH":
-        return new LH();
+        return new LH(memory);
       case "LW":
-        return new LW();
+        return new LW(memory);
       case "LD":
-        return new LD();
+        return new LD(memory);
 
       //Load-Unsigned
       case "LBU":
-        return new LBU();
+        return new LBU(memory);
       case "LHU":
-        return new LHU();
+        return new LHU(memory);
       case "LWU":
-        return new LWU();
+        return new LWU(memory);
 
       //Store
       case "SB":
-        return new SB();
+        return new SB(memory);
       case "SH":
-        return new SH();
+        return new SH(memory);
       case "SW":
-        return new SW();
+        return new SW(memory);
       case "SD":
-        return new SD();
+        return new SD(memory);
 
       //Unconditional branches
       case "J":
@@ -181,9 +185,9 @@ public class InstructionBuilder {
       case "HALT":
         return new HALT();
       case "TRAP":
-        return new TRAP();
+        return new TRAP(memory);
       case "SYSCALL":
-        return new SYSCALL();
+        return new SYSCALL(memory);
       case "BREAK":
         return new BREAK();
 
@@ -200,17 +204,17 @@ public class InstructionBuilder {
 
       //Load store
       case "LDC1":
-        return new LDC1();
+        return new LDC1(memory);
       case "L_D":
-        return new L_D();
+        return new L_D(memory);
       case "SDC1":
-        return new SDC1();
+        return new SDC1(memory);
       case "S_D":
-        return new S_D();
+        return new S_D(memory);
       case "LWC1":
-        return new LWC1();
+        return new LWC1(memory);
       case "SWC1":
-        return new SWC1();
+        return new SWC1(memory);
 
       //Move to and from
       case "DMTC1":

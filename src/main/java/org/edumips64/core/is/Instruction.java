@@ -39,7 +39,6 @@ public abstract class Instruction {
   protected String syntax;
   protected String name;
   protected String comment;
-  protected static Memory memory = Memory.getInstance();
   //protected static CPU cpu;
   protected Register[] TR; //is not static because each instruction has got its own registers
   protected RegisterFP[] TRfp;

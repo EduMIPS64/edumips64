@@ -35,7 +35,8 @@ public abstract class FPLDSTInstructions extends LDSTInstructions {
   final static int FT_FIELD = 0;
   final static int FT_FIELD_INIT = 11;
   final static int FT_FIELD_LENGTH = 5;
-  public FPLDSTInstructions() {
+  public FPLDSTInstructions(Memory memory) {
+    super(memory);
     this.syntax = "%F,%L(%R)";
     this.paramCount = 3;
   }

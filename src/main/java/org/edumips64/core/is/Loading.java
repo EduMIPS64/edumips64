@@ -37,6 +37,10 @@ import org.edumips64.utils.*;
 public abstract class Loading extends LDSTInstructions {
   protected static final Logger logger = Logger.getLogger(Loading.class.getName());
 
+  public Loading(Memory memory) {
+    super(memory);
+  }
+
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException {
     //if the base register is valid ...
     Register base = cpu.getRegister(params.get(BASE_FIELD));

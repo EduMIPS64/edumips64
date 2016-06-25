@@ -40,14 +40,16 @@ public class SYSCALL extends Instruction {
 
   private Dinero din;
   private IOManager iom;
+  private Memory memory;
 
-    public SYSCALL() {
-      this.syntax = "%U";
-      this.paramCount = 1;
-      this.name = "SYSCALL";
-      din = Dinero.getInstance();
-      iom = IOManager.getInstance();
-    }
+  public SYSCALL(Memory memory) {
+    this.syntax = "%U";
+    this.paramCount = 1;
+    this.name = "SYSCALL";
+    din = Dinero.getInstance();
+    iom = IOManager.getInstance();
+    this.memory = memory;
+  }
 
   public void IF() {
     syscall_n = params.get(0);
@@ -98,7 +100,7 @@ public class SYSCALL extends Instruction {
       int flags_address = (int) address + filename.length();
       flags_address += 8 - (flags_address % 8);
 
-      MemoryElement flags_m = Memory.getInstance().getCellByAddress(flags_address);
+      MemoryElement flags_m = memory.getCellByAddress(flags_address);
       int flags = (int) flags_m.getValue();
 
       // Memory access for the string and the flags (note the <=)
@@ -119,7 +121,7 @@ public class SYSCALL extends Instruction {
 
     } else if (syscall_n == 2) {
       // int close(int fd)
-      MemoryElement fd_cell = Memory.getInstance().getCellByAddress(address);
+      MemoryElement fd_cell = memory.getCellByAddress(address);
       int fd = (int) fd_cell.getValue();
       logger.info("Closing fd " + fd);
       return_value = iom.close(fd);
@@ -129,15 +131,15 @@ public class SYSCALL extends Instruction {
       int fd, count;
       long buf_addr;
 
-      MemoryElement temp = Memory.getInstance().getCellByAddress(address);
+      MemoryElement temp = memory.getCellByAddress(address);
       fd = (int) temp.getValue();
       address += 8;
 
-      temp = Memory.getInstance().getCellByAddress(address);
+      temp = memory.getCellByAddress(address);
       buf_addr = temp.getValue();
       address += 8;
 
-      temp = Memory.getInstance().getCellByAddress(address);
+      temp = memory.getCellByAddress(address);
       count = (int) temp.getValue();
       address += 8;
 
