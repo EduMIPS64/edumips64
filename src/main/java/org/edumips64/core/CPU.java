@@ -102,7 +102,7 @@ public class CPU {
   private CPU() {
     config = ConfigManager.getConfig();
     // To avoid future singleton problems
-    Instruction.buildInstruction("BUBBLE");
+    InstructionBuilder.buildInstruction("BUBBLE");
 
     logger.info("Creating the CPU...");
     cycles = 0;
@@ -450,7 +450,7 @@ public class CPU {
       // put in the IF stage the instruction the PC points to
       pipe.put(PipeStage.IF, mem.getInstruction(pc));
       pipe.put(PipeStage.EX, pipe.get(PipeStage.ID));
-      pipe.put(PipeStage.ID, Instruction.buildInstruction("BUBBLE"));
+      pipe.put(PipeStage.ID, InstructionBuilder.buildInstruction("BUBBLE"));
       old_pc.writeDoubleWord((pc.getValue()));
       pc.writeDoubleWord((pc.getValue()) + 4);
 
@@ -460,7 +460,7 @@ public class CPU {
 
     } catch (RAWException ex) {
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, Instruction.buildInstruction("BUBBLE"));
+        pipe.put(PipeStage.EX, InstructionBuilder.buildInstruction("BUBBLE"));
       }
 
       RAWStalls++;
@@ -474,7 +474,7 @@ public class CPU {
       logger.info(fpPipe.toString());
 
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, Instruction.buildInstruction("BUBBLE"));
+        pipe.put(PipeStage.EX, InstructionBuilder.buildInstruction("BUBBLE"));
       }
 
       WAWStalls++;
@@ -485,7 +485,7 @@ public class CPU {
       }
     } catch (FPDividerNotAvailableException ex) {
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, Instruction.buildInstruction("BUBBLE"));
+        pipe.put(PipeStage.EX, InstructionBuilder.buildInstruction("BUBBLE"));
       }
 
       dividerStalls++;
@@ -496,7 +496,7 @@ public class CPU {
 
     } catch (FPFunctionalUnitNotAvailableException ex) {
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, Instruction.buildInstruction("BUBBLE"));
+        pipe.put(PipeStage.EX, InstructionBuilder.buildInstruction("BUBBLE"));
       }
 
       funcUnitStalls++;
@@ -556,7 +556,7 @@ public class CPU {
       logger.info("Putting " + next_if + "in IF.");
       pipe.put(PipeStage.IF, next_if);
     } else {
-      pipe.put(PipeStage.ID, Instruction.buildInstruction("BUBBLE"));
+      pipe.put(PipeStage.ID, InstructionBuilder.buildInstruction("BUBBLE"));
     }
 
     if (breaking) {

@@ -33,6 +33,7 @@ import org.edumips64.core.fpu.FPInstructionUtils;
 import org.edumips64.core.fpu.FPOverflowException;
 import org.edumips64.core.fpu.FPUnderflowException;
 import org.edumips64.core.is.Instruction;
+import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.utils.Converter;
 import org.edumips64.utils.IrregularStringOfBitsException;
 import org.edumips64.utils.IrregularStringOfHexException;
@@ -516,7 +517,7 @@ public class Parser {
                 }
               }
 
-              tmpInst = Instruction.buildInstruction(line.substring(i, end).toUpperCase());
+              tmpInst = InstructionBuilder.buildInstruction(line.substring(i, end).toUpperCase());
 
               if (tmpInst == null) {
                 numError++;
@@ -1196,7 +1197,7 @@ public class Parser {
 
       try {
         logger.warning("No terminating instruction detected, adding one.");
-        Instruction tmpInst = Instruction.buildInstruction("SYSCALL");
+        Instruction tmpInst = InstructionBuilder.buildInstruction("SYSCALL");
         tmpInst.getParams().add(0);
         tmpInst.setFullName("SYSCALL 0");
 

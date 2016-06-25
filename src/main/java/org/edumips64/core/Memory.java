@@ -156,7 +156,7 @@ public class Memory {
   public Instruction getInstruction(int address) throws SymbolTableOverflowException {
     int index = address / 4;
     if (!instructions.containsKey(index)) {
-      addInstruction(Instruction.buildInstruction("BUBBLE"), address);
+      addInstruction(InstructionBuilder.buildInstruction("BUBBLE"), address);
     }
     return instructions.get(address / 4);
   }
