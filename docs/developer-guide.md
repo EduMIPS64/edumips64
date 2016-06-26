@@ -110,3 +110,33 @@ Currently, the only status check is the Travis CI continuous integration.
 If this proves to be too inconvenient, it might be better to split out a
 protected `stable` branch to use for releases and have `master` unprotected.
 We'll see how this fares as more people start contributing to the project.
+
+### Unit tests
+
+Unit tests are stored in the `src/test` directory. The `resources`
+subdirectory contains MIPS64 programs that are executed during unit test as a
+form of end-to-end unit tests, whereas `java` contains the actual Java code
+that runs unit tests.
+
+The main tests are contained in `CpuTests.java`. This class contains unit
+tests that run MIPS64 code (contained in `resources`).  One of the common
+patterns in those tests is that, if something goes unexpectedly during the
+execution of unit tests, the MIPS64 code executes a `BREAK` instruction, which
+will trigger a `BreakException` in the Java code and make the test fail. Tests
+in `CpuTests.java` can also verify other behaviors, including forwarding and
+correct working of the Dinero Tracefile generation logic.
+
+Other types of test, e.g., `ParserTest.java` or `MemoryTest.java`, will test
+other components in isolation.
+
+To add a unit test, the first consideration is whether this test should be
+writte in assembly or in Java. Tests in assembly should typically be put in
+`CpuTests.java`, since it contains already boilerplate for executing and
+verifying assembly programs. Tests which should not be written in assembly,
+and therefore most likely exercise only one component, should pertain to other
+classes, possibly even an entirely new class if required.
+
+When writing new unit test classes, pay attention to the initialization code
+necessary to initialize the simulator. Look at other unit test classes to make
+sure your new class behaves as required. Finally, remember to add new unit
+test classes to the `test` target in the ant `build.xml` file.
