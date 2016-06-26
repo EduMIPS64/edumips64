@@ -152,30 +152,36 @@ public class GUICode extends GUIComponent {
       }
 
       public Object getValueAt(int row, int col) {
-        Instruction instruction;
+        // Column 0 is the instruction address.
+        if (col == 0) {
+          try {
+            return Converter.binToHex(Converter.positiveIntToBin(16, row * 4));
+          } catch (IrregularStringOfBitsException ex) {
+            // Should never happen.
+            ex.printStackTrace();
+            return 0;
+          }
+        }
+
+        Instruction instruction = null;
         try {
           instruction = memory.getInstruction(row * 4);
         } catch (SymbolTableOverflowException e) {
           e.printStackTrace();
-          return new Object();
+        }
+
+        if (instruction == null) {
+            return "";
         }
 
         switch (col) {
-          case 0:
-            try {
-              return Converter.binToHex(Converter.positiveIntToBin(16, row * 4));
-            } catch (IrregularStringOfBitsException ex) {
-              ex.printStackTrace();
-            }
-            break;
-
           case 1:
             try {
               return instruction.getRepr().getHexString();
             } catch (IrregularStringOfBitsException ex) {
               ex.printStackTrace();
+              return "";
             }
-            break;
 
           case 2:
             return instruction.getLabel();
@@ -187,13 +193,8 @@ public class GUICode extends GUIComponent {
             if (instruction.getComment() != null) {
               return ";" + instruction.getComment();
             }
-            return "";
-
-          default:
-            return new Object();
         }
-
-        return new Object();
+        return "";
       }
 
       @SuppressWarnings("rawtypes")
