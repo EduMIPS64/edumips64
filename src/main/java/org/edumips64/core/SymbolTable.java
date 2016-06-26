@@ -97,7 +97,7 @@ public class SymbolTable {
   /** Adds to the Symbol Table, at the specified address, the given
    * instruction with the given label.
    */
-  public void setInstructionLabel(int address, String label) throws SameLabelsException, SymbolTableOverflowException {
+  public void setInstructionLabel(int address, String label) throws SameLabelsException {
     if (label != null && !label.equals("")) {
       if (instr_labels.containsKey(label)) {
         throw new SameLabelsException();
@@ -105,6 +105,10 @@ public class SymbolTable {
 
       instr_labels.put(label, address);
       Instruction temp = mem.getInstruction(address);
+      if (temp == null) {
+        // TODO: throw exception?
+        logger.severe("No instruction at address " + address);
+      }
       // TODO: attualmente l'istruzione si prende l'ultima etichetta
       temp.setLabel(label);
       logger.info("Added instruction label " + label + " to address " + address);

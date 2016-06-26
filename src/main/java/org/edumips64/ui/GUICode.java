@@ -163,13 +163,7 @@ public class GUICode extends GUIComponent {
           }
         }
 
-        Instruction instruction = null;
-        try {
-          instruction = memory.getInstruction(row * 4);
-        } catch (SymbolTableOverflowException e) {
-          e.printStackTrace();
-        }
-
+        Instruction instruction = memory.getInstruction(row * 4);
         if (instruction == null) {
             return "";
         }

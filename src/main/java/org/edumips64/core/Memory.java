@@ -23,9 +23,13 @@
 
 package org.edumips64.core;
 
-import org.edumips64.utils.*;
-import java.util.*;
-import org.edumips64.core.is.*;
+import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.Instruction;
+import org.edumips64.utils.Converter;
+import org.edumips64.utils.IrregularStringOfBitsException;
+
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 /**  This class models the main memory of a computer, with 64-bit elements (that is 8 byte).
@@ -153,10 +157,11 @@ public class Memory {
     instructions.put(listIndex, i);
   }
 
-  public Instruction getInstruction(int address) throws SymbolTableOverflowException {
+  // Returns null if there is no instruction at the given address.
+  public Instruction getInstruction(int address) {
     int index = address / 4;
     if (!instructions.containsKey(index)) {
-      addInstruction(InstructionBuilder.buildInstruction("BUBBLE"), address);
+      return null;
     }
     return instructions.get(address / 4);
   }
