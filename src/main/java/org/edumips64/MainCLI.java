@@ -40,8 +40,7 @@ public class MainCLI {
 
     try {
       LocalFileUtils lfu = new LocalFileUtils();
-      Parser.createInstance(lfu);
-      Parser p = Parser.getInstance();
+      Parser p = new Parser(lfu);
       CPU c = CPU.getInstance();
       c.setStatus(CPU.CPUStatus.READY);
 

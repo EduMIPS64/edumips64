@@ -72,8 +72,7 @@ public class WebUi implements EntryPoint {
     config = ConfigManager.getTmpConfig();
     ConfigManager.setConfig(config);
     fu = new NullFileUtils();
-    Parser.createInstance(fu);
-    parser = Parser.getInstance();
+    parser = new Parser(fu);
     cpu = CPU.getInstance();
   }
 }

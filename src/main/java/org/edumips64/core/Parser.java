@@ -82,20 +82,10 @@ public class Parser {
   private FileUtils fileUtils;
 
   /** Public methods */
-
-  /** Initializes the Parser with a given FileUtils instance.
-   *
-   * MUST be used before calling getInstance().
-   * TODO(andrea): use proper dependency injection. */
-  public static void createInstance(FileUtils f) {
-    instance = new Parser(f);
-  }
-
-  /** Singleton Pattern implementation
-   *  @return get the Singleton instance of the Parser
-   */
-  public static Parser getInstance() {
-    return instance;
+  public Parser(FileUtils utils) {
+    symTab = SymbolTable.getInstance();
+    CPU.getInstance();
+    this.fileUtils = utils;
   }
 
   /** Loading from File
@@ -120,15 +110,6 @@ public class Parser {
   }
 
   /** Private methods */
-
-  /** Singleton pattern constructor
-   */
-  private Parser(FileUtils utils) {
-    symTab = SymbolTable.getInstance();
-    CPU.getInstance();
-    this.fileUtils = utils;
-  }
-
   private String fileToString(String filename) throws ReadException {
     return fileUtils.ReadFile(filename);
   }

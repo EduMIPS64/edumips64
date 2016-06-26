@@ -249,8 +249,7 @@ public class Main extends JApplet {
     cgt = new CPUGUIThread();
     cgt.start();
 
-    Parser.createInstance(lfu);
-    parser = Parser.getInstance();
+    parser = new Parser(lfu);
 
     // Internal Frames
     JInternalFrame pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);

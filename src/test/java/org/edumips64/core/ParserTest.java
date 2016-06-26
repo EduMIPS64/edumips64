@@ -13,10 +13,7 @@ public class ParserTest {
   @Before
   public void setUp() throws Exception {
      ConfigManager.setConfig(config);
-     
-     // Refresh the Parser instance.
-     Parser.createInstance(new LocalFileUtils());
-     parser = Parser.getInstance();
+     parser = new Parser(new LocalFileUtils());
   }
   /** Allows easier testing of .data section contents by adding the ".data" prefix and the "\n.code\nSYSCALL 0" suffix. */
   void ParseData(String dataSectionContents) throws Exception {

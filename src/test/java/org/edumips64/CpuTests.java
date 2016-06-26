@@ -30,6 +30,7 @@ import org.edumips64.core.is.*;
 import org.edumips64.ui.CycleBuilder;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigManager;
+import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.LocalWriter;
 
@@ -49,7 +50,6 @@ import static org.hamcrest.CoreMatchers.*;
 @RunWith(JUnit4.class)
 public class CpuTests {
   private CPU cpu;
-  private LocalFileUtils lfu;
   private Parser parser;
   private static String testsLocation = "build/resources/test/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
@@ -119,10 +119,9 @@ public class CpuTests {
     ConfigManager.setConfig(config);
     cpu = CPU.getInstance();
     cpu.setStatus(CPU.CPUStatus.READY);
-    lfu = new LocalFileUtils();
+    FileUtils lfu = new LocalFileUtils();
     IOManager.createInstance(lfu);
-    Parser.createInstance(lfu);
-    parser = Parser.getInstance();
+    parser  = new Parser(lfu);
     Instruction.setEnableForwarding(true);
     fec = new FPUExceptionsConfig();
   }
