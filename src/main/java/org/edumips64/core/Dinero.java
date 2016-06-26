@@ -101,20 +101,8 @@ public class Dinero {
   }
   /** Calculate the offset */
   public void findOffset() {
-    int i;
-
-    for (i = 0; i < CPU.CODELIMIT; i++) {
-      try {
-        if (Memory.getInstance().getInstruction(i * 4).getName().equals(" ")) {
-          break;
-        }
-      } catch (SymbolTableOverflowException ex) {
-        // This should never happen, since the bounds checked in getInstruction are upper-limited by CPU.CODELIMIT.
-        ex.printStackTrace();
-      }
-    }
-
-    offset = i * 4;
+    int instructionsCount = Memory.getInstance().getInstructionsNumber();
+    offset = instructionsCount * 4;
     offset += offset % 8;
   }
 
