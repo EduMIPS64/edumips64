@@ -58,6 +58,8 @@ class VoidJump {
 public class Parser {
   /** Instance variables */
   private static final Logger logger = Logger.getLogger(Parser.class.getName());
+  private final Memory mem;
+
   private enum AliasRegister
   {zero, at, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, k0, k1, gp, sp, fp, ra}
   private static final String deprecateInstruction[] = {"BNEZ", "BEQZ", "HALT", "DADDUI", "L.D", "S.D"};
@@ -86,6 +88,7 @@ public class Parser {
     symTab = SymbolTable.getInstance();
     CPU.getInstance();
     this.fileUtils = utils;
+    mem = Memory.getInstance();
   }
 
   /** Loading from File
@@ -203,8 +206,6 @@ public class Parser {
     warning = new ParserMultiWarningException();
 
     LinkedList<VoidJump> voidJump = new LinkedList<VoidJump>();
-
-    Memory mem = Memory.getInstance();
 
     memoryCount = 0;
     String lastLabel = "";
@@ -1373,7 +1374,6 @@ public class Parser {
    *  @param instr params
    */
   private void writeDoubleInMemory(int row,  int i, int end, String line, String instr) throws MemoryElementNotFoundException {
-    Memory mem = Memory.getInstance();
     String value[] = instr.split(",");
     MemoryElement tmpMem;
 
@@ -1409,7 +1409,6 @@ public class Parser {
    *  @param name type of data
    */
   private void writeIntegerInMemory(int row,  int i, int end, String line, String instr, int numBit, String name) throws MemoryElementNotFoundException {
-    Memory mem = Memory.getInstance();
     int posInWord = 0; //position of byte to write into a doubleword
     String value[] = instr.split(",");
     MemoryElement tmpMem = null;
