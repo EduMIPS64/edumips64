@@ -152,44 +152,45 @@ public class GUICode extends GUIComponent {
       }
 
       public Object getValueAt(int row, int col) {
+        Instruction instruction;
         try {
-          switch (col) {
-          case 0:
+          instruction = memory.getInstruction(row * 4);
+        } catch (SymbolTableOverflowException e) {
+          e.printStackTrace();
+          return new Object();
+        }
 
+        switch (col) {
+          case 0:
             try {
               return Converter.binToHex(Converter.positiveIntToBin(16, row * 4));
             } catch (IrregularStringOfBitsException ex) {
               ex.printStackTrace();
             }
-
             break;
-          case 1:
 
+          case 1:
             try {
-              return memory.getInstruction(row * 4).getRepr().getHexString();
+              return instruction.getRepr().getHexString();
             } catch (IrregularStringOfBitsException ex) {
               ex.printStackTrace();
             }
-
             break;
-          case 2:
-            String label = memory.getInstruction(row * 4).getLabel();
-            return label;
-          case 3:
-            return memory.getInstruction(row * 4).getFullName();
-          case 4:
 
-            if (memory.getInstruction(row * 4).getComment() != null) {
-              return ";" + memory.getInstruction(row * 4).getComment();
-            } else {
-              return "";
+          case 2:
+            return instruction.getLabel();
+
+          case 3:
+            return instruction.getFullName();
+
+          case 4:
+            if (instruction.getComment() != null) {
+              return ";" + instruction.getComment();
             }
+            return "";
 
           default:
             return new Object();
-          }
-        } catch (SymbolTableOverflowException ex) {
-          ex.printStackTrace();
         }
 
         return new Object();
