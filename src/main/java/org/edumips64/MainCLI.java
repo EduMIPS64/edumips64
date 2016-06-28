@@ -95,7 +95,7 @@ public class MainCLI {
             } else if (tokens[1].compareToIgnoreCase("memory") == 0) {
               System.out.println(Memory.getInstance());
             } else if (tokens[1].compareToIgnoreCase("symbols") == 0) {
-              System.out.println(c.getSymbolTable());
+              System.out.println(SymbolTable.getInstance());
             } else if (tokens[1].compareToIgnoreCase("pipeline") == 0) {
               System.out.println(c.pipeLineString());
             } else {

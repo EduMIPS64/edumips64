@@ -98,7 +98,6 @@ public class CPU {
 
   /** CPU pipeline, each stage contains an Instruction object*/
   private Map<PipeStage, Instruction> pipe;
-  private SymbolTable symTable;
 
   /** The current stage of the pipeline.*/
   private PipeStage currentPipeStage;
@@ -131,8 +130,6 @@ public class CPU {
     status = CPUStatus.READY;
     mem = Memory.getInstance();
     logger.info("Got Memory instance..");
-    symTable = SymbolTable.getInstance();
-    logger.info("Got SymbolTable instance..");
 
     // Registers initialization
     gpr = new Register[32];
@@ -239,10 +236,6 @@ public class CPU {
 
   public RegisterFP[] getRegistersFP() {
     return fpr;
-  }
-
-  public SymbolTable getSymbolTable() {
-    return symTable;
   }
 
   /** This method returns a specific GPR
@@ -796,9 +789,6 @@ public class CPU {
     clearPipe();
     // Reset FP pipeline
     fpPipe.reset();
-
-    // Reset Symbol table
-    symTable.reset();
 
     // Reset tracefile
     Dinero.getInstance().reset();

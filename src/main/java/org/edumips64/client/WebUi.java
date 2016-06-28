@@ -7,6 +7,7 @@ import jsinterop.annotations.JsType;
 import org.edumips64.core.CPU;
 import org.edumips64.core.Memory;
 import org.edumips64.core.Parser;
+import org.edumips64.core.SymbolTable;
 import org.edumips64.core.is.HaltException;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigManager;
@@ -28,6 +29,7 @@ public class WebUi implements EntryPoint {
     logger.info("Running program: " + code);
     try {
       cpu.reset();
+      SymbolTable.getInstance().reset();
       logger.info("About to parse it.");
       parser.doParsing(code);
       logger.info("Parsed. Running.");
