@@ -22,12 +22,32 @@
  */
 
 package org.edumips64.core;
-import org.edumips64.core.fpu.*;
-import java.util.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import org.edumips64.core.is.*;
-import org.edumips64.utils.*;
+
+import org.edumips64.core.fpu.EXNotAvailableException;
+import org.edumips64.core.fpu.FPDividerNotAvailableException;
+import org.edumips64.core.fpu.FPFunctionalUnitNotAvailableException;
+import org.edumips64.core.fpu.FPInvalidOperationException;
+import org.edumips64.core.fpu.FPPipeline;
+import org.edumips64.core.fpu.MemoryNotAvailableException;
+import org.edumips64.core.is.AddressErrorException;
+import org.edumips64.core.is.BUBBLE;
+import org.edumips64.core.is.BreakException;
+import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.Instruction;
+import org.edumips64.core.is.JumpException;
+import org.edumips64.core.is.RAWException;
+import org.edumips64.core.is.TwosComplementSumException;
+import org.edumips64.core.is.WAWException;
+import org.edumips64.utils.ConfigManager;
+import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.FPUConfigurator;
+import org.edumips64.utils.IrregularStringOfBitsException;
 
 /** This class models a MIPS CPU with 32 64-bit General Purpose Registers.
 *  @author Andrea Spadaccini, Simona Ullo, Antonella Scandura, Massimo Trubia (FPU modifications)
@@ -95,14 +115,16 @@ public class CPU {
   /** Statistics */
   private int cycles, instructions, RAWStalls, WAWStalls, dividerStalls, funcUnitStalls, memoryStalls, exStalls;
 
+  /** BUBBLE */
+  private Instruction bubble;
+
   /** Static initializer */
   static {
     cpu = null;
   }
   private CPU() {
+    bubble = new BUBBLE();
     config = ConfigManager.getConfig();
-    // To avoid future singleton problems
-    InstructionBuilder.buildInstruction("BUBBLE");
 
     logger.info("Creating the CPU...");
     cycles = 0;
@@ -446,7 +468,7 @@ public class CPU {
       // put in the IF stage the instruction the PC points to
       pipe.put(PipeStage.IF, mem.getInstruction(pc));
       pipe.put(PipeStage.EX, pipe.get(PipeStage.ID));
-      pipe.put(PipeStage.ID, InstructionBuilder.buildInstruction("BUBBLE"));
+      pipe.put(PipeStage.ID, bubble);
       old_pc.writeDoubleWord((pc.getValue()));
       pc.writeDoubleWord((pc.getValue()) + 4);
 
@@ -456,7 +478,7 @@ public class CPU {
 
     } catch (RAWException ex) {
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, InstructionBuilder.buildInstruction("BUBBLE"));
+        pipe.put(PipeStage.EX, bubble);
       }
 
       RAWStalls++;
@@ -470,7 +492,7 @@ public class CPU {
       logger.info(fpPipe.toString());
 
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, InstructionBuilder.buildInstruction("BUBBLE"));
+        pipe.put(PipeStage.EX, bubble);
       }
 
       WAWStalls++;
@@ -481,7 +503,7 @@ public class CPU {
       }
     } catch (FPDividerNotAvailableException ex) {
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, InstructionBuilder.buildInstruction("BUBBLE"));
+        pipe.put(PipeStage.EX, bubble);
       }
 
       dividerStalls++;
@@ -492,7 +514,7 @@ public class CPU {
 
     } catch (FPFunctionalUnitNotAvailableException ex) {
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, InstructionBuilder.buildInstruction("BUBBLE"));
+        pipe.put(PipeStage.EX, bubble);
       }
 
       funcUnitStalls++;
@@ -552,7 +574,7 @@ public class CPU {
       logger.info("Putting " + next_if + "in IF.");
       pipe.put(PipeStage.IF, next_if);
     } else {
-      pipe.put(PipeStage.ID, InstructionBuilder.buildInstruction("BUBBLE"));
+      pipe.put(PipeStage.ID, bubble);
     }
 
     if (breaking) {
