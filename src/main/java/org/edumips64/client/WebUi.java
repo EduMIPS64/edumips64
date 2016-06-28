@@ -6,6 +6,7 @@ import jsinterop.annotations.JsType;
 
 import org.edumips64.core.*;
 import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.io.FileUtils;
@@ -21,6 +22,7 @@ public class WebUi implements EntryPoint {
   private FileUtils fu;
   private SymbolTable symTab;
   private Memory memory;
+  private InstructionBuilder instructionBuilder;
 
   // Executes the program. Returns an empty string on success, or an error message.
   public String runProgram(String code) {
@@ -76,7 +78,8 @@ public class WebUi implements EntryPoint {
     memory = Memory.getInstance();
     symTab = new SymbolTable(memory);
     fu = new NullFileUtils();
-    parser = new Parser(fu, symTab, memory);
+    instructionBuilder = new InstructionBuilder(memory);
+    parser = new Parser(fu, symTab, memory, instructionBuilder);
     cpu = CPU.getInstance();
   }
 }

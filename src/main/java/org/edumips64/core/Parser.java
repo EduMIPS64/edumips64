@@ -83,12 +83,14 @@ public class Parser {
   private String filename;
   private SymbolTable symTab;
   private FileUtils fileUtils;
+  private InstructionBuilder instructionBuilder;
 
   /** Public methods */
-  public Parser(FileUtils utils, SymbolTable symTab, Memory memory) {
+  public Parser(FileUtils utils, SymbolTable symTab, Memory memory, InstructionBuilder instructionBuilder) {
     this.symTab = symTab;
     this.fileUtils = utils;
     this.mem = memory;
+    this.instructionBuilder = instructionBuilder;
   }
 
   /** Loading from File
@@ -499,7 +501,7 @@ public class Parser {
                 }
               }
 
-              tmpInst = InstructionBuilder.buildInstruction(line.substring(i, end).toUpperCase());
+              tmpInst = instructionBuilder.buildInstruction(line.substring(i, end).toUpperCase());
 
               if (tmpInst == null) {
                 numError++;
@@ -1179,7 +1181,7 @@ public class Parser {
 
       try {
         logger.warning("No terminating instruction detected, adding one.");
-        Instruction tmpInst = InstructionBuilder.buildInstruction("SYSCALL");
+        Instruction tmpInst = instructionBuilder.buildInstruction("SYSCALL");
         tmpInst.getParams().add(0);
         tmpInst.setFullName("SYSCALL 0");
 

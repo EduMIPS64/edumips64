@@ -1,5 +1,6 @@
 package org.edumips64.core;
 
+import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;
@@ -10,6 +11,7 @@ public class ParserTest {
   private Parser parser;
   private Memory memory;
   private SymbolTable symTab;
+  private InstructionBuilder instructionBuilder;
   private ConfigStore config = ConfigManager.getTmpConfig();
 
   @Before
@@ -17,7 +19,8 @@ public class ParserTest {
      ConfigManager.setConfig(config);
      memory = Memory.getInstance();
      symTab = new SymbolTable(memory);
-     parser = new Parser(new LocalFileUtils(), symTab, memory);
+     instructionBuilder = new InstructionBuilder(memory);
+     parser = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
   }
   /** Allows easier testing of .data section contents by adding the ".data" prefix and the "\n.code\nSYSCALL 0" suffix. */
   void ParseData(String dataSectionContents) throws Exception {

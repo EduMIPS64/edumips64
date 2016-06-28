@@ -23,6 +23,7 @@
 package org.edumips64;
 
 import org.edumips64.core.*;
+import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.img.*;
 import org.edumips64.ui.*;
 import org.edumips64.utils.*;
@@ -57,6 +58,7 @@ public class Main extends JApplet {
   static Parser parser;
   static SymbolTable symTab;
   static Memory memory;
+  static InstructionBuilder instructionBuilder;
   static GUIFrontend front;
   static ConfigStore configStore;
   static JFileChooser jfc;
@@ -253,7 +255,8 @@ public class Main extends JApplet {
 
     memory = Memory.getInstance();
     symTab = new SymbolTable(memory);
-    parser = new Parser(lfu, symTab, memory);
+    instructionBuilder = new InstructionBuilder(memory);
+    parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
     // Internal Frames
     JInternalFrame pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);

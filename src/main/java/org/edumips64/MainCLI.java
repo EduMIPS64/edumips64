@@ -42,7 +42,8 @@ public class MainCLI {
       LocalFileUtils lfu = new LocalFileUtils();
       Memory m = Memory.getInstance();
       SymbolTable symTab = new SymbolTable(m);
-      Parser p = new Parser(lfu, symTab, m);
+      InstructionBuilder instructionBuilder = new InstructionBuilder(m);
+      Parser p = new Parser(lfu, symTab, m, instructionBuilder);
       CPU c = CPU.getInstance();
       c.setStatus(CPU.CPUStatus.READY);
 

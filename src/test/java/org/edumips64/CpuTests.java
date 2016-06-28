@@ -53,6 +53,7 @@ public class CpuTests {
   private Parser parser;
   private Memory memory;
   private SymbolTable symTab;
+  private InstructionBuilder instructionBuilder;
   private static String testsLocation = "build/resources/test/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
   private Dinero dinero = Dinero.getInstance();
@@ -125,7 +126,8 @@ public class CpuTests {
     symTab = new SymbolTable(memory);
     FileUtils lfu = new LocalFileUtils();
     IOManager.createInstance(lfu);
-    parser  = new Parser(lfu, symTab, memory);
+    instructionBuilder = new InstructionBuilder(memory);
+    parser  = new Parser(lfu, symTab, memory, instructionBuilder);
     Instruction.setEnableForwarding(true);
     fec = new FPUExceptionsConfig();
   }
