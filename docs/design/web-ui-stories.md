@@ -7,7 +7,7 @@ MIPS64 simulator. The context is always a desktop web interface, unless
 specified.
 
 Stories will be addressed with the initial of their section and then the
-number of the story (e.g., `BREAK support` is `E.7`).
+number of the story (e.g., `BREAK support` is `E.6`).
 
 In terms of priority, `P.*` need to be done before any other work is done.
 
