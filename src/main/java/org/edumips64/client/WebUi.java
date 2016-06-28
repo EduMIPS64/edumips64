@@ -19,6 +19,8 @@ public class WebUi implements EntryPoint {
   private Parser parser;
   private ConfigStore config;
   private FileUtils fu;
+  private SymbolTable symTab;
+  private Memory memory;
 
   // Executes the program. Returns an empty string on success, or an error message.
   public String runProgram(String code) {
@@ -27,7 +29,7 @@ public class WebUi implements EntryPoint {
     try {
       cpu.reset();
       Dinero.getInstance().reset();
-      SymbolTable.getInstance().reset();
+      symTab.reset();
       logger.info("About to parse it.");
       parser.doParsing(code);
       logger.info("Parsed. Running.");
@@ -71,8 +73,10 @@ public class WebUi implements EntryPoint {
     // Simulator initialization.
     config = ConfigManager.getTmpConfig();
     ConfigManager.setConfig(config);
+    memory = Memory.getInstance();
+    symTab = new SymbolTable(memory);
     fu = new NullFileUtils();
-    parser = new Parser(fu);
+    parser = new Parser(fu, symTab, memory);
     cpu = CPU.getInstance();
   }
 }

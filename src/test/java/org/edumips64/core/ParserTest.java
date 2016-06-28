@@ -8,12 +8,16 @@ import org.junit.Test;
 
 public class ParserTest {
   private Parser parser;
+  private Memory memory;
+  private SymbolTable symTab;
   private ConfigStore config = ConfigManager.getTmpConfig();
 
   @Before
   public void setUp() throws Exception {
      ConfigManager.setConfig(config);
-     parser = new Parser(new LocalFileUtils());
+     memory = Memory.getInstance();
+     symTab = new SymbolTable(memory);
+     parser = new Parser(new LocalFileUtils(), symTab, memory);
   }
   /** Allows easier testing of .data section contents by adding the ".data" prefix and the "\n.code\nSYSCALL 0" suffix. */
   void ParseData(String dataSectionContents) throws Exception {

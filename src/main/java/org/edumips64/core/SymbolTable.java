@@ -24,12 +24,11 @@
 
 package org.edumips64.core;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
-import org.edumips64.core.is.*;
-import org.edumips64.utils.*;
-import org.edumips64.core.MemoryElementNotFoundException;
+import org.edumips64.core.is.Instruction;
 
 /** This class acts as a proxy to retrieve memory cells and instruction from
 * labels
@@ -41,12 +40,12 @@ public class SymbolTable {
   private Map<String, Integer> mem_labels;
   private Map<String, Integer> instr_labels;
 
-  private Memory mem = null;
+  private Memory mem;
 
-  private SymbolTable() {
-    mem_labels = new HashMap<String, Integer>();
-    instr_labels = new HashMap<String, Integer>();
-    mem = Memory.getInstance();
+  public SymbolTable(Memory memory) {
+    mem_labels = new HashMap<>();
+    instr_labels = new HashMap<>();
+    this.mem = memory;
   }
 
   public void setCellLabel(int address, String label) throws SameLabelsException, MemoryElementNotFoundException {
@@ -81,17 +80,6 @@ public class SymbolTable {
     int address = mem_labels.get(label);
     logger.info("Label found at address " + address);
     return mem.getCellByAddress(address);
-  }
-
-  /** Singleton pattern: This method returns the unique instance of SymbolTable.
-  *  @return the unique instance of SymbolTable
-  */
-  public static SymbolTable getInstance() {
-    if (symTable == null) {
-      symTable = new SymbolTable();
-    }
-
-    return symTable;
   }
 
   /** Adds to the Symbol Table, at the specified address, the given

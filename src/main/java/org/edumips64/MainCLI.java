@@ -40,7 +40,9 @@ public class MainCLI {
 
     try {
       LocalFileUtils lfu = new LocalFileUtils();
-      Parser p = new Parser(lfu);
+      Memory m = Memory.getInstance();
+      SymbolTable symTab = new SymbolTable(m);
+      Parser p = new Parser(lfu, symTab, m);
       CPU c = CPU.getInstance();
       c.setStatus(CPU.CPUStatus.READY);
 
@@ -93,9 +95,9 @@ public class MainCLI {
                 System.out.println(c.getRegister(Integer.parseInt(tokens[2])));
               }
             } else if (tokens[1].compareToIgnoreCase("memory") == 0) {
-              System.out.println(Memory.getInstance());
+              System.out.println(m);
             } else if (tokens[1].compareToIgnoreCase("symbols") == 0) {
-              System.out.println(SymbolTable.getInstance());
+              System.out.println(symTab);
             } else if (tokens[1].compareToIgnoreCase("pipeline") == 0) {
               System.out.println(c.pipeLineString());
             } else {

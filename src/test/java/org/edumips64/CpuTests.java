@@ -51,6 +51,8 @@ import static org.hamcrest.CoreMatchers.*;
 public class CpuTests {
   private CPU cpu;
   private Parser parser;
+  private Memory memory;
+  private SymbolTable symTab;
   private static String testsLocation = "build/resources/test/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
   private Dinero dinero = Dinero.getInstance();
@@ -119,9 +121,11 @@ public class CpuTests {
     ConfigManager.setConfig(config);
     cpu = CPU.getInstance();
     cpu.setStatus(CPU.CPUStatus.READY);
+    memory = Memory.getInstance();
+    symTab = new SymbolTable(memory);
     FileUtils lfu = new LocalFileUtils();
     IOManager.createInstance(lfu);
-    parser  = new Parser(lfu);
+    parser  = new Parser(lfu, symTab, memory);
     Instruction.setEnableForwarding(true);
     fec = new FPUExceptionsConfig();
   }
@@ -140,7 +144,7 @@ public class CpuTests {
     log.warning("================================= Starting test " + testPath);
     cpu.reset();
     Dinero.getInstance().reset();
-    SymbolTable.getInstance().reset();
+    symTab.reset();
     testPath = testsLocation + testPath;
     CycleBuilder builder = new CycleBuilder();
 
@@ -175,7 +179,7 @@ public class CpuTests {
     } finally {
       cpu.reset();
       Dinero.getInstance().reset();
-      SymbolTable.getInstance().reset();
+      symTab.reset();
     }
   }
 

@@ -55,6 +55,8 @@ public class Main extends JApplet {
   public static CPUGUIThread cgt;
   static LocalFileUtils lfu;
   static Parser parser;
+  static SymbolTable symTab;
+  static Memory memory;
   static GUIFrontend front;
   static ConfigStore configStore;
   static JFileChooser jfc;
@@ -249,7 +251,9 @@ public class Main extends JApplet {
     cgt = new CPUGUIThread();
     cgt.start();
 
-    parser = new Parser(lfu);
+    memory = Memory.getInstance();
+    symTab = new SymbolTable(memory);
+    parser = new Parser(lfu, symTab, memory);
 
     // Internal Frames
     JInternalFrame pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);
@@ -450,7 +454,7 @@ public class Main extends JApplet {
   private static void openFile(String file) {
     log.info("Trying to open " + file);
     cpu.reset();
-    SymbolTable.getInstance().reset();
+    symTab.reset();
     Dinero.getInstance().reset();
 
     try {
@@ -473,7 +477,7 @@ public class Main extends JApplet {
         log.info("NullPointerException: " + e.toString());
         e.printStackTrace();
       } finally {
-        log.info(SymbolTable.getInstance().toString());
+        log.info(symTab.toString());
       }
 
       log.info("After parsing");
@@ -603,7 +607,7 @@ public class Main extends JApplet {
 
   public static void resetSimulator(boolean reopenFile) {
     cpu.reset();
-    SymbolTable.getInstance().reset();
+    symTab.reset();
     Dinero.getInstance().reset();
 
     try {

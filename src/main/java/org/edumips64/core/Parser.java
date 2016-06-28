@@ -85,10 +85,10 @@ public class Parser {
   private FileUtils fileUtils;
 
   /** Public methods */
-  public Parser(FileUtils utils) {
-    symTab = SymbolTable.getInstance();
+  public Parser(FileUtils utils, SymbolTable symTab, Memory memory) {
+    this.symTab = symTab;
     this.fileUtils = utils;
-    mem = Memory.getInstance();
+    this.mem = memory;
   }
 
   /** Loading from File
