@@ -4,10 +4,7 @@ import com.google.gwt.core.client.EntryPoint;
 
 import jsinterop.annotations.JsType;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.Memory;
-import org.edumips64.core.Parser;
-import org.edumips64.core.SymbolTable;
+import org.edumips64.core.*;
 import org.edumips64.core.is.HaltException;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigManager;
@@ -29,6 +26,7 @@ public class WebUi implements EntryPoint {
     logger.info("Running program: " + code);
     try {
       cpu.reset();
+      Dinero.getInstance().reset();
       SymbolTable.getInstance().reset();
       logger.info("About to parse it.");
       parser.doParsing(code);

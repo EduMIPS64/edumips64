@@ -139,6 +139,7 @@ public class CpuTests {
   private CpuTestStatus runMipsTest(String testPath) throws Exception {
     log.warning("================================= Starting test " + testPath);
     cpu.reset();
+    Dinero.getInstance().reset();
     SymbolTable.getInstance().reset();
     testPath = testsLocation + testPath;
     CycleBuilder builder = new CycleBuilder();
@@ -173,6 +174,7 @@ public class CpuTests {
       return new CpuTestStatus(cpu, tmp.getAbsolutePath());
     } finally {
       cpu.reset();
+      Dinero.getInstance().reset();
       SymbolTable.getInstance().reset();
     }
   }

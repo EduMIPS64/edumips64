@@ -451,6 +451,7 @@ public class Main extends JApplet {
     log.info("Trying to open " + file);
     cpu.reset();
     SymbolTable.getInstance().reset();
+    Dinero.getInstance().reset();
 
     try {
       // Aggiorniamo i componenti gai
@@ -603,6 +604,7 @@ public class Main extends JApplet {
   public static void resetSimulator(boolean reopenFile) {
     cpu.reset();
     SymbolTable.getInstance().reset();
+    Dinero.getInstance().reset();
 
     try {
       iom.reset();

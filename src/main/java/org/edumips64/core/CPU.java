@@ -790,9 +790,6 @@ public class CPU {
     // Reset FP pipeline
     fpPipe.reset();
 
-    // Reset tracefile
-    Dinero.getInstance().reset();
-
     logger.info("CPU Resetted");
     config = ConfigManager.getConfig();
   }
