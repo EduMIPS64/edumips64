@@ -30,6 +30,7 @@
 package org.edumips64.core;
 
 import org.edumips64.core.fpu.FPInstructionUtils;
+
 import org.edumips64.core.fpu.FPOverflowException;
 import org.edumips64.core.fpu.FPUnderflowException;
 import org.edumips64.core.is.Instruction;
@@ -86,7 +87,6 @@ public class Parser {
   /** Public methods */
   public Parser(FileUtils utils) {
     symTab = SymbolTable.getInstance();
-    CPU.getInstance();
     this.fileUtils = utils;
     mem = Memory.getInstance();
   }
