@@ -13,8 +13,10 @@ notifications:
 language: java
 python:
 - "2.7"
-node_js:
-- "5"
+before_install:
+- . $HOME/.nvm/nvm.sh
+- nvm install 5
+- nvm use 5
 install: 
 - "sudo pip install Sphinx==1.1.3 && gradle getLibs"
 - "npm install -g bower gulp && cd src/main/web && npm install && bower install"
