@@ -29,3 +29,11 @@ span.capitalize,
 strong.capitalize {
     display: inline-block;
 }
+div[ui-ace] {
+    position:absolute;
+    top:0;
+    bottom:48px;
+    right:0;
+    left:0;
+    font-size: 16px;
+}

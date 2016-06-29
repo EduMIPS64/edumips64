@@ -1,8 +1,11 @@
 <md-toolbar layout="row">
     <div class="md-toolbar-tools">
+        <!--
         <div style="background:white;border-radius:4px;padding:5px 5px 0px 5px">
             <img src="http://www.edumips.org/images/edumips64-logo.png" height="24" alt="logo">
         </div>
+        -->
+        <img src="images/logo.png" height="32" alt="logo">
         <span flex></span>
         <md-button class="md-icon-button" aria-label="open">
             <md-icon md-svg-icon="images/cloud_upload.svg"></md-icon>
@@ -26,7 +29,7 @@
             <md-grid-tile-header>
                 <h3 translate>{{'UNSAVED' | translate}}</h3>
             </md-grid-tile-header>
-            <div ui-ace="{ showGutter: true, onChange: app.editorChanged }" style="position:absolute;top:0;bottom:48px;right:0;left:0"></div>
+            <div ui-ace="{ showGutter: true, onChange: app.editorChanged }"></div>
             <md-grid-tile-footer>
                 <h3>{{app.locs}} {{'LOCS' | translate}}</h3>
             </md-grid-tile-footer>
