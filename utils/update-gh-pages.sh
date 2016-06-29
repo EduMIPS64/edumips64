@@ -6,9 +6,9 @@ set -u
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   if [[ "$JAVA_HOME" == *java-8* ]]; then
-    echo "Java 8 worker, should update JAR on GitHub pages"
+    echo "Java 8 worker, should update GitHub pages (JAR or web UI)"
   else
-    echo "Non-java 8 worker. Not updating JAR"
+    echo "Non-java 8 worker. Not updating Github pages"
     echo "JAVA_HOME=${JAVA_HOME}"
     exit 0
   fi
@@ -31,7 +31,7 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     echo "done."
 	  cd gh-pages
 	  mv $HOME/edumips64-latest.jar .
-  elif ["$TRAVIS_BRANCH" == "webui-prototype"]; then
+  elif [ "$TRAVIS_BRANCH" == "webui-prototype" ]; then
     echo -n "Copying web UI..."
 	  cd gh-pages
     rm -rf webui  
@@ -39,7 +39,7 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     cp -Rf $HOME/webui/* ./webui  
     echo "done."
   else
-    echo "Non-master branch: $GIT_BRANCH. Not updating the JAR."
+    echo "Non-master branch: $TRAVIS_BRANCH. Not updating the JAR."
     return 0
   fi
 
