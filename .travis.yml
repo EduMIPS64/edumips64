@@ -25,10 +25,10 @@ before_install:
 - nvm use 5
 install: 
 - "sudo pip install Sphinx==1.1.3 && gradle getLibs"
-- "npm install -g bower gulp && cd src/main/web && npm install && bower install"
+- "npm install -g bower gulp && cd src/main/web && npm install && bower install && cd ../../.."
 script:
 - "ant test"
-- gulp
+- "cd src/main/web && gulp && cd ../../.."
 jdk:
 - oraclejdk8
 after_success: ./utils/update-gh-pages.sh
