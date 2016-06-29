@@ -12,6 +12,8 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     echo "JAVA_HOME=${JAVA_HOME}"
     exit 0
   fi
+  
+  cp -R src/main/web/dist $HOME/webui
 
   echo -n "Cloning git repo.. "
   cd $HOME
@@ -19,11 +21,6 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   git config --global user.name "Travis"
   git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/lupino3/edumips64.git gh-pages > /dev/null
   echo "done."
-  
-  echo -n "Copying web UI..."
-  rm -rf gh-pages/webui  
-  mkdir gh-pages/webui
-  cp -r src/main/web/dist/* gh-pages/webui
   
   GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
@@ -35,9 +32,15 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
 	cd gh-pages
 	mv $HOME/edumips64-latest.jar .
   else
+	cd gh-pages
     echo "Non-master branch: $GIT_BRANCH. Not updating the JAR."
   fi
 
+  echo -n "Copying web UI..."
+  rm -rf webui  
+  mkdir webui
+  cp -Rf $HOME/webui/* ./webui  
+  
   # Add, commit and push files.
   echo -n "Committing files.. "
   git add -f .
