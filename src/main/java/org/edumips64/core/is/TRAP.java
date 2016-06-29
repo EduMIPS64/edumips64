@@ -28,8 +28,8 @@ import org.edumips64.utils.*;
  * @author Andrea Spadaccini
  */
 public class TRAP extends SYSCALL {
-  public TRAP(Memory memory) {
-    super(memory);
+  public TRAP(Memory memory, IOManager iom) {
+    super(memory, iom);
     this.name = "TRAP";
   }
 }

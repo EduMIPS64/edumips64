@@ -39,11 +39,12 @@ public class MainCLI {
     CurrentLocale.setLanguage("en");
 
     try {
-      LocalFileUtils lfu = new LocalFileUtils();
-      Memory m = Memory.getInstance();
-      SymbolTable symTab = new SymbolTable(m);
-      InstructionBuilder instructionBuilder = new InstructionBuilder(m);
-      Parser p = new Parser(lfu, symTab, m, instructionBuilder);
+      LocalFileUtils localFileUtils = new LocalFileUtils();
+      Memory memory = Memory.getInstance();
+      SymbolTable symTab = new SymbolTable(memory);
+      IOManager iom = new IOManager(localFileUtils, memory);
+      InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom);
+      Parser p = new Parser(localFileUtils, symTab, memory, instructionBuilder);
       CPU c = CPU.getInstance();
       c.setStatus(CPU.CPUStatus.READY);
 
@@ -96,7 +97,7 @@ public class MainCLI {
                 System.out.println(c.getRegister(Integer.parseInt(tokens[2])));
               }
             } else if (tokens[1].compareToIgnoreCase("memory") == 0) {
-              System.out.println(m);
+              System.out.println(memory);
             } else if (tokens[1].compareToIgnoreCase("symbols") == 0) {
               System.out.println(symTab);
             } else if (tokens[1].compareToIgnoreCase("pipeline") == 0) {

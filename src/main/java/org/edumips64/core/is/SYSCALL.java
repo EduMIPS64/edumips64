@@ -42,12 +42,12 @@ public class SYSCALL extends Instruction {
   private IOManager iom;
   private Memory memory;
 
-  public SYSCALL(Memory memory) {
+  public SYSCALL(Memory memory, IOManager iom) {
     this.syntax = "%U";
     this.paramCount = 1;
     this.name = "SYSCALL";
     din = Dinero.getInstance();
-    iom = IOManager.getInstance();
+    this.iom = iom;
     this.memory = memory;
   }
 

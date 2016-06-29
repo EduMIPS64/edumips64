@@ -23,6 +23,7 @@ public class WebUi implements EntryPoint {
   private SymbolTable symTab;
   private Memory memory;
   private InstructionBuilder instructionBuilder;
+  private IOManager iom;
 
   // Executes the program. Returns an empty string on success, or an error message.
   public String runProgram(String code) {
@@ -78,7 +79,8 @@ public class WebUi implements EntryPoint {
     memory = Memory.getInstance();
     symTab = new SymbolTable(memory);
     fu = new NullFileUtils();
-    instructionBuilder = new InstructionBuilder(memory);
+    iom = new IOManager(fu, memory);
+    instructionBuilder = new InstructionBuilder(memory, iom);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
     cpu = CPU.getInstance();
   }

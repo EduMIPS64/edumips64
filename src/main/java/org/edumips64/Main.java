@@ -228,8 +228,6 @@ public class Main extends JApplet {
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
     lfu = new LocalFileUtils();
-    IOManager.createInstance(lfu);
-    iom = IOManager.getInstance();
 
     try {
       ConfigManager.setConfig(new JavaPrefsConfigStore(ConfigManager.defaults));
@@ -255,7 +253,8 @@ public class Main extends JApplet {
 
     memory = Memory.getInstance();
     symTab = new SymbolTable(memory);
-    instructionBuilder = new InstructionBuilder(memory);
+    iom = new IOManager(lfu, memory);
+    instructionBuilder = new InstructionBuilder(memory, iom);
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
     // Internal Frames

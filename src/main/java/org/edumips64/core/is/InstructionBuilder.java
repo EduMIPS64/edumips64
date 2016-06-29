@@ -1,12 +1,15 @@
 package org.edumips64.core.is;
 
+import org.edumips64.core.IOManager;
 import org.edumips64.core.Memory;
 
 public class InstructionBuilder {
   private Memory memory;
+  private IOManager iom;
 
-  public InstructionBuilder(Memory memory) {
+  public InstructionBuilder(Memory memory, IOManager iom) {
     this.memory = memory;
+    this.iom = iom;
   }
   /**
    * Creates a new instance of an Instruction's subclass
@@ -188,9 +191,9 @@ public class InstructionBuilder {
       case "HALT":
         return new HALT();
       case "TRAP":
-        return new TRAP(memory);
+        return new TRAP(memory, iom);
       case "SYSCALL":
-        return new SYSCALL(memory);
+        return new SYSCALL(memory, iom);
       case "BREAK":
         return new BREAK();
 

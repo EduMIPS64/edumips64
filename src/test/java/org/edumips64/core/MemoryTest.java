@@ -3,6 +3,7 @@ package org.edumips64.core;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.io.LocalFileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,11 +13,13 @@ public class MemoryTest {
   private ConfigStore config = ConfigManager.getTmpConfig();
   private Memory m = Memory.getInstance();
   private InstructionBuilder instructionBuilder;
+  private IOManager iom;
 
   @Before
   public void setUp() throws Exception {
     ConfigManager.setConfig(config);
-    instructionBuilder = new InstructionBuilder(m);
+    iom = new IOManager(new LocalFileUtils(), m);
+    instructionBuilder = new InstructionBuilder(m, iom);
   }
 
   /* Regression test for Issue #84 */

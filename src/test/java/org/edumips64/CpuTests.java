@@ -53,6 +53,7 @@ public class CpuTests {
   private Parser parser;
   private Memory memory;
   private SymbolTable symTab;
+  private IOManager iom;
   private InstructionBuilder instructionBuilder;
   private static String testsLocation = "build/resources/test/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
@@ -125,8 +126,8 @@ public class CpuTests {
     memory = Memory.getInstance();
     symTab = new SymbolTable(memory);
     FileUtils lfu = new LocalFileUtils();
-    IOManager.createInstance(lfu);
-    instructionBuilder = new InstructionBuilder(memory);
+    iom = new IOManager(lfu, memory);
+    instructionBuilder = new InstructionBuilder(memory, iom);
     parser  = new Parser(lfu, symTab, memory, instructionBuilder);
     Instruction.setEnableForwarding(true);
     fec = new FPUExceptionsConfig();

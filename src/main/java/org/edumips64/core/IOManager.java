@@ -78,11 +78,10 @@ public class IOManager {
 
   private static final Logger logger = Logger.getLogger(IOManager.class.getName());
 
-  // Singleton
-  private static IOManager instance;
-
   // FileUtils instance.
   FileUtils fileUtils;
+
+  private Memory memory;
 
   /** Closes all the open files */
   public void reset() throws IOException {
@@ -95,17 +94,10 @@ public class IOManager {
     logger.info("IOManager: resetted. next_fd = " + next_descriptor);
   }
 
-  public static void createInstance(FileUtils fu) {
-    instance = new IOManager(fu);
-  }
-
-  public static IOManager getInstance() {
-    return instance;
-  }
-
-  private IOManager(FileUtils fu) {
-    ins = new HashMap<Integer, Reader>();
-    outs = new HashMap<Integer, Writer>();
+  public IOManager(FileUtils fu, Memory memory) {
+    this.memory = memory;
+    ins = new HashMap<>();
+    outs = new HashMap<>();
 
     // We set the next descriptor to 3, because 0 is stdin, 1 is stdout and
     // 2 is stderr
@@ -226,7 +218,7 @@ public class IOManager {
         if (i % 8 == 0) {
           posInWord = 0;
           logger.info("write(): getting a new cell at address " + address);
-          memEl = Memory.getInstance().getCellByAddress(address);
+          memEl = memory.getCellByAddress(address);
           address += 8;
         }
 
@@ -280,7 +272,7 @@ public class IOManager {
         if (i % 8 == 0) {
           posInWord = 0;
           logger.info("read(): getting a new cell at address " + address);
-          memEl = Memory.getInstance().getCellByAddress(address);
+          memEl = memory.getCellByAddress(address);
           address += 8;
         }
 
