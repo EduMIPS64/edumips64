@@ -57,7 +57,7 @@ gulp.task('html', ['styles', 'scripts'], () => {
     .pipe($.if('*.js', $.uglify()))
     .pipe($.if('*.css', $.cssnano({safe: true, autoprefixer: false})))
     .pipe($.if('*.html', $.htmlmin({collapseWhitespace: true})))
-    .pipe($.if('*.html', replace('<base href="/">', '<base href="/webui/">')))    
+    .pipe($.if('*.html', replace('<base href="/">', '<base href="/webui/">')))
     .pipe(gulp.dest('dist'));
 });
 
@@ -88,6 +88,14 @@ gulp.task('extras', () => {
     ], {
         dot: true
     }).pipe(gulp.dest('dist'));
+});
+
+gulp.task('locales', () => {
+    return gulp.src([
+        'app/locales/*'
+    ], {
+        dot: true
+    }).pipe(gulp.dest('dist/locales'));
 });
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
@@ -151,7 +159,7 @@ gulp.task('wiredep', () => {
     .pipe(gulp.dest('app'));
 });
 
-gulp.task('build', ['lint', 'html', 'images', 'fonts', 'extras'], () => {
+gulp.task('build', ['lint', 'html', 'images', 'fonts', 'extras', 'locales'], () => {
     return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 

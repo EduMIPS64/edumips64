@@ -1,0 +1,29 @@
+<md-dialog aria-label="settings dialog" ng-cloak>
+    <form>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 class="capitalize">{{'SETTINGS' | translate}}</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="vm.cancel()">
+                    <md-icon md-svg-src="images/close.svg" aria-label="Close dialog"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <div layout="row">
+                    <md-input-container class="md-block" flex>
+                        <label class="capitalize">{{'LANGUAGE' | translate}}</label>
+                        <md-select ng-model="vm.preferences.language">
+                            <md-option ng-repeat="(key, language) in vm.availableLanguages" value="{{key}}">{{language}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <md-button ng-click="vm.ok()">{{'OK' | translate}}</md-button>
+            <md-button ng-click="vm.cancel()">{{'CANCEL' | translate}}</md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

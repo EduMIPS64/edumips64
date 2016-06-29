@@ -12,8 +12,8 @@
             <md-icon md-svg-icon="images/cloud_download.svg"></md-icon>
             <md-tooltip>{{'DOWNLOAD_SOURCE_FILE' | translate}}</md-tooltip>
         </md-button>
-        <md-button class="md-icon-button" aria-label="settings">
-            <md-icon md-svg-icon="images/ic_settings.svg"></md-icon>
+        <md-button class="md-icon-button" aria-label="settings" ng-click="app.openSettingsDialog($event)">
+            <md-icon md-svg-icon="images/settings.svg"></md-icon>
             <md-tooltip>{{'SETTINGS' | translate}}</md-tooltip>
         </md-button>
     </div>
@@ -24,11 +24,11 @@
     <md-grid-list style="height:100%" md-cols="6" md-row-height="fit" md-gutter="10px">
         <md-grid-tile class="gray" md-rowspan="4" md-colspan="2">
             <md-grid-tile-header>
-                <h3 translate>UNSAVED</h3>
+                <h3 translate>{{'UNSAVED' | translate}}</h3>
             </md-grid-tile-header>
-            <div ui-ace="{ showGutter: true, onChange: vm.editorChanged }" style="position:absolute;top:0;bottom:48px;right:0;left:0"></div>
+            <div ui-ace="{ showGutter: true, onChange: app.editorChanged }" style="position:absolute;top:0;bottom:48px;right:0;left:0"></div>
             <md-grid-tile-footer>
-                <h3>{{vm.locs}} LOCs</h3>
+                <h3>{{app.locs}} {{'LOCS' | translate}}</h3>
             </md-grid-tile-footer>
         </md-grid-tile>
         <md-grid-tile class="green" md-rowspan="2" md-colspan="2">

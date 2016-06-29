@@ -21,3 +21,11 @@
 md-grid-tile {
     transition: all 400ms ease-out 50ms;
 }
+
+.capitalize::first-letter {
+    text-transform: capitalize;
+}
+span.capitalize,
+strong.capitalize {
+    display: inline-block;
+}
