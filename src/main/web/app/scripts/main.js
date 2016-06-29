@@ -7,7 +7,7 @@ angular.module('edmApp').config(function($mdThemingProvider, $locationProvider, 
 
     $locationProvider.html5Mode({
         enabled: true,
-        requireBase: false
+        requireBase: true
     });
 
     $stateProvider.state('app', {

@@ -5,6 +5,7 @@ const browserSync = require('browser-sync');
 const del = require('del');
 const wiredep = require('wiredep').stream;
 const modRewrite = require('connect-modrewrite');
+const replace = require('gulp-replace');
 
 const $ = gulpLoadPlugins();
 const reload = browserSync.reload;
@@ -48,15 +49,6 @@ gulp.task('lint', () => {
     })
     .pipe(gulp.dest('app/scripts'));
 });
-gulp.task('lint:test', () => {
-    return lint('test/spec/**/*.js', {
-        fix: true,
-        env: {
-            mocha: true
-        }
-    })
-    .pipe(gulp.dest('test/spec/**/*.js'));
-});
 
 gulp.task('html', ['styles', 'scripts'], () => {
     return gulp.src('app/**/*.html')
@@ -65,6 +57,7 @@ gulp.task('html', ['styles', 'scripts'], () => {
     .pipe($.if('*.js', $.uglify()))
     .pipe($.if('*.css', $.cssnano({safe: true, autoprefixer: false})))
     .pipe($.if('*.html', $.htmlmin({collapseWhitespace: true})))
+    .pipe($.if('*.html', replace('<base href="/">', '<base href="/webui/">')))    
     .pipe(gulp.dest('dist'));
 });
 
