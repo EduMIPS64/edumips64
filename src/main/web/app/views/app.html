@@ -1,1 +1,56 @@
-<h1>EduMips WebApp boilerplate</h1>
+<md-toolbar layout="row">
+    <div class="md-toolbar-tools">
+        <div style="background:white;border-radius:4px;padding:5px 5px 0px 5px">
+            <img src="http://www.edumips.org/images/edumips64-logo.png" height="24" alt="logo">
+        </div>
+        <span flex></span>
+        <md-button class="md-icon-button" aria-label="open">
+            <md-icon md-svg-icon="images/cloud_upload.svg"></md-icon>
+            <md-tooltip>{{'OPEN_SOURCE_FILE' | translate}}</md-tooltip>
+        </md-button>
+        <md-button class="md-icon-button" aria-label="download">
+            <md-icon md-svg-icon="images/cloud_download.svg"></md-icon>
+            <md-tooltip>{{'DOWNLOAD_SOURCE_FILE' | translate}}</md-tooltip>
+        </md-button>
+        <md-button class="md-icon-button" aria-label="settings">
+            <md-icon md-svg-icon="images/ic_settings.svg"></md-icon>
+            <md-tooltip>{{'SETTINGS' | translate}}</md-tooltip>
+        </md-button>
+    </div>
+</md-toolbar>
+
+<md-content flex class="md-padding">
+
+    <md-grid-list style="height:100%" md-cols="6" md-row-height="fit" md-gutter="10px">
+        <md-grid-tile class="gray" md-rowspan="4" md-colspan="2">
+            <md-grid-tile-header>
+                <h3 translate>UNSAVED</h3>
+            </md-grid-tile-header>
+            <div ui-ace="{ showGutter: true, onChange: vm.editorChanged }" style="position:absolute;top:0;bottom:48px;right:0;left:0"></div>
+            <md-grid-tile-footer>
+                <h3>{{vm.locs}} LOCs</h3>
+            </md-grid-tile-footer>
+        </md-grid-tile>
+        <md-grid-tile class="green" md-rowspan="2" md-colspan="2">
+            <md-grid-tile-header>
+                <h3>{{'DATA' | translate}}</h3>
+            </md-grid-tile-header>
+        </md-grid-tile>
+        <md-grid-tile class="purple" md-rowspan="4" md-colspan="1">
+            <md-grid-tile-header>
+                <h3>{{'CYCLES' | translate}}</h3>
+            </md-grid-tile-header>
+        </md-grid-tile>
+        <md-grid-tile class="yellow" md-rowspan="4" md-colspan="1">
+            <md-grid-tile-header>
+                <h3>{{'REGISTERS' | translate}}</h3>
+            </md-grid-tile-header>
+        </md-grid-tile>
+        <md-grid-tile class="red" md-rowspan="2" md-colspan="2">
+            <md-grid-tile-header>
+                <h3>{{'CODE' | translate}}</h3>
+            </md-grid-tile-header>
+        </md-grid-tile>
+    </md-grid-list>
+
+</md-content>
