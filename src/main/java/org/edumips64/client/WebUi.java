@@ -80,8 +80,8 @@ public class WebUi implements EntryPoint {
     symTab = new SymbolTable(memory);
     fu = new NullFileUtils();
     iom = new IOManager(fu, memory);
-    instructionBuilder = new InstructionBuilder(memory, iom);
-    parser = new Parser(fu, symTab, memory, instructionBuilder);
     cpu = CPU.getInstance();
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu);
+    parser = new Parser(fu, symTab, memory, instructionBuilder);
   }
 }

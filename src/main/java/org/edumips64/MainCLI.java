@@ -39,13 +39,13 @@ public class MainCLI {
     CurrentLocale.setLanguage("en");
 
     try {
+      CPU c = CPU.getInstance();
       LocalFileUtils localFileUtils = new LocalFileUtils();
       Memory memory = Memory.getInstance();
       SymbolTable symTab = new SymbolTable(memory);
       IOManager iom = new IOManager(localFileUtils, memory);
-      InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom);
+      InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, c);
       Parser p = new Parser(localFileUtils, symTab, memory, instructionBuilder);
-      CPU c = CPU.getInstance();
       c.setStatus(CPU.CPUStatus.READY);
 
       if (args.length > 0) {

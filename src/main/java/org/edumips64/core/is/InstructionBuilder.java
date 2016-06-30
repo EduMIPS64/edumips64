@@ -13,10 +13,12 @@ import org.edumips64.core.Memory;
 public class InstructionBuilder {
   private Memory memory;
   private IOManager iom;
+  private CPU cpu;
 
-  public InstructionBuilder(Memory memory, IOManager iom) {
+  public InstructionBuilder(Memory memory, IOManager iom, CPU cpu) {
     this.memory = memory;
     this.iom = iom;
+    this.cpu = cpu;
   }
   /**
    * Creates a new instance of an Instruction's subclass
@@ -28,8 +30,6 @@ public class InstructionBuilder {
     // If the name of the requested instruction has got a dot, the instruction is FP and an
     // underscore takes the place of the dot because classes names cannot contain dots
     String name = instructionName.replaceAll("\\.", "_");
-
-    CPU cpu = CPU.getInstance();
 
     Instruction instruction;
     switch(name) {

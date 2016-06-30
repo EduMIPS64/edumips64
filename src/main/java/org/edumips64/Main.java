@@ -254,7 +254,7 @@ public class Main extends JApplet {
     memory = Memory.getInstance();
     symTab = new SymbolTable(memory);
     iom = new IOManager(lfu, memory);
-    instructionBuilder = new InstructionBuilder(memory, iom);
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu);
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
     // Internal Frames

@@ -19,7 +19,7 @@ public class MemoryTest {
   public void setUp() throws Exception {
     ConfigManager.setConfig(config);
     iom = new IOManager(new LocalFileUtils(), m);
-    instructionBuilder = new InstructionBuilder(m, iom);
+    instructionBuilder = new InstructionBuilder(m, iom, CPU.getInstance());
   }
 
   /* Regression test for Issue #84 */
