@@ -1,5 +1,6 @@
 package org.edumips64.core.is;
 
+import org.edumips64.core.CPU;
 import org.edumips64.core.IOManager;
 import org.edumips64.core.Memory;
 
@@ -28,251 +29,358 @@ public class InstructionBuilder {
     // underscore takes the place of the dot because classes names cannot contain dots
     String name = instructionName.replaceAll("\\.", "_");
 
+    CPU cpu = CPU.getInstance();
+
+    Instruction instruction;
     switch(name) {
       //ALU R-Type 32-bits
       case "ADD":
-        return new ADD();
+        instruction = new ADD();
+        break;
       case "ADDU":
-        return new ADDU();
+        instruction = new ADDU();
+        break;
       case "SUB":
-        return new SUB();
+        instruction = new SUB();
+        break;
       case "SUBU":
-        return new SUBU();
+        instruction = new SUBU();
+        break;
       case "DIV":
-        return new DIV();
+        instruction = new DIV();
+        break;
       case "DIVU":
-        return new DIVU();
+        instruction = new DIVU();
+        break;
       case "MULT":
-        return new MULT();
+        instruction = new MULT();
+        break;
       case "MULTU":
-        return new MULTU();
+        instruction = new MULTU();
+        break;
 
       //ALU I-Type 32-bits
       case "ADDI":
-        return new ADDI();
+        instruction = new ADDI();
+        break;
       case "ADDIU":
-        return new ADDIU();
+        instruction = new ADDIU();
+        break;
 
       //ALU Shifting 32-bits
       case "SLL":
-        return new SLL();
+        instruction = new SLL();
+        break;
       case "SLLV":
-        return new SLLV();
+        instruction = new SLLV();
+        break;
       case "SRA":
-        return new SRA();
+        instruction = new SRA();
+        break;
       case "SRAV":
-        return new SRAV();
+        instruction = new SRAV();
+        break;
       case "SRL":
-        return new SRL();
+        instruction = new SRL();
+        break;
       case "SRLV":
-        return new SRLV();
+        instruction = new SRLV();
+        break;
 
       //ALU R-Type
       case "AND":
-        return new AND();
+        instruction = new AND();
+        break;
       case "DADD":
-        return new DADD();
+        instruction = new DADD();
+        break;
       case "DADDU":
-        return new DADDU();
+        instruction = new DADDU();
+        break;
       case "DSUB":
-        return new DSUB();
+        instruction = new DSUB();
+        break;
       case "DSUBU":
-        return new DSUBU();
+        instruction = new DSUBU();
+        break;
       case "OR":
-        return new OR();
+        instruction = new OR();
+        break;
       case "SLT":
-        return new SLT();
+        instruction = new SLT();
+        break;
       case "SLTU":
-        return new SLTU();
+        instruction = new SLTU();
+        break;
       case "XOR":
-        return new XOR();
+        instruction = new XOR();
+        break;
       case "MOVN":
-        return new MOVN();
+        instruction = new MOVN();
+        break;
       case "MOVZ":
-        return new MOVZ();
+        instruction = new MOVZ();
+        break;
       case "DDIV":
-        return new DDIV();
+        instruction = new DDIV();
+        break;
       case "DDIVU":
-        return new DDIVU();
+        instruction = new DDIVU();
+        break;
       case "DMULT":
-        return new DMULT();
+        instruction = new DMULT();
+        break;
       case "DMULTU":
-        return new DMULTU();
+        instruction = new DMULTU();
+        break;
       case "MFLO":
-        return new MFLO();
+        instruction = new MFLO();
+        break;
       case "MFHI":
-        return new MFHI();
+        instruction = new MFHI();
+        break;
 
       //ALU I-Type
       case "ANDI":
-        return new ANDI();
+        instruction = new ANDI();
+        break;
       case "DADDI":
-        return new DADDI();
+        instruction = new DADDI();
+        break;
       case "DADDUI":
-        return new DADDUI();
+        instruction = new DADDUI();
+        break;
       case "DADDIU":
-        return new DADDIU();
+        instruction = new DADDIU();
+        break;
       case "LUI":
-        return new LUI();
+        instruction = new LUI();
+        break;
       case "ORI":
-        return new ORI();
+        instruction = new ORI();
+        break;
       case "SLTI":
-        return new SLTI();
+        instruction = new SLTI();
+        break;
       case "SLTIU":
-        return new SLTIU();
+        instruction = new SLTIU();
+        break;
       case "XORI":
-        return new XORI();
+        instruction = new XORI();
+        break;
 
       //ALU Shifting
       case "DSLL":
-        return new DSLL();
+        instruction = new DSLL();
+        break;
       case "DSLLV":
-        return new DSLLV();
+        instruction = new DSLLV();
+        break;
       case "DSRA":
-        return new DSRA();
+        instruction = new DSRA();
+        break;
       case "DSRAV":
-        return new DSRAV();
+        instruction = new DSRAV();
+        break;
       case "DSRL":
-        return new DSRL();
+        instruction = new DSRL();
+        break;
       case "DSRLV":
-        return new DSRLV();
+        instruction = new DSRLV();
+        break;
 
       //Load-Signed
       case "LB":
-        return new LB(memory);
+        instruction = new LB(memory);
+        break;
       case "LH":
-        return new LH(memory);
+        instruction = new LH(memory);
+        break;
       case "LW":
-        return new LW(memory);
+        instruction = new LW(memory);
+        break;
       case "LD":
-        return new LD(memory);
+        instruction = new LD(memory);
+        break;
 
       //Load-Unsigned
       case "LBU":
-        return new LBU(memory);
+        instruction = new LBU(memory);
+        break;
       case "LHU":
-        return new LHU(memory);
+        instruction = new LHU(memory);
+        break;
       case "LWU":
-        return new LWU(memory);
+        instruction = new LWU(memory);
+        break;
 
       //Store
       case "SB":
-        return new SB(memory);
+        instruction = new SB(memory);
+        break;
       case "SH":
-        return new SH(memory);
+        instruction = new SH(memory);
+        break;
       case "SW":
-        return new SW(memory);
+        instruction = new SW(memory);
+        break;
       case "SD":
-        return new SD(memory);
+        instruction = new SD(memory);
+        break;
 
       //Unconditional branches
       case "J":
-        return new J();
+        instruction = new J();
+        break;
       case "JAL":
-        return new JAL();
+        instruction = new JAL();
+        break;
       case "JALR":
-        return new JALR();
+        instruction = new JALR();
+        break;
       case "JR":
-        return new JR();
+        instruction = new JR();
+        break;
       case "B":
-        return new B();
+        instruction = new B();
+        break;
 
       //Conditional branches
       case "BEQ":
-        return new BEQ();
+        instruction = new BEQ();
+        break;
       case "BNE":
-        return new BNE();
+        instruction = new BNE();
+        break;
       case "BNEZ":
-        return new BNEZ();
+        instruction = new BNEZ();
+        break;
       case "BEQZ":
-        return new BEQZ();
+        instruction = new BEQZ();
+        break;
       case "BGEZ":
-        return new BGEZ();
+        instruction = new BGEZ();
+        break;
 
       //Special instructions
       case "NOP":
-        return new NOP();
+        instruction = new NOP();
+        break;
       case "HALT":
-        return new HALT();
+        instruction = new HALT();
+        break;
       case "TRAP":
-        return new TRAP(memory, iom);
+        instruction = new TRAP(memory, iom);
+        break;
       case "SYSCALL":
-        return new SYSCALL(memory, iom);
+        instruction = new SYSCALL(memory, iom);
+        break;
       case "BREAK":
-        return new BREAK();
+        instruction = new BREAK();
+        break;
 
       //Floating point instructions
       //Arithmetic
       case "ADD_D":
-        return new ADD_D();
+        instruction = new ADD_D();
+        break;
       case "SUB_D":
-        return new SUB_D();
+        instruction = new SUB_D();
+        break;
       case "MUL_D":
-        return new MUL_D();
+        instruction = new MUL_D();
+        break;
       case "DIV_D":
-        return new DIV_D();
+        instruction = new DIV_D();
+        break;
 
       //Load store
       case "LDC1":
-        return new LDC1(memory);
+        instruction = new LDC1(memory);
+        break;
       case "L_D":
-        return new L_D(memory);
+        instruction = new L_D(memory);
+        break;
       case "SDC1":
-        return new SDC1(memory);
+        instruction = new SDC1(memory);
+        break;
       case "S_D":
-        return new S_D(memory);
+        instruction = new S_D(memory);
+        break;
       case "LWC1":
-        return new LWC1(memory);
+        instruction = new LWC1(memory);
+        break;
       case "SWC1":
-        return new SWC1(memory);
+        instruction = new SWC1(memory);
+        break;
 
       //Move to and from
       case "DMTC1":
-        return new DMTC1();
+        instruction = new DMTC1();
+        break;
       case "DMFC1":
-        return new DMFC1();
+        instruction = new DMFC1();
+        break;
       case "MTC1":
-        return new MTC1();
+        instruction = new MTC1();
+        break;
       case "MFC1":
-        return new MFC1();
+        instruction = new MFC1();
+        break;
 
       //Formatted operand move
       case "MOV_D":
-        return new MOV_D();
+        instruction = new MOV_D();
+        break;
       case "MOVZ_D":
-        return new MOVZ_D();
+        instruction = new MOVZ_D();
+        break;
       case "MOVN_D":
-        return new MOVN_D();
+        instruction = new MOVN_D();
+        break;
 
       //Special arithmetic instructions
       case "C_LT_D":
-        return new C_LT_D();
+        instruction = new C_LT_D();
+        break;
       case "C_EQ_D":
-        return new C_EQ_D();
+        instruction = new C_EQ_D();
+        break;
 
       //Conditional branches instructions
       case "BC1T":
-        return new BC1T();
+        instruction = new BC1T();
+        break;
       case "BC1F":
-        return new BC1F();
+        instruction = new BC1F();
+        break;
 
       //Conditional move on CC instructions
       case "MOVT_D":
-        return new MOVT_D();
+        instruction = new MOVT_D();
+        break;
       case "MOVF_D":
-        return new MOVF_D();
+        instruction = new MOVF_D();
+        break;
 
       //Conversion instructions
       case "CVT_L_D":
-        return new CVT_L_D();
+        instruction = new CVT_L_D();
+        break;
       case "CVT_D_L":
-        return new CVT_D_L();
+        instruction = new CVT_D_L();
+        break;
       case "CVT_W_D":
-        return new CVT_W_D();
+        instruction = new CVT_W_D();
+        break;
       case "CVT_D_W":
-        return new CVT_D_W();
+        instruction = new CVT_D_W();
+        break;
+
       default:
         return null;
     }
+    instruction.setCPU(cpu);
+    return instruction;
   }
 }

@@ -33,7 +33,6 @@ import org.edumips64.core.fpu.*;
 import org.edumips64.utils.*;
 
 public abstract class ComputationalInstructions extends Instruction {
-  protected static CPU cpu = CPU.getInstance();
   public void IF() {
     Dinero din = Dinero.getInstance();
 

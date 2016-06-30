@@ -35,7 +35,6 @@ import java.util.logging.Logger;
  */
 
 public abstract class LDSTInstructions extends Instruction {
-  protected static CPU cpu = CPU.getInstance();
   final static int RT_FIELD = 0;
   final static int OFFSET_FIELD = 1;
   final static int BASE_FIELD = 2;

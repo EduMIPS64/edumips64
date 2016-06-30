@@ -44,7 +44,6 @@ public abstract class FPMoveToAndFromInstructions extends ComputationalInstructi
   static int COP1_FIELD_INIT = 0;
   static int OPCODE_VALUE_INIT = 6;
   String OPCODE_VALUE = "";
-  CPU cpu = CPU.getInstance();
 
   FPMoveToAndFromInstructions() {
     this.syntax = "%R,%F";

@@ -56,7 +56,6 @@ public class SYSCALL extends Instruction {
     logger.info("SYSCALL " + syscall_n + " (" + this.hashCode() + ") is in IF");
 
     try {
-      CPU cpu = CPU.getInstance();
       din.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
@@ -66,9 +65,8 @@ public class SYSCALL extends Instruction {
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
     if (syscall_n == 0) {
       logger.info("Stopping CPU due to SYSCALL (" + this.hashCode() + ")");
-      CPU.getInstance().setStatus(CPU.CPUStatus.STOPPING);
+      cpu.setStatus(CPU.CPUStatus.STOPPING);
     } else if ((syscall_n > 0) && (syscall_n <= 5)) {
-      CPU cpu = CPU.getInstance();
       Register r14 = cpu.getRegister(14);
 
       if (r14.getWriteSemaphore() > 0) {
@@ -289,11 +287,11 @@ public class SYSCALL extends Instruction {
 
     if (syscall_n == 0) {
       logger.info("Stopped CPU due to SYSCALL (" + this.hashCode() + ")");
-      CPU.getInstance().setStatus(CPU.CPUStatus.HALTED);
+      cpu.setStatus(CPU.CPUStatus.HALTED);
       throw new HaltException();
     } else if (syscall_n > 0 && syscall_n <= 5) {
       logger.info("SYSCALL (" + this.hashCode() + "): setting R1 to " + return_value);
-      Register r1 = CPU.getInstance().getRegister(1);
+      Register r1 = cpu.getRegister(1);
       logger.info("SYSCALL (" + this.hashCode() + "): got R1");
       r1.setBits(Converter.intToBin(64, return_value), 0);
       logger.info("SYSCALL (" + this.hashCode() + "): set R1 to " + return_value);

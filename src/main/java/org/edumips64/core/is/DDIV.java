@@ -127,32 +127,4 @@ class DDIV extends ALU_RType {
     repr.setBits(Converter.intToBin(RS_FIELD_LENGTH, params.get(RS_FIELD)), RS_FIELD_INIT);
     repr.setBits(Converter.intToBin(RT_FIELD_LENGTH, params.get(RT_FIELD)), RT_FIELD_INIT);
   }
-
-
-
-  public static void main(String[] args) {
-    DDIV ins = new DDIV();
-    List<Integer>params = new Vector<Integer>();
-    int rs = 1;
-    int rt = 2;
-    params.add(rs);  //dividendo
-    params.add(rt);  //divisore
-
-    try {
-      cpu.getRegister(rs).writeDoubleWord(-9223372036854775807L);   //rs register
-      cpu.getRegister(rt).writeDoubleWord(922);     //rt register
-      ins.setParams(params);
-    } catch (IrregularWriteOperationException e) {
-      e.printStackTrace();
-    }
-
-    try {
-      ins.pack();
-      ins.ID();
-      ins.EX();
-      ins.WB();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
 }

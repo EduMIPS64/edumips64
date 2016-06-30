@@ -34,7 +34,6 @@ import org.edumips64.utils.*;
  * @author Trubia Massimo, Russo Daniele
  */
 public abstract class FlowControlInstructions extends Instruction {
-  protected static CPU cpu = CPU.getInstance();
   public void IF() {
     Dinero din = Dinero.getInstance();
 

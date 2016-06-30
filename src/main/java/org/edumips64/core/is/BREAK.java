@@ -44,7 +44,6 @@ public class BREAK extends Instruction {
     Dinero din = Dinero.getInstance();
 
     try {
-      CPU cpu = CPU.getInstance();
       din.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();

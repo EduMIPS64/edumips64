@@ -45,7 +45,6 @@ public abstract class FPFormattedOperandMoveInstructions extends ComputationalIn
   static int FMT_FIELD_INIT = 6;
   static String ZERO_FIELD = "00000";
   static int ZERO_FIELD_INIT = 11;
-  static CPU cpu = CPU.getInstance();
 
   String OPCODE_VALUE = "";
   String FMT_FIELD = "";

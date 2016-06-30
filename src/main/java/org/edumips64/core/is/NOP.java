@@ -33,7 +33,6 @@ import org.edumips64.utils.*;
  * @author Trubia Massimo, Russo Daniele
  */
 public class NOP extends Instruction {
-  protected static CPU cpu = CPU.getInstance();
 
   /** Creates a new instance of HALT */
   NOP() {

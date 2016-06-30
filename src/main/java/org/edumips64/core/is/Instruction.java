@@ -47,6 +47,14 @@ public abstract class Instruction {
   protected static final Logger logger = Logger.getLogger(Instruction.class.getName());
   protected Integer serialNumber;
 
+  /** CPU instance. It is set through setCPU, and it should always be set before the instruction is considered
+   * fully built. InstructionBuilder + package-local instruction constructors enforce this.
+   */
+  protected CPU cpu;
+  void setCPU(CPU cpu) {
+    this.cpu = cpu;
+  }
+
 
   /** Creates a new instance of Instruction */
   Instruction() {
