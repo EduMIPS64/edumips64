@@ -37,3 +37,48 @@ div[ui-ace] {
     left:0;
     font-size: 16px;
 }
+div[file-dropper] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+div[file-dropper]>.dropper-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: 50px;
+    border: dashed 10px #d3d3d3;
+    color: #d3d3d3;
+    background-color: rgba(255,255,255,0.85);
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    z-index: 6;
+    transition: visibility 0.2s, opacity 0.2s ease-in-out;
+    opacity: 0;
+    visibility: hidden;
+    display: flex;
+}
+div[file-dropper]>.dropper-overlay.active {
+    visibility: visible;
+    opacity: 1;
+}
+.editor-footer {
+    display: flex;
+}
+.editor md-grid-tile-footer>figcaption {
+    width: 100%;
+    display: flex;
+    padding: 0px 20px;
+}
+.editor md-grid-tile-footer>figcaption>div:first-child {
+    flex-grow: 1;
+}
+.editor md-grid-tile-footer>figcaption>div:last-child {
+    width: 100px;
+    text-align: right;
+}

@@ -4,8 +4,8 @@ angular.module('edmApp').controller('SettingsDialogController', function($mdDial
     var vm = this;
 
     vm.availableLanguages = {
-        "en-EN": "English",
-        "it-IT": "Italiano"
+        'en-EN': 'English',
+        'it-IT': 'Italiano'
     };
 
     vm.ok = function() {

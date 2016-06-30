@@ -25,13 +25,13 @@
 <md-content flex class="md-padding">
 
     <md-grid-list style="height:100%" md-cols="6" md-row-height="fit" md-gutter="10px">
-        <md-grid-tile class="gray" md-rowspan="4" md-colspan="2">
-            <md-grid-tile-header>
-                <h3 translate>{{'UNSAVED' | translate}}</h3>
-            </md-grid-tile-header>
-            <div ui-ace="{ showGutter: true, onChange: app.editorChanged }"></div>
+        <md-grid-tile class="gray editor" md-rowspan="4" md-colspan="2">
+            <div file-dropper="app.onDropFile($file)">
+                <div ui-ace="{ showGutter: true, onChange: app.editorChanged }" ng-model="app.editorContent"></div>
+            </div>
             <md-grid-tile-footer>
-                <h3>{{app.locs}} {{'LOCS' | translate}}</h3>
+                <div>{{app.filename}} ({{app.filesize | number : 0}} bytes)</div>
+                <div>{{app.locs}} {{'LOCS' | translate}}</div>
             </md-grid-tile-footer>
         </md-grid-tile>
         <md-grid-tile class="green" md-rowspan="2" md-colspan="2">

@@ -4,6 +4,9 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $mdS
     var vm = this;
 
     vm.locs = 0;
+    vm.editorContent = '';
+    vm.filesize = 0;
+    vm.filename = 'new_file.s';
     vm.customFullscreen = $mdMedia('xs') || $mdMedia('sm');
 
     vm.toggleMenu = function() {
@@ -22,13 +25,20 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $mdS
             templateUrl: 'views/settings-dialog.html',
             parent: angular.element(document.body),
             targetEvent: event,
-            clickOutsideToClose:true,
+            clickOutsideToClose: true,
             fullscreen: useFullScreen
         }).then(function(answer) {
             $log.log('Settings dialog resolved', answer);
         }, function() {
             $log.log('Settings dialog rejected');
         });
+    };
+
+    vm.onDropFile = function(file) {
+        console.log(file);
+        vm.editorContent = file.content;
+        vm.filename = file.name;
+        vm.filesize = file.size;
     };
 
     $scope.$watch(function() {

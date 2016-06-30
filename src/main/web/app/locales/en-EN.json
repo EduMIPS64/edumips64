@@ -11,5 +11,6 @@
     "SETTINGS": "settings",
     "OK": "ok",
     "CANCEL": "cancel",
-    "LANGUAGE": "language"
+    "LANGUAGE": "language",
+    "DROP_YOUR_FILE_HERE": "drop your file here"
 }
