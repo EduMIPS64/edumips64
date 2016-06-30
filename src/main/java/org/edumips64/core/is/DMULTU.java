@@ -50,7 +50,7 @@ class DMULTU extends ALU_RType {
   String lo;
   String hi;
 
-  public DMULTU() {
+  DMULTU() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R,%R";
     name = "DMULTU";

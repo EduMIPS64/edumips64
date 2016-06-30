@@ -45,7 +45,7 @@ class MFLO extends ALU_RType {
   final int LO_REG = 1;
   final String OPCODE_VALUE = "010010";
 
-  public MFLO() {
+  MFLO() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R";
     name = "MFLO";

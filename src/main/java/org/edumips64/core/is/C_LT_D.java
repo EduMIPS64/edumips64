@@ -42,7 +42,7 @@ class C_LT_D extends FPC_cond_DInstructions {
   // (100)bin=(4)dec is the condition code assigned to the predicate less than in a MIPS64 processor
   String NAME = "C.LT.D";
 
-  public C_LT_D() {
+  C_LT_D() {
     super.COND_VALUE = COND_VALUE;
     super.name = NAME;
   }

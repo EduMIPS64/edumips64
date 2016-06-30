@@ -51,7 +51,7 @@ class DMULT extends ALU_RType {
   String lo;
   String hi;
 
-  public DMULT() {
+  DMULT() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R,%R";
     name = "DMULT";

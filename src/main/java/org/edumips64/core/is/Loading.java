@@ -37,7 +37,7 @@ import org.edumips64.utils.*;
 public abstract class Loading extends LDSTInstructions {
   protected static final Logger logger = Logger.getLogger(Loading.class.getName());
 
-  public Loading(Memory memory) {
+  Loading(Memory memory) {
     super(memory);
   }
 

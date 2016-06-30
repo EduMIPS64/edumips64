@@ -38,7 +38,7 @@ import org.edumips64.utils.*;
 class SW extends Storing {
   final String OPCODE_VALUE = "101011";
 
-  public SW(Memory memory) {
+  SW(Memory memory) {
     super(memory);
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "SW";

@@ -39,7 +39,7 @@ public class BGEZ extends FlowControl_IType {
   final String RT_VALUE = "00001";
 
   /** Creates a new instance of BGEZ */
-  public BGEZ() {
+  BGEZ() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R,%B";
     name = "BGEZ";

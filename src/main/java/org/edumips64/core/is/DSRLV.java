@@ -48,7 +48,7 @@ public class DSRLV extends ALU_RType {
   final int RT_FIELD_LENGTH = 5;
   final int RS_FIELD_LENGTH = 5;
   final String OPCODE_VALUE = "010110";
-  public DSRLV() {
+  DSRLV() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "DSRLV";
   }

@@ -49,7 +49,7 @@ public abstract class FPFormattedOperandMoveInstructions extends ComputationalIn
 
   String OPCODE_VALUE = "";
   String FMT_FIELD = "";
-  public FPFormattedOperandMoveInstructions() {
+  FPFormattedOperandMoveInstructions() {
     this.syntax = "%F,%F";
     this.paramCount = 2;
   }

@@ -32,7 +32,8 @@ import org.edumips64.utils.*;
  */
 public class BUBBLE extends Instruction {
 
-  /** Creates a new instance of BUBBLE */
+  /** Creates a new instance of BUBBLE. This constructor is public because the CPU can build new BUBBLE instructions
+   * itself, since it's an internal instruction. */
   public BUBBLE() {
     name = " ";
     fullname = " ";

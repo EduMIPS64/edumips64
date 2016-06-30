@@ -37,7 +37,7 @@ public abstract class Storing extends LDSTInstructions {
   protected static final Logger logger = Logger.getLogger(Storing.class.getName());
   protected Register rt;
 
-  public Storing(Memory memory) {
+  Storing(Memory memory) {
     super(memory);
   }
 

@@ -49,7 +49,7 @@ public abstract class FPConditionalZerosMoveInstructions extends ComputationalIn
 
   String OPCODE_VALUE = "";
   String FMT_FIELD = "";
-  public FPConditionalZerosMoveInstructions() {
+  FPConditionalZerosMoveInstructions() {
     this.syntax = "%F,%F,%R";
     this.paramCount = 3;
   }

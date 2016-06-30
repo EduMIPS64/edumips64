@@ -3,6 +3,12 @@ package org.edumips64.core.is;
 import org.edumips64.core.IOManager;
 import org.edumips64.core.Memory;
 
+/** InstructionBuilder should be used to build all the instructions to be run by the CPU. The only exception is
+ * BUBBLE, which has a public constructor to allow the CPU to build it without depending on InstructionBuilder.
+ *
+ * BUBBLE is a special instruction that should not be used by programs (it's not rendered), therefore InstructionBuilder
+ * will refuse to build it.
+ */
 public class InstructionBuilder {
   private Memory memory;
   private IOManager iom;
@@ -186,8 +192,6 @@ public class InstructionBuilder {
       //Special instructions
       case "NOP":
         return new NOP();
-      case "BUBBLE":
-        return new BUBBLE();
       case "HALT":
         return new HALT();
       case "TRAP":

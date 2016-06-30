@@ -42,7 +42,7 @@ class SUB_D extends FPArithmeticInstructions {
   String NAME = "SUB.D";
 
 
-  public SUB_D() {
+  SUB_D() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.FMT_FIELD = FMT_FIELD;
     super.name = NAME;

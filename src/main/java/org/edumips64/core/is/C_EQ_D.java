@@ -42,7 +42,7 @@ class C_EQ_D extends FPC_cond_DInstructions {
   // (010)bin=(2)dec is the condition code assigned to the predicate equal in a MIPS64 processor
   String NAME = "C.EQ.D";
 
-  public C_EQ_D() {
+  C_EQ_D() {
     super.COND_VALUE = COND_VALUE;
     super.name = NAME;
   }

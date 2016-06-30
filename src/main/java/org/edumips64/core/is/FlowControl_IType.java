@@ -44,7 +44,7 @@ public abstract class FlowControl_IType extends FlowControlInstructions {
   final static int OFFSET_FIELD_LENGTH = 16;
   String OPCODE_VALUE = "";
   final static int OPCODE_VALUE_INIT = 0;
-  public FlowControl_IType() {
+  FlowControl_IType() {
     this.syntax = "%R,%R,%E";
     this.paramCount = 3;
   }

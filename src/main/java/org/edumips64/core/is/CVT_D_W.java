@@ -41,7 +41,7 @@ class CVT_D_W extends FPConversionFCSRInstructions {
   static String FMT_FIELD = "10100"; //WORD IS 20
   static String NAME = "CVT.D.W";
 
-  public CVT_D_W() {
+  CVT_D_W() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.FMT_FIELD = FMT_FIELD;
     super.name = NAME;

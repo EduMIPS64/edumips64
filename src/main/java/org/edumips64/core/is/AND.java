@@ -40,7 +40,7 @@ import org.edumips64.utils.*;
 public class AND extends ALU_RType {
   public String OPCODE_VALUE = "100100";
 
-  public AND() {
+  AND() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "AND";
   }

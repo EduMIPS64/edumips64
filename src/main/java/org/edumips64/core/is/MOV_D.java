@@ -38,7 +38,7 @@ class MOV_D extends FPFormattedOperandMoveInstructions {
   String NAME = "MOV.D";
   String FMT_FIELD = "10001";
 
-  public MOV_D() {
+  MOV_D() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.name = NAME;
     super.FMT_FIELD = FMT_FIELD;

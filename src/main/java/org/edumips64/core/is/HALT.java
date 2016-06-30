@@ -39,7 +39,7 @@ import org.edumips64.utils.*;
  */
 public class HALT extends Instruction {
   final String OPCODE_VALUE = "000001";
-  public HALT() {
+  HALT() {
     name = "HALT";
   }
   public void IF() {

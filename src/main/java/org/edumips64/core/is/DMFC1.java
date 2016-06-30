@@ -37,7 +37,7 @@ class DMFC1 extends FPMoveFromInstructions {
   String OPCODE_VALUE = "00001";
   String NAME = "DMFC1";
 
-  public DMFC1() {
+  DMFC1() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.name = NAME;
   }

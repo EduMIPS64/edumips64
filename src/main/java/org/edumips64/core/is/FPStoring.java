@@ -32,7 +32,7 @@ import org.edumips64.utils.*;
  */
 public abstract class FPStoring extends FPLDSTInstructions {
 
-  public FPStoring(Memory memory) {
+  FPStoring(Memory memory) {
     super(memory);
   }
 

@@ -39,7 +39,7 @@ public class B extends FlowControl_IType {
   final static int OFFSET_FIELD = 0;
 
   /** Creates a new instance of B */
-  public B() {
+  B() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%B";
     name = "B";

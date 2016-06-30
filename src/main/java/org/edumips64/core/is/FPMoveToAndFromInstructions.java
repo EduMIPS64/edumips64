@@ -46,7 +46,7 @@ public abstract class FPMoveToAndFromInstructions extends ComputationalInstructi
   String OPCODE_VALUE = "";
   CPU cpu = CPU.getInstance();
 
-  public FPMoveToAndFromInstructions() {
+  FPMoveToAndFromInstructions() {
     this.syntax = "%R,%F";
     this.paramCount = 2;
   }

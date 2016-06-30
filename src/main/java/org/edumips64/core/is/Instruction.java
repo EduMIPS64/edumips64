@@ -49,7 +49,7 @@ public abstract class Instruction {
 
 
   /** Creates a new instance of Instruction */
-  public Instruction() {
+  Instruction() {
     params = new LinkedList<>();
     TR = new Register[5];
     TRfp = new RegisterFP[5];

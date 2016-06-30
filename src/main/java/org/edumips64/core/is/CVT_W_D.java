@@ -41,7 +41,7 @@ class CVT_W_D extends FPConversionFCSRInstructions {
   static String FMT_FIELD = "10001"; //DOUBLE IS 17
   static String NAME = "CVT.W.D";
 
-  public CVT_W_D() {
+  CVT_W_D() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.FMT_FIELD = FMT_FIELD;
     super.name = NAME;

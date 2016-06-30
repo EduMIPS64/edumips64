@@ -49,7 +49,7 @@ public abstract class FPConditionalBranchesInstructions extends FlowControlInstr
   String ND_FIELD = "";
   String TF_FIELD = "";
   String CC_FIELD_VALUE = "";
-  public FPConditionalBranchesInstructions() {
+  FPConditionalBranchesInstructions() {
     this.syntax = "%C,%B";
     this.paramCount = 2;
   }

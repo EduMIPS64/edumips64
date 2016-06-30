@@ -42,7 +42,7 @@ public class SYSCALL extends Instruction {
   private IOManager iom;
   private Memory memory;
 
-  public SYSCALL(Memory memory, IOManager iom) {
+  SYSCALL(Memory memory, IOManager iom) {
     this.syntax = "%U";
     this.paramCount = 1;
     this.name = "SYSCALL";

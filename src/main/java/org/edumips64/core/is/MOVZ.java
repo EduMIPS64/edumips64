@@ -43,7 +43,7 @@ class MOVZ extends ALU_RType {
   // Set to true if the Write Back stage should write data.
   private boolean should_write = false;
 
-  public MOVZ() {
+  MOVZ() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "MOVZ";
   }

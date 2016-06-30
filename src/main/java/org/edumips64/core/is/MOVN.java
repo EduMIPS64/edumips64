@@ -47,7 +47,7 @@ class MOVN extends ALU_RType {
   private boolean should_write = false;
 
 
-  public MOVN() {
+  MOVN() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "MOVN";
   }

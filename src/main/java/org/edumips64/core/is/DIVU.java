@@ -50,7 +50,7 @@ class DIVU extends ALU_RType {
   final static int HI_REG = 3;
   final String OPCODE_VALUE = "011011";
 
-  public DIVU() {
+  DIVU() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R,%R";
     name = "DIVU";

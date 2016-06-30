@@ -35,7 +35,7 @@ import org.edumips64.core.fpu.*;
 public abstract class FPConversionFCSRInstructions extends FPFormattedOperandMoveInstructions {
   String OPCODE_VALUE = "";
   String FMT_FIELD = "";
-  public FPConversionFCSRInstructions() {
+  FPConversionFCSRInstructions() {
     this.syntax = "%F,%F";
     this.paramCount = 2;
   }

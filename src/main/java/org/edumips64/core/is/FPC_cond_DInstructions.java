@@ -56,7 +56,7 @@ public abstract class FPC_cond_DInstructions extends ComputationalInstructions {
 
   String COND_VALUE = "";
 
-  public FPC_cond_DInstructions() {
+  FPC_cond_DInstructions() {
     syntax = "%C,%F,%F";
     paramCount = 3;
   }

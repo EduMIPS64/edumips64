@@ -42,7 +42,7 @@ class MUL_D extends FPArithmeticInstructions {
   String NAME = "MUL.D";
 
 
-  public MUL_D() {
+  MUL_D() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.FMT_FIELD = FMT_FIELD;
     name = NAME;

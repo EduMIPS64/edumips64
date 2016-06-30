@@ -43,7 +43,7 @@ class ADD_D extends FPArithmeticInstructions {
   String FMT_FIELD = "10001"; //DOUBLE IS 17
   String NAME = "ADD.D";
 
-  public ADD_D() {
+  ADD_D() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.FMT_FIELD = FMT_FIELD;
     super.name = NAME;

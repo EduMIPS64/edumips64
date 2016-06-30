@@ -38,7 +38,7 @@ import org.edumips64.utils.*;
 public class JALR extends FlowControl_RType {
   final int PC_VALUE = 0;
   final String OPCODE_VALUE = "001001";
-  public JALR() {
+  JALR() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "JALR";
   }

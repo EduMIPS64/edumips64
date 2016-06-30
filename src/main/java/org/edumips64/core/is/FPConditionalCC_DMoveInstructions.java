@@ -54,7 +54,7 @@ public abstract class FPConditionalCC_DMoveInstructions extends ComputationalIns
 
   int TF_FIELD_VALUE;
 
-  public FPConditionalCC_DMoveInstructions() {
+  FPConditionalCC_DMoveInstructions() {
     this.syntax = "%F,%F,%C";
     this.paramCount = 3;
   }

@@ -50,7 +50,7 @@ class DDIV extends ALU_RType {
   final static int HI_REG = 3;
   final String OPCODE_VALUE = "011110";
 
-  public DDIV() {
+  DDIV() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R,%R";
     name = "DDIV";

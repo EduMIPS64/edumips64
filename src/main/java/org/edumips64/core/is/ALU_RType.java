@@ -48,7 +48,7 @@ public abstract class ALU_RType extends ComputationalInstructions {
   String OPCODE_VALUE = "";
   final static int OPCODE_VALUE_INIT = 26;
   private static final Logger logger = Logger.getLogger(ALU_RType.class.getName());
-  public ALU_RType() {
+  ALU_RType() {
     syntax = "%R,%R,%R";
     paramCount = 3;
   }

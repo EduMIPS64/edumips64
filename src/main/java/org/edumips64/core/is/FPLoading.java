@@ -34,7 +34,7 @@ import org.edumips64.utils.*;
  */
 public abstract class FPLoading extends FPLDSTInstructions {
 
-  public FPLoading(Memory memory) {
+  FPLoading(Memory memory) {
     super(memory);
   }
 

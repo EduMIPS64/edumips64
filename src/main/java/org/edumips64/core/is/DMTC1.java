@@ -37,7 +37,7 @@ class DMTC1 extends FPMoveToInstructions {
   String OPCODE_VALUE = "00101";
   String NAME = "DMTC1";
 
-  public DMTC1() {
+  DMTC1() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.name = NAME;
   }

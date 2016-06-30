@@ -40,7 +40,7 @@ class MOVT_D extends FPConditionalCC_DMoveInstructions {
   String NAME = "MOVT.D";
   int TF_FIELD_VALUE = 1;
 
-  public MOVT_D() {
+  MOVT_D() {
     super.TF_FIELD_VALUE = TF_FIELD_VALUE;
     super.name = NAME;
   }

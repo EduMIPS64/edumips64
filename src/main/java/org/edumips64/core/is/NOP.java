@@ -36,7 +36,7 @@ public class NOP extends Instruction {
   protected static CPU cpu = CPU.getInstance();
 
   /** Creates a new instance of HALT */
-  public NOP() {
+  NOP() {
     name = "NOP";
   }
   public void IF() {

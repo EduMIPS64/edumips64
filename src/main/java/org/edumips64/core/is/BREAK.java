@@ -37,7 +37,7 @@ import org.edumips64.utils.*;
  */
 public class BREAK extends Instruction {
   final String OPCODE_VALUE = "000000"; // SPECIAL
-  public BREAK() {
+  BREAK() {
     name = "BREAK";
   }
   public void IF() throws BreakException {

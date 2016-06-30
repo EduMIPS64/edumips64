@@ -36,7 +36,7 @@ import org.edumips64.utils.*;
 class SWC1 extends FPStoring {
   final String OPCODE_VALUE = "111001";
 
-  public SWC1(Memory memory) {
+  SWC1(Memory memory) {
     super(memory);
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "SWC1";
