@@ -55,9 +55,11 @@ public class GUIConfig extends JDialog {
   // Local cache of the configuration values that will need to be applied to
   // the configuration backend.
   Map<String, Object> cache;
+  private CPU cpu;
 
-  public GUIConfig(final JFrame owner) {
+  public GUIConfig(final JFrame owner, CPU cpu) {
     super(owner, CurrentLocale.getString("Config.ITEM"), true);
+    this.cpu = cpu;
     logger.info("Building a new GUIConfig instance.");
     MAIN = CurrentLocale.getString("Config.MAIN");
     APPEARANCE = CurrentLocale.getString("Config.APPEARANCE");
@@ -390,7 +392,6 @@ public class GUIConfig extends JDialog {
           org.edumips64.Main.getGUIFrontend().updateComponents();
 
           if (Instruction.getEnableForwarding() != config.getBoolean("forwarding")) {
-            CPU cpu = CPU.getInstance();
             Instruction.setEnableForwarding(config.getBoolean("forwarding"));
 
             // Let's verify that we have to reset the CPU
