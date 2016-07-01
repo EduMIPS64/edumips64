@@ -205,8 +205,7 @@ public class Main extends JApplet {
 
     f.setExtendedState(f.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
-//debugging code
-    //BigDecimal bd=new BigDecimal("1e-23");
+//debugging code //BigDecimal bd=new BigDecimal("1e-23");
     //BigInteger bi=FPInstructionUtils.doubleTo64FixedPoint(bd,CPU.FPRoundingMode.TOWARDS_PLUS_INFINITY);
     //System.out.println(bi.longValue());
   }
@@ -255,7 +254,7 @@ public class Main extends JApplet {
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
     front = new GUIFrontend(cpu, memory);
-    cgt = new CPUGUIThread();
+    cgt = new CPUGUIThread(cpu, front, f);
     cgt.start();
 
     // Internal Frames
@@ -1106,10 +1105,6 @@ public class Main extends JApplet {
 
   public static GUIFrontend getGUIFrontend() {
     return front;
-  }
-
-  public static JFrame getMainFrame() {
-    return f;
   }
 
   public static void startPB() {

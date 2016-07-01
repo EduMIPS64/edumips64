@@ -62,11 +62,11 @@ public class CPUGUIThread extends Thread {
 
   private static final Logger logger = Logger.getLogger(CPUGUIThread.class.getName());
 
-  public CPUGUIThread() {
+  public CPUGUIThread(CPU cpu, GUIFrontend front, JFrame mainFrame) {
     externalStop = false;
-    cpu = CPU.getInstance();
-    front = Main.getGUIFrontend();
-    f = Main.getMainFrame();
+    this.cpu = cpu;
+    this.front = front;
+    f = mainFrame;
     updateConfigValues();
   }
 
