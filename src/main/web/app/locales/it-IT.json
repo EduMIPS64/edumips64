@@ -12,5 +12,10 @@
     "OK": "ok",
     "CANCEL": "annulla",
     "LANGUAGE": "lingua",
-    "DROP_YOUR_FILE_HERE": "trascina qua il file"
+    "DROP_YOUR_FILE_HERE": "trascina qua il file",
+    "EXECUTION": "esecuzione",
+    "RUN": "esegui",
+    "SINGLE_CYCLE": "ciclo singolo",
+    "MULTI_CYCLE": "ciclo multiplo",
+    "STOP": "stop"
 }

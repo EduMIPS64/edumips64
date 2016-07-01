@@ -6,7 +6,48 @@
         </div>
         -->
         <img src="images/logo.png" height="32" alt="logo">
+
         <span flex></span>
+
+        <md-menu>
+            <md-button class="md-icon-button" aria-label="Run" ng-click="$mdOpenMenu()">
+                <md-icon md-menu-origin md-svg-icon="images/play_arrow.svg"></md-icon>
+                <md-tooltip>{{'EXECUTION' | translate}}</md-tooltip>
+            </md-button>
+            <md-menu-content width="4">
+                <md-menu-item>
+                    <md-button ng-click="app.runSingle()">
+                        <md-icon md-svg-icon="images/skip_next.svg"></md-icon>
+                        <span translate class="capitalize">SINGLE_CYCLE</span>
+                        <span>F7</span>
+                    </md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button ng-click="app.runAll()">
+                        <md-icon md-svg-icon="images/play_arrow.svg"></md-icon>
+                        <span translate class="capitalize">RUN</span>
+                        <span>F4</span>
+                    </md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button ng-click="app.runMulti()">
+                        <md-icon md-svg-icon="images/fast_forward.svg"></md-icon>
+                        <span translate class="capitalize">MULTI_CYCLE</span>
+                        <span>F8</span>
+                    </md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button ng-click="app.stop()" ng-enabled="false">
+                        <md-icon md-svg-icon="images/stop.svg"></md-icon>
+                        <span translate class="capitalize">STOP</span>
+                        <span>F9</span>
+                    </md-button>
+                </md-menu-item>
+            </md-menu-content>
+        </md-menu>
+
+        <span flex></span>
+
         <md-button class="md-icon-button" aria-label="open">
             <md-icon md-svg-icon="images/cloud_upload.svg"></md-icon>
             <md-tooltip>{{'OPEN_SOURCE_FILE' | translate}}</md-tooltip>
@@ -15,6 +56,7 @@
             <md-icon md-svg-icon="images/cloud_download.svg"></md-icon>
             <md-tooltip>{{'DOWNLOAD_SOURCE_FILE' | translate}}</md-tooltip>
         </md-button>
+
         <md-button class="md-icon-button" aria-label="settings" ng-click="app.openSettingsDialog($event)">
             <md-icon md-svg-icon="images/settings.svg"></md-icon>
             <md-tooltip>{{'SETTINGS' | translate}}</md-tooltip>

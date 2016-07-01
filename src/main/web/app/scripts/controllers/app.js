@@ -37,13 +37,25 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $mdS
     };
 
     vm.onDropFile = function(file) {
-        console.log(file);
         vm.editorContent = file.content;
         vm.filename = file.name;
         vm.filesize = file.size;
     };
 
     vm.registers = [];
+
+    vm.runAll = function() {
+        var simulator = new jsedumips64.WebUi();
+        simulator.init();
+        var result = simulator.runProgram(vm.editorContent);
+        if (result.length != 0) {
+            $log.error(result);
+        } else {
+            $log.log(simulator.getRegisters());
+            $log.log(simulator.getMemory());
+            $log.log(simulator.getStatistics());
+        }
+    };
 
     $scope.$watch(function() {
         return $mdMedia('xs') || $mdMedia('sm');
@@ -75,6 +87,5 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $mdS
         name: 'HI',
         value: getRandomInt(0, Number.MAX_SAFE_INTEGER)
     });
-    console.log(vm.registers);
 
 });

@@ -19,14 +19,12 @@ angular.module('edmApp').directive('fileDropper', function($parse) {
             element.bind('dragster:enter', function(event) {
                 event.stopPropagation();
                 event.preventDefault();
-                console.log('dragenter');
                 angular.element(this).children().eq(0).addClass('active');
                 return false;
             });
             element.bind('dragster:leave', function(event) {
                 event.stopPropagation();
                 event.preventDefault();
-                console.log('dragleave');
                 angular.element(this).children().eq(0).removeClass('active');
                 return false;
             });

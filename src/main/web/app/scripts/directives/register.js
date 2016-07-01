@@ -28,7 +28,6 @@ angular.module('edmApp').directive('register', function() {
             $scope.$watchGroup(['vm.format', 'vm.value'], function() {
                 var format = arguments[0][0];
                 var value = arguments[0][1];
-                console.log( padLeft(11, 19) )
                 switch(format) {
                     case 'hex':
                         vm.convertedValue = padLeft(value.toString(16), 16).toUpperCase();
