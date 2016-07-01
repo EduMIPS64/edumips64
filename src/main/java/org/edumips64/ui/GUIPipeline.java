@@ -77,8 +77,7 @@ public class GUIPipeline extends GUIComponent {
     numMultiplier = 7;
     numAdder = 4;
     pannello = new Pannello1();
-    pipeline = new HashMap<CPU.PipeStage, Instruction>();
-    CPU.getInstance();
+    pipeline = new HashMap<>();
   }
 
   public void setContainer(Container co) {
