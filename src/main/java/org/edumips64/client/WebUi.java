@@ -51,7 +51,7 @@ public class WebUi implements EntryPoint {
   }
 
   public String getMemory() {
-    return Memory.getInstance().toString();
+    return memory.toString();
   }
 
   public String getRegisters() {
