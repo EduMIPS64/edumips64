@@ -24,6 +24,8 @@
 
 package org.edumips64.ui;
 
+import org.edumips64.core.CPU;
+import org.edumips64.core.Memory;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigManager;
 
@@ -46,8 +48,8 @@ public class GUICycles extends GUIComponent {
   CycleBuilder builder;
   static ConfigStore config = ConfigManager.getConfig();
 
-  public GUICycles() {
-    super();
+  public GUICycles(CPU cpu, Memory memory) {
+    super(cpu, memory);
     builder = new CycleBuilder();
     rightPanel = new RightPanel();
 

@@ -58,8 +58,8 @@ public class GUIRegisters extends GUIComponent {
   //(i want to avoid to modify the class constructor) the value is zero if a gpr is double clicked
   //1 if an fpr is double clicked
 
-  public GUIRegisters() {
-    super();
+  public GUIRegisters(CPU cpu, Memory memory) {
+    super(cpu, memory);
     registers = cpu.getRegisters();
     registersFP = cpu.getRegistersFP();
     regPanel = new RegPanel();
@@ -500,16 +500,5 @@ public class GUIRegisters extends GUIComponent {
       public void keyReleased(KeyEvent e)  {}
       public void keyTyped(KeyEvent e)  {}
     }
-  }
-
-  public static void main(String argv[]) {
-    JFrame frame = new JFrame("Registers");
-    Container c = frame.getContentPane();
-    GUIRegisters GUIR = new GUIRegisters();
-    GUIR.setContainer(c);
-    //c.add(GUIR.regPanel);
-    //setDefaultCloseOperation(EXIT_ON_CLOSE);
-    frame.pack();
-    frame.setVisible(true);
   }
 }

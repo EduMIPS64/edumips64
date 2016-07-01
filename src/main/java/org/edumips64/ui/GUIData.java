@@ -38,7 +38,6 @@ import javax.swing.table.*;
 */
 public class GUIData extends GUIComponent {
   DataPanel dataPanel;
-  Memory memory;
   MemoryElement memoryElement;
   String memoryAddress[] = new String[CPU.DATALIMIT];
   JTextArea text;
@@ -46,9 +45,8 @@ public class GUIData extends GUIComponent {
 
   private static final Logger logger = Logger.getLogger(CPU.class.getName());
 
-  public GUIData() {
-    super();
-    memory = Memory.getInstance();        //INIT OGGETTO MEMORIA!!!!!!!!!!!!!!! ^_^ Ãš qui, Ãš proprio qui!!!! NdR!!
+  public GUIData(CPU cpu, Memory memory) {
+    super(cpu, memory);
     dataPanel = new DataPanel();
   }
 

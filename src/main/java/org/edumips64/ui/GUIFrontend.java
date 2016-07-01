@@ -51,13 +51,13 @@ public class GUIFrontend {
 
   /**Creates the six internal component
   */
-  public GUIFrontend() {
-    cycles = new GUICycles();
-    regs = new GUIRegisters();
-    stats = new GUIStatistics();
-    pipe = new GUIPipeline();
-    data = new GUIData();
-    code = new GUICode();
+  public GUIFrontend(CPU cpu, Memory memory) {
+    cycles = new GUICycles(cpu, memory);
+    regs = new GUIRegisters(cpu, memory);
+    stats = new GUIStatistics(cpu, memory);
+    pipe = new GUIPipeline(cpu, memory);
+    data = new GUIData(cpu, memory);
+    code = new GUICode(cpu, memory);
 
     components = new GUIComponent[6];
     components[0] = cycles;
@@ -193,32 +193,5 @@ public class GUIFrontend {
     for (int i = 0; i < columnCount; ++i) {
       tcm.getColumn(i).setPreferredWidth(widths[i]);
     }
-  }
-
-  public static void main(String []arg) {
-    JFrame f = new JFrame("EduMIPS64");
-
-
-    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-    JInternalFrame frame1 = new JInternalFrame("Pipeline", true, true, true, true);
-    GUIFrontend front = new GUIFrontend();
-
-
-
-    frame1.setVisible(true);
-    frame1.setBounds(0, 0, 590, 670);
-    f.setBounds(0, 0, 600, 710);
-    f.setVisible(true);
-
-    Container comp = frame1.getContentPane();
-    front.setPipelineContainer(comp);
-
-    f.getLayeredPane().add(frame1);  //LE JInternalFrame VANNO AGGIUNTE NO ALLA FRAME PRINCIPALE, MA AD UNA JDesktopPane (che Ãš figlia delle JLayeredPane)
-    //for(int J=0;J<1000000000;J++);
-
-    //front.prova();
-    //for(int J=0;J<500000000;J++);
-
   }
 }

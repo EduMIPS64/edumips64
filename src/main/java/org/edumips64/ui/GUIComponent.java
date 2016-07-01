@@ -30,13 +30,15 @@ import java.awt.*;
 * This abstract class is implemented by every graphics component class.
 * @author Filippo Mondello
 */
-public abstract class GUIComponent {
-  Container cont;
-  CPU cpu;
+abstract class GUIComponent {
+  protected Container cont;
+  protected CPU cpu;
+  protected Memory memory;
 
-  public GUIComponent() {
+  public GUIComponent(CPU cpu, Memory memory) {
     cont = null;
-    cpu = CPU.getInstance();
+    this.cpu = cpu;
+    this.memory = memory;
   }
 
   /**Set the container of the component class.

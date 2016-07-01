@@ -72,8 +72,8 @@ public class GUIPipeline extends GUIComponent {
   }
 
 
-  public GUIPipeline() {
-    super();
+  GUIPipeline(CPU cpu, Memory memory) {
+    super(cpu, memory);
     numMultiplier = 7;
     numAdder = 4;
     pannello = new Pannello1();

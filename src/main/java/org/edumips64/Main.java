@@ -247,17 +247,16 @@ public class Main extends JApplet {
     cpu = CPU.getInstance();
     cpu.setStatus(CPU.CPUStatus.READY);
 
-    front = new GUIFrontend();
-
-    cgt = new CPUGUIThread();
-    cgt.start();
-
     memory = Memory.getInstance();
     symTab = new SymbolTable(memory);
     iom = new IOManager(lfu, memory);
     dinero = new Dinero(memory);
     instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
+
+    front = new GUIFrontend(cpu, memory);
+    cgt = new CPUGUIThread();
+    cgt.start();
 
     // Internal Frames
     JInternalFrame pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);
