@@ -25,9 +25,13 @@
 
 package org.edumips64.ui;
 
-import org.edumips64.core.*;
-import org.edumips64.core.is.*;
-import java.util.*;
+import org.edumips64.core.CPU;
+import org.edumips64.core.is.Instruction;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class CycleBuilder {
   private Instruction [] instr;
@@ -47,8 +51,8 @@ public class CycleBuilder {
   // instruction has to be added to "elementsList"
   int inputStructuralStalls;
 
-  public CycleBuilder() {
-    cpu = CPU.getInstance();
+  public CycleBuilder(CPU cpu) {
+    this.cpu = cpu;
     instr = new Instruction[5];
     elementsList = Collections.synchronizedList(new LinkedList<CycleElement>());
     updateStalls();

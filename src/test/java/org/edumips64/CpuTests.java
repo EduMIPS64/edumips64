@@ -150,7 +150,7 @@ public class CpuTests {
     dinero.reset();
     symTab.reset();
     testPath = testsLocation + testPath;
-    CycleBuilder builder = new CycleBuilder();
+    CycleBuilder builder = new CycleBuilder(cpu);
 
     try {
       try {

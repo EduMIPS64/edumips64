@@ -50,7 +50,7 @@ public class GUICycles extends GUIComponent {
 
   public GUICycles(CPU cpu, Memory memory) {
     super(cpu, memory);
-    builder = new CycleBuilder();
+    builder = new CycleBuilder(cpu);
     rightPanel = new RightPanel();
 
     jsp1 = new JScrollPane(rightPanel);
