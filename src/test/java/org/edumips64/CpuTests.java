@@ -57,7 +57,7 @@ public class CpuTests {
   private InstructionBuilder instructionBuilder;
   private static String testsLocation = "build/resources/test/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
-  private Dinero dinero = Dinero.getInstance();
+  private Dinero dinero;
   private ConfigStore config = ConfigManager.getTmpConfig();
 
   @Rule
@@ -124,6 +124,7 @@ public class CpuTests {
     cpu = CPU.getInstance();
     cpu.setStatus(CPU.CPUStatus.READY);
     memory = Memory.getInstance();
+    dinero = new Dinero(memory);
     symTab = new SymbolTable(memory);
     FileUtils lfu = new LocalFileUtils();
     iom = new IOManager(lfu, memory);
@@ -146,7 +147,7 @@ public class CpuTests {
   private CpuTestStatus runMipsTest(String testPath) throws Exception {
     log.warning("================================= Starting test " + testPath);
     cpu.reset();
-    Dinero.getInstance().reset();
+    dinero.reset();
     symTab.reset();
     testPath = testsLocation + testPath;
     CycleBuilder builder = new CycleBuilder();
@@ -181,7 +182,7 @@ public class CpuTests {
       return new CpuTestStatus(cpu, tmp.getAbsolutePath());
     } finally {
       cpu.reset();
-      Dinero.getInstance().reset();
+      dinero.reset();
       symTab.reset();
     }
   }

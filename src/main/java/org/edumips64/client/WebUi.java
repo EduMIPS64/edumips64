@@ -32,7 +32,7 @@ public class WebUi implements EntryPoint {
     logger.info("Running program: " + code);
     try {
       cpu.reset();
-      Dinero.getInstance().reset();
+      dinero.reset();
       symTab.reset();
       logger.info("About to parse it.");
       parser.doParsing(code);
@@ -82,7 +82,7 @@ public class WebUi implements EntryPoint {
     fu = new NullFileUtils();
     iom = new IOManager(fu, memory);
     cpu = CPU.getInstance();
-    dinero = Dinero.getInstance();
+    dinero = new Dinero(memory);
     instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
   }

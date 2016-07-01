@@ -255,7 +255,7 @@ public class Main extends JApplet {
     memory = Memory.getInstance();
     symTab = new SymbolTable(memory);
     iom = new IOManager(lfu, memory);
-    dinero = Dinero.getInstance();
+    dinero = new Dinero(memory);
     instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
@@ -459,7 +459,7 @@ public class Main extends JApplet {
     log.info("Trying to open " + file);
     cpu.reset();
     symTab.reset();
-    Dinero.getInstance().reset();
+    dinero.reset();
 
     try {
       // Aggiorniamo i componenti gai
@@ -612,7 +612,7 @@ public class Main extends JApplet {
   public static void resetSimulator(boolean reopenFile) {
     cpu.reset();
     symTab.reset();
-    Dinero.getInstance().reset();
+    dinero.reset();
 
     try {
       iom.reset();
@@ -758,11 +758,10 @@ public class Main extends JApplet {
 
         if (val == JFileChooser.APPROVE_OPTION) {
           String filename = jfc.getSelectedFile().getPath();
-          Dinero din = Dinero.getInstance();
 
           try {
             LocalWriter w = new LocalWriter(filename, false);
-            din.writeTraceData(w);
+            dinero.writeTraceData(w);
             w.close();
             log.info("Wrote dinero tracefile");
           } catch (Exception ex) {
@@ -918,7 +917,7 @@ public class Main extends JApplet {
     dinFrontend.setEnabled(false);
     dinFrontend.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        JDialog dinFrame = new DineroFrontend(f);
+        JDialog dinFrame = new DineroFrontend(f, dinero);
         dinFrame.setModal(true);
         dinFrame.setVisible(true);
       }

@@ -23,6 +23,7 @@
 
 package org.edumips64.ui;
 
+import org.edumips64.core.Dinero;
 import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.io.LocalWriterAdapter;
@@ -48,6 +49,7 @@ public class DineroFrontend extends JDialog {
   private static JButton browse, execute;
   private static JTextArea result;
   private static Container cp;
+  private Dinero dinero;
 
   private class StreamReader extends Thread {
     private InputStream stream;
@@ -106,8 +108,9 @@ public class DineroFrontend extends JDialog {
     return result;
   }
 
-  public DineroFrontend(Frame owner) {
+  public DineroFrontend(Frame owner, Dinero dinero) {
     super(owner);
+    this.dinero = dinero;
     setTitle("Dinero frontend");
     cp = rootPane.getContentPane();
     cp.setLayout(new BoxLayout(cp, BoxLayout.PAGE_AXIS));
@@ -173,24 +176,24 @@ public class DineroFrontend extends JDialog {
           result.setText("");
 
           logger.info("Starting the Dinero process.");
-          Process dinero = Runtime.getRuntime().exec(paramsList.toArray(new String[0]));
+          Process process = Runtime.getRuntime().exec(paramsList.toArray(new String[0]));
 
           logger.info("Creating and starting reader threads for stdout and stderr");
-          StreamReader stdoutReader = new StreamReader(dinero.getInputStream(), "stdout");
-          StreamReader stderrReader = new StreamReader(dinero.getErrorStream(), "stderr");
+          StreamReader stdoutReader = new StreamReader(process.getInputStream(), "stdout");
+          StreamReader stderrReader = new StreamReader(process.getErrorStream(), "stderr");
           stdoutReader.start();
           stderrReader.start();
 
           logger.info("Sending the tracefile to Dinero via stdin");
           // Let's send the tracefile to Dinero
-          PrintWriter dineroIn = new PrintWriter(dinero.getOutputStream());
-          org.edumips64.core.Dinero.getInstance().writeTraceData(new LocalWriterAdapter(dineroIn));
+          PrintWriter dineroIn = new PrintWriter(process.getOutputStream());
+          dinero.writeTraceData(new LocalWriterAdapter(dineroIn));
           dineroIn.flush();
           dineroIn.close();
 
           // Well, wait for Dinero to terminate
           logger.info("Data sent. Waiting for Dinero to terminate.");
-          dinero.waitFor();
+          process.waitFor();
           logger.info("Dinero terminated.");
           stdoutReader.join(10000);
           stderrReader.join(10000);

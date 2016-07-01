@@ -44,7 +44,7 @@ public class MainCLI {
       Memory memory = Memory.getInstance();
       SymbolTable symTab = new SymbolTable(memory);
       IOManager iom = new IOManager(localFileUtils, memory);
-      Dinero dinero = Dinero.getInstance();
+      Dinero dinero = new Dinero(memory);
       InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, c, dinero);
       Parser p = new Parser(localFileUtils, symTab, memory, instructionBuilder);
       c.setStatus(CPU.CPUStatus.READY);

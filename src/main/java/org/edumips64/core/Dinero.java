@@ -35,29 +35,20 @@ import java.io.IOException;
 
 public class Dinero {
 
-  /** Instance of the Dinero */
-  private static Dinero dinero;
-
-  int offset = 0;
+  private Memory memory;
   private LinkedList <String> dineroData;
+  private int offset;
 
-  /**Singlethon constructor */
-  private Dinero() {
-    dineroData = new LinkedList <String>();
+  public Dinero(Memory memory) {
+    this.memory = memory;
+    reset();
   }
-  public static Dinero getInstance() {
-    if (dinero == null) {
-      dinero = new Dinero();
-    }
 
-    return dinero;
-  }
-  /**
-   */
   public void reset() {
     offset = 0;
-    dineroData = new LinkedList <String>();
+    dineroData = new LinkedList <>();
   }
+
   /** Add a read Instruction
    * @param address address of the read Instruction
    */
@@ -100,8 +91,8 @@ public class Dinero {
 
   }
   /** Calculate the offset */
-  public void findOffset() {
-    int instructionsCount = Memory.getInstance().getInstructionsNumber();
+  private void findOffset() {
+    int instructionsCount = memory.getInstructionsNumber();
     offset = instructionsCount * 4;
     offset += offset % 8;
   }

@@ -22,7 +22,7 @@ public class ParserTest {
      memory = Memory.getInstance();
      symTab = new SymbolTable(memory);
      iom = new IOManager(new LocalFileUtils(), memory);
-     dinero = Dinero.getInstance();
+     dinero = new Dinero(memory);
      instructionBuilder = new InstructionBuilder(memory, iom, CPU.getInstance(), dinero);
      parser = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
   }
