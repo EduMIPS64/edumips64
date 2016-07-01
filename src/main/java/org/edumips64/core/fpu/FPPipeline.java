@@ -45,7 +45,6 @@ public class FPPipeline {
   private Divider divider;
   private Multiplier multiplier;
   private Adder adder;
-  private CPU cpu;
   private int nInstructions; //used for understanding if the fpPipe is empty or not
   private Queue<Instruction> entryQueue; //if an output structural hazard occurs instructions leave the
   //FPPipeline in the same order by which they has entered
@@ -171,8 +170,6 @@ public class FPPipeline {
    *  If an integer instruction is passed at the method 3 is returned
    */
   public int putInstruction(Instruction instr, boolean simulation) {  //throws InputStructuralHazardException
-    cpu = CPU.getInstance();
-
     if (instr != null && CPU.knownFPInstructions.contains(instr.getName())) {
       String instrName = instr.getName();
 
