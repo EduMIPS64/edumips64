@@ -25,6 +25,7 @@
 package org.edumips64.core.fpu;
 import java.math.*;
 import org.edumips64.core.CPU;
+import org.edumips64.core.FCSRRegister;
 import org.edumips64.utils.*;
 //import java.util.regex.Matcher;
 //import java.util.regex.Pattern;
@@ -32,7 +33,7 @@ import org.edumips64.utils.*;
 /** Group of functions used in the Floating point unit
  */
 public class FPInstructionUtils {
-  static CPU cpu = CPU.getInstance();
+  static FCSRRegister fcsr = CPU.getInstance().getFCSR();
   static String PLUSINFINITY = "0111111111110000000000000000000000000000000000000000000000000000";
   static String MINUSINFINITY = "1111111111110000000000000000000000000000000000000000000000000000";
   static String PLUSZERO = "0000000000000000000000000000000000000000000000000000000000000000";
@@ -86,12 +87,12 @@ public class FPInstructionUtils {
       if (value_bd.compareTo(theBiggest) == 1 || value_bd.compareTo(theSmallest) == -1) {
         //exception
         //before raising the trap or return the special value we modify the cause bit
-        cpu.setFCSRCause("O", 1);
+        fcsr.setFCSRCause("O", 1);
 
-        if (cpu.getFPExceptions(CPU.FPExceptions.OVERFLOW)) {
+        if (fcsr.getFPExceptions(CPU.FPExceptions.OVERFLOW)) {
           throw new FPOverflowException();
         } else {
-          cpu.setFCSRFlags("O", 1);
+          fcsr.setFCSRFlags("O", 1);
         }
 
         if (value_bd.compareTo(theBiggest) == 1) {
@@ -107,12 +108,12 @@ public class FPInstructionUtils {
       if ((value_bd.compareTo(theZeroMinus) == 1 && value_bd.compareTo(theZeroPlus) == -1) && (value_bd.compareTo(zero) != 0 && value_bd.compareTo(minuszero) != 0)) {
         //exception
         //before raising the trap or return the special value we modify the cause bit
-        cpu.setFCSRCause("U", 1);
+        fcsr.setFCSRCause("U", 1);
 
-        if (cpu.getFPExceptions(CPU.FPExceptions.UNDERFLOW)) {
+        if (fcsr.getFPExceptions(CPU.FPExceptions.UNDERFLOW)) {
           throw new FPUnderflowException();
         } else {
-          cpu.setFCSRFlags("U", 1);
+          fcsr.setFCSRFlags("U", 1);
         }
 
         if (value_bd.compareTo(zero) == 1) {
@@ -129,13 +130,13 @@ public class FPInstructionUtils {
 
       return padding64(output);
     } catch (NumberFormatException e) {
-      if (cpu.getFPExceptions(CPU.FPExceptions.OVERFLOW)) {
-        cpu.setFCSRCause("O", 1);
+      if (fcsr.getFPExceptions(CPU.FPExceptions.OVERFLOW)) {
+        fcsr.setFCSRCause("O", 1);
         // TODO(Issue #77): this should raise IrregularStringOfBitsException in case
         // the string does not represent a valid number.
         throw new FPOverflowException();
       } else {
-        cpu.setFCSRFlags("V", 1);
+        fcsr.setFCSRFlags("V", 1);
       }
 
       return PLUSZERO;
@@ -213,12 +214,12 @@ public class FPInstructionUtils {
       //and if the trap is enabled an exception occurs, else a Qnan is returned
       if ((isQNaN(value1) || isQNaN(value2)) || (isSNaN(value1) || isSNaN(value2))) {
         //before raising the trap or return the special value we modify the cause bit
-        cpu.setFCSRCause("V", 1);
+        fcsr.setFCSRCause("V", 1);
 
-        if (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
+        if (fcsr.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
           throw new FPInvalidOperationException();
         } else {
-          cpu.setFCSRFlags("V", 1);
+          fcsr.setFCSRFlags("V", 1);
         }
 
         return QNAN_NEW;
@@ -233,12 +234,12 @@ public class FPInstructionUtils {
 
       if (cond) {
         //before raising the trap or return the special value we modify the cause bit
-        cpu.setFCSRCause("V", 1);
+        fcsr.setFCSRCause("V", 1);
 
-        if (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
+        if (fcsr.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
           throw new FPInvalidOperationException();
         } else {
-          cpu.setFCSRFlags("V", 1);
+          fcsr.setFCSRFlags("V", 1);
         }
 
         return QNAN_NEW;
@@ -328,12 +329,12 @@ public class FPInstructionUtils {
       //and if the trap is enabled an exception occurs, else a Qnan is returned
       if ((isQNaN(value1) || isQNaN(value2)) || (isSNaN(value1) || isSNaN(value2))) {
         //before raising the trap or return the special value we modify the cause bit
-        cpu.setFCSRCause("V", 1);
+        fcsr.setFCSRCause("V", 1);
 
-        if (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
+        if (fcsr.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
           throw new FPInvalidOperationException();
         } else {
-          cpu.setFCSRFlags("V", 1);
+          fcsr.setFCSRFlags("V", 1);
         }
 
         return QNAN_NEW;
@@ -349,12 +350,12 @@ public class FPInstructionUtils {
 
       if (cond) {
         //before raising the trap or return the special value we modify the cause bit
-        cpu.setFCSRCause("V", 1);
+        fcsr.setFCSRCause("V", 1);
 
-        if (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
+        if (fcsr.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
           throw new FPInvalidOperationException();
         } else {
-          cpu.setFCSRFlags("V", 1);
+          fcsr.setFCSRFlags("V", 1);
         }
 
         return QNAN_NEW;
@@ -443,12 +444,12 @@ public class FPInstructionUtils {
       //and if the exception is enabled a trap occurs, else a Qnan is returned
       if ((isQNaN(value1) || isQNaN(value2)) || (isSNaN(value1) || isSNaN(value2))) {
         //before raising the trap or return the special value we modify the cause bit
-        cpu.setFCSRCause("V", 1);
+        fcsr.setFCSRCause("V", 1);
 
-        if (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
+        if (fcsr.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
           throw new FPInvalidOperationException();
         } else {
-          cpu.setFCSRFlags("V", 1);
+          fcsr.setFCSRFlags("V", 1);
         }
 
         return QNAN_NEW;
@@ -462,12 +463,12 @@ public class FPInstructionUtils {
 
       if (cond) {
         //before raising the trap or return the special value we modify the cause bit
-        cpu.setFCSRCause("V", 1);
+        fcsr.setFCSRCause("V", 1);
 
-        if (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
+        if (fcsr.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
           throw new FPInvalidOperationException();
         } else {
-          cpu.setFCSRFlags("V", 1);
+          fcsr.setFCSRFlags("V", 1);
         }
 
         return QNAN_NEW;
@@ -554,12 +555,12 @@ public class FPInstructionUtils {
       //and if the exception is enabled a trap occurs, else a Qnan is returned
       if ((isQNaN(value1) || isQNaN(value2)) || (isSNaN(value1) || isSNaN(value2))) {
         //before raising the trap or return the special value we modify the cause bit
-        cpu.setFCSRCause("V", 1);
+        fcsr.setFCSRCause("V", 1);
 
-        if (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
+        if (fcsr.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
           throw new FPInvalidOperationException();
         } else {
-          cpu.setFCSRFlags("V", 1);
+          fcsr.setFCSRFlags("V", 1);
         }
 
         return QNAN_NEW;
@@ -572,12 +573,12 @@ public class FPInstructionUtils {
 
       if (cond) {
         //before raising the trap or return the special value we modify the cause bit
-        cpu.setFCSRCause("V", 1);
+        fcsr.setFCSRCause("V", 1);
 
-        if (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
+        if (fcsr.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
           throw new FPInvalidOperationException();
         } else {
-          cpu.setFCSRFlags("V", 1);
+          fcsr.setFCSRFlags("V", 1);
         }
 
         return QNAN_NEW;
@@ -604,12 +605,12 @@ public class FPInstructionUtils {
 
       if (cond) {
         //before raising the trap or return the special value we modify the cause bit
-        cpu.setFCSRCause("Z", 1);
+        fcsr.setFCSRCause("Z", 1);
 
-        if (cpu.getFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO)) {
+        if (fcsr.getFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO)) {
           throw new FPDivideByZeroException();
         } else {
-          cpu.setFCSRFlags("Z", 1);
+          fcsr.setFCSRFlags("Z", 1);
         }
 
         int sign1 = getDoubleSign(value1);

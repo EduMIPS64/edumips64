@@ -195,7 +195,7 @@ public class GUIStatistics extends GUIComponent {
         label.setText(" " + "7654321 0      VZOUIVZOUIVZOUI");
         return label;
       case 18:
-        label.setText(" " + cpu.getFCSR());
+        label.setText(" " + cpu.getFCSR().getBinString());
         return label;
       }
 

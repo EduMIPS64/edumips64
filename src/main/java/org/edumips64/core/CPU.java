@@ -281,9 +281,9 @@ public class CPU {
     return fpPipe.getInstructionByFuncUnit(funcUnit, stage);
   }
 
-  /** Gets a binary string representing the Floating Point Control Status Register*/
-  public String getFCSR() {
-    return FCSR.getBinString();
+  /** Gets the Floating Point Control Status Register*/
+  public FCSRRegister getFCSR() {
+    return FCSR;
   }
 
   /** Gets the selected FCC bit of the FCSR
