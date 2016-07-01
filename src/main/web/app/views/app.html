@@ -36,22 +36,25 @@
         </md-grid-tile>
         <md-grid-tile class="green" md-rowspan="2" md-colspan="2">
             <md-grid-tile-header>
-                <h3>{{'DATA' | translate}}</h3>
+                <h3 class="capitalize">{{'DATA' | translate}}</h3>
             </md-grid-tile-header>
         </md-grid-tile>
         <md-grid-tile class="purple" md-rowspan="4" md-colspan="1">
             <md-grid-tile-header>
-                <h3>{{'CYCLES' | translate}}</h3>
+                <h3 class="capitalize">{{'CYCLES' | translate}}</h3>
             </md-grid-tile-header>
         </md-grid-tile>
         <md-grid-tile class="yellow" md-rowspan="4" md-colspan="1">
             <md-grid-tile-header>
-                <h3>{{'REGISTERS' | translate}}</h3>
+                <h3 class="capitalize">{{'REGISTERS' | translate}}</h3>
             </md-grid-tile-header>
+            <div class="registers-container">
+                <register ng-repeat="register in app.registers" format="app.format" name="register.name" value="register.value"></register>
+            </div>
         </md-grid-tile>
         <md-grid-tile class="red" md-rowspan="2" md-colspan="2">
             <md-grid-tile-header>
-                <h3>{{'CODE' | translate}}</h3>
+                <h3 class="capitalize">{{'CODE' | translate}}</h3>
             </md-grid-tile-header>
         </md-grid-tile>
     </md-grid-list>

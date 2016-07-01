@@ -17,6 +17,8 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $mdS
         vm.locs = event[1].env.document.getLength();
     };
 
+    vm.format = 'hex';
+
     vm.openSettingsDialog = function(event) {
         var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && vm.customFullscreen;
         $mdDialog.show({
@@ -41,9 +43,38 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $mdS
         vm.filesize = file.size;
     };
 
+    vm.registers = [];
+
     $scope.$watch(function() {
         return $mdMedia('xs') || $mdMedia('sm');
     }, function(wantsFullScreen) {
         $scope.customFullscreen = (wantsFullScreen === true);
     });
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    for(var i = 0; i < 32; i++) {
+        vm.registers.push({
+            name: 'R' + i,
+            value: getRandomInt(0, Number.MAX_SAFE_INTEGER)
+        });
+    }
+    for(var i = 0; i < 32; i++) {
+        vm.registers.push({
+            name: 'F' + i,
+            value: getRandomInt(0, Number.MAX_SAFE_INTEGER)
+        });
+    }
+    vm.registers.push({
+        name: 'LO',
+        value: getRandomInt(0, Number.MAX_SAFE_INTEGER)
+    });
+    vm.registers.push({
+        name: 'HI',
+        value: getRandomInt(0, Number.MAX_SAFE_INTEGER)
+    });
+    console.log(vm.registers);
+
 });
