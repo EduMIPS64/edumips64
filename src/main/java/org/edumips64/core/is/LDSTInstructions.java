@@ -53,9 +53,6 @@ public abstract class LDSTInstructions extends Instruction {
   // Size of the read/write operations. Must be set by derived classes
   protected byte memoryOpSize;
 
-  // Dinero instance
-  protected Dinero dinero = Dinero.getInstance();
-
   // Memory address with which the instruction is operating
   protected long address;
 

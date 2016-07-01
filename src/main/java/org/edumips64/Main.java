@@ -58,6 +58,7 @@ public class Main extends JApplet {
   static Parser parser;
   static SymbolTable symTab;
   static Memory memory;
+  static Dinero dinero;
   static InstructionBuilder instructionBuilder;
   static GUIFrontend front;
   static ConfigStore configStore;
@@ -254,7 +255,8 @@ public class Main extends JApplet {
     memory = Memory.getInstance();
     symTab = new SymbolTable(memory);
     iom = new IOManager(lfu, memory);
-    instructionBuilder = new InstructionBuilder(memory, iom, cpu);
+    dinero = Dinero.getInstance();
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
     // Internal Frames

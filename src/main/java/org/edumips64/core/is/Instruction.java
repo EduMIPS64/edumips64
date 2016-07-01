@@ -55,6 +55,13 @@ public abstract class Instruction {
     this.cpu = cpu;
   }
 
+  /** Dinero instance. It is set through setDinero, and it should always be set before the instruction is considered
+   * fully built. InstructionBuilder + package-local instruction constructors enforce this.
+   */
+  protected Dinero dinero;
+  void setDinero(Dinero dinero) {
+    this.dinero = dinero;
+  }
 
   /** Creates a new instance of Instruction */
   Instruction() {

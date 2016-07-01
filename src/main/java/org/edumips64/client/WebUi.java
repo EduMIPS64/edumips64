@@ -24,6 +24,7 @@ public class WebUi implements EntryPoint {
   private Memory memory;
   private InstructionBuilder instructionBuilder;
   private IOManager iom;
+  private Dinero dinero;
 
   // Executes the program. Returns an empty string on success, or an error message.
   public String runProgram(String code) {
@@ -81,7 +82,8 @@ public class WebUi implements EntryPoint {
     fu = new NullFileUtils();
     iom = new IOManager(fu, memory);
     cpu = CPU.getInstance();
-    instructionBuilder = new InstructionBuilder(memory, iom, cpu);
+    dinero = Dinero.getInstance();
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
   }
 }

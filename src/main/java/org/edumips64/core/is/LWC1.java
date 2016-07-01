@@ -50,8 +50,7 @@ class LWC1 extends FPLoading {
     //restoring the address from the temporary register
     long address = TR[OFFSET_PLUS_BASE].getValue();
     //For the trace file
-    Dinero din = Dinero.getInstance();
-    din.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), 4);
+    dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), 4);
     MemoryElement memEl = memory.getCellByAddress(address);
     //reading from the memory element and saving values on LMD register
     TR[LMD_REGISTER].writeWord(memEl.readWord((int)(address % 8)));

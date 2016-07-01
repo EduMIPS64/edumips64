@@ -14,12 +14,14 @@ public class MemoryTest {
   private Memory m = Memory.getInstance();
   private InstructionBuilder instructionBuilder;
   private IOManager iom;
+  private Dinero dinero;
 
   @Before
   public void setUp() throws Exception {
     ConfigManager.setConfig(config);
     iom = new IOManager(new LocalFileUtils(), m);
-    instructionBuilder = new InstructionBuilder(m, iom, CPU.getInstance());
+    dinero = Dinero.getInstance();
+    instructionBuilder = new InstructionBuilder(m, iom, CPU.getInstance(), dinero);
   }
 
   /* Regression test for Issue #84 */

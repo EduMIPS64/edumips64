@@ -39,10 +39,8 @@ public class NOP extends Instruction {
     name = "NOP";
   }
   public void IF() {
-    Dinero din = Dinero.getInstance();
-
     try {
-      din.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }

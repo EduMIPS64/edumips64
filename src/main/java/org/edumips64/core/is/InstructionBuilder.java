@@ -1,6 +1,7 @@
 package org.edumips64.core.is;
 
 import org.edumips64.core.CPU;
+import org.edumips64.core.Dinero;
 import org.edumips64.core.IOManager;
 import org.edumips64.core.Memory;
 
@@ -14,11 +15,13 @@ public class InstructionBuilder {
   private Memory memory;
   private IOManager iom;
   private CPU cpu;
+  private Dinero dinero;
 
-  public InstructionBuilder(Memory memory, IOManager iom, CPU cpu) {
+  public InstructionBuilder(Memory memory, IOManager iom, CPU cpu, Dinero dinero) {
     this.memory = memory;
     this.iom = iom;
     this.cpu = cpu;
+    this.dinero = dinero;
   }
   /**
    * Creates a new instance of an Instruction's subclass
@@ -381,6 +384,7 @@ public class InstructionBuilder {
         return null;
     }
     instruction.setCPU(cpu);
+    instruction.setDinero(dinero);
     return instruction;
   }
 }

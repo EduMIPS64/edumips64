@@ -13,6 +13,7 @@ public class ParserTest {
   private SymbolTable symTab;
   private IOManager iom;
   private InstructionBuilder instructionBuilder;
+  private Dinero dinero;
   private ConfigStore config = ConfigManager.getTmpConfig();
 
   @Before
@@ -21,7 +22,8 @@ public class ParserTest {
      memory = Memory.getInstance();
      symTab = new SymbolTable(memory);
      iom = new IOManager(new LocalFileUtils(), memory);
-     instructionBuilder = new InstructionBuilder(memory, iom, CPU.getInstance());
+     dinero = Dinero.getInstance();
+     instructionBuilder = new InstructionBuilder(memory, iom, CPU.getInstance(), dinero);
      parser = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
   }
   /** Allows easier testing of .data section contents by adding the ".data" prefix and the "\n.code\nSYSCALL 0" suffix. */

@@ -43,10 +43,8 @@ public class HALT extends Instruction {
     name = "HALT";
   }
   public void IF() {
-    Dinero din = Dinero.getInstance();
-
     try {
-      din.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }
