@@ -13,8 +13,13 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $mdS
         $mdSidenav('left').toggle();
     };
 
+    vm.aceLoaded = function(editor) {
+        editor.getSession().getDocument().setNewLineMode('unix');
+    };
+
     vm.editorChanged = function(event) {
         vm.locs = event[1].env.document.getLength();
+        vm.filesize = vm.editorContent.length;
     };
 
     vm.format = 'hex';
@@ -39,7 +44,7 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $mdS
     vm.onDropFile = function(file) {
         vm.editorContent = file.content;
         vm.filename = file.name;
-        vm.filesize = file.size;
+        //vm.filesize = file.size;
     };
 
     vm.registers = [];

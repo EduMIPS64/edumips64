@@ -69,7 +69,7 @@
     <md-grid-list style="height:100%" md-cols="6" md-row-height="fit" md-gutter="10px">
         <md-grid-tile class="gray editor" md-rowspan="4" md-colspan="2">
             <div file-dropper="app.onDropFile($file)">
-                <div ui-ace="{ showGutter: true, onChange: app.editorChanged }" ng-model="app.editorContent"></div>
+                <div ui-ace="{ showGutter: true, onLoad: app.aceLoaded, onChange: app.editorChanged }" ng-model="app.editorContent"></div>
             </div>
             <md-grid-tile-footer>
                 <div>{{app.filename}} ({{app.filesize | number : 0}} bytes)</div>
