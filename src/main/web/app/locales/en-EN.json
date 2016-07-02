@@ -17,5 +17,7 @@
     "RUN": "run",
     "SINGLE_CYCLE": "single cycle",
     "MULTI_CYCLE": "multi-cycle",
-    "STOP": "stop"
+    "STOP": "stop",
+    "DISCARD_CHANGES": "discard changes",
+    "WOULD_YOU_LIKE_TO_DISCARD_YOUR_CHANGES": "would you like to discard your changes?"
 }

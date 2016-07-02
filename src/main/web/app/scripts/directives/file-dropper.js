@@ -43,6 +43,7 @@ angular.module('edmApp').directive('fileDropper', function($parse) {
                     file.content = result.target.result;
                     scope.$apply(function() {
                         fileDropperFn(scope, {
+                            '$event': event,
                             '$file': file
                         });
                     });

@@ -25,3 +25,7 @@ angular.module('edmApp').config(function($mdThemingProvider, $locationProvider, 
         templateUrl: 'views/app.html'
     });
 });
+
+String.prototype.capitalizeFirstLetter = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}

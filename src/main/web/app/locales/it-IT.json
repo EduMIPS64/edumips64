@@ -17,5 +17,7 @@
     "RUN": "esegui",
     "SINGLE_CYCLE": "ciclo singolo",
     "MULTI_CYCLE": "ciclo multiplo",
-    "STOP": "stop"
+    "STOP": "stop",
+    "DISCARD_CHANGES": "ignora modifiche",
+    "WOULD_YOU_LIKE_TO_DISCARD_YOUR_CHANGES": "vuoi ignorare le modifiche non salvate?"
 }

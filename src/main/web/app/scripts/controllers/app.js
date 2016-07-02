@@ -1,7 +1,8 @@
-angular.module('edmApp').controller('AppController', function($scope, $log, $mdSidenav, $mdMedia, $mdDialog) {
+angular.module('edmApp').controller('AppController', function($scope, $log, $translate, $mdSidenav, $mdMedia, $mdDialog, $q) {
     'use strict';
 
     var vm = this;
+    var touched = false;
 
     vm.locs = 0;
     vm.editorContent = '';
@@ -20,6 +21,7 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $mdS
     vm.editorChanged = function(event) {
         vm.locs = event[1].env.document.getLength();
         vm.filesize = vm.editorContent.length;
+        touched = true;
     };
 
     vm.format = 'hex';
@@ -41,10 +43,31 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $mdS
         });
     };
 
-    vm.onDropFile = function(file) {
-        vm.editorContent = file.content;
-        vm.filename = file.name;
-        //vm.filesize = file.size;
+    vm.onDropFile = function(event, file) {
+        var title = $translate.instant('DISCARD_CHANGES').capitalizeFirstLetter();
+        var text = $translate.instant('WOULD_YOU_LIKE_TO_DISCARD_YOUR_CHANGES').capitalizeFirstLetter();
+        var ok = $translate.instant('OK');
+        var cancel = $translate.instant('CANCEL');
+        var dialog = $mdDialog.confirm()
+            .title(title)
+            .textContent(text)
+            .ariaLabel('Confirm discard')
+            .targetEvent(event)
+            .ok(ok)
+            .cancel(cancel);
+
+        var promise = null;
+        if(touched) {
+            promise = $mdDialog.show(dialog);
+        } else {
+            promise = $q.when(true);
+        }
+        return promise.then(function() {
+            vm.filename = file.name;
+            vm.editorContent = file.content;
+            touched = false;
+        });
+
     };
 
     vm.registers = [];
