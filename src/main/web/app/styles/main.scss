@@ -82,7 +82,7 @@ div[file-dropper]>.dropper-overlay.active {
     width: 100px;
     text-align: right;
 }
-md-menu-item>button>span:last-child {
+md-menu-item>button>span:last-of-type {
     float: right;
 }
 .registers-container {

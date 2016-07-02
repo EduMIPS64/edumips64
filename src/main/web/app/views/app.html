@@ -16,28 +16,28 @@
             </md-button>
             <md-menu-content width="4">
                 <md-menu-item>
-                    <md-button ng-click="app.runSingle()">
+                    <md-button ng-click="app.runSingle()" keyboard-shortcut="f7">
                         <md-icon md-svg-icon="images/skip_next.svg"></md-icon>
                         <span translate class="capitalize">SINGLE_CYCLE</span>
                         <span>F7</span>
                     </md-button>
                 </md-menu-item>
                 <md-menu-item>
-                    <md-button ng-click="app.runAll()">
+                    <md-button ng-click="app.runAll()" keyboard-shortcut="f4">
                         <md-icon md-svg-icon="images/play_arrow.svg"></md-icon>
                         <span translate class="capitalize">RUN</span>
                         <span>F4</span>
                     </md-button>
                 </md-menu-item>
                 <md-menu-item>
-                    <md-button ng-click="app.runMulti()">
+                    <md-button ng-click="app.runMulti()" keyboard-shortcut="f8">
                         <md-icon md-svg-icon="images/fast_forward.svg"></md-icon>
                         <span translate class="capitalize">MULTI_CYCLE</span>
                         <span>F8</span>
                     </md-button>
                 </md-menu-item>
                 <md-menu-item>
-                    <md-button ng-click="app.stop()" ng-enabled="false">
+                    <md-button ng-click="app.stop()" ng-enabled="false" keyboard-shortcut="f9">
                         <md-icon md-svg-icon="images/stop.svg"></md-icon>
                         <span translate class="capitalize">STOP</span>
                         <span>F9</span>

@@ -44,7 +44,21 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $mdS
 
     vm.registers = [];
 
+    vm.runSingle = function() {
+        $log.log('Run single step invoked');
+    };
+
+    vm.runMulti = function() {
+        $log.log('Run multi-cycle invoked');
+    };
+
+    vm.stop = function() {
+        $log.log('Stop invoked');
+    };
+
     vm.runAll = function() {
+        $log.log('Run invoked');
+        $log.log(vm.editorContent);
         var simulator = new jsedumips64.WebUi();
         simulator.init();
         var result = simulator.runProgram(vm.editorContent);
