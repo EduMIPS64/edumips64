@@ -227,6 +227,7 @@ public class Parser {
     memoryCount = 0;
     String lastLabel = "";
 
+    code = code.replaceAll("\r\n", "\n");
     for (String line : code.split("\n")) {
       row++;
       logger.info("-- Processing line " + row);
