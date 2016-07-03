@@ -35,14 +35,16 @@
               $("#run-button").click(function () {
                   var simulator = new jsedumips64.WebUi();
                   simulator.init();
-                  var result = simulator.runProgram($("#code").val());
-                  if (result.length != 0) {
-                      alert(result);
-                  } else {
-                      $("#registers").html(simulator.getRegisters());
-                      $("#memory").html(simulator.getMemory());
-                      $("#statistics").html(simulator.getStatistics());
+                  try {
+                      simulator.loadProgram($("#code").val());
+                  } catch(e) {
+                      // TODO: should discriminate between WrongStateException and ParserMultiWarningException
+                      var javaException = e["__java$exception"];
+                      if (javaException.hasErrors()) {
+                          alert(javaException.toString());
+                      }
                   }
+                  // TODO: run the program and handle exceptions.
               });
           });
       </script>

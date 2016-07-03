@@ -1,4 +1,7 @@
 package org.edumips64.core;
+import jsinterop.annotations.JsMethod;
+import jsinterop.annotations.JsType;
+
 import java.util.*;
 /*
  * ParserMultiException.java
@@ -30,6 +33,7 @@ import java.util.*;
  * @author mancausoft, Vanni
  */
 
+@JsType(namespace = "jsedumips64")
 public class ParserMultiException extends Exception {
 
   protected LinkedList <ParserException>exception;
@@ -54,6 +58,7 @@ public class ParserMultiException extends Exception {
    *
    * The exception might be empty or contain only warnings.
    */
+  @JsMethod
   public boolean hasErrors() {
     for (ParserException e : exception) {
       if (e.isError()) {
