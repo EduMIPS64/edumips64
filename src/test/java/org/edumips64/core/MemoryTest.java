@@ -11,17 +11,20 @@ import static org.junit.Assert.*;
 
 public class MemoryTest {
   private ConfigStore config = ConfigManager.getTmpConfig();
-  private Memory m = Memory.getInstance();
+  private Memory m;
   private InstructionBuilder instructionBuilder;
   private IOManager iom;
   private Dinero dinero;
+  private CPU cpu;
 
   @Before
   public void setUp() throws Exception {
+    m = new Memory();
+    cpu = new CPU(m);
     ConfigManager.setConfig(config);
     iom = new IOManager(new LocalFileUtils(), m);
     dinero = new Dinero(m);
-    instructionBuilder = new InstructionBuilder(m, iom, CPU.getInstance(), dinero);
+    instructionBuilder = new InstructionBuilder(m, iom, cpu, dinero);
   }
 
   /* Regression test for Issue #84 */

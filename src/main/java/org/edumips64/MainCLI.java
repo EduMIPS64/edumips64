@@ -39,9 +39,9 @@ public class MainCLI {
     CurrentLocale.setLanguage("en");
 
     try {
-      CPU c = CPU.getInstance();
+      Memory memory = new Memory();
+      CPU c = new CPU(memory);
       LocalFileUtils localFileUtils = new LocalFileUtils();
-      Memory memory = Memory.getInstance();
       SymbolTable symTab = new SymbolTable(memory);
       IOManager iom = new IOManager(localFileUtils, memory);
       Dinero dinero = new Dinero(memory);

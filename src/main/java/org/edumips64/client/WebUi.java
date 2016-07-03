@@ -76,11 +76,11 @@ public class WebUi implements EntryPoint {
     // Simulator initialization.
     config = ConfigManager.getTmpConfig();
     ConfigManager.setConfig(config);
-    memory = Memory.getInstance();
+    memory = new Memory();
     symTab = new SymbolTable(memory);
     fu = new NullFileUtils();
     iom = new IOManager(fu, memory);
-    cpu = CPU.getInstance();
+    cpu = new CPU(memory);
     dinero = new Dinero(memory);
     instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
     parser = new Parser(fu, symTab, memory, instructionBuilder);

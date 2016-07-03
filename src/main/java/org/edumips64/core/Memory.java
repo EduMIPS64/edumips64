@@ -43,14 +43,12 @@ public class Memory {
   private SortedMap<Integer, MemoryElement> cells;
   private SortedMap<Integer, Instruction> instructions;
 
-  private static Memory memory = null;
-
   private static final Logger logger = Logger.getLogger(Memory.class.getName());
 
   // Keep track of non-BUBBLE instructions for code size purposes.
   private int instructionCount = 0;
 
-  private Memory() {
+  public Memory() {
     logger.info("Building Memory: " + this.hashCode());
     cells = new TreeMap<>();
     instructions = new TreeMap<>();
@@ -62,19 +60,6 @@ public class Memory {
    */
   public int getInstructionsNumber() {
     return instructionCount;
-  }
-
-  /** Singleton pattern: since the unique constructor of this class is private, this static method
-   * returns the unique allowed instance of Memory, thus subsequent calls of this method will return exactly
-   * the same object.
-   * @return unique instance of Memory
-   */
-  public static Memory getInstance() {
-    if (memory == null) {
-      memory = new Memory();
-    }
-
-    return memory;
   }
 
   /** Gets the index of the given instruction

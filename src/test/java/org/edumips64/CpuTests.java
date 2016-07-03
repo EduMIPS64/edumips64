@@ -121,9 +121,9 @@ public class CpuTests {
   @Before
   public void testSetup() {
     ConfigManager.setConfig(config);
-    cpu = CPU.getInstance();
+    memory = new Memory();
+    cpu = new CPU(memory);
     cpu.setStatus(CPU.CPUStatus.READY);
-    memory = Memory.getInstance();
     dinero = new Dinero(memory);
     symTab = new SymbolTable(memory);
     FileUtils lfu = new LocalFileUtils();
