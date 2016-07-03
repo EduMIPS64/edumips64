@@ -243,10 +243,10 @@ public class Main extends JApplet {
     cp.setLayout(new BorderLayout());
     cp.add(createMenuBar(), BorderLayout.NORTH);
 
-    cpu = CPU.getInstance();
+    memory = new Memory();
+    cpu = new CPU(memory);
     cpu.setStatus(CPU.CPUStatus.READY);
 
-    memory = Memory.getInstance();
     symTab = new SymbolTable(memory);
     iom = new IOManager(lfu, memory);
     dinero = new Dinero(memory);
