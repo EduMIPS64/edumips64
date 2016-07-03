@@ -64,12 +64,12 @@ class MFLO extends ALU_RType {
     rd.incrWriteSemaphore();
   }
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }
   public void WB() throws IrregularStringOfBitsException {
-    if (!isEnableForwarding()) {
+    if (!cpu.isEnableForwarding()) {
       doWB();
     }
   }

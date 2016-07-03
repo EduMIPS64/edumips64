@@ -98,12 +98,12 @@ class DMULT extends ALU_RType {
     hi = tmp.substring(0, 64);
     lo = tmp.substring(64);
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }
   public void WB() throws IrregularStringOfBitsException {
-    if (!isEnableForwarding()) {
+    if (!cpu.isEnableForwarding()) {
       doWB();
     }
   }

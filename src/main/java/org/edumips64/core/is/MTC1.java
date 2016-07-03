@@ -47,7 +47,7 @@ class MTC1 extends FPMoveToInstructions {
     String value = TR[RT_FIELD].getBinString();
     TRfp[FS_FIELD].setBits(value.substring(32, 64), 32);
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }

@@ -808,6 +808,10 @@ public class CPU {
     return s;
   }
 
+  public boolean isEnableForwarding() {
+    return config.getBoolean("forwarding");
+  }
+
   /** Test method that returns a string containing the values of every
    * FPR.
    * @return a string

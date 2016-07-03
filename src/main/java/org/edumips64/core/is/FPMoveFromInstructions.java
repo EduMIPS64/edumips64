@@ -56,7 +56,7 @@ public abstract class FPMoveFromInstructions extends FPMoveToAndFromInstructions
   public abstract void EX() throws IrregularStringOfBitsException, IrregularWriteOperationException;
   public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {};
   public void WB() throws IrregularStringOfBitsException {
-    if (!isEnableForwarding()) {
+    if (!cpu.isEnableForwarding()) {
       doWB();
     }
   }

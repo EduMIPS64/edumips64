@@ -53,7 +53,7 @@ class LDC1 extends FPLoading {
     //reading from the memory element and saving values on LMD register
     TR[LMD_REGISTER].setBits(memEl.getBinString(), 0);
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }

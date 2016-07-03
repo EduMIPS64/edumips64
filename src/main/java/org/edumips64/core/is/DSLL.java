@@ -85,7 +85,7 @@ public class DSLL extends ALU_RType {
 
     TR[RD_FIELD].setBits(sb.substring(0), 0);
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }

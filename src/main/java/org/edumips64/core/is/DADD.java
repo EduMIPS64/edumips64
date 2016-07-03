@@ -59,7 +59,7 @@ class DADD extends ALU_RType {
       //if the enable forwarding is turned on we have to ensure that registers
       //should be unlocked also if a synchronous exception occurs. This is performed
       //by executing the WB method before raising the trap
-      if (isEnableForwarding()) {
+      if (cpu.isEnableForwarding()) {
         doWB();
       }
 
@@ -70,7 +70,7 @@ class DADD extends ALU_RType {
 
     TR[RD_FIELD].setBits(outputstring, 0);
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }

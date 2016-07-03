@@ -53,7 +53,7 @@ public class JALR extends FlowControl_RType {
     TR[PC_VALUE].writeDoubleWord(cpu.getPC().getValue() - 4);
     cpu.getPC().setBits(cpu.getRegister(params.get(RS_FIELD)).getBinString(), 0);
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
 
@@ -68,7 +68,7 @@ public class JALR extends FlowControl_RType {
 
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!isEnableForwarding()) {
+    if (!cpu.isEnableForwarding()) {
       doWB();
     }
   }

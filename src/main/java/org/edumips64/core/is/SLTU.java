@@ -77,7 +77,7 @@ class SLTU extends ALU_RType {
       TR[RD_FIELD].writeDoubleWord(0);
     }
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }
