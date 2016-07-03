@@ -52,9 +52,12 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
   String OPCODE_VALUE = "";
   String FMT_FIELD = "";
 
-  FPArithmeticInstructions() {
+  FPInstructionUtils fpInstructionUtils;
+
+  FPArithmeticInstructions(FCSRRegister fcsr) {
     syntax = "%F,%F,%F";
     paramCount = 3;
+    fpInstructionUtils = new FPInstructionUtils(fcsr);
   }
 
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, WAWException {

@@ -146,7 +146,7 @@ public class FCSRRegister extends BitSet32 {
    * @param exceptionName the exception name to set
    * @param value         boolean that is true in order to enable that exception or false for disabling it
    */
-  void setFPExceptions(CPU.FPExceptions exceptionName, boolean value) throws IrregularStringOfBitsException {
+  public void setFPExceptions(CPU.FPExceptions exceptionName, boolean value) throws IrregularStringOfBitsException {
     switch (exceptionName) {
       case DIVIDE_BY_ZERO:
         setFCSREnables("Z", (value) ? 1 : 0);

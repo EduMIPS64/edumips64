@@ -60,11 +60,19 @@ public class ParserTest {
 
   @Test(expected = ParserMultiException.class)
   public void FPOverflowPositiveNumberTest() throws Exception {
+    parser.getFCSR().setFPExceptions(CPU.FPExceptions.OVERFLOW, true);
     ParseDouble("-1.8E308");
   }
 
   @Test(expected = ParserMultiException.class)
   public void FPOverflowNegativeNumberTest() throws Exception {
+    parser.getFCSR().setFPExceptions(CPU.FPExceptions.OVERFLOW, true);
+    ParseDouble("4.95E324");
+  }
+
+  @Test
+  public void FPOverflowNoThrowOnDisabledExceptionsTest() throws Exception {
+    parser.getFCSR().setFPExceptions(CPU.FPExceptions.OVERFLOW, false);
     ParseDouble("4.95E324");
   }
 
