@@ -62,7 +62,7 @@ public abstract class FPMoveToInstructions extends FPMoveToAndFromInstructions {
   }
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!isEnableForwarding()) {
+    if (!cpu.isEnableForwarding()) {
       doWB();
     }
   }

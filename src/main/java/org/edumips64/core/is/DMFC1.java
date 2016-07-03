@@ -48,7 +48,7 @@ class DMFC1 extends FPMoveFromInstructions {
     String value = TRfp[FS_FIELD].getBinString();
     TR[RT_FIELD].setBits(value, 0);
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }

@@ -49,7 +49,7 @@ class MFC1 extends FPMoveFromInstructions {
     String value = TRfp[FS_FIELD].getBinString();
     TR[RT_FIELD].writeWord(Converter.binToInt(value.substring(32, 64), false));
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }

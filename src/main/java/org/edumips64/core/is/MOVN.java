@@ -58,7 +58,7 @@ class MOVN extends ALU_RType {
       should_write = true;
     }
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }

@@ -60,7 +60,7 @@ public class SUBU extends ALU_RType {
 
     TR[RD_FIELD].setBits(filledOutputstring, 0);
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
 
