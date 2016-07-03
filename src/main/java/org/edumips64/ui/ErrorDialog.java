@@ -43,9 +43,8 @@ import javax.swing.event.*;
 public class ErrorDialog extends JDialog {
 
   private static boolean[] lineIsError;
-  JButton okButton;
   int numError = 0, width = 710, height = 350;
-  public ErrorDialog(final JFrame owner, LinkedList<ParserException> peList, String title) {
+  public ErrorDialog(final JFrame owner, LinkedList<ParserException> peList, String title, Boolean showWarning) {
 
     super(owner, title, true);
 
@@ -98,8 +97,6 @@ public class ErrorDialog extends JDialog {
     table.getColumnModel().getColumn(3).setCellRenderer(renderer);
 
     int i = 0;
-    boolean warnings = ConfigManager.getConfig().getBoolean("warnings");
-
     for (ParserException e : peList) {
       lineIsError[i] = e.isError();
 
@@ -107,7 +104,7 @@ public class ErrorDialog extends JDialog {
         numError++;
       }
 
-      if (lineIsError[i] || warnings) {
+      if (lineIsError[i] || showWarning) {
         dft.addRow(e.getStringArray());
         i++;
       }
@@ -139,7 +136,7 @@ public class ErrorDialog extends JDialog {
     setSize(width, height);
     setLocation((getScreenWidth() - getWidth()) / 2, (getScreenHeight() - getHeight()) / 2);
 
-    if (!warnings && numError == 0) {
+    if (!showWarning && numError == 0) {
       setVisible(false);
       dispose();
     } else {

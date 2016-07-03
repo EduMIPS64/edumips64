@@ -489,8 +489,4 @@ public class CurrentLocale {
       return key;
     }
   }
-
-  public static boolean isSelected(String lan) {
-    return config.getString("language").equals(lan);
-  }
 }

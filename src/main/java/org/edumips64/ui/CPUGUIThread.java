@@ -59,14 +59,16 @@ public class CPUGUIThread extends Thread {
   private CPU cpu;
   private GUIFrontend front;
   private JFrame f;
+  private ConfigStore config;
 
   private static final Logger logger = Logger.getLogger(CPUGUIThread.class.getName());
 
-  public CPUGUIThread(CPU cpu, GUIFrontend front, JFrame mainFrame) {
+  public CPUGUIThread(CPU cpu, GUIFrontend front, JFrame mainFrame, ConfigStore config) {
     externalStop = false;
     this.cpu = cpu;
     this.front = front;
     f = mainFrame;
+    this.config = config;
     updateConfigValues();
   }
 
@@ -74,7 +76,6 @@ public class CPUGUIThread extends Thread {
    * configuration values from the configuration file.
    */
   public void updateConfigValues() {
-    ConfigStore config = ConfigManager.getConfig();
     sleep_interval = config.getInt("sleep_interval");
     verbose = config.getBoolean("verbose");
     masked = config.getBoolean("syncexc-masked");
