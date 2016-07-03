@@ -59,4 +59,10 @@ public class ParserTest {
   public void FPOverflowNegativeNumberTest() throws Exception {
     ParseDouble("4.95E324");
   }
+
+  /** Regression test for issue #95 */
+  @Test
+  public void CRLFParsingTest() throws Exception {
+    parser.doParsing(".data\r\n.double 8\r\n.code\r\nSYSCALL 0\r\n");
+  }
 }
