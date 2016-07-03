@@ -33,10 +33,12 @@ import org.edumips64.core.fpu.*;
  * */
 
 public class BitSet64FP extends FixedBitSet {
+  private FPInstructionUtils fpInstructionUtils;
 
   /** Creates a default new instance of BitSet64FP. */
   public BitSet64FP() {
     super(64);
+    fpInstructionUtils = new FPInstructionUtils(new FCSRRegister());
   }
 
   /** Writes a floating point double precision number into this FixedBitSet: the value to be written must be in the range
@@ -48,7 +50,7 @@ public class BitSet64FP extends FixedBitSet {
    */
   public void writeDouble(double value) throws FPUnderflowException, FPOverflowException, FPInvalidOperationException, IrregularWriteOperationException, IrregularStringOfBitsException {
     this.reset(false);
-    String bits = FPInstructionUtils.doubleToBin(value + "");
+    String bits = fpInstructionUtils.doubleToBin(value + "");
 
     try {
       this.setBits(bits, 0);
@@ -67,7 +69,7 @@ public class BitSet64FP extends FixedBitSet {
    */
   public void writeDouble(String value) throws  FPOverflowException, FPUnderflowException, FPInvalidOperationException, IrregularWriteOperationException, IrregularStringOfBitsException {
     this.reset(false);
-    String bits = FPInstructionUtils.doubleToBin(value);
+    String bits = fpInstructionUtils.doubleToBin(value);
 
     try {
       this.setBits(bits, 0);

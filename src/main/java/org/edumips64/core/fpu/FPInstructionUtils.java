@@ -36,7 +36,16 @@ import org.edumips64.utils.IrregularStringOfBitsException;
 /** Group of functions used in the Floating point unit
  */
 public class FPInstructionUtils {
-  private static FCSRRegister fcsr = CPU.getInstance().getFCSR();
+  private FCSRRegister fcsr;
+
+  /** The fcsr parameter is used to get/set flags relative to the state of FPU exceptions.
+   *
+   * Classes that don't need to work with the "real" state of the CPU (for example, Parser or unit tests), can just pass
+   * any instance of FCSRRegister to this constructor.
+   */
+  public FPInstructionUtils(FCSRRegister fcsr) {
+    this.fcsr = fcsr;
+  }
   private final static String PLUSINFINITY = "0111111111110000000000000000000000000000000000000000000000000000";
   private final static String MINUSINFINITY = "1111111111110000000000000000000000000000000000000000000000000000";
   private final static String PLUSZERO = "0000000000000000000000000000000000000000000000000000000000000000";
@@ -70,7 +79,7 @@ public class FPInstructionUtils {
    * @return the binary string
    * @throws FPOverflowException,FPUnderflowException,IrregularStringOfBitsException
    */
-  public static String doubleToBin(String value) throws FPOverflowException, FPUnderflowException, IrregularStringOfBitsException {
+  public String doubleToBin(String value) throws FPOverflowException, FPUnderflowException, IrregularStringOfBitsException {
     //if a special value is passed then the proper binary string is returned
     String old_value = value;
     value = parseKeywords(value);
@@ -187,7 +196,7 @@ public class FPInstructionUtils {
    * @return the result value (if trap are disabled, special values are returned as binary string)
    * @throws FPInvalidOperationException,FPUnderflowException,FPOverflowException
    */
-  public static String doubleSum(String value1, String value2) throws FPInvalidOperationException, FPUnderflowException, FPOverflowException, IrregularStringOfBitsException {
+  public String doubleSum(String value1, String value2) throws FPInvalidOperationException, FPUnderflowException, FPOverflowException, IrregularStringOfBitsException {
     if (is64BinaryString(value1) && is64BinaryString(value2)) {
       // QNaN check:
       // 1. any NaN
@@ -251,7 +260,7 @@ public class FPInstructionUtils {
    * After the addition, if the result is too large in absolute value a right signed infinity is returned, else
    * if the FP overflow or underflow are enabled an exception occurs.
    */
-  public static String doubleSubtraction(String value1, String value2) throws FPInvalidOperationException, FPUnderflowException, FPOverflowException, IrregularStringOfBitsException {
+  public String doubleSubtraction(String value1, String value2) throws FPInvalidOperationException, FPUnderflowException, FPOverflowException, IrregularStringOfBitsException {
     if (!(is64BinaryString(value1) && is64BinaryString(value2))) {
       return null;
     }
@@ -313,7 +322,7 @@ public class FPInstructionUtils {
    * else a trap occur. After the multiplication, if the result is too large in absolute value a right signed infinity is returned, else
    * if the FP overflow or underflow are enabled an exception occurs.
    */
-  public static String doubleMultiplication(String value1, String value2) throws FPInvalidOperationException, FPUnderflowException, FPOverflowException, IrregularStringOfBitsException {
+  public String doubleMultiplication(String value1, String value2) throws FPInvalidOperationException, FPUnderflowException, FPOverflowException, IrregularStringOfBitsException {
     if (!(is64BinaryString(value1) && is64BinaryString(value2))) {
       return null;
     }
@@ -389,7 +398,7 @@ public class FPInstructionUtils {
    * After the operation, if the result is too small in absolute value a right signed infinity is returned, else
    * if the FP underflow is enabled an exception occurs.
    */
-  public static String doubleDivision(String value1, String value2) throws FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, IrregularStringOfBitsException {
+  public String doubleDivision(String value1, String value2) throws FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, IrregularStringOfBitsException {
     if (!(is64BinaryString(value1) && is64BinaryString(value2))) {
       return null;
     }

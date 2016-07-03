@@ -43,7 +43,8 @@ class ADD_D extends FPArithmeticInstructions {
   String FMT_FIELD = "10001"; //DOUBLE IS 17
   String NAME = "ADD.D";
 
-  ADD_D() {
+  ADD_D(FCSRRegister fcsr) {
+    super(fcsr);
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.FMT_FIELD = FMT_FIELD;
     super.name = NAME;
@@ -51,6 +52,6 @@ class ADD_D extends FPArithmeticInstructions {
 
   @Override
   protected String doFPArith(String operand1, String operand2) throws FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, IrregularStringOfBitsException {
-    return FPInstructionUtils.doubleSum(operand1, operand2);
+    return fpInstructionUtils.doubleSum(operand1, operand2);
   }
 }

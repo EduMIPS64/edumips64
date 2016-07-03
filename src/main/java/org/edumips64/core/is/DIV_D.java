@@ -42,7 +42,8 @@ class DIV_D extends FPArithmeticInstructions {
   String NAME = "DIV.D";
 
 
-  DIV_D() {
+  DIV_D(FCSRRegister fcsr) {
+    super(fcsr);
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.FMT_FIELD = FMT_FIELD;
     name = NAME;
@@ -50,6 +51,6 @@ class DIV_D extends FPArithmeticInstructions {
 
   @Override
   protected String doFPArith(String operand1, String operand2) throws FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, IrregularStringOfBitsException {
-    return FPInstructionUtils.doubleDivision(operand1, operand2);
+    return fpInstructionUtils.doubleDivision(operand1, operand2);
   }
 }

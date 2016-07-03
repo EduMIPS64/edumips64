@@ -285,16 +285,16 @@ public class InstructionBuilder {
       //Floating point instructions
       //Arithmetic
       case "ADD_D":
-        instruction = new ADD_D();
+        instruction = new ADD_D(cpu.getFCSR());
         break;
       case "SUB_D":
-        instruction = new SUB_D();
+        instruction = new SUB_D(cpu.getFCSR());
         break;
       case "MUL_D":
-        instruction = new MUL_D();
+        instruction = new MUL_D(cpu.getFCSR());
         break;
       case "DIV_D":
-        instruction = new DIV_D();
+        instruction = new DIV_D(cpu.getFCSR());
         break;
 
       //Load store
