@@ -66,7 +66,7 @@ public class WebUi implements EntryPoint {
         cpu.getWAWStalls() + " WAW Stalls\n" +
         cpu.getStructuralStallsDivider() + " structural stalls (divider not available)\n" +
         cpu.getStructuralStallsMemory() + " structural stalls (Memory not available)\n" +
-        "Code Size: " + (Memory.getInstance().getInstructionsNumber() * 4) + " Bytes";
+        "Code Size: " + (memory.getInstructionsNumber() * 4) + " Bytes";
   }
 
   @Override
