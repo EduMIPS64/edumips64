@@ -244,7 +244,7 @@ public class Main extends JApplet {
     cp.add(createMenuBar(), BorderLayout.NORTH);
 
     memory = new Memory();
-    cpu = new CPU(memory);
+    cpu = new CPU(memory, configStore);
     cpu.setStatus(CPU.CPUStatus.READY);
 
     symTab = new SymbolTable(memory);

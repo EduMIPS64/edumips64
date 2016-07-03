@@ -122,7 +122,7 @@ public class CpuTests {
   public void testSetup() {
     ConfigManager.setConfig(config);
     memory = new Memory();
-    cpu = new CPU(memory);
+    cpu = new CPU(memory, config);
     cpu.setStatus(CPU.CPUStatus.READY);
     dinero = new Dinero(memory);
     symTab = new SymbolTable(memory);

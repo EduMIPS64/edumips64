@@ -21,7 +21,7 @@ public class ParserTest {
   public void setUp() throws Exception {
      ConfigManager.setConfig(config);
      memory = new Memory();
-     cpu = new CPU(memory);
+     cpu = new CPU(memory, config);
      symTab = new SymbolTable(memory);
      iom = new IOManager(new LocalFileUtils(), memory);
      dinero = new Dinero(memory);

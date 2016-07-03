@@ -20,7 +20,7 @@ public class MemoryTest {
   @Before
   public void setUp() throws Exception {
     m = new Memory();
-    cpu = new CPU(m);
+    cpu = new CPU(m, config);
     ConfigManager.setConfig(config);
     iom = new IOManager(new LocalFileUtils(), m);
     dinero = new Dinero(m);
