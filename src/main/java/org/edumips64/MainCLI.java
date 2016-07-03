@@ -39,8 +39,9 @@ public class MainCLI {
     CurrentLocale.setLanguage("en");
 
     try {
+      ConfigStore cfg = ConfigManager.getConfig();
       Memory memory = new Memory();
-      CPU c = new CPU(memory);
+      CPU c = new CPU(memory, cfg);
       LocalFileUtils localFileUtils = new LocalFileUtils();
       SymbolTable symTab = new SymbolTable(memory);
       IOManager iom = new IOManager(localFileUtils, memory);

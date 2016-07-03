@@ -115,9 +115,9 @@ public class CPU {
   /** BUBBLE */
   private Instruction bubble;
 
-  public CPU(Memory memory) {
+  public CPU(Memory memory, ConfigStore config) {
+    this.config = config;
     bubble = new BUBBLE();
-    config = ConfigManager.getConfig();
 
     logger.info("Creating the CPU...");
     cycles = 0;
@@ -760,7 +760,6 @@ public class CPU {
       ex.printStackTrace();
     }
 
-
     LO.reset();
     HI.reset();
 
@@ -777,7 +776,6 @@ public class CPU {
     fpPipe.reset();
 
     logger.info("CPU Resetted");
-    config = ConfigManager.getConfig();
   }
 
   /** Test method that returns a string containing the status of the pipeline.
