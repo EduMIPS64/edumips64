@@ -49,7 +49,7 @@ public class DSLLV extends ALU_RType {
   final int RS_FIELD_LENGTH = 5;
   final String OPCODE_VALUE = "010100";
   /** Creates a new instance of DSLLV */
-  public DSLLV() {
+  DSLLV() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "DSLLV";
   }

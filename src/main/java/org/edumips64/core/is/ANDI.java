@@ -40,7 +40,7 @@ import org.edumips64.utils.*;
 class ANDI extends ALU_IType {
   final String OPCODE_VALUE = "001100";
 
-  public ANDI() {
+  ANDI() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "ANDI";
   }

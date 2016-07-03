@@ -45,11 +45,10 @@ public abstract class FPConditionalZerosMoveInstructions extends ComputationalIn
   static int COP1_FIELD_INIT = 0;
   static int OPCODE_VALUE_INIT = 26;
   static int FMT_FIELD_INIT = 6;
-  static CPU cpu = CPU.getInstance();
 
   String OPCODE_VALUE = "";
   String FMT_FIELD = "";
-  public FPConditionalZerosMoveInstructions() {
+  FPConditionalZerosMoveInstructions() {
     this.syntax = "%F,%F,%R";
     this.paramCount = 3;
   }

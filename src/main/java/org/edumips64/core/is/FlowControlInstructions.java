@@ -34,12 +34,9 @@ import org.edumips64.utils.*;
  * @author Trubia Massimo, Russo Daniele
  */
 public abstract class FlowControlInstructions extends Instruction {
-  protected static CPU cpu = CPU.getInstance();
   public void IF() {
-    Dinero din = Dinero.getInstance();
-
     try {
-      din.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }

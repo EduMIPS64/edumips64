@@ -40,7 +40,7 @@ import org.edumips64.utils.IrregularStringOfBitsException;
 public class OR extends ALU_RType {
   public String OPCODE_VALUE = "100101";
   /** Creates a new instance of OR */
-  public OR() {
+  OR() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "OR";
   }

@@ -36,7 +36,7 @@ import org.edumips64.utils.*;
 
 public class JR extends FlowControl_RType {
   final  String OPCODE_VALUE = "001000";
-  public JR() {
+  JR() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "JR";
 

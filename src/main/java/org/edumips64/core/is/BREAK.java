@@ -37,15 +37,12 @@ import org.edumips64.utils.*;
  */
 public class BREAK extends Instruction {
   final String OPCODE_VALUE = "000000"; // SPECIAL
-  public BREAK() {
+  BREAK() {
     name = "BREAK";
   }
   public void IF() throws BreakException {
-    Dinero din = Dinero.getInstance();
-
     try {
-      CPU cpu = CPU.getInstance();
-      din.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }

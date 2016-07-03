@@ -33,17 +33,14 @@ import org.edumips64.utils.*;
  * @author Trubia Massimo, Russo Daniele
  */
 public class NOP extends Instruction {
-  protected static CPU cpu = CPU.getInstance();
 
   /** Creates a new instance of HALT */
-  public NOP() {
+  NOP() {
     name = "NOP";
   }
   public void IF() {
-    Dinero din = Dinero.getInstance();
-
     try {
-      din.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }

@@ -30,6 +30,7 @@ import org.edumips64.core.is.*;
 import org.edumips64.ui.CycleBuilder;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigManager;
+import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.LocalWriter;
 
@@ -49,11 +50,14 @@ import static org.hamcrest.CoreMatchers.*;
 @RunWith(JUnit4.class)
 public class CpuTests {
   private CPU cpu;
-  private LocalFileUtils lfu;
   private Parser parser;
+  private Memory memory;
+  private SymbolTable symTab;
+  private IOManager iom;
+  private InstructionBuilder instructionBuilder;
   private static String testsLocation = "build/resources/test/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
-  private Dinero dinero = Dinero.getInstance();
+  private Dinero dinero;
   private ConfigStore config = ConfigManager.getTmpConfig();
 
   @Rule
@@ -119,10 +123,13 @@ public class CpuTests {
     ConfigManager.setConfig(config);
     cpu = CPU.getInstance();
     cpu.setStatus(CPU.CPUStatus.READY);
-    lfu = new LocalFileUtils();
-    IOManager.createInstance(lfu);
-    Parser.createInstance(lfu);
-    parser = Parser.getInstance();
+    memory = Memory.getInstance();
+    dinero = new Dinero(memory);
+    symTab = new SymbolTable(memory);
+    FileUtils lfu = new LocalFileUtils();
+    iom = new IOManager(lfu, memory);
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
+    parser  = new Parser(lfu, symTab, memory, instructionBuilder);
     Instruction.setEnableForwarding(true);
     fec = new FPUExceptionsConfig();
   }
@@ -140,8 +147,10 @@ public class CpuTests {
   private CpuTestStatus runMipsTest(String testPath) throws Exception {
     log.warning("================================= Starting test " + testPath);
     cpu.reset();
+    dinero.reset();
+    symTab.reset();
     testPath = testsLocation + testPath;
-    CycleBuilder builder = new CycleBuilder();
+    CycleBuilder builder = new CycleBuilder(cpu);
 
     try {
       try {
@@ -173,6 +182,8 @@ public class CpuTests {
       return new CpuTestStatus(cpu, tmp.getAbsolutePath());
     } finally {
       cpu.reset();
+      dinero.reset();
+      symTab.reset();
     }
   }
 

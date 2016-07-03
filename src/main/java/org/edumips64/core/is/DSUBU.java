@@ -37,7 +37,7 @@ import org.edumips64.utils.*;
  */
 public class DSUBU extends ALU_RType {
   final String OPCODE_VALUE = "101111";
-  public DSUBU() {
+  DSUBU() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "DSUBU";
   }

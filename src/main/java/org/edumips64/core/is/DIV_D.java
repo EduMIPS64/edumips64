@@ -42,7 +42,7 @@ class DIV_D extends FPArithmeticInstructions {
   String NAME = "DIV.D";
 
 
-  public DIV_D() {
+  DIV_D() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.FMT_FIELD = FMT_FIELD;
     name = NAME;

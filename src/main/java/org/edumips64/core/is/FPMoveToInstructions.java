@@ -33,7 +33,7 @@ import org.edumips64.utils.*;
 
 public abstract class FPMoveToInstructions extends FPMoveToAndFromInstructions {
 
-  public FPMoveToInstructions() {
+  FPMoveToInstructions() {
   }
 
   public void ID() throws RAWException, WAWException, IrregularStringOfBitsException {

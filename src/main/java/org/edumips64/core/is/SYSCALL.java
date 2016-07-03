@@ -40,22 +40,22 @@ public class SYSCALL extends Instruction {
 
   private Dinero din;
   private IOManager iom;
+  private Memory memory;
 
-    public SYSCALL() {
-      this.syntax = "%U";
-      this.paramCount = 1;
-      this.name = "SYSCALL";
-      din = Dinero.getInstance();
-      iom = IOManager.getInstance();
-    }
+  SYSCALL(Memory memory, IOManager iom) {
+    this.syntax = "%U";
+    this.paramCount = 1;
+    this.name = "SYSCALL";
+    this.iom = iom;
+    this.memory = memory;
+  }
 
   public void IF() {
     syscall_n = params.get(0);
     logger.info("SYSCALL " + syscall_n + " (" + this.hashCode() + ") is in IF");
 
     try {
-      CPU cpu = CPU.getInstance();
-      din.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }
@@ -64,9 +64,8 @@ public class SYSCALL extends Instruction {
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
     if (syscall_n == 0) {
       logger.info("Stopping CPU due to SYSCALL (" + this.hashCode() + ")");
-      CPU.getInstance().setStatus(CPU.CPUStatus.STOPPING);
+      cpu.setStatus(CPU.CPUStatus.STOPPING);
     } else if ((syscall_n > 0) && (syscall_n <= 5)) {
-      CPU cpu = CPU.getInstance();
       Register r14 = cpu.getRegister(14);
 
       if (r14.getWriteSemaphore() > 0) {
@@ -98,12 +97,12 @@ public class SYSCALL extends Instruction {
       int flags_address = (int) address + filename.length();
       flags_address += 8 - (flags_address % 8);
 
-      MemoryElement flags_m = Memory.getInstance().getCellByAddress(flags_address);
+      MemoryElement flags_m = memory.getCellByAddress(flags_address);
       int flags = (int) flags_m.getValue();
 
       // Memory access for the string and the flags (note the <=)
       for (int i = (int) address; i <= flags_address; i += 8) {
-        din.Load(Converter.binToHex(Converter.positiveIntToBin(64, i)), 8);
+        dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, i)), 8);
       }
 
       logger.info("We must open " + filename + " with flags " + flags);
@@ -119,7 +118,7 @@ public class SYSCALL extends Instruction {
 
     } else if (syscall_n == 2) {
       // int close(int fd)
-      MemoryElement fd_cell = Memory.getInstance().getCellByAddress(address);
+      MemoryElement fd_cell = memory.getCellByAddress(address);
       int fd = (int) fd_cell.getValue();
       logger.info("Closing fd " + fd);
       return_value = iom.close(fd);
@@ -129,15 +128,15 @@ public class SYSCALL extends Instruction {
       int fd, count;
       long buf_addr;
 
-      MemoryElement temp = Memory.getInstance().getCellByAddress(address);
+      MemoryElement temp = memory.getCellByAddress(address);
       fd = (int) temp.getValue();
       address += 8;
 
-      temp = Memory.getInstance().getCellByAddress(address);
+      temp = memory.getCellByAddress(address);
       buf_addr = temp.getValue();
       address += 8;
 
-      temp = Memory.getInstance().getCellByAddress(address);
+      temp = memory.getCellByAddress(address);
       count = (int) temp.getValue();
       address += 8;
 
@@ -165,7 +164,7 @@ public class SYSCALL extends Instruction {
       int format_string_address = (int) tempMemCell.getValue();
 
       // Recording in the tracefile the last memory access
-      din.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), 8);
+      dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), 8);
 
       // Fetching the format string
       String format_string = fetchString(format_string_address);
@@ -181,7 +180,7 @@ public class SYSCALL extends Instruction {
       t1 += 8 - (t1 % 8);
 
       for (int i = format_string_address; i < t1; i += 8) {
-        din.Load(Converter.binToHex(Converter.positiveIntToBin(64, i)), 8);
+        dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, i)), 8);
       }
 
       int oldIndex = 0;
@@ -211,7 +210,7 @@ public class SYSCALL extends Instruction {
           t2 += 8 - (t2 % 8);
 
           for (int i = str_address; i < t2; i += 8) {
-            din.Load(Converter.binToHex(Converter.positiveIntToBin(64, i)), 8);
+            dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, i)), 8);
           }
 
           logger.info("Got " + param);
@@ -223,7 +222,7 @@ public class SYSCALL extends Instruction {
           MemoryElement memCell = memory.getCellByAddress(next_param_address);
 
           // Tracefile entry for this memory access
-          din.Load(Converter.binToHex(Converter.positiveIntToBin(64, next_param_address)), 8);
+          dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, next_param_address)), 8);
 
           Long val = memCell.getValue();
           next_param_address += 8;
@@ -287,11 +286,11 @@ public class SYSCALL extends Instruction {
 
     if (syscall_n == 0) {
       logger.info("Stopped CPU due to SYSCALL (" + this.hashCode() + ")");
-      CPU.getInstance().setStatus(CPU.CPUStatus.HALTED);
+      cpu.setStatus(CPU.CPUStatus.HALTED);
       throw new HaltException();
     } else if (syscall_n > 0 && syscall_n <= 5) {
       logger.info("SYSCALL (" + this.hashCode() + "): setting R1 to " + return_value);
-      Register r1 = CPU.getInstance().getRegister(1);
+      Register r1 = cpu.getRegister(1);
       logger.info("SYSCALL (" + this.hashCode() + "): got R1");
       r1.setBits(Converter.intToBin(64, return_value), 0);
       logger.info("SYSCALL (" + this.hashCode() + "): set R1 to " + return_value);

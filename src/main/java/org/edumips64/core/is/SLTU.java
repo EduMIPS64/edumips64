@@ -42,7 +42,7 @@ class SLTU extends ALU_RType {
   final String OPCODE_VALUE = "101011";
 
 
-  public SLTU() {
+  SLTU() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "SLTU";
   }

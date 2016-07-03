@@ -42,7 +42,7 @@ public class XOR extends ALU_RType {
   public String OPCODE_VALUE = "100110";
 
   /** Creates a new instance of XOR */
-  public XOR() {
+  XOR() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "XOR";
   }

@@ -40,7 +40,7 @@ public class BC1T extends FPConditionalBranchesInstructions {
   static String TF_FIELD = "1";
   static String NAME = "BC1T";
 
-  public BC1T() {
+  BC1T() {
     super.ND_FIELD = ND_FIELD;
     super.TF_FIELD = TF_FIELD;
     super.name = NAME;

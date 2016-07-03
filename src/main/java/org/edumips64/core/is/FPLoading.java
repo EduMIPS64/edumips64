@@ -34,7 +34,8 @@ import org.edumips64.utils.*;
  */
 public abstract class FPLoading extends FPLDSTInstructions {
 
-  public FPLoading() {
+  FPLoading(Memory memory) {
+    super(memory);
   }
 
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, WAWException {

@@ -30,7 +30,7 @@ package org.edumips64.core.is;
  * @author Trubia Massimo, Russo Daniele, Andrea Spadaccini
  */
 public class IntegerOverflowException extends org.edumips64.core.SynchronousException {
-  public IntegerOverflowException() {
+  IntegerOverflowException() {
     super("INTOVERFLOW");
   }
 }

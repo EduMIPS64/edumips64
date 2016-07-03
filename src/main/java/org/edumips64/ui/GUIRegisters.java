@@ -58,8 +58,8 @@ public class GUIRegisters extends GUIComponent {
   //(i want to avoid to modify the class constructor) the value is zero if a gpr is double clicked
   //1 if an fpr is double clicked
 
-  public GUIRegisters() {
-    super();
+  public GUIRegisters(CPU cpu, Memory memory) {
+    super(cpu, memory);
     registers = cpu.getRegisters();
     registersFP = cpu.getRegistersFP();
     regPanel = new RegPanel();
@@ -73,27 +73,6 @@ public class GUIRegisters extends GUIComponent {
 
   public void update() {
     regPanel.updateRegistersNames();
-
-    /*
-    //DEBUG: writing test on FPR 0
-      CPU cpu=CPU.getInstance();
-      cpu.setFPExceptions(CPU.FPExceptions.OVERFLOW,false);
-        try {
-          cpu.getRegisterFP(0).writeDouble("54E38");
-        } catch (IrregularWriteOperationException ex) {
-          ex.printStackTrace();
-        } catch (FPOverflowException ex) {
-          ex.printStackTrace();
-        } catch (FPInvalidOperationException ex) {
-          ex.printStackTrace();
-        } catch (FPExponentTooLargeException ex) {
-          ex.printStackTrace();
-        } catch (FPUnderflowException ex) {
-          ex.printStackTrace();
-        }
-        System.out.println(cpu.fprString());
-    // fine debug
-    */
     registers = cpu.getRegisters();
     registersFP = cpu.getRegistersFP();
 
@@ -247,7 +226,6 @@ public class GUIRegisters extends GUIComponent {
             }
             //FPU   //click on generic fpr
             else if (theTable.getSelectedColumn() == 3 && theTable.getSelectedRow() < 32) {
-              CPU cpu = CPU.getInstance();
               org.edumips64.Main.getSB().setText(
                 CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
                 CurrentLocale.getString("StatusBar.OFREGISTERFP") +
@@ -451,7 +429,6 @@ public class GUIRegisters extends GUIComponent {
           valueCurrent[rowCurrent] = newValue;
 
           try {
-            CPU cpu = CPU.getInstance();
             String bin = Converter.hexToBin(valueCurrent[rowCurrent]);
 
             //writing labels on registers
@@ -523,16 +500,5 @@ public class GUIRegisters extends GUIComponent {
       public void keyReleased(KeyEvent e)  {}
       public void keyTyped(KeyEvent e)  {}
     }
-  }
-
-  public static void main(String argv[]) {
-    JFrame frame = new JFrame("Registers");
-    Container c = frame.getContentPane();
-    GUIRegisters GUIR = new GUIRegisters();
-    GUIR.setContainer(c);
-    //c.add(GUIR.regPanel);
-    //setDefaultCloseOperation(EXIT_ON_CLOSE);
-    frame.pack();
-    frame.setVisible(true);
   }
 }

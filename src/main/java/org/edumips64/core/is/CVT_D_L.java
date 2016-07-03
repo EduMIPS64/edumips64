@@ -41,7 +41,7 @@ class CVT_D_L extends FPConversionFCSRInstructions {
   static String FMT_FIELD = "10101"; //LONG IS 21
   static String NAME = "CVT.D.L";
 
-  public CVT_D_L() {
+  CVT_D_L() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.FMT_FIELD = FMT_FIELD;
     super.name = NAME;

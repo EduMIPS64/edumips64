@@ -39,21 +39,18 @@ import org.edumips64.utils.*;
  */
 public class HALT extends Instruction {
   final String OPCODE_VALUE = "000001";
-  public HALT() {
+  HALT() {
     name = "HALT";
   }
   public void IF() {
-    Dinero din = Dinero.getInstance();
-
     try {
-      CPU cpu = CPU.getInstance();
-      din.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }
   }
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException {
-    CPU.getInstance().setStatus(CPU.CPUStatus.STOPPING);
+    cpu.setStatus(CPU.CPUStatus.STOPPING);
   }
 
   public void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
@@ -63,7 +60,7 @@ public class HALT extends Instruction {
   }
 
   public void WB() throws HaltException, IrregularStringOfBitsException {
-    CPU.getInstance().setStatus(CPU.CPUStatus.HALTED);
+    cpu.setStatus(CPU.CPUStatus.HALTED);
     throw new HaltException();
   }
 

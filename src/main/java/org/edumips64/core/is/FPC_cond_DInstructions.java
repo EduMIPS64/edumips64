@@ -36,7 +36,6 @@ import java.util.*;
  * @author Trubia Massimo
  */
 public abstract class FPC_cond_DInstructions extends ComputationalInstructions {
-  static CPU cpu = CPU.getInstance();
   final static int CC_FIELD = 0;
   final static int FS_FIELD = 1;
   final static int FT_FIELD = 2;
@@ -56,7 +55,7 @@ public abstract class FPC_cond_DInstructions extends ComputationalInstructions {
 
   String COND_VALUE = "";
 
-  public FPC_cond_DInstructions() {
+  FPC_cond_DInstructions() {
     syntax = "%C,%F,%F";
     paramCount = 3;
   }

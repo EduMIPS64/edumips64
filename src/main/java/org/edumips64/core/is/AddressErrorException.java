@@ -31,9 +31,9 @@ package org.edumips64.core.is;
  * @author Massimo
  */
 public class AddressErrorException extends Exception {
-  public AddressErrorException() {}
+  AddressErrorException() {}
 
-  public AddressErrorException(String message) {
+  AddressErrorException(String message) {
     super(message);
   }
 }

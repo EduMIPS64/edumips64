@@ -40,7 +40,7 @@ public class J extends FlowControl_JType {
   final String OPCODE_VALUE = "000010";
 
   /** Creates a new instance of J */
-  public J() {
+  J() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "J";
   }

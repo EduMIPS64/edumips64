@@ -30,9 +30,11 @@
 package org.edumips64.core;
 
 import org.edumips64.core.fpu.FPInstructionUtils;
+
 import org.edumips64.core.fpu.FPOverflowException;
 import org.edumips64.core.fpu.FPUnderflowException;
 import org.edumips64.core.is.Instruction;
+import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.utils.Converter;
 import org.edumips64.utils.IrregularStringOfBitsException;
 import org.edumips64.utils.IrregularStringOfHexException;
@@ -57,6 +59,8 @@ class VoidJump {
 public class Parser {
   /** Instance variables */
   private static final Logger logger = Logger.getLogger(Parser.class.getName());
+  private final Memory mem;
+
   private enum AliasRegister
   {zero, at, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, k0, k1, gp, sp, fp, ra}
   private static final String deprecateInstruction[] = {"BNEZ", "BEQZ", "HALT", "DADDUI", "L.D", "S.D"};
@@ -79,22 +83,14 @@ public class Parser {
   private String filename;
   private SymbolTable symTab;
   private FileUtils fileUtils;
+  private InstructionBuilder instructionBuilder;
 
   /** Public methods */
-
-  /** Initializes the Parser with a given FileUtils instance.
-   *
-   * MUST be used before calling getInstance().
-   * TODO(andrea): use proper dependency injection. */
-  public static void createInstance(FileUtils f) {
-    instance = new Parser(f);
-  }
-
-  /** Singleton Pattern implementation
-   *  @return get the Singleton instance of the Parser
-   */
-  public static Parser getInstance() {
-    return instance;
+  public Parser(FileUtils utils, SymbolTable symTab, Memory memory, InstructionBuilder instructionBuilder) {
+    this.symTab = symTab;
+    this.fileUtils = utils;
+    this.mem = memory;
+    this.instructionBuilder = instructionBuilder;
   }
 
   /** Loading from File
@@ -119,15 +115,6 @@ public class Parser {
   }
 
   /** Private methods */
-
-  /** Singleton pattern constructor
-   */
-  private Parser(FileUtils utils) {
-    symTab = SymbolTable.getInstance();
-    CPU.getInstance();
-    this.fileUtils = utils;
-  }
-
   private String fileToString(String filename) throws ReadException {
     return fileUtils.ReadFile(filename);
   }
@@ -221,8 +208,6 @@ public class Parser {
     warning = new ParserMultiWarningException();
 
     LinkedList<VoidJump> voidJump = new LinkedList<VoidJump>();
-
-    Memory mem = Memory.getInstance();
 
     memoryCount = 0;
     String lastLabel = "";
@@ -517,7 +502,7 @@ public class Parser {
                 }
               }
 
-              tmpInst = Instruction.buildInstruction(line.substring(i, end).toUpperCase());
+              tmpInst = instructionBuilder.buildInstruction(line.substring(i, end).toUpperCase());
 
               if (tmpInst == null) {
                 numError++;
@@ -1197,7 +1182,7 @@ public class Parser {
 
       try {
         logger.warning("No terminating instruction detected, adding one.");
-        Instruction tmpInst = Instruction.buildInstruction("SYSCALL");
+        Instruction tmpInst = instructionBuilder.buildInstruction("SYSCALL");
         tmpInst.getParams().add(0);
         tmpInst.setFullName("SYSCALL 0");
 
@@ -1392,7 +1377,6 @@ public class Parser {
    *  @param instr params
    */
   private void writeDoubleInMemory(int row,  int i, int end, String line, String instr) throws MemoryElementNotFoundException {
-    Memory mem = Memory.getInstance();
     String value[] = instr.split(",");
     MemoryElement tmpMem;
 
@@ -1428,7 +1412,6 @@ public class Parser {
    *  @param name type of data
    */
   private void writeIntegerInMemory(int row,  int i, int end, String line, String instr, int numBit, String name) throws MemoryElementNotFoundException {
-    Memory mem = Memory.getInstance();
     int posInWord = 0; //position of byte to write into a doubleword
     String value[] = instr.split(",");
     MemoryElement tmpMem = null;

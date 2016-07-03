@@ -22,6 +22,8 @@
  */
 
 package org.edumips64.ui;
+import org.edumips64.core.CPU;
+import org.edumips64.core.Memory;
 import org.edumips64.utils.*;
 
 import java.awt.BorderLayout;
@@ -42,8 +44,8 @@ public class GUIStatistics extends GUIComponent {
   private int nCycles, nInstructions, rawStalls, codeSize, WAWStalls, dividerStalls, memoryStalls;
   private float cpi;
 
-  public GUIStatistics() {
-    super();
+  public GUIStatistics(CPU cpu, Memory memory) {
+    super(cpu, memory);
     statPanel = new StatPanel();
 
     jsp = new JScrollPane(statPanel);
@@ -84,7 +86,7 @@ public class GUIStatistics extends GUIComponent {
     }
 
     rawStalls = cpu.getRAWStalls();
-    codeSize = (cpu.getMemory().getInstructionsNumber()) * 4;
+    codeSize = (memory.getInstructionsNumber()) * 4;
     WAWStalls = cpu.getWAWStalls();
     dividerStalls = cpu.getStructuralStallsDivider();
     memoryStalls = cpu.getStructuralStallsMemory();
@@ -193,7 +195,7 @@ public class GUIStatistics extends GUIComponent {
         label.setText(" " + "7654321 0      VZOUIVZOUIVZOUI");
         return label;
       case 18:
-        label.setText(" " + cpu.getFCSR());
+        label.setText(" " + cpu.getFCSR().getBinString());
         return label;
       }
 

@@ -37,7 +37,7 @@ import org.edumips64.utils.*;
 public class BNE extends FlowControl_IType {
   final String OPCODE_VALUE = "000101";
 
-  public BNE() {
+  BNE() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R,%R,%B";
     name = "BNE";

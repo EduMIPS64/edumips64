@@ -40,7 +40,7 @@ class ADD extends ALU_RType {
   final String OPCODE_VALUE = "100000";
 
 
-  public ADD() {
+  ADD() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "ADD";
   }

@@ -39,10 +39,14 @@ public class MainCLI {
     CurrentLocale.setLanguage("en");
 
     try {
-      LocalFileUtils lfu = new LocalFileUtils();
-      Parser.createInstance(lfu);
-      Parser p = Parser.getInstance();
       CPU c = CPU.getInstance();
+      LocalFileUtils localFileUtils = new LocalFileUtils();
+      Memory memory = Memory.getInstance();
+      SymbolTable symTab = new SymbolTable(memory);
+      IOManager iom = new IOManager(localFileUtils, memory);
+      Dinero dinero = new Dinero(memory);
+      InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, c, dinero);
+      Parser p = new Parser(localFileUtils, symTab, memory, instructionBuilder);
       c.setStatus(CPU.CPUStatus.READY);
 
       if (args.length > 0) {
@@ -94,9 +98,9 @@ public class MainCLI {
                 System.out.println(c.getRegister(Integer.parseInt(tokens[2])));
               }
             } else if (tokens[1].compareToIgnoreCase("memory") == 0) {
-              System.out.println(c.getMemory());
+              System.out.println(memory);
             } else if (tokens[1].compareToIgnoreCase("symbols") == 0) {
-              System.out.println(c.getSymbolTable());
+              System.out.println(symTab);
             } else if (tokens[1].compareToIgnoreCase("pipeline") == 0) {
               System.out.println(c.pipeLineString());
             } else {

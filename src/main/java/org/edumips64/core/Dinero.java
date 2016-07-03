@@ -35,29 +35,20 @@ import java.io.IOException;
 
 public class Dinero {
 
-  /** Instance of the Dinero */
-  private static Dinero dinero;
-
-  int offset = 0;
+  private Memory memory;
   private LinkedList <String> dineroData;
+  private int offset;
 
-  /**Singlethon constructor */
-  private Dinero() {
-    dineroData = new LinkedList <String>();
+  public Dinero(Memory memory) {
+    this.memory = memory;
+    reset();
   }
-  public static Dinero getInstance() {
-    if (dinero == null) {
-      dinero = new Dinero();
-    }
 
-    return dinero;
-  }
-  /**
-   */
   public void reset() {
     offset = 0;
-    dineroData = new LinkedList <String>();
+    dineroData = new LinkedList <>();
   }
+
   /** Add a read Instruction
    * @param address address of the read Instruction
    */
@@ -100,22 +91,9 @@ public class Dinero {
 
   }
   /** Calculate the offset */
-  public void findOffset() {
-    CPU cpu = CPU.getInstance();
-    int i;
-
-    for (i = 0; i < CPU.CODELIMIT; i++) {
-      try {
-        if (cpu.getMemory().getInstruction(i * 4).getName().equals(" ")) {
-          break;
-        }
-      } catch (SymbolTableOverflowException ex) {
-        // This should never happen, since the bounds checked in getInstruction are upper-limited by CPU.CODELIMIT.
-        ex.printStackTrace();
-      }
-    }
-
-    offset = i * 4;
+  private void findOffset() {
+    int instructionsCount = memory.getInstructionsNumber();
+    offset = instructionsCount * 4;
     offset += offset % 8;
   }
 

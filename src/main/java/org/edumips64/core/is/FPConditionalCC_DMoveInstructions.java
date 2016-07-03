@@ -50,11 +50,10 @@ public abstract class FPConditionalCC_DMoveInstructions extends ComputationalIns
   static String FMT_FIELD = "10001"; //17 for double
   static int FMT_FIELD_INIT = 6;
   final static int TF_FIELD_INIT = 15;
-  static CPU cpu = CPU.getInstance();
 
   int TF_FIELD_VALUE;
 
-  public FPConditionalCC_DMoveInstructions() {
+  FPConditionalCC_DMoveInstructions() {
     this.syntax = "%F,%F,%C";
     this.paramCount = 3;
   }

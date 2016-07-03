@@ -40,7 +40,7 @@ public class BEQZ extends FlowControl_IType {
   public String OPCODE_VALUE = "000110";
 
   /** Creates a new instance of BEQZ */
-  public BEQZ() {
+  BEQZ() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R,%B";
     name = "BEQZ";

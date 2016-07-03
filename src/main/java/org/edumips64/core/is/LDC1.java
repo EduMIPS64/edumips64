@@ -37,7 +37,8 @@ import org.edumips64.utils.*;
  */
 class LDC1 extends FPLoading {
   String OPCODE_VALUE = "110111";
-  public LDC1() {
+  LDC1(Memory memory) {
+    super(memory);
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "LDC1";
   }
@@ -46,8 +47,7 @@ class LDC1 extends FPLoading {
     //restoring the address from the temporary register
     long address = TR[OFFSET_PLUS_BASE].getValue();
     //For the trace file
-    Dinero din = Dinero.getInstance();
-    din.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), 8);
+    dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), 8);
 
     MemoryElement memEl = memory.getCellByAddress(address);
     //reading from the memory element and saving values on LMD register

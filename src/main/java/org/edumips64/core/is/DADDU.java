@@ -40,7 +40,7 @@ import org.edumips64.utils.IrregularStringOfBitsException;
  */
 public class DADDU extends ALU_RType {
   final String OPCODE_VALUE = "101101";
-  public DADDU() {
+  DADDU() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "DADDU";
   }

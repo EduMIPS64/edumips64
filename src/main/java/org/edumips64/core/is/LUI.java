@@ -45,7 +45,7 @@ class LUI extends ALU_IType {
   final static int IMM_FIELD_LENGTH = 16;
   final String OPCODE_VALUE = "001111";
 
-  public LUI() {
+  LUI() {
     syntax = "%R,%I";
     //super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "LUI";

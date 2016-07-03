@@ -48,7 +48,7 @@ public abstract class ALU_RType extends ComputationalInstructions {
   String OPCODE_VALUE = "";
   final static int OPCODE_VALUE_INIT = 26;
   private static final Logger logger = Logger.getLogger(ALU_RType.class.getName());
-  public ALU_RType() {
+  ALU_RType() {
     syntax = "%R,%R,%R";
     paramCount = 3;
   }
@@ -114,38 +114,4 @@ public abstract class ALU_RType extends ComputationalInstructions {
     repr.setBits(Converter.intToBin(RT_FIELD_LENGTH, params.get(RT_FIELD)), RT_FIELD_INIT);
     repr.setBits(Converter.intToBin(RD_FIELD_LENGTH, params.get(RD_FIELD)), RD_FIELD_INIT);
   }
-
-  public static void main(String[] args) {
-//DEBUGGING DADD DADDU DSUB DSUBU
-    //DSUB ins=new DSUB();
-    DADD ins = new DADD();
-    //DADDU ins=new DADDU();
-    //SLT ins=new SLT();
-    //SLTU ins=new SLTU();
-    //OR ins=new OR();
-    //DSLL ins=new DSLL();
-    //AND ins=new AND();
-    //DSRL ins=new DSRL();
-    //DSLLV ins=new DSLLV();
-    //DSRLV ins=new DSRLV();
-    //DSRA ins=new DSRA();
-    //DSRAV ins = new DSRAV();
-
-    List<Integer>params = new Vector<Integer>();
-    int rd = 2;
-    int rs = 3;
-    int rt = 30;
-    params.add(rd);  //destinazione R2
-    params.add(rs);  //sorgente1 R3
-    params.add(rt);  //sorgente2 R4
-
-    try {
-      cpu.getRegister(rs).writeDoubleWord(82337254775807L);   //rs register
-      cpu.getRegister(rt).writeDoubleWord(-76284523455L);     //rt register
-      ins.setParams(params);
-    } catch (IrregularWriteOperationException e) {
-      e.printStackTrace();
-    }
-  }
-
 }

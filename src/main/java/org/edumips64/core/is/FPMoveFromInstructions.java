@@ -33,7 +33,7 @@ import org.edumips64.utils.*;
 
 public abstract class FPMoveFromInstructions extends FPMoveToAndFromInstructions {
 
-  public FPMoveFromInstructions() {
+  FPMoveFromInstructions() {
   }
   public void ID() throws RAWException, WAWException, IrregularStringOfBitsException {
     //if the source register is valid we pass its own value into a temporary register

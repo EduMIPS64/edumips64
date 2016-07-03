@@ -41,7 +41,7 @@ public class FlowControl_JType extends FlowControlInstructions {
   final static int OPCODE_VALUE_LENGTH = 6;
   String OPCODE_VALUE = "";
   /** Creates a new instance of FlowControl_JType */
-  public FlowControl_JType() {
+  FlowControl_JType() {
     this.syntax = "%E";
     this.paramCount = 1;
   }

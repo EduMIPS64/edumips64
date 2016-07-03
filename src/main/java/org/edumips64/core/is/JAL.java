@@ -41,7 +41,7 @@ public class JAL extends FlowControl_JType {
   final int PC_VALUE = 0;
 
   /** Creates a new instance of J */
-  public JAL() {
+  JAL() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "JAL";
   }

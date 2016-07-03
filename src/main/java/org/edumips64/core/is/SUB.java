@@ -39,7 +39,7 @@ import org.edumips64.utils.*;
 public class SUB extends ALU_RType {
   final String OPCODE_VALUE = "100010";
 
-  public SUB() {
+  SUB() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "SUB";
   }

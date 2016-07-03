@@ -46,7 +46,7 @@ class MFHI extends ALU_RType {
   final int HI_REG = 1;
   final String OPCODE_VALUE = "010000";
 
-  public MFHI() {
+  MFHI() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R";
     name = "MFHI";

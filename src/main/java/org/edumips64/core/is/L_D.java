@@ -38,7 +38,9 @@ import org.edumips64.utils.*;
  */
 class L_D extends LDC1 {
   final String OPCODE_VALUE = "110111";
-  public L_D() {
+
+  L_D(Memory memory) {
+    super(memory);
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "L.D";
   }

@@ -52,7 +52,7 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
   String OPCODE_VALUE = "";
   String FMT_FIELD = "";
 
-  public FPArithmeticInstructions() {
+  FPArithmeticInstructions() {
     syntax = "%F,%F,%F";
     paramCount = 3;
   }

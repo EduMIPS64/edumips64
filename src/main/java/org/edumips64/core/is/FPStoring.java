@@ -31,6 +31,11 @@ import org.edumips64.utils.*;
  * @author Massimo
  */
 public abstract class FPStoring extends FPLDSTInstructions {
+
+  FPStoring(Memory memory) {
+    super(memory);
+  }
+
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException {
     //if the base register and the ft register are valid passing value of ft register into a temporary floating point register
     Register base = cpu.getRegister(params.get(BASE_FIELD));

@@ -38,7 +38,7 @@ class MOVN_D extends FPConditionalZerosMoveInstructions {
   String FMT_FIELD = "10001"; //DOUBLE IS 17
   String NAME = "MOVN.D";
 
-  public MOVN_D() {
+  MOVN_D() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.FMT_FIELD = FMT_FIELD;
     super.name = NAME;

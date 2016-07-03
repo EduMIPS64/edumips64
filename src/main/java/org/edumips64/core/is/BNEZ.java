@@ -38,7 +38,7 @@ public class BNEZ extends FlowControl_IType {
   protected final int OFFSET_FIELD = 1;
 
   /** Creates a new instance of BEQZ */
-  public BNEZ() {
+  BNEZ() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R,%B";
     name = "BNEZ";

@@ -53,7 +53,7 @@ class MULTU extends ALU_RType {
   String lo;
   String hi;
 
-  public MULTU() {
+  MULTU() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R,%R";
     name = "MULTU";

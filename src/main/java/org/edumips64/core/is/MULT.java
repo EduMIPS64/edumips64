@@ -53,7 +53,7 @@ class MULT extends ALU_RType {
   String lo;
   String hi;
 
-  public MULT() {
+  MULT() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R,%R";
     name = "MULT";

@@ -50,7 +50,7 @@ class DMULTU extends ALU_RType {
   String lo;
   String hi;
 
-  public DMULTU() {
+  DMULTU() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R,%R";
     name = "DMULTU";
@@ -112,33 +112,5 @@ class DMULTU extends ALU_RType {
     repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);
     repr.setBits(Converter.intToBin(RS_FIELD_LENGTH, params.get(RS_FIELD)), RS_FIELD_INIT);
     repr.setBits(Converter.intToBin(RT_FIELD_LENGTH, params.get(RT_FIELD)), RT_FIELD_INIT);
-  }
-
-
-
-  public static void main(String[] args) {
-    DMULTU ins = new DMULTU();
-    List<Integer>params = new Vector<Integer>();
-    int rs = 1;
-    int rt = 2;
-    params.add(rs);  //fattore1
-    params.add(rt);  //fattore2
-
-    try {
-      cpu.getRegister(rs).writeDoubleWord(-9345345345223L);   //rs register
-      cpu.getRegister(rt).writeDoubleWord(9224234234234234L);     //rt register
-      ins.setParams(params);
-    } catch (IrregularWriteOperationException e) {
-      e.printStackTrace();
-    }
-
-    try {
-      ins.pack();
-      ins.ID();
-      ins.EX();
-      ins.WB();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
   }
 }

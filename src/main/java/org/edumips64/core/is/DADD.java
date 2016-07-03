@@ -39,7 +39,7 @@ class DADD extends ALU_RType {
   final String OPCODE_VALUE = "101100";
 
 
-  public DADD() {
+  DADD() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "DADD";
   }

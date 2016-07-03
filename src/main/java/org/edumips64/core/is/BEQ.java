@@ -38,7 +38,7 @@ public class BEQ extends FlowControl_IType {
   final String OPCODE_VALUE = "000100";
 
   /** Creates a new instance of BEQ */
-  public BEQ() {
+  BEQ() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     syntax = "%R,%R,%B";
     name = "BEQ";

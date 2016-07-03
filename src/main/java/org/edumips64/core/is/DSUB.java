@@ -36,7 +36,7 @@ import org.edumips64.utils.*;
 public class DSUB extends ALU_RType {
   final String OPCODE_VALUE = "101110";
   /** Creates a new instance of DSUB */
-  public DSUB() {
+  DSUB() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "DSUB";
   }

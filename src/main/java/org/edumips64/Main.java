@@ -23,6 +23,7 @@
 package org.edumips64;
 
 import org.edumips64.core.*;
+import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.img.*;
 import org.edumips64.ui.*;
 import org.edumips64.utils.*;
@@ -55,6 +56,10 @@ public class Main extends JApplet {
   public static CPUGUIThread cgt;
   static LocalFileUtils lfu;
   static Parser parser;
+  static SymbolTable symTab;
+  static Memory memory;
+  static Dinero dinero;
+  static InstructionBuilder instructionBuilder;
   static GUIFrontend front;
   static ConfigStore configStore;
   static JFileChooser jfc;
@@ -200,8 +205,7 @@ public class Main extends JApplet {
 
     f.setExtendedState(f.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
-//debugging code
-    //BigDecimal bd=new BigDecimal("1e-23");
+//debugging code //BigDecimal bd=new BigDecimal("1e-23");
     //BigInteger bi=FPInstructionUtils.doubleTo64FixedPoint(bd,CPU.FPRoundingMode.TOWARDS_PLUS_INFINITY);
     //System.out.println(bi.longValue());
   }
@@ -224,8 +228,6 @@ public class Main extends JApplet {
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
     lfu = new LocalFileUtils();
-    IOManager.createInstance(lfu);
-    iom = IOManager.getInstance();
 
     try {
       ConfigManager.setConfig(new JavaPrefsConfigStore(ConfigManager.defaults));
@@ -244,13 +246,16 @@ public class Main extends JApplet {
     cpu = CPU.getInstance();
     cpu.setStatus(CPU.CPUStatus.READY);
 
-    front = new GUIFrontend();
+    memory = Memory.getInstance();
+    symTab = new SymbolTable(memory);
+    iom = new IOManager(lfu, memory);
+    dinero = new Dinero(memory);
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
+    parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
-    cgt = new CPUGUIThread();
+    front = new GUIFrontend(cpu, memory);
+    cgt = new CPUGUIThread(cpu, front, f);
     cgt.start();
-
-    Parser.createInstance(lfu);
-    parser = Parser.getInstance();
 
     // Internal Frames
     JInternalFrame pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);
@@ -451,6 +456,8 @@ public class Main extends JApplet {
   private static void openFile(String file) {
     log.info("Trying to open " + file);
     cpu.reset();
+    symTab.reset();
+    dinero.reset();
 
     try {
       // Aggiorniamo i componenti gai
@@ -472,7 +479,7 @@ public class Main extends JApplet {
         log.info("NullPointerException: " + e.toString());
         e.printStackTrace();
       } finally {
-        log.info(SymbolTable.getInstance().toString());
+        log.info(symTab.toString());
       }
 
       log.info("After parsing");
@@ -602,6 +609,8 @@ public class Main extends JApplet {
 
   public static void resetSimulator(boolean reopenFile) {
     cpu.reset();
+    symTab.reset();
+    dinero.reset();
 
     try {
       iom.reset();
@@ -747,11 +756,10 @@ public class Main extends JApplet {
 
         if (val == JFileChooser.APPROVE_OPTION) {
           String filename = jfc.getSelectedFile().getPath();
-          Dinero din = Dinero.getInstance();
 
           try {
             LocalWriter w = new LocalWriter(filename, false);
-            din.writeTraceData(w);
+            dinero.writeTraceData(w);
             w.close();
             log.info("Wrote dinero tracefile");
           } catch (Exception ex) {
@@ -827,7 +835,7 @@ public class Main extends JApplet {
     config.add(settings);
     settings.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        new GUIConfig(f);
+        new GUIConfig(f, cpu);
       }
     });
     // ---------------- LANGUAGE MENU
@@ -907,7 +915,7 @@ public class Main extends JApplet {
     dinFrontend.setEnabled(false);
     dinFrontend.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        JDialog dinFrame = new DineroFrontend(f);
+        JDialog dinFrame = new DineroFrontend(f, dinero);
         dinFrame.setModal(true);
         dinFrame.setVisible(true);
       }
@@ -1097,10 +1105,6 @@ public class Main extends JApplet {
 
   public static GUIFrontend getGUIFrontend() {
     return front;
-  }
-
-  public static JFrame getMainFrame() {
-    return f;
   }
 
   public static void startPB() {

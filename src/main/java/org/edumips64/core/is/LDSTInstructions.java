@@ -35,7 +35,6 @@ import java.util.logging.Logger;
  */
 
 public abstract class LDSTInstructions extends Instruction {
-  protected static CPU cpu = CPU.getInstance();
   final static int RT_FIELD = 0;
   final static int OFFSET_FIELD = 1;
   final static int BASE_FIELD = 2;
@@ -54,18 +53,19 @@ public abstract class LDSTInstructions extends Instruction {
   // Size of the read/write operations. Must be set by derived classes
   protected byte memoryOpSize;
 
-  // Dinero instance
-  protected Dinero dinero = Dinero.getInstance();
-
   // Memory address with which the instruction is operating
   protected long address;
 
   protected MemoryElement memEl;
 
+  // Memory instance
+  protected Memory memory;
+
   String OPCODE_VALUE = "";
-  public LDSTInstructions() {
+  LDSTInstructions(Memory memory) {
     this.syntax = "%R,%L(%R)";
     this.paramCount = 3;
+    this.memory = memory;
   }
 
   public void setOpcode(String opcode) {

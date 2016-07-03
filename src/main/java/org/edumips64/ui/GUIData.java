@@ -38,7 +38,6 @@ import javax.swing.table.*;
 */
 public class GUIData extends GUIComponent {
   DataPanel dataPanel;
-  Memory memory;
   MemoryElement memoryElement;
   String memoryAddress[] = new String[CPU.DATALIMIT];
   JTextArea text;
@@ -46,9 +45,8 @@ public class GUIData extends GUIComponent {
 
   private static final Logger logger = Logger.getLogger(CPU.class.getName());
 
-  public GUIData() {
-    super();
-    memory = cpu.getMemory();        //INIT OGGETTO MEMORIA!!!!!!!!!!!!!!! ^_^ Ãš qui, Ãš proprio qui!!!! NdR!!
+  public GUIData(CPU cpu, Memory memory) {
+    super(cpu, memory);
     dataPanel = new DataPanel();
   }
 
@@ -58,7 +56,7 @@ public class GUIData extends GUIComponent {
   }
 
   public void update() {
-    memory = cpu.getMemory();
+    memory = memory;
   }
 
   public void draw() {
@@ -200,20 +198,20 @@ public class GUIData extends GUIComponent {
         try {
           switch (col) {
           case 0:
-            long address = cpu.getMemory().getCellByIndex(row).getAddress();
+            long address = memory.getCellByIndex(row).getAddress();
             toReturn = Converter.binToHex(Converter.positiveIntToBin(16, address));
             break;
           case 1:
-            toReturn = cpu.getMemory().getCellByIndex(row).getHexString();
+            toReturn = memory.getCellByIndex(row).getHexString();
             break;
           case 2:
-            toReturn = cpu.getMemory().getCellByIndex(row).getLabel();
+            toReturn = memory.getCellByIndex(row).getLabel();
             break;
           case 3:
-            toReturn = cpu.getMemory().getCellByIndex(row).getCode();
+            toReturn = memory.getCellByIndex(row).getCode();
             break;
           case 4:
-            toReturn = cpu.getMemory().getCellByIndex(row).getComment();
+            toReturn = memory.getCellByIndex(row).getComment();
             break;
           }
         } catch (IrregularStringOfBitsException ex) {

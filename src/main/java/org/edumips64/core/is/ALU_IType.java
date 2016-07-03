@@ -45,7 +45,7 @@ public class ALU_IType extends ComputationalInstructions {
 
   private static final Logger logger = Logger.getLogger(ALU_IType.class.getName());
 
-  public ALU_IType() {
+  ALU_IType() {
     this.syntax = "%R,%R,%I";
     this.paramCount = 3;
   }

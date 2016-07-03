@@ -4,9 +4,9 @@ import com.google.gwt.core.client.EntryPoint;
 
 import jsinterop.annotations.JsType;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.Parser;
+import org.edumips64.core.*;
 import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.io.FileUtils;
@@ -20,6 +20,11 @@ public class WebUi implements EntryPoint {
   private Parser parser;
   private ConfigStore config;
   private FileUtils fu;
+  private SymbolTable symTab;
+  private Memory memory;
+  private InstructionBuilder instructionBuilder;
+  private IOManager iom;
+  private Dinero dinero;
 
   // Executes the program. Returns an empty string on success, or an error message.
   public String runProgram(String code) {
@@ -27,6 +32,8 @@ public class WebUi implements EntryPoint {
     logger.info("Running program: " + code);
     try {
       cpu.reset();
+      dinero.reset();
+      symTab.reset();
       logger.info("About to parse it.");
       parser.doParsing(code);
       logger.info("Parsed. Running.");
@@ -44,7 +51,7 @@ public class WebUi implements EntryPoint {
   }
 
   public String getMemory() {
-    return cpu.getMemory().toString();
+    return memory.toString();
   }
 
   public String getRegisters() {
@@ -59,7 +66,7 @@ public class WebUi implements EntryPoint {
         cpu.getWAWStalls() + " WAW Stalls\n" +
         cpu.getStructuralStallsDivider() + " structural stalls (divider not available)\n" +
         cpu.getStructuralStallsMemory() + " structural stalls (Memory not available)\n" +
-        "Code Size: " + (cpu.getMemory().getInstructionsNumber() * 4) + " Bytes";
+        "Code Size: " + (Memory.getInstance().getInstructionsNumber() * 4) + " Bytes";
   }
 
   @Override
@@ -69,9 +76,13 @@ public class WebUi implements EntryPoint {
     // Simulator initialization.
     config = ConfigManager.getTmpConfig();
     ConfigManager.setConfig(config);
+    memory = Memory.getInstance();
+    symTab = new SymbolTable(memory);
     fu = new NullFileUtils();
-    Parser.createInstance(fu);
-    parser = Parser.getInstance();
+    iom = new IOManager(fu, memory);
     cpu = CPU.getInstance();
+    dinero = new Dinero(memory);
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
+    parser = new Parser(fu, symTab, memory, instructionBuilder);
   }
 }

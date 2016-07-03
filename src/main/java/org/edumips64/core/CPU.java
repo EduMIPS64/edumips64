@@ -22,12 +22,32 @@
  */
 
 package org.edumips64.core;
-import org.edumips64.core.fpu.*;
-import java.util.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import org.edumips64.core.is.*;
-import org.edumips64.utils.*;
+
+import org.edumips64.core.fpu.EXNotAvailableException;
+import org.edumips64.core.fpu.FPDividerNotAvailableException;
+import org.edumips64.core.fpu.FPFunctionalUnitNotAvailableException;
+import org.edumips64.core.fpu.FPInvalidOperationException;
+import org.edumips64.core.fpu.FPPipeline;
+import org.edumips64.core.fpu.MemoryNotAvailableException;
+import org.edumips64.core.is.AddressErrorException;
+import org.edumips64.core.is.BUBBLE;
+import org.edumips64.core.is.BreakException;
+import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.Instruction;
+import org.edumips64.core.is.JumpException;
+import org.edumips64.core.is.RAWException;
+import org.edumips64.core.is.TwosComplementSumException;
+import org.edumips64.core.is.WAWException;
+import org.edumips64.utils.ConfigManager;
+import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.FPUConfigurator;
+import org.edumips64.utils.IrregularStringOfBitsException;
 
 /** This class models a MIPS CPU with 32 64-bit General Purpose Registers.
 *  @author Andrea Spadaccini, Simona Ullo, Antonella Scandura, Massimo Trubia (FPU modifications)
@@ -78,7 +98,6 @@ public class CPU {
 
   /** CPU pipeline, each stage contains an Instruction object*/
   private Map<PipeStage, Instruction> pipe;
-  private SymbolTable symTable;
 
   /** The current stage of the pipeline.*/
   private PipeStage currentPipeStage;
@@ -95,22 +114,22 @@ public class CPU {
   /** Statistics */
   private int cycles, instructions, RAWStalls, WAWStalls, dividerStalls, funcUnitStalls, memoryStalls, exStalls;
 
+  /** BUBBLE */
+  private Instruction bubble;
+
   /** Static initializer */
   static {
     cpu = null;
   }
   private CPU() {
+    bubble = new BUBBLE();
     config = ConfigManager.getConfig();
-    // To avoid future singleton problems
-    Instruction.buildInstruction("BUBBLE");
 
     logger.info("Creating the CPU...");
     cycles = 0;
     status = CPUStatus.READY;
     mem = Memory.getInstance();
     logger.info("Got Memory instance..");
-    symTable = SymbolTable.getInstance();
-    logger.info("Got SymbolTable instance..");
 
     // Registers initialization
     gpr = new Register[32];
@@ -219,14 +238,6 @@ public class CPU {
     return fpr;
   }
 
-  public Memory getMemory() {
-    return mem;
-  }
-
-  public SymbolTable getSymbolTable() {
-    return symTable;
-  }
-
   /** This method returns a specific GPR
    * @param index the register number (0-31)
    */
@@ -270,9 +281,9 @@ public class CPU {
     return fpPipe.getInstructionByFuncUnit(funcUnit, stage);
   }
 
-  /** Gets a binary string representing the Floating Point Control Status Register*/
-  public String getFCSR() {
-    return FCSR.getBinString();
+  /** Gets the Floating Point Control Status Register*/
+  public FCSRRegister getFCSR() {
+    return FCSR;
   }
 
   /** Gets the selected FCC bit of the FCSR
@@ -450,7 +461,7 @@ public class CPU {
       // put in the IF stage the instruction the PC points to
       pipe.put(PipeStage.IF, mem.getInstruction(pc));
       pipe.put(PipeStage.EX, pipe.get(PipeStage.ID));
-      pipe.put(PipeStage.ID, Instruction.buildInstruction("BUBBLE"));
+      pipe.put(PipeStage.ID, bubble);
       old_pc.writeDoubleWord((pc.getValue()));
       pc.writeDoubleWord((pc.getValue()) + 4);
 
@@ -460,7 +471,7 @@ public class CPU {
 
     } catch (RAWException ex) {
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, Instruction.buildInstruction("BUBBLE"));
+        pipe.put(PipeStage.EX, bubble);
       }
 
       RAWStalls++;
@@ -474,7 +485,7 @@ public class CPU {
       logger.info(fpPipe.toString());
 
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, Instruction.buildInstruction("BUBBLE"));
+        pipe.put(PipeStage.EX, bubble);
       }
 
       WAWStalls++;
@@ -485,7 +496,7 @@ public class CPU {
       }
     } catch (FPDividerNotAvailableException ex) {
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, Instruction.buildInstruction("BUBBLE"));
+        pipe.put(PipeStage.EX, bubble);
       }
 
       dividerStalls++;
@@ -496,7 +507,7 @@ public class CPU {
 
     } catch (FPFunctionalUnitNotAvailableException ex) {
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, Instruction.buildInstruction("BUBBLE"));
+        pipe.put(PipeStage.EX, bubble);
       }
 
       funcUnitStalls++;
@@ -556,7 +567,7 @@ public class CPU {
       logger.info("Putting " + next_if + "in IF.");
       pipe.put(PipeStage.IF, next_if);
     } else {
-      pipe.put(PipeStage.ID, Instruction.buildInstruction("BUBBLE"));
+      pipe.put(PipeStage.ID, bubble);
     }
 
     if (breaking) {
@@ -778,12 +789,6 @@ public class CPU {
     clearPipe();
     // Reset FP pipeline
     fpPipe.reset();
-
-    // Reset Symbol table
-    symTable.reset();
-
-    // Reset tracefile
-    Dinero.getInstance().reset();
 
     logger.info("CPU Resetted");
     config = ConfigManager.getConfig();

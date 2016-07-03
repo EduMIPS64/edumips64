@@ -37,7 +37,7 @@ class MTC1 extends FPMoveToInstructions {
   String OPCODE_VALUE = "00100";
   String NAME = "MTC1";
 
-  public MTC1() {
+  MTC1() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     super.name = NAME;
   }

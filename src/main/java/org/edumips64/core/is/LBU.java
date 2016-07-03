@@ -37,7 +37,9 @@ import org.edumips64.utils.*;
  */
 class LBU extends Loading {
   final String OPCODE_VALUE = "100100";
-  public LBU() {
+
+  LBU(Memory memory) {
+    super(memory);
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "LBU";
     this.memoryOpSize = 1;
