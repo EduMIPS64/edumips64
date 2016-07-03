@@ -5,7 +5,9 @@
 
 [Working on the GWT frontend](#working-on-the-gwt-frontend)
 
-[A note on the Cloud9 web IDE](#a-note-on-the-cloud9-web-ide)
+[Source code structure](#source-code-structure)
+
+[Submitting code](#submitting-code)
 
 ### Requirements
 
@@ -79,19 +81,62 @@ frontend code.
 To create a releasable version of the JS code, use the `gwtc` target. The
 compiled code (HTML + JS) will be stored in the `war` directory.
 
-### A note on the Cloud9 web IDE
+### Source code structure
 
-[Cloud9](http://c9.io) is a nice Web IDE that provides GitHub integration and a Linux
-container that can be used for development.
+The source code structure follows the [Gradle project layout conventions](https://docs.gradle.org/current/userguide/java_plugin.html#N152C8).
+The main package for the simulator is `org.edumips64`, therefore the Java code
+resides in `src/main/java/org/edumips64`, and contains 5 sub-packages, plus
+the entry points.
 
-The Cloud9 IDE can be used for development of EduMIPS64, but its lack of X
-Server means that it is not possible to:
+`Main.java` is the code for the main Swing frontend entry point, while `MainCLI.java`
+contains an experimental CLI front-end.
 
- * run the Swing UI JAR;
- * use GWT's devmode;
+* The `client` package contains Java code for the Web UI. 
+* The `core` package contains all the core classes for the simulator, including
+  important bits such as the CPU, the Memory, instructions and the Parser.
+* The `img` package contains a class to load images and the actual images used
+  in the simulator.
+* The `ui` package contains the code for the Swing UI.
+* The `utils` package contains miscellaneous code, including abstractions needed
+  to decouple the core code from packages that are not available in the GWT
+  JRE emulation (such as `java.io`).
 
-To test GWT changes, use the `ant gwtc` target, and then right-click on
-`war/edumips64.html` in the Workspace panel and then choose "Preview".
+### Submitting code
 
-It should be possible to test the Swing UI by doing the same with
-`utils/test-applet.html`.
+Code should be submitted as pull requests. The `master` branch is protected,
+meaning that pull requests can be merged only if they pass the status checks.
+Currently, the only status check is the Travis CI continuous integration.
+
+If this proves to be too inconvenient, it might be better to split out a
+protected `stable` branch to use for releases and have `master` unprotected.
+We'll see how this fares as more people start contributing to the project.
+
+### Unit tests
+
+Unit tests are stored in the `src/test` directory. The `resources`
+subdirectory contains MIPS64 programs that are executed during unit test as a
+form of end-to-end unit tests, whereas `java` contains the actual Java code
+that runs unit tests.
+
+The main tests are contained in `CpuTests.java`. This class contains unit
+tests that run MIPS64 code (contained in `resources`).  One of the common
+patterns in those tests is that, if something goes unexpectedly during the
+execution of unit tests, the MIPS64 code executes a `BREAK` instruction, which
+will trigger a `BreakException` in the Java code and make the test fail. Tests
+in `CpuTests.java` can also verify other behaviors, including forwarding and
+correct working of the Dinero Tracefile generation logic.
+
+Other types of test, e.g., `ParserTest.java` or `MemoryTest.java`, will test
+other components in isolation.
+
+To add a unit test, the first consideration is whether this test should be
+writte in assembly or in Java. Tests in assembly should typically be put in
+`CpuTests.java`, since it contains already boilerplate for executing and
+verifying assembly programs. Tests which should not be written in assembly,
+and therefore most likely exercise only one component, should pertain to other
+classes, possibly even an entirely new class if required.
+
+When writing new unit test classes, pay attention to the initialization code
+necessary to initialize the simulator. Look at other unit test classes to make
+sure your new class behaves as required. Finally, remember to add new unit
+test classes to the `test` target in the ant `build.xml` file.
