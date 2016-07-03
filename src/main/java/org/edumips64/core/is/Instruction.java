@@ -45,7 +45,7 @@ public abstract class Instruction {
   protected String fullname;
   protected String label;
   protected static final Logger logger = Logger.getLogger(Instruction.class.getName());
-  protected Integer serialNumber;
+  protected int serialNumber;
 
   /** CPU instance. It is set through setCPU, and it should always be set before the instruction is considered
    * fully built. InstructionBuilder + package-local instruction constructors enforce this.
@@ -63,6 +63,10 @@ public abstract class Instruction {
     this.dinero = dinero;
   }
 
+  void setSerialNumber(int serialNumber) {
+    this.serialNumber = serialNumber;
+  }
+
   /** Creates a new instance of Instruction */
   Instruction() {
     params = new LinkedList<>();
@@ -71,9 +75,6 @@ public abstract class Instruction {
     repr = new BitSet32();
     syntax = "";
     repr.reset(false);
-    //generating a serial number for the current instruction
-    serialNumber = ConfigManager.getConfig().getInt("serialNumber");
-    ConfigManager.getConfig().putInt("serialNumber", serialNumber + 1);
 
     //initialization of temporary registers
     for (int i = 0; i < TR.length; i++) {

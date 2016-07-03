@@ -25,7 +25,7 @@ public class ParserTest {
      symTab = new SymbolTable(memory);
      iom = new IOManager(new LocalFileUtils(), memory);
      dinero = new Dinero(memory);
-     instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
+     instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
      parser = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
   }
   /** Allows easier testing of .data section contents by adding the ".data" prefix and the "\n.code\nSYSCALL 0" suffix. */

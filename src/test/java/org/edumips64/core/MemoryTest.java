@@ -24,7 +24,7 @@ public class MemoryTest {
     ConfigManager.setConfig(config);
     iom = new IOManager(new LocalFileUtils(), m);
     dinero = new Dinero(m);
-    instructionBuilder = new InstructionBuilder(m, iom, cpu, dinero);
+    instructionBuilder = new InstructionBuilder(m, iom, cpu, dinero, config);
   }
 
   /* Regression test for Issue #84 */
