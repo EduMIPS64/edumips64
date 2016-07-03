@@ -128,7 +128,7 @@ public class CpuTests {
     symTab = new SymbolTable(memory);
     FileUtils lfu = new LocalFileUtils();
     iom = new IOManager(lfu, memory);
-    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser  = new Parser(lfu, symTab, memory, instructionBuilder);
     Instruction.setEnableForwarding(true);
     fec = new FPUExceptionsConfig();

@@ -250,7 +250,7 @@ public class Main extends JApplet {
     symTab = new SymbolTable(memory);
     iom = new IOManager(lfu, memory);
     dinero = new Dinero(memory);
-    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, configStore);
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
     front = new GUIFrontend(cpu, memory);

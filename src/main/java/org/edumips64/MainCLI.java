@@ -46,7 +46,7 @@ public class MainCLI {
       SymbolTable symTab = new SymbolTable(memory);
       IOManager iom = new IOManager(localFileUtils, memory);
       Dinero dinero = new Dinero(memory);
-      InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, c, dinero);
+      InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, c, dinero, cfg);
       Parser p = new Parser(localFileUtils, symTab, memory, instructionBuilder);
       c.setStatus(CPU.CPUStatus.READY);
 

@@ -82,7 +82,7 @@ public class WebUi implements EntryPoint {
     iom = new IOManager(fu, memory);
     cpu = new CPU(memory, config);
     dinero = new Dinero(memory);
-    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
   }
 }

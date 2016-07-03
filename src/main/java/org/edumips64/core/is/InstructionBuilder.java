@@ -4,6 +4,8 @@ import org.edumips64.core.CPU;
 import org.edumips64.core.Dinero;
 import org.edumips64.core.IOManager;
 import org.edumips64.core.Memory;
+import org.edumips64.utils.ConfigManager;
+import org.edumips64.utils.ConfigStore;
 
 /** InstructionBuilder should be used to build all the instructions to be run by the CPU. The only exception is
  * BUBBLE, which has a public constructor to allow the CPU to build it without depending on InstructionBuilder.
@@ -16,12 +18,14 @@ public class InstructionBuilder {
   private IOManager iom;
   private CPU cpu;
   private Dinero dinero;
+  private ConfigStore config;
 
-  public InstructionBuilder(Memory memory, IOManager iom, CPU cpu, Dinero dinero) {
+  public InstructionBuilder(Memory memory, IOManager iom, CPU cpu, Dinero dinero, ConfigStore config) {
     this.memory = memory;
     this.iom = iom;
     this.cpu = cpu;
     this.dinero = dinero;
+    this.config = config;
   }
   /**
    * Creates a new instance of an Instruction's subclass
@@ -383,6 +387,13 @@ public class InstructionBuilder {
       default:
         return null;
     }
+
+    // Serial number for the instruction being built.
+    int serialNumber = config.getInt("serialNumber");
+    config.putInt("serialNumber", serialNumber + 1);
+    instruction.setSerialNumber(serialNumber);
+
+    // Inject other dependencies.
     instruction.setCPU(cpu);
     instruction.setDinero(dinero);
     return instruction;
