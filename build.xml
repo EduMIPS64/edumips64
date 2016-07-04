@@ -191,7 +191,7 @@
   </target>
 
   <!-- *** compile *** compiles the code -->
-  <target name="compile" depends="mkdirs">
+  <target name="compile" depends="mkdirs,webLibs">
     <javac
         source="${src_java_version}"
         target="${dst_java_version}"
