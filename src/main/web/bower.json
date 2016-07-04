@@ -9,7 +9,9 @@
     "ace-builds": "^1.2.3",
     "angular-translate-loader-static-files": "^2.11.0",
     "dragster": "^0.1.3",
-    "angular-keyboard": "angular-keyboard-shortcuts#^0.2.0"
+    "angular-keyboard": "angular-keyboard-shortcuts#^0.2.0",
+    "satellizer": "^0.14.1",
+    "angular-local-storage": "^0.2.7"
   },
   "overrides": {
     "ace-builds": {

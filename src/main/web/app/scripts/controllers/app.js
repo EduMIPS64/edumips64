@@ -8,6 +8,7 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $tra
     vm.editorContent = '';
     vm.filesize = 0;
     vm.filename = 'new_file.s';
+    vm.format = 'hex';
     vm.customFullscreen = $mdMedia('xs') || $mdMedia('sm');
 
     vm.toggleMenu = function() {
@@ -24,7 +25,23 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $tra
         touched = true;
     };
 
-    vm.format = 'hex';
+    vm.openSourceDialog = function(event) {
+
+        var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && vm.customFullscreen;
+        $mdDialog.show({
+            controller: 'OpenDialogController',
+            controllerAs: 'vm',
+            templateUrl: 'views/open-dialog.html',
+            parent: angular.element(document.body),
+            targetEvent: event,
+            clickOutsideToClose: true,
+            fullscreen: useFullScreen
+        }).then(function(answer) {
+            $log.log('Open dialog resolved', answer);
+        }, function() {
+            $log.log('Open dialog rejected');
+        });
+    };
 
     vm.openSettingsDialog = function(event) {
         var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && vm.customFullscreen;

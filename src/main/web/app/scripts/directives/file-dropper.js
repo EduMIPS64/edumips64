@@ -7,7 +7,7 @@ angular.module('edmApp').directive('fileDropper', function($parse) {
         template: [
             '<div class="dropper-overlay" translate>DROP_YOUR_FILE_HERE</div>',
             '<div ng-transclude></div>'
-        ],
+        ].join(''),
         link: function (scope, element, attrs) {
             var dragster = new Dragster(element[0]);
             var fileDropperFn = $parse(attrs.fileDropper);

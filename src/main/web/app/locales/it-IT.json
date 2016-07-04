@@ -19,5 +19,16 @@
     "MULTI_CYCLE": "ciclo multiplo",
     "STOP": "stop",
     "DISCARD_CHANGES": "ignora modifiche",
-    "WOULD_YOU_LIKE_TO_DISCARD_YOUR_CHANGES": "vuoi ignorare le modifiche non salvate?"
+    "WOULD_YOU_LIKE_TO_DISCARD_YOUR_CHANGES": "vuoi ignorare le modifiche non salvate?",
+    "OPEN_SOURCE_FILE": "apri file sorgente",
+    "FROM_DISK": "da disco",
+    "FROM_GITHUB": "da Github",
+    "GITHUB_AUTHENTICATE_DESC_1": "accedi con il tuo account Github per caricare un file sorgente dai tuoi gists.",
+    "GITHUB_AUTHENTICATE_DESC_2": "una volta autenticato, qui troverai tutti i tuoi gist e potrai scegliere quale aprire.",
+    "AUTHENTICATE_WITH_GITHUB": "accedi con Github",
+    "LOAD_SOURCE_FROM_GITHUB": "apri file sorgente da Github",
+    "CREATED": "creato",
+    "UPDATED": "modificato",
+    "CLICK_OPEN_OR_DROP_FILE": "clicca sul pulsante per aprire un file sorgente dal tuo PC o trascina il file qua sopra.",
+    "OPEN_FROM_DISK": "apri dal tuo PC"
 }

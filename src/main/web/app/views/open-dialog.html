@@ -1,0 +1,52 @@
+<md-dialog aria-label="open dialog" ng-cloak>
+    <form>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 class="capitalize">{{'OPEN_SOURCE_FILE' | translate}}</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="vm.cancel()">
+                    <md-icon md-svg-src="images/close.svg" aria-label="Close dialog"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content style="width:800px;max-height:810px;height:460px;">
+            <md-tabs md-border-bottom>
+                <md-tab label="{{'FROM_DISK' | translate}}">
+                    <md-content class="md-padding">
+                        <div file-dropper="vm.onDropFile($event, $file)" style="height:300px;position:relative">
+                            <p class="capitalize" translate>CLICK_OPEN_OR_DROP_FILE</p>
+                            <md-button class="md-raised md-primary" ng-click="">
+                                {{'OPEN_FROM_DISK' | translate}}
+                            </md-button>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="{{'FROM_GITHUB' | translate}}">
+                    <md-list ng-if="vm.isAuthenticated" style="height:410px;">
+                        <md-list-item class="md-2-line" ng-repeat="gist in vm.gists" ng-click="vm.openGist(gist)">
+                            <img ng-src="{{gist.ownerAvatar}}" class="md-avatar" alt="{{gist.ownerLogin}}" />
+                            <div class="md-list-item-text">
+                                <h3>{{ gist.name }}</h3>
+                                <p>{{ gist.size | number : 0}}b | {{'CREATED' | translate}} {{gist.created | date : 'medium'}} | {{'UPDATED' | translate}} {{gist.updated | date : 'medium'}}</p>
+                            </div>
+                        </md-list-item>
+                    </md-list>
+                    <md-content class="md-padding" ng-if="!vm.isAuthenticated">
+                        <h1 class="md-display-2 capitalize" translate>LOAD_SOURCE_FROM_GITHUB</h1>
+                        <p>
+                            <span class="capitalize" translate>GITHUB_AUTHENTICATE_DESC_1</span>
+                            <span class="capitalize" translate>GITHUB_AUTHENTICATE_DESC_2</span>
+                        </p>
+                        <md-button class="md-raised md-primary" ng-click="vm.auth($event)">
+                            {{'AUTHENTICATE_WITH_GITHUB' | translate}}
+                        </md-button>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <md-button ng-click="vm.ok()">{{'OK' | translate}}</md-button>
+            <md-button ng-click="vm.cancel()">{{'CANCEL' | translate}}</md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

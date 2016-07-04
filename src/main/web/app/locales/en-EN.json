@@ -19,5 +19,16 @@
     "MULTI_CYCLE": "multi-cycle",
     "STOP": "stop",
     "DISCARD_CHANGES": "discard changes",
-    "WOULD_YOU_LIKE_TO_DISCARD_YOUR_CHANGES": "would you like to discard your changes?"
+    "WOULD_YOU_LIKE_TO_DISCARD_YOUR_CHANGES": "would you like to discard your changes?",
+    "OPEN_SOURCE_FILE": "open source file",
+    "FROM_DISK": "from disk",
+    "FROM_GITHUB": "from Github",
+    "GITHUB_AUTHENTICATE_DESC_1": "please authenticate with your Github account if you would like to load any source file from among your gists.",
+    "GITHUB_AUTHENTICATE_DESC_2": "once authenticated, any of your gists will be listed here.",
+    "AUTHENTICATE_WITH_GITHUB": "login with Github",
+    "LOAD_SOURCE_FROM_GITHUB": "load source files from Github",
+    "CREATED": "created",
+    "UPDATED": "updated",
+    "CLICK_OPEN_OR_DROP_FILE": "click the button to open a source file from your disk or just drop here your file.",
+    "OPEN_FROM_DISK": "open from disk"
 }
