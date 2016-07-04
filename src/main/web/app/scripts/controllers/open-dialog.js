@@ -1,11 +1,10 @@
-angular.module('edmApp').controller('OpenDialogController', function($mdDialog, $auth, $scope, $http, $window, localStorageService) {
+angular.module('edmApp').controller('OpenDialogController', function($mdDialog, $auth, $scope, $http, $window) {
     'use strict';
 
     var vm = this;
 
     var loadGists = function() {
-        var token = localStorageService.get('githubAuthCode');
-        $http({
+        return $http({
             url: 'https://api.github.com/gists',
             method: 'GET'
         }).then(function(result) {

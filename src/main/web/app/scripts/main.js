@@ -1,6 +1,6 @@
-angular.module('edmApp', ['ngMaterial', 'ngAnimate', 'ui.router', 'pascalprecht.translate', 'ui.ace', 'angular-keyboard', 'satellizer', 'LocalStorageModule']);
+angular.module('edmApp', ['ngMaterial', 'ngAnimate', 'ui.router', 'pascalprecht.translate', 'ui.ace', 'angular-keyboard', 'satellizer']);
 
-angular.module('edmApp').config(function($mdThemingProvider, $locationProvider, $urlRouterProvider, $stateProvider, $translateProvider, $authProvider, localStorageServiceProvider) {
+angular.module('edmApp').config(function($mdThemingProvider, $locationProvider, $urlRouterProvider, $stateProvider, $translateProvider, $authProvider) {
     'use strict';
 
     $translateProvider.useStaticFilesLoader({
@@ -31,8 +31,6 @@ angular.module('edmApp').config(function($mdThemingProvider, $locationProvider, 
         controller: 'AppController',
         templateUrl: 'views/app.html'
     });
-
-    localStorageServiceProvider.setPrefix('edumips64');
 });
 
 String.prototype.capitalizeFirstLetter = function() {
