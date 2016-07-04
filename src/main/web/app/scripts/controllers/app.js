@@ -35,6 +35,7 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $tra
 
     vm.aceLoaded = function(editor) {
         editor.getSession().getDocument().setNewLineMode('unix');
+        editor.getSession().setMode("ace/mode/mips_assembler");
     };
 
     vm.editorChanged = function(event) {
