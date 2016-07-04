@@ -91,7 +91,11 @@ md-menu-item>button>span:last-of-type {
     bottom: 0;
     right: 0;
     left: 0;
-    overflow-y: scroll;
+    overflow-y: hidden;
+
+    &:hover {
+        overflow-y: scroll;
+    }
 }
 .register {
     display: flex;
@@ -113,6 +117,7 @@ md-menu-item>button>span:last-of-type {
 }
 ::-webkit-scrollbar {
     width: 5px!important;
+    height: 5px!important;
 }
 ::-webkit-scrollbar-track {
     /*background: #FFF;
@@ -144,4 +149,11 @@ button input[type="file"] {
     opacity: 0;
     cursor: pointer !important;
     min-height: 36px;
+}
+.ace_scrollbar {
+    opacity: 0;
+    transition: opacity 400ms ease-out 50ms;
+}
+div[ui-ace]:hover .ace_scrollbar {
+    opacity: 1;
 }
