@@ -27,13 +27,42 @@ angular.module('edmApp').controller('OpenDialogController', function($mdDialog, 
 
     vm.isAuthenticated = false;
     vm.gists = [];
+    vm.url = null;
+    vm.preview = {};
 
     vm.auth = function(event) {
         return $auth.authenticate('github');
     };
 
+    vm.onFileOpen = function(event, file) {
+        var reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = function(data) {
+            $mdDialog.hide({
+                name: file.name,
+                content: data.target.result
+            });
+        };
+        reader.onerror = function() {
+            console.error('Unable to read ' + file.name);
+        };
+    };
+
+    vm.openGist = function(gist) {
+        $http({
+            url: gist.url,
+            method: 'get',
+            skipAuthorization: true
+        }).then(function(result) {
+            return {
+                name: gist.name,
+                content: result.data
+            }
+        }).then($mdDialog.hide);
+    };
+
     vm.ok = function() {
-        $mdDialog.hide();
+        $mdDialog.hide(vm.preview);
     };
 
     vm.cancel = function() {
@@ -47,6 +76,24 @@ angular.module('edmApp').controller('OpenDialogController', function($mdDialog, 
     $scope.$watch('vm.isAuthenticated', function(isAuthenticated) {
         if(isAuthenticated) {
             loadGists();
+        }
+    });
+
+    $scope.$watch('vm.url', function(url) {
+        if(!!url) {
+            var name = url.split('/').slice(-1)[0];
+            $http({
+                url: url,
+                method: 'get',
+                skipAuthorization: true
+            }).then(function(result) {
+                vm.preview = {
+                    name: name,
+                    content: result.data
+                };
+            });
+        } else {
+            vm.preview = {};
         }
     });
 

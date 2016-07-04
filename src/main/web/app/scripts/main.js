@@ -1,4 +1,4 @@
-angular.module('edmApp', ['ngMaterial', 'ngAnimate', 'ui.router', 'pascalprecht.translate', 'ui.ace', 'angular-keyboard', 'satellizer']);
+angular.module('edmApp', ['ngMaterial', 'ngAnimate', 'ui.router', 'pascalprecht.translate', 'ui.ace', 'angular-keyboard', 'satellizer', 'ngMessages']);
 
 angular.module('edmApp').config(function($mdThemingProvider, $locationProvider, $urlRouterProvider, $stateProvider, $translateProvider, $authProvider) {
     'use strict';

@@ -1,5 +1,5 @@
 <md-dialog aria-label="open dialog" ng-cloak>
-    <form>
+    <form name="openSourceFileForm">
         <md-toolbar>
             <div class="md-toolbar-tools">
                 <h2 class="capitalize">{{'OPEN_SOURCE_FILE' | translate}}</h2>
@@ -10,15 +10,28 @@
             </div>
         </md-toolbar>
         <md-dialog-content style="width:800px;max-height:810px;height:460px;">
-            <md-tabs md-border-bottom>
+            <md-tabs md-border-bottom md-selected="vm.selectedTab">
                 <md-tab label="{{'FROM_DISK' | translate}}">
                     <md-content class="md-padding">
-                        <div file-dropper="vm.onDropFile($event, $file)" style="height:300px;position:relative">
+                        <div style="height:300px;position:relative">
                             <p class="capitalize" translate>CLICK_OPEN_OR_DROP_FILE</p>
                             <md-button class="md-raised md-primary" ng-click="">
+                                <input type="file" file-opener="vm.onFileOpen($event, $file)" ><!-- accept=".csv" -->
                                 {{'OPEN_FROM_DISK' | translate}}
                             </md-button>
                         </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="{{'FROM_URL' | translate}}">
+                    <md-content class="md-padding">
+                        <p class="capitalize" translate>ENTER_URL</p>
+                        <md-input-container class="md-block" md-no-float>
+                            <input required name="url" placeholder="{{'URL' | translate}}" ng-model="vm.url" ng-pattern="/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/"></input>
+                            <div ng-messages="openSourceFileForm.url.$error" ng-hide="false">
+                                <div ng-message="pattern" translate class="capitalize">ENTER_VALID_URL</div>
+                            </div>
+                        </md-input-container>
+                        <pre>{{vm.preview.content}}</pre>
                     </md-content>
                 </md-tab>
                 <md-tab label="{{'FROM_GITHUB' | translate}}">
@@ -45,7 +58,7 @@
             </md-tabs>
         </md-dialog-content>
         <md-dialog-actions layout="row">
-            <md-button ng-click="vm.ok()">{{'OK' | translate}}</md-button>
+            <md-button ng-if="vm.selectedTab === 1" ng-click="vm.ok()">{{'OK' | translate}}</md-button>
             <md-button ng-click="vm.cancel()">{{'CANCEL' | translate}}</md-button>
         </md-dialog-actions>
     </form>

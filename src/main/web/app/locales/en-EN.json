@@ -23,6 +23,7 @@
     "OPEN_SOURCE_FILE": "open source file",
     "FROM_DISK": "from disk",
     "FROM_GITHUB": "from Github",
+    "FROM_URL": "from URL",
     "GITHUB_AUTHENTICATE_DESC_1": "please authenticate with your Github account if you would like to load any source file from among your gists.",
     "GITHUB_AUTHENTICATE_DESC_2": "once authenticated, any of your gists will be listed here.",
     "AUTHENTICATE_WITH_GITHUB": "login with Github",
@@ -30,5 +31,7 @@
     "CREATED": "created",
     "UPDATED": "updated",
     "CLICK_OPEN_OR_DROP_FILE": "click the button to open a source file from your disk or just drop here your file.",
-    "OPEN_FROM_DISK": "open from disk"
+    "OPEN_FROM_DISK": "open from disk",
+    "ENTER_URL": "please enter a valid URL to load your source file from.",
+    "ENTER_VALID_URL": "not a valid URL"
 }

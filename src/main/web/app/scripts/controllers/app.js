@@ -3,6 +3,24 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $tra
 
     var vm = this;
     var touched = false;
+    var confirmSourceReplace = function() {
+        var title = $translate.instant('DISCARD_CHANGES').capitalizeFirstLetter();
+        var text = $translate.instant('WOULD_YOU_LIKE_TO_DISCARD_YOUR_CHANGES').capitalizeFirstLetter();
+        var ok = $translate.instant('OK');
+        var cancel = $translate.instant('CANCEL');
+        var dialog = $mdDialog.confirm()
+            .title(title)
+            .textContent(text)
+            .ariaLabel('Confirm discard')
+            .targetEvent(event)
+            .ok(ok)
+            .cancel(cancel);
+        if(touched) {
+            return $mdDialog.show(dialog);
+        } else {
+            return $q.when(true);
+        }
+    };
 
     vm.locs = 0;
     vm.editorContent = '';
@@ -26,20 +44,23 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $tra
     };
 
     vm.openSourceDialog = function(event) {
-
-        var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && vm.customFullscreen;
-        $mdDialog.show({
-            controller: 'OpenDialogController',
-            controllerAs: 'vm',
-            templateUrl: 'views/open-dialog.html',
-            parent: angular.element(document.body),
-            targetEvent: event,
-            clickOutsideToClose: true,
-            fullscreen: useFullScreen
-        }).then(function(answer) {
-            $log.log('Open dialog resolved', answer);
-        }, function() {
-            $log.log('Open dialog rejected');
+        confirmSourceReplace().then(function() {
+            var useFullScreen = ($mdMedia('sm') || $mdMedia('xs'))  && vm.customFullscreen;
+            $mdDialog.show({
+                controller: 'OpenDialogController',
+                controllerAs: 'vm',
+                templateUrl: 'views/open-dialog.html',
+                parent: angular.element(document.body),
+                targetEvent: event,
+                clickOutsideToClose: true,
+                fullscreen: useFullScreen
+            }).then(function(file) {
+                vm.filename = file.name;
+                vm.editorContent = file.content;
+                touched = false;
+            }, function() {
+                $log.log('Open dialog rejected');
+            });
         });
     };
 
@@ -61,30 +82,11 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $tra
     };
 
     vm.onDropFile = function(event, file) {
-        var title = $translate.instant('DISCARD_CHANGES').capitalizeFirstLetter();
-        var text = $translate.instant('WOULD_YOU_LIKE_TO_DISCARD_YOUR_CHANGES').capitalizeFirstLetter();
-        var ok = $translate.instant('OK');
-        var cancel = $translate.instant('CANCEL');
-        var dialog = $mdDialog.confirm()
-            .title(title)
-            .textContent(text)
-            .ariaLabel('Confirm discard')
-            .targetEvent(event)
-            .ok(ok)
-            .cancel(cancel);
-
-        var promise = null;
-        if(touched) {
-            promise = $mdDialog.show(dialog);
-        } else {
-            promise = $q.when(true);
-        }
-        return promise.then(function() {
+        return confirmSourceReplace().then(function() {
             vm.filename = file.name;
             vm.editorContent = file.content;
             touched = false;
         });
-
     };
 
     vm.registers = [];
@@ -103,10 +105,9 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $tra
 
     vm.runAll = function() {
         $log.log('Run invoked');
-        $log.log(vm.editorContent);
         var simulator = new jsedumips64.WebUi();
         simulator.init();
-        var result = simulator.runProgram(vm.editorContent);
+        var result = simulator.loadProgram(vm.editorContent);
         if (result.length != 0) {
             $log.error(result);
         } else {
