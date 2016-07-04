@@ -204,6 +204,10 @@
         classpath="${base.classpath}">
         <compilerarg value="-Xlint"/>
         <compilerarg value="-Xlint:-serial"/>
+      <classpath>
+        <pathelement location="src/main/java"/>
+        <path refid="project.class.path"/>
+      </classpath>
     </javac>
   </target>
 
