@@ -111,7 +111,7 @@ gulp.task('serve', ['styles', 'scripts', 'fonts'], () => {
             },
             middleware: [
                 modRewrite([
-                    '!\\.\\w+$ /index.html [L]'
+                    '^[^\\.]*$ /index.html [L]'
                 ])
             ]
         }
@@ -137,7 +137,7 @@ gulp.task('serve:dist', () => {
             baseDir: ['dist'],
             middleware: [
                 modRewrite([
-                    '!\\.\\w+$ /index.html [L]'
+                    '^[^\\.]*$ /index.html [L]'
                 ])
             ]
         }

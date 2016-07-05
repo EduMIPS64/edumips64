@@ -9,56 +9,75 @@
                 </md-button>
             </div>
         </md-toolbar>
-        <md-dialog-content style="width:800px;max-height:810px;height:460px;">
-            <md-tabs md-border-bottom md-selected="vm.selectedTab">
-                <md-tab label="{{'FROM_DISK' | translate}}">
-                    <md-content class="md-padding">
-                        <div style="height:300px;position:relative">
-                            <p class="capitalize" translate>CLICK_OPEN_OR_DROP_FILE</p>
-                            <md-button class="md-raised md-primary" ng-click="">
-                                <input type="file" file-opener="vm.onFileOpen($event, $file)" ><!-- accept=".csv" -->
-                                {{'OPEN_FROM_DISK' | translate}}
-                            </md-button>
-                        </div>
-                    </md-content>
-                </md-tab>
-                <md-tab label="{{'FROM_URL' | translate}}">
-                    <md-content class="md-padding">
-                        <p class="capitalize" translate>ENTER_URL</p>
-                        <md-input-container class="md-block" md-no-float>
-                            <input required name="url" placeholder="{{'URL' | translate}}" ng-model="vm.url" ng-pattern="/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/"></input>
-                            <div ng-messages="openSourceFileForm.url.$error" ng-hide="false">
-                                <div ng-message="pattern" translate class="capitalize">ENTER_VALID_URL</div>
+        <md-dialog-content style="width:800px;max-height:810px;height:50vh">
+            <md-tabs md-border-bottom md-selected="vm.selectedTab" layout-fill>
+                <md-tab>
+                    <md-tab-label>{{'FROM_DISK' | translate}}</md-tab-label>
+                    <md-tab-body>
+                        <md-content class="md-padding">
+                            <div file-dropper="vm.onDropFile($event, $file)" ><!-- FIX THIS -->
+                                <p class="capitalize" translate>CLICK_OPEN_OR_DROP_FILE</p>
+                                <div class="text-center">
+                                    <md-button class="md-raised md-primary">
+                                        <input type="file" file-opener="vm.onFileOpen($event, $file)" accept=".s">
+                                        {{'OPEN_FROM_DISK' | translate}}
+                                    </md-button>
+                                </div>
                             </div>
-                        </md-input-container>
-                        <pre>{{vm.preview.content}}</pre>
-                    </md-content>
+                        </md-content>
+                    </md-tab-body>
                 </md-tab>
-                <md-tab label="{{'FROM_GITHUB' | translate}}">
-                    <md-list ng-if="vm.isAuthenticated" style="height:410px;">
-                        <md-list-item class="md-2-line" ng-repeat="gist in vm.gists" ng-click="vm.openGist(gist)">
-                            <img ng-src="{{gist.ownerAvatar}}" class="md-avatar" alt="{{gist.ownerLogin}}" />
-                            <div class="md-list-item-text">
-                                <h3>{{ gist.name }}</h3>
-                                <p>{{ gist.size | number : 0}}b | {{'CREATED' | translate}} {{gist.created | date : 'medium'}} | {{'UPDATED' | translate}} {{gist.updated | date : 'medium'}}</p>
+                <md-tab>
+                    <md-tab-label>{{'FROM_URL' | translate}}</md-tab-label>
+                    <md-tab-body class="md-padding">
+                        <md-content class="md-padding">
+                            <p class="capitalize" translate>ENTER_URL</p>
+                            <md-input-container class="md-block" md-no-float>
+                                <input required name="url" placeholder="{{'URL' | translate}}" ng-model="vm.url" ng-pattern="/^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)$/"></input>
+                                <div ng-messages="openSourceFileForm.url.$error" ng-hide="false">
+                                    <div ng-message="pattern" translate class="capitalize">ENTER_VALID_URL</div>
+                                </div>
+                            </md-input-container>
+                            <pre>{{vm.preview.content}}</pre>
+                        </md-content>
+                    </md-tab-body>
+                </md-tab>
+                <md-tab>
+                    <md-tab-label>{{'FROM_GISTS' | translate}}</md-tab-label>
+                    <md-tab-body>
+                        <md-list ng-if="vm.isAuthenticated">
+                            <md-list-item class="md-2-line" ng-repeat="gist in vm.gists" ng-click="vm.openGist(gist)">
+                                <img ng-src="{{gist.ownerAvatar}}" class="md-avatar" alt="{{gist.ownerLogin}}" />
+                                <div class="md-list-item-text">
+                                    <h3>{{ gist.name }}</h3>
+                                    <p>{{ gist.size | number : 0}}b | {{'CREATED' | translate}} {{gist.created | date : 'medium'}} | {{'UPDATED' | translate}} {{gist.updated | date : 'medium'}}</p>
+                                </div>
+                            </md-list-item>
+                        </md-list>
+                        <md-content class="md-padding" ng-if="!vm.isAuthenticated">
+                            <p>
+                                <span class="capitalize" translate>GITHUB_AUTHENTICATE_DESC_1</span>
+                                <span class="capitalize" translate>GITHUB_AUTHENTICATE_DESC_2</span>
+                            </p>
+                            <div class="text-center">
+                                <md-button class="md-raised md-primary" ng-click="vm.authGithub($event)">
+                                    {{'AUTHENTICATE_WITH_GITHUB' | translate}}
+                                </md-button>
                             </div>
-                        </md-list-item>
-                    </md-list>
-                    <md-content class="md-padding" ng-if="!vm.isAuthenticated">
-                        <h1 class="md-display-2 capitalize" translate>LOAD_SOURCE_FROM_GITHUB</h1>
-                        <p>
-                            <span class="capitalize" translate>GITHUB_AUTHENTICATE_DESC_1</span>
-                            <span class="capitalize" translate>GITHUB_AUTHENTICATE_DESC_2</span>
-                        </p>
-                        <md-button class="md-raised md-primary" ng-click="vm.auth($event)">
-                            {{'AUTHENTICATE_WITH_GITHUB' | translate}}
-                        </md-button>
-                    </md-content>
+                        </md-content>
+                    </md-tab-body>
                 </md-tab>
             </md-tabs>
         </md-dialog-content>
-        <md-dialog-actions layout="row">
-            <md-button ng-if="vm.selectedTab === 1" ng-click="vm.ok()">{{'OK' | translate}}</md-button>
+        <md-dialog-actions>
+            <md-button class="md-raised md-warn" ng-click="vm.disconnectGithub($event)" ng-if="vm.isAuthenticated && vm.selectedTab === 2">{{'DISCONNECT_GITHUB' | translate}}</md-button>
+            <!--
+            <div layout="row" layout-align="start center" >
+                <a ng-href="{{vm.githubUser.html_url}}" target="_blank"><img ng-src="{{vm.githubUser.avatar_url}}" alt="avatar" width="30" height="30"></a>
+                <p><strong>@{{vm.githubUser.login}}</strong> {{vm.githubUser.name}}</p>
+            </div>-->
+            <span flex></span>
+            <md-button class="md-primary" ng-if="vm.selectedTab === 1" ng-disabled="vm.preview.content.length === 0" ng-click="vm.ok()">{{'OK' | translate}}</md-button>
             <md-button ng-click="vm.cancel()">{{'CANCEL' | translate}}</md-button>
         </md-dialog-actions>
     </form>

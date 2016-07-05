@@ -1,10 +1,20 @@
-angular.module('edmApp').controller('OpenDialogController', function($mdDialog, $auth, $scope, $http, $window) {
+angular.module('edmApp').controller('OpenDialogController', function($q, $mdDialog, $auth, $scope, $http, $window) {
     'use strict';
 
     var vm = this;
 
     var loadGists = function() {
-        return $http({
+        vm.isLoading = true;
+        var promises = [], promise = null;
+        promise = $http({
+            url: 'https://api.github.com/user',
+            method: 'GET'
+        }).then(function(result) {
+            vm.githubUser = result.data;
+            return result;
+        });
+        promises.push(promise);
+        $http({
             url: 'https://api.github.com/gists',
             method: 'GET'
         }).then(function(result) {
@@ -22,16 +32,40 @@ angular.module('edmApp').controller('OpenDialogController', function($mdDialog, 
                     });
                 });
             });
+            return result;
+        });
+        promises.push(promise);
+        $q.all(promises).finally(function() {
+            vm.isLoading = false;
         });
     };
 
     vm.isAuthenticated = false;
+    vm.isLoading = false;
     vm.gists = [];
     vm.url = null;
-    vm.preview = {};
+    vm.preview = {
+        name: '',
+        content: ''
+    };
+    vm.githubUser = {};
 
-    vm.auth = function(event) {
-        return $auth.authenticate('github');
+    vm.disconnectGithub = function(event) {
+        $auth.logout();
+    };
+
+    vm.authGithub = function(event) {
+        vm.isLoading = true;
+        return $auth.authenticate('github').finally(function() {
+            vm.isLoading = false;
+        });
+    };
+
+    vm.onDropFile = function(event, file) {
+        $mdDialog.hide({
+            name: file.name,
+            content: file.content
+        });
     };
 
     vm.onFileOpen = function(event, file) {
@@ -93,7 +127,10 @@ angular.module('edmApp').controller('OpenDialogController', function($mdDialog, 
                 };
             });
         } else {
-            vm.preview = {};
+            vm.preview = {
+                name: '',
+                content: ''
+            };
         }
     });
 
