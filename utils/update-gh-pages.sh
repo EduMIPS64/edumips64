@@ -20,11 +20,6 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     exit 0
   fi
 
-  echo -n "Building JAR.. "
-  ant latest-jar > /dev/null
-  cp edumips64-latest.jar $HOME > /dev/null
-  echo "done."
-
   echo -n "Cloning git repo.. "
   cd $HOME
   git config --global user.email "travis@travis-ci.org"
