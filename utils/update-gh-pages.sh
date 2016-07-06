@@ -5,21 +5,6 @@ set -e
 set -u
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-  if [[ "$JAVA_HOME" == *java-8* ]]; then
-    echo "Java 8 worker, should update GitHub pages (JAR or web UI)"
-  else
-    echo "Non-java 8 worker. Not updating Github pages"
-    echo "JAVA_HOME=${JAVA_HOME}"
-    exit 0
-  fi
-
-  GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-
-  if [ "$GIT_BRANCH" != "master" ]; then 
-    echo "Non-master branch: $GIT_BRANCH. Not updating the JAR."
-    exit 0
-  fi
-
   echo -n "Cloning git repo.. "
   cd $HOME
   git config --global user.email "travis@travis-ci.org"
