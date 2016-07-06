@@ -31,6 +31,7 @@ import org.edumips64.utils.io.LocalWriterAdapter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 import javax.swing.*;
@@ -56,10 +57,10 @@ public class DineroFrontend extends JDialog {
     private String name;
     private LinkedList<String> contents;
     private boolean finished = false;
-    public StreamReader(InputStream stream, String name) {
+    StreamReader(InputStream stream, String name) {
       this.stream = stream;
       this.name = name;
-      this.contents = new LinkedList<String>();
+      this.contents = new LinkedList<>();
       this.finished = false;
     }
 
@@ -86,13 +87,13 @@ public class DineroFrontend extends JDialog {
     }
 
     // Will always be called after join()
-    public boolean isFinished() {
+    boolean isFinished() {
       return finished;
     }
   }
 
   private LinkedList<String> extractSimulationResults(LinkedList<String> stdout) {
-    LinkedList<String> result = new LinkedList<String>();
+    LinkedList<String> result = new LinkedList<>();
     boolean found = false;
 
     for (String line : stdout) {
@@ -147,90 +148,84 @@ public class DineroFrontend extends JDialog {
     execute = new JButton("Execute");
     execute.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-    browse.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        JFileChooser jfc = new JFileChooser();
-        int val = jfc.showOpenDialog(null);
+    browse.addActionListener(e -> {
+      JFileChooser jfc = new JFileChooser();
+      int val = jfc.showOpenDialog(null);
 
-        if (val == JFileChooser.APPROVE_OPTION) {
-          config.putString("dineroIV", jfc.getSelectedFile().getPath());
-          path.setText(jfc.getSelectedFile().getPath());
-        }
+      if (val == JFileChooser.APPROVE_OPTION) {
+        config.putString("dineroIV", jfc.getSelectedFile().getPath());
+        path.setText(jfc.getSelectedFile().getPath());
       }
     });
 
-    execute.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        try {
-          String dineroPath = path.getText();
-          String paramString = params.getText();
+    execute.addActionListener(e -> {
+      try {
+        String dineroPath = path.getText();
+        String paramString = params.getText();
 
-          LinkedList<String> paramsList = new LinkedList<String>();
-          paramsList.add(dineroPath);
+        LinkedList<String> paramsList = new LinkedList<>();
+        paramsList.add(dineroPath);
 
-          for (String p : paramString.split(" ")) {
-            paramsList.add(p);
+        Collections.addAll(paramsList, paramString.split(" "));
+
+        // Clean up the JTextArea
+        result.setText("");
+
+        logger.info("Starting the Dinero process.");
+        Process process = Runtime.getRuntime().exec(paramsList.toArray(new String[0]));
+
+        logger.info("Creating and starting reader threads for stdout and stderr");
+        StreamReader stdoutReader = new StreamReader(process.getInputStream(), "stdout");
+        StreamReader stderrReader = new StreamReader(process.getErrorStream(), "stderr");
+        stdoutReader.start();
+        stderrReader.start();
+
+        logger.info("Sending the tracefile to Dinero via stdin");
+        // Let's send the tracefile to Dinero
+        PrintWriter dineroIn = new PrintWriter(process.getOutputStream());
+        dinero.writeTraceData(new LocalWriterAdapter(dineroIn));
+        dineroIn.flush();
+        dineroIn.close();
+
+        // Well, wait for Dinero to terminate
+        logger.info("Data sent. Waiting for Dinero to terminate.");
+        process.waitFor();
+        logger.info("Dinero terminated.");
+        stdoutReader.join(10000);
+        stderrReader.join(10000);
+        logger.info("Reader threads have been joined. Results: " + stdoutReader.isFinished() + ", " + stderrReader.isFinished());
+
+        // Debug info
+        logger.info("STDOUT: " + stdoutReader.getContents());
+        logger.info("STDERR: " + stderrReader.getContents());
+
+        logger.info("Writing data to the JTextArea..");
+        LinkedList<String> simulationResults = extractSimulationResults(stdoutReader.getContents());
+
+        if (simulationResults.isEmpty()) {
+          result.append(">> Errors while retrieving the simulation results.");
+          result.append(">> STDOUT: " + stdoutReader.getContents());
+          result.append(">> STDERR: " + stderrReader.getContents());
+        } else {
+          result.append(">> Dinero path: " + dineroPath + "\n");
+          result.append(">> Dinero parameters: " + paramString + "\n");
+          result.append(">> Simulation results:\n");
+
+          for (String line : simulationResults) {
+            result.append(line);
           }
-
-          // Clean up the JTextArea
-          result.setText("");
-
-          logger.info("Starting the Dinero process.");
-          Process process = Runtime.getRuntime().exec(paramsList.toArray(new String[0]));
-
-          logger.info("Creating and starting reader threads for stdout and stderr");
-          StreamReader stdoutReader = new StreamReader(process.getInputStream(), "stdout");
-          StreamReader stderrReader = new StreamReader(process.getErrorStream(), "stderr");
-          stdoutReader.start();
-          stderrReader.start();
-
-          logger.info("Sending the tracefile to Dinero via stdin");
-          // Let's send the tracefile to Dinero
-          PrintWriter dineroIn = new PrintWriter(process.getOutputStream());
-          dinero.writeTraceData(new LocalWriterAdapter(dineroIn));
-          dineroIn.flush();
-          dineroIn.close();
-
-          // Well, wait for Dinero to terminate
-          logger.info("Data sent. Waiting for Dinero to terminate.");
-          process.waitFor();
-          logger.info("Dinero terminated.");
-          stdoutReader.join(10000);
-          stderrReader.join(10000);
-          logger.info("Reader threads have been joined. Results: " + stdoutReader.isFinished() + ", " + stderrReader.isFinished());
-
-          // Debug info
-          logger.info("STDOUT: " + stdoutReader.getContents());
-          logger.info("STDERR: " + stderrReader.getContents());
-
-          logger.info("Writing data to the JTextArea..");
-          LinkedList<String> simulationResults = extractSimulationResults(stdoutReader.getContents());
-
-          if (simulationResults.isEmpty()) {
-            result.append(">> Errors while retrieving the simulation results.");
-            result.append(">> STDOUT: " + stdoutReader.getContents());
-            result.append(">> STDERR: " + stderrReader.getContents());
-          } else {
-            result.append(">> Dinero path: " + dineroPath + "\n");
-            result.append(">> Dinero parameters: " + paramString + "\n");
-            result.append(">> Simulation results:\n");
-
-            for (String line : simulationResults) {
-              result.append(line);
-            }
-          }
-
-          logger.info("DineroFrontend: all done.");
-        } catch (InterruptedException ie) {
-          result.append(">> ERROR: " + ie);
-          logger.severe("InterruptedException: " + ie);
-        } catch (java.io.IOException ioe) {
-          result.append(">> ERROR: " + ioe);
-          logger.severe("IOException: " + ioe);
-        } catch (Exception ex) {
-          result.append(">> ERROR: " + ex);
-          logger.severe("Exception: " + ex);
         }
+
+        logger.info("DineroFrontend: all done.");
+      } catch (InterruptedException ie) {
+        result.append(">> ERROR: " + ie);
+        logger.severe("InterruptedException: " + ie);
+      } catch (IOException ioe) {
+        result.append(">> ERROR: " + ioe);
+        logger.severe("IOException: " + ioe);
+      } catch (Exception ex) {
+        result.append(">> ERROR: " + ex);
+        logger.severe("Exception: " + ex);
       }
     });
 
