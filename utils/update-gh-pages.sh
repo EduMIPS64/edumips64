@@ -5,7 +5,7 @@ set -e
 set -u
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-  echo -n "Cloning git repo.. "
+  echo -n "Cloning gh-pages branch.. "
   cd $HOME
   git config --global user.email "travis@travis-ci.org"
   git config --global user.name "Travis"
@@ -14,6 +14,7 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
 
   echo "Git branch: $TRAVIS_BRANCH"
 
+  # Execute special per-branch actions.
   if [ "$TRAVIS_BRANCH" == "master" ]; then 
     echo -n "Building JAR.. "
     ant latest-jar > /dev/null
@@ -28,10 +29,17 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     mkdir webui
     cp -Rf $HOME/webui/* ./webui  
     echo "done."
-  else
-    echo "Non-master branch: $TRAVIS_BRANCH. Not updating the JAR."
-    return 0
   fi
+
+  # Always build and update the JS code.
+  echo -n "Building the JS code... "
+  ant gwtc > /dev/null
+  echo "done"
+
+  JS_DIR=gh-pages/edumips64/${TRAVIS_BRANCH}
+  echo "Copying the JS code to ${JS_DIR}."
+  mkdir -p gh-pages/edumips64/${TRAVIS_BRANCH}
+  cp war/edumips64/* gh-pages/edumips64/${TRAVIS_BRANCH}
 
   # Add, commit and push files.
   echo -n "Committing files.. "
