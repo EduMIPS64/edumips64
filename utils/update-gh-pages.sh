@@ -41,6 +41,7 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   cd ${GH_PAGES_DIR}
   echo -n "Committing files.. "
   git add -f .
+  git add -f ${JS_DIR}
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"
   git push -fq origin gh-pages > /dev/null
   echo "done."
