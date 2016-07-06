@@ -4,12 +4,16 @@
 set -e
 set -u
 
+# Debug info.
+echo ${PWD}
+ls
+
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-  echo -n "Cloning gh-pages branch.. "
-  cd $HOME
+  GH_PAGES_DIR=${HOME}/gh-pages
+  echo -n "Cloning gh-pages branch to ${GH_PAGES_DIR}.. "
   git config --global user.email "travis@travis-ci.org"
   git config --global user.name "Travis"
-  git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/lupino3/edumips64.git gh-pages > /dev/null
+  git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/lupino3/edumips64.git ${GH_PAGES_DIR} > /dev/null
   echo "done."
 
   echo "Git branch: $TRAVIS_BRANCH"
@@ -19,12 +23,12 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     echo -n "Building JAR.. "
     ant latest-jar > /dev/null
     echo "done."
-    cp edumips64-latest.jar gh-pages
+    cp edumips64-latest.jar ${GH_PAGES_DIR}
   elif [ "$TRAVIS_BRANCH" == "webui-prototype" ]; then
-    echo -n "Copying web UI..."
-    rm -rf gh-pages/webui
-    mkdir gh-pages/webui
-    cp -Rf $HOME/webui/* gh-pages/webui
+    echo -n "Copying web UI... "
+    mkdir -p ${GH_PAGES_DIR}/webui
+    rm -rf ${GH_PAGES_DIR}/webui/*
+    cp -Rf $HOME/webui/* ${GH_PAGES_DIR}/webui
     echo "done."
   fi
 
@@ -34,6 +38,7 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   cp war/edumips64/* gh-pages/edumips64/${TRAVIS_BRANCH}
 
   # Add, commit and push files.
+  cd ${GH_PAGES_DIR}
   echo -n "Committing files.. "
   git add -f .
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"
