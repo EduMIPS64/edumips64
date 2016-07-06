@@ -14,7 +14,7 @@ language: java
 python:
 - "2.7"
 install: "sudo pip install Sphinx==1.1.3 && gradle getLibs"
-script: "ant test"
+script: "ant test && ant gwtc"
 jdk:
 - oraclejdk8
 after_success: ./utils/update-gh-pages.sh
