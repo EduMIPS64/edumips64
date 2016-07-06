@@ -70,7 +70,7 @@
     <javac srcdir="src/main/java" includes="**" encoding="utf-8"
         includeantruntime="false"
         destdir="war/WEB-INF/classes"
-        source="1.7" target="1.7" nowarn="true"
+        source="${src_java_version}" target="${dst_java_version}" nowarn="true"
         debug="true" debuglevel="lines,vars,source">
       <classpath refid="project.class.path"/>
     </javac>
@@ -90,7 +90,7 @@
   </target>
 
   <target name="gwtc" depends="compileWeb" description="GWT compile to JavaScript (production mode)">
-    <java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler" maxmemory="256m">
+    <java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler" maxmemory="2g">
       <classpath>
         <pathelement location="src/main/java"/>
         <path refid="project.class.path"/>

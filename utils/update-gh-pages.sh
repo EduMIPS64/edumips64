@@ -4,40 +4,44 @@
 set -e
 set -u
 
+# Debug info.
+echo ${PWD}
+ls
+
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-  if [[ "$JAVA_HOME" == *java-8* ]]; then
-    echo "Java 8 worker, should update JAR on GitHub pages"
-  else
-    echo "Non-java 8 worker. Not updating JAR"
-    echo "JAVA_HOME=${JAVA_HOME}"
-    exit 0
-  fi
-
-  GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-
-  if [ "$GIT_BRANCH" != "master" ]; then 
-    echo "Non-master branch: $GIT_BRANCH. Not updating the JAR."
-    exit 0
-  fi
-
-  echo -n "Building JAR.. "
-  ant latest-jar > /dev/null
-  cp edumips64-latest.jar $HOME > /dev/null
-  echo "done."
-
-  echo -n "Cloning git repo.. "
-  cd $HOME
+  GH_PAGES_DIR=${HOME}/gh-pages
+  echo -n "Cloning gh-pages branch to ${GH_PAGES_DIR}.. "
   git config --global user.email "travis@travis-ci.org"
   git config --global user.name "Travis"
-  git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/lupino3/edumips64.git gh-pages > /dev/null
+  git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/lupino3/edumips64.git ${GH_PAGES_DIR} > /dev/null
   echo "done."
 
-  cd gh-pages
-  mv $HOME/edumips64-latest.jar .
+  echo "Git branch: $TRAVIS_BRANCH"
+
+  # Execute special per-branch actions.
+  if [ "$TRAVIS_BRANCH" == "master" ]; then 
+    echo -n "Building JAR.. "
+    ant latest-jar > /dev/null
+    echo "done."
+    cp edumips64-latest.jar ${GH_PAGES_DIR}
+  elif [ "$TRAVIS_BRANCH" == "webui-prototype" ]; then
+    echo -n "Copying web UI... "
+    mkdir -p ${GH_PAGES_DIR}/webui
+    rm -rf ${GH_PAGES_DIR}/webui/*
+    cp -Rf $HOME/webui/* ${GH_PAGES_DIR}/webui
+    echo "done."
+  fi
+
+  JS_DIR=${GH_PAGES_DIR}/edumips64/${TRAVIS_BRANCH}
+  echo "Copying the JS code to ${JS_DIR}."
+  mkdir -p ${JS_DIR}
+  cp war/edumips64/* ${JS_DIR}
 
   # Add, commit and push files.
-  echo -n "Committing JAR.. "
+  cd ${GH_PAGES_DIR}
+  echo -n "Committing files.. "
   git add -f .
+  git add -f ${JS_DIR}
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"
   git push -fq origin gh-pages > /dev/null
   echo "done."
