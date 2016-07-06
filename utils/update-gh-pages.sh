@@ -18,23 +18,15 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   if [ "$TRAVIS_BRANCH" == "master" ]; then 
     echo -n "Building JAR.. "
     ant latest-jar > /dev/null
-    cp edumips64-latest.jar $HOME > /dev/null
     echo "done."
-	  cd gh-pages
-	  mv $HOME/edumips64-latest.jar .
+    cp edumips64-latest.jar gh-pages
   elif [ "$TRAVIS_BRANCH" == "webui-prototype" ]; then
     echo -n "Copying web UI..."
-	  cd gh-pages
-    rm -rf webui  
-    mkdir webui
-    cp -Rf $HOME/webui/* ./webui  
+    rm -rf gh-pages/webui
+    mkdir gh-pages/webui
+    cp -Rf $HOME/webui/* gh-pages/webui
     echo "done."
   fi
-
-  # Always build and update the JS code.
-  echo -n "Building the JS code... "
-  ant gwtc > /dev/null
-  echo "done"
 
   JS_DIR=gh-pages/edumips64/${TRAVIS_BRANCH}
   echo "Copying the JS code to ${JS_DIR}."
