@@ -32,10 +32,10 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
     echo "done."
   fi
 
-  JS_DIR=gh-pages/edumips64/${TRAVIS_BRANCH}
+  JS_DIR=${GH_PAGES_DIR}/edumips64/${TRAVIS_BRANCH}
   echo "Copying the JS code to ${JS_DIR}."
-  mkdir -p gh-pages/edumips64/${TRAVIS_BRANCH}
-  cp war/edumips64/* gh-pages/edumips64/${TRAVIS_BRANCH}
+  mkdir -p ${JS_DIR}
+  cp war/edumips64/* ${JS_DIR}
 
   # Add, commit and push files.
   cd ${GH_PAGES_DIR}
