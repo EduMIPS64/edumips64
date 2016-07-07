@@ -88,7 +88,26 @@
     <!-- Create directories for the compilation process. -->
     <mkdir dir="${outputDir}" />
   </target>
-
+  
+  <!-- like gwtc, but with only one worker. Works on Cloud9 due to reduced memory demand -->
+  <target name="gwtc-lowmem" depends="compileWeb" description="GWT compile to JavaScript (production mode)">
+    <java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler" maxmemory="2g">
+      <classpath>
+        <pathelement location="src/main/java"/>
+        <path refid="project.class.path"/>
+      </classpath>
+      <arg line="-war"/>
+      <arg value="war"/>
+      <!-- Additional arguments like -style PRETTY or -logLevel DEBUG -->
+      <arg line="${gwt.args}"/>
+      <arg value="org.edumips64.webclient"/>
+      <arg line="-strict"/>
+      <arg line="-generateJsInteropExports"/>
+      <arg line="-localWorkers"/>
+      <arg value="1"/>
+    </java>
+  </target>
+  
   <target name="gwtc" depends="compileWeb" description="GWT compile to JavaScript (production mode)">
     <java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler" maxmemory="2g">
       <classpath>
