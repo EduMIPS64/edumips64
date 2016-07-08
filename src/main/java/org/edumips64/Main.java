@@ -253,7 +253,7 @@ public class Main extends JApplet {
     instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, configStore);
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
-    front = new GUIFrontend(cpu, memory);
+    front = new GUIFrontend(cpu, memory, configStore);
     cgt = new CPUGUIThread(cpu, front, f, configStore);
     cgt.start();
 

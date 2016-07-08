@@ -43,8 +43,6 @@ public class GUIPipeline extends GUIComponent {
 
   Map <CPU.PipeStage, Instruction> pipeline;
 
-  private ConfigStore config = ConfigManager.getConfig();
-
   /**
   * Set the number of multiplier latency stages.
   * Currently this method is not used.
@@ -72,8 +70,8 @@ public class GUIPipeline extends GUIComponent {
   }
 
 
-  GUIPipeline(CPU cpu, Memory memory) {
-    super(cpu, memory);
+  GUIPipeline(CPU cpu, Memory memory, ConfigStore config) {
+    super(cpu, memory, config);
     numMultiplier = 7;
     numAdder = 4;
     pannello = new Pannello1();

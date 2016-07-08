@@ -35,8 +35,8 @@ public class GUICode extends GUIComponent {
   String memoryAddress[] = new String[CPU.CODELIMIT];
   private static int ifIndex, idIndex, exIndex, memIndex, wbIndex, A1Index, A2Index, A3Index, A4Index, M1Index, M2Index, M3Index, M4Index, M5Index, M6Index, M7Index, DIVIndex;
 
-  public GUICode(CPU cpu, Memory memory) {
-    super(cpu, memory);
+  public GUICode(CPU cpu, Memory memory, ConfigStore config) {
+    super(cpu, memory, config);
     codePanel = new CodePanel();
   }
 
@@ -212,7 +212,6 @@ public class GUICode extends GUIComponent {
       label = new JLabel();
       Font f = new Font("Monospaced", Font.PLAIN, 12);
       int rowTable = row;
-      ConfigStore config = ConfigManager.getConfig();
 
       if (column == 0) {
         try {
