@@ -52,9 +52,12 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
   String OPCODE_VALUE = "";
   String FMT_FIELD = "";
 
-  FPArithmeticInstructions() {
+  FPInstructionUtils fpInstructionUtils;
+
+  FPArithmeticInstructions(FCSRRegister fcsr) {
     syntax = "%F,%F,%F";
     paramCount = 3;
+    fpInstructionUtils = new FPInstructionUtils(fcsr);
   }
 
   public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, WAWException {
@@ -92,7 +95,7 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
       //if the enable forwarding is turned on we have to ensure that registers
       //should be unlocked also if a synchronous exception occurs. This is performed
       //by executing the WB method before raising the trap
-      if (isEnableForwarding()) {
+      if (cpu.isEnableForwarding()) {
         doWB();
       }
 
@@ -109,7 +112,7 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
       }
     }
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }
@@ -121,7 +124,7 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
   }
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!isEnableForwarding()) {
+    if (!cpu.isEnableForwarding()) {
       doWB();
     }
   }

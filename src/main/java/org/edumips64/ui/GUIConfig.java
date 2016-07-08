@@ -41,7 +41,6 @@ import java.awt.event.*;
 public class GUIConfig extends JDialog {
 
   private static final Logger logger = Logger.getLogger(GUIConfig.class.getName());
-  private static ConfigStore config = ConfigManager.getConfig();
   String MAIN;
   String APPEARANCE;
   String FPUEXCEPTIONS;
@@ -56,9 +55,11 @@ public class GUIConfig extends JDialog {
   // the configuration backend.
   Map<String, Object> cache;
   private CPU cpu;
+  private ConfigStore config;
 
-  public GUIConfig(final JFrame owner, CPU cpu) {
+  public GUIConfig(final JFrame owner, CPU cpu, ConfigStore config) {
     super(owner, CurrentLocale.getString("Config.ITEM"), true);
+    this.config = config;
     this.cpu = cpu;
     logger.info("Building a new GUIConfig instance.");
     MAIN = CurrentLocale.getString("Config.MAIN");
@@ -390,17 +391,6 @@ public class GUIConfig extends JDialog {
           config.mergeFromGenericMap(cache);
           // Might be needed if show_alias is changed.
           org.edumips64.Main.getGUIFrontend().updateComponents();
-
-          if (Instruction.getEnableForwarding() != config.getBoolean("forwarding")) {
-            Instruction.setEnableForwarding(config.getBoolean("forwarding"));
-
-            // Let's verify that we have to reset the CPU
-            if (cpu.getStatus() == CPU.CPUStatus.RUNNING) {
-              logger.info("Reset");
-              org.edumips64.Main.resetSimulator(true);
-            }
-          }
-
           org.edumips64.Main.updateCGT();
         } catch (ConfigStoreTypeException ex) {
           logger.severe("Unknown type encountered while storing the configuration.");

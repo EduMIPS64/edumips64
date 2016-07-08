@@ -88,7 +88,7 @@ public abstract class FPConditionalCC_DMoveInstructions extends ComputationalIns
     cpu.getRegisterFP(params.get(FD_FIELD)).decrWAWSemaphore();
   }
   public void WB() throws IrregularStringOfBitsException {
-    if (!isEnableForwarding()) {
+    if (!cpu.isEnableForwarding()) {
       doWB();
     }
   }

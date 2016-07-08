@@ -21,10 +21,23 @@
 
 package org.edumips64.core.is;
 
-import org.edumips64.core.*;
-import org.edumips64.core.fpu.*;
+import org.edumips64.core.BitSet32;
+import org.edumips64.core.CPU;
+import org.edumips64.core.Dinero;
+import org.edumips64.core.DivisionByZeroException;
+import org.edumips64.core.IrregularWriteOperationException;
+import org.edumips64.core.MemoryElementNotFoundException;
+import org.edumips64.core.NotAlignException;
+import org.edumips64.core.Register;
+import org.edumips64.core.RegisterFP;
+import org.edumips64.core.fpu.FPDivideByZeroException;
+import org.edumips64.core.fpu.FPInvalidOperationException;
+import org.edumips64.core.fpu.FPOverflowException;
+import org.edumips64.core.fpu.FPUnderflowException;
 import org.edumips64.utils.*;
-import java.util.*;
+
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**Abstract class: it provides all methods and attributes for each instruction type
@@ -45,7 +58,7 @@ public abstract class Instruction {
   protected String fullname;
   protected String label;
   protected static final Logger logger = Logger.getLogger(Instruction.class.getName());
-  protected Integer serialNumber;
+  protected int serialNumber;
 
   /** CPU instance. It is set through setCPU, and it should always be set before the instruction is considered
    * fully built. InstructionBuilder + package-local instruction constructors enforce this.
@@ -63,6 +76,10 @@ public abstract class Instruction {
     this.dinero = dinero;
   }
 
+  void setSerialNumber(int serialNumber) {
+    this.serialNumber = serialNumber;
+  }
+
   /** Creates a new instance of Instruction */
   Instruction() {
     params = new LinkedList<>();
@@ -71,19 +88,12 @@ public abstract class Instruction {
     repr = new BitSet32();
     syntax = "";
     repr.reset(false);
-    //generating a serial number for the current instruction
-    serialNumber = ConfigManager.getConfig().getInt("serialNumber");
-    ConfigManager.getConfig().putInt("serialNumber", serialNumber + 1);
 
     //initialization of temporary registers
     for (int i = 0; i < TR.length; i++) {
       TR[i] = new Register("TR " + i + "(Instruction " + serialNumber + ")");
       TRfp[i] = new RegisterFP();
     }
-  }
-
-  public static boolean isEnableForwarding() {
-    return ConfigManager.getConfig().getBoolean("forwarding");
   }
 
   /** <pre>
@@ -245,22 +255,6 @@ public abstract class Instruction {
       repr += " {label: " + label + "}";
     }
     return repr;
-  }
-
-  /**
-   * Enable forwarding mode
-   * @param value This variable enable the forwarding modality if it is true
-   * */
-  public static void setEnableForwarding(boolean value) {
-    ConfigManager.getConfig().putBoolean("forwarding", value);
-  }
-
-  /** Gets the state of EnableForwarding. This modality anticipates writing on registers
-   * at EX stage for Alu instructions or at MEM stage for Load-Store instructions
-   * @return The forwarding state
-   * */
-  public static boolean getEnableForwarding() {
-    return isEnableForwarding();
   }
 
   /**<pre>

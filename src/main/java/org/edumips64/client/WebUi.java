@@ -66,7 +66,7 @@ public class WebUi implements EntryPoint {
         cpu.getWAWStalls() + " WAW Stalls\n" +
         cpu.getStructuralStallsDivider() + " structural stalls (divider not available)\n" +
         cpu.getStructuralStallsMemory() + " structural stalls (Memory not available)\n" +
-        "Code Size: " + (Memory.getInstance().getInstructionsNumber() * 4) + " Bytes";
+        "Code Size: " + (memory.getInstructionsNumber() * 4) + " Bytes";
   }
 
   @Override
@@ -76,13 +76,13 @@ public class WebUi implements EntryPoint {
     // Simulator initialization.
     config = ConfigManager.getTmpConfig();
     ConfigManager.setConfig(config);
-    memory = Memory.getInstance();
+    memory = new Memory();
     symTab = new SymbolTable(memory);
     fu = new NullFileUtils();
     iom = new IOManager(fu, memory);
-    cpu = CPU.getInstance();
+    cpu = new CPU(memory, config);
     dinero = new Dinero(memory);
-    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
   }
 }

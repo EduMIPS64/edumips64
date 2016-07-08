@@ -109,14 +109,12 @@ public class DineroFrontend extends JDialog {
     return result;
   }
 
-  public DineroFrontend(Frame owner, Dinero dinero) {
+  public DineroFrontend(Frame owner, Dinero dinero, ConfigStore config) {
     super(owner);
     this.dinero = dinero;
     setTitle("Dinero frontend");
     cp = rootPane.getContentPane();
     cp.setLayout(new BoxLayout(cp, BoxLayout.PAGE_AXIS));
-
-    final ConfigStore config = ConfigManager.getConfig();
 
     Dimension hSpace = new Dimension(5, 0);
     Dimension vSpace = new Dimension(0, 5);
@@ -163,10 +161,12 @@ public class DineroFrontend extends JDialog {
         String dineroPath = path.getText();
         String paramString = params.getText();
 
-        LinkedList<String> paramsList = new LinkedList<>();
+        LinkedList<String> paramsList = new LinkedList<String>();
         paramsList.add(dineroPath);
 
-        Collections.addAll(paramsList, paramString.split(" "));
+        for (String p : paramString.split(" ")) {
+          paramsList.add(p);
+        }
 
         // Clean up the JTextArea
         result.setText("");

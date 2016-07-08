@@ -51,13 +51,13 @@ public class GUIFrontend {
 
   /**Creates the six internal component
   */
-  public GUIFrontend(CPU cpu, Memory memory) {
-    cycles = new GUICycles(cpu, memory);
-    regs = new GUIRegisters(cpu, memory);
-    stats = new GUIStatistics(cpu, memory);
-    pipe = new GUIPipeline(cpu, memory);
-    data = new GUIData(cpu, memory);
-    code = new GUICode(cpu, memory);
+  public GUIFrontend(CPU cpu, Memory memory, ConfigStore config) {
+    cycles = new GUICycles(cpu, memory, config);
+    regs = new GUIRegisters(cpu, memory, config);
+    stats = new GUIStatistics(cpu, memory, config);
+    pipe = new GUIPipeline(cpu, memory, config);
+    data = new GUIData(cpu, memory, config);
+    code = new GUICode(cpu, memory, config);
 
     components = new GUIComponent[6];
     components[0] = cycles;

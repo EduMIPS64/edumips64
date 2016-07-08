@@ -52,7 +52,7 @@ public class DSUBU extends ALU_RType {
     //There isn't IntegerOverflow cases
     TR[RD_FIELD].setBits(outputstring, 0);
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
 

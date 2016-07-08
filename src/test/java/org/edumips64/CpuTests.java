@@ -121,16 +121,16 @@ public class CpuTests {
   @Before
   public void testSetup() {
     ConfigManager.setConfig(config);
-    cpu = CPU.getInstance();
+    memory = new Memory();
+    cpu = new CPU(memory, config);
     cpu.setStatus(CPU.CPUStatus.READY);
-    memory = Memory.getInstance();
     dinero = new Dinero(memory);
     symTab = new SymbolTable(memory);
     FileUtils lfu = new LocalFileUtils();
     iom = new IOManager(lfu, memory);
-    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser  = new Parser(lfu, symTab, memory, instructionBuilder);
-    Instruction.setEnableForwarding(true);
+    config.putBoolean("forwarding", true);
     fec = new FPUExceptionsConfig();
   }
 
@@ -197,16 +197,16 @@ public class CpuTests {
    * corresponding CpuTestStatus object.
    */
   private Map<ForwardingStatus, CpuTestStatus> runMipsTestWithAndWithoutForwarding(String testPath) throws Exception {
-    boolean forwardingStatus = Instruction.getEnableForwarding();
+    boolean forwardingStatus = config.getBoolean("forwarding");
     Map<ForwardingStatus, CpuTestStatus> statuses = new HashMap<>();
 
-    Instruction.setEnableForwarding(true);
+    config.putBoolean("forwarding", true);
     statuses.put(ForwardingStatus.ENABLED, runMipsTest(testPath));
 
-    Instruction.setEnableForwarding(false);
+    config.putBoolean("forwarding", false);
     statuses.put(ForwardingStatus.DISABLED, runMipsTest(testPath));
 
-    Instruction.setEnableForwarding(forwardingStatus);
+    config.putBoolean("forwarding", forwardingStatus);
     return statuses;
   }
 

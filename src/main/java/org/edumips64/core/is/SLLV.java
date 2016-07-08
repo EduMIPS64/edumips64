@@ -81,7 +81,7 @@ public class SLLV extends ALU_RType {
 
     TR[RD_FIELD].setBits(target, 0);
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }

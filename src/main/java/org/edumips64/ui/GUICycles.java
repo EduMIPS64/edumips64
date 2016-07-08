@@ -46,10 +46,9 @@ public class GUICycles extends GUIComponent {
   Dimension dim, dim2;
 
   CycleBuilder builder;
-  static ConfigStore config = ConfigManager.getConfig();
 
-  public GUICycles(CPU cpu, Memory memory) {
-    super(cpu, memory);
+  public GUICycles(CPU cpu, Memory memory, ConfigStore config) {
+    super(cpu, memory, config);
     builder = new CycleBuilder(cpu);
     rightPanel = new RightPanel();
 

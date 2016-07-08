@@ -49,7 +49,7 @@ class MOV_D extends FPFormattedOperandMoveInstructions {
     String value = TRfp[FS_FIELD].getBinString();
     TRfp[FD_FIELD].setBits(value, 0);
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }

@@ -109,26 +109,20 @@ public class CPU {
   /** Simulator configuration */
   private ConfigStore config;
 
-  private static CPU cpu;
-
   /** Statistics */
   private int cycles, instructions, RAWStalls, WAWStalls, dividerStalls, funcUnitStalls, memoryStalls, exStalls;
 
   /** BUBBLE */
   private Instruction bubble;
 
-  /** Static initializer */
-  static {
-    cpu = null;
-  }
-  private CPU() {
+  public CPU(Memory memory, ConfigStore config) {
+    this.config = config;
     bubble = new BUBBLE();
-    config = ConfigManager.getConfig();
 
     logger.info("Creating the CPU...");
     cycles = 0;
     status = CPUStatus.READY;
-    mem = Memory.getInstance();
+    mem = memory;
     logger.info("Got Memory instance..");
 
     // Registers initialization
@@ -220,14 +214,6 @@ public class CPU {
     pipe.put(PipeStage.EX, null);
     pipe.put(PipeStage.MEM, null);
     pipe.put(PipeStage.WB, null);
-  }
-
-  public static CPU getInstance() {
-    if (cpu == null) {
-      cpu = new CPU();
-    }
-
-    return cpu;
   }
 
   public Register[] getRegisters() {
@@ -774,7 +760,6 @@ public class CPU {
       ex.printStackTrace();
     }
 
-
     LO.reset();
     HI.reset();
 
@@ -791,7 +776,6 @@ public class CPU {
     fpPipe.reset();
 
     logger.info("CPU Resetted");
-    config = ConfigManager.getConfig();
   }
 
   /** Test method that returns a string containing the status of the pipeline.
@@ -822,6 +806,10 @@ public class CPU {
     }
 
     return s;
+  }
+
+  public boolean isEnableForwarding() {
+    return config.getBoolean("forwarding");
   }
 
   /** Test method that returns a string containing the values of every

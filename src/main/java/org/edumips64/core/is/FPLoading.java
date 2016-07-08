@@ -70,7 +70,7 @@ public abstract class FPLoading extends FPLDSTInstructions {
   }
 
   public void WB() throws IrregularStringOfBitsException {
-    if (!isEnableForwarding()) {
+    if (!cpu.isEnableForwarding()) {
       doWB();
     }
   }

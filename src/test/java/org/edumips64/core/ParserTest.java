@@ -15,15 +15,17 @@ public class ParserTest {
   private InstructionBuilder instructionBuilder;
   private Dinero dinero;
   private ConfigStore config = ConfigManager.getTmpConfig();
+  private CPU cpu;
 
   @Before
   public void setUp() throws Exception {
      ConfigManager.setConfig(config);
-     memory = Memory.getInstance();
+     memory = new Memory();
+     cpu = new CPU(memory, config);
      symTab = new SymbolTable(memory);
      iom = new IOManager(new LocalFileUtils(), memory);
      dinero = new Dinero(memory);
-     instructionBuilder = new InstructionBuilder(memory, iom, CPU.getInstance(), dinero);
+     instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
      parser = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
   }
   /** Allows easier testing of .data section contents by adding the ".data" prefix and the "\n.code\nSYSCALL 0" suffix. */
@@ -60,11 +62,19 @@ public class ParserTest {
 
   @Test(expected = ParserMultiException.class)
   public void FPOverflowPositiveNumberTest() throws Exception {
+    parser.getFCSR().setFPExceptions(CPU.FPExceptions.OVERFLOW, true);
     ParseDouble("-1.8E308");
   }
 
   @Test(expected = ParserMultiException.class)
   public void FPOverflowNegativeNumberTest() throws Exception {
+    parser.getFCSR().setFPExceptions(CPU.FPExceptions.OVERFLOW, true);
+    ParseDouble("4.95E324");
+  }
+
+  @Test
+  public void FPOverflowNoThrowOnDisabledExceptionsTest() throws Exception {
+    parser.getFCSR().setFPExceptions(CPU.FPExceptions.OVERFLOW, false);
     ParseDouble("4.95E324");
   }
 

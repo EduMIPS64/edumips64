@@ -58,8 +58,8 @@ public class GUIRegisters extends GUIComponent {
   //(i want to avoid to modify the class constructor) the value is zero if a gpr is double clicked
   //1 if an fpr is double clicked
 
-  public GUIRegisters(CPU cpu, Memory memory) {
-    super(cpu, memory);
+  public GUIRegisters(CPU cpu, Memory memory, ConfigStore config) {
+    super(cpu, memory, config);
     registers = cpu.getRegisters();
     registersFP = cpu.getRegistersFP();
     regPanel = new RegPanel();
@@ -187,7 +187,7 @@ public class GUIRegisters extends GUIComponent {
     }
 
     public String fillFirstColumn(int i) {
-      if (ConfigManager.getConfig().getBoolean("show_aliases")) {
+      if (config.getBoolean("show_aliases")) {
         return registerToAlias(" " + i) + "=";
       } else {
         return "R" + i + " =";

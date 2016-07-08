@@ -61,7 +61,7 @@ class ADDI extends ALU_IType {
       //if the enable forwarding is turned on we have to ensure that registers
       //should be unlocked also if a synchronous exception occurs. This is performed
       //by executing the WB method before raising the trap
-      if (isEnableForwarding()) {
+      if (cpu.isEnableForwarding()) {
         doWB();
       }
 
@@ -78,7 +78,7 @@ class ADDI extends ALU_IType {
       TR[RT_FIELD].setBits(filledOutputstring, 0);
     }
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }

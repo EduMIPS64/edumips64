@@ -84,6 +84,13 @@ public class Parser {
   private SymbolTable symTab;
   private FileUtils fileUtils;
   private InstructionBuilder instructionBuilder;
+  private FPInstructionUtils fpInstructionUtils;
+
+  /** Accessible only because of unit tests */
+  private FCSRRegister fcsr;
+  FCSRRegister getFCSR() {
+    return fcsr;
+  }
 
   /** Public methods */
   public Parser(FileUtils utils, SymbolTable symTab, Memory memory, InstructionBuilder instructionBuilder) {
@@ -91,6 +98,8 @@ public class Parser {
     this.fileUtils = utils;
     this.mem = memory;
     this.instructionBuilder = instructionBuilder;
+    this.fcsr = new FCSRRegister();
+    fpInstructionUtils = new FPInstructionUtils(this.fcsr);
   }
 
   /** Loading from File
@@ -1386,7 +1395,7 @@ public class Parser {
 
       // TODO(andrea): unit tests for those 3 cases.
       try {
-        tmpMem.setBits(FPInstructionUtils.doubleToBin(aValue.trim()), 0);
+        tmpMem.setBits(fpInstructionUtils.doubleToBin(aValue.trim()), 0);
       } catch (FPOverflowException ex) {
         numError++;
         //error.add("DOUBLE_TOO_LARGE",row,i+1,line);

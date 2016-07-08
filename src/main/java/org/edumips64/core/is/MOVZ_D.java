@@ -53,7 +53,7 @@ class MOVZ_D extends FPConditionalZerosMoveInstructions {
       TRfp[FD_FIELD].setBits(fs, 0);
     }
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }

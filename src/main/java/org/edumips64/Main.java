@@ -243,18 +243,18 @@ public class Main extends JApplet {
     cp.setLayout(new BorderLayout());
     cp.add(createMenuBar(), BorderLayout.NORTH);
 
-    cpu = CPU.getInstance();
+    memory = new Memory();
+    cpu = new CPU(memory, configStore);
     cpu.setStatus(CPU.CPUStatus.READY);
 
-    memory = Memory.getInstance();
     symTab = new SymbolTable(memory);
     iom = new IOManager(lfu, memory);
     dinero = new Dinero(memory);
-    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero);
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, configStore);
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
-    front = new GUIFrontend(cpu, memory);
-    cgt = new CPUGUIThread(cpu, front, f);
+    front = new GUIFrontend(cpu, memory, configStore);
+    cgt = new CPUGUIThread(cpu, front, f, configStore);
     cgt.start();
 
     // Internal Frames
@@ -474,7 +474,7 @@ public class Main extends JApplet {
         String absoluteFilename = new File(file).getAbsolutePath();
         parser.parse(absoluteFilename);
       } catch (ParserMultiWarningException pmwe) {
-        new ErrorDialog(f, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"));
+        new ErrorDialog(f, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean("warnings"));
       } catch (NullPointerException e) {
         log.info("NullPointerException: " + e.toString());
         e.printStackTrace();
@@ -506,7 +506,7 @@ public class Main extends JApplet {
       f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
     } catch (ParserMultiException ex) {
       log.info("Error opening " + file);
-      new ErrorDialog(f, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"));
+      new ErrorDialog(f, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean("warnings"));
       openedFile = null;
       f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
       resetSimulator(false);
@@ -835,7 +835,7 @@ public class Main extends JApplet {
     config.add(settings);
     settings.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        new GUIConfig(f, cpu);
+        new GUIConfig(f, cpu, configStore);
       }
     });
     // ---------------- LANGUAGE MENU
@@ -845,7 +845,7 @@ public class Main extends JApplet {
       lang_en = new JCheckBoxMenuItem(
         CurrentLocale.getString("MenuItem.ENGLISH"),
         new ImageIcon(IMGLoader.getImage("en.png")),
-        CurrentLocale.isSelected("en"));
+        configStore.getString("language").equals("en"));
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -868,7 +868,7 @@ public class Main extends JApplet {
       lang_it = new JCheckBoxMenuItem(
         CurrentLocale.getString("MenuItem.ITALIAN"),
         new ImageIcon(IMGLoader.getImage("it.png")),
-        CurrentLocale.isSelected("it"));
+        configStore.getString("language").equals("it"));
 
       lang.add(lang_it);
     } catch (IOException e) {
@@ -915,7 +915,7 @@ public class Main extends JApplet {
     dinFrontend.setEnabled(false);
     dinFrontend.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        JDialog dinFrame = new DineroFrontend(f, dinero);
+        JDialog dinFrame = new DineroFrontend(f, dinero, configStore);
         dinFrame.setModal(true);
         dinFrame.setVisible(true);
       }

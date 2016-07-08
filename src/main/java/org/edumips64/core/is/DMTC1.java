@@ -47,7 +47,7 @@ class DMTC1 extends FPMoveToInstructions {
     String value = TR[RT_FIELD].getBinString();
     TRfp[FS_FIELD].setBits(value, 0);
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }

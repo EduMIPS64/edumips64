@@ -44,8 +44,8 @@ public class GUIStatistics extends GUIComponent {
   private int nCycles, nInstructions, rawStalls, codeSize, WAWStalls, dividerStalls, memoryStalls;
   private float cpi;
 
-  public GUIStatistics(CPU cpu, Memory memory) {
-    super(cpu, memory);
+  public GUIStatistics(CPU cpu, Memory memory, ConfigStore config) {
+    super(cpu, memory, config);
     statPanel = new StatPanel();
 
     jsp = new JScrollPane(statPanel);

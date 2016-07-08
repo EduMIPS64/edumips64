@@ -55,7 +55,7 @@ class LWC1 extends FPLoading {
     //reading from the memory element and saving values on LMD register
     TR[LMD_REGISTER].writeWord(memEl.readWord((int)(address % 8)));
 
-    if (isEnableForwarding()) {
+    if (cpu.isEnableForwarding()) {
       doWB();
     }
   }
