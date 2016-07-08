@@ -161,10 +161,12 @@ public class DineroFrontend extends JDialog {
         String dineroPath = path.getText();
         String paramString = params.getText();
 
-        LinkedList<String> paramsList = new LinkedList<>();
+        LinkedList<String> paramsList = new LinkedList<String>();
         paramsList.add(dineroPath);
 
-        Collections.addAll(paramsList, paramString.split(" "));
+        for (String p : paramString.split(" ")) {
+          paramsList.add(p);
+        }
 
         // Clean up the JTextArea
         result.setText("");
