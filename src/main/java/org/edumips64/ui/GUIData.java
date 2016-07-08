@@ -45,8 +45,8 @@ public class GUIData extends GUIComponent {
 
   private static final Logger logger = Logger.getLogger(CPU.class.getName());
 
-  public GUIData(CPU cpu, Memory memory) {
-    super(cpu, memory);
+  public GUIData(CPU cpu, Memory memory, ConfigStore config) {
+    super(cpu, memory, config);
     dataPanel = new DataPanel();
   }
 
@@ -133,7 +133,7 @@ public class GUIData extends GUIComponent {
                            " " + tableModel.getValueAt(theTable.getSelectedRow(), 0) + " : ";
 
             //if the current memory cell visualization is long
-            if (ConfigManager.getConfig().getBoolean("LONGDOUBLEVIEW")) {
+            if (config.getBoolean("LONGDOUBLEVIEW")) {
               value += Converter.hexToLong("0X" + tableModel.getValueAt(theTable.getSelectedRow(), 1));
             } else { //the current memory cell visualization in the status bar is double, we build a temp. bitset in order to read the double value
               BitSet64FP bs = new BitSet64FP();

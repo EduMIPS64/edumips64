@@ -23,6 +23,7 @@
 
 package org.edumips64.ui;
 import org.edumips64.core.*;
+import org.edumips64.utils.ConfigStore;
 
 import java.awt.*;
 
@@ -34,11 +35,13 @@ abstract class GUIComponent {
   protected Container cont;
   protected CPU cpu;
   protected Memory memory;
+  protected ConfigStore config;
 
-  public GUIComponent(CPU cpu, Memory memory) {
+  public GUIComponent(CPU cpu, Memory memory, ConfigStore config) {
     cont = null;
     this.cpu = cpu;
     this.memory = memory;
+    this.config = config;
   }
 
   /**Set the container of the component class.
