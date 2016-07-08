@@ -25,10 +25,17 @@ package org.edumips64.utils;
 import java.util.*;
 import java.util.logging.Logger;
 
+/** This class has mostly static methods. If the 'config' attribute is set, then the current language is
+   fetched from it. Otherwise, "en" is considered the default and used.
+ */
 public class CurrentLocale {
 
   private static Map<String, Map<String, String>> languages;
-  private static ConfigStore config = ConfigManager.getConfig();
+  private static ConfigStore config;
+
+  public static void setConfig(ConfigStore config) {
+    CurrentLocale.config = config;
+  }
 
   private static final Logger logger = Logger.getLogger(CurrentLocale.class.getName());
 
@@ -474,12 +481,11 @@ public class CurrentLocale {
     languages.put("it", it);
   }
 
-  public static void setLanguage(String language) {
-    config.putString("language", language);
-  }
-
   public static String getString(String key) {
-    String lang_name = config.getString("language");
+    String lang_name = "en";
+    if (config != null) {
+      lang_name = config.getString("language");
+    }
 
     try {
       Map<String, String> lang = languages.get(lang_name);

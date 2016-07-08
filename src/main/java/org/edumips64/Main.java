@@ -236,6 +236,7 @@ public class Main extends JApplet {
       ConfigManager.setConfig(new InMemoryConfigStore(ConfigManager.defaults));
     }
     configStore = ConfigManager.getConfig();
+    CurrentLocale.setConfig(configStore);
     jfc = new JFileChooser(new File(configStore.getString("lastdir")));
 
     desk = new JDesktopPane();
@@ -856,7 +857,7 @@ public class Main extends JApplet {
       public void actionPerformed(ActionEvent e) {
         lang_en.setState(true);
         lang_it.setState(false);
-        CurrentLocale.setLanguage("en");
+        configStore.putString("language", "en");
         initMenuItems();
         setFrameTitles();
         front.updateLanguageStrings();
@@ -879,7 +880,7 @@ public class Main extends JApplet {
       public void actionPerformed(ActionEvent e) {
         lang_it.setState(true);
         lang_en.setState(false);
-        CurrentLocale.setLanguage("it");
+        configStore.putString("language", "it");
         initMenuItems();
         setFrameTitles();
         front.updateLanguageStrings();
