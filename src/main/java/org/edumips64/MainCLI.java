@@ -36,10 +36,9 @@ import java.io.*;
 
 public class MainCLI {
   public static void main(String args[]) {
-    CurrentLocale.setLanguage("en");
-
     try {
-      ConfigStore cfg = ConfigManager.getConfig();
+      ConfigStore cfg = new JavaPrefsConfigStore(ConfigStore.defaults);
+      CurrentLocale.setConfig(cfg);
       Memory memory = new Memory();
       CPU c = new CPU(memory, cfg);
       LocalFileUtils localFileUtils = new LocalFileUtils();

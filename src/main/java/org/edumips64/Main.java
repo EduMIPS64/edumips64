@@ -31,7 +31,6 @@ import org.edumips64.utils.io.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Handler;
@@ -229,13 +228,8 @@ public class Main extends JApplet {
     JDialog.setDefaultLookAndFeelDecorated(true);
     lfu = new LocalFileUtils();
 
-    try {
-      ConfigManager.setConfig(new JavaPrefsConfigStore(ConfigManager.defaults));
-    } catch (Exception e) {
-      log.warning("Could not access the Java Preferences API. Using in-memory configuration storage. Error: " + e);
-      ConfigManager.setConfig(new InMemoryConfigStore(ConfigManager.defaults));
-    }
-    configStore = ConfigManager.getConfig();
+    configStore = new JavaPrefsConfigStore(ConfigStore.defaults);
+    CurrentLocale.setConfig(configStore);
     jfc = new JFileChooser(new File(configStore.getString("lastdir")));
 
     desk = new JDesktopPane();
@@ -856,7 +850,7 @@ public class Main extends JApplet {
       public void actionPerformed(ActionEvent e) {
         lang_en.setState(true);
         lang_it.setState(false);
-        CurrentLocale.setLanguage("en");
+        configStore.putString("language", "en");
         initMenuItems();
         setFrameTitles();
         front.updateLanguageStrings();
@@ -879,7 +873,7 @@ public class Main extends JApplet {
       public void actionPerformed(ActionEvent e) {
         lang_it.setState(true);
         lang_en.setState(false);
-        CurrentLocale.setLanguage("it");
+        configStore.putString("language", "it");
         initMenuItems();
         setFrameTitles();
         front.updateLanguageStrings();

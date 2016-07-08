@@ -44,7 +44,6 @@ import org.edumips64.core.is.JumpException;
 import org.edumips64.core.is.RAWException;
 import org.edumips64.core.is.TwosComplementSumException;
 import org.edumips64.core.is.WAWException;
-import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.FPUConfigurator;
 import org.edumips64.utils.IrregularStringOfBitsException;

@@ -1,8 +1,8 @@
 package org.edumips64.core;
 
 import org.edumips64.core.is.InstructionBuilder;
-import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +10,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class MemoryTest {
-  private ConfigStore config = ConfigManager.getTmpConfig();
+  private ConfigStore config;
   private Memory m;
   private InstructionBuilder instructionBuilder;
   private IOManager iom;
@@ -19,9 +19,9 @@ public class MemoryTest {
 
   @Before
   public void setUp() throws Exception {
+    config = new InMemoryConfigStore(ConfigStore.defaults);
     m = new Memory();
     cpu = new CPU(m, config);
-    ConfigManager.setConfig(config);
     iom = new IOManager(new LocalFileUtils(), m);
     dinero = new Dinero(m);
     instructionBuilder = new InstructionBuilder(m, iom, cpu, dinero, config);

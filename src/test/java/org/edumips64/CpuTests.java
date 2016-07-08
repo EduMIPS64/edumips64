@@ -29,7 +29,7 @@ import org.edumips64.core.*;
 import org.edumips64.core.is.*;
 import org.edumips64.ui.CycleBuilder;
 import org.edumips64.utils.ConfigStore;
-import org.edumips64.utils.ConfigManager;
+import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.LocalWriter;
@@ -58,7 +58,7 @@ public class CpuTests {
   private static String testsLocation = "build/resources/test/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
   private Dinero dinero;
-  private ConfigStore config = ConfigManager.getTmpConfig();
+  private ConfigStore config;
 
   @Rule
   public ErrorCollector collector = new ErrorCollector();
@@ -120,7 +120,7 @@ public class CpuTests {
 
   @Before
   public void testSetup() {
-    ConfigManager.setConfig(config);
+    config = new InMemoryConfigStore(ConfigStore.defaults);
     memory = new Memory();
     cpu = new CPU(memory, config);
     cpu.setStatus(CPU.CPUStatus.READY);
