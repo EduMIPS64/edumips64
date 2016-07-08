@@ -4,7 +4,6 @@ import org.edumips64.core.CPU;
 import org.edumips64.core.Dinero;
 import org.edumips64.core.IOManager;
 import org.edumips64.core.Memory;
-import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;
 
 /** InstructionBuilder should be used to build all the instructions to be run by the CPU. The only exception is

@@ -1,8 +1,8 @@
 package org.edumips64.core;
 
 import org.edumips64.core.is.InstructionBuilder;
+import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.LocalFileUtils;
-import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,12 +14,12 @@ public class ParserTest {
   private IOManager iom;
   private InstructionBuilder instructionBuilder;
   private Dinero dinero;
-  private ConfigStore config = ConfigManager.getTmpConfig();
+  private ConfigStore config;
   private CPU cpu;
 
   @Before
   public void setUp() throws Exception {
-     ConfigManager.setConfig(config);
+     config = new InMemoryConfigStore(ConfigStore.defaults);
      memory = new Memory();
      cpu = new CPU(memory, config);
      symTab = new SymbolTable(memory);

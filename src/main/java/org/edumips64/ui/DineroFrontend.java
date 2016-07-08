@@ -24,7 +24,6 @@
 package org.edumips64.ui;
 
 import org.edumips64.core.Dinero;
-import org.edumips64.utils.ConfigManager;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.io.LocalWriterAdapter;
 

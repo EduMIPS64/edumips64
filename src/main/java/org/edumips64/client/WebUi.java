@@ -8,7 +8,7 @@ import org.edumips64.core.*;
 import org.edumips64.core.is.HaltException;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.utils.ConfigStore;
-import org.edumips64.utils.ConfigManager;
+import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.NullFileUtils;
 
@@ -74,8 +74,7 @@ public class WebUi implements EntryPoint {
 
   public void init() {
     // Simulator initialization.
-    config = ConfigManager.getTmpConfig();
-    ConfigManager.setConfig(config);
+    config = new InMemoryConfigStore(ConfigStore.defaults);
     memory = new Memory();
     symTab = new SymbolTable(memory);
     fu = new NullFileUtils();

@@ -31,7 +31,6 @@ import org.edumips64.utils.io.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Handler;
@@ -229,13 +228,7 @@ public class Main extends JApplet {
     JDialog.setDefaultLookAndFeelDecorated(true);
     lfu = new LocalFileUtils();
 
-    try {
-      ConfigManager.setConfig(new JavaPrefsConfigStore(ConfigManager.defaults));
-    } catch (Exception e) {
-      log.warning("Could not access the Java Preferences API. Using in-memory configuration storage. Error: " + e);
-      ConfigManager.setConfig(new InMemoryConfigStore(ConfigManager.defaults));
-    }
-    configStore = ConfigManager.getConfig();
+    configStore = new JavaPrefsConfigStore(ConfigStore.defaults);
     CurrentLocale.setConfig(configStore);
     jfc = new JFileChooser(new File(configStore.getString("lastdir")));
 
