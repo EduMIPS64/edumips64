@@ -57,6 +57,10 @@ tabella.
 Dati di tipo doubleword possono essere introdotti sia dalla direttiva
 `.word` che dalla direttiva `.word64`.
 
+I tipi di dato sono interpretati con segno. Questo significa che tutte le
+costanti intere nella sezione `.data` devono essere compresi tra -2^(n-1) e
+2^(n-1) - 1 (estremi inclusi).
+
 Esiste una differenza sostanziale tra la dichiarazione di una lista di dati 
 utilizzando un'unica direttiva oppure direttive multiple dello stesso tipo.
 EduMIPS64 inizia la scrittura a partire dalla successiva double word a 64 bit non appena 

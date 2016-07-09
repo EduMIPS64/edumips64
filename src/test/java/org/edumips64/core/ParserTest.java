@@ -84,4 +84,61 @@ public class ParserTest {
   public void CRLFParsingTest() throws Exception {
     parser.doParsing(".data\r\n.double 8\r\n.code\r\nSYSCALL 0\r\n");
   }
+
+  /** Regression tests for issue #1 */
+  @Test
+  public void NotOutOfBoundsTest() throws Exception {
+    // Test that all the values just before overflow are parsed correctly.
+    ParseData(".byte -128");
+    ParseData(".byte 127");
+    ParseData(".word16 -32768");
+    ParseData(".word16 32767");
+    ParseData(".word32 -2147483648");
+    ParseData(".word32 2147483647");
+
+    ParseData(".word -9223372036854775808");
+    ParseData(".word 9223372036854775807");
+    ParseData(".word64 -9223372036854775808");
+    ParseData(".word64 9223372036854775807");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void OutOfBoundsByteTest() throws Exception {
+    ParseData(".byte 128");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void NegativeOutOfBoundsByteTest() throws Exception {
+    ParseData(".byte -129");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void OutOfBoundsHalfWordTest() throws Exception {
+    ParseData(".word16 32768");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void NegativeOutOfBoundsHalfWordTest() throws Exception {
+    ParseData(".word16 -32769");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void OutOfBoundsWordTest() throws Exception {
+    ParseData(".word32 2147483648");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void NegativeOutOfBoundsWordTest() throws Exception {
+    ParseData(".word32 -2147483649");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void OutOfBoundsDoubleWordTest() throws Exception {
+    ParseData(".word 9223372036854775808");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void NegativeOutOfBoundsDoubleWordTest() throws Exception {
+    ParseData(".word -9223372036854775809");
+  }
 }

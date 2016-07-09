@@ -53,6 +53,9 @@ table.
 Please note that a double word can be introduced either by the `.word`
 directive or by the `.word64` directive.
 
+All the data types are interpreted as signed. This means that integer literals
+in the `.data` section must be between -2^(n-1) and 2^(n-1) - 1 (inclusive).
+
 There is a big difference between declaring a list of data elements
 using a single directive or by using multiple directives of the same type. EduMIPS64
 starts writing from the next 64-bit double word as soon as it finds a datatype identifier,
