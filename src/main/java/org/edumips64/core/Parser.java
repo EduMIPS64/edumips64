@@ -99,6 +99,10 @@ public class Parser {
     this.mem = memory;
     this.instructionBuilder = instructionBuilder;
     this.fcsr = new FCSRRegister();
+    fcsr.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, true);
+    fcsr.setFPExceptions(CPU.FPExceptions.OVERFLOW, true);
+    fcsr.setFPExceptions(CPU.FPExceptions.UNDERFLOW, true);
+    fcsr.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO, true);
     fpInstructionUtils = new FPInstructionUtils(this.fcsr);
   }
 
