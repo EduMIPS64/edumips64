@@ -86,7 +86,12 @@ public class Parser {
   private InstructionBuilder instructionBuilder;
   private FPInstructionUtils fpInstructionUtils;
 
-  /** Accessible only because of unit tests */
+  /** Accessible only because of unit tests.
+   *  The Parser needs an FCSR register only because the core FP functions of the simulator
+   *  are coupled too tightly with the actual implementation of the FPU, and therefore they assume
+   *  that there is an FCSR register and use it to decide whether to throw an exception or not.
+   *
+   *  The Parser uses the FP functions to parse, and as a result it needs to have an FCSR. Not ideal. */
   private FCSRRegister fcsr;
   FCSRRegister getFCSR() {
     return fcsr;
