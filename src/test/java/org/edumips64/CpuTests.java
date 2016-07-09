@@ -33,6 +33,7 @@ import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.LocalWriter;
+import org.edumips64.utils.io.StringWriter;
 
 import java.io.File;
 import java.util.HashMap;
@@ -46,6 +47,7 @@ import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
 public class CpuTests {
@@ -59,6 +61,7 @@ public class CpuTests {
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
   private Dinero dinero;
   private ConfigStore config;
+  private StringWriter stdOut;
 
   @Rule
   public ErrorCollector collector = new ErrorCollector();
@@ -126,8 +129,10 @@ public class CpuTests {
     cpu.setStatus(CPU.CPUStatus.READY);
     dinero = new Dinero(memory);
     symTab = new SymbolTable(memory);
+    stdOut = new StringWriter();
     FileUtils lfu = new LocalFileUtils();
     iom = new IOManager(lfu, memory);
+    iom.setStdOutput(stdOut);
     instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser  = new Parser(lfu, symTab, memory, instructionBuilder);
     config.putBoolean("forwarding", true);
@@ -267,6 +272,12 @@ public class CpuTests {
   public void testReadWriteFile() throws Exception {
     // TODO(andrea): clean up the test file.
     runMipsTest("read-write.s");
+  }
+
+  @Test
+  public void testPrintf() throws Exception {
+    runMipsTest("hello-world.s");
+    assertEquals("9th of July:\nEduMIPS64 version 1.2 is being tested!", stdOut.toString());
   }
 
   /* Test for instruction B */
