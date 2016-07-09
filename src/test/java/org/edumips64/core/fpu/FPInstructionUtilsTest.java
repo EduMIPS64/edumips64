@@ -5,6 +5,7 @@ import org.edumips64.core.FCSRRegister;
 import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.ConfigStore;
 
+import org.edumips64.utils.IrregularStringOfBitsException;
 import org.junit.Test;
 import org.junit.Before;
 
@@ -36,5 +37,18 @@ public class FPInstructionUtilsTest {
   public void UnderflowTest() throws Exception {
     fcsr.setFPExceptions(CPU.FPExceptions.UNDERFLOW, true);
     fp.doubleToBin("4.9E-325");
+  }
+
+  /** Regression tests for issue #77 */
+  @Test(expected = IrregularStringOfBitsException.class)
+  public void TryToParseAWord() throws Exception {
+    fcsr.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, true);
+    fp.doubleToBin("wrong");
+  }
+
+  @Test(expected = IrregularStringOfBitsException.class)
+  public void TryToParseAWrongNumber() throws Exception {
+    fcsr.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, true);
+    fp.doubleToBin("--10");
   }
 }

@@ -88,14 +88,23 @@ public class FPInstructionUtils {
       return value;
     }
 
+    // Check if the value can be treated as a valid double.
+    try {
+      Double.parseDouble(value);
+    } catch (NumberFormatException e) {
+      throw new IrregularStringOfBitsException();
+    }
+
+    // Constants to be used for the comparisons.
+    final BigDecimal theBiggest = new BigDecimal(BIGGEST);
+    final BigDecimal theSmallest = new BigDecimal(SMALLEST);
+    final BigDecimal theZeroMinus = new BigDecimal(MINUSZERO_DEC);
+    final BigDecimal theZeroPlus = new BigDecimal(PLUSZERO_DEC);
+    final BigDecimal zero = new BigDecimal(0.0);
+    final BigDecimal minuszero = new BigDecimal(-0.0);
+
     try { //Check if the exponent is not in signed 32 bit, in this case the NumberFormatException occurs
       BigDecimal value_bd = new BigDecimal(value);
-      BigDecimal theBiggest = new BigDecimal(BIGGEST);
-      BigDecimal theSmallest = new BigDecimal(SMALLEST);
-      BigDecimal theZeroMinus = new BigDecimal(MINUSZERO_DEC);
-      BigDecimal theZeroPlus = new BigDecimal(PLUSZERO_DEC);
-      BigDecimal zero = new BigDecimal(0.0);
-      BigDecimal minuszero = new BigDecimal(-0.0);
 
       // Check for overflow.
       if (value_bd.compareTo(theBiggest) == 1 || value_bd.compareTo(theSmallest) == -1) {
@@ -128,8 +137,6 @@ public class FPInstructionUtils {
     } catch (NumberFormatException e) {
       if (fcsr.getFPExceptions(CPU.FPExceptions.OVERFLOW)) {
         fcsr.setFCSRCause("O", 1);
-        // TODO(Issue #77): this should raise IrregularStringOfBitsException in case
-        // the string does not represent a valid number.
         throw new FPOverflowException();
       } else {
         fcsr.setFCSRFlags("V", 1);
