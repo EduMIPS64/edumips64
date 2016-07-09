@@ -9,5 +9,5 @@ public interface Writer {
   void write(String s) throws WriteException;
 
   /* Tries to close the file. In case of failure, does nothing. */
-  void close();
+  default void close() {};
 }
