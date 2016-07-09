@@ -1440,69 +1440,49 @@ public class Parser {
         tmpMem = mem.getCellByIndex(memoryCount);
         memoryCount++;
       }
+      String val = value[j].trim();
+      if(val.isEmpty()) {
+        numError++;
+        error.add("INVALIDVALUE", row, i + 1, line);
+        i = line.length();
+        continue;
+      }
 
-      if (isNumber(value[j])) {
+      if (isHexNumber(val)) {
         try {
-          long num = Long.parseLong(value[j]);
-
-          if (numBit == 8) {
-            tmpMem.writeByte((int) num, posInWord);
-          } else if (numBit == 16) {
-            tmpMem.writeHalf((int) num, posInWord);
-          } else if (numBit == 32) {
-            tmpMem.writeWord(num, posInWord);
-          } else if (numBit == 64) {
-            tmpMem.writeDoubleWord(num);
-          }
-
-          if ((num < - (Converter.powLong(2, numBit - 1)) || num > (Converter.powLong(2, numBit) - 1)) &&  numBit != 64) {
-            throw new NumberFormatException();
-          }
-        } catch (NumberFormatException ex) {
+          val = Converter.hexToLong(val);
+        } catch (IrregularStringOfHexException e) {
           numError++;
-          error.add(name.toUpperCase() + "_TOO_LARGE", row, i + 1, line);
+          error.add("INVALIDVALUE", row, i + 1, line);
+          i = line.length();
           continue;
-        } catch (Exception e) {
-          e.printStackTrace();
-          //non ci dovrebbe arrivare mai ma se per caso ci arriva che faccio?
         }
-      } else if (isHexNumber(value[j])) {
-        try {
-          long num = Long.parseLong(Converter.hexToLong(value[j]));
+      }
 
-          if (numBit == 8) {
-            tmpMem.writeByte((int) num, posInWord);
-          } else if (numBit == 16) {
-            tmpMem.writeHalf((int) num, posInWord);
-          } else if (numBit == 32) {
-            tmpMem.writeWord(num, posInWord);
-          } else if (numBit == 64) {
-            String tmp = value[j].substring(2);
+      try {
+        // Convert the integer to a long, and then check for overflow.
+        long num = Long.parseLong(val);
 
-            while (tmp.charAt(0) == '0') {
-              tmp = tmp.substring(1);
-            }
-
-            if (tmp.length() > numBit / 4) {
-              throw new NumberFormatException();
-            }
-
-            tmpMem.writeDoubleWord(num);
-          }
-
-          if ((num < - (Converter.powLong(2, numBit - 1)) || num > (Converter.powLong(2, numBit) - 1)) &&  numBit != 64) {
-            throw new NumberFormatException();
-          }
-        } catch (NumberFormatException ex) {
-          numError++;
-          error.add(name.toUpperCase() + "_TOO_LARGE", row, i + 1, line);
-          continue;
-        } catch (Exception e) { //modificare in un altro modo
-          e.printStackTrace();
+        if ((num < - (Converter.powLong(2, numBit - 1)) || num > (Converter.powLong(2, numBit - 1) - 1)) &&  numBit != 64) {
+          throw new NumberFormatException();
         }
 
-      } else {
-        //manca riempimento errore
+        if (numBit == 8) {
+          tmpMem.writeByte((int) num, posInWord);
+        } else if (numBit == 16) {
+          tmpMem.writeHalf((int) num, posInWord);
+        } else if (numBit == 32) {
+          tmpMem.writeWord(num, posInWord);
+        } else if (numBit == 64) {
+          tmpMem.writeDoubleWord(num);
+        }
+
+      } catch (NumberFormatException ex) {
+        numError++;
+        error.add(name.toUpperCase() + "_TOO_LARGE", row, i + 1, line);
+        continue;
+      } catch (IrregularWriteOperationException | NotAlignException e) {
+        e.printStackTrace();
         numError++;
         error.add("INVALIDVALUE", row, i + 1, line);
         i = line.length();
