@@ -2,6 +2,7 @@ package org.edumips64.core;
 
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.utils.InMemoryConfigStore;
+import org.edumips64.utils.IrregularStringOfBitsException;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.ConfigStore;
 import org.junit.Before;
