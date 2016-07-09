@@ -146,20 +146,25 @@ public class FCSRRegister extends BitSet32 {
    * @param exceptionName the exception name to set
    * @param value         boolean that is true in order to enable that exception or false for disabling it
    */
-  public void setFPExceptions(CPU.FPExceptions exceptionName, boolean value) throws IrregularStringOfBitsException {
-    switch (exceptionName) {
-      case DIVIDE_BY_ZERO:
-        setFCSREnables("Z", (value) ? 1 : 0);
-        break;
-      case OVERFLOW:
-        setFCSREnables("O", (value) ? 1 : 0);
-        break;
-      case UNDERFLOW:
-        setFCSREnables("U", (value) ? 1 : 0);
-        break;
-      case INVALID_OPERATION:
-        setFCSREnables("V", (value) ? 1 : 0);
-        break;
+  public void setFPExceptions(CPU.FPExceptions exceptionName, boolean value) {
+    try {
+      switch (exceptionName) {
+        case DIVIDE_BY_ZERO:
+          setFCSREnables("Z", (value) ? 1 : 0);
+          break;
+        case OVERFLOW:
+          setFCSREnables("O", (value) ? 1 : 0);
+          break;
+        case UNDERFLOW:
+          setFCSREnables("U", (value) ? 1 : 0);
+          break;
+        case INVALID_OPERATION:
+          setFCSREnables("V", (value) ? 1 : 0);
+          break;
+      }
+    } catch (IrregularStringOfBitsException e) {
+      // Should never happen.
+      e.printStackTrace();
     }
   }
 
