@@ -15,5 +15,3 @@ gwt-unitCache/
 war/WEB-INF/
 .gradle
 war/
-gradle/*
-gradlew*
