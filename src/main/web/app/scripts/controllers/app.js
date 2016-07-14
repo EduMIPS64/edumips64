@@ -106,16 +106,26 @@ angular.module('edmApp').controller('AppController', function($scope, $log, $tra
 
     vm.runAll = function() {
         $log.log('Run invoked');
+
         var simulator = new jsedumips64.WebUi();
         simulator.init();
-        var result = simulator.loadProgram(vm.editorContent);
-        if (result.length != 0) {
-            $log.error(result);
-        } else {
-            $log.log(simulator.getRegisters());
-            $log.log(simulator.getMemory());
-            $log.log(simulator.getStatistics());
+        try {
+            simulator.loadProgram(vm.editorContent);
+        } catch(e) {
+            var javaException = e["__java$exception"];
+            var count = javaException.getNumError();
+            for(var i = 0; i < count; i++) {
+                var errorOrWarning = javaException.getError(i);
+                if(!errorOrWarning.isError || (errorOrWarning.isError && errorOrWarning.isError())) {
+                    console.error('error:', errorOrWarning.toString());
+                } else {
+                    console.warn('warning:', errorOrWarning.toString());
+                }
+            }
         }
+        $log.log('getRegisters', simulator.getRegisters());
+        $log.log('getMemory', simulator.getMemory());
+        $log.log('getStatistics', simulator.getStatistics());
     };
 
     $scope.$watch(function() {
