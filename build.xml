@@ -15,6 +15,10 @@
 <project name="edumips64" default="slim-jar" basedir="." xmlns:jacoco="antlib:org.jacoco.ant">
   <!-- Task definition for JaCoCo, the Java Coverage library -->
   <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+    <classpath path="libs/asm-5.0.3.jar" />
+    <classpath path="libs/asm-commons-5.0.3.jar" />
+    <classpath path="libs/asm-tree-5.0.3.jar" />
+    <classpath path="libs/asm-util-5.0.3.jar" />
     <classpath path="libs/org.jacoco.ant-0.7.7.201606060606.jar" />
     <classpath path="libs/org.jacoco.core-0.7.7.201606060606.jar" />
     <classpath path="libs/org.jacoco.report-0.7.7.201606060606.jar" />
@@ -34,6 +38,7 @@
     <property name="outputDir" value="build" />
     <property name="webOutputDir" value="war/" />
     <property name="javadocDir" value="javadoc" />
+    <property name="reportDir" value="report" />
     <property name="gwtVersion" value="2.8.0-SNAPSHOT" />
 
     <!-- Access the environment -->
@@ -159,6 +164,7 @@
     <delete dir="${outputDir}" />
     <delete dir="${javadocDir}" />
     <delete dir="${webOutputDir}" />
+    <delete dir="${reportDir}" />
   </target>
 
   <target name="cleandocs" depends="init">
@@ -278,7 +284,26 @@
             </test>
         </junit>
       </jacoco:coverage>
+
+      <jacoco:report>
+        <executiondata>
+          <file file="jacoco.exec" />
+        </executiondata>
+        <structure name="EduMIPS64">
+          <classfiles>
+            <fileset dir="build/" />
+          </classfiles>
+          <sourcefiles encoding="utf8">
+            <fileset dir="src/main/java/" />
+          </sourcefiles>
+        </structure>
+
+        <html destdir="${reportDir}"/>
+        <xml destfile="${reportDir}/report.xml"/>
+      </jacoco:report>
+
       <delete dir="${outputDir}" />
+      <delete file="jacoco.exec" />
   </target>
 
   <!-- *** standalone-jar *** compile with embedded javahelp -->

@@ -23,6 +23,7 @@ dependencies {
 
   testCompile "junit:junit:4.10"
   testCompile "org.jacoco:org.jacoco.ant:0.7.7.201606060606"
+  testCompile "org.ow2.asm:asm:5.0.3"
 }
 
 task getLibs(type: Copy) {
