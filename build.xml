@@ -12,7 +12,15 @@
 
     The output file names are in the init target.
 -->
-<project name="edumips64" default="slim-jar" basedir=".">
+<project name="edumips64" default="slim-jar" basedir="." xmlns:jacoco="antlib:org.jacoco.ant">
+  <!-- Task definition for JaCoCo, the Java Coverage library -->
+  <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+    <classpath path="libs/org.jacoco.ant-0.7.7.201606060606.jar" />
+    <classpath path="libs/org.jacoco.core-0.7.7.201606060606.jar" />
+    <classpath path="libs/org.jacoco.report-0.7.7.201606060606.jar" />
+    <classpath path="libs/org.jacoco.agent-0.7.7.201606060606.jar" />
+  </taskdef>
+
   <target name="init">
     <!-- Meta info about the simulator -->
     <property name="version" value="1.2.2" />
@@ -250,24 +258,26 @@
           <compilerarg value="-Xlint:-serial"/>
       </javac>
 
-      <junit printsummary="true" haltonfailure="yes" haltonerror="yes" fork="true">
-          <classpath>
-              <pathelement path="${base.classpath}"/>
-              <pathelement path="${outputDir}"/>
-          </classpath>
-          <test name="org.edumips64.CpuTests">
-              <formatter type="plain" usefile="false"/>
-          </test>
-          <test name="org.edumips64.core.FixedBitSetTest">
-              <formatter type="plain" usefile="false"/>
-          </test>
-          <test name="org.edumips64.core.ParserTest">
-              <formatter type="plain" usefile="false"/>
-          </test>
-          <test name="org.edumips64.core.fpu.FPInstructionUtilsTest">
-              <formatter type="plain" usefile="false"/>
-          </test>
-      </junit>
+      <jacoco:coverage>
+        <junit printsummary="true" haltonfailure="yes" haltonerror="yes" fork="true">
+            <classpath>
+                <pathelement path="${base.classpath}"/>
+                <pathelement path="${outputDir}"/>
+            </classpath>
+            <test name="org.edumips64.CpuTests">
+                <formatter type="plain" usefile="false"/>
+            </test>
+            <test name="org.edumips64.core.FixedBitSetTest">
+                <formatter type="plain" usefile="false"/>
+            </test>
+            <test name="org.edumips64.core.ParserTest">
+                <formatter type="plain" usefile="false"/>
+            </test>
+            <test name="org.edumips64.core.fpu.FPInstructionUtilsTest">
+                <formatter type="plain" usefile="false"/>
+            </test>
+        </junit>
+      </jacoco:coverage>
       <delete dir="${outputDir}" />
   </target>
 
