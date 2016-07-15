@@ -9,6 +9,8 @@
 
 [Submitting code](#submitting-code)
 
+[Unit tests](#unit-tests)
+
 ### Requirements
 
 In order to compile EduMIPS64, you need the following tools:
@@ -103,13 +105,13 @@ contains an experimental CLI front-end.
 
 ### Submitting code
 
-Code should be submitted as pull requests. The `master` branch is protected,
-meaning that pull requests can be merged only if they pass the status checks.
-Currently, the only status check is the Travis CI continuous integration.
-
-If this proves to be too inconvenient, it might be better to split out a
-protected `stable` branch to use for releases and have `master` unprotected.
-We'll see how this fares as more people start contributing to the project.
+We use the (GitHub Flow)[http://scottchacon.com/2011/08/31/github-flow.html]
+development workflow, which means that `master` is always fully working
+(the code can be built and all tests pass), and development is done in separate
+named branches. The good state of `master` is enforced by its protected
+status, meaning that no commits can be pushed directly to `master` and any
+pull requests for `master` have to pass the status checks (Travis CI building
+the code and executing unit tests).
 
 ### Unit tests
 
