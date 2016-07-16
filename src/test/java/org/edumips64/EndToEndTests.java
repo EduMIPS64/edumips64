@@ -265,7 +265,7 @@ public class EndToEndTests extends BaseTest {
   @Test
   public void testPrintf() throws Exception {
     runMipsTest("hello-world.s");
-    assertEquals("9th of July:\nEduMIPS64 version 1.2 is being tested!", stdOut.toString());
+    assertEquals("9th of July:\nEduMIPS64 version 1.2 is being tested! 100% success!", stdOut.toString());
   }
 
   /* Test for instruction B */
