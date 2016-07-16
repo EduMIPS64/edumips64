@@ -606,21 +606,8 @@ public class Converter {
 
     }
 
-    return new String(ret);
+    return ret;
   }
-
-
-  public static void main(String[] args) throws Exception {
-    String a = "0101";
-    String b = "0000";
-    String c = "0111";
-    String d = "1111";
-    System.out.println(a + " -> " + twoComplement(a) + " == " + twoComplementAndrea(a));
-    System.out.println(b + " -> " + twoComplement(b) + " == " + twoComplementAndrea(b));
-    System.out.println(c + " -> " + twoComplement(c) + " == " + twoComplementAndrea(c));
-    System.out.println(d + " -> " + twoComplement(d) + " == " + twoComplementAndrea(d));
-  }
-
   public static long powLong(int base, long exp) {
     long ret = 1;
 
