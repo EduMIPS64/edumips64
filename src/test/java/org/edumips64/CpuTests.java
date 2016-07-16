@@ -50,7 +50,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
-public class CpuTests {
+public class CpuTests extends BaseTest {
   private CPU cpu;
   private Parser parser;
   private Memory memory;
@@ -60,7 +60,6 @@ public class CpuTests {
   private static String testsLocation = "build/resources/test/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
   private Dinero dinero;
-  private ConfigStore config;
   private StringWriter stdOut;
 
   @Rule
@@ -111,19 +110,8 @@ public class CpuTests {
 
   private FPUExceptionsConfig fec;
 
-  @BeforeClass
-  public static void setup() {
-    // Disable logs of level lesser than WARNING.
-    Logger rootLogger = log.getParent();
-
-    for (Handler h : rootLogger.getHandlers()) {
-      h.setLevel(java.util.logging.Level.SEVERE);
-    }
-  }
-
   @Before
   public void testSetup() {
-    config = new InMemoryConfigStore(ConfigStore.defaults);
     memory = new Memory();
     cpu = new CPU(memory, config);
     cpu.setStatus(CPU.CPUStatus.READY);

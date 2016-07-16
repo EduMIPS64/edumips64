@@ -1,5 +1,6 @@
 package org.edumips64.core;
 
+import org.edumips64.BaseTest;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.IrregularStringOfBitsException;
@@ -8,19 +9,17 @@ import org.edumips64.utils.ConfigStore;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ParserTest {
+public class ParserTest extends BaseTest {
   private Parser parser;
   private Memory memory;
   private SymbolTable symTab;
   private IOManager iom;
   private InstructionBuilder instructionBuilder;
   private Dinero dinero;
-  private ConfigStore config;
   private CPU cpu;
 
   @Before
   public void setUp() throws Exception {
-     config = new InMemoryConfigStore(ConfigStore.defaults);
      memory = new Memory();
      cpu = new CPU(memory, config);
      symTab = new SymbolTable(memory);
