@@ -365,6 +365,19 @@ public class EndToEndTests extends BaseTest {
     collector.checkThat(statuses.get(ForwardingStatus.DISABLED).memStalls, equalTo(expected_mem_stalls));
   }
 
+  /* Tests for masking synchronous exceptions. Termination cannot be tested here since it's in the CPUGuiThread. */
+  @Test(expected = SynchronousException.class)
+  public void testDivisionByZeroThrowException() throws Exception {
+    config.putBoolean("syncex-masked", false);
+    runMipsTest("div0.s");
+  }
+
+  @Test
+  public void testDivisionByZeroNoThrowException() throws Exception {
+    config.putBoolean("syncexc-masked", true);
+    runMipsTest("div0.s");
+  }
+
   /* ------- REGRESSION TESTS -------- */
   /* Issue #7 */
   @Test
