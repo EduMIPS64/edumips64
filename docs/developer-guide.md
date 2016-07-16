@@ -120,7 +120,7 @@ subdirectory contains MIPS64 programs that are executed during unit test as a
 form of end-to-end unit tests, whereas `java` contains the actual Java code
 that runs unit tests.
 
-The main tests are contained in `CpuTests.java`. This class contains unit
+The main tests are contained in `EndToEndTests.java`. This class contains unit
 tests that run MIPS64 code (contained in `resources`).  One of the common
 patterns in those tests is that, if something goes unexpectedly during the
 execution of unit tests, the MIPS64 code executes a `BREAK` instruction, which
@@ -142,3 +142,12 @@ When writing new unit test classes, pay attention to the initialization code
 necessary to initialize the simulator. Look at other unit test classes to make
 sure your new class behaves as required. Finally, remember to add new unit
 test classes to the `test` target in the ant `build.xml` file.
+
+Executing unit tets via `ant test` will also produce a code coverage report,
+which can be found in the `report` subdirectory. The external service codecov.io
+is also configured to report results of unit test coverage for all pull requests.
+
+The Swing UI code is explicitly excluded from code coverage reports because
+writing tests for it is quite difficult and might not be worth it since we
+might be migrating to a new shiny web-based frontend.
+
