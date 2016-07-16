@@ -68,7 +68,7 @@ public class EndToEndTests extends BaseTest {
   class CpuTestStatus {
     int cycles;
     int instructions;
-    int rawStalls, wawStalls, memStalls;
+    int rawStalls, wawStalls, memStalls, divStalls;
     String traceFile;
 
     CpuTestStatus(CPU cpu, String dineroTrace) {
@@ -77,6 +77,7 @@ public class EndToEndTests extends BaseTest {
       wawStalls = cpu.getWAWStalls();
       rawStalls = cpu.getRAWStalls();
       memStalls = cpu.getStructuralStallsMemory();
+      divStalls = cpu.getStructuralStallsDivider();
       traceFile = dineroTrace;
 
       log.warning("Got " + cycles + " cycles, " + instructions + " instructions, " + rawStalls + " RAW Stalls and " + wawStalls + " WAW stalls.");
@@ -360,6 +361,17 @@ public class EndToEndTests extends BaseTest {
     collector.checkThat(statuses.get(ForwardingStatus.DISABLED).cycles, equalTo(expected_cycles));
     collector.checkThat(statuses.get(ForwardingStatus.DISABLED).instructions, equalTo(expected_instructions));
     collector.checkThat(statuses.get(ForwardingStatus.DISABLED).memStalls, equalTo(expected_mem_stalls));
+  }
+
+  @Test
+  public void testDivision() throws Exception {
+    runMipsTest("div.d.s");
+  }
+
+  @Test
+  public void testDividerStalls() throws Exception {
+    CpuTestStatus status = runMipsTest("div.d.divider-stalls.s");
+    assertEquals(status.divStalls, 23);
   }
 
   /* Tests for masking synchronous exceptions. Termination cannot be tested here since it's in the CPUGuiThread. */
