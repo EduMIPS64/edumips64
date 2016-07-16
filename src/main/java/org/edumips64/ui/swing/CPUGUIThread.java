@@ -22,12 +22,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.edumips64.ui;
+package org.edumips64.ui.swing;
 
 import org.edumips64.*;
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
-import org.edumips64.ui.*;
 import org.edumips64.utils.*;
 
 import java.util.logging.Logger;

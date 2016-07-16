@@ -1,22 +1,19 @@
 package org.edumips64.core.fpu;
 
+import org.edumips64.BaseTest;
 import org.edumips64.core.CPU;
 import org.edumips64.core.FCSRRegister;
-import org.edumips64.utils.InMemoryConfigStore;
-import org.edumips64.utils.ConfigStore;
 
 import org.edumips64.utils.IrregularStringOfBitsException;
 import org.junit.Test;
 import org.junit.Before;
 
-public class FPInstructionUtilsTest {
-  private ConfigStore config;
+public class FPInstructionUtilsTest extends BaseTest {
   private FPInstructionUtils fp;
   private FCSRRegister fcsr;
   
   @Before
   public void testSetup() {
-    config = new InMemoryConfigStore(ConfigStore.defaults);
     fcsr = new FCSRRegister();
     fp = new FPInstructionUtils(fcsr);
   }

@@ -1,5 +1,5 @@
                   .data
-  format_str:     .asciiz   "%dth of %s:\n%s version %i.%i is being tested!"
+  format_str:     .asciiz   "%dth of %s:\n%s version %i.%i is being tested! 100%% success!"
   s1:             .asciiz   "July"
   s2:             .asciiz   "EduMIPS64"
   fs_addr:        .space    4

@@ -390,9 +390,7 @@ public class Parser {
                         }
 
                         placeholder = false;
-                      }
-
-                      if (c == '%' && !placeholder) {
+                      } else if (c == '%') {
                         logger.info("Expecting on next step a valid placeholder...");
                         placeholder = true;
                       }

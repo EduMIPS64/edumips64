@@ -27,9 +27,7 @@ package org.edumips64;
 
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
-import org.edumips64.ui.CycleBuilder;
-import org.edumips64.utils.ConfigStore;
-import org.edumips64.utils.InMemoryConfigStore;
+import org.edumips64.ui.common.CycleBuilder;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.LocalWriter;
@@ -37,7 +35,6 @@ import org.edumips64.utils.io.StringWriter;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Scanner;
@@ -50,7 +47,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
-public class CpuTests {
+public class EndToEndTests extends BaseTest {
   private CPU cpu;
   private Parser parser;
   private Memory memory;
@@ -60,7 +57,6 @@ public class CpuTests {
   private static String testsLocation = "build/resources/test/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
   private Dinero dinero;
-  private ConfigStore config;
   private StringWriter stdOut;
 
   @Rule
@@ -111,19 +107,8 @@ public class CpuTests {
 
   private FPUExceptionsConfig fec;
 
-  @BeforeClass
-  public static void setup() {
-    // Disable logs of level lesser than WARNING.
-    Logger rootLogger = log.getParent();
-
-    for (Handler h : rootLogger.getHandlers()) {
-      h.setLevel(java.util.logging.Level.SEVERE);
-    }
-  }
-
   @Before
   public void testSetup() {
-    config = new InMemoryConfigStore(ConfigStore.defaults);
     memory = new Memory();
     cpu = new CPU(memory, config);
     cpu.setStatus(CPU.CPUStatus.READY);
@@ -277,7 +262,7 @@ public class CpuTests {
   @Test
   public void testPrintf() throws Exception {
     runMipsTest("hello-world.s");
-    assertEquals("9th of July:\nEduMIPS64 version 1.2 is being tested!", stdOut.toString());
+    assertEquals("9th of July:\nEduMIPS64 version 1.2 is being tested! 100% success!", stdOut.toString());
   }
 
   /* Test for instruction B */
@@ -375,6 +360,19 @@ public class CpuTests {
     collector.checkThat(statuses.get(ForwardingStatus.DISABLED).cycles, equalTo(expected_cycles));
     collector.checkThat(statuses.get(ForwardingStatus.DISABLED).instructions, equalTo(expected_instructions));
     collector.checkThat(statuses.get(ForwardingStatus.DISABLED).memStalls, equalTo(expected_mem_stalls));
+  }
+
+  /* Tests for masking synchronous exceptions. Termination cannot be tested here since it's in the CPUGuiThread. */
+  @Test(expected = SynchronousException.class)
+  public void testDivisionByZeroThrowException() throws Exception {
+    config.putBoolean("syncex-masked", false);
+    runMipsTest("div0.s");
+  }
+
+  @Test
+  public void testDivisionByZeroNoThrowException() throws Exception {
+    config.putBoolean("syncexc-masked", true);
+    runMipsTest("div0.s");
   }
 
   /* ------- REGRESSION TESTS -------- */

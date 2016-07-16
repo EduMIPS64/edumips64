@@ -22,8 +22,8 @@
  */
 package org.edumips64.core;
 
-import org.edumips64.utils.*;
-import java.util.BitSet;
+import org.edumips64.utils.Converter;
+import org.edumips64.utils.IrregularStringOfBitsException;
 
 /** This class models a 64-bit array, useful for registers and memory representation.
  * @author Salvatore Scellato
@@ -525,64 +525,5 @@ public class BitSet64 extends FixedBitSet {
       e.printStackTrace();
       throw new RuntimeException(e);
     }
-  }
-  public static void main(String[] args) throws Exception {
-
-    BitSet64 bs = new BitSet64();
-    StringBuffer buf = new StringBuffer();
-
-    for (int i = 0; i < 64; i++) {
-      buf.append("1");
-    }
-
-    BitSet64 bs2 = new BitSet64();
-    bs2.setBits(new String(buf), 0);
-    bs.setBits("011100110101101100101011001101010", 0);
-    System.out.println("Binary string: " + bs.getBinString());
-    System.out.println("Hex string: " + bs.getHexString());
-    System.out.println("Binary string: " + bs2.getBinString());
-    System.out.println("Hex string: " + bs2.getHexString());
-    System.out.println("\nPROVA SCRITTURA");
-    System.out.println("BYTE");
-    bs.writeByteUnsigned(240);
-    System.out.println("Binary string: " + bs.getBinString());
-    System.out.println("Hex string: " + bs.getHexString());
-    System.out.println("Value: " + Converter.binToInt(bs.getBinString(), true));
-    bs.writeByte(-12);
-    System.out.println("Binary string: " + bs.getBinString());
-    System.out.println("Hex string: " + bs.getHexString());
-    System.out.println("Value: " + Converter.binToInt(bs.getBinString(), false));
-    System.out.println("HALF");
-    bs.writeHalfUnsigned(64400);
-    System.out.println("Binary string: " + bs.getBinString());
-    System.out.println("Hex string: " + bs.getHexString());
-    System.out.println("Value: " + Converter.binToInt(bs.getBinString(), true));
-    bs.writeHalf(-4);
-    System.out.println("Binary string: " + bs.getBinString());
-    System.out.println("Hex string: " + bs.getHexString());
-    System.out.println("Value: " + Converter.binToInt(bs.getBinString(), false));
-    System.out.println("WORD");
-    bs.writeWordUnsigned(4001198875L);
-    System.out.println("Binary string: " + bs.getBinString());
-    System.out.println("Hex string: " + bs.getHexString());
-    System.out.println("Value: " + Converter.binToLong(bs.getBinString(), false));
-    bs.writeWord(-1987234555);
-    System.out.println("Binary string: " + bs.getBinString());
-    System.out.println("Hex string: " + bs.getHexString());
-    System.out.println("Value: " + Converter.binToInt(bs.getBinString(), false));
-    System.out.println("DOUBLE");
-    long l = (long)(Math.pow(2.0, 63.0) - 1);   // + Math.pow(2.0, 45) + Math.pow(3, 15));
-    System.out.println("long = " + l);
-    bs.writeDoubleWord(l);
-    System.out.println("Binary string: " + bs.getBinString());
-    System.out.println("Hex string: " + bs.getHexString());
-    System.out.println("Value: " + Converter.binToLong(bs.getBinString(), false));
-    l = (long)(-Math.pow(2.0, 63.0));   // + Math.pow(2.0, 45) + Math.pow(3, 15));
-    System.out.println("long = " + l);
-    bs.writeDoubleWord(l);
-    System.out.println("Binary string: " + bs.getBinString());
-    System.out.println("Hex string: " + bs.getHexString());
-    System.out.println("Value: " + Converter.binToLong(bs.getBinString(), false));
-    System.out.println(bs.readHalf(6));
   }
 }

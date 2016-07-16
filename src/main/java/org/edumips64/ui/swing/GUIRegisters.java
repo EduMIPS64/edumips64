@@ -21,22 +21,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.edumips64.ui;
+package org.edumips64.ui.swing;
 
 import org.edumips64.core.*;
 import org.edumips64.utils.*;
-import java.util.*;
-import java.io.*;
-import java.util.Arrays;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
-import javax.swing.event.*;
-import javax.swing.text.*;
 
 //diagnostics
-import org.edumips64.core.fpu.*;
+
 
 /**
 * This class shows the values stored in the registers.

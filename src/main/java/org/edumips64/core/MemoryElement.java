@@ -131,27 +131,6 @@ public class MemoryElement extends BitSet64 {
 
     return "ERRORE";
   }
-
-  public static void main(String[] args) throws Exception {
-    MemoryElement[] memory = new MemoryElement[64];
-    java.util.Random rand = new java.util.Random();
-    int index = 0;
-    java.util.List<BitSet64> list = new java.util.ArrayList<BitSet64>();
-
-    for (MemoryElement me : memory) {
-      me = new MemoryElement(index * 8);
-      int value = rand.nextInt(65536) - 32768;
-      me.writeHalf(value);
-      System.out.println("\nValue: " + value);
-      System.out.println("MemoryElement " + index);
-      System.out.println("Address " + me.getAddress());
-      System.out.println("String: " + me.getBinString());
-      //System.out.println("Unsigned value: " + r.getValueUnsigned());
-      System.out.println("Signed value: " + me.getValue());
-      index++;
-      list.add(me);
-    }
-  }
 }
 
 

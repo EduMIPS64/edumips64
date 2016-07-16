@@ -24,12 +24,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.edumips64.ui;
+package org.edumips64.ui.swing;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.border.*;
-import java.awt.event.*;
 import java.awt.Component;
 import java.awt.Color;
 

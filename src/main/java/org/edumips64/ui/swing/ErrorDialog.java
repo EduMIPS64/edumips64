@@ -20,22 +20,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.edumips64.ui;
+package org.edumips64.ui.swing;
 
 import org.edumips64.core.*;
 import org.edumips64.utils.*;
-import org.edumips64.Main;
-import org.edumips64.core.is.Instruction;
-import org.edumips64.core.CPU;
 
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import java.util.*;
 import java.awt.*;
-import java.io.*;
 import javax.swing.*;
 import java.awt.event.*;
-import javax.swing.event.*;
 
 /**
  * This class provides a window for configuration options.
