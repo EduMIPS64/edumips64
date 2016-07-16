@@ -450,10 +450,6 @@ public class CPU {
       old_pc.writeDoubleWord((pc.getValue()));
       pc.writeDoubleWord((pc.getValue()) + 4);
 
-      if (syncex != null) {
-        throw new SynchronousException(syncex);
-      }
-
     } catch (RAWException ex) {
       if (currentPipeStage == PipeStage.ID) {
         pipe.put(PipeStage.EX, bubble);
@@ -461,10 +457,6 @@ public class CPU {
 
       RAWStalls++;
       logger.info("RAW stalls incremented to " + RAWStalls);
-
-      if (syncex != null) {
-        throw new SynchronousException(syncex);
-      }
 
     } catch (WAWException ex) {
       logger.info(fpPipe.toString());
@@ -476,19 +468,12 @@ public class CPU {
       WAWStalls++;
       logger.info("WAW stalls incremented to " + RAWStalls);
 
-      if (syncex != null) {
-        throw new SynchronousException(syncex);
-      }
     } catch (FPDividerNotAvailableException ex) {
       if (currentPipeStage == PipeStage.ID) {
         pipe.put(PipeStage.EX, bubble);
       }
 
       dividerStalls++;
-
-      if (syncex != null) {
-        throw new SynchronousException(syncex);
-      }
 
     } catch (FPFunctionalUnitNotAvailableException ex) {
       if (currentPipeStage == PipeStage.ID) {
@@ -497,15 +482,9 @@ public class CPU {
 
       funcUnitStalls++;
 
-      if (syncex != null) {
-        throw new SynchronousException(syncex);
-      }
     } catch (EXNotAvailableException ex) {
       exStalls++;
 
-      if (syncex != null) {
-        throw new SynchronousException(syncex);
-      }
     } catch (SynchronousException ex) {
       logger.info("Exception: " + ex.getCode());
       throw ex;
