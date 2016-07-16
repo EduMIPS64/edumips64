@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.edumips64.ui;
+package org.edumips64.ui.swing;
 
 import org.edumips64.core.Dinero;
 import org.edumips64.utils.ConfigStore;
@@ -30,7 +30,6 @@ import org.edumips64.utils.io.LocalWriterAdapter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 import javax.swing.*;

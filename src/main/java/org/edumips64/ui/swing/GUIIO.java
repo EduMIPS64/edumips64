@@ -21,7 +21,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.edumips64.ui;
+package org.edumips64.ui.swing;
 
 import org.edumips64.utils.*;
 import org.edumips64.utils.io.Reader;
@@ -29,12 +29,8 @@ import org.edumips64.utils.io.ReadException;
 import org.edumips64.utils.io.Writer;
 import org.edumips64.utils.io.WriteException;
 import javax.swing.*;
-import javax.swing.border.*;
 import java.awt.*;
-import javax.swing.*;
 import java.awt.event.*;
-import java.util.*;
-import java.text.*;
 
 /** Input/output window.
  *  @author Andrea Spadaccini

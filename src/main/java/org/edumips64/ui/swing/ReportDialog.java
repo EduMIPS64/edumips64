@@ -24,7 +24,7 @@
 //utente: edumips.org58154
 //password: edubugreport
 //alias: bugs@edumips.org
-package org.edumips64.ui;
+package org.edumips64.ui.swing;
 
 import org.edumips64.core.*;
 import org.edumips64.utils.*;

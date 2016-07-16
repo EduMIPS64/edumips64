@@ -27,9 +27,7 @@ package org.edumips64;
 
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
-import org.edumips64.ui.CycleBuilder;
-import org.edumips64.utils.ConfigStore;
-import org.edumips64.utils.InMemoryConfigStore;
+import org.edumips64.ui.common.CycleBuilder;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.LocalWriter;
@@ -37,7 +35,6 @@ import org.edumips64.utils.io.StringWriter;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Scanner;

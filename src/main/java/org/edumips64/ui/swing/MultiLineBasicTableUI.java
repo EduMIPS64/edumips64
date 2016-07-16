@@ -24,13 +24,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.edumips64.ui;
+package org.edumips64.ui.swing;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.text.*;
 import javax.swing.table.*;
-import javax.swing.plaf.basic.*;
 import java.util.*;
 
 public class MultiLineBasicTableUI extends javax.swing.plaf.basic.BasicTableUI {

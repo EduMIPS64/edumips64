@@ -25,7 +25,7 @@ package org.edumips64;
 import org.edumips64.core.*;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.img.*;
-import org.edumips64.ui.*;
+import org.edumips64.ui.swing.*;
 import org.edumips64.utils.*;
 import org.edumips64.utils.io.*;
 
@@ -889,9 +889,9 @@ public class Main extends JApplet {
     manual.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         try {
-          org.edumips64.ui.GUIHelp.showHelp(null, "id");
+          GUIHelp.showHelp(null, "id");
         } catch (Exception exx) {
-          new org.edumips64.ui.ReportDialog(null, exx, "MIAO");
+          new ReportDialog(null, exx, "MIAO");
         }
       }
     });
