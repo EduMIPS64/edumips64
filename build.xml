@@ -270,6 +270,9 @@
                 <pathelement path="${base.classpath}"/>
                 <pathelement path="${outputDir}"/>
             </classpath>
+            <test name="org.edumips64.core.CPUTest">
+                <formatter type="plain" usefile="false"/>
+            </test>
             <test name="org.edumips64.EndToEndTests">
                 <formatter type="plain" usefile="false"/>
             </test>

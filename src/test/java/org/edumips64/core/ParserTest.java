@@ -2,12 +2,13 @@ package org.edumips64.core;
 
 import org.edumips64.BaseTest;
 import org.edumips64.core.is.InstructionBuilder;
-import org.edumips64.utils.InMemoryConfigStore;
-import org.edumips64.utils.IrregularStringOfBitsException;
 import org.edumips64.utils.io.LocalFileUtils;
-import org.edumips64.utils.ConfigStore;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+import java.math.BigInteger;
 
 public class ParserTest extends BaseTest {
   private Parser parser;
@@ -36,6 +37,56 @@ public class ParserTest extends BaseTest {
   /** Parse a double value */
   void ParseDouble(String doubleValue) throws Exception {
     ParseData(".double " + doubleValue);
+  }
+
+  @Test
+  public void EscapeSequencesTest() throws Exception {
+    // Java has no raw srings, so all special characters need to be escaped twice.
+    String expected = "\\\"\t\n\0";
+    ParseData(".ascii \"\\\\\\\"\\t\\n\\0\"");
+    MemoryElement el = memory.getCellByIndex(0);
+    StringBuffer actual = new StringBuffer();
+    for (int i = 0; i < 5; ++i) {
+      actual.append((char) el.readByte(i));
+    }
+    assertEquals(actual.toString(), expected);
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void InvalidEscapeSequencesTest() throws Exception {
+    ParseData(".ascii \"\\x\"");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void InvalidPlaceholder() throws Exception {
+    ParseData(".ascii \"%x\"");
+  }
+
+  @Test
+  public void ParseHex() throws Exception {
+    ParseData(".word 0x10");
+    MemoryElement el = memory.getCellByIndex(0);
+    assertEquals(el.readByte(0), 16);
+  }
+
+  @Test
+  public void Spaces() throws Exception {
+    // The user should be able to reserve space in small and larger amounts, specifying the amount in hexadecimal
+    // if they so desire.
+    ParseData(".space 0x10");
+    ParseData(".space 16");
+    ParseData(".space 8");
+    ParseData(".space 1");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void NoSpaces() throws Exception {
+    ParseData(".space");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void InvalidSpaces() throws Exception {
+    ParseData(".space yo");
   }
 
   @Test
