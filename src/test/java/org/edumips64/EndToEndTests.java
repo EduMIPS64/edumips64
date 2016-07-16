@@ -296,6 +296,12 @@ public class EndToEndTests extends BaseTest {
     runMipsTest("div.s");
   }
 
+  /* Test for instruction DIVU */
+  @Test
+  public void testDIVU() throws Exception {
+    runMipsTest("divu.s");
+  }
+
   /* Test for utils/strlen.s */
   @Test
   public void testStrlen() throws Exception {
