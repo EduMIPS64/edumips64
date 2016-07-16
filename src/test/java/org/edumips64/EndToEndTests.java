@@ -376,6 +376,11 @@ public class EndToEndTests extends BaseTest {
   }
 
   @Test
+  public void testFPCond() throws Exception {
+    runMipsTest("fp-cond.s");
+  }
+
+  @Test
   public void testSubtraction() throws Exception {
     runMipsTest("sub.d.s");
   }
