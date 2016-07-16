@@ -364,6 +364,11 @@ public class EndToEndTests extends BaseTest {
   }
 
   @Test
+  public void testSubtraction() throws Exception {
+    runMipsTest("sub.d.s");
+  }
+
+  @Test
   public void testDivision() throws Exception {
     runMipsTest("div.d.s");
   }
