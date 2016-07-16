@@ -290,6 +290,12 @@ public class EndToEndTests extends BaseTest {
     runMipsTest("jal.s");
   }
 
+  /* Test for instructions DIV, MFLO, MFHI */
+  @Test
+  public void testDIV() throws Exception {
+    runMipsTest("div.s");
+  }
+
   /* Test for utils/strlen.s */
   @Test
   public void testStrlen() throws Exception {
