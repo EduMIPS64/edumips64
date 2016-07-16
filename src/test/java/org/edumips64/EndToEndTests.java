@@ -50,7 +50,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
-public class CpuTests extends BaseTest {
+public class EndToEndTests extends BaseTest {
   private CPU cpu;
   private Parser parser;
   private Memory memory;
