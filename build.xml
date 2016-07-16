@@ -292,12 +292,16 @@
         <executiondata>
           <file file="jacoco.exec" />
         </executiondata>
-        <structure name="EduMIPS64">
+        <structure name="EduMIPS64 (excluding Swing UI)">
           <classfiles>
-            <fileset dir="build/" />
+            <fileset dir="build/">
+              <exclude name="org/edumips64/ui/swing/*.class"/>
+            </fileset>
           </classfiles>
           <sourcefiles encoding="utf8">
-            <fileset dir="src/main/java/" />
+            <fileset dir="src/main/java/">
+              <exclude name="org/edumips64/ui/swing/*.java" />
+            </fileset>
           </sourcefiles>
         </structure>
 
