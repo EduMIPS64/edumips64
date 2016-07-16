@@ -1,5 +1,7 @@
 package org.edumips64.core;
 
+import org.edumips64.BaseTest;
+import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.InMemoryConfigStore;
@@ -9,8 +11,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class MemoryTest {
-  private ConfigStore config;
+public class MemoryTest extends BaseTest {
   private Memory m;
   private InstructionBuilder instructionBuilder;
   private IOManager iom;
@@ -19,7 +20,6 @@ public class MemoryTest {
 
   @Before
   public void setUp() throws Exception {
-    config = new InMemoryConfigStore(ConfigStore.defaults);
     m = new Memory();
     cpu = new CPU(m, config);
     iom = new IOManager(new LocalFileUtils(), m);
@@ -32,7 +32,7 @@ public class MemoryTest {
   public void testInstructionCount() throws Exception {
     // Add 5 BUBBLE instructions.
     for (int i = 0; i < 5; ++i) {
-      m.addInstruction(instructionBuilder.buildInstruction("BUBBLE"), i*4);
+      m.addInstruction(new BUBBLE(), i*4);
     }
     // Add 2 non-BUBBLE instructions.
     m.addInstruction(instructionBuilder.buildInstruction("SYSCALL"), 24);

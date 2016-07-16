@@ -279,6 +279,9 @@
             <test name="org.edumips64.core.ParserTest">
                 <formatter type="plain" usefile="false"/>
             </test>
+            <test name="org.edumips64.core.MemoryTest">
+                <formatter type="plain" usefile="false"/>
+            </test>
             <test name="org.edumips64.core.fpu.FPInstructionUtilsTest">
                 <formatter type="plain" usefile="false"/>
             </test>
