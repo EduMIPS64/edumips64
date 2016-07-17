@@ -80,8 +80,8 @@ public class CPU {
   public enum CPUStatus {READY, RUNNING, STOPPING, HALTED}
   private CPUStatus status;
 
-  /** CPU pipeline, each stage contains an Instruction object*/
-  private Map<PipeStage, InstructionInterface> pipe;
+  /** CPU pipeline, each stage contains an Instruction object. */
+  private Pipeline pipe;
 
   /** The current stage of the pipeline.*/
   private PipeStage currentPipeStage;
@@ -137,8 +137,7 @@ public class CPU {
 
 
     // Pipeline initialization
-    pipe = new HashMap<>();
-    clearPipe();
+    pipe = new Pipeline();
     currentPipeStage = PipeStage.IF;
     logger.info("CPU Created.");
   }
@@ -186,14 +185,6 @@ public class CPU {
     return status;
   }
 
-  private void clearPipe() {
-    pipe.put(PipeStage.IF, null);
-    pipe.put(PipeStage.ID, null);
-    pipe.put(PipeStage.EX, null);
-    pipe.put(PipeStage.MEM, null);
-    pipe.put(PipeStage.WB, null);
-  }
-
   public Register[] getRegisters() {
     return gpr;
   }
@@ -226,13 +217,12 @@ public class CPU {
    *  we can halt the pipeline. The sufficient condition in order to return true is that fpPipe doesn't work
    *  and it hadn't issued any instrution now in the MEM stage */
   private boolean isPipelinesEmpty() {
-    boolean empty = pipe.get(PipeStage.ID) == null || pipe.get(PipeStage.ID).getName().equals(" ");
-    empty = empty && (pipe.get(PipeStage.EX) == null || pipe.get(PipeStage.EX).getName().equals(" "));
-    empty = empty && (pipe.get(PipeStage.MEM) == null || pipe.get(PipeStage.MEM).getName().equals(" "));
     // WB is not checked because currently this method is called before the
     // instruction in WB is removed from the pipeline.
-    empty = empty && fpPipe.isEmpty();
-    return empty;
+    return pipe.isEmptyOrBubble(PipeStage.ID) &&
+           pipe.isEmptyOrBubble(PipeStage.EX) &&
+           pipe.isEmptyOrBubble(PipeStage.MEM) &&
+           fpPipe.isEmpty();
   }
 
   /** Returns the instruction of the specified functional unit , null if it is empty.
@@ -272,18 +262,13 @@ public class CPU {
    *  @return an HashMap
    */
   public Map<PipeStage, InstructionInterface> getPipeline() {
-    return pipe;
+    // TODO: fix callers to use Pipeline.
+    return pipe.getInternalRepresentation();
   }
 
   // Includes FP instructions and bubbles. Used by CycleBuilder.
   public int getInstructionCount() {
-    int count = 0;
-    for (InstructionInterface i : pipe.values()) {
-      if (i != null) {
-        count++;
-      }
-    }
-    return count + fpPipe.size();
+    return pipe.size() + fpPipe.size();
   }
 
   /** Returns the number of cycles performed by the CPU.
@@ -427,9 +412,9 @@ public class CPU {
     } catch (JumpException ex) {
       logger.info("Executing a Jump.");
       try {
-        if (pipe.get(PipeStage.IF) != null) {
+        if (!pipe.isEmpty(PipeStage.IF)) {
           logger.info("Executing the IF() method of the instruction in IF.");
-          pipe.get(PipeStage.IF).IF();
+          pipe.IF().IF();
         }
       } catch (BreakException bex) {
         logger.info("Caught a BREAK after a Jump: ignoring it.");
@@ -437,15 +422,15 @@ public class CPU {
 
       // A J-Type instruction has just modified the Program Counter. We need to
       // put in the IF stage the instruction the PC points to
-      pipe.put(PipeStage.IF, mem.getInstruction(pc));
-      pipe.put(PipeStage.EX, pipe.get(PipeStage.ID));
-      pipe.put(PipeStage.ID, bubble);
+      pipe.setIF(mem.getInstruction(pc));
+      pipe.setEX(pipe.ID());
+      pipe.setID(bubble);
       old_pc.writeDoubleWord((pc.getValue()));
       pc.writeDoubleWord((pc.getValue()) + 4);
 
     } catch (RAWException ex) {
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, bubble);
+        pipe.setEX(bubble);
       }
 
       RAWStalls++;
@@ -455,7 +440,7 @@ public class CPU {
       logger.info(fpPipe.toString());
 
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, bubble);
+        pipe.setEX(bubble);
       }
 
       WAWStalls++;
@@ -463,14 +448,14 @@ public class CPU {
 
     } catch (FPDividerNotAvailableException ex) {
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, bubble);
+        pipe.setEX(bubble);
       }
 
       dividerStalls++;
 
     } catch (FPFunctionalUnitNotAvailableException ex) {
       if (currentPipeStage == PipeStage.ID) {
-        pipe.put(PipeStage.EX, bubble);
+        pipe.setEX(bubble);
       }
 
       funcUnitStalls++;
@@ -482,7 +467,7 @@ public class CPU {
       logger.info("Exception: " + ex.getCode());
       throw ex;
     } catch (HaltException ex) {
-      pipe.put(PipeStage.WB, null);
+      pipe.setWB(null);
       throw ex;
     } finally {
       logger.info("End of cycle " + cycles + "\n---------------------------------------------\n" + pipeLineString() + "\n");
@@ -498,47 +483,49 @@ public class CPU {
   private void stepWB() throws IrregularStringOfBitsException, HaltException {
     changeStage(PipeStage.WB);
 
-    if (pipe.get(PipeStage.WB) != null) {
-      boolean terminatorInstrInWB = terminating.contains(pipe.get(PipeStage.WB).getRepr().getHexString());
-      //we have to execute the WB method only if some conditions occur
-      //the current instruction in WB is a terminating instruction and the fpPipe is working
-      boolean notWBable = terminatorInstrInWB && !fpPipe.isEmpty();
-      //the current instruction in WB is a terminating instruction, the fpPipe doesn't work because it has just issued an instruction and it is in the MEM stage
-      notWBable = notWBable || (terminatorInstrInWB && !pipe.get(PipeStage.MEM).getName().equals(" "));
+    if (pipe.isEmpty(PipeStage.WB)) {
+      return;
+    }
 
-      if (!pipe.get(PipeStage.WB).getName().equals(" ")) {
-        instructions++;
-      }
+    boolean terminatorInstrInWB = terminating.contains(pipe.WB().getRepr().getHexString());
+    //we have to execute the WB method only if some conditions occur
+    //the current instruction in WB is a terminating instruction and the fpPipe is working
+    boolean notWBable = terminatorInstrInWB && !fpPipe.isEmpty();
+    //the current instruction in WB is a terminating instruction, the fpPipe doesn't work because it has just issued an instruction and it is in the MEM stage
+    notWBable = notWBable || (terminatorInstrInWB && !pipe.isBubble(PipeStage.MEM));
 
-      if (!notWBable) {
-        logger.info("Executing WB() for " + pipe.get(PipeStage.WB));
-        pipe.get(PipeStage.WB).WB();
-      }
+    if (!pipe.isBubble(PipeStage.WB)) {
+      instructions++;
+    }
 
-      // Move the instruction in WB out of the pipeline.
-      logger.info("Instruction " + pipe.get(PipeStage.WB) + " has been completed. Removing it.");
-      pipe.put(PipeStage.WB, null);
+    if (!notWBable) {
+      logger.info("Executing WB() for " + pipe.WB());
+      pipe.WB().WB();
+    }
 
-      //if the pipeline is empty and it is into the stopping state (because a long latency instruction was executed) we can halt the cpu when computations finished
-      if (isPipelinesEmpty() && getStatus() == CPUStatus.STOPPING) {
-        logger.info("Pipeline is empty and we are in STOPPING --> going to HALTED.");
-        setStatus(CPU.CPUStatus.HALTED);
-        throw new HaltException();
-      }
+    // Move the instruction in WB out of the pipeline.
+    logger.info("Instruction " + pipe.WB() + " has been completed. Removing it.");
+    pipe.setWB(null);
+
+    //if the pipeline is empty and it is into the stopping state (because a long latency instruction was executed) we can halt the cpu when computations finished
+    if (isPipelinesEmpty() && getStatus() == CPUStatus.STOPPING) {
+      logger.info("Pipeline is empty and we are in STOPPING --> going to HALTED.");
+      setStatus(CPU.CPUStatus.HALTED);
+      throw new HaltException();
     }
   }
 
   private void stepMEM() throws HaltException, NotAlignException, IrregularWriteOperationException, MemoryElementNotFoundException, AddressErrorException, IrregularStringOfBitsException {
     changeStage(PipeStage.MEM);
 
-    if (pipe.get(PipeStage.MEM) != null) {
-      logger.info("Executing MEM() for " + pipe.get(PipeStage.MEM));
-      pipe.get(PipeStage.MEM).MEM();
+    if (!pipe.isEmpty(PipeStage.MEM)) {
+      logger.info("Executing MEM() for " + pipe.MEM());
+      pipe.MEM().MEM();
     }
 
-    logger.info("Moving " + pipe.get(PipeStage.MEM) + " to WB");
-    pipe.put(PipeStage.WB, pipe.get(PipeStage.MEM));
-    pipe.put(PipeStage.MEM, null);
+    logger.info("Moving " + pipe.MEM() + " to WB");
+    pipe.setWB(pipe.MEM());
+    pipe.setMEM(null);
   }
 
   private String stepEX() throws SynchronousException, HaltException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
@@ -558,10 +545,10 @@ public class CPU {
     // if there will be a stall because a lot of instructions would fill the MEM stage, the EX()
     // method cannot be called because the integer instruction in EX cannot be moved.
     if (!shouldExecuteFP) {
-      instruction = pipe.get(PipeStage.EX);
+      instruction = pipe.EX();
     } else {
       //a structural stall has to be raised if the EX stage contains an instruction different from a bubble or other fu's contain instructions (counter of structural stalls must be incremented)
-      if ((pipe.get(PipeStage.EX) != null && !(pipe.get(PipeStage.EX).getName().compareTo(" ") == 0)) || fpPipe.getNReadyToExitInstr() > 1) {
+      if (!pipe.isEmptyOrBubble(PipeStage.EX) ||fpPipe.getNReadyToExitInstr() > 1) {
         memoryStalls++;
       }
       instruction = completedFpInstruction;
@@ -592,12 +579,11 @@ public class CPU {
       }
     }
 
-    InstructionInterface toMove = shouldExecuteFP ? lastFPInstructionInEx : pipe.get(PipeStage.EX);
+    InstructionInterface toMove = shouldExecuteFP ? lastFPInstructionInEx : pipe.EX();
     logger.info("Moving " + toMove + " to MEM");
-    pipe.put(PipeStage.MEM, toMove);
+    pipe.setMEM(toMove);
     if (!shouldExecuteFP) {
-
-      pipe.put(PipeStage.EX, null);
+      pipe.setEX(null);
     }
     // Shift instructions in the fpPipe.
     fpPipe.step();
@@ -611,35 +597,36 @@ public class CPU {
   private boolean stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, HaltException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
     changeStage(PipeStage.ID);
 
-    if (pipe.get(PipeStage.ID) != null) {
+    if (!pipe.isEmpty(PipeStage.ID)) {
       boolean isFP = FPPipeline.Constants.fparithmetic.contains(pipe.get(PipeStage.ID).getName());
 
       // Check if the desired unit (FP or not) is available.
-      if (isFP && (fpPipe.putInstruction(pipe.get(PipeStage.ID), true) != 0)) {
-        if (pipe.get(PipeStage.ID).getName().compareToIgnoreCase("DIV.D") == 0) {
+      if (isFP && (fpPipe.putInstruction(pipe.ID(), true) != 0)) {
+        if (pipe.ID().getName().compareToIgnoreCase("DIV.D") == 0) {
           throw new FPDividerNotAvailableException();
         } else {
           throw new FPFunctionalUnitNotAvailableException();
         }
-      } else if (!isFP && (pipe.get(PipeStage.EX) != null && pipe.get(PipeStage.EX).getName().compareTo(" ") != 0)) {
+      } else if (!isFP && (!pipe.isEmpty(PipeStage.EX) && !pipe.isBubble(PipeStage.EX))) {
         throw new EXNotAvailableException();
       }
 
-      logger.info("Executing ID() for " + pipe.get(PipeStage.ID));
+      logger.info("Executing ID() for " + pipe.ID());
       // Can change the CPU status from RUNNING to STOPPING.
-      boolean rawException = pipe.get(PipeStage.ID).ID();
+      boolean rawException = pipe.ID().ID();
       if (rawException) {
         return true;
       }
 
       if (isFP) {
-        logger.info("Moving " + pipe.get(PipeStage.ID) + " to the FP pipeline.");
-        fpPipe.putInstruction(pipe.get(PipeStage.ID), false);
+        logger.info("Moving " + pipe.ID() + " to the FP pipeline.");
+        fpPipe.putInstruction(pipe.ID(), false);
       } else {
-        logger.info("Moving " + pipe.get(PipeStage.ID) + " to EX");
-        pipe.put(PipeStage.EX, pipe.get(PipeStage.ID));
+        logger.info("Moving " + pipe.ID() + " to EX");
+        pipe.setEX(pipe.ID());
       }
-      pipe.put(PipeStage.ID, null);
+
+      pipe.setID(null);
     }
     return false;
   }
@@ -653,26 +640,28 @@ public class CPU {
 
     boolean breaking = false;
     if (status == CPUStatus.RUNNING) {
-      if (pipe.get(PipeStage.IF) != null) {  //rispetto a dinmips scambia le load con le IF
+      if (!pipe.isEmpty(PipeStage.IF)) {  //rispetto a dinmips scambia le load con le IF
         try {
-          logger.info("Executing IF() for " + pipe.get(PipeStage.IF));
-          pipe.get(PipeStage.IF).IF();
+          logger.info("Executing IF() for " + pipe.IF());
+          pipe.IF().IF();
         } catch (BreakException exc) {
           breaking = true;
         }
       }
 
-      logger.info("Moving " + pipe.get(PipeStage.IF) + " to ID");
-      pipe.put(PipeStage.ID, pipe.get(PipeStage.IF));
+      logger.info("Moving " + pipe.IF() + " to ID");
+      pipe.setID(pipe.IF());
+
       InstructionInterface next_if = mem.getInstruction(pc);
       logger.info("Fetched new instruction " + next_if);
+
       old_pc.writeDoubleWord((pc.getValue()));
       pc.writeDoubleWord((pc.getValue()) + 4);
       logger.info("New Program Counter value: " + pc.toString());
       logger.info("Putting " + next_if + "in IF.");
-      pipe.put(PipeStage.IF, next_if);
+      pipe.setIF(next_if);
     } else {
-      pipe.put(PipeStage.ID, bubble);
+      pipe.setID(bubble);
     }
 
     if (breaking) {
@@ -741,7 +730,7 @@ public class CPU {
     mem.reset();
 
     // Reset pipeline
-    clearPipe();
+    pipe.clear();
     // Reset FP pipeline
     fpPipe.reset();
 
@@ -753,11 +742,11 @@ public class CPU {
    */
   public String pipeLineString() {
     String s = "";
-    s += "IF:\t" + pipe.get(PipeStage.IF) + "\n";
-    s += "ID:\t" + pipe.get(PipeStage.ID) + "\n";
-    s += "EX:\t" + pipe.get(PipeStage.EX) + "\n";
-    s += "MEM:\t" + pipe.get(PipeStage.MEM) + "\n";
-    s += "WB:\t" + pipe.get(PipeStage.WB) + "\n";
+    s += "IF:\t" + pipe.IF() + "\n";
+    s += "ID:\t" + pipe.ID() + "\n";
+    s += "EX:\t" + pipe.EX() + "\n";
+    s += "MEM:\t" + pipe.MEM() + "\n";
+    s += "WB:\t" + pipe.WB() + "\n";
 
     return s;
   }
