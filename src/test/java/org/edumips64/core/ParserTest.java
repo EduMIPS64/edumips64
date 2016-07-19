@@ -8,34 +8,27 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.math.BigInteger;
-
 public class ParserTest extends BaseTest {
   private Parser parser;
   private Memory memory;
-  private SymbolTable symTab;
-  private IOManager iom;
-  private InstructionBuilder instructionBuilder;
-  private Dinero dinero;
-  private CPU cpu;
 
   @Before
   public void setUp() throws Exception {
-     memory = new Memory();
-     cpu = new CPU(memory, config);
-     symTab = new SymbolTable(memory);
-     iom = new IOManager(new LocalFileUtils(), memory);
-     dinero = new Dinero(memory);
-     instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
-     parser = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
+    memory = new Memory();
+    CPU cpu = new CPU(memory, config);
+    SymbolTable symTab = new SymbolTable(memory);
+    IOManager iom = new IOManager(new LocalFileUtils(), memory);
+    Dinero dinero = new Dinero(memory);
+    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
+    parser = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
   }
   /** Allows easier testing of .data section contents by adding the ".data" prefix and the "\n.code\nSYSCALL 0" suffix. */
-  void ParseData(String dataSectionContents) throws Exception {
+  private void ParseData(String dataSectionContents) throws Exception {
     parser.doParsing(".data\n " + dataSectionContents + "\n.code\nSYSCALL 0");
   }
 
   /** Parse a double value */
-  void ParseDouble(String doubleValue) throws Exception {
+  private void ParseDouble(String doubleValue) throws Exception {
     ParseData(".double " + doubleValue);
   }
 
@@ -45,7 +38,7 @@ public class ParserTest extends BaseTest {
     String expected = "\\\"\t\n\0";
     ParseData(".ascii \"\\\\\\\"\\t\\n\\0\"");
     MemoryElement el = memory.getCellByIndex(0);
-    StringBuffer actual = new StringBuffer();
+    StringBuilder actual = new StringBuilder();
     for (int i = 0; i < 5; ++i) {
       actual.append((char) el.readByte(i));
     }

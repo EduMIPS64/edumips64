@@ -30,6 +30,7 @@ import org.edumips64.utils.io.LocalWriterAdapter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 import javax.swing.*;
@@ -43,12 +44,9 @@ public class DineroFrontend extends JDialog {
   // the nested anonymous classes. They can be static, because at most
   // one instance of DineroFrame will be created in EduMIPS64
   private static final Logger logger = Logger.getLogger(DineroFrontend.class.getName());
-  private static JLabel pathLabel, paramsLabel;
   private static JTextField path, params;
-  private static JButton browse, execute;
+  private static JButton execute;
   private static JTextArea result;
-  private static Container cp;
-  private Dinero dinero;
 
   private class StreamReader extends Thread {
     private InputStream stream;
@@ -109,16 +107,15 @@ public class DineroFrontend extends JDialog {
 
   public DineroFrontend(Frame owner, Dinero dinero, ConfigStore config) {
     super(owner);
-    this.dinero = dinero;
     setTitle("Dinero frontend");
-    cp = rootPane.getContentPane();
+    Container cp = rootPane.getContentPane();
     cp.setLayout(new BoxLayout(cp, BoxLayout.PAGE_AXIS));
 
     Dimension hSpace = new Dimension(5, 0);
     Dimension vSpace = new Dimension(0, 5);
 
-    pathLabel = new JLabel("DineroIV executable path:");
-    paramsLabel = new JLabel("Command line parameters:");
+    JLabel pathLabel = new JLabel("DineroIV executable path:");
+    JLabel paramsLabel = new JLabel("Command line parameters:");
 
     path = new JTextField(config.getString("dineroIV"));
     params = new JTextField("-l1-usize 512 -l1-ubsize 64");
@@ -139,7 +136,7 @@ public class DineroFrontend extends JDialog {
       }
     });
 
-    browse = new JButton("Browse...");
+    JButton browse = new JButton("Browse...");
     browse.setAlignmentX(Component.RIGHT_ALIGNMENT);
     execute = new JButton("Execute");
     execute.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -159,12 +156,10 @@ public class DineroFrontend extends JDialog {
         String dineroPath = path.getText();
         String paramString = params.getText();
 
-        LinkedList<String> paramsList = new LinkedList<String>();
+        LinkedList<String> paramsList = new LinkedList<>();
         paramsList.add(dineroPath);
 
-        for (String p : paramString.split(" ")) {
-          paramsList.add(p);
-        }
+        Collections.addAll(paramsList, paramString.split(" "));
 
         // Clean up the JTextArea
         result.setText("");

@@ -35,12 +35,12 @@ import javax.swing.text.*;
 import java.util.*;
 
 
-public class MultiLineTable extends JTable {
+class MultiLineTable extends JTable {
 
-  public MultiLineTable(TableModel dm) {
+  MultiLineTable(TableModel dm) {
     this(dm, null, null);
   }
-  public MultiLineTable(TableModel dm, TableColumnModel cm, ListSelectionModel sm) {
+  private MultiLineTable(TableModel dm, TableColumnModel cm, ListSelectionModel sm) {
     super(dm, cm, sm);
     setUI(new MultiLineBasicTableUI());
 
@@ -51,6 +51,7 @@ public class MultiLineTable extends JTable {
     });
   }
 
+  @Override
   public int rowAtPoint(Point point) {
     int y = point.y;
     int rowSpacing = getIntercellSpacing().height;
@@ -68,7 +69,7 @@ public class MultiLineTable extends JTable {
     return -1;
   }
 
-  public int getHeight(String text, int width) {
+  int getHeight(String text, int width) {
     if (text == null) {
       text = "";
     }
@@ -94,11 +95,11 @@ public class MultiLineTable extends JTable {
     return false;
   }
 
-  public int getTabbedTextOffset(Segment s,
-                                 FontMetrics metrics,
-                                 int x0, int x, TabExpander e,
-                                 int startOffset,
-                                 boolean round) {
+  private int getTabbedTextOffset(Segment s,
+                                  FontMetrics metrics,
+                                  int x0, int x, TabExpander e,
+                                  int startOffset,
+                                  boolean round) {
     int currX = x0;
     int nextX = currX;
     char[] txt = s.array;
@@ -122,7 +123,7 @@ public class MultiLineTable extends JTable {
 
       if ((x >= currX) && (x < nextX)) {
         // found the hit position... return the appropriate side
-        if ((round == false) || ((x - currX) < (nextX - x))) {
+        if ((!round) || ((x - currX) < (nextX - x))) {
           return i - s.offset;
         } else {
           return i + 1 - s.offset;
@@ -135,9 +136,9 @@ public class MultiLineTable extends JTable {
     return s.count;
   }
 
-  public int getBreakLocation(Segment s, FontMetrics metrics,
-                              int x0, int x, TabExpander e,
-                              int startOffset) {
+  private int getBreakLocation(Segment s, FontMetrics metrics,
+                               int x0, int x, TabExpander e,
+                               int startOffset) {
 
     int index = getTabbedTextOffset(s, metrics, x0, x,
                                     e, startOffset, false);
@@ -159,9 +160,9 @@ public class MultiLineTable extends JTable {
     return index;
   }
 
-  class MyTabExpander implements TabExpander {
+  private class MyTabExpander implements TabExpander {
     int tabSize;
-    public MyTabExpander(FontMetrics metrics) {
+    MyTabExpander(FontMetrics metrics) {
       tabSize = 5 * metrics.charWidth('m');
     }
     public float nextTabStop(float x, int offset) {
@@ -177,10 +178,8 @@ public class MultiLineTable extends JTable {
     return -1;
   }
   public int getRowHeight(int row) {
-    int numCols = getColumnCount();
     TableModel tm = getModel();
-    int fontHeight = getFontMetrics(getFont()).getHeight();
-    int height = fontHeight;
+    int height = getFontMetrics(getFont()).getHeight();
     Enumeration<TableColumn> cols = getColumnModel().getColumns();
     int i = 0;
 

@@ -23,14 +23,23 @@
 
 package org.edumips64.ui.swing;
 
-import org.edumips64.utils.*;
-import org.edumips64.utils.io.Reader;
+import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.io.ReadException;
-import org.edumips64.utils.io.Writer;
+import org.edumips64.utils.io.Reader;
 import org.edumips64.utils.io.WriteException;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import org.edumips64.utils.io.Writer;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+import java.awt.Container;
+import java.awt.Font;
 
 /** Input/output window.
  *  @author Andrea Spadaccini
@@ -39,11 +48,10 @@ import java.awt.event.*;
 
 public class GUIIO extends JInternalFrame {
   private JTextArea output_area;
-  private JButton clear;
 
   private class OutputTask implements Runnable {
     public String message;
-    public OutputTask(String message) {
+    OutputTask(String message) {
       this.message = message;
     }
 
@@ -54,7 +62,7 @@ public class GUIIO extends JInternalFrame {
       if (GUIIO.this.isIcon()) {
         try {
           GUIIO.this.setIcon(false);
-        } catch (java.beans.PropertyVetoException e) {}
+        } catch (java.beans.PropertyVetoException ignored) {}
       }
     }
   }
@@ -79,13 +87,13 @@ public class GUIIO extends JInternalFrame {
    * This method forces the user to introduce  a number of characters that not exceed count.
   */
   public String read(int count) {
-    String read_s = null;
+    String read_s;
 
     do {
       read_s = JOptionPane.showInputDialog(this, CurrentLocale.getString("ENTERINPUT"), "EduMIPS64 - Input", JOptionPane.PLAIN_MESSAGE);
 
       if (read_s == null) {
-        read_s = new String();
+        read_s = "";
       }
 
       if (read_s.length() > count) {
@@ -104,17 +112,13 @@ public class GUIIO extends JInternalFrame {
     output_area.setEditable(false);
     output_area.setFont(new Font("Monospaced", Font.PLAIN, 12));
 
-    clear = new JButton(CurrentLocale.getString("CLEAR"));
+    JButton clear = new JButton(CurrentLocale.getString("CLEAR"));
 
     Container cp = this.getContentPane();
     Container lowerbox = Box.createHorizontalBox();
     lowerbox.add(clear);
 
-    clear.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        output_area.setText("");
-      }
-    });
+    clear.addActionListener(e -> output_area.setText(""));
 
 
     cp.setLayout(new BoxLayout(cp, BoxLayout.PAGE_AXIS));
@@ -137,11 +141,9 @@ public class GUIIO extends JInternalFrame {
    */
 
   private class WriterProxy implements Writer {
+    GUIIO guiio;
 
-    public GUIIO guiio;
-
-    public WriterProxy(GUIIO guiio) {
-
+    WriterProxy(GUIIO guiio) {
       this.guiio = guiio;
     }
 
@@ -163,11 +165,9 @@ public class GUIIO extends JInternalFrame {
    */
 
   private class ReaderProxy implements Reader {
+    GUIIO guiio;
 
-    public GUIIO guiio;
-
-    public ReaderProxy(GUIIO guiio) {
-
+    ReaderProxy(GUIIO guiio) {
       this.guiio = guiio;
     }
 

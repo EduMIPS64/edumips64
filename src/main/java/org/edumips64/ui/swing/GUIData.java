@@ -35,11 +35,10 @@ import javax.swing.table.*;
 * This class draw the data memory representation.
 */
 public class GUIData extends GUIComponent {
-  DataPanel dataPanel;
-  MemoryElement memoryElement;
-  String memoryAddress[] = new String[CPU.DATALIMIT];
-  JTextArea text;
-  int row;
+  private DataPanel dataPanel;
+  private String memoryAddress[] = new String[CPU.DATALIMIT];
+  private JTextArea text;
+  private int row;
 
   private static final Logger logger = Logger.getLogger(CPU.class.getName());
 
@@ -54,7 +53,6 @@ public class GUIData extends GUIComponent {
   }
 
   public void update() {
-    memory = memory;
   }
 
   public void draw() {
@@ -65,13 +63,13 @@ public class GUIData extends GUIComponent {
     GUIFrontend.updateColumnHeaderNames(dataPanel.theTable);
   }
 
-  class DataPanel extends JPanel {
+  private class DataPanel extends JPanel {
     JTable theTable;
     JScrollPane scrollTable;
-    public FileTableModel tableModel;
+    FileTableModel tableModel;
 
 
-    public DataPanel() {
+    DataPanel() {
       super();
       setBackground(Color.WHITE);
       setLayout(new BorderLayout());
@@ -96,9 +94,7 @@ public class GUIData extends GUIComponent {
           int row = theTable.getSelectedRow();
           int column = theTable.getSelectedColumn();
 
-          if (row == -1 || column != 1) {
-            return;  // can't determine selected cell
-          } else {
+          if (row != -1 && column == 1) {
             try {
               org.edumips64.Main.getSB().setText(
                 CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
@@ -138,9 +134,7 @@ public class GUIData extends GUIComponent {
 
               try {
                 bs.setBits(Converter.hexToBin("" + tableModel.getValueAt(theTable.getSelectedRow(), 1)), 0);
-              } catch (IrregularStringOfHexException ex) {
-                ex.printStackTrace();
-              } catch (IrregularStringOfBitsException ex) {
+              } catch (IrregularStringOfHexException | IrregularStringOfBitsException ex) {
                 ex.printStackTrace();
               }
 
@@ -154,10 +148,10 @@ public class GUIData extends GUIComponent {
 
           if (e.getClickCount() == 2) {
             row = theTable.getSelectedRow();
-            int column = theTable.getSelectedColumn();
             String memLabel = (String) tableModel.getValueAt(row, 0);
             String oldValue = (String) tableModel.getValueAt(row, 1);
             JDialog IVD = new InsertValueDialog(memLabel, oldValue);
+            IVD.setVisible(true);
           }
         }
       }
@@ -174,7 +168,7 @@ public class GUIData extends GUIComponent {
       private Class[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
       private String memoryAddress[];
 
-      public FileTableModel(String[] memoryAddress) {
+      FileTableModel(String[] memoryAddress) {
         this.memoryAddress = memoryAddress;
       }
 
@@ -212,9 +206,7 @@ public class GUIData extends GUIComponent {
             toReturn = memory.getCellByIndex(row).getComment();
             break;
           }
-        } catch (IrregularStringOfBitsException ex) {
-          logger.warning(ex.toString());
-        } catch (MemoryElementNotFoundException ex) {
+        } catch (IrregularStringOfBitsException | MemoryElementNotFoundException ex) {
           logger.warning(ex.toString());
         }
 
@@ -229,16 +221,13 @@ public class GUIData extends GUIComponent {
 
     class InsertValueDialog extends JDialog implements ActionListener {
       JButton OK;
-      int rowCurrent;
-      String valueCurrent[] = new String[CPU.DATALIMIT];
 
-      public InsertValueDialog() {
+      InsertValueDialog() {
         super();
       }
 
-      public InsertValueDialog(String memLabel, String oldValue) {
+      InsertValueDialog(String memLabel, String oldValue) {
         super();
-        JFrame frameDialog = new JFrame();
         setTitle("Data");
         GridBagLayout GBL = new GridBagLayout();
         GridBagConstraints GBC = new GridBagConstraints();
@@ -269,11 +258,10 @@ public class GUIData extends GUIComponent {
         GBL.setConstraints(OK, GBC);
         setSize(200, 100);
         setLocation(400, 300);
-        setVisible(true);
       }
 
-      public int confirmAction() {
-        String renumeration = null;
+      int confirmAction() {
+        String renumeration;
         boolean check = false;
         int okValue = 0;
 
@@ -290,14 +278,15 @@ public class GUIData extends GUIComponent {
           }
         }
 
-        if (check == true) {
+        if (check) {
           okValue = 1;
           String newValue = text.getText();
           int length = newValue.length();
           int difference = 16 - length;
 
+          MemoryElement memoryElement;
           if (difference != 0) {
-            renumeration = new String();
+            renumeration = "";
 
             for (int i = 0; i < difference; i++) {
               renumeration = renumeration + "0";
@@ -339,6 +328,7 @@ public class GUIData extends GUIComponent {
 
         if (pressed == OK) {
           InsertValueDialog obj = new InsertValueDialog();
+          obj.setVisible(true);
           int closeDialog = obj.confirmAction();
 
           if (closeDialog == 1) {
@@ -364,6 +354,7 @@ public class GUIData extends GUIComponent {
 
           if (active == KeyEvent.VK_ENTER) {
             InsertValueDialog obj = new InsertValueDialog();
+            obj.setVisible(true);
             int closeDialog = obj.confirmAction();
 
             if (closeDialog == 1) {

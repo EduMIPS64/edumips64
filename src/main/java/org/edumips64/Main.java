@@ -829,7 +829,7 @@ public class Main extends JApplet {
     config.add(settings);
     settings.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        new GUIConfig(f, cpu, configStore);
+        new GUIConfig(f, configStore);
       }
     });
     // ---------------- LANGUAGE MENU
