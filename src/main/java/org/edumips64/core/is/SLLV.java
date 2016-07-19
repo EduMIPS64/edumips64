@@ -57,7 +57,7 @@ public class SLLV extends ALU_RType {
     //getting strings from temporary registers
     String rt = TR[RT_FIELD].getBinString();
     String rs = TR[RS_FIELD].getBinString();
-    String shift = "", rd;
+    String shift = "";
     //getting the low order 5 bits from rs register
     shift = rs.substring(59);
     //cutting the high part of register

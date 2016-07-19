@@ -250,6 +250,7 @@ public class GUIRegisters extends GUIComponent {
             int row = theTable.getSelectedRow();
             oldValue = value[row]; //estraggo il valore corrente dal registro
             JDialog IVD = new InsertValueDialog(row, oldValue, value);
+            IVD.setVisible(true);
           }
           //double click on the generic fpr
           else if (theTable.getSelectedColumn() == 3 && theTable.getSelectedRow() < 32 && e.getClickCount() == 2) {
@@ -257,6 +258,7 @@ public class GUIRegisters extends GUIComponent {
             int row = theTable.getSelectedRow();
             oldValue = valueFP[row];
             JDialog IVD = new InsertValueDialog(row, oldValue, valueFP);
+            IVD.setVisible(true);
           }
         }
       }
@@ -324,6 +326,7 @@ public class GUIRegisters extends GUIComponent {
   //classe per la JDialog
   class InsertValueDialog extends JDialog implements ActionListener {
     JButton OK;
+    
     public InsertValueDialog() {
       super();
     }
@@ -373,9 +376,8 @@ public class GUIRegisters extends GUIComponent {
       GBL.setConstraints(OK, GBC);
       setSize(210, 100);
       setLocation(400, 300);
-      setVisible(true);
     }
-
+    
     public int confirmAction() {
       String renumeration = null;
       boolean check = false;
@@ -394,7 +396,7 @@ public class GUIRegisters extends GUIComponent {
         }
       }
 
-      if (check == true) {
+      if (check) {
         okValue = 1;
         String newValue = text.getText();
         int length = newValue.length();
@@ -457,6 +459,7 @@ public class GUIRegisters extends GUIComponent {
 
       if (pressed == OK) {
         InsertValueDialog obj = new InsertValueDialog();
+        obj.setVisible(true);
         int closeDialog = obj.confirmAction();
 
         if (closeDialog == 1) {
@@ -483,6 +486,7 @@ public class GUIRegisters extends GUIComponent {
 
         if (active == KeyEvent.VK_ENTER) {
           InsertValueDialog obj = new InsertValueDialog();
+          obj.setVisible(true);
           int closeDialog = obj.confirmAction();
 
           if (closeDialog == 1) {

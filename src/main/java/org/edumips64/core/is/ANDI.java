@@ -83,7 +83,7 @@ class ANDI extends ALU_IType {
       rsbit = rs.charAt(i) == '1' ? true : false;
       immbit = imm.charAt(i) == '1' ? true : false;
       resbit = rsbit && immbit;
-      sb.append(resbit == true ? '1' : '0');
+      sb.append(resbit ? '1' : '0');
     }
 
     TR[RT_FIELD].setBits(sb.substring(0), 0);

@@ -26,5 +26,4 @@ package org.edumips64.core.fpu;
  *  operation is not exact due to the restricted exponent and/or precision range.
  */
 public class FPInexactException extends Exception {
-  public FPInexactException() {}
 }
