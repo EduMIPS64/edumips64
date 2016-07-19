@@ -28,6 +28,7 @@ package org.edumips64;
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
 import org.edumips64.ui.common.CycleBuilder;
+import org.edumips64.utils.IrregularStringOfBitsException;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.LocalWriter;
@@ -70,6 +71,7 @@ public class EndToEndTests extends BaseTest {
     int instructions;
     int rawStalls, wawStalls, memStalls, divStalls;
     String traceFile;
+    RegisterFP[] fpRegisters;
 
     CpuTestStatus(CPU cpu, String dineroTrace) {
       cycles = cpu.getCycles();
@@ -79,6 +81,22 @@ public class EndToEndTests extends BaseTest {
       memStalls = cpu.getStructuralStallsMemory();
       divStalls = cpu.getStructuralStallsDivider();
       traceFile = dineroTrace;
+
+      // Deep copy the FP Registers.
+      RegisterFP cpuFPRegisters[] = cpu.getRegistersFP();
+      fpRegisters = new RegisterFP[cpuFPRegisters.length];
+      log.info("Deep copying " + cpuFPRegisters.length + " FP registers");
+      for (int i = 0; i < cpuFPRegisters.length; ++i) {
+        RegisterFP r = cpuFPRegisters[i];
+        fpRegisters[i] = new RegisterFP();
+        try {
+          log.info(i + ": " + r.getBinString());
+          fpRegisters[i].setBits(r.getBinString(), 0);
+        } catch (IrregularStringOfBitsException e) {
+          // Should never happen.
+          e.printStackTrace();
+        }
+      }
 
       log.warning("Got " + cycles + " cycles, " + instructions + " instructions, " + rawStalls + " RAW Stalls and " + wawStalls + " WAW stalls.");
     }
@@ -163,6 +181,7 @@ public class EndToEndTests extends BaseTest {
       }
     } catch (HaltException e) {
       log.warning("================================= Finished test " + testPath);
+      log.info(cpu.toString());
 
       File tmp = File.createTempFile("edumips64", "xdin");
       tmp.deleteOnExit();
@@ -394,6 +413,12 @@ public class EndToEndTests extends BaseTest {
   public void testDividerStalls() throws Exception {
     CpuTestStatus status = runMipsTest("div.d.divider-stalls.s");
     assertEquals(status.divStalls, 23);
+  }
+
+  @Test
+  public void testOutOfOrder() throws Exception {
+    CpuTestStatus status = runMipsTest("fpu-out-of-order-terminate.s");
+    assertEquals(2, Integer.parseInt(status.fpRegisters[2].getBinString(), 2));
   }
 
   /* Tests for masking synchronous exceptions. Termination cannot be tested here since it's in the CPUGuiThread. */
