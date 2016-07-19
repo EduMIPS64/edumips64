@@ -3,27 +3,22 @@ package org.edumips64.core;
 import org.edumips64.BaseTest;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
-import org.edumips64.utils.ConfigStore;
-import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class MemoryTest extends BaseTest {
   private Memory m;
   private InstructionBuilder instructionBuilder;
-  private IOManager iom;
-  private Dinero dinero;
-  private CPU cpu;
 
   @Before
   public void setUp() throws Exception {
     m = new Memory();
-    cpu = new CPU(m, config);
-    iom = new IOManager(new LocalFileUtils(), m);
-    dinero = new Dinero(m);
+    CPU cpu = new CPU(m, config);
+    IOManager iom = new IOManager(new LocalFileUtils(), m);
+    Dinero dinero = new Dinero(m);
     instructionBuilder = new InstructionBuilder(m, iom, cpu, dinero, config);
   }
 

@@ -22,16 +22,41 @@
  */
 package org.edumips64.ui.swing;
 
-import org.edumips64.core.CPU;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigStoreTypeException;
 import org.edumips64.utils.CurrentLocale;
 
-import java.util.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.logging.Logger;
-import java.awt.*;
-import javax.swing.*;
-import java.awt.event.*;
 
 /**
  * This class provides a window for configuration options.
@@ -39,36 +64,25 @@ import java.awt.event.*;
 public class GUIConfig extends JDialog {
 
   private static final Logger logger = Logger.getLogger(GUIConfig.class.getName());
-  String MAIN;
-  String APPEARANCE;
-  String FPUEXCEPTIONS;
-  String FPUROUNDING;
-  String BEHAVIOR;
-
-  JTabbedPane tabPanel;
-  JButton okButton;
-  int width = 700, height = 300;
 
   // Local cache of the configuration values that will need to be applied to
   // the configuration backend.
-  Map<String, Object> cache;
-  private CPU cpu;
+  private Map<String, Object> cache;
   private ConfigStore config;
 
-  public GUIConfig(final JFrame owner, CPU cpu, ConfigStore config) {
+  public GUIConfig(final JFrame owner, ConfigStore config) {
     super(owner, CurrentLocale.getString("Config.ITEM"), true);
     this.config = config;
-    this.cpu = cpu;
     logger.info("Building a new GUIConfig instance.");
-    MAIN = CurrentLocale.getString("Config.MAIN");
-    APPEARANCE = CurrentLocale.getString("Config.APPEARANCE");
-    BEHAVIOR = CurrentLocale.getString("Config.BEHAVIOR");
-    FPUEXCEPTIONS = CurrentLocale.getString("Config.FPUEXCEPTIONS");
-    FPUROUNDING = CurrentLocale.getString("Config.FPUROUNDING");
+    String MAIN = CurrentLocale.getString("Config.MAIN");
+    String APPEARANCE = CurrentLocale.getString("Config.APPEARANCE");
+    String BEHAVIOR = CurrentLocale.getString("Config.BEHAVIOR");
+    String FPUEXCEPTIONS = CurrentLocale.getString("Config.FPUEXCEPTIONS");
+    String FPUROUNDING = CurrentLocale.getString("Config.FPUROUNDING");
 
-    cache = new HashMap<String, Object>();
+    cache = new HashMap<>();
 
-    tabPanel = new JTabbedPane();
+    JTabbedPane tabPanel = new JTabbedPane();
     tabPanel.addTab(MAIN, makeMainPanel());
     tabPanel.addTab(BEHAVIOR, makeBehaviorPanel());
     tabPanel.addTab(FPUEXCEPTIONS, makeExceptionsPanel());
@@ -79,20 +93,21 @@ public class GUIConfig extends JDialog {
     buttonPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
     addButtons(buttonPanel);
 
-    getRootPane().setDefaultButton(okButton);
     Container content = getContentPane();
 
     content.add(tabPanel, BorderLayout.CENTER);
     content.add(buttonPanel, BorderLayout.PAGE_END);
 
     //pack();
+    int width = 700;
+    int height = 300;
     setSize(width, height);
     setLocation((getScreenWidth() - getWidth()) / 2, (getScreenHeight() - getHeight()) / 2);
     setVisible(true);
   }
 
-  GridBagLayout gbl;
-  GridBagConstraints gbc;
+  private GridBagLayout gbl;
+  private GridBagConstraints gbc;
 
   private JPanel makeMainPanel() {
     gbl = new GridBagLayout();
@@ -235,7 +250,7 @@ public class GUIConfig extends JDialog {
 
   // Monster function that adds a given row (label + control) to a given
   // JPanel, and sets its behaviour according to the type of control.
-  public void addRow(JPanel panel, final int row, final String key, final JComponent comp) {
+  private void addRow(JPanel panel, final int row, final String key, final JComponent comp) {
     String title = CurrentLocale.getString("Config." + key.toUpperCase());
     String tip = CurrentLocale.getString("Config." + key.toUpperCase() + ".tip");
     //Setting title
@@ -270,7 +285,7 @@ public class GUIConfig extends JDialog {
       // one and this code is tailored for it.
       rbut.setAction(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
-          LinkedList<String> keys = new LinkedList<String>();
+          LinkedList<String> keys = new LinkedList<>();
           keys.add("NEAREST");
           keys.add("TOWARDZERO");
           keys.add("TOWARDS_PLUS_INFINITY");
@@ -328,17 +343,15 @@ public class GUIConfig extends JDialog {
       final JButton button = (JButton) comp;
       button.setBounds(0, 0, 50, 10);
       button.setBackground(new Color(config.getInt(key)));
-      button.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          Color color = JColorChooser.showDialog(
-                          GUIConfig.this,
-                          CurrentLocale.getString("Config." + key.toUpperCase()),
-                          button.getBackground());
+      button.addActionListener(e -> {
+        Color color = JColorChooser.showDialog(
+                        GUIConfig.this,
+                        CurrentLocale.getString("Config." + key.toUpperCase()),
+                        button.getBackground());
 
-          if (color != null) {
-            button.setBackground(color);
-            cache.put(key, button.getBackground().getRGB());
-          }
+        if (color != null) {
+          button.setBackground(color);
+          cache.put(key, button.getBackground().getRGB());
         }
       });
     }
@@ -367,7 +380,7 @@ public class GUIConfig extends JDialog {
   }
 
 
-  public void addButtons(JPanel buttonPanel) {
+  private void addButtons(JPanel buttonPanel) {
 
     final JButton okButton = new JButton("OK");
     final JButton cancelButton = new JButton("Cancel");
@@ -376,33 +389,27 @@ public class GUIConfig extends JDialog {
     buttonPanel.add(cancelButton);
 
     //Setting Action for each buttons
-    cancelButton.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        setVisible(false);
-      }
-    });
-    okButton.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
+    cancelButton.addActionListener(e -> setVisible(false));
+    okButton.addActionListener(e -> {
 
-        try {
-          // Flush the cache to the actual configuration.
-          config.mergeFromGenericMap(cache);
-          // Might be needed if show_alias is changed.
-          org.edumips64.Main.getGUIFrontend().updateComponents();
-          org.edumips64.Main.updateCGT();
-        } catch (ConfigStoreTypeException ex) {
-          logger.severe("Unknown type encountered while storing the configuration.");
-        }
-
-        setVisible(false);
+      try {
+        // Flush the cache to the actual configuration.
+        config.mergeFromGenericMap(cache);
+        // Might be needed if show_alias is changed.
+        org.edumips64.Main.getGUIFrontend().updateComponents();
+        org.edumips64.Main.updateCGT();
+      } catch (ConfigStoreTypeException ex) {
+        logger.severe("Unknown type encountered while storing the configuration.");
       }
+
+      setVisible(false);
     });
   }
-  public static int getScreenWidth() {
+  private static int getScreenWidth() {
     return (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
   }
 
-  public static int getScreenHeight() {
+  private static int getScreenHeight() {
     return (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
   }
 

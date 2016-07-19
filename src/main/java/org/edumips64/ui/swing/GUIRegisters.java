@@ -23,38 +23,60 @@
 
 package org.edumips64.ui.swing;
 
-import org.edumips64.core.*;
-import org.edumips64.utils.*;
+import org.edumips64.core.CPU;
+import org.edumips64.core.Memory;
+import org.edumips64.core.Register;
+import org.edumips64.core.RegisterFP;
+import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.Converter;
+import org.edumips64.utils.CurrentLocale;
+import org.edumips64.utils.IrregularStringOfHexException;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.table.*;
-
-//diagnostics
-
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.table.AbstractTableModel;
 
 /**
 * This class shows the values stored in the registers.
 */
 
-public class GUIRegisters extends GUIComponent {
-  Register registers[];
-  RegisterFP registersFP[];
-  RegPanel regPanel;
-  JTextArea text;
-  String oldValue;
+class GUIRegisters extends GUIComponent {
+  private Register registers[];
+  private RegisterFP registersFP[];
+  private RegPanel regPanel;
+  private JTextArea text;
   String value[] = new String[34];
-  String valueFP[] = new String[32];
-  int rowCurrent;
-  String valueCurrent[];
+  private String valueFP[] = new String[32];
+  private int rowCurrent;
+  private String valueCurrent[];
   private enum AliasRegister
-  {zero, at, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, k0, k1, gp, sp, fp, ra};
-  public int xprLastDoubleClick; //used for instanciating an InsertValueDialog if a double click on gpr or fpr is performed
+  {zero, at, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, k0, k1, gp, sp, fp, ra}
+  private int xprLastDoubleClick; //used for instanciating an InsertValueDialog if a double click on gpr or fpr is performed
   //(i want to avoid to modify the class constructor) the value is zero if a gpr is double clicked
   //1 if an fpr is double clicked
 
-  public GUIRegisters(CPU cpu, Memory memory, ConfigStore config) {
+  GUIRegisters(CPU cpu, Memory memory, ConfigStore config) {
     super(cpu, memory, config);
     registers = cpu.getRegisters();
     registersFP = cpu.getRegistersFP();
@@ -88,7 +110,7 @@ public class GUIRegisters extends GUIComponent {
     cont.repaint();
   }
 
-  public String registerToAlias(String reg) {
+  private String registerToAlias(String reg) {
     int number = Integer.parseInt(reg.substring(1));
 
     if (number == 32) {
@@ -109,16 +131,14 @@ public class GUIRegisters extends GUIComponent {
   }
 
 
-  class RegPanel extends JPanel {
+  private class RegPanel extends JPanel {
     JTable theTable;
     JScrollPane scrollTable;
-    public FileTableModel tableModel;
+    FileTableModel tableModel;
     String numR[] = new String[34];
     String numRF[] = new String[34];
 
-    int cont = 0; //contatore che conta le cifre significative dei valori di input
-
-    public RegPanel() {
+    RegPanel() {
       super();
       setLayout(new BorderLayout());
       tableModel = new FileTableModel(value);
@@ -143,9 +163,7 @@ public class GUIRegisters extends GUIComponent {
           int row = theTable.getSelectedRow();
           int column = theTable.getSelectedColumn();
 
-          if (row == -1 || column != 1) {
-            return;  // can't determine selected cell
-          } else {
+          if (row != -1 && column == 1) {
             try {
               org.edumips64.Main.getSB().setText(
                 CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
@@ -182,7 +200,7 @@ public class GUIRegisters extends GUIComponent {
       value[33] = "0000000000000000";
     }
 
-    public String fillFirstColumn(int i) {
+    String fillFirstColumn(int i) {
       if (config.getBoolean("show_aliases")) {
         return registerToAlias(" " + i) + "=";
       } else {
@@ -190,7 +208,7 @@ public class GUIRegisters extends GUIComponent {
       }
     }
 
-    public void updateRegistersNames() {
+    void updateRegistersNames() {
       for (int i = 0; i < 32; i++) {
         numR[i] = fillFirstColumn(i);
       }
@@ -245,6 +263,7 @@ public class GUIRegisters extends GUIComponent {
 
 
           //double click on the generic gpr
+          String oldValue;
           if (theTable.getSelectedColumn() == 1 &&  theTable.getSelectedRow() != 0 && e.getClickCount() == 2) {
             xprLastDoubleClick = 0;
             int row = theTable.getSelectedRow();
@@ -275,7 +294,7 @@ public class GUIRegisters extends GUIComponent {
       private Class[] columnClasses = {String.class, String.class, String.class, String.class};
       private String value[];
 
-      public FileTableModel(String[] value) {
+      FileTableModel(String[] value) {
         this.value = value;
       }
 
@@ -324,18 +343,17 @@ public class GUIRegisters extends GUIComponent {
   }
 
   //classe per la JDialog
-  class InsertValueDialog extends JDialog implements ActionListener {
+  private class InsertValueDialog extends JDialog implements ActionListener {
     JButton OK;
     
-    public InsertValueDialog() {
+    InsertValueDialog() {
       super();
     }
 
-    public InsertValueDialog(int row, String oldValue, String value[]) {
+    InsertValueDialog(int row, String oldValue, String value[]) {
       super();
       rowCurrent = row;
       valueCurrent = value;
-      JFrame frameDialog = new JFrame();
       setTitle("Register");
       GridBagLayout GBL = new GridBagLayout();
       GridBagConstraints GBC = new GridBagConstraints();
@@ -378,8 +396,8 @@ public class GUIRegisters extends GUIComponent {
       setLocation(400, 300);
     }
     
-    public int confirmAction() {
-      String renumeration = null;
+    int confirmAction() {
+      String renumeration;
       boolean check = false;
       int okValue = 0;
 
@@ -403,7 +421,7 @@ public class GUIRegisters extends GUIComponent {
         int difference = 16 - length;
 
         if (difference != 0) {
-          renumeration = new String();
+          renumeration = "";
 
           for (int i = 0; i < difference; i++) {
             renumeration = renumeration + "0";
@@ -471,7 +489,6 @@ public class GUIRegisters extends GUIComponent {
 
     //classe interna per quando si PIGIA "INVIO"
     class MyKeyListener implements KeyListener {
-      String stringa = oldValue;
       public void keyPressed(KeyEvent e) {
         text.setEditable(true);
         int active = e.getKeyCode();

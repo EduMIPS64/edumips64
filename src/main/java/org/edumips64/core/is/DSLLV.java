@@ -58,9 +58,7 @@ public class DSLLV extends ALU_RType {
   throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
     String rt = TR[RT_FIELD].getBinString();
     String rs = TR[RS_FIELD].getBinString();
-    String shift = "", rd;
-    int nbits;
-    shift = rs.substring(58);
+    String shift = rs.substring(58);
     int shift_value = Converter.binToInt(shift, true);
     StringBuffer buf = new StringBuffer(rt);
 

@@ -31,8 +31,8 @@ import javax.swing.table.*;
 * This class draws the code memory representation in a window with five columns.
 */
 public class GUICode extends GUIComponent {
-  CodePanel codePanel;
-  String memoryAddress[] = new String[CPU.CODELIMIT];
+  private CodePanel codePanel;
+  private String memoryAddress[] = new String[CPU.CODELIMIT];
   private static int ifIndex, idIndex, exIndex, memIndex, wbIndex, A1Index, A2Index, A3Index, A4Index, M1Index, M2Index, M3Index, M4Index, M5Index, M6Index, M7Index, DIVIndex;
 
   public GUICode(CPU cpu, Memory memory, ConfigStore config) {
@@ -100,12 +100,12 @@ public class GUICode extends GUIComponent {
     codePanel.theTable.scrollRectToVisible(codePanel.theTable.getCellRect(ifIndex, 0, true));
   }
 
-  class CodePanel extends JPanel {
+  private class CodePanel extends JPanel {
     JTable theTable;
     JScrollPane scrollTable;
     MyTableModel tableModel;
 
-    public CodePanel() {
+    CodePanel() {
       super();
 
       setLayout(new BorderLayout());
@@ -133,7 +133,7 @@ public class GUICode extends GUIComponent {
       private Class[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
       private String memoryAddress[];
 
-      public MyTableModel(String[] memoryAddress) {
+      MyTableModel(String[] memoryAddress) {
         this.memoryAddress = memoryAddress;
       }
 
@@ -196,11 +196,8 @@ public class GUICode extends GUIComponent {
     }
   }
 
-  class MyTableCellRenderer implements TableCellRenderer {
+  private class MyTableCellRenderer implements TableCellRenderer {
     private JLabel label;
-
-    public MyTableCellRenderer() {
-    }
 
     public Component getTableCellRendererComponent(JTable table,
         Object value,
@@ -223,8 +220,7 @@ public class GUICode extends GUIComponent {
       }
 
       if (column == 1) {
-        String repr = (String) value;
-        repr = (String) codePanel.tableModel.getValueAt(row, column);
+        String repr = (String) codePanel.tableModel.getValueAt(row, column);
         label.setText(repr);
         label.setFont(f);
       }
@@ -235,15 +231,13 @@ public class GUICode extends GUIComponent {
       }
 
       if (column == 3) {
-        String iName = (String) value;
-        iName = (String) codePanel.tableModel.getValueAt(row, column);
+        String iName = (String) codePanel.tableModel.getValueAt(row, column);
         label.setText(iName);
         label.setFont(f);
       }
 
       if (column == 4) {
-        String iComment = (String) value;
-        iComment = (String) codePanel.tableModel.getValueAt(row, column);
+        String iComment = (String) codePanel.tableModel.getValueAt(row, column);
         label.setText(iComment);
         label.setFont(f);
       }

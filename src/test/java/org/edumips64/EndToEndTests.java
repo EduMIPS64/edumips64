@@ -51,10 +51,7 @@ import static org.junit.Assert.assertEquals;
 public class EndToEndTests extends BaseTest {
   private CPU cpu;
   private Parser parser;
-  private Memory memory;
   private SymbolTable symTab;
-  private IOManager iom;
-  private InstructionBuilder instructionBuilder;
   private static String testsLocation = "build/resources/test/";
   private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
   private Dinero dinero;
@@ -128,16 +125,16 @@ public class EndToEndTests extends BaseTest {
 
   @Before
   public void testSetup() {
-    memory = new Memory();
+    Memory memory = new Memory();
     cpu = new CPU(memory, config);
     cpu.setStatus(CPU.CPUStatus.READY);
     dinero = new Dinero(memory);
     symTab = new SymbolTable(memory);
     stdOut = new StringWriter();
     FileUtils lfu = new LocalFileUtils();
-    iom = new IOManager(lfu, memory);
+    IOManager iom = new IOManager(lfu, memory);
     iom.setStdOutput(stdOut);
-    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
+    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser  = new Parser(lfu, symTab, memory, instructionBuilder);
     config.putBoolean("forwarding", true);
     fec = new FPUExceptionsConfig();
