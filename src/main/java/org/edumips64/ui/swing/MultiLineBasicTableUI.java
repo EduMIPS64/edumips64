@@ -34,10 +34,6 @@ import java.util.*;
 public class MultiLineBasicTableUI extends javax.swing.plaf.basic.BasicTableUI {
 
 
-  public MultiLineBasicTableUI() {
-    super();
-  }
-
   private Dimension createTableSize(long width) {
     int numCols = table.getColumnCount();
     int numRows = table.getRowCount();
