@@ -113,7 +113,7 @@ public abstract class FPC_cond_DInstructions extends ComputationalInstructions {
 
     //now we make the and operation between the truth mask and the comparison of the registers
     condition = (cond2 && less) || (cond1 && equal) || (cond0 && unordered);
-    condition_int = (condition == true) ? 1 : 0;
+    condition_int = condition ? 1 : 0;
     cpu.setFCSRConditionCode(params.get(CC_FIELD).intValue(), condition_int);
   }
   public void MEM() {}

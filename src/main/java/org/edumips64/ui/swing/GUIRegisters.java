@@ -396,7 +396,7 @@ public class GUIRegisters extends GUIComponent {
         }
       }
 
-      if (check == true) {
+      if (check) {
         okValue = 1;
         String newValue = text.getText();
         int length = newValue.length();
