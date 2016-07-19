@@ -4,8 +4,9 @@
 [![Build Status](https://secure.travis-ci.org/lupino3/edumips64.png)](http://travis-ci.org/lupino3/edumips64)
 [![Stories in Ready](https://badge.waffle.io/lupino3/edumips64.png?label=ready&title=Ready)](https://waffle.io/lupino3/edumips64)
 
-EduMIPS64 is a cross-platform visual MIPS64 CPU simulator written in
-Java/swing.
+EduMIPS64 is a cross-platform visual MIPS64 CPU simulator written in Java.
+
+![Screenshot](http://www.edumips.org/edumips64-1.2.2-screenshot.png)
 
 The EduMIPS64 web site is http://www.edumips.org. There is also a
 developers' blog at http://edumips64.blogspot.com.
