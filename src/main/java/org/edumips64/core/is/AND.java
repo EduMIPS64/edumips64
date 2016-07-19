@@ -59,7 +59,7 @@ public class AND extends ALU_RType {
       rtbit = rt.charAt(i) == '1' ? true : false;
 
       resbit = rsbit && rtbit;
-      outputstring += (resbit == true ? 1 : 0);
+      outputstring += (resbit ? 1 : 0);
     }
 
     //saving bitwise AND result into a temporary register
