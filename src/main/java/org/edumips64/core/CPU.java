@@ -58,11 +58,10 @@ public class CPU {
 
   /** FPU Elements*/
   private RegisterFP[] fpr;
-  private boolean lastExWasFP;
   private Instruction lastFPInstructionInEx;
 
-  public static enum FPExceptions {INVALID_OPERATION, DIVIDE_BY_ZERO, UNDERFLOW, OVERFLOW}
-  public static enum FPRoundingMode { TO_NEAREST, TOWARD_ZERO, TOWARDS_PLUS_INFINITY, TOWARDS_MINUS_INFINITY}
+  public enum FPExceptions {INVALID_OPERATION, DIVIDE_BY_ZERO, UNDERFLOW, OVERFLOW}
+  public enum FPRoundingMode { TO_NEAREST, TOWARD_ZERO, TOWARDS_PLUS_INFINITY, TOWARDS_MINUS_INFINITY}
   private FCSRRegister FCSR;
   public static List<String> knownFPInstructions; // set of Floating point instructions that must pass through the FPU pipeline
   private FPPipeline fpPipe;
@@ -151,7 +150,7 @@ public class CPU {
 
 
     // Pipeline initialization
-    pipe = new HashMap<PipeStage, Instruction>();
+    pipe = new HashMap<>();
     clearPipe();
     currentPipeStage = PipeStage.IF;
 
@@ -246,7 +245,7 @@ public class CPU {
   /** Returns true if the pipeline is empty. In this case, if CPU is in stopping state
    *  we can halt the pipeline. The sufficient condition in order to return true is that fpPipe doesn't work
    *  and it hadn't issued any instrution now in the MEM stage */
-  public boolean isPipelinesEmpty() {
+  private boolean isPipelinesEmpty() {
     boolean empty = pipe.get(PipeStage.ID) == null || pipe.get(PipeStage.ID).getName().equals(" ");
     empty = empty && (pipe.get(PipeStage.EX) == null || pipe.get(PipeStage.EX).getName().equals(" "));
     empty = empty && (pipe.get(PipeStage.MEM) == null || pipe.get(PipeStage.MEM).getName().equals(" "));
@@ -398,7 +397,7 @@ public class CPU {
   public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, WAWException, MemoryNotAvailableException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException {
     configFPExceptionsAndRM();
 
-    String syncex = null;
+    String syncex;
 
     if (status != CPUStatus.RUNNING && status != CPUStatus.STOPPING) {
       throw new StoppedCPUException();
@@ -496,14 +495,14 @@ public class CPU {
     }
   }
 
-  public void changeStage(PipeStage newStatus) {
+  private void changeStage(PipeStage newStatus) {
     logger.info(newStatus.toString() + " STAGE: " + pipe.get(newStatus) + "\n================================");
     currentPipeStage = newStatus;
   }
 
   // Individual stages.
 
-  public void stepIF() throws IrregularStringOfBitsException, HaltException, IrregularWriteOperationException, BreakException {
+  private void stepIF() throws IrregularStringOfBitsException, HaltException, IrregularWriteOperationException, BreakException {
     // We don't have to execute any methods, but we must get the new
     // instruction from the symbol table.
     changeStage(PipeStage.IF);
@@ -540,7 +539,7 @@ public class CPU {
     }
   }
 
-  public void stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, HaltException, RAWException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
+  private void stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, HaltException, RAWException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
     changeStage(PipeStage.ID);
 
     if (pipe.get(PipeStage.ID) != null) {
@@ -572,7 +571,7 @@ public class CPU {
     }
   }
 
-  public String stepEX() throws SynchronousException, HaltException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
+  private String stepEX() throws SynchronousException, HaltException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
     changeStage(PipeStage.EX);
 
     // Used for exception handling
@@ -585,9 +584,6 @@ public class CPU {
     Instruction completedFpInstruction = fpPipe.getCompletedInstruction();
     Instruction instruction;
     boolean shouldExecuteFP = completedFpInstruction != null;
-
-    // Keep track that we last executed a FP instruction in EX.
-    lastExWasFP = shouldExecuteFP;
 
     // if there will be a stall because a lot of instructions would fill the MEM stage, the EX()
     // method cannot be called because the integer instruction in EX cannot be moved.
@@ -626,16 +622,13 @@ public class CPU {
       }
     }
 
-    Instruction toMove = lastExWasFP ? lastFPInstructionInEx : pipe.get(PipeStage.EX);
+    Instruction toMove = shouldExecuteFP ? lastFPInstructionInEx : pipe.get(PipeStage.EX);
     logger.info("Moving " + toMove + " to MEM");
     pipe.put(PipeStage.MEM, toMove);
-    if (!lastExWasFP) {
+    if (!shouldExecuteFP) {
 
       pipe.put(PipeStage.EX, null);
     }
-    // Reset lastExWasFP.
-    lastExWasFP = false;
-
     // Shift instructions in the fpPipe.
     fpPipe.step();
 
@@ -643,7 +636,7 @@ public class CPU {
     return syncex;
   }
 
-  public void stepMEM() throws HaltException, NotAlignException, IrregularWriteOperationException, MemoryElementNotFoundException, AddressErrorException, IrregularStringOfBitsException {
+  private void stepMEM() throws HaltException, NotAlignException, IrregularWriteOperationException, MemoryElementNotFoundException, AddressErrorException, IrregularStringOfBitsException {
     changeStage(PipeStage.MEM);
 
     if (pipe.get(PipeStage.MEM) != null) {
@@ -656,7 +649,7 @@ public class CPU {
     pipe.put(PipeStage.MEM, null);
   }
 
-  public void stepWB() throws IrregularStringOfBitsException, HaltException {
+  private void stepWB() throws IrregularStringOfBitsException, HaltException {
     changeStage(PipeStage.WB);
 
     if (pipe.get(PipeStage.WB) != null) {
@@ -794,7 +787,7 @@ public class CPU {
    * FPR.
    * @return a string
    */
-  public String fprString() {
+  private String fprString() {
     String s = "";
     int i = 0;
 
@@ -805,7 +798,7 @@ public class CPU {
     return s;
   }
 
-  public void configFPExceptionsAndRM() {
+  private void configFPExceptionsAndRM() {
     try {
       FCSR.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, config.getBoolean("INVALID_OPERATION"));
       FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW, config.getBoolean("OVERFLOW"));

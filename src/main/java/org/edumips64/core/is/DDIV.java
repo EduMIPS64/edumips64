@@ -74,7 +74,6 @@ class DDIV extends ALU_RType {
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, DivisionByZeroException {
 
     //getting values from temporary registers
-    boolean sign;
     long rs = TR[RS_FIELD].getValue();
     long rt = TR[RT_FIELD].getValue();
 

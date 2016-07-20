@@ -36,7 +36,6 @@ import org.edumips64.core.is.Instruction;
 */
 public class SymbolTable {
   private static final Logger logger = Logger.getLogger(SymbolTable.class.getName());
-  private static SymbolTable symTable = null;
   private Map<String, Integer> mem_labels;
   private Map<String, Integer> instr_labels;
 

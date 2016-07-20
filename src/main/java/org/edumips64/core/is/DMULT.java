@@ -25,12 +25,12 @@
 
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
-import org.edumips64.utils.*;
-import java.math.BigInteger;
+import org.edumips64.core.IrregularWriteOperationException;
+import org.edumips64.core.Register;
+import org.edumips64.utils.Converter;
+import org.edumips64.utils.IrregularStringOfBitsException;
 
-//per diagnostica
-import java.util.*;
+import java.math.BigInteger;
 
 /**
  * <pre>
@@ -48,8 +48,8 @@ class DMULT extends ALU_RType {
   final int RT_FIELD = 1;
   final String OPCODE_VALUE = "011100";
 
-  String lo;
-  String hi;
+  private String lo;
+  private String hi;
 
   DMULT() {
     super.OPCODE_VALUE = OPCODE_VALUE;
@@ -75,7 +75,6 @@ class DMULT extends ALU_RType {
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
 
     //getting values from temporary registers
-    boolean sign;
     BigInteger rs = new BigInteger(Long.toString(TR[RS_FIELD].getValue()));
     BigInteger rt = new BigInteger(Long.toString(TR[RT_FIELD].getValue()));
     BigInteger result = rs.multiply(rt);

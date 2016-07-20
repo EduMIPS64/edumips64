@@ -350,16 +350,6 @@ public class BitSet64 extends FixedBitSet {
    * @throws IrregularWriteOperationException if value is not correct or anything else goes wrong during the operation
    */
   public void writeDoubleWord(long value) throws IrregularWriteOperationException {
-    if (-value > Math.pow(2.0, 63.0) || value >= Math.pow(2.0, 63.0)) {
-      /*System.out.println("writeDoubleWord, hai tentato di scrivere un numero troppo grande: " + value);
-      System.out.println( -value + " > " + Math.pow(2.0, 63.0));
-      System.out.println(-value > Math.pow(2.0,63.0));
-      System.out.println( (double)value + " >= " + Math.pow(2.0, 63.0));
-      System.out.println((double)value >= Math.pow(2.0,63.0));
-      */
-      //throw new IrregularWriteOperationException();
-    }
-
     String bits = Converter.positiveIntToBin(value);
 
     if (value >= 0) {

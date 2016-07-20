@@ -24,10 +24,14 @@
  */
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
-import org.edumips64.utils.*;
-
-import java.util.logging.Logger;
+import org.edumips64.core.IrregularWriteOperationException;
+import org.edumips64.core.Memory;
+import org.edumips64.core.MemoryElement;
+import org.edumips64.core.MemoryElementNotFoundException;
+import org.edumips64.core.NotAlignException;
+import org.edumips64.utils.Converter;
+import org.edumips64.utils.CurrentLocale;
+import org.edumips64.utils.IrregularStringOfBitsException;
 
 /**This is the base class of Load store instructions
  *
@@ -47,9 +51,6 @@ public abstract class LDSTInstructions extends Instruction {
   final static int OFFSET_FIELD_LENGTH = 16;
   final static int BASE_FIELD_LENGTH = 5;
 
-  // Logger instance
-  private static final Logger logger = Logger.getLogger(LDSTInstructions.class.getName());
-
   // Size of the read/write operations. Must be set by derived classes
   protected byte memoryOpSize;
 
@@ -68,9 +69,6 @@ public abstract class LDSTInstructions extends Instruction {
     this.memory = memory;
   }
 
-  public void setOpcode(String opcode) {
-
-  }
   public void IF() {
     try {
       dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
@@ -78,7 +76,7 @@ public abstract class LDSTInstructions extends Instruction {
       e.printStackTrace();
     }
   }
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, WAWException {};
+  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, WAWException {}
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException, AddressErrorException {
     // Compute the address
@@ -99,7 +97,7 @@ public abstract class LDSTInstructions extends Instruction {
       throw new NotAlignException(message);
     }
 
-  };
+  }
 
   // This is the method that actually stores/loads data to/from memory, and
   // that is different for each concrete sub-class
@@ -108,7 +106,8 @@ public abstract class LDSTInstructions extends Instruction {
   // Does the necessary operations (e.g., forwarding) before and after the
   // execution of doMEM();
   public abstract void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
-  public void WB() throws IrregularStringOfBitsException {};
+  public void WB() throws IrregularStringOfBitsException {}
+
   public void pack() throws IrregularStringOfBitsException {
     //conversion of instruction parameters of params list to the "repr" 32 binary value
     repr.setBits(OPCODE_VALUE, 0);
