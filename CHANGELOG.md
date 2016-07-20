@@ -1,5 +1,27 @@
 # EduMIPS64 ChangeLog
 
+## Unreleased
+### Added
+- Compiled the core to JavaScript. It's possible to run the EduMIPS64 core
+  in the browser! A very simplistic prototype is available at 
+  www.edumips.org/edumips64.html.
+- Developer guide, with documentation useful for developers that want to
+  contribute.
+### Changed
+### Fixed
+- Values that exceed data types' limits are silently discarded in .data (Issue
+  #1)
+- Parsing an invalid double should raise IrregularStringOfBitsException (Issue
+  #77)
+- Lots of code quality fixes, thanks to the Codacity analysis
+- Added more unit tests (including, but not limited to, FPU, SYSCALL and
+  out-of-order execution. Started tracking and improving code coverage
+- Removed all uses of the Singleton design pattern (Issue #83)
+- CRLF bug on windows (Issue #95)
+- The code size should not take into account BUBBLE instructions (Issue #84)
+- Better dependency handling (Issue #74)
+- Fixed handling of the %% placeholder in the parser
+
 ## 1.2.2 (10/06/2016) - Contrada Fumata
 ### Fixed
 - JR does not respect RAW stalls (Issue #68)
