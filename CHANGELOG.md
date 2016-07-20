@@ -17,6 +17,7 @@
 ### Added
 - Build JAR for every master push and make it available at a known location
   (Issue #30)
+
 ### Fixed
 - Settings window's buttons are often hidden (Issue #38)
 - StringIndexOutOfBoundsException raised at run-time (Issue #36)
@@ -39,6 +40,7 @@
   standard Java feature (Issue #27) (andrea).
 - New Ant targets to build JAR files with no embedded libraries, useful for
   distro packagers (andrea)
+
 ### Fixed:
 - Issue #9 (Handle the JavaHelp dependency in a better way) (andrea)
 - Issue #13 (Fix src-release ant target) (andrea)
@@ -62,6 +64,7 @@
 ## 1.0 (24/11/2012) - Philadelphia
 ### Added
 - Floating Point Unit support (developed by max83t)
+
 ### Fixed
 - Issue #14 (ant javadoc not working)
 - Issue #15 (Make debug mode change verbosity)
@@ -82,6 +85,7 @@
   vanni)
 - Added labels to the GUIData frame; fixed GUIData and GUICode default column
   widths so that they can be read (andrea)
+
 ### Fixed
 - bugs #8 (Weird GUI under Mac OS X) and #9 (Incorrect behavior of
   MOVN and MOVZ)
@@ -104,6 +108,7 @@
 - Updated embedded manual with a SYSCALL page (jesky)
 - Added the MIPS alias to each register's name in the Registers window (andrea)
 - Added debug info to svnjar (mancausoft)
+
 ### Fixed
 - Parser bug fixes (mancausoft)
 - Memory bug fixes (mancausoft)
@@ -126,6 +131,7 @@
 - Updated manual (MIPS32 group, andrea)
 - Clear button for the I/O window (andrea)
 - Changed default interval between cycles from 100ms to 10ms (andrea)
+
 ### Fixed
 - Fixed compilation under Java 6 (andrea)
 - Bug fix in the locale files (andrea)
@@ -165,6 +171,7 @@
 - Italian translation of the PDF manual (simona)
 - #include command (mancausoft)
 - .word64 directive (andrea)
+
 ### Fixed
 - Fixed a bug in SYSCALL 5. (andrea)
 
@@ -174,6 +181,7 @@
   exceptions stop the CPU (andrea)
 - Appended three dots to those menu items that open new dialogs, according
   to a widespread convention (andrea)
+
 ### Changed
 - Removed an useless debug print in the BREAK instruction (andrea)
 - Changed the "Run to" text to "Run", the "Completa" text to "Esegui". and
@@ -187,6 +195,7 @@
 ## 0.3.5.1 (17/09/2006)
 ### Added
 - TRAP 0 is recognized as the end of the program, like SYSCALL 0 and HALT (andrea)
+
 ### Fixed
 - Fixed a bug in labels handling: now only case insensitive labels are
   accepted (andrea)
@@ -216,6 +225,7 @@
 - Makefile updated with the I/O icon (mancausoft)
 - The parser now recognizes SYSCALL 0 as HALT, and it doesn't complain if a
   SYSCALL 0 closes the program (mancausoft)
+
 ### Changed
 - The HALT instruction is added to the list of deprecated instruction (mancausoft)
 
@@ -246,6 +256,7 @@
 - Added the right locale entries for the log window's title. (andrea)
 - The .space instruction now accepts an hexadecimal parameter too. (andrea)
 - Parser code improvements and cleanups (mancausoft + andrea)
+
 ### Fixed
 - Corrected a bug that made fatal errors send the CPU in an infinite loop.
   At least, now we can read the log when there's a fatal error. (andrea)
@@ -264,12 +275,14 @@
   executing "ant". (andrea)
 - Advanced frames handling (improved tiling algorithm, ability to hide/unhide
   windows from menu) (andrea)
+
 ### Changed
 - The "Execute" and the "Tools" menu now become gray if all the inner items
   are not available (andrea)
 - Log window icon (vanni)
 - CPUGUIThread now doesn't wait for the sleep interval to pass when a single
   step is issued (andrea)
+
 ### Fixed
 - Integer overflow and division by zero exception handling.
   The execution is stopped if one of these exceptions is raised. This solved
@@ -283,6 +296,7 @@
 ### Added
 - Added the ability to customize the delay between cycles in verbose mode (andrea)
 - The jar file can be used as an applet (vanni)
+
 ### Fixed
 - JDialog + XGl fix (mancausoft + andrea)
 - JApplet + XGl fix (mancausoft)
@@ -296,6 +310,7 @@
   - Handled the FileNotFoundException exception in the Main class. (andrea)
 - In DineroFrontend, dineroIV is invoked if you press Enter when you are in
   the parameters textfield. (andrea)
+
 ### Changed
 - Updated the manual according to the last changes. (andrea)
 
@@ -319,8 +334,10 @@
 - Added the Dinero Path to the Preferences (vanni)
 - The parser reads the file as it's ISO-8859-1. (mancausoft) [Will be made customizable later].
 - Added some instructions in the Italian manual (Vanni)
+
 ### Changed
 - Better About Window (vanni)
+
 ### Fixed
 - Fixed the "negative memory address" bug (mancausoft)
 - Fixed a bug in the CPU reset: now LO and HI are correctly resetted (andrea)
@@ -328,11 +345,13 @@
 ## 0.2 (26/06/2006) [Public Release]
 ### Added
 - Now in the titlebar there's the version number (andrea)
+
 ### Fixed
 - Fixed Dinero Frontend font that in some PCs wasn't monospaced. (andrea)
 - Fixed a DDIV bug: semaphores where wrongly decremented if there was a
   division by zero and forwarding was disabled (mancausoft)
 - Fixed a micro-bug in the translations (andrea)
+
 ### Changed
 - Changed DineroIV default options (andrea)
 
@@ -340,8 +359,10 @@
 ### Added
 - The status bar displays the decimal value of a register or of a memory
   cell if you click on it (vanni) [I told you that the status bar would be useful.. :P]
+
 ### Changed
 - Updated the manual in order to include recent features. (andrea)
+
 ### Fixed
 - Removed accented letters from the italian version of the manual (ale)
 - Now the Manual is a modal dialog, so we solve the multiple-opening
@@ -366,6 +387,7 @@
   the Main class (andrea)
 - The code window now focuses on the IF row even if it's not in the range
   of currently visible rows (andrea)
+
 ### Fixed
 - Fixed the "Timmy bug": memory location that don't hold a value ara
   automatically set to zero and a warning is shown (mancausoft)
@@ -382,6 +404,7 @@
 ### Added
 - Updated documentation for the new warnings menu option (andrea).
 - Added an option to enable/disable warnings (vanni).
+
 ### Fixed
 - Fixed the bug in the Gui Code frame that made the fetched instruction
   not to have its own colored background (andrea).
@@ -392,7 +415,8 @@
 ### Added
 - Added the split size chooser in the Cycles window (Filippo)
 - Added a note in the changelog with the name of the author of the change
-  entry(andrea)
+  entry (andrea)
+
 ### Fixed
 - Fixed (maybe) the GREAT FORWARDING BUG (mancausoft)
 - Dinero Frontend now works under Windows and Linux, with the standard
@@ -407,8 +431,10 @@
 ## 0.1 (17/06/2006)
 ### Added
   - Recent files list (vanni)
+
 ### Changed
   - Dinero frontend disabled under windows (andrea)
+
 ### Fixed
   - Fixed the "infinite open" bug (mancausoft)
 
@@ -416,6 +442,7 @@
 ### Added
   - Added release_notes, readme, changelog, install, authors to the source
     distribution (andrea)
+
 ### Fixed
   - Fixed the config bug: saving config file into the .jar didn't work if
     there were spaces in the current directory name (andrea)
