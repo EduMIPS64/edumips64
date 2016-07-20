@@ -8,12 +8,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.containsString;
 
 public class CPUTest extends BaseTest {
-  private Memory m;
   private CPU cpu;
 
   @Before
   public void setUp() throws Exception {
-    m = new Memory();
+    Memory m = new Memory();
     cpu = new CPU(m, config);
   }
 

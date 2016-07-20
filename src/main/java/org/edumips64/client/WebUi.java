@@ -18,12 +18,8 @@ import java.util.logging.Logger;
 public class WebUi implements EntryPoint {
   private CPU cpu;
   private Parser parser;
-  private ConfigStore config;
-  private FileUtils fu;
   private SymbolTable symTab;
   private Memory memory;
-  private InstructionBuilder instructionBuilder;
-  private IOManager iom;
   private Dinero dinero;
 
   // Executes the program. Returns an empty string on success, or an error message.
@@ -74,14 +70,14 @@ public class WebUi implements EntryPoint {
 
   public void init() {
     // Simulator initialization.
-    config = new InMemoryConfigStore(ConfigStore.defaults);
+    ConfigStore config = new InMemoryConfigStore(ConfigStore.defaults);
     memory = new Memory();
     symTab = new SymbolTable(memory);
-    fu = new NullFileUtils();
-    iom = new IOManager(fu, memory);
+    FileUtils fu = new NullFileUtils();
+    IOManager iom = new IOManager(fu, memory);
     cpu = new CPU(memory, config);
     dinero = new Dinero(memory);
-    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
+    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
   }
 }

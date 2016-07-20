@@ -65,17 +65,13 @@ public class Parser {
   {zero, at, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, k0, k1, gp, sp, fp, ra}
   private static final String deprecateInstruction[] = {"BNEZ", "BEQZ", "HALT", "DADDUI", "L.D", "S.D"};
 
-  private ParserMultiWarningException warning;
   private ParserMultiException error;
-  private boolean isFirstOutOfMemory;
   /** Base basePath to use for further #include directives. */
   private String basePath;
   private int numError;
-  private int numWarning;
-  /** Instance of Parser
-  */
-  private static Parser instance = null;
-  private enum FileSection {NONE, DATA, TEXT};
+
+  private enum FileSection {NONE, DATA, TEXT}
+
   private FileSection section;
   /** File to be parsed
   */
@@ -181,7 +177,7 @@ public class Parser {
     int i = 0;
 
     //check loop
-    Stack<String> included = new Stack<String>();
+    Stack<String> included = new Stack<>();
     included.push(this.filename);
 
     checkLoop(filetmp, included);
@@ -215,17 +211,16 @@ public class Parser {
 
   public void doParsing(String code) throws ParserMultiException {
     boolean isFirstOutOfInstructionMemory = true;
-    isFirstOutOfMemory = true;
+    boolean isFirstOutOfMemory = true;
     boolean halt = false;
     int row = 0;
-    int nline = 0;
     numError = 0;
-    numWarning = 0;
+    int numWarning = 0;
     int instrCount = -4;    // Hack fituso by Andrea
     error = new ParserMultiException();
-    warning = new ParserMultiWarningException();
+    ParserMultiWarningException warning = new ParserMultiWarningException();
 
-    LinkedList<VoidJump> voidJump = new LinkedList<VoidJump>();
+    LinkedList<VoidJump> voidJump = new LinkedList<>();
 
     memoryCount = 0;
     String lastLabel = "";
@@ -258,7 +253,7 @@ public class Parser {
         int end = Math.min(tab, space) - 1;
 
         String instr = line.substring(i, end + 1);
-        String parameters = null;
+        String parameters;
 
         try {
           if (line.charAt(i) == '.') {
@@ -309,7 +304,7 @@ public class Parser {
                 continue;
               }
 
-              MemoryElement tmpMem = null;
+              MemoryElement tmpMem;
               tmpMem = mem.getCellByIndex(memoryCount);
               logger.info("line: " + line);
               String[] comment = (line.substring(i)).split(";", 2);
@@ -450,19 +445,19 @@ public class Parser {
                 end = line.length();
               } else if (instr.compareToIgnoreCase(".WORD") == 0 || instr.compareToIgnoreCase(".WORD64") == 0) {
                 logger.info("pamword: " + parameters);
-                writeIntegerInMemory(row, i, end, line, parameters, 64, "WORD");
+                writeIntegerInMemory(row, i, line, parameters, 64, "WORD");
                 end = line.length();
               } else if (instr.compareToIgnoreCase(".WORD32") == 0) {
-                writeIntegerInMemory(row, i, end, line, parameters, 32, "WORD32");
+                writeIntegerInMemory(row, i, line, parameters, 32, "WORD32");
                 end = line.length();
               } else if (instr.compareToIgnoreCase(".BYTE") == 0) {
-                writeIntegerInMemory(row, i, end, line, parameters, 8, "BYTE");
+                writeIntegerInMemory(row, i, line, parameters, 8, "BYTE");
                 end = line.length();
               } else if (instr.compareToIgnoreCase(".WORD16") == 0) {
-                writeIntegerInMemory(row, i, end, line, parameters, 16 , "WORD16");
+                writeIntegerInMemory(row, i, line, parameters, 16 , "WORD16");
                 end = line.length();
               } else if (instr.compareToIgnoreCase(".DOUBLE") == 0) {
-                writeDoubleInMemory(row, i, end, line, parameters);
+                writeDoubleInMemory(row, i, line, parameters);
                 end = line.length();
               } else {
                 numError++;
@@ -514,7 +509,7 @@ public class Parser {
                 if (deprecateInstruction[timmy].toUpperCase().equals(line.substring(i, end).toUpperCase())) {
                   warning.add("WINMIPS64_NOT_MIPS64", row, i + 1, line);
                   error.addWarning("WINMIPS64_NOT_MIPS64", row, i + 1, line);
-                  numWarning ++;
+                  numWarning++;
                 }
               }
 
@@ -672,7 +667,7 @@ public class Parser {
 
                       } else {
                         try {
-                          int offset = 0, cc;
+                          int cc;
                           MemoryElement tmpMem;
                           cc = param.indexOf("+", indPar);
 
@@ -1212,7 +1207,6 @@ public class Parser {
         symTab.setInstructionLabel((instrCount + 4), "");
       } catch (SymbolTableOverflowException ex) {
         if (isFirstOutOfInstructionMemory) { //is first out of memory?
-          isFirstOutOfInstructionMemory = false;
           numError++;
           error.add("OUTOFINSTRUCTIONMEMORY", row, 0, "Halt");
         }
@@ -1275,7 +1269,7 @@ public class Parser {
       if (reg.charAt(0) == '$' && (num = isAlias(reg.substring(1))) != -1) {
         return num;
       }
-    } catch (Exception e) {}
+    } catch (Exception ignored) {}
 
     return -1;
   }
@@ -1301,7 +1295,7 @@ public class Parser {
       if (reg.charAt(0) == '$' && (num = isAlias(reg.substring(1))) != -1) {
         return num;
       }
-    } catch (Exception e) {}
+    } catch (Exception ignored) {}
 
     return -1;
   }
@@ -1388,11 +1382,10 @@ public class Parser {
   /** Write a double in memory
    *  @param row number of row
    *  @param i
-   *  @param end
    *  @param line the line of code
    *  @param instr params
    */
-  private void writeDoubleInMemory(int row,  int i, int end, String line, String instr) throws MemoryElementNotFoundException {
+  private void writeDoubleInMemory(int row, int i, String line, String instr) throws MemoryElementNotFoundException {
     String value[] = instr.split(",");
     MemoryElement tmpMem;
 
@@ -1421,13 +1414,12 @@ public class Parser {
   /** Write an integer in memory
    *  @param row number of row
    *  @param i
-   *  @param end
    *  @param line the line of code
    *  @param instr
    *  @param numBit
    *  @param name type of data
    */
-  private void writeIntegerInMemory(int row,  int i, int end, String line, String instr, int numBit, String name) throws MemoryElementNotFoundException {
+  private void writeIntegerInMemory(int row, int i, String line, String instr, int numBit, String name) throws MemoryElementNotFoundException {
     int posInWord = 0; //position of byte to write into a doubleword
     String value[] = instr.split(",");
     MemoryElement tmpMem = null;
@@ -1492,8 +1484,8 @@ public class Parser {
   }
 
   private List<String> splitStringParameters(String params, boolean auto_terminate) throws StringFormatException {
-    List<String> pList = new LinkedList<String>();
-    StringBuffer temp = new StringBuffer();
+    List<String> pList = new LinkedList<>();
+    StringBuilder temp = new StringBuilder();
     logger.info("Params: " + params);
     params = params.trim();
     logger.info("After trimming: " + params);

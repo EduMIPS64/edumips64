@@ -23,14 +23,14 @@
 
 package org.edumips64.ui.swing;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.*;
-import javax.swing.*;
-import java.awt.event.*;
-import java.io.*;
+import org.edumips64.utils.CurrentLocale;
 
-import org.edumips64.utils.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
+import java.awt.Component;
+import java.awt.Dimension;
 
 /** StatusBar class
  *  @author Andrea Spadaccini
@@ -39,7 +39,6 @@ import org.edumips64.utils.*;
 public class StatusBar {
   private JLabel statusLabel;
   private JProgressBar pb;
-  private Box box;
   private Component sbComponent;
 
   public StatusBar() {
@@ -51,7 +50,7 @@ public class StatusBar {
     //pb.setIndeterminate(true);
 
     //statusLabel.setBorder(BorderFactory.createLoweredBevelBorder());
-    box = Box.createHorizontalBox();
+    Box box = Box.createHorizontalBox();
     box.setBorder(BorderFactory.createLoweredBevelBorder());
     box.add(statusLabel);
     box.add(Box.createHorizontalGlue());

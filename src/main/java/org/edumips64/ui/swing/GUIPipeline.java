@@ -34,40 +34,13 @@ import java.util.*;
 * and the units for floating point operations.
 * @author Filippo Mondello
 */
-public class GUIPipeline extends GUIComponent {
-  Pannello1 pannello;
+class GUIPipeline extends GUIComponent {
+  private Pannello1 pannello;
 
   private int numMultiplier;
   private int numAdder;
 
-  Map <CPU.PipeStage, Instruction> pipeline;
-
-  /**
-  * Set the number of multiplier latency stages.
-  * Currently this method is not used.
-  */
-
-
-  public void setNumMultiplier(int n) throws OutOfRangeException {
-    if ((n >= 2) && (n <= 8)) {
-      numMultiplier = n;
-    } else {
-      throw new OutOfRangeException();
-    }
-  }
-
-  /**
-  * Set the number of adder latency stages.
-  * Currently this method is not used.
-  */
-  public void setNumAdder(int n) throws OutOfRangeException {
-    if ((n >= 2) && (n <= 8)) {
-      numAdder = n;
-    } else {
-      throw new OutOfRangeException();
-    }
-  }
-
+  private Map <CPU.PipeStage, Instruction> pipeline;
 
   GUIPipeline(CPU cpu, Memory memory, ConfigStore config) {
     super(cpu, memory, config);
@@ -83,23 +56,18 @@ public class GUIPipeline extends GUIComponent {
     draw();
   }
 
+  @Override
   public void update() {
     pipeline = cpu.getPipeline();
-
-    Instruction i = pipeline.get(CPU.PipeStage.IF);
-    i = pipeline.get(CPU.PipeStage.ID);
-    i = pipeline.get(CPU.PipeStage.EX);
-    i = pipeline.get(CPU.PipeStage.MEM);
-    i = pipeline.get(CPU.PipeStage.WB);
   }
 
   public void draw() {
     cont.repaint();
   }
 
-  int dimCar;
+  private int dimCar;
 
-  class Pannello1 extends JPanel {
+  private class Pannello1 extends JPanel {
     int alt, largh;
 
     public void paintComponent(Graphics g) {
@@ -183,7 +151,7 @@ public class GUIPipeline extends GUIComponent {
       }
 
       Font f1 = new Font("Arial", Font.PLAIN, dimCar);
-      FontMetrics fm1 = g.getFontMetrics(f1);
+      g.getFontMetrics(f1);
       g.setFont(f1);
       //Stringhe all'interno dei blocchi
       g.drawString("IF", largh * 17 / 200, (alt / 2));
@@ -202,7 +170,7 @@ public class GUIPipeline extends GUIComponent {
     /*Per ogni blocco della pipeline, all'interno di questa funzione dovrÃ² controllare se c'Ãš
     qualche istruzione, e in tal caso colorare il blocco e scrivere il nome dell'istruzione
     */
-    public void riempiBlocchi(Graphics g) {
+    void riempiBlocchi(Graphics g) {
       g.setColor(Color.white);
       g.fillRect(largh / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       g.fillRect(largh * 4 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
@@ -341,9 +309,9 @@ public class GUIPipeline extends GUIComponent {
     /**
     *Questo metodo stampa all'interno di ogni blocco della pipeline il nome dell'istruzione che viÃš all'interno.
     */
-    public void riempiStringhe(Graphics g) {
+    void riempiStringhe(Graphics g) {
       Font f1 = new Font("Arial", Font.PLAIN, dimCar - 3);
-      FontMetrics fm1 = g.getFontMetrics(f1);
+      g.getFontMetrics(f1);
       g.setFont(f1);
       g.setColor(Color.blue);
       Instruction i = pipeline.get(CPU.PipeStage.IF);
