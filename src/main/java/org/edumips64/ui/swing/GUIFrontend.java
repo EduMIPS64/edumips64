@@ -36,15 +36,15 @@ import java.util.logging.Logger;
 */
 public class GUIFrontend {
 
-  GUICycles cycles;
-  GUIRegisters regs;
-  GUIStatistics stats;
-  GUIPipeline pipe;
-  GUIData data;
-  GUICode code;
+  private GUICycles cycles;
+  private GUIRegisters regs;
+  private GUIStatistics stats;
+  private GUIPipeline pipe;
+  private GUIData data;
+  private GUICode code;
 
   // Array containing the six components, useful to write more compact code
-  GUIComponent components[];
+  private GUIComponent components[];
 
   private static final Logger logger = Logger.getLogger(GUIFrontend.class.getName());
 
@@ -116,11 +116,9 @@ public class GUIFrontend {
   public void updateComponents() {
     if (!SwingUtilities.isEventDispatchThread()) {
       try {
-        SwingUtilities.invokeAndWait(new Runnable() {
-          public void run() {
-            for (GUIComponent c : components) {
-              c.update();
-            }
+        SwingUtilities.invokeAndWait(() -> {
+          for (GUIComponent c : components) {
+            c.update();
           }
         });
       } catch (InterruptedException e) {
@@ -150,11 +148,9 @@ public class GUIFrontend {
   public void represent() {
     if (!SwingUtilities.isEventDispatchThread()) {
       try {
-        SwingUtilities.invokeAndWait(new Runnable() {
-          public void run() {
-            for (GUIComponent c : components) {
-              c.draw();
-            }
+        SwingUtilities.invokeAndWait(() -> {
+          for (GUIComponent c : components) {
+            c.draw();
           }
         });
       } catch (InterruptedException e) {
@@ -173,7 +169,7 @@ public class GUIFrontend {
    * Static utility method that saves the column width of a table, redraws
    * its header labels and then restores the widths
    */
-  public static void updateColumnHeaderNames(JTable table) {
+  static void updateColumnHeaderNames(JTable table) {
     // We need to save and restore the column widths, because the
     // createDeafultColumnsFromModel(), the method that we use to refresh
     // the column names, restores the default width.
