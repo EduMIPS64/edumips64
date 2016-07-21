@@ -421,7 +421,7 @@ public class EndToEndTests extends BaseTest {
   /* Tests for masking synchronous exceptions. Termination cannot be tested here since it's in the CPUGuiThread. */
   @Test(expected = SynchronousException.class)
   public void testDivisionByZeroThrowException() throws Exception {
-    config.putBoolean("syncex-masked", false);
+    config.putBoolean("syncexc-masked", false);
     runMipsTest("div0.s");
   }
 
