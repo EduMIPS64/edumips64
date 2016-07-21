@@ -1,10 +1,11 @@
-EduMIPS64 Authors
-=================
+# Authors
 
-Current mantainer and main developer:
+## Current mantainer and main developer
+
 * Andrea Spadaccini (andrea.spadaccini@gmail.com, spadaccio@google.com)
 
-Former developers (in alphabetical order):
+## Former core developers (in alphabetical order)
+
 * Alessandro Nicolosi - <alenico84(at)hotmail(dot)com>
 * Andrea Milazzo (Wiki Administrator) - <mancausoft(at)edumips(dot)org>
 * Antonella Scandura - <anto(dot)tuny(at)hotmail(dot)it>
