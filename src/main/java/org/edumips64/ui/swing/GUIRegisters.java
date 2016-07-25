@@ -27,10 +27,7 @@ import org.edumips64.core.CPU;
 import org.edumips64.core.Memory;
 import org.edumips64.core.Register;
 import org.edumips64.core.RegisterFP;
-import org.edumips64.utils.ConfigStore;
-import org.edumips64.utils.Converter;
-import org.edumips64.utils.CurrentLocale;
-import org.edumips64.utils.IrregularStringOfHexException;
+import org.edumips64.utils.*;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -201,7 +198,7 @@ class GUIRegisters extends GUIComponent {
     }
 
     String fillFirstColumn(int i) {
-      if (config.getBoolean("show_aliases")) {
+      if (config.getBoolean(ConfigKey.SHOW_ALIASES)) {
         return registerToAlias(" " + i) + "=";
       } else {
         return "R" + i + " =";

@@ -230,7 +230,7 @@ public class Main extends JApplet {
 
     configStore = new JavaPrefsConfigStore(ConfigStore.defaults);
     CurrentLocale.setConfig(configStore);
-    jfc = new JFileChooser(new File(configStore.getString("lastdir")));
+    jfc = new JFileChooser(new File(configStore.getString(ConfigKey.LAST_DIR)));
 
     desk = new JDesktopPane();
     Container cp = (f == null) ? getContentPane() : f.getContentPane();
@@ -468,7 +468,7 @@ public class Main extends JApplet {
         String absoluteFilename = new File(file).getAbsolutePath();
         parser.parse(absoluteFilename);
       } catch (ParserMultiWarningException pmwe) {
-        new ErrorDialog(f, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean("warnings"));
+        new ErrorDialog(f, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
       } catch (NullPointerException e) {
         log.info("NullPointerException: " + e.toString());
         e.printStackTrace();
@@ -500,7 +500,7 @@ public class Main extends JApplet {
       f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
     } catch (ParserMultiException ex) {
       log.info("Error opening " + file);
-      new ErrorDialog(f, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean("warnings"));
+      new ErrorDialog(f, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
       openedFile = null;
       f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
       resetSimulator(false);
@@ -710,7 +710,7 @@ public class Main extends JApplet {
 
         if (val == JFileChooser.APPROVE_OPTION) {
           String filename = jfc.getSelectedFile().getPath();
-          configStore.putString("lastdir", jfc.getCurrentDirectory().getAbsolutePath());
+          configStore.putString(ConfigKey.LAST_DIR, jfc.getCurrentDirectory().getAbsolutePath());
           addFileToRecentMenu(filename);
 
           resetSimulator(false);
@@ -721,7 +721,7 @@ public class Main extends JApplet {
     });
 
     // Add recently opened files menu items to the recent files submenu.
-    for (String filename : Arrays.asList(configStore.getString("files").split(File.pathSeparator))) {
+    for (String filename : Arrays.asList(configStore.getString(ConfigKey.FILES).split(File.pathSeparator))) {
       if (filename.length() > 0) {
         log.info("Adding '" + filename + "' to recently opened files.");
         addFileToRecentMenu(filename);
@@ -806,7 +806,7 @@ public class Main extends JApplet {
     multi_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
     multi_cycle.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        cgt.setSteps(configStore.getInt("n_step"));
+        cgt.setSteps(configStore.getInt(ConfigKey.N_STEPS));
 
         synchronized (cgt) {
           cgt.notify();
@@ -839,7 +839,7 @@ public class Main extends JApplet {
       lang_en = new JCheckBoxMenuItem(
         CurrentLocale.getString("MenuItem.ENGLISH"),
         new ImageIcon(IMGLoader.getImage("en.png")),
-        configStore.getString("language").equals("en"));
+        configStore.getString(ConfigKey.LANGUAGE).equals("en"));
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -850,7 +850,7 @@ public class Main extends JApplet {
       public void actionPerformed(ActionEvent e) {
         lang_en.setState(true);
         lang_it.setState(false);
-        configStore.putString("language", "en");
+        configStore.putString(ConfigKey.LANGUAGE, "en");
         initMenuItems();
         setFrameTitles();
         front.updateLanguageStrings();
@@ -862,7 +862,7 @@ public class Main extends JApplet {
       lang_it = new JCheckBoxMenuItem(
         CurrentLocale.getString("MenuItem.ITALIAN"),
         new ImageIcon(IMGLoader.getImage("it.png")),
-        configStore.getString("language").equals("it"));
+        configStore.getString(ConfigKey.LANGUAGE).equals("it"));
 
       lang.add(lang_it);
     } catch (IOException e) {
@@ -873,7 +873,7 @@ public class Main extends JApplet {
       public void actionPerformed(ActionEvent e) {
         lang_it.setState(true);
         lang_en.setState(false);
-        configStore.putString("language", "it");
+        configStore.putString(ConfigKey.LANGUAGE, "it");
         initMenuItems();
         setFrameTitles();
         front.updateLanguageStrings();
@@ -1067,7 +1067,7 @@ public class Main extends JApplet {
     }
 
     files = files.substring(0, files.length() - 1);
-    configStore.putString("files", files);
+    configStore.putString(ConfigKey.FILES, files);
   }
 
   /** Sets the caption of the menu item, adding, if possible, the mnemonic */

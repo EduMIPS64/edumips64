@@ -24,6 +24,7 @@
 package org.edumips64.ui.swing;
 
 import org.edumips64.core.Dinero;
+import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.io.LocalWriterAdapter;
 
@@ -117,7 +118,7 @@ public class DineroFrontend extends JDialog {
     JLabel pathLabel = new JLabel("DineroIV executable path:");
     JLabel paramsLabel = new JLabel("Command line parameters:");
 
-    path = new JTextField(config.getString("dineroIV"));
+    path = new JTextField(config.getString(ConfigKey.DINERO));
     params = new JTextField("-l1-usize 512 -l1-ubsize 64");
 
     path.setPreferredSize(new Dimension(400, 26));
@@ -146,7 +147,7 @@ public class DineroFrontend extends JDialog {
       int val = jfc.showOpenDialog(null);
 
       if (val == JFileChooser.APPROVE_OPTION) {
-        config.putString("dineroIV", jfc.getSelectedFile().getPath());
+        config.putString(ConfigKey.DINERO, jfc.getSelectedFile().getPath());
         path.setText(jfc.getSelectedFile().getPath());
       }
     });

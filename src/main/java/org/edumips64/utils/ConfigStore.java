@@ -32,75 +32,75 @@ import java.util.logging.Logger;
  * storage object by calling the getConfig method of ConfigManager.
  * */
 public abstract class ConfigStore {
-  public static Map<String, Object> defaults;
+  public static Map<ConfigKey, Object> defaults;
   static {
     ConfigStore.defaults = new HashMap<>();
 
     // Global parameters.
-    ConfigStore.defaults.put("language", "en");
-    ConfigStore.defaults.put("files", "");
+    ConfigStore.defaults.put(ConfigKey.LANGUAGE, "en");
+    ConfigStore.defaults.put(ConfigKey.FILES, "");
     // TODO(andrea): this will create problems in the applet, and needs to be
     // encapsulated in some way.
-    ConfigStore.defaults.put("lastdir", System.getProperty("user.dir", ""));
-    ConfigStore.defaults.put("dineroIV", "dineroIV");
-    ConfigStore.defaults.put("serialNumber", 0);
+    ConfigStore.defaults.put(ConfigKey.LAST_DIR, System.getProperty("user.dir", ""));
+    ConfigStore.defaults.put(ConfigKey.DINERO, "dineroIV");
+    ConfigStore.defaults.put(ConfigKey.SERIAL_NUMBER, 0);
 
     // Colors.
-    ConfigStore.defaults.put("IFColor", -256);                // Color.yellow.getRGB())
-    ConfigStore.defaults.put("IDColor", -16746256);           // Color(0, 120, 240).getRGB());
-    ConfigStore.defaults.put("EXColor", -65536);              // Color.red.getRGB());
-    ConfigStore.defaults.put("MEMColor", -16711936);          // Color.green.getRGB());
-    ConfigStore.defaults.put("FPAdderColor", -16744448);      // Color(0, 128, 0).getRGB());
-    ConfigStore.defaults.put("FPMultiplierColor",-16744320);  // Color(0, 128, 128).getRGB());
-    ConfigStore.defaults.put("FPDividerColor", -8355840);     // Color(128, 128, 0).getRGB());
-    ConfigStore.defaults.put("WBColor", -5111630);            // Color.magenta.darker().getRGB());
-    ConfigStore.defaults.put("RAWColor", -16776961);          // Color.blue.brighter().getRGB());
-    ConfigStore.defaults.put("SAMEIFColor", -6908236);        // Color(150, 150, 180).getRGB());
+    ConfigStore.defaults.put(ConfigKey.IF_COLOR, -256);                // Color.yellow.getRGB())
+    ConfigStore.defaults.put(ConfigKey.ID_COLOR, -16746256);           // Color(0, 120, 240).getRGB());
+    ConfigStore.defaults.put(ConfigKey.EX_COLOR, -65536);              // Color.red.getRGB());
+    ConfigStore.defaults.put(ConfigKey.MEM_COLOR, -16711936);          // Color.green.getRGB());
+    ConfigStore.defaults.put(ConfigKey.FP_ADDER_COLOR, -16744448);      // Color(0, 128, 0).getRGB());
+    ConfigStore.defaults.put(ConfigKey.FP_MULTIPLIER_COLOR,-16744320);  // Color(0, 128, 128).getRGB());
+    ConfigStore.defaults.put(ConfigKey.FP_DIVIDER_COLOR, -8355840);     // Color(128, 128, 0).getRGB());
+    ConfigStore.defaults.put(ConfigKey.WB_COLOR, -5111630);            // Color.magenta.darker().getRGB());
+    ConfigStore.defaults.put(ConfigKey.RAW_COLOR, -16776961);          // Color.blue.brighter().getRGB());
+    ConfigStore.defaults.put(ConfigKey.SAME_IF_COLOR, -6908236);        // Color(150, 150, 180).getRGB());
 
     // Simulation parameters.
-    ConfigStore.defaults.put("forwarding", false);
-    ConfigStore.defaults.put("warnings", false);
-    ConfigStore.defaults.put("verbose", true);
-    ConfigStore.defaults.put("syncexc-masked", false);
-    ConfigStore.defaults.put("syncexc-terminate", false);
-    ConfigStore.defaults.put("n_step", 4);
-    ConfigStore.defaults.put("sleep_interval", 10);
-    ConfigStore.defaults.put("show_aliases", false);
+    ConfigStore.defaults.put(ConfigKey.FORWARDING, false);
+    ConfigStore.defaults.put(ConfigKey.WARNINGS, false);
+    ConfigStore.defaults.put(ConfigKey.VERBOSE, true);
+    ConfigStore.defaults.put(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
+    ConfigStore.defaults.put(ConfigKey.SYNC_EXCEPTIONS_TERMINATE, false);
+    ConfigStore.defaults.put(ConfigKey.N_STEPS, 4);
+    ConfigStore.defaults.put(ConfigKey.SLEEP_INTERVAL, 10);
+    ConfigStore.defaults.put(ConfigKey.SHOW_ALIASES, false);
 
     // FPU exceptions defaults.
-    ConfigStore.defaults.put("INVALID_OPERATION", true);
-    ConfigStore.defaults.put("OVERFLOW", true);
-    ConfigStore.defaults.put("UNDERFLOW", true);
-    ConfigStore.defaults.put("DIVIDE_BY_ZERO", true);
+    ConfigStore.defaults.put(ConfigKey.FP_INVALID_OPERATION, true);
+    ConfigStore.defaults.put(ConfigKey.FP_OVERFLOW, true);
+    ConfigStore.defaults.put(ConfigKey.FP_UNDERFLOW, true);
+    ConfigStore.defaults.put(ConfigKey.FP_DIVIDE_BY_ZERO, true);
 
     // FPU Rounding mode defaults.
-    ConfigStore.defaults.put("NEAREST", false);
-    ConfigStore.defaults.put("TOWARDZERO", true);
-    ConfigStore.defaults.put("TOWARDS_PLUS_INFINITY", false);
-    ConfigStore.defaults.put("TOWARDS_MINUS_INFINITY", false);
+    ConfigStore.defaults.put(ConfigKey.FP_NEAREST, false);
+    ConfigStore.defaults.put(ConfigKey.FP_TOWARDS_ZERO, true);
+    ConfigStore.defaults.put(ConfigKey.FP_TOWARDS_PLUS_INFINITY, false);
+    ConfigStore.defaults.put(ConfigKey.FP_TOWARDS_MINUS_INFINITY, false);
 
     // How to show memory cells containing floating point values.
-    ConfigStore.defaults.put("LONGDOUBLEVIEW", true);  // long=true  double=false
+    ConfigStore.defaults.put(ConfigKey.FP_LONG_DOUBLE_VIEW, true);  // long=true  double=false
   }
 
   // The interface exposes getter and setter methods for all the supported
   // types (String, int, boolean, Color). Color is serialized as an int.
-  public abstract void putString(String key, String value);
-  public abstract String getString(String key);
+  public abstract void putString(ConfigKey key, String value);
+  public abstract String getString(ConfigKey key);
 
-  public abstract void putInt(String key, int value);
-  public abstract int getInt(String key);
+  public abstract void putInt(ConfigKey key, int value);
+  public abstract int getInt(ConfigKey key);
 
-  public abstract void putBoolean(String key, boolean value);
-  public abstract boolean getBoolean(String key);
+  public abstract void putBoolean(ConfigKey key, boolean value);
+  public abstract boolean getBoolean(ConfigKey key);
 
   protected static final Logger logger = Logger.getLogger(ConfigStore.class.getName());
 
   // Generic utility function to populate a ConfigStore object from a set of
   // <String, Object> pairs.
-  public void mergeFromGenericMap(Map<String, Object> values) throws ConfigStoreTypeException {
-    for (Map.Entry<String, Object> item : values.entrySet()) {
-      String key = item.getKey();
+  public void mergeFromGenericMap(Map<ConfigKey, Object> values) throws ConfigStoreTypeException {
+    for (Map.Entry<ConfigKey, Object> item : values.entrySet()) {
+      ConfigKey key = item.getKey();
       Object value = item.getValue();
 
       if (value instanceof String) {

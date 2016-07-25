@@ -28,6 +28,7 @@ package org.edumips64;
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
 import org.edumips64.ui.common.CycleBuilder;
+import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.IrregularStringOfBitsException;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
@@ -106,18 +107,18 @@ public class EndToEndTests extends BaseTest {
 
     // Constructor, initializes the values from the Config store.
     public FPUExceptionsConfig() {
-      invalidOperation = config.getBoolean("INVALID_OPERATION");
-      overflow = config.getBoolean("OVERFLOW");
-      underflow = config.getBoolean("UNDERFLOW");
-      divideByZero = config.getBoolean("DIVIDE_BY_ZERO");
+      invalidOperation = config.getBoolean(ConfigKey.FP_INVALID_OPERATION);
+      overflow = config.getBoolean(ConfigKey.FP_OVERFLOW);
+      underflow = config.getBoolean(ConfigKey.FP_UNDERFLOW);
+      divideByZero = config.getBoolean(ConfigKey.FP_DIVIDE_BY_ZERO);
     }
 
     // Restore values to the config Store.
     void restore() {
-      config.putBoolean("INVALID_OPERATION", invalidOperation);
-      config.putBoolean("OVERFLOW", overflow);
-      config.putBoolean("UNDERFLOW", underflow);
-      config.putBoolean("DIVIDE_BY_ZERO", divideByZero);
+      config.putBoolean(ConfigKey.FP_INVALID_OPERATION, invalidOperation);
+      config.putBoolean(ConfigKey.FP_OVERFLOW, overflow);
+      config.putBoolean(ConfigKey.FP_UNDERFLOW, underflow);
+      config.putBoolean(ConfigKey.FP_DIVIDE_BY_ZERO, divideByZero);
     }
   }
 
@@ -136,7 +137,7 @@ public class EndToEndTests extends BaseTest {
     iom.setStdOutput(stdOut);
     InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser  = new Parser(lfu, symTab, memory, instructionBuilder);
-    config.putBoolean("forwarding", true);
+    config.putBoolean(ConfigKey.FORWARDING, true);
     fec = new FPUExceptionsConfig();
   }
 
@@ -204,16 +205,16 @@ public class EndToEndTests extends BaseTest {
    * corresponding CpuTestStatus object.
    */
   private Map<ForwardingStatus, CpuTestStatus> runMipsTestWithAndWithoutForwarding(String testPath) throws Exception {
-    boolean forwardingStatus = config.getBoolean("forwarding");
+    boolean forwardingStatus = config.getBoolean(ConfigKey.FORWARDING);
     Map<ForwardingStatus, CpuTestStatus> statuses = new HashMap<>();
 
-    config.putBoolean("forwarding", true);
+    config.putBoolean(ConfigKey.FORWARDING, true);
     statuses.put(ForwardingStatus.ENABLED, runMipsTest(testPath));
 
-    config.putBoolean("forwarding", false);
+    config.putBoolean(ConfigKey.FORWARDING, false);
     statuses.put(ForwardingStatus.DISABLED, runMipsTest(testPath));
 
-    config.putBoolean("forwarding", forwardingStatus);
+    config.putBoolean(ConfigKey.FORWARDING, forwardingStatus);
     return statuses;
   }
 
@@ -375,10 +376,10 @@ public class EndToEndTests extends BaseTest {
   @Test
   public void testFPUMul() throws Exception {
     // This test contains code that raises exceptions, let's disable them.
-    config.putBoolean("INVALID_OPERATION", false);
-    config.putBoolean("OVERFLOW", false);
-    config.putBoolean("UNDERFLOW", false);
-    config.putBoolean("DIVIDE_BY_ZERO", false);
+    config.putBoolean(ConfigKey.FP_INVALID_OPERATION, false);
+    config.putBoolean(ConfigKey.FP_OVERFLOW, false);
+    config.putBoolean(ConfigKey.FP_UNDERFLOW, false);
+    config.putBoolean(ConfigKey.FP_DIVIDE_BY_ZERO, false);
     Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-mul.s");
 
     // Same behaviour with and without forwarding.
@@ -421,13 +422,13 @@ public class EndToEndTests extends BaseTest {
   /* Tests for masking synchronous exceptions. Termination cannot be tested here since it's in the CPUGuiThread. */
   @Test(expected = SynchronousException.class)
   public void testDivisionByZeroThrowException() throws Exception {
-    config.putBoolean("syncexc-masked", false);
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
     runMipsTest("div0.s");
   }
 
   @Test
   public void testDivisionByZeroNoThrowException() throws Exception {
-    config.putBoolean("syncexc-masked", true);
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, true);
     runMipsTest("div0.s");
   }
 

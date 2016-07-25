@@ -8,18 +8,20 @@ import java.util.prefs.Preferences;
 public class JavaPrefsConfigStore extends ConfigStore {
   private static final Logger logger = Logger.getLogger(JavaPrefsConfigStore.class.getName());
   private Preferences prefs;
-  private Map<String, Object> defaults;
+  private Map<ConfigKey, Object> defaults;
 
-  public JavaPrefsConfigStore(Map<String, Object> defaults) {
+  public JavaPrefsConfigStore(Map<ConfigKey, Object> defaults) {
     prefs = Preferences.userRoot().node("edumips64.config");
     this.defaults = defaults;
   }
 
-  public void putString(String key, String value) {
-    prefs.put(key, value);
+  @Override
+  public void putString(ConfigKey key, String value) {
+    prefs.put(String.valueOf(key), value);
   }
 
-  public String getString(String key) {
+  @Override
+  public String getString(ConfigKey key) {
     String default_value = "";
 
     if (defaults.containsKey(key)) {
@@ -28,14 +30,16 @@ public class JavaPrefsConfigStore extends ConfigStore {
       logger.warning("No default value for string configuration key " + key + ", using empty string.");
     }
 
-    return prefs.get(key, default_value);
+    return prefs.get(String.valueOf(key), default_value);
   }
 
-  public void putInt(String key, int value) {
-    prefs.putInt(key, value);
+  @Override
+  public void putInt(ConfigKey key, int value) {
+    prefs.putInt(String.valueOf(key), value);
   }
 
-  public int getInt(String key) {
+  @Override
+  public int getInt(ConfigKey key) {
     int default_value = 0;
 
     if (defaults.containsKey(key)) {
@@ -44,14 +48,16 @@ public class JavaPrefsConfigStore extends ConfigStore {
       logger.warning("No default value for integer configuration key " + key + ", using 0.");
     }
 
-    return prefs.getInt(key, default_value);
+    return prefs.getInt(String.valueOf(key), default_value);
   }
 
-  public void putBoolean(String key, boolean value) {
-    prefs.putBoolean(key, value);
+  @Override
+  public void putBoolean(ConfigKey key, boolean value) {
+    prefs.putBoolean(String.valueOf(key), value);
   }
 
-  public boolean getBoolean(String key) {
+  @Override
+  public boolean getBoolean(ConfigKey key) {
     boolean default_value = false;
 
     if (defaults.containsKey(key)) {
@@ -60,6 +66,6 @@ public class JavaPrefsConfigStore extends ConfigStore {
       logger.warning("No default value for boolean configuration key " + key + ", using false.");
     }
 
-    return prefs.getBoolean(key, default_value);
+    return prefs.getBoolean(String.valueOf(key), default_value);
   }
 }
