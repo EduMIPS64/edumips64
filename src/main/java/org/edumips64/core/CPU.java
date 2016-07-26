@@ -44,6 +44,7 @@ import org.edumips64.core.is.JumpException;
 import org.edumips64.core.is.RAWException;
 import org.edumips64.core.is.TwosComplementSumException;
 import org.edumips64.core.is.WAWException;
+import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.FPUConfigurator;
 import org.edumips64.utils.IrregularStringOfBitsException;
@@ -575,8 +576,8 @@ public class CPU {
     changeStage(PipeStage.EX);
 
     // Used for exception handling
-    boolean masked = config.getBoolean("syncexc-masked");
-    boolean terminate = config.getBoolean("syncexc-terminate");
+    boolean masked = config.getBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED);
+    boolean terminate = config.getBoolean(ConfigKey.SYNC_EXCEPTIONS_TERMINATE);
 
     // Code of the synchronous exception that happens in EX.
     String syncex = null;
@@ -780,7 +781,7 @@ public class CPU {
   }
 
   public boolean isEnableForwarding() {
-    return config.getBoolean("forwarding");
+    return config.getBoolean(ConfigKey.FORWARDING);
   }
 
   /** Test method that returns a string containing the values of every
@@ -800,19 +801,19 @@ public class CPU {
 
   private void configFPExceptionsAndRM() {
     try {
-      FCSR.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, config.getBoolean("INVALID_OPERATION"));
-      FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW, config.getBoolean("OVERFLOW"));
-      FCSR.setFPExceptions(CPU.FPExceptions.UNDERFLOW, config.getBoolean("UNDERFLOW"));
-      FCSR.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO, config.getBoolean("DIVIDE_BY_ZERO"));
+      FCSR.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, config.getBoolean(ConfigKey.FP_INVALID_OPERATION));
+      FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW, config.getBoolean(ConfigKey.FP_OVERFLOW));
+      FCSR.setFPExceptions(CPU.FPExceptions.UNDERFLOW, config.getBoolean(ConfigKey.FP_UNDERFLOW));
+      FCSR.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO, config.getBoolean(ConfigKey.FP_DIVIDE_BY_ZERO));
 
       //setting the rounding mode
-      if (config.getBoolean("NEAREST")) {
+      if (config.getBoolean(ConfigKey.FP_NEAREST)) {
         FCSR.setFCSRRoundingMode(FPRoundingMode.TO_NEAREST);
-      } else if (config.getBoolean("TOWARDZERO")) {
+      } else if (config.getBoolean(ConfigKey.FP_TOWARDS_ZERO)) {
         FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARD_ZERO);
-      } else if (config.getBoolean("TOWARDS_PLUS_INFINITY")) {
+      } else if (config.getBoolean(ConfigKey.FP_TOWARDS_PLUS_INFINITY)) {
         FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_PLUS_INFINITY);
-      } else if (config.getBoolean("TOWARDS_MINUS_INFINITY")) {
+      } else if (config.getBoolean(ConfigKey.FP_TOWARDS_MINUS_INFINITY)) {
         FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_MINUS_INFINITY);
       }
     } catch (IrregularStringOfBitsException ex) {

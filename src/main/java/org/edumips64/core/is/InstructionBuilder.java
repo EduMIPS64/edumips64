@@ -4,6 +4,7 @@ import org.edumips64.core.CPU;
 import org.edumips64.core.Dinero;
 import org.edumips64.core.IOManager;
 import org.edumips64.core.Memory;
+import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 
 /** InstructionBuilder should be used to build all the instructions to be run by the CPU. The only exception is
@@ -388,8 +389,8 @@ public class InstructionBuilder {
     }
 
     // Serial number for the instruction being built.
-    int serialNumber = config.getInt("serialNumber");
-    config.putInt("serialNumber", serialNumber + 1);
+    int serialNumber = config.getInt(ConfigKey.SERIAL_NUMBER);
+    config.putInt(ConfigKey.SERIAL_NUMBER, serialNumber + 1);
     instruction.setSerialNumber(serialNumber);
 
     // Inject other dependencies.

@@ -28,6 +28,7 @@ import org.edumips64.core.CPU;
 import org.edumips64.core.Memory;
 import org.edumips64.ui.common.CycleBuilder;
 import org.edumips64.ui.common.CycleElement;
+import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 
 import java.awt.*;
@@ -155,30 +156,30 @@ public class GUICycles extends GUIComponent {
 
     private Color getColorByState(String st, String pre) {
       if (st.equals("IF")) {
-        return new Color(config.getInt("IFColor"));
+        return new Color(config.getInt(ConfigKey.IF_COLOR));
       } else if (st.equals("ID")) {
-        return new Color(config.getInt("IDColor"));
+        return new Color(config.getInt(ConfigKey.ID_COLOR));
       } else if (st.equals("EX")) {
-        return new Color(config.getInt("EXColor"));
+        return new Color(config.getInt(ConfigKey.EX_COLOR));
       } else if (st.equals("MEM")) {
-        return new Color(config.getInt("MEMColor"));
+        return new Color(config.getInt(ConfigKey.MEM_COLOR));
       } else if (st.equals("WB")) {
-        return new Color(config.getInt("WBColor"));
+        return new Color(config.getInt(ConfigKey.WB_COLOR));
       } else if (st.equals("Str")) {
-        return new Color(config.getInt("EXColor"));
+        return new Color(config.getInt(ConfigKey.EX_COLOR));
       } else if (st.equals("A1") || st.equals("A2") || st.equals("A3") || st.equals("A4") || st.equals("StAdd")) {
-        return new Color(config.getInt("FPAdderColor"));
+        return new Color(config.getInt(ConfigKey.FP_ADDER_COLOR));
       } else if (st.equals("M1") || st.equals("M2") || st.equals("M3") || st.equals("M4") || st.equals("M5") || st.equals("M6") || st.equals("M7") || st.equals("StMul")) {
-        return new Color(config.getInt("FPMultiplierColor"));
+        return new Color(config.getInt(ConfigKey.FP_MULTIPLIER_COLOR));
       } else if (st.matches("D[0-2][0-9]") || st.matches("DIV")) {
-        return new Color(config.getInt("FPDividerColor"));
+        return new Color(config.getInt(ConfigKey.FP_DIVIDER_COLOR));
       } else if (st.equals("RAW")) {
-        return new Color(config.getInt("IDColor"));
+        return new Color(config.getInt(ConfigKey.ID_COLOR));
       } else if (st.equals("WAW") || st.equals("StDiv") || st.equals("StEx") || st.equals("StFun")) {
-        return new Color(config.getInt("IDColor"));
+        return new Color(config.getInt(ConfigKey.ID_COLOR));
       } else if (st.equals(" ")) {
         if (pre.equals("IF")) {
-          return new Color(config.getInt("IFColor"));
+          return new Color(config.getInt(ConfigKey.IF_COLOR));
         }
       }
       return null;

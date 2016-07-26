@@ -22,6 +22,7 @@
  */
 package org.edumips64.ui.swing;
 
+import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigStoreTypeException;
 import org.edumips64.utils.CurrentLocale;
@@ -67,7 +68,7 @@ public class GUIConfig extends JDialog {
 
   // Local cache of the configuration values that will need to be applied to
   // the configuration backend.
-  private Map<String, Object> cache;
+  private Map<ConfigKey, Object> cache;
   private ConfigStore config;
 
   public GUIConfig(final JFrame owner, ConfigStore config) {
@@ -123,8 +124,8 @@ public class GUIConfig extends JDialog {
     panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
     int row = 2;
 
-    addRow(panel, row++, "forwarding", new JCheckBox());
-    addRow(panel, row++, "n_step", new JNumberField());
+    addRow(panel, row++, ConfigKey.FORWARDING, new JCheckBox());
+    addRow(panel, row++, ConfigKey.N_STEPS, new JNumberField());
 
     // fill remaining vertical space
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
@@ -145,11 +146,11 @@ public class GUIConfig extends JDialog {
     panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
     int row = 2;
 
-    addRow(panel, row++, "warnings", new JCheckBox());
-    addRow(panel, row++, "verbose", new JCheckBox());
-    addRow(panel, row++, "sleep_interval", new JNumberField());
-    addRow(panel, row++, "syncexc-masked", new JCheckBox());
-    addRow(panel, row++, "syncexc-terminate", new JCheckBox());
+    addRow(panel, row++, ConfigKey.WARNINGS, new JCheckBox());
+    addRow(panel, row++, ConfigKey.VERBOSE, new JCheckBox());
+    addRow(panel, row++, ConfigKey.SLEEP_INTERVAL, new JNumberField());
+    addRow(panel, row++, ConfigKey.SYNC_EXCEPTIONS_MASKED, new JCheckBox());
+    addRow(panel, row++, ConfigKey.SYNC_EXCEPTIONS_TERMINATE, new JCheckBox());
 
     // fill remaining vertical space
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
@@ -171,10 +172,10 @@ public class GUIConfig extends JDialog {
     panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
     int row = 2;
 
-    addRow(panel, row++, "INVALID_OPERATION", new JCheckBox());
-    addRow(panel, row++, "OVERFLOW", new JCheckBox());
-    addRow(panel, row++, "UNDERFLOW", new JCheckBox());
-    addRow(panel, row++, "DIVIDE_BY_ZERO", new JCheckBox());
+    addRow(panel, row++, ConfigKey.FP_INVALID_OPERATION, new JCheckBox());
+    addRow(panel, row++, ConfigKey.FP_OVERFLOW, new JCheckBox());
+    addRow(panel, row++, ConfigKey.FP_UNDERFLOW, new JCheckBox());
+    addRow(panel, row++, ConfigKey.FP_DIVIDE_BY_ZERO, new JCheckBox());
 
     // fill remaining vertical space
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
@@ -207,10 +208,10 @@ public class GUIConfig extends JDialog {
     panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
     int row = 2;
 
-    addRow(panel, row++, "NEAREST", rdoNearest);
-    addRow(panel, row++, "TOWARDZERO", rdoTowardZero);
-    addRow(panel, row++, "TOWARDS_PLUS_INFINITY", rdoTowardsPlusInfinity);
-    addRow(panel, row++, "TOWARDS_MINUS_INFINITY", rdoTowardsMinusInfinity);
+    addRow(panel, row++, ConfigKey.FP_NEAREST, rdoNearest);
+    addRow(panel, row++, ConfigKey.FP_TOWARDS_ZERO, rdoTowardZero);
+    addRow(panel, row++, ConfigKey.FP_TOWARDS_PLUS_INFINITY, rdoTowardsPlusInfinity);
+    addRow(panel, row++, ConfigKey.FP_TOWARDS_MINUS_INFINITY, rdoTowardsMinusInfinity);
 
     // fill remaining vertical space
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
@@ -232,16 +233,16 @@ public class GUIConfig extends JDialog {
     panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
     int row = 2;
 
-    addRow(panel, row++, "IFColor", new JButton());
-    addRow(panel, row++, "IDColor", new JButton());
-    addRow(panel, row++, "EXColor", new JButton());
-    addRow(panel, row++, "MEMColor", new JButton());
-    addRow(panel, row++, "WBColor", new JButton());
-    addRow(panel, row++, "FPAdderColor", new JButton());
-    addRow(panel, row++, "FPMultiplierColor", new JButton());
-    addRow(panel, row++, "FPDividerColor", new JButton());
-    addRow(panel, row++, "LONGDOUBLEVIEW", new JCheckBox());
-    addRow(panel, row++, "show_aliases", new JCheckBox());
+    addRow(panel, row++, ConfigKey.IF_COLOR, new JButton());
+    addRow(panel, row++, ConfigKey.ID_COLOR, new JButton());
+    addRow(panel, row++, ConfigKey.EX_COLOR, new JButton());
+    addRow(panel, row++, ConfigKey.MEM_COLOR, new JButton());
+    addRow(panel, row++, ConfigKey.WB_COLOR, new JButton());
+    addRow(panel, row++, ConfigKey.FP_ADDER_COLOR, new JButton());
+    addRow(panel, row++, ConfigKey.FP_MULTIPLIER_COLOR, new JButton());
+    addRow(panel, row++, ConfigKey.FP_DIVIDER_COLOR, new JButton());
+    addRow(panel, row++, ConfigKey.FP_LONG_DOUBLE_VIEW, new JCheckBox());
+    addRow(panel, row++, ConfigKey.SHOW_ALIASES, new JCheckBox());
 
     // fill remaining vertical space
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
@@ -250,9 +251,9 @@ public class GUIConfig extends JDialog {
 
   // Monster function that adds a given row (label + control) to a given
   // JPanel, and sets its behaviour according to the type of control.
-  private void addRow(JPanel panel, final int row, final String key, final JComponent comp) {
-    String title = CurrentLocale.getString("Config." + key.toUpperCase());
-    String tip = CurrentLocale.getString("Config." + key.toUpperCase() + ".tip");
+  private void addRow(JPanel panel, final int row, final ConfigKey key, final JComponent comp) {
+    String title = CurrentLocale.getString("Config." + String.valueOf(key).toUpperCase());
+    String tip = CurrentLocale.getString("Config." + String.valueOf(key).toUpperCase() + ".tip");
     //Setting title
     JLabel label = new JLabel(title);
     label.setHorizontalAlignment(JLabel.RIGHT);
@@ -285,16 +286,16 @@ public class GUIConfig extends JDialog {
       // one and this code is tailored for it.
       rbut.setAction(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
-          LinkedList<String> keys = new LinkedList<>();
-          keys.add("NEAREST");
-          keys.add("TOWARDZERO");
-          keys.add("TOWARDS_PLUS_INFINITY");
-          keys.add("TOWARDS_MINUS_INFINITY");
+          LinkedList<ConfigKey> keys = new LinkedList<>();
+          keys.add(ConfigKey.FP_NEAREST);
+          keys.add(ConfigKey.FP_TOWARDS_ZERO);
+          keys.add(ConfigKey.FP_TOWARDS_PLUS_INFINITY);
+          keys.add(ConfigKey.FP_TOWARDS_MINUS_INFINITY);
 
           cache.put(key, true);
           keys.remove(key);
 
-          for (String k : keys) {
+          for (ConfigKey k : keys) {
             cache.put(k, false);
           }
         }
@@ -346,7 +347,7 @@ public class GUIConfig extends JDialog {
       button.addActionListener(e -> {
         Color color = JColorChooser.showDialog(
                         GUIConfig.this,
-                        CurrentLocale.getString("Config." + key.toUpperCase()),
+                        CurrentLocale.getString("Config." + String.valueOf(key).toUpperCase()),
                         button.getBackground());
 
         if (color != null) {

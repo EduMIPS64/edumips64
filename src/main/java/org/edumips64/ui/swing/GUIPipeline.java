@@ -22,6 +22,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.edumips64.ui.swing;
+import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
@@ -200,42 +201,42 @@ class GUIPipeline extends GUIComponent {
       Instruction i = pipeline.get(CPU.PipeStage.IF);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(new Color(config.getInt("IFColor")));
+        g.setColor(new Color(config.getInt(ConfigKey.IF_COLOR)));
         g.fillRect(largh / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(CPU.PipeStage.ID);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(new Color(config.getInt("IDColor")));
+        g.setColor(new Color(config.getInt(ConfigKey.ID_COLOR)));
         g.fillRect(largh * 4 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(CPU.PipeStage.EX);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(new Color(config.getInt("EXColor")));
+        g.setColor(new Color(config.getInt(ConfigKey.EX_COLOR)));
         g.fillRect(largh * 9 / 20, (alt / 2) - (alt * 5 / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(CPU.PipeStage.MEM);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(new Color(config.getInt("MEMColor")));
+        g.setColor(new Color(config.getInt(ConfigKey.MEM_COLOR)));
         g.fillRect(largh * 14 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(CPU.PipeStage.WB);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(new Color(config.getInt("WBColor")));
+        g.setColor(new Color(config.getInt(ConfigKey.WB_COLOR)));
         g.fillRect(largh * 17 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
 
       //filling FPU elements
       //ADDER
-      g.setColor(new Color(config.getInt("FPAdderColor")));
+      g.setColor(new Color(config.getInt(ConfigKey.FP_ADDER_COLOR)));
       spiazzAdd = (largh * 20 / 60) / numAdder;
       int j;
 
@@ -260,7 +261,7 @@ class GUIPipeline extends GUIComponent {
       }
 
 //MULTIPLIER
-      g.setColor(new Color(config.getInt("FPMultiplierColor")));
+      g.setColor(new Color(config.getInt(ConfigKey.FP_MULTIPLIER_COLOR)));
       spiazzMul = (largh * 20 / 60) / numMultiplier;
 
       if (cpu.isFuncUnitFilled("MULTIPLIER", 1)) {
@@ -299,7 +300,7 @@ class GUIPipeline extends GUIComponent {
       }
 
       //DIVIDER
-      g.setColor(new Color(config.getInt("FPDividerColor")));
+      g.setColor(new Color(config.getInt(ConfigKey.FP_DIVIDER_COLOR)));
 
       if (cpu.isFuncUnitFilled("DIVIDER", 0)) {
         g.fillRect(largh * 8 / 20, (alt / 2) + (alt * 3 / 12), largh * 2 / 10, alt / 6);

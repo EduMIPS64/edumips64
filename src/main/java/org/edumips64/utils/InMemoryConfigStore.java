@@ -7,19 +7,21 @@ import java.util.logging.Logger;
 /** ConfigStore implementation based on in-memory storage. */
 public class InMemoryConfigStore extends ConfigStore {
   private static final Logger logger = Logger.getLogger(InMemoryConfigStore.class.getName());
-  private Map<String, Object> data;
-  private Map<String, Object> defaults;
+  private Map<ConfigKey, Object> data;
+  private Map<ConfigKey, Object> defaults;
 
-  public InMemoryConfigStore(Map<String, Object> defaults) {
+  public InMemoryConfigStore(Map<ConfigKey, Object> defaults) {
     this.defaults = defaults;
-    data = new HashMap<String, Object>();
+    data = new HashMap<>();
   }
 
-  public void putString(String key, String value) {
+  @Override
+  public void putString(ConfigKey key, String value) {
     data.put(key, value);
   }
 
-  public String getString(String key) {
+  @Override
+  public String getString(ConfigKey key) {
     if (data.containsKey(key)) {
       return (String) data.get(key);
     }
@@ -35,11 +37,13 @@ public class InMemoryConfigStore extends ConfigStore {
     return default_value;
   }
 
-  public void putInt(String key, int value) {
+  @Override
+  public void putInt(ConfigKey key, int value) {
     data.put(key, value);
   }
 
-  public int getInt(String key) {
+  @Override
+  public int getInt(ConfigKey key) {
     if (data.containsKey(key)) {
       return (Integer) data.get(key);
     }
@@ -55,11 +59,13 @@ public class InMemoryConfigStore extends ConfigStore {
     return default_value;
   }
 
-  public void putBoolean(String key, boolean value) {
+  @Override
+  public void putBoolean(ConfigKey key, boolean value) {
     data.put(key, value);
   }
 
-  public boolean getBoolean(String key) {
+  @Override
+  public boolean getBoolean(ConfigKey key) {
     if (data.containsKey(key)) {
       return (Boolean) data.get(key);
     }

@@ -220,7 +220,7 @@ public class CurrentLocale {
     en.put("ErrorDialog.DESCRIPTION", "Description");
     en.put("ErrorDialog.MSG0", "Code contains");
     en.put("ErrorDialog.MSG1", "errors and");
-    en.put("ErrorDialog.MSG2", "warnings");
+    en.put("ErrorDialog.MSG2", String.valueOf(ConfigKey.WARNINGS));
     en.put("ReportDialog.MSG", "EduMIPS64 Fatal error! Please help the developers, by opening a new issue on GitHub (https://github.com/lupino3/edumips64/issues/new) with the following text, or by sending it via email to bugs@edumips.org");
     en.put("ReportDialog.BUTTON", "Close");
     en.put("DIVZERO.Message", "Division by zero");
@@ -484,7 +484,7 @@ public class CurrentLocale {
   public static String getString(String key) {
     String lang_name = "en";
     if (config != null) {
-      lang_name = config.getString("language");
+      lang_name = config.getString(ConfigKey.LANGUAGE);
     }
 
     try {

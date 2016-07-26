@@ -244,42 +244,42 @@ public class GUICode extends GUIComponent {
 
       if (rowTable == ifIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt("IFColor")));
+        label.setBackground(new Color(config.getInt(ConfigKey.IF_COLOR)));
       }
 
       if (rowTable == idIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt("IDColor")));
+        label.setBackground(new Color(config.getInt(ConfigKey.ID_COLOR)));
       }
 
       if (rowTable == exIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt("EXColor")));
+        label.setBackground(new Color(config.getInt(ConfigKey.EX_COLOR)));
       }
 
       if (rowTable == memIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt("MEMColor")));
+        label.setBackground(new Color(config.getInt(ConfigKey.MEM_COLOR)));
       }
 
       if (rowTable == wbIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt("WBColor")));
+        label.setBackground(new Color(config.getInt(ConfigKey.WB_COLOR)));
       }
 
       if (rowTable == M1Index || rowTable == M2Index || rowTable == M3Index || rowTable == M4Index || rowTable == M5Index || rowTable == M6Index || rowTable == M7Index) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt("FPMultiplierColor")));
+        label.setBackground(new Color(config.getInt(ConfigKey.FP_MULTIPLIER_COLOR)));
       }
 
       if (rowTable == A1Index || rowTable == A2Index || rowTable == A3Index || rowTable == A4Index) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt("FPAdderColor")));
+        label.setBackground(new Color(config.getInt(ConfigKey.FP_ADDER_COLOR)));
       }
 
       if (rowTable == DIVIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt("FPDividerColor")));
+        label.setBackground(new Color(config.getInt(ConfigKey.FP_DIVIDER_COLOR)));
       }
 
       return label;
