@@ -31,6 +31,7 @@ import org.edumips64.core.is.Instruction;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 public class CycleBuilder {
@@ -41,6 +42,9 @@ public class CycleBuilder {
 
   // Data structure that contains the actual time diagram of the pipeline.
   List<CycleElement> elementsList;
+
+  // Lookup map from serial number to index into elementsList.
+  Map<Long, Integer> serialToElementIndexMap;
 
   // Stalls counters.
   int RAWStalls, WAWStalls, structStallsEX, structStallsDivider, structStallsFuncUnit;
@@ -55,6 +59,7 @@ public class CycleBuilder {
     this.cpu = cpu;
     instr = new Instruction[5];
     elementsList = Collections.synchronizedList(new LinkedList<CycleElement>());
+    serialToElementIndexMap = Collections.synchronizedMap(new HashMap<>());
     updateStalls();
   }
   public List<CycleElement> getElementsList() {
@@ -68,15 +73,7 @@ public class CycleBuilder {
   // next CycleElement belonging to the given instruction serial number that
   // is not finalized (i.e., past WB) and has not been updated yet.
   public int getInstructionToUpdate(long serialNumber) {
-    for (int i = 0; i < elementsList.size(); ++i) {
-      CycleElement tmp = elementsList.get(i);
-
-      if (tmp.getSerialNumber() == serialNumber && tmp.getUpdateTime() == curTime - 1 && !tmp.isFinalized()) {
-        return i;
-      }
-    }
-
-    return -1;
+    return serialToElementIndexMap.get(serialNumber);
   }
 
 
@@ -185,7 +182,11 @@ public class CycleBuilder {
         if (instr[0] != null) {
           if (!inputStallOccurred) {
             // We must instantiate a new CycleElement only if the CPU is running or there was a JumpException and the the IF instruction was changed.
-            elementsList.add(new CycleElement(instr[0], curTime));
+            synchronized(elementsList) {
+              int newIndex = elementsList.size();
+              elementsList.add(newIndex, new CycleElement(instr[0], curTime));
+              serialToElementIndexMap.put(instr[0].getSerialNumber(), newIndex);
+            }
             instructionsCount++;
           } else {
             index = getInstructionToUpdate(instr[0].getSerialNumber());
