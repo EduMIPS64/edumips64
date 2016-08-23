@@ -350,7 +350,7 @@
   </target>
 
   <!-- *** cli-jar *** runs org.edumips64.MainCLI -->
-  <target name="cli-jar" depends="compile,htmldoc">
+  <target name="cli-jar" depends="compile">
       <property name="jar_filename" value="${cli_jar_filename}" />
       <property name="main_class" value="org.edumips64.MainCLI" />
 
