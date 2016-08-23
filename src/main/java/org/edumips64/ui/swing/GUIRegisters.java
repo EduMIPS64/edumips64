@@ -209,8 +209,6 @@ class GUIRegisters extends GUIComponent {
       for (int i = 0; i < 32; i++) {
         numR[i] = fillFirstColumn(i);
       }
-
-      draw();
     }
 
     //classe interna che gestisce l'evento doppio click
