@@ -39,7 +39,7 @@
     <property name="webOutputDir" value="war/" />
     <property name="javadocDir" value="javadoc" />
     <property name="reportDir" value="report" />
-    <property name="gwtVersion" value="2.8.0-SNAPSHOT" />
+    <property name="gwtVersion" value="2.8.0-rc1" />
 
     <!-- Access the environment -->
     <property environment="env" />
@@ -74,7 +74,7 @@
 
   <target name="webLibs" depends="init" description="Copy libs to WEB-INF/lib">
     <mkdir dir="war/WEB-INF/lib" />
-    <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet-2.8.0-SNAPSHOT.jar" />
+    <copy todir="war/WEB-INF/lib" file="${gwt.sdk}/gwt-servlet-${gwtVersion}.jar" />
     <!-- Add any additional server libs that need to be copied -->
   </target>
 
