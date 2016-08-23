@@ -51,7 +51,13 @@ public class MainCLI {
 
       if (args.length > 0) {
         String absoluteFilename = new File(args[0]).getAbsolutePath();
-        p.parse(absoluteFilename);
+        try {
+          p.parse(absoluteFilename);
+        } catch (ParserMultiException e) {
+          if (e.hasErrors()) {
+            throw e;
+          }
+        }
         c.setStatus(CPU.CPUStatus.RUNNING);
       }
 

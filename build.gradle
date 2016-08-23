@@ -12,7 +12,7 @@ repositories {
   }
 }
 
-def gwtVersion = "2.8.0-SNAPSHOT"
+def gwtVersion = "2.8.0-rc1"
 
 dependencies {
   compile "javax.help:javahelp:2.0.05"

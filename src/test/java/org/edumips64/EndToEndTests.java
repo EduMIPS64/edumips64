@@ -519,4 +519,11 @@ public class EndToEndTests extends BaseTest {
     runMipsTestWithAndWithoutForwarding("jr-raw.s");
     runMipsTestWithAndWithoutForwarding("jalr-raw.s");
   }
+  
+  /* Issue #132:The longer the simulation goes on, the lower the simulation rate.
+     This tests only part of the bug, since part of it is related to the GUI. */
+  @Test
+  public void testHailStone() throws Exception {
+    runMipsTestWithAndWithoutForwarding("hailstoneenglish.s");
+  }
 }
