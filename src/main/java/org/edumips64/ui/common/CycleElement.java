@@ -77,6 +77,7 @@ public class CycleElement {
     String lastState = states.getLast();
 
     if (!validateStateTransition(lastState, newState)) {
+      logger.severe("Instruction: " + instruction + ", startTime: " + startTime);
       logger.severe("State " + newState + " is not allowed after state " + lastState);
     }
 
