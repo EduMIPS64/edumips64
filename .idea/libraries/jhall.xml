@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="jhall">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/libs/jhall.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
