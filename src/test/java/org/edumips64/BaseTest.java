@@ -17,7 +17,7 @@ public class BaseTest {
   @BeforeClass
   public static void setup() {
     config = new InMemoryConfigStore(ConfigStore.defaults);
-    // Disable logs of level lesser than WARNING.
+    // Disable logs of level lesser than SEVERE.
     Logger rootLogger = log.getParent();
 
     for (Handler h : rootLogger.getHandlers()) {

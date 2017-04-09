@@ -54,7 +54,7 @@ public class EndToEndTests extends BaseTest {
   private Parser parser;
   private SymbolTable symTab;
   private static String testsLocation = "build/resources/test/";
-  private final static Logger log = Logger.getLogger(CpuTestStatus.class.getName());
+  private final static Logger log = Logger.getLogger(EndToEndTests.class.getName());
   private Dinero dinero;
   private StringWriter stdOut;
 
@@ -152,7 +152,8 @@ public class EndToEndTests extends BaseTest {
    * @param testPath path of the test code.
    */
   private CpuTestStatus runMipsTest(String testPath) throws Exception {
-    log.warning("================================= Starting test " + testPath);
+    log.warning("================================= Starting test " + testPath + " (forwarding: " +
+        config.getBoolean(ConfigKey.FORWARDING) + ")");
     cpu.reset();
     dinero.reset();
     symTab.reset();
