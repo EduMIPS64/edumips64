@@ -105,7 +105,7 @@ public class CycleElement {
     allowedTransitions = new HashMap<>();
     allowedTransitions.put("IF", new HashSet<>(Arrays.asList("ID", " ")));
     allowedTransitions.put("ID", new HashSet<>(Arrays.asList("ID", "EX", "RAW", "WAW", "DIV", "StDiv", "StEx", "StFun", "A1", "M1")));
-    allowedTransitions.put("RAW", new HashSet<>(Arrays.asList("RAW", "EX", "M1", "A1")));
+    allowedTransitions.put("RAW", new HashSet<>(Arrays.asList("RAW", "WAW", "EX", "M1", "A1")));
     allowedTransitions.put("WAW", new HashSet<>(Arrays.asList("WAW", "EX", "M1", "A1")));
 
     allowedTransitions.put("EX", new HashSet<>(Arrays.asList("MEM", "Str")));
