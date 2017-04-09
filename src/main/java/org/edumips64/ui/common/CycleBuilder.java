@@ -28,23 +28,27 @@ package org.edumips64.ui.common;
 import org.edumips64.core.CPU;
 import org.edumips64.core.is.Instruction;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Logger;
 
 public class CycleBuilder {
-  private Instruction [] instr;
   private CPU cpu;
   private int curTime, oldTime;
   private int instructionsCount;
 
+  private static final Logger logger = Logger.getLogger(CycleBuilder.class.getName());
+
   // Data structure that contains the actual time diagram of the pipeline.
   private List<CycleElement> elementsList;
 
-  // Lookup map from serial number to the corresponding CycleElement.
-  private Map<Integer, CycleElement> serialToElementIndexMap;
+  // Counter of how many times a given instruction, represented by its serial number, has
+  // been processed in a given step of the CycleBuilder. The map is reset at every step.
+  //
+  // This is needed to handle corner cases related to the same instruction being present
+  // multiple times in the pipeline. By marking an instruction as processed, it's possible
+  // to get the right CycleElement corresponding to the proper instruction instance being
+  // processed at a given time.
+  private Map<Integer, Integer> processedCountMap;
 
   // Stalls counters.
   private int RAWStalls, WAWStalls, structStallsEX, structStallsDivider, structStallsFuncUnit;
@@ -54,12 +58,11 @@ public class CycleBuilder {
   // DividerNotAvailable, RAW, WAW), in order to understand if a new
   // instruction has to be added to "elementsList"
   private int inputStructuralStalls;
+  private List<CycleElement> lastElements;
 
   public CycleBuilder(CPU cpu) {
     this.cpu = cpu;
-    instr = new Instruction[5];
     elementsList = Collections.synchronizedList(new ArrayList<CycleElement>());
-    serialToElementIndexMap = Collections.synchronizedMap(new HashMap<>());
     updateStalls();
   }
   public List<CycleElement> getElementsList() {
@@ -73,33 +76,101 @@ public class CycleBuilder {
     return curTime;
   }
 
+  // This method assumes that the CPU has just finished one cycle and that it is necessary to update the
+  // CycleBuilder's internal representation to match the state of the CPU.
   public void step() {
     Map<CPU.PipeStage, Instruction> pipeline = cpu.getPipeline();
     curTime = cpu.getCycles();
+    int instrInPipelineCount = cpu.getInstructionCount();
+
+    // View into the last N elements of the list. This list is used to search for CycleElements
+    // corresponding to a given instruction in the getElementToUpdate() method.
+    //
+    // The max() statement is needed to avoid negative indexing (and therefore errors), in the case when the
+    // size of the list of elements is smaller than the number of stages in the pipeline, which happens in the
+    // first cycles of a program.
+    lastElements = new ArrayList<>(elementsList.subList(Math.max(elementsList.size() - instrInPipelineCount, 0), elementsList.size()));
+
+    // Reverse the list since the elements are updated from IF to WB, and the elementsList is sorted in
+    // chronological order.
+    Collections.reverse(lastElements);
+    logger.info("Got " + lastElements.size() + " CycleElements. " + instrInPipelineCount + " instructions in the pipeline.");
+
+    // The map is reset at every cycle on purpose.
+    processedCountMap = new HashMap<>();
 
     if (oldTime != curTime) {
       if (curTime > 0) {
         CycleElement el;
-        instr[0] = pipeline.get(CPU.PipeStage.IF);
-        instr[1] = pipeline.get(CPU.PipeStage.ID);
-        instr[2] = pipeline.get(CPU.PipeStage.EX);
-        instr[3] = pipeline.get(CPU.PipeStage.MEM);
-        instr[4] = pipeline.get(CPU.PipeStage.WB);
 
-        // WB
-        el = getElementToUpdate(instr[4]);
-        if (el != null) {
-          el.addState("WB");
+        // Pre-compute EX stage stalls
+        boolean RAWStallOccurred = (RAWStalls != cpu.getRAWStalls());
+        boolean WAWStallOccurred = (WAWStalls != cpu.getWAWStalls());
+        boolean structStallEXOccurred = (structStallsEX != cpu.getStructuralStallsEX());
+        boolean structStallDividerOccurred = (structStallsDivider != cpu.getStructuralStallsDivider());
+        boolean structStallsFuncUnitOccurred = (structStallsFuncUnit != cpu.getStructuralStallsFuncUnit());
+        boolean inputStallOccurred = (inputStructuralStalls != cpu.getStructuralStallsDivider() + cpu.getStructuralStallsEX() + cpu.getStructuralStallsFuncUnit() + cpu.getRAWStalls() + cpu.getWAWStalls());
+
+        // Check if something fishy is going on.
+        if (inputStallOccurred && !(RAWStallOccurred || WAWStallOccurred || structStallDividerOccurred || structStallEXOccurred || structStallsFuncUnitOccurred)) {
+          logger.severe("Something fishy going on with the instruction that has to go into ID");
         }
 
-        // MEM
-        el = getElementToUpdate(instr[3]);
+
+        // IF
+        if (pipeline.get(CPU.PipeStage.IF) != null) {
+          // We must instantiate a new CycleElement only if the CPU is running or there was a JumpException and the the
+          // IF instruction was changed (i.e., if no input stalls occurred).
+          if (!inputStallOccurred) {
+            synchronized(elementsList) {
+              CycleElement newElement = new CycleElement(pipeline.get(CPU.PipeStage.IF), curTime);
+              elementsList.add(newElement);
+            }
+            instructionsCount++;
+          } else {
+            el = getElementToUpdate(pipeline.get(CPU.PipeStage.IF));
+
+            if (el != null) {
+              el.addState(" ");
+            }
+          }
+        }
+
+        // If there were stalls, such as RAW, WAW, EXNotAvailable,
+        // DividerNotAvailable, FuncUnitNotAvailable, we cannot add a new
+        // CycleElement in "elementsList" and we must add tags as RAW, WAW,
+        // StEx, StDiv, StFun into the right instruction's state list
+
+        // ID
+        el = getElementToUpdate(pipeline.get(CPU.PipeStage.ID));
         if (el != null) {
-          el.addState("MEM");
+          if (!inputStallOccurred) {
+            el.addState("ID");
+          }
+
+          if (RAWStallOccurred) {
+            el.addState("RAW");
+          }
+
+          if (WAWStallOccurred) {
+            el.addState("WAW");
+          }
+
+          if (structStallDividerOccurred) {
+            el.addState("StDiv");
+          }
+
+          if (structStallEXOccurred) {
+            el.addState("StEx");
+          }
+
+          if (structStallsFuncUnitOccurred) {
+            el.addState("StFun");
+          }
         }
 
         // EX
-        el = getElementToUpdate(instr[2]);
+        el = getElementToUpdate(pipeline.get(CPU.PipeStage.EX));
         if (el != null) {
           // If a structural stall(memory) occurs, the instruction in EX has to be tagged first with "EX" and then with "StEx"
           boolean exTagged = false;
@@ -118,65 +189,16 @@ public class CycleBuilder {
           }
         }
 
-        // If there were stalls, such as RAW, WAW, EXNotAvailable,
-        // DividerNotAvailable, FuncUnitNotAvailable, we cannot add a new
-        // CycleElement in "elementsList" and we must add tags as RAW, WAW,
-        // StEx, StDiv, StFun into the right instruction's state list
-
-        //EX stage stalls
-        boolean RAWStallOccurred = (RAWStalls != cpu.getRAWStalls());
-        boolean WAWStallOccurred = (WAWStalls != cpu.getWAWStalls());
-        boolean structStallEXOccurred = (structStallsEX != cpu.getStructuralStallsEX());
-        boolean structStallDividerOccured = (structStallsDivider != cpu.getStructuralStallsDivider());
-        boolean structStallsFuncUnitOccurred = (structStallsFuncUnit != cpu.getStructuralStallsFuncUnit());
-        boolean inputStallOccurred = (inputStructuralStalls != cpu.getStructuralStallsDivider() + cpu.getStructuralStallsEX() + cpu.getStructuralStallsFuncUnit() + cpu.getRAWStalls() + cpu.getWAWStalls());
-
-        // ID
-        el = getElementToUpdate(instr[1]);
+        // MEM
+        el = getElementToUpdate(pipeline.get(CPU.PipeStage.MEM));
         if (el != null) {
-          if (!inputStallOccurred) {
-            el.addState("ID");
-          }
-
-          if (RAWStallOccurred) {
-            el.addState("RAW");
-          }
-
-          if (WAWStallOccurred) {
-            el.addState("WAW");
-          }
-
-          if (structStallDividerOccured) {
-            el.addState("StDiv");
-          }
-
-          if (structStallEXOccurred) {
-            el.addState("StEx");
-          }
-
-          if (structStallsFuncUnitOccurred) {
-            el.addState("StFun");
-          }
+          el.addState("MEM");
         }
 
-        // IF
-        if (instr[0] != null) {
-          if (!inputStallOccurred) {
-            // We must instantiate a new CycleElement only if the CPU is running or there was a JumpException and the the IF instruction was changed.
-            synchronized(elementsList) {
-              int newIndex = elementsList.size();
-              CycleElement element = new CycleElement(instr[0], curTime);
-              elementsList.add(newIndex, element);
-              serialToElementIndexMap.put(instr[0].getSerialNumber(), element);
-            }
-            instructionsCount++;
-          } else {
-            el = getElementToUpdate(instr[0]);
-
-            if (el != null) {
-              el.addState(" ");
-            }
-          }
+        // WB
+        el = getElementToUpdate(pipeline.get(CPU.PipeStage.WB));
+        if (el != null) {
+          el.addState("WB");
         }
 
         //we have to check instructions in the FP pipeline
@@ -260,10 +282,38 @@ public class CycleBuilder {
   // Returns the CycleElement corresponding to the given Instruction. Returns null if the Instruction is null,
   // is a BUBBLE or if it's not in the map.
   private CycleElement getElementToUpdate(Instruction instruction) {
+    // Early exit in case of bogus instructions.
     if (instruction == null || instruction.isBubble()) {
       return null;
     }
-    return serialToElementIndexMap.get(instruction.getSerialNumber());
+
+    int serial = instruction.getSerialNumber();
+    if (!processedCountMap.containsKey(serial)) {
+      processedCountMap.put(serial, 0);
+    }
+    int instructionProcessedCount = processedCountMap.get(serial);
+
+    // The CycleElement to be returned.
+    CycleElement element = null;
+
+    // How many times the a CycleElement corresponding to the given instruction was seen in the list of CycleElements
+    // being analyzed. Let N be the number of times the instruction was already processed by getElementToUpdate(). The
+    // cycle terminates when the CycleElement N (corresponding to the given instruction) is found in the list of
+    // CycleElements, or when the list is exhausted. (N == instructionProcessedCount).
+    int instructionSeenCount = 0;
+    for (CycleElement el : lastElements) {
+      if (el.getSerialNumber() == serial) {
+        if (instructionSeenCount == instructionProcessedCount) {
+          element = el;
+          break;
+        }
+        instructionSeenCount++;
+      }
+    }
+
+    // Increment the counter to indicate that, in this step() cycle, the given instruction was processed one more time.
+    processedCountMap.put(serial, instructionProcessedCount + 1);
+    return element;
   }
 
   private void updateStalls() {
