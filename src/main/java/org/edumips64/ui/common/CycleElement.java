@@ -87,7 +87,7 @@ public class CycleElement {
   }
 
   /**
-  * @return the initial time in which the instruction occuped the IF stage in pipeline.
+  * @return the initial time in which the instruction occupied the IF stage in pipeline.
   */
   public int getTime() {
     return startTime;
