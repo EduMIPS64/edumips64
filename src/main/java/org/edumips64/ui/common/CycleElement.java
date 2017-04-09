@@ -35,7 +35,7 @@ import org.edumips64.core.is.Instruction;
 */
 public class CycleElement {
 
-  int startTime;
+  private int startTime;
   private LinkedList<String> states;
   private Instruction instruction;
 
@@ -43,13 +43,13 @@ public class CycleElement {
 
   /**
   * A new element of this class is created.
-  * @param nom the name of the instruction
+  * @param instruction the instruction object
   * @param startTime the time in which the element is entered in pipeline
   */
-  public CycleElement(Instruction instruction, int startTime) {
+  CycleElement(Instruction instruction, int startTime) {
     this.startTime = startTime;
     this.instruction = instruction;
-    states = new LinkedList<String>();
+    states = new LinkedList<>();
     states.add("IF");
   }
 
@@ -60,20 +60,11 @@ public class CycleElement {
     return instruction.getFullName();
   }
 
-  public int getUpdateTime() {
-    return startTime + states.size() - 1;
-  }
-  public boolean isFinalized() {
-    // TODO(lupino): make this check if the instruction has been discarded
-    // because of a jump.
-    return states.getLast() == "WB";
-  }
-
   /**
   * This method is called for every clock cycle.
-  * @param stat the current stage in pipeline of the instruction.
+  * @param newState the current stage in pipeline of the instruction.
   */
-  public void addState(String newState) {
+  void addState(String newState) {
     String lastState = states.getLast();
 
     if (!validateStateTransition(lastState, newState)) {
@@ -91,7 +82,7 @@ public class CycleElement {
     return states;
   }
 
-  public String getLastState() {
+  String getLastState() {
     return states.getLast();
   }
 
@@ -100,11 +91,6 @@ public class CycleElement {
   */
   public int getTime() {
     return startTime;
-  }
-
-  /** Returns the serial number of the referred instruction*/
-  public long getSerialNumber() {
-    return instruction.getSerialNumber();
   }
 
   public boolean shouldRender() {
@@ -116,23 +102,20 @@ public class CycleElement {
   // TODO: complete the map (it does not contain all possible transitions).
   private static Map<String, Set<String>> allowedTransitions;
   static {
-    allowedTransitions = new HashMap<String, Set<String>>();
-    allowedTransitions.put("IF", new HashSet<String>(Arrays.asList("ID", " ")));
-    allowedTransitions.put("ID", new HashSet<String>(Arrays.asList("ID", "EX", "RAW", "WAW", "DIV", "StDiv", "StEx", "StFun", "A1", "M1")));
-    allowedTransitions.put("RAW", new HashSet<String>(Arrays.asList("RAW", "EX", "M1", "A1")));
-    allowedTransitions.put("WAW", new HashSet<String>(Arrays.asList("WAW", "EX", "M1", "A1")));
+    allowedTransitions = new HashMap<>();
+    allowedTransitions.put("IF", new HashSet<>(Arrays.asList("ID", " ")));
+    allowedTransitions.put("ID", new HashSet<>(Arrays.asList("ID", "EX", "RAW", "WAW", "DIV", "StDiv", "StEx", "StFun", "A1", "M1")));
+    allowedTransitions.put("RAW", new HashSet<>(Arrays.asList("RAW", "EX", "M1", "A1")));
+    allowedTransitions.put("WAW", new HashSet<>(Arrays.asList("WAW", "EX", "M1", "A1")));
 
-    allowedTransitions.put("EX", new HashSet<String>(Arrays.asList("MEM", "Str")));
-    allowedTransitions.put("MEM", new HashSet<String>(Arrays.asList("WB")));
-    allowedTransitions.put("WB", new HashSet<String>(Arrays.asList(" ")));
+    allowedTransitions.put("EX", new HashSet<>(Arrays.asList("MEM", "Str")));
+    allowedTransitions.put("MEM", new HashSet<>(Arrays.asList("WB")));
+    allowedTransitions.put("WB", new HashSet<>(Arrays.asList(" ")));
   }
 
   private static boolean validateStateTransition(String curState, String nextState) {
-    if (!allowedTransitions.containsKey(curState)) {
-      // Don't check states that are not in the map.
-      return true;
-    }
+    // Don't check states that are not in the map.
+    return !allowedTransitions.containsKey(curState) || allowedTransitions.get(curState).contains(nextState);
 
-    return allowedTransitions.get(curState).contains(nextState);
   }
 }
