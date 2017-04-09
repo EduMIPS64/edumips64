@@ -67,6 +67,10 @@ public class FPPipeline {
     readyToExit = 0;
   }
 
+  public int size() {
+    return nInstructions;
+  }
+
   public String toString() {
     String output = "";
     output += adder.toString();

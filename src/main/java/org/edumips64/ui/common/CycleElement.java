@@ -44,7 +44,7 @@ public class CycleElement {
   /**
   * A new element of this class is created.
   * @param instruction the instruction object
-  * @param startTime the time in which the element is entered in pipeline
+  * @param startTime the time in which the element entered in the pipeline
   */
   CycleElement(Instruction instruction, int startTime) {
     this.startTime = startTime;
@@ -58,6 +58,10 @@ public class CycleElement {
   */
   public String getName() {
     return instruction.getFullName();
+  }
+
+  public int getSerialNumber() {
+    return instruction.getSerialNumber();
   }
 
   /**
