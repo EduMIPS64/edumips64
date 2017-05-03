@@ -1,14 +1,12 @@
 # EduMIPS64 ChangeLog
 
-## Unreleased
+## 1.2.3 (04/05/2017) - Angelo
 ### Added
 - Compiled the core to JavaScript. It's possible to run the EduMIPS64 core
   in the browser! A very simplistic prototype is available at 
   www.edumips.org/edumips64.html.
 - Developer guide, with documentation useful for developers that want to
   contribute.
-
-### Changed
 
 ### Fixed
 - Values that exceed data types' limits are silently discarded in .data (Issue
@@ -27,6 +25,9 @@
 - Fixed handling of the %% placeholder in the parser
 - Fix no-GUI execution (#133) - the GUI is correctly not updated if the "sync"
   option is disabled.
+- Fix CycleBuilder bug when the same instruction is in the pipeline multiple
+  times (#139)
+- Sped up CycleBuilder logic a lot, addressing the non-UI root cause of #132
 
 ## 1.2.2 (10/06/2016) - Contrada Fumata
 ### Fixed
