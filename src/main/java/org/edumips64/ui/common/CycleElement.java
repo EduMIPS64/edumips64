@@ -39,12 +39,16 @@ public class CycleElement {
   private LinkedList<String> states;
   private Instruction instruction;
 
+  // Boolean storing whether this CycleElement contains one or more invalid transactions.
+  // Used for testing and debugging purposes.
+  private boolean hasInvalidTransaction = false;
+
   private static final Logger logger = Logger.getLogger(CycleElement.class.getName());
 
   /**
   * A new element of this class is created.
   * @param instruction the instruction object
-  * @param startTime the time in which the element is entered in pipeline
+  * @param startTime the time in which the element entered in the pipeline
   */
   CycleElement(Instruction instruction, int startTime) {
     this.startTime = startTime;
@@ -60,6 +64,10 @@ public class CycleElement {
     return instruction.getFullName();
   }
 
+  public int getSerialNumber() {
+    return instruction.getSerialNumber();
+  }
+
   /**
   * This method is called for every clock cycle.
   * @param newState the current stage in pipeline of the instruction.
@@ -68,11 +76,16 @@ public class CycleElement {
     String lastState = states.getLast();
 
     if (!validateStateTransition(lastState, newState)) {
+      hasInvalidTransaction = true;
       logger.severe("Instruction: " + instruction + ", startTime: " + startTime);
       logger.severe("State " + newState + " is not allowed after state " + lastState);
     }
 
     states.add(newState);
+  }
+
+  public boolean hasInvalidTransaction() {
+    return hasInvalidTransaction;
   }
 
   /**
@@ -87,7 +100,7 @@ public class CycleElement {
   }
 
   /**
-  * @return the initial time in which the instruction occuped the IF stage in pipeline.
+  * @return the initial time in which the instruction occupied the IF stage in pipeline.
   */
   public int getTime() {
     return startTime;

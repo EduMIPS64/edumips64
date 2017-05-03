@@ -296,6 +296,18 @@ public class CPU {
     return pipe;
   }
 
+  // Includes FP instructions.
+  // TODO: make this accurate and test it, it seems to be returning an upper bound.
+  public int getInstructionCount() {
+    int count = 0;
+    for (Instruction i : pipe.values()) {
+      if (i != null && !i.isBubble()) {
+        count++;
+      }
+    }
+    return count + fpPipe.size();
+  }
+
   /** Returns the number of cycles performed by the CPU.
    *  @return an integer
    */

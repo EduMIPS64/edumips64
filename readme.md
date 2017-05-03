@@ -27,6 +27,9 @@ The JAR for the latest development version is available at
 http://lupino3.github.io/edumips64/edumips64-latest.jar (built by Travis CI
 every time a new revision is pushed and passes unit tests).
 
+This project adheres to the Contributor Covenant [code of conduct](CODE_OF_CONDUCT.md).
+By participating, you are expected to uphold this code. Please report unacceptable behavior to andrea.spadaccini@gmail.com.
+
 To contribute to EduMIPS64, please start by reading the [developer guide](docs/developer-guide.md).
 
 The proof-of-concept JS web application (GWT compilation + JS UI) is available at www.edumips.org/edumips64.html. It is currently manually pushed.

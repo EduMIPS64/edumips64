@@ -245,7 +245,7 @@ public abstract class Instruction {
   }
 
   /** Gets the serial number of this instruction */
-  public long getSerialNumber() {
+  public int getSerialNumber() {
     return serialNumber;
   }
 
@@ -302,6 +302,15 @@ public abstract class Instruction {
     return i.getSerialNumber() == serialNumber;
   }
 
+  /** Use the serial number as the hash code for the instruction.
+   * This is consistent with the overridden equals().
+   * @return the serial number of the instruction
+   */
+  @Override
+  public int hashCode() {
+    return serialNumber;
+  }
+
   /**<pre>
    * Returns true if the instruction is a BUBBLE, false otherwise. BUBBLE is used to fill
    * the pipeline and is not a real instruction, so some parts of the UI code need to know
@@ -310,6 +319,6 @@ public abstract class Instruction {
    * </pre>
    */
   public boolean isBubble() {
-    return name == " ";
+    return name.equals(" ");
   }
 }
