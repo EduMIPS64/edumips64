@@ -1,4 +1,4 @@
-10th of June, 2015                                              EduMIPS64 1.2.2
+4th of May, 2017                                                EduMIPS64 1.2.3
 
                            EduMIPS64 RELEASE NOTES	
                            http://www.edumips.org
@@ -9,13 +9,13 @@ graphical debugger.
 Notes for this release:
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This is version 1.2.2 of EduMIPS64, a bug-fix release that follows up on
-version 1.2.1, that was released a few weeks ago. The codename for this
-release is "Contrada Fumata", since it is being released from a nice country
-house in Contrada Fumata, near Adrano.
+This is version 1.2.3 of EduMIPS64, a bug-fix release that follows up on
+version 1.2.1, that was released in June 2016. The codename for this
+release is "Angelo", to honor a dear friend who recently left us.
 
-This release mostly fixes one bug with the JR/JALR instructions, that didn't
-properly respect RAW stalls.
+This release introduces performance improvements for large programs (thousands
+of instructions), a few bug fixes, code quality improvements thanks to
+Codacity analysis and improved test coverage.
 
 Please keep in mind that this is still EXPERIMENTAL SOFTWARE. It may
 BURN YOUR HARD DISK, DESTROY ALL YOUR DATA and even GO OUT WITH YOUR
@@ -27,9 +27,35 @@ EduMIPS64 is hosted on GitHub: www.github.com/lupino3/edumips64.
 Our web site is www.edumips.org, and our development blog is
 http://edumips64.blogspot.com.
 
-New in this release since version 1.2.1
+New in this release since version 1.2.2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Bugs fixed:
------------
-- JR does not respect RAW stalls (Issue #68)
+Added
+~~~~~
+- Compiled the core to JavaScript. It's possible to run the EduMIPS64 core
+  in the browser! A very simplistic prototype is available at 
+  www.edumips.org/edumips64.html.
+- Developer guide, with documentation useful for developers that want to
+  contribute.
+
+Fixed
+~~~~~
+- Values that exceed data types' limits are silently discarded in .data (Issue
+  #1)
+- Parsing an invalid double should raise IrregularStringOfBitsException (Issue
+  #77)
+- Lots of code quality fixes, thanks to the Codacity analysis
+- Added more unit tests (including, but not limited to, FPU, SYSCALL and
+  out-of-order execution. Started tracking and improving code coverage
+- Fixed a flaky unit test (#125)
+- Added typed configuration keys (#130)
+- Removed all uses of the Singleton design pattern (Issue #83)
+- CRLF bug on windows (Issue #95)
+- The code size should not take into account BUBBLE instructions (Issue #84)
+- Better dependency handling (Issue #74)
+- Fixed handling of the %% placeholder in the parser
+- Fix no-GUI execution (#133) - the GUI is correctly not updated if the "sync"
+  option is disabled.
+- Fix CycleBuilder bug when the same instruction is in the pipeline multiple
+  times (#139)
+- Sped up CycleBuilder logic a lot, addressing the non-UI root cause of #132
