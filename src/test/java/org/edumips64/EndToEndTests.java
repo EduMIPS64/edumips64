@@ -28,6 +28,7 @@ package org.edumips64;
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
 import org.edumips64.ui.common.CycleBuilder;
+import org.edumips64.ui.common.CycleElement;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.IrregularStringOfBitsException;
 import org.edumips64.utils.io.FileUtils;
@@ -187,6 +188,13 @@ public class EndToEndTests extends BaseTest {
       LocalWriter w = new LocalWriter(tmp.getAbsolutePath(), false);
       dinero.writeTraceData(w);
       w.close();
+
+      // Check if the transactions in the CycleBuilder are all valid.
+      for (CycleElement el : builder.getElementsList()) {
+        if (el.hasInvalidTransaction()) {
+          throw new InvalidCycleElementTransactionException();
+        }
+      }
 
       return new CpuTestStatus(cpu, tmp.getAbsolutePath());
     } finally {
