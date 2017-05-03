@@ -39,6 +39,10 @@ public class CycleElement {
   private LinkedList<String> states;
   private Instruction instruction;
 
+  // Boolean storing whether this CycleElement contains one or more invalid transactions.
+  // Used for testing and debugging purposes.
+  private boolean hasInvalidTransaction = false;
+
   private static final Logger logger = Logger.getLogger(CycleElement.class.getName());
 
   /**
@@ -72,11 +76,16 @@ public class CycleElement {
     String lastState = states.getLast();
 
     if (!validateStateTransition(lastState, newState)) {
+      hasInvalidTransaction = true;
       logger.severe("Instruction: " + instruction + ", startTime: " + startTime);
       logger.severe("State " + newState + " is not allowed after state " + lastState);
     }
 
     states.add(newState);
+  }
+
+  public boolean hasInvalidTransaction() {
+    return hasInvalidTransaction;
   }
 
   /**
