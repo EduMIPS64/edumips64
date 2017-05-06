@@ -13,7 +13,7 @@ notifications:
 language: java
 python:
 - "2.7"
-install: "sudo pip install Sphinx==1.1.3 && gradle getLibs"
+install: "sudo pip install Sphinx==1.1.3 && gradle getLibs && sudo apt-get install ant-optional"
 script: "ant test && ant gwtc"
 jdk:
 - oraclejdk8
