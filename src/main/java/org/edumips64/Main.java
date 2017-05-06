@@ -184,7 +184,7 @@ public class Main extends JApplet {
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
     f = new JFrame();
-    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     // Maximizing the application
     Insets screenInsets = f.getToolkit().getScreenInsets(f.getGraphicsConfiguration());
     Rectangle screenSize = f.getGraphicsConfiguration().getBounds();
