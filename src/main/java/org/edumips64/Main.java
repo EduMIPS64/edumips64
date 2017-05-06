@@ -210,10 +210,6 @@ public class Main extends JApplet {
     }
 
     f.setExtendedState(f.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-
-//debugging code //BigDecimal bd=new BigDecimal("1e-23");
-    //BigInteger bi=FPInstructionUtils.doubleTo64FixedPoint(bd,CPU.FPRoundingMode.TOWARDS_PLUS_INFINITY);
-    //System.out.println(bi.longValue());
   }
 
   private static void addFrame(String name, JInternalFrame f) {
