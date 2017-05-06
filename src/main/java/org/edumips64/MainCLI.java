@@ -25,10 +25,15 @@ package org.edumips64;
 
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
+import org.edumips64.ui.common.CycleBuilder;
 import org.edumips64.utils.*;
 import org.edumips64.utils.io.LocalFileUtils;
 
 import java.io.*;
+
+import static org.edumips64.Main.configStore;
+import static org.edumips64.Main.showVersion;
+import static org.edumips64.Main.usage;
 
 /** Interactive shell for EduMIPS64
  * @author Andrea Spadaccini
@@ -39,6 +44,11 @@ public class MainCLI {
     try {
       ConfigStore cfg = new JavaPrefsConfigStore(ConfigStore.defaults);
       CurrentLocale.setConfig(cfg);
+
+      // Parse the args as early as possible, since it will influence logging level as well.
+      String toOpen = Main.parseArgsOrExit(args);
+
+      // Initialize the CPU and all its dependencies.
       Memory memory = new Memory();
       CPU c = new CPU(memory, cfg);
       LocalFileUtils localFileUtils = new LocalFileUtils();
@@ -47,10 +57,13 @@ public class MainCLI {
       Dinero dinero = new Dinero(memory);
       InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, c, dinero, cfg);
       Parser p = new Parser(localFileUtils, symTab, memory, instructionBuilder);
+      CycleBuilder builder = new CycleBuilder(c);
       c.setStatus(CPU.CPUStatus.READY);
 
-      if (args.length > 0) {
-        String absoluteFilename = new File(args[0]).getAbsolutePath();
+      // Initialization done. Print a welcome message and open the file if needed.
+      System.out.println("Benvenuto nella shell di EduMIPS64!!");
+      if (toOpen != null) {
+        String absoluteFilename = new File(toOpen).getAbsolutePath();
         try {
           p.parse(absoluteFilename);
         } catch (ParserMultiException e) {
@@ -59,17 +72,12 @@ public class MainCLI {
           }
         }
         c.setStatus(CPU.CPUStatus.RUNNING);
+        System.out.println("(Caricato il file " + absoluteFilename + ")");
       }
 
+      // Start the (very primitive) Read/Eval/Print Loop.
       BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
-      System.out.println("Benvenuto nella shell di EduMIPS64!!");
-
-      if (args.length > 0) {
-        System.out.println("(Caricato il file " + args[0] + ")");
-      }
-
       System.out.print("> ");
-
       while (true) {
 
         String read = keyboard.readLine();
@@ -86,6 +94,7 @@ public class MainCLI {
           help += "help\t\t\tmostra questo messaggio di aiuto\n";
           help += "step\t\t\tfa avanzare di uno step la macchina a stati della CPU:\n";
           help += "step n\t\t\tfa avanzare di n step la macchina a stati della CPU:\n";
+          help += "run\t\t\tesegue il programma fino a terminazione\n";
           help += "show registers\t\tmostra il contenuto dei registri\n";
           help += "show memory\t\tmostra il contenuto della memoria\n";
           help += "show symbols\t\tmostra il contenuto della symbol table\n";
@@ -113,6 +122,20 @@ public class MainCLI {
               System.out.println("Bisogna fornire almeno un parametro al comando show");
             }
           }
+        } else if (tokens[0].compareTo("run") == 0) {
+            int steps = 0;
+            long startTimeMs = System.currentTimeMillis();
+            try {
+              while(true) {
+                steps++;
+                c.step();
+                builder.step();
+              }
+            } catch (HaltException e) {
+              long endTimeMs = System.currentTimeMillis();
+              long totalTimeMs = endTimeMs - startTimeMs;
+              System.out.println("Esecuzione terminata. " + steps + " step eseguiti in " + totalTimeMs + "ms");
+            }
         } else if (tokens[0].compareTo("step") == 0) {
           try {
             int num = 1;
@@ -128,6 +151,7 @@ public class MainCLI {
 
               for (int i = 0; i < num; ++i) {
                 c.step();
+                builder.step();
                 System.out.println(c.pipeLineString());
               }
             } catch (Exception e) {
