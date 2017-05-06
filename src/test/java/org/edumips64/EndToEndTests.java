@@ -153,6 +153,13 @@ public class EndToEndTests extends BaseTest {
    * @param testPath path of the test code.
    */
   private CpuTestStatus runMipsTest(String testPath) throws Exception {
+    return runMipsTest(testPath, false);
+  }
+
+  // Version of runMipsTest that allows to specify whether to write a trace file.
+  // Writing the trace file can unnecessarily slow down the tests, so by default they are not written (see previous
+  // override of this method).
+  private CpuTestStatus runMipsTest(String testPath, boolean writeTracefile) throws Exception {
     log.warning("================================= Starting test " + testPath + " (forwarding: " +
         config.getBoolean(ConfigKey.FORWARDING) + ")");
     cpu.reset();
@@ -160,6 +167,7 @@ public class EndToEndTests extends BaseTest {
     symTab.reset();
     testPath = testsLocation + testPath;
     CycleBuilder builder = new CycleBuilder(cpu);
+    String tracefile = null;
 
     try {
       try {
@@ -183,11 +191,14 @@ public class EndToEndTests extends BaseTest {
       log.warning("================================= Finished test " + testPath);
       log.info(cpu.toString());
 
-      File tmp = File.createTempFile("edumips64", "xdin");
-      tmp.deleteOnExit();
-      LocalWriter w = new LocalWriter(tmp.getAbsolutePath(), false);
-      dinero.writeTraceData(w);
-      w.close();
+      if (writeTracefile) {
+        File tmp = File.createTempFile("edumips64", "xdin");
+        tracefile = tmp.getAbsolutePath();
+        tmp.deleteOnExit();
+        LocalWriter w = new LocalWriter(tmp.getAbsolutePath(), false);
+        dinero.writeTraceData(w);
+        w.close();
+      }
 
       // Check if the transactions in the CycleBuilder are all valid.
       for (CycleElement el : builder.getElementsList()) {
@@ -196,7 +207,7 @@ public class EndToEndTests extends BaseTest {
         }
       }
 
-      return new CpuTestStatus(cpu, tmp.getAbsolutePath());
+      return new CpuTestStatus(cpu, tracefile);
     } finally {
       cpu.reset();
       dinero.reset();
@@ -238,7 +249,7 @@ public class EndToEndTests extends BaseTest {
   }
 
   private void runTestAndCompareTracefileWithGolden(String path) throws Exception {
-    CpuTestStatus s = runMipsTest(path);
+    CpuTestStatus s = runMipsTest(path, true);
     String goldenTrace = testsLocation + path + ".xdin.golden";
 
     String golden = new Scanner(new File(goldenTrace)).useDelimiter("\\A").next();
