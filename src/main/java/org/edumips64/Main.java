@@ -97,7 +97,7 @@ public class Main extends JApplet {
   public static boolean debug_mode = false;
   private static JDesktopPane desk;
 
-  private static void usage() {
+  static void usage() {
     showVersion();
     System.out.println(CurrentLocale.getString("HT.Options"));
     System.out.println(CurrentLocale.getString("HT.File"));
@@ -107,17 +107,13 @@ public class Main extends JApplet {
     System.out.println(CurrentLocale.getString("HT.Version"));
   }
 
-  private static void showVersion() {
+  static void showVersion() {
     System.out.println("EduMIPS64 version " + VERSION + " (codename: " + CODENAME + ", git revision " + git_revision + ", built on " + build_date + ") - Ciao 'mbare.");
   }
 
-  public static void main(String args[]) {
-    // Meta properties.
-    VERSION = MetaInfo.get("Signature-Version");
-    CODENAME = MetaInfo.get("Codename");
-    build_date = MetaInfo.get("Build-Date");
-    git_revision = MetaInfo.get("Git-Revision");
-
+  // Parses the command-line arguments.
+  // Returns the filename to open (if any) and sets parameters such as logging. If necessary, exits.
+  static String parseArgsOrExit(String[] args) {
     // Checking CLI parameters.
     String toOpen = null;
     boolean printUsageAndExit = false, printVersionAndExit = false;
@@ -149,18 +145,15 @@ public class Main extends JApplet {
 
         if (printUsageAndExit) {
           usage();
-          return;
+          System.exit(0);
         }
 
         if (printVersionAndExit) {
           showVersion();
-          return;
+          System.exit(0);
         }
       }
     }
-
-    // Configure logger format.
-    System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tm%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
 
     if (!debug_mode) {
       // Disable logging message whose level is less than WARNING.
@@ -170,6 +163,20 @@ public class Main extends JApplet {
         h.setLevel(java.util.logging.Level.WARNING);
       }
     }
+    return toOpen;
+  }
+
+  public static void main(String args[]) {
+    // Meta properties.
+    VERSION = MetaInfo.get("Signature-Version");
+    CODENAME = MetaInfo.get("Codename");
+    build_date = MetaInfo.get("Build-Date");
+    git_revision = MetaInfo.get("Git-Revision");
+
+    String toOpen = parseArgsOrExit(args);
+
+    // Configure logger format.
+    System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tm%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
 
     showVersion();
 
