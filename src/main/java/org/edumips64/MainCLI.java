@@ -25,15 +25,11 @@ package org.edumips64;
 
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
-import org.edumips64.ui.common.CycleBuilder;
+import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.*;
 import org.edumips64.utils.io.LocalFileUtils;
 
 import java.io.*;
-
-import static org.edumips64.Main.configStore;
-import static org.edumips64.Main.showVersion;
-import static org.edumips64.Main.usage;
 
 /** Interactive shell for EduMIPS64
  * @author Andrea Spadaccini
@@ -57,7 +53,6 @@ public class MainCLI {
       Dinero dinero = new Dinero(memory);
       InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, c, dinero, cfg);
       Parser p = new Parser(localFileUtils, symTab, memory, instructionBuilder);
-      CycleBuilder builder = new CycleBuilder(c);
       c.setStatus(CPU.CPUStatus.READY);
 
       // Initialization done. Print a welcome message and open the file if needed.
@@ -129,7 +124,6 @@ public class MainCLI {
               while(true) {
                 steps++;
                 c.step();
-                builder.step();
               }
             } catch (HaltException e) {
               long endTimeMs = System.currentTimeMillis();
@@ -151,7 +145,6 @@ public class MainCLI {
 
               for (int i = 0; i < num; ++i) {
                 c.step();
-                builder.step();
                 System.out.println(c.pipeLineString());
               }
             } catch (Exception e) {

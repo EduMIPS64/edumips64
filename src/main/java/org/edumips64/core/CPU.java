@@ -44,10 +44,7 @@ import org.edumips64.core.is.JumpException;
 import org.edumips64.core.is.RAWException;
 import org.edumips64.core.is.TwosComplementSumException;
 import org.edumips64.core.is.WAWException;
-import org.edumips64.utils.ConfigKey;
-import org.edumips64.utils.ConfigStore;
-import org.edumips64.utils.FPUConfigurator;
-import org.edumips64.utils.IrregularStringOfBitsException;
+import org.edumips64.utils.*;
 
 /** This class models a MIPS CPU with 32 64-bit General Purpose Registers.
 *  @author Andrea Spadaccini, Simona Ullo, Antonella Scandura, Massimo Trubia (FPU modifications)
@@ -114,6 +111,10 @@ public class CPU {
   /** BUBBLE */
   private Instruction bubble;
 
+  /** CycleBuilder. Representation of all state transitions that happened inside the CPU. Needed for UIs, but
+   *  stored here because it needs to be invoked every time the CPU does one step. */
+  private CycleBuilder builder;
+
   public CPU(Memory memory, ConfigStore config) {
     this.config = config;
     bubble = new BUBBLE();
@@ -161,6 +162,9 @@ public class CPU {
     knownFPInstructions = conf.getFPArithmeticInstructions();
     terminatingInstructionsOPCodes = conf.getTerminatingInstructions();
 
+    // CycleBuilder.
+    this.builder = new CycleBuilder(this);
+
     logger.info("CPU Created.");
   }
 
@@ -199,6 +203,10 @@ public class CPU {
   }
 
 //GETTING PROPERTIES -----------------------------------------------------------------
+
+  public CycleBuilder getCycleBuilder() {
+    return builder;
+  }
 
   /** Gets the CPU status
    *  @return status a CPUStatus value representing the current CPU status
@@ -503,6 +511,7 @@ public class CPU {
       pipe.put(PipeStage.WB, null);
       throw ex;
     } finally {
+      builder.step();
       logger.info("End of cycle " + cycles + "\n---------------------------------------------\n" + pipeLineString() + "\n");
     }
   }
@@ -757,6 +766,9 @@ public class CPU {
     clearPipe();
     // Reset FP pipeline
     fpPipe.reset();
+
+    // Reset CycleBuilder
+    builder.reset();
 
     logger.info("CPU Resetted");
   }

@@ -26,8 +26,8 @@ package org.edumips64.ui.swing;
 
 import org.edumips64.core.CPU;
 import org.edumips64.core.Memory;
-import org.edumips64.ui.common.CycleBuilder;
-import org.edumips64.ui.common.CycleElement;
+import org.edumips64.utils.CycleBuilder;
+import org.edumips64.utils.CycleElement;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 
@@ -51,7 +51,7 @@ public class GUICycles extends GUIComponent {
 
   public GUICycles(CPU cpu, Memory memory, ConfigStore config) {
     super(cpu, memory, config);
-    builder = new CycleBuilder(cpu);
+    builder = cpu.getCycleBuilder();
     rightPanel = new RightPanel();
 
     jsp1 = new JScrollPane(rightPanel);
@@ -82,13 +82,8 @@ public class GUICycles extends GUIComponent {
     draw();
   }
 
-
-  public synchronized void update() {
-    synchronized (rightPanel) {
-      synchronized (leftPanel) {
-        builder.step();
-      }
-    }
+  @Override
+  public void update() {
   }
 
   public synchronized void draw() {
