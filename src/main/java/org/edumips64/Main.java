@@ -52,9 +52,11 @@ public class Main extends JApplet {
   public static String git_revision;
 
   private static CPU cpu;
-  private static CPUGUIThread cgt;
+  // The last created CPU Worker. Necessary for the Stop menu item.
+  private  static CPUSwingWorker cpuWorker;
   private static Parser parser;
   private static SymbolTable symTab;
+  private static Memory memory;
   private static Dinero dinero;
   private static GUIFrontend front;
   private static ConfigStore configStore;
@@ -244,8 +246,6 @@ public class Main extends JApplet {
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
     front = new GUIFrontend(cpu, memory, configStore);
-    cgt = new CPUGUIThread(cpu, front, f, configStore);
-    cgt.start();
 
     // Internal Frames
     JInternalFrame pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);
@@ -383,7 +383,7 @@ public class Main extends JApplet {
 
   /** Updates the configuration parameters of CPUGUIThread */
   public static void updateCGT() {
-    cgt.updateConfigValues();
+    cpuWorker.updateConfigValues();
   }
 
   /** Changes the status of running menu items.
@@ -479,9 +479,11 @@ public class Main extends JApplet {
       log.info("Set the status to RUNNING");
 
       // Let's fetch the first instruction
-      synchronized (cgt) {
-        cgt.setSteps(1);
-        cgt.notify();
+      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore);
+      cpuWorker.setSteps(1);
+      cpuWorker.execute();
+      while (cpuWorker.isDone()) {
+        Thread.sleep(200);
       }
 
       openedFile = file;
@@ -609,8 +611,10 @@ public class Main extends JApplet {
     }
 
     cpu.setStatus(CPU.CPUStatus.READY);
-    front.updateComponents();
-    front.represent();
+    SwingUtilities.invokeLater(() -> {
+      front.updateComponents();
+      front.represent();
+    });
 
     if (openedFile != null && reopenFile) {
       openFile(openedFile);
@@ -763,40 +767,39 @@ public class Main extends JApplet {
     exec.add(single_cycle);
     single_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
     single_cycle.addActionListener(e -> {
-      cgt.setSteps(1);
-
-      synchronized (cgt) {
-        cgt.notify();
-      }
+      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore);
+      cpuWorker.setSteps(1);
+      cpuWorker.execute();
     });
 
     // Execute the whole program
     exec.add(run_to);
     run_to.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
     run_to.addActionListener(e -> {
-      cgt.setSteps(-1);
-
-      synchronized (cgt) {
-        cgt.notify();
-      }
+      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore);
+      cpuWorker.setSteps(-1);
+      cpuWorker.execute();
     });
 
     // Execute a fixed number of steps
     exec.add(multi_cycle);
     multi_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
     multi_cycle.addActionListener(e -> {
-      cgt.setSteps(configStore.getInt(ConfigKey.N_STEPS));
-
-      synchronized (cgt) {
-        cgt.notify();
-      }
+      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore);
+      cpuWorker.setSteps(configStore.getInt(ConfigKey.N_STEPS));
+      cpuWorker.execute();
     });
 
     // Stops the execution
     exec.add(stop);
     stop.setEnabled(false);
     stop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F9, 0));
-    stop.addActionListener(e -> cgt.stopExecution());
+    stop.addActionListener(e -> {
+      // TODO: properly implement stop.
+      if (cpuWorker != null) {
+        cpuWorker.stopExecution();
+      }
+    });
 
     // ---------------- CONFIGURE MENU
 
