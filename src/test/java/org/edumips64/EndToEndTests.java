@@ -439,7 +439,7 @@ public class EndToEndTests extends BaseTest {
     assertEquals(2, Integer.parseInt(status.fpRegisters[2].getBinString(), 2));
   }
 
-  /* Tests for masking synchronous exceptions. Termination cannot be tested here since it's in the CPUGuiThread. */
+  /* Tests for masking synchronous exceptions. Termination cannot be tested here since it's in the CPUSwingWorker. */
   @Test(expected = SynchronousException.class)
   public void testDivisionByZeroThrowException() throws Exception {
     config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
