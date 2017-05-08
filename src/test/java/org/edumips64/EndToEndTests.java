@@ -27,8 +27,8 @@ package org.edumips64;
 
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
-import org.edumips64.ui.common.CycleBuilder;
-import org.edumips64.ui.common.CycleElement;
+import org.edumips64.utils.CycleBuilder;
+import org.edumips64.utils.CycleElement;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.IrregularStringOfBitsException;
 import org.edumips64.utils.io.FileUtils;
@@ -166,7 +166,6 @@ public class EndToEndTests extends BaseTest {
     dinero.reset();
     symTab.reset();
     testPath = testsLocation + testPath;
-    CycleBuilder builder = new CycleBuilder(cpu);
     String tracefile = null;
 
     try {
@@ -185,7 +184,6 @@ public class EndToEndTests extends BaseTest {
 
       while (true) {
         cpu.step();
-        builder.step();
       }
     } catch (HaltException e) {
       log.warning("================================= Finished test " + testPath);
@@ -202,7 +200,7 @@ public class EndToEndTests extends BaseTest {
 
       // Check if the transactions in the CycleBuilder are all valid.
       boolean allValid = true;
-      for (CycleElement el : builder.getElementsList()) {
+      for (CycleElement el : cpu.getCycleBuilder().getElementsList()) {
         allValid &= el.isValid();
       }
       if (!allValid) {
