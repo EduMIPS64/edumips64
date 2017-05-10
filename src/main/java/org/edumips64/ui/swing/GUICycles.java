@@ -120,32 +120,36 @@ public class GUICycles extends GUIComponent {
     public synchronized void fill(Graphics g) {
       int row = 0;
 
-      for (CycleElement el: builder.getElementsList()) {
-        // TODO: verify rendering for other cases.
-        if (!el.shouldRender()) {
-          continue;
-        }
-        int column = 0;
-        String pre = "IF";
-        int elementTime = el.getTime();
-
-        for (String st: el.getStates()) {
-          Color color = getColorByState(st, pre);
-          if (color != null) {
-            g.setColor(color);
+      java.util.List<CycleElement> elements = builder.getElementsList();
+      synchronized(elements) {
+        for (CycleElement el : elements) {
+          // TODO: verify rendering for other cases.
+          // TODO: should we re-draw this at every cycle?
+          if (!el.shouldRender()) {
+            continue;
           }
-          g.fillRect(10 + (elementTime + column - 1) * 30, 9 + row * 15, 30, 13);
-          g.setColor(Color.black);
-          g.drawRect(10 + (elementTime + column - 1) * 30, 9 + row * 15, 30, 13);
-          g.drawString(st, 15 + (elementTime + column - 1) * 30, 20 + row * 15);
-          column++;
+          int column = 0;
+          String pre = "IF";
+          int elementTime = el.getTime();
 
-          if ((!st.equals(" ")) && (!st.equals("RAW"))) {
-            pre = st;
+          for (String st : el.getStates()) {
+            Color color = getColorByState(st, pre);
+            if (color != null) {
+              g.setColor(color);
+            }
+            g.fillRect(10 + (elementTime + column - 1) * 30, 9 + row * 15, 30, 13);
+            g.setColor(Color.black);
+            g.drawRect(10 + (elementTime + column - 1) * 30, 9 + row * 15, 30, 13);
+            g.drawString(st, 15 + (elementTime + column - 1) * 30, 20 + row * 15);
+            column++;
+
+            if ((!st.equals(" ")) && (!st.equals("RAW"))) {
+              pre = st;
+            }
           }
-        }
 
-        row++;
+          row++;
+        }
       }
     }
 
@@ -191,9 +195,12 @@ public class GUICycles extends GUIComponent {
       g.setFont(f1);
       int i = 0;
 
-      for (CycleElement el: builder.getElementsList()) {
-        g.drawString(el.getName(), 5, 20 + i * 15);
-        i++;
+      java.util.List<CycleElement> elements = builder.getElementsList();
+      synchronized(elements) {
+        for (CycleElement el : elements) {
+          g.drawString(el.getName(), 5, 20 + i * 15);
+          i++;
+        }
       }
     }
   }
