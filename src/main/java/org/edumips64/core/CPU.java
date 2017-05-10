@@ -296,12 +296,11 @@ public class CPU {
     return pipe;
   }
 
-  // Includes FP instructions.
-  // TODO: make this accurate and test it, it seems to be returning an upper bound.
+  // Includes FP instructions and bubbles. Used by CycleBuilder.
   public int getInstructionCount() {
     int count = 0;
     for (Instruction i : pipe.values()) {
-      if (i != null && !i.isBubble()) {
+      if (i != null) {
         count++;
       }
     }
