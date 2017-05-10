@@ -51,19 +51,16 @@ public class Main extends JApplet {
   public static String build_date;
   public static String git_revision;
 
-  static CPU cpu;
-  public static CPUGUIThread cgt;
-  static LocalFileUtils lfu;
-  static Parser parser;
-  static SymbolTable symTab;
-  static Memory memory;
-  static Dinero dinero;
-  static InstructionBuilder instructionBuilder;
-  static GUIFrontend front;
-  static ConfigStore configStore;
-  static JFileChooser jfc;
+  private static CPU cpu;
+  private static CPUGUIThread cgt;
+  private static Parser parser;
+  private static SymbolTable symTab;
+  private static Dinero dinero;
+  private static GUIFrontend front;
+  private static ConfigStore configStore;
+  private static JFileChooser jfc;
 
-  static JFrame f = null;
+  private static JFrame f = null;
   private static JMenuItem open;
   private static JMenuItem reset;
   private static JMenuItem exit;
@@ -82,22 +79,18 @@ public class Main extends JApplet {
   private static JCheckBoxMenuItem pipelineJCB, registersJCB, memoryJCB, codeJCB, cyclesJCB, statsJCB, ioJCB;
 
   public static GUIIO ioFrame;
-  public static IOManager iom;
+  private static IOManager iom;
 
-  public final static Logger log = Logger.getLogger(Main.class.getName());
+  private final static Logger log = Logger.getLogger(Main.class.getName());
 
-  private static JInternalFrame memoryFrame;
-  private static JInternalFrame codeFrame;
-  private static JInternalFrame cyclesFrame;
-  private static JInternalFrame statsFrame;
   private static Map<String, JInternalFrame> mapped_frames;
   private static java.util.List<JInternalFrame> ordered_frames;
 
   private static String openedFile = null;
-  public static boolean debug_mode = false;
+  private static boolean debug_mode = false;
   private static JDesktopPane desk;
 
-  static void usage() {
+  private static void usage() {
     showVersion();
     System.out.println(CurrentLocale.getString("HT.Options"));
     System.out.println(CurrentLocale.getString("HT.File"));
@@ -107,7 +100,7 @@ public class Main extends JApplet {
     System.out.println(CurrentLocale.getString("HT.Version"));
   }
 
-  static void showVersion() {
+  private static void showVersion() {
     System.out.println("EduMIPS64 version " + VERSION + " (codename: " + CODENAME + ", git revision " + git_revision + ", built on " + build_date + ") - Ciao 'mbare.");
   }
 
@@ -229,7 +222,7 @@ public class Main extends JApplet {
   public void init() {
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
-    lfu = new LocalFileUtils();
+    LocalFileUtils lfu = new LocalFileUtils();
 
     configStore = new JavaPrefsConfigStore(ConfigStore.defaults);
     CurrentLocale.setConfig(configStore);
@@ -240,14 +233,14 @@ public class Main extends JApplet {
     cp.setLayout(new BorderLayout());
     cp.add(createMenuBar(), BorderLayout.NORTH);
 
-    memory = new Memory();
+    Memory memory = new Memory();
     cpu = new CPU(memory, configStore);
     cpu.setStatus(CPU.CPUStatus.READY);
 
     symTab = new SymbolTable(memory);
     iom = new IOManager(lfu, memory);
     dinero = new Dinero(memory);
-    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, configStore);
+    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, configStore);
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
     front = new GUIFrontend(cpu, memory, configStore);
@@ -275,7 +268,7 @@ public class Main extends JApplet {
         registersJCB.setState(true);
       }
     });
-    memoryFrame = new JInternalFrame(CurrentLocale.getString("MEMORY"), true, false, true, true);
+    JInternalFrame memoryFrame = new JInternalFrame(CurrentLocale.getString("MEMORY"), true, false, true, true);
     memoryFrame.addInternalFrameListener(new InternalFrameAdapter() {
       public void internalFrameIconified(InternalFrameEvent e) {
         memoryJCB.setState(false);
@@ -284,7 +277,7 @@ public class Main extends JApplet {
         memoryJCB.setState(true);
       }
     });
-    codeFrame = new JInternalFrame(CurrentLocale.getString("CODE"), true, false, true, true);
+    JInternalFrame codeFrame = new JInternalFrame(CurrentLocale.getString("CODE"), true, false, true, true);
     codeFrame.addInternalFrameListener(new InternalFrameAdapter() {
       public void internalFrameIconified(InternalFrameEvent e) {
         codeJCB.setState(false);
@@ -293,7 +286,7 @@ public class Main extends JApplet {
         codeJCB.setState(true);
       }
     });
-    cyclesFrame = new JInternalFrame(CurrentLocale.getString("CYCLES"), true, false, true, true);
+    JInternalFrame cyclesFrame = new JInternalFrame(CurrentLocale.getString("CYCLES"), true, false, true, true);
     cyclesFrame.addInternalFrameListener(new InternalFrameAdapter() {
       public void internalFrameIconified(InternalFrameEvent e) {
         cyclesJCB.setState(false);
@@ -302,7 +295,7 @@ public class Main extends JApplet {
         cyclesJCB.setState(true);
       }
     });
-    statsFrame = new JInternalFrame(CurrentLocale.getString("STATS"), true, false, true, true);
+    JInternalFrame statsFrame = new JInternalFrame(CurrentLocale.getString("STATS"), true, false, true, true);
     statsFrame.addInternalFrameListener(new InternalFrameAdapter() {
       public void internalFrameIconified(InternalFrameEvent e) {
         statsJCB.setState(false);
@@ -339,8 +332,8 @@ public class Main extends JApplet {
     // structures. But time is running out, this is not my main task but
     // only something I need in order to achieve my objective. Sorry.
     // --andrea
-    mapped_frames = new HashMap<String, JInternalFrame>();
-    ordered_frames = new ArrayList<JInternalFrame>();
+    mapped_frames = new HashMap<>();
+    ordered_frames = new ArrayList<>();
 
     addFrame("cycles", cyclesFrame);
     addFrame("registers", registersFrame);
@@ -378,7 +371,7 @@ public class Main extends JApplet {
     // Auto-minimze the log window and the I/O window
     try {
       ioFrame.setIcon(true);
-    } catch (java.beans.PropertyVetoException e) {}
+    } catch (java.beans.PropertyVetoException ignored) {}
 
     tileWindows();
   }
@@ -530,7 +523,7 @@ public class Main extends JApplet {
   private static void tileWindows() {
     // First of all, we don't have to consider iconified frames, because
     // the frames to be tiled are the ones that aren't iconified
-    java.util.List<JInternalFrame> list = new ArrayList<JInternalFrame>();
+    java.util.List<JInternalFrame> list = new ArrayList<>();
 
     for (JInternalFrame f : ordered_frames) {
       if (!f.isIcon()) {
@@ -604,7 +597,7 @@ public class Main extends JApplet {
     }
   }
 
-  public static void resetSimulator(boolean reopenFile) {
+  private static void resetSimulator(boolean reopenFile) {
     cpu.reset();
     symTab.reset();
     dinero.reset();
@@ -683,7 +676,7 @@ public class Main extends JApplet {
     run_to = new JMenuItem();
     multi_cycle = new JMenuItem();
     stop = new JMenuItem();
-    JMenuItem tile = new JMenuItem();
+    JMenuItem tile;
     dinFrontend = new JMenuItem();
     manual = new JMenuItem();
     settings = new JMenuItem();
@@ -706,20 +699,18 @@ public class Main extends JApplet {
     // ---------------- FILE MENU
     // Open file
     file.add(open);
-    open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-    open.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        int val = jfc.showOpenDialog(f);
+    open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+    open.addActionListener(e -> {
+      int val = jfc.showOpenDialog(f);
 
-        if (val == JFileChooser.APPROVE_OPTION) {
-          String filename = jfc.getSelectedFile().getPath();
-          configStore.putString(ConfigKey.LAST_DIR, jfc.getCurrentDirectory().getAbsolutePath());
-          addFileToRecentMenu(filename);
+      if (val == JFileChooser.APPROVE_OPTION) {
+        String filename = jfc.getSelectedFile().getPath();
+        configStore.putString(ConfigKey.LAST_DIR, jfc.getCurrentDirectory().getAbsolutePath());
+        addFileToRecentMenu(filename);
 
-          resetSimulator(false);
-          openFile(filename);
-          changeShownMenuItems(cpu.getStatus());
-        }
+        resetSimulator(false);
+        openFile(filename);
+        changeShownMenuItems(cpu.getStatus());
       }
     });
 
@@ -736,33 +727,27 @@ public class Main extends JApplet {
 
     // Reset the simulator and the CPU
     file.add(reset);
-    reset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
-    reset.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        resetSimulator(true);
-      }
-    });
+    reset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
+    reset.addActionListener(e -> resetSimulator(true));
 
     // Write Dinero Tracefile
     file.add(dinero_tracefile);
-    dinero_tracefile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK));
-    dinero_tracefile.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        jfc.setSelectedFile(new File(openedFile + ".xdin"));
-        int val = jfc.showSaveDialog(f);
+    dinero_tracefile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_MASK));
+    dinero_tracefile.addActionListener(e -> {
+      jfc.setSelectedFile(new File(openedFile + ".xdin"));
+      int val = jfc.showSaveDialog(f);
 
-        if (val == JFileChooser.APPROVE_OPTION) {
-          String filename = jfc.getSelectedFile().getPath();
+      if (val == JFileChooser.APPROVE_OPTION) {
+        String filename = jfc.getSelectedFile().getPath();
 
-          try {
-            LocalWriter w = new LocalWriter(filename, false);
-            dinero.writeTraceData(w);
-            w.close();
-            log.info("Wrote dinero tracefile");
-          } catch (Exception ex) {
-            ex.printStackTrace();
-            log.info("Exception in DineroTracefile: " + ex);
-          }
+        try {
+          LocalWriter w = new LocalWriter(filename, false);
+          dinero.writeTraceData(w);
+          w.close();
+          log.info("Wrote dinero tracefile");
+        } catch (Exception ex) {
+          ex.printStackTrace();
+          log.info("Exception in DineroTracefile: " + ex);
         }
       }
     });
@@ -770,50 +755,40 @@ public class Main extends JApplet {
 
     // Exit
     file.add(exit);
-    exit.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        System.exit(0);
-      }
-    });
+    exit.addActionListener(e -> System.exit(0));
 
 
     // ---------------- EXECUTE MENU
     // Execute a single simulation step
     exec.add(single_cycle);
     single_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
-    single_cycle.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        cgt.setSteps(1);
+    single_cycle.addActionListener(e -> {
+      cgt.setSteps(1);
 
-        synchronized (cgt) {
-          cgt.notify();
-        }
+      synchronized (cgt) {
+        cgt.notify();
       }
     });
 
     // Execute the whole program
     exec.add(run_to);
     run_to.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
-    run_to.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        cgt.setSteps(-1);
+    run_to.addActionListener(e -> {
+      cgt.setSteps(-1);
 
-        synchronized (cgt) {
-          cgt.notify();
-        }
+      synchronized (cgt) {
+        cgt.notify();
       }
     });
 
     // Execute a fixed number of steps
     exec.add(multi_cycle);
     multi_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
-    multi_cycle.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        cgt.setSteps(configStore.getInt(ConfigKey.N_STEPS));
+    multi_cycle.addActionListener(e -> {
+      cgt.setSteps(configStore.getInt(ConfigKey.N_STEPS));
 
-        synchronized (cgt) {
-          cgt.notify();
-        }
+      synchronized (cgt) {
+        cgt.notify();
       }
     });
 
@@ -821,20 +796,12 @@ public class Main extends JApplet {
     exec.add(stop);
     stop.setEnabled(false);
     stop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F9, 0));
-    stop.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        cgt.stopExecution();
-      }
-    });
+    stop.addActionListener(e -> cgt.stopExecution());
 
     // ---------------- CONFIGURE MENU
 
     config.add(settings);
-    settings.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        new GUIConfig(f, configStore);
-      }
-    });
+    settings.addActionListener(e -> new GUIConfig(f, configStore));
     // ---------------- LANGUAGE MENU
     config.add(lang);
 
@@ -849,16 +816,14 @@ public class Main extends JApplet {
 
     lang.add(lang_en);
 
-    lang_en.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        lang_en.setState(true);
-        lang_it.setState(false);
-        configStore.putString(ConfigKey.LANGUAGE, "en");
-        initMenuItems();
-        setFrameTitles();
-        front.updateLanguageStrings();
-        // f.setVisible(true);
-      }
+    lang_en.addActionListener(e -> {
+      lang_en.setState(true);
+      lang_it.setState(false);
+      configStore.putString(ConfigKey.LANGUAGE, "en");
+      initMenuItems();
+      setFrameTitles();
+      front.updateLanguageStrings();
+      // f.setVisible(true);
     });
 
     try {
@@ -872,16 +837,14 @@ public class Main extends JApplet {
       e.printStackTrace();
     }
 
-    lang_it.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        lang_it.setState(true);
-        lang_en.setState(false);
-        configStore.putString(ConfigKey.LANGUAGE, "it");
-        initMenuItems();
-        setFrameTitles();
-        front.updateLanguageStrings();
-        // f.setVisible(true);
-      }
+    lang_it.addActionListener(e -> {
+      lang_it.setState(true);
+      lang_en.setState(false);
+      configStore.putString(ConfigKey.LANGUAGE, "it");
+      initMenuItems();
+      setFrameTitles();
+      front.updateLanguageStrings();
+      // f.setVisible(true);
     });
 
 
@@ -889,141 +852,117 @@ public class Main extends JApplet {
 
     manual = new JMenuItem();
     help.add(manual);
-    manual.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        try {
-          GUIHelp.showHelp(null, "id");
-        } catch (Exception exx) {
-          new ReportDialog(null, exx, "MIAO");
-        }
+    manual.addActionListener(e -> {
+      try {
+        GUIHelp.showHelp(null, "id");
+      } catch (Exception exx) {
+        new ReportDialog(null, exx, "MIAO");
       }
     });
 
     aboutUs = new JMenuItem(CurrentLocale.getString("MenuItem.ABOUT_US"));
     help.add(aboutUs);
-    aboutUs.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        GUIAbout ab = new GUIAbout(null);
-        //ab.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        ab.setVisible(true);
-      }
+    aboutUs.addActionListener(e -> {
+      GUIAbout ab = new GUIAbout(null);
+      //ab.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+      ab.setVisible(true);
     });
     // ---------------- TOOLS MENU
     dinFrontend.setEnabled(false);
-    dinFrontend.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        JDialog dinFrame = new DineroFrontend(f, dinero, configStore);
-        dinFrame.setModal(true);
-        dinFrame.setVisible(true);
-      }
+    dinFrontend.addActionListener(e -> {
+      JDialog dinFrame = new DineroFrontend(f, dinero, configStore);
+      dinFrame.setModal(true);
+      dinFrame.setVisible(true);
     });
     tools.add(dinFrontend);
 
     // ---------------- WINDOW MENU
     //
     tile = new JMenuItem("Tile");
-    tile.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        tileWindows();
-      }
-    });
+    tile.addActionListener(e -> tileWindows());
     window.add(tile);
     window.addSeparator();
 
     pipelineJCB.setText(CurrentLocale.getString("pipeline".toUpperCase()));
     pipelineJCB.setState(true);
-    pipelineJCB.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        boolean cur_state = mapped_frames.get("pipeline").isIcon();
+    pipelineJCB.addActionListener(e -> {
+      boolean cur_state = mapped_frames.get("pipeline").isIcon();
 
-        try {
-          mapped_frames.get("pipeline").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {
-        }
+      try {
+        mapped_frames.get("pipeline").setIcon(!cur_state);
+      } catch (java.beans.PropertyVetoException ignored) {
       }
     });
     window.add(pipelineJCB);
 
     cyclesJCB.setText(CurrentLocale.getString("cycles".toUpperCase()));
     cyclesJCB.setState(true);
-    cyclesJCB.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        boolean cur_state = mapped_frames.get("cycles").isIcon();
+    cyclesJCB.addActionListener(e -> {
+      boolean cur_state = mapped_frames.get("cycles").isIcon();
 
-        try {
-          mapped_frames.get("cycles").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {
-        }
+      try {
+        mapped_frames.get("cycles").setIcon(!cur_state);
+      } catch (java.beans.PropertyVetoException ignored) {
       }
     });
     window.add(cyclesJCB);
 
     registersJCB.setText(CurrentLocale.getString("registers".toUpperCase()));
     registersJCB.setState(true);
-    registersJCB.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        boolean cur_state = mapped_frames.get("registers").isIcon();
+    registersJCB.addActionListener(e -> {
+      boolean cur_state = mapped_frames.get("registers").isIcon();
 
-        try {
-          mapped_frames.get("registers").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {
-        }
+      try {
+        mapped_frames.get("registers").setIcon(!cur_state);
+      } catch (java.beans.PropertyVetoException ignored) {
       }
     });
     window.add(registersJCB);
 
     statsJCB.setText(CurrentLocale.getString("stats".toUpperCase()));
     statsJCB.setState(true);
-    statsJCB.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        boolean cur_state = mapped_frames.get("stats").isIcon();
+    statsJCB.addActionListener(e -> {
+      boolean cur_state = mapped_frames.get("stats").isIcon();
 
-        try {
-          mapped_frames.get("stats").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {
-        }
+      try {
+        mapped_frames.get("stats").setIcon(!cur_state);
+      } catch (java.beans.PropertyVetoException ignored) {
       }
     });
     window.add(statsJCB);
 
     memoryJCB.setText(CurrentLocale.getString("memory".toUpperCase()));
     memoryJCB.setState(true);
-    memoryJCB.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        boolean cur_state = mapped_frames.get("memory").isIcon();
+    memoryJCB.addActionListener(e -> {
+      boolean cur_state = mapped_frames.get("memory").isIcon();
 
-        try {
-          mapped_frames.get("memory").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {
-        }
+      try {
+        mapped_frames.get("memory").setIcon(!cur_state);
+      } catch (java.beans.PropertyVetoException ignored) {
       }
     });
     window.add(memoryJCB);
 
     codeJCB.setText(CurrentLocale.getString("code".toUpperCase()));
     codeJCB.setState(true);
-    codeJCB.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        boolean cur_state = mapped_frames.get("code").isIcon();
+    codeJCB.addActionListener(e -> {
+      boolean cur_state = mapped_frames.get("code").isIcon();
 
-        try {
-          mapped_frames.get("code").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {
-        }
+      try {
+        mapped_frames.get("code").setIcon(!cur_state);
+      } catch (java.beans.PropertyVetoException ignored) {
       }
     });
     window.add(codeJCB);
 
     ioJCB.setText(CurrentLocale.getString("log".toUpperCase()));
     ioJCB.setState(true);
-    ioJCB.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        boolean cur_state = mapped_frames.get("io").isIcon();
+    ioJCB.addActionListener(e -> {
+      boolean cur_state = mapped_frames.get("io").isIcon();
 
-        try {
-          mapped_frames.get("io").setIcon(!cur_state);
-        } catch (java.beans.PropertyVetoException ex) {
-        }
+      try {
+        mapped_frames.get("io").setIcon(!cur_state);
+      } catch (java.beans.PropertyVetoException ignored) {
       }
     });
     window.add(ioJCB);
@@ -1034,13 +973,11 @@ public class Main extends JApplet {
   /** add a new JMenuItem in recent file menu at the position pos for the file "namefile"*/
   private static void addFileToRecentMenu(final String filename) {
     JMenuItem item = new JMenuItem(filename);
-    item.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        resetSimulator(false);
-        openFile(filename);
-        addFileToRecentMenu(filename);
-        changeShownMenuItems(cpu.getStatus());
-      }
+    item.addActionListener(e -> {
+      resetSimulator(false);
+      openFile(filename);
+      addFileToRecentMenu(filename);
+      changeShownMenuItems(cpu.getStatus());
     });
 
     // Add at the top of the list.
@@ -1061,16 +998,16 @@ public class Main extends JApplet {
     }
 
     // Update configuration.
-    String files = "";
+    StringBuilder files = new StringBuilder();
 
     for (Component c : lastfiles.getMenuComponents()) {
       if (c instanceof JMenuItem) {
-        files += ((JMenuItem)c).getText() + File.pathSeparator;
+        files.append(((JMenuItem) c).getText()).append(File.pathSeparator);
       }
     }
 
-    files = files.substring(0, files.length() - 1);
-    configStore.putString(ConfigKey.FILES, files);
+    files = new StringBuilder(files.substring(0, files.length() - 1));
+    configStore.putString(ConfigKey.FILES, files.toString());
   }
 
   /** Sets the caption of the menu item, adding, if possible, the mnemonic */
