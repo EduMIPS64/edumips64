@@ -64,7 +64,7 @@ public class CycleBuilder {
 
   public CycleBuilder(CPU cpu) {
     this.cpu = cpu;
-    elementsList = Collections.synchronizedList(new ArrayList<CycleElement>());
+    elementsList = new ArrayList<>();
     lastElements = new ArrayList<>();
     updateStalls();
   }
