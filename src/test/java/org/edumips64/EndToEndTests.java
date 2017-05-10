@@ -201,10 +201,12 @@ public class EndToEndTests extends BaseTest {
       }
 
       // Check if the transactions in the CycleBuilder are all valid.
+      boolean allValid = true;
       for (CycleElement el : builder.getElementsList()) {
-        if (el.hasInvalidTransaction()) {
-          throw new InvalidCycleElementTransactionException();
-        }
+        allValid &= el.isValid();
+      }
+      if (!allValid) {
+        throw new InvalidCycleElementTransactionException();
       }
 
       return new CpuTestStatus(cpu, tracefile);

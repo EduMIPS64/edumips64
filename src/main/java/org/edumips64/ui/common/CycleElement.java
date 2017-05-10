@@ -84,8 +84,32 @@ public class CycleElement {
     states.add(newState);
   }
 
-  public boolean hasInvalidTransaction() {
-    return hasInvalidTransaction;
+  // Should only be called when the Cycle refers to a completed instruction. Used only in unit tests.
+  boolean isFinalStateValid() {
+    String lastState = states.getLast();
+    // Valid termination states. IF is valid due to branches.
+    if (lastState.equals("WB") || lastState.equals("IF")) {
+      return true;
+    }
+
+    // " " is the only other valid end state, but it is acceptable only if it's added to IF.
+    if (lastState.equals(" ")) {
+      Set<String> allStates = new HashSet<>(states);
+      if (allStates.size() == 2 && states.getFirst() == "IF") {
+        return true;
+      } else {
+        logger.severe("The empty state is not valid as a final state if there are not only IF states. All states: " + states.toString());
+        return false;
+      }
+    }
+
+    logger.severe(lastState + " is not a valid final state.");
+    return false;
+  }
+
+  // Should only be called when the Cycle refers to a completed instruction. Used only in unit tests.
+  public boolean isValid() {
+    return !hasInvalidTransaction && isFinalStateValid();
   }
 
   /**
