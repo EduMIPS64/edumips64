@@ -795,7 +795,6 @@ public class Main extends JApplet {
     stop.setEnabled(false);
     stop.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F9, 0));
     stop.addActionListener(e -> {
-      // TODO: properly implement stop.
       if (cpuWorker != null) {
         cpuWorker.stopExecution();
       }
