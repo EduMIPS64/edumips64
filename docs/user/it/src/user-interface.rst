@@ -1,7 +1,7 @@
 L'interfaccia utente
 ====================
 L'interfaccia grafica EduMIPS64 si ispira a quella di WinMIPS64. Infatti, la
-finestra principale è identica, eccetto che per qualche menù. 
+finestra principale è identica, eccetto che per qualche menù.
 
 .. Please refer to chapter~\ref{mips-simulators} for an overview of some MIPS and DLX simulators (including WinMIPS64), and to \cite{winmips-web} for more information about WinMIPS64.  %In figure~\ref{fig:edumips-main} you can see the main window of EduMIPS64, composed by
 
@@ -49,11 +49,11 @@ simulazione.
 
 * *Completa* Inizia l'esecuzione, fermandosi quando il simulatore
   raggiunge una SYSCALL 0 (o equivalente) o un'istruzione di `BREAK`,
-  oppure quando l'utente seleziona la voce Stop del menù (o preme F9).  
+  oppure quando l'utente seleziona la voce Stop del menù (o preme F9).
 
 * *Cicli multipli* Esegue un certo numero di passi di simulazione, tale
-  valore può essere configurato attraverso la finestra di configurazione. 
-  
+  valore può essere configurato attraverso la finestra di configurazione.
+
 .. Vedere la sezione~\ref{dialog-settings} per ulteriori dettagli.
 
 * *Ferma* Ferma l'esecuzione quando il simulatore è in modalità
@@ -82,6 +82,11 @@ La voce di menù `Impostazioni...` non è disponibile quando il
 simulatore è in modalità "Completa" o "Cicli multipli", a causa di
 possibili race conditions.
 
+Il simulatore rallenta notevolmente quando l'interfaccia grafica va aggiornata
+in tempo reale. Per eseguire grandi programmi (migliaia di cicli) più
+velocemente, disabilitare l'opzione "Sincronizza la GUI con la CPU
+nell'esecuzione multi step".
+
 Strumenti
 ~~~~~~~~~
 Questo menù contiene solo una voce, utilizzata per aprire la finestra del
@@ -107,7 +112,7 @@ Aiuto
 ~~~~~
 Questo menù contiene voci relative all'aiuto in linea.
 
-* *Manuale...* Mostra la finestra di help. 
+* *Manuale...* Mostra la finestra di help.
 * *Informazioni su...* Mostra una finestra contenente i nomi di coloro
   che hanno collaborato al progetto ed i loro ruoli.
 
@@ -204,7 +209,7 @@ dialogo, e la simulazione sarà fermata non appena tale finestra verrà
 chiusa.
 
 L'ultima sezione permette di modificare i colori associati ai diversi stadi
-della pipeline. Abbastanza inutile, ma carino.  
+della pipeline. Abbastanza inutile, ma carino.
 
 Dinero Frontend
 ~~~~~~~~~~~~~~~
