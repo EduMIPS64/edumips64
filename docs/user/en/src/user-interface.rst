@@ -61,6 +61,10 @@ This menu is only available when a source file is loaded and the end of the
 simulation is not reached. The *Stop* menu item is available only in
 "Run" or "Multi Cycle" mode.
 
+Note that the simulator slows down when updating the UI. If you want to
+execute long (thousands of cycles) programs quickly, disable the "Sync
+graphics with CPU in multi-step execution" option.
+
 Configure
 ~~~~~~~~~
 The Configure menu provides facilities for customizing EduMIPS64 appearance and
