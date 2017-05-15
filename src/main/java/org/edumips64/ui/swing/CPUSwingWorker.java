@@ -34,16 +34,11 @@ import javax.swing.*;
 
 import static java.lang.Thread.sleep;
 
-/** This class handles the multi-threaded CPU object, and acts as a proxy between
- * the Main class and the CPU class.
- * @author Antonella Scandura
- * @author Andrea Spadaccini
+/**
+ * Swing worker that deals with executing the program and updating the UI.
  * */
 public class CPUSwingWorker extends SwingWorker<Void, Void> {
 
-  /**
-   * Needed for multithreading.
-   */
   private int nStep;
 
   /**
@@ -71,6 +66,7 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
   private GUIFrontend front;
   private JFrame f;
   private ConfigStore config;
+  private GUIUpdateThread guiUpdateThread;
 
   private static final Logger logger = Logger.getLogger(CPUSwingWorker.class.getName());
 
@@ -81,6 +77,8 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
     f = mainFrame;
     this.config = config;
     updateConfigValues();
+    guiUpdateThread = new GUIUpdateThread(front);
+    guiUpdateThread.start();
   }
 
   /**
@@ -123,6 +121,7 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
 
   @Override
   protected Void doInBackground() throws Exception {
+    long startTimeMs = System.currentTimeMillis();
     logger.info("running");
 
     // Let's disable the running menu items and enable the stop menu
@@ -197,23 +196,18 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
         haltCPU();
         break;
       } finally {
-        final int currentSteps = steps;
-        SwingUtilities.invokeLater(() -> {
-          front.updateComponents();
-          if (verbose) {
-            // Very crude rate limiting, works well for very big programs, not so well for short ones.
-            // TODO: create another worker thread that does updates as quickly as the main Swing thread can do,
-            // but no faster. For big programs, the CPU finishes pretty quickly, but thousands of invocations are
-            // scheduled for the main Swing thread, that keeps executing GUI updates after termination.
-            if (nStep > 0 || (nStep < 0 && currentSteps % 1000 == 0)) {
-              front.represent();
-            }
-          }
-        });
+        front.updateComponents();
+        if (verbose) {
+          // SwingUtilities.invokeAndWait(() -> front.represent());
+          guiUpdateThread.triggerUpdate();
+        }
       }
     }
 
-    SwingUtilities.invokeLater(() -> {
+    guiUpdateThread.terminate();
+    guiUpdateThread.join();
+
+    SwingUtilities.invokeAndWait(() -> {
       // Represent changes, in case the user chose non-verbose mode.
       front.represent();
 
@@ -224,6 +218,9 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
       Main.setStopStatus(false);
       Main.stopPB();
     });
+    long endTimeMs = System.currentTimeMillis();
+    float cyclesPerSecond = steps / ((endTimeMs - startTimeMs) / 1000);
+    logger.info("Executed " + steps + " steps in " + (endTimeMs - startTimeMs) + " ms. Speed: " + cyclesPerSecond + " cycles/sec");
     return null;
   }
 }
