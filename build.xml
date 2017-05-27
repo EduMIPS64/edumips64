@@ -27,8 +27,8 @@
 
   <target name="init">
     <!-- Meta info about the simulator -->
-    <property name="version" value="1.2.3" />
-    <property name="codename" value="Angelo" />
+    <property name="version" value="1.2.4" />
+    <property name="codename" value="Nicolosi" />
 
     <!-- Set build file properties -->
     <property name="sourceDir" value="src/main/java/org/edumips64/" />
