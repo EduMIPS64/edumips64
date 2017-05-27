@@ -1,5 +1,13 @@
 # EduMIPS64 ChangeLog
 
+## 1.2.4 () - Nicolosi
+### Added
+### Fixed
+- Proper use of Swing and threading (Issue #11)
+- Run CycleBuilder inside the CPU (Issue #147)
+- In some cases, the simulator fails to add the WB state to the Cycles
+  window (Issue #148)
+
 ## 1.2.3 (04/05/2017) - Angelo
 ### Added
 - Compiled the core to JavaScript. It's possible to run the EduMIPS64 core
