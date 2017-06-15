@@ -24,7 +24,7 @@ package org.edumips64;
 
 import org.edumips64.core.*;
 import org.edumips64.core.is.InstructionBuilder;
-import org.edumips64.img.*;
+import org.edumips64.ui.swing.img.*;
 import org.edumips64.ui.swing.*;
 import org.edumips64.utils.*;
 import org.edumips64.utils.io.*;

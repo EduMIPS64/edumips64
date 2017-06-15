@@ -1,4 +1,4 @@
-package org.edumips64.img;
+package org.edumips64.ui.swing.img;
 import javax.imageio.ImageIO;
 import java.awt.Image;
 import java.io.File;

@@ -112,7 +112,7 @@ public class ErrorDialog extends JDialog {
 
     try {
       label = new JLabel(msg, new ImageIcon(
-                           org.edumips64.img.IMGLoader.getImage(
+                           org.edumips64.ui.swing.img.IMGLoader.getImage(
                              ((numError > 0) ? "error.png" : "warning.png")
                            )), SwingConstants.LEFT);
       label.setIconTextGap(50);

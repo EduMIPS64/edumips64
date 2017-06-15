@@ -26,18 +26,13 @@
 //alias: bugs@edumips.org
 package org.edumips64.ui.swing;
 
-import org.edumips64.core.*;
 import org.edumips64.utils.*;
 import org.edumips64.Main;
 
-import java.util.*;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
 import java.awt.event.*;
-import javax.swing.event.*;
-import java.awt.font.*;
-import java.text.*;
 
 /**
  * This class provides a window for configuration options.
@@ -70,7 +65,7 @@ public class ReportDialog extends JDialog {
     textArea.setForeground(new Color(0, 0, 85));
 
     try {
-      JLabel label = new JLabel(new ImageIcon(org.edumips64.img.IMGLoader.getImage("fatal.png")), SwingConstants.LEFT);
+      JLabel label = new JLabel(new ImageIcon(org.edumips64.ui.swing.img.IMGLoader.getImage("fatal.png")), SwingConstants.LEFT);
       titlePanel.add("West", label);
     } catch (java.io.IOException e) {}
 
