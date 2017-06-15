@@ -242,7 +242,6 @@ public class GUIConfig extends JDialog {
     addRow(panel, row++, ConfigKey.FP_MULTIPLIER_COLOR, new JButton());
     addRow(panel, row++, ConfigKey.FP_DIVIDER_COLOR, new JButton());
     addRow(panel, row++, ConfigKey.FP_LONG_DOUBLE_VIEW, new JCheckBox());
-    addRow(panel, row++, ConfigKey.SHOW_ALIASES, new JCheckBox());
 
     // fill remaining vertical space
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
