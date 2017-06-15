@@ -141,7 +141,7 @@ class GUIRegisters extends GUIComponent {
       tableModel = new FileTableModel(value);
       setBackground(Color.WHITE);
       theTable = new JTable(tableModel);
-      theTable.getColumnModel().getColumn(0).setPreferredWidth(50);
+      theTable.getColumnModel().getColumn(0).setPreferredWidth(100);
       theTable.getColumnModel().getColumn(1).setPreferredWidth(147);
       theTable.getColumnModel().getColumn(2).setPreferredWidth(50);
       theTable.getColumnModel().getColumn(3).setPreferredWidth(147);
@@ -185,7 +185,7 @@ class GUIRegisters extends GUIComponent {
       //init dei vettori statici 1a e 3a colonna
       for (int i = 0; i < 32; i++) {
         numR[i] = fillFirstColumn(i);
-        numRF[i] = "F" + i + " =";
+        numRF[i] = "F" + i;
         value[i] = "0000000000000000";
 //FPU
         valueFP[i] = "0000000000000000";
@@ -198,11 +198,7 @@ class GUIRegisters extends GUIComponent {
     }
 
     String fillFirstColumn(int i) {
-      if (config.getBoolean(ConfigKey.SHOW_ALIASES)) {
-        return registerToAlias(" " + i) + "=";
-      } else {
-        return "R" + i + " =";
-      }
+      return "R" + i + (i < 10 ? " " : "") + " (" + registerToAlias(" " + i) + ")";
     }
 
     void updateRegistersNames() {

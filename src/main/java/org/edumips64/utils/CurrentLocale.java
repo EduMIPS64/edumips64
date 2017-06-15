@@ -156,8 +156,6 @@ public class CurrentLocale {
     en.put("Config.WARNINGS.tip", "Enable Warnings in compile time");
     en.put("Config.FORWARDING", "Enable forwarding");
     en.put("Config.FORWARDING.tip", "Enables forwarding in the pipeline");
-    en.put("Config.SHOW_ALIASES", "Use MIPS32 aliases in the Registers window");
-    en.put("Config.SHOW_ALIASES.tip", "Replaces the number of each register with its MIPS32 alias in the Registers window");
     en.put("Config.LONGDOUBLEVIEW", "Long/double mem.cells view");
     en.put("Config.LONGDOUBLEVIEW.tip", "Switchs between long and double visualisation of memory cells in the status bar");
     en.put("Config.VERBOSE", "Sync graphics with CPU in multi-step execution");
@@ -262,8 +260,6 @@ public class CurrentLocale {
 
     // Italian messages.
     HashMap<String, String> it = new HashMap<>();
-    it.put("Config.SHOW_ALIASES", "Utilizza gli alias MIPS ");
-    it.put("Config.SHOW_ALIASES.tip", "Visualizza gli alias MIPS come nomi dei registri ");
     it.put("DOUBLE_EXT_TOO_LARGE", "Esponente oltre i 32 bit");
     it.put("LABELTOOLARGE", "Numero troppo grande per una label");
     it.put("MEMORYADDRESSINVALID", "Etichetta invalida, deve essere allineata a 64 bit");
@@ -376,8 +372,6 @@ public class CurrentLocale {
     it.put("Config.WARNINGS.tip", "Abilita avvisi in fase di compilazione");
     it.put("Config.FORWARDING", "Abilita forwarding");
     it.put("Config.FORWARDING.tip", "Abilita l'opzione forwarding");
-    it.put("Config.SHOW_ALIASES", "Utilizza gli alias MIPS32 nella finestra dei registri");
-    it.put("Config.SHOW_ALIASES.tip", "Sostituisce l'alias MIPS32 di ogni registro al suo nome canonico nella finestra dei registri");
     it.put("Config.LONGDOUBLEVIEW", "Visualizza mem. Long/double");
     it.put("Config.LONGDOUBLEVIEW.tip", "Visualizza le celle di memoria come valori long o double nella barra di stato");
     it.put("Config.VERBOSE", "Sincronizza la GUI con la CPU nell'esecuzione multi-step");

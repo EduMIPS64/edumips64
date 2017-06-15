@@ -65,7 +65,6 @@ public abstract class ConfigStore {
     ConfigStore.defaults.put(ConfigKey.SYNC_EXCEPTIONS_TERMINATE, false);
     ConfigStore.defaults.put(ConfigKey.N_STEPS, 4);
     ConfigStore.defaults.put(ConfigKey.SLEEP_INTERVAL, 10);
-    ConfigStore.defaults.put(ConfigKey.SHOW_ALIASES, false);
 
     // FPU exceptions defaults.
     ConfigStore.defaults.put(ConfigKey.FP_INVALID_OPERATION, true);

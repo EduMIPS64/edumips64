@@ -30,7 +30,6 @@ public enum ConfigKey {
     SYNC_EXCEPTIONS_TERMINATE("syncexc-terminate"),
     N_STEPS("n_step"),
     SLEEP_INTERVAL("sleep_interval"),
-    SHOW_ALIASES("show_aliases"),
     FP_INVALID_OPERATION("INVALID_OPERATION"),
     FP_OVERFLOW("OVERFLOW"),
     FP_UNDERFLOW("UNDERFLOW"),
