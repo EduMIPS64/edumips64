@@ -35,6 +35,7 @@
     <property name="webDir" value="src/main/java/org/edumips64/client/" />
     <property name="testDir" value="src/test/java/org/edumips64/" />
     <property name="testResourcesDir" value="build/resources/test" />
+    <property name="resourcesDir" value="src/main/resources/" />
     <property name="outputDir" value="build" />
     <property name="webOutputDir" value="war/" />
     <property name="javadocDir" value="javadoc" />
@@ -320,7 +321,7 @@
   <target name="standalone-jar" depends="compile,htmldoc">
       <property name="jar_filename" value="${standalone_jar_filename}" />
       <property name="main_class" value="org.edumips64.Main" />
-      <property name="splash_img" value="org/edumips64/img/splash.png"/>
+      <property name="splash_img" value="org/edumips64/ui/swing/img/splash.png"/>
 
       <antcall target="copy-base-files" />
       <antcall target="copy-help-files" />
@@ -332,7 +333,7 @@
   <target name="latest-jar" depends="compile,htmldoc">
       <property name="jar_filename" value="${latest_jar_filename}" />
       <property name="main_class" value="org.edumips64.Main" />
-      <property name="splash_img" value="org/edumips64/img/splash.png"/>
+      <property name="splash_img" value="org/edumips64/ui/swing/img/splash.png"/>
 
       <antcall target="copy-base-files" />
       <antcall target="copy-help-files" />
@@ -344,7 +345,7 @@
   <target name="slim-jar" depends="compile">
       <property name="jar_filename" value="${slim_jar_filename}" />
       <property name="main_class" value="org.edumips64.Main" />
-      <property name="splash_img" value="org/edumips64/img/splash.png"/>
+      <property name="splash_img" value="org/edumips64/ui/swing/img/splash.png"/>
 
       <antcall target="make-jarfile" />
   </target>
@@ -408,8 +409,8 @@
       </copy>
   </target>
   <target name="copy-base-files">
-      <copy todir="${outputDir}/org/edumips64/img">
-          <fileset dir="${sourceDir}/img">
+      <copy todir="${outputDir}/org/edumips64/ui/swing/img">
+          <fileset dir="${resourcesDir}/images">
       <include name="**/*.png" />
     </fileset>
   </copy>
