@@ -546,4 +546,8 @@ public class EndToEndTests extends BaseTest {
   public void testHailStone() throws Exception {
     runMipsTestWithAndWithoutForwarding("hailstoneenglish.s");
   }
+  @Test
+  public void testSetBitSort() throws Exception {
+    runMipsTestWithAndWithoutForwarding("set-bit-sort.s");
+  }
 }
