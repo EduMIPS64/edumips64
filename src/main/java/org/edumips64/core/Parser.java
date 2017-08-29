@@ -500,7 +500,7 @@ public class Parser {
               // Check for halt-like instructions
               String temp = cleanFormat(line.substring(i)).toUpperCase();
 
-              if (temp.equals("HALT") || temp.equals("SYSCALL 0") || temp.equals("TRAP 0")) {
+              if (temp.contains("HALT") || temp.contains("SYSCALL 0") || temp.contains("TRAP 0")) {
                 halt = true;
               }
 
