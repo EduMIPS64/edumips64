@@ -254,6 +254,8 @@ public class EndToEndTests extends BaseTest {
 
     String golden = new Scanner(new File(goldenTrace)).useDelimiter("\\A").next();
     String trace = new Scanner(new File(s.traceFile)).useDelimiter("\\A").next();
+    golden = golden.replaceAll("\r\n", "\n");
+    trace = trace.replaceAll("\r\n", "\n");
     collector.checkThat("Dinero trace file differs from the golden one.", trace, equalTo(golden));
   }
 
