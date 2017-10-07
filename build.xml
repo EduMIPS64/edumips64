@@ -241,14 +241,17 @@
     </javac>
   </target>
 
-  <!-- *** test *** run unit tests-->
-  <target name="test" depends="mkdirs,compile">
-      <!-- prepare resources for the tests -->
-      <copy todir="${testResourcesDir}">
+  <target name="copy-test-files" depends="mkdirs" description="Copy test files.">
+    <!-- prepare resources for the tests -->
+    <copy todir="${testResourcesDir}">
         <fileset dir="src/test/resources/">
-          <include name="**/*.*" />
+            <include name="**/*.*" />
         </fileset>
-      </copy>
+    </copy>
+  </target>
+
+  <!-- *** test *** run unit tests-->
+  <target name="test" depends="mkdirs,compile,copy-test-files">
 
       <!-- cannot use the compile target since we'll need to compile test code
            as well. -->
