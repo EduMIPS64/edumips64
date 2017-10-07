@@ -46,7 +46,7 @@ public class StatusBar {
     statusLabel.setText(CurrentLocale.getString("StatusBar.WELCOME") + " " + org.edumips64.Main.VERSION);
 
     pb = new JProgressBar(0, 10);
-    pb.setMaximumSize(new Dimension(30, 10));
+    pb.setMaximumSize(new Dimension(60, 10));
     //pb.setIndeterminate(true);
 
     //statusLabel.setBorder(BorderFactory.createLoweredBevelBorder());
