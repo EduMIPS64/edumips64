@@ -26,6 +26,7 @@
 package org.edumips64.core.is;
 
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 /** This is the base class for loading instruction
@@ -38,12 +39,12 @@ public abstract class FPLoading extends FPLDSTInstructions {
     super(memory);
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, WAWException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the base register is valid ...
     Register base = cpu.getRegister(params.get(BASE_FIELD));
 
     if (base.getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     //calculating  address (base+offset)
@@ -59,6 +60,7 @@ public abstract class FPLoading extends FPLDSTInstructions {
 
     ft.incrWriteSemaphore();
     ft.incrWAWSemaphore();
+    return false;
   }
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {

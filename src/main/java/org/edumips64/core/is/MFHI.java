@@ -26,6 +26,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 //per diagnostica
@@ -51,18 +52,19 @@ class MFHI extends ALU_RType {
     syntax = "%R";
     name = "MFHI";
   }
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the HI register is valid passing his own value into temporary register
     Register hi_reg = cpu.getHI();
 
     if (hi_reg.getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     TR[HI_REG] = hi_reg;
     //locking the destination register
     Register rd = cpu.getRegister(params.get(RD_FIELD));
     rd.incrWriteSemaphore();
+    return false;
   }
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
     if (cpu.isEnableForwarding()) {

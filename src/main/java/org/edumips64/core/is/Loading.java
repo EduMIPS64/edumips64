@@ -28,6 +28,7 @@ package org.edumips64.core.is;
 import java.util.logging.Logger;
 
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 /** This is the base class for loading instruction
@@ -41,13 +42,13 @@ public abstract class Loading extends LDSTInstructions {
     super(memory);
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the base register is valid ...
     Register base = cpu.getRegister(params.get(BASE_FIELD));
 
     if (base.getWriteSemaphore() > 0) {
       logger.info("RAW in " + fullname + ": base register still needs to be written to.");
-      throw new RAWException();
+      return true;
     }
 
     //calculating  address (base+offset)
@@ -57,6 +58,7 @@ public abstract class Loading extends LDSTInstructions {
     //locking rt register
     Register rt = cpu.getRegister(params.get(RT_FIELD));
     rt.incrWriteSemaphore();
+    return false;
   }
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException, AddressErrorException {

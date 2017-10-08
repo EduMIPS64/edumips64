@@ -24,6 +24,7 @@
  */
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 /**
  * <pre>
@@ -46,7 +47,7 @@ public class JAL extends FlowControl_JType {
     this.name = "JAL";
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //saving PC value into a temporary register
     cpu.getRegister(31).incrWriteSemaphore();  //deadlock !!!
     TR[PC_VALUE].writeDoubleWord(cpu.getPC().getValue() - 4);

@@ -29,6 +29,7 @@ import org.edumips64.core.Memory;
 import org.edumips64.core.MemoryElement;
 import org.edumips64.core.MemoryElementNotFoundException;
 import org.edumips64.core.NotAlignException;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.Converter;
 import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.IrregularStringOfBitsException;
@@ -76,7 +77,9 @@ public abstract class LDSTInstructions extends Instruction {
       e.printStackTrace();
     }
   }
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, WAWException {}
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+    return false;
+  }
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException, AddressErrorException {
     // Compute the address

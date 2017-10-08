@@ -24,6 +24,7 @@
  */
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 
@@ -51,14 +52,14 @@ class LUI extends ALU_IType {
     this.name = "LUI";
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the source register is valid passing its own values into a temporary register
     //locking the target register
     Register rt = cpu.getRegister(params.get(RT_FIELD));
     rt.incrWriteSemaphore();
     //writing the immediate value of "params" on a temporary register
     TR[IMM_FIELD].writeHalf(params.get(IMM_FIELD));
-
+    return false;
   }
   public void EX() throws IrregularStringOfBitsException, IrregularWriteOperationException {
     //getting strings from temporary registers

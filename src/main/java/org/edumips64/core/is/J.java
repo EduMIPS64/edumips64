@@ -24,6 +24,7 @@
  */
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 /**
  * <pre>
@@ -45,7 +46,7 @@ public class J extends FlowControl_JType {
     this.name = "J";
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //converting INSTR_INDEX into a bynary value of 26 bits in length
     String instr_index = Converter.positiveIntToBin(28, params.get(INSTR_INDEX));
     //appending the 35 most significant bits of the program counter on the left of "instr_index"

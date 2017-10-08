@@ -23,6 +23,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 
@@ -36,13 +37,13 @@ public abstract class FPStoring extends FPLDSTInstructions {
     super(memory);
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the base register and the ft register are valid passing value of ft register into a temporary floating point register
     Register base = cpu.getRegister(params.get(BASE_FIELD));
     RegisterFP ft = cpu.getRegisterFP(params.get(FT_FIELD));
 
     if (base.getWriteSemaphore() > 0 || ft.getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     TR[FT_FIELD].setBits(ft.getBinString(), 0);
@@ -50,6 +51,7 @@ public abstract class FPStoring extends FPLDSTInstructions {
     long address = base.getValue() + params.get(OFFSET_FIELD);
     //saving address into a temporary register
     TR[OFFSET_PLUS_BASE].writeDoubleWord(address);
+    return false;
   }
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {}

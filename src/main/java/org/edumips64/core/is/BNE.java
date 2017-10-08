@@ -25,6 +25,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 /** <pre>
  *         Syntax: BNE rt, rs, immediate
@@ -43,9 +44,9 @@ public class BNE extends FlowControl_IType {
     name = "BNE";
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0 || cpu.getRegister(params.get(RT_FIELD)).getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     //getting registers rs and rt
@@ -73,7 +74,6 @@ public class BNE extends FlowControl_IType {
 
       throw new JumpException();
     }
+    return false;
   }
-
-
 }

@@ -52,13 +52,13 @@ public abstract class FPFormattedOperandMoveInstructions extends ComputationalIn
     this.syntax = "%F,%F";
     this.paramCount = 2;
   }
-  public void ID() throws RAWException, WAWException, IrregularStringOfBitsException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the source register is valid we pass its own value into a temporary register
     RegisterFP fd = cpu.getRegisterFP(params.get(FD_FIELD));
     RegisterFP fs = cpu.getRegisterFP(params.get(FS_FIELD));
 
     if (fs.getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     TRfp[FS_FIELD].setBits(fs.getBinString(), 0);
@@ -71,6 +71,7 @@ public abstract class FPFormattedOperandMoveInstructions extends ComputationalIn
 
     fd.incrWriteSemaphore();
     fd.incrWAWSemaphore();
+    return false;
   }
   public abstract void EX() throws IrregularStringOfBitsException, FPInvalidOperationException, IrregularWriteOperationException, FPUnderflowException, FPOverflowException;
   public void MEM() throws MemoryElementNotFoundException {

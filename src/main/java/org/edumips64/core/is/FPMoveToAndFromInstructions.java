@@ -24,6 +24,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 /**This is the base class of the move to and from instructions
@@ -49,7 +50,7 @@ public abstract class FPMoveToAndFromInstructions extends ComputationalInstructi
     this.syntax = "%R,%F";
     this.paramCount = 2;
   }
-  public abstract void ID() throws RAWException, WAWException, IrregularStringOfBitsException;
+  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException;
   public abstract void EX() throws IrregularStringOfBitsException, IrregularWriteOperationException;
   public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {};
   public abstract void WB() throws IrregularStringOfBitsException;

@@ -25,6 +25,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 /** *Syntax:    BREAK
@@ -49,7 +50,8 @@ public class BREAK extends Instruction {
 
     throw new BreakException();
   }
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+    return false;
   }
 
   public void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {

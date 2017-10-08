@@ -117,9 +117,19 @@ public abstract class Instruction {
    * <pre>
    * Decode stage of the Pipeline
    * In this method all instructions that modify GPRs lock the involved register
+   *
+   * Returns true if there are RAW conflict, false if there is none.
+   *
+   * This is an optimization, since in large programs with no forwarding, RAW is
+   * pretty common, and the code for handling it takes a significant amount of
+   * time.
+   *
+   * For example, before this optimization was implemented the testSetBitSort unit
+   * test took ~21.4 seconds to finish, and after it it takes ~15.5 seconds (under
+   * Windows).
    *</pre>
    **/
-  public abstract void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException;
+  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException;
 
   /**
    * <pre>

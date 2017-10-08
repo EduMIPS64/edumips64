@@ -24,6 +24,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 /** <pre>
  *         Syntax: B offset
@@ -45,7 +46,7 @@ public class B extends FlowControl_IType {
     name = "B";
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException, TwosComplementSumException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //getting registers rs and rt
     //converting offset into a signed binary value of 64 bits in length
     BitSet64 bs = new BitSet64();

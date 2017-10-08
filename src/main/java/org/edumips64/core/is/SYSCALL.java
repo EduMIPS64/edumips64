@@ -21,6 +21,7 @@
 package org.edumips64.core.is;
 
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 import org.edumips64.utils.io.*;
 import java.util.logging.Logger;
@@ -61,7 +62,7 @@ public class SYSCALL extends Instruction {
     }
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     if (syscall_n == 0) {
       logger.info("Stopping CPU due to SYSCALL (" + this.hashCode() + ")");
       cpu.setStatus(CPU.CPUStatus.STOPPING);
@@ -69,7 +70,7 @@ public class SYSCALL extends Instruction {
       Register r14 = cpu.getRegister(14);
 
       if (r14.getWriteSemaphore() > 0) {
-        throw new RAWException();
+        return true;
       }
 
       Register r1 = cpu.getRegister(1);
@@ -82,6 +83,7 @@ public class SYSCALL extends Instruction {
       // TODO: invalid syscall
       logger.info("INVALID SYSCALL (" + this.hashCode() + ")");
     }
+    return false;
   }
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException {

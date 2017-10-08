@@ -26,6 +26,7 @@
 package org.edumips64.core.is;
 
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 /** <pre>
@@ -46,11 +47,11 @@ public class BEQZ extends FlowControl_IType {
     name = "BEQZ";
   }
 
-  public void ID()
-  throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException, TwosComplementSumException {
+  public boolean ID()
+      throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //getting registers rs and rt
     if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     String rs = cpu.getRegister(params.get(RS_FIELD)).getBinString();
@@ -77,6 +78,7 @@ public class BEQZ extends FlowControl_IType {
 
       throw new JumpException();
     }
+    return false;
   }
   public void pack() throws IrregularStringOfBitsException {
     repr.setBits(OPCODE_VALUE, OPCODE_VALUE_INIT);

@@ -26,9 +26,9 @@
 package org.edumips64.core.is;
 
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 //per diagnostica
-import java.util.*;
 import java.util.logging.Logger;
 
 /**This is the base class for the R-Type instructions
@@ -53,7 +53,7 @@ public abstract class ALU_RType extends ComputationalInstructions {
     paramCount = 3;
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if source registers are valid passing their own values into temporary registers
     logger.info("Executing step ID of " + fullname);
     logger.info("RD is R" + params.get(RD_FIELD) + "; RS is R" + params.get(RS_FIELD) + "; RT is R" + params.get(RT_FIELD) + ";");
@@ -64,12 +64,12 @@ public abstract class ALU_RType extends ComputationalInstructions {
     //    throw new RAWException();
     if (rs.getWriteSemaphore() > 0) {
       logger.info("RAW on RS");
-      throw new RAWException();
+      return true;
     }
 
     if (rt.getWriteSemaphore() > 0) {
       logger.info("RAW on RT");
-      throw new RAWException();
+      return true;
     }
 
     TR[RS_FIELD].setBits(rs.getBinString(), 0);
@@ -86,6 +86,7 @@ public abstract class ALU_RType extends ComputationalInstructions {
     // Lock RD
     rd.incrWriteSemaphore();
     logger.info("RD = " + TR[RD_FIELD].getValue() + "; RS = " + TR[RS_FIELD].getValue() + "; RT = " + TR[RT_FIELD].getValue() + ";");
+    return false;
   }
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException {

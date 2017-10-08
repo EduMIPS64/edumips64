@@ -29,7 +29,7 @@ import org.edumips64.utils.*;
 import org.edumips64.core.fpu.*;
 import java.math.*;
 //per diagnostica
-import java.util.*;
+
 
 /**This is the base class for the instructions of the type C.cond.fmt
  *
@@ -60,17 +60,18 @@ public abstract class FPC_cond_DInstructions extends ComputationalInstructions {
     paramCount = 3;
   }
 
-  public void ID() throws IrregularStringOfBitsException, RAWException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if source registers are valid passing their own values into temporary registers
     RegisterFP fs = cpu.getRegisterFP(params.get(FS_FIELD));
     RegisterFP ft = cpu.getRegisterFP(params.get(FT_FIELD));
 
     if (fs.getWriteSemaphore() > 0 || ft.getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     TRfp[FS_FIELD].setBits(fs.getBinString(), 0);
     TRfp[FT_FIELD].setBits(ft.getBinString(), 0);
+    return false;
   }
 
   public void EX() throws IrregularStringOfBitsException, FPInvalidOperationException {
@@ -84,9 +85,9 @@ public abstract class FPC_cond_DInstructions extends ComputationalInstructions {
 
 
     //truth mask
-    boolean cond0 = (COND_VALUE.charAt(3) == '1') ? true : false;  //codes the unordered predicate
-    boolean cond1 = (COND_VALUE.charAt(2) == '1') ? true : false;  //codes the equal predicate
-    boolean cond2 = (COND_VALUE.charAt(1) == '1') ? true : false;  //codes the less predicate
+    boolean cond0 = COND_VALUE.charAt(3) == '1';  //codes the unordered predicate
+    boolean cond1 = COND_VALUE.charAt(2) == '1';  //codes the equal predicate
+    boolean cond2 = COND_VALUE.charAt(1) == '1';  //codes the less predicate
 
     if (FPInstructionUtils.isSNaN(fs.getBinString()) || FPInstructionUtils.isSNaN(ft.getBinString())
         || FPInstructionUtils.isQNaN(fs.getBinString()) || FPInstructionUtils.isQNaN(ft.getBinString())) {

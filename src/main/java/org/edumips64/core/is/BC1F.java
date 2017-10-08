@@ -24,6 +24,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 /** <pre>
    *<pre>
@@ -45,8 +46,8 @@ public class BC1F extends FPConditionalBranchesInstructions {
     super.name = NAME;
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException {
-    boolean condition = (cpu.getFCSRConditionCode(params.get(CC_FIELD)) == 0) ? true : false;
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+    boolean condition = cpu.getFCSRConditionCode(params.get(CC_FIELD)) == 0;
 
     //converting offset into a signed binary value of 64 bits in length
     BitSet64 bs = new BitSet64();
@@ -69,6 +70,7 @@ public class BC1F extends FPConditionalBranchesInstructions {
 
       throw new JumpException();
     }
+    return false;
   }
 
 
