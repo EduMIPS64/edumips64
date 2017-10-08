@@ -26,6 +26,7 @@
 package org.edumips64.core.is;
 
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 
@@ -41,7 +42,7 @@ public abstract class FlowControlInstructions extends Instruction {
       e.printStackTrace();
     }
   }
-  public abstract void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException, TwosComplementSumException;
+  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException;
   public abstract void EX() throws IrregularStringOfBitsException, IntegerOverflowException, IrregularWriteOperationException;
   public abstract void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException;
   public abstract void WB() throws IrregularStringOfBitsException;

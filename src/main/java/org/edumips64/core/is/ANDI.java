@@ -24,6 +24,7 @@
  */
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 
@@ -46,12 +47,12 @@ class ANDI extends ALU_IType {
   }
   //since this operation is carried out with zero padding of immediate, against sign_extend(immediate) methodology
   //of all others instructions in the same category, is necessary the overriding of ID method
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the source register is valid passing its own values into a temporary register
     Register rs = cpu.getRegister(params.get(RS_FIELD));
 
     if (rs.getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     TR[RS_FIELD] = rs;
@@ -69,7 +70,7 @@ class ANDI extends ALU_IType {
 
     sb.append(TR[IMM_FIELD].getBinString().substring(48, 64));
     TR[IMM_FIELD].setBits(sb.substring(0), 0);
-
+    return false;
   }
   public void EX() throws IrregularStringOfBitsException {
     //getting values from temporary registers
@@ -80,8 +81,8 @@ class ANDI extends ALU_IType {
 
     //performing bitwise OR between immediate and rs register
     for (int i = 0; i < 64; i++) {
-      rsbit = rs.charAt(i) == '1' ? true : false;
-      immbit = imm.charAt(i) == '1' ? true : false;
+      rsbit = rs.charAt(i) == '1';
+      immbit = imm.charAt(i) == '1';
       resbit = rsbit && immbit;
       sb.append(resbit ? '1' : '0');
     }

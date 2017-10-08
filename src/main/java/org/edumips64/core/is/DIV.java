@@ -25,6 +25,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 //per diagnostica
@@ -57,13 +58,13 @@ class DIV extends ALU_RType {
     syntax = "%R,%R";
     name = "DIV";
   }
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if source registers are valid passing their own values into temporary registers
     Register rs = cpu.getRegister(params.get(RS_FIELD));
     Register rt = cpu.getRegister(params.get(RT_FIELD));
 
     if (rs.getWriteSemaphore() > 0 || rt.getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     TR[RS_FIELD] = rs;
@@ -71,7 +72,7 @@ class DIV extends ALU_RType {
     //locking the destination registers (quozient and remainder)
     cpu.getLO().incrWriteSemaphore();
     cpu.getHI().incrWriteSemaphore();
-
+    return false;
   }
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, DivisionByZeroException {
     //getting String from temporary register

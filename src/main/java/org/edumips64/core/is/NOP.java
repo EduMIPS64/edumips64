@@ -25,6 +25,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 /**Syntax:     NOP
@@ -45,8 +46,8 @@ public class NOP extends Instruction {
       e.printStackTrace();
     }
   }
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException {
-
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+    return false;
   }
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {

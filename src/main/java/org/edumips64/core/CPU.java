@@ -442,7 +442,10 @@ public class CPU {
       syncex = stepEX();
 
       // ID: instruction decode / register fetch stage
-      stepID();
+      boolean rawException = stepID();
+      if (rawException) {
+        throw new RAWException();
+      }
 
       // IF: instruction fetch stage.
       stepIF();
@@ -560,7 +563,9 @@ public class CPU {
     }
   }
 
-  private void stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, HaltException, RAWException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
+  // Returns true if there is a RAW conflict, false otherwis3. See docs for Instruction.ID()
+  // for an explanation of why it is the case.
+  private boolean stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, HaltException, RAWException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
     changeStage(PipeStage.ID);
 
     if (pipe.get(PipeStage.ID) != null) {
@@ -579,7 +584,10 @@ public class CPU {
 
       logger.info("Executing ID() for " + pipe.get(PipeStage.ID));
       // Can change the CPU status from RUNNING to STOPPING.
-      pipe.get(PipeStage.ID).ID();
+      boolean rawException = pipe.get(PipeStage.ID).ID();
+      if (rawException) {
+        return true;
+      }
 
       if (isFP) {
         logger.info("Moving " + pipe.get(PipeStage.ID) + " to the FP pipeline.");
@@ -590,6 +598,7 @@ public class CPU {
       }
       pipe.put(PipeStage.ID, null);
     }
+    return false;
   }
 
   private String stepEX() throws SynchronousException, HaltException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {

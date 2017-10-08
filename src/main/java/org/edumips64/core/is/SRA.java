@@ -25,6 +25,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 /**
@@ -55,12 +56,12 @@ public class SRA extends ALU_RType {
   }
   //since this operation is carried out writing sa value as unsigned value, it is necessary
   //the overriding of ID method
-  public void ID() throws RAWException, IrregularWriteOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the source register is valid passing his own value into a temporary register
     Register rt = cpu.getRegister(params.get(RT_FIELD));
 
     if (rt.getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     TR[RT_FIELD] = rt;
@@ -69,6 +70,7 @@ public class SRA extends ALU_RType {
     //increment the semaphore of the destination register
     Register rd = cpu.getRegister(params.get(RD_FIELD));
     rd.incrWriteSemaphore();
+    return false;
   }
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {

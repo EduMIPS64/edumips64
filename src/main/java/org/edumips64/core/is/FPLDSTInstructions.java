@@ -24,6 +24,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 /**This is the base class of FP Load store instructions
@@ -40,7 +41,9 @@ public abstract class FPLDSTInstructions extends LDSTInstructions {
     this.syntax = "%F,%L(%R)";
     this.paramCount = 3;
   }
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, WAWException {}
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+    return false;
+  }
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {}
   public void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {}
   public void WB() throws IrregularStringOfBitsException {}

@@ -40,7 +40,7 @@ public abstract class ComputationalInstructions extends Instruction {
       e.printStackTrace();
     }
   }
-  public abstract void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, WAWException;
+  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException;
   public abstract void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, FPInvalidOperationException;
   public abstract void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException;
   public abstract void WB() throws IrregularStringOfBitsException;

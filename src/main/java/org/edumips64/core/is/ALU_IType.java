@@ -23,6 +23,7 @@
 package org.edumips64.core.is;
 
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 //per diagnostica
 import java.util.logging.Logger;
@@ -50,12 +51,12 @@ public class ALU_IType extends ComputationalInstructions {
     this.paramCount = 3;
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the source register is valid passing its own values into a temporary register
     Register rs = cpu.getRegister(params.get(RS_FIELD));
 
     if (rs.getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     TR[RS_FIELD].setBits(rs.getBinString(), 0);
@@ -64,7 +65,7 @@ public class ALU_IType extends ComputationalInstructions {
     rt.incrWriteSemaphore();
     //writing the immediate value of "params" on a temporary register
     TR[IMM_FIELD].writeHalf(params.get(IMM_FIELD));
-
+    return false;
   }
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException {

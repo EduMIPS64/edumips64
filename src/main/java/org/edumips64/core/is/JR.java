@@ -24,6 +24,7 @@
  */
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 /**
  * <pre>
@@ -42,9 +43,9 @@ public class JR extends FlowControl_RType {
 
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
     cpu.getPC().setBits(cpu.getRegister(params.get(RS_FIELD)).getBinString(), 0);
     throw new JumpException();

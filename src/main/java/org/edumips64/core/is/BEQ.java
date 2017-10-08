@@ -25,6 +25,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 /** <pre>
  *         Syntax: BEQ rs, rt, offset
@@ -44,9 +45,9 @@ public class BEQ extends FlowControl_IType {
     name = "BEQ";
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, JumpException, TwosComplementSumException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0 || cpu.getRegister(params.get(RT_FIELD)).getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     //getting registers rs and rt
@@ -74,7 +75,6 @@ public class BEQ extends FlowControl_IType {
 
       throw new JumpException();
     }
+    return false;
   }
-
-
 }

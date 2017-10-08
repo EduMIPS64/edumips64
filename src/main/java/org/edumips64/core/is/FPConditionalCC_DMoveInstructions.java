@@ -24,6 +24,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 /**This is the base class of the conditional move to and from instructions
@@ -57,13 +58,13 @@ public abstract class FPConditionalCC_DMoveInstructions extends ComputationalIns
     this.syntax = "%F,%F,%C";
     this.paramCount = 3;
   }
-  public void ID() throws RAWException, WAWException, IrregularStringOfBitsException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the source register is valid we pass its own value into a temporary register
     RegisterFP fd = cpu.getRegisterFP(params.get(FD_FIELD));
     RegisterFP fs = cpu.getRegisterFP(params.get(FS_FIELD));
 
     if (fs.getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     TRfp[FS_FIELD].setBits(fs.getBinString(), 0);
@@ -76,6 +77,7 @@ public abstract class FPConditionalCC_DMoveInstructions extends ComputationalIns
 
     fd.incrWriteSemaphore();
     fd.incrWAWSemaphore();
+    return false;
   }
   public void EX() throws IrregularStringOfBitsException {
     String fs = TRfp[FS_FIELD].getBinString();

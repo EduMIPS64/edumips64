@@ -24,6 +24,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.*;
 
 import java.util.logging.Logger;
@@ -41,20 +42,20 @@ public abstract class Storing extends LDSTInstructions {
     super(memory);
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the base register and the rt register are valid passing value of rt register into a temporary register
     Register base = cpu.getRegister(params.get(BASE_FIELD));
     rt = cpu.getRegister(params.get(RT_FIELD));
 
     if (base.getWriteSemaphore() > 0) {
       logger.info("RAW in " + fullname + ": base register still needs to be written to.");
-      throw new RAWException();
+      return true;
     }
 
     if (!cpu.isEnableForwarding()) {
       if (rt.getWriteSemaphore() > 0) {
         logger.info("RAW in " + fullname + ": rt register still needs to be written to.");
-        throw new RAWException();
+        return true;
       }
 
       TR[RT_FIELD].setBits(rt.getBinString(), 0);
@@ -64,6 +65,7 @@ public abstract class Storing extends LDSTInstructions {
     long address = base.getValue() + params.get(OFFSET_FIELD);
     //saving address into a temporary register
     TR[OFFSET_PLUS_BASE].writeDoubleWord(address);
+    return false;
   }
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, NotAlignException, AddressErrorException {

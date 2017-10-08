@@ -27,6 +27,7 @@
 package org.edumips64.core.is;
 import org.edumips64.core.IrregularWriteOperationException;
 import org.edumips64.core.Register;
+import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.utils.Converter;
 import org.edumips64.utils.IrregularStringOfBitsException;
 
@@ -56,13 +57,13 @@ class DMULT extends ALU_RType {
     syntax = "%R,%R";
     name = "DMULT";
   }
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if source registers are valid passing their own values into temporary registers
     Register rs = cpu.getRegister(params.get(RS_FIELD));
     Register rt = cpu.getRegister(params.get(RT_FIELD));
 
     if (rs.getWriteSemaphore() > 0 || rt.getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     TR[RS_FIELD] = rs;
@@ -71,6 +72,7 @@ class DMULT extends ALU_RType {
 
     cpu.getLO().incrWriteSemaphore();
     cpu.getHI().incrWriteSemaphore();
+    return false;
   }
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
 

@@ -60,13 +60,13 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
     fpInstructionUtils = new FPInstructionUtils(fcsr);
   }
 
-  public void ID() throws RAWException, IrregularWriteOperationException, IrregularStringOfBitsException, WAWException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if source registers are valid passing their own values into temporary registers
     RegisterFP fs = cpu.getRegisterFP(params.get(FS_FIELD));
     RegisterFP ft = cpu.getRegisterFP(params.get(FT_FIELD));
 
     if (fs.getWriteSemaphore() > 0 || ft.getWriteSemaphore() > 0) {
-      throw new RAWException();
+      return true;
     }
 
     TRfp[FS_FIELD].setBits(fs.getBinString(), 0);
@@ -80,6 +80,7 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
 
     fd.incrWriteSemaphore();
     fd.incrWAWSemaphore();
+    return false;
   }
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException {
