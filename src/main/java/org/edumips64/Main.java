@@ -864,7 +864,7 @@ public class Main extends JApplet {
     help.add(manual);
     manual.addActionListener(e -> {
       try {
-        GUIHelp.showHelp(null, "id");
+        GUIHelp.showHelp(null);
       } catch (Exception exx) {
         new ReportDialog(null, exx, "MIAO");
       }
