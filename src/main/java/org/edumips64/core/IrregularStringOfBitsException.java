@@ -1,7 +1,7 @@
-/* DivisionByZeroException.java
+/* IrregularStringOfBitsException.java
  *
- * Exception thrown when a number is divided by zero
- * (c) 2006 Andrea Spadaccini
+ * Exception thrown when trying to use an irregular string of bits to set a bitset.
+ * (c) 2006 Salvatore Scellato
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -20,13 +20,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package org.edumips64.core;
 
-/** Exception thrown when a number is divided by zero
- *  @author Andrea Spadaccini */
-public class DivisionByZeroException extends SynchronousException {
-  public DivisionByZeroException() {
-    super("DIVZERO");
-  }
-}
+/** Exception thrown when trying to use an irregular string of bits to set a bitset.
+ * @author Salvatore Scellato
+ * */
+
+public class IrregularStringOfBitsException extends Exception {}

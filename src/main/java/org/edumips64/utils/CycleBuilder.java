@@ -26,7 +26,7 @@
 package org.edumips64.utils;
 
 import org.edumips64.core.CPU;
-import org.edumips64.core.is.Instruction;
+import org.edumips64.core.is.InstructionInterface;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -89,7 +89,7 @@ public class CycleBuilder {
   // This method assumes that the CPU has just finished one cycle and that it is necessary to update the
   // CycleBuilder's internal representation to match the state of the CPU.
   public void step() {
-    Map<CPU.PipeStage, Instruction> pipeline = cpu.getPipeline();
+    Map<CPU.PipeStage, InstructionInterface> pipeline = cpu.getPipeline();
     curTime = cpu.getCycles();
     int instrInPipelineCount = cpu.getInstructionCount();
 
@@ -286,7 +286,7 @@ public class CycleBuilder {
 
   // Returns the CycleElement corresponding to the given Instruction. Returns null if the Instruction is null,
   // is a BUBBLE or if it's not in the map.
-  private CycleElement getElementToUpdate(Instruction instruction) {
+  private CycleElement getElementToUpdate(InstructionInterface instruction) {
     // Early exit in case of bogus instructions.
     if (instruction == null || instruction.isBubble()) {
       return null;

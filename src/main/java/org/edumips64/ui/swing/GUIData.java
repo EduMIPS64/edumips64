@@ -23,6 +23,7 @@
 package org.edumips64.ui.swing;
 
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.BitSet64FP;
 import org.edumips64.utils.*;
 
 import java.awt.*;
@@ -36,7 +37,7 @@ import javax.swing.table.*;
 */
 public class GUIData extends GUIComponent {
   private DataPanel dataPanel;
-  private String memoryAddress[] = new String[CPU.DATALIMIT];
+  private String memoryAddress[] = new String[Memory.DATALIMIT];
   private JTextArea text;
   private int row;
 

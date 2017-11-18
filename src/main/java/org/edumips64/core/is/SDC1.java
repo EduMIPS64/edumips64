@@ -24,7 +24,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
-import org.edumips64.utils.*;
+
 /** <pre>
  *       Syntax: SDC1 ft, offset(base)
  *  Description: memory[base+offset] = ft

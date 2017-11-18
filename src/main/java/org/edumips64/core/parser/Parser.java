@@ -27,17 +27,15 @@
  * @author mancausoft, Vanni
  */
 
-package org.edumips64.core;
+package org.edumips64.core.parser;
 
+import org.edumips64.core.*;
 import org.edumips64.core.fpu.FPInstructionUtils;
 
 import org.edumips64.core.fpu.FPOverflowException;
 import org.edumips64.core.fpu.FPUnderflowException;
 import org.edumips64.core.is.Instruction;
 import org.edumips64.core.is.InstructionBuilder;
-import org.edumips64.utils.Converter;
-import org.edumips64.utils.IrregularStringOfBitsException;
-import org.edumips64.utils.IrregularStringOfHexException;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.ReadException;
 
@@ -89,7 +87,7 @@ public class Parser {
    *
    *  The Parser uses the FP functions to parse, and as a result it needs to have an FCSR. Not ideal. */
   private FCSRRegister fcsr;
-  FCSRRegister getFCSR() {
+  public FCSRRegister getFCSR() {
     return fcsr;
   }
 
@@ -100,10 +98,10 @@ public class Parser {
     this.mem = memory;
     this.instructionBuilder = instructionBuilder;
     this.fcsr = new FCSRRegister();
-    fcsr.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, true);
-    fcsr.setFPExceptions(CPU.FPExceptions.OVERFLOW, true);
-    fcsr.setFPExceptions(CPU.FPExceptions.UNDERFLOW, true);
-    fcsr.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO, true);
+    fcsr.setFPExceptions(FCSRRegister.FPExceptions.INVALID_OPERATION, true);
+    fcsr.setFPExceptions(FCSRRegister.FPExceptions.OVERFLOW, true);
+    fcsr.setFPExceptions(FCSRRegister.FPExceptions.UNDERFLOW, true);
+    fcsr.setFPExceptions(FCSRRegister.FPExceptions.DIVIDE_BY_ZERO, true);
     fpInstructionUtils = new FPInstructionUtils(this.fcsr);
   }
 
@@ -124,7 +122,7 @@ public class Parser {
    * @param text the string to replace
    * @return a new String
    */
-  static String replaceTab(String text) {
+  public static String replaceTab(String text) {
     return text.replace("\t", " ");
   }
 
@@ -969,11 +967,11 @@ public class Parser {
                           int tmp = Integer.parseInt(param.substring(indPar, endPar).trim());
 
                           //if (tmp<0 || tmp%2!=0 || tmp > org.edumips64.core.CPU.DATALIMIT)
-                          if (tmp < 0 || tmp > org.edumips64.core.CPU.DATALIMIT) {
+                          if (tmp < 0 || tmp > Memory.DATALIMIT) {
                             numError++;
                             String er = "LABELADDRESSINVALID";
 
-                            if (tmp > org.edumips64.core.CPU.DATALIMIT) {
+                            if (tmp > Memory.DATALIMIT) {
                               er = "LABELTOOLARGE";
                             }
 

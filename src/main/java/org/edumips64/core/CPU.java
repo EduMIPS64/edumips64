@@ -23,23 +23,15 @@
 
 package org.edumips64.core;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-import org.edumips64.core.fpu.EXNotAvailableException;
-import org.edumips64.core.fpu.FPDividerNotAvailableException;
-import org.edumips64.core.fpu.FPFunctionalUnitNotAvailableException;
-import org.edumips64.core.fpu.FPInvalidOperationException;
-import org.edumips64.core.fpu.FPPipeline;
-import org.edumips64.core.fpu.MemoryNotAvailableException;
+import org.edumips64.core.fpu.*;
 import org.edumips64.core.is.AddressErrorException;
-import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
-import org.edumips64.core.is.Instruction;
+import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.is.JumpException;
 import org.edumips64.core.is.RAWException;
 import org.edumips64.core.is.TwosComplementSumException;
@@ -56,14 +48,10 @@ public class CPU {
 
   /** FPU Elements*/
   private RegisterFP[] fpr;
-  private Instruction lastFPInstructionInEx;
+  private InstructionInterface lastFPInstructionInEx;
 
-  public enum FPExceptions {INVALID_OPERATION, DIVIDE_BY_ZERO, UNDERFLOW, OVERFLOW}
-  public enum FPRoundingMode { TO_NEAREST, TOWARD_ZERO, TOWARDS_PLUS_INFINITY, TOWARDS_MINUS_INFINITY}
   private FCSRRegister FCSR;
-  public static List<String> knownFPInstructions; // set of Floating point instructions that must pass through the FPU pipeline
   private FPPipeline fpPipe;
-  private List<String> terminatingInstructionsOPCodes;
 
   /** Program Counter*/
   private Register pc, old_pc;
@@ -93,14 +81,10 @@ public class CPU {
   private CPUStatus status;
 
   /** CPU pipeline, each stage contains an Instruction object*/
-  private Map<PipeStage, Instruction> pipe;
+  private Map<PipeStage, InstructionInterface> pipe;
 
   /** The current stage of the pipeline.*/
   private PipeStage currentPipeStage;
-
-  /** The code and data sections limits*/
-  public static final int CODELIMIT = 16384; // 16 bit bus (2^12 / 4)
-  public static final int DATALIMIT = 8192;  // 16 bit bus (2^12 / 8)
 
   /** Simulator configuration */
   private ConfigStore config;
@@ -109,15 +93,16 @@ public class CPU {
   private int cycles, instructions, RAWStalls, WAWStalls, dividerStalls, funcUnitStalls, memoryStalls, exStalls;
 
   /** BUBBLE */
-  private Instruction bubble;
+  private InstructionInterface bubble;
 
-  /** CycleBuilder. Representation of all state transitions that happened inside the CPU. Needed for UIs, but
-   *  stored here because it needs to be invoked every time the CPU does one step. */
-  private CycleBuilder builder;
+  /** Terminating instructions */
+  private static ArrayList<String> terminating = new ArrayList<>(
+      Arrays.asList("0000000C",     // SYSCALL 0
+                    "04000000"));   // HALT
 
-  public CPU(Memory memory, ConfigStore config) {
+  public CPU(Memory memory, ConfigStore config, InstructionInterface bubble) {
     this.config = config;
-    bubble = new BUBBLE();
+    this.bubble = bubble;
 
     logger.info("Creating the CPU...");
     cycles = 0;
@@ -155,16 +140,6 @@ public class CPU {
     pipe = new HashMap<>();
     clearPipe();
     currentPipeStage = PipeStage.IF;
-
-
-    //FPU initialization
-    FPUConfigurator conf = new FPUConfigurator();
-    knownFPInstructions = conf.getFPArithmeticInstructions();
-    terminatingInstructionsOPCodes = conf.getTerminatingInstructions();
-
-    // CycleBuilder.
-    this.builder = new CycleBuilder(this);
-
     logger.info("CPU Created.");
   }
 
@@ -203,10 +178,6 @@ public class CPU {
   }
 
 //GETTING PROPERTIES -----------------------------------------------------------------
-
-  public CycleBuilder getCycleBuilder() {
-    return builder;
-  }
 
   /** Gets the CPU status
    *  @return status a CPUStatus value representing the current CPU status
@@ -270,7 +241,7 @@ public class CPU {
    *  @param stage The integer that refers to the stage of the functional unit.
    *      ADDER [1,4], MULTIPLIER [1,7], DIVIDER [any] */
 
-  public Instruction getInstructionByFuncUnit(String funcUnit, int stage) {
+  public InstructionInterface getInstructionByFuncUnit(String funcUnit, int stage) {
     return fpPipe.getInstructionByFuncUnit(funcUnit, stage);
   }
 
@@ -288,7 +259,7 @@ public class CPU {
 
   /** Gets the current rounding mode readeng the FCSR
    * @return the rounding mode */
-  public FPRoundingMode getFCSRRoundingMode() {
+  public FCSRRegister.FPRoundingMode getFCSRRoundingMode() {
     return FCSR.getFCSRRoundingMode();
   }
 
@@ -300,14 +271,14 @@ public class CPU {
   /** Gets the integer pipeline
    *  @return an HashMap
    */
-  public Map<PipeStage, Instruction> getPipeline() {
+  public Map<PipeStage, InstructionInterface> getPipeline() {
     return pipe;
   }
 
   // Includes FP instructions and bubbles. Used by CycleBuilder.
   public int getInstructionCount() {
     int count = 0;
-    for (Instruction i : pipe.values()) {
+    for (InstructionInterface i : pipe.values()) {
       if (i != null) {
         count++;
       }
@@ -374,7 +345,7 @@ public class CPU {
   /** Gets the floating point unit enabled exceptions
    *  @return true if exceptionName is enabled, false in the other case
    */
-  public boolean getFPExceptions(FPExceptions exceptionName) {
+  public boolean getFPExceptions(FCSRRegister.FPExceptions exceptionName) {
     return FCSR.getFPExceptions(exceptionName);
   }
 
@@ -414,7 +385,7 @@ public class CPU {
 
   /** This method performs a single pipeline step
   */
-  public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, WAWException, MemoryNotAvailableException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException {
+  public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, WAWException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException {
     configFPExceptionsAndRM();
 
     String syncex;
@@ -514,7 +485,6 @@ public class CPU {
       pipe.put(PipeStage.WB, null);
       throw ex;
     } finally {
-      builder.step();
       logger.info("End of cycle " + cycles + "\n---------------------------------------------\n" + pipeLineString() + "\n");
     }
   }
@@ -546,7 +516,7 @@ public class CPU {
 
       logger.info("Moving " + pipe.get(PipeStage.IF) + " to ID");
       pipe.put(PipeStage.ID, pipe.get(PipeStage.IF));
-      Instruction next_if = mem.getInstruction(pc);
+      InstructionInterface next_if = mem.getInstruction(pc);
       logger.info("Fetched new instruction " + next_if);
       old_pc.writeDoubleWord((pc.getValue()));
       pc.writeDoubleWord((pc.getValue()) + 4);
@@ -569,7 +539,7 @@ public class CPU {
     changeStage(PipeStage.ID);
 
     if (pipe.get(PipeStage.ID) != null) {
-      boolean isFP = knownFPInstructions.contains(pipe.get(PipeStage.ID).getName());
+      boolean isFP = FPPipeline.Constants.fparithmetic.contains(pipe.get(PipeStage.ID).getName());
 
       // Check if the desired unit (FP or not) is available.
       if (isFP && (fpPipe.putInstruction(pipe.get(PipeStage.ID), true) != 0)) {
@@ -611,8 +581,8 @@ public class CPU {
     // Code of the synchronous exception that happens in EX.
     String syncex = null;
 
-    Instruction completedFpInstruction = fpPipe.getCompletedInstruction();
-    Instruction instruction;
+    InstructionInterface completedFpInstruction = fpPipe.getCompletedInstruction();
+    InstructionInterface instruction;
     boolean shouldExecuteFP = completedFpInstruction != null;
 
     // if there will be a stall because a lot of instructions would fill the MEM stage, the EX()
@@ -652,7 +622,7 @@ public class CPU {
       }
     }
 
-    Instruction toMove = shouldExecuteFP ? lastFPInstructionInEx : pipe.get(PipeStage.EX);
+    InstructionInterface toMove = shouldExecuteFP ? lastFPInstructionInEx : pipe.get(PipeStage.EX);
     logger.info("Moving " + toMove + " to MEM");
     pipe.put(PipeStage.MEM, toMove);
     if (!shouldExecuteFP) {
@@ -683,7 +653,7 @@ public class CPU {
     changeStage(PipeStage.WB);
 
     if (pipe.get(PipeStage.WB) != null) {
-      boolean terminatorInstrInWB = terminatingInstructionsOPCodes.contains(pipe.get(PipeStage.WB).getRepr().getHexString());
+      boolean terminatorInstrInWB = terminating.contains(pipe.get(PipeStage.WB).getRepr().getHexString());
       //we have to execute the WB method only if some conditions occur
       //the current instruction in WB is a terminating instruction and the fpPipe is working
       boolean notWBable = terminatorInstrInWB && !fpPipe.isEmpty();
@@ -776,9 +746,6 @@ public class CPU {
     // Reset FP pipeline
     fpPipe.reset();
 
-    // Reset CycleBuilder
-    builder.reset();
-
     logger.info("CPU Resetted");
   }
 
@@ -833,20 +800,20 @@ public class CPU {
 
   private void configFPExceptionsAndRM() {
     try {
-      FCSR.setFPExceptions(CPU.FPExceptions.INVALID_OPERATION, config.getBoolean(ConfigKey.FP_INVALID_OPERATION));
-      FCSR.setFPExceptions(CPU.FPExceptions.OVERFLOW, config.getBoolean(ConfigKey.FP_OVERFLOW));
-      FCSR.setFPExceptions(CPU.FPExceptions.UNDERFLOW, config.getBoolean(ConfigKey.FP_UNDERFLOW));
-      FCSR.setFPExceptions(CPU.FPExceptions.DIVIDE_BY_ZERO, config.getBoolean(ConfigKey.FP_DIVIDE_BY_ZERO));
+      FCSR.setFPExceptions(FCSRRegister.FPExceptions.INVALID_OPERATION, config.getBoolean(ConfigKey.FP_INVALID_OPERATION));
+      FCSR.setFPExceptions(FCSRRegister.FPExceptions.OVERFLOW, config.getBoolean(ConfigKey.FP_OVERFLOW));
+      FCSR.setFPExceptions(FCSRRegister.FPExceptions.UNDERFLOW, config.getBoolean(ConfigKey.FP_UNDERFLOW));
+      FCSR.setFPExceptions(FCSRRegister.FPExceptions.DIVIDE_BY_ZERO, config.getBoolean(ConfigKey.FP_DIVIDE_BY_ZERO));
 
       //setting the rounding mode
       if (config.getBoolean(ConfigKey.FP_NEAREST)) {
-        FCSR.setFCSRRoundingMode(FPRoundingMode.TO_NEAREST);
+        FCSR.setFCSRRoundingMode(FCSRRegister.FPRoundingMode.TO_NEAREST);
       } else if (config.getBoolean(ConfigKey.FP_TOWARDS_ZERO)) {
-        FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARD_ZERO);
+        FCSR.setFCSRRoundingMode(FCSRRegister.FPRoundingMode.TOWARD_ZERO);
       } else if (config.getBoolean(ConfigKey.FP_TOWARDS_PLUS_INFINITY)) {
-        FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_PLUS_INFINITY);
+        FCSR.setFCSRRoundingMode(FCSRRegister.FPRoundingMode.TOWARDS_PLUS_INFINITY);
       } else if (config.getBoolean(ConfigKey.FP_TOWARDS_MINUS_INFINITY)) {
-        FCSR.setFCSRRoundingMode(FPRoundingMode.TOWARDS_MINUS_INFINITY);
+        FCSR.setFCSRRoundingMode(FCSRRegister.FPRoundingMode.TOWARDS_MINUS_INFINITY);
       }
     } catch (IrregularStringOfBitsException ex) {
       Logger.getLogger(CPU.class.getName()).log(Level.SEVERE, null, ex);

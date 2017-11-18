@@ -16,9 +16,9 @@ public class MemoryTest extends BaseTest {
   @Before
   public void setUp() throws Exception {
     m = new Memory();
-    CPU cpu = new CPU(m, config);
+    CPU cpu = new CPU(m, config, new BUBBLE());
     IOManager iom = new IOManager(new LocalFileUtils(), m);
-    Dinero dinero = new Dinero(m);
+    Dinero dinero = new Dinero();
     instructionBuilder = new InstructionBuilder(m, iom, cpu, dinero, config);
   }
 

@@ -7,6 +7,7 @@ import jsinterop.annotations.JsType;
 import org.edumips64.core.*;
 import org.edumips64.core.is.HaltException;
 import org.edumips64.core.is.InstructionBuilder;
+import org.edumips64.core.parser.Parser;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.FileUtils;
@@ -32,6 +33,7 @@ public class WebUi implements EntryPoint {
       symTab.reset();
       logger.info("About to parse it.");
       parser.doParsing(code);
+      dinero.setDataOffset(memory.getInstructionsNumber()*4);
       logger.info("Parsed. Running.");
       cpu.setStatus(CPU.CPUStatus.RUNNING);
       while (true) {
@@ -76,7 +78,7 @@ public class WebUi implements EntryPoint {
     FileUtils fu = new NullFileUtils();
     IOManager iom = new IOManager(fu, memory);
     cpu = new CPU(memory, config);
-    dinero = new Dinero(memory);
+    dinero = new Dinero();
     InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
   }

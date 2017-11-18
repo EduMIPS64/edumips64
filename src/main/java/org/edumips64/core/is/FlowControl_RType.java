@@ -28,7 +28,6 @@ package org.edumips64.core.is;
 
 import org.edumips64.core.*;
 import org.edumips64.core.fpu.FPInvalidOperationException;
-import org.edumips64.utils.*;
 
 /** This is the base class for R-Type flowcontrol instructions
  *

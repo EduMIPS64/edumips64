@@ -1,7 +1,10 @@
 package org.edumips64.core;
 
 import org.edumips64.BaseTest;
+import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
+import org.edumips64.core.parser.Parser;
+import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,10 +18,10 @@ public class ParserTest extends BaseTest {
   @Before
   public void setUp() throws Exception {
     memory = new Memory();
-    CPU cpu = new CPU(memory, config);
+    CPU cpu = new CPU(memory, config, new BUBBLE());
     SymbolTable symTab = new SymbolTable(memory);
     IOManager iom = new IOManager(new LocalFileUtils(), memory);
-    Dinero dinero = new Dinero(memory);
+    Dinero dinero = new Dinero();
     InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
   }
@@ -106,19 +109,19 @@ public class ParserTest extends BaseTest {
 
   @Test(expected = ParserMultiException.class)
   public void FPOverflowPositiveNumberTest() throws Exception {
-    parser.getFCSR().setFPExceptions(CPU.FPExceptions.OVERFLOW, true);
+    parser.getFCSR().setFPExceptions(FCSRRegister.FPExceptions.OVERFLOW, true);
     ParseDouble("-1.8E308");
   }
 
   @Test(expected = ParserMultiException.class)
   public void FPOverflowNegativeNumberTest() throws Exception {
-    parser.getFCSR().setFPExceptions(CPU.FPExceptions.OVERFLOW, true);
+    parser.getFCSR().setFPExceptions(FCSRRegister.FPExceptions.OVERFLOW, true);
     ParseDouble("4.95E324");
   }
 
   @Test
   public void FPOverflowNoThrowOnDisabledExceptionsTest() throws Exception {
-    parser.getFCSR().setFPExceptions(CPU.FPExceptions.OVERFLOW, false);
+    parser.getFCSR().setFPExceptions(FCSRRegister.FPExceptions.OVERFLOW, false);
     ParseDouble("4.95E324");
   }
 

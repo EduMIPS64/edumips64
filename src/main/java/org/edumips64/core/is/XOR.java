@@ -26,7 +26,7 @@
 
 package org.edumips64.core.is;
 
-import org.edumips64.utils.IrregularStringOfBitsException;
+import org.edumips64.core.IrregularStringOfBitsException;
 
 /**
  * <pre>

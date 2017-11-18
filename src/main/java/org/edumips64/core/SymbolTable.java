@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.edumips64.core.is.Instruction;
+import org.edumips64.core.is.InstructionInterface;
 
 /** This class acts as a proxy to retrieve memory cells and instruction from
 * labels
@@ -91,7 +91,7 @@ public class SymbolTable {
       }
 
       instr_labels.put(label, address);
-      Instruction temp = mem.getInstruction(address);
+      InstructionInterface temp = mem.getInstruction(address);
       if (temp == null) {
         // TODO: throw exception?
         logger.severe("No instruction at address " + address);

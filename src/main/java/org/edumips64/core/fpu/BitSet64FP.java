@@ -20,13 +20,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.edumips64.core;
+package org.edumips64.core.fpu;
 
-//import org.edumips64.utils.*;
-import org.edumips64.utils.Converter;
-import org.edumips64.utils.IrregularStringOfBitsException;
-import java.util.BitSet;
-import org.edumips64.core.fpu.*;
+import org.edumips64.core.FCSRRegister;
+import org.edumips64.core.FixedBitSet;
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.IrregularWriteOperationException;
 
 /** This class models a 64-bit array, useful for floating point registers
  * @author Massimo Trubia

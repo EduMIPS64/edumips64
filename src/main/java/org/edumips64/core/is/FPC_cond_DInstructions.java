@@ -25,7 +25,6 @@
 package org.edumips64.core.is;
 
 import org.edumips64.core.*;
-import org.edumips64.utils.*;
 import org.edumips64.core.fpu.*;
 import java.math.*;
 //per diagnostica
@@ -98,7 +97,7 @@ public abstract class FPC_cond_DInstructions extends ComputationalInstructions {
       //checking for invalid operation exception (if it is raised the FCSR isn't modified)
       //this exception occurs
       if (FPInstructionUtils.isSNaN(fs.getBinString()) || FPInstructionUtils.isSNaN(ft.getBinString())
-          || (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION) && (FPInstructionUtils.isQNaN(fs.getBinString()) || FPInstructionUtils.isQNaN(ft.getBinString())))) {
+          || (cpu.getFPExceptions(FCSRRegister.FPExceptions.INVALID_OPERATION) && (FPInstructionUtils.isQNaN(fs.getBinString()) || FPInstructionUtils.isQNaN(ft.getBinString())))) {
         //before raising the trap or return the special value we modify the cause bit
         cpu.setFCSRCause("V", 1);
         throw new FPInvalidOperationException();

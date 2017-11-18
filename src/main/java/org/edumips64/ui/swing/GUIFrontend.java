@@ -50,8 +50,8 @@ public class GUIFrontend {
 
   /**Creates the six internal component
   */
-  public GUIFrontend(CPU cpu, Memory memory, ConfigStore config) {
-    cycles = new GUICycles(cpu, memory, config);
+  public GUIFrontend(CPU cpu, Memory memory, ConfigStore config, CycleBuilder builder) {
+    cycles = new GUICycles(cpu, memory, config, builder);
     regs = new GUIRegisters(cpu, memory, config);
     stats = new GUIStatistics(cpu, memory, config);
     pipe = new GUIPipeline(cpu, memory, config);

@@ -1,5 +1,4 @@
-package org.edumips64.core;
-import java.util.*;
+package org.edumips64.core.parser;
 /*
  * ParserMultiWarningException.java
  *

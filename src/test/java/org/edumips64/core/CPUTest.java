@@ -1,6 +1,7 @@
 package org.edumips64.core;
 
 import org.edumips64.BaseTest;
+import org.edumips64.core.is.BUBBLE;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,7 +14,7 @@ public class CPUTest extends BaseTest {
   @Before
   public void setUp() throws Exception {
     Memory m = new Memory();
-    cpu = new CPU(m, config);
+    cpu = new CPU(m, config, new BUBBLE());
   }
 
   @Test(expected = StoppedCPUException.class)

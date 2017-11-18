@@ -26,7 +26,7 @@
 package org.edumips64.core.is;
 import org.edumips64.core.*;
 import org.edumips64.core.fpu.*;
-import org.edumips64.utils.*;
+
 import java.math.*;
 
 /**
@@ -59,7 +59,7 @@ class CVT_L_D extends FPConversionFCSRInstructions {
       //before raising the trap or return the special value we modify the cause bit
       cpu.setFCSRCause("V", 1);
 
-      if (cpu.getFPExceptions(CPU.FPExceptions.INVALID_OPERATION)) {
+      if (cpu.getFPExceptions(FCSRRegister.FPExceptions.INVALID_OPERATION)) {
         throw new FPInvalidOperationException();
       } else {
         cpu.setFCSRFlags("V", 1);

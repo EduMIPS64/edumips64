@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import org.edumips64.core.is.Instruction;
+import org.edumips64.core.is.InstructionInterface;
 
 /**
 * This class represents the single element that is then drawn in the cycles
@@ -37,7 +38,7 @@ public class CycleElement {
 
   private int startTime;
   private LinkedList<String> states;
-  private Instruction instruction;
+  private InstructionInterface instruction;
 
   // Boolean storing whether this CycleElement contains one or more invalid transactions.
   // Used for testing and debugging purposes.
@@ -50,7 +51,7 @@ public class CycleElement {
   * @param instruction the instruction object
   * @param startTime the time in which the element entered in the pipeline
   */
-  CycleElement(Instruction instruction, int startTime) {
+  CycleElement(InstructionInterface instruction, int startTime) {
     this.startTime = startTime;
     this.instruction = instruction;
     states = new LinkedList<>();

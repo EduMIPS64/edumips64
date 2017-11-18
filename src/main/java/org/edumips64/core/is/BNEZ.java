@@ -27,7 +27,7 @@ package org.edumips64.core.is;
 
 import org.edumips64.core.*;
 import org.edumips64.core.fpu.FPInvalidOperationException;
-import org.edumips64.utils.*;
+
 /** <pre>
  *  Syntax:        BNEZ rs, offset
  *  Description:   To test a GPR then do a PC-relative conditional branch

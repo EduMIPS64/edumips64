@@ -23,7 +23,11 @@
 package org.edumips64;
 
 import org.edumips64.core.*;
+import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
+import org.edumips64.core.parser.Parser;
+import org.edumips64.core.parser.ParserMultiException;
+import org.edumips64.core.parser.ParserMultiWarningException;
 import org.edumips64.ui.swing.img.*;
 import org.edumips64.ui.swing.*;
 import org.edumips64.utils.*;
@@ -57,6 +61,7 @@ public class Main extends JApplet {
   private static Parser parser;
   private static SymbolTable symTab;
   private static Memory memory;
+  private static CycleBuilder builder;
   private static Dinero dinero;
   private static GUIFrontend front;
   private static ConfigStore configStore;
@@ -235,17 +240,18 @@ public class Main extends JApplet {
     cp.setLayout(new BorderLayout());
     cp.add(createMenuBar(), BorderLayout.NORTH);
 
-    Memory memory = new Memory();
-    cpu = new CPU(memory, configStore);
+    memory = new Memory();
+    cpu = new CPU(memory, configStore, new BUBBLE());
     cpu.setStatus(CPU.CPUStatus.READY);
 
     symTab = new SymbolTable(memory);
     iom = new IOManager(lfu, memory);
-    dinero = new Dinero(memory);
+    dinero = new Dinero();
     InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, configStore);
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
-    front = new GUIFrontend(cpu, memory, configStore);
+    builder = new CycleBuilder(cpu);
+    front = new GUIFrontend(cpu, memory, configStore, builder);
 
     // Internal Frames
     JInternalFrame pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);
@@ -475,11 +481,12 @@ public class Main extends JApplet {
       log.info("After parsing");
 
       // The file has correctly been parsed
+      dinero.setDataOffset(memory.getInstructionsNumber() * 4);
       cpu.setStatus(CPU.CPUStatus.RUNNING);
       log.info("Set the status to RUNNING");
 
       // Let's fetch the first instruction
-      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore);
+      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder);
       cpuWorker.setSteps(1);
       cpuWorker.execute();
       while (cpuWorker.isDone()) {
@@ -603,6 +610,7 @@ public class Main extends JApplet {
     cpu.reset();
     symTab.reset();
     dinero.reset();
+    builder.reset();
 
     try {
       iom.reset();
@@ -767,7 +775,7 @@ public class Main extends JApplet {
     exec.add(single_cycle);
     single_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
     single_cycle.addActionListener(e -> {
-      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore);
+      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder);
       cpuWorker.setSteps(1);
       cpuWorker.execute();
     });
@@ -776,7 +784,7 @@ public class Main extends JApplet {
     exec.add(run_to);
     run_to.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
     run_to.addActionListener(e -> {
-      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore);
+      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder);
       cpuWorker.setSteps(-1);
       cpuWorker.execute();
     });
@@ -785,7 +793,7 @@ public class Main extends JApplet {
     exec.add(multi_cycle);
     multi_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
     multi_cycle.addActionListener(e -> {
-      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore);
+      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder);
       cpuWorker.setSteps(configStore.getInt(ConfigKey.N_STEPS));
       cpuWorker.execute();
     });
