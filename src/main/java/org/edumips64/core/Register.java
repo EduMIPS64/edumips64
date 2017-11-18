@@ -27,8 +27,6 @@ package org.edumips64.core;
 
 import java.util.logging.Logger;
 
-import org.edumips64.utils.*;
-
 
 /** This class models a 64-bit CPU's internal register.
  * @author Salvatore Scellato

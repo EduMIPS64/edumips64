@@ -22,9 +22,6 @@
  */
 package org.edumips64.core;
 
-import org.edumips64.utils.Converter;
-import org.edumips64.utils.IrregularStringOfBitsException;
-
 /** This class models a 64-bit array, useful for registers and memory representation.
  * @author Salvatore Scellato
  * */

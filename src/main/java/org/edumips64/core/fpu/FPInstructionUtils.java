@@ -28,10 +28,9 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
-import org.edumips64.core.CPU;
 import org.edumips64.core.FCSRRegister;
-import org.edumips64.utils.Converter;
-import org.edumips64.utils.IrregularStringOfBitsException;
+import org.edumips64.core.Converter;
+import org.edumips64.core.IrregularStringOfBitsException;
 
 /** Group of functions used in the Floating point unit
  */
@@ -108,7 +107,7 @@ public class FPInstructionUtils {
 
       // Check for overflow.
       if (value_bd.compareTo(theBiggest) == 1 || value_bd.compareTo(theSmallest) == -1) {
-        fcsr.setFlagsOrRaiseException(CPU.FPExceptions.OVERFLOW);
+        fcsr.setFlagsOrRaiseException(FCSRRegister.FPExceptions.OVERFLOW);
         if (value_bd.compareTo(theBiggest) == 1) {
           return PLUSINFINITY;
         }
@@ -120,7 +119,7 @@ public class FPInstructionUtils {
 
       // Check for underflow.
       if ((value_bd.compareTo(theZeroMinus) == 1 && value_bd.compareTo(theZeroPlus) == -1) && (value_bd.compareTo(zero) != 0 && value_bd.compareTo(minuszero) != 0)) {
-        fcsr.setFlagsOrRaiseException(CPU.FPExceptions.UNDERFLOW);
+        fcsr.setFlagsOrRaiseException(FCSRRegister.FPExceptions.UNDERFLOW);
 
         if (value_bd.compareTo(zero) == 1) {
           return PLUSZERO;
@@ -135,7 +134,7 @@ public class FPInstructionUtils {
       return padding64(output);
 
     } catch (NumberFormatException e) {
-      if (fcsr.getFPExceptions(CPU.FPExceptions.OVERFLOW)) {
+      if (fcsr.getFPExceptions(FCSRRegister.FPExceptions.OVERFLOW)) {
         fcsr.setFCSRCause("O", 1);
         throw new FPOverflowException();
       } else {
@@ -213,7 +212,7 @@ public class FPInstructionUtils {
       wrongOperands = wrongOperands || (isNegativeInfinity(value1) && isPositiveInfinity(value2));
       if (isNan || wrongOperands) {
         try {
-          fcsr.setFlagsOrRaiseException(CPU.FPExceptions.INVALID_OPERATION);
+          fcsr.setFlagsOrRaiseException(FCSRRegister.FPExceptions.INVALID_OPERATION);
         } catch (FPDivideByZeroException e) {
           // Should never happen.
           e.printStackTrace();
@@ -279,7 +278,7 @@ public class FPInstructionUtils {
     wrongOperands = wrongOperands || (isNegativeInfinity(value1) && isNegativeInfinity(value2));
     if (isNan || wrongOperands) {
       try {
-        fcsr.setFlagsOrRaiseException(CPU.FPExceptions.INVALID_OPERATION);
+        fcsr.setFlagsOrRaiseException(FCSRRegister.FPExceptions.INVALID_OPERATION);
       } catch (FPDivideByZeroException e) {
         // Should never happen.
         e.printStackTrace();
@@ -341,7 +340,7 @@ public class FPInstructionUtils {
     wrongOperands = wrongOperands || (isInfinity(value1) && isZero(value2));
     if (isNan || wrongOperands) {
       try {
-        fcsr.setFlagsOrRaiseException(CPU.FPExceptions.INVALID_OPERATION);
+        fcsr.setFlagsOrRaiseException(FCSRRegister.FPExceptions.INVALID_OPERATION);
       } catch (FPDivideByZeroException e) {
         // Should never happen.
         e.printStackTrace();
@@ -416,7 +415,7 @@ public class FPInstructionUtils {
     boolean wrongOperands = isInfinity(value1) && isInfinity(value2);
     wrongOperands = wrongOperands || (isZero(value1) && isZero(value2));
     if (isNan || wrongOperands) {
-      fcsr.setFlagsOrRaiseException(CPU.FPExceptions.INVALID_OPERATION);
+      fcsr.setFlagsOrRaiseException(FCSRRegister.FPExceptions.INVALID_OPERATION);
       return QNAN_NEW;
     }
 
@@ -431,7 +430,7 @@ public class FPInstructionUtils {
     }
 
     if (!isZero(value1) && isZero(value2)) {
-      fcsr.setFlagsOrRaiseException(CPU.FPExceptions.DIVIDE_BY_ZERO);
+      fcsr.setFlagsOrRaiseException(FCSRRegister.FPExceptions.DIVIDE_BY_ZERO);
       return getSignedInfinity(res_sign);
     }
 
@@ -649,7 +648,7 @@ public class FPInstructionUtils {
    * @param value a binary string representing a double value according to the IEEE754 standard
    * @param rm    the rounding mode to use for the conversion
    **/
-  public static BigInteger doubleToBigInteger(String value, CPU.FPRoundingMode rm) throws IrregularStringOfBitsException {
+  public static BigInteger doubleToBigInteger(String value, FCSRRegister.FPRoundingMode rm) throws IrregularStringOfBitsException {
     //we have to check if a XNan o Infinity was passed to this function
     if (isQNaN(value) || isSNaN(value) || isInfinity(value) || !is64BinaryString(value)) {
       return null;

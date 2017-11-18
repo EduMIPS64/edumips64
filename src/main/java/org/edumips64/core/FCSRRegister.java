@@ -25,13 +25,14 @@ import org.edumips64.core.fpu.FPDivideByZeroException;
 import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.core.fpu.FPOverflowException;
 import org.edumips64.core.fpu.FPUnderflowException;
-import org.edumips64.utils.IrregularStringOfBitsException;
 
 /** This class models the Floating Point Control and Status Register
  * @author Massimo Trubia
  * */
 
 public class FCSRRegister extends BitSet32 {
+  public enum FPExceptions {INVALID_OPERATION, DIVIDE_BY_ZERO, UNDERFLOW, OVERFLOW}
+  public enum FPRoundingMode { TO_NEAREST, TOWARD_ZERO, TOWARDS_PLUS_INFINITY, TOWARDS_MINUS_INFINITY}
 //SETTING PROPERTIES ----------------------------------------------------------
 
   /**
@@ -122,7 +123,7 @@ public class FCSRRegister extends BitSet32 {
    *
    * @param rm a constant that belongs to the following values TO_NEAREST ,TOWARD_ZERO,TOWARDS_PLUS_INFINITY,TOWARDS_MINUS_INFINITY
    */
-  void setFCSRRoundingMode(CPU.FPRoundingMode rm) throws IrregularStringOfBitsException {
+  void setFCSRRoundingMode(FPRoundingMode rm) throws IrregularStringOfBitsException {
     final int FCSR_RM_FIELD_INIT = 30;
     switch (rm) {
       case TO_NEAREST:
@@ -146,7 +147,7 @@ public class FCSRRegister extends BitSet32 {
    * @param exceptionName the exception name to set
    * @param value         boolean that is true in order to enable that exception or false for disabling it
    */
-  public void setFPExceptions(CPU.FPExceptions exceptionName, boolean value) {
+  public void setFPExceptions(FPExceptions exceptionName, boolean value) {
     try {
       switch (exceptionName) {
         case DIVIDE_BY_ZERO:
@@ -215,23 +216,23 @@ public class FCSRRegister extends BitSet32 {
     }
   }
 
-  CPU.FPRoundingMode getFCSRRoundingMode() {
+  FPRoundingMode getFCSRRoundingMode() {
     final int FCSR_RM_FIELD_INIT = 30;
 
     if (getBinString().substring(FCSR_RM_FIELD_INIT, size).compareTo("00") == 0) {
-      return CPU.FPRoundingMode.TO_NEAREST;
+      return FPRoundingMode.TO_NEAREST;
     }
 
     if (getBinString().substring(FCSR_RM_FIELD_INIT, size).compareTo("01") == 0) {
-      return CPU.FPRoundingMode.TOWARD_ZERO;
+      return FPRoundingMode.TOWARD_ZERO;
     }
 
     if (getBinString().substring(FCSR_RM_FIELD_INIT, size).compareTo("10") == 0) {
-      return CPU.FPRoundingMode.TOWARDS_PLUS_INFINITY;
+      return FPRoundingMode.TOWARDS_PLUS_INFINITY;
     }
 
     if (getBinString().substring(FCSR_RM_FIELD_INIT, size).compareTo("11") == 0) {
-      return CPU.FPRoundingMode.TOWARDS_MINUS_INFINITY;
+      return FPRoundingMode.TOWARDS_MINUS_INFINITY;
     }
 
     return null;
@@ -242,7 +243,7 @@ public class FCSRRegister extends BitSet32 {
    *
    * @return true if exceptionName is enabled, false in the other case
    */
-  public boolean getFPExceptions(CPU.FPExceptions exceptionName) {
+  public boolean getFPExceptions(FPExceptions exceptionName) {
     //return this.fpEnabledExceptions.get(exceptionName);
     switch (exceptionName) {
       case DIVIDE_BY_ZERO:
@@ -258,7 +259,7 @@ public class FCSRRegister extends BitSet32 {
     return false;
   }
 
-  private String getFlag(CPU.FPExceptions exceptionName) {
+  private String getFlag(FPExceptions exceptionName) {
     switch (exceptionName) {
       case DIVIDE_BY_ZERO:
         return "Z";
@@ -273,7 +274,7 @@ public class FCSRRegister extends BitSet32 {
     return null;
   }
 
-  public void setFlagsOrRaiseException(CPU.FPExceptions exceptionName) throws FPDivideByZeroException, FPOverflowException, FPUnderflowException, FPInvalidOperationException {
+  public void setFlagsOrRaiseException(FPExceptions exceptionName) throws FPDivideByZeroException, FPOverflowException, FPUnderflowException, FPInvalidOperationException {
     String flag = getFlag(exceptionName);
 
     // Before raising the exception, we set the cause bit.

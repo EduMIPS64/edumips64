@@ -30,9 +30,9 @@ import org.edumips64.core.MemoryElement;
 import org.edumips64.core.MemoryElementNotFoundException;
 import org.edumips64.core.NotAlignException;
 import org.edumips64.core.fpu.FPInvalidOperationException;
-import org.edumips64.utils.Converter;
+import org.edumips64.core.Converter;
 import org.edumips64.utils.CurrentLocale;
-import org.edumips64.utils.IrregularStringOfBitsException;
+import org.edumips64.core.IrregularStringOfBitsException;
 
 /**This is the base class of Load store instructions
  *

@@ -28,8 +28,8 @@ package org.edumips64.core.is;
 import org.edumips64.core.IrregularWriteOperationException;
 import org.edumips64.core.Register;
 import org.edumips64.core.fpu.FPInvalidOperationException;
-import org.edumips64.utils.Converter;
-import org.edumips64.utils.IrregularStringOfBitsException;
+import org.edumips64.core.Converter;
+import org.edumips64.core.IrregularStringOfBitsException;
 
 import java.math.BigInteger;
 

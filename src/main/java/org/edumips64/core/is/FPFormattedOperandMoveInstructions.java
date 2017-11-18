@@ -24,7 +24,6 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
-import org.edumips64.utils.*;
 import org.edumips64.core.fpu.*;
 
 /**This is the base class of the move to and from instructions

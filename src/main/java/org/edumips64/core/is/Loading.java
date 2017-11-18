@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 
 import org.edumips64.core.*;
 import org.edumips64.core.fpu.FPInvalidOperationException;
-import org.edumips64.utils.*;
 
 /** This is the base class for loading instruction
  *

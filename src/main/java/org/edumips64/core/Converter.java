@@ -20,7 +20,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.edumips64.utils;
+package org.edumips64.core;
 
 /** This class provides a set of static method for numeric conversion.
  * NOTE: bit strings will be considered little-endian, that is to say that the right-most bit is the less significant one: this

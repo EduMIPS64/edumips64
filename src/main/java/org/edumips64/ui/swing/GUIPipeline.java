@@ -22,10 +22,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.edumips64.ui.swing;
+import org.edumips64.core.CPU;
+import org.edumips64.core.Memory;
+import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
-import org.edumips64.core.*;
-import org.edumips64.core.is.*;
+
 import java.awt.*;
 import javax.swing.*;
 import java.util.*;
@@ -41,7 +43,7 @@ class GUIPipeline extends GUIComponent {
   private int numMultiplier;
   private int numAdder;
 
-  private Map <CPU.PipeStage, Instruction> pipeline;
+  private Map <CPU.PipeStage, InstructionInterface> pipeline;
 
   GUIPipeline(CPU cpu, Memory memory, ConfigStore config) {
     super(cpu, memory, config);
@@ -198,7 +200,7 @@ class GUIPipeline extends GUIComponent {
 
 
 
-      Instruction i = pipeline.get(CPU.PipeStage.IF);
+      InstructionInterface i = pipeline.get(CPU.PipeStage.IF);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(new Color(config.getInt(ConfigKey.IF_COLOR)));
@@ -315,7 +317,7 @@ class GUIPipeline extends GUIComponent {
       g.getFontMetrics(f1);
       g.setFont(f1);
       g.setColor(Color.blue);
-      Instruction i = pipeline.get(CPU.PipeStage.IF);
+      InstructionInterface i = pipeline.get(CPU.PipeStage.IF);
 
       if (i != null) {
         if (i.getName() != null && !i.getName().equals(" ")) {

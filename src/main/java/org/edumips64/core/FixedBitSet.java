@@ -23,17 +23,16 @@
  */
 package org.edumips64.core;
 
-import org.edumips64.utils.*;
 /** Abstract class: it contains a fixed-size BitSet instance.
  * @author Salvatore Scellato
  * */
-abstract class FixedBitSet {
+abstract public class FixedBitSet {
 
   private char[] bitset;
   protected int size;
 
   /** Creates a default new instance of FixedBitSet with a given size. */
-  FixedBitSet(int desiredSize) {
+  public FixedBitSet(int desiredSize) {
     size = desiredSize;
     bitset = new char[size];
     reset(false);

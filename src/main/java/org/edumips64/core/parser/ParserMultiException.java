@@ -1,4 +1,4 @@
-package org.edumips64.core;
+package org.edumips64.core.parser;
 import java.util.*;
 /*
  * ParserMultiException.java

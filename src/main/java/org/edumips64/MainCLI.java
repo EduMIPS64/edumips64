@@ -25,7 +25,8 @@ package org.edumips64;
 
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
-import org.edumips64.utils.CycleBuilder;
+import org.edumips64.core.parser.Parser;
+import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.utils.*;
 import org.edumips64.utils.io.LocalFileUtils;
 
@@ -46,11 +47,11 @@ public class MainCLI {
 
       // Initialize the CPU and all its dependencies.
       Memory memory = new Memory();
-      CPU c = new CPU(memory, cfg);
+      CPU c = new CPU(memory, cfg, new BUBBLE());
       LocalFileUtils localFileUtils = new LocalFileUtils();
       SymbolTable symTab = new SymbolTable(memory);
       IOManager iom = new IOManager(localFileUtils, memory);
-      Dinero dinero = new Dinero(memory);
+      Dinero dinero = new Dinero();
       InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, c, dinero, cfg);
       Parser p = new Parser(localFileUtils, symTab, memory, instructionBuilder);
       c.setStatus(CPU.CPUStatus.READY);
@@ -66,6 +67,7 @@ public class MainCLI {
             throw e;
           }
         }
+        dinero.setDataOffset(memory.getInstructionsNumber()*4);
         c.setStatus(CPU.CPUStatus.RUNNING);
         System.out.println("(Caricato il file " + absoluteFilename + ")");
       }
@@ -124,6 +126,7 @@ public class MainCLI {
               while(true) {
                 steps++;
                 c.step();
+
               }
             } catch (HaltException e) {
               long endTimeMs = System.currentTimeMillis();

@@ -26,11 +26,14 @@
 package org.edumips64;
 
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.*;
+import org.edumips64.core.parser.Parser;
+import org.edumips64.core.parser.ParserMultiWarningException;
 import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.CycleElement;
 import org.edumips64.utils.ConfigKey;
-import org.edumips64.utils.IrregularStringOfBitsException;
+import org.edumips64.core.IrregularStringOfBitsException;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.LocalWriter;
@@ -58,6 +61,8 @@ public class EndToEndTests extends BaseTest {
   private final static Logger log = Logger.getLogger(EndToEndTests.class.getName());
   private Dinero dinero;
   private StringWriter stdOut;
+  private Memory memory;
+  private CycleBuilder builder;
 
   @Rule
   public ErrorCollector collector = new ErrorCollector();
@@ -127,10 +132,10 @@ public class EndToEndTests extends BaseTest {
 
   @Before
   public void testSetup() {
-    Memory memory = new Memory();
-    cpu = new CPU(memory, config);
+    memory = new Memory();
+    cpu = new CPU(memory, config, new BUBBLE());
     cpu.setStatus(CPU.CPUStatus.READY);
-    dinero = new Dinero(memory);
+    dinero = new Dinero();
     symTab = new SymbolTable(memory);
     stdOut = new StringWriter();
     FileUtils lfu = new LocalFileUtils();
@@ -140,6 +145,7 @@ public class EndToEndTests extends BaseTest {
     parser  = new Parser(lfu, symTab, memory, instructionBuilder);
     config.putBoolean(ConfigKey.FORWARDING, true);
     fec = new FPUExceptionsConfig();
+    builder = new CycleBuilder(cpu);
   }
 
   @After
@@ -165,6 +171,7 @@ public class EndToEndTests extends BaseTest {
     cpu.reset();
     dinero.reset();
     symTab.reset();
+    builder.reset();
     testPath = testsLocation + testPath;
     String tracefile = null;
 
@@ -180,10 +187,12 @@ public class EndToEndTests extends BaseTest {
         }
       }
 
+      dinero.setDataOffset(memory.getInstructionsNumber()*4);
       cpu.setStatus(CPU.CPUStatus.RUNNING);
 
       while (true) {
         cpu.step();
+        builder.step();
       }
     } catch (HaltException e) {
       log.warning("================================= Finished test " + testPath);
@@ -200,7 +209,7 @@ public class EndToEndTests extends BaseTest {
 
       // Check if the transactions in the CycleBuilder are all valid.
       boolean allValid = true;
-      for (CycleElement el : cpu.getCycleBuilder().getElementsList()) {
+      for (CycleElement el : builder.getElementsList()) {
         allValid &= el.isValid();
       }
       if (!allValid) {

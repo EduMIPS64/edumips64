@@ -26,8 +26,6 @@
 package org.edumips64.core.is;
 import org.edumips64.core.*;
 import org.edumips64.core.fpu.*;
-import org.edumips64.utils.*;
-import java.math.*;
 
 /**
  * <pre>

@@ -22,7 +22,7 @@
  */
 package org.edumips64.ui.swing;
 import org.edumips64.core.*;
-import org.edumips64.core.is.Instruction;
+import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.utils.*;
 import java.awt.*;
 import javax.swing.*;
@@ -32,7 +32,7 @@ import javax.swing.table.*;
 */
 public class GUICode extends GUIComponent {
   private CodePanel codePanel;
-  private String memoryAddress[] = new String[CPU.CODELIMIT];
+  private String memoryAddress[] = new String[Memory.CODELIMIT];
   private static int ifIndex, idIndex, exIndex, memIndex, wbIndex, A1Index, A2Index, A3Index, A4Index, M1Index, M2Index, M3Index, M4Index, M5Index, M6Index, M7Index, DIVIndex;
 
   public GUICode(CPU cpu, Memory memory, ConfigStore config) {
@@ -67,7 +67,7 @@ public class GUICode extends GUIComponent {
     TableColumn column4 = codePanel.theTable.getColumnModel().getColumn(4);
     column4.setCellRenderer(new MyTableCellRenderer());
 
-    Instruction ifInstruction = cpu.getPipeline().get(CPU.PipeStage.IF);
+    InstructionInterface ifInstruction = cpu.getPipeline().get(CPU.PipeStage.IF);
     ifIndex = memory.getInstructionIndex(ifInstruction);
     if ((ifInstruction != null) && ifInstruction.isBubble()) {
       ifIndex = -1;
@@ -161,7 +161,7 @@ public class GUICode extends GUIComponent {
           }
         }
 
-        Instruction instruction = memory.getInstruction(row * 4);
+        InstructionInterface instruction = memory.getInstruction(row * 4);
         if (instruction == null) {
             return "";
         }

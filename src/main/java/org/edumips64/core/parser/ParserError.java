@@ -1,7 +1,9 @@
-/* FPUConfigurator.java
+/*
+ * ParserError.java
  *
- * This class gives the FPU current Local settings.
- * (c)Massimo Trubia 2007
+ * Single Error not throwable
+ *
+ * (c) 2006 mancausoft, Vanni
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -20,28 +22,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.edumips64.utils;
 
-import java.util.*;
-public class FPUConfigurator {
-  static LinkedList<String> fparithmetic, terminating;
+package org.edumips64.core.parser;
 
-  public FPUConfigurator() {
-    fparithmetic = new LinkedList<>();
-    terminating = new LinkedList<>();
-    fparithmetic.add("ADD.D");
-    fparithmetic.add("SUB.D");
-    fparithmetic.add("DIV.D");
-    fparithmetic.add("MUL.D");
-    terminating.add("0000000C");    // SYSCALL 0
-    terminating.add("04000000");    // HALT
-  }
+/**
+ *
+ * @author mancausoft, Vanni
+ */
 
-  public LinkedList<String> getFPArithmeticInstructions() {
-    return fparithmetic;
-  }
-
-  public LinkedList<String> getTerminatingInstructions() {
-    return terminating;
+public class ParserError extends ParserException {
+  ParserError(String description, int row, int column, String line) {
+    super(description, row, column, Parser.replaceTab(line));
   }
 }

@@ -24,7 +24,8 @@
  */
 
 package org.edumips64.core.is;
-import org.edumips64.utils.*;
+import org.edumips64.core.IrregularStringOfBitsException;
+
 /**<pre>
  *      Syntax: DSUB rd, rs, rt
  * Description: To subtract 64-bit integers; trap on overflow

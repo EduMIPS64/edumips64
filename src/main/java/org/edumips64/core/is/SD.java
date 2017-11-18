@@ -25,7 +25,6 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
-import org.edumips64.utils.*;
 /** <pre>
  *       Syntax: SD rt, offset(base)
  *  Description: memory[base+offset] = rt

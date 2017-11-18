@@ -1,7 +1,7 @@
-/* IrregularStringOfHexException.java
+/* DivisionByZeroException.java
  *
- * Exception thrown when trying to get a MemoryElement that does not exists.
- * (c) 2006 Andrea Milazzo, Vanni G. Rizzo
+ * Exception thrown when a number is divided by zero
+ * (c) 2006 Andrea Spadaccini
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -20,8 +20,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.edumips64.utils;
 
-public class IrregularStringOfHexException extends Exception {}
+package org.edumips64.core.is;
 
+import org.edumips64.core.SynchronousException;
 
+/** Exception thrown when a number is divided by zero
+ *  @author Andrea Spadaccini */
+public class DivisionByZeroException extends SynchronousException {
+  public DivisionByZeroException() {
+    super("DIVZERO");
+  }
+}

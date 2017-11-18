@@ -23,7 +23,6 @@
 
 package org.edumips64.core;
 
-import org.edumips64.utils.*;
 /** This class models a 64-bit memory location with a given address.
  * @author Salvatore Scellato
  * */

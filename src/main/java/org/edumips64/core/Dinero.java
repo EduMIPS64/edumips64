@@ -27,21 +27,26 @@
 
 package org.edumips64.core;
 
-import org.edumips64.utils.*;
 import org.edumips64.utils.io.Writer;
 import org.edumips64.utils.io.WriteException;
 import java.util.*;
-import java.io.IOException;
 
 public class Dinero {
 
-  private Memory memory;
   private LinkedList <String> dineroData;
+
+  // Offset of the data segment. This class writes a trace file that assumes
+  // that the data segment starts immediately after the code segment ends.
   private int offset;
 
-  public Dinero(Memory memory) {
-    this.memory = memory;
-    reset();
+  /** Sets the data offset.
+   * @param dataOffset offset of the data section. Should be after the code
+   *                   section. Typically this is the number of instructions
+   *                   times 4 (each instruction takes 32 bits).
+   */
+  public void setDataOffset(int dataOffset) {
+    // Align the dataOffset to 64 bit if needed.
+    offset = dataOffset + dataOffset % 8;
   }
 
   public void reset() {
@@ -55,48 +60,27 @@ public class Dinero {
   public void IF(String address) {
     dineroData.add("i " + address + " 4");
   }
-  /**
-   */
-  public void Load(String address, int nByte) {
-    if (offset == 0) {
-      findOffset();
-    }
 
+  public void Load(String address, int nByte) {
     try {
       long addr = Long.parseLong(Converter.hexToLong("0x" + address));
       addr += offset;
       dineroData.add("r " + Converter.binToHex(Converter.intToBin(64, addr)) + " " + nByte);
-    } catch (IrregularStringOfHexException ex) {
-      ex.printStackTrace();
-    } catch (IrregularStringOfBitsException ex) {
+    } catch (IrregularStringOfHexException | IrregularStringOfBitsException ex) {
       ex.printStackTrace();
     }
   }
-  /**
-   */
-  public void Store(String address, int nByte) {
-    if (offset == 0) {
-      findOffset();
-    }
 
+  public void Store(String address, int nByte) {
     try {
       long addr = Long.parseLong(Converter.hexToLong("0x" + address));
       addr += offset;
       dineroData.add("w " + Converter.binToHex(Converter.intToBin(64, addr)) + " " + nByte);
-    } catch (IrregularStringOfHexException ex) {
-      ex.printStackTrace();
-    } catch (IrregularStringOfBitsException ex) {
+    } catch (IrregularStringOfHexException | IrregularStringOfBitsException ex) {
       ex.printStackTrace();
     }
 
   }
-  /** Calculate the offset */
-  private void findOffset() {
-    int instructionsCount = memory.getInstructionsNumber();
-    offset = instructionsCount * 4;
-    offset += offset % 8;
-  }
-
 
   /** Writes the trace data to a Writer
    *  @param buff the Writer to output the data to

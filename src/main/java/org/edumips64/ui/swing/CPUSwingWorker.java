@@ -67,10 +67,11 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
   private JFrame f;
   private ConfigStore config;
   private GUIUpdateThread guiUpdateThread;
+  private CycleBuilder builder;
 
   private static final Logger logger = Logger.getLogger(CPUSwingWorker.class.getName());
 
-  public CPUSwingWorker(CPU cpu, GUIFrontend front, JFrame mainFrame, ConfigStore config) {
+  public CPUSwingWorker(CPU cpu, GUIFrontend front, JFrame mainFrame, ConfigStore config, CycleBuilder builder) {
     externalStop = false;
     this.cpu = cpu;
     this.front = front;
@@ -196,6 +197,7 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
         haltCPU();
         break;
       } finally {
+        builder.step();
         front.updateComponents();
         if (verbose) {
           // SwingUtilities.invokeAndWait(() -> front.represent());

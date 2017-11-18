@@ -23,10 +23,11 @@
  * 18/05/2006 - Andrea Spadaccini:
  *  * Removed lock-related functions, in order to add read and write semaphores
  */
-package org.edumips64.core;
+package org.edumips64.core.fpu;
 
-import org.edumips64.utils.*;
 
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.fpu.BitSet64FP;
 
 /** This class models a 64-bit CPU's internal register.
  * @author Massimo Trubia

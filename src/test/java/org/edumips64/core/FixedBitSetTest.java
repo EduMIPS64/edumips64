@@ -1,6 +1,5 @@
 package org.edumips64.core;
 
-import org.edumips64.utils.IrregularStringOfBitsException;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

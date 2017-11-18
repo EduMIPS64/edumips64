@@ -49,9 +49,9 @@ public class GUICycles extends GUIComponent {
 
   CycleBuilder builder;
 
-  public GUICycles(CPU cpu, Memory memory, ConfigStore config) {
+  public GUICycles(CPU cpu, Memory memory, ConfigStore config, CycleBuilder builder) {
     super(cpu, memory, config);
-    builder = cpu.getCycleBuilder();
+    this.builder = builder;
     rightPanel = new RightPanel();
 
     jsp1 = new JScrollPane(rightPanel);

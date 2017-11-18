@@ -23,10 +23,7 @@
 
 package org.edumips64.core;
 
-import org.edumips64.core.is.HaltException;
-import org.edumips64.core.is.Instruction;
-import org.edumips64.utils.Converter;
-import org.edumips64.utils.IrregularStringOfBitsException;
+import org.edumips64.core.is.InstructionInterface;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -36,12 +33,16 @@ import java.util.logging.Logger;
  * The Memory is composed of MemoryElement and its size is not limited.
  */
 public class Memory {
+  /** The code and data sections limits*/
+  public static final int CODELIMIT = 16384; // 16 bit bus (2^12 / 4)
+  public static final int DATALIMIT = 8192;  // 16 bit bus (2^12 / 8)
+
   // Data structures for the data and code memory. In both maps, the key is represented by the index of the element.
   // The index is derived by taking the address of the given element and dividing it by its width (8 for the memory,
   // 4 for the code).
   // SortedMaps are used to have the map entries sorted by key (useful for string representation).
   private SortedMap<Integer, MemoryElement> cells;
-  private SortedMap<Integer, Instruction> instructions;
+  private SortedMap<Integer, InstructionInterface> instructions;
 
   private static final Logger logger = Logger.getLogger(Memory.class.getName());
 
@@ -65,9 +66,9 @@ public class Memory {
   /** Gets the index of the given instruction
    * @return the position of the instruction in the list, or -1 if the instruction doesn't exist.
    */
-  public int getInstructionIndex(Instruction to_find) {
+  public int getInstructionIndex(InstructionInterface to_find) {
     int pos = 0;
-    for(Instruction i : instructions.values()) {
+    for(InstructionInterface i : instructions.values()) {
       if (i.equals(to_find)) {
         return pos;
       }
@@ -95,7 +96,7 @@ public class Memory {
    * bounds
    */
   public MemoryElement getCellByIndex(int index) throws MemoryElementNotFoundException {
-    if (index >= CPU.DATALIMIT || index < 0) {
+    if (index >= DATALIMIT || index < 0) {
       throw new MemoryElementNotFoundException();
     }
 
@@ -121,17 +122,17 @@ public class Memory {
     }
 
     tmp += "\nCode:\n";
-    for (Instruction i : instructions.values()) {
+    for (InstructionInterface i : instructions.values()) {
       tmp += i.toString() + "\n";
     }
 
     return tmp;
   }
 
-  public void addInstruction(Instruction i, int address) throws SymbolTableOverflowException {
+  public void addInstruction(InstructionInterface i, int address) throws SymbolTableOverflowException {
     // TODO(lupino3): remove the limit.
-    if (address > CPU.CODELIMIT) {
-      logger.warning("Address exceeding the CPU code limit: " + address + " > " + CPU.CODELIMIT);
+    if (address > CODELIMIT) {
+      logger.warning("Address exceeding the CPU code limit: " + address + " > " + CODELIMIT);
       throw new SymbolTableOverflowException();
     }
 
@@ -143,7 +144,7 @@ public class Memory {
   }
 
   // Returns null if there is no instruction at the given address.
-  public Instruction getInstruction(int address) {
+  public InstructionInterface getInstruction(int address) {
     int index = address / 4;
     if (!instructions.containsKey(index)) {
       return null;
@@ -155,11 +156,7 @@ public class Memory {
   *   @return an Instruction object
   *   @param address a BitSet64 object holding the address of the Instruction
     */
-  public Instruction getInstruction(BitSet64 address) throws HaltException, IrregularStringOfBitsException {
-    try {
+  InstructionInterface getInstruction(BitSet64 address) throws IrregularStringOfBitsException {
       return instructions.get((int)(Converter.binToLong(address.getBinString(), false) / 4));
-    } catch (IndexOutOfBoundsException e) {
-      throw new HaltException();
-    }
   }
 }

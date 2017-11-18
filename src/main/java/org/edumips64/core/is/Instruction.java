@@ -21,20 +21,8 @@
 
 package org.edumips64.core.is;
 
-import org.edumips64.core.BitSet32;
-import org.edumips64.core.CPU;
-import org.edumips64.core.Dinero;
-import org.edumips64.core.DivisionByZeroException;
-import org.edumips64.core.IrregularWriteOperationException;
-import org.edumips64.core.MemoryElementNotFoundException;
-import org.edumips64.core.NotAlignException;
-import org.edumips64.core.Register;
-import org.edumips64.core.RegisterFP;
-import org.edumips64.core.fpu.FPDivideByZeroException;
-import org.edumips64.core.fpu.FPInvalidOperationException;
-import org.edumips64.core.fpu.FPOverflowException;
-import org.edumips64.core.fpu.FPUnderflowException;
-import org.edumips64.utils.*;
+import org.edumips64.core.*;
+import org.edumips64.core.fpu.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +32,7 @@ import java.util.logging.Logger;
  *
  * @author Trubia Massimo, Russo Daniele
  */
-public abstract class Instruction {
+public abstract class Instruction implements InstructionInterface {
 
   protected BitSet32 repr;
   protected List<Integer> params;
@@ -104,57 +92,6 @@ public abstract class Instruction {
   public BitSet32 getRepr() {
     return repr;
   }
-
-  /**
-   * <pre>
-   * Instruction fetch.
-   * Now it is used in order to generate the Dinero trace-file
-   *</pre>
-   */
-  public void IF() throws BreakException {}
-
-  /**
-   * <pre>
-   * Decode stage of the Pipeline
-   * In this method all instructions that modify GPRs lock the involved register
-   *
-   * Returns true if there are RAW conflict, false if there is none.
-   *
-   * This is an optimization, since in large programs with no forwarding, RAW is
-   * pretty common, and the code for handling it takes a significant amount of
-   * time.
-   *
-   * For example, before this optimization was implemented the testSetBitSort unit
-   * test took ~21.4 seconds to finish, and after it it takes ~15.5 seconds (under
-   * Windows).
-   *</pre>
-   **/
-  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException;
-
-  /**
-   * <pre>
-   * Execute stage of the Pipeline
-   * In this stage all Alu Instructions perform their computations and save results in temporary registers
-   * </pre>
-   **/
-
-  public abstract void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, NotAlignException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, AddressErrorException;
-
-  /**
-   * <pre>
-   * Memory stage of the Pipeline
-   * In this stage all Load and Store instructions access memory for getting or putting data
-   * </pre>
-   **/
-  public abstract void MEM() throws HaltException, IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
-
-  /**
-   * <pre>
-   * Write Back stage of the Pipeline
-   * In this stage all instructions that modify registers write and unlock them
-   * </pre>
-   **/
-  public abstract void WB() throws HaltException, IrregularStringOfBitsException;
 
   /**
    * <pre>

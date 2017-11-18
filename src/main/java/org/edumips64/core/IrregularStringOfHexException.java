@@ -1,7 +1,7 @@
-/* IrregularStringOfBitsException.java
+/* IrregularStringOfHexException.java
  *
- * Exception thrown when trying to use an irregular string of bits to set a bitset.
- * (c) 2006 Salvatore Scellato
+ * Exception thrown when trying to get a MemoryElement that does not exists.
+ * (c) 2006 Andrea Milazzo, Vanni G. Rizzo
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
@@ -20,10 +20,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.edumips64.utils;
+package org.edumips64.core;
 
-/** Exception thrown when trying to use an irregular string of bits to set a bitset.
- * @author Salvatore Scellato
- * */
+public class IrregularStringOfHexException extends Exception {}
 
-public class IrregularStringOfBitsException extends Exception {}
+

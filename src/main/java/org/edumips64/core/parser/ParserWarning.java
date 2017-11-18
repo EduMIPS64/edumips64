@@ -1,5 +1,5 @@
 /*
- * ParserError.java
+ * ParserWarning.java
  *
  * Single Error not throwable
  *
@@ -23,16 +23,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.edumips64.core;
-import org.edumips64.utils.CurrentLocale;
+package org.edumips64.core.parser;
 
 /**
  *
  * @author mancausoft, Vanni
  */
 
-public class ParserError extends ParserException {
-  ParserError(String description, int row, int column, String line) {
-    super(description, row, column, Parser.replaceTab(line));
+public class ParserWarning extends ParserException {
+  ParserWarning(String description, int row, int column, String line) {
+    super(description, row, column, line);
+    super.setError(false);
   }
 }
