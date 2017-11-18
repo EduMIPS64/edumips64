@@ -102,3 +102,8 @@ fabric.properties
 
 # Project config
 edumips64.iml
+
+#################################################################################
+## Bazel
+
+bazel-*
