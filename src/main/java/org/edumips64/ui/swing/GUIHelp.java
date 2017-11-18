@@ -74,11 +74,8 @@ public class GUIHelp {
    *
    * @param parent
    *            the parent that owns this help dialog
-   * @param helpId
-   *            the help ID to display (an invalid ID will result in the top level help topic being
-   *            displayed)
    */
-  public static void showHelp(Window parent, String helpId) {
+  public static void showHelp(Window parent) {
     HSurl = Main.class.getResource(CurrentLocale.getString("HELPDIR") + "/");
     String s = HSurl.getProtocol() + ":" + HSurl.getPath().replace("%20", " ");
     String s1 = CurrentLocale.getString("HELPSET");
