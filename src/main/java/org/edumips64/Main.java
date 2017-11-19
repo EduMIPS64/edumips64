@@ -870,7 +870,7 @@ public class Main extends JApplet {
     aboutUs = new JMenuItem(CurrentLocale.getString("MenuItem.ABOUT_US"));
     help.add(aboutUs);
     aboutUs.addActionListener(e -> {
-      GUIAbout ab = new GUIAbout(null);
+      GUIAbout ab = new GUIAbout(null, VERSION, CODENAME, build_date, git_revision);
       //ab.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
       ab.setVisible(true);
     });

@@ -33,16 +33,15 @@ import java.awt.geom.AffineTransform;
 * This class draws the "about us" animation.
 */
 public class GUIAbout extends JDialog implements Runnable  {
-  int x = 0, y = 0, clock;
-  Thread animazione;
-  Display lavagna;
-  boolean running;
-  boolean click = true;
-  Container cp;
+  private int x = 0;
+  private int y = 0;
+  private Thread animazione;
+  private Display lavagna;
+  private boolean running;
 
-  protected static Image logo;
+  private static Image logo;
 
-  static String members[] = {
+  private static String members[] = {
     "EduMIPS64 Project",
     "http://www.edumips.org",
     "MIPS64 Instruction set simulator",
@@ -51,7 +50,7 @@ public class GUIAbout extends JDialog implements Runnable  {
 
     "Andrea Spadaccini",
     "andrea.spadaccini@gmail.com",
-    "Project Leader - Mantainer",
+    "Project Leader - Maintainer",
     "Antonella Scandura",
     "anto.tuny@hotmail.it",
     "Main GUI - Documentation",
@@ -96,9 +95,8 @@ public class GUIAbout extends JDialog implements Runnable  {
     "fabrizio@fazzino.it",
     "The Professor"
   };
-  int width = 500, height = 400;
 
-  public GUIAbout(final JFrame owner) {
+  public GUIAbout(final JFrame owner, String version, String codename, String buildDate, String gitRevision) {
     super(owner, "Credits", true);
 
     try {
@@ -113,7 +111,9 @@ public class GUIAbout extends JDialog implements Runnable  {
     //owner.setEnabled(false);
     //MediaTracker mt = new MediaTracker(this);
 
-    lavagna = new Display(width, height);
+    int width = 500;
+    int height = 400;
+    lavagna = new Display(width, height, version, codename, buildDate, gitRevision);
     getGlassPane().addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
         setVisible(false);
@@ -136,11 +136,11 @@ public class GUIAbout extends JDialog implements Runnable  {
     repaint();
     start();
   }
-  public static int getScreenWidth() {
+  private static int getScreenWidth() {
     return (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
   }
 
-  public static int getScreenHeight() {
+  private static int getScreenHeight() {
     return (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
   }
   public void start() {
@@ -165,13 +165,16 @@ public class GUIAbout extends JDialog implements Runnable  {
 
       try {
         Thread.sleep(40);
-      } catch (InterruptedException e) { }
+      } catch (InterruptedException ignored) { }
     }
   }
   /*In this class there is the Panel that draws the animation.
    */
   class Display extends JPanel {
-    int width, height, head, xg = 0, yg = 0;
+    int width;
+    int height;
+    int head;
+    int xg = 0;
     Graphics2D G;
     BufferedImage I;
 
@@ -180,11 +183,13 @@ public class GUIAbout extends JDialog implements Runnable  {
     Font font_role = new Font("Verdana", Font.BOLD, 13);
 
     GradientPaint gradient;
-    boolean bigger;
+
+    private final String version, codename, buildDate, gitRevision;
+
     /* The Contructor of the Panel.
      * w is the Panel Wiidth, y the Height
      */
-    public Display(int w, int h) {
+    Display(int w, int h, String version, String codename, String buildDate, String gitRevision) {
       setBackground(Color.yellow);
       setBounds(0, 0, w, h);
       width = w;
@@ -194,6 +199,10 @@ public class GUIAbout extends JDialog implements Runnable  {
       G = (Graphics2D) I.getGraphics();
       head = 98;//logo.getHeight(this);
       gradient = new GradientPaint(width / 4, height / 4, Color.white, width, height, Color.yellow);
+      this.version = version;
+      this.codename = codename;
+      this.buildDate = buildDate;
+      this.gitRevision = gitRevision;
     }
 
     public void  paintComponent(Graphics g) {
@@ -211,9 +220,9 @@ public class GUIAbout extends JDialog implements Runnable  {
       //HEAD: the width value of the logo image. I use it to know when the text must disappear
       G.setColor(new Color(0, 0, 0));
       G.setFont(new Font("Verdana", Font.BOLD, 15));
-      G.drawString("Version " + org.edumips64.Main.VERSION + " (" + org.edumips64.Main.CODENAME + ")", 150, 92);
+      G.drawString("Version " + version + " (" + codename + ")", 150, 92);
       G.setFont(new Font("Verdana", Font.PLAIN, 12));
-      G.drawString("Built on " + org.edumips64.Main.build_date + ", git rev " + org.edumips64.Main.git_revision, 150, 112);
+      G.drawString("Built on " + buildDate + ", git rev " + gitRevision, 150, 112);
       head = logo.getHeight(this);
       G.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
       //inizio stringhe
@@ -257,7 +266,7 @@ public class GUIAbout extends JDialog implements Runnable  {
     /** Give the Alpha transparency value knowing the line to draw
      * @return (int)  the alpha value for the selected line
      */
-    public int getAlpha(int line) {
+    int getAlpha(int line) {
       //border is the value of the height of you wrap of passage from visible to transparent
       int border = 120;
       return (line <= head || line >= height) ?     // we are out of border?
