@@ -71,10 +71,13 @@ class GUIRegisters extends GUIComponent {
   //(i want to avoid to modify the class constructor) the value is zero if a gpr is double clicked
   //1 if an fpr is double clicked
 
-  GUIRegisters(CPU cpu, Memory memory, ConfigStore config) {
+  private StatusBar statusbar;
+
+  GUIRegisters(CPU cpu, Memory memory, ConfigStore config, StatusBar sb) {
     super(cpu, memory, config);
     registers = cpu.getRegisters();
     registersFP = cpu.getRegistersFP();
+    statusbar = sb;
     regPanel = new RegPanel();
     xprLastDoubleClick = 0;
   }
@@ -160,7 +163,7 @@ class GUIRegisters extends GUIComponent {
 
           if (row != -1 && column == 1) {
             try {
-              org.edumips64.Main.getSB().setText(
+              statusbar.setText(
                 CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
                 CurrentLocale.getString("StatusBar.OFREGISTER") +
                 theTable.getSelectedRow() +
@@ -215,21 +218,21 @@ class GUIRegisters extends GUIComponent {
             //click on LO register
             if (theTable.getSelectedRow() == 32 && theTable.getSelectedColumn() == 1) {
 
-              org.edumips64.Main.getSB().setText(
+              statusbar.setText(
                 CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " + "LO" + " : " +
                 Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));
 
             }
             //click on HI register
             else if (theTable.getSelectedRow() == 33  && theTable.getSelectedColumn() == 1) {
-              org.edumips64.Main.getSB().setText(
+              statusbar.setText(
                 CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
                 "HI" + " : " +
                 Converter.hexToLong("0X" + value[theTable.getSelectedRow()]));
             }
             //FPU   //click on generic fpr
             else if (theTable.getSelectedColumn() == 3 && theTable.getSelectedRow() < 32) {
-              org.edumips64.Main.getSB().setText(
+              statusbar.setText(
                 CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
                 CurrentLocale.getString("StatusBar.OFREGISTERFP") +
                 theTable.getSelectedRow() +
@@ -239,7 +242,7 @@ class GUIRegisters extends GUIComponent {
             }
             //click on generic gpr
             else if (theTable.getSelectedColumn() == 1) {
-              org.edumips64.Main.getSB().setText(
+              statusbar.setText(
                 CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
                 CurrentLocale.getString("StatusBar.OFREGISTER") +
                 theTable.getSelectedRow() +
