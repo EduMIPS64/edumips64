@@ -37,6 +37,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.logging.Handler;
 import java.io.File;
@@ -97,6 +98,9 @@ public class Main extends JApplet {
   private static String openedFile = null;
   private static boolean debug_mode = false;
   private static JDesktopPane desk;
+
+  /** Callbacks for CPUSwingWorker */
+  private static Runnable initCallback, haltCallback, finalizeCallback;
 
   private static void usage() {
     showVersion();
@@ -371,6 +375,29 @@ public class Main extends JApplet {
     cp.add(sb.getComponent(), BorderLayout.SOUTH);
     cp.add(desk, BorderLayout.CENTER);
 
+    // Set up callbacks for CPUSwingWorkers.
+    initCallback = () -> {
+       // Let's disable the running menu items and enable the stop menu
+       // item
+       Main.setRunningMenuItemsStatus(false);
+       Main.setStopStatus(true);
+
+       // Progress bar
+       SwingUtilities.invokeLater(Main::startPB);
+    };
+    haltCallback = () -> Main.changeShownMenuItems(CPU.CPUStatus.HALTED);
+    finalizeCallback = () -> {
+      // Represent changes, in case the user chose non-verbose mode.
+      front.represent();
+
+      if (cpu.getStatus() != CPU.CPUStatus.HALTED) {
+        Main.setRunningMenuItemsStatus(true);
+      }
+
+      Main.setStopStatus(false);
+      Main.stopPB();
+    };
+
     changeShownMenuItems(cpu.getStatus());
   }
 
@@ -477,7 +504,7 @@ public class Main extends JApplet {
       log.info("Set the status to RUNNING");
 
       // Let's fetch the first instruction
-      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder, VERSION);
+      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder, VERSION, initCallback, haltCallback, finalizeCallback);
       cpuWorker.setSteps(1);
       cpuWorker.execute();
       while (cpuWorker.isDone()) {
@@ -760,13 +787,17 @@ public class Main extends JApplet {
     file.add(exit);
     exit.addActionListener(e -> System.exit(0));
 
+    // Lambda to create a CPUSwingWorker. Used to have a single place where CPUSwingWorker is
+    // created.
+    Supplier<CPUSwingWorker> workerBuilder = () ->
+        new CPUSwingWorker(cpu, front, f, configStore, builder, VERSION, initCallback, haltCallback, finalizeCallback);
 
     // ---------------- EXECUTE MENU
     // Execute a single simulation step
     exec.add(single_cycle);
     single_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
     single_cycle.addActionListener(e -> {
-      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder, VERSION);
+      cpuWorker = workerBuilder.get();
       cpuWorker.setSteps(1);
       cpuWorker.execute();
     });
@@ -775,7 +806,7 @@ public class Main extends JApplet {
     exec.add(run_to);
     run_to.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
     run_to.addActionListener(e -> {
-      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder, VERSION);
+      cpuWorker = workerBuilder.get();
       cpuWorker.setSteps(-1);
       cpuWorker.execute();
     });
@@ -784,7 +815,7 @@ public class Main extends JApplet {
     exec.add(multi_cycle);
     multi_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
     multi_cycle.addActionListener(e -> {
-      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder, VERSION);
+      cpuWorker = workerBuilder.get();
       cpuWorker.setSteps(configStore.getInt(ConfigKey.N_STEPS));
       cpuWorker.execute();
     });
