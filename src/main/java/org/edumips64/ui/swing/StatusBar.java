@@ -41,9 +41,9 @@ public class StatusBar {
   private JProgressBar pb;
   private Component sbComponent;
 
-  public StatusBar() {
+  public StatusBar(String version) {
     statusLabel = new JLabel();
-    statusLabel.setText(CurrentLocale.getString("StatusBar.WELCOME") + " " + org.edumips64.Main.VERSION);
+    statusLabel.setText(CurrentLocale.getString("StatusBar.WELCOME") + " " + version);
 
     pb = new JProgressBar(0, 10);
     pb.setMaximumSize(new Dimension(60, 10));

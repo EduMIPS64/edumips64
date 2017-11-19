@@ -252,7 +252,7 @@ public class Main extends JApplet {
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
     builder = new CycleBuilder(cpu);
-    sb = new StatusBar();
+    sb = new StatusBar(VERSION);
     front = new GUIFrontend(cpu, memory, configStore, builder, sb);
 
     // Internal Frames
