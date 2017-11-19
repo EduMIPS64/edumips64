@@ -412,7 +412,7 @@
       </copy>
   </target>
   <target name="copy-base-files">
-      <copy todir="${outputDir}/org/edumips64/ui/swing/img">
+      <copy todir="${outputDir}/images">
           <fileset dir="${resourcesDir}/images">
       <include name="**/*.png" />
     </fileset>
