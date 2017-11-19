@@ -383,11 +383,6 @@ public class Main extends JApplet {
     tileWindows();
   }
 
-  /** Gets a reference to the status bar */
-  public static StatusBar getSB() {
-    return sb;
-  }
-
   /** Updates the configuration parameters of CPUGUIThread */
   public static void updateCGT() {
     cpuWorker.updateConfigValues();
@@ -461,7 +456,7 @@ public class Main extends JApplet {
       front.updateComponents();
       front.represent();
     } catch (Exception ex) {
-      new ReportDialog(f, ex, CurrentLocale.getString("GUI_STEP_ERROR"));
+      new ReportDialog(f, ex, CurrentLocale.getString("GUI_STEP_ERROR"), VERSION);
     }
 
     try {
@@ -487,7 +482,7 @@ public class Main extends JApplet {
       log.info("Set the status to RUNNING");
 
       // Let's fetch the first instruction
-      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder);
+      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder, VERSION);
       cpuWorker.setSteps(1);
       cpuWorker.execute();
       while (cpuWorker.isDone()) {
@@ -525,7 +520,7 @@ public class Main extends JApplet {
     } catch (Exception e) {
       f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
       log.info("Error opening " + file);
-      new ReportDialog(f, e, CurrentLocale.getString("ERROR"));
+      new ReportDialog(f, e, CurrentLocale.getString("ERROR"), VERSION);
     }
   }
 
@@ -776,7 +771,7 @@ public class Main extends JApplet {
     exec.add(single_cycle);
     single_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
     single_cycle.addActionListener(e -> {
-      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder);
+      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder, VERSION);
       cpuWorker.setSteps(1);
       cpuWorker.execute();
     });
@@ -785,7 +780,7 @@ public class Main extends JApplet {
     exec.add(run_to);
     run_to.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
     run_to.addActionListener(e -> {
-      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder);
+      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder, VERSION);
       cpuWorker.setSteps(-1);
       cpuWorker.execute();
     });
@@ -794,7 +789,7 @@ public class Main extends JApplet {
     exec.add(multi_cycle);
     multi_cycle.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
     multi_cycle.addActionListener(e -> {
-      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder);
+      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder, VERSION);
       cpuWorker.setSteps(configStore.getInt(ConfigKey.N_STEPS));
       cpuWorker.execute();
     });
@@ -868,7 +863,7 @@ public class Main extends JApplet {
         URL helpSetUrl = Main.class.getResource(CurrentLocale.getString("HELPDIR") + "/");
         GUIHelp.showHelp(null, helpSetUrl);
       } catch (Exception exx) {
-        new ReportDialog(null, exx, "MIAO");
+        new ReportDialog(null, exx, "MIAO", VERSION);
       }
     });
 
