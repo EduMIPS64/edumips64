@@ -53,8 +53,8 @@ public class Main extends JApplet {
 
   public static String VERSION;
   public static String CODENAME;
-  public static String build_date;
-  public static String git_revision;
+  public static String BUILD_DATE;
+  public static String GIT_REVISION;
 
   private static CPU cpu;
   // The last created CPU Worker. Necessary for the Stop menu item.
@@ -109,7 +109,7 @@ public class Main extends JApplet {
   }
 
   private static void showVersion() {
-    System.out.println("EduMIPS64 version " + VERSION + " (codename: " + CODENAME + ", git revision " + git_revision + ", built on " + build_date + ") - Ciao 'mbare.");
+    System.out.println("EduMIPS64 version " + VERSION + " (codename: " + CODENAME + ", git revision " + GIT_REVISION + ", built on " + BUILD_DATE + ") - Ciao 'mbare.");
   }
 
   // Parses the command-line arguments.
@@ -171,8 +171,8 @@ public class Main extends JApplet {
     // Meta properties.
     VERSION = MetaInfo.get("Signature-Version");
     CODENAME = MetaInfo.get("Codename");
-    build_date = MetaInfo.get("Build-Date");
-    git_revision = MetaInfo.get("Git-Revision");
+    BUILD_DATE = MetaInfo.get("Build-Date");
+    GIT_REVISION = MetaInfo.get("Git-Revision");
 
     String toOpen = parseArgsOrExit(args);
 
@@ -870,7 +870,7 @@ public class Main extends JApplet {
     aboutUs = new JMenuItem(CurrentLocale.getString("MenuItem.ABOUT_US"));
     help.add(aboutUs);
     aboutUs.addActionListener(e -> {
-      GUIAbout ab = new GUIAbout(null, VERSION, CODENAME, build_date, git_revision);
+      GUIAbout ab = new GUIAbout(null, VERSION, CODENAME, BUILD_DATE, GIT_REVISION);
       //ab.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
       ab.setVisible(true);
     });
