@@ -5,6 +5,7 @@ import com.google.gwt.core.client.EntryPoint;
 import jsinterop.annotations.JsType;
 
 import org.edumips64.core.*;
+import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.HaltException;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
@@ -77,7 +78,7 @@ public class WebUi implements EntryPoint {
     symTab = new SymbolTable(memory);
     FileUtils fu = new NullFileUtils();
     IOManager iom = new IOManager(fu, memory);
-    cpu = new CPU(memory, config);
+    cpu = new CPU(memory, config, new BUBBLE());
     dinero = new Dinero();
     InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
