@@ -35,6 +35,7 @@ import org.edumips64.utils.io.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Handler;
@@ -864,7 +865,8 @@ public class Main extends JApplet {
     help.add(manual);
     manual.addActionListener(e -> {
       try {
-        GUIHelp.showHelp(null);
+        URL helpSetUrl = Main.class.getResource(CurrentLocale.getString("HELPDIR") + "/");
+        GUIHelp.showHelp(null, helpSetUrl);
       } catch (Exception exx) {
         new ReportDialog(null, exx, "MIAO");
       }

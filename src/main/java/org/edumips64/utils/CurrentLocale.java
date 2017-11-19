@@ -251,7 +251,6 @@ public class CurrentLocale {
     en.put("CLEAR", "Clear");
     en.put("DATA", "Data");
     en.put("HELPDIR", "help/en");
-    en.put("HELPSET", "EduMIPS64.hs");
     en.put("NEGADDRERR", "Negative memory address error in instruction");
     en.put("ALIGNERR", "Alignment error in instruction");
     en.put("THEADDRESS", "the address");
@@ -467,7 +466,6 @@ public class CurrentLocale {
     it.put("CLEAR", "Pulisci");
     it.put("DATA", "Dati");
     it.put("HELPDIR", "help/it");
-    it.put("HELPSET", "EduMIPS64.hs");
     it.put("NEGADDRERR", "Tentativo di accesso ad indirizzo di memoria negativo nell'istruzione");
     it.put("ALIGNERR", "Errore di allineamento nell'istruzione");
     it.put("THEADDRESS", "l'indirizzo");

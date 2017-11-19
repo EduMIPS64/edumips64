@@ -23,9 +23,9 @@
 
 package org.edumips64.ui.swing;
 
-
 import java.awt.Dimension;
 import java.awt.Window;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Vector;
@@ -36,68 +36,42 @@ import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
 
-import org.edumips64.Main;
-import org.edumips64.utils.CurrentLocale;
-
-
 /**
  * This class controls the Edumips64 user guide.
  */
 public class GUIHelp {
-  public final static String HELP_DEFAULT = "EduMIPS64Help";
+  private final static String HELPSET = "EduMIPS64.hs";
 
-  /**
-   * The help broker used to display Edumips's help.
-   */
-  private static HelpBroker helpBroker;
-  private static URL url, HSurl;
-
-  private static URL[] parseURLs(String s) {
-    Vector<URL> vector = new Vector<URL>();
-
-    try {
-      URL url = new URL(s);
-      vector.addElement(url);
-    } catch (Exception exception) {
-      System.err.println("cannot create URL for " + s);
-    }
-
+  private static URL[] parseURLs(String s) throws MalformedURLException {
+    Vector<URL> vector = new Vector<>();
+    URL url = new URL(s);
+    vector.addElement(url);
     URL aurl[] = new URL[vector.size()];
     vector.copyInto(aurl);
     return aurl;
   }
 
-
   /**
-   * Shows the Edumips64 help window. If the help system was not initialized properly, shows an error dialog
-   * instead.
+   * Shows the EduMIPS64 help window.
    *
-   * @param parent
-   *            the parent that owns this help dialog
+   * @param parent the window that owns this help dialog
+   * @param helpSetUrl the URL to the directory of the help set.
    */
-  public static void showHelp(Window parent) {
-    HSurl = Main.class.getResource(CurrentLocale.getString("HELPDIR") + "/");
-    String s = HSurl.getProtocol() + ":" + HSurl.getPath().replace("%20", " ");
-    String s1 = CurrentLocale.getString("HELPSET");
+  public static void showHelp(Window parent, URL helpSetUrl) throws HelpSetException, BadIDException, MalformedURLException {
+    // Clean up the URL from spaces.
+    String cleanUrl = helpSetUrl.getProtocol() + ":" + helpSetUrl.getPath().replace("%20", " ");
 
-    try {
-      URL aurl[] = GUIHelp.parseURLs(s);
-      URLClassLoader urlclassloader = new URLClassLoader(aurl);
-      url = HelpSet.findHelpSet(urlclassloader, s1);
+    URL aurl[] = GUIHelp.parseURLs(cleanUrl);
+    URLClassLoader urlclassloader = new URLClassLoader(aurl);
+    URL url = HelpSet.findHelpSet(urlclassloader, HELPSET);
 
-      HelpSet helpset = new HelpSet(urlclassloader, url);
-      helpBroker = helpset.createHelpBroker();
-      helpBroker.initPresentation();
-      helpBroker.setSize(new Dimension(800, 600));
-      ((DefaultHelpBroker) helpBroker).setActivationWindow(parent);
-      helpBroker.initPresentation();
-      helpBroker.setSize(helpBroker.getSize());
-      helpBroker.setDisplayed(true);
-    } catch (HelpSetException helpsetexception) {
-      System.err.println("Could not create HelpSet for " + url);
-      System.err.println(helpsetexception);
-    } catch (BadIDException bie) {
-      helpBroker.setCurrentID(HELP_DEFAULT);
-    }
+    HelpSet helpset = new HelpSet(urlclassloader, url);
+    HelpBroker helpBroker = helpset.createHelpBroker();
+    helpBroker.initPresentation();
+    helpBroker.setSize(new Dimension(800, 600));
+    ((DefaultHelpBroker) helpBroker).setActivationWindow(parent);
+    helpBroker.initPresentation();
+    helpBroker.setSize(helpBroker.getSize());
+    helpBroker.setDisplayed(true);
   }
 }
