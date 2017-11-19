@@ -252,7 +252,8 @@ public class Main extends JApplet {
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
     builder = new CycleBuilder(cpu);
-    front = new GUIFrontend(cpu, memory, configStore, builder);
+    sb = new StatusBar();
+    front = new GUIFrontend(cpu, memory, configStore, builder, sb);
 
     // Internal Frames
     JInternalFrame pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);
@@ -367,7 +368,6 @@ public class Main extends JApplet {
     front.setCyclesContainer(cyclesFrame.getContentPane());
     front.setStatisticsContainer(statsFrame.getContentPane());
 
-    sb = new StatusBar();
     cp.add(sb.getComponent(), BorderLayout.SOUTH);
     cp.add(desk, BorderLayout.CENTER);
 

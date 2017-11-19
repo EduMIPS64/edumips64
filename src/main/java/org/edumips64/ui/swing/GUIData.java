@@ -40,11 +40,13 @@ public class GUIData extends GUIComponent {
   private String memoryAddress[] = new String[Memory.DATALIMIT];
   private JTextArea text;
   private int row;
+  private StatusBar statusbar;
 
   private static final Logger logger = Logger.getLogger(CPU.class.getName());
 
-  public GUIData(CPU cpu, Memory memory, ConfigStore config) {
+  public GUIData(CPU cpu, Memory memory, ConfigStore config, StatusBar sb) {
     super(cpu, memory, config);
+    statusbar = sb;
     dataPanel = new DataPanel();
   }
 
@@ -97,7 +99,7 @@ public class GUIData extends GUIComponent {
 
           if (row != -1 && column == 1) {
             try {
-              org.edumips64.Main.getSB().setText(
+              statusbar.setText(
                 CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
                 CurrentLocale.getString("StatusBar.MEMORYCELL") +
                 " " + tableModel.getValueAt(theTable.getSelectedRow(), 0) +
@@ -142,7 +144,7 @@ public class GUIData extends GUIComponent {
               value += bs.readDouble();
             }
 
-            org.edumips64.Main.getSB().setText(value);
+            statusbar.setText(value);
           } catch (IrregularStringOfHexException hex) {
             hex.printStackTrace();
           }
