@@ -71,9 +71,13 @@ public class GUIConfig extends JDialog {
   private Map<ConfigKey, Object> cache;
   private ConfigStore config;
 
-  public GUIConfig(final JFrame owner, ConfigStore config) {
+  // Callback to call after updates.
+  private Runnable updateCallback;
+
+  public GUIConfig(final JFrame owner, ConfigStore config, Runnable updateCallback) {
     super(owner, CurrentLocale.getString("Config.ITEM"), true);
     this.config = config;
+    this.updateCallback = updateCallback;
     logger.info("Building a new GUIConfig instance.");
     String MAIN = CurrentLocale.getString("Config.MAIN");
     String APPEARANCE = CurrentLocale.getString("Config.APPEARANCE");
@@ -396,8 +400,7 @@ public class GUIConfig extends JDialog {
         // Flush the cache to the actual configuration.
         config.mergeFromGenericMap(cache);
         // Might be needed if show_alias is changed.
-        org.edumips64.Main.getGUIFrontend().updateComponents();
-        org.edumips64.Main.updateCGT();
+        updateCallback.run();
       } catch (ConfigStoreTypeException ex) {
         logger.severe("Unknown type encountered while storing the configuration.");
       }

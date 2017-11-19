@@ -383,11 +383,6 @@ public class Main extends JApplet {
     tileWindows();
   }
 
-  /** Updates the configuration parameters of CPUGUIThread */
-  public static void updateCGT() {
-    cpuWorker.updateConfigValues();
-  }
-
   /** Changes the status of running menu items.
    *  @param status a boolean
    */
@@ -807,7 +802,12 @@ public class Main extends JApplet {
     // ---------------- CONFIGURE MENU
 
     config.add(settings);
-    settings.addActionListener(e -> new GUIConfig(f, configStore));
+    settings.addActionListener(e -> new GUIConfig(f, configStore, () -> {
+      getGUIFrontend().updateComponents();
+      if (cpuWorker != null) {
+        cpuWorker.updateConfigValues();
+      }
+    }));
     // ---------------- LANGUAGE MENU
     config.add(lang);
 
