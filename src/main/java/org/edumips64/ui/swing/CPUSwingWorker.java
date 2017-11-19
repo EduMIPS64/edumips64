@@ -64,7 +64,7 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
 
   private CPU cpu;
   private GUIFrontend front;
-  private JFrame f;
+  private JFrame mainFrame;
   private ConfigStore config;
   private GUIUpdateThread guiUpdateThread;
   private CycleBuilder builder;
@@ -72,15 +72,23 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
   private static final Logger logger = Logger.getLogger(CPUSwingWorker.class.getName());
   private String version;
 
-  public CPUSwingWorker(CPU cpu, GUIFrontend front, JFrame mainFrame, ConfigStore config, CycleBuilder builder, String version) {
+  /** Callbacks */
+  private Runnable initCallback, haltCallback, finalizeCallback;
+
+  public CPUSwingWorker(CPU cpu, GUIFrontend front, JFrame mainFrame, ConfigStore config, CycleBuilder builder, String version, Runnable initCallback, Runnable haltCallback, Runnable finalizeCallback) {
     externalStop = false;
     this.builder = builder;
     this.cpu = cpu;
     this.front = front;
-    f = mainFrame;
+    this.mainFrame = mainFrame;
     this.config = config;
     this.version = version;
     updateConfigValues();
+
+    this.haltCallback = haltCallback;
+    this.initCallback = initCallback;
+    this.finalizeCallback = finalizeCallback;
+
     guiUpdateThread = new GUIUpdateThread(front);
     guiUpdateThread.start();
   }
@@ -120,7 +128,7 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
     logger.info("Halting the CPU.");
     front.updateComponents();
     cpu.setStatus(CPU.CPUStatus.HALTED);
-    Main.changeShownMenuItems(CPU.CPUStatus.HALTED);
+    haltCallback.run();
   }
 
   @Override
@@ -128,13 +136,7 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
     long startTimeMs = System.currentTimeMillis();
     logger.info("running");
 
-    // Let's disable the running menu items and enable the stop menu
-    // item
-    Main.setRunningMenuItemsStatus(false);
-    Main.setStopStatus(true);
-
-    // Progress bar
-    SwingUtilities.invokeLater(Main::startPB);
+    initCallback.run();
 
     // If the nStep variable is set to a value < 0, then we must loop forever (an exception
     // will be the way to terminate execution); otherwise, we must be looping only
@@ -166,7 +168,7 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
       } catch (SynchronousException ex) {
         logger.info("Caught a synchronous exception.");
         SwingUtilities.invokeLater(() -> {
-          JOptionPane.showMessageDialog(f, CurrentLocale.getString(ex.getCode() + ".Message"), "EduMIPS64 - " + CurrentLocale.getString("EXCEPTION"), JOptionPane.ERROR_MESSAGE);
+          JOptionPane.showMessageDialog(mainFrame, CurrentLocale.getString(ex.getCode() + ".Message"), "EduMIPS64 - " + CurrentLocale.getString("EXCEPTION"), JOptionPane.ERROR_MESSAGE);
           front.updateComponents();
           front.represent();
         });
@@ -181,22 +183,22 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
         break;
       } catch (NotAlignException ex) {
         logger.info("NotAlignException. " + ex);
-        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(Main.ioFrame, ex.getMessage(), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE));
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(mainFrame, ex.getMessage(), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE));
         haltCPU();
         break;
       } catch (AddressErrorException ex) {
         logger.info("AddressErrorException. " + ex);
-        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, ex.getMessage(), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE));
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(mainFrame, ex.getMessage(), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE));
         haltCPU();
         break;
       } catch (MemoryElementNotFoundException ex) {
         logger.info("Attempt to read a non-existent cell (MemoryElementNotFoundException). " + ex);
-        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(org.edumips64.Main.ioFrame, CurrentLocale.getString("ERROR_LABEL"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE));
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(mainFrame, CurrentLocale.getString("ERROR_LABEL"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE));
         haltCPU();
         break;
       } catch (Exception ex) {
         logger.severe("Exception in CPUSwingWorker: " + ex);
-        SwingUtilities.invokeLater(() -> new ReportDialog(f, ex, CurrentLocale.getString("GUI_STEP_ERROR"), version));
+        SwingUtilities.invokeLater(() -> new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), version));
         haltCPU();
         break;
       } finally {
@@ -212,17 +214,8 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
     guiUpdateThread.terminate();
     guiUpdateThread.join();
 
-    SwingUtilities.invokeAndWait(() -> {
-      // Represent changes, in case the user chose non-verbose mode.
-      front.represent();
+    SwingUtilities.invokeAndWait(finalizeCallback);
 
-      if (cpu.getStatus() != CPU.CPUStatus.HALTED) {
-        Main.setRunningMenuItemsStatus(true);
-      }
-
-      Main.setStopStatus(false);
-      Main.stopPB();
-    });
     long endTimeMs = System.currentTimeMillis();
     float cyclesPerSecond = steps / ((endTimeMs - startTimeMs) / 1000);
     logger.info("Executed " + steps + " steps in " + (endTimeMs - startTimeMs) + " ms. Speed: " + cyclesPerSecond + " cycles/sec");
