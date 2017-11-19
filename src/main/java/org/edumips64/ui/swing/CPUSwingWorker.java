@@ -73,6 +73,7 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
 
   public CPUSwingWorker(CPU cpu, GUIFrontend front, JFrame mainFrame, ConfigStore config, CycleBuilder builder) {
     externalStop = false;
+    this.builder = builder;
     this.cpu = cpu;
     this.front = front;
     f = mainFrame;
