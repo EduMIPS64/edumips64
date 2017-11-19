@@ -21,38 +21,43 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-//utente: edumips.org58154
-//password: edubugreport
-//alias: bugs@edumips.org
 package org.edumips64.ui.swing;
 
-import org.edumips64.utils.*;
-import org.edumips64.Main;
+import org.edumips64.ui.swing.img.IMGLoader;
+import org.edumips64.utils.CurrentLocale;
 
-import java.awt.*;
-import java.io.*;
-import javax.swing.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Toolkit;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * This class provides a window for configuration options.
 */
 public class ReportDialog extends JDialog {
-  JButton okButton;
-  int width = 450, height = 400;
 
-  public ReportDialog(final JFrame owner, Exception exception, String title) {
+  public ReportDialog(final JFrame owner, Exception exception, String title, String version) {
     super(owner, title, true);
 
     JPanel buttonPanel = new JPanel();
     JButton okButton = new JButton(CurrentLocale.getString("ReportDialog.BUTTON"));
     buttonPanel.add(okButton);
 
-    okButton.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        setVisible(false);
-        dispose();
-      }
+    okButton.addActionListener(e -> {
+      setVisible(false);
+      dispose();
     });
     buttonPanel.add(okButton);
 
@@ -65,9 +70,9 @@ public class ReportDialog extends JDialog {
     textArea.setForeground(new Color(0, 0, 85));
 
     try {
-      JLabel label = new JLabel(new ImageIcon(org.edumips64.ui.swing.img.IMGLoader.getImage("fatal.png")), SwingConstants.LEFT);
+      JLabel label = new JLabel(new ImageIcon(IMGLoader.getImage("fatal.png")), SwingConstants.LEFT);
       titlePanel.add("West", label);
-    } catch (java.io.IOException e) {}
+    } catch (java.io.IOException ignored) {}
 
     titlePanel.add("Center", textArea);
     //label style in TextArea
@@ -79,7 +84,7 @@ public class ReportDialog extends JDialog {
     textArea.setBorder(null);
 
     //fill the Text Area whit Exception informations
-    String exmsg = new String();
+    String exmsg;
 
     try {
       StringWriter sw = new StringWriter();
@@ -90,7 +95,7 @@ public class ReportDialog extends JDialog {
       exmsg = "fatal error";
     }
 
-    exmsg += "Version " + Main.VERSION + "\r\n";
+    exmsg += "Version " + version + "\r\n";
 
     JTextArea ta = new JTextArea(exmsg);
 
@@ -103,17 +108,18 @@ public class ReportDialog extends JDialog {
     getContentPane().add("Center", scrollTable);
     getContentPane().add("South", buttonPanel);
 
+    int height = 400;
+    int width = 450;
     setSize(width, height);
     setLocation((getScreenWidth() - getWidth()) / 2, (getScreenHeight() - getHeight()) / 2);
     setVisible(true);
-
   }
 
-  public static int getScreenWidth() {
+  private static int getScreenWidth() {
     return (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
   }
 
-  public static int getScreenHeight() {
+  private static int getScreenHeight() {
     return (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
   }
 }

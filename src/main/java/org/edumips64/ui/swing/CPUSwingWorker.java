@@ -70,14 +70,16 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
   private CycleBuilder builder;
 
   private static final Logger logger = Logger.getLogger(CPUSwingWorker.class.getName());
+  private String version;
 
-  public CPUSwingWorker(CPU cpu, GUIFrontend front, JFrame mainFrame, ConfigStore config, CycleBuilder builder) {
+  public CPUSwingWorker(CPU cpu, GUIFrontend front, JFrame mainFrame, ConfigStore config, CycleBuilder builder, String version) {
     externalStop = false;
     this.builder = builder;
     this.cpu = cpu;
     this.front = front;
     f = mainFrame;
     this.config = config;
+    this.version = version;
     updateConfigValues();
     guiUpdateThread = new GUIUpdateThread(front);
     guiUpdateThread.start();
@@ -194,7 +196,7 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
         break;
       } catch (Exception ex) {
         logger.severe("Exception in CPUSwingWorker: " + ex);
-        SwingUtilities.invokeLater(() -> new ReportDialog(f, ex, CurrentLocale.getString("GUI_STEP_ERROR")));
+        SwingUtilities.invokeLater(() -> new ReportDialog(f, ex, CurrentLocale.getString("GUI_STEP_ERROR"), version));
         haltCPU();
         break;
       } finally {
