@@ -57,12 +57,12 @@ public class EndToEndTests extends BaseTest {
   private CPU cpu;
   private Parser parser;
   private SymbolTable symTab;
-  private static String testsLocation = "build/resources/test/";
   private final static Logger log = Logger.getLogger(EndToEndTests.class.getName());
   private Dinero dinero;
   private StringWriter stdOut;
   private Memory memory;
   private CycleBuilder builder;
+  private static String testsLocation = "src/test/resources/";
 
   @Rule
   public ErrorCollector collector = new ErrorCollector();
