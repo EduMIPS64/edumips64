@@ -1,7 +1,7 @@
 ; test-open-existent.s - opens an existing file.
 ; (c) 2014 Andrea Spadaccini, licensed under the GNU GPL v2 or later
                   .data
-  params_sys1:    .asciiz     "build.xml"
+  params_sys1:    .asciiz     "src/test/resources/test-open-existent.s"
                   .word64     0x1     ; O_RDONLY
 
                   .text

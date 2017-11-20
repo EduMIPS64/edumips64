@@ -34,7 +34,7 @@
     <property name="sourceDir" value="src/main/java/org/edumips64/" />
     <property name="webDir" value="src/main/java/org/edumips64/client/" />
     <property name="testDir" value="src/test/java/org/edumips64/" />
-    <property name="testResourcesDir" value="build/resources/test" />
+    <property name="testResourcesDir" value="src/test/resources/" />
     <property name="resourcesDir" value="src/main/resources/" />
     <property name="outputDir" value="build" />
     <property name="webOutputDir" value="war/" />
