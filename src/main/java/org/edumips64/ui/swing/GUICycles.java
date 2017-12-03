@@ -40,7 +40,7 @@ import javax.swing.*;
 */
 public class GUICycles extends GUIComponent {
   public static final int DY = 15;
-  public static final int DX = 30;
+  public static final int DX = 35;
   private CyclePanel cyclePanel;
   private JScrollPane cyclePanelSp;
   private Dimension instructionPanelDim;
@@ -153,7 +153,7 @@ public class GUICycles extends GUIComponent {
             g.drawRect(x, y, width, height);
 
             // Write the stage name.
-            int fontXOffset = scale(5);
+            int fontXOffset = scale(1);
             int fontYOffset = scale(11);
             g.drawString(st, x+fontXOffset, y+fontYOffset);
             column++;
