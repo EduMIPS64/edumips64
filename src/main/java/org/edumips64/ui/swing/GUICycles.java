@@ -98,18 +98,24 @@ public class GUICycles extends GUIComponent {
     int instrCount = builder.getInstructionsCount();
     int time = builder.getTime();
 
-    cyclePanelDim.setSize(20 + time * DX, DX + instrCount * DY);
-
-    if (DX + instrCount * DY > instructionPanel.getHeight()) {
-      instructionPanelDim.setSize(splitPane.getDividerLocation(), DX + instrCount * DY);
-    } else {
-      instructionPanelDim.setSize(splitPane.getDividerLocation(), instructionPanel.getHeight());
-    }
-
+    // Set CyclePanel size.
+    int cyclePanelWidth = 20 + time * DX;
+    int cyclePanelHeight = 30 + instrCount * DY;
+    cyclePanelDim.setSize(cyclePanelWidth, cyclePanelHeight);
     cyclePanelSp.getViewport().setViewSize(cyclePanelDim);
+
+    // Set InstrPanel size.
+    int instrHeight = Math.max(DX + instrCount * DY, instructionPanel.getHeight());
+    instructionPanelDim.setSize(splitPane.getDividerLocation(), instrHeight);
     instructionPanelSp.getViewport().setViewSize(instructionPanelDim);
-    instructionPanelSp.getViewport().setViewPosition(new Point(0, instrCount * DY));
-    cyclePanelSp.getViewport().setViewPosition(new Point(time * DX, instrCount * DY));
+
+    // Set viewpoints.
+    int yPoint = instrCount * (DY + 20);
+    int cyclePanelX = time * DX;
+    instructionPanelSp.getViewport().setViewPosition(new Point(0, yPoint));
+    cyclePanelSp.getViewport().setViewPosition(new Point(cyclePanelX, yPoint));
+
+    // Repaint container.
     cont.repaint();
   }
 
