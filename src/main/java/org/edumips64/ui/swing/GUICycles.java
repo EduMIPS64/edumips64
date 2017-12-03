@@ -99,19 +99,19 @@ public class GUICycles extends GUIComponent {
     int time = builder.getTime();
 
     // Set CyclePanel size.
-    int cyclePanelWidth = 20 + time * DX;
-    int cyclePanelHeight = 30 + instrCount * DY;
+    int cyclePanelWidth = scale(20 + time * DX);
+    int cyclePanelHeight = scale(30 + instrCount * DY);
     cyclePanelDim.setSize(cyclePanelWidth, cyclePanelHeight);
     cyclePanelSp.getViewport().setViewSize(cyclePanelDim);
 
     // Set InstrPanel size.
-    int instrHeight = Math.max(DX + instrCount * DY, instructionPanel.getHeight());
+    int instrHeight = Math.max(cyclePanelHeight, instructionPanel.getHeight());
     instructionPanelDim.setSize(splitPane.getDividerLocation(), instrHeight);
     instructionPanelSp.getViewport().setViewSize(instructionPanelDim);
 
     // Set viewpoints.
-    int yPoint = instrCount * (DY + 20);
-    int cyclePanelX = time * DX;
+    int yPoint = scale(instrCount * (DY + 20));
+    int cyclePanelX = scale(time * DX);
     instructionPanelSp.getViewport().setViewPosition(new Point(0, yPoint));
     cyclePanelSp.getViewport().setViewPosition(new Point(cyclePanelX, yPoint));
 
