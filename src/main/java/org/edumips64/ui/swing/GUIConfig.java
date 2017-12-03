@@ -29,14 +29,7 @@ import org.edumips64.utils.CurrentLocale;
 import org.omg.CORBA.Current;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -60,8 +53,20 @@ public class GUIConfig extends JDialog {
   // Callback to call after updates.
   private Runnable updateCallback;
 
+  // Font scaling factor.
+  float scalingFactor;
+
+  void scaleFont(Component component) {
+    Font oldFont = component.getFont();
+    component.setFont(oldFont.deriveFont(oldFont.getSize() * scalingFactor));
+  }
+
   public GUIConfig(final JFrame owner, ConfigStore config, Runnable updateCallback) {
     super(owner, CurrentLocale.getString("Config.ITEM"), true);
+    scalingFactor = config.getInt(ConfigKey.UI_FONT_SIZE) / (float)getFont().getSize();
+
+    scaleFont(this);
+
     this.config = config;
     this.updateCallback = updateCallback;
     logger.info("Building a new GUIConfig instance.");
@@ -74,6 +79,7 @@ public class GUIConfig extends JDialog {
     cache = new HashMap<>();
 
     JTabbedPane tabPanel = new JTabbedPane();
+    scaleFont(tabPanel);
     tabPanel.addTab(MAIN, makeMainPanel());
     tabPanel.addTab(BEHAVIOR, makeBehaviorPanel());
     tabPanel.addTab(FPUEXCEPTIONS, makeExceptionsPanel());
@@ -90,8 +96,8 @@ public class GUIConfig extends JDialog {
     content.add(buttonPanel, BorderLayout.PAGE_END);
 
     //pack();
-    int width = 700;
-    int height = 300;
+    int width = (int)(700 * scalingFactor);
+    int height = (int)(300 * scalingFactor);
     setSize(width, height);
     setLocation((getScreenWidth() - getWidth()) / 2, (getScreenHeight() - getHeight()) / 2);
     setVisible(true);
@@ -246,8 +252,12 @@ public class GUIConfig extends JDialog {
     String tip = CurrentLocale.getString("Config." + String.valueOf(key).toUpperCase() + ".tip");
     //Setting title
     JLabel label = new JLabel(title);
+    label.setFont(getFont());
     label.setHorizontalAlignment(JLabel.RIGHT);
     label.setToolTipText(tip);
+
+    scaleFont(comp);
+
     grid_add(panel, label, gbl, gbc, .1, 0, 0, row, 1, 1);
 
 
@@ -374,7 +384,9 @@ public class GUIConfig extends JDialog {
   private void addButtons(JPanel buttonPanel) {
 
     final JButton okButton = new JButton("OK");
+    okButton.setFont(getFont());
     final JButton cancelButton = new JButton("Cancel");
+    cancelButton.setFont(getFont());
 
     buttonPanel.add(okButton);
     buttonPanel.add(cancelButton);
