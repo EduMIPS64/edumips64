@@ -209,12 +209,12 @@ public class GUICycles extends GUIComponent {
 
       java.util.List<CycleElement> elements = builder.getElementsList();
       synchronized(elements) {
-        int i = 0;
+        int row = 0;
         for (CycleElement el : elements) {
           int x = scale(5);
-          int y = scale(20 + i * DY);
+          int y = scale(20 + row * DY);
           g.drawString(el.getName(), x, y);
-          i++;
+          row++;
         }
       }
     }
