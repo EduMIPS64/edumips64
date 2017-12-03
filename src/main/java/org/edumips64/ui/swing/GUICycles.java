@@ -79,6 +79,9 @@ public class GUICycles extends GUIComponent {
 
     // Reset the component's font. This window has a different font type and is slightly smaller than the rest of the UI.
     this.font = new Font("Arial", Font.PLAIN, font.getSize() - 1);
+
+    // This component has a scaling factor of 11, since the original numbers were derived with a font size of 11.
+    this.scalingDenominator = 11.0f;
   }
 
   public void setContainer(Container co) {
