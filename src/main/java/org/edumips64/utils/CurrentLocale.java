@@ -102,7 +102,6 @@ public class CurrentLocale {
     en.put("REGISTERS", "Registers");
     en.put("MEMORY", "Data");
     en.put("CODE", "Code");
-    en.put("CYCLES", "Cycles");
     en.put("PIPELINE", "Pipeline");
     en.put("LOGGER", "Log");
     en.put("IO", "Input/Output");
@@ -135,7 +134,6 @@ public class CurrentLocale {
     en.put("CYCLES", "Cycles");
     en.put("CYCLE", "Cycle");
     en.put("INSTRUCTIONS", "Instructions");
-    en.put("INSTRUCTION", "Instruction");
     en.put("CPI", "CPI (Cycles per instruction)");
     en.put("RAWS", "RAW Stalls");
     en.put("RAW", "RAW Stall");
@@ -331,7 +329,6 @@ public class CurrentLocale {
     it.put("HEXREPR", "Rappresentazione");
     it.put("COMMENT", "Commento");
     it.put("LABEL", "Etichetta");
-    it.put("INSTRUCTION", "Istruzione");
     it.put("STATS", "Statistiche");
     it.put("PROSIM", "Simulatore di processore MIPS64");
     it.put("GUI_WARNING", "Attenzione");
@@ -350,7 +347,6 @@ public class CurrentLocale {
     it.put("SAMELABEL", "Etichetta già esistente");
     it.put("CHOOSE_COLOR", "Seleziona un colore ");
     it.put("EXECUTION", "Esecuzione");
-    it.put("CYCLES", "Cicli");
     it.put("CYCLE", "Ciclo");
     it.put("INSTRUCTIONS", "Istruzioni");
     it.put("INSTRUCTION", "Istruzione");
