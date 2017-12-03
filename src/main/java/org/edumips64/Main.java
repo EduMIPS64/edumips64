@@ -917,6 +917,7 @@ public class Main extends JApplet {
     // ---------------- WINDOW MENU
     //
     tile = new JMenuItem("Tile");
+    tile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
     tile.addActionListener(e -> tileWindows());
     window.add(tile);
     window.addSeparator();
