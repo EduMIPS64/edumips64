@@ -145,7 +145,7 @@ public class GUICycles extends GUIComponent {
             int x = scale(10 + (elementTime + column - 1) * DX);
             int y = scale(9 + row * DY);
             int width = scale(DX);
-            int height = scale(13);
+            int height = scale(DY - 2);
 
             // Draw the colored rectangle and a black outline.
             g.fillRect(x, y, width, height);
