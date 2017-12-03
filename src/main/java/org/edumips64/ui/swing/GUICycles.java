@@ -143,7 +143,8 @@ public class GUICycles extends GUIComponent {
             }
             int x = scale(10 + (elementTime + column - 1) * DX);
             int y = scale(9 + row * DY);
-            int width = scale(DX), height = scale(13);
+            int width = scale(DX);
+            int height = scale(13);
 
             // Draw the colored rectangle and a black outline.
             g.fillRect(x, y, width, height);
@@ -151,7 +152,8 @@ public class GUICycles extends GUIComponent {
             g.drawRect(x, y, width, height);
 
             // Write the stage name.
-            int fontXOffset = scale(5), fontYOffset = scale(11);
+            int fontXOffset = scale(5);
+            int fontYOffset = scale(11);
             g.drawString(st, x+fontXOffset, y+fontYOffset);
             column++;
 
@@ -208,7 +210,8 @@ public class GUICycles extends GUIComponent {
       synchronized(elements) {
         int i = 0;
         for (CycleElement el : elements) {
-          int x = scale(5), y = scale(20 + i * DY);
+          int x = scale(5);
+          int y = scale(20 + i * DY);
           g.drawString(el.getName(), x, y);
           i++;
         }
