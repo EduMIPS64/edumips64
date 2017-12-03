@@ -682,11 +682,19 @@ public class Main extends JApplet {
     setMenuItem(ioJCB, "IO");
   }
 
+  static Font getScaledFont(Font oldFont) {
+    float newSize = (float) configStore.getInt(ConfigKey.UI_FONT_SIZE) / 12.0f * oldFont.getSize();
+    return oldFont.deriveFont(newSize);
+  }
+
   /** Creates a new menu bar.
    *  @return the menu bar
    */
   private static JMenuBar createMenuBar() {
     JMenuBar mb = new JMenuBar();
+
+    UIManager.put("Menu.font", getScaledFont((Font)UIManager.get("Menu.font")));
+    UIManager.put("MenuItem.font", getScaledFont((Font)UIManager.get("MenuItem.font")));
 
     // Creation of all menus and menu items
     file = new JMenu();
