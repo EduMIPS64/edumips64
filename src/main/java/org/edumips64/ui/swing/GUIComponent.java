@@ -39,6 +39,7 @@ abstract class GUIComponent {
   protected ConfigStore config;
 
   Font font;
+  float scalingDenominator = 12.0f;
 
   GUIComponent(CPU cpu, Memory memory, ConfigStore config) {
     cont = null;
@@ -53,7 +54,7 @@ abstract class GUIComponent {
    * designed for a font size of 12.
    */
   public int scale(int dimension) {
-    float scalingFactor = (float) (font.getSize() / 12.0);
+    float scalingFactor = font.getSize() / scalingDenominator;
     return (int)Math.ceil(dimension * scalingFactor);
   }
 
