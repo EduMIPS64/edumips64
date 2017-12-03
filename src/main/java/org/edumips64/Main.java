@@ -259,6 +259,8 @@ public class Main extends JApplet {
     sb = new StatusBar(VERSION);
     front = new GUIFrontend(cpu, memory, configStore, builder, sb);
 
+    UIManager.put("InternalFrame.titleFont", getScaledFont((Font)UIManager.get("InternalFrame.titleFont")));
+
     // Internal Frames
     JInternalFrame pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);
     pipeFrame.addInternalFrameListener(new InternalFrameAdapter() {
