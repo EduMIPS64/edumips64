@@ -39,41 +39,44 @@ import javax.swing.*;
 * @author Filippo Mondello, Massimo Trubia (FPU modifications)
 */
 public class GUICycles extends GUIComponent {
-  RightPanel rightPanel;
-  LeftPanel leftPanel;
+  private CyclePanel cyclePanel;
+  private JScrollPane cyclePanelSp;
+  private Dimension instructionPanelDim;
 
-  JScrollPane jsp1, jsp2;
+  private InstructionPanel instructionPanel;
+  private JScrollPane instructionPanelSp;
+  private Dimension cyclePanelDim;
+
   private JSplitPane splitPane;
+  private CycleBuilder builder;
 
-  Dimension dim, dim2;
-
-  CycleBuilder builder;
-
-  public GUICycles(CPU cpu, Memory memory, ConfigStore config, CycleBuilder builder) {
+  GUICycles(CPU cpu, Memory memory, ConfigStore config, CycleBuilder builder) {
     super(cpu, memory, config);
     this.builder = builder;
-    rightPanel = new RightPanel();
 
-    jsp1 = new JScrollPane(rightPanel);
-    dim = new Dimension(20, 30);
-    rightPanel.setPreferredSize(dim);
+    // Initialize the left panel (list of instructions).
+    instructionPanel = new InstructionPanel();
+    instructionPanelSp = new JScrollPane(instructionPanel);
+    instructionPanelDim = new Dimension(10, 30);
+    instructionPanel.setPreferredSize(instructionPanelDim);
+    instructionPanelSp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-    leftPanel = new LeftPanel();
+    // Initialize the right panel (list of instructions).
+    cyclePanel = new CyclePanel();
+    cyclePanelSp = new JScrollPane(cyclePanel);
+    cyclePanelDim = new Dimension(20, 30);
+    cyclePanel.setPreferredSize(cyclePanelDim);
+    cyclePanelSp.setVerticalScrollBar(instructionPanelSp.getVerticalScrollBar());
+    cyclePanelSp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+    cyclePanelSp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-    jsp2 = new JScrollPane(leftPanel);
-    dim2 = new Dimension(10, 30);
-    leftPanel.setPreferredSize(dim2);
-
-    jsp1.setVerticalScrollBar(jsp2.getVerticalScrollBar());
-
-    jsp1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-    jsp2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    jsp1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-
-    splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jsp2, jsp1);
+    // SplitPane che contiene entrambi i pannelli.
+    splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, instructionPanelSp, cyclePanelSp);
     splitPane.setOneTouchExpandable(true);
     splitPane.setDividerLocation(150);
 
+    // Reset the component's font. This window has a different font type and is slightly smaller than the rest of the UI.
+    this.font = new Font("Arial", Font.PLAIN, font.getSize() - 1);
   }
 
   public void setContainer(Container co) {
@@ -90,34 +93,33 @@ public class GUICycles extends GUIComponent {
     int instrCount = builder.getInstructionsCount();
     int time = builder.getTime();
 
-    dim.setSize(20 + time * 30, 30 + instrCount * 15);
+    cyclePanelDim.setSize(20 + time * 30, 30 + instrCount * 15);
 
-    if (30 + instrCount * 15 > leftPanel.getHeight()) {
-      dim2.setSize(splitPane.getDividerLocation(), 30 + instrCount * 15);
+    if (30 + instrCount * 15 > instructionPanel.getHeight()) {
+      instructionPanelDim.setSize(splitPane.getDividerLocation(), 30 + instrCount * 15);
     } else {
-      dim2.setSize(splitPane.getDividerLocation(), leftPanel.getHeight());
+      instructionPanelDim.setSize(splitPane.getDividerLocation(), instructionPanel.getHeight());
     }
 
-    jsp1.getViewport().setViewSize(dim);
-    jsp2.getViewport().setViewSize(dim2);
-    jsp2.getViewport().setViewPosition(new Point(0, instrCount * 15));
-    jsp1.getViewport().setViewPosition(new Point(time * 30, instrCount * 15));
+    cyclePanelSp.getViewport().setViewSize(cyclePanelDim);
+    instructionPanelSp.getViewport().setViewSize(instructionPanelDim);
+    instructionPanelSp.getViewport().setViewPosition(new Point(0, instrCount * 15));
+    cyclePanelSp.getViewport().setViewPosition(new Point(time * 30, instrCount * 15));
     cont.repaint();
   }
 
-  class RightPanel extends JPanel {
+  class CyclePanel extends JPanel {
 
     public synchronized void paintComponent(Graphics g) {
       super.paintComponent(g);
       setBackground(Color.white);
       g.setColor(Color.black);
-      Font f1 = new Font("Arial", Font.PLAIN, 11);
-      g.setFont(f1);
+      g.setFont(font);
 
       fill(g);
     }
 
-    public synchronized void fill(Graphics g) {
+    synchronized void fill(Graphics g) {
       int row = 0;
 
       java.util.List<CycleElement> elements = builder.getElementsList();
@@ -137,10 +139,18 @@ public class GUICycles extends GUIComponent {
             if (color != null) {
               g.setColor(color);
             }
-            g.fillRect(10 + (elementTime + column - 1) * 30, 9 + row * 15, 30, 13);
+            int x = 10 + (elementTime + column - 1) * 30;
+            int y = 9 + row * 15;
+            int width = 30, height = 13;
+
+            // Draw the colored rectangle and a black outline.
+            g.fillRect(x, y, width, height);
             g.setColor(Color.black);
-            g.drawRect(10 + (elementTime + column - 1) * 30, 9 + row * 15, 30, 13);
-            g.drawString(st, 15 + (elementTime + column - 1) * 30, 20 + row * 15);
+            g.drawRect(x, y, width, height);
+
+            // Write the stage name.
+            int fontXOffset = 5, fontYOffset = 11;
+            g.drawString(st, x+fontXOffset, y+fontYOffset);
             column++;
 
             if ((!st.equals(" ")) && (!st.equals("RAW"))) {
@@ -185,20 +195,19 @@ public class GUICycles extends GUIComponent {
     }
   }
 
-  class LeftPanel extends JPanel {
-
+  class InstructionPanel extends JPanel {
     public synchronized void paintComponent(Graphics g) {
       super.paintComponent(g);
       setBackground(Color.white);
       g.setColor(Color.black);
-      Font f1 = new Font("Arial", Font.PLAIN, 11);
-      g.setFont(f1);
-      int i = 0;
+      g.setFont(font);
 
       java.util.List<CycleElement> elements = builder.getElementsList();
       synchronized(elements) {
+        int i = 0;
         for (CycleElement el : elements) {
-          g.drawString(el.getName(), 5, 20 + i * 15);
+          int x = 5, y = 20 + i * 15;
+          g.drawString(el.getName(), x, y);
           i++;
         }
       }
