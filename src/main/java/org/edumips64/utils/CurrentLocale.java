@@ -485,7 +485,7 @@ public class CurrentLocale {
       Map<String, String> lang = languages.get(lang_name);
       return lang.get(key);
     } catch (Exception e) {
-      logger.severe("Could not look up find language " + lang_name + "; key: " + key);
+      logger.severe("Could not look up key " + key + " in language " + lang_name);
       return key;
     }
   }
