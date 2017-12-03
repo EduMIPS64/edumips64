@@ -25,6 +25,8 @@ import org.edumips64.core.*;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.utils.*;
 import java.awt.*;
+import java.util.function.Function;
+import java.util.function.IntFunction;
 import javax.swing.*;
 import javax.swing.table.*;
 /**
@@ -116,12 +118,16 @@ public class GUICode extends GUIComponent {
       theTable.setFocusable(false);
       theTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
       theTable.setShowGrid(false);
+      theTable.setFont(font);
 
-      theTable.getColumnModel().getColumn(0).setPreferredWidth(60);
-      theTable.getColumnModel().getColumn(1).setPreferredWidth(130);
-      theTable.getColumnModel().getColumn(2).setPreferredWidth(80);
-      theTable.getColumnModel().getColumn(3).setPreferredWidth(200);
-      theTable.getColumnModel().getColumn(4).setPreferredWidth(200);
+      Font headerFont = theTable.getTableHeader().getFont();
+      theTable.getTableHeader().setFont(new Font(headerFont.getName(), headerFont.getStyle(), config.getInt(ConfigKey.UI_FONT_SIZE)));
+      theTable.getColumnModel().getColumn(0).setPreferredWidth(scale(60));
+      theTable.getColumnModel().getColumn(1).setPreferredWidth(scale(130));
+      theTable.getColumnModel().getColumn(2).setPreferredWidth(scale(80));
+      theTable.getColumnModel().getColumn(3).setPreferredWidth(scale(200));
+      theTable.getColumnModel().getColumn(4).setPreferredWidth(scale(200));
+      theTable.setRowHeight(scale(theTable.getRowHeight()));
 
       scrollTable = new JScrollPane(theTable);
       add(scrollTable, BorderLayout.CENTER);
@@ -207,13 +213,12 @@ public class GUICode extends GUIComponent {
         int column) {
       codePanel.tableModel = (CodePanel.MyTableModel) table.getModel();
       label = new JLabel();
-      Font f = new Font("Monospaced", Font.PLAIN, 12);
+      label.setFont(table.getFont());
       int rowTable = row;
 
       if (column == 0) {
         try {
           label.setText(Converter.binToHex(Converter.positiveIntToBin(16, row++ * 4)));
-          label.setFont(f);
         } catch (IrregularStringOfBitsException e) {
           e.printStackTrace();
         }
@@ -222,24 +227,20 @@ public class GUICode extends GUIComponent {
       if (column == 1) {
         String repr = (String) codePanel.tableModel.getValueAt(row, column);
         label.setText(repr);
-        label.setFont(f);
       }
 
       if (column == 2) {
         label.setText((String) codePanel.tableModel.getValueAt(row, column));
-        label.setFont(f);
       }
 
       if (column == 3) {
         String iName = (String) codePanel.tableModel.getValueAt(row, column);
         label.setText(iName);
-        label.setFont(f);
       }
 
       if (column == 4) {
         String iComment = (String) codePanel.tableModel.getValueAt(row, column);
         label.setText(iComment);
-        label.setFont(f);
       }
 
       if (rowTable == ifIndex) {

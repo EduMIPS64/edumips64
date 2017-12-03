@@ -142,18 +142,18 @@ class GUIRegisters extends GUIComponent {
       tableModel = new FileTableModel(value);
       setBackground(Color.WHITE);
       theTable = new JTable(tableModel);
-      theTable.getColumnModel().getColumn(0).setPreferredWidth(100);
-      theTable.getColumnModel().getColumn(1).setPreferredWidth(147);
-      theTable.getColumnModel().getColumn(2).setPreferredWidth(50);
-      theTable.getColumnModel().getColumn(3).setPreferredWidth(147);
+      theTable.setFont(font);
+      theTable.getColumnModel().getColumn(0).setPreferredWidth(scale(100));
+      theTable.getColumnModel().getColumn(1).setPreferredWidth(scale(147));
+      theTable.getColumnModel().getColumn(2).setPreferredWidth(scale(50));
+      theTable.getColumnModel().getColumn(3).setPreferredWidth(scale(147));
       theTable.setRowSelectionAllowed(false);
       theTable.setColumnSelectionAllowed(false);
       theTable.setCellSelectionEnabled(false);
       theTable.setTableHeader(null);
       theTable.setShowGrid(false);
-      Font f = new Font("Monospaced", Font.PLAIN, 12);
-      theTable.setFont(f);
       theTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+      theTable.setRowHeight(scale(theTable.getRowHeight()));
 
       //ascoltatore della tabella
       theTable.addFocusListener(new FocusAdapter() {

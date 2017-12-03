@@ -202,6 +202,8 @@ public class CurrentLocale {
     en.put("Config.SYNCEXC-MASKED.tip", "Makes the simulator ignore the Division by zero and Integer Overflow exceptions");
     en.put("Config.SYNCEXC-TERMINATE", "Terminate on synchronous exceptions");
     en.put("Config.SYNCEXC-TERMINATE.tip", "Halt the simulation on Division by zero and Integer Overflow exceptions");
+    en.put("Config.FONTSIZE", "Font size");
+    en.put("Config.FONTSIZE.tip", "Size of the font");
     en.put("StatusBar.WELCOME", "Welcome to EduMIPS64");
     en.put("StatusBar.DECIMALVALUE", "Decimal value");
     en.put("StatusBar.OFREGISTER", "of R");
@@ -255,6 +257,7 @@ public class CurrentLocale {
     en.put("ALIGNERR", "Alignment error in instruction");
     en.put("THEADDRESS", "the address");
     en.put("ISNOTALIGNED", "is not aligned to");
+    en.put("RESTART_FONT", "Please restart the simulator to use the new font.");
     languages.put("en", en);
 
     // Italian messages.
@@ -417,6 +420,8 @@ public class CurrentLocale {
     it.put("Config.SYNCEXC-MASKED.tip", "Fa sì che il simulatore ignori le eccezioni Divisione per zero ed Integer overflow");
     it.put("Config.SYNCEXC-TERMINATE", "Termina se si verifica un'eccezione sincrona");
     it.put("Config.SYNCEXC-TERMINATE.tip", "Ferma la simulazione al verificarsi di eccezioni di tipo Divisione per zero ed Integer overflow");
+    it.put("Config.FONTSIZE", "Dimensione font");
+    it.put("Config.FONTSIZE.tip", "Dimensione del font");
     it.put("StatusBar.WELCOME", "Benvenuti in EduMIPS64");
     it.put("StatusBar.DECIMALVALUE", "Valore decimale");
     it.put("StatusBar.OFREGISTER", "di R");
@@ -470,6 +475,7 @@ public class CurrentLocale {
     it.put("ALIGNERR", "Errore di allineamento nell'istruzione");
     it.put("THEADDRESS", "l'indirizzo");
     it.put("ISNOTALIGNED", "non è allineato a");
+    it.put("RESTART_FONT", "E' necessario riavviare il simulatore per utilizzare il nuovo font.");
     languages.put("it", it);
   }
 

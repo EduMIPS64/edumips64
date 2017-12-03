@@ -23,6 +23,7 @@
 
 package org.edumips64.ui.swing;
 import org.edumips64.core.*;
+import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 
 import java.awt.*;
@@ -32,16 +33,28 @@ import java.awt.*;
 * @author Filippo Mondello
 */
 abstract class GUIComponent {
-  protected Container cont;
+  Container cont;
   protected CPU cpu;
   protected Memory memory;
   protected ConfigStore config;
 
-  public GUIComponent(CPU cpu, Memory memory, ConfigStore config) {
+  Font font;
+
+  GUIComponent(CPU cpu, Memory memory, ConfigStore config) {
     cont = null;
     this.cpu = cpu;
     this.memory = memory;
     this.config = config;
+
+    font = new Font("Monospaced", Font.PLAIN, config.getInt(ConfigKey.UI_FONT_SIZE));
+  }
+
+  /** Used to scale dimensions of the UI. Based on the assumption that original dimensions were
+   * designed for a font size of 12.
+   */
+  public int scale(int dimension) {
+    float scalingFactor = (float) (font.getSize() / 12.0);
+    return (int)Math.ceil(dimension * scalingFactor);
   }
 
   /**Set the container of the component class.

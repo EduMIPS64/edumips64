@@ -26,23 +26,9 @@ import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigStoreTypeException;
 import org.edumips64.utils.CurrentLocale;
+import org.omg.CORBA.Current;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -246,6 +232,7 @@ public class GUIConfig extends JDialog {
     addRow(panel, row++, ConfigKey.FP_MULTIPLIER_COLOR, new JButton());
     addRow(panel, row++, ConfigKey.FP_DIVIDER_COLOR, new JButton());
     addRow(panel, row++, ConfigKey.FP_LONG_DOUBLE_VIEW, new JCheckBox());
+    addRow(panel, row++, ConfigKey.UI_FONT_SIZE, new JNumberField());
 
     // fill remaining vertical space
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
@@ -397,10 +384,21 @@ public class GUIConfig extends JDialog {
     okButton.addActionListener(e -> {
 
       try {
+        boolean fontChanged = false;
+        if (cache.containsKey(ConfigKey.UI_FONT_SIZE)) {
+          fontChanged = config.getInt(ConfigKey.UI_FONT_SIZE) != (Integer) cache.get(ConfigKey.UI_FONT_SIZE);
+        }
         // Flush the cache to the actual configuration.
         config.mergeFromGenericMap(cache);
         // Might be needed if show_alias is changed.
         updateCallback.run();
+
+        // Warn the user that they need to restart the simulator if they changed the font size.
+        if (fontChanged) {
+          JOptionPane.showMessageDialog(null,
+              CurrentLocale.getString("RESTART_FONT"), CurrentLocale.getString("GUI_WARNING"),
+              JOptionPane.WARNING_MESSAGE);
+        }
       } catch (ConfigStoreTypeException ex) {
         logger.severe("Unknown type encountered while storing the configuration.");
       }

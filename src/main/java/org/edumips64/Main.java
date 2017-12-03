@@ -317,7 +317,7 @@ public class Main extends JApplet {
       }
     });
 
-    ioFrame = new GUIIO(CurrentLocale.getString("IO"), true, false, true, true);
+    ioFrame = new GUIIO(CurrentLocale.getString("IO"), configStore);
     ioFrame.addInternalFrameListener(new InternalFrameAdapter() {
       public void internalFrameIconified(InternalFrameEvent e) {
         ioJCB.setState(false);
