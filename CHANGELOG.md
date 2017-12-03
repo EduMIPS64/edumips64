@@ -1,12 +1,20 @@
 # EduMIPS64 ChangeLog
 
-## 1.2.4 () - Nicolosi
+## 1.2.4 (17/12/2017) - Nicolosi
 ### Added
+- Ability to set font size.
+- Show both register numbers and MIPS32 aliases (Issue #67)
+- Performance improvements (stop using exceptions for RAW stalls, improve use
+  of Swing threading).
+
 ### Fixed
 - Proper use of Swing and threading (Issue #11)
 - Run CycleBuilder inside the CPU (Issue #147)
 - In some cases, the simulator fails to add the WB state to the Cycles
   window (Issue #148)
+- EduMIPS64 is unusable on 4k displays (Issue #159)
+- Poor UI behavior with dual monitors (Issue #162)
+- Improved modularity by removing unnecessary cross-module dependencies.
 
 ## 1.2.3 (04/05/2017) - Angelo
 ### Added
