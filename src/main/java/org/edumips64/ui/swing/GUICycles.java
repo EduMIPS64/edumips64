@@ -129,6 +129,7 @@ public class GUICycles extends GUIComponent {
         for (CycleElement el : elements) {
           // TODO: verify rendering for other cases.
           // TODO: should we re-draw this at every cycle?
+          // TODO: do we need to draw everything at every cycle? If x or y are outside the visible panel, we could just stop.
           if (!el.shouldRender()) {
             continue;
           }
