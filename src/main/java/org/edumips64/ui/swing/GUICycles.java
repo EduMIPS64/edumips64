@@ -39,6 +39,8 @@ import javax.swing.*;
 * @author Filippo Mondello, Massimo Trubia (FPU modifications)
 */
 public class GUICycles extends GUIComponent {
+  public static final int DY = 15;
+  public static final int DX = 30;
   private CyclePanel cyclePanel;
   private JScrollPane cyclePanelSp;
   private Dimension instructionPanelDim;
@@ -57,14 +59,14 @@ public class GUICycles extends GUIComponent {
     // Initialize the left panel (list of instructions).
     instructionPanel = new InstructionPanel();
     instructionPanelSp = new JScrollPane(instructionPanel);
-    instructionPanelDim = new Dimension(10, 30);
+    instructionPanelDim = new Dimension(10, DX);
     instructionPanel.setPreferredSize(instructionPanelDim);
     instructionPanelSp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
     // Initialize the right panel (list of instructions).
     cyclePanel = new CyclePanel();
     cyclePanelSp = new JScrollPane(cyclePanel);
-    cyclePanelDim = new Dimension(20, 30);
+    cyclePanelDim = new Dimension(20, DX);
     cyclePanel.setPreferredSize(cyclePanelDim);
     cyclePanelSp.setVerticalScrollBar(instructionPanelSp.getVerticalScrollBar());
     cyclePanelSp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -93,18 +95,18 @@ public class GUICycles extends GUIComponent {
     int instrCount = builder.getInstructionsCount();
     int time = builder.getTime();
 
-    cyclePanelDim.setSize(20 + time * 30, 30 + instrCount * 15);
+    cyclePanelDim.setSize(20 + time * DX, DX + instrCount * DY);
 
-    if (30 + instrCount * 15 > instructionPanel.getHeight()) {
-      instructionPanelDim.setSize(splitPane.getDividerLocation(), 30 + instrCount * 15);
+    if (DX + instrCount * DY > instructionPanel.getHeight()) {
+      instructionPanelDim.setSize(splitPane.getDividerLocation(), DX + instrCount * DY);
     } else {
       instructionPanelDim.setSize(splitPane.getDividerLocation(), instructionPanel.getHeight());
     }
 
     cyclePanelSp.getViewport().setViewSize(cyclePanelDim);
     instructionPanelSp.getViewport().setViewSize(instructionPanelDim);
-    instructionPanelSp.getViewport().setViewPosition(new Point(0, instrCount * 15));
-    cyclePanelSp.getViewport().setViewPosition(new Point(time * 30, instrCount * 15));
+    instructionPanelSp.getViewport().setViewPosition(new Point(0, instrCount * DY));
+    cyclePanelSp.getViewport().setViewPosition(new Point(time * DX, instrCount * DY));
     cont.repaint();
   }
 
@@ -139,9 +141,9 @@ public class GUICycles extends GUIComponent {
             if (color != null) {
               g.setColor(color);
             }
-            int x = 10 + (elementTime + column - 1) * 30;
-            int y = 9 + row * 15;
-            int width = 30, height = 13;
+            int x = scale(10 + (elementTime + column - 1) * DX);
+            int y = scale(9 + row * DY);
+            int width = scale(DX), height = scale(13);
 
             // Draw the colored rectangle and a black outline.
             g.fillRect(x, y, width, height);
@@ -149,7 +151,7 @@ public class GUICycles extends GUIComponent {
             g.drawRect(x, y, width, height);
 
             // Write the stage name.
-            int fontXOffset = 5, fontYOffset = 11;
+            int fontXOffset = scale(5), fontYOffset = scale(11);
             g.drawString(st, x+fontXOffset, y+fontYOffset);
             column++;
 
@@ -206,7 +208,7 @@ public class GUICycles extends GUIComponent {
       synchronized(elements) {
         int i = 0;
         for (CycleElement el : elements) {
-          int x = 5, y = 20 + i * 15;
+          int x = scale(5), y = scale(20 + i * DY);
           g.drawString(el.getName(), x, y);
           i++;
         }
