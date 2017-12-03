@@ -79,17 +79,19 @@ public class GUIData extends GUIComponent {
       tableModel = new FileTableModel(memoryAddress);
       theTable = new JTable(tableModel);
       theTable.setCellSelectionEnabled(false);
-      theTable.getColumnModel().getColumn(0).setPreferredWidth(60);
-      theTable.getColumnModel().getColumn(1).setPreferredWidth(130);
-      theTable.getColumnModel().getColumn(2).setPreferredWidth(80);
-      theTable.getColumnModel().getColumn(3).setPreferredWidth(200);
-      theTable.getColumnModel().getColumn(4).setPreferredWidth(200);
+      theTable.setFont(font);
+      theTable.getColumnModel().getColumn(0).setPreferredWidth(scale(60));
+      theTable.getColumnModel().getColumn(1).setPreferredWidth(scale(130));
+      theTable.getColumnModel().getColumn(2).setPreferredWidth(scale(80));
+      theTable.getColumnModel().getColumn(3).setPreferredWidth(scale(200));
+      theTable.getColumnModel().getColumn(4).setPreferredWidth(scale(200));
+      theTable.setRowHeight(scale(theTable.getRowHeight()));
 
       //theTable.setTableHeader(null); //cosÃ¬ visualizzo le intestazioni
+      Font headerFont = theTable.getTableHeader().getFont();
+      theTable.getTableHeader().setFont(new Font(headerFont.getName(), headerFont.getStyle(), font.getSize()));
       theTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
       theTable.setShowGrid(false);
-      Font f = new Font("Monospaced", Font.PLAIN, 12);
-      theTable.setFont(f);
       theTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
       theTable.addFocusListener(new FocusAdapter() {
@@ -238,6 +240,7 @@ public class GUIData extends GUIComponent {
         Container c = getContentPane();
         c.setLayout(GBL);
         JLabel label = new JLabel(memLabel);
+        label.setFont(font);
         c.add(label);
         GBC.gridx = 0;
         GBC.gridy = 0;

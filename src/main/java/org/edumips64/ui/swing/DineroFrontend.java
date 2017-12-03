@@ -246,7 +246,7 @@ public class DineroFrontend extends JDialog {
     result = new JTextArea();
     result.setBorder(BorderFactory.createTitledBorder("Messages"));
     result.setEditable(false);
-    result.setFont(new Font("Monospaced", Font.PLAIN, 12));
+    result.setFont(new Font("Monospaced", Font.PLAIN, config.getInt(ConfigKey.UI_FONT_SIZE)));
 
     cp.add(execute);
     cp.add(Box.createRigidArea(vSpace));

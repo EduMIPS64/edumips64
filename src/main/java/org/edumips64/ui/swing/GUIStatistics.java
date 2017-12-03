@@ -44,7 +44,7 @@ public class GUIStatistics extends GUIComponent {
   private int nCycles, nInstructions, rawStalls, codeSize, WAWStalls, dividerStalls, memoryStalls;
   private float cpi;
 
-  public GUIStatistics(CPU cpu, Memory memory, ConfigStore config) {
+  GUIStatistics(CPU cpu, Memory memory, ConfigStore config) {
     super(cpu, memory, config);
     statPanel = new StatPanel();
 
@@ -61,12 +61,12 @@ public class GUIStatistics extends GUIComponent {
                             " 0 WAR Stalls", " 0 Structural Stalls(Divider not available)", "0 Structural Stalls (Memory not available)", " 0 Branch Taken Stalls", " 0 Branch Misprediction Stalls",
                             " Code Size", " 0 Bytes", "FPU info", "FCSR", "FCSRGroups", "FCSRMnemonics", "FCSRValues"
                            };
-    public StatPanel() {
+    StatPanel() {
       super();
       setLayout(new BorderLayout());
       setBackground(Color.WHITE);
       statList = new JList(statistics);
-      statList.setFixedCellWidth(400) ;
+      statList.setFixedCellWidth(scale(400)) ;
       statList.setCellRenderer(new MyListCellRenderer());
       add(statList, BorderLayout.WEST);
     }
@@ -102,9 +102,8 @@ public class GUIStatistics extends GUIComponent {
     @Override
     public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
       statPanel.statList = list;
-      Font f = new Font("Monospaced", Font.PLAIN, 12);
       JLabel label = new JLabel();
-      label.setFont(f);
+      label.setFont(font);
 
       switch (index) {
       case 0:

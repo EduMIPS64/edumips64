@@ -38,11 +38,12 @@ public enum ConfigKey {
     FP_TOWARDS_ZERO("TOWARDZERO"),
     FP_TOWARDS_PLUS_INFINITY("TOWARDS_PLUS_INFINITY"),
     FP_TOWARDS_MINUS_INFINITY("TOWARDS_MINUS_INFINITY"),
-    FP_LONG_DOUBLE_VIEW("LONGDOUBLEVIEW");
+    FP_LONG_DOUBLE_VIEW("LONGDOUBLEVIEW"),
+    UI_FONT_SIZE("FONTSIZE");
     
     private final String text;
     
-    private ConfigKey(String text) {
+    ConfigKey(String text) {
         this.text = text;
     }
     

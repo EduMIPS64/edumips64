@@ -80,6 +80,9 @@ public abstract class ConfigStore {
 
     // How to show memory cells containing floating point values.
     ConfigStore.defaults.put(ConfigKey.FP_LONG_DOUBLE_VIEW, true);  // long=true  double=false
+
+    // UI font options.
+    ConfigStore.defaults.put(ConfigKey.UI_FONT_SIZE, 18);
   }
 
   // The interface exposes getter and setter methods for all the supported

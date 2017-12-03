@@ -23,6 +23,8 @@
 
 package org.edumips64.ui.swing;
 
+import org.edumips64.utils.ConfigKey;
+import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.io.ReadException;
 import org.edumips64.utils.io.Reader;
@@ -105,12 +107,12 @@ public class GUIIO extends JInternalFrame {
     return read_s;
   }
 
-  public GUIIO(String title, boolean resizable, boolean closable, boolean maximizable, boolean iconifiable) {
-    super(title, resizable, closable, maximizable, iconifiable);
+  public GUIIO(String title, ConfigStore config) {
+    super(title, true, false, true, true);
     output_area = new JTextArea();
     output_area.setBorder(BorderFactory.createTitledBorder("Output"));
     output_area.setEditable(false);
-    output_area.setFont(new Font("Monospaced", Font.PLAIN, 12));
+    output_area.setFont(new Font("Monospaced", Font.PLAIN, config.getInt(ConfigKey.UI_FONT_SIZE)));
 
     JButton clear = new JButton(CurrentLocale.getString("CLEAR"));
 
