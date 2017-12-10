@@ -712,6 +712,7 @@ public class Main extends JApplet {
 
     UIManager.put("Menu.font", getScaledFont((Font)UIManager.get("Menu.font")));
     UIManager.put("MenuItem.font", getScaledFont((Font)UIManager.get("MenuItem.font")));
+    UIManager.put("CheckBoxMenuItem.font", getScaledFont((Font)UIManager.get("CheckBoxMenuItem.font")));
 
     // Creation of all menus and menu items
     file = new JMenu();
