@@ -69,7 +69,7 @@ public class Main extends JApplet {
   private static ConfigStore configStore;
   private static JFileChooser jfc;
 
-  private static JFrame f = null;
+  private static JFrame mainFrame;
   private static JMenuItem open;
   private static JMenuItem reset;
   private static JMenuItem exit;
@@ -188,24 +188,49 @@ public class Main extends JApplet {
     // Creating the main JFrame
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
-    f = new JFrame();
-    f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    mainFrame = new JFrame();
+    mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     // Maximizing the application
-    Insets screenInsets = f.getToolkit().getScreenInsets(f.getGraphicsConfiguration());
-    Rectangle screenSize = f.getGraphicsConfiguration().getBounds();
+    Insets screenInsets = mainFrame.getToolkit().getScreenInsets(mainFrame.getGraphicsConfiguration());
+    Rectangle screenSize = mainFrame.getGraphicsConfiguration().getBounds();
     Rectangle maxBounds = new Rectangle(screenInsets.left + screenSize.x,
                                         screenInsets.top + screenSize.y,
                                         screenSize.x + screenSize.width - screenInsets.right - screenInsets.left,
                                         screenSize.y + screenSize.height - screenInsets.bottom - screenInsets.top);
-    f.setMaximizedBounds(maxBounds);
-    f.setBounds(maxBounds);
+    mainFrame.setMaximizedBounds(maxBounds);
+    mainFrame.setBounds(maxBounds);
 
-    f.setLocation(0, 0);
+    mainFrame.setLocation(0, 0);
     Main mm = new Main();
     mm.init();
-    f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
-    f.setVisible(true);
-    mm.start();
+    mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
+    mainFrame.setVisible(true);
+    mainFrame.setExtendedState(mainFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+    // Auto-minimze the log window and the I/O window
+    try {
+      ioFrame.setIcon(true);
+    } catch (java.beans.PropertyVetoException ignored) {}
+
+    // Tile windows once the window is maximized.
+    mainFrame.addWindowStateListener(new WindowStateListener() {
+      // Keep track of whether maximization was already done, to prevent unwanted tiling of windows when the main
+      // window is maximized again.
+        private boolean alreadyMaximized = false;
+
+        public void windowStateChanged(WindowEvent event) {
+          if (alreadyMaximized) {
+            return;
+          }
+          boolean isMaximized = (event.getNewState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
+          boolean wasMaximized = (event.getOldState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
+
+          if (isMaximized && !wasMaximized) {
+            tileWindows();
+            alreadyMaximized = true;
+          }
+        }
+     });
+
     log.info("Simulator started");
 
     if (toOpen != null) {
@@ -213,8 +238,6 @@ public class Main extends JApplet {
       openFile(toOpen);
       addFileToRecentMenu(toOpen);
     }
-
-    f.setExtendedState(f.getExtendedState() | JFrame.MAXIMIZED_BOTH);
   }
 
   private static void addFrame(String name, JInternalFrame f) {
@@ -241,7 +264,7 @@ public class Main extends JApplet {
     jfc = new JFileChooser(new File(configStore.getString(ConfigKey.LAST_DIR)));
 
     desk = new JDesktopPane();
-    Container cp = (f == null) ? getContentPane() : f.getContentPane();
+    Container cp = (mainFrame == null) ? getContentPane() : mainFrame.getContentPane();
     cp.setLayout(new BorderLayout());
     cp.add(createMenuBar(), BorderLayout.NORTH);
 
@@ -359,8 +382,8 @@ public class Main extends JApplet {
 
     // Setting icons for the main frame and for the internal frames
     try {
-      if (f != null) {
-        f.setIconImage(IMGLoader.getImage("ico.png"));
+      if (mainFrame != null) {
+        mainFrame.setIconImage(IMGLoader.getImage("ico.png"));
       }
 
     } catch (IOException e) {
@@ -401,15 +424,6 @@ public class Main extends JApplet {
     };
 
     changeShownMenuItems(cpu.getStatus());
-  }
-
-  public void start() {
-    // Auto-minimze the log window and the I/O window
-    try {
-      ioFrame.setIcon(true);
-    } catch (java.beans.PropertyVetoException ignored) {}
-
-    tileWindows();
   }
 
   /** Changes the status of running menu items.
@@ -480,7 +494,7 @@ public class Main extends JApplet {
       front.updateComponents();
       front.represent();
     } catch (Exception ex) {
-      new ReportDialog(f, ex, CurrentLocale.getString("GUI_STEP_ERROR"), VERSION);
+      new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), VERSION);
     }
 
     try {
@@ -490,7 +504,7 @@ public class Main extends JApplet {
         String absoluteFilename = new File(file).getAbsolutePath();
         parser.parse(absoluteFilename);
       } catch (ParserMultiWarningException pmwe) {
-        new ErrorDialog(f, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
+        new ErrorDialog(mainFrame, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
       } catch (NullPointerException e) {
         log.info("NullPointerException: " + e.toString());
         e.printStackTrace();
@@ -506,7 +520,7 @@ public class Main extends JApplet {
       log.info("Set the status to RUNNING");
 
       // Let's fetch the first instruction
-      cpuWorker = new CPUSwingWorker(cpu, front, f, configStore, builder, VERSION, initCallback, haltCallback, finalizeCallback);
+      cpuWorker = new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, VERSION, initCallback, haltCallback, finalizeCallback);
       cpuWorker.setSteps(1);
       cpuWorker.execute();
       while (cpuWorker.isDone()) {
@@ -522,12 +536,12 @@ public class Main extends JApplet {
         nome_file = token.nextToken();
       }
 
-      f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
+      mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
     } catch (ParserMultiException ex) {
       log.info("Error opening " + file);
-      new ErrorDialog(f, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
+      new ErrorDialog(mainFrame, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
       openedFile = null;
-      f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
+      mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
       resetSimulator(false);
     } catch (ReadException ex) {
       String tmpfile;
@@ -538,18 +552,18 @@ public class Main extends JApplet {
         tmpfile = ex.getMessage();
       }
 
-      f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
+      mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
       log.info("File not found: " + tmpfile);
-      JOptionPane.showMessageDialog(f, CurrentLocale.getString("FILE_NOT_FOUND") + ": " + tmpfile, "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(mainFrame, CurrentLocale.getString("FILE_NOT_FOUND") + ": " + tmpfile, "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
     } catch (Exception e) {
-      f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
+      mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
       log.info("Error opening " + file);
-      new ReportDialog(f, e, CurrentLocale.getString("ERROR"), VERSION);
+      new ReportDialog(mainFrame, e, CurrentLocale.getString("ERROR"), VERSION);
     }
   }
 
   /** Tiles windows. */
-  private static void tileWindows() {
+  public static void tileWindows() {
     // First of all, we don't have to consider iconified frames, because
     // the frames to be tiled are the ones that aren't iconified
     java.util.List<JInternalFrame> list = new ArrayList<>();
@@ -568,6 +582,7 @@ public class Main extends JApplet {
     }
 
     Dimension size = desk.getSize();
+    log.info("tiling windows with size: " + size);
 
     if (count == 1) {
       desk.getDesktopManager().resizeFrame(list.get(0), 0, 0, size.width, size.height);
@@ -613,11 +628,11 @@ public class Main extends JApplet {
 
   /** Sets the frame titles. Used when the locale is changed. */
   private static void setFrameTitles() {
-    if (f != null) {
+    if (mainFrame != null) {
       if (openedFile != null) {
-        f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + openedFile);
+        mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + openedFile);
       } else {
-        f.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
+        mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
       }
     }
 
@@ -741,7 +756,7 @@ public class Main extends JApplet {
     file.add(open);
     open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
     open.addActionListener(e -> {
-      int val = jfc.showOpenDialog(f);
+      int val = jfc.showOpenDialog(mainFrame);
 
       if (val == JFileChooser.APPROVE_OPTION) {
         String filename = jfc.getSelectedFile().getPath();
@@ -775,7 +790,7 @@ public class Main extends JApplet {
     dinero_tracefile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_MASK));
     dinero_tracefile.addActionListener(e -> {
       jfc.setSelectedFile(new File(openedFile + ".xdin"));
-      int val = jfc.showSaveDialog(f);
+      int val = jfc.showSaveDialog(mainFrame);
 
       if (val == JFileChooser.APPROVE_OPTION) {
         String filename = jfc.getSelectedFile().getPath();
@@ -800,7 +815,7 @@ public class Main extends JApplet {
     // Lambda to create a CPUSwingWorker. Used to have a single place where CPUSwingWorker is
     // created.
     Supplier<CPUSwingWorker> workerBuilder = () ->
-        new CPUSwingWorker(cpu, front, f, configStore, builder, VERSION, initCallback, haltCallback, finalizeCallback);
+        new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, VERSION, initCallback, haltCallback, finalizeCallback);
 
     // ---------------- EXECUTE MENU
     // Execute a single simulation step
@@ -843,7 +858,7 @@ public class Main extends JApplet {
     // ---------------- CONFIGURE MENU
 
     config.add(settings);
-    settings.addActionListener(e -> new GUIConfig(f, configStore, () -> {
+    settings.addActionListener(e -> new GUIConfig(mainFrame, configStore, () -> {
       getGUIFrontend().updateComponents();
       if (cpuWorker != null) {
         cpuWorker.updateConfigValues();
@@ -870,7 +885,7 @@ public class Main extends JApplet {
       initMenuItems();
       setFrameTitles();
       front.updateLanguageStrings();
-      // f.setVisible(true);
+      // mainFrame.setVisible(true);
     });
 
     try {
@@ -891,7 +906,7 @@ public class Main extends JApplet {
       initMenuItems();
       setFrameTitles();
       front.updateLanguageStrings();
-      // f.setVisible(true);
+      // mainFrame.setVisible(true);
     });
 
 
@@ -918,7 +933,7 @@ public class Main extends JApplet {
     // ---------------- TOOLS MENU
     dinFrontend.setEnabled(false);
     dinFrontend.addActionListener(e -> {
-      JDialog dinFrame = new DineroFrontend(f, dinero, configStore);
+      JDialog dinFrame = new DineroFrontend(mainFrame, dinero, configStore);
       dinFrame.setModal(true);
       dinFrame.setVisible(true);
     });
