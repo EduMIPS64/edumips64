@@ -29,31 +29,23 @@ import javax.swing.table.DefaultTableModel;
 import java.util.*;
 import java.awt.*;
 import javax.swing.*;
-import java.awt.event.*;
 
 /**
  * This class provides a window for configuration options.
 */
 public class ErrorDialog extends JDialog {
 
-  private static boolean[] lineIsError;
-  int numError = 0, width = 710, height = 350;
   public ErrorDialog(final JFrame owner, LinkedList<ParserException> peList, String title, Boolean showWarning) {
 
     super(owner, title, true);
 
-    lineIsError = new boolean[peList.size() * 10];
+    boolean[] lineIsError = new boolean[peList.size() * 10];
     JPanel buttonPanel = new JPanel();
 
     JButton okButton = new JButton("OK");
     buttonPanel.add(okButton);
 
-    okButton.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        setVisible(false);
-        //dispose();
-      }
-    });
+    okButton.addActionListener(e -> setVisible(false));
     buttonPanel.add(okButton);
 
     String[] columnNames = {
@@ -62,14 +54,10 @@ public class ErrorDialog extends JDialog {
       CurrentLocale.getString("ErrorDialog.LINE"),
       CurrentLocale.getString("ErrorDialog.DESCRIPTION")
     };
-    DefaultTableModel dft = new DefaultTableModel(columnNames, 0);  // peList.size());
-    //DefaultTableModel(Object[][] data, Object[] columnNames)
-    //DefaultTableModel(Object[] columnNames, int rowCount)
+    DefaultTableModel dft = new DefaultTableModel(columnNames, 0);
 
     MultiLineTable table = new MultiLineTable(dft);
     MultiLineCellRenderer renderer = new MultiLineCellRenderer(lineIsError);
-
-    //DefaultTableCellRenderer dftcr =new DefaultTableCellRenderer();
 
     table.setCellSelectionEnabled(false);
     table.setFocusable(false);
@@ -91,6 +79,7 @@ public class ErrorDialog extends JDialog {
     table.getColumnModel().getColumn(3).setCellRenderer(renderer);
 
     int i = 0;
+    int numError = 0;
     for (ParserException e : peList) {
       lineIsError[i] = e.isError();
 
@@ -116,9 +105,9 @@ public class ErrorDialog extends JDialog {
                              ((numError > 0) ? "error.png" : "warning.png")
                            )), SwingConstants.LEFT);
       label.setIconTextGap(50);
-      label.setFont(new Font("Verdana", 0, 20));
+      label.setFont(new Font("Verdana", Font.PLAIN, 20));
       label.setForeground(new Color(0, 0, 85));
-    } catch (java.io.IOException e) {}
+    } catch (java.io.IOException ignored) {}
 
     getRootPane().setDefaultButton(okButton);
     getContentPane().setLayout(new BorderLayout());
@@ -127,8 +116,9 @@ public class ErrorDialog extends JDialog {
     getContentPane().add("Center", scrollTable);
     getContentPane().add("South", buttonPanel);
 
+    int width = 710;
+    int height = 350;
     setSize(width, height);
-    setLocation((getScreenWidth() - getWidth()) / 2, (getScreenHeight() - getHeight()) / 2);
 
     if (!showWarning && numError == 0) {
       setVisible(false);
@@ -136,17 +126,5 @@ public class ErrorDialog extends JDialog {
     } else {
       setVisible(true);
     }
-
-  }
-  public boolean fileWithError() {
-    return (numError > 0);
-  }
-
-  public static int getScreenWidth() {
-    return (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-  }
-
-  public static int getScreenHeight() {
-    return (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
   }
 }

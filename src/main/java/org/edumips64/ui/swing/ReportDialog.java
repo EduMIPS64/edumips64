@@ -1,4 +1,4 @@
-/**
+/*
  * ReportDialog.java
  *
  * This class provides a window for report no-catched exception in EduMips64 code.
@@ -29,7 +29,6 @@ import org.edumips64.utils.CurrentLocale;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Toolkit;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -66,7 +65,7 @@ public class ReportDialog extends JDialog {
     titlePanel.setLayout(new BorderLayout());
     String msg = CurrentLocale.getString("ReportDialog.MSG");
     JTextArea textArea = new JTextArea(msg);
-    textArea.setFont(new Font("Verdana", 0, 20));
+    textArea.setFont(new Font("Verdana", Font.PLAIN, 20));
     textArea.setForeground(new Color(0, 0, 85));
 
     try {
@@ -83,7 +82,7 @@ public class ReportDialog extends JDialog {
     textArea.setForeground((Color) UIManager.get("Label.foreground"));
     textArea.setBorder(null);
 
-    //fill the Text Area whit Exception informations
+    // Fill the Text Area with Exception information
     String exmsg;
 
     try {
@@ -111,15 +110,6 @@ public class ReportDialog extends JDialog {
     int height = 400;
     int width = 450;
     setSize(width, height);
-    setLocation((getScreenWidth() - getWidth()) / 2, (getScreenHeight() - getHeight()) / 2);
     setVisible(true);
-  }
-
-  private static int getScreenWidth() {
-    return (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-  }
-
-  private static int getScreenHeight() {
-    return (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
   }
 }
