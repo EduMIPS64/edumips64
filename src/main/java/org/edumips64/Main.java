@@ -902,7 +902,7 @@ public class Main extends JApplet {
     manual.addActionListener(e -> {
       try {
         URL helpSetUrl = Main.class.getResource(CurrentLocale.getString("HELPDIR") + "/");
-        GUIHelp.showHelp(null, helpSetUrl);
+        GUIHelp.showHelp(null, helpSetUrl, configStore);
       } catch (Exception exx) {
         new ReportDialog(null, exx, "MIAO", VERSION);
       }
