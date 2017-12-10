@@ -23,6 +23,8 @@
 
 package org.edumips64.ui.swing;
 
+import org.edumips64.utils.ConfigKey;
+import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
 
 import javax.swing.BorderFactory;
@@ -41,8 +43,9 @@ public class StatusBar {
   private JProgressBar pb;
   private Component sbComponent;
 
-  public StatusBar(String version) {
+  public StatusBar(String version, ConfigStore cfg) {
     statusLabel = new JLabel();
+    statusLabel.setFont(statusLabel.getFont().deriveFont((float)cfg.getInt(ConfigKey.UI_FONT_SIZE)));
     statusLabel.setText(CurrentLocale.getString("StatusBar.WELCOME") + " " + version);
 
     pb = new JProgressBar(0, 10);
