@@ -52,10 +52,10 @@ import javax.swing.event.*;
 
 public class Main extends JApplet {
 
-  public static String VERSION;
-  public static String CODENAME;
-  public static String BUILD_DATE;
-  public static String GIT_REVISION;
+  private static String VERSION;
+  private static String CODENAME;
+  private static String BUILD_DATE;
+  private static String GIT_REVISION;
 
   private static CPU cpu;
   // The last created CPU Worker. Necessary for the Stop menu item.
@@ -87,7 +87,7 @@ public class Main extends JApplet {
   private static JCheckBoxMenuItem lang_en, lang_it;
   private static JCheckBoxMenuItem pipelineJCB, registersJCB, memoryJCB, codeJCB, cyclesJCB, statsJCB, ioJCB;
 
-  public static GUIIO ioFrame;
+  private static GUIIO ioFrame;
   private static IOManager iom;
 
   private final static Logger log = Logger.getLogger(Main.class.getName());
@@ -429,7 +429,7 @@ public class Main extends JApplet {
   /** Changes the status of running menu items.
    *  @param status a boolean
    */
-  public static void setRunningMenuItemsStatus(boolean status) {
+  private static void setRunningMenuItemsStatus(boolean status) {
     single_cycle.setEnabled(status);
     multi_cycle.setEnabled(status);
     run_to.setEnabled(status);
@@ -447,7 +447,7 @@ public class Main extends JApplet {
   /** Enables or disables the Stop menu item and the Settings menu item.
    *  @param status boolean
    */
-  public static void setStopStatus(boolean status) {
+  private static void setStopStatus(boolean status) {
     stop.setEnabled(status);
     settings.setEnabled(!status);
     file.setEnabled(!status);
@@ -462,7 +462,7 @@ public class Main extends JApplet {
    *
    *    @param s the new CPU status
    * */
-  public static void changeShownMenuItems(CPU.CPUStatus s) {
+  private static void changeShownMenuItems(CPU.CPUStatus s) {
     if (s == CPU.CPUStatus.READY) {
       log.info("CPU Ready");
       setCacheMenuItemsStatus(false);
@@ -563,7 +563,7 @@ public class Main extends JApplet {
   }
 
   /** Tiles windows. */
-  public static void tileWindows() {
+  private static void tileWindows() {
     // First of all, we don't have to consider iconified frames, because
     // the frames to be tiled are the ones that aren't iconified
     java.util.List<JInternalFrame> list = new ArrayList<>();
@@ -699,7 +699,7 @@ public class Main extends JApplet {
     setMenuItem(ioJCB, "IO");
   }
 
-  static Font getScaledFont(Font oldFont) {
+  private static Font getScaledFont(Font oldFont) {
     float newSize = (float) configStore.getInt(ConfigKey.UI_FONT_SIZE) / 12.0f * oldFont.getSize();
     return oldFont.deriveFont(newSize);
   }
@@ -1101,15 +1101,15 @@ public class Main extends JApplet {
     item.setText(localCaption);
   }
 
-  public static GUIFrontend getGUIFrontend() {
+  private static GUIFrontend getGUIFrontend() {
     return front;
   }
 
-  public static void startPB() {
+  private static void startPB() {
     sb.startPB();
   }
 
-  public static void stopPB() {
+  private static void stopPB() {
     sb.stopPB();
   }
 }
