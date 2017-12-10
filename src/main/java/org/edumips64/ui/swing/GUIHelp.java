@@ -23,8 +23,10 @@
 
 package org.edumips64.ui.swing;
 
-import java.awt.Dimension;
-import java.awt.Window;
+import org.edumips64.utils.ConfigKey;
+import org.edumips64.utils.ConfigStore;
+
+import java.awt.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -57,7 +59,7 @@ public class GUIHelp {
    * @param parent the window that owns this help dialog
    * @param helpSetUrl the URL to the directory of the help set.
    */
-  public static void showHelp(Window parent, URL helpSetUrl) throws HelpSetException, BadIDException, MalformedURLException {
+  public static void showHelp(Window parent, URL helpSetUrl, ConfigStore cfg) throws HelpSetException, BadIDException, MalformedURLException {
     // Clean up the URL from spaces.
     String cleanUrl = helpSetUrl.getProtocol() + ":" + helpSetUrl.getPath().replace("%20", " ");
 
@@ -65,13 +67,19 @@ public class GUIHelp {
     URLClassLoader urlclassloader = new URLClassLoader(aurl);
     URL url = HelpSet.findHelpSet(urlclassloader, HELPSET);
 
+    int desiredFontSize = cfg.getInt(ConfigKey.UI_FONT_SIZE);
+    float windowScalingFactor = desiredFontSize / 12.0f;
+
     HelpSet helpset = new HelpSet(urlclassloader, url);
     HelpBroker helpBroker = helpset.createHelpBroker();
     helpBroker.initPresentation();
-    helpBroker.setSize(new Dimension(800, 600));
+    helpBroker.setSize(new Dimension((int) (800 * windowScalingFactor), (int) (600 * windowScalingFactor)));
+    // Update the font.
+    helpBroker.setSize(helpBroker.getSize());
+    Font newFont = helpBroker.getFont().deriveFont((float)desiredFontSize);
     ((DefaultHelpBroker) helpBroker).setActivationWindow(parent);
     helpBroker.initPresentation();
-    helpBroker.setSize(helpBroker.getSize());
+    helpBroker.setFont(newFont);
     helpBroker.setDisplayed(true);
   }
 }
