@@ -54,9 +54,9 @@ public class GUIConfig extends JDialog {
   private Runnable updateCallback;
 
   // Font scaling factor.
-  float scalingFactor;
+  private float scalingFactor;
 
-  void scaleFont(Component component) {
+  private void scaleFont(Component component) {
     Font oldFont = component.getFont();
     component.setFont(oldFont.deriveFont(oldFont.getSize() * scalingFactor));
   }
@@ -99,7 +99,6 @@ public class GUIConfig extends JDialog {
     int width = (int)(700 * scalingFactor);
     int height = (int)(300 * scalingFactor);
     setSize(width, height);
-    setLocation((getScreenWidth() - getWidth()) / 2, (getScreenHeight() - getHeight()) / 2);
     setVisible(true);
   }
 
@@ -417,13 +416,6 @@ public class GUIConfig extends JDialog {
 
       setVisible(false);
     });
-  }
-  private static int getScreenWidth() {
-    return (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-  }
-
-  private static int getScreenHeight() {
-    return (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
   }
 
 }
