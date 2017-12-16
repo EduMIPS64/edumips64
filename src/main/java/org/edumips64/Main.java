@@ -254,6 +254,18 @@ public class Main extends JApplet {
     f.setVisible(true);
   }
 
+  private void setFileChooserFont(Component[] components) {
+    float newSize = configStore.getInt(ConfigKey.UI_FONT_SIZE);
+    for (Component c : components) {
+      if (c instanceof Container) {
+        setFileChooserFont(((Container) c).getComponents());
+      }
+      try {
+        c.setFont(c.getFont().deriveFont(newSize));
+      } catch (Exception ignored) {}
+    }
+  }
+
   public void init() {
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
@@ -262,6 +274,7 @@ public class Main extends JApplet {
     configStore = new JavaPrefsConfigStore(ConfigStore.defaults);
     CurrentLocale.setConfig(configStore);
     jfc = new JFileChooser(new File(configStore.getString(ConfigKey.LAST_DIR)));
+    setFileChooserFont(jfc.getComponents());
 
     desk = new JDesktopPane();
     Container cp = (mainFrame == null) ? getContentPane() : mainFrame.getContentPane();
