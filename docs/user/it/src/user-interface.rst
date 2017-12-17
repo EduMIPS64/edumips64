@@ -208,8 +208,15 @@ sono mascherate e tale opzione è abilitata, apparirà una finestra di
 dialogo, e la simulazione sarà fermata non appena tale finestra verrà
 chiusa.
 
-L'ultima sezione permette di modificare i colori associati ai diversi stadi
-della pipeline. Abbastanza inutile, ma carino.
+L'ultima sezione permette di modificare l'aspetto dell'interfaccia utente. Ci
+sono opzioni per cambiare i colori associati ai diversi stadi della pipeline,
+un'opzione per scegliere se mostrare i valori delle celle di memoria come long
+o come double ed un'opzione per impostare la dimensione del font
+dell'interfaccia.
+
+Nota: lo scaling proporzionale dell'interfaccia rispetto alla dimensione del
+font non funziona benissimo, ma dovrebbe essere sufficiente a rendere il
+simulatore utilizzabile su schermi ad alta risoluzione (e.g., 4k).
 
 Dinero Frontend
 ~~~~~~~~~~~~~~~

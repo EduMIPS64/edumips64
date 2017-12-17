@@ -199,8 +199,13 @@ dialog is closed. If exceptions are not masked and the termination option is
 checked, the dialog will pop out, and the simulation will be stopped as soon as
 the dialog is closed.
 
-The last tab allows to change the colors that are associated to the different
-pipeline stages through the frames. It's pretty useless, but it's cute.
+The last tab allows to change the appearance of the user interface. There are
+options to change the colors associated to the different pipeline stages, an
+option to choose whether memory cells are shown as long or double values and
+an option to set the UI font size.
+
+Note that the UI scaling with font size is far from perfect, but it should be
+enough to make the simulator usable with high-resolution displays (e.g., 4k).
 
 Dinero Frontend
 ~~~~~~~~~~~~~~~
