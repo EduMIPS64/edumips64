@@ -284,6 +284,9 @@ public class EndToEndTests extends BaseTest {
   @Test
   public void testHalt() throws Exception {
       CpuTestStatus status = runMipsTest("halt.s");
+
+      // Note that the proper count here should be 5, not 6. There is a long-standing bug
+      // in cycle count, see Issue #48: https://github.com/lupino3/edumips64/issues/48.
       collector.checkThat(status.cycles, equalTo(6));
       collector.checkThat(status.instructions, equalTo(1));
       collector.checkThat(status.memStalls, equalTo(0));
