@@ -494,81 +494,51 @@ public class CPU {
     currentPipeStage = newStatus;
   }
 
-  // Individual stages.
+  // Individual stages, in execution order (WB, MEM, EX, ID, IF).
+  private void stepWB() throws IrregularStringOfBitsException, HaltException {
+    changeStage(PipeStage.WB);
 
-  private void stepIF() throws IrregularStringOfBitsException, HaltException, IrregularWriteOperationException, BreakException {
-    // We don't have to execute any methods, but we must get the new
-    // instruction from the symbol table.
-    changeStage(PipeStage.IF);
+    if (pipe.get(PipeStage.WB) != null) {
+      boolean terminatorInstrInWB = terminating.contains(pipe.get(PipeStage.WB).getRepr().getHexString());
+      //we have to execute the WB method only if some conditions occur
+      //the current instruction in WB is a terminating instruction and the fpPipe is working
+      boolean notWBable = terminatorInstrInWB && !fpPipe.isEmpty();
+      //the current instruction in WB is a terminating instruction, the fpPipe doesn't work because it has just issued an instruction and it is in the MEM stage
+      notWBable = notWBable || (terminatorInstrInWB && !pipe.get(PipeStage.MEM).getName().equals(" "));
 
-    logger.info("CPU Status: " + status.name());
-
-    boolean breaking = false;
-    if (status == CPUStatus.RUNNING) {
-      if (pipe.get(PipeStage.IF) != null) {  //rispetto a dinmips scambia le load con le IF
-        try {
-          logger.info("Executing IF() for " + pipe.get(PipeStage.IF));
-          pipe.get(PipeStage.IF).IF();
-        } catch (BreakException exc) {
-          breaking = true;
-        }
+      if (!pipe.get(PipeStage.WB).getName().equals(" ")) {
+        instructions++;
       }
 
-      logger.info("Moving " + pipe.get(PipeStage.IF) + " to ID");
-      pipe.put(PipeStage.ID, pipe.get(PipeStage.IF));
-      InstructionInterface next_if = mem.getInstruction(pc);
-      logger.info("Fetched new instruction " + next_if);
-      old_pc.writeDoubleWord((pc.getValue()));
-      pc.writeDoubleWord((pc.getValue()) + 4);
-      logger.info("New Program Counter value: " + pc.toString());
-      logger.info("Putting " + next_if + "in IF.");
-      pipe.put(PipeStage.IF, next_if);
-    } else {
-      pipe.put(PipeStage.ID, bubble);
-    }
+      if (!notWBable) {
+        logger.info("Executing WB() for " + pipe.get(PipeStage.WB));
+        pipe.get(PipeStage.WB).WB();
+      }
 
-    if (breaking) {
-      logger.info("Re-throwing the BREAK exception");
-      throw new BreakException();
+      // Move the instruction in WB out of the pipeline.
+      logger.info("Instruction " + pipe.get(PipeStage.WB) + " has been completed. Removing it.");
+      pipe.put(PipeStage.WB, null);
+
+      //if the pipeline is empty and it is into the stopping state (because a long latency instruction was executed) we can halt the cpu when computations finished
+      if (isPipelinesEmpty() && getStatus() == CPUStatus.STOPPING) {
+        logger.info("Pipeline is empty and we are in STOPPING --> going to HALTED.");
+        setStatus(CPU.CPUStatus.HALTED);
+        throw new HaltException();
+      }
     }
   }
 
-  // Returns true if there is a RAW conflict, false otherwis3. See docs for Instruction.ID()
-  // for an explanation of why it is the case.
-  private boolean stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, HaltException, RAWException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
-    changeStage(PipeStage.ID);
+  private void stepMEM() throws HaltException, NotAlignException, IrregularWriteOperationException, MemoryElementNotFoundException, AddressErrorException, IrregularStringOfBitsException {
+    changeStage(PipeStage.MEM);
 
-    if (pipe.get(PipeStage.ID) != null) {
-      boolean isFP = FPPipeline.Constants.fparithmetic.contains(pipe.get(PipeStage.ID).getName());
-
-      // Check if the desired unit (FP or not) is available.
-      if (isFP && (fpPipe.putInstruction(pipe.get(PipeStage.ID), true) != 0)) {
-        if (pipe.get(PipeStage.ID).getName().compareToIgnoreCase("DIV.D") == 0) {
-          throw new FPDividerNotAvailableException();
-        } else {
-          throw new FPFunctionalUnitNotAvailableException();
-        }
-      } else if (!isFP && (pipe.get(PipeStage.EX) != null && pipe.get(PipeStage.EX).getName().compareTo(" ") != 0)) {
-          throw new EXNotAvailableException();
-      }
-
-      logger.info("Executing ID() for " + pipe.get(PipeStage.ID));
-      // Can change the CPU status from RUNNING to STOPPING.
-      boolean rawException = pipe.get(PipeStage.ID).ID();
-      if (rawException) {
-        return true;
-      }
-
-      if (isFP) {
-        logger.info("Moving " + pipe.get(PipeStage.ID) + " to the FP pipeline.");
-        fpPipe.putInstruction(pipe.get(PipeStage.ID), false);
-      } else {
-        logger.info("Moving " + pipe.get(PipeStage.ID) + " to EX");
-        pipe.put(PipeStage.EX, pipe.get(PipeStage.ID));
-      }
-      pipe.put(PipeStage.ID, null);
+    if (pipe.get(PipeStage.MEM) != null) {
+      logger.info("Executing MEM() for " + pipe.get(PipeStage.MEM));
+      pipe.get(PipeStage.MEM).MEM();
     }
-    return false;
+
+    logger.info("Moving " + pipe.get(PipeStage.MEM) + " to WB");
+    pipe.put(PipeStage.WB, pipe.get(PipeStage.MEM));
+    pipe.put(PipeStage.MEM, null);
   }
 
   private String stepEX() throws SynchronousException, HaltException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
@@ -636,49 +606,78 @@ public class CPU {
     return syncex;
   }
 
-  private void stepMEM() throws HaltException, NotAlignException, IrregularWriteOperationException, MemoryElementNotFoundException, AddressErrorException, IrregularStringOfBitsException {
-    changeStage(PipeStage.MEM);
+  // Returns true if there is a RAW conflict, false otherwis3. See docs for Instruction.ID()
+  // for an explanation of why it is the case.
+  private boolean stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, HaltException, RAWException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
+    changeStage(PipeStage.ID);
 
-    if (pipe.get(PipeStage.MEM) != null) {
-      logger.info("Executing MEM() for " + pipe.get(PipeStage.MEM));
-      pipe.get(PipeStage.MEM).MEM();
+    if (pipe.get(PipeStage.ID) != null) {
+      boolean isFP = FPPipeline.Constants.fparithmetic.contains(pipe.get(PipeStage.ID).getName());
+
+      // Check if the desired unit (FP or not) is available.
+      if (isFP && (fpPipe.putInstruction(pipe.get(PipeStage.ID), true) != 0)) {
+        if (pipe.get(PipeStage.ID).getName().compareToIgnoreCase("DIV.D") == 0) {
+          throw new FPDividerNotAvailableException();
+        } else {
+          throw new FPFunctionalUnitNotAvailableException();
+        }
+      } else if (!isFP && (pipe.get(PipeStage.EX) != null && pipe.get(PipeStage.EX).getName().compareTo(" ") != 0)) {
+        throw new EXNotAvailableException();
+      }
+
+      logger.info("Executing ID() for " + pipe.get(PipeStage.ID));
+      // Can change the CPU status from RUNNING to STOPPING.
+      boolean rawException = pipe.get(PipeStage.ID).ID();
+      if (rawException) {
+        return true;
+      }
+
+      if (isFP) {
+        logger.info("Moving " + pipe.get(PipeStage.ID) + " to the FP pipeline.");
+        fpPipe.putInstruction(pipe.get(PipeStage.ID), false);
+      } else {
+        logger.info("Moving " + pipe.get(PipeStage.ID) + " to EX");
+        pipe.put(PipeStage.EX, pipe.get(PipeStage.ID));
+      }
+      pipe.put(PipeStage.ID, null);
     }
-
-    logger.info("Moving " + pipe.get(PipeStage.MEM) + " to WB");
-    pipe.put(PipeStage.WB, pipe.get(PipeStage.MEM));
-    pipe.put(PipeStage.MEM, null);
+    return false;
   }
 
-  private void stepWB() throws IrregularStringOfBitsException, HaltException {
-    changeStage(PipeStage.WB);
+  private void stepIF() throws IrregularStringOfBitsException, HaltException, IrregularWriteOperationException, BreakException {
+    // We don't have to execute any methods, but we must get the new
+    // instruction from the symbol table.
+    changeStage(PipeStage.IF);
 
-    if (pipe.get(PipeStage.WB) != null) {
-      boolean terminatorInstrInWB = terminating.contains(pipe.get(PipeStage.WB).getRepr().getHexString());
-      //we have to execute the WB method only if some conditions occur
-      //the current instruction in WB is a terminating instruction and the fpPipe is working
-      boolean notWBable = terminatorInstrInWB && !fpPipe.isEmpty();
-      //the current instruction in WB is a terminating instruction, the fpPipe doesn't work because it has just issued an instruction and it is in the MEM stage
-      notWBable = notWBable || (terminatorInstrInWB && !pipe.get(PipeStage.MEM).getName().equals(" "));
+    logger.info("CPU Status: " + status.name());
 
-      if (!pipe.get(PipeStage.WB).getName().equals(" ")) {
-        instructions++;
+    boolean breaking = false;
+    if (status == CPUStatus.RUNNING) {
+      if (pipe.get(PipeStage.IF) != null) {  //rispetto a dinmips scambia le load con le IF
+        try {
+          logger.info("Executing IF() for " + pipe.get(PipeStage.IF));
+          pipe.get(PipeStage.IF).IF();
+        } catch (BreakException exc) {
+          breaking = true;
+        }
       }
 
-      if (!notWBable) {
-        logger.info("Executing WB() for " + pipe.get(PipeStage.WB));
-        pipe.get(PipeStage.WB).WB();
-      }
+      logger.info("Moving " + pipe.get(PipeStage.IF) + " to ID");
+      pipe.put(PipeStage.ID, pipe.get(PipeStage.IF));
+      InstructionInterface next_if = mem.getInstruction(pc);
+      logger.info("Fetched new instruction " + next_if);
+      old_pc.writeDoubleWord((pc.getValue()));
+      pc.writeDoubleWord((pc.getValue()) + 4);
+      logger.info("New Program Counter value: " + pc.toString());
+      logger.info("Putting " + next_if + "in IF.");
+      pipe.put(PipeStage.IF, next_if);
+    } else {
+      pipe.put(PipeStage.ID, bubble);
+    }
 
-      // Move the instruction in WB out of the pipeline.
-      logger.info("Instruction " + pipe.get(PipeStage.WB) + " has been completed. Removing it.");
-      pipe.put(PipeStage.WB, null);
-
-      //if the pipeline is empty and it is into the stopping state (because a long latency instruction was executed) we can halt the cpu when computations finished
-      if (isPipelinesEmpty() && getStatus() == CPUStatus.STOPPING) {
-        logger.info("Pipeline is empty and we are in STOPPING --> going to HALTED.");
-        setStatus(CPU.CPUStatus.HALTED);
-        throw new HaltException();
-      }
+    if (breaking) {
+      logger.info("Re-throwing the BREAK exception");
+      throw new BreakException();
     }
   }
 
