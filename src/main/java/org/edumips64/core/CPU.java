@@ -385,7 +385,7 @@ public class CPU {
 
   /** This method performs a single pipeline step
   */
-  public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, WAWException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException {
+  public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException {
     configFPExceptionsAndRM();
 
     String syncex;
@@ -608,7 +608,7 @@ public class CPU {
 
   // Returns true if there is a RAW conflict, false otherwis3. See docs for Instruction.ID()
   // for an explanation of why it is the case.
-  private boolean stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, HaltException, RAWException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
+  private boolean stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, HaltException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
     changeStage(PipeStage.ID);
 
     if (pipe.get(PipeStage.ID) != null) {
@@ -644,7 +644,7 @@ public class CPU {
     return false;
   }
 
-  private void stepIF() throws IrregularStringOfBitsException, HaltException, IrregularWriteOperationException, BreakException {
+  private void stepIF() throws IrregularStringOfBitsException, IrregularWriteOperationException, BreakException {
     // We don't have to execute any methods, but we must get the new
     // instruction from the symbol table.
     changeStage(PipeStage.IF);
@@ -767,15 +767,15 @@ public class CPU {
    * @return string representation of the register file contents
    */
   public String gprString() {
-    String s = "";
+    StringBuilder s = new StringBuilder();
 
     int i = 0;
 
     for (Register r : gpr) {
-      s += "Register " + i++ + ":\t" + r.toString() + "\n";
+      s.append("Register ").append(i++).append(":\t").append(r.toString()).append("\n");
     }
 
-    return s;
+    return s.toString();
   }
 
   public boolean isEnableForwarding() {
@@ -787,14 +787,14 @@ public class CPU {
    * @return a string
    */
   private String fprString() {
-    String s = "";
+    StringBuilder s = new StringBuilder();
     int i = 0;
 
     for (RegisterFP r: fpr) {
-      s += "FP Register " + i++ + ":\t" + r.toString() + "\n";
+      s.append("FP Register ").append(i++).append(":\t").append(r.toString()).append("\n");
     }
 
-    return s;
+    return s.toString();
   }
 
   private void configFPExceptionsAndRM() {
