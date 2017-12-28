@@ -105,7 +105,7 @@ contains an experimental CLI front-end.
 
 ### Submitting code
 
-We use the (GitHub Flow)[http://scottchacon.com/2011/08/31/github-flow.html]
+We use the [GitHub Flow](http://scottchacon.com/2011/08/31/github-flow.html)
 development workflow, which means that `master` is always fully working
 (the code can be built and all tests pass), and development is done in separate
 named branches. The good state of `master` is enforced by its protected
