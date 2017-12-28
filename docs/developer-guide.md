@@ -115,6 +115,11 @@ the code and executing unit tests).
 
 ### Unit tests
 
+It is expected that all new features are implemented with good unit tests coverage.
+
+There is a suite of end-to-end tests, but any significant change to core classes
+should ideally come with their own separate unit tests.
+
 Unit tests are stored in the `src/test` directory. The `resources`
 subdirectory contains MIPS64 programs that are executed during unit test as a
 form of end-to-end unit tests, whereas `java` contains the actual Java code
