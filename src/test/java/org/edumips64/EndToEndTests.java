@@ -1,4 +1,4 @@
-/* CpuTests.java
+/* EndToEndTests.java
  *
  * Tests for the EduMIPS64 CPU. These test focus on running MIPS64 programs,
  * treating the CPU as a black box and analyzing the correctness of its
@@ -53,14 +53,9 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
-public class EndToEndTests extends BaseTest {
-  private CPU cpu;
-  private Parser parser;
-  private SymbolTable symTab;
+public class EndToEndTests extends BaseWithInstructionBuilderTest {
   private final static Logger log = Logger.getLogger(EndToEndTests.class.getName());
-  private Dinero dinero;
-  private StringWriter stdOut;
-  private Memory memory;
+  private Parser parser;
   private CycleBuilder builder;
   private static String testsLocation = "src/test/resources/";
 
@@ -132,16 +127,7 @@ public class EndToEndTests extends BaseTest {
 
   @Before
   public void testSetup() {
-    memory = new Memory();
-    cpu = new CPU(memory, config, new BUBBLE());
-    cpu.setStatus(CPU.CPUStatus.READY);
-    dinero = new Dinero();
-    symTab = new SymbolTable(memory);
-    stdOut = new StringWriter();
-    FileUtils lfu = new LocalFileUtils();
-    IOManager iom = new IOManager(lfu, memory);
-    iom.setStdOutput(stdOut);
-    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
+    super.testSetup();
     parser  = new Parser(lfu, symTab, memory, instructionBuilder);
     config.putBoolean(ConfigKey.FORWARDING, true);
     fec = new FPUExceptionsConfig();
