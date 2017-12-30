@@ -280,6 +280,9 @@
             <test name="org.edumips64.EndToEndTests">
                 <formatter type="plain" usefile="false"/>
             </test>
+            <test name="org.edumips64.core.PipelineTest">
+                <formatter type="plain" usefile="false"/>
+            </test>
             <test name="org.edumips64.core.FixedBitSetTest">
                 <formatter type="plain" usefile="false"/>
             </test>
