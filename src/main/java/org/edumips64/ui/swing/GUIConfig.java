@@ -26,7 +26,6 @@ import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigStoreTypeException;
 import org.edumips64.utils.CurrentLocale;
-import org.omg.CORBA.Current;
 
 import javax.swing.*;
 import java.awt.*;
