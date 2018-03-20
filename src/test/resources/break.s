@@ -1,6 +1,25 @@
-; break.s - tests for the BREAK exception
-; (c) 2012 Andrea Spadaccini, licensed under the GNU GPL v2 or later
-; Just executes a BREAK instruction. This must work because most unit tests
+; break.s - test file for EduMIPS64.
+;
+; Simply executes a BREAK instruction. This must work because most unit tests
 ; execute BREAK on failure.
+;
+; (c) 2018 Andrea Spadaccini and the EduMIPS64 team
+;
+; This file is part of the EduMIPS64 project, and is released under the GNU
+; General Public License.
+; 
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the GNU General Public License as published by
+; the Free Software Foundation; either version 2 of the License, or
+; (at your option) any later version.
+; 
+; This program is distributed in the hope that it will be useful,
+; but WITHOUT ANY WARRANTY; without even the implied warranty of
+; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+; GNU General Public License for more details.
+; 
+; You should have received a copy of the GNU General Public License
+; along with this program; if not, write to the Free Software
+; Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
                 .code
     break
