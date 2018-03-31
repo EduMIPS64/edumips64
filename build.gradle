@@ -31,7 +31,3 @@ task getLibs(type: Copy) {
   into "libs"
   include "*.jar"
 }
-
-task wrapper(type: Wrapper) {
-   gradleVersion = '2.0' //version required
-}
