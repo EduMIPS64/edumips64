@@ -24,6 +24,7 @@
 package org.edumips64.ui.swing;
 import org.edumips64.core.CPU;
 import org.edumips64.core.Memory;
+import org.edumips64.core.Pipeline;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
@@ -43,7 +44,7 @@ class GUIPipeline extends GUIComponent {
   private int numMultiplier;
   private int numAdder;
 
-  private Map <CPU.PipeStage, InstructionInterface> pipeline;
+  private Map <Pipeline.Stage, InstructionInterface> pipeline;
 
   GUIPipeline(CPU cpu, Memory memory, ConfigStore config) {
     super(cpu, memory, config);
@@ -200,35 +201,35 @@ class GUIPipeline extends GUIComponent {
 
 
 
-      InstructionInterface i = pipeline.get(CPU.PipeStage.IF);
+      InstructionInterface i = pipeline.get(Pipeline.Stage.IF);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(new Color(config.getInt(ConfigKey.IF_COLOR)));
         g.fillRect(largh / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
-      i = pipeline.get(CPU.PipeStage.ID);
+      i = pipeline.get(Pipeline.Stage.ID);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(new Color(config.getInt(ConfigKey.ID_COLOR)));
         g.fillRect(largh * 4 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
-      i = pipeline.get(CPU.PipeStage.EX);
+      i = pipeline.get(Pipeline.Stage.EX);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(new Color(config.getInt(ConfigKey.EX_COLOR)));
         g.fillRect(largh * 9 / 20, (alt / 2) - (alt * 5 / 12), largh / 10, alt / 6);
       }
 
-      i = pipeline.get(CPU.PipeStage.MEM);
+      i = pipeline.get(Pipeline.Stage.MEM);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(new Color(config.getInt(ConfigKey.MEM_COLOR)));
         g.fillRect(largh * 14 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
-      i = pipeline.get(CPU.PipeStage.WB);
+      i = pipeline.get(Pipeline.Stage.WB);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
         g.setColor(new Color(config.getInt(ConfigKey.WB_COLOR)));
@@ -317,7 +318,7 @@ class GUIPipeline extends GUIComponent {
       g.getFontMetrics(f1);
       g.setFont(f1);
       g.setColor(Color.blue);
-      InstructionInterface i = pipeline.get(CPU.PipeStage.IF);
+      InstructionInterface i = pipeline.get(Pipeline.Stage.IF);
 
       if (i != null) {
         if (i.getName() != null && !i.getName().equals(" ")) {
@@ -325,7 +326,7 @@ class GUIPipeline extends GUIComponent {
         }
       }
 
-      i = pipeline.get(CPU.PipeStage.ID);
+      i = pipeline.get(Pipeline.Stage.ID);
 
       if (i != null) {
         if (i.getName() != null && !i.getName().equals(" ")) {
@@ -333,7 +334,7 @@ class GUIPipeline extends GUIComponent {
         }
       }
 
-      i = pipeline.get(CPU.PipeStage.EX);
+      i = pipeline.get(Pipeline.Stage.EX);
 
       if (i != null) {
         if (i.getName() != null && !i.getName().equals(" ")) {
@@ -341,7 +342,7 @@ class GUIPipeline extends GUIComponent {
         }
       }
 
-      i = pipeline.get(CPU.PipeStage.MEM);
+      i = pipeline.get(Pipeline.Stage.MEM);
 
       if (i != null) {
         if (i.getName() != null && !i.getName().equals(" ")) {
@@ -349,7 +350,7 @@ class GUIPipeline extends GUIComponent {
         }
       }
 
-      i = pipeline.get(CPU.PipeStage.WB);
+      i = pipeline.get(Pipeline.Stage.WB);
 
       if (i != null) {
         if (i.getName() != null && !i.getName().equals(" ")) {

@@ -9,23 +9,27 @@ import java.util.Map;
  * Has some convenience methods for dealing with them and making the CPU code
  * a bit simpler.
  */
-class Pipeline {
-  private Map<CPU.PipeStage, InstructionInterface> stageInstructionMap;
+public class Pipeline {
+
+  /** Pipeline stage*/
+  public enum Stage {IF, ID, EX, MEM, WB}
+
+  private Map<Stage, InstructionInterface> stageInstructionMap;
 
   Pipeline() {
     stageInstructionMap = new HashMap<>();
     clear();
   }
 
-  boolean isEmptyOrBubble(CPU.PipeStage stage) {
+  boolean isEmptyOrBubble(Stage stage) {
     return isEmpty(stage) || isBubble(stage);
   }
 
-  boolean isEmpty(CPU.PipeStage stage) {
+  boolean isEmpty(Stage stage) {
     return stageInstructionMap.get(stage) == null;
   }
 
-  boolean isBubble(CPU.PipeStage stage) {
+  boolean isBubble(Stage stage) {
     return !isEmpty(stage) && stageInstructionMap.get(stage).getName().equals(" ");
   }
 
@@ -35,11 +39,11 @@ class Pipeline {
         .count();
   }
 
-  Map<CPU.PipeStage, InstructionInterface> getInternalRepresentation() {
+  Map<Stage, InstructionInterface> getInternalRepresentation() {
     return stageInstructionMap;
   }
 
-  InstructionInterface get(CPU.PipeStage stage) {
+  InstructionInterface get(Stage stage) {
     return stageInstructionMap.get(stage);
   }
 
@@ -49,50 +53,50 @@ class Pipeline {
    * no mapping was in place.
    */
   InstructionInterface IF() {
-    return get(CPU.PipeStage.IF);
+    return get(Stage.IF);
   }
 
   InstructionInterface ID() {
-    return get(CPU.PipeStage.ID);
+    return get(Stage.ID);
   }
 
   InstructionInterface EX() {
-    return get(CPU.PipeStage.EX);
+    return get(Stage.EX);
   }
 
   InstructionInterface MEM() {
-    return get(CPU.PipeStage.MEM);
+    return get(Stage.MEM);
   }
 
   InstructionInterface WB() {
-    return get(CPU.PipeStage.WB);
+    return get(Stage.WB);
   }
 
   InstructionInterface setIF(InstructionInterface instruction) {
-    return stageInstructionMap.put(CPU.PipeStage.IF, instruction);
+    return stageInstructionMap.put(Stage.IF, instruction);
   }
 
   InstructionInterface setID(InstructionInterface instruction) {
-    return stageInstructionMap.put(CPU.PipeStage.ID, instruction);
+    return stageInstructionMap.put(Stage.ID, instruction);
   }
 
   InstructionInterface setEX(InstructionInterface instruction) {
-    return stageInstructionMap.put(CPU.PipeStage.EX, instruction);
+    return stageInstructionMap.put(Stage.EX, instruction);
   }
 
   InstructionInterface setMEM(InstructionInterface instruction) {
-    return stageInstructionMap.put(CPU.PipeStage.MEM, instruction);
+    return stageInstructionMap.put(Stage.MEM, instruction);
   }
 
   InstructionInterface setWB(InstructionInterface instruction) {
-    return stageInstructionMap.put(CPU.PipeStage.WB, instruction);
+    return stageInstructionMap.put(Stage.WB, instruction);
   }
 
   void clear() {
-    stageInstructionMap.put(CPU.PipeStage.IF, null);
-    stageInstructionMap.put(CPU.PipeStage.ID, null);
-    stageInstructionMap.put(CPU.PipeStage.EX, null);
-    stageInstructionMap.put(CPU.PipeStage.MEM, null);
-    stageInstructionMap.put(CPU.PipeStage.WB, null);
+    stageInstructionMap.put(Stage.IF, null);
+    stageInstructionMap.put(Stage.ID, null);
+    stageInstructionMap.put(Stage.EX, null);
+    stageInstructionMap.put(Stage.MEM, null);
+    stageInstructionMap.put(Stage.WB, null);
   }
 }

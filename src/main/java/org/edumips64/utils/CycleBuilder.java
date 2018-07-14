@@ -26,6 +26,7 @@
 package org.edumips64.utils;
 
 import org.edumips64.core.CPU;
+import org.edumips64.core.Pipeline;
 import org.edumips64.core.is.InstructionInterface;
 
 import java.util.*;
@@ -89,7 +90,7 @@ public class CycleBuilder {
   // This method assumes that the CPU has just finished one cycle and that it is necessary to update the
   // CycleBuilder's internal representation to match the state of the CPU.
   public void step() {
-    Map<CPU.PipeStage, InstructionInterface> pipeline = cpu.getPipeline();
+    Map<Pipeline.Stage, InstructionInterface> pipeline = cpu.getPipeline();
     curTime = cpu.getCycles();
     int instrInPipelineCount = cpu.getInstructionCount();
 
@@ -127,18 +128,18 @@ public class CycleBuilder {
 
 
       // IF
-      if (pipeline.get(CPU.PipeStage.IF) != null) {
+      if (pipeline.get(Pipeline.Stage.IF) != null) {
         // We must instantiate a new CycleElement only if the CPU is running or there was a JumpException and the the
         // IF instruction was changed (i.e., if no input stalls occurred).
         if (!inputStallOccurred) {
           synchronized(elementsList) {
             logger.info("Adding a new element to the list of elements");
-            CycleElement newElement = new CycleElement(pipeline.get(CPU.PipeStage.IF), curTime);
+            CycleElement newElement = new CycleElement(pipeline.get(Pipeline.Stage.IF), curTime);
             elementsList.add(newElement);
           }
           instructionsCount++;
         } else {
-          el = getElementToUpdate(pipeline.get(CPU.PipeStage.IF));
+          el = getElementToUpdate(pipeline.get(Pipeline.Stage.IF));
 
           if (el != null) {
             el.addState(" ");
@@ -152,7 +153,7 @@ public class CycleBuilder {
       // StEx, StDiv, StFun into the right instruction's state list
 
       // ID
-      el = getElementToUpdate(pipeline.get(CPU.PipeStage.ID));
+      el = getElementToUpdate(pipeline.get(Pipeline.Stage.ID));
       if (el != null) {
         if (!inputStallOccurred) {
           el.addState("ID");
@@ -180,7 +181,7 @@ public class CycleBuilder {
       }
 
       // EX
-      el = getElementToUpdate(pipeline.get(CPU.PipeStage.EX));
+      el = getElementToUpdate(pipeline.get(Pipeline.Stage.EX));
       if (el != null) {
         // If a structural stall(memory) occurs, the instruction in EX has to be tagged first with "EX" and then with "StEx"
         boolean exTagged = false;
@@ -200,13 +201,13 @@ public class CycleBuilder {
       }
 
       // MEM
-      el = getElementToUpdate(pipeline.get(CPU.PipeStage.MEM));
+      el = getElementToUpdate(pipeline.get(Pipeline.Stage.MEM));
       if (el != null) {
         el.addState("MEM");
       }
 
       // WB
-      el = getElementToUpdate(pipeline.get(CPU.PipeStage.WB));
+      el = getElementToUpdate(pipeline.get(Pipeline.Stage.WB));
       if (el != null) {
         el.addState("WB");
       }
