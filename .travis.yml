@@ -5,6 +5,7 @@ env:
       IzTN2uuR4nsJ8+1IRmLXxn29+MK8PuKYgArbAU/aQPPm1vIUdMv0AYF/rq9N
       YBdJJqfUHwOcGBFuwX1oKp4ykb6VTdYGOOCAN0j3IWtDXMkFM+qSTsLishyw
       wSR11Z5SzTPxMGrY8cOupSH8mckmJvecomcYLctZdYwiP72+rSs=
+  - BAZEL_VERSION=0.10.0
 notifications:
   irc:
     channels:
@@ -13,8 +14,22 @@ notifications:
 language: java
 python:
 - "2.7"
-install: "sudo pip install Sphinx==1.1.3 && gradle getLibs && sudo apt-get install ant-optional"
-script: "ant test && ant gwtc"
+install:
+  - |
+    sudo pip install Sphinx==1.1.3
+    gradle getLibs
+    sudo apt-get install ant-optional
+    URL="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh"
+    wget -O install.sh "${URL}"
+    chmod +x install.sh
+    ./install.sh --user
+    rm -f install.sh
+script:
+  - |
+    ant test
+    ant gwtc
+    bazel test //src/test/java/org/edumips64/...:all
+
 jdk:
 - oraclejdk8
 after_success: 
