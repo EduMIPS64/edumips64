@@ -11,6 +11,8 @@
 
 [Unit tests](#unit-tests)
 
+[Bazel](#bazel)
+
 ### Requirements
 
 In order to compile EduMIPS64, you need the following tools:
@@ -155,4 +157,13 @@ is also configured to report results of unit test coverage for all pull requests
 The Swing UI code is explicitly excluded from code coverage reports because
 writing tests for it is quite difficult and might not be worth it since we
 might be migrating to a new shiny web-based frontend.
+
+### Bazel
+
+[Bazel](https://bazel.io) support is currently work-in-progress. Main commands,
+to be run from the repository's base directory:
+
+* `bazel build //src/main/jaa/org/edumips64:edumips64_deploy.jar` builds a
+  self-contained JAR.
+* `bazel test //src/test/java/org/edumips64/...:all` runs all unit tests.
 
