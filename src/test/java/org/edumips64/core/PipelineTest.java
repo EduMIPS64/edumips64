@@ -21,11 +21,11 @@ public class PipelineTest extends BaseWithInstructionBuilderTest {
   @Test
   public void testEmptyPipeline() {
     assertEquals(0, pipeline.size());
-    assertTrue(pipeline.isEmpty(CPU.PipeStage.IF));
-    assertTrue(pipeline.isEmpty(CPU.PipeStage.ID));
-    assertTrue(pipeline.isEmpty(CPU.PipeStage.EX));
-    assertTrue(pipeline.isEmpty(CPU.PipeStage.MEM));
-    assertTrue(pipeline.isEmpty(CPU.PipeStage.WB));
+    assertTrue(pipeline.isEmpty(Pipeline.Stage.IF));
+    assertTrue(pipeline.isEmpty(Pipeline.Stage.ID));
+    assertTrue(pipeline.isEmpty(Pipeline.Stage.EX));
+    assertTrue(pipeline.isEmpty(Pipeline.Stage.MEM));
+    assertTrue(pipeline.isEmpty(Pipeline.Stage.WB));
     
     // Test that even with an empty pipeline the getters work.
     assertEquals(null, pipeline.IF());
@@ -60,12 +60,12 @@ public class PipelineTest extends BaseWithInstructionBuilderTest {
   @Test
   public void testIsBubble() {
     pipeline.setIF(new BUBBLE());
-    assertTrue(pipeline.isBubble(CPU.PipeStage.IF));
-    assertTrue(pipeline.isEmptyOrBubble(CPU.PipeStage.IF));
+    assertTrue(pipeline.isBubble(Pipeline.Stage.IF));
+    assertTrue(pipeline.isEmptyOrBubble(Pipeline.Stage.IF));
     
     pipeline.setIF(instructionBuilder.buildInstruction("ADD"));
-    assertFalse(pipeline.isBubble(CPU.PipeStage.IF));
-    assertFalse(pipeline.isEmptyOrBubble(CPU.PipeStage.IF));
+    assertFalse(pipeline.isBubble(Pipeline.Stage.IF));
+    assertFalse(pipeline.isEmptyOrBubble(Pipeline.Stage.IF));
   }
   
   @Test

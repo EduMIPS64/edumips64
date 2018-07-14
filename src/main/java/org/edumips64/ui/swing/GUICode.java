@@ -25,8 +25,6 @@ import org.edumips64.core.*;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.utils.*;
 import java.awt.*;
-import java.util.function.Function;
-import java.util.function.IntFunction;
 import javax.swing.*;
 import javax.swing.table.*;
 /**
@@ -69,15 +67,15 @@ public class GUICode extends GUIComponent {
     TableColumn column4 = codePanel.theTable.getColumnModel().getColumn(4);
     column4.setCellRenderer(new MyTableCellRenderer());
 
-    InstructionInterface ifInstruction = cpu.getPipeline().get(CPU.PipeStage.IF);
+    InstructionInterface ifInstruction = cpu.getPipeline().get(Pipeline.Stage.IF);
     ifIndex = memory.getInstructionIndex(ifInstruction);
     if ((ifInstruction != null) && ifInstruction.isBubble()) {
       ifIndex = -1;
     }
-    idIndex = memory.getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.ID));
-    exIndex = memory.getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.EX));
-    memIndex = memory.getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.MEM));
-    wbIndex = memory.getInstructionIndex(cpu.getPipeline().get(CPU.PipeStage.WB));
+    idIndex = memory.getInstructionIndex(cpu.getPipeline().get(Pipeline.Stage.ID));
+    exIndex = memory.getInstructionIndex(cpu.getPipeline().get(Pipeline.Stage.EX));
+    memIndex = memory.getInstructionIndex(cpu.getPipeline().get(Pipeline.Stage.MEM));
+    wbIndex = memory.getInstructionIndex(cpu.getPipeline().get(Pipeline.Stage.WB));
 
     A1Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 1));
     A2Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 2));
