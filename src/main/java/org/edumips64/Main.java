@@ -35,9 +35,11 @@ import org.edumips64.utils.io.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.Handler;
 import java.io.File;
@@ -237,6 +239,12 @@ public class Main extends JApplet {
       resetSimulator(false);
       openFile(toOpen);
       addFileToRecentMenu(toOpen);
+    }
+
+    try {
+      SwingUtilities.invokeAndWait(Main::tileWindows);
+    } catch (InterruptedException | InvocationTargetException e) {
+      log.log(Level.SEVERE, "Could not tile windows.", e);
     }
   }
 
