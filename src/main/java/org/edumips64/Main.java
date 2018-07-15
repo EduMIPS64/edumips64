@@ -255,7 +255,7 @@ public class Main extends JApplet {
     try {
       f.setFrameIcon(new ImageIcon(IMGLoader.getImage(name + ".png")));
     } catch (IOException e) {
-      e.printStackTrace();
+      log.log(Level.WARNING, "Could not add icons to frame " + name, e);
     }
 
     desk.add(f);
@@ -406,9 +406,8 @@ public class Main extends JApplet {
       if (mainFrame != null) {
         mainFrame.setIconImage(IMGLoader.getImage("ico.png"));
       }
-
     } catch (IOException e) {
-      e.printStackTrace();
+      log.log(Level.WARNING, "Could not add icon to main frame.", e);
     }
 
     front.setPipelineContainer(pipeFrame.getContentPane());
@@ -528,7 +527,7 @@ public class Main extends JApplet {
         new ErrorDialog(mainFrame, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
       } catch (NullPointerException e) {
         log.info("NullPointerException: " + e.toString());
-        e.printStackTrace();
+        log.log(Level.SEVERE, "Could not parse " + file, e);
       } finally {
         log.info(symTab.toString());
       }
@@ -823,8 +822,7 @@ public class Main extends JApplet {
           w.close();
           log.info("Wrote dinero tracefile");
         } catch (Exception ex) {
-          ex.printStackTrace();
-          log.info("Exception in DineroTracefile: " + ex);
+          log.log(Level.SEVERE, "Could not write trace file.", ex);
         }
       }
     });
@@ -895,7 +893,7 @@ public class Main extends JApplet {
         new ImageIcon(IMGLoader.getImage("en.png")),
         configStore.getString(ConfigKey.LANGUAGE).equals("en"));
     } catch (IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, "Could not create english language checkbox.", e);
     }
 
     lang.add(lang_en);
@@ -918,7 +916,7 @@ public class Main extends JApplet {
 
       lang.add(lang_it);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.log(Level.SEVERE, "Could not create italian language checkbox.", e);
     }
 
     lang_it.addActionListener(e -> {
