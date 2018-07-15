@@ -29,7 +29,7 @@ script:
     ant test
     ant gwtc
     bazel test //src/test/java/org/edumips64/...:all
-
+    bazel build //src/main/java/org/edumips64:edumips64_deploy.jar --workspace_status_command=utils/bazel-stamp.sh --stamp
 jdk:
 - oraclejdk8
 after_success: 
