@@ -1,11 +1,16 @@
 # Common values for the Sphinx configuration for all languages.
 
-# Import version from build.xml (hacky)
-from xml.dom.minidom import parse
-dom = parse('../../../../build.xml')
-init_node = [x for x in dom.getElementsByTagName('target') if x.getAttribute('name') == u'init'][0]
-version_node = [x for x in init_node.childNodes if x.nodeName == u'property' and x.getAttribute('name') == u'version'][0]
-version = version_node.getAttribute('value')
+try:
+    # Import version from build.xml (hacky)
+    # TODO(#186): make this independent from build.xml.
+    from xml.dom.minidom import parse
+    dom = parse('../../../../build.xml')
+    init_node = [x for x in dom.getElementsByTagName('target') if x.getAttribute('name') == u'init'][0]
+    version_node = [x for x in init_node.childNodes if x.nodeName == u'property' and x.getAttribute('name') == u'version'][0]
+    version = version_node.getAttribute('value')
+except:
+    version = "1.2.5"
+
 release = version
 
 # Other variables
