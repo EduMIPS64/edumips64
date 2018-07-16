@@ -936,8 +936,13 @@ public class Main extends JApplet {
     help.add(manual);
     manual.addActionListener(e -> {
       try {
-        URL helpSetUrl = Main.class.getResource(CurrentLocale.getString("HELPDIR") + "/");
-        GUIHelp.showHelp(null, helpSetUrl, configStore);
+        String hsPath = CurrentLocale.getString("HELPDIR") + "/";
+        URL helpSetUrl = Main.class.getResource(hsPath);
+        if (helpSetUrl == null) {
+          log.log(Level.SEVERE, "Could not open helpset " + hsPath);
+        } else {
+          GUIHelp.showHelp(null, helpSetUrl, configStore);
+        }
       } catch (Exception exx) {
         new ReportDialog(null, exx, "MIAO", VERSION);
       }
