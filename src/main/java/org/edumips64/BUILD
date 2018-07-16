@@ -1,6 +1,8 @@
 # Build variables.
 codename = "Nicolosi"
+
 splash_img = "org/edumips64/ui/swing/img/splash.png"
+
 version = "1.2.4"
 
 manifest_lines = [
@@ -17,10 +19,16 @@ manifest_lines = [
 # Main binary rule.
 java_binary(
     name = "edumips64",
-    main_class = "org.edumips64.Main",
-    runtime_deps = ["main-lib"],
     deploy_manifest_lines = manifest_lines,
+    main_class = "org.edumips64.Main",
+    resources = [
+        "//docs:html_it_files",
+        "//docs/user/it:javahelp",
+    ],
     stamp = 1,
+    runtime_deps = [
+        "main-lib",
+    ],
 )
 
 java_library(
