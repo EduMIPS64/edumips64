@@ -31,6 +31,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.help.BadIDException;
 import javax.help.DefaultHelpBroker;
@@ -43,37 +45,49 @@ import javax.help.HelpSetException;
  */
 public class GUIHelp {
   private final static String HELPSET = "EduMIPS64.hs";
-
-  private static URL[] parseURLs(String s) throws MalformedURLException {
-    Vector<URL> vector = new Vector<>();
-    URL url = new URL(s);
-    vector.addElement(url);
-    URL aurl[] = new URL[vector.size()];
-    vector.copyInto(aurl);
-    return aurl;
-  }
+  private final static Logger log = Logger.getLogger(GUIHelp.class.getName());
 
   /**
    * Shows the EduMIPS64 help window.
    *
+   * In case of error, logs a SEVERE error statement and returns without showing the help window.
+   *
    * @param parent the window that owns this help dialog
    * @param helpSetUrl the URL to the directory of the help set.
    */
-  public static void showHelp(Window parent, URL helpSetUrl, ConfigStore cfg) throws HelpSetException, BadIDException, MalformedURLException {
+  public static void showHelp(Window parent, URL helpSetUrl, ConfigStore cfg) {
     // Clean up the URL from spaces.
-    String cleanUrl = helpSetUrl.getProtocol() + ":" + helpSetUrl.getPath().replace("%20", " ");
+    log.info("Got helpSetUrl: <"+helpSetUrl+">");
+    String clean = helpSetUrl.getProtocol() + ":" + helpSetUrl.getPath().replace("%20", " ");
+    URL cleanUrl;
 
-    URL aurl[] = GUIHelp.parseURLs(cleanUrl);
-    URLClassLoader urlclassloader = new URLClassLoader(aurl);
+    try {
+      cleanUrl = new URL(clean);
+    } catch (MalformedURLException e) {
+      log.log(Level.SEVERE, "Could not parse Help URL_" + clean, e);
+      return;
+    }
+    log.info("Cleaned: <" + cleanUrl + ">");
+
+
+    URLClassLoader urlclassloader = new URLClassLoader(new URL[]{cleanUrl});
     URL url = HelpSet.findHelpSet(urlclassloader, HELPSET);
+    log.info("Final Helpset Url: <" + url + ">");
+
+    HelpSet helpset;
+    try {
+      helpset = new HelpSet(urlclassloader, url);
+    } catch (HelpSetException e) {
+      log.log(Level.SEVERE, "Could not load helpset " + url, e);
+      return;
+    }
 
     int desiredFontSize = cfg.getInt(ConfigKey.UI_FONT_SIZE);
     float windowScalingFactor = desiredFontSize / 12.0f;
-
-    HelpSet helpset = new HelpSet(urlclassloader, url);
     HelpBroker helpBroker = helpset.createHelpBroker();
     helpBroker.initPresentation();
     helpBroker.setSize(new Dimension((int) (800 * windowScalingFactor), (int) (600 * windowScalingFactor)));
+
     // Update the font.
     helpBroker.setSize(helpBroker.getSize());
     Font newFont = helpBroker.getFont().deriveFont((float)desiredFontSize);
