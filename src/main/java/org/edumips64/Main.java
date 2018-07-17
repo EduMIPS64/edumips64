@@ -935,17 +935,13 @@ public class Main extends JApplet {
     manual = new JMenuItem();
     help.add(manual);
     manual.addActionListener(e -> {
-      try {
         String hsPath = CurrentLocale.getString("HELPDIR") + "/";
         URL helpSetUrl = Main.class.getResource(hsPath);
         if (helpSetUrl == null) {
-          log.log(Level.SEVERE, "Could not open helpset " + hsPath);
-        } else {
-          GUIHelp.showHelp(null, helpSetUrl, configStore);
+          log.log(Level.SEVERE, "Could not create helpset URL for path: <" + hsPath + ">");
+          return;
         }
-      } catch (Exception exx) {
-        new ReportDialog(null, exx, "MIAO", VERSION);
-      }
+        GUIHelp.showHelp(null, helpSetUrl, configStore);
     });
 
     aboutUs = new JMenuItem(CurrentLocale.getString("MenuItem.ABOUT_US"));
