@@ -1,4 +1,5 @@
 ---
+sudo: false
 env:
   global:
   - secure: |-
@@ -6,14 +7,26 @@ env:
       YBdJJqfUHwOcGBFuwX1oKp4ykb6VTdYGOOCAN0j3IWtDXMkFM+qSTsLishyw
       wSR11Z5SzTPxMGrY8cOupSH8mckmJvecomcYLctZdYwiP72+rSs=
   - BAZEL_VERSION=0.10.0
+cache:
+  apt: true
+  directories:
+    - $HOME/.cache/pip
+addons:
+  apt:
+    packages:
+      - ant-optional
+      - texlive-latex-base
+      - texlive-latex-extra
+      - texlive-fonts-extra
+      - texlive-fonts-recommended
+      - texlive-lang-english
+      - texlive-lang-italian
 notifications:
   irc:
     channels:
     - irc.freenode.org#edumips64
     skip_join: true
 language: java
-python:
-- "2.7"
 install:
   - |
     set -e
@@ -23,9 +36,6 @@ install:
 
     gradle getLibs &
     GRADLE_PID=$!
-
-    sudo apt-get install ant-optional texlive-latex-base texlive-latex-extra texlive-fonts-extra texlive-fonts-recommended texlive-lang-english texlive-lang-italian &
-    APT_PID=$!
 
     # Install Bazel.
     URL="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh"
@@ -38,7 +48,6 @@ install:
     # checked.
     wait ${PIP_PID}
     wait ${GRADLE_PID}
-    wait ${APT_PID}
 script:
   - |
     set -e
