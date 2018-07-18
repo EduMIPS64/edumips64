@@ -39,6 +39,8 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
 
   # Add, commit and push files.
   cd ${GH_PAGES_DIR}
+  echo "Git status:"
+  git status
   echo -n "Committing files.. "
   git add -f .
   git add -f ${JS_DIR}
