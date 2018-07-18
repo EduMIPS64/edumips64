@@ -17,14 +17,28 @@ python:
 install:
   - |
     set -e
-    sudo pip install Sphinx==1.1.3
-    gradle getLibs
-    sudo apt-get install ant-optional texlive-latex-base texlive-latex-extra texlive-fonts-extra texlive-fonts-recommended texlive-lang-english texlive-lang-italian
+    # Parallelize downloads of dependencies.
+    sudo pip install Sphinx==1.1.3 &
+    PIP_PID=$!
+
+    gradle getLibs &
+    GRADLE_PID=$!
+
+    sudo apt-get install ant-optional texlive-latex-base texlive-latex-extra texlive-fonts-extra texlive-fonts-recommended texlive-lang-english texlive-lang-italian &
+    APT_PID=$!
+
+    # Install Bazel.
     URL="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh"
-    wget -O install.sh "${URL}"
+    wget -O install.sh -nv "${URL}"
     chmod +x install.sh
     ./install.sh --user
     rm -f install.sh
+
+    # Wait for background processes to finish. All waits are necessary to make sure the exit status of each process is
+    # checked.
+    wait ${PIP_PID}
+    wait ${GRADLE_PID}
+    wait ${APT_PID}
 script:
   - |
     set -e
