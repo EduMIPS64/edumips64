@@ -16,9 +16,10 @@ python:
 - "2.7"
 install:
   - |
+    set -e
     sudo pip install Sphinx==1.1.3
     gradle getLibs
-    sudo apt-get install ant-optional
+    sudo apt-get install ant-optional texlive-latex-base texlive-fonts-extra texlive-fonts-recommended
     URL="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh"
     wget -O install.sh "${URL}"
     chmod +x install.sh
@@ -26,8 +27,10 @@ install:
     rm -f install.sh
 script:
   - |
+    set -e
     ant test
     ant gwtc
+    ant docs
     bazel test //src/test/java/org/edumips64/...:all
     bazel build //src/main/java/org/edumips64:edumips64_deploy.jar --workspace_status_command=utils/bazel-stamp.sh --stamp
 jdk:
