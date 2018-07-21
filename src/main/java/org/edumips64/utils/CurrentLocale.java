@@ -250,7 +250,7 @@ public class CurrentLocale {
     en.put("HT.MultipleFile", "Error: -f may be used only once.");
     en.put("CLEAR", "Clear");
     en.put("DATA", "Data");
-    en.put("HELPDIR", "help/en");
+    en.put("HELPDIR", "/docs/user/en");
     en.put("NEGADDRERR", "Negative memory address error in instruction");
     en.put("ALIGNERR", "Alignment error in instruction");
     en.put("THEADDRESS", "the address");
@@ -466,7 +466,7 @@ public class CurrentLocale {
     it.put("HT.MultipleFile", "Errore: -f può essere usato una sola volta");
     it.put("CLEAR", "Pulisci");
     it.put("DATA", "Dati");
-    it.put("HELPDIR", "help/it");
+    it.put("HELPDIR", "/docs/user/it");
     it.put("NEGADDRERR", "Tentativo di accesso ad indirizzo di memoria negativo nell'istruzione");
     it.put("ALIGNERR", "Errore di allineamento nell'istruzione");
     it.put("THEADDRESS", "l'indirizzo");
