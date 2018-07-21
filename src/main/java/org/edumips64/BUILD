@@ -1,7 +1,7 @@
 # Build variables.
 codename = "Nicolosi"
 
-splash_img = "org/edumips64/ui/swing/img/splash.png"
+splash_img = "images/splash.png"
 
 version = "1.2.4"
 
