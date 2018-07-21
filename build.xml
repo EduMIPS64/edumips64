@@ -383,35 +383,39 @@
 
   <!-- Utility targets to copy files. -->
   <target name="copy-help-files">
-      <copy todir="${outputDir}/org/edumips64/help/en/html">
+      <copy todir="${outputDir}/docs/user/en/html">
         <fileset dir="docs/user/en/output/html">
-      <include name="**/*.*" />
-    </fileset>
+          <include name="**/*.*" />
+        </fileset>
       </copy>
-      <copy todir="${outputDir}/org/edumips64/help/en">
-        <fileset dir="docs/user/en/javahelp">
-      <include name="**/*.*" />
-    </fileset>
+      <copy todir="${outputDir}/docs/user/en">
+        <fileset dir="docs/user/en">
+          <include name="EduMIPS64*.*" />
+          <include name="Map.jhm" />
+          <include name="JavaHelpSearch/*.*" />
+        </fileset>
       </copy>
-      <copy todir="${outputDir}/org/edumips64/help/it/html">
+      <copy todir="${outputDir}/docs/user/it/html">
         <fileset dir="docs/user/it/output/html">
-      <include name="**/*.*" />
-    </fileset>
+          <include name="**/*.*" />
+        </fileset>
       </copy>
-      <copy todir="${outputDir}/org/edumips64/help/it/img">
-        <fileset dir="docs/user/img">
-      <include name="**/*.*" />
-    </fileset>
+      <copy todir="${outputDir}/docs/user/it/img">
+        <fileset dir="docs/user/it/img">
+          <include name="**/*.*" />
+        </fileset>
       </copy>
-      <copy todir="${outputDir}/org/edumips64/help/en/img">
-        <fileset dir="docs/user/img">
-      <include name="**/*.*" />
-    </fileset>
+      <copy todir="${outputDir}/docs/user/en/img">
+        <fileset dir="docs/user/en/img">
+          <include name="**/*.*" />
+        </fileset>
       </copy>
-      <copy todir="${outputDir}/org/edumips64/help/it">
-        <fileset dir="docs/user/it/javahelp">
-      <include name="**/*.*" />
-    </fileset>
+      <copy todir="${outputDir}/docs/user/it">
+        <fileset dir="docs/user/en">
+          <include name="EduMIPS64*.*" />
+          <include name="Map.jhm" />
+          <include name="JavaHelpSearch/*.*" />
+        </fileset>
       </copy>
   </target>
   <target name="copy-base-files">
