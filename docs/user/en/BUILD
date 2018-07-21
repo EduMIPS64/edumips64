@@ -16,6 +16,11 @@ filegroup(
 )
 
 filegroup(
+    name = "src",
+    srcs = glob(["src/*.rst"]) + ["src/conf.py"],
+)
+
+filegroup(
     name = "images",
     srcs = [
         "img/Back.png",
@@ -23,11 +28,6 @@ filegroup(
         "img/Home.png",
         "img/Print.png",
     ],
-)
-
-filegroup(
-    name = "src",
-    srcs = glob(["src/*.rst"]) + ["src/conf.py"],
 )
 
 html_files = [

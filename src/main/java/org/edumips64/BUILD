@@ -22,7 +22,11 @@ java_binary(
     deploy_manifest_lines = manifest_lines,
     main_class = "org.edumips64.Main",
     resources = [
-        "//docs:html_it_files",
+        "//docs/user/en:html",
+        "//docs/user/en:images",
+        "//docs/user/en:javahelp",
+        "//docs/user/it:html",
+        "//docs/user/it:images",
         "//docs/user/it:javahelp",
     ],
     stamp = 1,
