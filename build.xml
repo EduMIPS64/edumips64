@@ -339,7 +339,7 @@
   <target name="latest-jar" depends="compile,htmldoc">
       <property name="jar_filename" value="${latest_jar_filename}" />
       <property name="main_class" value="org.edumips64.Main" />
-      <property name="splash_img" value="org/edumips64/ui/swing/img/splash.png"/>
+      <property name="splash_img" value="images/splash.png"/>
 
       <antcall target="copy-base-files" />
       <antcall target="copy-help-files" />
@@ -351,7 +351,7 @@
   <target name="slim-jar" depends="compile">
       <property name="jar_filename" value="${slim_jar_filename}" />
       <property name="main_class" value="org.edumips64.Main" />
-      <property name="splash_img" value="org/edumips64/ui/swing/img/splash.png"/>
+      <property name="splash_img" value="images/splash.png"/>
 
       <antcall target="make-jarfile" />
   </target>
