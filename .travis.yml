@@ -59,9 +59,12 @@ script:
     ant gwtc
     ant docs
     
-    # Bazel-based tests: unit tests and building the JAR file.
+    # Bazel-based tests: unit tests and building the JAR files.
     bazel test //src/test/java/org/edumips64/...:all
-    bazel build //src/main/java/org/edumips64:edumips64_deploy.jar --workspace_status_command=utils/bazel-stamp.sh --stamp
+    bazel build //src/main/java/org/edumips64:standalone-jar --workspace_status_command=utils/bazel-stamp.sh --stamp
+    bazel build //src/main/java/org/edumips64:slim-jar --workspace_status_command=utils/bazel-stamp.sh --stamp
+    bazel build //src/main/java/org/edumips64:cli-jar --workspace_status_command=utils/bazel-stamp.sh --stamp
+
 jdk:
 - oraclejdk8
 after_success: 
