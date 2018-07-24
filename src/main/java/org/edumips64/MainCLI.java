@@ -43,6 +43,7 @@ public class MainCLI {
       CurrentLocale.setConfig(cfg);
 
       // Parse the args as early as possible, since it will influence logging level as well.
+      // TODO: extract parseArgsOrExit out of the Main class.
       String toOpen = Main.parseArgsOrExit(args);
 
       // Initialize the CPU and all its dependencies.
