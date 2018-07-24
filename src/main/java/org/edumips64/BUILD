@@ -8,11 +8,6 @@ version = "1.2.4"
 manifest_nosplash_lines = [
     "Codename: {}".format(codename),
     "Signature-Version: {}".format(version),
-
-    # Missing variables due to https://github.com/bazelbuild/bazel/issues/2009. Must be fixed before relying only
-    # on Bazel.
-    #"Build-Date: {}".format(CURRENT_TIME),
-    #"Git-Revision: {}".format(git_revision),
 ]
 
 manifest_lines = manifest_nosplash_lines + [
