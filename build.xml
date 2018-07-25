@@ -92,8 +92,9 @@
       <fileset dir="src/main/java" excludes="**/*.java"/>
     </copy>
     <copy todir="war/">
-      <fileset dir="utils">
+      <fileset dir="src/main/java/org/edumips64/client">
         <include name="edumips64.html" />
+        <include name="logo.png" />
       </fileset>
     </copy>
   </target>
