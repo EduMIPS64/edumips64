@@ -53,17 +53,20 @@ script:
   - |
     # Fail if any of the following commands fails.
     set -e
-    
+
     # Ant-based tests: run unit-tests, build the web UI, build HTML+PDF docs.
     ant test
     ant gwtc
     ant docs
-    
+
     # Bazel-based tests: unit tests and building the JAR files.
     bazel test //src/test/java/org/edumips64/...:all
     bazel build //src/main/java/org/edumips64:standalone-jar --workspace_status_command=utils/bazel-stamp.sh --stamp
     bazel build //src/main/java/org/edumips64:slim-jar --workspace_status_command=utils/bazel-stamp.sh --stamp
     bazel build //src/main/java/org/edumips64:cli-jar --workspace_status_command=utils/bazel-stamp.sh --stamp
+
+    # Build web UI.
+    bazel build //src/main/java/org/edumips64:webclient
 
 jdk:
 - oraclejdk8
