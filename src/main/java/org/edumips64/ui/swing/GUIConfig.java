@@ -35,6 +35,7 @@ import java.awt.event.FocusEvent;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -44,8 +45,9 @@ public class GUIConfig extends JDialog {
 
   private static final Logger logger = Logger.getLogger(GUIConfig.class.getName());
 
-  // Local cache of the configuration values that will need to be applied to
-  // the configuration backend.
+  // Local cache of the configuration values. Includes both modified and non-modified values.
+  // Note that existing values are stored here in order to execute a validation of configuration values before
+  // committing the changes to the ConfigStore.
   private Map<ConfigKey, Object> cache;
   private ConfigStore config;
 
@@ -84,6 +86,8 @@ public class GUIConfig extends JDialog {
     tabPanel.addTab(FPUEXCEPTIONS, makeExceptionsPanel());
     tabPanel.addTab(FPUROUNDING, makeRoundingPanel());
     tabPanel.addTab(APPEARANCE, makeAppearancePanel());
+
+    logger.log(Level.INFO, "Current values: " + cache.toString());
 
     final JPanel buttonPanel = new JPanel();
     buttonPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
@@ -267,6 +271,8 @@ public class GUIConfig extends JDialog {
       cbox.setVerticalAlignment(SwingConstants.CENTER);
       cbox.setSelected(config.getBoolean(key));
 
+      cache.put(key, config.getBoolean(key));
+
       cbox.setAction(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
           logger.info("Changing " + key + " to " + cbox.getModel().isSelected());
@@ -278,6 +284,8 @@ public class GUIConfig extends JDialog {
       rbut.setHorizontalAlignment(SwingConstants.LEFT);
       rbut.setVerticalAlignment(SwingConstants.CENTER);
       rbut.setSelected(config.getBoolean(key));
+
+      cache.put(key, config.getBoolean(key));
 
       // When a radio button is clicked, the other buttons must be deselected.
       // TODO: more generic handling of radio buttons: currently we have only
@@ -301,6 +309,8 @@ public class GUIConfig extends JDialog {
     } else if (comp instanceof JNumberField) {
       final JNumberField number = (JNumberField) comp;
       number.setNumber(config.getInt(key));
+
+      cache.put(key, config.getInt(key));
 
       number.addFocusListener(new FocusAdapter() {
         public void focusLost(FocusEvent e) {
@@ -326,6 +336,8 @@ public class GUIConfig extends JDialog {
       final JTextField text = (JTextField) comp;
       text.setText(config.getString(key));
 
+      cache.put(key, config.getString(key));
+
       text.addFocusListener(new FocusAdapter() {
         public void focusLost(FocusEvent e) {
           logger.info("focus");
@@ -342,6 +354,9 @@ public class GUIConfig extends JDialog {
       final JButton button = (JButton) comp;
       button.setBounds(0, 0, 50, 10);
       button.setBackground(new Color(config.getInt(key)));
+
+      cache.put(key, config.getInt(key));
+
       button.addActionListener(e -> {
         Color color = JColorChooser.showDialog(
                         GUIConfig.this,
@@ -392,6 +407,7 @@ public class GUIConfig extends JDialog {
     //Setting Action for each buttons
     cancelButton.addActionListener(e -> setVisible(false));
     okButton.addActionListener(e -> {
+      logger.log(Level.INFO, "Pushing values: " + cache.toString());
 
       try {
         boolean fontChanged = false;
