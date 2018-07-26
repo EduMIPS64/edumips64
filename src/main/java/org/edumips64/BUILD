@@ -1,3 +1,5 @@
+load("@io_bazel_rules_gwt//gwt:gwt.bzl", "gwt_application")
+
 # Build variables.
 codename = "Nicolosi"
 
@@ -161,6 +163,35 @@ java_library(
         "//src/main/java/org/edumips64/utils:cyclebuilder",
         "//src/main/java/org/edumips64/utils:javaprefsconfigstore",
         "//src/main/java/org/edumips64/utils:metainfo",
+        "//src/main/java/org/edumips64/utils/io",
+    ],
+)
+
+# TODO: the dev-mode doesn't seem to work, but the generated code works.
+gwt_application(
+    name = "webclient",
+    srcs = ["client/WebUi.java"],
+    compiler_flags = [
+        "-generateJsInteropExports",
+        "-strict",
+    ],
+    modules = ["org.edumips64.webclient"],
+    pubs = [
+        "client/edumips64.html",
+        "client/logo.png",
+    ],
+    resources = ["webclient.gwt.xml"],
+    deps = [
+        "//src/main/java/org/edumips64/core:cpu",
+        "//src/main/java/org/edumips64/core:dinero",
+        "//src/main/java/org/edumips64/core:iomanager",
+        "//src/main/java/org/edumips64/core:memory",
+        "//src/main/java/org/edumips64/core:symboltable",
+        "//src/main/java/org/edumips64/core/is",
+        "//src/main/java/org/edumips64/core/is:exceptions",
+        "//src/main/java/org/edumips64/core/is:instructionbuilder",
+        "//src/main/java/org/edumips64/core/parser",
+        "//src/main/java/org/edumips64/utils:config",
         "//src/main/java/org/edumips64/utils/io",
     ],
 )
