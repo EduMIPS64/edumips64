@@ -35,9 +35,6 @@ install:
     sudo pip install Sphinx==1.1.3 &
     PIP_PID=$!
 
-    gradle getLibs &
-    GRADLE_PID=$!
-
     # Install Bazel.
     URL="https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-installer-linux-x86_64.sh"
     wget -O install.sh -nv "${URL}"
@@ -48,16 +45,10 @@ install:
     # Wait for background processes to finish. All waits are necessary to make sure the exit status of each process is
     # checked.
     wait ${PIP_PID}
-    wait ${GRADLE_PID}
 script:
   - |
     # Fail if any of the following commands fails.
     set -e
-
-    # Ant-based tests: run unit-tests, build the web UI, build HTML+PDF docs.
-    ant test
-    ant gwtc
-    ant docs
 
     # Bazel-based tests: unit tests and building the JAR files.
     bazel test //src/test/java/org/edumips64/...:all
