@@ -7,4 +7,9 @@
 echo "CURRENT_TIME $(date)"
 
 # Stable variable with the most recent Git commit.
-echo "STABLE_GIT_COMMIT $(git rev-parse HEAD)"
+repo=$(basename $(git rev-parse --show-toplevel 2>/dev/null))
+branch=$(git symbolic-ref HEAD 2>/dev/null)
+branch=${branch##refs/heads/}
+rev=$(git rev-parse --short HEAD 2>/dev/null)
+
+echo "STABLE_GIT_COMMIT ${repo}:${branch}:${rev}"
