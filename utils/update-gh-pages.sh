@@ -38,10 +38,9 @@ echo "Git branch: $TRAVIS_BRANCH"
 # Execute special per-branch actions.
 if [ "$TRAVIS_BRANCH" == "master" ]; then
   # Build JAR.
-  echo -n "Building JAR.. "
-  ant latest-jar > /dev/null
+  echo -n "Copying latest JAR to ${GH_PAGES_DIR}.. "
+  cp bazel-genfiles/src/main/java/org/edumips64/edumips64-1.*.jar ${GH_PAGES_DIR}/edumips64-latest.jar
   echo "done."
-  cp edumips64-latest.jar ${GH_PAGES_DIR}
 
   # Deploy the last version of the web UI.
   deploy_webui ${GH_PAGES_DIR}
