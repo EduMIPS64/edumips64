@@ -1,7 +1,7 @@
 ### Table of Contents
 [Requirements](#requirements)
 
-[Main Ant targets](#main-ant-targets)
+[Main Bazel targets](#main-bazel-targets)
 
 [Working on the GWT frontend](#working-on-the-gwt-frontend)
 
@@ -18,20 +18,17 @@
 In order to compile EduMIPS64, you need the following tools:
 - Java JDK version 8 or above.
 - Apache Ant version 1.8 or above (needed for JUnit 4 tests)
-- Gradle
+- Bazel (http://bazel.io)
 
 To build the user documentation, you'll need:
 - GNU Make
 - Sphinx (http://sphinx.pocoo.org/) version 1.0.7 or above
 - latex / pdflatex
 
-Gradle will help you download the following dependencies:
+Bazel will download the following dependencies:
 - JUnit
 - JavaHelp
 - GWT (experimental)
-
-To download the dependencies (Javahelp, JUnit), use the `gradle getLibs`
-command. This is a necessary step before doing any development work.
 
 If you want to use the automatic style checks (pre-commit hook), then you
 should have Automatic Style (astyle) installed.
@@ -39,42 +36,47 @@ should have Automatic Style (astyle) installed.
 This project uses Travis CI for continuous integration
 (https://travis-ci.org/lupino3/edumips64).
 
-### Main Ant targets
+### Main Bazel targets
 
-The default action is `slim-jar`.
+Note that you will need to specify the command to use to generate build-time
+variables. This is done by appending the following parameters to all the
+`bazel build` commands: `--workspace_status_command=utils/bazel-stamp.sh --stamp`.
 
-* `slim-jar` builds the jar package named edumips64-`version`-nodeps.jar, that
-  does not embed the JavaHelp libraries and is oriented towards distribution
-  package creators, that should add a dependency on JavaHelp and appropriately
-  set the classpath in their scripts.
+* `//src/main/java/org/edumips64:slim-jar` builds the jar package named
+  edumips64-`version`-nodeps.jar, that does not embed the JavaHelp libraries
+  and is oriented towards distribution package creators, that should add a
+  dependency on JavaHelp and appropriately set the classpath in their scripts.
 
-* `test` runs unit tests;
+* `//src/test/java/org/edumips64/:all` runs all unit tests (to be ran with
+  `bazel test`);
 
-* `standalone-jar` builds the jar package named edumips64-`version`.jar, that
-  embeds the JavaHelp libraries, and is oriented towards users downloading the
-  JAR archive from the website (not through package managers).
+* `//src/main/java/org/edumips64:standalone-jar` builds the jar package named
+  edumips64-`version`.jar, that embeds the JavaHelp libraries, and is oriented
+  towards users downloading the JAR archive from the website (not through
+  package managers).
+  
+* `//src/main/java/org/edumips64:cli-jar` builds a jar package containing an
+  experimental CLI front-end.
 
-* `clean` removes the jar files, the build directory and the compiled
-  documentation
+* `//docs/user/en:pdf` builds the English PDF docs.
 
-* `docs` builds the user documentation (both in-app HTML and PDF)
+* `//docs/user/en:html` builds the English HTML docs.
 
-* `cli-jar` build a jar package containing an experimental CLI front-end
+* `//docs/user/it:pdf` builds the English PDF docs.
 
-* `src-release` builds a tar.bz2 file containing the source distribution
+* `//docs/user/it:html` builds the English HTML docs.
 
-* `javadoc` builds the javadoc documentation; will store it in the `javadoc`
-   directory.
-
-* `devmode` and `gwtc` are related to the GWT frontend, see below.
+* `//src/main/java/org/edumips64:{devmode,gwtc}` are related to the GWT frontend,
+  see below.
 
 ### Working on the GWT frontend
 
 An experimental web frontend, based on GWT, is being developed right now.
 Currently, only a prototype is available. The GWT code for it is in the
-`org.edumips64.client` package. The HTML file is in `contrib/edumips64.html`.
+`org.edumips64.client` package. The HTML file is at
+`src/main/java/org/edumips64/client/edumips64.html`.
 
-To work on it, run the `ant devmode` ANT target, which will fire up the GWT
+To work on it, run the `devmode` Build target, which will fire up the GWT
 developer console for you. Once the console is available, you'll be given a
 local URL where the frontend will be available.
 
@@ -82,8 +84,7 @@ Every time you change the GWT frontend, reloading that web page will cause the
 GWT console to recompile the code, thus allowing quick iteration on the web
 frontend code.
 
-To create a releasable version of the JS code, use the `gwtc` target. The
-compiled code (HTML + JS) will be stored in the `war` directory.
+To create a releasable version of the JS code, use the `gwtc` target.
 
 ### Source code structure
 
@@ -147,23 +148,8 @@ classes, possibly even an entirely new class if required.
 
 When writing new unit test classes, pay attention to the initialization code
 necessary to initialize the simulator. Look at other unit test classes to make
-sure your new class behaves as required. Finally, remember to add new unit
-test classes to the `test` target in the ant `build.xml` file.
-
-Executing unit tets via `ant test` will also produce a code coverage report,
-which can be found in the `report` subdirectory. The external service codecov.io
-is also configured to report results of unit test coverage for all pull requests.
+sure your new class behaves as required.
 
 The Swing UI code is explicitly excluded from code coverage reports because
 writing tests for it is quite difficult and might not be worth it since we
 might be migrating to a new shiny web-based frontend.
-
-### Bazel
-
-[Bazel](https://bazel.io) support is currently work-in-progress. Main commands,
-to be run from the repository's base directory:
-
-* `bazel build //src/main/jaa/org/edumips64:edumips64_deploy.jar` builds a
-  self-contained JAR.
-* `bazel test //src/test/java/org/edumips64/...:all` runs all unit tests.
-
