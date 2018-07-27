@@ -107,3 +107,4 @@ edumips64.iml
 ## Bazel
 
 /bazel-*
+.project/.blaze/
