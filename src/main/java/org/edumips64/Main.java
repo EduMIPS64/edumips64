@@ -121,10 +121,11 @@ public class Main extends JApplet {
 
   // Parses the command-line arguments.
   // Returns the filename to open (if any) and sets parameters such as logging. If necessary, exits.
-  static String parseArgsOrExit(String[] args) {
+  public static String parseArgsOrExit(String[] args) {
     // Checking CLI parameters.
     String toOpen = null;
-    boolean printUsageAndExit = false, printVersionAndExit = false;
+    boolean printUsageAndExit = false;
+    boolean printVersionAndExit = false;
 
     if (args.length > 0) {
       for (int i = 0; i < args.length; ++i) {
