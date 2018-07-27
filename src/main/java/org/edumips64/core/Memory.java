@@ -33,9 +33,14 @@ import java.util.logging.Logger;
  * The Memory is composed of MemoryElement and its size is not limited.
  */
 public class Memory {
-  /** The code and data sections limits*/
-  public static final int CODELIMIT = 16384; // 16 bit bus (2^12 / 4)
-  public static final int DATALIMIT = 8192;  // 16 bit bus (2^12 / 8)
+  /** The code and data sections limits. Note that these limits are expressed in number of memory cells,
+   *  not number of bytes.*/
+  public static final int CODELIMIT = 16384; // 16 bit bus (2^16 / 4)
+  public static final int DATALIMIT = 8192;  // 16 bit bus (2^16 / 8)
+
+  /** Instruction offset limits in bytes */
+  public static final int MAX_OFFSET_BYTES = 32768;  // 2^15
+  public static final int MIN_OFFSET_BYTES = -32767; // -2^15 - 1
 
   // Data structures for the data and code memory. In both maps, the key is represented by the index of the element.
   // The index is derived by taking the address of the given element and dividing it by its width (8 for the memory,
