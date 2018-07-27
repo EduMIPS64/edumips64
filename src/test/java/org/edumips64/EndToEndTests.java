@@ -550,4 +550,11 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testSetBitSort() throws Exception {
     runMipsTestWithAndWithoutForwarding("set-bit-sort.s");
   }
+
+  /* Issue #175: While parsing LW and SW instructions, offset cannot be negative
+     or above 8192 */
+  @Test
+  public void testLargeOffsets() throws Exception {
+    runMipsTestWithAndWithoutForwarding("large-offsets.s");
+  }
 }

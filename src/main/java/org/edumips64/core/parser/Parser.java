@@ -967,11 +967,11 @@ public class Parser {
                           int tmp = Integer.parseInt(param.substring(indPar, endPar).trim());
 
                           //if (tmp<0 || tmp%2!=0 || tmp > org.edumips64.core.CPU.DATALIMIT)
-                          if (tmp < 0 || tmp > Memory.DATALIMIT) {
+                          if (tmp < 0 || tmp > Memory.MAX_OFFSET_BYTES) {
                             numError++;
                             String er = "LABELADDRESSINVALID";
 
-                            if (tmp > Memory.DATALIMIT) {
+                            if (tmp > Memory.MAX_OFFSET_BYTES) {
                               er = "LABELTOOLARGE";
                             }
 
