@@ -257,6 +257,7 @@ public class CurrentLocale {
     en.put("ISNOTALIGNED", "is not aligned to");
     en.put("RESTART_FONT", "Please restart the simulator to use the new font.");
     en.put("NO_MASK_AND_TERMINATE", "Please choose only one option between masking synchronous exceptions and program termination on synchronous exceptions.");
+    en.put("FWD_RESET_WARNING", "Changing the forwarding setting will reset the simulation. Continue?");
     languages.put("en", en);
 
     // Italian messages.
@@ -474,6 +475,7 @@ public class CurrentLocale {
     it.put("ISNOTALIGNED", "non è allineato a");
     it.put("RESTART_FONT", "E' necessario riavviare il simulatore per utilizzare il nuovo font.");
     it.put("NO_MASK_AND_TERMINATE", "Selezionare solo una opzione tra mascheramento eccezioni sincrone e terminazione in seguito ad eccezioni sincrone.");
+    it.put("FWD_RESET_WARNING", "Cambiare la modalità di forwarding indurrà un riavvio della simulazione. Continuare?");
     languages.put("it", it);
   }
 

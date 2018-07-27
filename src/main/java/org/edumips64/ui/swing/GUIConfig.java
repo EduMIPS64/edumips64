@@ -35,6 +35,7 @@ import java.awt.event.FocusEvent;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,7 +53,7 @@ public class GUIConfig extends JDialog {
   private ConfigStore config;
 
   // Callback to call after updates.
-  private Runnable updateCallback;
+  private Consumer<Boolean> updateCallback;
 
   // Font scaling factor.
   private float scalingFactor;
@@ -62,7 +63,7 @@ public class GUIConfig extends JDialog {
     component.setFont(oldFont.deriveFont(oldFont.getSize() * scalingFactor));
   }
 
-  public GUIConfig(final JFrame owner, ConfigStore config, Runnable updateCallback) {
+  public GUIConfig(final JFrame owner, ConfigStore config, Consumer<Boolean> updateCallback) {
     super(owner, CurrentLocale.getString("Config.ITEM"), true);
     scalingFactor = config.getInt(ConfigKey.UI_FONT_SIZE) / (float)getFont().getSize();
 
@@ -417,14 +418,24 @@ public class GUIConfig extends JDialog {
           return;
         }
 
-        boolean fontChanged = false;
-        if (cache.containsKey(ConfigKey.UI_FONT_SIZE)) {
-          fontChanged = config.getInt(ConfigKey.UI_FONT_SIZE) != (Integer) cache.get(ConfigKey.UI_FONT_SIZE);
+        boolean fontChanged = config.getInt(ConfigKey.UI_FONT_SIZE) != (Integer) cache.get(ConfigKey.UI_FONT_SIZE);
+        boolean fwdChanged = config.getBoolean(ConfigKey.FORWARDING) != (Boolean) cache.get(ConfigKey.FORWARDING);
+
+        // Alert the user that the simulation will be restarted if the forwarding setting is changed.
+        if (fwdChanged) {
+            boolean shouldReset = JOptionPane.showConfirmDialog(null,
+                    CurrentLocale.getString("FWD_RESET_WARNING"), CurrentLocale.getString("GUI_WARNING"),
+                    JOptionPane.YES_NO_OPTION) == 0;
+            if (!shouldReset) {
+              return;
+            }
         }
+
         // Flush the cache to the actual configuration.
         config.mergeFromGenericMap(cache);
-        // Might be needed if show_alias is changed.
-        updateCallback.run();
+
+        // Run the update callback.
+        updateCallback.accept(fwdChanged);
 
         // Warn the user that they need to restart the simulator if they changed the font size.
         if (fontChanged) {
