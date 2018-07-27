@@ -32,6 +32,7 @@ import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 
 import java.awt.*;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 /** This class draws the cycles component. It gives a representation of the timing
@@ -115,31 +116,48 @@ public class GUICycles extends GUIComponent {
     instructionPanelSp.getViewport().setViewPosition(new Point(0, yPoint));
     cyclePanelSp.getViewport().setViewPosition(new Point(cyclePanelX, yPoint));
 
-    // Repaint container.
+    // App-triggered painting.
     cont.repaint();
   }
 
   class CyclePanel extends JPanel {
 
-    public synchronized void paintComponent(Graphics g) {
-      super.paintComponent(g);
+    public synchronized void paint(Graphics g) {
+      super.paint(g);
       setBackground(Color.white);
       g.setColor(Color.black);
       g.setFont(font);
 
+      Rectangle clip = g.getClipBounds();
+
       fill(g);
+    }
+
+    private boolean shouldDraw(CycleElement el, int row, Rectangle clipBounds) {
+      int elementTime = el.getTime();
+      int x = scale(10 + (elementTime - 1) * DX);
+      int y = scale(9 + row * DY);
+      int width = el.getStates().size() * 9 * DX;
+      int height = scale(DY - 2);
+      Rectangle elRectangle = new Rectangle(x, y, width, height);
+      return clipBounds.intersects(elRectangle);
     }
 
     synchronized void fill(Graphics g) {
       int row = 0;
 
+      Rectangle clipBounds = g.getClipBounds();
+
       java.util.List<CycleElement> elements = builder.getElementsList();
       synchronized(elements) {
         for (CycleElement el : elements) {
-          // TODO: verify rendering for other cases.
-          // TODO: should we re-draw this at every cycle?
-          // TODO: do we need to draw everything at every cycle? If x or y are outside the visible panel, we could just stop.
           if (!el.shouldRender()) {
+            continue;
+          }
+
+          // Do not draw the row if it's outside the clipping rectangle.
+          if (!shouldDraw(el, row, clipBounds)) {
+            row++;
             continue;
           }
           int column = 0;
@@ -171,7 +189,6 @@ public class GUICycles extends GUIComponent {
               pre = st;
             }
           }
-
           row++;
         }
       }
@@ -210,11 +227,13 @@ public class GUICycles extends GUIComponent {
   }
 
   class InstructionPanel extends JPanel {
-    public synchronized void paintComponent(Graphics g) {
-      super.paintComponent(g);
+    public synchronized void paint(Graphics g) {
+      super.paint(g);
       setBackground(Color.white);
       g.setColor(Color.black);
       g.setFont(font);
+
+      Rectangle clip = g.getClipBounds();
 
       java.util.List<CycleElement> elements = builder.getElementsList();
       synchronized(elements) {
@@ -222,6 +241,13 @@ public class GUICycles extends GUIComponent {
         for (CycleElement el : elements) {
           int x = scale(5);
           int y = scale(20 + row * DY);
+
+          // Do not draw the row if it's outside the clipping rectangle.
+          if (y < clip.y || y > clip.y + clip.height) {
+            row++;
+            continue;
+          }
+
           g.drawString(el.getName(), x, y);
           row++;
         }
