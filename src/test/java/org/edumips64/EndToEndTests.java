@@ -557,4 +557,8 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testLargeOffsets() throws Exception {
     runMipsTestWithAndWithoutForwarding("large-offsets.s");
   }
+  @Test
+  public void testNegativeOffsets() throws Exception {
+    runMipsTestWithAndWithoutForwarding("negative-offsets.s");
+  }
 }
