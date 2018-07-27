@@ -54,3 +54,14 @@ java_test(
         "//src/test/java/org/edumips64:basetest",
     ],
 )
+
+java_test(
+    name = "PipelineTest",
+    size = "small",
+    srcs = ["PipelineTest.java"],
+    deps = [
+        "//src/main/java/org/edumips64/core:pipeline",
+        "//src/main/java/org/edumips64/core/is",
+        "//src/test/java/org/edumips64:basewithbuildertest",
+    ],
+)
