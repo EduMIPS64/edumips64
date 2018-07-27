@@ -127,4 +127,25 @@ public abstract class ConfigStore {
       logger.severe("Type error while loading the defaults.");
     }
   }
+
+  public static boolean isValid(Map<ConfigKey, Object> values) throws ConfigStoreTypeException {
+    // Invalid configuration: mask synchronous exception and terminate on synchronous exceptions.
+
+    // Can return true if the map does not contain both keys.
+    if (!(values.containsKey(ConfigKey.SYNC_EXCEPTIONS_MASKED) && values.containsKey(ConfigKey.SYNC_EXCEPTIONS_TERMINATE))) {
+      return true;
+    }
+
+    Object masked_value = values.get(ConfigKey.SYNC_EXCEPTIONS_MASKED);
+    Object terminate_value = values.get(ConfigKey.SYNC_EXCEPTIONS_TERMINATE);
+
+    if (!((masked_value instanceof Boolean) && (terminate_value instanceof Boolean))) {
+      throw new ConfigStoreTypeException();
+    }
+
+    boolean masked = (Boolean) masked_value;
+    boolean terminate = (Boolean) terminate_value;
+
+    return !(masked && terminate);
+  }
 }
