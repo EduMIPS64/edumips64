@@ -410,6 +410,13 @@ public class GUIConfig extends JDialog {
       logger.log(Level.INFO, "Pushing values: " + cache.toString());
 
       try {
+        if (!ConfigStore.isValid(cache)) {
+          JOptionPane.showMessageDialog(null,
+                  CurrentLocale.getString("NO_MASK_AND_TERMINATE"), CurrentLocale.getString("GUI_WARNING"),
+                  JOptionPane.WARNING_MESSAGE);
+          return;
+        }
+
         boolean fontChanged = false;
         if (cache.containsKey(ConfigKey.UI_FONT_SIZE)) {
           fontChanged = config.getInt(ConfigKey.UI_FONT_SIZE) != (Integer) cache.get(ConfigKey.UI_FONT_SIZE);
@@ -432,5 +439,4 @@ public class GUIConfig extends JDialog {
       setVisible(false);
     });
   }
-
 }
