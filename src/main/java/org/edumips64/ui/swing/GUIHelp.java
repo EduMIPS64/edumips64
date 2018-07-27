@@ -30,11 +30,9 @@ import java.awt.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.help.BadIDException;
 import javax.help.DefaultHelpBroker;
 import javax.help.HelpBroker;
 import javax.help.HelpSet;
