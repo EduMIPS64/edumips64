@@ -878,10 +878,13 @@ public class Main extends JApplet {
     // ---------------- CONFIGURE MENU
 
     config.add(settings);
-    settings.addActionListener(e -> new GUIConfig(mainFrame, configStore, () -> {
+    settings.addActionListener(e -> new GUIConfig(mainFrame, configStore, (fwdChanged) -> {
       getGUIFrontend().updateComponents();
       if (cpuWorker != null) {
         cpuWorker.updateConfigValues();
+      }
+      if (fwdChanged) {
+        resetSimulator(true);
       }
     }));
     // ---------------- LANGUAGE MENU
