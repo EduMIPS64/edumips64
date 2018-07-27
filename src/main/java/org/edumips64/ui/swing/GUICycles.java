@@ -39,8 +39,8 @@ import javax.swing.*;
 * @author Filippo Mondello, Massimo Trubia (FPU modifications)
 */
 public class GUICycles extends GUIComponent {
-  public static final int DY = 15;
-  public static final int DX = 35;
+  private static final int DY = 15;
+  private static final int DX = 35;
   private CyclePanel cyclePanel;
   private JScrollPane cyclePanelSp;
   private Dimension instructionPanelDim;
