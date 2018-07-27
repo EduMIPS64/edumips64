@@ -38,6 +38,7 @@ import java.awt.event.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -95,7 +96,7 @@ public class Main extends JApplet {
   private final static Logger log = Logger.getLogger(Main.class.getName());
 
   private static Map<String, JInternalFrame> mapped_frames;
-  private static java.util.List<JInternalFrame> ordered_frames;
+  private static List<JInternalFrame> ordered_frames;
 
   private static String openedFile = null;
   private static boolean debug_mode = false;
@@ -167,7 +168,7 @@ public class Main extends JApplet {
       Logger rootLogger = log.getParent();
 
       for (Handler h : rootLogger.getHandlers()) {
-        h.setLevel(java.util.logging.Level.WARNING);
+        h.setLevel(Level.WARNING);
       }
     }
     return toOpen;
@@ -791,7 +792,7 @@ public class Main extends JApplet {
     });
 
     // Add recently opened files menu items to the recent files submenu.
-    for (String filename : Arrays.asList(configStore.getString(ConfigKey.FILES).split(File.pathSeparator))) {
+    for (String filename : configStore.getString(ConfigKey.FILES).split(File.pathSeparator)) {
       if (filename.length() > 0) {
         log.info("Adding '" + filename + "' to recently opened files.");
         addFileToRecentMenu(filename);
