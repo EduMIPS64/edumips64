@@ -29,6 +29,10 @@ public class ParserTest extends BaseTest {
   private void ParseData(String dataSectionContents) throws Exception {
     parser.doParsing(".data\n " + dataSectionContents + "\n.code\nSYSCALL 0");
   }
+  /** Allows easier testing of .code section contents by adding the ".code" prefix and the "\nSYSCALL 0" suffix. */
+  private void ParseCode(String codeSectionContents) throws Exception {
+    parser.doParsing(".code\n " + codeSectionContents + "\nSYSCALL 0");
+  }
 
   /** Parse a double value */
   private void ParseDouble(String doubleValue) throws Exception {
@@ -186,5 +190,24 @@ public class ParserTest extends BaseTest {
   @Test(expected = ParserMultiException.class)
   public void NegativeOutOfBoundsDoubleWordTest() throws Exception {
     ParseData(".word -9223372036854775809");
+  }
+
+  /** Tests for #175 */
+  @Test()
+  public void LargeValuesTest() throws Exception {
+    ParseCode("LW r1, 32768(r0)");
+    ParseCode("LW r1, -32767(r0)");
+    ParseCode("SW r1, 32768(r0)");
+    ParseCode("SW r1, -32767(r0)");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void OffsetTooLargePositiveTest() throws Exception {
+    ParseCode("LW r1, 32769(r0)");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void OffsetTooLargeNegativeTest() throws Exception {
+    ParseCode("LW r1, -32768(r0)");
   }
 }

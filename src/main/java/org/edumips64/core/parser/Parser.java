@@ -966,14 +966,9 @@ public class Parser {
                         } else if (isNumber(param.substring(indPar, endPar).trim())) {
                           int tmp = Integer.parseInt(param.substring(indPar, endPar).trim());
 
-                          //if (tmp<0 || tmp%2!=0 || tmp > org.edumips64.core.CPU.DATALIMIT)
-                          if (tmp < 0 || tmp > Memory.MAX_OFFSET_BYTES) {
+                          if (tmp < Memory.MIN_OFFSET_BYTES || tmp > Memory.MAX_OFFSET_BYTES) {
                             numError++;
                             String er = "LABELADDRESSINVALID";
-
-                            if (tmp > Memory.MAX_OFFSET_BYTES) {
-                              er = "LABELTOOLARGE";
-                            }
 
                             error.add(er, row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
                             i = line.length();

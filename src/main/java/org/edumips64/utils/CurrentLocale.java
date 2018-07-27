@@ -45,8 +45,7 @@ public class CurrentLocale {
     // English messages.
     HashMap<String, String> en = new HashMap<>();
     en.put("DOUBLE_EXT_TOO_LARGE", "Exponent over 32 bits large");
-    en.put("LABELADDRESSINVALID", "Invalid label");
-    en.put("LABELTOOLARGE", "Label value too large ");
+    en.put("LABELADDRESSINVALID", "Invalid offset: should be between -32767 and 32768 (16 bit signed).");
     en.put("FP_INVALID_OPERATION", "An invalid operation is performed");
     en.put("FP_DIV_BY_ZERO", "A division by zero is carried out");
     en.put("FP_OVERFLOW", "Floating point overflow, the number in absolute value is too large");
@@ -263,7 +262,7 @@ public class CurrentLocale {
     // Italian messages.
     HashMap<String, String> it = new HashMap<>();
     it.put("DOUBLE_EXT_TOO_LARGE", "Esponente oltre i 32 bit");
-    it.put("LABELTOOLARGE", "Numero troppo grande per una label");
+    it.put("LABELADDRESSINVALID", "Offset non valido: deve essere compreso tra -32767 e 32768 (16 bit con segno).");
     it.put("MEMORYADDRESSINVALID", "Etichetta invalida, deve essere allineata a 64 bit");
     it.put("FP_INVALID_OPERATION", "È stata eseguita un'operazione non valida");
     it.put("FP_DIV_BY_ZERO", "È stata effettuata una divisione per zero");
