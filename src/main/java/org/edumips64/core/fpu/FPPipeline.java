@@ -24,7 +24,6 @@
  */
 
 package org.edumips64.core.fpu;
-import org.edumips64.core.*;
 import org.edumips64.core.is.*;
 
 import java.util.*;
@@ -42,18 +41,15 @@ public class FPPipeline {
     public static List<String> fparithmetic = new ArrayList<>(Arrays.asList("ADD.D",
         "SUB.D", "DIV.D", "MUL.D"));
   }
-  private static int STRUCT_HAZARD = 0; //status constant of pipeStatus[]
-  private int pipeStatus[];
   private Divider divider;
   private Multiplier multiplier;
   private Adder adder;
   private int nInstructions; //used for understanding if the fpPipe is empty or not
   //FPPipeline in the same order by which they has entered
-  private int readyToExit; //number of instructions that hold the last position of the f.u.
 
 
   public FPPipeline() {
-    //Instanciating functional units objects
+    // Instantiating functional units objects.
     nInstructions = 0;
     divider = new Divider();
     divider.reset();
@@ -61,10 +57,6 @@ public class FPPipeline {
     multiplier.reset();
     adder = new Adder();
     adder.reset();
-    pipeStatus = new int[1];
-    pipeStatus[STRUCT_HAZARD] = 0; // 0 means that any structural hazard at the last getCompletedInstruction() call
-    // happened. 1 means the contrary.
-    readyToExit = 0;
   }
 
   public int size() {
@@ -77,10 +69,6 @@ public class FPPipeline {
     output += multiplier.toString();
     output += divider.toString();
     return output;
-  }
-
-  public int getNReadyToExitInstr() {
-    return readyToExit;
   }
 
   /** Returns true if the specified functional unit is filled by an instruction, false when the contrary happens.
@@ -324,13 +312,7 @@ public class FPPipeline {
     /** Returns the last instruction in the functional unit, if any instruction was found
      *  null is returned, the instruction is not removed from the HashMap */
     public InstructionInterface getInstruction() {
-      InstructionInterface instr;
-
-      if ((instr = multiplier.get(Constants.FPMultiplierStatus.M7)) == null) {
-        return null;
-      }
-
-      return instr;
+      return multiplier.get(Constants.FPMultiplierStatus.M7);
     }
 
     /** Remove the last instruction in the functional unit*/
@@ -421,13 +403,7 @@ public class FPPipeline {
     /** Returns the last instruction in the functional unit, if any instruction was found
      *  null is returned, the instruction is not removed from the HashMap */
     public InstructionInterface getInstruction() {
-      InstructionInterface instr;
-
-      if ((instr = adder.get(Constants.FPAdderStatus.A4)) == null) {
-        return null;
-      }
-
-      return instr;
+      return adder.get(Constants.FPAdderStatus.A4);
     }
 
     /** Remove the last instruction in the functional unit*/
