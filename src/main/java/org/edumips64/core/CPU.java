@@ -48,8 +48,6 @@ public class CPU {
 
   /** FPU Elements*/
   private RegisterFP[] fpr;
-  private InstructionInterface lastFPInstructionInEx;
-
   private FCSRRegister FCSR;
   private FPPipeline fpPipe;
 
@@ -369,9 +367,7 @@ public class CPU {
   */
   public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException {
     configFPExceptionsAndRM();
-
-    String syncex;
-
+    Optional<String> syncex;
     if (status != CPUStatus.RUNNING && status != CPUStatus.STOPPING) {
       throw new StoppedCPUException();
     }
@@ -394,7 +390,9 @@ public class CPU {
       // exception can be thrown.
       syncex = stepEX();
 
-      // ID: instruction decode / register fetch stage
+      // ID: instruction decode / register fetch stage. The RAW exception is handled
+      // via a return value instead of an exception because throwing exceptions proved
+      // to be a bottleneck in large programs. (See docs for Instruction.ID()).
       boolean rawException = stepID();
       if (rawException) {
         throw new RAWException();
@@ -403,8 +401,8 @@ public class CPU {
       // IF: instruction fetch stage.
       stepIF();
 
-      if (syncex != null) {
-        throw new SynchronousException(syncex);
+      if (syncex.isPresent()) {
+        throw new SynchronousException(syncex.get());
       }
     } catch (JumpException ex) {
       logger.info("Executing a Jump.");
@@ -414,6 +412,9 @@ public class CPU {
           pipe.IF().IF();
         }
       } catch (BreakException bex) {
+        // This needs to be ignored here because BREAK throws BreakException when it enters
+        // the IF stage, but if BREAK enters IF after a jump instruction is about to modify
+        // the program counter, then it must be discarded (like every other instruction).
         logger.info("Caught a BREAK after a Jump: ignoring it.");
       }
 
@@ -429,9 +430,7 @@ public class CPU {
       if (currentPipeStage == Pipeline.Stage.ID) {
         pipe.setEX(bubble);
       }
-
       RAWStalls++;
-      logger.info("RAW stalls incremented to " + RAWStalls);
 
     } catch (WAWException ex) {
       logger.info(fpPipe.toString());
@@ -439,22 +438,18 @@ public class CPU {
       if (currentPipeStage == Pipeline.Stage.ID) {
         pipe.setEX(bubble);
       }
-
       WAWStalls++;
-      logger.info("WAW stalls incremented to " + RAWStalls);
 
     } catch (FPDividerNotAvailableException ex) {
       if (currentPipeStage == Pipeline.Stage.ID) {
         pipe.setEX(bubble);
       }
-
       dividerStalls++;
 
     } catch (FPFunctionalUnitNotAvailableException ex) {
       if (currentPipeStage == Pipeline.Stage.ID) {
         pipe.setEX(bubble);
       }
-
       funcUnitStalls++;
 
     } catch (EXNotAvailableException ex) {
@@ -463,9 +458,11 @@ public class CPU {
     } catch (SynchronousException ex) {
       logger.info("Exception: " + ex.getCode());
       throw ex;
+
     } catch (HaltException ex) {
       pipe.setWB(null);
       throw ex;
+
     } finally {
       logger.info("End of cycle " + cycles + "\n---------------------------------------------\n" + pipeLineString() + "\n");
     }
@@ -477,7 +474,7 @@ public class CPU {
   }
 
   // Individual stages, in execution order (WB, MEM, EX, ID, IF).
-  private void stepWB() throws IrregularStringOfBitsException, HaltException {
+  private void stepWB() throws HaltException, IrregularStringOfBitsException {
     changeStage(Pipeline.Stage.WB);
 
     if (pipe.isEmpty(Pipeline.Stage.WB)) {
@@ -525,7 +522,7 @@ public class CPU {
     pipe.setMEM(null);
   }
 
-  private String stepEX() throws SynchronousException, HaltException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
+  private Optional<String> stepEX() throws SynchronousException, HaltException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
     changeStage(Pipeline.Stage.EX);
 
     // Used for exception handling
@@ -533,32 +530,29 @@ public class CPU {
     boolean terminate = config.getBoolean(ConfigKey.SYNC_EXCEPTIONS_TERMINATE);
 
     // Code of the synchronous exception that happens in EX.
-    String syncex = null;
+    Optional<String> syncex = Optional.empty();
 
+    // If the FPU has one completed instruction, that one should be executed. Otherwise, the instruction in the EX
+    // stage should be executed.
     InstructionInterface completedFpInstruction = fpPipe.getCompletedInstruction();
-    InstructionInterface instruction;
-    boolean shouldExecuteFP = completedFpInstruction != null;
 
-    // if there will be a stall because a lot of instructions would fill the MEM stage, the EX()
-    // method cannot be called because the integer instruction in EX cannot be moved.
-    if (!shouldExecuteFP) {
-      instruction = pipe.EX();
-    } else {
-      //a structural stall has to be raised if the EX stage contains an instruction different from a bubble or other fu's contain instructions (counter of structural stalls must be incremented)
-      if (!pipe.isEmptyOrBubble(Pipeline.Stage.EX) ||fpPipe.getNReadyToExitInstr() > 1) {
+    // Actual instruction to execute this cycle.
+    InstructionInterface toExecute = pipe.EX();
+    if (completedFpInstruction != null) {
+      // If there is a completed FP instruction, we give precedence to that one.
+      toExecute = completedFpInstruction;
+
+      // A structural stall has to be raised if the EX stage contains an instruction different from a bubble.
+      if (!pipe.isEmptyOrBubble(Pipeline.Stage.EX)) {
         memoryStalls++;
       }
-      instruction = completedFpInstruction;
-
-      // Keep track of the last FP instruction in EX.
-      lastFPInstructionInEx = instruction;
     }
 
     // Execute the instruction, and handle synchronous exceptions.
-    if (instruction != null) {
+    if (toExecute != null) {
       try {
-        logger.info("Executing EX() for " + instruction);
-        instruction.EX();
+        logger.info("Executing EX() for " + toExecute);
+        toExecute.EX();
       } catch (SynchronousException e) {
         if (masked) {
           logger.info("[EXCEPTION] [MASKED] " + e.getCode());
@@ -568,18 +562,17 @@ public class CPU {
             throw new SynchronousException(e.getCode());
           } else {
             // We must complete this cycle, but we must notify the user.
-            // If the syncex string is not null, the CPU code will throw
+            // If the syncex contains a string, the CPU code will throw
             // the exception at the end of the step
-            syncex = e.getCode();
+            syncex = Optional.of(e.getCode());
           }
         }
       }
     }
 
-    InstructionInterface toMove = shouldExecuteFP ? lastFPInstructionInEx : pipe.EX();
-    logger.info("Moving " + toMove + " to MEM");
-    pipe.setMEM(toMove);
-    if (!shouldExecuteFP) {
+    logger.info("Moving " + toExecute + " to MEM");
+    pipe.setMEM(toExecute);
+    if (completedFpInstruction == null) {
       pipe.setEX(null);
     }
     // Shift instructions in the fpPipe.
@@ -594,37 +587,39 @@ public class CPU {
   private boolean stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, HaltException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
     changeStage(Pipeline.Stage.ID);
 
-    if (!pipe.isEmpty(Pipeline.Stage.ID)) {
-      boolean isFP = FPPipeline.Constants.fparithmetic.contains(pipe.get(Pipeline.Stage.ID).getName());
-
-      // Check if the desired unit (FP or not) is available.
-      if (isFP && (fpPipe.putInstruction(pipe.ID(), true) != 0)) {
-        if (pipe.ID().getName().compareToIgnoreCase("DIV.D") == 0) {
-          throw new FPDividerNotAvailableException();
-        } else {
-          throw new FPFunctionalUnitNotAvailableException();
-        }
-      } else if (!isFP && (!pipe.isEmpty(Pipeline.Stage.EX) && !pipe.isBubble(Pipeline.Stage.EX))) {
-        throw new EXNotAvailableException();
-      }
-
-      logger.info("Executing ID() for " + pipe.ID());
-      // Can change the CPU status from RUNNING to STOPPING.
-      boolean rawException = pipe.ID().ID();
-      if (rawException) {
-        return true;
-      }
-
-      if (isFP) {
-        logger.info("Moving " + pipe.ID() + " to the FP pipeline.");
-        fpPipe.putInstruction(pipe.ID(), false);
-      } else {
-        logger.info("Moving " + pipe.ID() + " to EX");
-        pipe.setEX(pipe.ID());
-      }
-
-      pipe.setID(null);
+    if (pipe.isEmpty(Pipeline.Stage.ID)) {
+      return false;
     }
+
+    boolean isFP = FPPipeline.Constants.fparithmetic.contains(pipe.get(Pipeline.Stage.ID).getName());
+
+    // Check if the desired unit (FP or not) is available.
+    if (isFP && (fpPipe.putInstruction(pipe.ID(), true) != 0)) {
+      if (pipe.ID().getName().compareToIgnoreCase("DIV.D") == 0) {
+        throw new FPDividerNotAvailableException();
+      } else {
+        throw new FPFunctionalUnitNotAvailableException();
+      }
+    } else if (!isFP && (!pipe.isEmpty(Pipeline.Stage.EX) && !pipe.isBubble(Pipeline.Stage.EX))) {
+      throw new EXNotAvailableException();
+    }
+
+    logger.info("Executing ID() for " + pipe.ID());
+    // Can change the CPU status from RUNNING to STOPPING.
+    boolean rawException = pipe.ID().ID();
+    if (rawException) {
+      return true;
+    }
+
+    if (isFP) {
+      logger.info("Moving " + pipe.ID() + " to the FP pipeline.");
+      fpPipe.putInstruction(pipe.ID(), false);
+    } else {
+      logger.info("Moving " + pipe.ID() + " to EX");
+      pipe.setEX(pipe.ID());
+    }
+
+    pipe.setID(null);
     return false;
   }
 
