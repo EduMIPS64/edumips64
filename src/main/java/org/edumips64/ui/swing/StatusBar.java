@@ -40,6 +40,7 @@ import java.awt.Dimension;
 
 public class StatusBar {
   private JLabel statusLabel;
+  private JLabel cpuStatusLabel;
   private JProgressBar pb;
   private Component sbComponent;
 
@@ -47,6 +48,9 @@ public class StatusBar {
     statusLabel = new JLabel();
     statusLabel.setFont(statusLabel.getFont().deriveFont((float)cfg.getInt(ConfigKey.UI_FONT_SIZE)));
     statusLabel.setText(CurrentLocale.getString("StatusBar.WELCOME") + " " + version);
+
+    cpuStatusLabel = new JLabel();
+    cpuStatusLabel.setFont(statusLabel.getFont().deriveFont((float)cfg.getInt(ConfigKey.UI_FONT_SIZE)));
 
     pb = new JProgressBar(0, 10);
     pb.setMaximumSize(new Dimension(60, 10));
@@ -57,6 +61,7 @@ public class StatusBar {
     box.setBorder(BorderFactory.createLoweredBevelBorder());
     box.add(statusLabel);
     box.add(Box.createHorizontalGlue());
+    box.add(cpuStatusLabel);
     box.add(pb);
 
     //sbComponent = statusLabel;
@@ -78,5 +83,7 @@ public class StatusBar {
   public void setText(String text) {
     statusLabel.setText(text);
   }
+
+  public void setCpuStatusText(String text) {cpuStatusLabel.setText(text + "  ");}
 }
 

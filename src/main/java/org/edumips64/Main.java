@@ -305,6 +305,8 @@ public class Main extends JApplet {
     sb = new StatusBar(VERSION, configStore);
     front = new GUIFrontend(cpu, memory, configStore, builder, sb);
 
+    cpu.setCpuStatusChangeCallback(sb::setCpuStatusText);
+
     UIManager.put("InternalFrame.titleFont", getScaledFont((Font)UIManager.get("InternalFrame.titleFont")));
 
     // Internal Frames

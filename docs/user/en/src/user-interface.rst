@@ -9,8 +9,24 @@ The EduMIPS64 main window is composed by a menu bar and six frames, showing
 different aspects of the simulation. There's also a status bar, that has the
 double purpose to show the content of memory cells and registers when you
 click them and to notify the user that the simulator is running when the
-simulation has been started but verbose mode is not selected. There are more
-details in the following section.
+simulation has been started but verbose mode is not selected.
+
+The status bar also shows the CPU status. It can show one of the following four
+states:
+
+* *READY* The CPU hasn't executed any instructions (no program is loaded).
+* *RUNNING* The CPU is executing a series of instructions.
+* *STOPPING* The CPU has found a termination instruction, and is executing the
+  instructions that are already in the pipeline before terminating the execution.
+* *HALTED* The CPU is stopped: a program just finished running.
+
+Note that the CPU status is different from the simulator status. The simulator may
+execute a number of CPU cycles and then stop executing, allowing the user to inspect
+memory and registers: in this state, between CPU cycles, the CPU stays in *RUNNING*
+or *STOPPING* state. Once the CPU reaches the *HALTED* state, the user cannot run
+any CPU cycle without loading a program again (the same program, or a different one).
+
+There are more details in the following sections.
 
 The menu bar
 ------------
