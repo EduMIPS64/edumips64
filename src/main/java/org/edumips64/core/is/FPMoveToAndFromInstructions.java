@@ -49,7 +49,7 @@ public abstract class FPMoveToAndFromInstructions extends ComputationalInstructi
     this.syntax = "%R,%F";
     this.paramCount = 2;
   }
-  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException;
+  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException;
   public abstract void EX() throws IrregularStringOfBitsException, IrregularWriteOperationException;
   public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException {};
   public abstract void WB() throws IrregularStringOfBitsException;

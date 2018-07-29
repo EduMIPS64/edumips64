@@ -44,7 +44,7 @@ public class JALR extends FlowControl_RType {
     this.name = "JALR";
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     // TODO(andrea): we should probably WAW on R31.
     if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0) {
       return true;

@@ -51,7 +51,7 @@ public abstract class FPFormattedOperandMoveInstructions extends ComputationalIn
     this.syntax = "%F,%F";
     this.paramCount = 2;
   }
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the source register is valid we pass its own value into a temporary register
     RegisterFP fd = cpu.getRegisterFP(params.get(FD_FIELD));
     RegisterFP fs = cpu.getRegisterFP(params.get(FS_FIELD));

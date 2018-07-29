@@ -53,7 +53,7 @@ public class DSRA extends ALU_RType {
   }
   //since this operation is carried out writing sa value as unsigned value, it is necessary
   //the overriding of ID method
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the source register is valid passing his own value into a temporary register
     Register rt = cpu.getRegister(params.get(RT_FIELD));
 

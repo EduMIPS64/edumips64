@@ -46,7 +46,7 @@ public class J extends FlowControl_JType {
     this.name = "J";
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //converting INSTR_INDEX into a bynary value of 26 bits in length
     String instr_index = Converter.positiveIntToBin(28, params.get(INSTR_INDEX));
     //appending the 35 most significant bits of the program counter on the left of "instr_index"

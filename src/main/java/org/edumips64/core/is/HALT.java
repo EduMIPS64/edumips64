@@ -49,15 +49,15 @@ public class HALT extends Instruction {
       e.printStackTrace();
     }
   }
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     cpu.setStatus(CPU.CPUStatus.STOPPING);
     return false;
   }
 
-  public void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
   }
 
-  public void MEM() throws HaltException, IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+  public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
   }
 
   public void WB() throws HaltException, IrregularStringOfBitsException {

@@ -49,17 +49,17 @@ public class BREAK extends Instruction {
 
     throw new BreakException();
   }
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     return false;
   }
 
-  public void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
+  public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
   }
 
-  public void MEM() throws HaltException, IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
+  public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException {
   }
 
-  public void WB() throws HaltException, IrregularStringOfBitsException {
+  public void WB() throws IrregularStringOfBitsException {
   }
 
   public void pack() throws IrregularStringOfBitsException {

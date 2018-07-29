@@ -46,7 +46,7 @@ public class BC1F extends FPConditionalBranchesInstructions {
     super.name = NAME;
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     boolean condition = cpu.getFCSRConditionCode(params.get(CC_FIELD)) == 0;
 
     //converting offset into a signed binary value of 64 bits in length

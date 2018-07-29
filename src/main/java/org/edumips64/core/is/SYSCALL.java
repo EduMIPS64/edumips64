@@ -61,7 +61,7 @@ public class SYSCALL extends Instruction {
     }
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     if (syscall_n == 0) {
       logger.info("Stopping CPU due to SYSCALL (" + this.hashCode() + ")");
       cpu.setStatus(CPU.CPUStatus.STOPPING);

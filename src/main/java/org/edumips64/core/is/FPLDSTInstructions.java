@@ -40,7 +40,7 @@ public abstract class FPLDSTInstructions extends LDSTInstructions {
     this.syntax = "%F,%L(%R)";
     this.paramCount = 3;
   }
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     return false;
   }
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException {}

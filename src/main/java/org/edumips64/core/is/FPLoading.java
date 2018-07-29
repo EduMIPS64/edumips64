@@ -39,7 +39,7 @@ public abstract class FPLoading extends FPLDSTInstructions {
     super(memory);
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the base register is valid ...
     Register base = cpu.getRegister(params.get(BASE_FIELD));
 

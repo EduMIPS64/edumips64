@@ -59,7 +59,7 @@ public abstract class FPC_cond_DInstructions extends ComputationalInstructions {
     paramCount = 3;
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if source registers are valid passing their own values into temporary registers
     RegisterFP fs = cpu.getRegisterFP(params.get(FS_FIELD));
     RegisterFP ft = cpu.getRegisterFP(params.get(FT_FIELD));

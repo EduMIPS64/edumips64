@@ -50,7 +50,7 @@ class MFLO extends ALU_RType {
     syntax = "%R";
     name = "MFLO";
   }
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the LO register is valid passing his own value into temporary register
     Register lo_reg = cpu.getLO();
 
