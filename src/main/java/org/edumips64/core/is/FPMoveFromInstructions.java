@@ -36,7 +36,7 @@ public abstract class FPMoveFromInstructions extends FPMoveToAndFromInstructions
 
   FPMoveFromInstructions() {
   }
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the source register is valid we pass its own value into a temporary register
     RegisterFP fs = cpu.getRegisterFP(params.get(FS_FIELD));
     Register rt = cpu.getRegister(params.get(RT_FIELD));

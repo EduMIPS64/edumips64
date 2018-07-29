@@ -34,7 +34,7 @@ public interface InstructionInterface {
    * Windows).
    *</pre>
    **/
-  boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException;
+  boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException;
 
   /**
    * <pre>
@@ -43,7 +43,7 @@ public interface InstructionInterface {
    * </pre>
    **/
 
-  void EX() throws HaltException, IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, NotAlignException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, AddressErrorException;
+  void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, NotAlignException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, AddressErrorException;
 
   /**
    * <pre>
@@ -51,7 +51,7 @@ public interface InstructionInterface {
    * In this stage all Load and Store instructions access memory for getting or putting data
    * </pre>
    **/
-  void MEM() throws HaltException, IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
+  void MEM() throws IrregularStringOfBitsException, NotAlignException, MemoryElementNotFoundException, AddressErrorException, IrregularWriteOperationException;
 
   /**
    * <pre>

@@ -50,7 +50,7 @@ public class ALU_IType extends ComputationalInstructions {
     this.paramCount = 3;
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the source register is valid passing its own values into a temporary register
     Register rs = cpu.getRegister(params.get(RS_FIELD));
 

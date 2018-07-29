@@ -52,7 +52,7 @@ public abstract class ALU_RType extends ComputationalInstructions {
     paramCount = 3;
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if source registers are valid passing their own values into temporary registers
     logger.info("Executing step ID of " + fullname);
     logger.info("RD is R" + params.get(RD_FIELD) + "; RS is R" + params.get(RS_FIELD) + "; RT is R" + params.get(RT_FIELD) + ";");

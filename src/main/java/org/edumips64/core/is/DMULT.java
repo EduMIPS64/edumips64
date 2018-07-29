@@ -57,7 +57,7 @@ class DMULT extends ALU_RType {
     syntax = "%R,%R";
     name = "DMULT";
   }
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if source registers are valid passing their own values into temporary registers
     Register rs = cpu.getRegister(params.get(RS_FIELD));
     Register rt = cpu.getRegister(params.get(RT_FIELD));

@@ -46,7 +46,7 @@ class XORI extends ALU_IType {
 
   //since this operation is carried out with zero padding of the immediate, //against sign_extend(immediate) methodology
   //of all others instructions in the same category, it is necessary the overriding of the ID method
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the source register is valid passing its own values into a temporary register
     Register rs = cpu.getRegister(params.get(RS_FIELD));
 

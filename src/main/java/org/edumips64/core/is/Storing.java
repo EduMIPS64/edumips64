@@ -41,7 +41,7 @@ public abstract class Storing extends LDSTInstructions {
     super(memory);
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the base register and the rt register are valid passing value of rt register into a temporary register
     Register base = cpu.getRegister(params.get(BASE_FIELD));
     rt = cpu.getRegister(params.get(RT_FIELD));

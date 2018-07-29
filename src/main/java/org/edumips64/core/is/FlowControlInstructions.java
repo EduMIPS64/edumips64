@@ -41,7 +41,7 @@ public abstract class FlowControlInstructions extends Instruction {
       e.printStackTrace();
     }
   }
-  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException;
+  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException;
   public abstract void EX() throws IrregularStringOfBitsException, IntegerOverflowException, IrregularWriteOperationException;
   public abstract void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException;
   public abstract void WB() throws IrregularStringOfBitsException;

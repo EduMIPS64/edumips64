@@ -51,7 +51,7 @@ class MFHI extends ALU_RType {
     syntax = "%R";
     name = "MFHI";
   }
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the HI register is valid passing his own value into temporary register
     Register hi_reg = cpu.getHI();
 

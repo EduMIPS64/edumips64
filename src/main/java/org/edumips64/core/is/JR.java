@@ -43,7 +43,7 @@ public class JR extends FlowControl_RType {
 
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0) {
       return true;
     }

@@ -54,7 +54,7 @@ public abstract class FPConditionalBranchesInstructions extends FlowControlInstr
     this.paramCount = 2;
   }
 
-  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException;
+  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException;
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, IrregularWriteOperationException {
   }

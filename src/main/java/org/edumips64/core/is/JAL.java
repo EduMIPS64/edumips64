@@ -47,7 +47,7 @@ public class JAL extends FlowControl_JType {
     this.name = "JAL";
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //saving PC value into a temporary register
     cpu.getRegister(31).incrWriteSemaphore();  //deadlock !!!
     TR[PC_VALUE].writeDoubleWord(cpu.getPC().getValue() - 4);

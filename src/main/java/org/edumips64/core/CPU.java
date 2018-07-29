@@ -509,7 +509,7 @@ public class CPU {
     }
   }
 
-  private void stepMEM() throws HaltException, NotAlignException, IrregularWriteOperationException, MemoryElementNotFoundException, AddressErrorException, IrregularStringOfBitsException {
+  private void stepMEM() throws NotAlignException, IrregularWriteOperationException, MemoryElementNotFoundException, AddressErrorException, IrregularStringOfBitsException {
     changeStage(Pipeline.Stage.MEM);
 
     if (!pipe.isEmpty(Pipeline.Stage.MEM)) {
@@ -522,7 +522,7 @@ public class CPU {
     pipe.setMEM(null);
   }
 
-  private Optional<String> stepEX() throws SynchronousException, HaltException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
+  private Optional<String> stepEX() throws SynchronousException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
     changeStage(Pipeline.Stage.EX);
 
     // Used for exception handling
@@ -584,7 +584,7 @@ public class CPU {
 
   // Returns true if there is a RAW conflict, false otherwis3. See docs for Instruction.ID()
   // for an explanation of why it is the case.
-  private boolean stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, HaltException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
+  private boolean stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
     changeStage(Pipeline.Stage.ID);
 
     if (pipe.isEmpty(Pipeline.Stage.ID)) {

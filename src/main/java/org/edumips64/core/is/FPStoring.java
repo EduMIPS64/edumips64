@@ -37,7 +37,7 @@ public abstract class FPStoring extends FPLDSTInstructions {
     super(memory);
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the base register and the ft register are valid passing value of ft register into a temporary floating point register
     Register base = cpu.getRegister(params.get(BASE_FIELD));
     RegisterFP ft = cpu.getRegisterFP(params.get(FT_FIELD));
