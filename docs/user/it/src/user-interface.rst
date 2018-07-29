@@ -10,8 +10,27 @@ mostrano i differenti aspetti della simulazione.  è inoltre presente una
 barra di stato, che ha il duplice scopo di mostrare il contenuto delle celle
 di memoria e dei registri quando vengono selezionati e di notificare
 all'utente che il simulatore è in esecuzione quando la simulazione è
-stata avviata ma la modalità verbose  non è stata attivata.  Maggiori
-dettagli sono descritti nelle sezioni a seguire.
+stata avviata ma la modalità verbose non è stata attivata.
+
+La barra di stato mostra inoltre lo stato in cui si trova la CPU. Può mostrare
+uno dei quattro seguenti stati:
+
+* *READY* La CPU non ha caricato alcuna istruzione (nessun programma è stato
+  caricato).
+* *RUNNING* La CPU sta eseguendo una serie di istruzioni.
+* *STOPPING* La CPU ha riscontrato un'istruzione di terminazione,
+  e sta eseguendo le istruzioni già presenti nella pipeline prima di
+  terminare il programma.
+* *HALTED* La CPU ha terminato l'esecuzione del programma.
+
+Nota che lo stato della CPU è differente dallo stato del simulatore. Il simulatore
+può eseguire un numero finito di cicli di CPU e fermarsi, consentendo all'utente
+di ispezionare memoria e registri: in questo stato intermedio tra cicli di CPU, la
+CPU rimane comunque in stato *RUNNING* o *STOPPING*. Una volta che la CPU raggiunge
+lo stato *HALTED*, l'utente non può più eseguire alcun ciclo di CPU senza caricare
+nuovamente un programma (lo stesso, od uno differente).
+
+Maggiori dettagli sono descritti nelle sezioni a seguire.
 
 La barra dei menù
 -----------------

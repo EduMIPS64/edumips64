@@ -24,6 +24,7 @@
 package org.edumips64.core;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -95,13 +96,19 @@ public class CPU {
       Arrays.asList("0000000C",     // SYSCALL 0
                     "04000000"));   // HALT
 
+  private Consumer<String> cpuStatusChangeCallback;
+
+  public void setCpuStatusChangeCallback(Consumer<String> callback) {
+    cpuStatusChangeCallback = callback;
+  }
+
   public CPU(Memory memory, ConfigStore config, InstructionInterface bubble) {
     this.config = config;
     this.bubble = bubble;
 
     logger.info("Creating the CPU...");
     cycles = 0;
-    status = CPUStatus.READY;
+    setStatus(CPUStatus.READY);
     mem = memory;
     logger.info("Got Memory instance..");
 
@@ -142,9 +149,12 @@ public class CPU {
   /** Sets the CPU status.
    *  @param status a CPUStatus value
    */
-  public  void setStatus(CPUStatus status) {
+  public void setStatus(CPUStatus status) {
     logger.info("Changing CPU status to " + status.name());
     this.status = status;
+    if (cpuStatusChangeCallback != null) {
+      cpuStatusChangeCallback.accept(status.name());
+    }
   }
 
   /** Sets the flag bits of the FCSR
@@ -669,7 +679,7 @@ public class CPU {
    */
   public void reset() {
     // Reset CPU state.
-    status = CPUStatus.READY;
+    setStatus(CPUStatus.READY);
     cycles = 0;
     instructions = 0;
     RAWStalls = 0;
