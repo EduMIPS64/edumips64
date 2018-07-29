@@ -47,26 +47,8 @@ public class B extends FlowControl_IType {
   }
 
   public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
-    //getting registers rs and rt
-    //converting offset into a signed binary value of 64 bits in length
-    BitSet64 bs = new BitSet64();
-    bs.writeHalf(params.get(OFFSET_FIELD));
-    String offset = bs.getBinString();
-
-    String pc_new = "";
-    Register pc = cpu.getPC();
-    String pc_old = cpu.getPC().getBinString();
-
-    //subtracting 4 to the pc_old temporary variable using bitset64 safe methods
-    BitSet64 bs_temp = new BitSet64();
-    bs_temp.writeDoubleWord(-4);
-    pc_old = InstructionsUtils.twosComplementSum(pc_old, bs_temp.getBinString());
-
-    //updating program counter
-    pc_new = InstructionsUtils.twosComplementSum(pc_old, offset);
-    pc.setBits(pc_new, 0);
-
-    throw new JumpException();
+    jumpToOffset(OFFSET_FIELD);
+    return false;
   }
 
   public void pack() throws IrregularStringOfBitsException {

@@ -49,6 +49,26 @@ public abstract class FlowControl_IType extends FlowControlInstructions {
     this.paramCount = 3;
   }
 
+  void jumpToOffset(int offsetField) throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException {
+    BitSet64 bs = new BitSet64();
+    bs.writeHalf(params.get(offsetField));
+    String offset = bs.getBinString();
+
+    Register pc = cpu.getPC();
+    String pc_old = cpu.getPC().getBinString();
+
+    //subtracting 4 to the pc_old temporary variable using bitset64 safe methods
+    BitSet64 bs_temp = new BitSet64();
+    bs_temp.writeDoubleWord(-4);
+    pc_old = InstructionsUtils.twosComplementSum(pc_old, bs_temp.getBinString());
+
+    //updating program counter
+    String pc_new = InstructionsUtils.twosComplementSum(pc_old, offset);
+    pc.setBits(pc_new, 0);
+
+    throw new JumpException();
+  }
+
   public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, HaltException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     return false;
   }
