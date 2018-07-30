@@ -485,18 +485,22 @@ public class CPU {
       return;
     }
 
-    boolean terminatorInstrInWB = terminating.contains(pipe.WB().getRepr().getHexString());
-    //we have to execute the WB method only if some conditions occur
-    //the current instruction in WB is a terminating instruction and the fpPipe is working
-    boolean notWBable = terminatorInstrInWB && !fpPipe.isEmpty();
-    //the current instruction in WB is a terminating instruction, the fpPipe doesn't work because it has just issued an instruction and it is in the MEM stage
-    notWBable = notWBable || (terminatorInstrInWB && !pipe.isBubble(Pipeline.Stage.MEM));
+    // Do not execute the WB() method if the current instruction is a terminating instruction
+    // and there is either some instruction in the FP pipeline or a non-BUBBLE instruction in
+    // the MEM stage, which should only ever come from the FP pipeline, given that once a
+    // terminating instruction enters the pipeline the CPU stops fetching instructions.
+    // This corner case is necessary to handle out-of-order termination for FP instructions.
+    boolean shouldWB = true;
+    if (terminating.contains(pipe.WB().getRepr().getHexString()) &&
+            (!fpPipe.isEmpty() || !pipe.isBubble(Pipeline.Stage.MEM))) {
+      shouldWB = false;
+    }
 
     if (!pipe.isBubble(Pipeline.Stage.WB)) {
       instructions++;
     }
 
-    if (!notWBable) {
+    if (shouldWB) {
       logger.info("Executing WB() for " + pipe.WB());
       pipe.WB().WB();
     }
