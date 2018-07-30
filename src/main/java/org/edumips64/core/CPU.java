@@ -29,14 +29,7 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 
 import org.edumips64.core.fpu.*;
-import org.edumips64.core.is.AddressErrorException;
-import org.edumips64.core.is.BreakException;
-import org.edumips64.core.is.HaltException;
-import org.edumips64.core.is.InstructionInterface;
-import org.edumips64.core.is.JumpException;
-import org.edumips64.core.is.RAWException;
-import org.edumips64.core.is.TwosComplementSumException;
-import org.edumips64.core.is.WAWException;
+import org.edumips64.core.is.*;
 import org.edumips64.utils.*;
 
 /** This class models a MIPS CPU with 32 64-bit General Purpose Registers.
@@ -470,6 +463,7 @@ public class CPU {
       throw ex;
 
     } catch (HaltException ex) {
+      setStatus(CPU.CPUStatus.HALTED);
       pipe.setWB(null);
       throw ex;
 
@@ -514,7 +508,6 @@ public class CPU {
     //if the pipeline is empty and it is into the stopping state (because a long latency instruction was executed) we can halt the cpu when computations finished
     if (isPipelinesEmpty() && getStatus() == CPUStatus.STOPPING) {
       logger.info("Pipeline is empty and we are in STOPPING --> going to HALTED.");
-      setStatus(CPU.CPUStatus.HALTED);
       throw new HaltException();
     }
   }
@@ -616,7 +609,13 @@ public class CPU {
 
     logger.info("Executing ID() for " + pipe.ID());
     // Can change the CPU status from RUNNING to STOPPING.
-    boolean rawException = pipe.ID().ID();
+    boolean rawException = false;
+    try {
+      rawException = pipe.ID().ID();
+    } catch (StoppingException e) {
+      logger.info("Stopping CPU due to SYSCALL (" + pipe.ID().hashCode() + ")");
+      setStatus(CPU.CPUStatus.STOPPING);
+    }
     if (rawException) {
       return true;
     }
