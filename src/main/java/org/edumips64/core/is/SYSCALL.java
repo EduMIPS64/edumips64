@@ -61,10 +61,9 @@ public class SYSCALL extends Instruction {
     }
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException, StoppingException {
     if (syscall_n == 0) {
-      logger.info("Stopping CPU due to SYSCALL (" + this.hashCode() + ")");
-      cpu.setStatus(CPU.CPUStatus.STOPPING);
+      throw new StoppingException();
     } else if ((syscall_n > 0) && (syscall_n <= 5)) {
       Register r14 = cpu.getRegister(14);
 
@@ -287,7 +286,6 @@ public class SYSCALL extends Instruction {
 
     if (syscall_n == 0) {
       logger.info("Stopped CPU due to SYSCALL (" + this.hashCode() + ")");
-      cpu.setStatus(CPU.CPUStatus.HALTED);
       throw new HaltException();
     } else if (syscall_n > 0 && syscall_n <= 5) {
       logger.info("SYSCALL (" + this.hashCode() + "): setting R1 to " + return_value);

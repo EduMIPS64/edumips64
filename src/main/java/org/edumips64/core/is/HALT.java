@@ -49,9 +49,8 @@ public class HALT extends Instruction {
       e.printStackTrace();
     }
   }
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
-    cpu.setStatus(CPU.CPUStatus.STOPPING);
-    return false;
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException, StoppingException {
+    throw new StoppingException();
   }
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
@@ -61,7 +60,6 @@ public class HALT extends Instruction {
   }
 
   public void WB() throws HaltException, IrregularStringOfBitsException {
-    cpu.setStatus(CPU.CPUStatus.HALTED);
     throw new HaltException();
   }
 
