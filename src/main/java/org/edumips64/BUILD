@@ -1,11 +1,10 @@
 load("@io_bazel_rules_gwt//gwt:gwt.bzl", "gwt_application")
+load(":version.bzl", "version")
 
 # Build variables.
 codename = "Nicolosi"
 
 splash_img = "images/splash.png"
-
-version = "1.2.4"
 
 manifest_nosplash_lines = [
     "Codename: {}".format(codename),
