@@ -159,6 +159,11 @@ Statistics
 La finestra Statistiche mostra alcune statistiche riguardanti l'esecuzione del
 programma.
 
+Nota che durante l'ultimo ciclo di esecuzione il contatore dei cicli non viene
+incrementato, perché l'ultimo ciclo non è un vero ciclo di CPU ma solo uno
+pseudo-ciclo che ha l'unico compito di rimuovere l'ultima istruzione dalla
+pipeline ed incrementare il contatore delle istruzioni eseguite.
+
 Pipeline
 ~~~~~~~~
 La finestra Pipeline mostra lo stato attuale della pipeline, visualizzando

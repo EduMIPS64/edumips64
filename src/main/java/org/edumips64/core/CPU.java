@@ -465,6 +465,9 @@ public class CPU {
     } catch (HaltException ex) {
       setStatus(CPU.CPUStatus.HALTED);
       pipe.setWB(null);
+      // The last tick does not execute a full CPU cycle, it just removes the last instruction from the pipeline.
+      // Decrementing the cycles counter by one.
+      cycles--;
       throw ex;
 
     } finally {
