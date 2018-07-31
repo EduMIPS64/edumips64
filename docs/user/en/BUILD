@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//src/main/java/org/edumips64:version.bzl", "version")
+
 filegroup(
     name = "javahelp",
     srcs = [
@@ -61,6 +63,7 @@ genrule(
     ]),
 )
 
+pdf = "edumips64-" + version + "-manual-en.pdf"
 genrule(
     name = "pdf",
     srcs = [
@@ -68,7 +71,7 @@ genrule(
         ":makefile",
         "//docs/user:common_conf",
     ],
-    outs = ["EduMIPS64.pdf"],
+    outs = [pdf],
     cmd = "\n".join([
         # Get the absolute path of the output directory as a destination.
         "DST=$$(readlink -f $(@D))",
@@ -76,7 +79,7 @@ genrule(
         "cd $$(dirname $(location :makefile))",
         # Remove -Q to debug Sphinx.
         "make latexpdf BUILDDIR=$$DST SPHINXOPTS='-N -a -E -Q'",
-        "cp $$DST/latex/EduMIPS64.pdf $$DST/EduMIPS64.pdf"
+        "cp $$DST/latex/EduMIPS64.pdf $$DST/" + pdf,
     ]),
 )
 
