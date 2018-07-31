@@ -148,6 +148,11 @@ Statistics
 ~~~~~~~~~~
 The Statistics frame shows some statistics about the program execution.
 
+Note that during the last execution cycle the cycles counter is not incremented,
+because the last execution cycle is not a full CPU cycle but rather a
+pseudo-cycle whose only duties are to remove the last instruction from the
+pipeline and increment the counter of executed instructions.
+
 Pipeline
 ~~~~~~~~
 The Pipeline frame shows the actual status of the pipeline, showing which

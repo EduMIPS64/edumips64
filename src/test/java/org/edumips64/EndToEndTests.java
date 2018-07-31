@@ -271,9 +271,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testHalt() throws Exception {
       CpuTestStatus status = runMipsTest("halt.s");
 
-      // Note that the proper count here should be 5, not 6. There is a long-standing bug
-      // in cycle count, see Issue #48: https://github.com/lupino3/edumips64/issues/48.
-      collector.checkThat(status.cycles, equalTo(6));
+      collector.checkThat(status.cycles, equalTo(5));
       collector.checkThat(status.instructions, equalTo(1));
       collector.checkThat(status.memStalls, equalTo(0));
       collector.checkThat(status.rawStalls, equalTo(0));
@@ -362,11 +360,11 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   @Test
   public void testForwarding() throws Exception {
     // Simple test.
-    runForwardingTest("forwarding.s", 16, 19, 10);
+    runForwardingTest("forwarding.s", 15, 18, 10);
 
     // Tests taken from Hennessy & Patterson, Appendix A
-    runForwardingTest("forwarding-hp-pA16.s", 11, 13, 6);
-    runForwardingTest("forwarding-hp-pA18.s", 9, 13, 4);
+    runForwardingTest("forwarding-hp-pA16.s", 10, 12, 6);
+    runForwardingTest("forwarding-hp-pA18.s", 8, 12, 4);
   }
 
   @Test
@@ -381,13 +379,13 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding(filename);
 
     // With forwarding
-    collector.checkThat(filename + ": cycles with forwarding.", statuses.get(ForwardingStatus.ENABLED).cycles, equalTo(20));
+    collector.checkThat(filename + ": cycles with forwarding.", statuses.get(ForwardingStatus.ENABLED).cycles, equalTo(19));
     collector.checkThat(filename + ": instructions with forwarding.", statuses.get(ForwardingStatus.ENABLED).instructions, equalTo(5));
     collector.checkThat(filename + ": WAW stalls with forwarding." ,statuses.get(ForwardingStatus.ENABLED).wawStalls, equalTo(7));
     collector.checkThat(filename + ": RAW stalls with forwarding.", statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(1));
 
     // Without forwarding
-    collector.checkThat(filename + ": cycles without forwarding.", statuses.get(ForwardingStatus.DISABLED).cycles, equalTo(21));
+    collector.checkThat(filename + ": cycles without forwarding.", statuses.get(ForwardingStatus.DISABLED).cycles, equalTo(20));
     collector.checkThat(filename + ": instructions without forwarding.", statuses.get(ForwardingStatus.DISABLED).instructions, equalTo(5));
     collector.checkThat(filename + ": WAW stalls without forwarding." ,statuses.get(ForwardingStatus.DISABLED).wawStalls, equalTo(7));
     collector.checkThat(filename + ": RAW stalls without forwarding.", statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(2));
@@ -403,7 +401,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-mul.s");
 
     // Same behaviour with and without forwarding.
-    int expected_cycles = 43, expected_instructions = 32, expected_mem_stalls = 6;
+    int expected_cycles = 42, expected_instructions = 32, expected_mem_stalls = 6;
     collector.checkThat(statuses.get(ForwardingStatus.ENABLED).cycles, equalTo(expected_cycles));
     collector.checkThat(statuses.get(ForwardingStatus.ENABLED).instructions, equalTo(expected_instructions));
     collector.checkThat(statuses.get(ForwardingStatus.ENABLED).memStalls, equalTo(expected_mem_stalls));
@@ -529,8 +527,8 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   /* Issue #51: Problem with SYSCALL 0 after branch. */
   @Test
   public void testTerminationInID() throws Exception {
-    runForwardingTest("issue51-halt.s", 12, 18, 6);
-    runForwardingTest("issue51-syscall0.s", 12, 18, 6);
+    runForwardingTest("issue51-halt.s", 11, 17, 6);
+    runForwardingTest("issue51-syscall0.s", 11, 17, 6);
   }
 
   /* Issue #68: JR does not respect RAW stalls. */
