@@ -355,6 +355,12 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runMipsTest("memtest.s");
   }
 
+  /* Read-after-write test */
+  @Test
+  public void testRAW() throws Exception {
+    runMipsTestWithAndWithoutForwarding("raw.s");
+  }
+
   /* Forwarding test. The number of cycles is hardcoded and depends on the
    * contents of forwarding.s */
   @Test
