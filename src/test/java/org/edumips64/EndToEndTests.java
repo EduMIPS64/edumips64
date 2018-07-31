@@ -87,7 +87,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       log.info("Deep copying " + cpuFPRegisters.length + " FP registers");
       for (int i = 0; i < cpuFPRegisters.length; ++i) {
         RegisterFP r = cpuFPRegisters[i];
-        fpRegisters[i] = new RegisterFP();
+        fpRegisters[i] = new RegisterFP("F" + i);
         try {
           log.info(i + ": " + r.getBinString());
           fpRegisters[i].setBits(r.getBinString(), 0);

@@ -35,11 +35,13 @@ import org.edumips64.core.fpu.BitSet64FP;
 public class RegisterFP extends BitSet64FP {
   private int writeSemaphore;
   private int WAWSemaphore;
+  private String name;
 
   /** Creates a default new instance of Register. */
-  public RegisterFP() {
+  public RegisterFP(String name) {
     writeSemaphore = 0;
     WAWSemaphore = 0;
+    this.name = name;
   }
 
   /** Returns the value of the semaphore
@@ -75,7 +77,7 @@ public class RegisterFP extends BitSet64FP {
    */
   public void decrWriteSemaphore() {
     if (--writeSemaphore < 0) {
-      throw new RuntimeException();
+      throw new RuntimeException("write semaphore for " + name + " reached a negative value.");
     }
   }
 
@@ -86,7 +88,7 @@ public class RegisterFP extends BitSet64FP {
    */
   public void decrWAWSemaphore() {
     if (--WAWSemaphore < 0) {
-      throw new RuntimeException();
+      throw new RuntimeException("WAW semaphore for " + name + " reached a negative value.");
     }
   }
 
