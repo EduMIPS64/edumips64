@@ -40,7 +40,7 @@ if [ "$TRAVIS_BRANCH" == "master" ]; then
   # Build JAR.
   echo -n "Copying latest JAR to ${GH_PAGES_DIR}.. "
   # TODO: remove hardcoded version.
-  cp bazel-genfiles/src/main/java/org/edumips64/edumips64-1.2.4.jar ${GH_PAGES_DIR}/edumips64-latest.jar
+  cp bazel-genfiles/src/main/java/org/edumips64/edumips64-1.2.5.jar ${GH_PAGES_DIR}/edumips64-latest.jar
   echo "done."
 
   # Deploy the last version of the web UI.

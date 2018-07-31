@@ -2,7 +2,7 @@ load("@io_bazel_rules_gwt//gwt:gwt.bzl", "gwt_application")
 load(":version.bzl", "version")
 
 # Build variables.
-codename = "Nicolosi"
+codename = "Eden"
 
 splash_img = "images/splash.png"
 

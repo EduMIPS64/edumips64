@@ -1,5 +1,19 @@
 # EduMIPS64 ChangeLog
 
+## 1.2.5 (31/08/2018) - Eden
+### Added
+- Show CPU state in the main window (Issue #78)
+
+### Fixed
+- Cycles display is wrong for code shown in attachment (Issue #48)
+- Changing the forwarding setting should reset the simulator (Issue #98)
+- It should be impossible to both mask synchronous exceptions and terminate on synchronous exceptions (Issue #111)
+- Fix cycles UI for hailstoneenglish.s (Issue #134)
+- Add building PDFs to Travis (Issue #168)
+- While parsing LW and SW instructions, offset cannot be negative or above 8192 (Issue #175)
+- Migrate to Bazel (Issue #180)
+- Splash screen not working (Issue #195)
+
 ## 1.2.4 (17/12/2017) - Nicolosi
 ### Added
 - Ability to set font size.
