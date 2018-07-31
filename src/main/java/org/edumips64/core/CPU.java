@@ -122,7 +122,7 @@ public class CPU {
     fpr = new RegisterFP[32];
 
     for (int i = 0; i < 32; i++) {
-      fpr[i] = new RegisterFP();
+      fpr[i] = new RegisterFP("F" + i);
     }
 
     FCSR = new FCSRRegister();

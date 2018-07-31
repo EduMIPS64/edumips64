@@ -80,7 +80,7 @@ public abstract class Instruction implements InstructionInterface {
     //initialization of temporary registers
     for (int i = 0; i < TR.length; i++) {
       TR[i] = new Register("TR " + i + "(Instruction " + serialNumber + ")");
-      TRfp[i] = new RegisterFP();
+      TRfp[i] = new RegisterFP("TR (float) " + i + "(Instruction " + serialNumber + ")");
     }
   }
 
