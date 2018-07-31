@@ -1,4 +1,4 @@
-17th of December, 2017                                          EduMIPS64 1.2.4
+31st of July, 2018                                          EduMIPS64 1.2.5
 
                            EduMIPS64 RELEASE NOTES	
                            http://www.edumips.org
@@ -9,18 +9,25 @@ graphical debugger.
 Notes for this release:
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This is version 1.2.4 of EduMIPS64, a bug-fix release that follows up on
-version 1.2.3, that was released in May 2017. The codename for this
-release is "Nicolosi", last name of a dear friend that left us this year, in
-the same spirit of the previous version.
+This is version 1.2.5 of EduMIPS64, a bug-fix release that follows up on
+version 1.2.4, that was released in December 2017. The codename for this
+release is "Eden", as an homage to The Binding of Isaac, and also because
+gardening is nice.
 
-This release introduces some more performance improvements for large programs
-(thousands of instructions) and the ability to set the font size, useful for
-high-resolution displays (e.g., 4k displays).
+This release fixes issues with the cycles counter, which has always been
+off-by-one, improves the UI for large programs, fixes the parsing of
+load/store instructions' offsets and improves the handling of settings.
+
+There is also a small new feature: the current CPU state is displayed in the
+status bar.
+
+A large change for developers is the migration to Bazel (http://bazel.io),
+which is now the only build system used by EduMIPS64 (superseding both Gradle
+and Ant).
 
 Please keep in mind that this is still EXPERIMENTAL SOFTWARE. It may
 BURN YOUR HARD DISK, DESTROY ALL YOUR DATA and even GO OUT WITH YOUR
-WIFE/HUSBAND. :)
+PARTNER. :)
 
 If you find a bug, please open an issue on GitHub.
 
@@ -28,22 +35,20 @@ EduMIPS64 is hosted on GitHub: www.github.com/lupino3/edumips64.
 Our web site is www.edumips.org, and our development blog is
 http://edumips64.blogspot.com.
 
-New in this release since version 1.2.3
+New in this release since version 1.2.4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Added
-~~~~~
-- Ability to set font size.
-- Show both register numbers and MIPS32 aliases (Issue #67)
-- Performance improvements (stop using exceptions for RAW stalls, improve use
-  of Swing threading).
+-----
+- Show CPU state in the main window (Issue #78)
 
 Fixed
-~~~~~
-- Proper use of Swing and threading (Issue #11)
-- Run CycleBuilder inside the CPU (Issue #147)
-- In some cases, the simulator fails to add the WB state to the Cycles
-  window (Issue #148)
-- EduMIPS64 is unusable on 4k displays (Issue #159)
-- Improved modularity by removing unnecessary cross-module dependencies.
-- Poor UI behavior with dual monitors (Issue #162)
+-----
+- Cycles display is wrong for code shown in attachment (Issue #48)
+- Changing the forwarding setting should reset the simulator (Issue #98)
+- It should be impossible to both mask synchronous exceptions and terminate on synchronous exceptions (Issue #111)
+- Fix cycles UI for hailstoneenglish.s (Issue #134)
+- Add building PDFs to Travis (Issue #168)
+- While parsing LW and SW instructions, offset cannot be negative or above 8192 (Issue #175)
+- Migrate to Bazel (Issue #180)
+- Splash screen not working (Issue #195)
