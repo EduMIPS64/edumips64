@@ -54,6 +54,13 @@ public abstract class FPConditionalBranchesInstructions extends FlowControlInstr
     this.paramCount = 2;
   }
 
+  public void IF() {
+    try {
+      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+    } catch (IrregularStringOfBitsException e) {
+      e.printStackTrace();
+    }
+  }
   public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException;
 
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, IrregularWriteOperationException {

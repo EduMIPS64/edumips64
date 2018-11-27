@@ -34,14 +34,8 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  * @author Trubia Massimo, Russo Daniele
  */
 public abstract class FlowControlInstructions extends Instruction {
-  public void IF() {
-    try {
-      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
-    } catch (IrregularStringOfBitsException e) {
-      e.printStackTrace();
-    }
-  }
-  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException;
+  public abstract void IF() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, PredictedJumpException;
+  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, UntakenBranchException, TakenBranchException, BreakException, WAWException, FPInvalidOperationException;
   public abstract void EX() throws IrregularStringOfBitsException, IntegerOverflowException, IrregularWriteOperationException;
   public abstract void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException;
   public abstract void WB() throws IrregularStringOfBitsException;

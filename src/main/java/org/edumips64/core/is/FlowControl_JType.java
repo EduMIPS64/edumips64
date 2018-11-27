@@ -46,6 +46,14 @@ public class FlowControl_JType extends FlowControlInstructions {
     this.paramCount = 1;
   }
 
+  public void IF() {
+    try {
+      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+    } catch (IrregularStringOfBitsException e) {
+      e.printStackTrace();
+    }
+  }
+
   public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     return false;
   }

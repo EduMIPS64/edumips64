@@ -36,8 +36,8 @@ genrule(
         "unzip -q $(OUTS) META-INF/MANIFEST.MF",
         "sed -i '$$ d' META-INF/MANIFEST.MF",
         "echo \"Build-Date: $$(date)\" >> META-INF/MANIFEST.MF",
-        "GIT_REV=$$(grep STABLE_GIT_COMMIT bazel-out/stable-status.txt | cut -d' ' -f2)",
-        "echo \"Git-Revision: $$GIT_REV\" >> META-INF/MANIFEST.MF",
+        #"GIT_REV=$$(grep STABLE_GIT_COMMIT bazel-out/stable-status.txt | cut -d' ' -f2)",
+        #"echo \"Git-Revision: $$GIT_REV\" >> META-INF/MANIFEST.MF",
         "zip -q -r -ll $(OUTS) META-INF/MANIFEST.MF",
         "chmod u-w $(OUTS);",
     ]),
@@ -119,6 +119,8 @@ java_library(
         "MainCLI.java",
     ],
     deps = [
+        "//src/main/java/org/edumips64/core:BranchPredictor",
+        #"//src/main/java/org/edumips64/core:Prediction",
         "//src/main/java/org/edumips64/core:cpu",
         "//src/main/java/org/edumips64/core:dinero",
         "//src/main/java/org/edumips64/core:iomanager",
@@ -146,6 +148,8 @@ java_library(
         "MainCLI.java",
     ],
     deps = [
+        "//src/main/java/org/edumips64/core:BranchPredictor",
+        #"//src/main/java/org/edumips64/core:Prediction",
         "//src/main/java/org/edumips64/core:cpu",
         "//src/main/java/org/edumips64/core:dinero",
         "//src/main/java/org/edumips64/core:iomanager",

@@ -40,10 +40,18 @@ public class FlowControl_RType extends FlowControlInstructions {
   final static int RS_FIELD_LENGTH = 5;
   final static int OPCODE_VALUE_LENGTH = 6;
   String OPCODE_VALUE = "";
-  /** Creates a new instance of FlowControl_JType */
+  /** Creates a new instance of FlowControl_RType */
   FlowControl_RType() {
     this.syntax = "%R";
     this.paramCount = 1;
+  }
+
+  public void IF() {
+    try {
+      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+    } catch (IrregularStringOfBitsException e) {
+      e.printStackTrace();
+    }
   }
 
   public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {

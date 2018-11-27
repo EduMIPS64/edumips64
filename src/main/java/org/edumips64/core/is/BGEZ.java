@@ -46,7 +46,7 @@ public class BGEZ extends FlowControl_IType {
     name = "BGEZ";
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, UntakenBranchException, TakenBranchException, BreakException, WAWException, FPInvalidOperationException {
     if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0) {
       return true;
     }
@@ -56,8 +56,13 @@ public class BGEZ extends FlowControl_IType {
     //converting offset into a signed binary value of 64 bits in length
     boolean condition = rs.charAt(0) == '0';
 
-    if (condition) {
-      jumpToOffset(OFFSET_FIELD);
+    UpdatePrediction(condition);
+
+    if (prediction && !condition) {
+      jumpBackToNormal();
+    }
+    else if (!prediction && condition){
+      JumpBackToOffset(OFFSET_FIELD);
     }
     return false;
   }

@@ -76,6 +76,7 @@ public class GUIConfig extends JDialog {
     String APPEARANCE = CurrentLocale.getString("Config.APPEARANCE");
     String BEHAVIOR = CurrentLocale.getString("Config.BEHAVIOR");
     String FPUEXCEPTIONS = CurrentLocale.getString("Config.FPUEXCEPTIONS");
+    String BRANCHPREDICTION = CurrentLocale.getString("Config.BRANCHPREDICTION");
     String FPUROUNDING = CurrentLocale.getString("Config.FPUROUNDING");
 
     cache = new HashMap<>();
@@ -85,6 +86,7 @@ public class GUIConfig extends JDialog {
     tabPanel.addTab(MAIN, makeMainPanel());
     tabPanel.addTab(BEHAVIOR, makeBehaviorPanel());
     tabPanel.addTab(FPUEXCEPTIONS, makeExceptionsPanel());
+    tabPanel.addTab(BRANCHPREDICTION, makeBranchPredictionPanel());
     tabPanel.addTab(FPUROUNDING, makeRoundingPanel());
     tabPanel.addTab(APPEARANCE, makeAppearancePanel());
 
@@ -175,6 +177,42 @@ public class GUIConfig extends JDialog {
     addRow(panel, row++, ConfigKey.FP_OVERFLOW, new JCheckBox());
     addRow(panel, row++, ConfigKey.FP_UNDERFLOW, new JCheckBox());
     addRow(panel, row++, ConfigKey.FP_DIVIDE_BY_ZERO, new JCheckBox());
+
+    // fill remaining vertical space
+    grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
+
+    return panel;
+  }
+
+  private JPanel makeBranchPredictionPanel() {
+    ButtonGroup bg = new ButtonGroup();
+    JRadioButton predUntaken = new JRadioButton();
+    JRadioButton predTaken = new JRadioButton();
+    JRadioButton pred2bit = new JRadioButton();
+    JRadioButton predDynamic21 = new JRadioButton();
+    bg.add(predUntaken);
+    bg.add(predTaken);
+    bg.add(pred2bit);
+    bg.add(predDynamic21);
+
+    gbl = new GridBagLayout();
+    gbc = new GridBagConstraints();
+
+
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.insets = new Insets(0, 10, 0, 10);
+
+    JPanel panel = new JPanel();
+
+    panel.setLayout(gbl);
+    panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
+    int row = 2;
+
+    addRow(panel, row++, ConfigKey.PRED_UNTAKEN, predUntaken);
+    addRow(panel, row++, ConfigKey.PRED_TAKEN, predTaken);
+    addRow(panel, row++, ConfigKey.PRED_2BIT, pred2bit);
+    addRow(panel, row++, ConfigKey.PRED_DYNAMIC21, predDynamic21);
 
     // fill remaining vertical space
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
@@ -293,18 +331,39 @@ public class GUIConfig extends JDialog {
       // one and this code is tailored for it.
       rbut.setAction(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
+          //FPU Rounding
           LinkedList<ConfigKey> keys = new LinkedList<>();
           keys.add(ConfigKey.FP_NEAREST);
           keys.add(ConfigKey.FP_TOWARDS_ZERO);
           keys.add(ConfigKey.FP_TOWARDS_PLUS_INFINITY);
           keys.add(ConfigKey.FP_TOWARDS_MINUS_INFINITY);
 
+          //Branch Prediction
+          LinkedList<ConfigKey> keys_pred = new LinkedList<>();
+          keys_pred.add(ConfigKey.PRED_UNTAKEN);
+          keys_pred.add(ConfigKey.PRED_TAKEN);
+          keys_pred.add(ConfigKey.PRED_2BIT);
+          keys_pred.add(ConfigKey.PRED_DYNAMIC21);
+
           cache.put(key, true);
           keys.remove(key);
+          keys_pred.remove(key);
 
-          for (ConfigKey k : keys) {
-            cache.put(k, false);
+          // delete other keys
+          if (key == ConfigKey.FP_NEAREST || key == ConfigKey.FP_TOWARDS_ZERO
+              || key == ConfigKey.FP_TOWARDS_PLUS_INFINITY || key == ConfigKey.FP_TOWARDS_MINUS_INFINITY) {
+            for (ConfigKey k : keys) {
+              cache.put(k, false);
+            }
           }
+          else if (key == ConfigKey.PRED_UNTAKEN || key == ConfigKey.PRED_TAKEN
+                   || key == ConfigKey.PRED_2BIT || key == ConfigKey.PRED_DYNAMIC21) {
+            for (ConfigKey k : keys_pred) {
+              cache.put(k, false);
+            }
+          }
+
+
         }
       });
     } else if (comp instanceof JNumberField) {

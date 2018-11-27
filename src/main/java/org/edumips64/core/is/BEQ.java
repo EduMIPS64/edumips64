@@ -45,7 +45,7 @@ public class BEQ extends FlowControl_IType {
     name = "BEQ";
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, UntakenBranchException, TakenBranchException, BreakException, WAWException, FPInvalidOperationException {
     if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0 || cpu.getRegister(params.get(RT_FIELD)).getWriteSemaphore() > 0) {
       return true;
     }
@@ -55,9 +55,15 @@ public class BEQ extends FlowControl_IType {
     String rt = cpu.getRegister(params.get(RT_FIELD)).getBinString();
     boolean condition = rs.equals(rt);
 
-    if (condition) {
-      jumpToOffset(OFFSET_FIELD);
+    UpdatePrediction(condition);
+
+    if (prediction && !condition) {
+      jumpBackToNormal();
     }
+    else if (!prediction && condition){
+      JumpBackToOffset(OFFSET_FIELD);
+    }
+
     return false;
   }
 }

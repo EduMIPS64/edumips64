@@ -143,7 +143,9 @@ public class CurrentLocale {
     en.put("STRUCTS_DIVNOTAVAILABLE", "Structural Stalls (Divider not available)");
     en.put("STRUCTS_MEMNOTAVAILABLE", "Structural Stalls (Memory not available)");
     en.put("BTS", "Branch Taken Stalls");
+    en.put("BUTS", "Branch Untaken Stalls");
     en.put("BMS", "Branch Misprediction Stalls");
+    en.put("FS", "Flushing Stalls");
     en.put("CSIZE", "Code size");
     en.put("Config.APPEARANCE", "Appearance");
     en.put("Config.BEHAVIOR", "Behavior");
@@ -168,6 +170,11 @@ public class CurrentLocale {
     en.put("Config.UNDERFLOW.tip", "Enables the floating point underflow");
     en.put("Config.DIVIDE_BY_ZERO", "Divide by zero exception");
     en.put("Config.DIVIDE_BY_ZERO.tip", "Enables the floating point divide by zero exception");
+    en.put("Config.BRANCHPREDICTION", "Branch Prediction Mode");
+    en.put("Config.UNTAKEN", "Predicting Untaken");
+    en.put("Config.TAKEN", "Predicting Taken");
+    en.put("Config.2BIT", "2-bit Predictor");
+    en.put("Config.DYNAMIC21", "Correlating (2,1)");
     en.put("Config.FPUROUNDING", "FPU Rounding");
     en.put("Config.NEAREST", "To nearest");
     en.put("Config.NEAREST.tip", "Rounds the result to the nearest representable value, rounding to the even one when values are equally near");

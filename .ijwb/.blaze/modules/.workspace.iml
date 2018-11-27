@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.system.id="Blaze" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../..">
+      <sourceFolder url="file://$MODULE_DIR$/../../.." isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../src/test/java" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../bazel-bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../bazel-edumips64" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../bazel-genfiles" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../bazel-out" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../bazel-testlogs" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="jetty-jndi-9.2.14.v20151106-ijar_84fddc4a" level="project" />
+    <orderEntry type="library" name="jetty-io-9.2.14.v20151106-ijar_f7aa18ea" level="project" />
+    <orderEntry type="library" name="jsinterop-annotations-1.0.0-ijar_862f63f8" level="project" />
+    <orderEntry type="library" name="gwt-user-2.8.0-ijar_4586ce6a" level="project" />
+    <orderEntry type="library" name="jetty-xml-9.2.14.v20151106-ijar_a9d6f434" level="project" />
+    <orderEntry type="library" name="gwt-dev-2.8.0-ijar_41068df6" level="project" />
+    <orderEntry type="library" name="tapestry-4.0.2-ijar_139f800a" level="project" />
+    <orderEntry type="library" name="jetty-annotations-9.2.14.v20151106-ijar_3402a51a" level="project" />
+    <orderEntry type="library" name="colt-1.2.0-ijar_2832604a" level="project" />
+    <orderEntry type="library" name="jetty-plus-9.2.14.v20151106-ijar_9ff6006a" level="project" />
+    <orderEntry type="library" name="javahelp-2.0.05-ijar_d9bb50cd" level="project" />
+    <orderEntry type="library" name="commons-io-2.4-ijar_a62524aa" level="project" />
+    <orderEntry type="library" name="asm-5.0.3-ijar_e986eaaa" level="project" />
+    <orderEntry type="library" name="jetty-server-9.2.14.v20151106-ijar_beb82d4a" level="project" />
+    <orderEntry type="library" name="jetty-servlet-9.2.14.v20151106-ijar_6bf9b958" level="project" />
+    <orderEntry type="library" name="javahelp-2.0.05-ijar_a8534714" level="project" />
+    <orderEntry type="library" name="validation-api-1.0.0.GA-ijar_a8cb1e0a" level="project" />
+    <orderEntry type="library" name="jetty-util-9.2.14.v20151106-ijar_e4b95d6a" level="project" />
+    <orderEntry type="library" name="jetty-http-9.2.14.v20151106-ijar_d95ea2a" level="project" />
+    <orderEntry type="library" name="jsinterop-annotations-1.0.0-sources-ijar_23323606" level="project" />
+    <orderEntry type="library" name="sac-1.3-ijar_ca820e76" level="project" />
+    <orderEntry type="library" name="jetty-webapp-9.2.14.v20151106-ijar_7795580a" level="project" />
+    <orderEntry type="library" name="jetty-security-9.2.14.v20151106-ijar_c6b5162a" level="project" />
+    <orderEntry type="library" name="jetty-servlets-9.2.14.v20151106-ijar_3d2ddcea" level="project" />
+    <orderEntry type="library" name="javax.servlet-api-3.1.0-ijar_6903f5e8" level="project" />
+    <orderEntry type="library" name="gson-2.6.2-ijar_892e4e6a" level="project" />
+    <orderEntry type="library" name="jsr250-api-1.0-ijar_44f20dfc" level="project" />
+    <orderEntry type="library" name="validation-api-1.0.0.GA-sources-ijar_e374786a" level="project" />
+    <orderEntry type="library" name="ant-1.9.7-ijar_3d6926d2" level="project" />
+  </component>
+</module>

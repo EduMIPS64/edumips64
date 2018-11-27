@@ -42,6 +42,7 @@ public class GUIStatistics extends GUIComponent {
   StatPanel statPanel;
   JScrollPane jsp;
   private int nCycles, nInstructions, rawStalls, codeSize, WAWStalls, dividerStalls, memoryStalls;
+  private int flushing_stalls, untaken_stalls, taken_stalls, misprediction_stalls;
   private float cpi;
 
   GUIStatistics(CPU cpu, Memory memory, ConfigStore config) {
@@ -58,7 +59,8 @@ public class GUIStatistics extends GUIComponent {
   class StatPanel extends JPanel {
     JList statList;
     String [] statistics = {" Execution", " 0 Cycles", " 0 Instructions", " ", " Stalls", " 0 RAW Stalls", " 0 WAW Stalls",
-                            " 0 WAR Stalls", " 0 Structural Stalls(Divider not available)", "0 Structural Stalls (Memory not available)", " 0 Branch Taken Stalls", " 0 Branch Misprediction Stalls",
+                            " 0 WAR Stalls", /*" 0 Structural Stalls(Divider not available)", " 0 Structural Stalls (Memory not available)",*/
+                            " 0 Flushing Stalls", " 0 Branch Untaken Stalls", " 0 Branch Taken Stalls", " 0 Branch Misprediction Stalls",
                             " Code Size", " 0 Bytes", "FPU info", "FCSR", "FCSRGroups", "FCSRMnemonics", "FCSRValues"
                            };
     StatPanel() {
@@ -90,6 +92,10 @@ public class GUIStatistics extends GUIComponent {
     WAWStalls = cpu.getWAWStalls();
     dividerStalls = cpu.getStructuralStallsDivider();
     memoryStalls = cpu.getStructuralStallsMemory();
+    flushing_stalls = cpu.getFlushingStalls();
+    untaken_stalls = cpu.getUntakenStalls();
+    taken_stalls = cpu.getTakenStalls();
+    misprediction_stalls = cpu.getMispredictionStalls();
   }
 
   public void draw() {
@@ -162,16 +168,24 @@ public class GUIStatistics extends GUIComponent {
         label.setText(" 0 " + CurrentLocale.getString("WARS"));
         return label;
       case 8:
+        // original implementation
+        /*
         label.setText(" " + dividerStalls + " " + CurrentLocale.getString("STRUCTS_DIVNOTAVAILABLE"));
+        */
+        label.setText(" " + flushing_stalls + " " + CurrentLocale.getString("FS"));
         return label;
       case 9:
+        // original implementation
+        /*
         label.setText(" " + memoryStalls  + " " + CurrentLocale.getString("STRUCTS_MEMNOTAVAILABLE"));
+        */
+        label.setText(" " + untaken_stalls + " " + CurrentLocale.getString("BUTS"));
         return label;
       case 10:
-        label.setText(" 0 " + CurrentLocale.getString("BTS"));
+        label.setText(" " + taken_stalls + " " + CurrentLocale.getString("BTS"));
         return label;
       case 11:
-        label.setText(" 0 " + CurrentLocale.getString("BMS"));
+        label.setText(" " + misprediction_stalls + " " + CurrentLocale.getString("BMS"));
         return label;
       case 12:
         label.setText(" " + CurrentLocale.getString("CSIZE"));

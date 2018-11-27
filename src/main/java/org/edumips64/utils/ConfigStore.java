@@ -72,6 +72,12 @@ public abstract class ConfigStore {
     ConfigStore.defaults.put(ConfigKey.FP_UNDERFLOW, true);
     ConfigStore.defaults.put(ConfigKey.FP_DIVIDE_BY_ZERO, true);
 
+    // Branch Prediction mode defaults
+    ConfigStore.defaults.put(ConfigKey.PRED_UNTAKEN, true);
+    ConfigStore.defaults.put(ConfigKey.PRED_TAKEN, false);
+    ConfigStore.defaults.put(ConfigKey.PRED_2BIT, false);
+    ConfigStore.defaults.put(ConfigKey.PRED_DYNAMIC21, false);
+
     // FPU Rounding mode defaults.
     ConfigStore.defaults.put(ConfigKey.FP_NEAREST, false);
     ConfigStore.defaults.put(ConfigKey.FP_TOWARDS_ZERO, true);

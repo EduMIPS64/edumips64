@@ -11,6 +11,7 @@ java_library(
         ":memory",
         ":pipeline",
         ":registers",
+        ":BranchPredictor",
         "//src/main/java/org/edumips64/core/fpu:exceptions",
         "//src/main/java/org/edumips64/core/fpu:fppipeline",
         "//src/main/java/org/edumips64/core/fpu:registerfp",
@@ -133,4 +134,16 @@ java_library(
 java_library(
     name = "exceptions",
     srcs = glob(["*Exception.java"]),
+)
+
+java_library(
+    name = "BranchPredictor",
+    srcs = [
+        "BranchPredictor.java",
+        "Prediction.java",
+    ],
+    deps = [
+        "//src/main/java/org/edumips64/core/is:exceptions",
+        "//src/main/java/org/edumips64/core/is:instructioninterface",
+    ],
 )

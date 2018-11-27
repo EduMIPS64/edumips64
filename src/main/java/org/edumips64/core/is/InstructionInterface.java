@@ -16,7 +16,7 @@ public interface InstructionInterface {
    * Now it is used in order to generate the Dinero trace-file
    *</pre>
    */
-  default void IF() throws BreakException {}
+  default void IF() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, BreakException, PredictedJumpException {}
 
   /**
    * <pre>
@@ -34,7 +34,7 @@ public interface InstructionInterface {
    * Windows).
    *</pre>
    **/
-  boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException, StoppingException;
+  boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, UntakenBranchException, TakenBranchException, BreakException, WAWException, FPInvalidOperationException, StoppingException;
 
   /**
    * <pre>

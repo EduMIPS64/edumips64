@@ -47,7 +47,11 @@ public class CPU {
 
   /** Program Counter*/
   private Register pc, old_pc;
+  private Register pc_branch; // pc of the branch instruction
   private Register LO, HI;
+
+  /** Branch Predictor*/
+  private BranchPredictor predictor;
 
   /** CPU status.
    *  READY - the CPU has been initialized but the symbol table hasn't been
@@ -80,6 +84,8 @@ public class CPU {
 
   /** Statistics */
   private int cycles, instructions, RAWStalls, WAWStalls, dividerStalls, funcUnitStalls, memoryStalls, exStalls;
+  private int flushing_stalls, untaken_stalls, taken_stalls, misprediction_stalls;
+
 
   /** BUBBLE */
   private InstructionInterface bubble;
@@ -95,6 +101,7 @@ public class CPU {
     cpuStatusChangeCallback = callback;
   }
 
+  /** Constructor **/
   public CPU(Memory memory, ConfigStore config, InstructionInterface bubble) {
     this.config = config;
     this.bubble = bubble;
@@ -115,8 +122,13 @@ public class CPU {
 
     pc = new Register("PC");
     old_pc = new Register("Old PC");
+    pc_branch = new Register("PC BRANCH");
     LO = new Register("LO");
     HI = new Register("HI");
+
+    //Branch Predictor
+    predictor = new BranchPredictor();
+    ConfigBranchPredictionMode();
 
     //Floating point registers initialization
     fpr = new RegisterFP[32];
@@ -173,6 +185,12 @@ public class CPU {
   public void setFCSRConditionCode(int cc, int condition) throws IrregularStringOfBitsException {
     FCSR.setFCSRConditionCode(cc, condition);
   }
+
+  // Statistical Properties
+  public void IncrFlushingStalls() { flushing_stalls++; }
+  public void IncrUntakenStalls() { untaken_stalls++; }
+  public void IncrTakenStalls() { taken_stalls++; }
+  public void IncrMispredictionStalls() { misprediction_stalls++; }
 
 //GETTING PROPERTIES -----------------------------------------------------------------
 
@@ -297,6 +315,29 @@ public class CPU {
     return WAWStalls;
   }
 
+  /** Returns the number of Flushing stalls that happened inside the pipeline
+   * @return an integer
+   */
+  public int getFlushingStalls() {
+    return flushing_stalls;
+  }
+
+  /** Returns the number of Branch Untaken stalls that happened inside the pipeline
+   * @return an integer
+   */
+  public int getUntakenStalls() { return untaken_stalls; }
+
+  /** Returns the number of Branch Taken stalls that happened inside the pipeline
+   * @return an integer
+   */
+  public int getTakenStalls() { return taken_stalls; }
+
+  /** Returns the number of Branch Misprediction stalls that happened inside the pipeline
+   * @return an integer
+   */
+  public int getMispredictionStalls() { return misprediction_stalls; }
+
+
   /** Returns the number of Structural Stalls (Divider not available) that happened inside the pipeline
    * @return an integer
    */
@@ -338,6 +379,14 @@ public class CPU {
   public Register getPC() {
     return pc;
   }
+
+  /** Gets the Program Counter register of the Branch instruction
+   *  @return a Register object
+   */
+  public Register getPCBranch() {
+    return pc_branch;
+  }
+
   /** Gets the Last Program Counter register
    *  @return a Register object
    */
@@ -359,6 +408,13 @@ public class CPU {
     return HI;
   }
 
+  /** Gets the BranchPredictor.
+   * @return a BranchPredictor object
+   */
+  public BranchPredictor getBranchPredictor() {
+    return predictor;
+  }
+
   /** Gets the structural stall counter
    *@return the memory stall counter
    */
@@ -368,7 +424,7 @@ public class CPU {
 
   /** This method performs a single pipeline step
   */
-  public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException {
+  public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, PredictedJumpException {
     configFPExceptionsAndRM();
     Optional<String> syncex;
     if (status != CPUStatus.RUNNING && status != CPUStatus.STOPPING) {
@@ -428,6 +484,81 @@ public class CPU {
       pipe.setID(bubble);
       old_pc.writeDoubleWord((pc.getValue()));
       pc.writeDoubleWord((pc.getValue()) + 4);
+
+      //updating stalls
+      flushing_stalls++;
+
+    } catch (PredictedJumpException ex) {
+      /**
+        Finish the rest of IF stage after the exception detected.
+      **/
+
+      logger.info("Moving " + pipe.IF() + " to ID");
+      pipe.setID(pipe.IF());
+
+      InstructionInterface next_if = mem.getInstruction(pc);
+      logger.info("Fetched new instruction " + next_if);
+
+      old_pc.writeDoubleWord((pc.getValue()));
+      pc.writeDoubleWord((pc.getValue()) + 4);
+      logger.info("New Program Counter value: " + pc.toString());
+      logger.info("Putting " + next_if + "in IF.");
+      pipe.setIF(next_if);
+
+    } catch (UntakenBranchException ex) {
+      /**
+      When UntakenBranchException occurs, the branch prediction failed.
+      The next instruction should be the pc_branch+4.
+      The one after next should be the pc_branch+4.
+      There is 1 flushing in this scenario.
+      **/
+      pipe.setIF(mem.getInstruction(pc));
+      logger.info("Executing an untaken branch target.");
+      /*
+      try {
+        if (!pipe.isEmpty(Pipeline.Stage.IF)) {
+          logger.info("Executing the IF() method of the branch target.");
+          pipe.IF().IF();
+        }
+      } catch (BreakException bex) {
+        // This needs to be ignored here because BREAK throws BreakException when it enters
+        // the IF stage, but if BREAK enters IF after a jump instruction is about to modify
+        // the program counter, then it must be discarded (like every other instruction).
+        logger.info("Caught a BREAK after a Jump: ignoring it.");
+      }
+      */
+
+      // A J-Type instruction has just modified the Program Counter. We need to
+      // put in the IF stage the instruction the PC points to
+      pipe.setEX(pipe.ID());
+      pipe.setID(bubble);
+      pc.writeDoubleWord((pc.getValue()) + 4);
+
+      //Branch Stalls
+      logger.info("Updating Stalls.");
+      flushing_stalls++;
+      misprediction_stalls++;
+      untaken_stalls++;
+
+    } catch (TakenBranchException ex) {
+      /**
+       When TakenBranchException occurs, the branch prediction failed.
+       There is 1 flushing in this scenario.
+       **/
+      logger.info("Executing a Taken Branch.");
+
+      // A J-Type instruction has just modified the Program Counter. We need to
+      // put in the IF stage the instruction the PC points to
+      pipe.setIF(mem.getInstruction(pc));
+      pipe.setEX(pipe.ID());
+      pipe.setID(bubble);
+      old_pc.writeDoubleWord((pc.getValue()));
+      pc.writeDoubleWord((pc.getValue()) + 4);
+
+      //updating stalls
+      flushing_stalls++;
+      taken_stalls++;
+      misprediction_stalls++;
 
     } catch (RAWException ex) {
       if (currentPipeStage == Pipeline.Stage.ID) {
@@ -594,7 +725,7 @@ public class CPU {
 
   // Returns true if there is a RAW conflict, false otherwis3. See docs for Instruction.ID()
   // for an explanation of why it is the case.
-  private boolean stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
+  private boolean stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, IrregularWriteOperationException, JumpException, PredictedJumpException, UntakenBranchException, TakenBranchException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
     changeStage(Pipeline.Stage.ID);
 
     if (pipe.isEmpty(Pipeline.Stage.ID)) {
@@ -639,7 +770,7 @@ public class CPU {
     return false;
   }
 
-  private void stepIF() throws IrregularStringOfBitsException, IrregularWriteOperationException, BreakException {
+  private void stepIF() throws IrregularStringOfBitsException, IrregularWriteOperationException, BreakException, TwosComplementSumException, PredictedJumpException {
     // We don't have to execute any methods, but we must get the new
     // instruction from the symbol table.
     changeStage(Pipeline.Stage.IF);
@@ -690,6 +821,10 @@ public class CPU {
     instructions = 0;
     RAWStalls = 0;
     WAWStalls = 0;
+    flushing_stalls = 0;
+    untaken_stalls = 0;
+    taken_stalls = 0;
+    misprediction_stalls = 0;
     dividerStalls = 0;
     funcUnitStalls = 0;
     exStalls = 0;
@@ -705,6 +840,7 @@ public class CPU {
       fpr[i].reset();
     }
 
+    //
 
     try {
       // Reset the FCSR condition codes.
@@ -733,6 +869,7 @@ public class CPU {
     // Reset program counter
     pc.reset();
     old_pc.reset();
+    pc_branch.reset();
 
     // Reset the memory.
     mem.reset();
@@ -741,6 +878,10 @@ public class CPU {
     pipe.clear();
     // Reset FP pipeline
     fpPipe.reset();
+
+    //Reset predictor
+    predictor.reset();
+    ConfigBranchPredictionMode();
 
     logger.info("CPU Resetted");
   }
@@ -794,6 +935,21 @@ public class CPU {
     return s.toString();
   }
 
+  private void ConfigBranchPredictionMode(){
+    if (config.getBoolean(ConfigKey.PRED_UNTAKEN)) {
+      predictor.setPredictionMode(3);
+    }
+    else if (config.getBoolean(ConfigKey.PRED_TAKEN)) {
+      predictor.setPredictionMode(4);
+    }
+    else if (config.getBoolean(ConfigKey.PRED_2BIT)) {
+      predictor.setPredictionMode(1);
+    }
+    else if (config.getBoolean(ConfigKey.PRED_DYNAMIC21)) {
+      predictor.setPredictionMode(2);
+    }
+  }
+
   private void configFPExceptionsAndRM() {
     try {
       FCSR.setFPExceptions(FCSRRegister.FPExceptions.INVALID_OPERATION, config.getBoolean(ConfigKey.FP_INVALID_OPERATION));
@@ -827,7 +983,7 @@ public class CPU {
   }
 
   /** Private class, representing the R0 register */
-  // TODO: DEVE IMPOSTARE I SEMAFORI?????
+  // TODO: SHOULD SET THE TRANSPARENCE????? (translated by Google)
   private class R0 extends Register {
     public R0() {
       super("R0");
