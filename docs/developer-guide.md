@@ -11,7 +11,7 @@
 
 [Unit tests](#unit-tests)
 
-[Bazel](#bazel)
+[Compiling under Windoes](#windows)
 
 ### Requirements
 
@@ -153,3 +153,8 @@ sure your new class behaves as required.
 The Swing UI code is explicitly excluded from code coverage reports because
 writing tests for it is quite difficult and might not be worth it since we
 might be migrating to a new shiny web-based frontend.
+
+### Windows
+
+Compilation under Windows is possible by using the Windows Subsystem for Linux
+(WSL), exactly in the same way as you would do under Linux.
