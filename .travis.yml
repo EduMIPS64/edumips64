@@ -6,7 +6,7 @@ env:
       IzTN2uuR4nsJ8+1IRmLXxn29+MK8PuKYgArbAU/aQPPm1vIUdMv0AYF/rq9N
       YBdJJqfUHwOcGBFuwX1oKp4ykb6VTdYGOOCAN0j3IWtDXMkFM+qSTsLishyw
       wSR11Z5SzTPxMGrY8cOupSH8mckmJvecomcYLctZdYwiP72+rSs=
-  - BAZEL_VERSION=0.10.0
+  - BAZEL_VERSION=0.21.0
 cache:
   apt: true
   directories:
