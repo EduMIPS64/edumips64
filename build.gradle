@@ -19,20 +19,38 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
-// Define the main class for the application
 mainClassName = 'org.edumips64.Main'
+version = "1.2.5"
 
-// Jar configuration
+/*
+ * Fat / standalone jar tasks
+ */
 jar {
     manifest {
         attributes 'Main-Class': mainClassName
     }
 }
 
-// Fat / standalone / uber jar configuration
 shadowJar {
    classifier = 'standalone'
 }
+
+// CLI standalone jar task
+// https://github.com/johnrengelman/shadow/issues/138#issuecomment-446238613
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+task cliJar(type: ShadowJar, dependsOn: shadowJar) {
+  mergeServiceFiles()
+  classifier = 'cli'
+  manifest {
+        attributes 'Main-Class': 'org.edumips64.MainCLI'
+  }
+  group = 'build'
+  // TODO: remove GUI-related source files from sourceSet of CLI jar
+  from zipTree(shadowJar.archivePath)
+  description = 'Assemble the CLI jar file'
+  configurations = [project.configurations.runtime]
+}
+assemble.dependsOn(cliJar)  // make sure to execute cliJar upon assemble
 
 
 /* 
@@ -43,27 +61,31 @@ task itHtmlDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
     sourceDirectory = "${projectDir}/docs/user/it/src"
     outputDirectory = "build/docs/it/html"
     group = 'Documentation'
+    description = 'Compile the HTML documentation in Italian'
 }
 task itLatexDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
     builder = "latex"
     sourceDirectory = "${projectDir}/docs/user/it/src"
     outputDirectory = "build/docs/it/latex"
     group = 'Documentation'
+    description = 'Compile the LateX documentation in Italian'
 }
 task enHtmlDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
     builder = "html"
     sourceDirectory = "${projectDir}/docs/user/en/src"
     outputDirectory = "build/docs/en/html"
     group = 'Documentation'
+    description = 'Compile the HTML documentation in English'
 }
 task enLatexDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
     builder = "latex"
     sourceDirectory = "${projectDir}/docs/user/en/src"
     outputDirectory = "build/docs/en/latex"
     group = 'Documentation'
+    description = 'Compile the LateX documentation in English'
 }
 // Catch-all task for documentation
 task allDocs(type: GradleBuild) {
      tasks = ['itHtmlDocs', 'itLatexDocs', 'enHtmlDocs', 'enLatexDocs']
+     description = 'Run all documentation tasks'
 }
-
