@@ -39,16 +39,16 @@ shadowJar {
 // https://github.com/johnrengelman/shadow/issues/138#issuecomment-446238613
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 task cliJar(type: ShadowJar, dependsOn: shadowJar) {
-  mergeServiceFiles()
-  classifier = 'cli'
-  manifest {
+    mergeServiceFiles()
+    classifier = 'cli'
+    manifest {
         attributes 'Main-Class': 'org.edumips64.MainCLI'
-  }
-  group = 'build'
-  // TODO: remove GUI-related source files from sourceSet of CLI jar
-  from zipTree(shadowJar.archivePath)
-  description = 'Assemble the CLI jar file'
-  configurations = [project.configurations.runtime]
+    }
+    group = 'build'
+    // TODO: remove GUI-related source files from sourceSet of CLI jar
+    from zipTree(shadowJar.archivePath)
+    description = 'Assemble the CLI jar file'
+    configurations = [project.configurations.runtime]
 }
 assemble.dependsOn(cliJar)  // make sure to execute cliJar upon assemble
 
@@ -84,8 +84,17 @@ task enLatexDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
     group = 'Documentation'
     description = 'Compile the LateX documentation in English'
 }
+task enPdfDocs(type:Exec, dependsOn: enLatexDocs) {
+    workingDir 'build/docs/en/latex'
+    commandLine 'make'
+}
+task itPdfDocs(type:Exec, dependsOn: itLatexDocs) {
+    workingDir 'build/docs/en/latex'
+    commandLine 'make'
+}
 // Catch-all task for documentation
 task allDocs(type: GradleBuild) {
-     tasks = ['itHtmlDocs', 'itLatexDocs', 'enHtmlDocs', 'enLatexDocs']
-     description = 'Run all documentation tasks'
+    tasks = ['itHtmlDocs', 'itPdfDocs', 'enHtmlDocs', 'enPdfDocs']
+    description = 'Run all documentation tasks'
 }
+check.dependsOn(allDocs)
