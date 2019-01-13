@@ -19,7 +19,7 @@ addons:
       - texlive-fonts-recommended
       - texlive-lang-english
       - texlive-lang-italian
-      - build-essential
+      - texlive-xetex
 #notifications:
 #  irc:
 #    channels:

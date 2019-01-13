@@ -55,6 +55,7 @@ assemble.dependsOn(cliJar)  // make sure to execute cliJar upon assemble
 
 /* 
  * Documentation tasks
+ * https://github.com/trustin/sphinx-gradle-plugin/issues/3#issuecomment-340078195
  */
 task itHtmlDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
     builder = "html"
@@ -86,11 +87,11 @@ task enLatexDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
 }
 task enPdfDocs(type:Exec, dependsOn: enLatexDocs) {
     workingDir 'build/docs/en/latex'
-    commandLine 'make'
+    commandLine 'xelatex', 'EduMIPS64.tex'
 }
 task itPdfDocs(type:Exec, dependsOn: itLatexDocs) {
-    workingDir 'build/docs/en/latex'
-    commandLine 'make'
+    workingDir 'build/docs/it/latex'
+    commandLine 'xelatex', 'EduMIPS64.tex'
 }
 // Catch-all task for documentation
 task allDocs(type: GradleBuild) {
