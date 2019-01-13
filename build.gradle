@@ -1,0 +1,69 @@
+/*
+ * EduMips64 Gradle build configuration
+ */
+
+plugins {
+    id 'java'
+    id 'application'
+    id "kr.motd.sphinx" version "2.3.1"                     // Sphinx plugin: to build the documentation   
+    id "com.github.johnrengelman.shadow" version "4.0.3"    // Shadow plugin: to build the uber/fat/standalone jar
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation 'com.google.gwt:gwt-user:2.8.2'
+    implementation 'javax.help:javahelp:2.0.05'
+    testImplementation 'junit:junit:4.12'
+}
+
+// Define the main class for the application
+mainClassName = 'org.edumips64.Main'
+
+// Jar configuration
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}
+
+// Fat / standalone / uber jar configuration
+shadowJar {
+   classifier = 'standalone'
+}
+
+
+/* 
+ * Documentation tasks
+ */
+task itHtmlDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
+    builder = "html"
+    sourceDirectory = "${projectDir}/docs/user/it/src"
+    outputDirectory = "build/docs/it/html"
+    group = 'Documentation'
+}
+task itLatexDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
+    builder = "latex"
+    sourceDirectory = "${projectDir}/docs/user/it/src"
+    outputDirectory = "build/docs/it/latex"
+    group = 'Documentation'
+}
+task enHtmlDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
+    builder = "html"
+    sourceDirectory = "${projectDir}/docs/user/en/src"
+    outputDirectory = "build/docs/en/html"
+    group = 'Documentation'
+}
+task enLatexDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
+    builder = "latex"
+    sourceDirectory = "${projectDir}/docs/user/en/src"
+    outputDirectory = "build/docs/en/latex"
+    group = 'Documentation'
+}
+// Catch-all task for documentation
+task allDocs(type: GradleBuild) {
+     tasks = ['itHtmlDocs', 'itLatexDocs', 'enHtmlDocs', 'enLatexDocs']
+}
+
