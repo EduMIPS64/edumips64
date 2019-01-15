@@ -19,37 +19,56 @@ dependencies {
 }
 
 mainClassName = 'org.edumips64.Main'
-version = "1.2.5"
+version = '1.2.5'
+//codename = 'Eden'
+
 
 /*
- * Fat / standalone jar tasks
+ * Jar tasks
  */
+
+/*def getManifest(mainClass) {
+    manifest {
+        attributes 'Main-Class': mainClass
+        attributes 'SplashScreen-Image': 'images/splash.png'
+        attributes 'Signature-Version': version
+        attributes 'Codename': 'Eden'
+        attributes "Build-Date": (new Date()).toString()
+        attributes "Git-Revision": 'edumips64:master:1e6c1ae'
+    }
+    return manifest
+}*/
+
+def getCheckedOutGitCommitHash() {
+  'git rev-parse --verify --short HEAD'.execute().text.trim()
+}
+
 jar {
+    //getManifest(mainClassName)
     manifest {
         attributes 'Main-Class': mainClassName
+        attributes 'SplashScreen-Image': 'images/splash.png'
+        attributes 'Signature-Version': version
+        attributes 'Codename': 'Eden'
+        attributes "Build-Date": new Date()
+        attributes "Git-Revision": getCheckedOutGitCommitHash() //'edumips64:master:1e6c1ae'
     }
 }
+
+task cliJar(type: Jar, dependsOn: jar) {  
+    classifier = 'cli'
+    from sourceSets.main.output
+    manifest {
+        attributes 'Main-Class': 'org.edumips64.MainCLI'
+        attributes 'SplashScreen-Image': 'images/splash.png'
+        attributes 'Signature-Version': version
+    }
+}
+assemble.dependsOn(cliJar) 
 
 shadowJar {
    classifier = 'standalone'
 }
-
-// CLI standalone jar task
-// https://github.com/johnrengelman/shadow/issues/138#issuecomment-446238613
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-task cliJar(type: ShadowJar, dependsOn: shadowJar) {
-    mergeServiceFiles()
-    classifier = 'cli'
-    manifest {
-        attributes 'Main-Class': 'org.edumips64.MainCLI'
-    }
-    group = 'build'
-    // TODO: remove GUI-related source files from sourceSet of CLI jar
-    from zipTree(shadowJar.archivePath)
-    description = 'Assemble the CLI jar file'
-    configurations = [project.configurations.runtime]
-}
-assemble.dependsOn(cliJar)  // make sure to execute cliJar upon assemble
 
 
 /* 
