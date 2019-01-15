@@ -60,38 +60,38 @@ assemble.dependsOn(cliJar)  // make sure to execute cliJar upon assemble
 task itHtmlDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
     builder = "html"
     sourceDirectory = "${projectDir}/docs/user/it/src"
-    outputDirectory = "build/docs/it/html"
+    outputDirectory = "${buildDir}/docs/it/html"
     group = 'Documentation'
     description = 'Compile the HTML documentation in Italian'
 }
 task itLatexDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
     builder = "latex"
     sourceDirectory = "${projectDir}/docs/user/it/src"
-    outputDirectory = "build/docs/it/latex"
+    outputDirectory = "${buildDir}/docs/it/latex"
     group = 'Documentation'
     description = 'Compile the LateX documentation in Italian'
 }
 task enHtmlDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
     builder = "html"
     sourceDirectory = "${projectDir}/docs/user/en/src"
-    outputDirectory = "build/docs/en/html"
+    outputDirectory = "${buildDir}/docs/en/html"
     group = 'Documentation'
     description = 'Compile the HTML documentation in English'
 }
 task enLatexDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
     builder = "latex"
     sourceDirectory = "${projectDir}/docs/user/en/src"
-    outputDirectory = "build/docs/en/latex"
+    outputDirectory = "${buildDir}/docs/en/latex"
     group = 'Documentation'
     description = 'Compile the LateX documentation in English'
 }
 task enPdfDocs(type:Exec, dependsOn: enLatexDocs) {
-    workingDir 'build/docs/en/latex'
-    commandLine 'xelatex', 'EduMIPS64.tex'
+    workingDir "${buildDir}/docs/en/latex"
+    commandLine 'make', 'all-pdf'
 }
 task itPdfDocs(type:Exec, dependsOn: itLatexDocs) {
-    workingDir 'build/docs/it/latex'
-    commandLine 'xelatex', 'EduMIPS64.tex'
+    workingDir "${buildDir}/docs/it/latex"
+    commandLine 'make', 'all-pdf'
 }
 // Catch-all task for documentation
 task allDocs(type: GradleBuild) {
