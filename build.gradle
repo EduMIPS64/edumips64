@@ -64,13 +64,6 @@ task itHtmlDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
     group = 'Documentation'
     description = 'Compile the HTML documentation in Italian'
 }
-task itLatexDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
-    builder = "latex"
-    sourceDirectory = "${projectDir}/docs/user/it/src"
-    outputDirectory = "${buildDir}/docs/it/latex"
-    group = 'Documentation'
-    description = 'Compile the LateX documentation in Italian'
-}
 task enHtmlDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
     builder = "html"
     sourceDirectory = "${projectDir}/docs/user/en/src"
@@ -78,20 +71,13 @@ task enHtmlDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
     group = 'Documentation'
     description = 'Compile the HTML documentation in English'
 }
-task enLatexDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
-    builder = "latex"
-    sourceDirectory = "${projectDir}/docs/user/en/src"
-    outputDirectory = "${buildDir}/docs/en/latex"
-    group = 'Documentation'
-    description = 'Compile the LateX documentation in English'
+task enPdfDocs(type:Exec) {
+    workingDir "${projectDir}/docs/user/en/src"
+    commandLine "make", "latexpdf", "BUILDDIR=${buildDir}/docs/en", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E"
 }
-task enPdfDocs(type:Exec, dependsOn: enLatexDocs) {
-    workingDir "${buildDir}/docs/en/latex"
-    commandLine 'make', 'all-pdf'
-}
-task itPdfDocs(type:Exec, dependsOn: itLatexDocs) {
-    workingDir "${buildDir}/docs/it/latex"
-    commandLine 'make', 'all-pdf'
+task itPdfDocs(type:Exec) {
+    workingDir "${projectDir}/docs/user/it/src"
+    commandLine "make", "latexpdf", "BUILDDIR=${buildDir}/docs/it", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E"
 }
 // Catch-all task for documentation
 task allDocs(type: GradleBuild) {

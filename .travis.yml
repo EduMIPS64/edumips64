@@ -19,6 +19,7 @@ addons:
       - texlive-fonts-recommended
       - texlive-lang-english
       - texlive-lang-italian
+      - texlive-xetex
       - latexmk
 #notifications:
 #  irc:
