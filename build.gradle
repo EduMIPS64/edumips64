@@ -5,7 +5,6 @@
 plugins {
     id 'java'
     id 'application'
-    id "kr.motd.sphinx" version "2.3.1"                     // Sphinx plugin: to build the documentation   
     id "com.github.johnrengelman.shadow" version "4.0.3"    // Shadow plugin: to build the uber/fat/standalone jar
 }
 
@@ -55,33 +54,27 @@ assemble.dependsOn(cliJar)  // make sure to execute cliJar upon assemble
 
 /* 
  * Documentation tasks
- * https://github.com/trustin/sphinx-gradle-plugin/issues/3#issuecomment-340078195
  */
-task itHtmlDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
-    builder = "html"
-    sourceDirectory = "${projectDir}/docs/user/it/src"
-    outputDirectory = "${buildDir}/docs/it/html"
-    group = 'Documentation'
-    description = 'Compile the HTML documentation in Italian'
-}
-task enHtmlDocs (type: kr.motd.gradle.sphinx.gradle.SphinxTask){
-    builder = "html"
-    sourceDirectory = "${projectDir}/docs/user/en/src"
-    outputDirectory = "${buildDir}/docs/en/html"
-    group = 'Documentation'
-    description = 'Compile the HTML documentation in English'
-}
-task enPdfDocs(type:Exec) {
+task htmlDocsIt(type:Exec) {
     workingDir "${projectDir}/docs/user/en/src"
-    commandLine "make", "latexpdf", "BUILDDIR=${buildDir}/docs/en", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E"
+    commandLine "make", "html", "BUILDDIR=${buildDir}/docs/en", "SPHINXOPTS=-N -a -E -Q"
 }
-task itPdfDocs(type:Exec) {
+task htmlDocsEn(type:Exec) {
     workingDir "${projectDir}/docs/user/it/src"
-    commandLine "make", "latexpdf", "BUILDDIR=${buildDir}/docs/it", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E"
+    commandLine "make", "html", "BUILDDIR=${buildDir}/docs/it", "SPHINXOPTS=-N -a -E -Q"
+}
+task pdfDocsEn(type:Exec) {
+    workingDir "${projectDir}/docs/user/en/src"
+    commandLine "make", "latexpdf", "BUILDDIR=${buildDir}/docs/en", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E -Q"
+}
+task pdfDocsIt(type:Exec) {
+    workingDir "${projectDir}/docs/user/it/src"
+    commandLine "make", "latexpdf", "BUILDDIR=${buildDir}/docs/it", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E -Q"
 }
 // Catch-all task for documentation
 task allDocs(type: GradleBuild) {
-    tasks = ['itHtmlDocs', 'itPdfDocs', 'enHtmlDocs', 'enPdfDocs']
+    tasks = ['htmlDocsIt', 'htmlDocsEn', 'pdfDocsEn', 'pdfDocsIt']
     description = 'Run all documentation tasks'
 }
+// Include allDocs task in check task
 check.dependsOn(allDocs)
