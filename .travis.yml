@@ -1,18 +1,13 @@
----
-sudo: false
 dist: xenial
 env:
-  #global:
-  #- secure: |-
-  #    IzTN2uuR4nsJ8+1IRmLXxn29+MK8PuKYgArbAU/aQPPm1vIUdMv0AYF/rq9N
-  #    YBdJJqfUHwOcGBFuwX1oKp4ykb6VTdYGOOCAN0j3IWtDXMkFM+qSTsLishyw
-  #    wSR11Z5SzTPxMGrY8cOupSH8mckmJvecomcYLctZdYwiP72+rSs=
-cache:
-  apt: true
-  directories:
-    - $HOME/.cache/pip
+  global:
+    - secure: |-
+      IzTN2uuR4nsJ8+1IRmLXxn29+MK8PuKYgArbAU/aQPPm1vIUdMv0AYF/rq9N
+      YBdJJqfUHwOcGBFuwX1oKp4ykb6VTdYGOOCAN0j3IWtDXMkFM+qSTsLishyw
+      wSR11Z5SzTPxMGrY8cOupSH8mckmJvecomcYLctZdYwiP72+rSs=
 addons:
   apt:
+    update: true
     packages:
       - texlive-latex-base
       - texlive-latex-extra
@@ -23,18 +18,12 @@ addons:
       - texlive-xetex
       - latexmk
       - python3-sphinx
-#notifications:
-#  irc:
-#    channels:
-#    - irc.freenode.org#edumips64
-#    skip_join: true
 language: java
 jdk:
   - openjdk8
   - openjdk9
   - openjdk10
   - openjdk11
-  - oraclejdk11
-#after_success: 
-#- ./utils/update-gh-pages.sh
-#- bash <(curl -s https://codecov.io/bash)
+after_success: 
+  #- ./utils/update-gh-pages.sh
+  - bash <(curl -s https://codecov.io/bash)
