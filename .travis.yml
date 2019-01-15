@@ -30,10 +30,12 @@ addons:
 #    skip_join: true
 language: java
 jdk:
-  - oraclejdk8
   - oraclejdk9
   - oraclejdk10
-  - openjdk8
+  - oraclejdk11
+  - openjdk9
+  - openjdk10
+  - openjdk11
 #after_success: 
 #- ./utils/update-gh-pages.sh
 #- bash <(curl -s https://codecov.io/bash)
