@@ -1,5 +1,6 @@
 ---
 sudo: false
+dist: xenial
 env:
   #global:
   #- secure: |-
@@ -21,6 +22,7 @@ addons:
       - texlive-lang-italian
       - texlive-xetex
       - latexmk
+      - python3-sphinx
 #notifications:
 #  irc:
 #    channels:
