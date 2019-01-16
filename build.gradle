@@ -5,7 +5,6 @@
 plugins {
     id 'java'
     id 'application'
-    id "com.github.johnrengelman.shadow" version "4.0.3"    // Shadow plugin: to build the uber/fat/standalone jar
 }
 
 repositories {
@@ -54,9 +53,9 @@ check.dependsOn(allDocs)
 /*
  * Jar tasks
  */
-// Compile HTML docs for JavaHelp before assembling the jar
-jar.dependsOn htmlDocsIt
-jar.dependsOn htmlDocsEn
+// Compile HTML docs for JavaHelp before processResources task
+processResources.dependsOn htmlDocsIt
+processResources.dependsOn htmlDocsEn
 
 // Include the docs folder at the root of the jar, for JavaHelp
 processResources {
@@ -90,8 +89,9 @@ ext.sharedManifest = manifest {
         'Git-Revision': getGitRevisionId() )
 }
 
-// Main "slim/nodeps" jar
+// "Slim / nodeps" jar
 jar {
+    //classifier = 'nodeps'
     manifest {
         attributes 'Main-Class': mainClassName
         attributes 'SplashScreen-Image': 'images/splash.png'
@@ -110,8 +110,16 @@ task cliJar(type: Jar, dependsOn: jar) {
 }
 assemble.dependsOn(cliJar) 
 
-// TODO check out this https://docs.gradle.org/current/userguide/working_with_files.html#sec:creating_uber_jar_example
 // "Fat" / standalone jar (includes all dependencies)
-shadowJar {
-   classifier = 'standalone'
+task standaloneJar(type: Jar, dependsOn: configurations.runtimeClasspath) {
+    classifier = 'standalone'
+    from sourceSets.main.output
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+    manifest {
+        attributes 'Main-Class': mainClassName
+        from sharedManifest        
+    }
 }
+assemble.dependsOn(standaloneJar) 
