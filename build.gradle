@@ -22,57 +22,6 @@ mainClassName = 'org.edumips64.Main'
 version = '1.2.5'
 ext.codename = 'Eden'
 
-// Include the docs folder at the root of the jar, for JavaHelp
-processResources {
-    from ('docs/') {
-        into 'docs'
-        excludes = ["**/src/**", "**/design/**", "**/*.py", "**/*.md"]
-    }
-}
-
-/*
- * Jar tasks
- */
-def getGitRevisionId() {
-  def branch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
-  def commitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
-  return 'edumips64:' + branch + ':' + commitHash
-}
-
-ext.sharedManifest = manifest {
-    attributes(
-        'Signature-Version': version,
-        'Codename': codename,
-        'Build-Date': new Date(),
-        'Git-Revision': getGitRevisionId() )
-}
-
-// Main "slim" jar
-jar {
-    manifest {
-        attributes 'Main-Class': mainClassName
-        attributes 'SplashScreen-Image': 'images/splash.png'
-        from sharedManifest        
-    }
-}
-
-// Cli jar
-task cliJar(type: Jar, dependsOn: jar) {  
-    classifier = 'cli'
-    from sourceSets.main.output
-    manifest {
-        attributes 'Main-Class': 'org.edumips64.MainCLI'
-        from sharedManifest        
-    }
-}
-assemble.dependsOn(cliJar) 
-
-// TODO check out this https://docs.gradle.org/current/userguide/working_with_files.html#sec:creating_uber_jar_example
-// "Fat" / standalone jar (includes all dependencies)
-shadowJar {
-   classifier = 'standalone'
-}
-
 
 /* 
  * Documentation tasks
@@ -100,3 +49,69 @@ task allDocs(type: GradleBuild) {
 }
 // Include allDocs task in check task
 check.dependsOn(allDocs)
+
+
+/*
+ * Jar tasks
+ */
+// Compile HTML docs for JavaHelp before assembling the jar
+jar.dependsOn htmlDocsIt
+jar.dependsOn htmlDocsEn
+
+// Include the docs folder at the root of the jar, for JavaHelp
+processResources {
+    from ("${buildDir}/docs/en") {
+        into 'docs/user/en'
+        includes = ["html/**"]
+        excludes = ["**/_sources/**"]
+    }
+    from ("${buildDir}/docs/it") {
+        into 'docs/user/it'
+        includes = ["html/**"]
+        excludes = ["**/_sources/**"]
+    }
+    from ('docs/') {
+        into 'docs'
+        excludes = ["**/src/**", "**/design/**", "**/*.py", "**/*.md"]
+    }
+}
+
+def getGitRevisionId() {
+  def branch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
+  def commitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
+  return 'edumips64:' + branch + ':' + commitHash
+}
+
+ext.sharedManifest = manifest {
+    attributes(
+        'Signature-Version': version,
+        'Codename': codename,
+        'Build-Date': new Date(),
+        'Git-Revision': getGitRevisionId() )
+}
+
+// Main "slim/nodeps" jar
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+        attributes 'SplashScreen-Image': 'images/splash.png'
+        from sharedManifest        
+    }
+}
+
+// Cli jar
+task cliJar(type: Jar, dependsOn: jar) {  
+    classifier = 'cli'
+    from sourceSets.main.output
+    manifest {
+        attributes 'Main-Class': 'org.edumips64.MainCLI'
+        from sharedManifest        
+    }
+}
+assemble.dependsOn(cliJar) 
+
+// TODO check out this https://docs.gradle.org/current/userguide/working_with_files.html#sec:creating_uber_jar_example
+// "Fat" / standalone jar (includes all dependencies)
+shadowJar {
+   classifier = 'standalone'
+}
