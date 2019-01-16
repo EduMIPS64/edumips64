@@ -20,54 +20,47 @@ dependencies {
 
 mainClassName = 'org.edumips64.Main'
 version = '1.2.5'
-def codename = 'Eden'
+ext.codename = 'Eden'
 
 
 /*
  * Jar tasks
  */
-
-/*def getManifest(mainClass) {
-    manifest {
-        attributes 'Main-Class': mainClass
-        attributes 'SplashScreen-Image': 'images/splash.png'
-        attributes 'Signature-Version': version
-        attributes 'Codename': 'Eden'
-        attributes "Build-Date": (new Date()).toString()
-        attributes "Git-Revision": 'edumips64:master:1e6c1ae'
-    }
-    return manifest
-}*/
-
 def getGitRevisionId() {
   def branch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
   def commitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
   return 'edumips64:' + branch + ':' + commitHash
 }
 
+ext.sharedManifest = manifest {
+    attributes(
+        'Signature-Version': version,
+        'Codename': codename,
+        "Build-Date": new Date(),
+        "Git-Revision": getGitRevisionId() )
+}
+
+// Main "slim" jar
 jar {
-    //getManifest(mainClassName)
     manifest {
         attributes 'Main-Class': mainClassName
         attributes 'SplashScreen-Image': 'images/splash.png'
-        attributes 'Signature-Version': version
-        attributes 'Codename': codename
-        attributes "Build-Date": new Date()
-        attributes "Git-Revision": getGitRevisionId() //'edumips64:master:1e6c1ae'
+        from sharedManifest        
     }
 }
 
+// Cli jar
 task cliJar(type: Jar, dependsOn: jar) {  
     classifier = 'cli'
     from sourceSets.main.output
     manifest {
         attributes 'Main-Class': 'org.edumips64.MainCLI'
-        attributes 'SplashScreen-Image': 'images/splash.png'
-        attributes 'Signature-Version': version
+        from sharedManifest        
     }
 }
 assemble.dependsOn(cliJar) 
 
+// "Fat" / standalone jar (includes all dependencies)
 shadowJar {
    classifier = 'standalone'
 }
