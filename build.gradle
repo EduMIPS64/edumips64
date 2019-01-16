@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.google.gwt:gwt-user:2.8.2'
+    compileOnly  'com.google.gwt:gwt-user:2.8.2'
     implementation 'javax.help:javahelp:2.0.05'
     testImplementation 'junit:junit:4.12'
 }
@@ -72,7 +72,7 @@ processResources {
     }
     from ('docs/') {
         into 'docs'
-        excludes = ["**/src/**", "**/design/**", "**/*.py", "**/*.md"]
+        excludes = ["**/src/**", "**/design/**", "**/*.py", "**/*.md", "**/__pycache__/**"]
     }
 }
 
