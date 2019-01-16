@@ -189,6 +189,10 @@ public class Main extends JApplet {
 
     showVersion();
 
+    // Set the Swing UI LookAndFeel according to the OS
+    try {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    } catch (Exception e) {  }
     // Creating the main JFrame
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
