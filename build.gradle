@@ -123,3 +123,14 @@ task standaloneJar(type: Jar, dependsOn: configurations.runtimeClasspath) {
     }
 }
 assemble.dependsOn(standaloneJar) 
+
+
+/*
+ * Test tasks
+ */
+test {
+    // Add verbose logging of test execution
+    afterTest { desc, result -> 
+        logger.quiet "Executed test ${desc.name} [${desc.className}] with result: ${result.resultType}"
+    }
+}
