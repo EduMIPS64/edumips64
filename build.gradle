@@ -36,8 +36,8 @@ ext.sharedManifest = manifest {
     attributes(
         'Signature-Version': version,
         'Codename': codename,
-        "Build-Date": new Date(),
-        "Git-Revision": getGitRevisionId() )
+        'Build-Date': new Date(),
+        'Git-Revision': getGitRevisionId() )
 }
 
 // Main "slim" jar
@@ -69,19 +69,19 @@ shadowJar {
 /* 
  * Documentation tasks
  */
-task htmlDocsIt(type:Exec) {
+task htmlDocsIt(type: Exec) {
     workingDir "${projectDir}/docs/user/en/src"
     commandLine "make", "html", "BUILDDIR=${buildDir}/docs/en", "SPHINXOPTS=-N -a -E -Q"
 }
-task htmlDocsEn(type:Exec) {
+task htmlDocsEn(type: Exec) {
     workingDir "${projectDir}/docs/user/it/src"
     commandLine "make", "html", "BUILDDIR=${buildDir}/docs/it", "SPHINXOPTS=-N -a -E -Q"
 }
-task pdfDocsEn(type:Exec) {
+task pdfDocsEn(type: Exec) {
     workingDir "${projectDir}/docs/user/en/src"
     commandLine "make", "latexpdf", "BUILDDIR=${buildDir}/docs/en", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E -Q"
 }
-task pdfDocsIt(type:Exec) {
+task pdfDocsIt(type: Exec) {
     workingDir "${projectDir}/docs/user/it/src"
     commandLine "make", "latexpdf", "BUILDDIR=${buildDir}/docs/it", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E -Q"
 }
