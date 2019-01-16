@@ -20,7 +20,7 @@ dependencies {
 
 mainClassName = 'org.edumips64.Main'
 version = '1.2.5'
-//codename = 'Eden'
+def codename = 'Eden'
 
 
 /*
@@ -39,8 +39,10 @@ version = '1.2.5'
     return manifest
 }*/
 
-def getCheckedOutGitCommitHash() {
-  'git rev-parse --verify --short HEAD'.execute().text.trim()
+def getGitRevisionId() {
+  def branch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
+  def commitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
+  return 'edumips64:' + branch + ':' + commitHash
 }
 
 jar {
@@ -49,9 +51,9 @@ jar {
         attributes 'Main-Class': mainClassName
         attributes 'SplashScreen-Image': 'images/splash.png'
         attributes 'Signature-Version': version
-        attributes 'Codename': 'Eden'
+        attributes 'Codename': codename
         attributes "Build-Date": new Date()
-        attributes "Git-Revision": getCheckedOutGitCommitHash() //'edumips64:master:1e6c1ae'
+        attributes "Git-Revision": getGitRevisionId() //'edumips64:master:1e6c1ae'
     }
 }
 
