@@ -189,10 +189,12 @@ public class Main extends JApplet {
 
     showVersion();
 
-    // Set the Swing UI LookAndFeel according to the OS
+    // Set the Swing LookAndFeel according to the predefined local GUI toolkit
     try {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    } catch (Exception e) {  }
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    } catch (Exception e) { 
+      log.log(Level.WARNING, "Could not set Swing LookAndFeel according to the predefined local GUI toolkit.", e);
+    }
     // Creating the main JFrame
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
