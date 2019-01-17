@@ -39,10 +39,10 @@ All the tasks of Gradle
 [Java](https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_tasks) and 
 [Application](https://docs.gradle.org/current/userguide/application_plugin.html#sec:application_tasks) 
 plugins are available to build,
-compile documentation, run tests and run EduMips64 itself.  
+compile documentation, run tests and run EduMIPS64 itself.  
 In particular you may find useful these tasks:
 
- * `./gradlew assemble`  - (Java plugin) compile and assemble jar artifacts 
+ * `./gradlew assemble` - (Java plugin) compile and assemble jar artifacts 
  * `./gradlew check` - (Java plugin) run tests and compile the documentation
  * `./gradlew run` - (Application plugin) run the application
 
@@ -52,9 +52,9 @@ Individual tasks for building single documentation (PDF and HTML) and jar target
 are available too: please read `build.gradle` for the complete list.  
 Gradle builds the following jar artifacts:
 
- - `edumips64-1.2.5-standalone.jar`: GUI executable jar including the JavaHelp dependency
- - `edumips64-1.2.5.jar`: GUI executable jar
- - `edumips64-1.2.5-cli.jar`: CLI executable jar 
+ - `edumips64-<version>-standalone.jar`: GUI executable jar including the JavaHelp dependency
+ - `edumips64-<version>.jar`: GUI executable jar
+ - `edumips64-<version>-cli.jar`: CLI executable jar 
 
 Gradle is supported by all the main Java IDEs (e.g. IDEA, Eclipse, NetBeans).
 

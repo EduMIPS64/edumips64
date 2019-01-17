@@ -18,7 +18,14 @@ addons:
       - texlive-xetex
       - latexmk
       - python3-sphinx
-language: java
+
+# Travis runs ./gradlew assemble and ./gradlew check
+# which, according to build.gradle, will run all
+# jar, test and documentation tasks.
+# See: 
+#  - build.gradle
+#  - https://docs.travis-ci.com/user/languages/java/
+language: java 
 jdk:
   - openjdk8
   - openjdk9
