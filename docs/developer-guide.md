@@ -1,7 +1,7 @@
 ### Table of Contents
 [Requirements](#requirements)
 
-[Main Bazel targets](#main-bazel-targets)
+[Main Gradle tasks](#main-gradle-tasks)
 
 [Working on the GWT frontend](#working-on-the-gwt-frontend)
 
@@ -15,17 +15,14 @@
 
 ### Requirements
 
-In order to compile EduMIPS64, you need the following tools:
-- Java JDK version 8 or above.
-- Apache Ant version 1.8 or above (needed for JUnit 4 tests)
-- Bazel (http://bazel.io)
+In order to compile EduMIPS64, you need the Java JDK version 8 or above.
 
 To build the user documentation, you'll need:
 - GNU Make
-- Sphinx (http://sphinx.pocoo.org/) version 1.0.7 or above
-- latex / pdflatex
+- Sphinx (http://www.sphinx-doc.org/) version 1.0.7 or above
+- a distribution of LateX
 
-Bazel will download the following dependencies:
+[Gradle](https://gradle.org/) will download the following dependencies:
 - JUnit
 - JavaHelp
 - GWT (experimental)
@@ -36,38 +33,30 @@ should have Automatic Style (astyle) installed.
 This project uses Travis CI for continuous integration
 (https://travis-ci.org/lupino3/edumips64).
 
-### Main Bazel targets
+### Main Gradle tasks
 
-Note that you will need to specify the command to use to generate build-time
-variables. This is done by appending the following parameters to all the
-`bazel build` commands: `--workspace_status_command=utils/bazel-stamp.sh --stamp`.
+All the tasks of Gradle 
+[Java](https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_tasks) and 
+[Application](https://docs.gradle.org/current/userguide/application_plugin.html#sec:application_tasks) 
+plugins are available to build,
+compile documentation, run tests and run EduMIPS64 itself.  
+In particular you may find useful these tasks:
 
-* `//src/main/java/org/edumips64:slim-jar` builds the jar package named
-  edumips64-`version`-nodeps.jar, that does not embed the JavaHelp libraries
-  and is oriented towards distribution package creators, that should add a
-  dependency on JavaHelp and appropriately set the classpath in their scripts.
+ * `./gradlew assemble` - (Java plugin) compile and assemble jar artifacts 
+ * `./gradlew check` - (Java plugin) run tests and compile the documentation
+ * `./gradlew run` - (Application plugin) run the application
 
-* `//src/test/java/org/edumips64/:all` runs all unit tests (to be ran with
-  `bazel test`);
+You may also find useful using the `--console=plain` flag to better see what tasks 
+are being executed.  
+Individual tasks for building single documentation (PDF and HTML) and jar targets 
+are available too: please read `build.gradle` for the complete list.  
+Gradle builds the following jar artifacts:
 
-* `//src/main/java/org/edumips64:standalone-jar` builds the jar package named
-  edumips64-`version`.jar, that embeds the JavaHelp libraries, and is oriented
-  towards users downloading the JAR archive from the website (not through
-  package managers).
-  
-* `//src/main/java/org/edumips64:cli-jar` builds a jar package containing an
-  experimental CLI front-end.
+ - `edumips64-<version>-standalone.jar`: GUI executable jar including the JavaHelp dependency
+ - `edumips64-<version>.jar`: GUI executable jar
+ - `edumips64-<version>-cli.jar`: CLI executable jar 
 
-* `//docs/user/en:pdf` builds the English PDF docs.
-
-* `//docs/user/en:html` builds the English HTML docs.
-
-* `//docs/user/it:pdf` builds the English PDF docs.
-
-* `//docs/user/it:html` builds the English HTML docs.
-
-* `//src/main/java/org/edumips64:{devmode,gwtc}` are related to the GWT frontend,
-  see below.
+Gradle is supported by all the main Java IDEs (e.g. IDEA, Eclipse, NetBeans).
 
 ### Working on the GWT frontend
 

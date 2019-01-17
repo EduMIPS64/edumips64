@@ -50,10 +50,6 @@ hs_err_pid*
 ###############################################################################
 ## Gradle.gitignore from github/gitignore
 
-# Custom
-gradle
-gradle-backup
-
 .gradle
 /build/
 

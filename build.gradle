@@ -1,0 +1,136 @@
+/*
+ * EduMIPS64 Gradle build configuration
+ */
+
+plugins {
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compileOnly  'com.google.gwt:gwt-user:2.8.2'
+    implementation 'javax.help:javahelp:2.0.05'
+    testImplementation 'junit:junit:4.12'
+}
+
+mainClassName = 'org.edumips64.Main'
+version = '1.2.5'
+ext.codename = 'Eden'
+
+
+/* 
+ * Documentation tasks
+ */
+task htmlDocsIt(type: Exec) {
+    workingDir "${projectDir}/docs/user/en/src"
+    commandLine "make", "html", "BUILDDIR=${buildDir}/docs/en", "SPHINXOPTS=-N -a -E -Q"
+}
+task htmlDocsEn(type: Exec) {
+    workingDir "${projectDir}/docs/user/it/src"
+    commandLine "make", "html", "BUILDDIR=${buildDir}/docs/it", "SPHINXOPTS=-N -a -E -Q"
+}
+task pdfDocsEn(type: Exec) {
+    workingDir "${projectDir}/docs/user/en/src"
+    commandLine "make", "latexpdf", "BUILDDIR=${buildDir}/docs/en", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E -Q"
+}
+task pdfDocsIt(type: Exec) {
+    workingDir "${projectDir}/docs/user/it/src"
+    commandLine "make", "latexpdf", "BUILDDIR=${buildDir}/docs/it", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E -Q"
+}
+// Catch-all task for documentation
+task allDocs(type: GradleBuild) {
+    tasks = ['htmlDocsIt', 'htmlDocsEn', 'pdfDocsEn', 'pdfDocsIt']
+    description = 'Run all documentation tasks'
+}
+// Include allDocs task in check task
+check.dependsOn(allDocs)
+
+
+/*
+ * Jar tasks
+ */
+// Compile HTML docs for JavaHelp before processResources task
+processResources.dependsOn htmlDocsIt
+processResources.dependsOn htmlDocsEn
+
+// Include the docs folder at the root of the jar, for JavaHelp
+processResources {
+    from ("${buildDir}/docs/en") {
+        into 'docs/user/en'
+        includes = ["html/**"]
+        excludes = ["**/_sources/**"]
+    }
+    from ("${buildDir}/docs/it") {
+        into 'docs/user/it'
+        includes = ["html/**"]
+        excludes = ["**/_sources/**"]
+    }
+    from ('docs/') {
+        into 'docs'
+        excludes = ["**/src/**", "**/design/**", "**/*.py", "**/*.md", "**/__pycache__/**"]
+    }
+}
+
+def getGitRevisionId() {
+  def branch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
+  def commitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
+  return 'edumips64:' + branch + ':' + commitHash
+}
+
+ext.sharedManifest = manifest {
+    attributes(
+        'Signature-Version': version,
+        'Codename': codename,
+        'Build-Date': new Date(),
+        'Git-Revision': getGitRevisionId() )
+}
+
+// "Slim / nodeps" jar
+jar {
+    //classifier = 'nodeps'
+    manifest {
+        attributes 'Main-Class': mainClassName
+        attributes 'SplashScreen-Image': 'images/splash.png'
+        from sharedManifest        
+    }
+}
+
+// Cli jar
+task cliJar(type: Jar, dependsOn: jar) {  
+    classifier = 'cli'
+    from sourceSets.main.output
+    manifest {
+        attributes 'Main-Class': 'org.edumips64.MainCLI'
+        from sharedManifest        
+    }
+}
+assemble.dependsOn(cliJar) 
+
+// "Fat" / standalone jar (includes all dependencies)
+task standaloneJar(type: Jar, dependsOn: configurations.runtimeClasspath) {
+    classifier = 'standalone'
+    from sourceSets.main.output
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+    manifest {
+        attributes 'Main-Class': mainClassName
+        from sharedManifest        
+    }
+}
+assemble.dependsOn(standaloneJar) 
+
+
+/*
+ * Test tasks
+ */
+test {
+    // Add verbose logging of test execution
+    afterTest { desc, result -> 
+        logger.quiet "Executed test ${desc.name} [${desc.className}] with result: ${result.resultType}"
+    }
+}

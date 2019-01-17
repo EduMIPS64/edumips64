@@ -8,6 +8,7 @@ set -u
 echo "Starting update-gh-pages.sh"
 
 deploy_webui() {
+  # TODO update this with gradle build files
   JS_DIR=$1
   WAR_PATH=bazel-bin/src/main/java/org/edumips64/
   echo "Copying the JS code to ${JS_DIR}."
@@ -39,8 +40,7 @@ echo "Git branch: $TRAVIS_BRANCH"
 if [ "$TRAVIS_BRANCH" == "master" ]; then
   # Build JAR.
   echo -n "Copying latest JAR to ${GH_PAGES_DIR}.. "
-  # TODO: remove hardcoded version.
-  cp bazel-genfiles/src/main/java/org/edumips64/edumips64-1.2.5.jar ${GH_PAGES_DIR}/edumips64-latest.jar
+  cp java -jar build/libs/edumips64-*-standalone.jar ${GH_PAGES_DIR}/edumips64-latest.jar
   echo "done."
 
   # Deploy the last version of the web UI.
