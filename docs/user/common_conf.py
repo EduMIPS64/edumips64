@@ -1,7 +1,15 @@
 # Common values for the Sphinx configuration for all languages.
 
-# TODO(#221): fetch this from version.bzl.
-version = "1.2.5"
+# Get the version from build.gradle
+import re
+
+regexp = re.compile(r'version\s*=\s*\'(\d+\.\d+\.\d+)\'')
+with open('../../../../build.gradle') as f:
+    for line in f:
+        if regexp.match(line):
+            version = regexp.match(line).group(1)
+            break
+
 release = version
 
 # Other variables
