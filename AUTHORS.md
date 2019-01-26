@@ -2,20 +2,26 @@
 
 ## Current mantainer and main developer
 
-* Andrea Spadaccini (andrea.spadaccini@gmail.com, spadaccio@google.com)
+* Andrea Spadaccini - [@lupino3](http://github.com/lupino3)
 
-## Former core developers (in alphabetical order)
+## Former core developers <in alphabetical order>
 
-* Alessandro Nicolosi - (alenico84(at)hotmail(dot)com)
-* Andrea Milazzo (Wiki Administrator) - (mancausoft(at)edumips(dot)org)
-* Antonella Scandura - (anto(dot)tuny(at)hotmail(dot)it)
-* Daniele Russo - (ManOfOnor(at)hotmail(dot)it)
-* Erik Urzi' - (jesky(at)hotmail.it)
-* Filippo Mondello - (filworld(at)hotmail(dot)com)
-* Giorgio Scibilia - (giorgioscibilia(at)gmail.com)
-* Lorenzo Sciuto - (lorenzos84(at)hotmail.com)
-* Massimo Trubia - (max83t(at)virgilio(dot)it)
-* Mirko Musumeci - (mirkochip84(at)ngweb(dot)it)
-* Salvatore Scellato - (salvo(dot)scellato(at)gmail(dot)com)
-* Simona Ullo - (simon(dot)u(at)tiscali(dot)it)
-* Vanni Rizzo - (ascoltalatuasete(at)gmail(dot)com)
+* Alessandro Nicolosi - [@alenico84](http://github.com/alenico84)
+* Andrea Milazzo - [@mancausoft](http://github.com/mancausoft)
+* Antonella Scandura - <anto.tuny@hotmail.it>
+* Daniele Russo - <ManOfOnor@hotmail.it>
+* Erik Urzi' - <jesky@hotmail.it>
+* Filippo Mondello - <filworld@hotmail.com>
+* Giorgio Scibilia - [@giorgioscibilia](http://github.com/giorgioscibilia)
+* Lorenzo Sciuto - <lorenzos84@hotmail.com>
+* Massimo Trubia - <max83t@virgilio.it>
+* Mirko Musumeci - [@mirkochip](http://github.com/mirkochip)
+* Salvatore Scellato - <salvo.scellato@gmail.com>
+* Simona Ullo - <simon.u@tiscali.it>
+* Vanni Rizzo - <ascoltalatuasete@gmail.com>
+
+## Contributors
+
+* Alessandro Di Stefano - [@aleskandro](http://github.com/aleskandro)
+* Maria Grazia Ciraulo - [@GraziaCiraulo](http://github.com/GraziaCiraulo)
+* Paolo Viotti - [@pviotti](http://github.com/pviotti)
