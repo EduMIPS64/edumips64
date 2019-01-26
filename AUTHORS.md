@@ -4,7 +4,7 @@
 
 * Andrea Spadaccini - [@lupino3](http://github.com/lupino3)
 
-## Former core developers <in alphabetical order>
+## Former core developers (in alphabetical order)
 
 * Alessandro Nicolosi - [@alenico84](http://github.com/alenico84)
 * Andrea Milazzo - [@mancausoft](http://github.com/mancausoft)
