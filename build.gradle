@@ -22,7 +22,6 @@ mainClassName = 'org.edumips64.Main'
 version = '1.2.5'
 ext.codename = 'Eden'
 
-
 /* 
  * Documentation tasks
  */
@@ -76,6 +75,11 @@ processResources {
     }
 }
 
+// The 'classes' task is also ran by unit tests. We don't want unit tests to copy around
+// resources, especially since processResources depends on compiling the HTML docs.
+classes.dependsOn.remove('processResources')
+jar.dependsOn('processResources')
+
 def getGitRevisionId() {
   def branch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
   def commitHash = 'git rev-parse --verify --short HEAD'.execute().text.trim()
@@ -123,8 +127,9 @@ task standaloneJar(type: Jar, dependsOn: configurations.runtimeClasspath) {
         from sharedManifest        
     }
 }
+// Not sure why standaloneJar does not depend on jar. Anyway, adding this dependency for now.
+standaloneJar.dependsOn(processResources)
 assemble.dependsOn(standaloneJar) 
-
 
 /*
  * Test tasks
