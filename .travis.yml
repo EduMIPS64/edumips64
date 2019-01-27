@@ -33,4 +33,4 @@ jdk:
   - openjdk11
 after_success: 
   - bash <(curl -s https://codecov.io/bash)
-  #- ./utils/update-gh-pages.sh
+  - ./utils/update-gh-pages.sh
