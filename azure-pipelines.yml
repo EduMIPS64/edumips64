@@ -10,7 +10,11 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 steps:
-- bash: sudo apt update && sudo apt install python3-sphinx latexmk texlive-latex-base texlive-latex-extra texlive-fonts-extra texlive-fonts-recommended texlive-lang-english texlive-lang-italian texlive-xetex
+- bash: |
+    sudo apt update && 
+    sudo apt install python3-sphinx latexmk texlive-latex-base 
+    texlive-latex-extra texlive-fonts-extra texlive-fonts-recommended 
+    texlive-lang-english texlive-lang-italian texlive-xetex
 - task: Gradle@2
   inputs:
     workingDirectory: ''
