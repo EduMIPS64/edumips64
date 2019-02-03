@@ -24,7 +24,7 @@ strategy:
 steps:
 - bash: |
       sudo apt update && 
-      sudo apt install python3-sphinx latexmk texlive-latex-base texlive-latex-extra texlive-fonts-extra texlive-fonts-recommended texlive-lang-english texlive-lang-italian texlive-xetexo
+      sudo apt install python3-sphinx latexmk texlive-latex-base texlive-latex-extra texlive-fonts-extra texlive-fonts-recommended texlive-lang-english texlive-lang-italian texlive-xetex
   displayName: 'Install dependencies'
 
 - task: Gradle@2
