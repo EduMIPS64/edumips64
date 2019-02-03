@@ -9,20 +9,32 @@ trigger:
 pool:
   vmImage: 'Ubuntu-16.04'
 
+startegy:
+  matrix:
+    jdk_8:
+        jdk_ver: '1.8'
+    jdk_9:
+        jdk_ver: '1.9'
+    jdk_10:
+        jdk_ver: '1.10'
+    jdk_11:
+        jdk_ver: '1.11'
+
+
 steps:
-- bash:
-    - |
+- bash: |
       sudo apt update && 
-      sudo apt install python3-sphinx latexmk texlive-latex-base \
-      texlive-latex-extra texlive-fonts-extra texlive-fonts-recommended \
-      texlive-lang-english texlive-lang-italian texlive-xetex
+      sudo apt install python3-sphinx latexmk texlive-latex-base texlive-latex-extra texlive-fonts-extra texlive-fonts-recommended texlive-lang-english texlive-lang-italian texlive-xetexo
+  displayName: 'Install dependencies'
+
 - task: Gradle@2
+  displayName: 'Gradle check task'
   inputs:
     workingDirectory: ''
     gradleWrapperFile: 'gradlew'
     gradleOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
+    jdkVersionOption: $(jdk_ver)
     jdkArchitectureOption: 'x64'
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
