@@ -9,7 +9,7 @@ trigger:
 pool:
   vmImage: 'Ubuntu-16.04'
 
-startegy:
+strategy:
   matrix:
     jdk_8:
         jdk_ver: '1.8'
