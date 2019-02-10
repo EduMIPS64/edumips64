@@ -564,6 +564,7 @@ public class Converter {
     return ret;
   }
 
+  //Determines if a string has only 0's and 1's chars
   private static boolean isBinaryString(String bits) {
     char bit;
     for (int i = 0; i < bits.length(); i++) {
@@ -575,6 +576,7 @@ public class Converter {
     return true;
   }
 
+  //Determines if any character past the first bit is not '0'
   private static boolean isOverflow(String bits){
     for (int i = 1; i < bits.length(); i++) {
       if (bits.charAt(i) != '0') {
@@ -584,6 +586,7 @@ public class Converter {
     return true;
   }
 
+  //Determines the integer value of an unsigned string of bits
   private static int getUnsignedIntValue(String bits){
     int value = 0;
     int i = 0;
@@ -595,6 +598,7 @@ public class Converter {
     return value;
   }
 
+  //Determines the long value of an unsigned string of bits
   private static long getUnsignedLongValue(String bits){
     long value = 0;
     int i = 0;
