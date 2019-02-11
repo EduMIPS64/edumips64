@@ -30,6 +30,7 @@ docs/*/output
 gwt-unitCache/
 war/WEB-INF/
 war/
+bin/
 
 ###############################################################################
 ## Java.gitignore from github/gitignore
@@ -47,12 +48,14 @@ war/
 # http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+# Other Java IDE files
+.classpath
+.project
+.settings
+.vscode
+
 ###############################################################################
 ## Gradle.gitignore from github/gitignore
-
-# Custom
-gradle
-gradle-backup
 
 .gradle
 /build/
