@@ -25,3 +25,4 @@
 * Alessandro Di Stefano - [**@aleskandro**](http://github.com/aleskandro)
 * Maria Grazia Ciraulo - [**@GraziaCiraulo**](http://github.com/GraziaCiraulo)
 * Paolo Viotti - [**@pviotti**](http://github.com/pviotti)
+* Howard - [**@hbuie112358**](http://github.com/hbuie112358)
