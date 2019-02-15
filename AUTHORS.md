@@ -1,6 +1,6 @@
 # Authors
 
-## Current mantainer and main developer
+## Lead developer and maintainer
 
 * Andrea Spadaccini - [**@lupino3**](http://github.com/lupino3)
 
