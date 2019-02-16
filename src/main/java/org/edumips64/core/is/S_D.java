@@ -34,7 +34,7 @@ import org.edumips64.utils.*;
  */
 public class S_D extends SDC1 {
 
-  final String OPCODE_VALUE = "111101";
+  private final String OPCODE_VALUE = "111101";
 
   S_D(Memory memory) {
     super(memory);

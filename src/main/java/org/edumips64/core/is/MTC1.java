@@ -34,8 +34,8 @@ import org.edumips64.core.IrregularStringOfBitsException;
  *</pre>
  */
 class MTC1 extends FPMoveToInstructions {
-  String OPCODE_VALUE = "00100";
-  String NAME = "MTC1";
+  private String OPCODE_VALUE = "00100";
+  private String NAME = "MTC1";
 
   MTC1() {
     super.OPCODE_VALUE = OPCODE_VALUE;

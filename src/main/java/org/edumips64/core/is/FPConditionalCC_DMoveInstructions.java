@@ -33,26 +33,26 @@ import org.edumips64.core.fpu.RegisterFP;
  */
 
 public abstract class FPConditionalCC_DMoveInstructions extends ComputationalInstructions {
-  final static int FD_FIELD = 0;
-  final static int FD_FIELD_INIT = 21;
-  final static int FD_FIELD_LENGTH = 5;
-  final static int FS_FIELD = 1;
-  final static int FS_FIELD_INIT = 16;
-  final static int FS_FIELD_LENGTH = 5;
-  final static int CC_FIELD = 2;
-  final static int CC_FIELD_INIT = 11;
-  final static int CC_FIELD_LENGTH = 3;
-  static String COP1_FIELD = "010001";
-  static int COP1_FIELD_INIT = 0;
-  static int MOVCF_FIELD_INIT = 26;
-  static String MOVCF_FIELD_VALUE = "010001";
-  static String ZERO_FIELD = "0";
-  final static int ZERO_FIELD_INIT = 14;
-  static String FMT_FIELD = "10001"; //17 for double
-  static int FMT_FIELD_INIT = 6;
-  final static int TF_FIELD_INIT = 15;
+  private final static int FD_FIELD = 0;
+  private final static int FD_FIELD_INIT = 21;
+  private final static int FD_FIELD_LENGTH = 5;
+  private final static int FS_FIELD = 1;
+  private final static int FS_FIELD_INIT = 16;
+  private final static int FS_FIELD_LENGTH = 5;
+  private final static int CC_FIELD = 2;
+  private final static int CC_FIELD_INIT = 11;
+  private final static int CC_FIELD_LENGTH = 3;
+  private static String COP1_FIELD = "010001";
+  private static int COP1_FIELD_INIT = 0;
+  private static int MOVCF_FIELD_INIT = 26;
+  private static String MOVCF_FIELD_VALUE = "010001";
+  private static String ZERO_FIELD = "0";
+  private final static int ZERO_FIELD_INIT = 14;
+  private static String FMT_FIELD = "10001"; //17 for double
+  private static int FMT_FIELD_INIT = 6;
+  private final static int TF_FIELD_INIT = 15;
 
-  int TF_FIELD_VALUE;
+  protected int TF_FIELD_VALUE;
 
   FPConditionalCC_DMoveInstructions() {
     this.syntax = "%F,%F,%C";

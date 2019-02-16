@@ -34,8 +34,8 @@ import org.edumips64.core.*;
  *</pre>
  */
 class MFC1 extends FPMoveFromInstructions {
-  String OPCODE_VALUE = "00000";
-  String NAME = "MFC1";
+  private String OPCODE_VALUE = "00000";
+  private String NAME = "MFC1";
 
   MFC1() {
     super.OPCODE_VALUE = OPCODE_VALUE;

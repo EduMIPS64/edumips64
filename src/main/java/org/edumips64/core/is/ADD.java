@@ -37,7 +37,7 @@ import org.edumips64.core.IrregularStringOfBitsException;
  *
  */
 class ADD extends ALU_RType {
-  final String OPCODE_VALUE = "100000";
+  private final String OPCODE_VALUE = "100000";
 
 
   ADD() {

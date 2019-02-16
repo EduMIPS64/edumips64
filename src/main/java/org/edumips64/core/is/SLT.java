@@ -38,7 +38,7 @@ import org.edumips64.core.IrregularStringOfBitsException;
 * @author Trubia Massimo, Russo Daniele
 */
 public class SLT extends ALU_RType {
-  final String OPCODE_VALUE = "101010";
+  private final String OPCODE_VALUE = "101010";
   SLT() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "SLT";

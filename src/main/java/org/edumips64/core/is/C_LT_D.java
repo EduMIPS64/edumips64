@@ -38,9 +38,9 @@ import java.math.*;
 
  */
 class C_LT_D extends FPC_cond_DInstructions {
-  String COND_VALUE = "0100"; // the first bit doesn't mean anything into this simulator
+  private String COND_VALUE = "0100"; // the first bit doesn't mean anything into this simulator
   // (100)bin=(4)dec is the condition code assigned to the predicate less than in a MIPS64 processor
-  String NAME = "C.LT.D";
+  private String NAME = "C.LT.D";
 
   C_LT_D() {
     super.COND_VALUE = COND_VALUE;

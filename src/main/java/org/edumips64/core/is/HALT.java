@@ -38,7 +38,7 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  * @author Trubia Massimo, Russo Daniele
  */
 public class HALT extends Instruction {
-  final String OPCODE_VALUE = "000001";
+  private final String OPCODE_VALUE = "000001";
   HALT() {
     name = "HALT";
   }

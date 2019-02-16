@@ -37,8 +37,8 @@ import java.math.*;
  *</pre>
  */
 class MOVF_D extends FPConditionalCC_DMoveInstructions {
-  String NAME = "MOVF.D";
-  int TF_FIELD_VALUE = 0;
+  private String NAME = "MOVF.D";
+  private int TF_FIELD_VALUE = 0;
 
   MOVF_D() {
     super.TF_FIELD_VALUE = TF_FIELD_VALUE;

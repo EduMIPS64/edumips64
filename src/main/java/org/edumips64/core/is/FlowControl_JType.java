@@ -34,12 +34,11 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  * @author Massimo
  */
 public class FlowControl_JType extends FlowControlInstructions {
-  final static int INSTR_INDEX = 0;
-  final static int OPCODE_VALUE_INIT = 0;
-  final static int INSTR_INDEX_INIT = 6;
-  final static int INSTR_INDEX_LENGTH = 26;
-  final static int OPCODE_VALUE_LENGTH = 6;
-  String OPCODE_VALUE = "";
+  protected final static int INSTR_INDEX = 0;
+  private final static int OPCODE_VALUE_INIT = 0;
+  private final static int INSTR_INDEX_INIT = 6;
+  private final static int INSTR_INDEX_LENGTH = 26;
+  protected String OPCODE_VALUE = "";
   /** Creates a new instance of FlowControl_JType */
   FlowControl_JType() {
     this.syntax = "%E";

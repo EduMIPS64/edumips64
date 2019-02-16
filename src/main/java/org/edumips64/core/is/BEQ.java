@@ -36,7 +36,7 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  */
 
 public class BEQ extends FlowControl_IType {
-  final String OPCODE_VALUE = "000100";
+  private final String OPCODE_VALUE = "000100";
 
   /** Creates a new instance of BEQ */
   BEQ() {

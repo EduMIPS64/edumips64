@@ -34,8 +34,8 @@ import org.edumips64.core.IrregularStringOfBitsException;
  *</pre>
  */
 class DMFC1 extends FPMoveFromInstructions {
-  String OPCODE_VALUE = "00001";
-  String NAME = "DMFC1";
+  private String OPCODE_VALUE = "00001";
+  private String NAME = "DMFC1";
 
   DMFC1() {
     super.OPCODE_VALUE = OPCODE_VALUE;

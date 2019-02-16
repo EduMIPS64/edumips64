@@ -32,16 +32,16 @@ import java.util.logging.Logger;
  * @author Trubia Massimo, Russo Daniele
  */
 public class ALU_IType extends ComputationalInstructions {
-  final static int RT_FIELD = 0;
-  final static int RS_FIELD = 1;
-  final static int IMM_FIELD = 2;
-  final static int RT_FIELD_INIT = 11;
-  final static int RS_FIELD_INIT = 6;
-  final static int IMM_FIELD_INIT = 16;
-  final static int RT_FIELD_LENGTH = 5;
-  final static int RS_FIELD_LENGTH = 5;
-  final static int IMM_FIELD_LENGTH = 16;
-  String OPCODE_VALUE = "";
+  protected final static int RT_FIELD = 0;
+  protected final static int RS_FIELD = 1;
+  protected final static int IMM_FIELD = 2;
+  private final static int RT_FIELD_INIT = 11;
+  private final static int RS_FIELD_INIT = 6;
+  private final static int IMM_FIELD_INIT = 16;
+  private final static int RT_FIELD_LENGTH = 5;
+  private final static int RS_FIELD_LENGTH = 5;
+  private final static int IMM_FIELD_LENGTH = 16;
+  protected String OPCODE_VALUE = "";
 
   private static final Logger logger = Logger.getLogger(ALU_IType.class.getName());
 

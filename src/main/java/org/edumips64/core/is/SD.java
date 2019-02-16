@@ -38,7 +38,7 @@ import org.edumips64.core.*;
  */
 public class SD extends Storing {
 
-  final String OPCODE_VALUE = "111111";
+  private final String OPCODE_VALUE = "111111";
 
   SD(Memory memory) {
     super(memory);

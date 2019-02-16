@@ -35,24 +35,24 @@ import java.math.*;
  * @author Trubia Massimo
  */
 public abstract class FPC_cond_DInstructions extends ComputationalInstructions {
-  final static int CC_FIELD = 0;
-  final static int FS_FIELD = 1;
-  final static int FT_FIELD = 2;
-  static String COP1_FIELD = "010001";
-  static String CONST_FIELD = "0011";
-  final static int COP1_FIELD_INIT = 0;
-  final static int CONST_FIELD_INIT = 24;
-  final static int CC_FIELD_INIT = 21;
-  final static int FS_FIELD_INIT = 16;
-  final static int FT_FIELD_INIT = 11;
-  final static int CC_FIELD_LENGTH = 3;
-  final static int FS_FIELD_LENGTH = 5;
-  final static int FT_FIELD_LENGTH = 5;
-  final static int COND_VALUE_INIT = 28;
-  final static int FMT_FIELD_INIT = 6;
-  static String FMT_FIELD = "10001"; // 17 is for double
+  private final static int CC_FIELD = 0;
+  private final static int FS_FIELD = 1;
+  private final static int FT_FIELD = 2;
+  private static String COP1_FIELD = "010001";
+  private static String CONST_FIELD = "0011";
+  private final static int COP1_FIELD_INIT = 0;
+  private final static int CONST_FIELD_INIT = 24;
+  private final static int CC_FIELD_INIT = 21;
+  private final static int FS_FIELD_INIT = 16;
+  private final static int FT_FIELD_INIT = 11;
+  private final static int CC_FIELD_LENGTH = 3;
+  private final static int FS_FIELD_LENGTH = 5;
+  private final static int FT_FIELD_LENGTH = 5;
+  private final static int COND_VALUE_INIT = 28;
+  private final static int FMT_FIELD_INIT = 6;
+  private static String FMT_FIELD = "10001"; // 17 is for double
 
-  String COND_VALUE = "";
+  protected String COND_VALUE = "";
 
   FPC_cond_DInstructions() {
     syntax = "%C,%F,%F";

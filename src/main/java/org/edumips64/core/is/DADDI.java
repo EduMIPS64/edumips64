@@ -36,7 +36,7 @@ import org.edumips64.core.IrregularStringOfBitsException;
  */
 
 class DADDI extends ALU_IType {
-  final String OPCODE_VALUE = "011000";
+  private final String OPCODE_VALUE = "011000";
   DADDI() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "DADDI";

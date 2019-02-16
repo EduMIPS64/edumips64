@@ -46,12 +46,12 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  * @author Giorgio Scibilia - Erik Urzi'- Sciuto Lorenzo
  */
 class MULT extends ALU_RType {
-  final int RS_FIELD = 0;
-  final int RT_FIELD = 1;
-  final String OPCODE_VALUE = "011000";
+  private final int RS_FIELD = 0;
+  private final int RT_FIELD = 1;
+  private final String OPCODE_VALUE = "011000";
 
-  String lo;
-  String hi;
+  private String lo;
+  private String hi;
 
   MULT() {
     super.OPCODE_VALUE = OPCODE_VALUE;

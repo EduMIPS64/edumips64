@@ -36,9 +36,9 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  */
 
 public class BC1F extends FPConditionalBranchesInstructions {
-  static String ND_FIELD = "0";
-  static String TF_FIELD = "0";
-  static String NAME = "BC1F";
+  private static String ND_FIELD = "0";
+  private static String TF_FIELD = "0";
+  private static String NAME = "BC1F";
 
   BC1F() {
     super.ND_FIELD = ND_FIELD;

@@ -37,7 +37,7 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  */
 
 class ORI extends ALU_IType {
-  final String OPCODE_VALUE = "001101";
+  private final String OPCODE_VALUE = "001101";
   ORI() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "ORI";
