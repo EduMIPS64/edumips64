@@ -110,7 +110,7 @@ public class RegisterFP extends BitSet64FP {
 
 
   public String toString() {
-    String s = new String();
+    String s = "";
 
     try {
       s = getHexString();
