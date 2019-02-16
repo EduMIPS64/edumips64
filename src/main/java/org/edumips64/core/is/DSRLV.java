@@ -42,12 +42,6 @@ public class DSRLV extends ALU_RType {
   private final int RD_FIELD = 0;
   private final int RT_FIELD = 1;
   private final int RS_FIELD = 2;
-  protected final int RD_FIELD_INIT = 11;
-  protected final int RT_FIELD_INIT = 16;
-  protected final int RS_FIELD_INIT = 21;
-  protected final int RD_FIELD_LENGTH = 5;
-  protected final int RT_FIELD_LENGTH = 5;
-  protected final int RS_FIELD_LENGTH = 5;
   private final String OPCODE_VALUE = "010110";
   DSRLV() {
     super.OPCODE_VALUE = OPCODE_VALUE;

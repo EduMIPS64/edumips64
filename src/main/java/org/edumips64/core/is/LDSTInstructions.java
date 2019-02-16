@@ -63,7 +63,7 @@ public abstract class LDSTInstructions extends Instruction {
   // Memory instance
   protected Memory memory;
 
-  String OPCODE_VALUE = "";
+  protected String OPCODE_VALUE = "";
   LDSTInstructions(Memory memory) {
     this.syntax = "%R,%L(%R)";
     this.paramCount = 3;

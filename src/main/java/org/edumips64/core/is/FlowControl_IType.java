@@ -49,7 +49,7 @@ public abstract class FlowControl_IType extends FlowControlInstructions {
     this.paramCount = 3;
   }
 
-  void jumpToOffset(int offsetField) throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException {
+  protected void jumpToOffset(int offsetField) throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException {
     BitSet64 bs = new BitSet64();
     bs.writeHalf(params.get(offsetField));
     String offset = bs.getBinString();

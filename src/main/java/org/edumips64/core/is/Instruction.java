@@ -39,20 +39,20 @@ public abstract class Instruction implements InstructionInterface {
   protected int paramCount;
   protected String syntax;
   protected String name;
-  protected String comment;
+  private String comment;
   //protected static CPU cpu;
   protected Register[] TR; //is not static because each instruction has got its own registers
   protected RegisterFP[] TRfp;
   protected String fullname;
   protected String label;
   protected static final Logger logger = Logger.getLogger(Instruction.class.getName());
-  protected int serialNumber;
+  private int serialNumber;
 
   /** CPU instance. It is set through setCPU, and it should always be set before the instruction is considered
    * fully built. InstructionBuilder + package-local instruction constructors enforce this.
    */
   protected CPU cpu;
-  void setCPU(CPU cpu) {
+  protected void setCPU(CPU cpu) {
     this.cpu = cpu;
   }
 
@@ -60,11 +60,11 @@ public abstract class Instruction implements InstructionInterface {
    * fully built. InstructionBuilder + package-local instruction constructors enforce this.
    */
   protected Dinero dinero;
-  void setDinero(Dinero dinero) {
+  protected void setDinero(Dinero dinero) {
     this.dinero = dinero;
   }
 
-  void setSerialNumber(int serialNumber) {
+  protected void setSerialNumber(int serialNumber) {
     this.serialNumber = serialNumber;
   }
 

@@ -51,8 +51,8 @@ class MULTU extends ALU_RType {
   private final int RT_FIELD = 1;
   private final String OPCODE_VALUE = "011001";
 
-  String lo;
-  String hi;
+  private String lo;
+  private String hi;
 
   MULTU() {
     super.OPCODE_VALUE = OPCODE_VALUE;

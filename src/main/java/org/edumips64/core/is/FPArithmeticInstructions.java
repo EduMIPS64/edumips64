@@ -51,7 +51,7 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
   protected String OPCODE_VALUE = "";
   protected String FMT_FIELD = "";
 
-  FPInstructionUtils fpInstructionUtils;
+  protected FPInstructionUtils fpInstructionUtils;
 
   FPArithmeticInstructions(FCSRRegister fcsr) {
     syntax = "%F,%F,%F";

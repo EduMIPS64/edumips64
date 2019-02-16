@@ -50,8 +50,8 @@ class MULT extends ALU_RType {
   private final int RT_FIELD = 1;
   private final String OPCODE_VALUE = "011000";
 
-  String lo;
-  String hi;
+  private String lo;
+  private String hi;
 
   MULT() {
     super.OPCODE_VALUE = OPCODE_VALUE;
