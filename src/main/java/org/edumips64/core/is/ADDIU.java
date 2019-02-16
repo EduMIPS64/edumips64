@@ -39,7 +39,7 @@ import org.edumips64.core.*;
  */
 
 class ADDIU extends ALU_IType {
-  final String OPCODE_VALUE = "001001";
+  private final String OPCODE_VALUE = "001001";
   ADDIU() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "ADDIU";

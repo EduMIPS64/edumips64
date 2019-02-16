@@ -39,16 +39,16 @@ import org.edumips64.core.IrregularStringOfBitsException;
  * @author Trubia Massimo, Russo Daniele
  */
 public class DSRAV extends ALU_RType {
-  final int RD_FIELD = 0;
-  final int RT_FIELD = 1;
-  final int RS_FIELD = 2;
-  final int RD_FIELD_INIT = 11;
-  final int RT_FIELD_INIT = 16;
-  final int RS_FIELD_INIT = 21;
-  final int RD_FIELD_LENGTH = 5;
-  final int RT_FIELD_LENGTH = 5;
-  final int RS_FIELD_LENGTH = 5;
-  final String OPCODE_VALUE = "010111";
+  private final int RD_FIELD = 0;
+  private final int RT_FIELD = 1;
+  private final int RS_FIELD = 2;
+  protected final int RD_FIELD_INIT = 11;
+  protected final int RT_FIELD_INIT = 16;
+  protected final int RS_FIELD_INIT = 21;
+  protected final int RD_FIELD_LENGTH = 5;
+  protected final int RT_FIELD_LENGTH = 5;
+  protected final int RS_FIELD_LENGTH = 5;
+  private final String OPCODE_VALUE = "010111";
 
   DSRAV() {
     super.OPCODE_VALUE = OPCODE_VALUE;

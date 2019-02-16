@@ -35,7 +35,7 @@ import org.edumips64.core.IrregularStringOfBitsException;
  * @author Trubia Massimo, Russo Daniele
  */
 public class DSUB extends ALU_RType {
-  final String OPCODE_VALUE = "101110";
+  private final String OPCODE_VALUE = "101110";
   /** Creates a new instance of DSUB */
   DSUB() {
     super.OPCODE_VALUE = OPCODE_VALUE;

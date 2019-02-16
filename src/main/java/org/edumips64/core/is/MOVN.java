@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  *
  */
 class MOVN extends ALU_RType {
-  final String OPCODE_VALUE = "001011";
+  private final String OPCODE_VALUE = "001011";
   private static final Logger logger = Logger.getLogger(MOVN.class.getName());
 
   // Set to true if the Write Back stage should write data.

@@ -34,9 +34,9 @@ import org.edumips64.core.IrregularStringOfBitsException;
  *</pre>
  */
 class MOV_D extends FPFormattedOperandMoveInstructions {
-  String OPCODE_VALUE = "000110";
-  String NAME = "MOV.D";
-  String FMT_FIELD = "10001";
+  private String OPCODE_VALUE = "000110";
+  private String NAME = "MOV.D";
+  private String FMT_FIELD = "10001";
 
   MOV_D() {
     super.OPCODE_VALUE = OPCODE_VALUE;

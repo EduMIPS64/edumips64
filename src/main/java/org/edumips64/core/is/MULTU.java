@@ -47,9 +47,9 @@ import java.math.BigInteger;
  * @author Giorgio Scibilia - Lorenzo Sciuto - Erik Urzi'
  */
 class MULTU extends ALU_RType {
-  final int RS_FIELD = 0;
-  final int RT_FIELD = 1;
-  final String OPCODE_VALUE = "011001";
+  private final int RS_FIELD = 0;
+  private final int RT_FIELD = 1;
+  private final String OPCODE_VALUE = "011001";
 
   String lo;
   String hi;

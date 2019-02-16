@@ -37,7 +37,7 @@ import org.edumips64.core.IrregularStringOfBitsException;
  */
 
 class ADDI extends ALU_IType {
-  final String OPCODE_VALUE = "001000";
+  protected final String OPCODE_VALUE = "001000";
   ADDI() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "ADDI";

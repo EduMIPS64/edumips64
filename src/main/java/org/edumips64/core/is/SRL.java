@@ -37,16 +37,16 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  * @author UrzÃ¬ Erik - Sciuto Lorenzo - Giorgio Scibilia
  */
 public class SRL extends ALU_RType {
-  final int RD_FIELD = 0;
-  final int RT_FIELD = 1;
-  final int SA_FIELD = 2;
-  final int RD_FIELD_INIT = 16;
-  final int RT_FIELD_INIT = 11;
-  final int SA_FIELD_INIT = 21;
-  final int RD_FIELD_LENGTH = 5;
-  final int RT_FIELD_LENGTH = 5;
-  final int SA_FIELD_LENGTH = 5;
-  final String OPCODE_VALUE = "000010";
+  private final int RD_FIELD = 0;
+  private final int RT_FIELD = 1;
+  private final int SA_FIELD = 2;
+  private final int RD_FIELD_INIT = 16;
+  private final int RT_FIELD_INIT = 11;
+  private final int SA_FIELD_INIT = 21;
+  private final int RD_FIELD_LENGTH = 5;
+  private final int RT_FIELD_LENGTH = 5;
+  private final int SA_FIELD_LENGTH = 5;
+  private final String OPCODE_VALUE = "000010";
 
   SRL() {
     super.OPCODE_VALUE = OPCODE_VALUE;

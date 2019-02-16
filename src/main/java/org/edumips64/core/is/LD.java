@@ -35,7 +35,7 @@ import org.edumips64.core.*;
  * @author Trubia Massimo, Russo Daniele
  */
 class LD extends Loading {
-  final String OPCODE_VALUE = "110111";
+  private final String OPCODE_VALUE = "110111";
 
   LD(Memory memory) {
     super(memory);

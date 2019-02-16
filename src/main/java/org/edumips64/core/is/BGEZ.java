@@ -35,9 +35,9 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  */
 
 public class BGEZ extends FlowControl_IType {
-  final String OPCODE_VALUE = "000001";
-  final static int OFFSET_FIELD = 1;
-  final String RT_VALUE = "00001";
+  private final String OPCODE_VALUE = "000001";
+  private final static int OFFSET_FIELD = 1;
+  private final String RT_VALUE = "00001";
 
   /** Creates a new instance of BGEZ */
   BGEZ() {

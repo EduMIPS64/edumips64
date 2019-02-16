@@ -35,15 +35,15 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
   * @author Trubia Massimo, Russo Daniele
  */
 class LUI extends ALU_IType {
-  final static int RT_FIELD = 0;
-  final static int IMM_FIELD = 1;
-  final static int RT_FIELD_INIT = 11;
-  final static int RS_FIELD_INIT = 6;
-  final static int IMM_FIELD_INIT = 16;
-  final static int RT_FIELD_LENGTH = 5;
-  final static int RS_FIELD_LENGTH = 5;
-  final static int IMM_FIELD_LENGTH = 16;
-  final String OPCODE_VALUE = "001111";
+  private final static int RT_FIELD = 0;
+  private final static int IMM_FIELD = 1;
+  private final static int RT_FIELD_INIT = 11;
+  private final static int RS_FIELD_INIT = 6;
+  private final static int IMM_FIELD_INIT = 16;
+  private final static int RT_FIELD_LENGTH = 5;
+  private final static int RS_FIELD_LENGTH = 5;
+  private final static int IMM_FIELD_LENGTH = 16;
+  private final String OPCODE_VALUE = "001111";
 
   LUI() {
     syntax = "%R,%I";

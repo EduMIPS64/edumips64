@@ -36,7 +36,7 @@ import org.edumips64.core.*;
  */
 
 class SLTI extends ALU_IType {
-  final String OPCODE_VALUE = "001010";
+  private final String OPCODE_VALUE = "001010";
   SLTI() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "SLTI";

@@ -45,9 +45,9 @@ import java.math.BigInteger;
  * @author Trubia Massimo, Russo Daniele
  */
 class DMULT extends ALU_RType {
-  final int RS_FIELD = 0;
-  final int RT_FIELD = 1;
-  final String OPCODE_VALUE = "011100";
+  private final int RS_FIELD = 0;
+  private final int RT_FIELD = 1;
+  private final String OPCODE_VALUE = "011100";
 
   private String lo;
   private String hi;

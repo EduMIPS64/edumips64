@@ -38,7 +38,7 @@ import org.edumips64.core.*;
  *
  */
 class SLTU extends ALU_RType {
-  final String OPCODE_VALUE = "101011";
+  private final String OPCODE_VALUE = "101011";
 
 
   SLTU() {

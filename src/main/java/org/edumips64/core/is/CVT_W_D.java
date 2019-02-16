@@ -37,9 +37,9 @@ import java.math.*;
  *</pre>
  */
 class CVT_W_D extends FPConversionFCSRInstructions {
-  static String OPCODE_VALUE = "100100";
-  static String FMT_FIELD = "10001"; //DOUBLE IS 17
-  static String NAME = "CVT.W.D";
+  private static String OPCODE_VALUE = "100100";
+  private static String FMT_FIELD = "10001"; //DOUBLE IS 17
+  private static String NAME = "CVT.W.D";
 
   CVT_W_D() {
     super.OPCODE_VALUE = OPCODE_VALUE;

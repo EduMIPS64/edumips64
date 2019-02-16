@@ -34,9 +34,9 @@ import org.edumips64.core.IrregularStringOfBitsException;
  *</pre>
  */
 class MOVN_D extends FPConditionalZerosMoveInstructions {
-  String OPCODE_VALUE = "010011";
-  String FMT_FIELD = "10001"; //DOUBLE IS 17
-  String NAME = "MOVN.D";
+  private String OPCODE_VALUE = "010011";
+  private String FMT_FIELD = "10001"; //DOUBLE IS 17
+  private String NAME = "MOVN.D";
 
   MOVN_D() {
     super.OPCODE_VALUE = OPCODE_VALUE;

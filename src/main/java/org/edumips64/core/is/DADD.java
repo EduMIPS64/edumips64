@@ -36,7 +36,7 @@ import org.edumips64.core.IrregularStringOfBitsException;
  *
  */
 class DADD extends ALU_RType {
-  final String OPCODE_VALUE = "101100";
+  private final String OPCODE_VALUE = "101100";
 
 
   DADD() {

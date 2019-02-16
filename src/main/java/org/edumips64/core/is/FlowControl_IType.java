@@ -33,17 +33,17 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  * @author Trubia Massimo, Russo Daniele
  */
 public abstract class FlowControl_IType extends FlowControlInstructions {
-  final static int RS_FIELD = 0;
-  final static int RT_FIELD = 1;
-  final static int OFFSET_FIELD = 2;
-  final static int RT_FIELD_INIT = 11;
-  final static int RS_FIELD_INIT = 6;
-  final static int OFFSET_FIELD_INIT = 16;
-  final static int RT_FIELD_LENGTH = 5;
-  final static int RS_FIELD_LENGTH = 5;
-  final static int OFFSET_FIELD_LENGTH = 16;
-  String OPCODE_VALUE = "";
-  final static int OPCODE_VALUE_INIT = 0;
+  protected final static int RS_FIELD = 0;
+  protected final static int RT_FIELD = 1;
+  protected final static int OFFSET_FIELD = 2;
+  protected final static int RT_FIELD_INIT = 11;
+  protected final static int RS_FIELD_INIT = 6;
+  protected final static int OFFSET_FIELD_INIT = 16;
+  protected final static int RT_FIELD_LENGTH = 5;
+  protected final static int RS_FIELD_LENGTH = 5;
+  protected final static int OFFSET_FIELD_LENGTH = 16;
+  protected String OPCODE_VALUE = "";
+  protected final static int OPCODE_VALUE_INIT = 0;
   FlowControl_IType() {
     this.syntax = "%R,%R,%E";
     this.paramCount = 3;

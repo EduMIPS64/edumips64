@@ -42,9 +42,9 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  *
  */
 class MFHI extends ALU_RType {
-  final int RD_FIELD = 0;
-  final int HI_REG = 1;
-  final String OPCODE_VALUE = "010000";
+  private final int RD_FIELD = 0;
+  private final int HI_REG = 1;
+  private final String OPCODE_VALUE = "010000";
 
   MFHI() {
     super.OPCODE_VALUE = OPCODE_VALUE;

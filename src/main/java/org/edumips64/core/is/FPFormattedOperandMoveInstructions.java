@@ -32,21 +32,21 @@ import org.edumips64.core.fpu.*;
  */
 
 public abstract class FPFormattedOperandMoveInstructions extends ComputationalInstructions {
-  final static int FD_FIELD = 0;
-  final static int FD_FIELD_INIT = 21;
-  final static int FD_FIELD_LENGTH = 5;
-  final static int FS_FIELD = 1;
-  final static int FS_FIELD_INIT = 16;
-  final static int FS_FIELD_LENGTH = 5;
-  static String COP1_FIELD = "010001";
-  static int COP1_FIELD_INIT = 0;
-  static int OPCODE_VALUE_INIT = 26;
-  static int FMT_FIELD_INIT = 6;
-  static String ZERO_FIELD = "00000";
-  static int ZERO_FIELD_INIT = 11;
+  protected final static int FD_FIELD = 0;
+  private final static int FD_FIELD_INIT = 21;
+  private final static int FD_FIELD_LENGTH = 5;
+  protected final static int FS_FIELD = 1;
+  private final static int FS_FIELD_INIT = 16;
+  private final static int FS_FIELD_LENGTH = 5;
+  private static String COP1_FIELD = "010001";
+  private static int COP1_FIELD_INIT = 0;
+  private static int OPCODE_VALUE_INIT = 26;
+  private static int FMT_FIELD_INIT = 6;
+  private static String ZERO_FIELD = "00000";
+  private static int ZERO_FIELD_INIT = 11;
 
-  String OPCODE_VALUE = "";
-  String FMT_FIELD = "";
+  protected String OPCODE_VALUE = "";
+  protected String FMT_FIELD = "";
   FPFormattedOperandMoveInstructions() {
     this.syntax = "%F,%F";
     this.paramCount = 2;

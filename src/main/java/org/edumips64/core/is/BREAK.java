@@ -36,7 +36,7 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  * @author Andrea Spadaccini
  */
 public class BREAK extends Instruction {
-  final String OPCODE_VALUE = "000000"; // SPECIAL
+  private final String OPCODE_VALUE = "000000"; // SPECIAL
   BREAK() {
     name = "BREAK";
   }

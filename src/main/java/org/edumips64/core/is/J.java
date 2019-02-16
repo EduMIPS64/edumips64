@@ -38,7 +38,7 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  */
 
 public class J extends FlowControl_JType {
-  final String OPCODE_VALUE = "000010";
+  private final String OPCODE_VALUE = "000010";
 
   /** Creates a new instance of J */
   J() {

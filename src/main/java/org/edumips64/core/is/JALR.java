@@ -37,8 +37,8 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  */
 
 public class JALR extends FlowControl_RType {
-  final int PC_VALUE = 0;
-  final String OPCODE_VALUE = "001001";
+  private final int PC_VALUE = 0;
+  private final String OPCODE_VALUE = "001001";
   JALR() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     this.name = "JALR";
