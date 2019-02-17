@@ -41,6 +41,8 @@ public class Converter {
    */
 
   public static int binToInt(String bits, boolean unsignd) throws IrregularStringOfBitsException {
+
+    //check for string irregularities to begin with
     if ((bits.length() > 32) || (unsignd && bits.length() == 32 && bits.charAt(0) == '1') || !isBinaryString(bits)) {
       throw new IrregularStringOfBitsException();
     }
