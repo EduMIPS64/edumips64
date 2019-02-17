@@ -43,13 +43,8 @@ public class ConverterTest {
 
     //32 Greater than
     @Test(expected = IrregularStringOfBitsException.class)
-    public void test32_UnsignedLenOver32Msb0() throws Exception{
-        Converter.binToInt(OVER_32_MSB_0, true);
-    }
-
-    @Test(expected = IrregularStringOfBitsException.class)
-    public void test32_UnsignedLenOver32Msb1() throws Exception{
-        Converter.binToInt(OVER_32_MSB_1, true);
+    public void test32_SignedLenOver32Msb0() throws Exception{
+        Converter.binToInt(OVER_32_MSB_0, false);
     }
 
     @Test(expected = IrregularStringOfBitsException.class)
@@ -58,8 +53,13 @@ public class ConverterTest {
     }
 
     @Test(expected = IrregularStringOfBitsException.class)
-    public void test32_SignedLenOver32Msb0() throws Exception{
-        Converter.binToInt(OVER_32_MSB_0, false);
+    public void test32_UnsignedLenOver32Msb0() throws Exception{
+        Converter.binToInt(OVER_32_MSB_0, true);
+    }
+
+    @Test(expected = IrregularStringOfBitsException.class)
+    public void test32_UnsignedLenOver32Msb1() throws Exception{
+        Converter.binToInt(OVER_32_MSB_1, true);
     }
 
     //32 Equals
@@ -117,14 +117,10 @@ public class ConverterTest {
     }
 
     //64 Greater than
-    @Test(expected = IrregularStringOfBitsException.class)
-    public void test64_UnsignedLenOver64Msb0() throws Exception{
-        Converter.binToLong(OVER_64_MSB_0, true);
-    }
 
     @Test(expected = IrregularStringOfBitsException.class)
-    public void test64_UnsignedLenOver64Msb1() throws Exception{
-        Converter.binToLong(OVER_64_MSB_1, true);
+    public void test64_SignedLenOver64Msb0() throws Exception{
+        Converter.binToLong(OVER_64_MSB_0, false);
     }
 
     @Test(expected = IrregularStringOfBitsException.class)
@@ -133,8 +129,13 @@ public class ConverterTest {
     }
 
     @Test(expected = IrregularStringOfBitsException.class)
-    public void test64_SignedLenOver64Msb0() throws Exception{
-        Converter.binToLong(OVER_64_MSB_0, false);
+    public void test64_UnsignedLenOver64Msb0() throws Exception{
+        Converter.binToLong(OVER_64_MSB_0, true);
+    }
+
+    @Test(expected = IrregularStringOfBitsException.class)
+    public void test64_UnsignedLenOver64Msb1() throws Exception{
+        Converter.binToLong(OVER_64_MSB_1, true);
     }
 
     //64 Equals
@@ -215,7 +216,7 @@ public class ConverterTest {
 
     @Test(expected = IrregularStringOfBitsException.class)
     public void test32_SignedNonBinLenUnder32Msb0() throws Exception{
-        Converter.binToInt(NONBINARY_EQUALS_64_MSB_0, false);
+        Converter.binToInt(NONBINARY_UNDER_32_MSB_0, false);
     }
 
     @Test(expected = IrregularStringOfBitsException.class)
@@ -269,7 +270,7 @@ public class ConverterTest {
 
     @Test(expected = IrregularStringOfBitsException.class)
     public void test64_SignedNonBinLenUnder64Msb1() throws Exception{
-        Converter.binToLong(NONBINARY_UNDER_32_MSB_1, false);
+        Converter.binToLong(NONBINARY_UNDER_64_MSB_1, false);
     }
 
     @Test(expected = IrregularStringOfBitsException.class)
@@ -291,9 +292,9 @@ public class ConverterTest {
 
     @Test
     public void test64_BitLengthZeroReturnsZero() throws Exception{
-        long actual = Converter.binToLong(BIT_LENGTH_0, true);
+        long actual = Converter.binToLong(BIT_LENGTH_0, false);
         assertEquals(0, actual);
-        actual = Converter.binToLong(BIT_LENGTH_0, false);
+        actual = Converter.binToLong(BIT_LENGTH_0, true);
         assertEquals(0, actual);
     }
 
