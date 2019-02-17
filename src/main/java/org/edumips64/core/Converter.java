@@ -51,7 +51,7 @@ public class Converter {
     //perchÃš il numero da ritornare Ãš -(2^32)
     //e non si puÃ² utilizzare il valore positivo (2^32)
     //con il tipo int :-(
-    if (!unsignd && bits.length() == 32 && bits.charAt(0) == '1' && isOverflow(bits)) {
+    if (!unsignd && bits.length() == 32 && isOverflow(bits)) {
       return (int)(-Math.pow(2.0, 32.0));
     }
 
@@ -78,6 +78,8 @@ public class Converter {
    * a value that cannot be stored into a <code>long</code> variable
    */
   public static long binToLong(String bits, boolean unsignd) throws IrregularStringOfBitsException {
+
+    //check for string irregularities to begin with
     if ((bits.length() > 64) || (unsignd && bits.length() == 64 && bits.charAt(0) == '1') || !isBinaryString(bits)) {
       throw new IrregularStringOfBitsException();
     }
@@ -88,7 +90,7 @@ public class Converter {
     //perchÃš il numero da ritornare Ãš -(2^63)
     //e non si puÃ² utilizzare il valore positivo (2^63)
     //con il tipo long :-(
-    if (!unsignd && bits.length() == 64 && bits.charAt(0) == '1' && isOverflow(bits)) {
+    if (!unsignd && bits.length() == 64 && isOverflow(bits)) {
       return (long)(-Math.pow(2.0, 63.0));
     }
 
@@ -564,20 +566,31 @@ public class Converter {
     return ret;
   }
 
-  //Determines if a string has only 0's and 1's chars
-  private static boolean isBinaryString(String bits) {
+  /**
+   * Determines if a string contains only 0's and 1's
+   * @param bits any string
+   * @return false if bits contains character that is not '0' and not '1', true otherwise
+   */
+  private static boolean isBinaryString(String bits) throws IrregularStringOfBitsException{
     char bit;
     for (int i = 0; i < bits.length(); i++) {
       bit = bits.charAt(i);
       if (bit != '0' && bit != '1') {
-        return false;
+        throw new IrregularStringOfBitsException();
       }
     }
     return true;
   }
 
-  //Determines if any character past the first bit is not '0'
+  /**
+   * Determines if msb is '1' and all the rest '0'
+   * @param bits any string of only 0's and 1's
+   * @return true if msb is '1' and all the rest '0', false otherwise
+   */
   private static boolean isOverflow(String bits){
+    if(bits.charAt(0) != '1'){
+      return false;
+    }
     for (int i = 1; i < bits.length(); i++) {
       if (bits.charAt(i) != '0') {
         return false;
@@ -586,7 +599,11 @@ public class Converter {
     return true;
   }
 
-  //Determines the integer value of an unsigned string of bits
+  /**
+   * Determines the integer value of an unsigned string of bits
+   * bits any string of only 0's and 1's
+   * @return integer value of the bit string
+   */
   private static int getUnsignedIntValue(String bits){
     int value = 0;
     int i = 0;
@@ -598,7 +615,11 @@ public class Converter {
     return value;
   }
 
-  //Determines the long value of an unsigned string of bits
+  /**
+   * Determines the long value of an unsigned string of bits
+   * bits any string of only 0's and 1's
+   * @return long value of the bit string
+   */
   private static long getUnsignedLongValue(String bits){
     long value = 0;
     int i = 0;
@@ -607,7 +628,6 @@ public class Converter {
         value += (long) Math.pow(2.0, (double) i);
       }
     }
-
     return value;
   }
 }
