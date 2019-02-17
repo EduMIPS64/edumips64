@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  *
  * @author Trubia Massimo, Russo Daniele
  */
-public class ALU_IType extends ComputationalInstructions {
+public abstract class ALU_IType extends ComputationalInstructions {
   protected final static int RT_FIELD = 0;
   protected final static int RS_FIELD = 1;
   protected final static int IMM_FIELD = 2;

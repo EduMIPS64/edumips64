@@ -33,7 +33,7 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  *
  * @author Trubia Massimo, Russo Daniele
  */
-public class FlowControl_RType extends FlowControlInstructions {
+public abstract class FlowControl_RType extends FlowControlInstructions {
   protected final static int RS_FIELD = 0;
   private final static int OPCODE_VALUE_INIT = 26;
   private final static int RS_FIELD_INIT = 6;
