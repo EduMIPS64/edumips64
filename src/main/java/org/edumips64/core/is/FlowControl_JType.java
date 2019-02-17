@@ -33,7 +33,7 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  *
  * @author Massimo
  */
-public class FlowControl_JType extends FlowControlInstructions {
+public abstract class FlowControl_JType extends FlowControlInstructions {
   protected final static int INSTR_INDEX = 0;
   private final static int OPCODE_VALUE_INIT = 0;
   private final static int INSTR_INDEX_INIT = 6;
