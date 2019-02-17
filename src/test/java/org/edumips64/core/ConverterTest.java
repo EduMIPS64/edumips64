@@ -6,10 +6,6 @@ import static org.junit.Assert.*;
 
 public class ConverterTest {
 
-    //common
-    private final String IRREGULAR_CHARS = "blah001";
-    private final String BIT_LENGTH_0 = "";
-
     //32 bit
     private final String GREATER_THAN_32 = "000000000000000000000000000010101";
     private final String _32_11 =  "00000000000000000000000000001011";
@@ -25,6 +21,10 @@ public class ConverterTest {
     private final String SIGNED_64 = "1000000000000000000000000000000000000000000000000000000000000101";
     private final String OVERFLOW_64 = "1000000000000000000000000000000000000000000000000000000000000000";
     private final long EXPECTED_VALUE_FOR_SIGNED_64 = -0x7FFFFFFFFFFFFFFBL;
+
+    //common
+    private final String IRREGULAR_CHARS = "blah001";
+    private final String BIT_LENGTH_0 = "";
 
 
     //******Begin 32 bit tests
