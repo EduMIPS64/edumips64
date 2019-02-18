@@ -9,14 +9,11 @@ trigger:
 pool:
   vmImage: 'Ubuntu-16.04'
 
+# JDK 1.9 and 1.10 are out of support on Azure Pipeline tasks 
 strategy:
   matrix:
     jdk_8:
         jdk_ver: '1.8'
-    jdk_9:
-        jdk_ver: '1.9'
-    jdk_10:
-        jdk_ver: '1.10'
     jdk_11:
         jdk_ver: '1.11'
 
