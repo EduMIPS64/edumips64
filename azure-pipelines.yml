@@ -36,3 +36,8 @@ steps:
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'check'
+
+- task: PublishTestResults@2
+
+- script: bash <(curl -s https://codecov.io/bash)
+  displayName: 'Codecov update'
