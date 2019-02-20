@@ -41,3 +41,5 @@ steps:
 
 - script: bash <(curl -s https://codecov.io/bash)
   displayName: 'Codecov update'
+  env:
+    CODECOV_TOKEN: $(codecov_token)
