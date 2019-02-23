@@ -29,6 +29,9 @@ package org.edumips64.core;
  * */
 public class Converter {
 
+  private static final int OVERFLOW_32 = -0x80000000;
+  private static final long OVERFLOW_64 = -0x8000000000000000L;
+
   /** Converts a string of bits in the relative value.
    * @param bits string of bits, must be composed obly by '0' and '1' chars, otherwise
    * an exception will be thrown. If the bit string is coded into a signed representation a negative number will be produced
@@ -54,7 +57,7 @@ public class Converter {
     //e non si puÃ² utilizzare il valore positivo (2^32)
     //con il tipo int :-(
     if (!unsignd && bits.length() == 32 && isOverflow(bits)) {
-      return (int)(-Math.pow(2.0, 32.0));
+      return OVERFLOW_32;
     }
 
     if (unsignd) {
@@ -93,7 +96,7 @@ public class Converter {
     //e non si puÃ² utilizzare il valore positivo (2^63)
     //con il tipo long :-(
     if (!unsignd && bits.length() == 64 && isOverflow(bits)) {
-      return (long)(-Math.pow(2.0, 63.0));
+        return OVERFLOW_64;
     }
 
     if (bits.length() == 0) {
@@ -611,7 +614,7 @@ public class Converter {
     int i = 0;
     for (int j = bits.length() - 1; j >= 0; j--, i++) {
       if (bits.charAt(j) == '1') {
-        value += (int) Math.pow(2.0, (double) i);
+        value += 1 << i;
       }
     }
     return value;
@@ -627,7 +630,7 @@ public class Converter {
     int i = 0;
     for (int j = bits.length() - 1; j >= 0; j--, i++) {
       if (bits.charAt(j) == '1') {
-        value += (long) Math.pow(2.0, (double) i);
+        value += 1L << i;
       }
     }
     return value;

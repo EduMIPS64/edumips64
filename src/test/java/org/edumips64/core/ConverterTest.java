@@ -13,8 +13,8 @@ public class ConverterTest {
     private final String EQUALS_32_MSB_0 = "00000000000000000000000000000101";
     private final String UNDER_32_MSB_1 =  "1000000000000000000000000000101";
     private final String UNDER_32_MSB_0 =  "0000000000000000000000000000101";
-    private final long EXPECTED_FOR_SIGNED_EQUALS_32 = -0x7FFFFFFBL;
-    private final long EXPECTED_FOR_SIGNED_UNDER_32 =  -0x3FFFFFFBL;
+    private final int EXPECTED_FOR_SIGNED_EQUALS_32 = -0x7FFFFFFB;
+    private final int EXPECTED_FOR_SIGNED_UNDER_32 =  -0x3FFFFFFB;
 
     //64 bit
     private final String OVER_64_MSB_0 =   "00000000000000000000000000000000000000000000000000000000000010101";
@@ -32,12 +32,14 @@ public class ConverterTest {
     private final String NONBINARY_UNDER_32_MSB_0 =  "000000a000000000000000000001011";
     private final String NONBINARY_UNDER_32_MSB_1 =  "100000a000000000000000000001011";
     private final String OVERFLOW_32 = "10000000000000000000000000000000";
+    private final int OVERFLOW_INT_EXPECTED = -0x80000000;
 
     private final String NONBINARY_EQUALS_64_MSB_0 = "000000000000000000000000a000000000000000000000000000000000001011";
     private final String NONBINARY_EQUALS_64_MSB_1 = "100000000000000000000000a000000000000000000000000000000000001011";
     private final String NONBINARY_UNDER_64_MSB_0 =  "00000000000000000000000a000000000000000000000000000000000001011";
     private final String NONBINARY_UNDER_64_MSB_1 =  "10000000000000000000000a000000000000000000000000000000000001011";
     private final String OVERFLOW_64 = "1000000000000000000000000000000000000000000000000000000000000000";
+    private final long OVERFLOW_LONG_EXPECTED = -0x8000000000000000L;
 
     private final String BIT_LENGTH_0 = "";
 
@@ -116,6 +118,54 @@ public class ConverterTest {
         assertEquals(expected, actual);
     }
 
+    //32 Irregular, overflow
+
+    @Test(expected = IrregularStringOfBitsException.class)
+    public void test32_SignedNonBinLen32Msb0() throws Exception{
+        Converter.binToInt(NONBINARY_EQUALS_32_MSB_0, false);
+    }
+
+    @Test(expected = IrregularStringOfBitsException.class)
+    public void test32_SignedNonBinLen32Msb1() throws Exception{
+        Converter.binToInt(NONBINARY_EQUALS_32_MSB_1, false);
+    }
+
+    @Test(expected = IrregularStringOfBitsException.class)
+    public void test32_UnsignedNonBinLen32Msb0() throws Exception{
+        Converter.binToInt(NONBINARY_EQUALS_32_MSB_0, true);
+    }
+
+    @Test(expected = IrregularStringOfBitsException.class)
+    public void test32_UnsignedNonBinLen32Msb1() throws Exception{
+        Converter.binToInt(NONBINARY_EQUALS_32_MSB_1, true);
+    }
+
+    @Test(expected = IrregularStringOfBitsException.class)
+    public void test32_SignedNonBinLenUnder32Msb0() throws Exception{
+        Converter.binToInt(NONBINARY_UNDER_32_MSB_0, false);
+    }
+
+    @Test(expected = IrregularStringOfBitsException.class)
+    public void test32_SignedNonBinLenUnder32Msb1() throws Exception{
+        Converter.binToInt(NONBINARY_UNDER_32_MSB_1, false);
+    }
+
+    @Test(expected = IrregularStringOfBitsException.class)
+    public void test32_UnsignedNonBinLenUnder32Msb0() throws Exception{
+        Converter.binToInt(NONBINARY_UNDER_32_MSB_0, true);
+    }
+
+    @Test(expected = IrregularStringOfBitsException.class)
+    public void test32_UnsignedNonBinLenUnder32Msb1() throws Exception{
+        Converter.binToInt(NONBINARY_UNDER_32_MSB_1, true);
+    }
+
+    @Test
+    public void test32_SignedOverflowReturnsCorrectValue() throws Exception{
+        int actual = Converter.binToInt(OVERFLOW_32, false);
+        assertEquals(OVERFLOW_INT_EXPECTED, actual);
+    }
+
     //64 Greater than
 
     @Test(expected = IrregularStringOfBitsException.class)
@@ -192,55 +242,6 @@ public class ConverterTest {
         assertEquals(expected, actual);
     }
 
-    //32 Irregular, overflow
-
-    @Test(expected = IrregularStringOfBitsException.class)
-    public void test32_SignedNonBinLen32Msb0() throws Exception{
-        Converter.binToInt(NONBINARY_EQUALS_32_MSB_0, false);
-    }
-
-    @Test(expected = IrregularStringOfBitsException.class)
-    public void test32_SignedNonBinLen32Msb1() throws Exception{
-        Converter.binToInt(NONBINARY_EQUALS_32_MSB_1, false);
-    }
-
-    @Test(expected = IrregularStringOfBitsException.class)
-    public void test32_UnsignedNonBinLen32Msb0() throws Exception{
-        Converter.binToInt(NONBINARY_EQUALS_32_MSB_0, true);
-    }
-
-    @Test(expected = IrregularStringOfBitsException.class)
-    public void test32_UnsignedNonBinLen32Msb1() throws Exception{
-        Converter.binToInt(NONBINARY_EQUALS_32_MSB_1, true);
-    }
-
-    @Test(expected = IrregularStringOfBitsException.class)
-    public void test32_SignedNonBinLenUnder32Msb0() throws Exception{
-        Converter.binToInt(NONBINARY_UNDER_32_MSB_0, false);
-    }
-
-    @Test(expected = IrregularStringOfBitsException.class)
-    public void test32_SignedNonBinLenUnder32Msb1() throws Exception{
-        Converter.binToInt(NONBINARY_UNDER_32_MSB_1, false);
-    }
-
-    @Test(expected = IrregularStringOfBitsException.class)
-    public void test32_UnsignedNonBinLenUnder32Msb0() throws Exception{
-        Converter.binToInt(NONBINARY_UNDER_32_MSB_0, true);
-    }
-
-    @Test(expected = IrregularStringOfBitsException.class)
-    public void test32_UnsignedNonBinLenUnder32Msb1() throws Exception{
-        Converter.binToInt(NONBINARY_UNDER_32_MSB_1, true);
-    }
-
-    @Test
-    public void test32_SignedOverflowReturnsCorrectValue() throws Exception{
-        long actual = Converter.binToLong(OVERFLOW_32, false);
-        long expected = (int)(-Math.pow(2.0, 31.0));
-        assertEquals(expected, actual);
-    }
-
     //64 Irregular, overflow
 
     @Test(expected = IrregularStringOfBitsException.class)
@@ -286,8 +287,7 @@ public class ConverterTest {
     @Test
     public void test64_SignedOverflowReturnsCorrectValue() throws Exception{
         long actual = Converter.binToLong(OVERFLOW_64, false);
-        long expected = (long)(-Math.pow(2.0, 63.0));
-        assertEquals(expected, actual);
+        assertEquals(OVERFLOW_LONG_EXPECTED, actual);
     }
 
     @Test
