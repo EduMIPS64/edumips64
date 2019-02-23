@@ -29,6 +29,9 @@ package org.edumips64.core;
  * */
 public class Converter {
 
+  private static final int OVERFLOW_32 = -0x80000000;
+  private static final long OVERFLOW_64 = -0x8000000000000000L;
+
   /** Converts a string of bits in the relative value.
    * @param bits string of bits, must be composed obly by '0' and '1' chars, otherwise
    * an exception will be thrown. If the bit string is coded into a signed representation a negative number will be produced
@@ -39,15 +42,13 @@ public class Converter {
    * @throws IrregularStringOfBitsException if the string of bits is not well-formed or the string of bits contains
    * a value that cannot be stored into an <code>int</code> variable
    */
+
   public static int binToInt(String bits, boolean unsignd) throws IrregularStringOfBitsException {
-    if (bits.length() > 32) {
+
+    //check for string irregularities to begin with
+    if ((bits.length() > 32) || (unsignd && bits.length() == 32 && bits.charAt(0) == '1') || !isBinaryString(bits)) {
       throw new IrregularStringOfBitsException();
     }
-
-    if (unsignd && bits.length() == 32 && bits.charAt(0) == '1') {
-      throw new IrregularStringOfBitsException();
-    }
-
 
     //se la stringa di bits Ãš lunga 32 bit
     //ed Ãš composta da uno 1 e 31 0
@@ -55,41 +56,18 @@ public class Converter {
     //perchÃš il numero da ritornare Ãš -(2^32)
     //e non si puÃ² utilizzare il valore positivo (2^32)
     //con il tipo int :-(
-    if (!unsignd && bits.length() == 32 && bits.charAt(0) == '1') {
-      boolean overflow = true;
-
-      for (int i = 1; i < bits.length(); i++) {
-        if (bits.charAt(i) != '0') {
-          overflow = false;
-          break;
-        }
-      }
-
-      if (overflow) {
-        return (int)(-Math.pow(2.0, 32.0));
-      }
+    if (!unsignd && bits.length() == 32 && isOverflow(bits)) {
+      return OVERFLOW_32;
     }
 
-    int value = 0;
-
     if (unsignd) {
-      for (int j = bits.length() - 1, i = 0; j >= 0; j--, i++) {
-        if (bits.charAt(j) == '1') {
-          value += (int) Math.pow(2.0, (double) i);
-        } else if (bits.charAt(j) != '0') {
-          throw new IrregularStringOfBitsException();
-        }
-      }
-
-      return value;
+      return getUnsignedIntValue(bits);
     } else {
       if (bits.charAt(0) == '0') {
         return Converter.binToInt(bits.substring(1), true);
-      } else if (bits.charAt(0) == '1') {
+      } else{
         String s = Converter.twoComplement(bits);
         return -1 * Converter.binToInt(s, true);
-      } else {
-        throw new IrregularStringOfBitsException();
       }
     }
   }
@@ -105,11 +83,9 @@ public class Converter {
    * a value that cannot be stored into a <code>long</code> variable
    */
   public static long binToLong(String bits, boolean unsignd) throws IrregularStringOfBitsException {
-    if (bits.length() > 64) {
-      throw new IrregularStringOfBitsException();
-    }
 
-    if (unsignd && bits.length() == 64 && bits.charAt(0) == '1') {
+    //check for string irregularities to begin with
+    if ((bits.length() > 64) || (unsignd && bits.length() == 64 && bits.charAt(0) == '1') || !isBinaryString(bits)) {
       throw new IrregularStringOfBitsException();
     }
 
@@ -119,45 +95,22 @@ public class Converter {
     //perchÃš il numero da ritornare Ãš -(2^63)
     //e non si puÃ² utilizzare il valore positivo (2^63)
     //con il tipo long :-(
-    if (!unsignd && bits.length() == 64 && bits.charAt(0) == '1') {
-      boolean overflow = true;
-
-      for (int i = 1; i < bits.length(); i++) {
-        if (bits.charAt(i) != '0') {
-          overflow = false;
-          break;
-        }
-      }
-
-      if (overflow) {
-        return (long)(-Math.pow(2.0, 63.0));
-      }
+    if (!unsignd && bits.length() == 64 && isOverflow(bits)) {
+        return OVERFLOW_64;
     }
-
-    long value = 0;
 
     if (bits.length() == 0) {
       return 0;
     }
 
     if (unsignd) {
-      for (int j = bits.length() - 1, i = 0; j >= 0; j--, i++) {
-        if (bits.charAt(j) == '1') {
-          value += (long) Math.pow(2.0, (double) i);
-        } else if (bits.charAt(j) != '0') {
-          throw new IrregularStringOfBitsException();
-        }
-      }
-
-      return value;
+      return getUnsignedLongValue(bits);
     } else {
       if (bits.charAt(0) == '0') {
         return Converter.binToLong(bits.substring(1), true);
-      } else if (bits.charAt(0) == '1') {
+      } else {
         String s = Converter.twoComplement(bits);
         return -1 * Converter.binToLong(s, true);
-      } else {
-        throw new IrregularStringOfBitsException();
       }
     }
   }
@@ -326,56 +279,56 @@ public class Converter {
       char toAppend = 'x';
 
       switch (value) {
-      case 0:
-        toAppend = '0';
-        break;
-      case 1:
-        toAppend = '1';
-        break;
-      case 2:
-        toAppend = '2';
-        break;
-      case 3:
-        toAppend = '3';
-        break;
-      case 4:
-        toAppend = '4';
-        break;
-      case 5:
-        toAppend = '5';
-        break;
-      case 6:
-        toAppend = '6';
-        break;
-      case 7:
-        toAppend = '7';
-        break;
-      case 8:
-        toAppend = '8';
-        break;
-      case 9:
-        toAppend = '9';
-        break;
-      case 10:
-        toAppend = 'A';
-        break;
-      case 11:
-        toAppend = 'B';
-        break;
-      case 12:
-        toAppend = 'C';
-        break;
-      case 13:
-        toAppend = 'D';
-        break;
-      case 14:
-        toAppend = 'E';
-        break;
-      case 15:
-        toAppend = 'F';
-        break;
-      default:
-        throw new IrregularStringOfBitsException();
+        case 0:
+          toAppend = '0';
+          break;
+        case 1:
+          toAppend = '1';
+          break;
+        case 2:
+          toAppend = '2';
+          break;
+        case 3:
+          toAppend = '3';
+          break;
+        case 4:
+          toAppend = '4';
+          break;
+        case 5:
+          toAppend = '5';
+          break;
+        case 6:
+          toAppend = '6';
+          break;
+        case 7:
+          toAppend = '7';
+          break;
+        case 8:
+          toAppend = '8';
+          break;
+        case 9:
+          toAppend = '9';
+          break;
+        case 10:
+          toAppend = 'A';
+          break;
+        case 11:
+          toAppend = 'B';
+          break;
+        case 12:
+          toAppend = 'C';
+          break;
+        case 13:
+          toAppend = 'D';
+          break;
+        case 14:
+          toAppend = 'E';
+          break;
+        case 15:
+          toAppend = 'F';
+          break;
+        default:
+          throw new IrregularStringOfBitsException();
       }
 
       ret.append(toAppend);
@@ -388,7 +341,7 @@ public class Converter {
    * @param hex string of hexadecimal, must start whith a 'x' or a 'X' and continue with only [0-9] or [A-F] (or [a-f]) chars, otherwise
    * an IrregularStringOfHexException exception will be thrown.
    * @return string of long digit [0-9].
-   * @throws IrregularStringOHexException if the string of hexadecimal is not well-formed.
+   * @throws IrregularStringOfHexException if the string of hexadecimal is not well-formed.
    */
   public static String hexToShort(String hex) throws IrregularStringOfHexException {
     if (hex.charAt(0) != '0' || hex.toUpperCase().charAt(1) != 'X') {
@@ -403,56 +356,56 @@ public class Converter {
       char value = hex.toUpperCase().charAt(i);
 
       switch (value) {
-      case '0':
-        ret += 0 * powLong(16, reversecont);
-        break;
-      case '1':
-        ret += 1 * powLong(16, reversecont);
-        break;
-      case '2':
-        ret += 2 * powLong(16, reversecont);
-        break;
-      case '3':
-        ret += 3 * powLong(16, reversecont);
-        break;
-      case '4':
-        ret += 4 * powLong(16, reversecont);
-        break;
-      case '5':
-        ret += 5 * powLong(16, reversecont);
-        break;
-      case '6':
-        ret += 6 * powLong(16, reversecont);
-        break;
-      case '7':
-        ret += 7 * powLong(16, reversecont);
-        break;
-      case '8':
-        ret += 8 * powLong(16, reversecont);
-        break;
-      case '9':
-        ret += 9 * powLong(16, reversecont);
-        break;
-      case 'A':
-        ret += 10 * powLong(16, reversecont);
-        break;
-      case 'B':
-        ret += 11 * powLong(16, reversecont);
-        break;
-      case 'C':
-        ret += 12 * powLong(16, reversecont);
-        break;
-      case 'D':
-        ret += 13 * powLong(16, reversecont);
-        break;
-      case 'E':
-        ret += 14 * powLong(16, reversecont);
-        break;
-      case 'F':
-        ret += 15 * powLong(16, reversecont);
-        break;
-      default:
-        throw new IrregularStringOfHexException();
+        case '0':
+          ret += 0 * powLong(16, reversecont);
+          break;
+        case '1':
+          ret += 1 * powLong(16, reversecont);
+          break;
+        case '2':
+          ret += 2 * powLong(16, reversecont);
+          break;
+        case '3':
+          ret += 3 * powLong(16, reversecont);
+          break;
+        case '4':
+          ret += 4 * powLong(16, reversecont);
+          break;
+        case '5':
+          ret += 5 * powLong(16, reversecont);
+          break;
+        case '6':
+          ret += 6 * powLong(16, reversecont);
+          break;
+        case '7':
+          ret += 7 * powLong(16, reversecont);
+          break;
+        case '8':
+          ret += 8 * powLong(16, reversecont);
+          break;
+        case '9':
+          ret += 9 * powLong(16, reversecont);
+          break;
+        case 'A':
+          ret += 10 * powLong(16, reversecont);
+          break;
+        case 'B':
+          ret += 11 * powLong(16, reversecont);
+          break;
+        case 'C':
+          ret += 12 * powLong(16, reversecont);
+          break;
+        case 'D':
+          ret += 13 * powLong(16, reversecont);
+          break;
+        case 'E':
+          ret += 14 * powLong(16, reversecont);
+          break;
+        case 'F':
+          ret += 15 * powLong(16, reversecont);
+          break;
+        default:
+          throw new IrregularStringOfHexException();
       }
 
     }
@@ -464,7 +417,7 @@ public class Converter {
    * @param hex string of hexadecimal, must start whith a 'x' or a 'X' and continue with only [0-9] or [A-F] (or [a-f]) chars, otherwise
    * an IrregularStringOfHexException exception will be thrown.
    * @return string of long digit [0-9].
-   * @throws IrregularStringOHexException if the string of hexadecimal is not well-formed.
+   * @throws IrregularStringOfHexException if the string of hexadecimal is not well-formed.
    */
   public static String hexToLong(String hex) throws IrregularStringOfHexException {
 
@@ -480,56 +433,56 @@ public class Converter {
       char value = hex.toUpperCase().charAt(i);
 
       switch (value) {
-      case '0':
-        ret += 0 * powLong(16, reversecont);
-        break;
-      case '1':
-        ret += 1 * powLong(16, reversecont);
-        break;
-      case '2':
-        ret += 2 * powLong(16, reversecont);
-        break;
-      case '3':
-        ret += 3 * powLong(16, reversecont);
-        break;
-      case '4':
-        ret += 4 * powLong(16, reversecont);
-        break;
-      case '5':
-        ret += 5 * powLong(16, reversecont);
-        break;
-      case '6':
-        ret += 6 * powLong(16, reversecont);
-        break;
-      case '7':
-        ret += 7 * powLong(16, reversecont);
-        break;
-      case '8':
-        ret += 8 * powLong(16, reversecont);
-        break;
-      case '9':
-        ret += 9 * powLong(16, reversecont);
-        break;
-      case 'A':
-        ret += 10 * powLong(16, reversecont);
-        break;
-      case 'B':
-        ret += 11 * powLong(16, reversecont);
-        break;
-      case 'C':
-        ret += 12 * powLong(16, reversecont);
-        break;
-      case 'D':
-        ret += 13 * powLong(16, reversecont);
-        break;
-      case 'E':
-        ret += 14 * powLong(16, reversecont);
-        break;
-      case 'F':
-        ret += 15 * powLong(16, reversecont);
-        break;
-      default:
-        throw new IrregularStringOfHexException();
+        case '0':
+          ret += 0 * powLong(16, reversecont);
+          break;
+        case '1':
+          ret += 1 * powLong(16, reversecont);
+          break;
+        case '2':
+          ret += 2 * powLong(16, reversecont);
+          break;
+        case '3':
+          ret += 3 * powLong(16, reversecont);
+          break;
+        case '4':
+          ret += 4 * powLong(16, reversecont);
+          break;
+        case '5':
+          ret += 5 * powLong(16, reversecont);
+          break;
+        case '6':
+          ret += 6 * powLong(16, reversecont);
+          break;
+        case '7':
+          ret += 7 * powLong(16, reversecont);
+          break;
+        case '8':
+          ret += 8 * powLong(16, reversecont);
+          break;
+        case '9':
+          ret += 9 * powLong(16, reversecont);
+          break;
+        case 'A':
+          ret += 10 * powLong(16, reversecont);
+          break;
+        case 'B':
+          ret += 11 * powLong(16, reversecont);
+          break;
+        case 'C':
+          ret += 12 * powLong(16, reversecont);
+          break;
+        case 'D':
+          ret += 13 * powLong(16, reversecont);
+          break;
+        case 'E':
+          ret += 14 * powLong(16, reversecont);
+          break;
+        case 'F':
+          ret += 15 * powLong(16, reversecont);
+          break;
+        default:
+          throw new IrregularStringOfHexException();
       }
 
     }
@@ -541,7 +494,7 @@ public class Converter {
    * @param hex string of hexadecimal, must start whith a 'x' or a 'X' and continue with only [0-9] or [A-F] (or [a-f]) chars, otherwise
    * an IrregularStringOfHexException exception will be thrown.
    * @return string of long digit [0-9].
-   * @throws IrregularStringOHexException if the string of hexadecimal is not well-formed.
+   * @throws IrregularStringOfHexException if the string of hexadecimal is not well-formed.
    */
   public static String hexToBin(String hex) throws IrregularStringOfHexException {
 
@@ -552,56 +505,56 @@ public class Converter {
       char value = hex.toUpperCase().charAt(i);
 
       switch (value) {
-      case '0':
-        ret += "0000";
-        break;
-      case '1':
-        ret += "0001";
-        break;
-      case '2':
-        ret += "0010";
-        break;
-      case '3':
-        ret += "0011";
-        break;
-      case '4':
-        ret += "0100";
-        break;
-      case '5':
-        ret += "0101";
-        break;
-      case '6':
-        ret += "0110";
-        break;
-      case '7':
-        ret += "0111";
-        break;
-      case '8':
-        ret += "1000";
-        break;
-      case '9':
-        ret += "1001";
-        break;
-      case 'A':
-        ret += "1010";
-        break;
-      case 'B':
-        ret += "1011";
-        break;
-      case 'C':
-        ret += "1100";
-        break;
-      case 'D':
-        ret += "1101";
-        break;
-      case 'E':
-        ret += "1110";
-        break;
-      case 'F':
-        ret += "1111";
-        break;
-      default:
-        throw new IrregularStringOfHexException();
+        case '0':
+          ret += "0000";
+          break;
+        case '1':
+          ret += "0001";
+          break;
+        case '2':
+          ret += "0010";
+          break;
+        case '3':
+          ret += "0011";
+          break;
+        case '4':
+          ret += "0100";
+          break;
+        case '5':
+          ret += "0101";
+          break;
+        case '6':
+          ret += "0110";
+          break;
+        case '7':
+          ret += "0111";
+          break;
+        case '8':
+          ret += "1000";
+          break;
+        case '9':
+          ret += "1001";
+          break;
+        case 'A':
+          ret += "1010";
+          break;
+        case 'B':
+          ret += "1011";
+          break;
+        case 'C':
+          ret += "1100";
+          break;
+        case 'D':
+          ret += "1101";
+          break;
+        case 'E':
+          ret += "1110";
+          break;
+        case 'F':
+          ret += "1111";
+          break;
+        default:
+          throw new IrregularStringOfHexException();
       }
 
     }
@@ -616,6 +569,71 @@ public class Converter {
     }
 
     return ret;
+  }
+
+  /**
+   * Determines if a string contains only 0's and 1's
+   * @param bits any string
+   * @return false if bits contains character that is not '0' and not '1', true otherwise
+   */
+  private static boolean isBinaryString(String bits) throws IrregularStringOfBitsException{
+    char bit;
+    for (int i = 0; i < bits.length(); i++) {
+      bit = bits.charAt(i);
+      if (bit != '0' && bit != '1') {
+        throw new IrregularStringOfBitsException();
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Determines if msb is '1' and all the rest '0'
+   * @param bits any string of only 0's and 1's
+   * @return true if msb is '1' and all the rest '0', false otherwise
+   */
+  private static boolean isOverflow(String bits){
+    if(bits.charAt(0) != '1'){
+      return false;
+    }
+    for (int i = 1; i < bits.length(); i++) {
+      if (bits.charAt(i) != '0') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Determines the integer value of an unsigned string of bits
+   * bits any string of only 0's and 1's
+   * @return integer value of the bit string
+   */
+  private static int getUnsignedIntValue(String bits){
+    int value = 0;
+    int i = 0;
+    for (int j = bits.length() - 1; j >= 0; j--, i++) {
+      if (bits.charAt(j) == '1') {
+        value += 1 << i;
+      }
+    }
+    return value;
+  }
+
+  /**
+   * Determines the long value of an unsigned string of bits
+   * bits any string of only 0's and 1's
+   * @return long value of the bit string
+   */
+  private static long getUnsignedLongValue(String bits){
+    long value = 0;
+    int i = 0;
+    for (int j = bits.length() - 1; j >= 0; j--, i++) {
+      if (bits.charAt(j) == '1') {
+        value += 1L << i;
+      }
+    }
+    return value;
   }
 }
 
