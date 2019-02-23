@@ -37,7 +37,7 @@ import org.edumips64.core.IrregularStringOfBitsException;
  * @author Sciuto Lorenzo - UrzÃ¬ Erik - Giorgio Scibilia
  */
 public class SUB extends ALU_RType {
-  final String OPCODE_VALUE = "100010";
+  private final String OPCODE_VALUE = "100010";
 
   SUB() {
     super.OPCODE_VALUE = OPCODE_VALUE;

@@ -34,24 +34,24 @@ import org.edumips64.core.fpu.*;
  * @author Trubia Massimo
  */
 public abstract class FPArithmeticInstructions extends ComputationalInstructions {
-  final static int FD_FIELD = 0;
-  final static int FS_FIELD = 1;
-  final static int FT_FIELD = 2;
-  static String COP1_FIELD = "010001";
-  final static int COP1_FIELD_INIT = 0;
-  final static int FD_FIELD_INIT = 21;
-  final static int FS_FIELD_INIT = 16;
-  final static int FT_FIELD_INIT = 11;
-  final static int FD_FIELD_LENGTH = 5;
-  final static int FS_FIELD_LENGTH = 5;
-  final static int FT_FIELD_LENGTH = 5;
-  final static int OPCODE_VALUE_INIT = 26;
-  final static int FMT_FIELD_INIT = 6;
+  private final static int FD_FIELD = 0;
+  private final static int FS_FIELD = 1;
+  private final static int FT_FIELD = 2;
+  private static String COP1_FIELD = "010001";
+  private final static int COP1_FIELD_INIT = 0;
+  private final static int FD_FIELD_INIT = 21;
+  private final static int FS_FIELD_INIT = 16;
+  private final static int FT_FIELD_INIT = 11;
+  private final static int FD_FIELD_LENGTH = 5;
+  private final static int FS_FIELD_LENGTH = 5;
+  private final static int FT_FIELD_LENGTH = 5;
+  private final static int OPCODE_VALUE_INIT = 26;
+  private final static int FMT_FIELD_INIT = 6;
 
-  String OPCODE_VALUE = "";
-  String FMT_FIELD = "";
+  protected String OPCODE_VALUE = "";
+  protected String FMT_FIELD = "";
 
-  FPInstructionUtils fpInstructionUtils;
+  protected FPInstructionUtils fpInstructionUtils;
 
   FPArithmeticInstructions(FCSRRegister fcsr) {
     syntax = "%F,%F,%F";

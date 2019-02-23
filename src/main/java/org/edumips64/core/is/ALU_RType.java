@@ -35,17 +35,17 @@ import java.util.logging.Logger;
  * @author Trubia Massimo, Russo Daniele
  */
 public abstract class ALU_RType extends ComputationalInstructions {
-  final static int RD_FIELD = 0;
-  final static int RS_FIELD = 1;
-  final static int RT_FIELD = 2;
-  final static int RD_FIELD_INIT = 16;
-  final static int RS_FIELD_INIT = 6;
-  final static int RT_FIELD_INIT = 11;
-  final static int RD_FIELD_LENGTH = 5;
-  final static int RS_FIELD_LENGTH = 5;
-  final static int RT_FIELD_LENGTH = 5;
-  String OPCODE_VALUE = "";
-  final static int OPCODE_VALUE_INIT = 26;
+  protected final static int RD_FIELD = 0;
+  protected final static int RS_FIELD = 1;
+  protected final static int RT_FIELD = 2;
+  protected final static int RD_FIELD_INIT = 16;
+  protected final static int RS_FIELD_INIT = 6;
+  protected final static int RT_FIELD_INIT = 11;
+  protected final static int RD_FIELD_LENGTH = 5;
+  protected final static int RS_FIELD_LENGTH = 5;
+  protected final static int RT_FIELD_LENGTH = 5;
+  protected String OPCODE_VALUE = "";
+  protected final static int OPCODE_VALUE_INIT = 26;
   private static final Logger logger = Logger.getLogger(ALU_RType.class.getName());
   ALU_RType() {
     syntax = "%R,%R,%R";

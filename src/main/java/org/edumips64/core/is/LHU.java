@@ -35,7 +35,7 @@ import org.edumips64.core.*;
  * @author Trubia Massimo, Russo Daniele
  */
 class LHU extends Loading {
-  final String OPCODE_VALUE = "100101";
+  private final String OPCODE_VALUE = "100101";
 
   LHU(Memory memory) {
     super(memory);

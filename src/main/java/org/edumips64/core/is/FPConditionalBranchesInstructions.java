@@ -33,22 +33,22 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  * @author Trubia Massimo
  */
 public abstract class FPConditionalBranchesInstructions extends FlowControlInstructions {
-  final static int CC_FIELD = 0;
-  final static int CC_FIELD_INIT = 11;
-  final static int CC_FIELD_LENGTH = 3;
-  final static int OFFSET_FIELD = 1;
-  final static int OFFSET_FIELD_INIT = 16;
-  final static int OFFSET_FIELD_LENGTH = 16;
-  static String COP1_VALUE = "010001";
-  final static int COP1_FIELD_INIT = 0;
-  static String BC_VALUE = "01000";
-  final static int BC_FIELD_INIT = 6;
-  final static int ND_FIELD_INIT = 14;
-  final static int TF_FIELD_INIT = 15;
+  protected final static int CC_FIELD = 0;
+  private final static int CC_FIELD_INIT = 11;
+  private final static int CC_FIELD_LENGTH = 3;
+  protected final static int OFFSET_FIELD = 1;
+  private final static int OFFSET_FIELD_INIT = 16;
+  private final static int OFFSET_FIELD_LENGTH = 16;
+  private static String COP1_VALUE = "010001";
+  private final static int COP1_FIELD_INIT = 0;
+  private static String BC_VALUE = "01000";
+  private final static int BC_FIELD_INIT = 6;
+  private final static int ND_FIELD_INIT = 14;
+  private final static int TF_FIELD_INIT = 15;
 
-  String ND_FIELD = "";
-  String TF_FIELD = "";
-  String CC_FIELD_VALUE = "";
+  protected String ND_FIELD = "";
+  protected String TF_FIELD = "";
+
   FPConditionalBranchesInstructions() {
     this.syntax = "%C,%B";
     this.paramCount = 2;

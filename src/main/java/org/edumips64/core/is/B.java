@@ -36,8 +36,8 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  */
 
 public class B extends FlowControl_IType {
-  final String OPCODE_VALUE = "000100";
-  final static int OFFSET_FIELD = 0;
+  private final String OPCODE_VALUE = "000100";
+  private final static int OFFSET_FIELD = 0;
 
   /** Creates a new instance of B */
   B() {

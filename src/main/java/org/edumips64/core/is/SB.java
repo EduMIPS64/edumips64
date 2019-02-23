@@ -34,7 +34,7 @@ import org.edumips64.core.*;
  * @author Trubia Massimo, Russo Daniele
  */
 class SB extends Storing {
-  final String OPCODE_VALUE = "101000";
+  private final String OPCODE_VALUE = "101000";
 
   SB(Memory memory) {
     super(memory);

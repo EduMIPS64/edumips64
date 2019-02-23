@@ -40,17 +40,17 @@ import org.edumips64.core.IrregularStringOfBitsException;
  */
 
 public abstract class LDSTInstructions extends Instruction {
-  final static int RT_FIELD = 0;
-  final static int OFFSET_FIELD = 1;
-  final static int BASE_FIELD = 2;
-  final static int LMD_REGISTER = 3;
-  final static int OFFSET_PLUS_BASE = 4;
-  final static int RT_FIELD_INIT = 11;
-  final static int OFFSET_FIELD_INIT = 16;
-  final static int BASE_FIELD_INIT = 6;
-  final static int RT_FIELD_LENGTH = 5;
-  final static int OFFSET_FIELD_LENGTH = 16;
-  final static int BASE_FIELD_LENGTH = 5;
+  protected final static int RT_FIELD = 0;
+  protected final static int OFFSET_FIELD = 1;
+  protected final static int BASE_FIELD = 2;
+  protected final static int LMD_REGISTER = 3;
+  protected final static int OFFSET_PLUS_BASE = 4;
+  private final static int RT_FIELD_INIT = 11;
+  protected final static int OFFSET_FIELD_INIT = 16;
+  protected final static int BASE_FIELD_INIT = 6;
+  private final static int RT_FIELD_LENGTH = 5;
+  protected final static int OFFSET_FIELD_LENGTH = 16;
+  protected final static int BASE_FIELD_LENGTH = 5;
 
   // Size of the read/write operations. Must be set by derived classes
   protected byte memoryOpSize;
@@ -63,7 +63,7 @@ public abstract class LDSTInstructions extends Instruction {
   // Memory instance
   protected Memory memory;
 
-  String OPCODE_VALUE = "";
+  protected String OPCODE_VALUE = "";
   LDSTInstructions(Memory memory) {
     this.syntax = "%R,%L(%R)";
     this.paramCount = 3;

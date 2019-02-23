@@ -35,9 +35,9 @@ import org.edumips64.core.fpu.*;
  *</pre>
  */
 class SUB_D extends FPArithmeticInstructions {
-  final String OPCODE_VALUE = "000001";
-  String FMT_FIELD = "10001"; //DOUBLE IS 17
-  String NAME = "SUB.D";
+  private final String OPCODE_VALUE = "000001";
+  private String FMT_FIELD = "10001"; //DOUBLE IS 17
+  private String NAME = "SUB.D";
 
 
   SUB_D(FCSRRegister fcsr) {

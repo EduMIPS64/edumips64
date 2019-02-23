@@ -35,9 +35,9 @@ import org.edumips64.core.fpu.*;
  *</pre>
  */
 class MUL_D extends FPArithmeticInstructions {
-  final String OPCODE_VALUE = "000010";
-  String FMT_FIELD = "10001"; //DOUBLE IS 17
-  String NAME = "MUL.D";
+  private final String OPCODE_VALUE = "000010";
+  private String FMT_FIELD = "10001"; //DOUBLE IS 17
+  private String NAME = "MUL.D";
 
 
   MUL_D(FCSRRegister fcsr) {

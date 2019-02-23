@@ -32,18 +32,18 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  */
 
 public abstract class FPMoveToAndFromInstructions extends ComputationalInstructions {
-  final static int RT_FIELD = 0;
-  final static int RT_FIELD_INIT = 11;
-  final static int RT_FIELD_LENGTH = 5;
-  final static int FS_FIELD = 1;
-  final static int FS_FIELD_INIT = 16;
-  final static int FS_FIELD_LENGTH = 5;
-  static String ZERO_FIELD = "00000000000";
-  final static int ZERO_FIELD_INIT = 21;
-  static String COP1_FIELD = "010001";
-  static int COP1_FIELD_INIT = 0;
-  static int OPCODE_VALUE_INIT = 6;
-  String OPCODE_VALUE = "";
+  protected final static int RT_FIELD = 0;
+  private final static int RT_FIELD_INIT = 11;
+  private final static int RT_FIELD_LENGTH = 5;
+  protected final static int FS_FIELD = 1;
+  private final static int FS_FIELD_INIT = 16;
+  private final static int FS_FIELD_LENGTH = 5;
+  private static String ZERO_FIELD = "00000000000";
+  private final static int ZERO_FIELD_INIT = 21;
+  private static String COP1_FIELD = "010001";
+  private static int COP1_FIELD_INIT = 0;
+  private static int OPCODE_VALUE_INIT = 6;
+  protected String OPCODE_VALUE = "";
 
   FPMoveToAndFromInstructions() {
     this.syntax = "%R,%F";

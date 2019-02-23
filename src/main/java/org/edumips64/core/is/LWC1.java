@@ -36,7 +36,7 @@ import org.edumips64.core.*;
 
  */
 class LWC1 extends FPLoading {
-  final String OPCODE_VALUE = "110001";
+  private final String OPCODE_VALUE = "110001";
   LWC1(Memory memory) {
     super(memory);
     super.OPCODE_VALUE = OPCODE_VALUE;

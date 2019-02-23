@@ -45,11 +45,11 @@ import java.math.BigInteger;
  * @author Trubia Massimo, Russo Daniele
  */
 class DDIVU extends ALU_RType {
-  final static int RS_FIELD = 0;
-  final static int RT_FIELD = 1;
-  final static int LO_REG = 2;
-  final static int HI_REG = 3;
-  final String OPCODE_VALUE = "011110";
+  private final static int RS_FIELD = 0;
+  private final static int RT_FIELD = 1;
+  private final static int LO_REG = 2;
+  private final static int HI_REG = 3;
+  private final String OPCODE_VALUE = "011110";
 
   DDIVU() {
     super.OPCODE_VALUE = OPCODE_VALUE;

@@ -37,7 +37,7 @@ import org.edumips64.core.*;
  * @author IS Group
  */
 class SH extends Storing {
-  final String OPCODE_VALUE = "101001";
+  private final String OPCODE_VALUE = "101001";
 
   SH(Memory memory) {
     super(memory);

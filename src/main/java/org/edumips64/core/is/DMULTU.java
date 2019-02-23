@@ -44,12 +44,12 @@ import java.math.BigInteger;
  * @author Andrea Milazzo (Mancausoft)
  */
 class DMULTU extends ALU_RType {
-  final int RS_FIELD = 0;
-  final int RT_FIELD = 1;
-  final String OPCODE_VALUE = "011100";
+  private final int RS_FIELD = 0;
+  private final int RT_FIELD = 1;
+  private final String OPCODE_VALUE = "011100";
 
-  String lo;
-  String hi;
+  private String lo;
+  private String hi;
 
   DMULTU() {
     super.OPCODE_VALUE = OPCODE_VALUE;

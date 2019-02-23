@@ -32,8 +32,8 @@ import java.util.logging.Logger;
 public class SYSCALL extends Instruction {
   private static final Logger logger = Logger.getLogger(SYSCALL.class.getName());
 
-  String OPCODE_VALUE = "000000";
-  String FINAL_VALUE = "001100";
+  private String OPCODE_VALUE = "000000";
+  private String FINAL_VALUE = "001100";
   private int syscall_n;
   private int return_value;
   private long address;

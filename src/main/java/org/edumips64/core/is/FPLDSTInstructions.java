@@ -32,9 +32,9 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  */
 
 public abstract class FPLDSTInstructions extends LDSTInstructions {
-  final static int FT_FIELD = 0;
-  final static int FT_FIELD_INIT = 11;
-  final static int FT_FIELD_LENGTH = 5;
+  protected final static int FT_FIELD = 0;
+  private final static int FT_FIELD_INIT = 11;
+  private final static int FT_FIELD_LENGTH = 5;
   FPLDSTInstructions(Memory memory) {
     super(memory);
     this.syntax = "%F,%L(%R)";

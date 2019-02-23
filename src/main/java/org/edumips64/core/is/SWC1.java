@@ -33,7 +33,7 @@ import org.edumips64.core.*;
  *               To store a word from an FPR to memory
  */
 class SWC1 extends FPStoring {
-  final String OPCODE_VALUE = "111001";
+  private final String OPCODE_VALUE = "111001";
 
   SWC1(Memory memory) {
     super(memory);

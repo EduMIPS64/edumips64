@@ -38,7 +38,7 @@ import java.util.logging.Logger;
  * @author Trubia Massimo, Russo Daniele
  */
 class MOVZ extends ALU_RType {
-  final String OPCODE_VALUE = "001010";
+  private final String OPCODE_VALUE = "001010";
   private static final Logger logger = Logger.getLogger(MOVZ.class.getName());
 
   // Set to true if the Write Back stage should write data.

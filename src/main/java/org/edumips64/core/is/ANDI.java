@@ -38,7 +38,7 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
   * @author Trubia Massimo, Russo Daniele
  */
 class ANDI extends ALU_IType {
-  final String OPCODE_VALUE = "001100";
+  private final String OPCODE_VALUE = "001100";
 
   ANDI() {
     super.OPCODE_VALUE = OPCODE_VALUE;

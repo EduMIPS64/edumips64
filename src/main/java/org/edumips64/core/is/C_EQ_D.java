@@ -38,9 +38,9 @@ import java.math.*;
 
  */
 class C_EQ_D extends FPC_cond_DInstructions {
-  String COND_VALUE = "0010"; // the first bit doesn't mean anything into this simulator
+  private String COND_VALUE = "0010"; // the first bit doesn't mean anything into this simulator
   // (010)bin=(2)dec is the condition code assigned to the predicate equal in a MIPS64 processor
-  String NAME = "C.EQ.D";
+  private String NAME = "C.EQ.D";
 
   C_EQ_D() {
     super.COND_VALUE = COND_VALUE;
