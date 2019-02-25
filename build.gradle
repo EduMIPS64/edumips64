@@ -5,6 +5,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'jacoco'
     id 'com.dorongold.task-tree' version '1.3.1'
 }
 
@@ -140,3 +141,15 @@ test {
         logger.quiet "Executed test ${desc.name} [${desc.className}] with result: ${result.resultType}"
     }
 }
+
+/*
+ * Code coverage report tasks
+ */
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled false
+    }
+}
+check.dependsOn jacocoTestReport
