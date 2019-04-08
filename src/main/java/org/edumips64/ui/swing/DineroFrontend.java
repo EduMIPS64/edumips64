@@ -46,8 +46,15 @@ public class DineroFrontend extends JDialog {
   // one instance of DineroFrame will be created in EduMIPS64
   private static final Logger logger = Logger.getLogger(DineroFrontend.class.getName());
   private static JTextField path, params;
-  private static JButton execute;
+  private static JButton execute, configure, create;	//configure and create buttons added to create panels and cache parameters
   private static JTextArea result;
+  private static JLabel pathLabel, paramsLabel, cacheLeveLabel, cacheTypeLabel;	//labels for cache level and cache type added
+  private static int argLevel;	//static declaration of array Level argument
+	private static char argType;	//static declaration of array type argument
+	private static Box cachePanel;	//static container globally declared for flexibility
+	private static JScrollPane scrollPane;	//static delclaration of scrollbar
+  public static JPanel panelL1, panelL2, panelL3, panelL4, panelL5;	//static panels to add configuration components
+  private static JComboBox cacheLevel, cacheType;		//static delcaration of cache combo boxes
 
   private class StreamReader extends Thread {
     private InputStream stream;
@@ -137,10 +144,110 @@ public class DineroFrontend extends JDialog {
       }
     });
 
-    JButton browse = new JButton("Browse...");
+		String[] level = {"1", "2", "3", "4", "5"};
+		String[] type = {"data", "instruction", "unified/mixed"};
+
+		cacheLeveLabel	= new JLabel("Set Cache Level (N)");	//Label for cacheLevel
+		cacheTypeLabel  = new JLabel("Set Cache Type (T)");	//Label for cacheType
+
+		cacheLeveLabel.setPreferredSize(new Dimension(110, 26));
+		cacheLeveLabel.setMaximumSize(new Dimension(120, 26));
+		cacheLeveLabel.setMinimumSize(new Dimension(90, 26));
+
+		cacheTypeLabel.setPreferredSize(new Dimension(110, 26));
+		cacheTypeLabel.setMaximumSize(new Dimension(120, 26));
+		cacheTypeLabel.setMinimumSize(new Dimension(80, 26));
+
+		//combo box defined for cache level
+		cacheLevel = new JComboBox(level);
+		cacheLevel.setPreferredSize(new Dimension(80, 26));
+		cacheLevel.setMaximumSize(new Dimension(100, 26));
+		cacheLevel.setMinimumSize(new Dimension(60, 26));
+		
+		//combo box defined for cache type
+		cacheType = new JComboBox(type);
+		cacheType.setPreferredSize(new Dimension(110, 26));
+		cacheType.setMaximumSize(new Dimension(130, 26));
+		cacheType.setMinimumSize(new Dimension(100, 26));
+
+		//combo box action of cache level - passing combo option to argument for cache panel
+		cacheLevel.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				String levelMsg = String.valueOf(cacheLevel.getSelectedItem());
+				argLevel = Integer.parseInt(levelMsg);
+			}
+		});
+		cacheLevel.setSelectedIndex(0);
+
+		//combo box action of cache type - passing combo option to argument for cache panel
+		cacheType.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				argType = (String.valueOf(cacheType.getSelectedItem())).charAt(0);
+			}
+		});
+		cacheType.setSelectedIndex(2);
+
+		//button for creating cache defined
+		create = new JButton("Create Cache");
+		create.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		
+		//button for configuring cache defined
+		configure = new JButton("Configure Cache");
+		configure.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		JButton browse = new JButton("Browse...");
     browse.setAlignmentX(Component.RIGHT_ALIGNMENT);
-    execute = new JButton("Execute");
-    execute.setAlignmentX(Component.CENTER_ALIGNMENT);
+		execute = new JButton("Execute");
+		execute.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+		//action for cache create button - creates panel to add cache parameters, based on cache level and type
+		create.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+
+				cachePanel.removeAll();
+
+				//Panels for different cache type and their configuration options
+				cachePanel.add(panelL1 = new DineroSingleCachePanel(argType, 1));
+
+				if (argLevel > 1){
+					cachePanel.add(Box.createRigidArea(vSpace));
+					cachePanel.add(panelL2 = new DineroSingleCachePanel(argType, 2));
+				}
+				
+				if (argLevel > 2){
+					cachePanel.add(Box.createRigidArea(vSpace));
+					cachePanel.add(panelL3 = new DineroSingleCachePanel(argType, 3));
+				}
+
+				if (argLevel > 3){
+					cachePanel.add(Box.createRigidArea(vSpace));
+					cachePanel.add(panelL4 = new DineroSingleCachePanel(argType, 4));
+				}
+
+				if (argLevel > 4){
+					cachePanel.add(Box.createRigidArea(vSpace));
+					cachePanel.add(panelL5 = new DineroSingleCachePanel(argType, 5));
+				}
+
+				//For cache panel container refresh
+				cachePanel.revalidate();
+				cachePanel.repaint();
+			}
+		});
+
+		//Action for cache configure button - to accumulate cache parameters
+		configure.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				String parameter;
+				//cache parameter only taken for defined cache levels
+				parameter = panelL1.toString();
+				if (argLevel > 1){parameter += panelL2.toString();}
+				if (argLevel > 2){parameter += panelL3.toString();}
+				if (argLevel > 3){parameter += panelL4.toString();}
+				if (argLevel > 4){parameter += panelL5.toString();}	
+				params.setText(parameter);
+			}
+		});
 
     browse.addActionListener(e -> {
       JFileChooser jfc = new JFileChooser();
@@ -243,15 +350,165 @@ public class DineroFrontend extends JDialog {
     cp.add(cmdLine);
     cp.add(Box.createRigidArea(vSpace));
 
+    //Box created for adding Cache Panel components
+		cachePanel = Box.createVerticalBox();
+		cachePanel.add(panelL1 = new DineroSingleCachePanel(argType, 1));
+		cp.add(cachePanel);
+    cp.add(Box.createRigidArea(vSpace));
+    
     result = new JTextArea();
     result.setBorder(BorderFactory.createTitledBorder("Messages"));
     result.setEditable(false);
     result.setFont(new Font("Monospaced", Font.PLAIN, config.getInt(ConfigKey.UI_FONT_SIZE)));
 
+    cp.add(configure);
+		cp.add(Box.createRigidArea(vSpace));
     cp.add(execute);
     cp.add(Box.createRigidArea(vSpace));
     cp.add(new JScrollPane(result));
 
-    setSize(850, 500);
+    //Vertical and horizontal scroll added to the Frame container
+		scrollPane = new JScrollPane(cp, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		setContentPane(scrollPane);
+
+		//Resized the frame container to have better UX with the new panels
+		setSize(900, 800);
   }
+}
+
+/** Panel with all the necessary controls to modify the options of a Cache.
+ */
+class DineroSingleCachePanel extends JPanel {
+	private DineroCacheOptions dco;
+	private JComboBox size, sizeUnit, bsize, bsizeUnit, level, type;
+	private JTextField assoc;
+	private JCheckBox ccc;
+	private JLabel cacheSizeLabel, cacheSizeUnitLabel, blockSizeLabel, bsizeUnitLabel, assocLabel, cccLabel;
+
+	public DineroSingleCachePanel(char type, int level) {
+		dco = new DineroCacheOptions(type, level);
+
+		String[] sizes = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "512"};
+		String[] units = {" ", "k", "M", "G"};
+
+		size = new JComboBox(sizes);
+		bsize = new JComboBox(sizes);
+
+		sizeUnit = new JComboBox(units);
+		bsizeUnit = new JComboBox(units);
+
+		assoc = new JTextField();
+		ccc = new JCheckBox();
+
+		cacheSizeLabel = new JLabel("Cache size");
+		cacheSizeUnitLabel = new JLabel("Unit (Byte)");
+		blockSizeLabel = new JLabel("Block size");
+		bsizeUnitLabel = new JLabel("Unit (Byte)");
+		assocLabel = new JLabel("N way set associative");
+		cccLabel = new JLabel("CCC Enable");
+
+		size.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				//dco.size = String.valueOf(sizeUnit.getSelectedItem());
+				sizeUnit.setSelectedIndex(0);
+			}
+		});
+		size.setSelectedIndex(0);
+
+		bsize.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				//dco.bsize = String.valueOf(bsize.getSelectedItem());
+				bsizeUnit.setSelectedIndex(0);
+			}
+		});
+		bsize.setSelectedIndex(0);
+		
+		sizeUnit.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				String sizeMsg = String.valueOf(size.getSelectedItem());
+				dco.size = sizeMsg + String.valueOf(sizeUnit.getSelectedItem());
+			}
+		});
+		sizeUnit.setSelectedIndex(0);
+
+		bsizeUnit.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				String bsizeMsg = String.valueOf(bsize.getSelectedItem());
+				dco.bsize = bsizeMsg + String.valueOf(bsizeUnit.getSelectedItem());
+			}
+		});
+		bsizeUnit.setSelectedIndex(0);
+
+		//adding components to panel layout
+		setBorder(BorderFactory.createTitledBorder("Level " + level + " cache (" + type + ")"));
+		setLayout(new GridLayout(2, 6, 1, 1));
+		add(cacheSizeLabel);
+		add(cacheSizeUnitLabel);
+		add(blockSizeLabel);
+		add(bsizeUnitLabel);
+		add(assocLabel);
+		add(cccLabel);
+		add(size);
+		add(sizeUnit);
+		add(bsize);
+		add(bsizeUnit);
+		add(assoc);
+		add(ccc);
+
+		//Default dimension set for panel
+		setPreferredSize(new Dimension(850, 80));
+		setMaximumSize(new Dimension(850, 90));
+		setMinimumSize(new Dimension(850, 50));
+	}
+
+	//Passes Dinero command parameters with proper syntax
+	public String toString(){
+		ccc.addItemListener(new ItemListener(){
+			public void itemStateChanged(ItemEvent e) {
+				Boolean cccFlag =  ccc.isSelected();
+				dco.ccc = cccFlag;
+			}
+		});
+
+		//Implements try and catch method to only allow numerical value only
+		try{
+			dco.assoc = Integer.parseInt(assoc.getText());
+		}
+		catch(NumberFormatException exception){
+			dco.assoc = 0;
+		}
+
+		return dco.toString();
+	}
+}
+
+/** Class holding the config options for a Cache.
+ *  Its attributes are public because this class has package visibility, and so 
+ *  it's used only by the DineroFrontend and the DineroCachePanel classes.
+ */
+class DineroCacheOptions {
+	public String size, bsize;
+	public int assoc = 0;
+	public boolean ccc = false;
+	
+	private char type;
+	private int level;
+	
+	public DineroCacheOptions(char type, int level) {
+		this.type = type;
+		this.level = level;
+	}
+	
+	public String toString() {
+		String prefix = "-l" + level + "-" + type;
+		String cmdline = prefix + "size" + " " + size + " ";
+		cmdline += prefix + "bsize" + " " + bsize + " ";
+
+		if(assoc > 0)
+			cmdline += prefix + "assoc" + " " + assoc + " ";
+		if(ccc)
+			cmdline += prefix + "ccc" + " ";
+
+		return cmdline;
+	}
 }
