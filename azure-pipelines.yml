@@ -47,7 +47,7 @@ steps:
 - task: Gradle@2
   displayName: 'Create standalone JAR'
   inputs:
-    workingDirectory: '$(Build.ArtifactStagingDirectory)'
+    workingDirectory: ''
     gradleWrapperFile: 'gradlew'
     gradleOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
@@ -56,3 +56,5 @@ steps:
     tasks: 'standaloneJar'
 
 - task: PublishBuildArtifacts@1
+  inputs:
+    workingDirectory: ''
