@@ -79,7 +79,6 @@ processResources {
 // The 'classes' task is also ran by unit tests. We don't want unit tests to copy around
 // resources, especially since processResources depends on compiling the HTML docs.
 classes.dependsOn.remove('processResources')
-jar.dependsOn('processResources')
 
 def getGitRevisionId() {
   def branch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
