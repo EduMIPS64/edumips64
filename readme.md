@@ -37,4 +37,5 @@ The proof-of-concept JS web application (GWT compilation + JS UI) is available a
 ## Known distribution packages
 
 [FreeBSD FreshPorts](https://www.freshports.org/emulators/edumips64/)
+
 [Gentoo](https://packages.gentoo.org/packages/app-emulation/edumips64)
