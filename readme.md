@@ -33,3 +33,8 @@ By participating, you are expected to uphold this code. Please report unacceptab
 To contribute to EduMIPS64, please start by reading the [developer guide](docs/developer-guide.md).
 
 The proof-of-concept JS web application (GWT compilation + JS UI) is available at www.edumips.org/edumips64.html. It is currently manually pushed.
+
+## Known distribution packages
+
+[FreeBSD FreshPorts](https://www.freshports.org/emulators/edumips64/)
+[Gentoo](https://packages.gentoo.org/packages/app-emulation/edumips64)
