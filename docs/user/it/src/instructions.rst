@@ -99,6 +99,12 @@ Ecco la lista delle istruzioni ALU di tipo R.
   Esegue il prodotto tra i registri a 64-bit rs ed rt, considerandoli come
   valori senza segno e ponendo i 64 bit bassi del risultato nel registro
   speciale LO e i 64 bit alti del risultato nel registro speciale HI.
+
+* `DMULU rs, rt`
+
+  Esegue il prodotto tra i registri a 64-bit rs ed rt, considerandoli come
+  valori senza segno e ponendo i 64 bit bassi del risultato nel registro
+  speciale LO e i 64 bit alti del risultato nel registro speciale HI.
   
 * `DSLL rd, rt, sa`
 

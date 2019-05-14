@@ -319,6 +319,12 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
         runMipsTest("dsubu-simple-test.s");
     }
 
+  /* Test for instructions DMULU and DMULTU */
+  @Test
+  public void testDMULU() throws Exception {
+        runMipsTest("dmulu-simple-test.s");
+    }
+
   /* Test for the instruction JAL */
   @Test
   public void testJAL() throws Exception {

@@ -1,5 +1,10 @@
 # EduMIPS64 ChangeLog
 
+## next
+
+### Added
+- Alias DMULU for DMULTU (Issue #249)
+
 ## 1.2.5 (31/08/2018) - Eden
 ### Added
 - Show CPU state in the main window (Issue #78)
