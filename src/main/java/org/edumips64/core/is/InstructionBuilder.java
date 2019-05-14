@@ -137,6 +137,9 @@ public class InstructionBuilder {
       case "DMULT":
         instruction = new DMULT();
         break;
+      case "DMULU":
+        instruction = new DMULU();
+        break;
       case "DMULTU":
         instruction = new DMULTU();
         break;
