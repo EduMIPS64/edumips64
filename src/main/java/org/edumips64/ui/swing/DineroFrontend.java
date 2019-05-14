@@ -48,13 +48,13 @@ public class DineroFrontend extends JDialog {
   private static JTextField path, params;
   private static JButton execute, configure, create;	//configure and create buttons added to create panels and cache parameters
   private static JTextArea result;
-  private static JLabel pathLabel, paramsLabel, cacheLeveLabel, cacheTypeLabel;	//labels for cache level and cache type added
+  private static JLabel  cacheLevelLabel, cacheTypeLabel;	//labels for cache level and cache type added
   private static int argLevel;	//static declaration of array Level argument
 	private static char argType;	//static declaration of array type argument
 	private static Box cachePanel;	//static container globally declared for flexibility
 	private static JScrollPane scrollPane;	//static delclaration of scrollbar
   public static JPanel panelL1, panelL2, panelL3, panelL4, panelL5;	//static panels to add configuration components
-  private static JComboBox cacheLevel, cacheType;		//static delcaration of cache combo boxes
+  private static JComboBox<String> cacheLevel, cacheType;		//static delcaration of cache combo boxes
 
   private class StreamReader extends Thread {
     private InputStream stream;
@@ -144,28 +144,28 @@ public class DineroFrontend extends JDialog {
       }
     });
 
-		String[] level = {"1", "2", "3", "4", "5"};
-		String[] type = {"data", "instruction", "unified/mixed"};
+		final String[] level = {"1", "2", "3", "4", "5"};
+		final String[] type = {"data", "instruction", "unified/mixed"};
 
-		cacheLeveLabel	= new JLabel("Set Cache Level (N)");	//Label for cacheLevel
+		cacheLevelLabel	= new JLabel("Set Cache Level (N)");	//Label for cacheLevel
 		cacheTypeLabel  = new JLabel("Set Cache Type (T)");	//Label for cacheType
 
-		cacheLeveLabel.setPreferredSize(new Dimension(110, 26));
-		cacheLeveLabel.setMaximumSize(new Dimension(120, 26));
-		cacheLeveLabel.setMinimumSize(new Dimension(90, 26));
+		cacheLevelLabel.setPreferredSize(new Dimension(110, 26));
+		cacheLevelLabel.setMaximumSize(new Dimension(120, 26));
+		cacheLevelLabel.setMinimumSize(new Dimension(90, 26));
 
 		cacheTypeLabel.setPreferredSize(new Dimension(110, 26));
 		cacheTypeLabel.setMaximumSize(new Dimension(120, 26));
 		cacheTypeLabel.setMinimumSize(new Dimension(80, 26));
 
 		//combo box defined for cache level
-		cacheLevel = new JComboBox(level);
+		cacheLevel = new JComboBox<String>(level);
 		cacheLevel.setPreferredSize(new Dimension(80, 26));
 		cacheLevel.setMaximumSize(new Dimension(100, 26));
 		cacheLevel.setMinimumSize(new Dimension(60, 26));
 		
 		//combo box defined for cache type
-		cacheType = new JComboBox(type);
+		cacheType = new JComboBox<String>(type);
 		cacheType.setPreferredSize(new Dimension(110, 26));
 		cacheType.setMaximumSize(new Dimension(130, 26));
 		cacheType.setMinimumSize(new Dimension(100, 26));
@@ -339,8 +339,8 @@ public class DineroFrontend extends JDialog {
     dineroEx.add(browse);
     cp.add(dineroEx);
 
-    cp.add(Box.createRigidArea(vSpace));
-
+		cp.add(Box.createRigidArea(vSpace));
+		
     Box cmdLine = Box.createHorizontalBox();
     cmdLine.add(Box.createHorizontalGlue());
     cmdLine.add(paramsLabel);
@@ -348,7 +348,22 @@ public class DineroFrontend extends JDialog {
     cmdLine.add(params);
     cmdLine.add(Box.createRigidArea(hSpace));
     cp.add(cmdLine);
-    cp.add(Box.createRigidArea(vSpace));
+		cp.add(Box.createRigidArea(vSpace));
+		
+		//Box for adding cache configuration ui
+		Box cacheCreate = Box.createHorizontalBox();
+		cacheCreate.add(Box.createHorizontalGlue());
+		cacheCreate.add(cacheLevelLabel);
+		cacheCreate.add(Box.createRigidArea(hSpace));
+		cacheCreate.add(cacheLevel);
+		cacheCreate.add(Box.createRigidArea(hSpace));
+		cacheCreate.add(cacheTypeLabel);
+		cacheCreate.add(Box.createRigidArea(hSpace));
+		cacheCreate.add(cacheType);
+		cacheCreate.add(Box.createRigidArea(hSpace));
+		cacheCreate.add(create);
+		cp.add(cacheCreate);
+		cp.add(Box.createRigidArea(vSpace));
 
     //Box created for adding Cache Panel components
 		cachePanel = Box.createVerticalBox();
@@ -380,7 +395,7 @@ public class DineroFrontend extends JDialog {
  */
 class DineroSingleCachePanel extends JPanel {
 	private DineroCacheOptions dco;
-	private JComboBox size, sizeUnit, bsize, bsizeUnit, level, type;
+	private JComboBox<String> size, sizeUnit, bsize, bsizeUnit;
 	private JTextField assoc;
 	private JCheckBox ccc;
 	private JLabel cacheSizeLabel, cacheSizeUnitLabel, blockSizeLabel, bsizeUnitLabel, assocLabel, cccLabel;
@@ -388,14 +403,14 @@ class DineroSingleCachePanel extends JPanel {
 	public DineroSingleCachePanel(char type, int level) {
 		dco = new DineroCacheOptions(type, level);
 
-		String[] sizes = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "512"};
-		String[] units = {" ", "k", "M", "G"};
+		final String[] sizes = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "512"};
+		final String[] units = {" ", "k", "M", "G"};
 
-		size = new JComboBox(sizes);
-		bsize = new JComboBox(sizes);
+		size = new JComboBox<String>(sizes);
+		bsize = new JComboBox<String>(sizes);
 
-		sizeUnit = new JComboBox(units);
-		bsizeUnit = new JComboBox(units);
+		sizeUnit = new JComboBox<String>(units);
+		bsizeUnit = new JComboBox<String>(units);
 
 		assoc = new JTextField();
 		ccc = new JCheckBox();
@@ -500,15 +515,29 @@ class DineroCacheOptions {
 	}
 	
 	public String toString() {
-		String prefix = "-l" + level + "-" + type;
-		String cmdline = prefix + "size" + " " + size + " ";
-		cmdline += prefix + "bsize" + " " + bsize + " ";
+		// creates empty builder, capacity 16
+		StringBuilder cacheConfig = new StringBuilder();
+		// adds 9 character string at beginning
+		try {
+			String prefix = "-l" + level + "-" + type;
+			cacheConfig.append("prefix");
 
-		if(assoc > 0)
-			cmdline += prefix + "assoc" + " " + assoc + " ";
-		if(ccc)
-			cmdline += prefix + "ccc" + " ";
+			String cmdline = prefix + "size" + " " + size + " ";
+			cacheConfig.append("cmdline");
 
-		return cmdline;
+			cmdline += prefix + "bsize" + " " + bsize + " ";
+
+			if(assoc > 0)
+				cmdline += prefix + "assoc" + " " + assoc + " ";
+			if(ccc)
+				cmdline += prefix + "ccc" + " ";
+			
+			cacheConfig.append("cmdline");
+			return cmdline;
+		}
+
+		catch (Exception e) {
+			return("");
+		}
 	}
 }
