@@ -32,7 +32,6 @@ import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 
 import java.awt.*;
-import java.util.logging.Logger;
 import javax.swing.*;
 
 /** This class draws the cycles component. It gives a representation of the timing
@@ -85,6 +84,7 @@ public class GUICycles extends GUIComponent {
     this.scalingDenominator = 11.0f;
   }
 
+  @Override
   public void setContainer(Container co) {
     super.setContainer(co);
     cont.add(splitPane);
@@ -122,13 +122,12 @@ public class GUICycles extends GUIComponent {
 
   class CyclePanel extends JPanel {
 
+    @Override
     public synchronized void paint(Graphics g) {
       super.paint(g);
       setBackground(Color.white);
       g.setColor(Color.black);
       g.setFont(font);
-
-      Rectangle clip = g.getClipBounds();
 
       fill(g);
     }
@@ -227,6 +226,7 @@ public class GUICycles extends GUIComponent {
   }
 
   class InstructionPanel extends JPanel {
+    @Override
     public synchronized void paint(Graphics g) {
       super.paint(g);
       setBackground(Color.white);

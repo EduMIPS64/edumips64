@@ -37,12 +37,12 @@ import javax.swing.table.*;
 */
 public class GUIData extends GUIComponent {
   private DataPanel dataPanel;
-  private String memoryAddress[] = new String[Memory.DATALIMIT];
+  private String[] memoryAddress = new String[Memory.DATALIMIT];
   private JTextArea text;
   private int row;
   private StatusBar statusbar;
 
-  private static final Logger logger = Logger.getLogger(CPU.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(CPU.class.getName());
 
   public GUIData(CPU cpu, Memory memory, ConfigStore config, StatusBar sb) {
     super(cpu, memory, config);
@@ -50,6 +50,7 @@ public class GUIData extends GUIComponent {
     dataPanel = new DataPanel();
   }
 
+  @Override
   public void setContainer(Container co) {
     super.setContainer(co);
     cont.add(dataPanel);
@@ -62,6 +63,7 @@ public class GUIData extends GUIComponent {
     cont.repaint();
   }
 
+  @Override
   public void updateLanguageStrings() {
     GUIFrontend.updateColumnHeaderNames(dataPanel.theTable);
   }
@@ -171,7 +173,7 @@ public class GUIData extends GUIComponent {
     class FileTableModel extends AbstractTableModel {
       private String[] columnLocaleStrings = {"ADDRESS", "HEXREPR", "LABEL", "DATA", "COMMENT"};
       private Class[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
-      private String memoryAddress[];
+      private String[] memoryAddress;
 
       FileTableModel(String[] memoryAddress) {
         this.memoryAddress = memoryAddress;
@@ -212,7 +214,7 @@ public class GUIData extends GUIComponent {
             break;
           }
         } catch (IrregularStringOfBitsException | MemoryElementNotFoundException ex) {
-          logger.warning(ex.toString());
+          LOGGER.warning(ex.toString());
         }
 
         return toReturn;

@@ -38,22 +38,17 @@ import org.edumips64.core.IrregularStringOfBitsException;
  * @author Erik UrzÃ¬ - Giorgio Scibilia - Sciuto Lorenzo
  */
 public class SLLV extends ALU_RType {
-  private final int RD_FIELD = 0;
-  private final int RT_FIELD = 1;
-  private final int RS_FIELD = 2;
-  private final int RD_FIELD_INIT = 11;
-  private final int RT_FIELD_INIT = 16;
-  private final int RS_FIELD_INIT = 21;
-  private final int RD_FIELD_LENGTH = 5;
-  private final int RT_FIELD_LENGTH = 5;
-  private final int RS_FIELD_LENGTH = 5;
-  private final String OPCODE_VALUE = "000100";
+  private static final int RD_FIELD = 0;
+  private static final int RT_FIELD = 1;
+  private static final int RS_FIELD = 2;
+  private static final String OPCODE_VALUE = "000100";
   SLLV() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "SLLV";
     syntax = "%R,%R,%R";
   }
 
+  @Override
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
     //getting strings from temporary registers
     String rt = TR[RT_FIELD].getBinString();
@@ -63,7 +58,7 @@ public class SLLV extends ALU_RType {
     shift = rs.substring(59);
     //cutting the high part of register
     rt = rt.substring(32, 64);
-    int shift_value = Converter.binToInt(shift, true);
+    int shiftValue = Converter.binToInt(shift, true);
     //composing new shifted value and performing sign extension
     StringBuffer buf = new StringBuffer();
 
@@ -71,10 +66,10 @@ public class SLLV extends ALU_RType {
       buf.append(rt.charAt(0));
     }
 
-    buf.append(rt.substring(shift_value));
+    buf.append(rt.substring(shiftValue));
 
     //filling the remaining bits with 0
-    for (int i = 0; i < shift_value; i++) {
+    for (int i = 0; i < shiftValue; i++) {
       buf.append('0');
     }
 

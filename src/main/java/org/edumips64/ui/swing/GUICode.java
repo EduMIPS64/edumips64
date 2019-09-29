@@ -32,7 +32,7 @@ import javax.swing.table.*;
 */
 public class GUICode extends GUIComponent {
   private CodePanel codePanel;
-  private String memoryAddress[] = new String[Memory.CODELIMIT];
+  private String[] memoryAddress = new String[Memory.CODELIMIT];
   private static int ifIndex, idIndex, exIndex, memIndex, wbIndex, A1Index, A2Index, A3Index, A4Index, M1Index, M2Index, M3Index, M4Index, M5Index, M6Index, M7Index, DIVIndex;
 
   public GUICode(CPU cpu, Memory memory, ConfigStore config) {
