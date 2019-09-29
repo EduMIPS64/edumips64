@@ -61,10 +61,10 @@ class GUIRegisters extends GUIComponent {
   private RegisterFP registersFP[];
   private RegPanel regPanel;
   private JTextArea text;
-  String value[] = new String[34];
-  private String valueFP[] = new String[32];
+  private String[] value = new String[34];
+  private String[] valueFP = new String[32];
   private int rowCurrent;
-  private String valueCurrent[];
+  private String[] valueCurrent;
   private enum AliasRegister
   {zero, at, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, k0, k1, gp, sp, fp, ra}
   private int xprLastDoubleClick; //used for instanciating an InsertValueDialog if a double click on gpr or fpr is performed
@@ -82,6 +82,7 @@ class GUIRegisters extends GUIComponent {
     xprLastDoubleClick = 0;
   }
 
+  @Override
   public void setContainer(Container co) {
     super.setContainer(co);
     cont.add(regPanel);
@@ -133,8 +134,8 @@ class GUIRegisters extends GUIComponent {
     JTable theTable;
     JScrollPane scrollTable;
     FileTableModel tableModel;
-    String numR[] = new String[34];
-    String numRF[] = new String[34];
+    String[] numR = new String[34];
+    String[] numRF = new String[34];
 
     RegPanel() {
       super();
@@ -298,6 +299,7 @@ class GUIRegisters extends GUIComponent {
         return value.length;
       }
 
+     @Override
       public String getColumnName(int col) {
         return columnNames[col];
       }
@@ -328,6 +330,7 @@ class GUIRegisters extends GUIComponent {
       }
 
       @SuppressWarnings("rawtypes")
+      @Override
       public Class getColumnClass(int c) {
         return columnClasses[c];
       }

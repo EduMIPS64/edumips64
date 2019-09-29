@@ -590,7 +590,7 @@ public class Main extends JApplet {
   private static void tileWindows() {
     // First of all, we don't have to consider iconified frames, because
     // the frames to be tiled are the ones that aren't iconified
-    java.util.List<JInternalFrame> list = new ArrayList<>();
+    List<JInternalFrame> list = new ArrayList<>();
 
     for (JInternalFrame f : ordered_frames) {
       if (!f.isIcon()) {
