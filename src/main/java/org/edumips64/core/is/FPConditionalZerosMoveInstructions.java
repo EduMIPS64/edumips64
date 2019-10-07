@@ -42,10 +42,10 @@ public abstract class FPConditionalZerosMoveInstructions extends ComputationalIn
   protected final static int RT_FIELD = 2;
   private final static int RT_FIELD_INIT = 11;
   private final static int RT_FIELD_LENGTH = 5;
-  private static String COP1_FIELD = "010001";
-  private static int COP1_FIELD_INIT = 0;
-  private static int OPCODE_VALUE_INIT = 26;
-  private static int FMT_FIELD_INIT = 6;
+  private final static String COP1_FIELD = "010001";
+  private final static int COP1_FIELD_INIT = 0;
+  private final static int OPCODE_VALUE_INIT = 26;
+  private final static int FMT_FIELD_INIT = 6;
 
   protected String OPCODE_VALUE = "";
   protected String FMT_FIELD = "";
@@ -103,9 +103,3 @@ public abstract class FPConditionalZerosMoveInstructions extends ComputationalIn
   }
 
 }
-
-
-
-
-
-

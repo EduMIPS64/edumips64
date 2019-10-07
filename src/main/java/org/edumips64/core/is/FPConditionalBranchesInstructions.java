@@ -39,9 +39,9 @@ public abstract class FPConditionalBranchesInstructions extends FlowControlInstr
   protected final static int OFFSET_FIELD = 1;
   private final static int OFFSET_FIELD_INIT = 16;
   private final static int OFFSET_FIELD_LENGTH = 16;
-  private static String COP1_VALUE = "010001";
+  private final static String COP1_VALUE = "010001";
   private final static int COP1_FIELD_INIT = 0;
-  private static String BC_VALUE = "01000";
+  private final static String BC_VALUE = "01000";
   private final static int BC_FIELD_INIT = 6;
   private final static int ND_FIELD_INIT = 14;
   private final static int TF_FIELD_INIT = 15;
