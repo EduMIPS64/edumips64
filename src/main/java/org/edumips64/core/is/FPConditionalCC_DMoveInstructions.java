@@ -42,14 +42,14 @@ public abstract class FPConditionalCC_DMoveInstructions extends ComputationalIns
   private final static int CC_FIELD = 2;
   private final static int CC_FIELD_INIT = 11;
   private final static int CC_FIELD_LENGTH = 3;
-  private static String COP1_FIELD = "010001";
-  private static int COP1_FIELD_INIT = 0;
-  private static int MOVCF_FIELD_INIT = 26;
-  private static String MOVCF_FIELD_VALUE = "010001";
-  private static String ZERO_FIELD = "0";
+  private final static String COP1_FIELD = "010001";
+  private final static int COP1_FIELD_INIT = 0;
+  private final static int MOVCF_FIELD_INIT = 26;
+  private final static String MOVCF_FIELD_VALUE = "010001";
+  private final static String ZERO_FIELD = "0";
   private final static int ZERO_FIELD_INIT = 14;
-  private static String FMT_FIELD = "10001"; //17 for double
-  private static int FMT_FIELD_INIT = 6;
+  private final static String FMT_FIELD = "10001"; //17 for double
+  private final static int FMT_FIELD_INIT = 6;
   private final static int TF_FIELD_INIT = 15;
 
   protected int TF_FIELD_VALUE;
@@ -114,9 +114,3 @@ public abstract class FPConditionalCC_DMoveInstructions extends ComputationalIns
   }
 
 }
-
-
-
-
-
-

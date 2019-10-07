@@ -38,11 +38,11 @@ public abstract class FPMoveToAndFromInstructions extends ComputationalInstructi
   protected final static int FS_FIELD = 1;
   private final static int FS_FIELD_INIT = 16;
   private final static int FS_FIELD_LENGTH = 5;
-  private static String ZERO_FIELD = "00000000000";
+  private final static String ZERO_FIELD = "00000000000";
   private final static int ZERO_FIELD_INIT = 21;
-  private static String COP1_FIELD = "010001";
-  private static int COP1_FIELD_INIT = 0;
-  private static int OPCODE_VALUE_INIT = 6;
+  private final static String COP1_FIELD = "010001";
+  private final static int COP1_FIELD_INIT = 0;
+  private final static int OPCODE_VALUE_INIT = 6;
   protected String OPCODE_VALUE = "";
 
   FPMoveToAndFromInstructions() {
@@ -64,9 +64,3 @@ public abstract class FPMoveToAndFromInstructions extends ComputationalInstructi
   }
 
 }
-
-
-
-
-
-

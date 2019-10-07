@@ -37,7 +37,7 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
   private final static int FD_FIELD = 0;
   private final static int FS_FIELD = 1;
   private final static int FT_FIELD = 2;
-  private static String COP1_FIELD = "010001";
+  private final static String COP1_FIELD = "010001";
   private final static int COP1_FIELD_INIT = 0;
   private final static int FD_FIELD_INIT = 21;
   private final static int FS_FIELD_INIT = 16;

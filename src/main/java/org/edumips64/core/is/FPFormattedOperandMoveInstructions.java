@@ -38,12 +38,12 @@ public abstract class FPFormattedOperandMoveInstructions extends ComputationalIn
   protected final static int FS_FIELD = 1;
   private final static int FS_FIELD_INIT = 16;
   private final static int FS_FIELD_LENGTH = 5;
-  private static String COP1_FIELD = "010001";
-  private static int COP1_FIELD_INIT = 0;
-  private static int OPCODE_VALUE_INIT = 26;
-  private static int FMT_FIELD_INIT = 6;
-  private static String ZERO_FIELD = "00000";
-  private static int ZERO_FIELD_INIT = 11;
+  private final static String COP1_FIELD = "010001";
+  private final static int COP1_FIELD_INIT = 0;
+  private final static int OPCODE_VALUE_INIT = 26;
+  private final static int FMT_FIELD_INIT = 6;
+  private final static String ZERO_FIELD = "00000";
+  private final static int ZERO_FIELD_INIT = 11;
 
   protected String OPCODE_VALUE = "";
   protected String FMT_FIELD = "";
@@ -99,9 +99,3 @@ public abstract class FPFormattedOperandMoveInstructions extends ComputationalIn
   }
 
 }
-
-
-
-
-
-
