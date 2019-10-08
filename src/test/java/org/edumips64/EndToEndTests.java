@@ -34,10 +34,7 @@ import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.CycleElement;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.core.IrregularStringOfBitsException;
-import org.edumips64.utils.io.FileUtils;
-import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.LocalWriter;
-import org.edumips64.utils.io.StringWriter;
 
 import java.io.File;
 import java.util.HashMap;
@@ -549,7 +546,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runMipsTestWithAndWithoutForwarding("jr-raw.s");
     runMipsTestWithAndWithoutForwarding("jalr-raw.s");
   }
-  
+
   /* Issue #132:The longer the simulation goes on, the lower the simulation rate.
      This tests only part of the bug, since part of it is related to the GUI. */
   @Test

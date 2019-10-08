@@ -31,7 +31,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -340,7 +339,7 @@ class GUIRegisters extends GUIComponent {
   //classe per la JDialog
   private class InsertValueDialog extends JDialog implements ActionListener {
     JButton OK;
-    
+
     InsertValueDialog() {
       super();
     }
@@ -390,7 +389,7 @@ class GUIRegisters extends GUIComponent {
       setSize(210, 100);
       setLocation(400, 300);
     }
-    
+
     int confirmAction() {
       String renumeration;
       boolean check = false;
