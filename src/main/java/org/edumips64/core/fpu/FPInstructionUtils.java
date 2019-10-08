@@ -525,9 +525,7 @@ public class FPInstructionUtils {
    */
   private static boolean isPositiveInfinity(String value) {
     if (is64BinaryString(value)) {
-      if (value.compareTo(PLUSINFINITY) == 0) {
-        return true;
-      }
+      return value.equals(PLUSINFINITY);
     }
 
     return false;
@@ -541,9 +539,7 @@ public class FPInstructionUtils {
    */
   private static boolean isNegativeInfinity(String value) {
     if (is64BinaryString(value)) {
-      if (value.compareTo(MINUSINFINITY) == 0) {
-        return true;
-      }
+      return value.equals(MINUSINFINITY);
     }
 
     return false;
@@ -557,9 +553,7 @@ public class FPInstructionUtils {
    */
   private static boolean isInfinity(String value) {
     if (is64BinaryString(value)) {
-      if (isPositiveInfinity(value) || isNegativeInfinity(value)) {
-        return true;
-      }
+      return isPositiveInfinity(value) || isNegativeInfinity(value);
     }
 
     return false;
@@ -591,9 +585,7 @@ public class FPInstructionUtils {
 
   private static boolean isPositiveZero(String value) {
     if (is64BinaryString(value)) {
-      if (value.compareTo(PLUSZERO) == 0) {
-        return true;
-      }
+      return value.equals(PLUSZERO);
     }
 
     return false;
@@ -605,9 +597,7 @@ public class FPInstructionUtils {
    */
   private static boolean isNegativeZero(String value) {
     if (is64BinaryString(value)) {
-      if (value.compareTo(MINUSZERO) == 0) {
-        return true;
-      }
+      return value.equals(MINUSZERO);
     }
 
     return false;
@@ -621,9 +611,7 @@ public class FPInstructionUtils {
    */
   private static boolean isZero(String value) {
     if (is64BinaryString(value)) {
-      if (isPositiveZero(value) || isNegativeZero(value)) {
-        return true;
-      }
+      return isPositiveZero(value) || isNegativeZero(value);
     }
 
     return false;
