@@ -3,7 +3,6 @@
 package org.edumips64.utils.io;
 
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.FileNotFoundException;
 
 public class LocalReader implements Reader {

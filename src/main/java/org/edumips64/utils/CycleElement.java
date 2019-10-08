@@ -26,7 +26,6 @@ package org.edumips64.utils;
 import java.util.*;
 import java.util.logging.Logger;
 
-import org.edumips64.core.is.Instruction;
 import org.edumips64.core.is.InstructionInterface;
 
 /**
