@@ -31,6 +31,7 @@ import org.edumips64.core.parser.ParserMultiWarningException;
 import org.edumips64.ui.swing.img.*;
 import org.edumips64.ui.swing.*;
 import org.edumips64.utils.*;
+import org.edumips64.utils.ApplicationSettings;
 import org.edumips64.utils.io.*;
 
 import java.awt.*;
@@ -42,7 +43,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.Handler;
 import java.io.File;
 import java.io.IOException;
 
@@ -99,95 +99,24 @@ public class Main extends JApplet {
   private static List<JInternalFrame> ordered_frames;
 
   private static String openedFile = null;
-  private static boolean debug_mode = false;
   private static JDesktopPane desk;
 
   /** Callbacks for CPUSwingWorker */
   private static Runnable initCallback, haltCallback, finalizeCallback;
 
-  private static void usage() {
-    showVersion();
-    System.out.println(CurrentLocale.getString("HT.Options"));
-    System.out.println(CurrentLocale.getString("HT.File"));
-    System.out.println(CurrentLocale.getString("HT.Debug"));
-    System.out.println(CurrentLocale.getString("HT.Help"));
-    System.out.println(CurrentLocale.getString("HT.Reset"));
-    System.out.println(CurrentLocale.getString("HT.Version"));
-  }
-
-  private static void showVersion() {
-    System.out.println("EduMIPS64 version " + VERSION + " (codename: " + CODENAME + ", git revision " + GIT_REVISION + ", built on " + BUILD_DATE + ") - Ciao 'mbare.");
-  }
-
-  // Parses the command-line arguments.
-  // Returns the filename to open (if any) and sets parameters such as logging. If necessary, exits.
-  public static String parseArgsOrExit(String[] args) {
-    // Checking CLI parameters.
-    String toOpen = null;
-    boolean printUsageAndExit = false;
-    boolean printVersionAndExit = false;
-
-    if (args.length > 0) {
-      for (int i = 0; i < args.length; ++i) {
-        if (args[i].compareTo("-f") == 0 || args[i].compareTo("--file") == 0) {
-          if (toOpen == null && ++i == args.length) {
-            System.err.println(CurrentLocale.getString("HT.MissingFile") + "\n");
-            printUsageAndExit = true;
-          } else if (toOpen != null) {
-            System.err.println(CurrentLocale.getString("HT.MultipleFile") + "\n");
-            printUsageAndExit = true;
-          } else {
-            toOpen = args[i];
-          }
-        } else if (args[i].compareTo("-d") == 0 || args[i].compareTo("--debug") == 0) {
-          debug_mode = true;
-        } else if (args[i].compareTo("-h") == 0 || args[i].compareTo("--help") == 0) {
-          printUsageAndExit = true;
-        } else if (args[i].compareTo("-v") == 0 || args[i].compareTo("--version") == 0) {
-          printVersionAndExit = true;
-        } else if (args[i].compareTo("-r") == 0 || args[i].compareTo("--reset") == 0) {
-          configStore.resetConfiguration();
-        } else {
-          System.err.println(CurrentLocale.getString("HT.UnrecognizedArgs") + ": " + args[i] + "\n");
-          printUsageAndExit = true;
-        }
-
-        if (printUsageAndExit) {
-          usage();
-          System.exit(0);
-        }
-
-        if (printVersionAndExit) {
-          showVersion();
-          System.exit(0);
-        }
-      }
-    }
-
-    if (!debug_mode) {
-      // Disable logging message whose level is less than WARNING.
-      Logger rootLogger = log.getParent();
-
-      for (Handler h : rootLogger.getHandlers()) {
-        h.setLevel(Level.WARNING);
-      }
-    }
-    return toOpen;
-  }
-
   public static void main(String args[]) {
     // Meta properties.
-    VERSION = MetaInfo.get("Signature-Version");
-    CODENAME = MetaInfo.get("Codename");
-    BUILD_DATE = MetaInfo.get("Build-Date");
-    GIT_REVISION = MetaInfo.get("Git-Revision");
+    VERSION = ApplicationSettings.VERSION;
+    CODENAME = ApplicationSettings.CODENAME;
+    BUILD_DATE = ApplicationSettings.BUILD_DATE;
+    GIT_REVISION = ApplicationSettings.GIT_REVISION;
 
-    String toOpen = parseArgsOrExit(args);
+    String toOpen = ApplicationSettings.parseArgsOrExit(args);
 
     // Configure logger format.
     System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tm%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
 
-    showVersion();
+    ApplicationSettings.showVersion();
 
     // Creating the main JFrame
     JFrame.setDefaultLookAndFeelDecorated(true);
@@ -281,7 +210,7 @@ public class Main extends JApplet {
     JDialog.setDefaultLookAndFeelDecorated(true);
     LocalFileUtils lfu = new LocalFileUtils();
 
-    configStore = new JavaPrefsConfigStore(ConfigStore.defaults);
+    configStore = ApplicationSettings.configStore;
     CurrentLocale.setConfig(configStore);
     jfc = new JFileChooser(new File(configStore.getString(ConfigKey.LAST_DIR)));
     setFileChooserFont(jfc.getComponents());
