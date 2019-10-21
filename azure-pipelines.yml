@@ -9,7 +9,7 @@ trigger:
 pool:
   vmImage: 'Ubuntu-16.04'
 
-# JDK 1.9 and 1.10 are out of support on Azure Pipeline tasks 
+# JDK 1.9 and 1.10 are out of support on Azure Pipeline tasks
 strategy:
   matrix:
     jdk_8:
@@ -20,14 +20,13 @@ strategy:
 
 steps:
 - bash: |
-      sudo apt update && 
+      sudo apt update &&
       sudo apt install python3-sphinx latexmk texlive-latex-base texlive-latex-extra texlive-fonts-extra texlive-fonts-recommended texlive-lang-english texlive-lang-italian texlive-xetex
   displayName: 'Install dependencies'
 
 - task: Gradle@2
   displayName: 'Gradle check task'
   inputs:
-    workingDirectory: ''
     gradleWrapperFile: 'gradlew'
     gradleOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
@@ -43,3 +42,17 @@ steps:
   displayName: 'Codecov update'
   env:
     CODECOV_TOKEN: $(codecov_token)
+
+- task: Gradle@2
+  displayName: 'Create standalone JAR'
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    gradleOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: $(jdk_ver)
+    jdkArchitectureOption: 'x64'
+    tasks: 'standaloneJar'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: './build/libs'
