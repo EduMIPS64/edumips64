@@ -54,7 +54,20 @@ steps:
     tasks: 'standaloneJar'
 
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish standalone artifact'
   inputs:
     pathtoPublish: './build/libs'
+    artifactName: $(artifact-name)
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish English manual'
+  inputs:
+    pathtoPublish: './build/docs/en/latex/EduMIPS64.pdf'
+    artifactName: $(artifact-name)
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Italian manual'
+  inputs:
+    pathtoPublish: './build/docs/it/latex/EduMIPS64.pdf'
     artifactName: $(artifact-name)
 
