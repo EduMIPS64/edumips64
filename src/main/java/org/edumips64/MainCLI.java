@@ -179,12 +179,12 @@ public class MainCLI {
    * @return A string containing the error message.
    */
   private static String getErrorReportingMessage() {
-	  String msg = "EduMIPS64 fatal error!\n" +
-			  "Please report the following stacktrace and system information,\n" +
-			  "along with the content of the assembly file you were executing\n" +
-			  "to the EduMIPS64 GitHub account: https://github.com/lupino3/edumips64/issues/new\n";
-	  msg += String.format("Version: %s, %s, %s\n", Main.VERSION, Main.BUILD_DATE, Main.GIT_REVISION);
-      msg += String.format("JRE version: %s\nOS: %s\n\n", System.getProperty("java.version"), System.getProperty("os.name"));
-      return msg;
+    String msg = "EduMIPS64 fatal error!\n" +
+  		  "Please report the following stacktrace and system information,\n" +
+		  "along with the content of the assembly file you were executing\n" +
+		  "to the EduMIPS64 GitHub account: https://github.com/lupino3/edumips64/issues/new\n";
+    msg += String.format("Version: %s, %s, %s\n", Main.VERSION, Main.BUILD_DATE, Main.GIT_REVISION);
+    msg += String.format("JRE version: %s\nOS: %s\n\n", System.getProperty("java.version"), System.getProperty("os.name"));
+    return msg;
   }  
 }

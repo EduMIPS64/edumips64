@@ -125,13 +125,13 @@ public class ReportDialog extends JDialog implements HyperlinkListener {
   }
 
   public void hyperlinkUpdate(HyperlinkEvent hle) {
-	if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
-		Desktop desktop = Desktop.getDesktop();
-		try {
-			desktop.browse(hle.getURL().toURI());
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}	
+    if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+      Desktop desktop = Desktop.getDesktop();
+      try {
+        desktop.browse(hle.getURL().toURI());
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      }
+    }
   }
 }
