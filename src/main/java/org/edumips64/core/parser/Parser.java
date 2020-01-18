@@ -293,15 +293,6 @@ public class Parser {
                 continue;
               }
 
-              if (instr == null) {
-                numWarning++;
-                warning.add("VALUE_MISS", row, i + 1, line);
-                error.addWarning("VALUE_MISS", row, i + 1, line);
-                memoryCount++;
-                i = line.length();
-                continue;
-              }
-
               MemoryElement tmpMem;
               tmpMem = mem.getCellByIndex(memoryCount);
               logger.info("line: " + line);
