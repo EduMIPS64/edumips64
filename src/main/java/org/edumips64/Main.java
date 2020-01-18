@@ -55,10 +55,10 @@ import javax.swing.event.*;
 
 public class Main extends JApplet {
 
-  private static String VERSION;
-  private static String CODENAME;
-  private static String BUILD_DATE;
-  private static String GIT_REVISION;
+  public static String VERSION;
+  public static String CODENAME;
+  public static String BUILD_DATE;
+  public static String GIT_REVISION;
 
   private static CPU cpu;
   // The last created CPU Worker. Necessary for the Stop menu item.
@@ -99,6 +99,7 @@ public class Main extends JApplet {
   private static List<JInternalFrame> ordered_frames;
 
   private static String openedFile = null;
+  public static String code = null;
   private static boolean debug_mode = false;
   private static JDesktopPane desk;
 
@@ -514,11 +515,11 @@ public class Main extends JApplet {
     dinero.reset();
 
     try {
-      // Aggiorniamo i componenti gai
+      // Update GUI components
       front.updateComponents();
       front.represent();
     } catch (Exception ex) {
-      new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), VERSION);
+      new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), VERSION, BUILD_DATE, GIT_REVISION, code);
     }
 
     try {
@@ -526,7 +527,7 @@ public class Main extends JApplet {
 
       try {
         String absoluteFilename = new File(file).getAbsolutePath();
-        parser.parse(absoluteFilename);
+        code = parser.parse(absoluteFilename);
       } catch (ParserMultiWarningException pmwe) {
         new ErrorDialog(mainFrame, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
       } catch (NullPointerException e) {
@@ -544,7 +545,7 @@ public class Main extends JApplet {
       log.info("Set the status to RUNNING");
 
       // Let's fetch the first instruction
-      cpuWorker = new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, VERSION, initCallback, haltCallback, finalizeCallback);
+      cpuWorker = new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback);
       cpuWorker.setSteps(1);
       cpuWorker.execute();
       while (cpuWorker.isDone()) {
@@ -582,7 +583,7 @@ public class Main extends JApplet {
     } catch (Exception e) {
       mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
       log.info("Error opening " + file);
-      new ReportDialog(mainFrame, e, CurrentLocale.getString("ERROR"), VERSION);
+      new ReportDialog(mainFrame, e, CurrentLocale.getString("ERROR"), VERSION, BUILD_DATE, GIT_REVISION, code);
     }
   }
 
@@ -839,7 +840,7 @@ public class Main extends JApplet {
     // Lambda to create a CPUSwingWorker. Used to have a single place where CPUSwingWorker is
     // created.
     Supplier<CPUSwingWorker> workerBuilder = () ->
-        new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, VERSION, initCallback, haltCallback, finalizeCallback);
+        new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback);
 
     // ---------------- EXECUTE MENU
     // Execute a single simulation step

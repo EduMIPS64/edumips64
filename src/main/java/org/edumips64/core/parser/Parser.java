@@ -108,14 +108,16 @@ public class Parser {
   /** Loading from File
    * @param filename A String with the system-dependent file name. It should be an absolute file name.
    * @throws SecurityException if a security manager exists and its checkRead method denies read access to the file.
+   * @returns A string containing the code parsed.
    */
-  public void parse(String filename) throws ParserMultiException, ReadException {
+  public String parse(String filename) throws ParserMultiException, ReadException {
     logger.info("About to parse " + filename);
     this.filename = filename;
     basePath = fileUtils.GetBasePath(filename);
     String code = preprocessor(filename);
     doParsing(code);
     logger.info(filename + " correctly parsed.");
+    return code;
   }
 
   /** Replace all Tabulator with space

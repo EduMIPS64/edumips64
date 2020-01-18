@@ -218,7 +218,8 @@ public class CurrentLocale {
     en.put("ErrorDialog.MSG0", "Code contains");
     en.put("ErrorDialog.MSG1", "errors and");
     en.put("ErrorDialog.MSG2", String.valueOf(ConfigKey.WARNINGS));
-    en.put("ReportDialog.MSG", "EduMIPS64 Fatal error! Please help the developers, by opening a new issue on GitHub (https://github.com/lupino3/edumips64/issues/new) with the following text, or by sending it via email to bugs@edumips.org");
+    en.put("ReportDialog.MSG", "EduMIPS64 Fatal error!<br/>Please help the developers, by opening a <a href='https://github.com/lupino3/edumips64/issues/new'>new issue on GitHub</a> with the following text, "
+    		+ "or by sending it via email to <a href='mailto:bugs@edumips.org'>bugs@edumips.org</a>.");
     en.put("ReportDialog.BUTTON", "Close");
     en.put("DIVZERO.Message", "Division by zero");
     en.put("INTOVERFLOW.Message", "Integer overflow");
@@ -436,7 +437,8 @@ public class CurrentLocale {
     it.put("ErrorDialog.MSG0", "Il codice contiene");
     it.put("ErrorDialog.MSG1", "errori e");
     it.put("ErrorDialog.MSG2", "avvisi");
-    it.put("ReportDialog.MSG", "Errore fatale! Aiuta gli sviluppatori, aprendo una issue su GitHub(https://github.com/lupino3/edumips64/issues/new) con il seguente testo, o inviandolo via email a bugs@edumips.org");
+    it.put("ReportDialog.MSG", "Errore fatale!<br/>Aiuta gli sviluppatori, aprendo una <a href='https://github.com/lupino3/edumips64/issues/new'>issue su GitHub</a> con il seguente testo, "
+    		+ "o inviandolo via email a <a href='mailto:bugs@edumips.org'>bugs@edumips.org</a>.");
     it.put("ReportDialog.BUTTON", "Chiudi");
     it.put("DIVZERO.Message", "Divisione per zero");
     it.put("INTOVERFLOW.Message", "Integer overflow");

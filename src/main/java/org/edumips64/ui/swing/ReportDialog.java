@@ -1,7 +1,7 @@
 /*
  * ReportDialog.java
  *
- * This class provides a window for report no-catched exception in EduMips64 code.
+ * This class provides a dialog box which helps the user report non-catched exceptions.
  * (c) 2006 EduMIPS64 project - Rizzo Vanni G.
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -23,15 +23,15 @@
  */
 package org.edumips64.ui.swing;
 
-import org.edumips64.ui.swing.img.IMGLoader;
-import org.edumips64.utils.CurrentLocale;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Font;
+import java.awt.Desktop;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -39,15 +39,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+
+import org.edumips64.ui.swing.img.IMGLoader;
+import org.edumips64.utils.CurrentLocale;
 
 /**
- * This class provides a window for configuration options.
+ * This class provides a dialog box which helps the user report non-catched exceptions.
 */
-public class ReportDialog extends JDialog {
+public class ReportDialog extends JDialog implements HyperlinkListener {
 
-  public ReportDialog(final JFrame owner, Exception exception, String title, String version) {
+  public ReportDialog(final JFrame owner, Exception exception, String title, String version, 
+		  String buildDate, String gitRevision, String code) {
     super(owner, title, true);
 
     JPanel buttonPanel = new JPanel();
@@ -63,24 +67,22 @@ public class ReportDialog extends JDialog {
     //Title's Icon and Text
     JPanel titlePanel = new JPanel();
     titlePanel.setLayout(new BorderLayout());
-    String msg = CurrentLocale.getString("ReportDialog.MSG");
-    JTextArea textArea = new JTextArea(msg);
-    textArea.setFont(new Font("Verdana", Font.PLAIN, 20));
-    textArea.setForeground(new Color(0, 0, 85));
 
     try {
       JLabel label = new JLabel(new ImageIcon(IMGLoader.getImage("fatal.png")), SwingConstants.LEFT);
       titlePanel.add("West", label);
     } catch (java.io.IOException ignored) {}
 
-    titlePanel.add("Center", textArea);
-    //label style in TextArea
-    textArea.setLineWrap(true);
-    textArea.setWrapStyleWord(true);
-    textArea.setEditable(false);
-    textArea.setBackground((Color) UIManager.get("Label.background"));
-    textArea.setForeground((Color) UIManager.get("Label.foreground"));
-    textArea.setBorder(null);
+    String msg = CurrentLocale.getString("ReportDialog.MSG");
+    JEditorPane jeditPane = new JEditorPane();
+    jeditPane.setContentType("text/html");
+    jeditPane.setText(msg);
+    jeditPane.addHyperlinkListener(this);
+    jeditPane.setEditable(false);
+    jeditPane.setBackground((Color) UIManager.get("Label.background"));
+    jeditPane.setForeground((Color) UIManager.get("Label.foreground"));
+
+    titlePanel.add("Center", jeditPane);
 
     // Fill the Text Area with Exception information
     String exmsg;
@@ -89,12 +91,20 @@ public class ReportDialog extends JDialog {
       StringWriter sw = new StringWriter();
       PrintWriter pw = new PrintWriter(sw);
       exception.printStackTrace(pw);
-      exmsg = "------\r\n" + sw.toString() + "------\r\n";
+      exmsg = "```java\n" + sw.toString() + "```\n";
     } catch (Exception exc) {
       exmsg = "fatal error";
     }
 
-    exmsg += "Version " + version + "\r\n";
+    exmsg += "## System information\n";
+    exmsg += String.format(" * Version: %s\n", version);
+    exmsg += String.format(" * Build date: %s\n" , buildDate);
+    exmsg += String.format(" * Git revision: %s\n" , gitRevision);
+    exmsg += String.format(" * JRE version: %s\n", System.getProperty("java.version"));
+    exmsg += String.format(" * OS: %s\n\n", System.getProperty("os.name"));
+    exmsg += "## Code of the assembly file in execution\n";
+    exmsg += code == null ? "<none>" : 
+    	String.format("<details><summary>Click to expand</summary>\n\n```assembly\n%s\n```\n</details>", code);
 
     JTextArea ta = new JTextArea(exmsg);
 
@@ -110,6 +120,18 @@ public class ReportDialog extends JDialog {
     int height = 400;
     int width = 450;
     setSize(width, height);
+    setLocationRelativeTo(owner);
     setVisible(true);
+  }
+
+  public void hyperlinkUpdate(HyperlinkEvent hle) {
+	if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+		Desktop desktop = Desktop.getDesktop();
+		try {
+			desktop.browse(hle.getURL().toURI());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}	
   }
 }
