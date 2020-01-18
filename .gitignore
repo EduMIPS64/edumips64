@@ -59,6 +59,7 @@ hs_err_pid*
 
 .gradle
 /build/
+gradle-backup/
 
 # Ignore Gradle GUI config
 gradle-app.setting
