@@ -67,12 +67,14 @@ public class SymbolTable {
     logger.info("Request for memory element labelled " + label);
 
     if (label == null) {
+      logger.warning("Label is null. Cannot access it.");
       throw new MemoryElementNotFoundException();
     }
 
     label = label.toLowerCase();
 
     if (!mem_labels.containsKey(label)) {
+      logger.warning("Label not found.");
       throw new MemoryElementNotFoundException();
     }
 
