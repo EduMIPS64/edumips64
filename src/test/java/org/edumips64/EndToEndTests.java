@@ -242,14 +242,19 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   }
 
   private void runTestAndCompareTracefileWithGolden(String path) throws Exception {
-    CpuTestStatus s = runMipsTest(path, true);
+    CpuTestStatus status = runMipsTest(path, true);
     String goldenTrace = testsLocation + path + ".xdin.golden";
 
-    String golden = new Scanner(new File(goldenTrace)).useDelimiter("\\A").next();
-    String trace = new Scanner(new File(s.traceFile)).useDelimiter("\\A").next();
-    golden = golden.replaceAll("\r\n", "\n");
-    trace = trace.replaceAll("\r\n", "\n");
-    collector.checkThat("Dinero trace file differs from the golden one.", trace, equalTo(golden));
+    String golden, trace;
+
+    try (
+      Scanner goldenScanner = new Scanner(new File(goldenTrace));
+      Scanner traceScanner = new Scanner(new File(status.traceFile));
+    ) {
+      golden = goldenScanner.useDelimiter("\\A").next().replaceAll("\r\n", "\n");
+      trace = traceScanner.useDelimiter("\\A").next().replaceAll("\r\n", "\n");
+      collector.checkThat("Dinero trace file differs from the golden one.", trace, equalTo(golden));
+    }
   }
 
   /* Test for the instruction BREAK */
