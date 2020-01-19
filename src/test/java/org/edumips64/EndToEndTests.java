@@ -29,6 +29,7 @@ import org.edumips64.core.*;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.*;
 import org.edumips64.core.parser.Parser;
+import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.core.parser.ParserMultiWarningException;
 import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.CycleElement;
@@ -241,14 +242,19 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   }
 
   private void runTestAndCompareTracefileWithGolden(String path) throws Exception {
-    CpuTestStatus s = runMipsTest(path, true);
+    CpuTestStatus status = runMipsTest(path, true);
     String goldenTrace = testsLocation + path + ".xdin.golden";
 
-    String golden = new Scanner(new File(goldenTrace)).useDelimiter("\\A").next();
-    String trace = new Scanner(new File(s.traceFile)).useDelimiter("\\A").next();
-    golden = golden.replaceAll("\r\n", "\n");
-    trace = trace.replaceAll("\r\n", "\n");
-    collector.checkThat("Dinero trace file differs from the golden one.", trace, equalTo(golden));
+    String golden, trace;
+
+    try (
+      Scanner goldenScanner = new Scanner(new File(goldenTrace));
+      Scanner traceScanner = new Scanner(new File(status.traceFile));
+    ) {
+      golden = goldenScanner.useDelimiter("\\A").next().replaceAll("\r\n", "\n");
+      trace = traceScanner.useDelimiter("\\A").next().replaceAll("\r\n", "\n");
+      collector.checkThat("Dinero trace file differs from the golden one.", trace, equalTo(golden));
+    }
   }
 
   /* Test for the instruction BREAK */
@@ -451,6 +457,12 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testDivisionByZeroThrowException() throws Exception {
     config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
     runMipsTest("div0.s");
+  }
+
+  /* Test for Out Of Memory while loading a file with more data than the memory can fit. */
+  @Test(expected = ParserMultiException.class)
+  public void testOom() throws Exception {
+    runMipsTest("oom.s");
   }
 
   @Test
