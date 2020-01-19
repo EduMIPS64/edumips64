@@ -102,6 +102,7 @@ public class Memory {
    */
   public MemoryElement getCellByIndex(int index) throws MemoryElementNotFoundException {
     if (index >= DATALIMIT || index < 0) {
+      logger.warning("Trying to access memory index " + index + " which is outside the expected range [0,"+DATALIMIT+").");
       throw new MemoryElementNotFoundException();
     }
 

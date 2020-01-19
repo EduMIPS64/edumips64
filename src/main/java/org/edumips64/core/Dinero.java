@@ -33,7 +33,7 @@ import java.util.*;
 
 public class Dinero {
 
-  private LinkedList <String> dineroData;
+  private LinkedList <String> dineroData = new LinkedList<>();
 
   // Offset of the data segment. This class writes a trace file that assumes
   // that the data segment starts immediately after the code segment ends.
