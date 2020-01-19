@@ -53,7 +53,7 @@ import javax.swing.event.*;
  * @author Andrea Spadaccini, Antonella Scandura, Vanni Rizzo
  * */
 
-public class Main extends JApplet {
+public class Main {
 
   private static String VERSION;
   private static String CODENAME;
@@ -287,7 +287,7 @@ public class Main extends JApplet {
     setFileChooserFont(jfc.getComponents());
 
     desk = new JDesktopPane();
-    Container cp = (mainFrame == null) ? getContentPane() : mainFrame.getContentPane();
+    Container cp = mainFrame.getContentPane();
     cp.setLayout(new BorderLayout());
     cp.add(createMenuBar(), BorderLayout.NORTH);
 
@@ -407,9 +407,7 @@ public class Main extends JApplet {
 
     // Setting icons for the main frame and for the internal frames
     try {
-      if (mainFrame != null) {
-        mainFrame.setIconImage(IMGLoader.getImage("ico.png"));
-      }
+      mainFrame.setIconImage(IMGLoader.getImage("ico.png"));
     } catch (IOException e) {
       log.log(Level.WARNING, "Could not add icon to main frame.", e);
     }
@@ -614,7 +612,7 @@ public class Main extends JApplet {
 
     // Ok, let's start with the code.
     int maxFramesInARow = 3;        // Maybe it'll be customizable...
-    int rows = (new Double(Math.ceil(((double) count) / ((double) maxFramesInARow)))).intValue();
+    int rows = (int) Math.ceil(((double) count) / ((double) maxFramesInARow));
     int cols = maxFramesInARow;
 
     // Optimization of the space
@@ -652,12 +650,10 @@ public class Main extends JApplet {
 
   /** Sets the frame titles. Used when the locale is changed. */
   private static void setFrameTitles() {
-    if (mainFrame != null) {
-      if (openedFile != null) {
-        mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + openedFile);
-      } else {
-        mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
-      }
+    if (openedFile != null) {
+      mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + openedFile);
+    } else {
+      mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
     }
 
     for (Map.Entry<String, JInternalFrame>e : mapped_frames.entrySet()) {
