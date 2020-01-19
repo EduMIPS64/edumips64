@@ -21,6 +21,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.edumips64.utils;
+
 import java.net.URLDecoder;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -30,27 +31,33 @@ import java.util.jar.Manifest;
 public class MetaInfo {
   static Attributes attributes;
 
+  public static String VERSION;
+  public static String CODENAME;
+  public static String BUILD_DATE;
+  public static String GIT_REVISION;
+
   static {
     try {
-      String path = MetaInfo.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-      String decodedPath = URLDecoder.decode(path, "UTF-8");
-      JarFile myJar = new JarFile(decodedPath);
-      Manifest manifest = myJar.getManifest();
-      if (manifest != null) {
-        attributes = manifest.getMainAttributes();
-      } else {
-        System.err.println("Error while getting the manifest from the JAR file.");
+      JarFile myJar = null;
+      try {
+        String path = MetaInfo.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String decodedPath = URLDecoder.decode(path, "UTF-8");
+        myJar = new JarFile(decodedPath);
+        Manifest manifest = myJar.getManifest();
+        if (manifest != null) {
+          attributes = manifest.getMainAttributes();
+          VERSION = attributes.getValue("Signature-Version");
+          CODENAME = attributes.getValue("Codename");
+          BUILD_DATE = attributes.getValue("Build-Date");
+          GIT_REVISION = attributes.getValue("Git-Revision");
+        } else
+          System.err.println("Error while getting the manifest from the JAR file.");
+      } finally {
+        if (myJar != null)
+          myJar.close();
       }
     } catch (Exception e) {
       System.err.println("Error while fetching version info from the jar file.");
     }
-  }
-
-  // Returns the attribute value, or an empty string if it isn't found.
-  public static String get(String attribute) {
-    if (attributes == null) {
-      return "";
-    }
-    return attributes.getValue(attribute);
   }
 }

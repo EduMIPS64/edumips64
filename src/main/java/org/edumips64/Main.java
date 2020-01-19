@@ -55,11 +55,6 @@ import javax.swing.event.*;
 
 public class Main extends JApplet {
 
-  public static String VERSION;
-  public static String CODENAME;
-  public static String BUILD_DATE;
-  public static String GIT_REVISION;
-
   private static CPU cpu;
   // The last created CPU Worker. Necessary for the Stop menu item.
   private  static CPUSwingWorker cpuWorker;
@@ -117,7 +112,7 @@ public class Main extends JApplet {
   }
 
   private static void showVersion() {
-    System.out.println("EduMIPS64 version " + VERSION + " (codename: " + CODENAME + ", git revision " + GIT_REVISION + ", built on " + BUILD_DATE + ") - Ciao 'mbare.");
+    System.out.println("EduMIPS64 version " + MetaInfo.VERSION + " (codename: " + MetaInfo.CODENAME + ", git revision " + MetaInfo.GIT_REVISION + ", built on " + MetaInfo.BUILD_DATE + ") - Ciao 'mbare.");
   }
 
   // Parses the command-line arguments.
@@ -177,11 +172,6 @@ public class Main extends JApplet {
   }
 
   public static void main(String args[]) {
-    // Meta properties.
-    VERSION = MetaInfo.get("Signature-Version");
-    CODENAME = MetaInfo.get("Codename");
-    BUILD_DATE = MetaInfo.get("Build-Date");
-    GIT_REVISION = MetaInfo.get("Git-Revision");
 
     String toOpen = parseArgsOrExit(args);
 
@@ -208,7 +198,7 @@ public class Main extends JApplet {
     mainFrame.setLocation(0, 0);
     Main mm = new Main();
     mm.init();
-    mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
+    mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
     mainFrame.setVisible(true);
     mainFrame.setExtendedState(mainFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
     // Auto-minimze the log window and the I/O window
@@ -303,7 +293,7 @@ public class Main extends JApplet {
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
     builder = new CycleBuilder(cpu);
-    sb = new StatusBar(VERSION, configStore);
+    sb = new StatusBar(configStore);
     front = new GUIFrontend(cpu, memory, configStore, builder, sb);
 
     cpu.setCpuStatusChangeCallback(sb::setCpuStatusText);
@@ -519,7 +509,7 @@ public class Main extends JApplet {
       front.updateComponents();
       front.represent();
     } catch (Exception ex) {
-      new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), VERSION, BUILD_DATE, GIT_REVISION, code);
+      new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION, code);
     }
 
     try {
@@ -561,12 +551,12 @@ public class Main extends JApplet {
         nome_file = token.nextToken();
       }
 
-      mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
+      mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
     } catch (ParserMultiException ex) {
       log.info("Error opening " + file);
       new ErrorDialog(mainFrame, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
       openedFile = null;
-      mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
+      mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
       resetSimulator(false);
     } catch (ReadException ex) {
       String tmpfile;
@@ -577,13 +567,13 @@ public class Main extends JApplet {
         tmpfile = ex.getMessage();
       }
 
-      mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
+      mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
       log.info("File not found: " + tmpfile);
       JOptionPane.showMessageDialog(mainFrame, CurrentLocale.getString("FILE_NOT_FOUND") + ": " + tmpfile, "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
     } catch (Exception e) {
-      mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
+      mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
       log.info("Error opening " + file);
-      new ReportDialog(mainFrame, e, CurrentLocale.getString("ERROR"), VERSION, BUILD_DATE, GIT_REVISION, code);
+      new ReportDialog(mainFrame, e, CurrentLocale.getString("ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION, code);
     }
   }
 
@@ -655,9 +645,9 @@ public class Main extends JApplet {
   private static void setFrameTitles() {
     if (mainFrame != null) {
       if (openedFile != null) {
-        mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + openedFile);
+        mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + openedFile);
       } else {
-        mainFrame.setTitle("EduMIPS64 v. " + VERSION + " - " + CurrentLocale.getString("PROSIM"));
+        mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
       }
     }
 
@@ -955,7 +945,7 @@ public class Main extends JApplet {
     aboutUs = new JMenuItem(CurrentLocale.getString("MenuItem.ABOUT_US"));
     help.add(aboutUs);
     aboutUs.addActionListener(e -> {
-      GUIAbout ab = new GUIAbout(null, VERSION, CODENAME, BUILD_DATE, GIT_REVISION);
+      GUIAbout ab = new GUIAbout(null, MetaInfo.VERSION, MetaInfo.CODENAME, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION);
       //ab.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
       ab.setVisible(true);
     });

@@ -196,7 +196,7 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
         break;
       } catch (Exception ex) {
         logger.severe("Exception in CPUSwingWorker: " + ex);
-        SwingUtilities.invokeLater(() -> new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), Main.VERSION, Main.BUILD_DATE, Main.GIT_REVISION, Main.code));
+        SwingUtilities.invokeLater(() -> new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION, Main.code));
         haltCPU();
         break;
       } finally {
