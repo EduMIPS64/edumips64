@@ -26,6 +26,7 @@ package org.edumips64.ui.swing;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
+import org.edumips64.utils.MetaInfo;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -44,10 +45,10 @@ public class StatusBar {
   private JProgressBar pb;
   private Component sbComponent;
 
-  public StatusBar(String version, ConfigStore cfg) {
+  public StatusBar(ConfigStore cfg) {
     statusLabel = new JLabel();
     statusLabel.setFont(statusLabel.getFont().deriveFont((float)cfg.getInt(ConfigKey.UI_FONT_SIZE)));
-    statusLabel.setText(CurrentLocale.getString("StatusBar.WELCOME") + " " + version);
+    statusLabel.setText(CurrentLocale.getString("StatusBar.WELCOME") + " " + MetaInfo.VERSION);
 
     cpuStatusLabel = new JLabel();
     cpuStatusLabel.setFont(statusLabel.getFont().deriveFont((float)cfg.getInt(ConfigKey.UI_FONT_SIZE)));

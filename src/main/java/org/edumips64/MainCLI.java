@@ -35,7 +35,6 @@ import java.io.*;
 /** Interactive shell for EduMIPS64
  * @author Andrea Spadaccini
  * */
-
 public class MainCLI {
   public static void main(String args[]) {
     try {
@@ -58,7 +57,7 @@ public class MainCLI {
       c.setStatus(CPU.CPUStatus.READY);
 
       // Initialization done. Print a welcome message and open the file if needed.
-      System.out.println("Benvenuto nella shell di EduMIPS64!!");
+      System.out.println("Welcome to EduMIPS64 CLI shell!");
       if (toOpen != null) {
         String absoluteFilename = new File(toOpen).getAbsolutePath();
         try {
@@ -70,7 +69,7 @@ public class MainCLI {
         }
         dinero.setDataOffset(memory.getInstructionsNumber()*4);
         c.setStatus(CPU.CPUStatus.RUNNING);
-        System.out.println("(Caricato il file " + absoluteFilename + ")");
+        System.out.println("(Loaded file " + absoluteFilename + ")");
       }
 
       // Start the (very primitive) Read/Eval/Print Loop.
@@ -87,26 +86,27 @@ public class MainCLI {
         String[] tokens = read.split(" ");
 
         if (tokens[0].compareToIgnoreCase("help") == 0) {
-          String help = "EduMIPS64 CLI SHELL - Comandi disponibili:\n";
+          String help = "EduMIPS64 CLI SHELL - Available commands:\n";
           help += "-----------------------------------------\n";
-          help += "help\t\t\tmostra questo messaggio di aiuto\n";
-          help += "step\t\t\tfa avanzare di uno step la macchina a stati della CPU:\n";
-          help += "step n\t\t\tfa avanzare di n step la macchina a stati della CPU:\n";
-          help += "run\t\t\tesegue il programma fino a terminazione\n";
-          help += "show registers\t\tmostra il contenuto dei registri\n";
-          help += "show memory\t\tmostra il contenuto della memoria\n";
-          help += "show symbols\t\tmostra il contenuto della symbol table\n";
-          help += "show pipeline\t\tmostra il contenuto della pipeline\n";
+          help += "help\t\t\tshow this help message\n";
+          help += "step\t\t\tmake the CPU state machine advance of one step\n";
+          help += "step n\t\t\tmake the CPU state machine advance of n steps\n";
+          help += "run\t\t\texecute the program till its end\n";
+          help += "show registers\t\tshow the content of registries\n";
+          help += "show memory\t\tshow the content of memory\n";
+          help += "show symbols\t\tshow the content of the symbol table\n";
+          help += "show pipeline\t\tshow the content of the pipeline\n";
+          help += "exit\t\t\texit EduMIPS64 CLI shell\n";
           System.out.println(help);
         } else if (tokens[0].compareToIgnoreCase("show") == 0) {
           if (tokens.length == 1) {
-            System.out.println("Bisogna fornire almeno un parametro al comando show");
+            System.out.println("The show command requires at least one parameter.");
           } else {
             if (tokens[1].compareToIgnoreCase("registers") == 0) {
               System.out.println(c.gprString());
             } else if (tokens[1].compareToIgnoreCase("register") == 0) {
               if (tokens.length < 3) {
-                System.out.println("Bisogna fornire almeno un parametro al comando show register");
+                System.out.println("The show register command requires at least one parameter.");
               } else {
                 System.out.println(c.getRegister(Integer.parseInt(tokens[2])));
               }
@@ -117,7 +117,7 @@ public class MainCLI {
             } else if (tokens[1].compareToIgnoreCase("pipeline") == 0) {
               System.out.println(c.pipeLineString());
             } else {
-              System.out.println("Bisogna fornire almeno un parametro al comando show");
+              System.out.println("The show command requires at least one parameter.");
             }
           }
         } else if (tokens[0].compareTo("run") == 0) {
@@ -132,7 +132,7 @@ public class MainCLI {
             } catch (HaltException e) {
               long endTimeMs = System.currentTimeMillis();
               long totalTimeMs = endTimeMs - startTimeMs;
-              System.out.println("Esecuzione terminata. " + steps + " step eseguiti in " + totalTimeMs + "ms");
+              System.out.println("Execution ended. " + steps + " steps were executed in " + totalTimeMs + "ms");
             }
         } else if (tokens[0].compareTo("step") == 0) {
           try {
@@ -144,7 +144,7 @@ public class MainCLI {
 
             try {
               if (num > 0) {
-                System.out.println("Eseguo " + num + " step di simulazione");
+                System.out.println("I execute " + num + " steps of simulation.");
               }
 
               for (int i = 0; i < num; ++i) {
@@ -152,23 +152,39 @@ public class MainCLI {
                 System.out.println(c.pipeLineString());
               }
             } catch (Exception e) {
-              System.out.println("Eccezione durante lo step!!");
+              System.err.println(getErrorReportingMessage());
               e.printStackTrace();
             }
           } catch (NumberFormatException e) {
-            System.out.println("Il secondo parametro del comando step dev'essere un numero intero");
+            System.out.println("The second parameter of the step command must be an integer.");
           }
         } else {
-          System.out.println("Comando non riconosciuto.\nDigitare 'help' per avere un elenco di comandi");
+          System.out.println("Unknown command.\nType 'help' to get the list of available commands.");
         }
 
         System.out.print("> ");
       }
 
-      System.out.println("Ciao ciao!");
+      System.out.println("Bye!");
     } catch (Exception e) {
+      System.err.println(getErrorReportingMessage());
       e.printStackTrace();
       System.exit(1);
     }
   }
+  
+  /**
+   * Compiles and returns a generic error message with version 
+   * and system diagnostic information to be used to report the error.
+   * @return A string containing the error message.
+   */
+  private static String getErrorReportingMessage() {
+    String msg = "EduMIPS64 fatal error!\n" +
+        "Please report the following stacktrace and system information,\n" +
+        "along with the content of the assembly file you were executing\n" +
+        "to the EduMIPS64 GitHub account: https://github.com/lupino3/edumips64/issues/new\n";
+    msg += String.format("Version: %s, %s, %s\n", MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION);
+    msg += String.format("JRE version: %s\nOS: %s\n\n", System.getProperty("java.version"), System.getProperty("os.name"));
+    return msg;
+  }  
 }
