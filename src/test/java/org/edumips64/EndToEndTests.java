@@ -29,6 +29,7 @@ import org.edumips64.core.*;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.*;
 import org.edumips64.core.parser.Parser;
+import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.core.parser.ParserMultiWarningException;
 import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.CycleElement;
@@ -451,6 +452,12 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testDivisionByZeroThrowException() throws Exception {
     config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
     runMipsTest("div0.s");
+  }
+
+  /* Test for Out Of Memory while loading a file with more data than the memory can fit. */
+  @Test(expected = ParserMultiException.class)
+  public void testOom() throws Exception {
+    runMipsTest("oom.s");
   }
 
   @Test
