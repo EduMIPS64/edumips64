@@ -34,6 +34,14 @@ inserita una o più righe al di sopra dell'effettiva dichiarazione del dato
 o dell'istruzione, facendo in modo che non ci sia nulla, eccetto commenti e
 linee vuote, tra l'etichetta stessa e la dichiarazione. 
 
+Limiti di memoria
+-----------------
+
+EduMIPS64 ha memoria limitata, sia per i dati (sezione `.data`) che per le
+istruzioni (sezione `.code`). Entrambe le sezioni hanno un limite di 64 kB,
+che si traduce in un massimo di 8192 celle di memoria da 64 bit e fino a
+16384 istruzioni (visto che ciascuna istruzione occupa 32 bit).
+
 La sezione `.data`
 ------------------
 La sezione *data* contiene i comandi che specificano il modo in cui la

@@ -31,6 +31,14 @@ can be used.  The label can be specified one or more rows above the effective
 data declaration or instruction, provided that there's nothing, except for
 comments and empty lines, between the label and the declaration. 
 
+Memory limits
+-------------
+
+EduMIPS64 has a fixed memory size for both data (the `.data` section) and
+instructions (the `.code` section). Both sections are capped at 64 kB, which
+means the simulator supports up to 8192 64-bit memory cells and up to 16384
+instructions (because each instruction takes 32 bits).
+
 The `.data` section
 -------------------
 The *data* section contains commands that specify how the memory must be

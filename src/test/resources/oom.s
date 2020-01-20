@@ -1050,5 +1050,10 @@
 ; this is one too much
 toomuch: .word64 0,0,0,0,0,0,0,0
 
+; 3 too much
+.word64 0,0,0,0,0,0,0,0
+.word64 0,0,0,0,0,0,0,0
+.word64 0,0,0,0,0,0,0,0
+
 .code
 syscall 0
