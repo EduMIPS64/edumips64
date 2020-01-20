@@ -1138,7 +1138,7 @@ public class Parser {
           if (isFirstOutOfMemory) { //is first out of memory?
             isFirstOutOfMemory = false;
             numError++;
-            error.add("OUTOFMEMORY", row, i + 1, line);
+            error.add("OUTOFMEMORY_PARSER", row, i + 1, line);
             i = line.length();
             continue;
           }
