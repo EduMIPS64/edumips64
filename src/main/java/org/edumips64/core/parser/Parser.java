@@ -1135,11 +1135,13 @@ public class Parser {
 
           i = end;
         } catch (MemoryElementNotFoundException ex) {
+          // Even if we don't report the error, advance i to prevent other errors from
+          // being generated on this line.
+          i = line.length();
           if (isFirstOutOfMemory) { //is first out of memory?
             isFirstOutOfMemory = false;
             numError++;
-            error.add("OUTOFMEMORY", row, i + 1, line);
-            i = line.length();
+            error.add("OUTOFMEMORY_PARSER", row, i + 1, line);
             continue;
           }
         } catch (IrregularWriteOperationException ex) {

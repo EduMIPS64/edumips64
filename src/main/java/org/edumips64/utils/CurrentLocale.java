@@ -231,6 +231,7 @@ public class CurrentLocale {
     en.put("WRITETOSTDIN", "Attempt to write to standard input");
     en.put("FILENOTOPENED", "The file descriptor isn't valid. Probably the file hasn't been correctly opened");
     en.put("OUTOFMEMORY", "The write (or read) attempt led to an invalid memory access");
+    en.put("OUTOFMEMORY_PARSER", "The data in the input file exceeds the EduMIPS64 memory");
     en.put("OUTOFINSTRUCTIONMEMORY", "Instruction memory exhausted");
     en.put("READFROMSTDOUT", "Attempt to read from standard output (or standard error)");
     en.put("OPENREADANDCREATE", "Attempt to open in read mode a file that doesn't exist (O_CREAT doesn't work in read or read/write mode)");
@@ -450,6 +451,7 @@ public class CurrentLocale {
     it.put("WRITETOSTDIN", "Tentativo di scrittura sullo standard input");
     it.put("FILENOTOPENED", "Il descrittore di file non è valido. Probabilmente il file non è stato aperto correttamente");
     it.put("OUTOFMEMORY", "Il tentativo di lettura (o scrittura) ha condotto ad un accesso in memoria non valido");
+    it.put("OUTOFMEMORY_PARSER", "I dati contenuti nel file assembly di input eccedono la memoria di EduMIPS64");
     it.put("OUTOFINSTRUCTIONMEMORY", "Esaurita memoria istruzioni");
     it.put("READFROMSTDOUT", "Tentativo di lettura dallo standard output (o dallo standard error)");
     it.put("OPENREADANDCREATE", "Tentativo di apertura in modalità lettura di un file che non esiste (O_CREAT non funziona in modalità lettura o lettura/scrittura)");
