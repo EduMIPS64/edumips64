@@ -37,10 +37,11 @@ linee vuote, tra l'etichetta stessa e la dichiarazione.
 Limiti di memoria
 -----------------
 
-EduMIPS64 ha memoria limitata, sia per i dati (sezione `.data`) che per le
-istruzioni (sezione `.code`). Entrambe le sezioni hanno un limite di 64 kB,
-che si traduce in un massimo di 8192 celle di memoria da 64 bit e fino a
-16384 istruzioni (visto che ciascuna istruzione occupa 32 bit).
+EduMIPS64 ha memoria limitata, sia per i dati (sezione `.data`, limitata a 640
+kB -- i.e., 80000 valori a 64 bit) che per le istruzioni (sezione `.code`,
+limitata a 128 kB -- i.e., 32000 istruzioni, ciascuna da 32 bit).
+
+I limiti sono arbitrari e fissati nel codice del simulatore.
 
 La sezione `.data`
 ------------------
