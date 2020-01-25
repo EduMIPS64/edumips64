@@ -636,19 +636,25 @@ public class Converter {
     return value;
   }
 
-/** Check if a string is a number
+/** Check if a string is an integer, i.e. a sequence of digits that might have a
+ *  sign as the first element.
    *  @param num the string to validate
-   *  @return true if num is a number, else false
+   *  @return true if num is an integer in the specified format, otherwise false
    */
-  public static boolean isNumber(String num) {
+  public static boolean isInteger(String num) {
+    if (num.length() == 0) {
+      return false;
+    }
+
     if (num.charAt(0) == '+' || num.charAt(0) == '-') {
       num = num.substring(1);
     }
 
-    for (int i = 0; i < num.length(); i++)
+    for (int i = 0; i < num.length(); i++) {
       if (num.charAt(i) < '0' || num.charAt(i) > '9') {
         return false;
       }
+    }
 
     return true;
   }
@@ -685,7 +691,7 @@ public class Converter {
         imm = imm.substring(1);
       }
 
-      if (isNumber(imm)) {
+      if (isInteger(imm)) {
         return true;
       } else if (isHexNumber(imm)) {
         if (imm.length() <= 6) {

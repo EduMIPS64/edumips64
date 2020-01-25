@@ -406,7 +406,7 @@ public class Parser {
                     parameters = Converter.hexToLong(parameters);
                   }
 
-                  if (Converter.isNumber(parameters)) {
+                  if (Converter.isInteger(parameters)) {
                     int num = Integer.parseInt(parameters);
 
                     for (int tmpi = 0; tmpi < num; tmpi++) {
@@ -618,7 +618,7 @@ public class Parser {
                           indPar++;
                         }
 
-                        if (Converter.isNumber(param.substring(indPar, endPar))) {
+                        if (Converter.isInteger(param.substring(indPar, endPar))) {
                           try {
                             imm = Integer.parseInt(param.substring(indPar, endPar));
 
@@ -664,7 +664,7 @@ public class Parser {
                           if (cc != -1) {
                             tmpMem = symTab.getCell(param.substring(indPar, cc).trim());
 
-                            if (Converter.isNumber(param.substring(cc + 1, endPar))) {
+                            if (Converter.isInteger(param.substring(cc + 1, endPar))) {
                               try {
                                 imm = Integer.parseInt(param.substring(indPar, endPar));
 
@@ -710,7 +710,7 @@ public class Parser {
                             if (cc != -1) {
                               tmpMem = symTab.getCell(param.substring(indPar, cc).trim());
 
-                              if (Converter.isNumber(param.substring(cc + 1, endPar))) {
+                              if (Converter.isInteger(param.substring(cc + 1, endPar))) {
                                 try {
                                   imm = Integer.parseInt(param.substring(indPar, endPar));
 
@@ -785,7 +785,7 @@ public class Parser {
                           indPar++;
                         }
 
-                        if (Converter.isNumber(param.substring(indPar, endPar))) {
+                        if (Converter.isInteger(param.substring(indPar, endPar))) {
                           try {
                             imm = Integer.parseInt(param.substring(indPar, endPar).trim());
 
@@ -870,7 +870,7 @@ public class Parser {
                           indPar++;
                         }
 
-                        if (Converter.isNumber(param.substring(indPar, endPar))) {
+                        if (Converter.isInteger(param.substring(indPar, endPar))) {
                           try {
                             imm = Integer.parseInt(param.substring(indPar, endPar).trim());
 
@@ -955,7 +955,7 @@ public class Parser {
 
                         if (param.substring(indPar, endPar).equals("")) {
                           tmpInst.getParams().add(0);
-                        } else if (Converter.isNumber(param.substring(indPar, endPar).trim())) {
+                        } else if (Converter.isInteger(param.substring(indPar, endPar).trim())) {
                           int tmp = Integer.parseInt(param.substring(indPar, endPar).trim());
 
                           if (tmp < Memory.MIN_OFFSET_BYTES || tmp > Memory.MAX_OFFSET_BYTES) {
@@ -1245,7 +1245,7 @@ public class Parser {
       int num;
 
       if (reg.charAt(0) == 'r' || reg.charAt(0) == 'R' || reg.charAt(0) == '$')    //ci sono altri modi di scrivere un registro???
-        if (Converter.isNumber(reg.substring(1))) {
+        if (Converter.isInteger(reg.substring(1))) {
           num = Integer.parseInt(reg.substring(1));
 
           if (num < 32 && num >= 0) {
@@ -1271,7 +1271,7 @@ public class Parser {
       int num;
 
       if (reg.charAt(0) == 'f' || reg.charAt(0) == 'F' || reg.charAt(0) == '$')
-        if (Converter.isNumber(reg.substring(1))) {
+        if (Converter.isInteger(reg.substring(1))) {
           num = Integer.parseInt(reg.substring(1));
 
           if (num < 32 && num >= 0) {
