@@ -12,7 +12,8 @@ Notes for this release:
 This is version 1.2.6 of EduMIPS64, a release that follows up on version 
 1.2.5, that was released in August 2018. This release contains a couple of
 changes, a new instruction alias (DMULU for DMULTU), an increased memory 
-size (640kB) and several bug fixes. 
+size (640kB), a better way to report bugs via GitHub and several bug fixes. 
+
 The codename for this release is Phlegmatic. First because it took a while
 to release a new version after 1.2.5. Second because I am releasing it while
 fighting with a bad and annoying cough, which I hope goes away as soon as
