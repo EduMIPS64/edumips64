@@ -26,3 +26,6 @@
 * Maria Grazia Ciraulo - [**@GraziaCiraulo**](http://github.com/GraziaCiraulo)
 * Paolo Viotti - [**@pviotti**](http://github.com/pviotti)
 * Howard - [**@hbuie112358**](http://github.com/hbuie112358)
+* Matthew Crumley - [**@silentmatt**](http://github.com/silentmatt)
+* ancbro - [**@ancbro**](http://github.com/ancbro)
+* Grandroid - [**@Grandroid**](http://github.com/Grandroid)

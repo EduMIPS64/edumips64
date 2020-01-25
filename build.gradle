@@ -23,8 +23,8 @@ dependencies {
 }
 
 mainClassName = 'org.edumips64.Main'
-version = '1.2.5'
-ext.codename = 'Eden'
+version = '1.2.6'
+ext.codename = 'Phlegmatic'
 
 // Enable some compilation warnings.
 tasks.withType(JavaCompile) {
