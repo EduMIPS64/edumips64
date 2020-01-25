@@ -32,6 +32,12 @@ tasks.withType(JavaCompile) {
     options.deprecation = true
 }
 
+// Specify Java source/target version.
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
 /* 
  * Documentation tasks
  */
@@ -138,6 +144,7 @@ task standaloneJar(type: Jar, dependsOn: configurations.runtimeClasspath) {
 }
 // Not sure why standaloneJar does not depend on jar. Anyway, adding this dependency for now.
 standaloneJar.dependsOn(processResources)
+jar.dependsOn(processResources)
 assemble.dependsOn(standaloneJar) 
 
 /*
