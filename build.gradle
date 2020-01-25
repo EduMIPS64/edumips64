@@ -144,6 +144,7 @@ task standaloneJar(type: Jar, dependsOn: configurations.runtimeClasspath) {
 }
 // Not sure why standaloneJar does not depend on jar. Anyway, adding this dependency for now.
 standaloneJar.dependsOn(processResources)
+jar.dependsOn(processResources)
 assemble.dependsOn(standaloneJar) 
 
 /*
