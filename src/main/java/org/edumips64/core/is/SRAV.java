@@ -40,12 +40,6 @@ public class SRAV extends ALU_RType {
   private final int RD_FIELD = 0;
   private final int RT_FIELD = 1;
   private final int RS_FIELD = 2;
-  private final int RD_FIELD_INIT = 11;
-  private final int RT_FIELD_INIT = 16;
-  private final int RS_FIELD_INIT = 21;
-  private final int RD_FIELD_LENGTH = 5;
-  private final int RT_FIELD_LENGTH = 5;
-  private final int RS_FIELD_LENGTH = 5;
   private final String OPCODE_VALUE = "000111";
 
   SRAV() {

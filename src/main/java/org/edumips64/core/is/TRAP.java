@@ -21,7 +21,6 @@
 package org.edumips64.core.is;
 
 import org.edumips64.core.*;
-import org.edumips64.utils.*;
 
 /** TRAP instruction, deprecated alias for the SYSCALL instruction.
  *

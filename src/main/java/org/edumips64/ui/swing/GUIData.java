@@ -169,10 +169,9 @@ public class GUIData extends GUIComponent {
       public void mouseReleased(MouseEvent e) { }
     }
 
-    @SuppressWarnings("rawtypes")
     class FileTableModel extends AbstractTableModel {
       private String[] columnLocaleStrings = {"ADDRESS", "HEXREPR", "LABEL", "DATA", "COMMENT"};
-      private Class[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
+      private Class<?>[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
       private String[] memoryAddress;
 
       FileTableModel(String[] memoryAddress) {
@@ -220,8 +219,7 @@ public class GUIData extends GUIComponent {
         return toReturn;
       }
 
-      @SuppressWarnings("rawtypes")
-      public Class getColumnClass(int c) {
+      public Class<?> getColumnClass(int c) {
         return columnClasses[c];
       }
     }

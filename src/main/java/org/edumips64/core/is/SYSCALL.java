@@ -38,7 +38,6 @@ public class SYSCALL extends Instruction {
   private int return_value;
   private long address;
 
-  private Dinero din;
   private IOManager iom;
   private Memory memory;
 
