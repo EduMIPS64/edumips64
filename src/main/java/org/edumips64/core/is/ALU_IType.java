@@ -41,6 +41,7 @@ public abstract class ALU_IType extends ComputationalInstructions {
   private final static int RT_FIELD_LENGTH = 5;
   private final static int RS_FIELD_LENGTH = 5;
   private final static int IMM_FIELD_LENGTH = 16;
+  private final static int IMM_FIELD_MAX = (int) Math.pow(2, IMM_FIELD_LENGTH - 1) - 1;
   protected String OPCODE_VALUE = "";
 
   private static final Logger logger = Logger.getLogger(ALU_IType.class.getName());
@@ -50,17 +51,29 @@ public abstract class ALU_IType extends ComputationalInstructions {
     this.paramCount = 3;
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  /**
+   * Throws an IntegerOverflowException if the size of the value that should be loaded in the immediate field
+   * exceeds the length of the field itself.
+   * @throws IntegerOverflowException
+   */
+  protected void checkImmediateForOverflow() throws IntegerOverflowException {
+    if (params.get(IMM_FIELD) > IMM_FIELD_MAX) {
+      throw new IntegerOverflowException();
+    }
+  }
+
+  public boolean ID() throws IntegerOverflowException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+    checkImmediateForOverflow();
     //if the source register is valid passing its own values into a temporary register
-    Register rs = cpu.getRegister(params.get(RS_FIELD));
+    final Register rs = cpu.getRegister(params.get(RS_FIELD));
 
     if (rs.getWriteSemaphore() > 0) {
       return true;
     }
 
     TR[RS_FIELD].setBits(rs.getBinString(), 0);
-    //locking the target register
-    Register rt = cpu.getRegister(params.get(RT_FIELD));
+    // locking the target register
+    final Register rt = cpu.getRegister(params.get(RT_FIELD));
     rt.incrWriteSemaphore();
     //writing the immediate value of "params" on a temporary register
     TR[IMM_FIELD].writeHalf(params.get(IMM_FIELD));

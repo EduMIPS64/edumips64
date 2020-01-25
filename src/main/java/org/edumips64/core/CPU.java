@@ -594,7 +594,7 @@ public class CPU {
 
   // Returns true if there is a RAW conflict, false otherwis3. See docs for Instruction.ID()
   // for an explanation of why it is the case.
-  private boolean stepID() throws TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
+  private boolean stepID() throws IntegerOverflowException, TwosComplementSumException, WAWException, IrregularStringOfBitsException, FPInvalidOperationException, BreakException, IrregularWriteOperationException, JumpException, FPDividerNotAvailableException, FPFunctionalUnitNotAvailableException, EXNotAvailableException {
     changeStage(Pipeline.Stage.ID);
 
     if (pipe.isEmpty(Pipeline.Stage.ID)) {

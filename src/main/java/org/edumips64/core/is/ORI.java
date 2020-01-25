@@ -44,7 +44,8 @@ class ORI extends ALU_IType {
   }
   //since this operation is carried out with zero padding of immediate, against sign_extend(immediate) methodology
   //of all others instructions in the same category, is necessary the overriding of ID method
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IntegerOverflowException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+    checkImmediateForOverflow();
     //if the source register is valid passing its own values into a temporary register
     Register rs = cpu.getRegister(params.get(RS_FIELD));
 

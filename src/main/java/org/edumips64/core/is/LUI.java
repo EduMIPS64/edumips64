@@ -51,7 +51,8 @@ class LUI extends ALU_IType {
     this.name = "LUI";
   }
 
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+  public boolean ID() throws IntegerOverflowException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
+    checkImmediateForOverflow();
     //if the source register is valid passing its own values into a temporary register
     //locking the target register
     Register rt = cpu.getRegister(params.get(RT_FIELD));
