@@ -39,7 +39,7 @@ public abstract class ComputationalInstructions extends Instruction {
       e.printStackTrace();
     }
   }
-  public abstract boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException;
+  public abstract boolean ID() throws IntegerOverflowException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException;
   public abstract void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException, DivisionByZeroException, FPInvalidOperationException, FPUnderflowException, FPOverflowException, FPDivideByZeroException, FPInvalidOperationException;
   public abstract void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException;
   public abstract void WB() throws IrregularStringOfBitsException;

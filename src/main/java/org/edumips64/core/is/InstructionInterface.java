@@ -34,7 +34,7 @@ public interface InstructionInterface {
    * Windows).
    *</pre>
    **/
-  boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException, StoppingException;
+  boolean ID() throws IntegerOverflowException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException, StoppingException;
 
   /**
    * <pre>

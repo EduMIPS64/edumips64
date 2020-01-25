@@ -580,4 +580,11 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testNegativeOffsets() throws Exception {
     runMipsTestWithAndWithoutForwarding("negative-offsets.s");
   }
+
+  /* Issue #255: Trying to store a large memory location in an immediate field
+     causes EduMIPS64 to crash */
+  @Test(expected = IntegerOverflowException.class)
+  public void testImmediateOverflow() throws Exception {
+    runMipsTest("immediate-overflow.s");
+  }
 }
