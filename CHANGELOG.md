@@ -1,6 +1,6 @@
 # EduMIPS64 ChangeLog
 
-## 1.2.6 (26/01/2019) - Phlegm
+## 1.2.6 (26/01/2019) - Phlegmatic
 ### Added
 - Alias DMULU for DMULTU (Issue #249)
 
