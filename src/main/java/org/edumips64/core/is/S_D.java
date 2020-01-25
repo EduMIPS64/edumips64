@@ -24,7 +24,7 @@
 
 package org.edumips64.core.is;
 import org.edumips64.core.*;
-import org.edumips64.utils.*;
+
 /** <pre>
  *DEPRECATED INSTRUCTION (SDC1 is to be used against S.D)
  *       Syntax: S.D ft, offset(base)

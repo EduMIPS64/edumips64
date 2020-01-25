@@ -31,12 +31,9 @@ public class GUIUpdateThread extends Thread {
   private boolean shouldUpdate = false;
   private boolean shouldTerminate = false;
   private GUIFrontend frontend;
-  private long periodMs;
 
   GUIUpdateThread(GUIFrontend frontend) {
     this.frontend = frontend;
-    // Rate-limiting to 100 updates / second.
-    periodMs = 10;
   }
 
   // Signals to this thread that an update is necessary. The logic that handles this boolean
