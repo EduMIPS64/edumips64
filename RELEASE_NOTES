@@ -1,4 +1,4 @@
-31st of July, 2018                                          EduMIPS64 1.2.5
+26th of January, 2020                                          EduMIPS64 1.2.6
 
                            EduMIPS64 RELEASE NOTES	
                            http://www.edumips.org
@@ -9,21 +9,21 @@ graphical debugger.
 Notes for this release:
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This is version 1.2.5 of EduMIPS64, a bug-fix release that follows up on
-version 1.2.4, that was released in December 2017. The codename for this
-release is "Eden", as an homage to The Binding of Isaac, and also because
-gardening is nice.
+This is version 1.2.6 of EduMIPS64, a release that follows up on version 
+1.2.5, that was released in August 2018. This release contains a couple of
+changes, a new instruction alias (DMULU for DMULTU), an increased memory 
+size (640kB) and several bug fixes. 
+The codename for this release is Phlegmatic. First because it took a while
+to release a new version after 1.2.5. Second because I am releasing it while
+fighting with a bad and annoying cough, which I hope goes away as soon as
+possible.
 
-This release fixes issues with the cycles counter, which has always been
-off-by-one, improves the UI for large programs, fixes the parsing of
-load/store instructions' offsets and improves the handling of settings.
+This release reverts the build system change in 1.2.5: we went back from
+Bazel to Gradle. There was no real benefit in using Bazel, and Gradle is
+more supported by IDEs. The main advantage we got from the Bazel migration
+was better code modularity, and that benefit still remains.
 
-There is also a small new feature: the current CPU state is displayed in the
-status bar.
-
-A large change for developers is the migration to Bazel (http://bazel.io),
-which is now the only build system used by EduMIPS64 (superseding both Gradle
-and Ant).
+We are now using Azure Pipelines instead of Travis as a CI system.
 
 Please keep in mind that this is still EXPERIMENTAL SOFTWARE. It may
 BURN YOUR HARD DISK, DESTROY ALL YOUR DATA and even GO OUT WITH YOUR
@@ -35,20 +35,22 @@ EduMIPS64 is hosted on GitHub: www.github.com/lupino3/edumips64.
 Our web site is www.edumips.org, and our development blog is
 http://edumips64.blogspot.com.
 
-New in this release since version 1.2.4
+New in this release since version 1.2.5
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Added
 -----
-- Show CPU state in the main window (Issue #78)
+- Alias DMULU for DMULTU (Issue #249)
 
 Fixed
 -----
-- Cycles display is wrong for code shown in attachment (Issue #48)
-- Changing the forwarding setting should reset the simulator (Issue #98)
-- It should be impossible to both mask synchronous exceptions and terminate on synchronous exceptions (Issue #111)
-- Fix cycles UI for hailstoneenglish.s (Issue #134)
-- Add building PDFs to Travis (Issue #168)
-- While parsing LW and SW instructions, offset cannot be negative or above 8192 (Issue #175)
-- Migrate to Bazel (Issue #180)
-- Splash screen not working (Issue #195)
+- Trying to store a large memory location in an immediate field causes EduMIPS64 to crash (Issue #255)
+- Fixed NullReference in the CLI application (#258)
+
+Changed
+-------
+- Improved the way OOM errors are handled (Issues #257 and #266)
+- Increased default data memory to 640 kB (Issue #268)
+- Improved the bug report dialog (Issue #262)
+- Code quality improvements (Issue #222, still open)
+- Migrated back to Gradle from Bazel (Issue #226)
