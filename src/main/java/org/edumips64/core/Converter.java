@@ -635,5 +635,97 @@ public class Converter {
     }
     return value;
   }
+
+/** Check if a string is an integer, i.e. a sequence of digits that might have a
+ *  sign as the first element.
+   *  @param num the string to validate
+   *  @return true if num is an integer in the specified format, otherwise false
+   */
+  public static boolean isInteger(String num) {
+    int len = num.length();
+    if (len == 0) {
+      return false;
+    }
+
+    // Check the sign.
+    int cur = 0;
+    char first = num.charAt(cur);
+    if (first == '+' || first == '-') {
+      if (len == 1) {
+        // Only a sign.
+        return false;
+      }
+      cur++;
+    }
+
+    // Check the rest of the number.
+    for (; cur < num.length(); cur++) {
+      char c = num.charAt(cur);
+      if (c < '0' || c > '9') {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+/** Check if a string is a Hex number
+   *  @param num the string to validate
+   *  @return true if num is a number, else false
+   */
+  public static boolean isHexNumber(String num) {
+    // Need at least 3 characters: 0, x (or X) and a number.
+    int len = num.length();
+    if (len < 3) {
+      return false;
+    }
+
+    // The first must be a 0, the second an x or X.
+    int cur = 0;
+    if (num.charAt(cur) != '0') {
+      return false;
+    }
+    cur++;
+    char x = num.charAt(cur);
+    if (x != 'x' && x != 'X') {
+      return false;
+    }
+    
+    // Check the rest of the number.
+    for (; cur < num.length(); cur++) {
+      char c = num.charAt(cur);
+      boolean isHexDigit = (c >= '0' || c <= '9') || (c >= 'a' || c <= 'f') || (c >= 'A' || c <= 'F');
+      if (!isHexDigit) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+/** Check if is a valid string for an immediate value (rough check on number of
+ *  digits, the caller is responsible for checking the actual value).
+ * 
+ * TODO: this is not very clean, this function should be removed and the caller
+ * should just convert to a number and check the value.
+   *  @param imm the string to validate
+   *  @return false if imm isn't a valid immediate, else true
+   */
+  public static boolean isImmediate(String imm) {
+    if (imm.length() == 0) {
+      return false;
+    }
+
+    if (imm.charAt(0) == '#') {
+      imm = imm.substring(1);
+    }
+
+    if (isInteger(imm)) {
+      return true;
+    } else if (isHexNumber(imm) && imm.length() <= 6) {
+      return true;
+    }
+
+    return false;
+  }
 }
 
