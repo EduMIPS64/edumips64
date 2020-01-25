@@ -766,7 +766,7 @@ public class Main {
     // ---------------- FILE MENU
     // Open file
     file.add(open);
-    open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
+    open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
     open.addActionListener(e -> {
       int val = jfc.showOpenDialog(mainFrame);
 
@@ -794,12 +794,12 @@ public class Main {
 
     // Reset the simulator and the CPU
     file.add(reset);
-    reset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
+    reset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
     reset.addActionListener(e -> resetSimulator(true));
 
     // Write Dinero Tracefile
     file.add(dinero_tracefile);
-    dinero_tracefile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_MASK));
+    dinero_tracefile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
     dinero_tracefile.addActionListener(e -> {
       jfc.setSelectedFile(new File(openedFile + ".xdin"));
       int val = jfc.showSaveDialog(mainFrame);
@@ -957,7 +957,7 @@ public class Main {
     // ---------------- WINDOW MENU
     //
     tile = new JMenuItem("Tile");
-    tile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_MASK));
+    tile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
     tile.addActionListener(e -> tileWindows());
     window.add(tile);
     window.addSeparator();

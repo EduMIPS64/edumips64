@@ -131,10 +131,9 @@ public class GUICode extends GUIComponent {
       add(scrollTable, BorderLayout.CENTER);
     }
 
-    @SuppressWarnings("rawtypes")
     class MyTableModel extends AbstractTableModel {
       private String[] columnLocaleStrings = {"ADDRESS", "HEXREPR", "LABEL", "INSTRUCTION", "COMMENT"};
-      private Class[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
+      private Class<?>[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
       private String memoryAddress[];
 
       MyTableModel(String[] memoryAddress) {
@@ -193,8 +192,7 @@ public class GUICode extends GUIComponent {
         return "";
       }
 
-      @SuppressWarnings("rawtypes")
-      public Class getColumnClass(int c) {
+      public Class<?> getColumnClass(int c) {
         return columnClasses[c];
       }
     }

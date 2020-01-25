@@ -280,10 +280,9 @@ class GUIRegisters extends GUIComponent {
       public void mouseReleased(MouseEvent e) { }
     }
 
-    @SuppressWarnings("rawtypes")
     class FileTableModel extends AbstractTableModel {
       private String[] columnNames = {"Colonna1", "Colonna2", "Colonna3", "Colonna4"};
-      private Class[] columnClasses = {String.class, String.class, String.class, String.class};
+      private Class<?>[] columnClasses = {String.class, String.class, String.class, String.class};
       private String value[];
 
       FileTableModel(String[] value) {
@@ -328,9 +327,8 @@ class GUIRegisters extends GUIComponent {
         }
       }
 
-      @SuppressWarnings("rawtypes")
       @Override
-      public Class getColumnClass(int c) {
+      public Class<?> getColumnClass(int c) {
         return columnClasses[c];
       }
     }
