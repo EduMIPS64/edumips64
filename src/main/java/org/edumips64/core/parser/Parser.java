@@ -110,14 +110,13 @@ public class Parser {
    * @throws SecurityException if a security manager exists and its checkRead method denies read access to the file.
    * @returns A string containing the code parsed.
    */
-  public String parse(String filename) throws ParserMultiException, ReadException {
+  public void parse(String filename) throws ParserMultiException, ReadException {
     logger.info("About to parse " + filename);
     this.filename = filename;
     basePath = fileUtils.GetBasePath(filename);
     String code = preprocessor(filename);
     doParsing(code);
     logger.info(filename + " correctly parsed.");
-    return code;
   }
 
   /** Replace all Tabulator with space

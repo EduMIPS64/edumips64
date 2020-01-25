@@ -501,7 +501,6 @@ public class Main {
     cpu.reset();
     symTab.reset();
     dinero.reset();
-
     try {
       // Update GUI components
       front.updateComponents();
@@ -515,7 +514,9 @@ public class Main {
 
       try {
         String absoluteFilename = new File(file).getAbsolutePath();
-        code = parser.parse(absoluteFilename);
+        LocalFileUtils lfu = new LocalFileUtils();
+        code = lfu.ReadFile(absoluteFilename);
+        parser.parse(absoluteFilename);
       } catch (ParserMultiWarningException pmwe) {
         new ErrorDialog(mainFrame, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
       } catch (NullPointerException e) {
