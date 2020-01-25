@@ -34,10 +34,11 @@ comments and empty lines, between the label and the declaration.
 Memory limits
 -------------
 
-EduMIPS64 has a fixed memory size for both data (the `.data` section) and
-instructions (the `.code` section). Both sections are capped at 64 kB, which
-means the simulator supports up to 8192 64-bit memory cells and up to 16384
-instructions (because each instruction takes 32 bits).
+EduMIPS64 has a fixed memory size for both data (the `.data` section, capped
+at 640 kB -- i.e., 80000 64-bit values) and instructions (the `.code` section,
+capped at 128 kB -- i.e., 32000 instructions, each occupying 32 bits).
+
+These limits are hardcoded in the simulator.
 
 The `.data` section
 -------------------

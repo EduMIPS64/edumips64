@@ -34,9 +34,10 @@ import java.util.logging.Logger;
  */
 public class Memory {
   /** The code and data sections limits. Note that these limits are expressed in number of memory cells,
-   *  not number of bytes.*/
-  public static final int CODELIMIT = 16384; // 16 bit bus (2^16 / 4)
-  public static final int DATALIMIT = 8192;  // 16 bit bus (2^16 / 8)
+   *  not number of bytes. Note that the limits are somehow arbitrary: the memory size is theoretically
+   *  limited by the amount of RAM we are willing to use for the CPU. */
+  public static final int CODELIMIT = 32000; // 128 kB code memory.
+  public static final int DATALIMIT = 80000; // 640 kB data memory.
 
   /** Instruction offset limits in bytes */
   public static final int MAX_OFFSET_BYTES = 32768;  // 2^15
