@@ -32,6 +32,12 @@ tasks.withType(JavaCompile) {
     options.deprecation = true
 }
 
+// Specify Java source/target version.
+compileJava {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
+
 /* 
  * Documentation tasks
  */
