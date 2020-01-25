@@ -1,7 +1,7 @@
 ; load-large-memory-location.s - test file for EduMIPS64.
 ;
-; Tries to load into an immediate a value (memory location) too large
-; for its size. The runner should expect an integer overflow error.
+; Loads data from a memory location that exceeds the immediate field size,
+; and checks that the data is correct.
 ;
 ; (c) 2020 Andrea Spadaccini and the EduMIPS64 team
 ;
@@ -91,7 +91,14 @@
 .word64 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 ; This is outside the memory addressable in an immediate.
-test: 	.word64 0
+test: 	.word64 42
 
 .code
-daddi	r11,r0,test
+    ld      r1, test(r0)
+    daddi   r2, r0, 42
+    bne     r1, r2, error
+    syscall 0
+
+error:
+    break
+    syscall 0
