@@ -642,16 +642,26 @@ public class Converter {
    *  @return true if num is an integer in the specified format, otherwise false
    */
   public static boolean isInteger(String num) {
-    if (num.length() == 0) {
+    int len = num.length();
+    if (len == 0) {
       return false;
     }
 
-    if (num.charAt(0) == '+' || num.charAt(0) == '-') {
-      num = num.substring(1);
+    // Check the sign.
+    int cur = 0;
+    char first = num.charAt(cur);
+    if (first == '+' || first == '-') {
+      if (len == 1) {
+        // Only a sign.
+        return false;
+      }
+      cur++;
     }
 
-    for (int i = 0; i < num.length(); i++) {
-      if (num.charAt(i) < '0' || num.charAt(i) > '9') {
+    // Check the rest of the number.
+    for (; cur < num.length(); cur++) {
+      char c = num.charAt(cur);
+      if (c < '0' || c > '9') {
         return false;
       }
     }
@@ -664,46 +674,58 @@ public class Converter {
    *  @return true if num is a number, else false
    */
   public static boolean isHexNumber(String num) {
-    try {
-      if (num.substring(0, 2).compareToIgnoreCase("0X") != 0) {
-        return false;
-      }
-
-      for (int i = 2; i < num.length(); i++)
-        if ((num.charAt(i) < '0' || num.charAt(i) > '9') && (num.charAt(i) < 'A' || num.charAt(i) > 'F')) {
-          return false;
-        }
-
-      return true;
-    } catch (Exception e) {
+    // Need at least 3 characters: 0, x (or X) and a number.
+    int len = num.length();
+    if (len < 3) {
       return false;
     }
 
+    // The first must be a 0, the second an x or X.
+    int cur = 0;
+    if (num.charAt(cur) != '0') {
+      return false;
+    }
+    cur++;
+    char x = num.charAt(cur);
+    if (x != 'x' && x != 'X') {
+      return false;
+    }
+    
+    // Check the rest of the number.
+    for (; cur < num.length(); cur++) {
+      char c = num.charAt(cur);
+      boolean isHexDigit = (c >= '0' || c <= '9') || (c >= 'a' || c <= 'f') || (c >= 'A' || c <= 'F');
+      if (!isHexDigit) {
+        return false;
+      }
+    }
+    return true;
   }
 
-/** Check if is a valid string for a register
+/** Check if is a valid string for an immediate value (rough check on number of
+ *  digits, the caller is responsible for checking the actual value).
+ * 
+ * TODO: this is not very clean, this function should be removed and the caller
+ * should just convert to a number and check the value.
    *  @param imm the string to validate
    *  @return false if imm isn't a valid immediate, else true
    */
   public static boolean isImmediate(String imm) {
-    try {
-      if (imm.charAt(0) == '#') {
-        imm = imm.substring(1);
-      }
-
-      if (isInteger(imm)) {
-        return true;
-      } else if (isHexNumber(imm)) {
-        if (imm.length() <= 6) {
-          return true;
-        }
-      }
-
-      return false;
-    } catch (Exception e) {
+    if (imm.length() == 0) {
       return false;
     }
 
+    if (imm.charAt(0) == '#') {
+      imm = imm.substring(1);
+    }
+
+    if (isInteger(imm)) {
+      return true;
+    } else if (isHexNumber(imm) && imm.length() <= 6) {
+      return true;
+    }
+
+    return false;
   }
 }
 
