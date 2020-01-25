@@ -635,5 +635,69 @@ public class Converter {
     }
     return value;
   }
+
+/** Check if a string is a number
+   *  @param num the string to validate
+   *  @return true if num is a number, else false
+   */
+  public static boolean isNumber(String num) {
+    if (num.charAt(0) == '+' || num.charAt(0) == '-') {
+      num = num.substring(1);
+    }
+
+    for (int i = 0; i < num.length(); i++)
+      if (num.charAt(i) < '0' || num.charAt(i) > '9') {
+        return false;
+      }
+
+    return true;
+  }
+
+/** Check if a string is a Hex number
+   *  @param num the string to validate
+   *  @return true if num is a number, else false
+   */
+  public static boolean isHexNumber(String num) {
+    try {
+      if (num.substring(0, 2).compareToIgnoreCase("0X") != 0) {
+        return false;
+      }
+
+      for (int i = 2; i < num.length(); i++)
+        if ((num.charAt(i) < '0' || num.charAt(i) > '9') && (num.charAt(i) < 'A' || num.charAt(i) > 'F')) {
+          return false;
+        }
+
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+
+  }
+
+/** Check if is a valid string for a register
+   *  @param imm the string to validate
+   *  @return false if imm isn't a valid immediate, else true
+   */
+  public static boolean isImmediate(String imm) {
+    try {
+      if (imm.charAt(0) == '#') {
+        imm = imm.substring(1);
+      }
+
+      if (isNumber(imm)) {
+        return true;
+      } else if (isHexNumber(imm)) {
+        if (imm.length() <= 6) {
+          return true;
+        }
+      }
+
+      return false;
+    } catch (Exception e) {
+      return false;
+    }
+
+  }
 }
 

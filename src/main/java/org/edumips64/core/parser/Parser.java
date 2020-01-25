@@ -402,11 +402,11 @@ public class Parser {
                 memoryCount++;
 
                 try {
-                  if (isHexNumber(parameters)) {
+                  if (Converter.isHexNumber(parameters)) {
                     parameters = Converter.hexToLong(parameters);
                   }
 
-                  if (isNumber(parameters)) {
+                  if (Converter.isNumber(parameters)) {
                     int num = Integer.parseInt(parameters);
 
                     for (int tmpi = 0; tmpi < num; tmpi++) {
@@ -613,12 +613,12 @@ public class Parser {
 
                       int imm;
 
-                      if (isImmediate(param.substring(indPar, endPar))) {
+                      if (Converter.isImmediate(param.substring(indPar, endPar))) {
                         if (param.charAt(indPar) == '#') {
                           indPar++;
                         }
 
-                        if (isNumber(param.substring(indPar, endPar))) {
+                        if (Converter.isNumber(param.substring(indPar, endPar))) {
                           try {
                             imm = Integer.parseInt(param.substring(indPar, endPar));
 
@@ -633,7 +633,7 @@ public class Parser {
 
                           tmpInst.getParams().add(imm);
                           indPar = endPar + 1;
-                        } else if (isHexNumber(param.substring(indPar, endPar))) {
+                        } else if (Converter.isHexNumber(param.substring(indPar, endPar))) {
                           try {
                             try {
                               imm = (int) Long.parseLong(Converter.hexToShort(param.substring(indPar, endPar)));
@@ -664,7 +664,7 @@ public class Parser {
                           if (cc != -1) {
                             tmpMem = symTab.getCell(param.substring(indPar, cc).trim());
 
-                            if (isNumber(param.substring(cc + 1, endPar))) {
+                            if (Converter.isNumber(param.substring(cc + 1, endPar))) {
                               try {
                                 imm = Integer.parseInt(param.substring(indPar, endPar));
 
@@ -679,7 +679,7 @@ public class Parser {
 
                               tmpInst.getParams().add(tmpMem.getAddress() + imm);
                               indPar = endPar + 1;
-                            } else if (isHexNumber(param.substring(cc + 1, endPar))) {
+                            } else if (Converter.isHexNumber(param.substring(cc + 1, endPar))) {
                               try {
                                 try {
                                   imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar, endPar)));
@@ -710,7 +710,7 @@ public class Parser {
                             if (cc != -1) {
                               tmpMem = symTab.getCell(param.substring(indPar, cc).trim());
 
-                              if (isNumber(param.substring(cc + 1, endPar))) {
+                              if (Converter.isNumber(param.substring(cc + 1, endPar))) {
                                 try {
                                   imm = Integer.parseInt(param.substring(indPar, endPar));
 
@@ -725,7 +725,7 @@ public class Parser {
 
                                 tmpInst.getParams().add(tmpMem.getAddress() - imm);
                                 indPar = endPar + 1;
-                              } else if (isHexNumber(param.substring(cc + 1, endPar))) {
+                              } else if (Converter.isHexNumber(param.substring(cc + 1, endPar))) {
                                 try {
                                   try {
                                     imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar, endPar)));
@@ -780,12 +780,12 @@ public class Parser {
 
                       int imm;
 
-                      if (isImmediate(param.substring(indPar, endPar))) {
+                      if (Converter.isImmediate(param.substring(indPar, endPar))) {
                         if (param.charAt(indPar) == '#') {
                           indPar++;
                         }
 
-                        if (isNumber(param.substring(indPar, endPar))) {
+                        if (Converter.isNumber(param.substring(indPar, endPar))) {
                           try {
                             imm = Integer.parseInt(param.substring(indPar, endPar).trim());
 
@@ -808,7 +808,7 @@ public class Parser {
 
                           tmpInst.getParams().add(imm);
                           indPar = endPar + 1;
-                        } else if (isHexNumber(param.substring(indPar, endPar).trim())) {
+                        } else if (Converter.isHexNumber(param.substring(indPar, endPar).trim())) {
                           try {
                             imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar, endPar)));
 
@@ -865,12 +865,12 @@ public class Parser {
 
                       int imm;
 
-                      if (isImmediate(param.substring(indPar, endPar))) {
+                      if (Converter.isImmediate(param.substring(indPar, endPar))) {
                         if (param.charAt(indPar) == '#') {
                           indPar++;
                         }
 
-                        if (isNumber(param.substring(indPar, endPar))) {
+                        if (Converter.isNumber(param.substring(indPar, endPar))) {
                           try {
                             imm = Integer.parseInt(param.substring(indPar, endPar).trim());
 
@@ -893,7 +893,7 @@ public class Parser {
 
                           tmpInst.getParams().add(imm);
                           indPar = endPar + 1;
-                        } else if (isHexNumber(param.substring(indPar, endPar).trim())) {
+                        } else if (Converter.isHexNumber(param.substring(indPar, endPar).trim())) {
                           try {
                             imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar, endPar)));
 
@@ -955,7 +955,7 @@ public class Parser {
 
                         if (param.substring(indPar, endPar).equals("")) {
                           tmpInst.getParams().add(0);
-                        } else if (isNumber(param.substring(indPar, endPar).trim())) {
+                        } else if (Converter.isNumber(param.substring(indPar, endPar).trim())) {
                           int tmp = Integer.parseInt(param.substring(indPar, endPar).trim());
 
                           if (tmp < Memory.MIN_OFFSET_BYTES || tmp > Memory.MAX_OFFSET_BYTES) {
@@ -1245,7 +1245,7 @@ public class Parser {
       int num;
 
       if (reg.charAt(0) == 'r' || reg.charAt(0) == 'R' || reg.charAt(0) == '$')    //ci sono altri modi di scrivere un registro???
-        if (isNumber(reg.substring(1))) {
+        if (Converter.isNumber(reg.substring(1))) {
           num = Integer.parseInt(reg.substring(1));
 
           if (num < 32 && num >= 0) {
@@ -1271,7 +1271,7 @@ public class Parser {
       int num;
 
       if (reg.charAt(0) == 'f' || reg.charAt(0) == 'F' || reg.charAt(0) == '$')
-        if (isNumber(reg.substring(1))) {
+        if (Converter.isNumber(reg.substring(1))) {
           num = Integer.parseInt(reg.substring(1));
 
           if (num < 32 && num >= 0) {
@@ -1293,7 +1293,7 @@ public class Parser {
    *  @return -1 if reg isn't a valid alias-register, else a number of
   register
    */
-  private int isAlias(String reg) {
+  int isAlias(String reg) {
     for (AliasRegister x : AliasRegister.values()) {
       if (reg.equalsIgnoreCase(x.name())) {
         return x.ordinal();
@@ -1301,69 +1301,6 @@ public class Parser {
     }
 
     return -1;
-  }
-
-  /** Check if a string is a number
-   *  @param num the string to validate
-   *  @return true if num is a number, else false
-   */
-  private boolean isNumber(String num) {
-    if (num.charAt(0) == '+' || num.charAt(0) == '-') {
-      num = num.substring(1);
-    }
-
-    for (int i = 0; i < num.length(); i++)
-      if (num.charAt(i) < '0' || num.charAt(i) > '9') {
-        return false;
-      }
-
-    return true;
-  }
-  /** Check if a string is a Hex number
-   *  @param num the string to validate
-   *  @return true if num is a number, else false
-   */
-  private boolean isHexNumber(String num) {
-    try {
-      if (num.substring(0, 2).compareToIgnoreCase("0X") != 0) {
-        return false;
-      }
-
-      for (int i = 2; i < num.length(); i++)
-        if ((num.charAt(i) < '0' || num.charAt(i) > '9') && (num.charAt(i) < 'A' || num.charAt(i) > 'F')) {
-          return false;
-        }
-
-      return true;
-    } catch (Exception e) {
-      return false;
-    }
-
-  }
-
-  /** Check if is a valid string for a register
-   *  @param imm the string to validate
-   *  @return false if imm isn't a valid immediate, else true
-   */
-  private boolean isImmediate(String imm) {
-    try {
-      if (imm.charAt(0) == '#') {
-        imm = imm.substring(1);
-      }
-
-      if (isNumber(imm)) {
-        return true;
-      } else if (isHexNumber(imm)) {
-        if (imm.length() <= 6) {
-          return true;
-        }
-      }
-
-      return false;
-    } catch (Exception e) {
-      return false;
-    }
-
   }
 
   /** Write a double in memory
@@ -1425,7 +1362,7 @@ public class Parser {
         continue;
       }
 
-      if (isHexNumber(val)) {
+      if (Converter.isHexNumber(val)) {
         try {
           val = Converter.hexToLong(val);
         } catch (IrregularStringOfHexException e) {
