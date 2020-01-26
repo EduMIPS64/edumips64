@@ -52,6 +52,7 @@ In particular you may find useful these tasks:
  * `./gradlew assemble` - (Java plugin) compile and assemble jar artifacts 
  * `./gradlew check` - (Java plugin) run tests and compile the documentation
  * `./gradlew run` - (Application plugin) run the application
+ * `./gradlew war` - (GWT plugin) compile the GWT experimental frontend
 
 You may also find useful using the `--console=plain` flag to better see what tasks 
 are being executed.  
@@ -81,6 +82,8 @@ Currently, only a prototype is available. The GWT code for it is in the
 `org.edumips64.client` package. The HTML file is at
 `src/main/java/org/edumips64/client/edumips64.html`.
 
+<!--
+TODO: fix gwtDev target. It doesn't include the html file for now.
 To work on it, run the `devmode` Build target, which will fire up the GWT
 developer console for you. Once the console is available, you'll be given a
 local URL where the frontend will be available.
@@ -88,8 +91,11 @@ local URL where the frontend will be available.
 Every time you change the GWT frontend, reloading that web page will cause the
 GWT console to recompile the code, thus allowing quick iteration on the web
 frontend code.
+-->
 
-To create a releasable version of the JS code, use the `gwtc` target.
+The `war` task will compile the Java code to JS and copy the resulting JS, including
+the static resources needed for the prototype frontend, to the `build/gwt/war`
+directory.
 
 ### Source code structure
 
