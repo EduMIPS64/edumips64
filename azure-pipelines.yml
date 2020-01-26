@@ -30,9 +30,7 @@ strategy:
 
 steps:
 - script: |
-      sudo apt install python3-pip
-      sudo pip3 install sphinx
-      sudo pip3 install rst2pdf
+      sudo pip3 install sphinx rst2pdf
   displayName: 'Install docs dependencies'
 
 - task: Gradle@2
