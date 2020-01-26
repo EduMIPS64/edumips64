@@ -3,7 +3,7 @@
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
-SPHINXBUILD   = sphinx-build
+SPHINXBUILD   = python3 -msphinx
 PAPER         =
 BUILDDIR      = ../output
 
@@ -38,6 +38,7 @@ clean:
 	-rm -rf $(BUILDDIR)/*
 
 html:
+	$(SPHINXBUILD) --version
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
