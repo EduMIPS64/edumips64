@@ -19,8 +19,15 @@ In order to compile EduMIPS64, you need the Java JDK version 8 or above.
 
 To build the user documentation, you'll need:
 - GNU Make
-- Sphinx (http://www.sphinx-doc.org/) version 1.0.7 or above
-- a distribution of LateX
+- Python 3
+- Sphinx (http://www.sphinx-doc.org/) version 2.3.1 or above
+- rst2pdf (for the PDF files) version 0.9.6 or above
+
+You can install the Python dependencies using PIP:
+
+```
+$ pip3 install -r docs/requirements.txt
+```
 
 [Gradle](https://gradle.org/) will download the following dependencies:
 - JUnit
