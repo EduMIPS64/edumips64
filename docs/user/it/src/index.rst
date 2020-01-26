@@ -5,7 +5,7 @@
 
 Benvenuti nella documentazione di EduMIPS64!
 ============================================
-EduMIPS64 è un simulatore di Instruction Set Architecture (ISA) MIPS64, 
+EduMIPS64 è un simulatore di Instruction Set Architecture (ISA) MIPS64,
 progettato per eseguire piccoli programmi che utilizzino il sottoinsieme
 dell'Instruction Set MIPS64 implementato dal simulatore stesso; permette
 all'utente di vedere come le istruzioni si comportino nella pipeline, come gli
@@ -25,19 +25,20 @@ differenze importanti con quest'ultimo.
 Questo manuale vi introdurrà ad EduMIPS64, e spiegherà come utilizzarlo.
 
 Il primo capitolo del manuale riguarda il formato dei file sorgente accettato
-dal simulatore, descrivendo i tipi di dato e le direttive, oltre ai parametri da
-linea di comando.
+dal simulatore, descrivendo i tipi di dato e le direttive, oltre ai parametri
+da linea di comando.
 
-Nel secondo capitolo è presentata una panoramica del set di istruzioni
-MIPS64 utilizzato da EduMIPS64, con tutti i parametri richiesti e le indicazioni per
+Nel secondo capitolo è presentata una panoramica del set di istruzioni MIPS64
+utilizzato da EduMIPS64, con tutti i parametri richiesti e le indicazioni per
 il loro utilizzo.
 
-Il terzo capitolo descrive la Floating Point Unit ed il suo insieme di istruzioni.
+Il terzo capitolo descrive la Floating Point Unit ed il suo insieme di
+istruzioni.
 
-Il quarto capitolo è una descrizione dell'interfaccia utente di EduMIPS64, che
-espone lo scopo di ciascuna finestra e di ciascun menù, insieme ad una
-descrizione delle finestre di configurazione, del Dinero frontend, del manuale e
-delle opzioni da linea di comando. 
+Il quarto capitolo è una descrizione dell'interfaccia utente di EduMIPS64,
+che espone lo scopo di ciascuna finestra e di ciascun menù, insieme ad una
+descrizione delle finestre di configurazione, del Dinero frontend, del
+manuale e delle opzioni da linea di comando.
 
 Il quinto capitolo contiene alcune esempi pratici di utilizzo del simulatore.
 

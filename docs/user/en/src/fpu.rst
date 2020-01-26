@@ -12,7 +12,7 @@ In the second paragraph we explain how EduMIPS64 allows users to enable or
 disable the IEEE floating point traps.
 
 In the third paragraph we describe how double precision numbers and special
-values can be specified in the source programs. 
+values can be specified in the source programs.
 
 In the fourth paragraph, we introduce the FCSR register, used by the FPU to
 represent its state. It contains information about rounding, the boolean
@@ -84,30 +84,32 @@ Exception configuration
 EduMIPS64 allows the user to enable or disable the traps for 4 of the 5 IEEE
 exceptions, through the *FPU Exceptions* tab in the *Configure* → *Settings*
 window. If any of them is disabled, the respective special value will be
-returned (as described in :ref:`special-values`). 
+returned (as described in :ref:`special-values`).
+
 .. In the situation depicted in
 .. Figure :ref:`fig-exception_cfg`, in which some checkbox are selected, if the
 .. CPU does not mask synchronous exceptions (Figure
 .. :ref:`fig-exception_mask_cfg`) the selected traps will be raised if the IEEE
-.. exceptional condition is encountered (Figure :ref:`fig-invalid_operation_trap`).
+.. exceptional condition is encountered (Figure
+.. :ref:`fig-invalid_operation_trap`).
 
 .. TODO: see how to include it in the resulting in-app help
 .. .. _fig-exception_cfg:
    .. figure:: ../../../img/exception_cfg.png
       :scale: 50%
-   
+
       Trap configuration for IEEE exceptions
-   
+
    .. _fig-exception_mask_cfg:
    .. figure:: ../../../img/exception_mask_cfg.png
       :scale: 50%
-   
+
       Option that masks all the synchronous exceptions
-   
+
    .. _fig-invalid_operation_trap:
    .. figure:: ../../../img/invalid_operation_trap.png
       :scale: 50%
-   
+
       Trap notification window
 
 
@@ -124,7 +126,7 @@ The directive can be used in 2 ways::
     variable-name: .double keyword
 
 where ``double_number`` can be represented either in extended notation
-(``1.0,0.003``), or in scientific notation(``3.7E-12,0.5E32``). 
+(``1.0,0.003``), or in scientific notation(``3.7E-12,0.5E32``).
 ``keyword`` can be ``POSITIVEINFINITY``, ``NEGATIVEINFINITY``,
 ``POSITIVEZERO``, ``NEGATIVEZERO``, ``SNAN`` e ``QNAN``,
 thus allowing to directly insert in memory the special values.
@@ -137,7 +139,7 @@ represented in the statistics window.
 
 .. .. figure:: ../../../img/fcsr_register.png
 ..    :scale: 50%
-.. 
+..
 ..    FCSR register in EduMIPS64
 
 The **FCC** field is 8 bits wide, from 0 to 7. The conditional instructions
@@ -154,7 +156,8 @@ during the execution of a program.
 
 The **Enable** field bits are set through the configuration window and show
 the IEEE exceptions for which traps are enabled.
-.. shown in Figure :ref:`fig-exception_cfg`, 
+
+.. shown in Figure :ref: `fig-exception_cfg`,
 
 The **Flag** field shows the exceptions that have happened but, since the trap
 is not enabled for that particular exception, have returned special values
@@ -172,8 +175,8 @@ instruction are described using a notation according to which the i-th
 memory cell is represented as ``memory[i]``, and the FCC fields of the FCSR
 register are ``FCSR_FCC[cc]``, ``cc`` ∈ [0,7].
 
-In some instructions, to avoid ambiguity, the registers are represented as 
-``GPR[i]`` and ``FPR[i]``, ``i`` ∈ [0,31], but in most cases we just use the 
+In some instructions, to avoid ambiguity, the registers are represented as
+``GPR[i]`` and ``FPR[i]``, ``i`` ∈ [0,31], but in most cases we just use the
 ``rx`` or ``fx`` notation, with ``x`` ∈ {d,s,t}. The three letters are used to
 indicate the purpose of each register (destination, source, third). Lastly,
 the values returned by conversion operations are represented with the
@@ -196,7 +199,7 @@ Some examples for the FPU instructions are available at
 
   *Description*: ``if FCSR_FCC[cc] == 0 then branch``
 
-  If ``FCSR_FCC[cc]`` is false, do a PC-relative branch. 
+  If ``FCSR_FCC[cc]`` is false, do a PC-relative branch.
 
   *Example*::
 
@@ -212,10 +215,10 @@ Some examples for the FPU instructions are available at
 
   *Description*: ``if FCSR_FCC[cc] == 1 then branch``
 
-  If ``FCSR_FCC[cc]`` is true, do a PC-relative branch. 
+  If ``FCSR_FCC[cc]`` is true, do a PC-relative branch.
 
   *Example*::
- 
+
     C.EQ.D 7,f1,f2
     BC1T 7,label
 
@@ -239,10 +242,10 @@ Some examples for the FPU instructions are available at
   *Description*: ``FCSR_FCC[cc] = (fs<ft)``
 
   Checks if ``fs`` is smaller than ``ft``, and saves the result of the
-  comparison in ``FCSR_FCC[cc]``. 
+  comparison in ``FCSR_FCC[cc]``.
 
   *Example*::
- 
+
      C.LT.D 2,f1,f2
      BC1T 2,target
 
@@ -261,7 +264,7 @@ Some examples for the FPU instructions are available at
   Converts a long to a double.
 
   *Example*::
- 
+
     DMTC1 r6,f5
     CVT.D.L f5,f5
 
@@ -281,7 +284,7 @@ Some examples for the FPU instructions are available at
   Converts an int to a double.
 
   *Example*::
- 
+
     MTC1 r6,f5
     CVT.D.W f5,f5
 
@@ -300,18 +303,19 @@ Some examples for the FPU instructions are available at
 * `CVT.L.D fd, fs`
 
   *Description:* ``fd = convert_doubleToLong(fs, CurrentRoundingMode)``
-  
+
   Converts a double to a long, rounding it before the conversion.
 
   *Example*::
- 
-    CVT.L.D f5,f5	
+
+    CVT.L.D f5,f5
     DMFC1 r6,f5
 
   ``CVT.L.D`` the double value in f5 to a long; then ``DMFC1`` copies f5 to
   r6; the result of this operation depends on the current rounding modality,
   that can be set in the *FPU Rounding* tab of the *Configure* →  *Settings*
   window.
+
 .. , as depicted in Figure :ref:`fig:fpu_rounding`.
 
   *Exceptions:* Invalid Operation is thrown if fs contains an infinite value,
@@ -322,38 +326,38 @@ Some examples for the FPU instructions are available at
 .. .. _fig-fpu_rounding:
 .. .. figure:: ../../../img/fpu_rounding.png
 ..    :scale: 50%
-.. 
+..
 ..    FPU Rounding
 
 .. table:: Rounding examples
 
-   =============== ========== ============= ============= 
-    Tipo            RM field   f5 register   r6 register 
-   =============== ========== ============= ============= 
-    To nearest      0          6.4           6             
-    To nearest      0          6.8           7            
-    To nearest      0          6.5           6 (to even)  
-    To nearest      0          7.5           8 (to even)  
-    Towards  0      1          7.1           7            
-    Towards  0      1          -2.3          -2           
-    Towards  ∞      2          4.2           5            
-    Towards  ∞      2          -3.9          -3           
-    Towards -∞      3          4.2           4            
-    Towards -∞      3          -3.9          -4           
-   =============== ========== ============= ============= 
+   =============== ========== ============= =============
+    Tipo            RM field   f5 register   r6 register
+   =============== ========== ============= =============
+    To nearest      0          6.4           6
+    To nearest      0          6.8           7
+    To nearest      0          6.5           6 (to even)
+    To nearest      0          7.5           8 (to even)
+    Towards  0      1          7.1           7
+    Towards  0      1          -2.3          -2
+    Towards  ∞      2          4.2           5
+    Towards  ∞      2          -3.9          -3
+    Towards -∞      3          4.2           4
+    Towards -∞      3          -3.9          -4
+   =============== ========== ============= =============
 
 * `CVT.W.D fd, fs`
 
   *Description:* ``fd = convert_DoubleToInt(fs, CurrentRoundingMode)``
 
   Converts a double to an int, using the current rounding modality.
-  
+
   *Exceptions:* Invalid Operation is thrown if fs contains an infinite value,
   any NaN or the results is outside the signed int domain [-2 :sup:`63`, 2
   :sup:`63` -1]
 
 * `DIV.D fd, fs, ft`
-  
+
   *Description:* ``fd = fs \div ft``
 
   *Exceptions:* Overflow or Underflow are raised if the results cannot be
@@ -363,11 +367,11 @@ Some examples for the FPU instructions are available at
   dividend that is not QNaN or SNaN.
 
 * `DMFC1 rt,fs`
-  
+
   *Description:* ``rt = fs``
 
   Executes a bit per bit copy of the FPR fs into the GPR rt.
-  
+
 * `DMTC1 rt, fs`
 
   *Description:* ``fs = rt``
@@ -375,7 +379,7 @@ Some examples for the FPU instructions are available at
   Executes a bit per bit copy of the GPR rt into the FPR fs.
 
 * `L.D ft, offset(base)`
- 
+
   *Description:* ``ft = memory[GPR[base] + offset]``
 
   Loads from memory a doubleword and stores it in ft.
@@ -394,53 +398,54 @@ Some examples for the FPU instructions are available at
   *Description:* ``ft = memory[GPR[base] + offset]``
 
   Loads from memory a word and stores it in ft.
-  
+
 * `MFC1 rt, fs`
 
   *Description:* ``rt = readInt(fs)``
 
   Reads the fs FPR as an int and writes its value to the rt GPR as long.
   *Example*::
-    
+
       MFC1 r6,f5
       SD r6,mem(R0)
 
-  Let ``f5=0xAAAAAAAABBBBBBBB``;  ``MFC1`` reads f5 as an int (lower 32 bits),
-  interpreting ``BBBBBBBB`` as ``-1145324613``, and writes the value to f6 (64
-  bits). After the execution of ``MFC1``, ``r6=0xFFFFFFFFBBBBBBBB = -1145324613``.
+  Let ``f5=0xAAAAAAAABBBBBBBB``; ``MFC1`` reads f5 as an int (lower 32 bits),
+  interpreting ``BBBBBBBB`` as ``-1145324613``, and writes the value to f6
+  (64 bits). After the execution of ``MFC1``, ``r6=0xFFFFFFFFBBBBBBBB =
+  -1145324613``.
   So the ``SD`` instruction will write to memory a doubleword with this value,
   since the sign in r6 was extended.
-  
+
 * `MOVF.D fd, fs, cc`
 
   *Description:* ``if FCSR_FCC[cc] == 0 then fd=fs``
 
   If FCSR_FCC[cc] is false, the copies fs to fd.
-  
+
 * `MOVT.D fd, fs, cc`
 
   *Description:* ``if FCSR_FCC[cc] == 1 then fd=fs``
 
   If FCSR_FCC[cc] is true, the copies fs to fd.
-  
+
 * `MOV.D fd, fs`
 
   *Description:* ``fd = fs``
 
   Copies fs to fd.
-  
+
 * `MOVN.D fd, fs, rt`
 
   *Description:* ``if rt != 0 then fd=fs``
 
   If rt is not zero, copies fs to fd.
-  
+
 * `MOVZ.D fd, fs, rt`
 
   *Description:* ``if rt == 0 then fd=fs``
 
   If rt is equal to zero, copies fs to fd.
-  
+
 .. TODO: find a way to do subscript with fixed-width font.
 
 * `MTC1 rt, fs`
@@ -456,7 +461,7 @@ Some examples for the FPU instructions are available at
   Let ``r5=0xAAAAAAAABBBBBBBB``;  ``MTC1`` reads the lower 32 bits of r5
   copying them to the 32 lower bits of f5. The higher 32 bits of f5 are not
   overwritten.
-  
+
 * `MUL.D fd, fs, ft`
 
   *Description:* ``fd = fs × ft``
@@ -465,7 +470,7 @@ Some examples for the FPU instructions are available at
   represented using the IEEE 754 standard. Invalid Operation is raised if fs
   or ft contain QNaN or SNan, or if an invalid operation is executed (multiply
   by ∞ OR BY QNaN).
-  
+
 * `S.D ft, offset(base)`
 
   *Description:* ``memory[base+offset] = ft``
@@ -474,13 +479,13 @@ Some examples for the FPU instructions are available at
 
 .. note:: `S.D` is not present in the MIPS64 ISA, it is an alias for ``SDC1``
           that is present in EduMIPS64 for compatibility with WinMIPS64.
-  
+
 * `SDC1 ft, offset(base)`
 
   *Description:* ``memory[base+offset] = ft``
 
   Copies ft to memory.
-  
+
 * `SUB.D fd, fs, ft`
 
   *Description:* ``fd = fs-ft``
@@ -489,7 +494,7 @@ Some examples for the FPU instructions are available at
   cannot be represented according to IEEE 753. Invalid operation is raised if
   fs or ft contain QNaN or SNan, or if an invalid operation (+∞ - ∞) is
   executed.
-  
+
 * `SWC1 ft, offset(base)`
 
   *Description:* ``memory[base+offset] = ft``

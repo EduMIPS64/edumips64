@@ -1,9 +1,12 @@
 The user interface
 ==================
-The GUI of EduMIPS64 is inspired to WinMIPS64 user interface. In fact, the main window
-is identical, except for some menus. 
+The GUI of EduMIPS64 is inspired to WinMIPS64 user interface. In fact, the
+main window is identical, except for some menus.
 
-.. Please refer to chapter~\ref{mips-simulators} for an overview of some MIPS and DLX simulators (including WinMIPS64), and to \cite{winmips-web} for more information about WinMIPS64.  %In figure~\ref{fig:edumips-main} you can see the main window of EduMIPS64, composed by
+.. Please refer to chapter~\ref{mips-simulators} for an overview of some MIPS
+   and DLX simulators (including WinMIPS64), and to \cite{winmips-web} for more
+   information about WinMIPS64. %In figure~\ref{fig:edumips-main} you can see
+   the main window of EduMIPS64, composed by
 
 The EduMIPS64 main window is composed by a menu bar and six frames, showing
 different aspects of the simulation. There's also a status bar, that has the
@@ -17,14 +20,16 @@ states:
 * *READY* The CPU hasn't executed any instructions (no program is loaded).
 * *RUNNING* The CPU is executing a series of instructions.
 * *STOPPING* The CPU has found a termination instruction, and is executing the
-  instructions that are already in the pipeline before terminating the execution.
+  instructions that are already in the pipeline before terminating the
+  execution.
 * *HALTED* The CPU is stopped: a program just finished running.
 
-Note that the CPU status is different from the simulator status. The simulator may
-execute a number of CPU cycles and then stop executing, allowing the user to inspect
-memory and registers: in this state, between CPU cycles, the CPU stays in *RUNNING*
-or *STOPPING* state. Once the CPU reaches the *HALTED* state, the user cannot run
-any CPU cycle without loading a program again (the same program, or a different one).
+Note that the CPU status is different from the simulator status. The
+simulator may execute a number of CPU cycles and then stop executing,
+allowing the user to inspect memory and registers: in this state, between CPU
+cycles, the CPU stays in *RUNNING* or *STOPPING* state. Once the CPU reaches
+the *HALTED* state, the user cannot run any CPU cycle without loading a
+program again (the same program, or a different one).
 
 There are more details in the following sections.
 
@@ -71,7 +76,7 @@ simulation.
 .. See~\ref{dialog-settings} for more details.
 
 * *Stop* Stops the execution when the simulator is in "Run"
-  or "Multi cycle" mode, as described previously.  
+  or "Multi cycle" mode, as described previously.
 
 This menu is only available when a source file is loaded and the end of the
 simulation is not reached. The *Stop* menu item is available only in
@@ -114,14 +119,14 @@ This menu contains items related to operations with frames.
   frames are put in a row. It tries to maximize the space occupied by every
   frame.
 
-The other menu items simply toggle the status of each frame, making them visible
-or minimizing them.
+The other menu items simply toggle the status of each frame, making them
+visible or minimizing them.
 
 Help
 ~~~~
 This menu contains help-related menu items.
 
-* *Manual...* Shows the Help dialog. 
+* *Manual...* Shows the Help dialog.
 
 * *About us...* Shows a cute dialog that contains the names of
   the project contributors, along with their roles.
@@ -133,25 +138,25 @@ one (the I/O frame) is hidden.
 
 Cycles
 ~~~~~~
-The Cycles frame shows the evolution of the execution flow during time, showing
-for each time slot which instructions are in the pipeline, and in which stage of
-the pipeline they are located.
+The Cycles frame shows the evolution of the execution flow during time,
+showing for each time slot which instructions are in the pipeline, and in
+which stage of the pipeline they are located.
 
 Registers
 ~~~~~~~~~
-The Registers frame shows the content of each register. By left-clicking on them
-you can see in the status bar their decimal (signed) value, while
-double-clicking on them will pop up a dialog that allows the user to change the
-value of the register.
+The Registers frame shows the content of each register. By left-clicking on
+them you can see in the status bar their decimal (signed) value, while
+double-clicking on them will pop up a dialog that allows the user to change
+the value of the register.
 
 Statistics
 ~~~~~~~~~~
 The Statistics frame shows some statistics about the program execution.
 
-Note that during the last execution cycle the cycles counter is not incremented,
-because the last execution cycle is not a full CPU cycle but rather a
-pseudo-cycle whose only duties are to remove the last instruction from the
-pipeline and increment the counter of executed instructions.
+Note that during the last execution cycle the cycles counter is not
+incremented, because the last execution cycle is not a full CPU cycle but
+rather a pseudo-cycle whose only duties are to remove the last instruction
+from the pipeline and increment the counter of executed instructions.
 
 Pipeline
 ~~~~~~~~
@@ -162,9 +167,9 @@ pipeline stages.
 Memory
 ~~~~~~
 The Memory frame shows memory cells content, along with labels and comments
-taken from the source code. Memory cells content, like registers, can be modified
-double-clicking on them, and clicking on them will show their decimal value in
-the status bar.
+taken from the source code. Memory cells content, like registers, can be
+modified double-clicking on them, and clicking on them will show their
+decimal value in the status bar.
 The first column shows the hexadecimal address of the memory cell, and the
 second column shows the value of the cell. Other columns show additional info
 from the source code.
@@ -179,9 +184,9 @@ from the source code.
 Input/Output
 ~~~~~~~~~~~~
 The Input/Output window provides an interface for the user to see the output
-that the program creates through the SYSCALLs 4 and 5. Actually it is not 
-used for input, as there's a dialog that pops up when a SYSCALL 3 tries to read
-from standard input, but future versions will include an input text box.
+that the program creates through the SYSCALLs 4 and 5. Actually it is not
+used for input, as there's a dialog that pops up when a SYSCALL 3 tries to
+read from standard input, but future versions will include an input text box.
 
 Dialogs
 -------
@@ -195,8 +200,8 @@ Clicking on the "OK" button will cause the options to be saved, while clicking
 on "Cancel" (or simply closing the window) will cause the changes to be
 ignored. Don't forget to click "OK" if you want to save your changes.
 
-The Main Settings tab allow to configure forwarding and the number of steps in the
-Multi Cycle mode.
+The Main Settings tab allow to configure forwarding and the number of steps
+in the Multi Cycle mode.
 
 The Behavior tab allow to enable or disable warnings during the parsing phase,
 the "Sync graphics with CPU in multi-step execution" option, when checked,
@@ -210,15 +215,15 @@ Those options are effective only when the simulation is run using the
 
 The last two options set the behavior of the simulator when a synchronous
 exception is raised. If the "Mask synchronous exceptions" option is checked,
-the simulator will ignore any Division by zero or Integer overflow exception. If
-the "Terminate on synchronous exception" option is checked, the simulation
+the simulator will ignore any Division by zero or Integer overflow exception.
+If the "Terminate on synchronous exception" option is checked, the simulation
 will be halted if a synchronous exception is raised. Please note that if
-synchronous exceptions are masked, nothing will happen, even if the termination
-option is checked. If exceptions are not masked and the termination option is not
-checked, a dialog will pop out, but the simulation will go on as soon as the
-dialog is closed. If exceptions are not masked and the termination option is
-checked, the dialog will pop out, and the simulation will be stopped as soon as
-the dialog is closed.
+synchronous exceptions are masked, nothing will happen, even if the
+termination option is checked. If exceptions are not masked and the
+termination option is not checked, a dialog will pop out, but the simulation
+will go on as soon as the dialog is closed. If exceptions are not masked and
+the termination option is checked, the dialog will pop out, and the
+simulation will be stopped as soon as the dialog is closed.
 
 The last tab allows to change the appearance of the user interface. There are
 options to change the colors associated to the different pipeline stages, an
@@ -230,30 +235,27 @@ enough to make the simulator usable with high-resolution displays (e.g., 4k).
 
 Dinero Frontend
 ~~~~~~~~~~~~~~~
-The Dinero Frontend dialog allows to feed a DineroIV process with the trace file
-internally generated by the execution of the program. In the first text box
-there is the path of the DineroIV executable, and in the second one there must
-be the parameters of DineroIV. 
+The Dinero Frontend dialog allows to feed a DineroIV process with the trace
+file internally generated by the execution of the program. In the first text
+box there is the path of the DineroIV executable, and in the second one there
+must be the parameters of DineroIV.
 
-.. % Please see~\cite{dinero-web} for further informations about the DineroIV cache simulator.
+.. % Please see~\cite{dinero-web} for further informations about the DineroIV
+   cache simulator.
 
 The lower section contains the output of the DineroIV process, from which you
 can take the data that you need.
 
 Help
 ~~~~
-The Help dialog contains three tabs with some indications on how to use the
-simulator. The first one is a brief introduction to EduMIPS64, the second one contains
-informations about the GUI and the third contains a summary of the supported
-instructions.
-
-.. TODO: change
+The Help dialog brings up the on-line manual, which is an HTML copy of this
+document.
 
 Command line options
 --------------------
 Three command line options are available. They are described in the following
-list, with the long name enclosed in round brackets. Long and short names can be
-used in the same way.
+list, with the long name enclosed in round brackets. Long and short names can
+be used in the same way.
 
 * `-v (--version)` prints the simulator version and exits.
 
@@ -266,10 +268,10 @@ used in the same way.
 
 * `-d (--debug)` enters Debug mode
 
-The `--debug` flag has the effect to activate Debug mode. In this mode, a
-new frame is available, the Debug frame, and it shows the log of internal
-activities of EduMIPS64. It is not useful for the end user, it is meant to be used by
-EduMIPS64 developers.
+The `--debug` flag has the effect to activate Debug mode. In this mode, a new
+frame is available, the Debug frame, and it shows the log of internal
+activities of EduMIPS64. It is not useful for the end user, it is meant to be
+used by EduMIPS64 developers.
 
 Running EduMIPS64
 -----------------

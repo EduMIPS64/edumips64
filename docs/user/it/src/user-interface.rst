@@ -3,7 +3,10 @@ L'interfaccia utente
 L'interfaccia grafica EduMIPS64 si ispira a quella di WinMIPS64. Infatti, la
 finestra principale è identica, eccetto che per qualche menù.
 
-.. Please refer to chapter~\ref{mips-simulators} for an overview of some MIPS and DLX simulators (including WinMIPS64), and to \cite{winmips-web} for more information about WinMIPS64.  %In figure~\ref{fig:edumips-main} you can see the main window of EduMIPS64, composed by
+.. Please refer to chapter~\ref{mips-simulators} for an overview of some MIPS
+  and DLX simulators (including WinMIPS64), and to \cite{winmips-web} for more
+  information about WinMIPS64. %In figure~\ref{fig:edumips-main} you can see
+  the main window of EduMIPS64, composed by
 
 La finestra principale di EduMIPS64 è caratterizzata da sei frame, che
 mostrano i differenti aspetti della simulazione.  è inoltre presente una
@@ -23,12 +26,13 @@ uno dei quattro seguenti stati:
   terminare il programma.
 * *HALTED* La CPU ha terminato l'esecuzione del programma.
 
-Nota che lo stato della CPU è differente dallo stato del simulatore. Il simulatore
-può eseguire un numero finito di cicli di CPU e fermarsi, consentendo all'utente
-di ispezionare memoria e registri: in questo stato intermedio tra cicli di CPU, la
-CPU rimane comunque in stato *RUNNING* o *STOPPING*. Una volta che la CPU raggiunge
-lo stato *HALTED*, l'utente non può più eseguire alcun ciclo di CPU senza caricare
-nuovamente un programma (lo stesso, od uno differente).
+Nota che lo stato della CPU è differente dallo stato del simulatore. Il
+simulatore può eseguire un numero finito di cicli di CPU e fermarsi,
+consentendo all'utente di ispezionare memoria e registri: in questo stato
+intermedio tra cicli di CPU, la CPU rimane comunque in stato *RUNNING* o
+*STOPPING*. Una volta che la CPU raggiunge lo stato *HALTED*, l'utente non
+può più eseguire alcun ciclo di CPU senza caricare nuovamente un programma
+(lo stesso, od uno differente).
 
 Maggiori dettagli sono descritti nelle sezioni a seguire.
 
@@ -249,19 +253,16 @@ DineroIV con il trace file generato internamente mediante l'esecuzione del
 programma. Nella prima casella di testo c'è il percorso dell'eseguibile
 DineroIV, e nella seconda devono essere inseriti i parametri opportuni.
 
-.. % Please see~\cite{dinero-web} for further informations about the DineroIV cache simulator.
+.. % Please see~\cite{dinero-web} for further informations about the DineroIV
+   cache simulator.
 
 La sezione più in basso contiene l'output del processo DineroIV, dal quale
 è possibile prelevare i dati di cui si necessita.
 
 Aiuto
 ~~~~~
-La finestra di Aiuto contiene tre sezioni con qualche indicazione riguardo
-l'utilizzo del simulatore.  La prima è una breve introduzione ad
-EduMIPS64, la seconda contiene informazioni riguardanti l'interfaccia grafica
-e la terza contiene un riassunto delle istruzioni supportate.
-
-.. TODO: change
+La finestra di Aiuto contiene il manuale del simulatore, che è una copia HTML
+del presente documento.
 
 Opzioni da riga di comando
 --------------------------

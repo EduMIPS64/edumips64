@@ -6,7 +6,8 @@ riconosciute da EduMIPS64. è possibile effettuare due differenti
 classificazioni: una basata sulla funzionalità delle istruzioni e l'altra
 basata sul tipo di parametri.
 
-.. Please refer to Section~\ref{mipsis} for more informations about those classifications.
+.. Please refer to Section~\ref{mipsis} for more informations about those
+   classifications.
 
 La prima classificazione suddivide le istruzioni in tre categorie: istruzioni
 ALU, istruzioni Load/Store, istruzioni di controllo del flusso. I prossimi tre
@@ -16,7 +17,8 @@ appartengono.
 Il quarto paragrafo descriverà le istruzioni che non rientrano in nessuna
 delle tre categorie sopraelencate.
 
-.. For a more complete MIPS64 instruction set reference, please refer to~\cite{mips-2}.
+.. For a more complete MIPS64 instruction set reference, please refer
+   to~\cite{mips-2}.
 
 
 Le istruzioni ALU
@@ -27,7 +29,7 @@ gruppo di istruzioni ALU conterrà quindi quelle istruzioni che effettuano
 questo tipo di operazioni.
 
 Le istruzioni ALU possono essere suddivise in due gruppi: *tipo R* e
-*tipo I*. 
+*tipo I*.
 
 Quattro di esse utilizzano due registri speciali: LO e HI. Tali registri sono
 interni alla CPU ed è possibile accedere al loro valore mediante le
@@ -76,7 +78,7 @@ Ecco la lista delle istruzioni ALU di tipo R.
   Esegue la divisione tra i registri a 64-bit rs ed rt, considerandoli come
   valori senza segno e ponendo i 64-bit del quoziente in LO ed i 64-bit del
   resto in HI.
-  
+
 * `DIV rs, rt`
 
   Esegue la divisione tra i registri a 32-bit rs ed rt, ponendo i 32-bit del
@@ -105,7 +107,7 @@ Ecco la lista delle istruzioni ALU di tipo R.
   Esegue il prodotto tra i registri a 64-bit rs ed rt, considerandoli come
   valori senza segno e ponendo i 64 bit bassi del risultato nel registro
   speciale LO e i 64 bit alti del risultato nel registro speciale HI.
-  
+
 * `DSLL rd, rt, sa`
 
   Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di
@@ -137,7 +139,7 @@ Ecco la lista delle istruzioni ALU di tipo R.
   Effettua uno shift verso destra del registro a 64-bit rt, di un numero di
   bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, e
   pone il risultato in rd. I bit liberi vengono posti a zero.
-  
+
 * `DSRLV rd, rt, rs`
 
   Effettua uno shift verso destra del registro a 64-bit rt, di un numero di
@@ -154,7 +156,7 @@ Ecco la lista delle istruzioni ALU di tipo R.
 
   Sottrae il valore del registro a 64-bit rt al valore del registro a 64-bit
   rs, e pone il risultato in rd.  Non si verificano eccezioni di overflow.
-  
+
 .. \MISN{}
 
 * `MFLO rd`
@@ -184,7 +186,7 @@ Ecco la lista delle istruzioni ALU di tipo R.
   Esegue il prodotto tra i registri a 32-bit rs ed rt, considerandoli come
   valori senza segno e ponendo i 32 bit bassi del risultato nel registro
   speciale LO e i 32 bit alti del risultato nel registro speciale HI.
-  
+
 * `OR rd, rs, rt`
 
   Esegue un OR bit a bit tra rs ed rt, e pone il risultato in rd.
@@ -224,7 +226,7 @@ Ecco la lista delle istruzioni ALU di tipo R.
   bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, e
   pone il risultato nel registro a 32-bit rd. I bit liberi vengono posti a
   zero.
-  
+
 * `SRLV rd, rt, rs`
 
   Effettua uno shift verso destra del registro a 32-bit rt, del numero di bit
@@ -243,7 +245,7 @@ Ecco la lista delle istruzioni ALU di tipo R.
   Sottrae il valore del registro a 32-bit rt al valore del registro a 32-bit
   rs, e pone il risultato in rd.
   Non si verificano eccezioni di overflow.
-  
+
 .. \MISN{}
 
 * `SLT rd, rs, rt`
@@ -308,7 +310,7 @@ Ecco la lista delle istruzioni ALU di tipo I.
 
   Carica la costante definita dal valore immediato nella metà superiore dei 32
   bit inferiori di rt, effettuando l'estensione del segno sui 32 bit superiori
-  del registro. 
+  del registro.
 
 * `ORI rt, rs, immediate`
 
@@ -336,6 +338,7 @@ Istruzioni load/store
 ---------------------
 Questa categoria contiene tutte le istruzioni che effettuano trasferimenti di
 dati tra i registri e la memoria. Ognuna di esse è espressa nella forma::
+
     [etichetta] istruzione rt, offset(base)
 
 In base all'utilizzo di un'istruzione load oppure store, rt rappresenterà di
@@ -510,8 +513,10 @@ utilizzare, scelti dalla seguente lista:
 * `O_WRONLY (0x02)` Apre il file in modalità sola scrittura;
 * `O_RDWR (0x03)` Apre il file in modalità di lettura/scrittura;
 * `O_CREAT (0x04)` Crea il file se non esiste;
-* `O_APPEND (0x08)` In modalità di scrittura, aggiunge il testo alla fine del file;
-* `O_TRUNC (0x08)` In modalità di scrittura, cancella il contenuto del file al momento della sua apertura.
+* `O_APPEND (0x08)` In modalità di scrittura, aggiunge il testo alla fine del
+  file;
+* `O_TRUNC (0x08)` In modalità di scrittura, cancella il contenuto del file al
+  momento della sua apertura.
 
 È obbligatorio specificare una delle prime tre modalità. La quinta e
 la sesta sono esclusive, non è possibile specificare O_APPEND se si
@@ -531,7 +536,7 @@ ritorno sarà -1.
 `SYSCALL 2 - close()`
 ~~~~~~~~~~~~~~~~~~~~~
 SYSCALL 2 richiede solo un parametro, il file descriptor del file che deve
-essere chiuso. 
+essere chiuso.
 
 Qualora l'operazione termini con successo, SYSCALL 2 ritornerà 0, altrimenti
 -1.  Possibili cause di errore sono il tentativo di chiudere un file
@@ -541,8 +546,9 @@ error.
 
 `SYSCALL 3 - read()`
 ~~~~~~~~~~~~~~~~~~~~
-SYSCALL 3 richiede tre parametri: il file descriptor da cui leggere, l'indirizzo
-nel quale i dati letti dovranno essere copiati, il numero di byte da leggere.
+SYSCALL 3 richiede tre parametri: il file descriptor da cui leggere,
+l'indirizzo nel quale i dati letti dovranno essere copiati, il numero di byte
+da leggere.
 
 Se il primo parametro è 0, il simulatore permetterà all'utente di
 inserire un valore mediante un'apposita finestra di dialogo.  Se la lunghezza
@@ -553,7 +559,7 @@ La chiamata di sistema ritorna il numero di byte effettivamente letti, o -1 se
 l'operazione di lettura fallisce. Possibili cause di errore sono il tentativo
 di leggere da un file inesistente, o di leggere dai file descriptor 1
 (standard output) o 2 (standard error), oppure il tentativo di leggere da un
-file di sola scrittura. 
+file di sola scrittura.
 
 `SYSCALL 4 - write()`
 ~~~~~~~~~~~~~~~~~~~~~
@@ -574,6 +580,7 @@ tentativo di scrivere su un file inesistente, o sul file descriptor 0
 SYSCALL 5 richiede un numero variabile di parametri, il primo è la
 cosiddetta "format string" o stringa di formato. Nella stringa di formato
 possono essere inseriti alcuni segnaposto, descritti nella seguente lista:
+
 * `%s` parametro di tipo stringa;
 * `%i` parametro di tipo intero;
 * `%d` si comporta come `%i`;
