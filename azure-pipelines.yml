@@ -15,7 +15,7 @@ schedules:
     - master
 
 pool:
-  vmImage: 'Ubuntu-16.04'
+  vmImage: 'Ubuntu-18.04'
 
 # JDK 1.9 and 1.10 are out of support on Azure Pipeline tasks
 strategy:
@@ -29,10 +29,9 @@ strategy:
 
 
 steps:
-- bash: |
-      sudo apt update &&
-      sudo apt install python3-sphinx latexmk texlive-latex-base texlive-latex-extra texlive-fonts-extra texlive-fonts-recommended texlive-lang-english texlive-lang-italian texlive-xetex
-  displayName: 'Install dependencies'
+- script: |
+      sudo pip3 install -r docs/requirements.txt
+  displayName: 'Install docs dependencies'
 
 - task: Gradle@2
   displayName: 'Gradle check task'

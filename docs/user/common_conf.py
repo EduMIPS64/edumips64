@@ -11,10 +11,15 @@ with open('../../../../build.gradle') as f:
             break
 
 release = version
+project = u'EduMIPS64'
+
+# rst2pdf config
+extensions = ['sphinx.ext.autodoc','rst2pdf.pdfbuilder']
+pdf_documents = [
+ ('index', project, project, u'Andrea Spadaccini and the EduMIPS64 development team'),
+]
 
 # Other variables
-project = u'EduMIPS64'
-extensions = []
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
