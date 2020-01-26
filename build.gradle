@@ -43,19 +43,19 @@ compileJava {
  */
 task htmlDocsIt(type: Exec) {
     workingDir "${projectDir}/docs/user/en/src"
-    commandLine "make", "html", "BUILDDIR=${buildDir}/docs/en", "SPHINXOPTS=-N -a -E -Q"
+    commandLine "make", "html", "BUILDDIR=${buildDir}/docs/en", "SPHINXOPTS=-N -a -E"
 }
 task htmlDocsEn(type: Exec) {
     workingDir "${projectDir}/docs/user/it/src"
-    commandLine "make", "html", "BUILDDIR=${buildDir}/docs/it", "SPHINXOPTS=-N -a -E -Q"
+    commandLine "make", "html", "BUILDDIR=${buildDir}/docs/it", "SPHINXOPTS=-N -a -E"
 }
 task pdfDocsEn(type: Exec) {
     workingDir "${projectDir}/docs/user/en/src"
-    commandLine "make", "pdf", "BUILDDIR=${buildDir}/docs/en", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E -Q"
+    commandLine "make", "pdf", "BUILDDIR=${buildDir}/docs/en", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E"
 }
 task pdfDocsIt(type: Exec) {
     workingDir "${projectDir}/docs/user/it/src"
-    commandLine "make", "pdf", "BUILDDIR=${buildDir}/docs/it", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E -Q"
+    commandLine "make", "pdf", "BUILDDIR=${buildDir}/docs/it", "LATEXMKOPTS=-xelatex", "SPHINXOPTS=-N -a -E"
 }
 // Catch-all task for documentation
 task allDocs(type: GradleBuild) {
