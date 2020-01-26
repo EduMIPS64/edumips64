@@ -17,8 +17,9 @@ SYSCALL 1.
 
 SYSCALL 0
 ~~~~~~~~~
-L'effetto dell'esecuzione della SYSCALL 0 è l'interruzione dell'esecuzione del programma.
-Esempio::
+L'effetto dell'esecuzione della SYSCALL 0 è l'interruzione dell'esecuzione
+del programma. Esempio::
+
   .code
   daddi   r1, r0, 0    ; salva il valore 0 in R1
   syscall 0            ; termina l'esecuzione
@@ -27,25 +28,25 @@ SYSCALL 1
 ~~~~~~~~~
 Programma d'esempio che apre un file::
 
-                  .data 
-  error_op:       .asciiz     "Errore durante l'apertura del file"    
+                  .data
+  error_op:       .asciiz     "Errore durante l'apertura del file"
   ok_message:     .asciiz     "Tutto ok."
   params_sys1:    .asciiz     "filename.txt"
-                  .word64     0xF                    
+                  .word64     0xF
 
                   .text
-  open:           daddi       r14, r0, params_sys1    
-                  syscall     1    
+  open:           daddi       r14, r0, params_sys1
+                  syscall     1
                   daddi       $s0, r0, -1
-                  dadd        $s2, r0, r1        
-                  daddi       $a0,r0,ok_message            
-                  bne         r1,$s0,end            
+                  dadd        $s2, r0, r1
+                  daddi       $a0,r0,ok_message
+                  bne         r1,$s0,end
                   daddi       $a0,r0,error_op
 
   end:            jal         print_string
                   syscall 0
-          
-                  #include    print.s      
+
+                  #include    print.s
 
 Nelle prime due righe, vengono salvate in memoria le stringhe che contengono
 i messaggi di errore e di successo, che saranno poi passati come parametri
@@ -86,18 +87,18 @@ Programma di esempio che chiude un file::
   ok_message:     .asciiz     "Tutto a posto"
 
                   .text
-  close:          daddi       r14, r0, params_sys2        
-                  sw          $s2, params_sys2(r0)    
-                  syscall     2            
-                  daddi       $s0, r0, -1        
-                  daddi       $a0, r0, ok_message            
-                  bne         r1, $s0, end            
+  close:          daddi       r14, r0, params_sys2
+                  sw          $s2, params_sys2(r0)
+                  syscall     2
+                  daddi       $s0, r0, -1
+                  daddi       $a0, r0, ok_message
+                  bne         r1, $s0, end
                   daddi       $a0, r0, error_cl
 
   end:            jal         print_string
                   syscall     0
-      
-                  #include    print.s         
+
+                  #include    print.s
 
 **Nota:** Questo esempio richiede che in $s2 ci sia il file descriptor del
 file da chiudere.
@@ -121,29 +122,29 @@ SYSCALL 3
 Programma di esempio che legge 16 byte da un file e li salva in memoria::
 
                   .data
-  params_sys3:    .space      8                
-  ind_value:      .space      8            
-                  .word64     16        
-  error_3:        .asciiz     "Errore durante la lettura da file."    
-  ok_message:     .asciiz     "Tutto ok."    
+  params_sys3:    .space      8
+  ind_value:      .space      8
+                  .word64     16
+  error_3:        .asciiz     "Errore durante la lettura da file."
+  ok_message:     .asciiz     "Tutto ok."
 
-  value:          .space      30                    
+  value:          .space      30
 
                   .text
-  read:           daddi       r14, r0, params_sys3 
+  read:           daddi       r14, r0, params_sys3
                   sw          $s2, params_sys3(r0)
-                  daddi       $s1, r0, value            
-                  sw          $s1, ind_value(r0)            
-                  syscall     3            
-                  daddi       $s0, r0, -1            
-                  daddi       $a0, r0,ok_message            
-                  bne         r1, $s0,end            
+                  daddi       $s1, r0, value
+                  sw          $s1, ind_value(r0)
+                  syscall     3
+                  daddi       $s0, r0, -1
+                  daddi       $a0, r0,ok_message
+                  bne         r1, $s0,end
                   daddi       $a0, r0,error_3
 
   end:            jal         print_string
                   syscall     0
-          
-                  #include    print.s 
+
+                  #include    print.s
 
 Le prime 4 righe della sezione .data contengono i parametri della SYSCALL 3,
 il file descriptor da cui si devono leggere i dati, l'indirizzo della cella di
@@ -164,29 +165,29 @@ SYSCALL 4
 Programma di esempio che scrive su file una stringa::
 
                   .data
-  params_sys4:    .space      8                
-  ind_value:      .space      8            
-                  .word64     16        
-  error_4:        .asciiz     "Errore durante la scrittura su stringa."    
-  ok_message:     .asciiz     "Tutto ok."    
-  value:          .space      30                    
+  params_sys4:    .space      8
+  ind_value:      .space      8
+                  .word64     16
+  error_4:        .asciiz     "Errore durante la scrittura su stringa."
+  ok_message:     .asciiz     "Tutto ok."
+  value:          .space      30
 
                   .text
-              
-  write:          daddi       r14, r0,params_sys4        
-                  sw          $s2, params_sys4(r0)        
-                  daddi       $s1, r0,value            
-                  sw          $s1, ind_value(r0)            
-                  syscall     4                
+
+  write:          daddi       r14, r0,params_sys4
+                  sw          $s2, params_sys4(r0)
+                  daddi       $s1, r0,value
+                  sw          $s1, ind_value(r0)
+                  syscall     4
                   daddi       $s0, r0,-1
-                  daddi       $a0, r0,ok_message            
-                  bne         r1, $s0,end            
+                  daddi       $a0, r0,ok_message
+                  bne         r1, $s0,end
                   daddi       $a0, r0,error_4
 
   end:            jal         print_string
                   syscall     0
-          
-                  #include    print.s 
+
+                  #include    print.s
 
 La struttura di quest'esempio è identica a quella dell'esempio di SYSCALL 3.
 
@@ -199,8 +200,8 @@ stringa contenuta nell'indirizzo di memoria a cui punta $a0::
   params_sys5:    .space  8
 
                   .text
-  print_string:   
-                  sw      $a0, params_sys5(r0)    
+  print_string:
+                  sw      $a0, params_sys5(r0)
                   daddi   r14, r0, params_sys5
                   syscall 5
                   jr      r31
@@ -226,7 +227,7 @@ che sarà illustrato nel seguente esempio::
   s1:             .asciiz   "Giugno"
   s2:             .asciiz   "EduMIPS64"
   fs_addr:        .space    4
-                  .word     5    
+                  .word     5
   s1_addr:        .space    4
   s2_addr:        .space    4
                   .word     0
