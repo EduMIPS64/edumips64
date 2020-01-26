@@ -1,13 +1,14 @@
 Source files format
 ===================
 
-EduMIPS64 tries to follow the conventions used in other MIPS64 and DLX simulators, so
-that old time users will not be confused by its syntax.
+EduMIPS64 tries to follow the conventions used in other MIPS64 and DLX
+simulators, so that old time users will not be confused by its syntax.
 
 There are two sections in a source file, the *data* section and the
 *code* section, introduced respectively by the *.data* and the
 *.code* directives. In the following listing you can see a very basic
 EduMIPS64 program::
+
   ; This is a comment
           .data
   label:  .word   15     ; This is an inline comment
@@ -29,7 +30,7 @@ Labels can be used in the code to reference a memory cell or an
 instruction.  They are case insensitive. Only a label for each source code line
 can be used.  The label can be specified one or more rows above the effective
 data declaration or instruction, provided that there's nothing, except for
-comments and empty lines, between the label and the declaration. 
+comments and empty lines, between the label and the declaration.
 
 Memory limits
 -------------
@@ -45,6 +46,7 @@ The `.data` section
 The *data* section contains commands that specify how the memory must be
 filled before program execution starts. The general form of a `.data` command
 is::
+
   [label:] .datatype value1 [, value2 [, ...]]
 
 EduMIPS64 supports different data types, that are described in the following
@@ -65,13 +67,13 @@ directive or by the `.word64` directive.
 All the data types are interpreted as signed. This means that integer literals
 in the `.data` section must be between -2^(n-1) and 2^(n-1) - 1 (inclusive).
 
-There is a big difference between declaring a list of data elements
-using a single directive or by using multiple directives of the same type. EduMIPS64
-starts writing from the next 64-bit double word as soon as it finds a datatype identifier,
-so the first `.byte` statement in the following listing will put
-the numbers 1, 2, 3 and 4 in the space of 4 bytes, taking 32 bits, while code in
-the next four rows will put each number in a different memory cell, occupying 32
-bytes::
+There is a big difference between declaring a list of data elements using a
+single directive or by using multiple directives of the same type. EduMIPS64
+starts writing from the next 64-bit double word as soon as it finds a
+datatype identifier, so the first `.byte` statement in the following listing
+will put the numbers 1, 2, 3 and 4 in the space of 4 bytes, taking 32 bits,
+while code in the next four rows will put each number in a different memory
+cell, occupying 32 bytes::
 
     .data
     .byte    1, 2, 3, 4
@@ -86,7 +88,7 @@ table refers to the right-most memory cell, that has the lowest address of the
 eight cells in each line.
 
 +----+-+-+-+-+-+-+-+-+
-|*0* |0|0|0|0|4|3|2|1|   
+|*0* |0|0|0|0|4|3|2|1|
 +----+-+-+-+-+-+-+-+-+
 |*8* |0|0|0|0|0|0|0|1|
 +----+-+-+-+-+-+-+-+-+
@@ -97,7 +99,7 @@ eight cells in each line.
 |*36*|0|0|0|0|0|0|0|4|
 +----+-+-+-+-+-+-+-+-+
 
-There are some special directives that need to be discussed: `.space`, 
+There are some special directives that need to be discussed: `.space`,
 `.ascii` and `.asciiz`.
 
 The `.space` directive is used to leave some free space in memory. It
@@ -109,7 +111,6 @@ The `.ascii` directive accepts strings containing any of the ASCII
 characters, and some special C-like escaping sequences, that are described in
 the following table, and puts those strings in memory.
 
-
         ================= =========================== ==========
         Escaping sequence Meaning                     ASCII code
         ================= =========================== ==========
@@ -117,7 +118,7 @@ the following table, and puts those strings in memory.
         \\t               Horizontal tabulation       9
         \\n               Newline character           10
         \\"               Literal quote character     34
-        \\\\              Literal backslash character 92
+        \\                Literal backslash character 92
         ================= =========================== ==========
 
 The `.asciiz` directive behaves exactly like the `.ascii` command,
@@ -128,6 +129,7 @@ The `.code` section
 The *code* section contains commands that specify how the memory must be
 filled when the program will start. The general form of a `.code` command
 is::
+
   [label:] instruction [param1 [, param2 [, param3]]]
 
 The *code* section can be specified with the `.text` alias.
@@ -147,11 +149,11 @@ Instructions can take three types of parameters:
   are simply inserted by writing the number, while base 16 number are inserted
   by putting before the number the prefix "0x"
 * *Address* an address is composed by an immediate value followed
-  by a register name enclosed in brackets. The value of the register will be 
+  by a register name enclosed in brackets. The value of the register will be
   used as base, the value of the immediate will be the offset.
 
-The size of immediate values is limited by the number of bits that are available
-in the bit encoding of the instruction. 
+The size of immediate values is limited by the number of bits that are
+available in the bit encoding of the instruction.
 
 You can use standard MIPS assembly aliases to address the first 32 registers,
 appending the alias to one of the standard register prefixes like "r", "\$"
@@ -195,9 +197,11 @@ and "R". See the next table.
             ======== ======
 
 .. % TODO: anche questa, ma nell'indice
-   %Please see~\cite{mips-2} for more details about how instruction are actually encoded.
+   %Please see~\cite{mips-2} for more details about how instruction are
+   actually encoded.
 
-.. The instructions that can be used in this section will be discussed in section~\ref{instructions}
+.. The instructions that can be used in this section will be discussed in
+   section~\ref{instructions}
 
 The `\#include` command
 -----------------------
