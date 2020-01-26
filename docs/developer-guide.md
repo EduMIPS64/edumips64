@@ -58,6 +58,15 @@ Gradle builds the following jar artifacts:
 
 Gradle is supported by all the main Java IDEs (e.g. IDEA, Eclipse, NetBeans).
 
+
+### Visual Studio Code
+
+If you want to work on EduMIPS64 with Visual Studio Code, you need to download the Java Extension Pack
+(see [Java in Visual Studio Code](https://code.visualstudio.com/docs/languages/java)).
+
+To make it recognize the EduMIPS64 folder as a project, run `./gradlew eclipse` to generate
+Eclipse-style project files, which are readable by the VSCode plugins.
+
 ### Working on the GWT frontend
 
 An experimental web frontend, based on GWT, is being developed right now.
@@ -102,7 +111,7 @@ development workflow, which means that `master` is always fully working
 (the code can be built and all tests pass), and development is done in separate
 named branches. The good state of `master` is enforced by its protected
 status, meaning that no commits can be pushed directly to `master` and any
-pull requests for `master` have to pass the status checks (Travis CI building
+pull requests for `master` have to pass the status checks (Azure Pipelines building
 the code and executing unit tests).
 
 ### Unit tests
