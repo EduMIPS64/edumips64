@@ -15,7 +15,7 @@ schedules:
     - master
 
 pool:
-  vmImage: 'Ubuntu-16.04'
+  vmImage: 'Ubuntu-18.04'
 
 # JDK 1.9 and 1.10 are out of support on Azure Pipeline tasks
 strategy:
@@ -29,10 +29,11 @@ strategy:
 
 
 steps:
-- bash: |
-      sudo apt update &&
-      sudo apt install python3-sphinx rst2pdf
-  displayName: 'Install dependencies'
+- script: |
+      sudo apt install python3-pip
+      sudo pip3 install sphinx
+      sudo pip3 install rst2pdf
+  displayName: 'Install docs dependencies'
 
 - task: Gradle@2
   displayName: 'Gradle check task'
