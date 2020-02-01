@@ -33,7 +33,6 @@ import java.util.logging.Logger;
  */
 public class Register extends BitSet64 {
   private int writeSemaphore;
-  private int readSemaphore;
   private String reg_name;
 
   public final static Logger logger = Logger.getLogger(Register.class.getName());
@@ -43,7 +42,6 @@ public class Register extends BitSet64 {
      */
   public Register(String name) {
     writeSemaphore = 0;
-    readSemaphore = 0;
     reg_name = name;
   }
 
@@ -52,20 +50,6 @@ public class Register extends BitSet64 {
    */
   public int getWriteSemaphore() {
     return writeSemaphore;
-  }
-
-  /** Returns the value of the semaphore
-   *  @return the numerical value of the semaphore
-   */
-  public int getReadSemaphore() {
-    return readSemaphore;
-  }
-
-  /** Increments the value of the semaphore
-   */
-  public void incrReadSemaphore() {
-    readSemaphore++;
-    logger.info("Incremented read semaphore for " + reg_name + ": " + readSemaphore);
   }
 
   /** Increments the value of the semaphore
@@ -88,19 +72,6 @@ public class Register extends BitSet64 {
     logger.info("Decremented write semaphore for " + reg_name + ": " + writeSemaphore);
   }
 
-  /** Decrements the value of the semaphore.
-   *  It throws a <code>RuntimeException</code> if the semaphore value gets below zero, because
-   *  the value becomes negative only in case of programming errors, and the EduMIPS64 team
-   *  doesn't make any programming error.
-   */
-  public void decrReadSemaphore() {
-    if (--readSemaphore < 0) {
-      throw new RuntimeException();
-    }
-
-    logger.info("Decremented read semaphore for " + reg_name + ": " + writeSemaphore);
-  }
-
   /** Returns the signed numeric decimal value stored in this register.
    * @return signed numerical value stored in this register
    */
@@ -119,7 +90,6 @@ public class Register extends BitSet64 {
   public void reset() {
     super.reset(false);
     writeSemaphore = 0;
-    readSemaphore = 0;
   }
 
 
