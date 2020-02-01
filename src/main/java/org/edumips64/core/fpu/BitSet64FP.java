@@ -59,26 +59,6 @@ public class BitSet64FP extends FixedBitSet {
     }
   }
 
-  /** Writes a floating point double precision number expressed as string into this FixedBitSet: the value to be written must be in the range
-   * [A=-1.797693134862315708145274237317E308,B=-4.9406564584124654417656879286822E-324] U [C=4.9406564584124654417656879286822E-324, D=1.797693134862315708145274237317E308].
-   * For values that belong to ]-Infinity,A[ U ]D,+ Infinity[  an overflow exception will be thrown, on the contrary
-   * values that belong to ]B,C[ an underflow exception will be thrown.
-   * @param value double number a string to be written: must be on the format  "2.345" or "2345E-3"
-   * @throws FPUnderflowException,FPOverflowException, IrregularWriteOperationException,FPInvalidOperationException
-   */
-  public void writeDouble(String value) throws  FPOverflowException, FPUnderflowException, FPInvalidOperationException, IrregularWriteOperationException, IrregularStringOfBitsException {
-    this.reset(false);
-    String bits = fpInstructionUtils.doubleToBin(value);
-
-    try {
-      this.setBits(bits, 0);
-    } catch (IrregularStringOfBitsException e) {
-      e.printStackTrace();
-      throw new IrregularWriteOperationException();
-    }
-
-  }
-
   /**Returns a string with a double value or the name of a special value
     * it is recommended the use of this method only for the visualisation of the double value because it may return an alphanumeric value
     * @return the double value or the special values "Quiet NaN","Signaling NaN", "Positive infinity", "Negative infinity","Positive zero","Negative zero"
