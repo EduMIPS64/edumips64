@@ -51,7 +51,7 @@ steps:
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: $(jdk-ver)
     jdkArchitectureOption: 'x64'
-    tasks: 'test'
+    tasks: 'check'
     publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'
 
@@ -81,14 +81,14 @@ steps:
     CODECOV_TOKEN: $(codecov_token)
 
 - task: Gradle@2
-  displayName: 'Create standalone JAR'
+  displayName: 'Create all JARs'
   inputs:
     gradleWrapperFile: 'gradlew'
     gradleOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: $(jdk-ver)
     jdkArchitectureOption: 'x64'
-    tasks: 'standaloneJar'
+    tasks: 'assemble'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish standalone artifact'
