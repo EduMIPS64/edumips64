@@ -34,16 +34,46 @@ steps:
   displayName: 'Install docs dependencies'
 
 - task: Gradle@2
-  displayName: 'Gradle check task'
+  displayName: 'Compile source code'
   inputs:
     gradleWrapperFile: 'gradlew'
     gradleOptions: '-Xmx3072m'
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: $(jdk-ver)
     jdkArchitectureOption: 'x64'
+    tasks: 'compileJava'
+
+- task: Gradle@2
+  displayName: 'Run unit tests'
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    gradleOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: $(jdk-ver)
+    jdkArchitectureOption: 'x64'
+    tasks: 'tests'
     publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'
-    tasks: 'check'
+
+- task: Gradle@2
+  displayName: 'Build all docs'
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    gradleOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: $(jdk-ver)
+    jdkArchitectureOption: 'x64'
+    tasks: 'allDocs'
+
+- task: Gradle@2
+  displayName: 'Build Web UI'
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    gradleOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: $(jdk-ver)
+    jdkArchitectureOption: 'x64'
+    tasks: 'war'
 
 - script: bash <(curl -s https://codecov.io/bash)
   displayName: 'Codecov update'
@@ -77,4 +107,3 @@ steps:
   inputs:
     pathtoPublish: './build/docs/it/latex/EduMIPS64.pdf'
     artifactName: 'edumips64-docs-it'
-
