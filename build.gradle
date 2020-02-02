@@ -67,38 +67,30 @@ task allDocs(type: GradleBuild) {
     tasks = ['htmlDocsIt', 'htmlDocsEn', 'pdfDocsEn', 'pdfDocsIt']
     description = 'Run all documentation tasks'
 }
-// Include allDocs task in check task
-check.dependsOn(allDocs)
-
 
 /*
  * Jar tasks
  */
-// Compile HTML docs for JavaHelp before processResources task
-processResources.dependsOn htmlDocsIt
-processResources.dependsOn htmlDocsEn
 
 // Include the docs folder at the root of the jar, for JavaHelp
-processResources {
+task copyHelp(type: Copy) {
     from ("${buildDir}/docs/en") {
-        into 'docs/user/en'
+        into 'user/en'
         includes = ["html/**"]
         excludes = ["**/_sources/**"]
     }
     from ("${buildDir}/docs/it") {
-        into 'docs/user/it'
+        into 'user/it'
         includes = ["html/**"]
         excludes = ["**/_sources/**"]
     }
     from ('docs/') {
-        into 'docs'
         excludes = ["**/src/**", "**/design/**", "**/*.py", "**/*.md", "**/__pycache__/**"]
     }
+    into 'build/classes/java/main/docs'
 }
-
-// The 'classes' task is also ran by unit tests. We don't want unit tests to copy around
-// resources, especially since processResources depends on compiling the HTML docs.
-classes.dependsOn.remove('processResources')
+copyHelp.dependsOn htmlDocsIt
+copyHelp.dependsOn htmlDocsEn
 
 def getGitRevisionId() {
   def branch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
@@ -133,7 +125,6 @@ task cliJar(type: Jar, dependsOn: jar) {
         from sharedManifest        
     }
 }
-assemble.dependsOn(cliJar) 
 
 // "Fat" / standalone jar (includes all dependencies)
 task standaloneJar(type: Jar, dependsOn: configurations.runtimeClasspath) {
@@ -147,10 +138,9 @@ task standaloneJar(type: Jar, dependsOn: configurations.runtimeClasspath) {
         from sharedManifest        
     }
 }
-// Not sure why standaloneJar does not depend on jar. Anyway, adding this dependency for now.
-standaloneJar.dependsOn(processResources)
-jar.dependsOn(processResources)
+standaloneJar.dependsOn(copyHelp)
 assemble.dependsOn(standaloneJar) 
+assemble.dependsOn(cliJar) 
 
 /*
  * Test tasks
@@ -161,6 +151,14 @@ test {
         logger.quiet "Executed test ${desc.name} [${desc.className}] with result: ${result.resultType}"
     }
 }
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled false
+    }
+}
+check.dependsOn jacocoTestReport
 
 /*
  * GWT tasks
@@ -172,18 +170,4 @@ task copyStaticFiles(type: Copy) {
     include 'logo.png'
     into 'build/gwt/war'
 }
-
 war.dependsOn copyStaticFiles
-check.dependsOn war
-
-/*
- * Code coverage report tasks
- */
-jacocoTestReport {
-    reports {
-        xml.enabled true
-        csv.enabled false
-        html.enabled false
-    }
-}
-check.dependsOn jacocoTestReport
