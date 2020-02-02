@@ -70,35 +70,29 @@ task allDocs(type: GradleBuild) {
 // Include allDocs task in check task
 check.dependsOn(allDocs)
 
-
 /*
  * Jar tasks
  */
-// Compile HTML docs for JavaHelp before processResources task
-processResources.dependsOn htmlDocsIt
-processResources.dependsOn htmlDocsEn
 
 // Include the docs folder at the root of the jar, for JavaHelp
-processResources {
+task copyHelp(type: Copy) {
     from ("${buildDir}/docs/en") {
-        into 'docs/user/en'
+        into 'user/en'
         includes = ["html/**"]
         excludes = ["**/_sources/**"]
     }
     from ("${buildDir}/docs/it") {
-        into 'docs/user/it'
+        into 'user/it'
         includes = ["html/**"]
         excludes = ["**/_sources/**"]
     }
     from ('docs/') {
-        into 'docs'
         excludes = ["**/src/**", "**/design/**", "**/*.py", "**/*.md", "**/__pycache__/**"]
     }
+    into 'build/classes/java/main/docs'
 }
-
-// The 'classes' task is also ran by unit tests. We don't want unit tests to copy around
-// resources, especially since processResources depends on compiling the HTML docs.
-classes.dependsOn.remove('processResources')
+copyHelp.dependsOn htmlDocsIt
+copyHelp.dependsOn htmlDocsEn
 
 def getGitRevisionId() {
   def branch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
@@ -148,8 +142,7 @@ task standaloneJar(type: Jar, dependsOn: configurations.runtimeClasspath) {
     }
 }
 // Not sure why standaloneJar does not depend on jar. Anyway, adding this dependency for now.
-standaloneJar.dependsOn(processResources)
-jar.dependsOn(processResources)
+standaloneJar.dependsOn(copyHelp)
 assemble.dependsOn(standaloneJar) 
 
 /*
