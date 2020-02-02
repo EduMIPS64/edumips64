@@ -51,7 +51,7 @@ steps:
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: $(jdk-ver)
     jdkArchitectureOption: 'x64'
-    tasks: 'tests'
+    tasks: 'test'
     publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'
 
