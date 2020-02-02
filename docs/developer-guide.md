@@ -11,7 +11,9 @@
 
 [Unit tests](#unit-tests)
 
-[Compiling under Windoes](#windows)
+[Compiling under Windows](#windows)
+
+[Compiling under Mac OSX](#mac-os-x)
 
 ### Requirements
 
@@ -169,3 +171,13 @@ might be migrating to a new shiny web-based frontend.
 
 Compilation under Windows is possible by using the Windows Subsystem for Linux
 (WSL), exactly in the same way as you would do under Linux.
+
+### Mac OS X
+
+The build works under Mac OS X (tested with Catalina 10.15.2, JDK 1.8.0.92).
+
+The only thing that might not work out of the box is downloading the Gradle GWT
+plugins, as the Maven repo uses Let's Encrypt as a certificate issuer, which
+is not trusted by default by the JDK.
+
+Follow instructions [here](https://dev.cloudburo.net/2018/06/03/install-letsencrypt-certificate-in-the-java-jdk-keystore-on-osx.html) to import the Let's Encrypt root certificates in the JDK keystore.
