@@ -600,4 +600,10 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testAdd() throws Exception {
     runMipsTest("add.s");
   }
+
+  /* Test for instruction BC1F */
+  @Test()
+  public void testBc1f() throws Exception {
+    runMipsTest("bc1f.s");
+  }
 }
