@@ -594,4 +594,10 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testLdLargeImmediate() throws Exception {
     runMipsTest("load-large-memory-location.s");
   }
+
+  /* Test for instruction ADD */
+  @Test()
+  public void testAdd() throws Exception {
+    runMipsTest("add.s");
+  }
 }
