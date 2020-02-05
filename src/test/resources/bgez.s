@@ -1,6 +1,6 @@
-; bc1f.s - test file for EduMIPS64.
+; bgez.s - test file for EduMIPS64.
 ;
-; Executes bc1f and ensures it branches correctly.
+; Executes bgez and ensures it branches correctly.
 ;
 ; (c) 2018 Andrea Spadaccini and the EduMIPS64 team
 ;
@@ -20,25 +20,24 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program; if not, write to the Free Software
 ; Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-.data
-        .double 3.14
-        .double 2.71
 
 .code
-        ldc1 f1, 0(r0)
-        ldc1 f2, 8(r0)
-        ldc1 f3, 0(r0)
+        addi r1, r0, 2
+        addi r2, r0, -2
 
-        c.eq.d 7, f1, f2 ; should be false
-        bc1f 7, continue
+greater:
+        bgez r1, zero ; should branch 2 >= 0
         break
         syscall 0
 
-continue:
-        c.eq.d 7, f1, f3 ; should be true
-        bc1f 7, error
+zero:
+        bgez r0, less ; should branch 0 >= 0
+        break
         syscall 0
 
+less:
+        bgez r2, error ; should not branch -2 < 0
+        syscall 0
 
 error:
         break
