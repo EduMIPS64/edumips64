@@ -76,7 +76,7 @@ jobs:
       uses: actions/upload-artifact@v1.0.0
       with:
         name: Slim JAR
-        path: ./build/libs/edumips64-${{ steps.read_property.outputs.value }}-slim.jar
+        path: ./build/libs/edumips64-${{ steps.read_property.outputs.value }}.jar
  
   # Build the Web UI. Done as a separate job because it's the slowest step
   # and it's worth doing it in parallel.
