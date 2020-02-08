@@ -1,5 +1,12 @@
 # EduMIPS64 ChangeLog
 
+## next (...)
+### Added
+### Fixed
+### Changed
+
+- Using GitHub Actions instead of Azure Pipelines as CI.
+
 ## 1.2.6 (26/01/2019) - Phlegmatic
 ### Added
 - Alias DMULU for DMULTU (Issue #249)

@@ -1,7 +1,6 @@
 # EduMIPS64
 
 ![Java CI](https://github.com/lupino3/edumips64/workflows/Java%20CI/badge.svg)
-[![Build Status](https://dev.azure.com/edumips64/EduMIPS64/_apis/build/status/lupino3.edumips64?branchName=master)](https://dev.azure.com/edumips64/EduMIPS64/_build/latest?definitionId=2&branchName=master)
 [![Documentation Status](https://readthedocs.org/projects/edumips64/badge/?version=latest)](http://edumips64.readthedocs.io/en/latest/?badge=latest)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1511/badge)](https://bestpractices.coreinfrastructure.org/projects/1511)
 [![Join the chat at https://gitter.im/lupino3/edumips64](https://badges.gitter.im/lupino3/edumips64.svg)](https://gitter.im/lupino3/edumips64?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
