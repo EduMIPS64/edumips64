@@ -27,8 +27,10 @@ jobs:
       id: read_property
       uses: christian-draeger/read-properties@1.0.0
       with:
-        path: 'gradle.properties'
+        path: './gradle.properties'
         property: 'version'
+    - name: Check version number
+      run: echo ${{ steps.read_property.version }}
     
     # Compile the code, run unit tests, upload code coverage results.
     - name: Compile Java code
