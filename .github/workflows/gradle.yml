@@ -39,8 +39,12 @@ jobs:
       run: ./gradlew allDocs  
 
     # Build JAR files.
-    - name: Build JARs
-      run: ./gradlew assemble
+    - name: Build standalone JAR
+      run: ./gradlew standaloneJar
+    - name: Build slim JAR
+      run: ./gradlew jar
+    - name: Build CLI JAR
+      run: ./gradlew cliJar
 
     # Upload artifacts (manuals and JARs)
     - name: Upload English Manual PDF
@@ -54,11 +58,11 @@ jobs:
         name: Italian manual (PDF)
         path: ./build/docs/it/latex/EduMIPS64.pdf
 
-    - name: Upload Standalone JAR
+    - name: Upload JARs
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: JAR
-        path: ./build/libs/edumips64-*-standalone.jar
+        name: jars
+        path: ./build/libs
  
   # Build the Web UI. Done as a separate job because it's the slowest step
   # and it's worth doing it in parallel.
