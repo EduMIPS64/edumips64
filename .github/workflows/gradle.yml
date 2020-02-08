@@ -19,9 +19,12 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+    - name: Install docs dependencies
+      run: pip3 install -r docs/requirements.txt -U  
+    
+    # Compile the code, run unit tests, upload code coverage results.
     - name: Compile Java code
       run: ./gradlew compileJava
     - name: Run unit tests
@@ -29,11 +32,27 @@ jobs:
     - name: Codecov
       uses: codecov/codecov-action@v1.0.5
       with:
-        # Repository upload token - get it from codecov.io
         token: ${{ secrets.CODECOV_TOKEN }}
 
+    # Build docs (PDF and HTML for the in-app help)
+    - name: Build all docs
+      run: ./gradlew allDocs  
+
+    # Build JAR files.
     - name: Build JARs
       run: ./gradlew assemble
+
+    # Upload artifacts (manuals and JARs)
+    - name: Upload English Manual PDF
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: English manual (PDF)
+        path: ./build/docs/en/latex/EduMIPS64.pdf
+    - name: Upload Italian Manual PDF
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: Italian manual (PDF)
+        path: ./build/docs/it/latex/EduMIPS64.pdf
 
     #- name: Upload Standalone JAR
     #  uses: actions/upload-artifact@v1.0.0
@@ -42,7 +61,9 @@ jobs:
     #    name: JAR
     #   # Directory containing files to upload
     #    path: ./build/libs/edumips64-standalone.jar
-  
+ 
+  # Build the Web UI. Done as a separate job because it's the slowest step
+  # and it's worth doing it in parallel.
   webui:
     runs-on: ubuntu-latest
     steps:
@@ -55,32 +76,3 @@ jobs:
       run: chmod +x gradlew
     - name: Build Web UI
       run: ./gradlew war
-  
-  docs:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Install docs dependencies
-      run: pip3 install -r docs/requirements.txt -U  
-    - name: Build all docs
-      run: ./gradlew allDocs  
-    - name: Upload English Manual PDF
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        # Artifact name
-        name: English manual (PDF)
-        # Directory containing files to upload
-        path: ./build/docs/en/latex/EduMIPS64.pdf
-    - name: Upload Italian Manual PDF
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        # Artifact name
-        name: Italian manual (PDF)
-        # Directory containing files to upload
-        path: ./build/docs/it/latex/EduMIPS64.pdf
