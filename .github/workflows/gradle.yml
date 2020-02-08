@@ -30,7 +30,7 @@ jobs:
         path: './gradle.properties'
         property: 'version'
     - name: Check version number
-      run: echo ${{ steps.read_property.version }}
+      run: echo ${{ steps.read_property.outputs.value }}
     
     # Compile the code, run unit tests, upload code coverage results.
     - name: Compile Java code
@@ -70,13 +70,13 @@ jobs:
       uses: actions/upload-artifact@v1.0.0
       with:
         name: Standalone JAR
-        path: ./build/libs/edumips64-${{ steps.read_property.version }}-standalone.jar
+        path: ./build/libs/edumips64-${{ steps.read_property.outputs.value }}-standalone.jar
 
     - name: Upload slim JAR
       uses: actions/upload-artifact@v1.0.0
       with:
         name: Slim JAR
-        path: ./build/libs/edumips64-${{ steps.read_property.version }}-slim.jar
+        path: ./build/libs/edumips64-${{ steps.read_property.outputs.value }}-slim.jar
  
   # Build the Web UI. Done as a separate job because it's the slowest step
   # and it's worth doing it in parallel.
