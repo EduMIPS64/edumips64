@@ -25,7 +25,34 @@ jobs:
       run: pip3 install -r docs/requirements.txt -U
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew build
-    - name: Test
+    - name: Compile Java code
+      run: ./gradlew compileJava
+    - name: Run unit tests
       run: ./gradlew test
+    - name: Build all docs
+      run: ./gradlew allDocs
+    - name: Build Web UI
+      run: ./gradlew war
+    - name: Build JARs
+      run: ./gradlew assemble
+    - name: Upload English Manual PDF
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        # Artifact name
+        name: English manual (PDF)
+        # Directory containing files to upload
+        path: ./build/docs/en/latex/EduMIPS64.pdf
+    - name: Upload Italian Manual PDF
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        # Artifact name
+        name: Italian manual (PDF)
+        # Directory containing files to upload
+        path: ./build/docs/it/latex/EduMIPS64.pdf
+    - name: Upload Standalone JAR
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        # Artifact name
+        name: JAR
+        # Directory containing files to upload
+        path: ./build/libs/edumips64-standalone.jar
