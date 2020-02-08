@@ -54,13 +54,11 @@ jobs:
         name: Italian manual (PDF)
         path: ./build/docs/it/latex/EduMIPS64.pdf
 
-    #- name: Upload Standalone JAR
-    #  uses: actions/upload-artifact@v1.0.0
-    #  with:
-    #    # Artifact name
-    #    name: JAR
-    #   # Directory containing files to upload
-    #    path: ./build/libs/edumips64-standalone.jar
+    - name: Upload Standalone JAR
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: JAR
+        path: ./build/libs/edumips64-*-standalone.jar
  
   # Build the Web UI. Done as a separate job because it's the slowest step
   # and it's worth doing it in parallel.
