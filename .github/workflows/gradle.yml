@@ -23,6 +23,12 @@ jobs:
       run: chmod +x gradlew
     - name: Install docs dependencies
       run: pip3 install -r docs/requirements.txt -U  
+    - name: Read version number
+      id: read_property
+      uses: christian-draeger/read-properties@1.0.0
+      with:
+        path: 'gradle.properties'
+        property: 'version'
     
     # Compile the code, run unit tests, upload code coverage results.
     - name: Compile Java code
@@ -58,11 +64,17 @@ jobs:
         name: Italian manual (PDF)
         path: ./build/docs/it/latex/EduMIPS64.pdf
 
-    - name: Upload JARs
+    - name: Upload standalone JAR
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: jars
-        path: ./build/libs
+        name: Standalone JAR
+        path: ./build/libs/edumips64-${{ steps.read_property.version }}-standalone.jar
+
+    - name: Upload slim JAR
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: Slim JAR
+        path: ./build/libs/edumips64-${{ steps.read_property.version }}-slim.jar
  
   # Build the Web UI. Done as a separate job because it's the slowest step
   # and it's worth doing it in parallel.
