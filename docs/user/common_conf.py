@@ -1,16 +1,15 @@
 # Common values for the Sphinx configuration for all languages.
 
-# Get the version from build.gradle
-import re
-
-regexp = re.compile(r'version\s*=\s*\'(\d+\.\d+\.\d+)\'')
-with open('../../../../build.gradle') as f:
+# Get the version from Gradle properties.
+properties = {}
+with open('../../../../gradle.properties') as f:
     for line in f:
-        if regexp.match(line):
-            version = regexp.match(line).group(1)
-            break
+        if "=" not in line:
+            continue
+        key, value = line.split("=")
+        properties[key] = value
 
-release = version
+release = properties["version"]
 project = u'EduMIPS64'
 
 # rst2pdf config
