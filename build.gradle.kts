@@ -156,6 +156,7 @@ tasks.create<Jar>("standaloneJar"){
     })
     manifest {
         attributes["Main-Class"] = application.mainClassName
+        attributes["SplashScreen-Image"] = "images/splash.png"
         from(sharedManifest)   
     }
     dependsOn("copyHelp")
