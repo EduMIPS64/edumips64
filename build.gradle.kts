@@ -152,7 +152,7 @@ tasks.create<Jar>("standaloneJar"){
     classifier = "standalone"
     from(sourceSets.main.get().output)
     from({
-        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+        configurations.runtimeClasspath.get().filter { it.name.contains("javahelp") && it.name.endsWith("jar") }.map { zipTree(it) }
     })
     manifest {
         attributes["Main-Class"] = application.mainClassName
