@@ -1,13 +1,11 @@
-26th of January, 2020                                          EduMIPS64 1.2.6
+# EduMIPS64 1.2.6
 
-                           EduMIPS64 RELEASE NOTES	
-                           http://www.edumips.org
+*26th of January, 2020*
 
 EduMIPS64 is a GPL MIPS64 Instruction Set Architecture (ISA) simulator and
 graphical debugger.
 
-Notes for this release:
-~~~~~~~~~~~~~~~~~~~~~~~
+## Notes for this release:
 
 This is version 1.2.6 of EduMIPS64, a release that follows up on version 
 1.2.5, that was released in August 2018. This release contains a couple of
@@ -32,24 +30,23 @@ PARTNER. :)
 
 If you find a bug, please open an issue on GitHub.
 
-EduMIPS64 is hosted on GitHub: www.github.com/lupino3/edumips64.
+EduMIPS64 is hosted on GitHub: www.github.com/EduMIPS64/edumips64.
 Our web site is www.edumips.org, and our development blog is
 http://edumips64.blogspot.com.
 
-New in this release since version 1.2.5
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## New in this release since version 1.2.5
 
-Added
------
+### Added
+
 - Alias DMULU for DMULTU (Issue #249)
 
-Fixed
------
+### Fixed
+
 - Trying to store a large memory location in an immediate field causes EduMIPS64 to crash (Issue #255)
 - Fixed NullReference in the CLI application (#258)
 
-Changed
--------
+### Changed
+
 - Improved the way OOM errors are handled (Issues #257 and #266)
 - Increased default data memory to 640 kB (Issue #268)
 - Improved the bug report dialog (Issue #262)
