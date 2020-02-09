@@ -1,4 +1,4 @@
-# EduMIPS64 1.2.6
+# EduMIPS64 version 1.2.6
 
 *26th of January, 2020*
 
