@@ -43,7 +43,10 @@ public class MainCLI {
 
       // Parse the args as early as possible, since it will influence logging level as well.
       // TODO: extract parseArgsOrExit out of the Main class.
-      String toOpen = Main.parseArgsOrExit(args);
+      Main.ParsedArgs toOpen = Main.parseArgsOrExit(args);
+      if (toOpen.shouldReset) {
+        cfg.resetConfiguration();
+      }
 
       // Initialize the CPU and all its dependencies.
       Memory memory = new Memory();
@@ -58,8 +61,8 @@ public class MainCLI {
 
       // Initialization done. Print a welcome message and open the file if needed.
       System.out.println("Welcome to EduMIPS64 CLI shell!");
-      if (toOpen != null) {
-        String absoluteFilename = new File(toOpen).getAbsolutePath();
+      if (toOpen.filename != null) {
+        String absoluteFilename = new File(toOpen.filename).getAbsolutePath();
         try {
           p.parse(absoluteFilename);
         } catch (ParserMultiException e) {
