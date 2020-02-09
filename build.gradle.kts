@@ -28,7 +28,7 @@ application {
   mainClassName = "org.edumips64.Main"  
 }
 val codename = "Phlegmatic"
-rootProject.version = "1.2.6"
+val version: String by project
 
 // Specify Java source/target version.
 tasks.compileJava {
@@ -152,10 +152,11 @@ tasks.create<Jar>("standaloneJar"){
     classifier = "standalone"
     from(sourceSets.main.get().output)
     from({
-        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+        configurations.runtimeClasspath.get().filter { it.name.contains("javahelp") && it.name.endsWith("jar") }.map { zipTree(it) }
     })
     manifest {
         attributes["Main-Class"] = application.mainClassName
+        attributes["SplashScreen-Image"] = "images/splash.png"
         from(sharedManifest)   
     }
     dependsOn("copyHelp")
