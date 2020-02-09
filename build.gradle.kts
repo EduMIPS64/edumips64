@@ -28,7 +28,7 @@ application {
   mainClassName = "org.edumips64.Main"  
 }
 val codename = "Phlegmatic"
-rootProject.version = "1.2.6"
+val version: String by project
 
 // Specify Java source/target version.
 tasks.compileJava {
