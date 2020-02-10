@@ -55,6 +55,9 @@ import javax.swing.event.*;
 
 public class Main {
 
+  // Elements that are public for unit tests.
+  public JFrame mainFrame;
+
   private CPU cpu;
   // The last created CPU Worker. Necessary for the Stop menu item.
   private CPUSwingWorker cpuWorker;
@@ -67,7 +70,6 @@ public class Main {
   private ConfigStore configStore;
   private JFileChooser jfc;
 
-  private JFrame mainFrame;
   private JMenuItem open;
   private JMenuItem reset;
   private JMenuItem exit;
@@ -195,53 +197,7 @@ public class Main {
     System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tm%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
 
     Main.showVersion();
-
-    // Creating the main JFrame
-    JFrame.setDefaultLookAndFeelDecorated(true);
-    JDialog.setDefaultLookAndFeelDecorated(true);
-    mm.mainFrame = new JFrame();
-    mm.mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    // Maximizing the application
-    Insets screenInsets = mm.mainFrame.getToolkit().getScreenInsets(mm.mainFrame.getGraphicsConfiguration());
-    Rectangle screenSize = mm.mainFrame.getGraphicsConfiguration().getBounds();
-    Rectangle maxBounds = new Rectangle(screenInsets.left + screenSize.x,
-                                        screenInsets.top + screenSize.y,
-                                        screenSize.x + screenSize.width - screenInsets.right - screenInsets.left,
-                                        screenSize.y + screenSize.height - screenInsets.bottom - screenInsets.top);
-    mm.mainFrame.setMaximizedBounds(maxBounds);
-    mm.mainFrame.setBounds(maxBounds);
-
-    mm.mainFrame.setLocation(0, 0);
     mm.init();
-    mm.mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
-    mm.mainFrame.setVisible(true);
-    mm.mainFrame.setExtendedState(mm.mainFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-    // Auto-minimze the log window and the I/O window
-    try {
-      mm.ioFrame.setIcon(true);
-    } catch (java.beans.PropertyVetoException ignored) {}
-
-    // Tile windows once the window is maximized.
-    mm.mainFrame.addWindowStateListener(new WindowStateListener() {
-      // Keep track of whether maximization was already done, to prevent unwanted tiling of windows when the main
-      // window is maximized again.
-        private boolean alreadyMaximized = false;
-
-        public void windowStateChanged(WindowEvent event) {
-          if (alreadyMaximized) {
-            return;
-          }
-          boolean isMaximized = (event.getNewState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
-          boolean wasMaximized = (event.getOldState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
-
-          if (isMaximized && !wasMaximized) {
-            mm.tileWindows();
-            alreadyMaximized = true;
-          }
-        }
-     });
-
-    log.info("Simulator started");
 
     if (parsedArgs.filename != null) {
       mm.resetSimulator(false);
@@ -283,8 +239,13 @@ public class Main {
   }
 
   public void init() {
+    // Creating the main JFrame
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
+    mainFrame = new JFrame();
+    mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+    log.info("Simulator started");
     LocalFileUtils lfu = new LocalFileUtils();
 
     configStore = new JavaPrefsConfigStore(ConfigStore.defaults);
@@ -453,6 +414,45 @@ public class Main {
     codeSupplier = () -> this.code;
 
     changeShownMenuItems(cpu.getStatus());
+
+    // Maximizing the application
+    Insets screenInsets = mainFrame.getToolkit().getScreenInsets(mainFrame.getGraphicsConfiguration());
+    Rectangle screenSize = mainFrame.getGraphicsConfiguration().getBounds();
+    Rectangle maxBounds = new Rectangle(screenInsets.left + screenSize.x,
+                                        screenInsets.top + screenSize.y,
+                                        screenSize.x + screenSize.width - screenInsets.right - screenInsets.left,
+                                        screenSize.y + screenSize.height - screenInsets.bottom - screenInsets.top);
+    mainFrame.setMaximizedBounds(maxBounds);
+    mainFrame.setBounds(maxBounds);
+
+    mainFrame.setLocation(0, 0);
+    mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
+    mainFrame.setVisible(true);
+    mainFrame.setExtendedState(mainFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+    // Auto-minimze the log window and the I/O window
+    try {
+      ioFrame.setIcon(true);
+    } catch (java.beans.PropertyVetoException ignored) {}
+
+    // Tile windows once the window is maximized.
+    mainFrame.addWindowStateListener(new WindowStateListener() {
+      // Keep track of whether maximization was already done, to prevent unwanted tiling of windows when the main
+      // window is maximized again.
+        private boolean alreadyMaximized = false;
+
+        public void windowStateChanged(WindowEvent event) {
+          if (alreadyMaximized) {
+            return;
+          }
+          boolean isMaximized = (event.getNewState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
+          boolean wasMaximized = (event.getOldState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
+
+          if (isMaximized && !wasMaximized) {
+            tileWindows();
+            alreadyMaximized = true;
+          }
+        }
+     });
   }
 
   /** Changes the status of running menu items.
