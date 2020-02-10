@@ -22,6 +22,8 @@ dependencies {
     compileOnly("com.google.gwt:gwt-user:2.8.2")
     implementation("javax.help:javahelp:2.0.05")
     testImplementation("junit:junit:4.12")
+    testCompile("org.assertj:assertj-core:3.11.1")
+    testCompile("org.assertj:assertj-swing:3.9.2")
 }
 
 application {
