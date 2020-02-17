@@ -56,6 +56,8 @@ it is still unclear how they will be represented.
 3. Cycles widget (temporal instruction diagram)
 4. I/O widget (necessary for `E.5.1`)
 5. Settings UI (necessary for `S.*`)
+6. Code editor text area widget
+7. Code editor with syntax highlighting.
 
 ### Settings
 
