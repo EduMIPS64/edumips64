@@ -36,7 +36,7 @@ jobs:
     - name: Compile Java code
       run: ./gradlew compileJava
     - name: Start VNC
-      run: vncserver :42 -localhost -geometry 1600x1200 -depth 16
+      run: echo "123456789" > vncpasswd && vncserver :42 -localhost -geometry 1600x1200 -depth 16
     - name: Run unit tests
       run: DISPLAY=42 ./gradlew check
     - name: Kill VNC
