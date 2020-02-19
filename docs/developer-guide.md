@@ -39,8 +39,8 @@ $ pip3 install -r docs/requirements.txt
 If you want to use the automatic style checks (pre-commit hook), then you
 should have Automatic Style (astyle) installed.
 
-This project uses Travis CI for continuous integration
-(https://travis-ci.org/lupino3/edumips64).
+This project uses GitHub Actions for continuous integration
+(https://github.com/EduMIPS64/edumips64/actions).
 
 ### Main Gradle tasks
 
@@ -126,7 +126,7 @@ development workflow, which means that `master` is always fully working
 (the code can be built and all tests pass), and development is done in separate
 named branches. The good state of `master` is enforced by its protected
 status, meaning that no commits can be pushed directly to `master` and any
-pull requests for `master` have to pass the status checks (Azure Pipelines building
+pull requests for `master` have to pass the status checks (Github Actions building
 the code and executing unit tests).
 
 ### Unit tests
