@@ -23,6 +23,8 @@ jobs:
       run: chmod +x gradlew
     - name: Install docs dependencies
       run: pip3 install -r docs/requirements.txt -U  
+    - name: Install VNC server for UI tests
+      run: sudo apt install tightvncserver
     - name: Read version from gradle.properties
       id: read_version
       uses: christian-draeger/read-properties@1.0.0
@@ -33,8 +35,12 @@ jobs:
     # Compile the code, run unit tests, upload code coverage results.
     - name: Compile Java code
       run: ./gradlew compileJava
+    - name: Start VNC
+      run: vncserver :42 -localhost -geometry 1600x1200 -depth 16
     - name: Run unit tests
-      run: ./gradlew check
+      run: DISPLAY=42 ./gradlew check
+    - name: Kill VNC
+      run: vncserver -kill :42
     - name: Codecov
       uses: codecov/codecov-action@v1.0.5
       with:
