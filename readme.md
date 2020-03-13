@@ -1,5 +1,3 @@
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/EduMIPS64/edumips64) 
-
 # EduMIPS64
 
 ![Java CI](https://github.com/lupino3/edumips64/workflows/Java%20CI/badge.svg)
@@ -10,6 +8,7 @@
 
 [![Join the chat at https://gitter.im/lupino3/edumips64](https://badges.gitter.im/lupino3/edumips64.svg)](https://gitter.im/lupino3/edumips64?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Stack Exchange questions](https://img.shields.io/stackexchange/stackoverflow/t/edumips64)](https://stackoverflow.com/questions/tagged/edumips64)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/EduMIPS64/edumips64) 
 
 EduMIPS64 is a free cross-platform visual MIPS64 CPU simulator written in Java.
 
