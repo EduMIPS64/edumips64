@@ -72,6 +72,7 @@ class GUIPipeline extends GUIComponent {
   private int dimCar;
 
   private class Pannello1 extends JPanel {
+    private static final long serialVersionUID = -1873304516301831571L;
     int alt, largh;
 
     public void paintComponent(Graphics g) {

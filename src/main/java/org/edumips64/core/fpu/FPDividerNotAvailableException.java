@@ -24,4 +24,6 @@ package org.edumips64.core.fpu;
  *
  * @author Massimo Trubia
  */
-public class FPDividerNotAvailableException extends Exception {}
+public class FPDividerNotAvailableException extends Exception {
+    private static final long serialVersionUID = -7682208734792379611L;
+}

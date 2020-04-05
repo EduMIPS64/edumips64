@@ -54,6 +54,7 @@ public class GUIStatistics extends GUIComponent {
   }
 
   class StatPanel extends JPanel {
+    private static final long serialVersionUID = 81105844698513914L;
     JList<? extends String> statList;
     String [] statistics = {" Execution", " 0 Cycles", " 0 Instructions", " ", " Stalls", " 0 RAW Stalls", " 0 WAW Stalls",
                             " 0 WAR Stalls", " 0 Structural Stalls(Divider not available)", "0 Structural Stalls (Memory not available)", " 0 Branch Taken Stalls", " 0 Branch Misprediction Stalls",

@@ -22,6 +22,8 @@
  */
 package org.edumips64.core;
 
-public class IrregularStringOfHexException extends Exception {}
+public class IrregularStringOfHexException extends Exception {
+    private static final long serialVersionUID = 4888369206680221619L;
+}
 
 

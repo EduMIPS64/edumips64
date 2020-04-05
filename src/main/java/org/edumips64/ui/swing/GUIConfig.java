@@ -43,6 +43,7 @@ import java.util.logging.Logger;
  * This class provides a window for configuration options.
 */
 public class GUIConfig extends JDialog {
+  private static final long serialVersionUID = -7037139989636376788L;
 
   private static final Logger logger = Logger.getLogger(GUIConfig.class.getName());
 

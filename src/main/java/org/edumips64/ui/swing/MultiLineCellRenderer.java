@@ -32,9 +32,8 @@ import javax.swing.border.*;
 import java.awt.Component;
 import java.awt.Color;
 
-import java.io.Serializable;
-
-public class MultiLineCellRenderer extends JTextArea implements TableCellRenderer, Serializable {
+public class MultiLineCellRenderer extends JTextArea implements TableCellRenderer {
+  private static final long serialVersionUID = -4281001238359343652L;
 
   protected static Border noFocusBorder;
 
@@ -92,6 +91,7 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
 
 
   public static class UIResource extends MultiLineCellRenderer implements javax.swing.plaf.UIResource {
+    private static final long serialVersionUID = -8775228397685982977L;
   }
 
 }

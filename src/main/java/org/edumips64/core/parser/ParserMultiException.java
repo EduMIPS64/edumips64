@@ -31,8 +31,8 @@ import java.util.*;
  */
 
 public class ParserMultiException extends Exception {
-
-  protected LinkedList <ParserException>exception;
+  private static final long serialVersionUID = -1182294876128642426L;
+  protected LinkedList<ParserException> exception;
 
   /** Create the ParserMultiException
    */

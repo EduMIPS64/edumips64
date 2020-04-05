@@ -26,6 +26,8 @@ package org.edumips64.core.fpu;
  * @author Trubia Massimo
  */
 public class FPOverflowException extends org.edumips64.core.SynchronousException {
+  private static final long serialVersionUID = -7139301622026955532L;
+
   public FPOverflowException() {
     super("FPOVERFLOW");
   }

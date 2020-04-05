@@ -130,6 +130,7 @@ class GUIRegisters extends GUIComponent {
 
 
   private class RegPanel extends JPanel {
+    private static final long serialVersionUID = 8078422671834887404L;
     JTable theTable;
     JScrollPane scrollTable;
     FileTableModel tableModel;
@@ -281,7 +282,8 @@ class GUIRegisters extends GUIComponent {
     }
 
     class FileTableModel extends AbstractTableModel {
-      private String[] columnNames = {"Colonna1", "Colonna2", "Colonna3", "Colonna4"};
+      private static final long serialVersionUID = -215234323840818814L;
+      private String[] columnNames = { "Colonna1", "Colonna2", "Colonna3", "Colonna4" };
       private Class<?>[] columnClasses = {String.class, String.class, String.class, String.class};
       private String value[];
 
@@ -336,6 +338,7 @@ class GUIRegisters extends GUIComponent {
 
   //classe per la JDialog
   private class InsertValueDialog extends JDialog implements ActionListener {
+    private static final long serialVersionUID = -2463021546228567288L;
     JButton OK;
 
     InsertValueDialog() {

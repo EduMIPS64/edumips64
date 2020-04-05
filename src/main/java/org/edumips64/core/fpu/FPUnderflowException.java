@@ -27,6 +27,8 @@ package org.edumips64.core.fpu;
  * @author Trubia Massimo
  */
 public class FPUnderflowException extends org.edumips64.core.SynchronousException {
+  private static final long serialVersionUID = -3703049138797582033L;
+
   public FPUnderflowException() {
     super("FPUNDERFLOW");
   }

@@ -28,5 +28,7 @@ package org.edumips64.core.is;
  *
  * @author Trubia Massimo, Russo Daniele
  */
-public class RAWException extends Exception {}
+public class RAWException extends Exception {
+    private static final long serialVersionUID = 8680059961969999472L;
+}
 

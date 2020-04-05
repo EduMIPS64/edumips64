@@ -25,6 +25,7 @@ package org.edumips64.core;
 
 /** Models a synchronous exception*/
 public class SynchronousException extends Exception {
+  private static final long serialVersionUID = -5084570924398502491L;
   private String errcode;
 
   /** Gets the error code */

@@ -41,6 +41,8 @@ import javax.swing.*;
  */
 
 public class DineroFrontend extends JDialog {
+  private static final long serialVersionUID = -3679388156127239041L;
+
   // Attributes are static in order to make them accessible from
   // the nested anonymous classes. They can be static, because at most
   // one instance of DineroFrame will be created in EduMIPS64

@@ -101,6 +101,7 @@ public class GUICode extends GUIComponent {
   }
 
   private class CodePanel extends JPanel {
+    private static final long serialVersionUID = 7422811605946389701L;
     JTable theTable;
     JScrollPane scrollTable;
     MyTableModel tableModel;
@@ -132,7 +133,8 @@ public class GUICode extends GUIComponent {
     }
 
     class MyTableModel extends AbstractTableModel {
-      private String[] columnLocaleStrings = {"ADDRESS", "HEXREPR", "LABEL", "INSTRUCTION", "COMMENT"};
+      private static final long serialVersionUID = -1790316554473776594L;
+      private String[] columnLocaleStrings = { "ADDRESS", "HEXREPR", "LABEL", "INSTRUCTION", "COMMENT" };
       private Class<?>[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
       private String memoryAddress[];
 

@@ -27,6 +27,8 @@ package org.edumips64.core.fpu;
  *  So to differentiate between the two cases, a divide-by-zero exception was implemented.
  */
 public class FPDivideByZeroException extends org.edumips64.core.SynchronousException {
+  private static final long serialVersionUID = -4259655339736003176L;
+
   public FPDivideByZeroException() {
     super("FPDIVBYZERO");
   }
