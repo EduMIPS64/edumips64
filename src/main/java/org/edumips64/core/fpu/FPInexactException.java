@@ -26,4 +26,5 @@ package org.edumips64.core.fpu;
  *  operation is not exact due to the restricted exponent and/or precision range.
  */
 public class FPInexactException extends Exception {
+    private static final long serialVersionUID = -5964561648601010362L;
 }

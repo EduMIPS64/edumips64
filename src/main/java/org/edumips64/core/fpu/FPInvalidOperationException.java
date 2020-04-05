@@ -30,6 +30,8 @@ package org.edumips64.core.fpu;
  * 4) Division: Â± 0/ Â± 0 or Â± ?/ Â± ?
  */
 public class FPInvalidOperationException  extends org.edumips64.core.SynchronousException {
+  private static final long serialVersionUID = 3276033034371478706L;
+
   public FPInvalidOperationException() {
     super("FPINVALID");
   }

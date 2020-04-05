@@ -121,6 +121,7 @@ public class GUICycles extends GUIComponent {
   }
 
   class CyclePanel extends JPanel {
+    private static final long serialVersionUID = 8910686437037524082L;
 
     @Override
     public synchronized void paint(Graphics g) {
@@ -226,6 +227,8 @@ public class GUICycles extends GUIComponent {
   }
 
   class InstructionPanel extends JPanel {
+    private static final long serialVersionUID = 1390774892068028190L;
+
     @Override
     public synchronized void paint(Graphics g) {
       super.paint(g);

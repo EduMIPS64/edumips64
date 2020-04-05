@@ -49,6 +49,7 @@ import java.awt.Font;
 
 
 public class GUIIO extends JInternalFrame {
+  private static final long serialVersionUID = -5006485330709384067L;
   private JTextArea output_area;
 
   private class OutputTask implements Runnable {

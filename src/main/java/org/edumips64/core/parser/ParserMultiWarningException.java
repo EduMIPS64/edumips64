@@ -30,6 +30,7 @@ package org.edumips64.core.parser;
  */
 
 public class ParserMultiWarningException extends ParserMultiException {
+  private static final long serialVersionUID = 8969558985156207740L;
 
   public void add(String description, int row, int column, String line) {
     ParserWarning tmp = new ParserWarning(description, row, column, line);

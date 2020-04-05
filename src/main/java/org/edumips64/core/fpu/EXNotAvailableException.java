@@ -24,4 +24,6 @@ package org.edumips64.core.fpu;
  *
  * @author Massimo Trubia
  */
-public class EXNotAvailableException extends Exception {}
+public class EXNotAvailableException extends Exception {
+    private static final long serialVersionUID = 5396450611744158476L;
+}

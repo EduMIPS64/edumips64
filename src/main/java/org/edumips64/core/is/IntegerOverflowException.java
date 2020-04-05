@@ -30,6 +30,8 @@ package org.edumips64.core.is;
  * @author Trubia Massimo, Russo Daniele, Andrea Spadaccini
  */
 public class IntegerOverflowException extends org.edumips64.core.SynchronousException {
+  private static final long serialVersionUID = 4883695065192685861L;
+
   IntegerOverflowException() {
     super("INTOVERFLOW");
   }

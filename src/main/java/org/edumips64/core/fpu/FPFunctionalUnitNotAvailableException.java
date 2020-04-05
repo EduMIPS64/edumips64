@@ -24,4 +24,6 @@ package org.edumips64.core.fpu;
  *
  * @author Massimo Trubia
  */
-public class FPFunctionalUnitNotAvailableException extends Exception {}
+public class FPFunctionalUnitNotAvailableException extends Exception {
+    private static final long serialVersionUID = -1702626016452018919L;
+}

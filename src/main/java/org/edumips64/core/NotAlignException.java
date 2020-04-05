@@ -24,7 +24,10 @@
 package org.edumips64.core;
 
 public class NotAlignException extends Exception {
-  public NotAlignException() {}
+  private static final long serialVersionUID = -3614996672999274690L;
+
+  public NotAlignException() {
+  }
 
   public NotAlignException(String message) {
     super(message);

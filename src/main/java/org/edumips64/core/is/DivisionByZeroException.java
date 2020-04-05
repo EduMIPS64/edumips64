@@ -28,6 +28,8 @@ import org.edumips64.core.SynchronousException;
 /** Exception thrown when a number is divided by zero
  *  @author Andrea Spadaccini */
 public class DivisionByZeroException extends SynchronousException {
+  private static final long serialVersionUID = -8599391007982914632L;
+
   public DivisionByZeroException() {
     super("DIVZERO");
   }
