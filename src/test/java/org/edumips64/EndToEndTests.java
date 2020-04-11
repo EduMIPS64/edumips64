@@ -577,11 +577,11 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
 
   /* Issue #132:The longer the simulation goes on, the lower the simulation rate.
      This tests only part of the bug, since part of it is related to the GUI. */
-  @Test(timeout=5000)
+  @Test(timeout=20000)
   public void testHailStone() throws Exception {
     runMipsTestWithAndWithoutForwarding("hailstoneenglish.s");
   }
-  @Test(timeout=10000)
+  @Test(timeout=20000)
   public void testSetBitSort() throws Exception {
     runMipsTestWithAndWithoutForwarding("set-bit-sort.s");
   }
