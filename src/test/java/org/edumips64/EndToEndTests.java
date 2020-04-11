@@ -617,4 +617,11 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testIssue304() throws Exception {
     runMipsTest("issue304.s", false, 30);
   }
+
+  /* Issue #304: Missing MEM/WB in Cycles UI for some FPU instructions.
+  */
+  @Test(timeout=2000)
+  public void testIssue304UI() throws Exception {
+    runMipsTest("infinite-bug-304.s", false, 0);
+  }
 }
