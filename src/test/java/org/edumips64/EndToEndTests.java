@@ -158,7 +158,6 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     builder.reset();
     testPath = testsLocation + testPath;
     String tracefile = null;
-    int curCycles = 0;
 
     try {
       try {
