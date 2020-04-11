@@ -97,10 +97,18 @@ public class CycleBuilder {
     // View into the last N elements of the list. This list is used to search for CycleElements
     // corresponding to a given instruction in the getElementToUpdate() method.
     //
+    // N is equal to the number of instructions in the pipeline plus the magic number 11, which represents
+    // the maximum number of stages an instruction will traverse from IF to WB.
+    //
+    // TODO: this is not a permanent fix, as there is still potential for bugs if an instruction gets stuck in
+    // the pipeline for too long (which may happen in case of MEM stalls, since the FP pipelines and EX have a
+    // deterministic precedence ordering. A permanent fix would probably look into the maximum age of the instructions
+    // in the pipeline and do something to enforce that ordering in the list of CycleElements.
+    //
     // The max() statement is needed to avoid negative indexing (and therefore errors), in the case when the
     // size of the list of elements is smaller than the number of stages in the pipeline, which happens in the
     // first cycles of a program.
-    int lookback = Math.max(elementsList.size() - instrInPipelineCount, 0);
+    int lookback = Math.max(elementsList.size() - (instrInPipelineCount + 11), 0);
     lastElements = new ArrayList<>(elementsList.subList(lookback, elementsList.size()));
 
     // If there are multiple elements for a given instruction (e.g., a fetched instruction that will not run)

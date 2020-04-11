@@ -128,6 +128,13 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
     logger.info("Halting the CPU.");
     front.updateComponents();
     cpu.setStatus(CPU.CPUStatus.HALTED);
+
+    // Check if the transactions in the CycleBuilder are all valid.
+    for (CycleElement el : builder.getElementsList()) {
+      if (!el.isValid()) {
+        logger.severe("Invalid CycleElement for instruction " + el.getName());
+      }
+    }
     haltCallback.run();
   }
 
