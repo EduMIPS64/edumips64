@@ -143,21 +143,27 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
    * @param testPath path of the test code.
    */
   private CpuTestStatus runMipsTest(String testPath) throws Exception {
-    return runMipsTest(testPath, false);
+    return runMipsTest(testPath, false, 0);
   }
 
   // Version of runMipsTest that allows to specify whether to write a trace file.
   // Writing the trace file can unnecessarily slow down the tests, so by default they are not written (see previous
   // override of this method).
-  private CpuTestStatus runMipsTest(String testPath, boolean writeTracefile) throws Exception {
+  //
+  // maxCycles is the maximum number of cycles to allow being executed before considering
+  // the test failed. Necessary for test cases for bugs that throw the CPU in an infinite loop,
+  // such as for example disappearing instructions that set a read/write semaphore, making
+  // it impossible to test their values. If > 0, an exception will be thrown.
+  private CpuTestStatus runMipsTest(String testPath, boolean writeTracefile, int maxCycles) throws Exception {
     log.warning("================================= Starting test " + testPath + " (forwarding: " +
-        config.getBoolean(ConfigKey.FORWARDING) + ")");
+        config.getBoolean(ConfigKey.FORWARDING) + ") (max cycles: " + maxCycles + ")");
     cpu.reset();
     dinero.reset();
     symTab.reset();
     builder.reset();
     testPath = testsLocation + testPath;
     String tracefile = null;
+    int curCycles = 0;
 
     try {
       try {
@@ -175,6 +181,11 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       cpu.setStatus(CPU.CPUStatus.RUNNING);
 
       while (true) {
+        curCycles++;
+        if (maxCycles > 0 && curCycles > maxCycles) {
+          log.severe("Exceeded maximum number of cycles allowed: " + maxCycles);
+          throw new HaltException();
+        }
         cpu.step();
         builder.step();
       }
@@ -189,6 +200,11 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
         LocalWriter w = new LocalWriter(tmp.getAbsolutePath(), false);
         dinero.writeTraceData(w);
         w.close();
+      }
+
+      // Check if the execution exceeded the maximum allowed number of cycles.
+      if (maxCycles > 0 && curCycles > maxCycles) {
+        throw new TestTookTooLongException();
       }
 
       // Check if the transactions in the CycleBuilder are all valid.
@@ -242,7 +258,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   }
 
   private void runTestAndCompareTracefileWithGolden(String path) throws Exception {
-    CpuTestStatus status = runMipsTest(path, true);
+    CpuTestStatus status = runMipsTest(path, true, 0);
     String goldenTrace = testsLocation + path + ".xdin.golden";
 
     String golden, trace;
@@ -593,5 +609,15 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   @Test()
   public void testLdLargeImmediate() throws Exception {
     runMipsTest("load-large-memory-location.s");
+  }
+
+  /* Issue #304: Infinite RAW stall in floating-point.
+     NOTE: there are 2 bugs in issue #304, for now only one is fixed. There is still
+     an incorrect representation on cycles (caught by this unit test as well): will
+     remove the expected exception once the second bug is fixed.
+  */
+  @Test(expected = InvalidCycleElementTransactionException.class)
+  public void testIssue304() throws Exception {
+    runMipsTest("issue304.s", false, 30);
   }
 }
