@@ -143,21 +143,27 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
    * @param testPath path of the test code.
    */
   private CpuTestStatus runMipsTest(String testPath) throws Exception {
-    return runMipsTest(testPath, false);
+    return runMipsTest(testPath, false, 0);
   }
 
   // Version of runMipsTest that allows to specify whether to write a trace file.
   // Writing the trace file can unnecessarily slow down the tests, so by default they are not written (see previous
   // override of this method).
-  private CpuTestStatus runMipsTest(String testPath, boolean writeTracefile) throws Exception {
+  //
+  // maxCycles is the maximum number of cycles to allow being executed before considering
+  // the test failed. Necessary for test cases for bugs that throw the CPU in an infinite loop,
+  // such as for example disappearing instructions that set a read/write semaphore, making
+  // it impossible to test their values. If > 0, an exception will be thrown.
+  private CpuTestStatus runMipsTest(String testPath, boolean writeTracefile, int maxCycles) throws Exception {
     log.warning("================================= Starting test " + testPath + " (forwarding: " +
-        config.getBoolean(ConfigKey.FORWARDING) + ")");
+        config.getBoolean(ConfigKey.FORWARDING) + ") (max cycles: " + maxCycles + ")");
     cpu.reset();
     dinero.reset();
     symTab.reset();
     builder.reset();
     testPath = testsLocation + testPath;
     String tracefile = null;
+    int curCycles = 0;
 
     try {
       try {
@@ -175,6 +181,11 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       cpu.setStatus(CPU.CPUStatus.RUNNING);
 
       while (true) {
+        curCycles++;
+        if (maxCycles > 0 && curCycles > maxCycles) {
+          log.severe("Exceeded maximum number of cycles allowed: " + maxCycles);
+          throw new HaltException();
+        }
         cpu.step();
         builder.step();
       }
@@ -189,6 +200,11 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
         LocalWriter w = new LocalWriter(tmp.getAbsolutePath(), false);
         dinero.writeTraceData(w);
         w.close();
+      }
+
+      // Check if the execution exceeded the maximum allowed number of cycles.
+      if (maxCycles > 0 && curCycles > maxCycles) {
+        throw new TestTookTooLongException();
       }
 
       // Check if the transactions in the CycleBuilder are all valid.
@@ -242,7 +258,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   }
 
   private void runTestAndCompareTracefileWithGolden(String path) throws Exception {
-    CpuTestStatus status = runMipsTest(path, true);
+    CpuTestStatus status = runMipsTest(path, true, 0);
     String goldenTrace = testsLocation + path + ".xdin.golden";
 
     String golden, trace;
@@ -258,19 +274,19 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   }
 
   /* Test for the instruction BREAK */
-  @Test(expected = BreakException.class)
+  @Test(expected = BreakException.class, timeout=2000)
   public void testBREAK() throws Exception {
     runMipsTest("break.s");
   }
 
   /* Test for r0 */
-  @Test
+  @Test(timeout=2000)
   public void testR0() throws Exception {
     runMipsTest("zero.s");
   }
 
   /* Test instruction and cycle count for the simplest valid program. */
-  @Test
+  @Test(timeout=2000)
   public void testHalt() throws Exception {
       CpuTestStatus status = runMipsTest("halt.s");
 
@@ -282,97 +298,97 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   }
 
   /* Tests for instruction SYSCALL. */
-  @Test(expected = BreakException.class)
+  @Test(expected = BreakException.class, timeout=2000)
   public void testOpenNonExistent() throws Exception {
     runMipsTest("test-open-nonexistent.s");
   }
 
-  @Test
+  @Test(timeout=2000)
   public void testOpenExistent() throws Exception {
     runMipsTest("test-open-existent.s");
   }
 
-  @Test
+  @Test(timeout=2000)
   public void testReadWriteFile() throws Exception {
     // TODO(andrea): clean up the test file.
     runMipsTest("read-write.s");
   }
 
-  @Test
+  @Test(timeout=2000)
   public void testPrintf() throws Exception {
     runMipsTest("hello-world.s");
     assertEquals("9th of July:\nEduMIPS64 version 1.2 is being tested! 100% success!", stdOut.toString());
   }
 
   /* Test for instruction B */
-  @Test
+  @Test(timeout=2000)
   public void testB() throws Exception {
     runMipsTest("b.s");
   }
 
   /* Test for instruction DADDU */
-  @Test
+  @Test(timeout=2000)
   public void testDADDU() throws Exception {
     runMipsTest("daddu-simple-test.s");
 }
 
   /* Test for instruction DSUBU */
-  @Test
+  @Test(timeout=2000)
   public void testDSUBU() throws Exception {
         runMipsTest("dsubu-simple-test.s");
     }
 
   /* Test for instructions DMULU and DMULTU */
-  @Test
+  @Test(timeout=2000)
   public void testDMULU() throws Exception {
         runMipsTest("dmulu-simple-test.s");
     }
 
   /* Test for the instruction JAL */
-  @Test
+  @Test(timeout=2000)
   public void testJAL() throws Exception {
     runMipsTest("jal.s");
   }
 
   /* Test for instructions DIV, MFLO, MFHI */
-  @Test
+  @Test(timeout=2000)
   public void testDIV() throws Exception {
     runMipsTest("div.s");
   }
 
   /* Test for instruction DIVU */
-  @Test
+  @Test(timeout=2000)
   public void testDIVU() throws Exception {
     runMipsTest("divu.s");
   }
 
   /* Test for utils/strlen.s */
-  @Test
+  @Test(timeout=2000)
   public void testStrlen() throws Exception {
     runMipsTest("test-strlen.s");
   }
 
   /* Test for utils/strcmp.s */
-  @Test
+  @Test(timeout=2000)
   public void testStrcmp() throws Exception {
     runMipsTest("test-strcmp.s");
   }
 
   /* Tests for the memory */
-  @Test
+  @Test(timeout=2000)
   public void testMemory() throws Exception {
     runMipsTest("memtest.s");
   }
 
   /* Read-after-write test */
-  @Test
+  @Test(timeout=2000)
   public void testRAW() throws Exception {
     runMipsTestWithAndWithoutForwarding("raw.s");
   }
 
   /* Forwarding test. The number of cycles is hardcoded and depends on the
    * contents of forwarding.s */
-  @Test
+  @Test(timeout=2000)
   public void testForwarding() throws Exception {
     // Simple test.
     runForwardingTest("forwarding.s", 15, 18, 10);
@@ -382,13 +398,13 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runForwardingTest("forwarding-hp-pA18.s", 8, 12, 4);
   }
 
-  @Test
+  @Test(timeout=2000)
   public void storeAfterLoad() throws Exception {
     runMipsTest("store-after-load.s");
   }
 
   /* ------- FPU TESTS -------- */
-  @Test
+  @Test(timeout=2000)
   public void testFPUStalls() throws Exception {
     String filename = "fpu-waw.s";
     Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding(filename);
@@ -406,7 +422,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     collector.checkThat(filename + ": RAW stalls without forwarding.", statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(2));
   }
 
-  @Test
+  @Test(timeout=2000)
   public void testFPUMul() throws Exception {
     // This test contains code that raises exceptions, let's disable them.
     config.putBoolean(ConfigKey.FP_INVALID_OPERATION, false);
@@ -425,47 +441,47 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     collector.checkThat(statuses.get(ForwardingStatus.DISABLED).memStalls, equalTo(expected_mem_stalls));
   }
 
-  @Test
+  @Test(timeout=2000)
   public void testFPCond() throws Exception {
     runMipsTest("fp-cond.s");
   }
 
-  @Test
+  @Test(timeout=2000)
   public void testSubtraction() throws Exception {
     runMipsTest("sub.d.s");
   }
 
-  @Test
+  @Test(timeout=2000)
   public void testDivision() throws Exception {
     runMipsTest("div.d.s");
   }
 
-  @Test
+  @Test(timeout=2000)
   public void testDividerStalls() throws Exception {
     CpuTestStatus status = runMipsTest("div.d.divider-stalls.s");
     assertEquals(status.divStalls, 23);
   }
 
-  @Test
+  @Test(timeout=2000)
   public void testOutOfOrder() throws Exception {
     CpuTestStatus status = runMipsTest("fpu-out-of-order-terminate.s");
     assertEquals(2, Integer.parseInt(status.fpRegisters[2].getBinString(), 2));
   }
 
   /* Tests for masking synchronous exceptions. Termination cannot be tested here since it's in the CPUSwingWorker. */
-  @Test(expected = SynchronousException.class)
+  @Test(expected = SynchronousException.class, timeout=2000)
   public void testDivisionByZeroThrowException() throws Exception {
     config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
     runMipsTest("div0.s");
   }
 
   /* Test for Out Of Memory while loading a file with more data than the memory can fit. */
-  @Test(expected = ParserMultiException.class)
+  @Test(expected = ParserMultiException.class, timeout=2000)
   public void testOom() throws Exception {
     runMipsTest("oom.s");
   }
 
-  @Test
+  @Test(timeout=2000)
   public void testDivisionByZeroNoThrowException() throws Exception {
     config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, true);
     runMipsTest("div0.s");
@@ -473,65 +489,65 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
 
   /* ------- REGRESSION TESTS -------- */
   /* Issue #7 */
-  @Test
+  @Test(timeout=2000)
   public void testMovnIssue7() throws Exception {
     runMipsTest("movn-issue-7.s");
   }
 
-  @Test
+  @Test(timeout=2000)
   public void testMovzIssue7() throws Exception {
     runMipsTest("movz-issue-7.s");
   }
 
   /* Issue #2: Misaligned memory operations are not handled correctly */
-  @Test(expected = NotAlignException.class)
+  @Test(expected = NotAlignException.class, timeout=2000)
   public void testMisalignLD() throws Exception {
     runMipsTest("misaligned-ld.s");
   }
 
-  @Test(expected = NotAlignException.class)
+  @Test(expected = NotAlignException.class, timeout=2000)
   public void testMisalignSD() throws Exception {
     runMipsTest("misaligned-sd.s");
   }
 
-  @Test(expected = NotAlignException.class)
+  @Test(expected = NotAlignException.class, timeout=2000)
   public void testMisalignLW() throws Exception {
     runMipsTest("misaligned-lw.s");
   }
 
-  @Test(expected = NotAlignException.class)
+  @Test(expected = NotAlignException.class, timeout=2000)
   public void testMisalignLWU() throws Exception {
     runMipsTest("misaligned-lwu.s");
   }
 
-  @Test(expected = NotAlignException.class)
+  @Test(expected = NotAlignException.class, timeout=2000)
   public void testMisalignSW() throws Exception {
     runMipsTest("misaligned-sw.s");
   }
 
-  @Test(expected = NotAlignException.class)
+  @Test(expected = NotAlignException.class, timeout=2000)
   public void testMisalignLH() throws Exception {
     runMipsTest("misaligned-lh.s");
   }
 
-  @Test(expected = NotAlignException.class)
+  @Test(expected = NotAlignException.class, timeout=2000)
   public void testMisalignLHU() throws Exception {
     runMipsTest("misaligned-lhu.s");
   }
 
-  @Test(expected = NotAlignException.class)
+  @Test(expected = NotAlignException.class, timeout=2000)
   public void testMisalignSH() throws Exception {
     runMipsTest("misaligned-sh.s");
   }
 
-  @Test
+  @Test(timeout=2000)
   public void testAligned() throws Exception {
     runMipsTest("aligned.s");
   }
 
   /* Issue #28: Dinero tracefile tracks both Load and Store memory accesses as
    * read. */
-  @Test
+  @Test(timeout=2000)
   public void testTracefile() throws Exception {
     runTestAndCompareTracefileWithGolden("tracefile-ld.s");
     runTestAndCompareTracefileWithGolden("tracefile-ldst.s");
@@ -540,20 +556,20 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   }
 
   /* Issue #36: StringIndexOutOfBoundsException raised at run-time. */
-  @Test(expected = AddressErrorException.class)
+  @Test(expected = AddressErrorException.class, timeout=2000)
   public void testNegativeAddress() throws Exception {
     runMipsTest("negative-address-issue-36.s");
   }
 
   /* Issue #51: Problem with SYSCALL 0 after branch. */
-  @Test
+  @Test(timeout=2000)
   public void testTerminationInID() throws Exception {
     runForwardingTest("issue51-halt.s", 11, 17, 6);
     runForwardingTest("issue51-syscall0.s", 11, 17, 6);
   }
 
   /* Issue #68: JR does not respect RAW stalls. */
-  @Test
+  @Test(timeout=2000)
   public void testRAWForRTypeFlowControl() throws Exception {
     runMipsTestWithAndWithoutForwarding("jr-raw.s");
     runMipsTestWithAndWithoutForwarding("jalr-raw.s");
@@ -561,37 +577,44 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
 
   /* Issue #132:The longer the simulation goes on, the lower the simulation rate.
      This tests only part of the bug, since part of it is related to the GUI. */
-  @Test
+  @Test(timeout=20000)
   public void testHailStone() throws Exception {
     runMipsTestWithAndWithoutForwarding("hailstoneenglish.s");
   }
-  @Test
+  @Test(timeout=20000)
   public void testSetBitSort() throws Exception {
     runMipsTestWithAndWithoutForwarding("set-bit-sort.s");
   }
 
   /* Issue #175: While parsing LW and SW instructions, offset cannot be negative
      or above 8192 */
-  @Test
+  @Test(timeout=2000)
   public void testLargeOffsets() throws Exception {
     runMipsTestWithAndWithoutForwarding("large-offsets.s");
   }
-  @Test
+  @Test(timeout=2000)
   public void testNegativeOffsets() throws Exception {
     runMipsTestWithAndWithoutForwarding("negative-offsets.s");
   }
 
   /* Issue #255: Trying to store a large memory location in an immediate field
      causes EduMIPS64 to crash */
-  @Test(expected = IntegerOverflowException.class)
+  @Test(expected = IntegerOverflowException.class, timeout=2000)
   public void testImmediateOverflow() throws Exception {
     runMipsTest("immediate-overflow.s");
   }
 
   /* Still issue #255 -- make sure that we can load large memory locations
      via ld/st instructions */
-  @Test()
+  @Test(timeout=2000)
   public void testLdLargeImmediate() throws Exception {
     runMipsTest("load-large-memory-location.s");
+  }
+
+  /* Issue #304: Infinite RAW stall in floating-point.
+  */
+  @Test(timeout=2000)
+  public void testIssue304() throws Exception {
+    runMipsTest("issue304.s", false, 30);
   }
 }

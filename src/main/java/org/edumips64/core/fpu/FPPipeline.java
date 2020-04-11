@@ -24,6 +24,9 @@
  */
 
 package org.edumips64.core.fpu;
+
+import org.edumips64.core.fpu.FPPipeline.Constants.FPAdderStatus;
+import org.edumips64.core.fpu.FPPipeline.Constants.FPMultiplierStatus;
 import org.edumips64.core.is.*;
 
 import java.util.*;
@@ -117,38 +120,43 @@ public class FPPipeline {
    *      ADDER [1,4], MULTIPLIER [1,7], DIVIDER [any] */
 
   public InstructionInterface getInstructionByFuncUnit(String funcUnit, int stage) {
-    if (funcUnit.compareToIgnoreCase("ADDER") == 0)
+    if (funcUnit.compareToIgnoreCase("ADDER") == 0) {
+      Map<FPAdderStatus, InstructionInterface> adderFu = adder.getFuncUnit();
+    
       switch (stage) {
       case 1:
-        return (adder.getFuncUnit().get(Constants.FPAdderStatus.A1));
+        return adderFu.get(Constants.FPAdderStatus.A1);
       case 2:
-        return (adder.getFuncUnit().get(Constants.FPAdderStatus.A2));
+        return adderFu.get(Constants.FPAdderStatus.A2);
       case 3:
-        return (adder.getFuncUnit().get(Constants.FPAdderStatus.A3));
+        return adderFu.get(Constants.FPAdderStatus.A3);
       case 4:
-        return (adder.getFuncUnit().get(Constants.FPAdderStatus.A4));
+        return adderFu.get(Constants.FPAdderStatus.A4);
       }
+    }
 
-    if (funcUnit.compareToIgnoreCase("MULTIPLIER") == 0)
+    if (funcUnit.compareToIgnoreCase("MULTIPLIER") == 0) {
+      Map<FPMultiplierStatus, InstructionInterface> multiplierFu = multiplier.getFuncUnit();
       switch (stage) {
       case 1:
-        return (multiplier.getFuncUnit().get(Constants.FPMultiplierStatus.M1));
+        return multiplierFu.get(Constants.FPMultiplierStatus.M1);
       case 2:
-        return (multiplier.getFuncUnit().get(Constants.FPMultiplierStatus.M2));
+        return multiplierFu.get(Constants.FPMultiplierStatus.M2);
       case 3:
-        return (multiplier.getFuncUnit().get(Constants.FPMultiplierStatus.M3));
+        return multiplierFu.get(Constants.FPMultiplierStatus.M3);
       case 4:
-        return (multiplier.getFuncUnit().get(Constants.FPMultiplierStatus.M4));
+        return multiplierFu.get(Constants.FPMultiplierStatus.M4);
       case 5:
-        return (multiplier.getFuncUnit().get(Constants.FPMultiplierStatus.M5));
+        return multiplierFu.get(Constants.FPMultiplierStatus.M5);
       case 6:
-        return (multiplier.getFuncUnit().get(Constants.FPMultiplierStatus.M6));
+        return multiplierFu.get(Constants.FPMultiplierStatus.M6);
       case 7:
-        return (multiplier.getFuncUnit().get(Constants.FPMultiplierStatus.M7));
+        return multiplierFu.get(Constants.FPMultiplierStatus.M7);
       }
+    }
 
     if (funcUnit.compareToIgnoreCase("DIVIDER") == 0) {
-      return (divider.getFuncUnit());
+      return divider.getFuncUnit();
     }
 
     return null;

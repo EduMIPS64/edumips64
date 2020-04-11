@@ -6,6 +6,10 @@
 ###############################################################################
 ## Custom directives.
 
+# Assembly files. We'll never store those in the root directory of the
+# project,
+/*.s
+
 # Vim temporary files.
 *.un~
 *.sw*

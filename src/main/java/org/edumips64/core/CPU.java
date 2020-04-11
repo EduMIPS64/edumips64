@@ -430,7 +430,7 @@ public class CPU {
       pc.writeDoubleWord((pc.getValue()) + 4);
 
     } catch (RAWException ex) {
-      if (currentPipeStage == Pipeline.Stage.ID) {
+      if (currentPipeStage == Pipeline.Stage.ID && pipe.EX() == null) {
         pipe.setEX(bubble);
       }
       RAWStalls++;
