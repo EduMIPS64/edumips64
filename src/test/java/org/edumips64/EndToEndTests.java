@@ -612,11 +612,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   }
 
   /* Issue #304: Infinite RAW stall in floating-point.
-     NOTE: there are 2 bugs in issue #304, for now only one is fixed. There is still
-     an incorrect representation on cycles (caught by this unit test as well): will
-     remove the expected exception once the second bug is fixed.
   */
-  @Test(expected = InvalidCycleElementTransactionException.class)
   public void testIssue304() throws Exception {
     runMipsTest("issue304.s", false, 30);
   }
