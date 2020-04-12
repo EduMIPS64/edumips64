@@ -90,7 +90,8 @@ tasks.create<Copy>("copyHelpIt") {
 
 tasks.create<Copy>("copyHelp") {
     from("docs/") {
-        exclude("**/src/**", "**/design/**", "**/*.py", "**/*.md", "**/__pycache__/**")
+        exclude("**/src/**", "**/design/**", "**/*.py",  "**/*.pyc", 
+            "**/*.md", "**/.buildinfo", "**/objects.inv", "**/*.txt", "**/__pycache__/**")
     }
     into ("${docsDir}")
     dependsOn("copyHelpEn")
@@ -98,7 +99,7 @@ tasks.create<Copy>("copyHelp") {
 }
 
 /*
-    Helper function to execute a command and return its output.
+ * Helper function to execute a command and return its output.
  */
 fun String.runCommand(workingDir: File = file("./")): String {
     val parts = this.split("\\s".toRegex())
@@ -213,8 +214,7 @@ tasks.register("release") {
 /*
  * GWT tasks
  * 2020/4 - commented out due to build issues:
- * us.ascendtech.gwt.classic Gradle plugin 
- * 
+ * https://github.com/EduMIPS64/edumips64/issues/311
  */
 /*gwt {
     modules.add("org.edumips64.webclient") 
