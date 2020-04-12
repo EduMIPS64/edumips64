@@ -10,8 +10,8 @@ plugins {
     id ("eclipse")
     id ("application")
     id ("jacoco")
-    id ("com.dorongold.task-tree") version "1.3.1"
-    id ("us.ascendtech.gwt.classic") version "0.4.20"
+    id ("com.dorongold.task-tree") version "1.5"
+    //id ("us.ascendtech.gwt.classic") version "0.4.36"
 }
 
 repositories {
@@ -149,6 +149,7 @@ tasks.jar {
         attributes["SplashScreen-Image"] = "images/splash.png"
         from(sharedManifest)       
     }
+    dependsOn("copyHelp")
 }
 
 // Cli jar
@@ -175,7 +176,6 @@ tasks.create<Jar>("standaloneJar"){
         attributes["SplashScreen-Image"] = "images/splash.png"
         from(sharedManifest)   
     }
-    dependsOn("copyHelp")
 }
 
 tasks.assemble{
@@ -212,8 +212,11 @@ tasks.register("release") {
 
 /*
  * GWT tasks
+ * 2020/4 - commented out due to build issues:
+ * us.ascendtech.gwt.classic Gradle plugin 
+ * 
  */
-gwt {
+/*gwt {
     modules.add("org.edumips64.webclient") 
 }
 
@@ -227,4 +230,4 @@ tasks.create<Copy>("copyStaticFiles") {
 
 tasks.war{
     dependsOn("copyStaticFiles")
-}
+}*/
