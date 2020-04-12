@@ -16,7 +16,7 @@
 - Using GitHub Actions instead of Azure Pipelines as CI.
 - Added timeouts to tests
 
-## 1.2.6 (26/01/2019) - Phlegmatic
+## 1.2.6 (26/01/2020) - Phlegmatic
 ### Added
 - Alias DMULU for DMULTU (Issue #249)
 
