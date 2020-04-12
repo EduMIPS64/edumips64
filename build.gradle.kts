@@ -124,7 +124,7 @@ fun getSourceControlMetadata() : Triple<String, String, String> {
     } else {
         println("Running under GitHub Actions")
         branch = System.getenv("GITHUB_REF")
-        commitHash = System.getenv("GITHUB_SHA").substring(0, 6)
+        commitHash = System.getenv("GITHUB_SHA").substring(0, 7)
         qualifier = "alpha"
     }
     return Triple(branch, commitHash, qualifier)
