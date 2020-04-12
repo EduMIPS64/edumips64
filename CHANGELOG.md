@@ -1,5 +1,12 @@
 # EduMIPS64 ChangeLog
 
+## 1.2.8 () - ?
+### Added
+
+### Fixed
+
+### Changed
+
 ## 1.2.7 (11/04/2020) - Hope
 ### Fixed
 - RAW stall in combination with FPU caused instructions to disappear (Issue #304)
