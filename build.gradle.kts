@@ -11,7 +11,7 @@ plugins {
     id ("application")
     id ("jacoco")
     id ("com.dorongold.task-tree") version "1.5"
-    //id ("us.ascendtech.gwt.classic") version "0.4.36"
+    id ("us.ascendtech.gwt.classic") version "0.4.36"
 }
 
 repositories {
@@ -213,10 +213,8 @@ tasks.register("release") {
 
 /*
  * GWT tasks
- * 2020/4 - commented out due to build issues:
- * https://github.com/EduMIPS64/edumips64/issues/311
  */
-/*gwt {
+gwt {
     modules.add("org.edumips64.webclient") 
 }
 
@@ -230,4 +228,4 @@ tasks.create<Copy>("copyStaticFiles") {
 
 tasks.war{
     dependsOn("copyStaticFiles")
-}*/
+}
