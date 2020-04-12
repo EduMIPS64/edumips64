@@ -112,7 +112,7 @@ public class Main {
   }
 
   private static void showVersion() {
-    System.out.println("EduMIPS64 version " + MetaInfo.VERSION + " (codename: " + MetaInfo.CODENAME + ", git revision " + MetaInfo.GIT_REVISION + ", built on " + MetaInfo.BUILD_DATE + ") - Ciao 'mbare.");
+    System.out.println("EduMIPS64 version " + MetaInfo.VERSION + " (codename: " + MetaInfo.CODENAME + ", git revision " + MetaInfo.FULL_BUILDSTRING + ", built on " + MetaInfo.BUILD_DATE + ") - Ciao 'mbare.");
   }
 
   public static class ParsedArgs {
@@ -522,7 +522,7 @@ public class Main {
       front.updateComponents();
       front.represent();
     } catch (Exception ex) {
-      new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION, code);
+      new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.FULL_BUILDSTRING, code);
     }
 
     try {
@@ -588,7 +588,7 @@ public class Main {
     } catch (Exception e) {
       mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
       log.info("Error opening " + file);
-      new ReportDialog(mainFrame, e, CurrentLocale.getString("ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION, code);
+      new ReportDialog(mainFrame, e, CurrentLocale.getString("ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.FULL_BUILDSTRING, code);
     }
   }
 
@@ -958,7 +958,7 @@ public class Main {
     aboutUs = new JMenuItem(CurrentLocale.getString("MenuItem.ABOUT_US"));
     help.add(aboutUs);
     aboutUs.addActionListener(e -> {
-      GUIAbout ab = new GUIAbout(null, MetaInfo.VERSION, MetaInfo.CODENAME, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION);
+      GUIAbout ab = new GUIAbout(null, MetaInfo.VERSION, MetaInfo.CODENAME, MetaInfo.BUILD_DATE, MetaInfo.FULL_BUILDSTRING);
       //ab.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
       ab.setVisible(true);
     });

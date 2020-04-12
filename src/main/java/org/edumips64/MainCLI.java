@@ -186,7 +186,7 @@ public class MainCLI {
         "Please report the following stacktrace and system information,\n" +
         "along with the content of the assembly file you were executing\n" +
         "to the EduMIPS64 GitHub account: https://github.com/lupino3/edumips64/issues/new\n";
-    msg += String.format("Version: %s, %s, %s\n", MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION);
+    msg += String.format("Version: %s, %s, %s\n", MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.FULL_BUILDSTRING);
     msg += String.format("JRE version: %s\nOS: %s\n\n", System.getProperty("java.version"), System.getProperty("os.name"));
     return msg;
   }  

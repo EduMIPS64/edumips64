@@ -112,17 +112,27 @@ fun String.runCommand(workingDir: File = file("./")): String {
     return proc.inputStream.bufferedReader().readText().trim()
 }
 
-fun getGitRevisionId() : String {
+fun getGitMetadata() : Pair<String, String> {
   val branch = "git rev-parse --abbrev-ref HEAD".runCommand()
   val commitHash = "git rev-parse --verify --short HEAD".runCommand()
-  return "edumips64:${branch}:${commitHash}"
+  return Pair(branch, commitHash)
+}
+
+fun getBuildQualifier() : String {
+    if(System.getenv("GITHUB_ACTIONS").isNullOrEmpty()) {
+        return ""
+    }
+    return "alpha"
 }
 
 val sharedManifest = the<JavaPluginConvention>().manifest {
     attributes["Signature-Version"] = version
     attributes["Codename"] = codename
     attributes["Build-Date"] = LocalDateTime.now()
-    attributes["Git-Revision"] = getGitRevisionId()
+    val (branch, gitRevision) = getGitMetadata()
+    attributes["Full-Buildstring"] = "$branch@$gitRevision"
+    attributes["Git-Revision"] = gitRevision
+    attributes["Build-Qualifier"] = getBuildQualifier()
 }
 
 // "Slim / nodeps" jar
@@ -180,6 +190,18 @@ tasks.jacocoTestReport {
 
 tasks.check{
     dependsOn("jacocoTestReport")
+}
+
+tasks.register("release") {
+    group = "Release"
+    description = "Creates all artifacts for a given EduMIPS64 release"
+    dependsOn("allDocs")
+    dependsOn("standaloneJar")
+    dependsOn("jar")
+
+    doFirst {
+        println("Creating artifacts for version $version")
+    }
 }
 
 /*
