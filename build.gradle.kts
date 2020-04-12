@@ -27,7 +27,7 @@ dependencies {
 application {
   mainClassName = "org.edumips64.Main"  
 }
-val codename = "Hope"
+val codename = "?"
 val version: String by project
 
 // Specify Java source/target version.
