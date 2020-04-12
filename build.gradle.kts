@@ -112,27 +112,33 @@ fun String.runCommand(workingDir: File = file("./")): String {
     return proc.inputStream.bufferedReader().readText().trim()
 }
 
-fun getGitMetadata() : Pair<String, String> {
-  val branch = "git rev-parse --abbrev-ref HEAD".runCommand()
-  val commitHash = "git rev-parse --verify --short HEAD".runCommand()
-  return Pair(branch, commitHash)
-}
-
-fun getBuildQualifier() : String {
+fun getSourceControlMetadata() : Triple<String, String, String> {
+    val branch: String
+    val commitHash: String
+    val qualifier: String
     if(System.getenv("GITHUB_ACTIONS").isNullOrEmpty()) {
-        return ""
+        println("Running locally")
+        branch = "git rev-parse --abbrev-ref HEAD".runCommand()
+        commitHash = "git rev-parse --verify --short HEAD".runCommand()
+        qualifier = ""
+    } else {
+        println("Running under GitHub Actions")
+        branch = System.getenv("GITHUB_REF")
+        commitHash = System.getenv("GITHUB_SHA").substring(0, 6)
+        qualifier = "alpha"
     }
-    return "alpha"
+    return Triple(branch, commitHash, qualifier)
 }
 
 val sharedManifest = the<JavaPluginConvention>().manifest {
     attributes["Signature-Version"] = version
     attributes["Codename"] = codename
     attributes["Build-Date"] = LocalDateTime.now()
-    val (branch, gitRevision) = getGitMetadata()
+
+    val (branch, gitRevision, qualifier) = getSourceControlMetadata()
     attributes["Full-Buildstring"] = "$branch@$gitRevision"
     attributes["Git-Revision"] = gitRevision
-    attributes["Build-Qualifier"] = getBuildQualifier()
+    attributes["Build-Qualifier"] = qualifier
 }
 
 // "Slim / nodeps" jar
