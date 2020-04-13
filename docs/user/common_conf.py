@@ -3,7 +3,7 @@
 # Get the version from build.gradle.kts
 import re
 
-regexp = re.compile(r'version\s*=\s*(\d+\.\d+\.\d+)')
+regexp = re.compile(r'version\s*=\s*(.*)')
 with open('../../../../gradle.properties') as f:
     for line in f:
         if regexp.match(line):
