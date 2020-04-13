@@ -437,7 +437,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
 
   @Test(timeout=2000)
   public void testDivision() throws Exception {
-    runMipsTest("div.d.s");
+    runMipsTestWithAndWithoutForwarding("div.d.s");
   }
 
   @Test(timeout=2000)
