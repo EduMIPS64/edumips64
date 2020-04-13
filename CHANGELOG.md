@@ -1,11 +1,9 @@
 # EduMIPS64 ChangeLog
 
-## 1.2.8 () - ?
-### Added
-
+## 1.2.7.1 (13/04/2020) - Hope
 ### Fixed
-
-### Changed
+- div.d incorrectly emits SEVERE logging statement (Issue #315)
+- Issues with v1.2.7 packages (Issue #311)
 
 ## 1.2.7 (11/04/2020) - Hope
 ### Fixed
