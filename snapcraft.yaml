@@ -1,0 +1,38 @@
+name: edumips64
+version: '1.2.7.1'
+summary: A free visual and cross-platform MIPS64 CPU simulator.
+description: EduMIPS64 is a free MIPS64 visual simulator and debugger, used as a teaching tool in Computer Architecture courses.
+grade: stable
+
+base: core18
+confinement: strict
+
+parts:
+  edumips64:
+    plugin: gradle
+    source: https://github.com/edumips64/edumips64.git
+    source-tag: v1.2.7.1
+    gradle-version: '6.3'
+    gradle-options: [standaloneJar]
+    override-build: |
+      pip3 install -r docs/requirements.txt -U
+      snapcraftctl build
+    build-packages:
+      - unzip
+      - python3
+      - python3-pip
+    stage:
+      - scripts/edumips64-snap-wrapper.sh
+
+
+apps:
+  edumips64:
+    command: scripts/edumips64-snap-wrapper.sh
+    environment:
+      JAVA_HOME: $SNAP/usr/lib/jvm/java-11-openjdk-amd64
+      PATH: $JAVA_HOME/jre/bin:$PATH
+    plugs:
+      - home
+      - x11
+    extensions:
+      - gnome-3-28
