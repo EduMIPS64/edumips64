@@ -21,10 +21,13 @@ parts:
       - unzip
       - python3
       - python3-pip
+    stage:
+      - scripts/edumips64-snap-wrapper.sh
+
 
 apps:
   edumips64:
-    command: java -jar $SNAP/jar/edumips64-1.2.7.1-standalone.jar
+    command: scripts/edumips64-snap-wrapper.sh
     environment:
       JAVA_HOME: $SNAP/usr/lib/jvm/java-11-openjdk-amd64
       PATH: $JAVA_HOME/jre/bin:$PATH
