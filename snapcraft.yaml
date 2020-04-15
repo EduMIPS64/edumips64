@@ -21,9 +21,10 @@ parts:
       - unzip
       - python3
       - python3-pip
-    stage:
-      - scripts/edumips64-snap-wrapper.sh
 
+  scripts:
+    plugin: dump
+    source: scripts/
 
 apps:
   edumips64:
