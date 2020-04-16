@@ -182,9 +182,9 @@ is not trusted by default by the JDK.
 
 Follow instructions [here](https://dev.cloudburo.net/2018/06/03/install-letsencrypt-certificate-in-the-java-jdk-keystore-on-osx.html) to import the Let's Encrypt root certificates in the JDK keystore.
 
-### Manual release QA
+### Manual release checklist
 
-Before doing a release, please do the following QA tasks. Over time, those should
+Before doing a release, please do the following tasks. Over time, those should
 be automated, but before that is done those checks should be done manually.
 
 - For each released JAR file:
@@ -198,3 +198,4 @@ be automated, but before that is done those checks should be done manually.
   - verify the JAR size (should be < 3 MB)
 - open the English manual and check the version
 - open the Italian manual and check the version
+- check the 'edge' snap and promote it to stable if it works (https://snapcraft.io/edumips64/releases, needs login)
