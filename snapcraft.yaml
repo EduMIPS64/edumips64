@@ -11,7 +11,6 @@ parts:
   edumips64:
     plugin: gradle
     source: https://github.com/edumips64/edumips64.git
-    source-tag: v1.2.7.1
     gradle-version: '6.3'
     gradle-options: [standaloneJar]
     override-build: |
@@ -24,7 +23,7 @@ parts:
     stage-packages:
       # This is required because snap ships the headless version by default,
       # which lacks splashscreen support.
-      - openjdk-11-jdk
+      - openjdk-11-jre
 
   scripts:
     plugin: dump
