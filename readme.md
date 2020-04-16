@@ -37,6 +37,8 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 ## Known distribution packages
 
+[Ubuntu Snap](https://snapcraft.io/edumips64): find EduMIPS64 in the Ubuntu app store or install via CLI (`snap install edumips64`).
+
 [FreeBSD FreshPorts](https://www.freshports.org/emulators/edumips64/)
 
 [Gentoo](https://packages.gentoo.org/packages/app-emulation/edumips64)
