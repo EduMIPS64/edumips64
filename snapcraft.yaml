@@ -18,22 +18,22 @@ parts:
       pip3 install -r docs/requirements.txt -U
       snapcraftctl build
     build-packages:
-      - unzip
+      - git
       - python3
       - python3-pip
+    stage-packages:
+      # This is required because snap ships the headless version by default,
+      # which lacks splashscreen support.
+      - openjdk-11-jdk
 
   scripts:
     plugin: dump
-    source: scripts/
+    source: scripts
 
 apps:
   edumips64:
-    command: scripts/edumips64-snap-wrapper.sh
-    environment:
-      JAVA_HOME: $SNAP/usr/lib/jvm/java-11-openjdk-amd64
-      PATH: $JAVA_HOME/jre/bin:$PATH
+    command: edumips64-snap-wrapper.sh
     plugs:
       - home
       - x11
-    extensions:
-      - gnome-3-28
+      - desktop

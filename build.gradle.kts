@@ -177,6 +177,7 @@ tasks.create<Jar>("standaloneJar"){
         attributes["SplashScreen-Image"] = "images/splash.png"
         from(sharedManifest)   
     }
+    dependsOn("copyHelp")
 }
 
 tasks.assemble{
