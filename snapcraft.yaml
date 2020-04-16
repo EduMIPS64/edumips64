@@ -11,7 +11,6 @@ parts:
   edumips64:
     plugin: gradle
     source: https://github.com/edumips64/edumips64.git
-    source-tag: v1.2.7.1
     gradle-version: '6.3'
     gradle-options: [standaloneJar]
     override-build: |
