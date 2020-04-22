@@ -642,4 +642,10 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testSrl() throws Exception {
     runMipsTest("srl.s");
   }
+
+  /* Test for instruction SRLV */
+  @Test()
+  public void testSrlv() throws Exception {
+    runMipsTest("srlv.s");
+  }
 }
