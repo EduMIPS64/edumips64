@@ -12,6 +12,7 @@
   <public path="client">
     <include name="edumips64.html" />
     <include name="ui.js" />
+    <include name="style.css" />
     <include name="logo.png" />
   </public>
 </module>
