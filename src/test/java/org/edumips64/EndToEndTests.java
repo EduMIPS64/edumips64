@@ -630,4 +630,10 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testSlt() throws Exception {
     runMipsTest("slt.s");
   }
+
+  /* Test for instruction SUB */
+  @Test()
+  public void testSub() throws Exception {
+    runMipsTest("sub.s");
+  }
 }
