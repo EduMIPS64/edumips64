@@ -218,15 +218,3 @@ tasks.register("release") {
 gwt {
     modules.add("org.edumips64.webclient") 
 }
-
-tasks.create<Copy>("copyStaticFiles") {
-    from("src/main/java/org/edumips64/client"){
-        include("edumips64.html")
-        include("logo.png")
-    }
-    into("build/gwt/war")
-}
-
-tasks.war{
-    dependsOn("copyStaticFiles")
-}
