@@ -9,4 +9,8 @@
     <exclude name="MetaInfo.java" />
     <exclude name="JavaPrefsConfigStore.java" />
   </source>
+  <public path="client">
+    <include name="edumips64.html" />
+    <include name="logo.png" />
+  </public>
 </module>
