@@ -624,4 +624,10 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testCvtdw() throws Exception {
     runMipsTest("cvtdw.s");
   }
+
+  /* Test for instruction SLT */
+  @Test()
+  public void testSlt() throws Exception {
+    runMipsTest("slt.s");
+  }
 }
