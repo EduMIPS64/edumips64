@@ -1,6 +1,6 @@
-; div.s - test file for EduMIPS64.
+; cvtdw.s - test file for EduMIPS64.
 ;
-; Executes a div and tests the results of the division.
+; Executes cvt.d.w and ensures it converts to double.
 ;
 ; (c) 2018 Andrea Spadaccini and the EduMIPS64 team
 ;
@@ -20,18 +20,21 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program; if not, write to the Free Software
 ; Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+.data
+        .double 10
+
 .code
+        ldc1 f2, 0(r0)
 
-        daddi   r1, r0, 5
-        daddi   r2, r0, 2
-        div     r1, r2
-        mflo    r3
-        mfhi    r4
+        addi r1, r0, 10
+        mtc1 r1, f1
+        cvt.d.w f1, f1
 
-        daddi   r5, r0, 1
-        bne     r3, r2, error
-        bne     r4, r5, error
+        c.eq.d 7, f1, f2 ; will be false if does not convert to double
+        bc1f 7, error
         syscall 0
 
-error:  break
+
+error:
+        break
         syscall 0

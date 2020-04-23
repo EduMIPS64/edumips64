@@ -1,6 +1,6 @@
-; div.s - test file for EduMIPS64.
+; sllv.s - test file for EduMIPS64.
 ;
-; Executes a div and tests the results of the division.
+; Tests sllv instruction and ensures that it left shifts correctly.
 ;
 ; (c) 2018 Andrea Spadaccini and the EduMIPS64 team
 ;
@@ -22,15 +22,17 @@
 ; Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 .code
 
-        daddi   r1, r0, 5
-        daddi   r2, r0, 2
-        div     r1, r2
-        mflo    r3
-        mfhi    r4
+        addi r1, r0, 11
+        addi r2, r0, 22
+        addi r3, r0, 352
+        addi r5, r0, 1
+        addi r6, r0, 5
 
-        daddi   r5, r0, 1
-        bne     r3, r2, error
-        bne     r4, r5, error
+shift:  sllv r4, r1, r5
+        bne  r4, r2, error
+
+        sllv r4, r1, r6
+        bne  r4, r3, error
         syscall 0
 
 error:  break

@@ -1,6 +1,6 @@
-; div.s - test file for EduMIPS64.
+; bc1f.s - test file for EduMIPS64.
 ;
-; Executes a div and tests the results of the division.
+; Executes bc1f and ensures it branches correctly.
 ;
 ; (c) 2018 Andrea Spadaccini and the EduMIPS64 team
 ;
@@ -20,18 +20,26 @@
 ; You should have received a copy of the GNU General Public License
 ; along with this program; if not, write to the Free Software
 ; Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+.data
+        .double 3.14
+        .double 2.71
+
 .code
+        ldc1 f1, 0(r0)
+        ldc1 f2, 8(r0)
+        ldc1 f3, 0(r0)
 
-        daddi   r1, r0, 5
-        daddi   r2, r0, 2
-        div     r1, r2
-        mflo    r3
-        mfhi    r4
-
-        daddi   r5, r0, 1
-        bne     r3, r2, error
-        bne     r4, r5, error
+        c.eq.d 7, f1, f2 ; should be false
+        bc1f 7, continue
+        break
         syscall 0
 
-error:  break
+continue:
+        c.eq.d 7, f1, f3 ; should be true
+        bc1f 7, error
+        syscall 0
+
+
+error:
+        break
         syscall 0

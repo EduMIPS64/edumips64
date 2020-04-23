@@ -1,6 +1,6 @@
-; div.s - test file for EduMIPS64.
+; srl.s - test file for EduMIPS64.
 ;
-; Executes a div and tests the results of the division.
+; Tests srl instruction and ensures that it right shifts correctly.
 ;
 ; (c) 2018 Andrea Spadaccini and the EduMIPS64 team
 ;
@@ -22,15 +22,15 @@
 ; Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 .code
 
-        daddi   r1, r0, 5
-        daddi   r2, r0, 2
-        div     r1, r2
-        mflo    r3
-        mfhi    r4
+        addi r1, r0, 120
+        addi r2, r0, 60
+        addi r3, r0, 3
 
-        daddi   r5, r0, 1
-        bne     r3, r2, error
-        bne     r4, r5, error
+shift:  srl r4, r1, 1
+        bne  r4, r2, error
+
+        srl r4, r1, 5
+        bne  r4, r3, error
         syscall 0
 
 error:  break

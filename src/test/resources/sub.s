@@ -1,6 +1,6 @@
-; div.s - test file for EduMIPS64.
+; sub.s - test file for EduMIPS64.
 ;
-; Executes a div and tests the results of the division.
+; Tests sub instruction and checks the result.
 ;
 ; (c) 2018 Andrea Spadaccini and the EduMIPS64 team
 ;
@@ -22,15 +22,19 @@
 ; Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 .code
 
-        daddi   r1, r0, 5
-        daddi   r2, r0, 2
-        div     r1, r2
-        mflo    r3
-        mfhi    r4
+        addi r1, r0, 20
+        addi r2, r0, 25
+        addi r3, r0, 5
+        addi r4, r0, -5
 
-        daddi   r5, r0, 1
-        bne     r3, r2, error
-        bne     r4, r5, error
+sub:    sub  r5, r2, r1
+        bne  r5, r3, error
+
+        sub  r5, r1, r2
+        bne  r5, r4, error
+
+equal:  sub  r5, r1, r1
+        bne  r5, r0, error
         syscall 0
 
 error:  break

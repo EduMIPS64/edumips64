@@ -1,6 +1,6 @@
-; div.s - test file for EduMIPS64.
+; add.s - test file for EduMIPS64.
 ;
-; Executes a div and tests the results of the division.
+; Executes an add and tests the results of the addition.
 ;
 ; (c) 2018 Andrea Spadaccini and the EduMIPS64 team
 ;
@@ -22,15 +22,12 @@
 ; Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 .code
 
-        daddi   r1, r0, 5
-        daddi   r2, r0, 2
-        div     r1, r2
-        mflo    r3
-        mfhi    r4
+        addi   r1, r0, 5
+        addi   r2, r0, 2
+        add    r3, r1, r2
 
-        daddi   r5, r0, 1
-        bne     r3, r2, error
-        bne     r4, r5, error
+        addi    r4, r0, 7
+        bne     r3, r4, error
         syscall 0
 
 error:  break
