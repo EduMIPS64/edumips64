@@ -5,8 +5,24 @@ body {
 
 textarea {
     width: 90%;
-    height: 400px;
+    height: 500px;
     font-family: monospace;
+}
+
+td.registerValue {
+    text-align: right;
+}
+
+table {
+    width: 90%;
+    height: 500px;
+    font-family: monospace;
+    border: 1px solid gray;
+}
+
+td {
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 #run-button {

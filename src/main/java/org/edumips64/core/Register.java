@@ -45,6 +45,10 @@ public class Register extends BitSet64 {
     reg_name = name;
   }
 
+  public String getName() {
+    return reg_name;
+  }
+
   /** Returns the value of the semaphore
    *  @return the numerical value of the semaphore
    */

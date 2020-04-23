@@ -3,7 +3,16 @@
 const Registers = (props) => {
     return (
         <div className="pure-u-1 pure-u-lg-1-4">
-            <textarea readOnly value={props.registers} />
+            <table>
+                {props.registers.map(register => (
+                    <tr key={register.name}>
+                        <td className="registerName">{register.name}</td>
+                        <td className="registerValue">{register.value}</td>
+                    </tr>
+                ))
+                }
+
+            </table>
         </div>
     ); 
 }
@@ -37,7 +46,12 @@ const Code = (props) => {
 }
 
 const Simulator = (props) => {
-    const [registers, setRegisters] = React.useState("Registers will appear here.");
+    const regs = [...Array(32).keys()];
+    const defaultRegisters = regs.map(r => {
+        return {name: `R${r}`, value: "0000000000000000"};
+    })
+
+    const [registers, setRegisters] = React.useState(defaultRegisters);
     const [memory, setMemory] = React.useState("Memory will appear here.");
     const [stats, setStats] = React.useState("Statistics will appear here");
     const [code, setCode] = React.useState(`; Example program. Loads the value 10 (A) into R1.
