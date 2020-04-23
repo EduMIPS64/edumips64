@@ -24,5 +24,6 @@ jobs:
         with:
           target_branch: master
           build_dir: build/gwt/war/edumips64
+          repo: EduMIPS64/web.edumips.org
         env:
           GITHUB_PAT: ${{ secrets.PAT_WEBUI }}
