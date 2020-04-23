@@ -1,6 +1,8 @@
 package org.edumips64.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArray;
 
 import jsinterop.annotations.JsType;
 
@@ -16,6 +18,25 @@ import org.edumips64.utils.io.NullFileUtils;
 
 import java.util.logging.Logger;
 
+class RegisterJSO extends JavaScriptObject {
+  protected RegisterJSO() {}
+  public final native String getName()/*-{
+    return this.name;
+}-*/; 
+
+public final native String getValue()/*-{
+    return this.value;
+}-*/;
+
+public final native void setValue(String value)/*-{
+    this.value = value;
+}-*/;
+
+public final native void setName(String name)/*-{
+    this.name = name;
+}-*/;
+}
+
 @JsType(namespace = "jsedumips64")
 public class WebUi implements EntryPoint {
   private CPU cpu;
@@ -23,10 +44,11 @@ public class WebUi implements EntryPoint {
   private SymbolTable symTab;
   private Memory memory;
   private Dinero dinero;
+   
+  private Logger logger = Logger.getLogger("simulator");
 
   // Executes the program. Returns an empty string on success, or an error message.
   public String runProgram(String code) {
-    Logger logger = Logger.getLogger("simulator");
     logger.info("Running program: " + code);
     try {
       cpu.reset();
@@ -53,8 +75,20 @@ public class WebUi implements EntryPoint {
     return memory.toString();
   }
 
-  public String getRegisters() {
-    return cpu.gprString();
+  public JsArray<RegisterJSO> getRegisters() {
+    JsArray<RegisterJSO> registers = JavaScriptObject.createArray().cast();
+
+    try {
+      for(Register r : cpu.getRegisters()) {
+        RegisterJSO register = (RegisterJSO)JavaScriptObject.createObject().cast();
+        register.setName(r.getName());
+        register.setValue(r.getHexString());
+        registers.push(register);
+      }
+    } catch (Exception e) {
+      logger.warning("Error fetching registers: " + e.toString());
+    }
+    return registers;
   }
 
   public String getStatistics() {
