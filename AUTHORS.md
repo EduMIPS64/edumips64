@@ -29,3 +29,4 @@
 * Matthew Crumley - [**@silentmatt**](http://github.com/silentmatt)
 * ancbro - [**@ancbro**](http://github.com/ancbro)
 * Grandroid - [**@Grandroid**](http://github.com/Grandroid)
+* Oscar Elhanafey - [**@Ooelhana**](http://github.com/Ooelhana)
