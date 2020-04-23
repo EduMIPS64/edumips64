@@ -25,4 +25,4 @@ jobs:
           target_branch: master
           build_dir: build/gwt/war/edumips64
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_WEBUI }}
+          GITHUB_PAT: ${{ secrets.PAT_WEBUI }}
