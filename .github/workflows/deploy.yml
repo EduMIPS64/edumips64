@@ -25,5 +25,8 @@ jobs:
         target_branch: master
         build_dir: build/gwt/war/edumips64
         repo: EduMIPS64/web.edumips.org
+        keep_history: true
+        commit_message: Update Web Frontend @ ${{ github.sha }}
+        fqdn: web.edumips.org
       env:
         GITHUB_PAT: ${{ secrets.PAT_WEBUI }}
