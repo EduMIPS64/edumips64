@@ -6,6 +6,7 @@ body {
 textarea {
     width: 90%;
     height: 400px;
+    font-family: monospace;
 }
 
 #run-button {
