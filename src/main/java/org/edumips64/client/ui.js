@@ -11,14 +11,14 @@ const Registers = (props) => {
 const Statistics = (props) => {
     return (
         <div className="pure-u-1 pure-u-lg-1-4">
-            <textarea id="statistics" readOnly value={props.stats} />
+            <textarea readOnly value={props.stats} />
         </div>
     );
 }
 const Memory = (props) => {
     return (
         <div className="pure-u-1 pure-u-lg-1-4">
-            <textarea id="memory" readOnly value={props.memory} />
+            <textarea readOnly value={props.memory} />
         </div>
     );
 }
@@ -31,7 +31,7 @@ const Code = (props) => {
                 onChange={(event) => {props.onChangeValue(event.target.value);}}
                 />
             <br />
-            <input type="button" value="Run" onClick={() => {props.onClick()}} />
+            <input id="run-button" type="button" value="Run" onClick={() => {props.onClick()}} />
         </div>
     );
 }
