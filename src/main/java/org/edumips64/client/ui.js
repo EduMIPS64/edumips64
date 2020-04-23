@@ -51,8 +51,7 @@ const Simulator = (props) => {
     const [registers, setRegisters] = React.useState("Registers will appear here.");
     const [memory, setMemory] = React.useState("Memory will appear here.");
     const [stats, setStats] = React.useState("Statistics will appear here");
-    const [code, setCode] = React.useState(`
-; Example program. Loads the value 10 (A) into R1.
+    const [code, setCode] = React.useState(`; Example program. Loads the value 10 (A) into R1.
 .data
     .word64 10
 
