@@ -1,6 +1,20 @@
 # EduMIPS64 ChangeLog
 
-## 1.2.6 (26/01/2019) - Phlegmatic
+## 1.2.7.1 (13/04/2020) - Hope
+### Fixed
+- div.d incorrectly emits SEVERE logging statement (Issue #315)
+- Issues with v1.2.7 packages (Issue #311)
+
+## 1.2.7 (11/04/2020) - Hope
+### Fixed
+- RAW stall in combination with FPU caused instructions to disappear (Issue #304)
+- Some instructions not showing correctly in Cycles UI (Issue #304)
+
+### Changed
+- Using GitHub Actions instead of Azure Pipelines as CI.
+- Added timeouts to tests
+
+## 1.2.6 (26/01/2020) - Phlegmatic
 ### Added
 - Alias DMULU for DMULTU (Issue #249)
 

@@ -55,51 +55,51 @@ import javax.swing.event.*;
 
 public class Main {
 
-  private static CPU cpu;
+  private CPU cpu;
   // The last created CPU Worker. Necessary for the Stop menu item.
-  private  static CPUSwingWorker cpuWorker;
-  private static Parser parser;
-  private static SymbolTable symTab;
-  private static Memory memory;
-  private static CycleBuilder builder;
-  private static Dinero dinero;
-  private static GUIFrontend front;
-  private static ConfigStore configStore;
-  private static JFileChooser jfc;
+  private CPUSwingWorker cpuWorker;
+  private Parser parser;
+  private SymbolTable symTab;
+  private Memory memory;
+  private CycleBuilder builder;
+  private Dinero dinero;
+  private GUIFrontend front;
+  private ConfigStore configStore;
+  private JFileChooser jfc;
 
-  private static JFrame mainFrame;
-  private static JMenuItem open;
-  private static JMenuItem reset;
-  private static JMenuItem exit;
-  private static JMenuItem single_cycle;
-  private static JMenuItem run_to;
-  private static JMenuItem multi_cycle;
-  private static JMenuItem aboutUs;
-  private static JMenuItem dinero_tracefile;
-  private static JMenuItem dinFrontend;
-  private static JMenuItem manual;
-  private static JMenuItem settings;
-  private static JMenuItem stop;
-  private static StatusBar sb;
-  private static JMenu file, lastfiles, exec, config, window, help, lang, tools;
-  private static JCheckBoxMenuItem lang_en, lang_it;
-  private static JCheckBoxMenuItem pipelineJCB, registersJCB, memoryJCB, codeJCB, cyclesJCB, statsJCB, ioJCB;
+  private JFrame mainFrame;
+  private JMenuItem open;
+  private JMenuItem reset;
+  private JMenuItem exit;
+  private JMenuItem single_cycle;
+  private JMenuItem run_to;
+  private JMenuItem multi_cycle;
+  private JMenuItem aboutUs;
+  private JMenuItem dinero_tracefile;
+  private JMenuItem dinFrontend;
+  private JMenuItem manual;
+  private JMenuItem settings;
+  private JMenuItem stop;
+  private StatusBar sb;
+  private JMenu file, lastfiles, exec, config, window, help, lang, tools;
+  private JCheckBoxMenuItem lang_en, lang_it;
+  private JCheckBoxMenuItem pipelineJCB, registersJCB, memoryJCB, codeJCB, cyclesJCB, statsJCB, ioJCB;
 
-  private static GUIIO ioFrame;
-  private static IOManager iom;
+  private GUIIO ioFrame;
+  private IOManager iom;
 
   private final static Logger log = Logger.getLogger(Main.class.getName());
 
-  private static Map<String, JInternalFrame> mapped_frames;
-  private static List<JInternalFrame> ordered_frames;
+  private Map<String, JInternalFrame> mapped_frames;
+  private List<JInternalFrame> ordered_frames;
 
-  private static String openedFile = null;
-  public static String code = null;
-  private static boolean debug_mode = false;
-  private static JDesktopPane desk;
+  private String openedFile = null;
+  private String code = null;
+  private JDesktopPane desk;
 
   /** Callbacks for CPUSwingWorker */
-  private static Runnable initCallback, haltCallback, finalizeCallback;
+  private Runnable initCallback, haltCallback, finalizeCallback;
+  private Supplier<String> codeSupplier;
 
   private static void usage() {
     showVersion();
@@ -112,16 +112,28 @@ public class Main {
   }
 
   private static void showVersion() {
-    System.out.println("EduMIPS64 version " + MetaInfo.VERSION + " (codename: " + MetaInfo.CODENAME + ", git revision " + MetaInfo.GIT_REVISION + ", built on " + MetaInfo.BUILD_DATE + ") - Ciao 'mbare.");
+    System.out.println("EduMIPS64 version " + MetaInfo.VERSION + " (codename: " + MetaInfo.CODENAME + ", git revision " + MetaInfo.FULL_BUILDSTRING + ", built on " + MetaInfo.BUILD_DATE + ") - Ciao 'mbare.");
+  }
+
+  public static class ParsedArgs {
+    public String filename;
+    public boolean shouldReset;
+
+    public ParsedArgs(String filename, boolean shouldReset) {
+      this.filename = filename;
+      this.shouldReset = shouldReset;
+    }
   }
 
   // Parses the command-line arguments.
   // Returns the filename to open (if any) and sets parameters such as logging. If necessary, exits.
-  public static String parseArgsOrExit(String[] args) {
+  public static ParsedArgs parseArgsOrExit(String[] args) {
     // Checking CLI parameters.
     String toOpen = null;
     boolean printUsageAndExit = false;
     boolean printVersionAndExit = false;
+    boolean debug_mode = false;
+    boolean should_reset = false;
 
     if (args.length > 0) {
       for (int i = 0; i < args.length; ++i) {
@@ -142,7 +154,7 @@ public class Main {
         } else if (args[i].compareTo("-v") == 0 || args[i].compareTo("--version") == 0) {
           printVersionAndExit = true;
         } else if (args[i].compareTo("-r") == 0 || args[i].compareTo("--reset") == 0) {
-          configStore.resetConfiguration();
+          should_reset = true;
         } else {
           System.err.println(CurrentLocale.getString("HT.UnrecognizedArgs") + ": " + args[i] + "\n");
           printUsageAndExit = true;
@@ -168,46 +180,49 @@ public class Main {
         h.setLevel(Level.WARNING);
       }
     }
-    return toOpen;
+    return new ParsedArgs(toOpen, should_reset);
   }
 
   public static void main(String args[]) {
 
-    String toOpen = parseArgsOrExit(args);
+    Main mm = new Main();
+    ParsedArgs parsedArgs = Main.parseArgsOrExit(args);
 
+    if (parsedArgs.shouldReset) {
+      mm.configStore.resetConfiguration();
+    }
     // Configure logger format.
     System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tm%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
 
-    showVersion();
+    Main.showVersion();
 
     // Creating the main JFrame
     JFrame.setDefaultLookAndFeelDecorated(true);
     JDialog.setDefaultLookAndFeelDecorated(true);
-    mainFrame = new JFrame();
-    mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    mm.mainFrame = new JFrame();
+    mm.mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     // Maximizing the application
-    Insets screenInsets = mainFrame.getToolkit().getScreenInsets(mainFrame.getGraphicsConfiguration());
-    Rectangle screenSize = mainFrame.getGraphicsConfiguration().getBounds();
+    Insets screenInsets = mm.mainFrame.getToolkit().getScreenInsets(mm.mainFrame.getGraphicsConfiguration());
+    Rectangle screenSize = mm.mainFrame.getGraphicsConfiguration().getBounds();
     Rectangle maxBounds = new Rectangle(screenInsets.left + screenSize.x,
                                         screenInsets.top + screenSize.y,
                                         screenSize.x + screenSize.width - screenInsets.right - screenInsets.left,
                                         screenSize.y + screenSize.height - screenInsets.bottom - screenInsets.top);
-    mainFrame.setMaximizedBounds(maxBounds);
-    mainFrame.setBounds(maxBounds);
+    mm.mainFrame.setMaximizedBounds(maxBounds);
+    mm.mainFrame.setBounds(maxBounds);
 
-    mainFrame.setLocation(0, 0);
-    Main mm = new Main();
+    mm.mainFrame.setLocation(0, 0);
     mm.init();
-    mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
-    mainFrame.setVisible(true);
-    mainFrame.setExtendedState(mainFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+    mm.mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
+    mm.mainFrame.setVisible(true);
+    mm.mainFrame.setExtendedState(mm.mainFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
     // Auto-minimze the log window and the I/O window
     try {
-      ioFrame.setIcon(true);
+      mm.ioFrame.setIcon(true);
     } catch (java.beans.PropertyVetoException ignored) {}
 
     // Tile windows once the window is maximized.
-    mainFrame.addWindowStateListener(new WindowStateListener() {
+    mm.mainFrame.addWindowStateListener(new WindowStateListener() {
       // Keep track of whether maximization was already done, to prevent unwanted tiling of windows when the main
       // window is maximized again.
         private boolean alreadyMaximized = false;
@@ -220,7 +235,7 @@ public class Main {
           boolean wasMaximized = (event.getOldState() & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH;
 
           if (isMaximized && !wasMaximized) {
-            tileWindows();
+            mm.tileWindows();
             alreadyMaximized = true;
           }
         }
@@ -228,20 +243,20 @@ public class Main {
 
     log.info("Simulator started");
 
-    if (toOpen != null) {
-      resetSimulator(false);
-      openFile(toOpen);
-      addFileToRecentMenu(toOpen);
+    if (parsedArgs.filename != null) {
+      mm.resetSimulator(false);
+      mm.openFile(parsedArgs.filename);
+      mm.addFileToRecentMenu(parsedArgs.filename);
     }
 
     try {
-      SwingUtilities.invokeAndWait(Main::tileWindows);
+      SwingUtilities.invokeAndWait(mm::tileWindows);
     } catch (InterruptedException | InvocationTargetException e) {
       log.log(Level.SEVERE, "Could not tile windows.", e);
     }
   }
 
-  private static void addFrame(String name, JInternalFrame f) {
+  private void addFrame(String name, JInternalFrame f) {
     mapped_frames.put(name, f);
     ordered_frames.add(f);
 
@@ -417,24 +432,25 @@ public class Main {
     initCallback = () -> {
        // Let's disable the running menu items and enable the stop menu
        // item
-       Main.setRunningMenuItemsStatus(false);
-       Main.setStopStatus(true);
+       setRunningMenuItemsStatus(false);
+       setStopStatus(true);
 
        // Progress bar
-       SwingUtilities.invokeLater(Main::startPB);
+       SwingUtilities.invokeLater(this::startPB);
     };
-    haltCallback = () -> Main.changeShownMenuItems(CPU.CPUStatus.HALTED);
+    haltCallback = () -> changeShownMenuItems(CPU.CPUStatus.HALTED);
     finalizeCallback = () -> {
       // Represent changes, in case the user chose non-verbose mode.
       front.represent();
 
       if (cpu.getStatus() != CPU.CPUStatus.HALTED) {
-        Main.setRunningMenuItemsStatus(true);
+        setRunningMenuItemsStatus(true);
       }
 
-      Main.setStopStatus(false);
-      Main.stopPB();
+      setStopStatus(false);
+      stopPB();
     };
+    codeSupplier = () -> this.code;
 
     changeShownMenuItems(cpu.getStatus());
   }
@@ -442,7 +458,7 @@ public class Main {
   /** Changes the status of running menu items.
    *  @param status a boolean
    */
-  private static void setRunningMenuItemsStatus(boolean status) {
+  private void setRunningMenuItemsStatus(boolean status) {
     single_cycle.setEnabled(status);
     multi_cycle.setEnabled(status);
     run_to.setEnabled(status);
@@ -451,7 +467,7 @@ public class Main {
   /** Changes the status of cache-related menu items.
    *  @param status a boolean
    */
-  private static void setCacheMenuItemsStatus(boolean status) {
+  private void setCacheMenuItemsStatus(boolean status) {
     tools.setEnabled(status);
     dinero_tracefile.setEnabled(status);
     dinFrontend.setEnabled(status);
@@ -460,7 +476,7 @@ public class Main {
   /** Enables or disables the Stop menu item and the Settings menu item.
    *  @param status boolean
    */
-  private static void setStopStatus(boolean status) {
+  private void setStopStatus(boolean status) {
     stop.setEnabled(status);
     settings.setEnabled(!status);
     file.setEnabled(!status);
@@ -475,7 +491,7 @@ public class Main {
    *
    *    @param s the new CPU status
    * */
-  private static void changeShownMenuItems(CPU.CPUStatus s) {
+  private void changeShownMenuItems(CPU.CPUStatus s) {
     if (s == CPU.CPUStatus.READY) {
       log.info("CPU Ready");
       setCacheMenuItemsStatus(false);
@@ -496,7 +512,7 @@ public class Main {
   }
 
   /** Opens a file. */
-  private static void openFile(String file) {
+  private void openFile(String file) {
     log.info("Trying to open " + file);
     cpu.reset();
     symTab.reset();
@@ -506,7 +522,7 @@ public class Main {
       front.updateComponents();
       front.represent();
     } catch (Exception ex) {
-      new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION, code);
+      new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.FULL_BUILDSTRING, code);
     }
 
     try {
@@ -534,7 +550,7 @@ public class Main {
       log.info("Set the status to RUNNING");
 
       // Let's fetch the first instruction
-      cpuWorker = new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback);
+      cpuWorker = new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
       cpuWorker.setSteps(1);
       cpuWorker.execute();
       while (cpuWorker.isDone()) {
@@ -572,12 +588,12 @@ public class Main {
     } catch (Exception e) {
       mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
       log.info("Error opening " + file);
-      new ReportDialog(mainFrame, e, CurrentLocale.getString("ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION, code);
+      new ReportDialog(mainFrame, e, CurrentLocale.getString("ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.FULL_BUILDSTRING, code);
     }
   }
 
   /** Tiles windows. */
-  private static void tileWindows() {
+  private void tileWindows() {
     // First of all, we don't have to consider iconified frames, because
     // the frames to be tiled are the ones that aren't iconified
     List<JInternalFrame> list = new ArrayList<>();
@@ -641,7 +657,7 @@ public class Main {
   }
 
   /** Sets the frame titles. Used when the locale is changed. */
-  private static void setFrameTitles() {
+  private void setFrameTitles() {
     if (openedFile != null) {
       mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + openedFile);
     } else {
@@ -653,7 +669,7 @@ public class Main {
     }
   }
 
-  private static void resetSimulator(boolean reopenFile) {
+  private void resetSimulator(boolean reopenFile) {
     cpu.reset();
     symTab.reset();
     dinero.reset();
@@ -679,7 +695,7 @@ public class Main {
   }
 
   /** Sets the menu items captions, adding, if possible, the mnemonic. */
-  private static void initMenuItems() {
+  private void initMenuItems() {
     setMenuItem(file, "Menu.FILE");
     setMenuItem(exec, "Menu.EXECUTE");
     setMenuItem(config, "Menu.CONFIGURE");
@@ -711,7 +727,7 @@ public class Main {
     setMenuItem(ioJCB, "IO");
   }
 
-  private static Font getScaledFont(Font oldFont) {
+  private Font getScaledFont(Font oldFont) {
     float newSize = (float) configStore.getInt(ConfigKey.UI_FONT_SIZE) / 12.0f * oldFont.getSize();
     return oldFont.deriveFont(newSize);
   }
@@ -719,7 +735,7 @@ public class Main {
   /** Creates a new menu bar.
    *  @return the menu bar
    */
-  private static JMenuBar createMenuBar() {
+  private JMenuBar createMenuBar() {
     JMenuBar mb = new JMenuBar();
 
     UIManager.put("Menu.font", getScaledFont((Font)UIManager.get("Menu.font")));
@@ -827,7 +843,7 @@ public class Main {
     // Lambda to create a CPUSwingWorker. Used to have a single place where CPUSwingWorker is
     // created.
     Supplier<CPUSwingWorker> workerBuilder = () ->
-        new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback);
+        new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
 
     // ---------------- EXECUTE MENU
     // Execute a single simulation step
@@ -942,7 +958,7 @@ public class Main {
     aboutUs = new JMenuItem(CurrentLocale.getString("MenuItem.ABOUT_US"));
     help.add(aboutUs);
     aboutUs.addActionListener(e -> {
-      GUIAbout ab = new GUIAbout(null, MetaInfo.VERSION, MetaInfo.CODENAME, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION);
+      GUIAbout ab = new GUIAbout(null, MetaInfo.VERSION, MetaInfo.CODENAME, MetaInfo.BUILD_DATE, MetaInfo.FULL_BUILDSTRING);
       //ab.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
       ab.setVisible(true);
     });
@@ -1051,7 +1067,7 @@ public class Main {
   }
 
   /** add a new JMenuItem in recent file menu at the position pos for the file "namefile"*/
-  private static void addFileToRecentMenu(final String filename) {
+  private void addFileToRecentMenu(final String filename) {
     JMenuItem item = new JMenuItem(filename);
     item.addActionListener(e -> {
       resetSimulator(false);
@@ -1117,15 +1133,15 @@ public class Main {
     item.setText(localCaption);
   }
 
-  private static GUIFrontend getGUIFrontend() {
+  private GUIFrontend getGUIFrontend() {
     return front;
   }
 
-  private static void startPB() {
+  private void startPB() {
     sb.startPB();
   }
 
-  private static void stopPB() {
+  private void stopPB() {
     sb.stopPB();
   }
 }

@@ -25,5 +25,7 @@ package org.edumips64.core.is;
  * Exception thrown when an HALT / SYSCALL 0 instruction performs the ID step.
  * When this exception is caught, the CPU should enter the STOPPING state.
  */
-public class StoppingException extends Exception {}
+public class StoppingException extends Exception {
+    private static final long serialVersionUID = 8356680614046019191L;
+}
 

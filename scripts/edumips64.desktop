@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=EduMIPS64
+Type=Application
+Exec=edumips64-snap-wrapper.sh
+Icon=icon.png

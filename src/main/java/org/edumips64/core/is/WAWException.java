@@ -28,5 +28,7 @@ package org.edumips64.core.is;
  *
  * @author Trubia Massimo, Russo Daniele
  */
-public class WAWException extends Exception {}
+public class WAWException extends Exception {
+    private static final long serialVersionUID = 8464983021181960087L;
+}
 

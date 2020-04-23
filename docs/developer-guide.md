@@ -11,7 +11,9 @@
 
 [Unit tests](#unit-tests)
 
-[Compiling under Windoes](#windows)
+[Compiling under Windows](#windows)
+
+[Compiling under Mac OSX](#mac-os-x)
 
 ### Requirements
 
@@ -37,8 +39,8 @@ $ pip3 install -r docs/requirements.txt
 If you want to use the automatic style checks (pre-commit hook), then you
 should have Automatic Style (astyle) installed.
 
-This project uses Travis CI for continuous integration
-(https://travis-ci.org/lupino3/edumips64).
+This project uses GitHub Actions for continuous integration
+(https://github.com/EduMIPS64/edumips64/actions).
 
 ### Main Gradle tasks
 
@@ -82,16 +84,13 @@ Currently, only a prototype is available. The GWT code for it is in the
 `org.edumips64.client` package. The HTML file is at
 `src/main/java/org/edumips64/client/edumips64.html`.
 
-<!--
-TODO: fix gwtDev target. It doesn't include the html file for now.
-To work on it, run the `devmode` Build target, which will fire up the GWT
+To work on it, run the `gwtDev` gradle target, which will fire up the GWT
 developer console for you. Once the console is available, you'll be given a
 local URL where the frontend will be available.
 
 Every time you change the GWT frontend, reloading that web page will cause the
 GWT console to recompile the code, thus allowing quick iteration on the web
 frontend code.
--->
 
 The `war` task will compile the Java code to JS and copy the resulting JS, including
 the static resources needed for the prototype frontend, to the `build/gwt/war`
@@ -124,7 +123,7 @@ development workflow, which means that `master` is always fully working
 (the code can be built and all tests pass), and development is done in separate
 named branches. The good state of `master` is enforced by its protected
 status, meaning that no commits can be pushed directly to `master` and any
-pull requests for `master` have to pass the status checks (Azure Pipelines building
+pull requests for `master` have to pass the status checks (Github Actions building
 the code and executing unit tests).
 
 ### Unit tests
@@ -169,3 +168,31 @@ might be migrating to a new shiny web-based frontend.
 
 Compilation under Windows is possible by using the Windows Subsystem for Linux
 (WSL), exactly in the same way as you would do under Linux.
+
+### Mac OS X
+
+The build works under Mac OS X (tested with Catalina 10.15.2, JDK 1.8.0.92).
+
+The only thing that might not work out of the box is downloading the Gradle GWT
+plugins, as the Maven repo uses Let's Encrypt as a certificate issuer, which
+is not trusted by default by the JDK.
+
+Follow instructions [here](https://dev.cloudburo.net/2018/06/03/install-letsencrypt-certificate-in-the-java-jdk-keystore-on-osx.html) to import the Let's Encrypt root certificates in the JDK keystore.
+
+### Manual release checklist
+
+Before doing a release, please do the following tasks. Over time, those should
+be automated, but before that is done those checks should be done manually.
+
+- For each released JAR file:
+  - load it with JRE 8
+  - verify that the splash screen works
+  - verify that the version number, code name, build date and git ID are correct
+  - open one .s file (e.g., `div.d.s`)
+  - run it
+  - if it's the standalone JAR, open the help
+  - close the application
+  - verify the JAR size (should be < 3 MB)
+- open the English manual and check the version
+- open the Italian manual and check the version
+- check the 'edge' snap and promote it to stable if it works (https://snapcraft.io/edumips64/releases, needs login)

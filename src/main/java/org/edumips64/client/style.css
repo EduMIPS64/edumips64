@@ -1,0 +1,31 @@
+body {
+    padding: 15px;
+    background-color: "white";
+}
+
+textarea {
+    width: 90%;
+    height: 400px;
+}
+
+#run-button {
+    width: 90%;
+}
+
+#logo {
+    height: 98px;
+    display: block;
+    width: 350px;
+}
+
+#nojs {
+    width: 22em; 
+    position: absolute; 
+    left: 50%; 
+    margin-left: -11em; 
+    color: red; 
+    background-color:white; 
+    border: 1px solid red; 
+    padding: 4px; 
+    font-family: sans-serif;
+}

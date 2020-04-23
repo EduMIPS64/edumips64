@@ -26,4 +26,6 @@ package org.edumips64.core;
  * @author Salvatore Scellato
  * */
 
-public class IrregularStringOfBitsException extends Exception {}
+public class IrregularStringOfBitsException extends Exception {
+    private static final long serialVersionUID = 7265168580471341375L;
+}

@@ -33,6 +33,7 @@ import java.awt.geom.AffineTransform;
 * This class draws the "about us" animation.
 */
 public class GUIAbout extends JDialog implements Runnable  {
+  private static final long serialVersionUID = -7537564795096552600L;
   private int x = 0;
   private int y = 0;
   private Thread animazione;
@@ -171,6 +172,7 @@ public class GUIAbout extends JDialog implements Runnable  {
   /*In this class there is the Panel that draws the animation.
    */
   class Display extends JPanel {
+    private static final long serialVersionUID = 7279111629683469505L;
     int width;
     int height;
     int head;

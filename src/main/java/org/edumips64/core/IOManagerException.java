@@ -26,6 +26,7 @@ package org.edumips64.core;
 /** Exception thrown when an I/O operation goes wrong.
  *  @author Andrea Spadaccini */
 public class IOManagerException extends Exception {
+  private static final long serialVersionUID = -2333639412487287449L;
   private String errcode;
 
   public IOManagerException(String code) {

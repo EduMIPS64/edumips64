@@ -24,11 +24,11 @@
 
 package org.edumips64.ui.swing;
 
-import org.edumips64.*;
 import org.edumips64.core.*;
 import org.edumips64.core.is.*;
 import org.edumips64.utils.*;
 
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 import javax.swing.*;
 
@@ -68,19 +68,21 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
   private ConfigStore config;
   private GUIUpdateThread guiUpdateThread;
   private CycleBuilder builder;
+  private Supplier<String> codeSupplier;
 
   private static final Logger logger = Logger.getLogger(CPUSwingWorker.class.getName());
 
   /** Callbacks */
   private Runnable initCallback, haltCallback, finalizeCallback;
 
-  public CPUSwingWorker(CPU cpu, GUIFrontend front, JFrame mainFrame, ConfigStore config, CycleBuilder builder, Runnable initCallback, Runnable haltCallback, Runnable finalizeCallback) {
+  public CPUSwingWorker(CPU cpu, GUIFrontend front, JFrame mainFrame, ConfigStore config, CycleBuilder builder, Runnable initCallback, Runnable haltCallback, Runnable finalizeCallback, Supplier<String> codeSupplier) {
     externalStop = false;
     this.builder = builder;
     this.cpu = cpu;
     this.front = front;
     this.mainFrame = mainFrame;
     this.config = config;
+    this.codeSupplier = codeSupplier;
     updateConfigValues();
 
     this.haltCallback = haltCallback;
@@ -126,6 +128,13 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
     logger.info("Halting the CPU.");
     front.updateComponents();
     cpu.setStatus(CPU.CPUStatus.HALTED);
+
+    // Check if the transactions in the CycleBuilder are all valid.
+    for (CycleElement el : builder.getElementsList()) {
+      if (!el.isValid()) {
+        logger.severe("Invalid CycleElement for instruction " + el.getName());
+      }
+    }
     haltCallback.run();
   }
 
@@ -196,7 +205,7 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
         break;
       } catch (Exception ex) {
         logger.severe("Exception in CPUSwingWorker: " + ex);
-        SwingUtilities.invokeLater(() -> new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION, Main.code));
+        SwingUtilities.invokeLater(() -> new ReportDialog(mainFrame, ex, CurrentLocale.getString("GUI_STEP_ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.FULL_BUILDSTRING, codeSupplier.get()));
         haltCPU();
         break;
       } finally {

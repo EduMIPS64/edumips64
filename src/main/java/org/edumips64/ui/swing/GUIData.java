@@ -69,6 +69,7 @@ public class GUIData extends GUIComponent {
   }
 
   private class DataPanel extends JPanel {
+    private static final long serialVersionUID = 390072605193346935L;
     JTable theTable;
     JScrollPane scrollTable;
     FileTableModel tableModel;
@@ -170,7 +171,8 @@ public class GUIData extends GUIComponent {
     }
 
     class FileTableModel extends AbstractTableModel {
-      private String[] columnLocaleStrings = {"ADDRESS", "HEXREPR", "LABEL", "DATA", "COMMENT"};
+      private static final long serialVersionUID = -5597071716323075669L;
+      private String[] columnLocaleStrings = { "ADDRESS", "HEXREPR", "LABEL", "DATA", "COMMENT" };
       private Class<?>[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
       private String[] memoryAddress;
 
@@ -225,6 +227,7 @@ public class GUIData extends GUIComponent {
     }
 
     class InsertValueDialog extends JDialog implements ActionListener {
+      private static final long serialVersionUID = 1803458321781254690L;
       JButton OK;
 
       InsertValueDialog() {

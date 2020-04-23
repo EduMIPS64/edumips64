@@ -26,6 +26,8 @@ package org.edumips64.ui.swing;
 import javax.swing.*;
 
 public class JNumberField extends JTextField {
+  private static final long serialVersionUID = 947868130966103L;
+
   public void setNumber(Integer number) {
     super.setText(number.toString());
   }

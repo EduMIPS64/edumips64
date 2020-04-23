@@ -22,4 +22,6 @@
  */
 package org.edumips64.core;
 
-public class MemoryElementNotFoundException extends Exception {}
+public class MemoryElementNotFoundException extends Exception {
+    private static final long serialVersionUID = -346701624817663878L;
+}

@@ -22,4 +22,6 @@
  */
 package org.edumips64.utils;
 
-public class ConfigStoreTypeException extends Exception {}
+public class ConfigStoreTypeException extends Exception {
+    private static final long serialVersionUID = -7239722325860824877L;
+}

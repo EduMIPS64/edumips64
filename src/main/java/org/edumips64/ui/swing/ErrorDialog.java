@@ -34,6 +34,7 @@ import javax.swing.*;
  * This class provides a window for configuration options.
 */
 public class ErrorDialog extends JDialog {
+  private static final long serialVersionUID = 6756487575875944232L;
 
   public ErrorDialog(final JFrame owner, LinkedList<ParserException> peList, String title, Boolean showWarning) {
 

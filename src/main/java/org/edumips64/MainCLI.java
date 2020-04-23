@@ -43,7 +43,10 @@ public class MainCLI {
 
       // Parse the args as early as possible, since it will influence logging level as well.
       // TODO: extract parseArgsOrExit out of the Main class.
-      String toOpen = Main.parseArgsOrExit(args);
+      Main.ParsedArgs toOpen = Main.parseArgsOrExit(args);
+      if (toOpen.shouldReset) {
+        cfg.resetConfiguration();
+      }
 
       // Initialize the CPU and all its dependencies.
       Memory memory = new Memory();
@@ -58,8 +61,8 @@ public class MainCLI {
 
       // Initialization done. Print a welcome message and open the file if needed.
       System.out.println("Welcome to EduMIPS64 CLI shell!");
-      if (toOpen != null) {
-        String absoluteFilename = new File(toOpen).getAbsolutePath();
+      if (toOpen.filename != null) {
+        String absoluteFilename = new File(toOpen.filename).getAbsolutePath();
         try {
           p.parse(absoluteFilename);
         } catch (ParserMultiException e) {
@@ -183,7 +186,7 @@ public class MainCLI {
         "Please report the following stacktrace and system information,\n" +
         "along with the content of the assembly file you were executing\n" +
         "to the EduMIPS64 GitHub account: https://github.com/lupino3/edumips64/issues/new\n";
-    msg += String.format("Version: %s, %s, %s\n", MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.GIT_REVISION);
+    msg += String.format("Version: %s, %s, %s\n", MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.FULL_BUILDSTRING);
     msg += String.format("JRE version: %s\nOS: %s\n\n", System.getProperty("java.version"), System.getProperty("os.name"));
     return msg;
   }  

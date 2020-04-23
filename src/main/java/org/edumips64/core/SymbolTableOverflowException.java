@@ -22,4 +22,6 @@
  */
 package org.edumips64.core;
 
-public class SymbolTableOverflowException extends Exception {}
+public class SymbolTableOverflowException extends Exception {
+    private static final long serialVersionUID = -3519822506430516325L;
+}

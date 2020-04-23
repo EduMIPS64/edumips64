@@ -36,6 +36,7 @@ import java.util.*;
 
 
 class MultiLineTable extends JTable {
+  private static final long serialVersionUID = 1308741390363066330L;
 
   MultiLineTable(TableModel dm) {
     this(dm, null, null);

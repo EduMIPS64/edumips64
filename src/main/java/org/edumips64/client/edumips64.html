@@ -13,67 +13,27 @@
       <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
       <!--<![endif]-->
 
+      <script type="text/javascript" language="javascript" src="edumips64.nocache.js"></script>
 
-      <script type="text/javascript" language="javascript" src="edumips64/edumips64.nocache.js"></script>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-      <style media="screen" type="text/css">
-          textarea {
-              width: 90%;
-              height: 400px;
-          }
+      <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+      <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+      <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 
-          #run-button {
-              width: 90%;
-          }
-          body {
-            padding: 15px;
-          }
-      </style>
+      <link rel="stylesheet" media="screen" type="text/css" href="style.css">
 
-      <script type="text/javascript" language="javascript">
-          $(function() {
-              $("#run-button").click(function () {
-                  var simulator = new jsedumips64.WebUi();
-                  simulator.init();
-                  var result = simulator.runProgram($("#code").val());
-                  if (result.length != 0) {
-                      alert(result);
-                  } else {
-                      $("#registers").html(simulator.getRegisters());
-                      $("#memory").html(simulator.getMemory());
-                      $("#statistics").html(simulator.getStatistics());
-                  }
-              });
-          });
-      </script>
+      <script type="text/babel" src="ui.js" ></script>
   </head>
-  <body bgcolor="white">
-  <img alt='EduMIPS64' height='98px; ' src='logo.png' style='display: block' width='350px; '/>
-  <h2>Web interface proof-of-concept</h2>
-  <p>This is a crude proof-of-concept of how it is possible to interact with the EduMIPS64 core in Javascript.</p>
-    <noscript>
-      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color:white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-        Your web browser must have JavaScript enabled
-        in order for this application to display correctly.
-      </div>
-    </noscript>
-  <div class="pure-g">
-      <div class="pure-u-1 pure-u-lg-1-4" id="codeContainer">
-        <textarea id="code">
-; Example program. Loads the value 10 (A) into R1.
-.data
-  .word64 10
-
-.code
-  lw r1, 0(r0)
-  SYSCALL 0
-        </textarea>
-          <br />
-          <input type="button" id="run-button" value="Run"></input>
-      </div>
-      <div class="pure-u-1 pure-u-lg-1-4" id="registersContainer"><textarea id="registers" placeholder="Registers will appear here." readonly></textarea></div>
-      <div class="pure-u-1 pure-u-lg-1-4" id="memoryContainer"><textarea id="memory" placeholder="Memory will appear here."readonly></textarea></div>
-      <div class="pure-u-1 pure-u-lg-1-4" id="statsContainer"><textarea id="statistics" placeholder="Statistics will appear here."readonly></textarea></div>
-  </div>
+  <body>
+    <img id="logo" alt='EduMIPS64' src='logo.png' />
+    <h2>Web interface proof-of-concept</h2>
+    <p>This is a crude proof-of-concept of how it is possible to interact with the EduMIPS64 core in Javascript.</p>
+      <noscript>
+        <div id="nojs">
+          Your web browser must have JavaScript enabled
+          in order for this application to display correctly.
+        </div>
+      </noscript>
+    <div class="pure-g" id="simulator">
+    </div>
   </body>
 </html>

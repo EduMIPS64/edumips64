@@ -7,7 +7,7 @@ MIPS64 simulator. The context is always a desktop web interface, unless
 specified.
 
 Stories will be addressed with the initial of their section and then the
-number of the story (e.g., `BREAK support` is `E.6`).
+number of the story (e.g., `BREAK support` is `E.9`).
 
 In terms of priority, `P.*` need to be done before any other work is done.
 
@@ -56,6 +56,8 @@ it is still unclear how they will be represented.
 3. Cycles widget (temporal instruction diagram)
 4. I/O widget (necessary for `E.5.1`)
 5. Settings UI (necessary for `S.*`)
+6. Code editor text area widget
+7. Code editor with syntax highlighting.
 
 ### Settings
 

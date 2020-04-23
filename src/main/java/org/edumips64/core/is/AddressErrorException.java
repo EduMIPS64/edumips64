@@ -31,7 +31,10 @@ package org.edumips64.core.is;
  * @author Massimo
  */
 public class AddressErrorException extends Exception {
-  AddressErrorException() {}
+  private static final long serialVersionUID = -4906613354218001061L;
+
+  AddressErrorException() {
+  }
 
   AddressErrorException(String message) {
     super(message);

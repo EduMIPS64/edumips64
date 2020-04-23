@@ -6,6 +6,10 @@
 ###############################################################################
 ## Custom directives.
 
+# Assembly files. We'll never store those in the root directory of the
+# project,
+/*.s
+
 # Vim temporary files.
 *.un~
 *.sw*
@@ -112,3 +116,6 @@ edumips64.iml
 
 /bazel-*
 .project/.blaze/
+
+# Mac OS X
+.DS_Store

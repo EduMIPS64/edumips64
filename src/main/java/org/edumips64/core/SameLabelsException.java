@@ -22,4 +22,6 @@
  */
 package org.edumips64.core;
 
-public class SameLabelsException extends Exception {}
+public class SameLabelsException extends Exception {
+    private static final long serialVersionUID = 1L;
+}

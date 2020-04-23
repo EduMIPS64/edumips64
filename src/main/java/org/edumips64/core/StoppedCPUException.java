@@ -31,5 +31,7 @@ package org.edumips64.core;
  *
  * @author Andrea Spadaccini
  */
-public class StoppedCPUException extends Exception {}
+public class StoppedCPUException extends Exception {
+    private static final long serialVersionUID = 4078106941100074156L;
+}
 

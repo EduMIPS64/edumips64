@@ -29,6 +29,9 @@ package org.edumips64.core;
  * @author Andrea Spadaccini
  */
 public class StringFormatException extends Exception {
-  public StringFormatException() {}
+  private static final long serialVersionUID = 797705026033533756L;
+
+  public StringFormatException() {
+  }
 }
 

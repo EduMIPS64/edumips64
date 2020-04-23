@@ -187,7 +187,7 @@ public class Converter {
   }
 
 
-  /** Performs an two-complement operation on the string of bits: that is to say every bit is complemented and then 1 is added to
+  /** Performs a two-complement operation on the string of bits: that is to say every bit is complemented and then 1 is added to
    * the value. This method is used for coding and decoding negative integers.
    * @param bits string of bits, must be composed obly by '0' and '1' chars, otherwise
    * an exception will be thrown.
@@ -195,51 +195,21 @@ public class Converter {
    * @throws IrregularStringOfBitsException if the string of bits is not well-formed.
    * */
   public static String twoComplement(String bits) throws IrregularStringOfBitsException {
-    StringBuffer buf = new StringBuffer();
-
-    for (int i = 0; i < bits.length(); i++) {
-      if (bits.charAt(i) == '1') {
-        buf.insert(i, '0');
-      } else if (bits.charAt(i) == '0') {
-        buf.insert(i, '1');
-      } else {
-        throw new IrregularStringOfBitsException();
-      }
-    }
-
-    boolean carry = false;
-
-    for (int i = buf.length() - 1; i >= 0; i--) {
-      if (buf.charAt(i) == '1') {
-        buf.setCharAt(i, '0');
-        carry = true;
-      } else if (buf.charAt(i) == '0') {
-        buf.setCharAt(i, '1');
-        carry = false;
-      }
-
-      if (!carry) {
-        break;
-      }
-    }
-
-    return new String(buf);
-  }
-
-  public static String twoComplementAndrea(String bits) {
     boolean carry = true;
     StringBuffer sbf = new StringBuffer(bits);
 
     for (int i = bits.length() - 1; i >= 0; --i) {
+      char cur = bits.charAt(i);
+      if (cur != '0' && cur != '1') {
+        throw new IrregularStringOfBitsException();
+      }
       if (carry) {
-        if (bits.charAt(i) == '0') {
-          sbf.setCharAt(i, '0');
-        } else {
-          sbf.setCharAt(i, '1');
+        sbf.setCharAt(i, cur);
+        if (cur == '1') {
           carry = false;
         }
       } else {
-        if (bits.charAt(i) == '0') {
+        if (cur == '0') {
           sbf.setCharAt(i, '1');
         } else {
           sbf.setCharAt(i, '0');

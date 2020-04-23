@@ -30,5 +30,7 @@ package org.edumips64.core.is;
 /**
  * @author Trubia Massimo, Russo Daniele
  */
-public class JumpException extends Exception {}
+public class JumpException extends Exception {
+    private static final long serialVersionUID = -5917134057718978237L;
+}
 

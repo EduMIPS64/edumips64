@@ -49,8 +49,10 @@ import org.edumips64.utils.CurrentLocale;
  * This class provides a dialog box which helps the user report non-catched exceptions.
 */
 public class ReportDialog extends JDialog implements HyperlinkListener {
+  private static final long serialVersionUID = -4772390089456527183L;
 
-  public ReportDialog(final JFrame owner, Exception exception, String title, String version, 
+  public ReportDialog(final JFrame owner, Exception exception, String title,
+      String version, 
 		  String buildDate, String gitRevision, String code) {
     super(owner, title, true);
 

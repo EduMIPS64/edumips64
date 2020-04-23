@@ -23,6 +23,8 @@
 
 package org.edumips64.core;
 
-public class IrregularWriteOperationException extends Exception {}
+public class IrregularWriteOperationException extends Exception {
+    private static final long serialVersionUID = -3456155400551794381L;
+}
 
 

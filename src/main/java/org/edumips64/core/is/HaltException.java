@@ -26,5 +26,7 @@ package org.edumips64.core.is;
  *the program is stopped
  * @author Trubia Massimo, Russo Daniele
  */
-public class HaltException extends Exception {}
+public class HaltException extends Exception {
+    private static final long serialVersionUID = 8305849491905752078L;
+}
 

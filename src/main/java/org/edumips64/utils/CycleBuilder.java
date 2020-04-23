@@ -97,10 +97,42 @@ public class CycleBuilder {
     // View into the last N elements of the list. This list is used to search for CycleElements
     // corresponding to a given instruction in the getElementToUpdate() method.
     //
+    // N is equal to the number of instructions in the pipeline plus the magic number 11, which represents
+    // the maximum number of stages an instruction will traverse from IF to WB.
+    //
+    // TODO: this is not a permanent fix, as there is still potential for bugs if an instruction gets stuck in
+    // the pipeline for too long (which may happen in case of MEM stalls, since the FP pipelines and EX have a
+    // deterministic precedence ordering. A permanent fix would probably look into the maximum age of the instructions
+    // in the pipeline and do something to enforce that ordering in the list of CycleElements.
+    //
     // The max() statement is needed to avoid negative indexing (and therefore errors), in the case when the
     // size of the list of elements is smaller than the number of stages in the pipeline, which happens in the
     // first cycles of a program.
-    lastElements = new ArrayList<>(elementsList.subList(Math.max(elementsList.size() - instrInPipelineCount, 0), elementsList.size()));
+    int lookback = Math.max(elementsList.size() - (instrInPipelineCount + 11), 0);
+    lastElements = new ArrayList<>(elementsList.subList(lookback, elementsList.size()));
+
+    // If there are multiple elements for a given instruction (e.g., a fetched instruction that will not run)
+    // we need to extend the look-back of lastElements.
+    Map<Integer, Integer> counts = new HashMap<>();
+    for (CycleElement el : lastElements) {
+      int counter = counts.getOrDefault(el.getSerialNumber(), 0) + 1;
+      counts.put(el.getSerialNumber(), counter);
+    }
+
+    // Get the number of repetitions for each element, and extend the list.
+    int additionalElementsCount = counts.values().stream().filter(x -> x > 1).mapToInt(x -> x - 1).sum();
+    logger.info("There are " + additionalElementsCount + " repeated cycle elements, getting this many more elements.");
+    for (int i = 0; i < additionalElementsCount; ++i) {
+      int idx = elementsList.size() - lookback - i;
+      if (idx == elementsList.size()) {
+        continue;
+      }
+      if (idx < 0) {
+        break;
+      }
+      CycleElement extra = elementsList.get(idx);
+      lastElements.add(0, extra); 
+    }
 
     // Reverse the list since the elements are updated from IF to WB, and the elementsList is sorted in
     // chronological order.
@@ -128,13 +160,14 @@ public class CycleBuilder {
 
 
       // IF
-      if (pipeline.get(Pipeline.Stage.IF) != null) {
+      InstructionInterface ifInstruction = pipeline.get(Pipeline.Stage.IF);
+      if (ifInstruction != null) {
         // We must instantiate a new CycleElement only if the CPU is running or there was a JumpException and the the
         // IF instruction was changed (i.e., if no input stalls occurred).
         if (!inputStallOccurred) {
           synchronized(elementsList) {
             logger.info("Adding a new element to the list of elements");
-            CycleElement newElement = new CycleElement(pipeline.get(Pipeline.Stage.IF), curTime);
+            CycleElement newElement = new CycleElement(ifInstruction, curTime);
             elementsList.add(newElement);
           }
           instructionsCount++;
