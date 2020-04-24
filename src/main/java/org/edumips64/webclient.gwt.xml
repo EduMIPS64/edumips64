@@ -15,5 +15,6 @@
     <include name="ui.js" />
     <include name="style.css" />
     <include name="logo.png" />
+    <include name="favicon.png" />
   </public>
 </module>
