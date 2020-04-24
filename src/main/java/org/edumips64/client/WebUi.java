@@ -1,8 +1,7 @@
 package org.edumips64.client;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArray;
+import com.google.gwt.json.client.JSONArray;
 
 import jsinterop.annotations.JsType;
 
@@ -17,25 +16,6 @@ import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.NullFileUtils;
 
 import java.util.logging.Logger;
-
-class RegisterJSO extends JavaScriptObject {
-  protected RegisterJSO() {}
-  public final native String getName()/*-{
-    return this.name;
-}-*/; 
-
-public final native String getValue()/*-{
-    return this.value;
-}-*/;
-
-public final native void setValue(String value)/*-{
-    this.value = value;
-}-*/;
-
-public final native void setName(String name)/*-{
-    this.name = name;
-}-*/;
-}
 
 @JsType(namespace = "jsedumips64")
 public class WebUi implements EntryPoint {
@@ -75,20 +55,22 @@ public class WebUi implements EntryPoint {
     return memory.toString();
   }
 
-  public JsArray<RegisterJSO> getRegisters() {
-    JsArray<RegisterJSO> registers = JavaScriptObject.createArray().cast();
+  public String getRegisters() {
+    JSONArray registers = new JSONArray();
 
     try {
+      int i = 0;
       for(Register r : cpu.getRegisters()) {
-        RegisterJSO register = (RegisterJSO)JavaScriptObject.createObject().cast();
-        register.setName(r.getName());
-        register.setValue(r.getHexString());
-        registers.push(register);
+        registers.set(i++,
+          new FluentJsonObject()
+            .put("name", r.getName())
+            .put("value", r.getHexString())
+            .toJsonObject());
       }
     } catch (Exception e) {
       logger.warning("Error fetching registers: " + e.toString());
     }
-    return registers;
+    return registers.toString();
   }
 
   public String getStatistics() {

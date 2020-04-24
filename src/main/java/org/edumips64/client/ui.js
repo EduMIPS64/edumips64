@@ -71,7 +71,7 @@ const Simulator = (props) => {
         if (result.length != 0) {
             alert(result);
         } else {
-            setRegisters(simulator.getRegisters());
+            setRegisters(JSON.parse(simulator.getRegisters()));
             setMemory(simulator.getMemory());
             setStats(simulator.getStatistics());
         }
