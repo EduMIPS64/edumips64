@@ -1,8 +1,7 @@
 package org.edumips64.client;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.client.JsArray;
+import com.google.gwt.json.client.JSONArray;
 
 import jsinterop.annotations.JsType;
 
@@ -17,25 +16,6 @@ import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.NullFileUtils;
 
 import java.util.logging.Logger;
-
-class RegisterJSO extends JavaScriptObject {
-  protected RegisterJSO() {}
-  public final native String getName()/*-{
-    return this.name;
-}-*/; 
-
-public final native String getValue()/*-{
-    return this.value;
-}-*/;
-
-public final native void setValue(String value)/*-{
-    this.value = value;
-}-*/;
-
-public final native void setName(String name)/*-{
-    this.name = name;
-}-*/;
-}
 
 @JsType(namespace = "jsedumips64")
 public class WebUi implements EntryPoint {
@@ -75,31 +55,39 @@ public class WebUi implements EntryPoint {
     return memory.toString();
   }
 
-  public JsArray<RegisterJSO> getRegisters() {
-    JsArray<RegisterJSO> registers = JavaScriptObject.createArray().cast();
+  public String getRegisters() {
+    JSONArray registers = new JSONArray();
 
     try {
+      int i = 0;
       for(Register r : cpu.getRegisters()) {
-        RegisterJSO register = (RegisterJSO)JavaScriptObject.createObject().cast();
-        register.setName(r.getName());
-        register.setValue(r.getHexString());
-        registers.push(register);
+        registers.set(i++,
+          new FluentJsonObject()
+            .put("name", r.getName())
+            .put("value", r.getHexString())
+            .toJsonObject());
       }
     } catch (Exception e) {
       logger.warning("Error fetching registers: " + e.toString());
     }
-    return registers;
+    return registers.toString();
   }
 
   public String getStatistics() {
-    // Ugly, but GWT does not support String.format.
-    return cpu.getCycles() + " cycles executed\n" +
-        cpu.getInstructions() + " instructions executed\n" +
-        cpu.getRAWStalls() + " RAW Stalls\n" +
-        cpu.getWAWStalls() + " WAW Stalls\n" +
-        cpu.getStructuralStallsDivider() + " structural stalls (divider not available)\n" +
-        cpu.getStructuralStallsMemory() + " structural stalls (Memory not available)\n" +
-        "Code Size: " + (memory.getInstructionsNumber() * 4) + " Bytes";
+    return new FluentJsonObject()
+      // Execution
+      .put("cycles", cpu.getCycles())
+      .put("instructions", cpu.getInstructions())
+      // Stalls
+      .put("rawStalls", cpu.getRAWStalls())
+      .put("wawStalls", cpu.getWAWStalls())
+      .put("dividerStalls", cpu.getStructuralStallsDivider())
+      .put("memoryStalls", cpu.getStructuralStallsMemory())
+      // Code size
+      .put("codeSizeBytes",memory.getInstructionsNumber() * 4)
+      // FPU Control Status Register (FCSR)
+      .put("fcsr", cpu.getFCSR().getBinString())
+      .toString();
   }
 
   @Override

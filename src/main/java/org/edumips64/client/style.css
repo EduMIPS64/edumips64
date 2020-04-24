@@ -3,6 +3,14 @@ body {
     background-color: "white";
 }
 
+div.widget {
+    width: 90%;
+    height: 500px;
+    font-family: monospace;
+    border: 1px solid gray;
+    padding: 0px 10px 0px 10px;
+}
+
 textarea {
     width: 90%;
     height: 500px;
