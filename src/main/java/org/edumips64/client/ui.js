@@ -17,10 +17,34 @@ const Registers = (props) => {
     ); 
 }
 
-const Statistics = (props) => {
+// A toy component that appends a final "s" to the label if
+// the given value is != 1. Of course this is not proper
+// pluralization, just me playing around with React.
+const PluralLabel = ({label, value}) => {
+    const pluralize = value => value != 1 ? "s" : "";
+    return <p>{value} {label}{pluralize(value)}</p>
+}
+
+const Statistics = ({cycles, instructions, rawStalls, wawStalls, memoryStalls, codeSizeBytes, fcsr}) => {
+    // TODO: FCSR.
     return (
         <div className="pure-u-1 pure-u-lg-1-4">
-            <textarea readOnly value={props.stats} />
+            <div className="widget">
+                <p>
+                <b>Execution</b>
+                <PluralLabel value={cycles} label="Cycle" />
+                <PluralLabel value={instructions} label="Instruction" />
+                <p>{instructions == 0 ? 0 : (cycles / instructions).toFixed(2)} Cycles per Instructions (CPI)</p>
+                </p>
+                <p>
+                <b>Stalls</b>
+                <PluralLabel value={rawStalls} label="RAW Stall" />
+                <PluralLabel value={wawStalls} label="WAW Stall" />
+                <PluralLabel value={memoryStalls} label="Memory Stall" />
+                <b>Code size</b>
+                <p>{codeSizeBytes} Bytes</p>
+                </p>
+            </div>
         </div>
     );
 }
@@ -46,14 +70,26 @@ const Code = (props) => {
 }
 
 const Simulator = (props) => {
+    const emptyReg = "0000000000000000";
     const regs = [...Array(32).keys()];
     const defaultRegisters = regs.map(r => {
-        return {name: `R${r}`, value: "0000000000000000"};
+        return {name: `R${r}`, value: emptyReg};
     })
+
+    const defaultStats = {
+        "cycles": 0,
+        "instructions": 0,
+        "rawStalls": 0,
+        "wawStalls": 0,
+        "dividerStalls": 0,
+        "memoryStalls": 0,
+        "codeSizeBytes": 0,
+        "fcsr": emptyReg
+    }
 
     const [registers, setRegisters] = React.useState(defaultRegisters);
     const [memory, setMemory] = React.useState("Memory will appear here.");
-    const [stats, setStats] = React.useState("Statistics will appear here");
+    const [stats, setStats] = React.useState(defaultStats);
     const [code, setCode] = React.useState(`; Example program. Loads the value 10 (A) into R1.
 .data
     .word64 10
@@ -73,7 +109,7 @@ const Simulator = (props) => {
         } else {
             setRegisters(JSON.parse(simulator.getRegisters()));
             setMemory(simulator.getMemory());
-            setStats(simulator.getStatistics());
+            setStats(JSON.parse(simulator.getStatistics()));
         }
     }
 
@@ -82,7 +118,7 @@ const Simulator = (props) => {
             <Code onClick={runCode} onChangeValue ={(text) => setCode(text)} code={code}/>
             <Registers registers={registers}/>
             <Memory memory={memory}/>
-            <Statistics stats={stats}/>
+            <Statistics {...stats}/>
         </React.Fragment>
     );
 }

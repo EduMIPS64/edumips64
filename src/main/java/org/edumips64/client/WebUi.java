@@ -74,14 +74,20 @@ public class WebUi implements EntryPoint {
   }
 
   public String getStatistics() {
-    // Ugly, but GWT does not support String.format.
-    return cpu.getCycles() + " cycles executed\n" +
-        cpu.getInstructions() + " instructions executed\n" +
-        cpu.getRAWStalls() + " RAW Stalls\n" +
-        cpu.getWAWStalls() + " WAW Stalls\n" +
-        cpu.getStructuralStallsDivider() + " structural stalls (divider not available)\n" +
-        cpu.getStructuralStallsMemory() + " structural stalls (Memory not available)\n" +
-        "Code Size: " + (memory.getInstructionsNumber() * 4) + " Bytes";
+    return new FluentJsonObject()
+      // Execution
+      .put("cycles", cpu.getCycles())
+      .put("instructions", cpu.getInstructions())
+      // Stalls
+      .put("rawStalls", cpu.getRAWStalls())
+      .put("wawStalls", cpu.getWAWStalls())
+      .put("dividerStalls", cpu.getStructuralStallsDivider())
+      .put("memoryStalls", cpu.getStructuralStallsMemory())
+      // Code size
+      .put("codeSizeBytes",memory.getInstructionsNumber() * 4)
+      // FPU Control Status Register (FCSR)
+      .put("fcsr", cpu.getFCSR().getBinString())
+      .toString();
   }
 
   @Override
