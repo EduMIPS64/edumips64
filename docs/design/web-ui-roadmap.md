@@ -2,13 +2,14 @@
 This is the list of user stories for the web UI, categorized in milestones, which
 will serve as a guide for the development of the Web UI.
 
-User stories should have corresponding GitHub issues (even if currently they don't).
-
 In the milestone list, stories will be addressed with the initial of their
 section and then the number of the story (e.g., `BREAK support` is `E.6`).
 
 ## Milestones
-### Alpha (Unnamed)
+### Alpha (EduMIPS64 2.0-alpha)
+Status: **In Progress**
+Project link on GitHub: https://github.com/orgs/EduMIPS64/projects/1
+
 This milestone is a basic working simulator, with a pretty rough UI and just enough
 basic features to run most programs and verify its working.
 
@@ -18,6 +19,8 @@ User stories and features:
 * `U.1-5` (Basic functional UI, no settings)
 
 ### Beta (EduMIPS64 2.0-beta)
+Status: **Not started**
+
 This milestone will improve the UI and split it out in its own repository
 and enable settings support.
 
@@ -28,6 +31,8 @@ User stories and features:
 * `S.1-2` (Forwarding setting)
 
 ### GA (EduMIPS64 2.0)
+Status: **Not started**
+
 Fully working web simulator, suitable as a replacement for the current simulator.
 
 * `E.7-8` (Dinero Tracefile Download, file-based SYSCALL)
@@ -36,6 +41,8 @@ Fully working web simulator, suitable as a replacement for the current simulator
 * `D.4` (Instrumentation)
 
 ### Future (EduMIPS64 3.0)
+Status: **Not started**
+
 The web allows us to do much more than we could do as a Java application. Examples
 of future features might be:
 
@@ -91,7 +98,7 @@ implementation of the remaining features.
 5. Setting parser warning/errors options
 
 ### Development features
-1. Move to a proper JS toolchain. Build and deploy the frontend JS from a separate GitHub repository to web.edumips.org.
+1. Move to a proper JS toolchain. Build and deploy the frontend JS from a separate GitHub repository to web.edumips.org. (#87)
 2. Move to React Material UI
 3. Find a good (dashboard) Material UI template to use as a starting point (e.g. https://github.com/devias-io/react-material-dashboard)
 4. Instrument web UI (Google Analytics + some metrics)
