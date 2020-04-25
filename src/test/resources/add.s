@@ -2,7 +2,7 @@
 ;
 ; Executes an add and tests the results of the addition.
 ;
-; (c) 2018 Andrea Spadaccini and the EduMIPS64 team
+; (c) 2018 Oscar Elhanafey and the EduMIPS64 team
 ;
 ; This file is part of the EduMIPS64 project, and is released under the GNU
 ; General Public License.
