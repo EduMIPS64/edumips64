@@ -44,6 +44,10 @@ public class RegisterFP extends BitSet64FP {
     this.name = name;
   }
 
+  public String getName() {
+    return this.name;
+  }
+
   /** Returns the value of the semaphore
    *  @return the numerical value of the semaphore
    */

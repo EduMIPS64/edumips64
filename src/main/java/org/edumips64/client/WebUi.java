@@ -6,6 +6,7 @@ import com.google.gwt.json.client.JSONArray;
 import jsinterop.annotations.JsType;
 
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.HaltException;
 import org.edumips64.core.is.InstructionBuilder;
@@ -56,17 +57,52 @@ public class WebUi implements EntryPoint {
   }
 
   public String getRegisters() {
-    JSONArray registers = new JSONArray();
+    FluentJsonObject registers = new FluentJsonObject();
 
     try {
+      // General Purpose Registers (GPR).
       int i = 0;
+      JSONArray jsonGeneralRegisters = new JSONArray();
       for(Register r : cpu.getRegisters()) {
-        registers.set(i++,
+        jsonGeneralRegisters.set(i++,
           new FluentJsonObject()
             .put("name", r.getName())
             .put("value", r.getHexString())
             .toJsonObject());
       }
+      registers.put("gpr", jsonGeneralRegisters);
+
+      // FPU registers.
+      i = 0;
+      JSONArray jsonFpuRegisters = new JSONArray();
+      for(RegisterFP r : cpu.getRegistersFP()) {
+        jsonFpuRegisters.set(i++,
+          new FluentJsonObject()
+            .put("name", r.getName())
+            .put("value", r.getHexString())
+            .toJsonObject());
+      }
+      registers.put("fpu", jsonFpuRegisters);
+
+      // Special registers (hi/lo/fcsr).
+      i = 0;
+      JSONArray specialRegisters = new JSONArray();
+      specialRegisters.set(i++,
+          new FluentJsonObject()
+            .put("name", cpu.getLO().getName())
+            .put("value", cpu.getLO().getHexString())
+            .toJsonObject());
+      specialRegisters.set(i++,
+          new FluentJsonObject()
+            .put("name", cpu.getHI().getName())
+            .put("value", cpu.getHI().getHexString())
+            .toJsonObject());
+      specialRegisters.set(i++,
+          new FluentJsonObject()
+            .put("name", "FCSR")
+            .put("value", cpu.getFCSR().getHexString())
+            .toJsonObject());
+      registers.put("special", specialRegisters);
     } catch (Exception e) {
       logger.warning("Error fetching registers: " + e.toString());
     }

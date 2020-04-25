@@ -1,6 +1,7 @@
 package org.edumips64.client;
 
 import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONString;
 
@@ -19,6 +20,11 @@ public class FluentJsonObject {
     }
 
     public FluentJsonObject put(String key, JSONObject value) {
+        json.put(key, value);
+        return this;
+    }
+
+    public FluentJsonObject put(String key, JSONArray value) {
         json.put(key, value);
         return this;
     }
