@@ -5,6 +5,22 @@ will serve as a guide for the development of the Web UI.
 In the milestone list, stories will be addressed with the initial of their
 section and then the number of the story (e.g., `BREAK support` is `E.6`).
 
+## Introduction
+
+EduMIPS64 was born in 2006 as a desktop application, even if it initially ran
+as a Java applet in addition to running as a desktop app.
+
+As technology evolved, Java applets became obsolete, and EduMIPS64 doesn't run as
+an applet anymore, but the idea of running the simulator on a browser is still
+something useful, because it reduces installation friction and enables lots of
+scenarios that are simply not possible in a desktop application.
+
+In 2016, the core parts of the simulator were cleaned up and separated from the
+rest of the application, and cross-compiled to JavaScript with Google Web Toolkit.
+
+This document analyzes the work necessary to build a modern, clean web UI for
+EduMIPS64 and, by extension, refine the Java -> JS API created with GWT.
+
 ## Milestones
 ### Alpha (EduMIPS64 2.0-alpha)
 Status: **In Progress**
@@ -89,6 +105,7 @@ implementation of the remaining features.
 8. Settings UI (necessary for `S.*`)
 9. Code editor with syntax highlighting (e.g., ACE or Monaco)
 10. Localization
+11. Show binary/decimal/hex values of all numbers in the UI.
 
 ### Settings
 1. Enabling / disabling forwarding
