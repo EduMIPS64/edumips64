@@ -1,17 +1,28 @@
 'use strict';
 
-const Registers = (props) => {
+const Registers = ({gpr, fpu, special}) => {
     return (
         <div className="pure-u-1 pure-u-lg-1-4">
-            <table>
-                {props.registers.map(register => (
+            <table className="registers">
+                <tbody>
+                {// Ugly way of using a single table to show both GPR and FPU registers.
+                gpr.map((register, i) => (
+                    <tr key={register.name}>
+                        <td className="registerName">{register.name}</td>
+                        <td className="registerValue">{register.value}</td>
+                        <td className="registerName">{fpu[i].name}</td>
+                        <td className="registerValue">{fpu[i].value}</td>
+                    </tr>
+                    ))
+                }
+                {special.filter(r => r.name != "FCSR").map(register => (
                     <tr key={register.name}>
                         <td className="registerName">{register.name}</td>
                         <td className="registerValue">{register.value}</td>
                     </tr>
-                ))
+                    ))
                 }
-
+                </tbody>
             </table>
         </div>
     ); 
@@ -70,11 +81,25 @@ const Code = (props) => {
 }
 
 const Simulator = (props) => {
+    // TODO: should the default state be fetched directly from the CPU?
+    // the current model creates the CPU only when something is executed,
+    // but in reality we should keep the CPU instance as state, and we could
+    // fetch default values from there.
     const emptyReg = "0000000000000000";
-    const regs = [...Array(32).keys()];
-    const defaultRegisters = regs.map(r => {
-        return {name: `R${r}`, value: emptyReg};
-    })
+
+    // Generates the default, empty registers as returned by the CPU getRegisters() call.
+    const generateDefaultRegisters = () => {
+        const regs = [...Array(32).keys()];
+
+        const defaultRegisters = regs.map(r => {
+            return {name: `R${r}`, value: emptyReg}
+        });
+        const fpuRegisters = regs.map(r => {
+            return {name: `F${r}`, value: emptyReg}
+        })
+        const specialRegisters = ["LO", "HI", "FCSR"].map(r => {return {name: r, value: emptyReg}});
+        return {"gpr": defaultRegisters, "fpu": fpuRegisters, "special": specialRegisters}
+    }
 
     const defaultStats = {
         "cycles": 0,
@@ -87,7 +112,7 @@ const Simulator = (props) => {
         "fcsr": emptyReg
     }
 
-    const [registers, setRegisters] = React.useState(defaultRegisters);
+    const [registers, setRegisters] = React.useState(generateDefaultRegisters());
     const [memory, setMemory] = React.useState("Memory will appear here.");
     const [stats, setStats] = React.useState(defaultStats);
     const [code, setCode] = React.useState(`; Example program. Loads the value 10 (A) into R1.
@@ -116,7 +141,7 @@ const Simulator = (props) => {
     return (
         <React.Fragment>
             <Code onClick={runCode} onChangeValue ={(text) => setCode(text)} code={code}/>
-            <Registers registers={registers}/>
+            <Registers {...registers}/>
             <Memory memory={memory}/>
             <Statistics {...stats}/>
         </React.Fragment>
