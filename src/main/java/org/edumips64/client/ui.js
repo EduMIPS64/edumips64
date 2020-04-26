@@ -128,9 +128,11 @@ const Simulator = (props) => {
         console.log("Executing runCode");
         const simulator = new jsedumips64.WebUi();
         simulator.init();
-        const result = simulator.runProgram(code);
-        if (result.length != 0) {
-            alert(result);
+        const result = JSON.parse(simulator.runProgram(code));
+        console.log(result);
+
+        if (!result.success) {
+            alert(result.errorMessage);
         } else {
             setRegisters(JSON.parse(simulator.getRegisters()));
             setMemory(simulator.getMemory());
