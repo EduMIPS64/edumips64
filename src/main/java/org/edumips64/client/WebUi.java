@@ -1,3 +1,25 @@
+/* WebUI.java
+ *
+ * GWT facade for the EduMIPS64 core.
+ * (c) 2020 Andrea Spadaccini
+ *
+ * This file is part of the EduMIPS64 project, and is released under the GNU
+ * General Public License.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 package org.edumips64.client;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -6,6 +28,7 @@ import com.google.gwt.json.client.JSONArray;
 import jsinterop.annotations.JsType;
 
 import org.edumips64.core.*;
+import org.edumips64.core.CPU.CPUStatus;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.HaltException;
@@ -28,28 +51,80 @@ public class WebUi implements EntryPoint {
    
   private Logger logger = Logger.getLogger("simulator");
 
-  // Executes the program. Returns an empty string on success, or an error message.
-  public String runProgram(String code) {
-    logger.info("Running program: " + code);
-    try {
+  private void info(String message) {
+    logger.info("[GWT] " + message);
+  }
+  private void warning(String message) {
+    logger.warning("[GWT] " + message);
+  }
+
+  public void reset() {
+      info("Resetting the CPU");
       cpu.reset();
       dinero.reset();
       symTab.reset();
-      logger.info("About to parse it.");
+  }
+
+  public Result loadInternal(String code) {
+    if (cpu.getStatus() != CPU.CPUStatus.READY) {
+      info("Resetting CPU before loading a new program.");
+      reset();
+    }
+
+    info("Loading program: " + code);
+    try {
       parser.doParsing(code);
       dinero.setDataOffset(memory.getInstructionsNumber()*4);
-      logger.info("Parsed. Running.");
-      cpu.setStatus(CPU.CPUStatus.RUNNING);
-      while (true) {
-        cpu.step();
-      }
-    } catch (HaltException e) {
-      logger.info("All done.");
-      return "";
     } catch (Exception e) {
-      logger.warning("Error: " + e.toString());
-      return e.toString();
+      warning("Parsing error: " + e.toString());
+      return Result.Failure(e.toString());
     }
+    cpu.setStatus(CPU.CPUStatus.RUNNING);
+    info("Program parsed.");
+    return Result.Success();
+  }
+
+  public String step() {
+    return stepInternal().toString();
+  }
+
+  private CPUStepStatus stepInternal() {
+    CPUStatus status = cpu.getStatus();
+    if (status != CPU.CPUStatus.RUNNING && status != CPU.CPUStatus.STOPPING) {
+      String message = "Cannot run in state " + cpu.getStatus();
+      return new CPUStepStatus(Result.Failure(message), true);
+    }
+
+    try {
+      cpu.step();
+    } catch (HaltException e) {
+      info("Program terminated successfully.");
+      return new CPUStepStatus(Result.Success(), true);
+    } catch (Exception e) {
+      warning("Error: " + e.toString());
+      return new CPUStepStatus(Result.Failure(e.toString()), true);
+    }
+
+    return new CPUStepStatus(Result.Success(), false);
+  }
+
+  private CPUStepStatus runAll() {
+    CPUStepStatus cpuStatus;
+    do {
+      cpuStatus = stepInternal();
+    } while (cpuStatus.result.success && !cpuStatus.terminated);
+
+    return cpuStatus;
+  }
+
+  // Executes the program. Returns an empty string on success, or an error message.
+  public String runProgram(String code) {
+    Result parseResult = loadInternal(code);
+    if (!parseResult.success) {
+      return parseResult.toJsonObject().toString();
+    }
+    CPUStepStatus result = runAll();
+    return result.toJsonObject().toString();
   }
 
   public String getMemory() {
@@ -104,7 +179,7 @@ public class WebUi implements EntryPoint {
             .toJsonObject());
       registers.put("special", specialRegisters);
     } catch (Exception e) {
-      logger.warning("Error fetching registers: " + e.toString());
+      warning("Error fetching registers: " + e.toString());
     }
     return registers.toString();
   }
@@ -127,7 +202,9 @@ public class WebUi implements EntryPoint {
   }
 
   @Override
-  public void onModuleLoad() {}
+  public void onModuleLoad() {
+    info("Module loaded.");
+  }
 
   public void init() {
     // Simulator initialization.
