@@ -80,50 +80,22 @@ const Code = (props) => {
     );
 }
 
-const Simulator = (props) => {
-    // TODO: should the default state be fetched directly from the CPU?
-    // the current model creates the CPU only when something is executed,
-    // but in reality we should keep the CPU instance as state, and we could
-    // fetch default values from there.
-    const emptyReg = "0000000000000000";
-
-    // Generates the default, empty registers as returned by the CPU getRegisters() call.
-    const generateDefaultRegisters = () => {
-        const regs = [...Array(32).keys()];
-
-        const defaultRegisters = regs.map(r => {
-            return {name: `R${r}`, value: emptyReg}
-        });
-        const fpuRegisters = regs.map(r => {
-            return {name: `F${r}`, value: emptyReg}
-        })
-        const specialRegisters = ["LO", "HI", "FCSR"].map(r => {return {name: r, value: emptyReg}});
-        return {"gpr": defaultRegisters, "fpu": fpuRegisters, "special": specialRegisters}
-    }
-
-    const defaultStats = {
-        "cycles": 0,
-        "instructions": 0,
-        "rawStalls": 0,
-        "wawStalls": 0,
-        "dividerStalls": 0,
-        "memoryStalls": 0,
-        "codeSizeBytes": 0,
-        "fcsr": emptyReg
-    }
-
-    const [simulator, setSimulator] = React.useState(props.simulator);
-    const [registers, setRegisters] = React.useState(generateDefaultRegisters());
-    const [memory, setMemory] = React.useState("Memory will appear here.");
-    const [stats, setStats] = React.useState(defaultStats);
-    const [code, setCode] = React.useState(`; Example program. Loads the value 10 (A) into R1.
+const sampleProgram =`; Example program. Loads the value 10 (A) into R1.
 .data
     .word64 10
 
 .code
     lw r1, 0(r0)
     SYSCALL 0
-`);
+`;
+
+const Simulator = (props) => {
+    const [simulator, setSimulator] = React.useState(props.simulator);
+    const [registers, setRegisters] = React.useState(JSON.parse(props.simulator.getRegisters()));
+    const [memory, setMemory] = React.useState(props.simulator.getMemory());
+    const [stats, setStats] = React.useState(JSON.parse(props.simulator.getStatistics()));
+    const [code, setCode] = React.useState(sampleProgram);
+
     const updateState = () => {
         setRegisters(JSON.parse(simulator.getRegisters()));
         setMemory(simulator.getMemory());
