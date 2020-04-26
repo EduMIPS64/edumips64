@@ -75,7 +75,7 @@ const Code = (props) => {
                 onChange={(event) => {props.onChangeValue(event.target.value);}}
                 />
             <br />
-            <input id="run-button" type="button" value="Run" onClick={() => {props.onClick()}} />
+            <input id="run-button" type="button" value="Run" onClick={() => {props.onClick()}} enabled={props.enabled} />
         </div>
     );
 }
@@ -112,6 +112,7 @@ const Simulator = (props) => {
         "fcsr": emptyReg
     }
 
+    const [simulator, setSimulator] = React.useState(props.simulator);
     const [registers, setRegisters] = React.useState(generateDefaultRegisters());
     const [memory, setMemory] = React.useState("Memory will appear here.");
     const [stats, setStats] = React.useState(defaultStats);
@@ -123,26 +124,26 @@ const Simulator = (props) => {
     lw r1, 0(r0)
     SYSCALL 0
 `);
-
+    const updateState = () => {
+        setRegisters(JSON.parse(simulator.getRegisters()));
+        setMemory(simulator.getMemory());
+        setStats(JSON.parse(simulator.getStatistics()));
+    }
+    
     const runCode = () => {
-        console.log("Executing runCode");
-        const simulator = new jsedumips64.WebUi();
-        simulator.init();
+        console.log("Executing runCode - " + simulator);
         const result = JSON.parse(simulator.runProgram(code));
+        updateState();
         console.log(result);
 
         if (!result.success) {
             alert(result.errorMessage);
-        } else {
-            setRegisters(JSON.parse(simulator.getRegisters()));
-            setMemory(simulator.getMemory());
-            setStats(JSON.parse(simulator.getStatistics()));
-        }
+        } 
     }
 
     return (
         <React.Fragment>
-            <Code onClick={runCode} onChangeValue ={(text) => setCode(text)} code={code}/>
+            <Code onClick={runCode} onChangeValue ={(text) => setCode(text)} code={code} />
             <Registers {...registers}/>
             <Memory memory={memory}/>
             <Statistics {...stats}/>
@@ -150,7 +151,21 @@ const Simulator = (props) => {
     );
 }
 
-ReactDOM.render(
-    <Simulator />,
-    document.getElementById('simulator')
-);
+// Ugly hack to wait for GWT initialization to finish.
+// If initialization is not done, jsedumips64 will be undefined.
+// I tried a couple of different ways of doing this with sleeps,
+// this is a compromise between simplicity and user experience.
+//
+// The better way to handle this would be to somehow get a call
+// when GWT is initialized, which could be done by overriding
+// the WebUi.onModuleLoad() function.
+console.log("Waiting 500ms for GWT to initialize");
+setTimeout(() => {
+    let sim = new jsedumips64.WebUi();
+    sim.init();
+
+    ReactDOM.render(
+        <Simulator simulator={sim} />,
+        document.getElementById('simulator')
+    )
+}, 500);
