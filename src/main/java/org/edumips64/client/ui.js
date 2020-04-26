@@ -19,6 +19,7 @@ const Registers = ({gpr, fpu, special}) => {
                     <tr key={register.name}>
                         <td className="registerName">{register.name}</td>
                         <td className="registerValue">{register.value}</td>
+                        <td /><td />
                     </tr>
                     ))
                 }
@@ -33,7 +34,7 @@ const Registers = ({gpr, fpu, special}) => {
 // pluralization, just me playing around with React.
 const PluralLabel = ({label, value}) => {
     const pluralize = value => value != 1 ? "s" : "";
-    return <p>{value} {label}{pluralize(value)}</p>
+    return <div>{value} {label}{pluralize(value)}</div>
 }
 
 const Statistics = ({cycles, instructions, rawStalls, wawStalls, memoryStalls, codeSizeBytes, fcsr}) => {
@@ -41,20 +42,22 @@ const Statistics = ({cycles, instructions, rawStalls, wawStalls, memoryStalls, c
     return (
         <div className="pure-u-1 pure-u-lg-1-4">
             <div className="widget">
-                <p>
-                <b>Execution</b>
-                <PluralLabel value={cycles} label="Cycle" />
-                <PluralLabel value={instructions} label="Instruction" />
-                <p>{instructions == 0 ? 0 : (cycles / instructions).toFixed(2)} Cycles per Instructions (CPI)</p>
-                </p>
-                <p>
-                <b>Stalls</b>
-                <PluralLabel value={rawStalls} label="RAW Stall" />
-                <PluralLabel value={wawStalls} label="WAW Stall" />
-                <PluralLabel value={memoryStalls} label="Memory Stall" />
-                <b>Code size</b>
-                <p>{codeSizeBytes} Bytes</p>
-                </p>
+                <div>
+                    <b>Execution</b>
+                    <PluralLabel value={cycles} label="Cycle" />
+                    <PluralLabel value={instructions} label="Instruction" />
+                    <div>{instructions == 0 ? 0 : (cycles / instructions).toFixed(2)} Cycles per Instructions (CPI)</div>
+                </div><br/>
+                <div>
+                    <b>Stalls</b>
+                    <PluralLabel value={rawStalls} label="RAW Stall" />
+                    <PluralLabel value={wawStalls} label="WAW Stall" />
+                    <PluralLabel value={memoryStalls} label="Memory Stall" />
+                </div><br />
+                <div>
+                    <b>Code size</b>
+                    <div>{codeSizeBytes} Bytes</div>
+                </div>
             </div>
         </div>
     );
