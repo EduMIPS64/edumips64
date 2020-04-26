@@ -23,7 +23,9 @@
 package org.edumips64.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.user.client.Command;
 
 import jsinterop.annotations.JsType;
 
@@ -203,8 +205,20 @@ public class WebUi implements EntryPoint {
 
   @Override
   public void onModuleLoad() {
-    info("Module loaded.");
+    // Invoke JS initialization logic that depends on this GWT module being loaded.
+    info("Module loaded, calling the global JS function onGwtReady()");
+    Scheduler.get().scheduleDeferred(new Command() {
+      public void execute() {
+        runOnGwtReady();
+      }
+    });
   }
+
+  private native void runOnGwtReady() /*-{
+    if (typeof $wnd.onGwtReady !== "undefined") {
+      $wnd.onGwtReady();
+    }
+  }-*/;
 
   public void init() {
     // Simulator initialization.

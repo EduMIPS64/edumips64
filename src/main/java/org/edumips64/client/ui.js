@@ -126,16 +126,9 @@ const Simulator = (props) => {
     );
 }
 
-// Ugly hack to wait for GWT initialization to finish.
-// If initialization is not done, jsedumips64 will be undefined.
-// I tried a couple of different ways of doing this with sleeps,
-// this is a compromise between simplicity and user experience.
-//
-// The better way to handle this would be to somehow get a call
-// when GWT is initialized, which could be done by overriding
-// the WebUi.onModuleLoad() function.
-console.log("Waiting 500ms for GWT to initialize");
-setTimeout(() => {
+// This method is called by WebUI.onModuleLoad, a callback invoked by GWT when the module is loaded.
+// It's necessary to be called by GWT because before the module is loaded the GWT objects cannot be used.
+const onGwtReady = () => {
     let sim = new jsedumips64.WebUi();
     sim.init();
 
@@ -143,4 +136,5 @@ setTimeout(() => {
         <Simulator simulator={sim} />,
         document.getElementById('simulator')
     )
-}, 500);
+
+}
