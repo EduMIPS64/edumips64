@@ -202,7 +202,9 @@ public class WebUi implements EntryPoint {
   }
 
   @Override
-  public void onModuleLoad() {}
+  public void onModuleLoad() {
+    info("Module loaded.");
+  }
 
   public void init() {
     // Simulator initialization.
