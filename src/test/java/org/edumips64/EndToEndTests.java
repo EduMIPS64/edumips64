@@ -411,7 +411,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testSllv() throws Exception {
     runMipsTest("sllv.s");
   }
-  
+
 
   /* Test for utils/strlen.s */
   @Test(timeout=2000)
@@ -662,72 +662,6 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runMipsTest("load-large-memory-location.s");
   }
 
-  /* Test for instruction ADD */
-  @Test()
-  public void testAdd() throws Exception {
-    runMipsTest("add.s");
-  }
-
-  /* Test for instruction BC1F */
-  @Test()
-  public void testBc1f() throws Exception {
-    runMipsTest("bc1f.s");
-  }
-
-  /* Test for instruction BGEZ */
-  @Test()
-  public void testBgez() throws Exception {
-    runMipsTest("bgez.s");
-  }
-
-  /* Test for instruction C.LT.D */
-  @Test()
-  public void testCltd() throws Exception {
-    runMipsTest("cltd.s");
-  }
-
-  /* Test for instruction CVT.D.W */
-  @Test()
-  public void testCvtdw() throws Exception {
-    runMipsTest("cvtdw.s");
-  }
-
-  /* Test for instruction SLT */
-  @Test()
-  public void testSlt() throws Exception {
-    runMipsTest("slt.s");
-  }
-
-  /* Test for instruction SUB */
-  @Test()
-  public void testSub() throws Exception {
-    runMipsTest("sub.s");
-  }
-
-  /* Test for instruction SRL */
-  @Test()
-  public void testSrl() throws Exception {
-    runMipsTest("srl.s");
-  }
-
-  /* Test for instruction SRLV */
-  @Test()
-  public void testSrlv() throws Exception {
-    runMipsTest("srlv.s");
-  }
-
-  /* Test for instruction SLL */
-  @Test()
-  public void testSll() throws Exception {
-    runMipsTest("sll.s");
-  }
-
-  /* Test for instruction SLLV */
-  @Test()
-  public void testSllv() throws Exception {
-    runMipsTest("sllv.s");
-  }
-  
   /* Issue #304: Infinite RAW stall in floating-point.
   */
   @Test(timeout=2000)
