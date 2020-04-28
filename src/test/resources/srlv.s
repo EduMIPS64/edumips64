@@ -2,7 +2,7 @@
 ;
 ; Tests srlv instruction and ensures that it right shifts correctly.
 ;
-; (c) 2018 Oscar Elhanafey and the EduMIPS64 team
+; (c) 2020 Oscar Elhanafey and the EduMIPS64 team
 ;
 ; This file is part of the EduMIPS64 project, and is released under the GNU
 ; General Public License.
