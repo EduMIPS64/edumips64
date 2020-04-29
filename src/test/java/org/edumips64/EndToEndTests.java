@@ -411,7 +411,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testSllv() throws Exception {
     runMipsTest("sllv.s");
   }
-  
+
 
   /* Test for utils/strlen.s */
   @Test(timeout=2000)
