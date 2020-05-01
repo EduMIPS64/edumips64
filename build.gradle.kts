@@ -21,7 +21,7 @@ repositories {
 dependencies {
     compileOnly("com.google.gwt:gwt-user:2.8.2")
     implementation("javax.help:javahelp:2.0.05")
-    testImplementation("junit:junit:4.12")
+    testImplementation("junit:junit:4.13")
 }
 
 application {
