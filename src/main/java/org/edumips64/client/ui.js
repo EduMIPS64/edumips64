@@ -2,8 +2,8 @@
 
 const Registers = ({gpr, fpu, special}) => {
     return (
-        <div className="pure-u-1 pure-u-lg-1-4">
-            <table className="registers">
+        <div>
+            <table id="registers">
                 <tbody>
                 {// Ugly way of using a single table to show both GPR and FPU registers.
                 gpr.map((register, i) => (
@@ -40,31 +40,29 @@ const PluralLabel = ({label, value}) => {
 const Statistics = ({cycles, instructions, rawStalls, wawStalls, memoryStalls, codeSizeBytes, fcsr}) => {
     // TODO: FCSR.
     return (
-        <div className="pure-u-1 pure-u-lg-1-4">
-            <div className="widget">
-                <div>
-                    <b>Execution</b>
-                    <PluralLabel value={cycles} label="Cycle" />
-                    <PluralLabel value={instructions} label="Instruction" />
-                    <div>{instructions == 0 ? 0 : (cycles / instructions).toFixed(2)} Cycles per Instructions (CPI)</div>
-                </div><br/>
-                <div>
-                    <b>Stalls</b>
-                    <PluralLabel value={rawStalls} label="RAW Stall" />
-                    <PluralLabel value={wawStalls} label="WAW Stall" />
-                    <PluralLabel value={memoryStalls} label="Memory Stall" />
-                </div><br />
-                <div>
-                    <b>Code size</b>
-                    <div>{codeSizeBytes} Bytes</div>
-                </div>
+        <div id="statistics">
+            <div>
+                <b>Execution</b>
+                <PluralLabel value={cycles} label="Cycle" />
+                <PluralLabel value={instructions} label="Instruction" />
+                <div>{instructions == 0 ? 0 : (cycles / instructions).toFixed(2)} Cycles per Instructions (CPI)</div>
+            </div><br/>
+            <div>
+                <b>Stalls</b>
+                <PluralLabel value={rawStalls} label="RAW Stall" />
+                <PluralLabel value={wawStalls} label="WAW Stall" />
+                <PluralLabel value={memoryStalls} label="Memory Stall" />
+            </div><br />
+            <div>
+                <b>Code size</b>
+                <div>{codeSizeBytes} Bytes</div>
             </div>
         </div>
     );
 }
 const Memory = (props) => {
     return (
-        <div className="pure-u-1 pure-u-lg-1-4">
+        <div id="memory">
             <textarea readOnly value={props.memory} />
         </div>
     );
@@ -72,12 +70,11 @@ const Memory = (props) => {
 
 const Code = (props) => {
     return (
-        <div className="pure-u-1 pure-u-lg-1-4">
+        <div id="code">
             <textarea 
                 value={props.code}
                 onChange={(event) => {props.onChangeValue(event.target.value);}}
                 />
-            <br />
             <input id="run-button" type="button" value="Run" onClick={() => {props.onClick()}} enabled={props.enabled} />
         </div>
     );
@@ -117,12 +114,12 @@ const Simulator = (props) => {
     }
 
     return (
-        <React.Fragment>
+        <div id="widgetGrid">
             <Code onClick={runCode} onChangeValue ={(text) => setCode(text)} code={code} />
             <Registers {...registers}/>
             <Memory memory={memory}/>
             <Statistics {...stats}/>
-        </React.Fragment>
+        </div>
     );
 }
 
