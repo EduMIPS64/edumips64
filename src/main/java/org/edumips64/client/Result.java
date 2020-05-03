@@ -1,6 +1,7 @@
 /* Result.java
  *
- * Thin value object to represent the result of a generic operation.
+ * Thin value object to represent the result of a generic operation, exported
+ * as a type to JavaScript.
  * (c) 2020 Andrea Spadaccini
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -22,8 +23,9 @@
  */
 package org.edumips64.client;
 
-import com.google.gwt.json.client.JSONObject;
+import jsinterop.annotations.JsType;
 
+@JsType(namespace="jsedumips64")
 public class Result {
   public boolean success = false;
   public String errorMessage = "";
@@ -36,18 +38,23 @@ public class Result {
     this.errorMessage = errorMessage;
   }
 
+  protected Result(Result r) {
+    this.success = r.success;
+    this.errorMessage = r.errorMessage;
+  }
+
+  protected Result() {}
+
+  public String toString() {
+    return "Result {success: " + success + ", errorMessage: " + errorMessage + "}";
+  }
+
+  // Static helpers to generate Results that represent success or failure.
   public static Result Success() {
     return new Result(true);
   }
 
   public static Result Failure(String message) {
     return new Result(false, message);
-  }
-
-  public JSONObject toJsonObject() {
-    return new FluentJsonObject()
-      .put("success", success)
-      .put("errorMessage", errorMessage)
-      .toJsonObject();
   }
 }

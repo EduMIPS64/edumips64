@@ -104,7 +104,7 @@ const Simulator = (props) => {
     
     const runCode = () => {
         console.log("Executing runCode - " + simulator);
-        const result = JSON.parse(simulator.runProgram(code));
+        const result = simulator.runProgram(code);
         updateState();
         console.log(result);
 
