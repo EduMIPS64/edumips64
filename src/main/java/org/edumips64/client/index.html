@@ -3,20 +3,10 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>EduMIPS64 Experimental Web Frontend</title>
 
-      <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
-      <!-- Responsive grid for Pure CSS -->
-      <!--[if lte IE 8]>
-      <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/grids-responsive-old-ie-min.css">
-      <![endif]-->
-      <!--[if gt IE 8]><!-->
-      <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/grids-responsive-min.css">
-      <!--<![endif]-->
-
        <!-- Materialize.CSS -->
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
       <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-   
 
       <script type="text/javascript" language="javascript" src="edumips64.nocache.js"></script>
 
@@ -55,21 +45,23 @@
         in order for this application to display correctly.
       </div>
     </noscript>
-    <div class="pure-g" id="simulator">
+
+    <!-- React mount node. -->
+    <div id="simulator">
     </div>
 
-  <!-- About modal dialog. -->
-  <div id="aboutmodal" class="modal">
-    <div class="modal-content">
-      <h4><img src='logo.png' /></h4>
-      <p>This is the web version of the <a href="https://www.edumips.org">EduMIPS64 CPU simulator</a>.</p>
-      <p>This is currently <strong>work-in-progress</strong>, very early stages and not fully functional.</p>
-      <p>The core of the simulator is cross-compiled from Java to JavaScript, and the UI is developed with React.</p>
-      <p>If you are interested in the evolution of this web application or want to contribute to it, please get in touch via GitHub!</p>
+    <!-- About modal dialog. -->
+    <div id="aboutmodal" class="modal">
+      <div class="modal-content">
+        <h4><img src='logo.png' /></h4>
+        <p>This is the web version of the <a href="https://www.edumips.org">EduMIPS64 CPU simulator</a>.</p>
+        <p>This is currently <strong>work-in-progress</strong>, very early stages and not fully functional.</p>
+        <p>The core of the simulator is cross-compiled from Java to JavaScript, and the UI is developed with React.</p>
+        <p>If you are interested in the evolution of this web application or want to contribute to it, please get in touch via GitHub!</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
+      </div>
     </div>
-    <div class="modal-footer">
-      <a href="#!" class="modal-close waves-effect waves-green btn-flat">Close</a>
-    </div>
-  </div>
   </body>
 </html>
