@@ -3,8 +3,13 @@ body {
     background-color: "white";
 }
 
+nav {
+    margin-bottom: 1em;
+}
+
 div.widget {
     width: 90%;
+    min-width: 800px;
     height: 500px;
     font-family: monospace;
     border: 1px solid gray;
@@ -13,7 +18,7 @@ div.widget {
 
 textarea {
     width: 90%;
-    height: 500px;
+    height: 100%;
     font-family: monospace;
 }
 
@@ -31,6 +36,8 @@ table {
 td {
     padding-left: 10px;
     padding-right: 10px;
+    padding-top: .1em;
+    padding-bottom: .1em;
 }
 
 #run-button {
@@ -38,9 +45,9 @@ td {
 }
 
 #logo {
-    height: 98px;
+    height: 62px;
     display: block;
-    width: 350px;
+    padding-left: 10px;
 }
 
 #nojs {
