@@ -50,8 +50,27 @@ public class WebUi implements EntryPoint {
   private SymbolTable symTab;
   private Memory memory;
   private Dinero dinero;
+
+  private ResultFactory resultFactory;
    
   private Logger logger = Logger.getLogger("simulator");
+
+  // Enum for the simulator status. This is a trimmed-down version of
+  // CPU.CPUStatus, hiding details that the JS client should not care
+  // about.
+  @JsType(namespace = "jsedumips64")
+  public enum Status {READY, RUNNING, STOPPED};
+  static Status FromCpuStatus(CPUStatus s) {
+    switch (s) {
+      case READY:
+        return Status.READY;
+      case RUNNING:
+      case STOPPING:
+        return Status.RUNNING;
+      default:
+        return Status.STOPPED;
+    }
+  }
 
   /* Public methods - available from JS. */
 
@@ -67,6 +86,7 @@ public class WebUi implements EntryPoint {
     dinero = new Dinero();
     InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
+    resultFactory = new ResultFactory(cpu);
   }
 
   public void reset() {
@@ -95,19 +115,18 @@ public class WebUi implements EntryPoint {
       return parseResult;
     }
 
-    CPUStepResult result = runAll();
-    return result;
+    return runAll();
   }
 
-  public CPUStepResult runAll() {
-    CPUStepResult cpuStatus;
+  public Result runAll() {
+    Result result;
     do {
       info("running one step");
-      cpuStatus = step();
-      info("step results: " + cpuStatus.toString());
-    } while (cpuStatus.success && !cpuStatus.terminated);
+      result = step();
+      info("step results: " + result.toString());
+    } while (result.success && (result.status != Status.STOPPED));
 
-    return cpuStatus;
+    return result;
   }
 
   public Result loadProgram(String code) {
@@ -122,11 +141,11 @@ public class WebUi implements EntryPoint {
       dinero.setDataOffset(memory.getInstructionsNumber()*4);
     } catch (Exception e) {
       warning("Parsing error: " + e.toString());
-      return Result.Failure(e.toString());
+      return resultFactory.Failure(e.toString());
     }
     cpu.setStatus(CPU.CPUStatus.RUNNING);
     info("Program parsed.");
-    return Result.Success();
+    return resultFactory.Success();
   }
 
   /* Public methods to get Simulator state */
@@ -205,27 +224,23 @@ public class WebUi implements EntryPoint {
   }
 
   /* Private methods */
-  private CPUStepResult step() {
+  private Result step() {
     CPUStatus status = cpu.getStatus();
     if (status != CPU.CPUStatus.RUNNING && status != CPU.CPUStatus.STOPPING) {
       String message = "Cannot run in state " + cpu.getStatus();
-      return new CPUStepResult(Result.Failure(message), true);
+      return resultFactory.Failure(message);
     }
 
     try {
       cpu.step();
     } catch (HaltException e) {
       info("Program terminated successfully.");
-      return new CPUStepResult(Result.Success(), true);
     } catch (Exception e) {
       warning("Error: " + e.toString());
-      return new CPUStepResult(Result.Failure(e.toString()), true);
+      return resultFactory.Failure(e.toString());
     }
-
-    return new CPUStepResult(Result.Success(), false);
+    return resultFactory.Success();
   }
-
-
 
   private native void runOnGwtReady() /*-{
     if (typeof $wnd.onGwtReady !== "undefined") {
@@ -238,5 +253,4 @@ public class WebUi implements EntryPoint {
   private void warning(String message) {
     logger.warning("[GWT] " + message);
   }
-
 }

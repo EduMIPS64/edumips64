@@ -42,8 +42,12 @@ table#registers td {
 #code > textarea {
     height: 95%;
 }
-#run-button {
-    width: 100%;
+div#controls {
+    height: 100%;
+}
+div#controls > input {
+    padding: .5em;
+    margin: 0 .5em;
 }
 
 #logo {

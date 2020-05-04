@@ -29,32 +29,14 @@ import jsinterop.annotations.JsType;
 public class Result {
   public boolean success = false;
   public String errorMessage = "";
+  public WebUi.Status status = WebUi.Status.READY;
 
-  private Result(boolean success) {
-    this.success = success;
-  }
-  private Result(boolean success, String errorMessage) {
+  public Result(boolean success, String errorMessage) {
     this.success = success;
     this.errorMessage = errorMessage;
   }
 
-  protected Result(Result r) {
-    this.success = r.success;
-    this.errorMessage = r.errorMessage;
-  }
-
-  protected Result() {}
-
   public String toString() {
-    return "Result {success: " + success + ", errorMessage: " + errorMessage + "}";
-  }
-
-  // Static helpers to generate Results that represent success or failure.
-  public static Result Success() {
-    return new Result(true);
-  }
-
-  public static Result Failure(String message) {
-    return new Result(false, message);
+    return "Result {success: " + success + ", errorMessage: " + errorMessage + ", Status: " + status.name() + "}";
   }
 }
