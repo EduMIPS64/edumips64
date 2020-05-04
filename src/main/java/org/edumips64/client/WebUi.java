@@ -129,6 +129,24 @@ public class WebUi implements EntryPoint {
     return result;
   }
 
+  public Result step() {
+    CPUStatus status = cpu.getStatus();
+    if (status != CPU.CPUStatus.RUNNING && status != CPU.CPUStatus.STOPPING) {
+      String message = "Cannot run in state " + cpu.getStatus();
+      return resultFactory.Failure(message);
+    }
+
+    try {
+      cpu.step();
+    } catch (HaltException e) {
+      info("Program terminated successfully.");
+    } catch (Exception e) {
+      warning("Error: " + e.toString());
+      return resultFactory.Failure(e.toString());
+    }
+    return resultFactory.Success();
+  }
+
   public Result loadProgram(String code) {
     if (cpu.getStatus() != CPU.CPUStatus.READY) {
       info("Resetting CPU before loading a new program.");
@@ -224,23 +242,6 @@ public class WebUi implements EntryPoint {
   }
 
   /* Private methods */
-  private Result step() {
-    CPUStatus status = cpu.getStatus();
-    if (status != CPU.CPUStatus.RUNNING && status != CPU.CPUStatus.STOPPING) {
-      String message = "Cannot run in state " + cpu.getStatus();
-      return resultFactory.Failure(message);
-    }
-
-    try {
-      cpu.step();
-    } catch (HaltException e) {
-      info("Program terminated successfully.");
-    } catch (Exception e) {
-      warning("Error: " + e.toString());
-      return resultFactory.Failure(e.toString());
-    }
-    return resultFactory.Success();
-  }
 
   private native void runOnGwtReady() /*-{
     if (typeof $wnd.onGwtReady !== "undefined") {

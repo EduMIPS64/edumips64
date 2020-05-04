@@ -77,7 +77,8 @@ const Code = (props) => {
                 />
             <div id="controls">
                 <input id="load-button" type="button" value="Load/Reset" onClick={() => {props.onLoadClick()}} disabled={!props.loadEnabled} />
-                <input id="run-button" type="button" value="Run" onClick={() => {props.onRunClick()}} disabled={!props.runEnabled} />
+                <input id="step-button" type="button" value="Single Step" onClick={() => {props.onStepClick()}} disabled={!props.stepEnabled} />
+                <input id="run-button" type="button" value="Run All" onClick={() => {props.onRunClick()}} disabled={!props.runEnabled} />
             </div>
         </div>
     );
@@ -100,7 +101,7 @@ const Simulator = (props) => {
     const [code, setCode] = React.useState(sampleProgram);
     const [status, setStatus] = React.useState(jsedumips64.Status.READY);
 
-    const runEnabled = status == jsedumips64.Status.RUNNING;
+    const simulatorRunning = status == jsedumips64.Status.RUNNING;
 
     const updateState = (result) => {
         setRegisters(JSON.parse(simulator.getRegisters()));
@@ -119,6 +120,18 @@ const Simulator = (props) => {
             alert(result.errorMessage);
         } 
     }
+
+    const stepCode = () => {
+        console.log("Executing step");
+        const result = simulator.step();
+        updateState(result);
+        console.log(result);
+
+        if (!result.success) {
+            alert(result.errorMessage);
+        } 
+
+    }
     
     const runCode = () => {
         console.log("Executing runCode - " + simulator);
@@ -134,10 +147,9 @@ const Simulator = (props) => {
     return (
         <div id="widgetGrid">
             <Code 
-                onRunClick={runCode} 
-                runEnabled={runEnabled}
-                onLoadClick={loadCode} 
-                loadEnabled={true}
+                onRunClick={runCode} runEnabled={simulatorRunning}
+                onStepClick={stepCode} stepEnabled={simulatorRunning}
+                onLoadClick={loadCode} loadEnabled={true}
                 onChangeValue={(text) => setCode(text)} 
                 code={code}
             />
