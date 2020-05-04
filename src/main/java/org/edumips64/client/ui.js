@@ -75,7 +75,8 @@ const Code = (props) => {
                 value={props.code}
                 onChange={(event) => {props.onChangeValue(event.target.value);}}
                 />
-            <input id="run-button" type="button" value="Run" onClick={() => {props.onClick()}} enabled={props.enabled} />
+            <input id="load-button" type="button" value="Load" onClick={() => {props.onLoadClick()}} disabled={!props.loadEnabled} />
+            <input id="run-button" type="button" value="Run" onClick={() => {props.onRunClick()}} disabled={!props.runEnabled} />
         </div>
     );
 }
@@ -101,10 +102,22 @@ const Simulator = (props) => {
         setMemory(simulator.getMemory());
         setStats(JSON.parse(simulator.getStatistics()));
     }
+
+    const loadCode = () => {
+        console.log("Executing loadCode");
+        const result = simulator.loadProgram(code);
+        updateState();
+        console.log(result);
+
+        if (!result.success) {
+            alert(result.errorMessage);
+        } 
+
+    }
     
     const runCode = () => {
         console.log("Executing runCode - " + simulator);
-        const result = simulator.runProgram(code);
+        const result = simulator.runAll();
         updateState();
         console.log(result);
 
@@ -115,7 +128,14 @@ const Simulator = (props) => {
 
     return (
         <div id="widgetGrid">
-            <Code onClick={runCode} onChangeValue ={(text) => setCode(text)} code={code} />
+            <Code 
+                onRunClick={runCode} 
+                runEnabled={true}
+                onLoadClick={loadCode} 
+                loadEnabled={true}
+                onChangeValue={(text) => setCode(text)} 
+                code={code}
+            />
             <Registers {...registers}/>
             <Memory memory={memory}/>
             <Statistics {...stats}/>

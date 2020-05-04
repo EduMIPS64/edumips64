@@ -99,6 +99,36 @@ public class WebUi implements EntryPoint {
     return result;
   }
 
+  public CPUStepResult runAll() {
+    CPUStepResult cpuStatus;
+    do {
+      info("running one step");
+      cpuStatus = step();
+      info("step results: " + cpuStatus.toString());
+    } while (cpuStatus.success && !cpuStatus.terminated);
+
+    return cpuStatus;
+  }
+
+  public Result loadProgram(String code) {
+    if (cpu.getStatus() != CPU.CPUStatus.READY) {
+      info("Resetting CPU before loading a new program.");
+      reset();
+    }
+
+    info("Loading program: " + code);
+    try {
+      parser.doParsing(code);
+      dinero.setDataOffset(memory.getInstructionsNumber()*4);
+    } catch (Exception e) {
+      warning("Parsing error: " + e.toString());
+      return Result.Failure(e.toString());
+    }
+    cpu.setStatus(CPU.CPUStatus.RUNNING);
+    info("Program parsed.");
+    return Result.Success();
+  }
+
   /* Public methods to get Simulator state */
   public String getMemory() {
     return memory.toString();
@@ -175,25 +205,6 @@ public class WebUi implements EntryPoint {
   }
 
   /* Private methods */
-  private Result loadProgram(String code) {
-    if (cpu.getStatus() != CPU.CPUStatus.READY) {
-      info("Resetting CPU before loading a new program.");
-      reset();
-    }
-
-    info("Loading program: " + code);
-    try {
-      parser.doParsing(code);
-      dinero.setDataOffset(memory.getInstructionsNumber()*4);
-    } catch (Exception e) {
-      warning("Parsing error: " + e.toString());
-      return Result.Failure(e.toString());
-    }
-    cpu.setStatus(CPU.CPUStatus.RUNNING);
-    info("Program parsed.");
-    return Result.Success();
-  }
-
   private CPUStepResult step() {
     CPUStatus status = cpu.getStatus();
     if (status != CPU.CPUStatus.RUNNING && status != CPU.CPUStatus.STOPPING) {
@@ -214,16 +225,6 @@ public class WebUi implements EntryPoint {
     return new CPUStepResult(Result.Success(), false);
   }
 
-  private CPUStepResult runAll() {
-    CPUStepResult cpuStatus;
-    do {
-      info("running one step");
-      cpuStatus = step();
-      info("step results: " + cpuStatus.toString());
-    } while (cpuStatus.success && !cpuStatus.terminated);
-
-    return cpuStatus;
-  }
 
 
   private native void runOnGwtReady() /*-{
