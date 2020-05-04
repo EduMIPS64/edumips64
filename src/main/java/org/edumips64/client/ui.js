@@ -75,7 +75,11 @@ const Code = (props) => {
                 value={props.code}
                 onChange={(event) => {props.onChangeValue(event.target.value);}}
                 />
-            <input id="run-button" type="button" value="Run" onClick={() => {props.onClick()}} enabled={props.enabled} />
+            <div id="controls">
+                <input id="load-button" type="button" value="Load/Reset" onClick={() => {props.onLoadClick()}} disabled={!props.loadEnabled} />
+                <input id="step-button" type="button" value="Single Step" onClick={() => {props.onStepClick()}} disabled={!props.stepEnabled} />
+                <input id="run-button" type="button" value="Run All" onClick={() => {props.onRunClick()}} disabled={!props.runEnabled} />
+            </div>
         </div>
     );
 }
@@ -95,17 +99,44 @@ const Simulator = (props) => {
     const [memory, setMemory] = React.useState(props.simulator.getMemory());
     const [stats, setStats] = React.useState(JSON.parse(props.simulator.getStatistics()));
     const [code, setCode] = React.useState(sampleProgram);
+    const [status, setStatus] = React.useState(jsedumips64.Status.READY);
 
-    const updateState = () => {
+    const simulatorRunning = status == jsedumips64.Status.RUNNING;
+
+    const updateState = (result) => {
         setRegisters(JSON.parse(simulator.getRegisters()));
         setMemory(simulator.getMemory());
         setStats(JSON.parse(simulator.getStatistics()));
+        setStatus(result.status);
+    }
+
+    const loadCode = () => {
+        console.log("Executing loadCode");
+        const result = simulator.loadProgram(code);
+        updateState(result);
+        console.log(result);
+
+        if (!result.success) {
+            alert(result.errorMessage);
+        } 
+    }
+
+    const stepCode = () => {
+        console.log("Executing step");
+        const result = simulator.step();
+        updateState(result);
+        console.log(result);
+
+        if (!result.success) {
+            alert(result.errorMessage);
+        } 
+
     }
     
     const runCode = () => {
         console.log("Executing runCode - " + simulator);
-        const result = JSON.parse(simulator.runProgram(code));
-        updateState();
+        const result = simulator.runAll();
+        updateState(result);
         console.log(result);
 
         if (!result.success) {
@@ -115,7 +146,13 @@ const Simulator = (props) => {
 
     return (
         <div id="widgetGrid">
-            <Code onClick={runCode} onChangeValue ={(text) => setCode(text)} code={code} />
+            <Code 
+                onRunClick={runCode} runEnabled={simulatorRunning}
+                onStepClick={stepCode} stepEnabled={simulatorRunning}
+                onLoadClick={loadCode} loadEnabled={true}
+                onChangeValue={(text) => setCode(text)} 
+                code={code}
+            />
             <Registers {...registers}/>
             <Memory memory={memory}/>
             <Statistics {...stats}/>

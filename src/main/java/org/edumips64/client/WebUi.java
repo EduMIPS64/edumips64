@@ -50,14 +50,43 @@ public class WebUi implements EntryPoint {
   private SymbolTable symTab;
   private Memory memory;
   private Dinero dinero;
+
+  private ResultFactory resultFactory;
    
   private Logger logger = Logger.getLogger("simulator");
 
-  private void info(String message) {
-    logger.info("[GWT] " + message);
+  // Enum for the simulator status. This is a trimmed-down version of
+  // CPU.CPUStatus, hiding details that the JS client should not care
+  // about.
+  @JsType(namespace = "jsedumips64")
+  public enum Status {READY, RUNNING, STOPPED};
+  static Status FromCpuStatus(CPUStatus s) {
+    switch (s) {
+      case READY:
+        return Status.READY;
+      case RUNNING:
+      case STOPPING:
+        return Status.RUNNING;
+      default:
+        return Status.STOPPED;
+    }
   }
-  private void warning(String message) {
-    logger.warning("[GWT] " + message);
+
+  /* Public methods - available from JS. */
+
+  /* Initialization / reset */
+  public void init() {
+    // Simulator initialization.
+    ConfigStore config = new InMemoryConfigStore(ConfigStore.defaults);
+    memory = new Memory();
+    symTab = new SymbolTable(memory);
+    FileUtils fu = new NullFileUtils();
+    IOManager iom = new IOManager(fu, memory);
+    cpu = new CPU(memory, config, new BUBBLE());
+    dinero = new Dinero();
+    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
+    parser = new Parser(fu, symTab, memory, instructionBuilder);
+    resultFactory = new ResultFactory(cpu);
   }
 
   public void reset() {
@@ -67,7 +96,58 @@ public class WebUi implements EntryPoint {
       symTab.reset();
   }
 
-  public Result loadInternal(String code) {
+  @Override
+  /* Initialization method, executed once GWT is ready to be imported by JS */
+  public void onModuleLoad() {
+    // Invoke JS initialization logic that depends on this GWT module being loaded.
+    info("Module loaded, calling the global JS function onGwtReady()");
+    Scheduler.get().scheduleDeferred(new Command() {
+      public void execute() {
+        runOnGwtReady();
+      }
+    });
+  }
+
+  /* Program execution control methods */
+  public Result runProgram(String code) {
+    Result parseResult = loadProgram(code);
+    if (!parseResult.success) {
+      return parseResult;
+    }
+
+    return runAll();
+  }
+
+  public Result runAll() {
+    Result result;
+    do {
+      info("running one step");
+      result = step();
+      info("step results: " + result.toString());
+    } while (result.success && (result.status != Status.STOPPED));
+
+    return result;
+  }
+
+  public Result step() {
+    CPUStatus status = cpu.getStatus();
+    if (status != CPU.CPUStatus.RUNNING && status != CPU.CPUStatus.STOPPING) {
+      String message = "Cannot run in state " + cpu.getStatus();
+      return resultFactory.Failure(message);
+    }
+
+    try {
+      cpu.step();
+    } catch (HaltException e) {
+      info("Program terminated successfully.");
+    } catch (Exception e) {
+      warning("Error: " + e.toString());
+      return resultFactory.Failure(e.toString());
+    }
+    return resultFactory.Success();
+  }
+
+  public Result loadProgram(String code) {
     if (cpu.getStatus() != CPU.CPUStatus.READY) {
       info("Resetting CPU before loading a new program.");
       reset();
@@ -79,56 +159,14 @@ public class WebUi implements EntryPoint {
       dinero.setDataOffset(memory.getInstructionsNumber()*4);
     } catch (Exception e) {
       warning("Parsing error: " + e.toString());
-      return Result.Failure(e.toString());
+      return resultFactory.Failure(e.toString());
     }
     cpu.setStatus(CPU.CPUStatus.RUNNING);
     info("Program parsed.");
-    return Result.Success();
+    return resultFactory.Success();
   }
 
-  public String step() {
-    return stepInternal().toString();
-  }
-
-  private CPUStepStatus stepInternal() {
-    CPUStatus status = cpu.getStatus();
-    if (status != CPU.CPUStatus.RUNNING && status != CPU.CPUStatus.STOPPING) {
-      String message = "Cannot run in state " + cpu.getStatus();
-      return new CPUStepStatus(Result.Failure(message), true);
-    }
-
-    try {
-      cpu.step();
-    } catch (HaltException e) {
-      info("Program terminated successfully.");
-      return new CPUStepStatus(Result.Success(), true);
-    } catch (Exception e) {
-      warning("Error: " + e.toString());
-      return new CPUStepStatus(Result.Failure(e.toString()), true);
-    }
-
-    return new CPUStepStatus(Result.Success(), false);
-  }
-
-  private CPUStepStatus runAll() {
-    CPUStepStatus cpuStatus;
-    do {
-      cpuStatus = stepInternal();
-    } while (cpuStatus.result.success && !cpuStatus.terminated);
-
-    return cpuStatus;
-  }
-
-  // Executes the program. Returns an empty string on success, or an error message.
-  public String runProgram(String code) {
-    Result parseResult = loadInternal(code);
-    if (!parseResult.success) {
-      return parseResult.toJsonObject().toString();
-    }
-    CPUStepStatus result = runAll();
-    return result.toJsonObject().toString();
-  }
-
+  /* Public methods to get Simulator state */
   public String getMemory() {
     return memory.toString();
   }
@@ -203,33 +241,17 @@ public class WebUi implements EntryPoint {
       .toString();
   }
 
-  @Override
-  public void onModuleLoad() {
-    // Invoke JS initialization logic that depends on this GWT module being loaded.
-    info("Module loaded, calling the global JS function onGwtReady()");
-    Scheduler.get().scheduleDeferred(new Command() {
-      public void execute() {
-        runOnGwtReady();
-      }
-    });
-  }
+  /* Private methods */
 
   private native void runOnGwtReady() /*-{
     if (typeof $wnd.onGwtReady !== "undefined") {
       $wnd.onGwtReady();
     }
   }-*/;
-
-  public void init() {
-    // Simulator initialization.
-    ConfigStore config = new InMemoryConfigStore(ConfigStore.defaults);
-    memory = new Memory();
-    symTab = new SymbolTable(memory);
-    FileUtils fu = new NullFileUtils();
-    IOManager iom = new IOManager(fu, memory);
-    cpu = new CPU(memory, config, new BUBBLE());
-    dinero = new Dinero();
-    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
-    parser = new Parser(fu, symTab, memory, instructionBuilder);
+  private void info(String message) {
+    logger.info("[GWT] " + message);
+  }
+  private void warning(String message) {
+    logger.warning("[GWT] " + message);
   }
 }
