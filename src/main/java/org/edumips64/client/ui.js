@@ -112,6 +112,7 @@ const Simulator = (props) => {
 
     const loadCode = () => {
         console.log("Executing loadCode");
+        simulator.reset();
         const result = simulator.loadProgram(code);
         updateState(result);
         console.log(result);
