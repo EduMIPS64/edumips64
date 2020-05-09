@@ -16,7 +16,7 @@
       <script src="https://unpkg.com/@babel/standalone@7.9.6/babel.min.js"></script>
       <script src="https://unpkg.com/requirejs@2.3.5/require.js" data-main="script"></script>    
 
-      <!-- Use Require to load the GWT javascript, because we need to bypass any cache. -->
+      <!-- JS initialization code -->
       <script type="text/javascript" language="javascript">
         // Append a random query parameter to all require requests, to bypass caches.
         // Do it only if it's not localhost, because GWT dev mode is not happy about those extra parameters.
@@ -28,17 +28,17 @@
 
         // Import the GWT JS code.
         requirejs(["edumips64.nocache"])
-      
-      </script>
 
-      <script type="text/babel" src="ui.js" ></script>
-
-      <script type="text/javascript">
         // Initialization code for Materialize.
         document.addEventListener('DOMContentLoaded', () => {
           let elems = document.querySelectorAll('.modal');
           M.Modal.init(elems);
         });
+      </script>
+
+      <!-- Import the React UI code. This is pre-processed in-browser (JSX -> JS) using Babel. -->
+      <script type="text/babel" src="ui.js" ></script>
+
     </script>
   </head>
   <body>
