@@ -31,16 +31,20 @@ import jsinterop.annotations.JsType;
 
 import org.edumips64.core.*;
 import org.edumips64.core.CPU.CPUStatus;
+import org.edumips64.core.Pipeline.Stage;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.HaltException;
 import org.edumips64.core.is.InstructionBuilder;
+import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.NullFileUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @JsType(namespace = "jsedumips64")
@@ -239,6 +243,20 @@ public class WebUi implements EntryPoint {
       // FPU Control Status Register (FCSR)
       .put("fcsr", cpu.getFCSR().getBinString())
       .toString();
+  }
+
+  public Pipeline getPipeline() {
+    // Convert the internal CPU representation to objects available to the JS code.
+    Map<Stage, InstructionInterface> cpuPipeline = cpu.getPipeline();
+
+    Pipeline p = new Pipeline();
+    p.IF = Instruction.FromInstruction(cpuPipeline.get(Stage.IF));
+    p.ID = Instruction.FromInstruction(cpuPipeline.get(Stage.ID));
+    p.EX = Instruction.FromInstruction(cpuPipeline.get(Stage.EX));
+    p.MEM = Instruction.FromInstruction(cpuPipeline.get(Stage.MEM));
+    p.WB = Instruction.FromInstruction(cpuPipeline.get(Stage.WB));
+
+    return p;
   }
 
   /* Private methods */
