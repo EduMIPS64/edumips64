@@ -2,20 +2,34 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>EduMIPS64 Experimental Web Frontend</title>
+      <link rel="stylesheet" media="screen" type="text/css" href="style.css">
+      <link rel="icon" type="image/png" href="favicon.png">
 
        <!-- Materialize.CSS -->
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
-      <script type="text/javascript" language="javascript" src="edumips64.nocache.js"></script>
-
+      <!-- JS libraries: Require, React, Babel (for JSX). -->
       <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
       <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
       <script src="https://unpkg.com/@babel/standalone@7.9.6/babel.min.js"></script>
+      <script src="https://unpkg.com/requirejs@2.3.5/require.js" data-main="script"></script>    
 
-      <link rel="stylesheet" media="screen" type="text/css" href="style.css">
-      <link rel="icon" type="image/png" href="favicon.png">
+      <!-- Use Require to load the GWT javascript, because we need to bypass any cache. -->
+      <script type="text/javascript" language="javascript">
+        // Append a random query parameter to all require requests, to bypass caches.
+        // Do it only if it's not localhost, because GWT dev mode is not happy about those extra parameters.
+        if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+          require.config({
+            urlArgs: "foo=" + (new Date()).getTime()
+          });
+        }
+
+        // Import the GWT JS code.
+        requirejs(["edumips64.nocache"])
+      
+      </script>
 
       <script type="text/babel" src="ui.js" ></script>
 
