@@ -137,6 +137,9 @@ const Simulator = (props) => {
         if (!result.success) {
             alert(result.errorMessage);
         } 
+
+        // Upon loading, run one step.
+        stepCode();
     }
 
     const stepCode = () => {
