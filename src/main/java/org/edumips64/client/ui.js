@@ -84,6 +84,20 @@ const Code = (props) => {
     );
 }
 
+const Pipeline = ({pipeline}) => {
+    return (
+        <div id="pipeline">
+            <table>
+                <tr><td>IF</td><td>{pipeline.IF?.Code}</td></tr>
+                <tr><td>ID</td><td>{pipeline.ID?.Code}</td></tr>
+                <tr><td>EX</td><td>{pipeline.EX?.Code}</td></tr>
+                <tr><td>MEM</td><td>{pipeline.MEM?.Code}</td></tr>
+                <tr><td>WB</td><td>{pipeline.WB?.Code}</td></tr>
+            </table>
+        </div>
+    )
+}
+
 const sampleProgram =`; Example program. Loads the value 10 (A) into R1.
 .data
     .word64 10
@@ -100,6 +114,7 @@ const Simulator = (props) => {
     const [stats, setStats] = React.useState(JSON.parse(props.simulator.getStatistics()));
     const [code, setCode] = React.useState(sampleProgram);
     const [status, setStatus] = React.useState(jsedumips64.Status.READY);
+    const [pipeline, setPipeline] = React.useState(props.simulator.getPipeline());
 
     const simulatorRunning = status == jsedumips64.Status.RUNNING;
 
@@ -108,6 +123,8 @@ const Simulator = (props) => {
         setMemory(simulator.getMemory());
         setStats(JSON.parse(simulator.getStatistics()));
         setStatus(result.status);
+        setPipeline(props.simulator.getPipeline());
+        console.log(pipeline);
     }
 
     const loadCode = () => {
@@ -157,6 +174,7 @@ const Simulator = (props) => {
             <Registers {...registers}/>
             <Memory memory={memory}/>
             <Statistics {...stats}/>
+            <Pipeline pipeline={pipeline}/>
         </div>
     );
 }
