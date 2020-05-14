@@ -22,11 +22,8 @@
  */
 package org.edumips64.client;
 
-import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.webworker.client.DedicatedWorkerEntryPoint;
-import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.json.client.JSONArray;
-import com.google.gwt.user.client.Command;
 
 import jsinterop.annotations.JsType;
 
@@ -44,7 +41,6 @@ import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.NullFileUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
