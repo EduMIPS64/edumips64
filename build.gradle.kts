@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.google.gwt:gwt-user:2.8.2")
+    compileOnly("com.google.gwt:gwt-user:2.9.0")
     implementation("javax.help:javahelp:2.0.05")
     testImplementation("junit:junit:4.13")
 }
