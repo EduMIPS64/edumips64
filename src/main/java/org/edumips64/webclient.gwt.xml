@@ -2,6 +2,12 @@
   <inherits name="com.google.gwt.user.User"/>
   <inherits name="com.google.gwt.logging.Logging"/>
   <inherits name="com.google.gwt.json.JSON" />
+  <inherits name="com.google.gwt.webworker.WebWorker"/>
+  <!-- Settings required for Web Worker support. A single permutation must be compiled. -->
+  <set-property name="user.agent" value="safari" />
+  <set-configuration-property name="user.agent.runtimeWarning" value="false" />
+  <add-linker name="dedicatedworker" />
+
   <entry-point class="org.edumips64.client.WebUi"/>
   <source path="client" />
   <source path="core" />

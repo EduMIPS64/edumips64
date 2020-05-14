@@ -23,6 +23,7 @@
 package org.edumips64.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.webworker.client.DedicatedWorkerEntryPoint;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.user.client.Command;
@@ -48,7 +49,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 @JsType(namespace = "jsedumips64")
-public class WebUi implements EntryPoint {
+public class WebUi extends DedicatedWorkerEntryPoint {
   private CPU cpu;
   private Parser parser;
   private SymbolTable symTab;
@@ -99,18 +100,23 @@ public class WebUi implements EntryPoint {
       dinero.reset();
       symTab.reset();
   }
-
+  
   @Override
-  /* Initialization method, executed once GWT is ready to be imported by JS */
-  public void onModuleLoad() {
-    // Invoke JS initialization logic that depends on this GWT module being loaded.
-    info("Module loaded, calling the global JS function onGwtReady()");
-    Scheduler.get().scheduleDeferred(new Command() {
-      public void execute() {
-        runOnGwtReady();
-      }
-    });
+  public void onWorkerLoad() {
+     info("Worker loaded, calling the global JS function onGwtReady()");
   }
+
+  // @Override
+  /* Initialization method, executed once GWT is ready to be imported by JS */
+  // public void onModuleLoad() {
+  //   // Invoke JS initialization logic that depends on this GWT module being loaded.
+  //   info("Module loaded, calling the global JS function onGwtReady()");
+  //   Scheduler.get().scheduleDeferred(new Command() {
+  //     public void execute() {
+  //       runOnGwtReady();
+  //     }
+  //   });
+  // }
 
   /* Program execution control methods */
   public Result runProgram(String code) {
