@@ -106,18 +106,6 @@ public class WebUi extends DedicatedWorkerEntryPoint {
      info("Worker loaded, calling the global JS function onGwtReady()");
   }
 
-  // @Override
-  /* Initialization method, executed once GWT is ready to be imported by JS */
-  // public void onModuleLoad() {
-  //   // Invoke JS initialization logic that depends on this GWT module being loaded.
-  //   info("Module loaded, calling the global JS function onGwtReady()");
-  //   Scheduler.get().scheduleDeferred(new Command() {
-  //     public void execute() {
-  //       runOnGwtReady();
-  //     }
-  //   });
-  // }
-
   /* Program execution control methods */
   public Result runProgram(String code) {
     Result parseResult = loadProgram(code);
@@ -266,12 +254,6 @@ public class WebUi extends DedicatedWorkerEntryPoint {
   }
 
   /* Private methods */
-
-  private native void runOnGwtReady() /*-{
-    if (typeof $wnd.onGwtReady !== "undefined") {
-      $wnd.onGwtReady();
-    }
-  }-*/;
   private void info(String message) {
     logger.info("[GWT] " + message);
   }
