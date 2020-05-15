@@ -4,11 +4,10 @@
   <inherits name="com.google.gwt.json.JSON" />
 
   <!-- Web worker linker. -->
-  <inherits name="org.gwtproject.rpc.worker.RpcToWorkers" />
-  <inherits name="prj.gwtwwlinker.workerlinker.WorkerLinker" />
+  <inherits name="org.edumips64.WorkerLinker" />
 
   <!-- Elemental2 core library, used for logging. -->
-  <inherits name="elemental2.core.Core"/>
+  <inherits name="elemental2.dom.Dom"/>
 
   <entry-point class="org.edumips64.client.WebUi"/>
 

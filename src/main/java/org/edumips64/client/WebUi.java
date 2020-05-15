@@ -25,7 +25,6 @@ package org.edumips64.client;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.json.client.JSONArray;
-import org.gwtproject.rpc.worker.client.worker.MessagePort;
 
 import jsinterop.annotations.JsType;
 
@@ -81,6 +80,7 @@ public class WebUi implements EntryPoint {
 
   /* Initialization / reset */
   public void init() {
+    info("Initializing the simulator");
     // Simulator initialization.
     ConfigStore config = new InMemoryConfigStore(ConfigStore.defaults);
     memory = new Memory();
@@ -92,6 +92,7 @@ public class WebUi implements EntryPoint {
     InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
     resultFactory = new ResultFactory(cpu);
+    info("initialization complete!");
   }
 
   public void reset() {
@@ -107,10 +108,6 @@ public class WebUi implements EntryPoint {
     info("Worker loaded, calling the global JS function onGwtReady()");
     init();
   }
-
-  private native MessagePort self() /*-{
-		return $wnd;
-	}-*/;
 
   /* Program execution control methods */
   public Result runProgram(String code) {
