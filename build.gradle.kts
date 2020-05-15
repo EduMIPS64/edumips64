@@ -22,6 +22,7 @@ dependencies {
     compileOnly("com.google.gwt:gwt-user:2.9.0")
     implementation("com.vertispan.rpc:workers:1.0-alpha-5")
     implementation("javax.help:javahelp:2.0.05")
+    implementation("com.google.elemental2:elemental2-core:1.0.0")
     testImplementation("junit:junit:4.13")
 }
 

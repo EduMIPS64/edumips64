@@ -7,6 +7,9 @@
   <inherits name="org.gwtproject.rpc.worker.RpcToWorkers" />
   <inherits name="prj.gwtwwlinker.workerlinker.WorkerLinker" />
 
+  <!-- Elemental2 core library, used for logging. -->
+  <inherits name="elemental2.core.Core"/>
+
   <entry-point class="org.edumips64.client.WebUi"/>
 
   <!-- Java files to compile to JS. Exclude the ones that use APIs not supported by GWT or are useless. -->

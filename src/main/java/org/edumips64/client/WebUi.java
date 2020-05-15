@@ -23,10 +23,13 @@
 package org.edumips64.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.json.client.JSONArray;
 import org.gwtproject.rpc.worker.client.worker.MessagePort;
 
 import jsinterop.annotations.JsType;
+
+import elemental2.dom.DomGlobal;
 
 import org.edumips64.core.*;
 import org.edumips64.core.CPU.CPUStatus;
@@ -100,7 +103,9 @@ public class WebUi implements EntryPoint {
   
   @Override
   public void onModuleLoad() {
-     info("Worker loaded, calling the global JS function onGwtReady()");
+    GWT.log("in onModuleLoad");
+    info("Worker loaded, calling the global JS function onGwtReady()");
+    init();
   }
 
   private native MessagePort self() /*-{
@@ -256,9 +261,9 @@ public class WebUi implements EntryPoint {
 
   /* Private methods */
   private void info(String message) {
-    logger.info("[GWT] " + message);
+    DomGlobal.console.log("[GWT] " + message);
   }
   private void warning(String message) {
-    logger.warning("[GWT] " + message);
+    DomGlobal.console.log("[GWT - warning] " + message);
   }
 }
