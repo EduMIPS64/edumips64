@@ -22,8 +22,9 @@
  */
 package org.edumips64.client;
 
-import com.google.gwt.webworker.client.DedicatedWorkerEntryPoint;
+import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.json.client.JSONArray;
+import org.gwtproject.rpc.worker.client.worker.MessagePort;
 
 import jsinterop.annotations.JsType;
 
@@ -45,7 +46,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 @JsType(namespace = "jsedumips64")
-public class WebUi extends DedicatedWorkerEntryPoint {
+public class WebUi implements EntryPoint {
   private CPU cpu;
   private Parser parser;
   private SymbolTable symTab;
@@ -98,9 +99,13 @@ public class WebUi extends DedicatedWorkerEntryPoint {
   }
   
   @Override
-  public void onWorkerLoad() {
+  public void onModuleLoad() {
      info("Worker loaded, calling the global JS function onGwtReady()");
   }
+
+  private native MessagePort self() /*-{
+		return $wnd;
+	}-*/;
 
   /* Program execution control methods */
   public Result runProgram(String code) {
