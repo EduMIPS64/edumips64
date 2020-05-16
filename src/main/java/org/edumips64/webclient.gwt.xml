@@ -14,6 +14,9 @@
   <set-property name="user.agent" value="safari" />
   <set-configuration-property name="user.agent.runtimeWarning" value="false" />
 
+  <!-- Ignore missing compatMode property, since we are running in web worker. -->
+  <set-configuration-property name="document.compatMode.severity" value="IGNORE" />
+
   <!-- Entry point. -->
   <entry-point class="org.edumips64.client.WebUi"/>
 
