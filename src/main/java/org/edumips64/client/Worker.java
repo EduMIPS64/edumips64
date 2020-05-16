@@ -43,6 +43,7 @@ public class Worker implements EntryPoint {
         route(event);
       }
     });
+    postMessage("ready");
   }
   
   private final void route(MessageEvent event) {
@@ -53,6 +54,10 @@ public class Worker implements EntryPoint {
 
   private native MessagePort self() /*-{
 		return $wnd;
+  }-*/;
+
+  private native void postMessage(String message) /*-{
+    $wnd.postMessage(message);
   }-*/;
 
   private void info(String message) {
