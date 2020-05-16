@@ -5,6 +5,7 @@
 
   <!-- Web worker linker. -->
   <inherits name="org.edumips64.WorkerLinker" />
+  <inherits name="org.gwtproject.rpc.worker.RpcToWorkers" />
 
   <!-- Configure logging. This allows to get the Java logging API statements into the browser's console. -->
   <inherits name="com.google.gwt.logging.Logging"/>

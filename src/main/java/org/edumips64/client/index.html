@@ -27,6 +27,7 @@
 
         // Import the GWT JS code.
         let edu64 = new Worker("worker.js");
+        edu64.postMessage("yo");
 
         // Initialization code for Materialize.
         document.addEventListener('DOMContentLoaded', () => {

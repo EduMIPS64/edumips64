@@ -27,6 +27,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.json.client.JSONArray;
 
 import jsinterop.annotations.JsType;
+import org.gwtproject.rpc.worker.client.worker.MessagePort;
+import org.gwtproject.rpc.worker.client.worker.MessageEvent;
 
 import org.edumips64.core.*;
 import org.edumips64.core.CPU.CPUStatus;
@@ -105,6 +107,12 @@ public class WebUi implements EntryPoint {
     GWT.log("in onModuleLoad");
     info("Worker loaded, calling the global JS function onGwtReady()");
     init();
+    self().addMessageHandler(new MessageEvent.MessageHandler() {
+      public void onMessage(MessageEvent event) {
+        info("GOT A MESSAGE");
+        info(event.getData());
+      }
+    });
   }
 
   /* Program execution control methods */
@@ -261,4 +269,7 @@ public class WebUi implements EntryPoint {
   private void warning(String message) {
     logger.warning("[GWT] " + message);
   }
+  private native MessagePort self() /*-{
+		return $wnd;
+	}-*/;
 }
