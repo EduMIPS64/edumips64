@@ -26,11 +26,8 @@ import com.google.gwt.core.client.EntryPoint;
 import org.gwtproject.rpc.worker.client.worker.MessagePort;
 import org.gwtproject.rpc.worker.client.worker.MessageEvent;
 
-import jsinterop.annotations.JsType;
-
 import java.util.logging.Logger;
 
-@JsType(namespace = "jsedumips64")
 public class Worker implements EntryPoint {
   private Simulator simulator;
   private Logger logger = Logger.getLogger("worker");
