@@ -6,9 +6,6 @@
   <!-- Web worker linker. -->
   <inherits name="org.edumips64.WorkerLinker" />
 
-  <!-- Elemental2 core library, used for logging. -->
-  <inherits name="elemental2.dom.Dom"/>
-
   <!-- Configure logging. This allows to get the Java logging API statements into the browser's console. -->
   <inherits name="com.google.gwt.logging.Logging"/>
   <set-property name="gwt.logging.enabled" value="TRUE" />

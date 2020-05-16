@@ -28,8 +28,6 @@ import com.google.gwt.json.client.JSONArray;
 
 import jsinterop.annotations.JsType;
 
-import elemental2.dom.DomGlobal;
-
 import org.edumips64.core.*;
 import org.edumips64.core.CPU.CPUStatus;
 import org.edumips64.core.Pipeline.Stage;
@@ -258,9 +256,9 @@ public class WebUi implements EntryPoint {
 
   /* Private methods */
   private void info(String message) {
-    DomGlobal.console.log("[GWT] " + message);
+    logger.info("[GWT] "+ message);
   }
   private void warning(String message) {
-    DomGlobal.console.log("[GWT - warning] " + message);
+    logger.warning("[GWT] " + message);
   }
 }

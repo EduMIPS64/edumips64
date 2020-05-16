@@ -22,8 +22,6 @@ dependencies {
     compileOnly("com.google.gwt:gwt-user:2.9.0")
     compileOnly("com.google.gwt:gwt-dev:2.9.0")
     implementation("javax.help:javahelp:2.0.05")
-    implementation("com.google.elemental2:elemental2-core:1.0.0")
-    implementation("com.google.elemental2:elemental2-dom:1.0.0")
     testImplementation("junit:junit:4.13")
 }
 
