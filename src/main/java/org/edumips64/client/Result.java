@@ -29,7 +29,7 @@ import jsinterop.annotations.JsType;
 public class Result {
   public boolean success = false;
   public String errorMessage = "";
-  public WebUi.Status status = WebUi.Status.READY;
+  public Simulator.Status status = Simulator.Status.READY;
 
   public Result(boolean success, String errorMessage) {
     this.success = success;

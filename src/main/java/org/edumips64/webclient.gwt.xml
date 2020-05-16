@@ -19,7 +19,7 @@
   <set-configuration-property name="document.compatMode.severity" value="IGNORE" />
 
   <!-- Entry point. -->
-  <entry-point class="org.edumips64.client.WebUi"/>
+  <entry-point class="org.edumips64.client.Worker"/>
 
   <!-- Java files to compile to JS. Exclude the ones that use APIs not supported by GWT or are useless. -->
   <source path="client" />

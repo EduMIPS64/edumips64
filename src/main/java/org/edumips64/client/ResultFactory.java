@@ -12,13 +12,13 @@ public class ResultFactory {
 
     public Result Success() {
         Result r = new Result(true, "");
-        r.status = WebUi.FromCpuStatus(cpu.getStatus());
+        r.status = Simulator.FromCpuStatus(cpu.getStatus());
         return r;
     }
 
     public Result Failure(String errorMessage) {
         Result r = new Result(false, errorMessage);
-        r.status = WebUi.FromCpuStatus(cpu.getStatus());
+        r.status = Simulator.FromCpuStatus(cpu.getStatus());
         return r;
     }
 }

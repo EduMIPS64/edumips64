@@ -1,35 +1,9 @@
-/* WebUI.java
- *
- * GWT facade for the EduMIPS64 core.
- * (c) 2020 Andrea Spadaccini
- *
- * This file is part of the EduMIPS64 project, and is released under the GNU
- * General Public License.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
 package org.edumips64.client;
 
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.json.client.JSONArray;
+import java.util.logging.Logger;
 
 import jsinterop.annotations.JsType;
-import org.gwtproject.rpc.worker.client.worker.MessagePort;
-import org.gwtproject.rpc.worker.client.worker.MessageEvent;
-
 import org.edumips64.core.*;
 import org.edumips64.core.CPU.CPUStatus;
 import org.edumips64.core.Pipeline.Stage;
@@ -45,10 +19,7 @@ import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.NullFileUtils;
 
 import java.util.Map;
-import java.util.logging.Logger;
-
-@JsType(namespace = "jsedumips64")
-public class WebUi implements EntryPoint {
+public class Simulator {
   private CPU cpu;
   private Parser parser;
   private SymbolTable symTab;
@@ -79,7 +50,7 @@ public class WebUi implements EntryPoint {
   /* Public methods - available from JS. */
 
   /* Initialization / reset */
-  public void init() {
+  public Simulator() {
     info("Initializing the simulator");
     // Simulator initialization.
     ConfigStore config = new InMemoryConfigStore(ConfigStore.defaults);
@@ -100,19 +71,6 @@ public class WebUi implements EntryPoint {
       cpu.reset();
       dinero.reset();
       symTab.reset();
-  }
-  
-  @Override
-  public void onModuleLoad() {
-    GWT.log("in onModuleLoad");
-    info("Worker loaded, calling the global JS function onGwtReady()");
-    init();
-    self().addMessageHandler(new MessageEvent.MessageHandler() {
-      public void onMessage(MessageEvent event) {
-        info("GOT A MESSAGE");
-        info(event.getData());
-      }
-    });
   }
 
   /* Program execution control methods */
@@ -269,7 +227,5 @@ public class WebUi implements EntryPoint {
   private void warning(String message) {
     logger.warning("[GWT] " + message);
   }
-  private native MessagePort self() /*-{
-		return $wnd;
-	}-*/;
+    
 }
