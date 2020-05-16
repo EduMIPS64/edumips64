@@ -15,7 +15,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  **************************************************************************/
-package prj.gwtwwlinker.workerlinker.code;
+package org.edumips64.client.workerlinker;
 
 import java.util.Set;
 import java.util.SortedSet;
