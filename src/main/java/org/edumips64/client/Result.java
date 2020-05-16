@@ -30,6 +30,10 @@ public class Result {
   public boolean success = false;
   public String errorMessage = "";
   public Simulator.Status status = Simulator.Status.READY;
+  public String memory = "";
+  public String registers = "";
+  public String statistics = "";
+  public Pipeline pipeline;
 
   public Result(boolean success, String errorMessage) {
     this.success = success;

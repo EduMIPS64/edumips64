@@ -39,8 +39,11 @@ public class Worker implements EntryPoint {
     DomGlobal.window.addEventListener("message", (evt) -> {
       info("GOT A MESSAGE FROM JS");
       if (evt instanceof MessageEvent) {
-        String data = String.valueOf(((MessageEvent) evt).data);
+        String data = ((MessageEvent<String>) evt).data;
         info(data);
+        // Test running a simple program and sending back a serialized result.
+        Result result = simulator.runProgram(".code\\ndaddi r1, r0, 0\\nsyscall 0\\n");
+        DomGlobal.postMessage(result);
       }
     });
     DomGlobal.postMessage("GWT ready");
