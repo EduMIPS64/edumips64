@@ -2,6 +2,7 @@
   <!-- Core GWT modules. -->
   <inherits name="com.google.gwt.core.Core" />
   <inherits name="com.google.gwt.json.JSON" />
+  <inherits name="elemental2.dom.Dom" />
 
   <!-- Web worker linker. -->
   <inherits name="org.edumips64.WorkerLinker" />

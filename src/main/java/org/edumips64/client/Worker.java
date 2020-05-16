@@ -23,8 +23,9 @@
 package org.edumips64.client;
 
 import com.google.gwt.core.client.EntryPoint;
-import org.gwtproject.rpc.worker.client.worker.MessagePort;
-import org.gwtproject.rpc.worker.client.worker.MessageEvent;
+
+import elemental2.dom.DomGlobal;
+import elemental2.dom.MessageEvent;
 
 import java.util.logging.Logger;
 
@@ -35,33 +36,17 @@ public class Worker implements EntryPoint {
   @Override
   public void onModuleLoad() {
     simulator = new Simulator();
-    self().addMessageHandler(new MessageEvent.MessageHandler() {
-      public void onMessage(MessageEvent event) {
-        route(event);
+    DomGlobal.window.addEventListener("message", (evt) -> {
+      info("GOT A MESSAGE FROM JS");
+      if (evt instanceof MessageEvent) {
+        String data = String.valueOf(((MessageEvent) evt).data);
+        info(data);
       }
     });
-    postMessage("ready");
+    DomGlobal.postMessage("GWT ready");
   }
-  
-  private final void route(MessageEvent event) {
-    info("GOT A MESSAGE");
-    info(event.getData());
-    // TODO: route calls to Simulator and send back messages.
-  }
-
-  private native MessagePort self() /*-{
-		return $wnd;
-  }-*/;
-
-  private native void postMessage(String message) /*-{
-    $wnd.postMessage(message);
-  }-*/;
 
   private void info(String message) {
     logger.info("[GWT] "+ message);
-  }
-
-  private void warning(String message) {
-    logger.warning("[GWT] " + message);
   }
 }
