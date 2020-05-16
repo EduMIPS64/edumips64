@@ -9,6 +9,15 @@
   <!-- Elemental2 core library, used for logging. -->
   <inherits name="elemental2.dom.Dom"/>
 
+  <!-- Configure logging. This allows to get the Java logging API statements into the browser's console.
+       Disabling most loggers is required to avoid depending on JS objects not available in a web worker. -->
+  <inherits name="com.google.gwt.logging.Logging"/>
+
+  <!-- Compile only one permutation. Since we run in a web worker context, there is no need for multiple UA support.-->
+  <set-property name="user.agent" value="safari" />
+  <set-configuration-property name="user.agent.runtimeWarning" value="false" />
+
+  <!-- Entry point. -->
   <entry-point class="org.edumips64.client.WebUi"/>
 
   <!-- Java files to compile to JS. Exclude the ones that use APIs not supported by GWT or are useless. -->
