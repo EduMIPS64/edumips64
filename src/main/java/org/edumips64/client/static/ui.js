@@ -1,5 +1,7 @@
 'use strict';
 
+const STEPS_STRIDE = 10;
+
 const Registers = ({gpr, fpu, special}) => {
     return (
         <div>
@@ -77,7 +79,8 @@ const Code = (props) => {
                 />
             <div id="controls">
                 <input id="load-button" type="button" value="Load/Reset" onClick={() => {props.onLoadClick()}} disabled={!props.loadEnabled} />
-                <input id="step-button" type="button" value="Single Step" onClick={() => {props.onStepClick()}} disabled={!props.stepEnabled} />
+                <input id="step-button" type="button" value="Single Step" onClick={() => {props.onStepClick(1)}} disabled={!props.stepEnabled} />
+                <input id="multi-step-button" type="button" value="Multi Step (50)" onClick={() => {props.onStepClick(50)}} disabled={!props.stepEnabled} />
                 <input id="run-button" type="button" value="Run All" onClick={() => {props.onRunClick()}} disabled={!props.runEnabled} />
             </div>
         </div>
@@ -123,6 +126,10 @@ const Simulator = ({sim, initialState}) => {
     const [status, setStatus] = React.useState(initialState.status);
     const [pipeline, setPipeline] = React.useState(initialState.pipeline);
 
+    // Number of steps left to run. Used to keep track of execution.
+    // If set to -1, runs until the execution ends.
+    const [stepsToRun, setStepsToRun] = React.useState(0);
+
     const simulatorRunning = status == "RUNNING";
 
     sim.onmessage = (e) => {
@@ -144,6 +151,17 @@ const Simulator = ({sim, initialState}) => {
         if (!result.success) {
             alert(result.errorMessage);
         } 
+
+        if (result.status !== "RUNNING") {
+            setStepsToRun(0);
+        } else if (stepsToRun > 0) {
+            console.log("Steps left: " + stepsToRun)
+            const toRun = Math.min(STEPS_STRIDE, stepsToRun);
+            console.log("Running: " + toRun)
+            const newStepsToRun = stepsToRun - toRun;
+            setStepsToRun(newStepsToRun);
+            sim.step(toRun);
+        }
     }
 
     const loadCode = () => {
@@ -151,9 +169,11 @@ const Simulator = ({sim, initialState}) => {
         sim.load(code);
     }
 
-    const stepCode = () => {
-        console.log("Executing step");
-        sim.step(1);
+    const stepCode = (n) => {
+        console.log("Executing steps: " + n);
+        const toRun = Math.min(n, STEPS_STRIDE);
+        setStepsToRun(n - toRun);
+        sim.step(toRun);
     }
     
     const runCode = () => {
