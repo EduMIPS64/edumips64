@@ -66,11 +66,6 @@ public class Worker implements EntryPoint {
             info("steps: " + steps);
             DomGlobal.postMessage(simulator.step(steps));
             break;
-          case "runall":
-            // TODO: implement runAll on the client side, and have the GWT side
-            // send status every N steps executed.
-            DomGlobal.postMessage(simulator.runAll());
-            break;
           case "load":
             String code = data.getAsAny("code").asString();
             Result parseResult = simulator.loadProgram(code);
