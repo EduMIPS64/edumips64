@@ -43,13 +43,33 @@ public class Worker implements EntryPoint {
       info("GOT A MESSAGE FROM JS");
       if (evt instanceof MessageEvent<?>) {
         MessageEvent<JsPropertyMap> message = Js.cast(evt);
-        info((String)message.data.get("method"));
-        // Test running a simple program and sending back a serialized result.
-        Result result = simulator.runProgram(".code\\ndaddi r1, r0, 0\\nsyscall 0\\n");
-        DomGlobal.postMessage(result);
+        String method = ((String)message.data.get("method")).toLowerCase();
+        switch(method) {
+          case "reset":
+            DomGlobal.postMessage(simulator.reset());
+            break;
+          case "step":
+            DomGlobal.postMessage(simulator.step());
+            break;
+          case "runall":
+            // TODO: implement runAll on the client side, and have the GWT side
+            // send status every N steps executed.
+            DomGlobal.postMessage(simulator.runAll());
+            break;
+          case "load":
+            String code = (String)message.data.get("code");
+            Result parseResult = simulator.loadProgram(code);
+            if (!parseResult.success) {
+              DomGlobal.postMessage(parseResult);
+            } else {
+              DomGlobal.postMessage(simulator.step());
+            }
+            break;
+          default:
+            info("UNKNOWN METHOD: " + method);
+        }
       }
     });
-    DomGlobal.postMessage("GWT ready");
   }
 
   private void info(String message) {

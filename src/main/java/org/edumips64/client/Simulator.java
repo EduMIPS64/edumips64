@@ -25,20 +25,15 @@ public class Simulator {
    
   private Logger logger = Logger.getLogger("simulator");
 
-  // Enum for the simulator status. This is a trimmed-down version of
-  // CPU.CPUStatus, hiding details that the JS client should not care
-  // about.
-  @JsType(namespace = "jsedumips64")
-  public enum Status {READY, RUNNING, STOPPED};
-  static Status FromCpuStatus(CPUStatus s) {
+  static String FromCpuStatus(CPUStatus s) {
     switch (s) {
       case READY:
-        return Status.READY;
+        return "READY";
       case RUNNING:
       case STOPPING:
-        return Status.RUNNING;
+        return "RUNNING";
       default:
-        return Status.STOPPED;
+        return "STOPPED";
     }
   }
 
@@ -61,11 +56,12 @@ public class Simulator {
     info("initialization complete!");
   }
 
-  public void reset() {
+  public Result reset() {
       info("Resetting the CPU");
       cpu.reset();
       dinero.reset();
       symTab.reset();
+      return resultFactory.Success();
   }
 
   /* Program execution control methods */
@@ -84,7 +80,7 @@ public class Simulator {
       info("running one step");
       result = step();
       info("step results: " + result.toString());
-    } while (result.success && (result.status != Status.STOPPED));
+    } while (result.success && (result.status != "STOPPED"));
 
     return result;
   }

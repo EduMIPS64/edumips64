@@ -29,7 +29,7 @@ import jsinterop.annotations.JsType;
 public class Result {
   public boolean success = false;
   public String errorMessage = "";
-  public Simulator.Status status = Simulator.Status.READY;
+  public String status = "READY";
   public String memory = "";
   public String registers = "";
   public String statistics = "";
@@ -41,6 +41,6 @@ public class Result {
   }
 
   public String toString() {
-    return "Result {success: " + success + ", errorMessage: " + errorMessage + ", Status: " + status.name() + "}";
+    return "Result {success: " + success + ", errorMessage: " + errorMessage + ", Status: " + status + "}";
   }
 }
