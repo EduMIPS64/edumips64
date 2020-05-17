@@ -17,14 +17,6 @@
 
       <!-- JS initialization code -->
       <script type="text/javascript" language="javascript">
-        // Append a random query parameter to all require requests, to bypass caches.
-        // Do it only if it's not localhost, because GWT dev mode is not happy about those extra parameters.
-        if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
-          require.config({
-            urlArgs: "foo=" + (new Date()).getTime()
-          });
-        }
-
         // Initialization code for Materialize.
         document.addEventListener('DOMContentLoaded', () => {
           let elems = document.querySelectorAll('.modal');
