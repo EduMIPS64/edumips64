@@ -74,26 +74,6 @@ public class Simulator {
       return resultFactory.Success();
   }
 
-  public Result runProgram(String code) {
-    Result parseResult = loadProgram(code);
-    if (!parseResult.success) {
-      return parseResult;
-    }
-
-    return runAll();
-  }
-
-  public Result runAll() {
-    Result result;
-    do {
-      info("running one step");
-      result = step(1);
-      info("step results: " + result.toString());
-    } while (result.success && (result.status != "STOPPED"));
-
-    return result;
-  }
-
   public Result step(int steps) {
     CPUStatus status = cpu.getStatus();
     if (status != CPU.CPUStatus.RUNNING && status != CPU.CPUStatus.STOPPING) {

@@ -141,6 +141,9 @@ const Simulator = ({sim, initialState}) => {
     // Tracks whether the worker is currently running code.
     const [executing, setExecuting] = React.useState(false);
 
+    // Tracks whether the simulation is running in "run all" mode (run until finished).
+    const [runAll, setRunAll] = React.useState(false);
+
     const simulatorRunning = status == "RUNNING";
 
     sim.onmessage = (e) => {
@@ -167,9 +170,12 @@ const Simulator = ({sim, initialState}) => {
         if (result.status !== "RUNNING" || mustStop) {
             setStepsToRun(0);
             setMustStop(false);
+            setRunAll(false);
         } else if (stepsToRun > 0) {
             console.log("Steps left: " + stepsToRun)
             stepCode(stepsToRun);
+        } else if (runAll) {
+            stepCode(INTERNAL_STEPS_STRIDE);
         }
     }
 
@@ -188,7 +194,8 @@ const Simulator = ({sim, initialState}) => {
     
     const runCode = () => {
         console.log("Executing runCode");
-        sim.runAll();
+        setRunAll(true);
+        stepCode(INTERNAL_STEPS_STRIDE);
     }
 
     return (
@@ -221,9 +228,6 @@ simulator.step = (n) => {
 }
 simulator.load = (code) => {
     simulator.postMessage({"method": "load", "code": code});
-}
-simulator.runAll = () => {
-    simulator.postMessage({"method": "runAll"});
 }
 
 simulator.reset();
