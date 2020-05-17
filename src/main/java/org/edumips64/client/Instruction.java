@@ -28,7 +28,7 @@ import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
 
 // Wrapper for Instruction / InstructionInterface.
-@JsType(namespace = "jsedumips64")
+@JsType
 public class Instruction {
     public String Name;
     public String Code;

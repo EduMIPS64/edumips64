@@ -25,7 +25,7 @@ package org.edumips64.client;
 
 import jsinterop.annotations.JsType;
 
-@JsType(namespace = "jsedumips64")
+@JsType
 public class Pipeline {
     public Instruction IF;
     public Instruction ID;

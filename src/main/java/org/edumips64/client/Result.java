@@ -1,7 +1,8 @@
 /* Result.java
  *
- * Thin value object to represent the result of a generic operation, exported
- * as a type to JavaScript.
+ * Value object to represent the result of a generic operation, exported
+ * as a type to JavaScript. Includes the full state of the CPU.
+ * 
  * (c) 2020 Andrea Spadaccini
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -25,7 +26,7 @@ package org.edumips64.client;
 
 import jsinterop.annotations.JsType;
 
-@JsType(namespace="jsedumips64")
+@JsType
 public class Result {
   public boolean success = false;
   public String errorMessage = "";
