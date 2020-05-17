@@ -81,20 +81,22 @@ Eclipse-style project files, which are readable by the VSCode plugins.
 
 An experimental web frontend, based on GWT, is being developed right now.
 Currently, only a prototype is available. The GWT code for it is in the
-`org.edumips64.client` package. The HTML file is at
-`src/main/java/org/edumips64/client/edumips64.html`.
+`org.edumips64.client` package. 
 
-To work on it, run the `gwtDev` gradle target, which will fire up the GWT
-developer console for you. Once the console is available, you'll be given a
-local URL where the frontend will be available.
+The GWT code runs as a Web Worker, to enable concurrency between UI interaction
+and the execution of the simulation steps.
 
-Every time you change the GWT frontend, reloading that web page will cause the
-GWT console to recompile the code, thus allowing quick iteration on the web
-frontend code.
+To compile it, run the `war` task. Then spin up a web server and browse to the
+`build/gwt/war/edumips64/` directory on the browser to interact with the web application.
 
-The `war` task will compile the Java code to JS and copy the resulting JS, including
-the static resources needed for the prototype frontend, to the `build/gwt/war`
-directory.
+Open the browser's console because it contains lots of information about what's
+happening in the JS and Java code.
+
+If you change the Java code, you'll need to recompile it. If you change the HTML/CSS/JS,
+no recompilation is needed but you'll need to copy the contents of the `static` directory
+onto `build/gwt/war/edumips64`. This is done for you by the `war` task, but it's quicker
+to just copy it over or have a custom long-standing process that automatically copies
+the static files over there.
 
 ### Source code structure
 
