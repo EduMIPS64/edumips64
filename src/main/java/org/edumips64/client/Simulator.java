@@ -87,22 +87,28 @@ public class Simulator {
     Result result;
     do {
       info("running one step");
-      result = step();
+      result = step(1);
       info("step results: " + result.toString());
     } while (result.success && (result.status != "STOPPED"));
 
     return result;
   }
 
-  public Result step() {
+  public Result step(int steps) {
     CPUStatus status = cpu.getStatus();
     if (status != CPU.CPUStatus.RUNNING && status != CPU.CPUStatus.STOPPING) {
       String message = "Cannot run in state " + cpu.getStatus();
       return resultFactory.Failure(message);
     }
 
+    if (steps <= 0) {
+      return resultFactory.Failure("The number of steps must be positive");
+    }
+
     try {
-      cpu.step();
+      do {
+        cpu.step();
+      } while (--steps > 0);
     } catch (HaltException e) {
       info("Program terminated successfully.");
     } catch (Exception e) {

@@ -1,5 +1,11 @@
 'use strict';
 
+// The amount of steps to run in multi-step executions.
+const INTERNAL_STEPS_STRIDE = 10;
+
+// Number of steps to run with the multi-step button.
+const STEP_STRIDE = 500;
+
 const Registers = ({gpr, fpu, special}) => {
     return (
         <div>
@@ -77,8 +83,10 @@ const Code = (props) => {
                 />
             <div id="controls">
                 <input id="load-button" type="button" value="Load/Reset" onClick={() => {props.onLoadClick()}} disabled={!props.loadEnabled} />
-                <input id="step-button" type="button" value="Single Step" onClick={() => {props.onStepClick()}} disabled={!props.stepEnabled} />
+                <input id="step-button" type="button" value="Single Step" onClick={() => {props.onStepClick(1)}} disabled={!props.stepEnabled} />
+                <input id="multi-step-button" type="button" value="Multi Step" onClick={() => {props.onStepClick(STEP_STRIDE)}} disabled={!props.stepEnabled} />
                 <input id="run-button" type="button" value="Run All" onClick={() => {props.onRunClick()}} disabled={!props.runEnabled} />
+                <input id="stop-button" type="button" value="Stop" onClick={() => {props.onStopClick()}} disabled={!props.stopEnabled} />
             </div>
         </div>
     );
@@ -123,6 +131,16 @@ const Simulator = ({sim, initialState}) => {
     const [status, setStatus] = React.useState(initialState.status);
     const [pipeline, setPipeline] = React.useState(initialState.pipeline);
 
+    // Number of steps left to run. Used to keep track of execution.
+    // If set to -1, runs until the execution ends.
+    const [stepsToRun, setStepsToRun] = React.useState(0);
+
+    // Signals that the simulation must stop.
+    const [mustStop, setMustStop] = React.useState(false);
+
+    // Tracks whether the worker is currently running code.
+    const [executing, setExecuting] = React.useState(false);
+
     const simulatorRunning = status == "RUNNING";
 
     sim.onmessage = (e) => {
@@ -134,6 +152,7 @@ const Simulator = ({sim, initialState}) => {
 
     const updateState = (result) => {
         console.log("Updating state.");
+        setExecuting(false);
         console.log(result);
         setRegisters(result.registers);
         setMemory(result.memory);
@@ -144,6 +163,14 @@ const Simulator = ({sim, initialState}) => {
         if (!result.success) {
             alert(result.errorMessage);
         } 
+
+        if (result.status !== "RUNNING" || mustStop) {
+            setStepsToRun(0);
+            setMustStop(false);
+        } else if (stepsToRun > 0) {
+            console.log("Steps left: " + stepsToRun)
+            stepCode(stepsToRun);
+        }
     }
 
     const loadCode = () => {
@@ -151,9 +178,12 @@ const Simulator = ({sim, initialState}) => {
         sim.load(code);
     }
 
-    const stepCode = () => {
-        console.log("Executing step");
-        sim.step();
+    const stepCode = (n) => {
+        console.log("Executing steps: " + n);
+        const toRun = Math.min(n, INTERNAL_STEPS_STRIDE);
+        setStepsToRun(n - toRun);
+        setExecuting(true);
+        sim.step(toRun);
     }
     
     const runCode = () => {
@@ -164,9 +194,10 @@ const Simulator = ({sim, initialState}) => {
     return (
         <div id="widgetGrid">
             <Code 
-                onRunClick={runCode} runEnabled={simulatorRunning}
-                onStepClick={stepCode} stepEnabled={simulatorRunning}
+                onRunClick={runCode} runEnabled={simulatorRunning && !executing}
+                onStepClick={stepCode} stepEnabled={simulatorRunning && !executing}
                 onLoadClick={loadCode} loadEnabled={true}
+                onStopClick={() => {setMustStop(true)}} stopEnabled={executing}
                 onChangeValue={(text) => setCode(text)} 
                 code={code}
             />
@@ -185,8 +216,8 @@ let simulator = new Worker("worker.js");
 simulator.reset = () => {
     simulator.postMessage({"method": "reset"});
 }
-simulator.step = () => {
-    simulator.postMessage({"method": "step"});
+simulator.step = (n) => {
+    simulator.postMessage({"method": "step", "steps": n});
 }
 simulator.load = (code) => {
     simulator.postMessage({"method": "load", "code": code});
