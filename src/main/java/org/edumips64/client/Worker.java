@@ -28,6 +28,7 @@ import elemental2.dom.DomGlobal;
 import elemental2.dom.MessageEvent;
 
 import jsinterop.base.Js;
+import jsinterop.base.JsPropertyMap;
 
 import java.util.logging.Logger;
 
@@ -41,8 +42,8 @@ public class Worker implements EntryPoint {
     DomGlobal.window.addEventListener("message", (evt) -> {
       info("GOT A MESSAGE FROM JS");
       if (evt instanceof MessageEvent<?>) {
-        MessageEvent<String> message = Js.cast(evt);
-        info(message.data);
+        MessageEvent<JsPropertyMap> message = Js.cast(evt);
+        info((String)message.data.get("method"));
         // Test running a simple program and sending back a serialized result.
         Result result = simulator.runProgram(".code\\ndaddi r1, r0, 0\\nsyscall 0\\n");
         DomGlobal.postMessage(result);

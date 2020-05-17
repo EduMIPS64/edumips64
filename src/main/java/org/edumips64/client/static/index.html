@@ -27,7 +27,7 @@
 
         // Import the GWT JS code.
         let edu64 = new Worker("worker.js");
-        edu64.postMessage("yo");
+        edu64.postMessage({"method": "init"});
         edu64.addEventListener("message", (e) => {
           console.log("Got message from worker: ", e);
         })
