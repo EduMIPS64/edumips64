@@ -50,16 +50,21 @@ public class Worker implements EntryPoint {
   public void onModuleLoad() {
     simulator = new Simulator();
     DomGlobal.window.addEventListener("message", (evt) -> {
-      info("GOT A MESSAGE FROM JS");
+      info("Got message from the UI");
       if (evt instanceof MessageEvent<?>) {
-        MessageEvent<JsPropertyMap> message = Js.cast(evt);
-        String method = ((String)message.data.get("method")).toLowerCase();
+        MessageEvent<JsPropertyMap<Object>> message = Js.cast(evt);
+        JsPropertyMap<Object> data = message.data;
+        info(data.toString());
+
+        String method = data.getAsAny("method").asString().toLowerCase();
         switch(method) {
           case "reset":
             DomGlobal.postMessage(simulator.reset());
             break;
           case "step":
-            DomGlobal.postMessage(simulator.step());
+            int steps = data.getAsAny("steps").asInt();
+            info("steps: " + steps);
+            DomGlobal.postMessage(simulator.step(steps));
             break;
           case "runall":
             // TODO: implement runAll on the client side, and have the GWT side
@@ -67,12 +72,12 @@ public class Worker implements EntryPoint {
             DomGlobal.postMessage(simulator.runAll());
             break;
           case "load":
-            String code = (String)message.data.get("code");
+            String code = data.getAsAny("code").asString();
             Result parseResult = simulator.loadProgram(code);
             if (!parseResult.success) {
               DomGlobal.postMessage(parseResult);
             } else {
-              DomGlobal.postMessage(simulator.step());
+              DomGlobal.postMessage(simulator.step(1));
             }
             break;
           default:

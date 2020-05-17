@@ -153,7 +153,7 @@ const Simulator = ({sim, initialState}) => {
 
     const stepCode = () => {
         console.log("Executing step");
-        sim.step();
+        sim.step(1);
     }
     
     const runCode = () => {
@@ -185,8 +185,8 @@ let simulator = new Worker("worker.js");
 simulator.reset = () => {
     simulator.postMessage({"method": "reset"});
 }
-simulator.step = () => {
-    simulator.postMessage({"method": "step"});
+simulator.step = (n) => {
+    simulator.postMessage({"method": "step", "steps": n});
 }
 simulator.load = (code) => {
     simulator.postMessage({"method": "load", "code": code});
