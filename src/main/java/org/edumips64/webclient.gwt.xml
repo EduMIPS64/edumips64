@@ -31,12 +31,6 @@
     <exclude name="JavaPrefsConfigStore.java" />
   </source>
 
-  <!-- Files to copy to the output directory. -->
-  <public path="client">
-    <include name="index.html" />
-    <include name="ui.js" />
-    <include name="style.css" />
-    <include name="logo.png" />
-    <include name="favicon.png" />
-  </public>
+  <!-- Copy static files to the output directory. -->
+  <public path="client/static" />
 </module>
