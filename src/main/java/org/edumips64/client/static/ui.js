@@ -1,6 +1,10 @@
 'use strict';
 
-const STEPS_STRIDE = 10;
+// The amount of steps to run in multi-step executions.
+const INTERNAL_STEPS_STRIDE = 10;
+
+// Number of steps to run with the multi-step button.
+const STEP_STRIDE = 500;
 
 const Registers = ({gpr, fpu, special}) => {
     return (
@@ -80,8 +84,9 @@ const Code = (props) => {
             <div id="controls">
                 <input id="load-button" type="button" value="Load/Reset" onClick={() => {props.onLoadClick()}} disabled={!props.loadEnabled} />
                 <input id="step-button" type="button" value="Single Step" onClick={() => {props.onStepClick(1)}} disabled={!props.stepEnabled} />
-                <input id="multi-step-button" type="button" value="Multi Step (50)" onClick={() => {props.onStepClick(50)}} disabled={!props.stepEnabled} />
+                <input id="multi-step-button" type="button" value="Multi Step" onClick={() => {props.onStepClick(STEP_STRIDE)}} disabled={!props.stepEnabled} />
                 <input id="run-button" type="button" value="Run All" onClick={() => {props.onRunClick()}} disabled={!props.runEnabled} />
+                <input id="stop-button" type="button" value="Stop" onClick={() => {props.onStopClick()}} disabled={!props.stopEnabled} />
             </div>
         </div>
     );
@@ -130,6 +135,12 @@ const Simulator = ({sim, initialState}) => {
     // If set to -1, runs until the execution ends.
     const [stepsToRun, setStepsToRun] = React.useState(0);
 
+    // Signals that the simulation must stop.
+    const [mustStop, setMustStop] = React.useState(false);
+
+    // Tracks whether the worker is currently running code.
+    const [executing, setExecuting] = React.useState(false);
+
     const simulatorRunning = status == "RUNNING";
 
     sim.onmessage = (e) => {
@@ -141,6 +152,7 @@ const Simulator = ({sim, initialState}) => {
 
     const updateState = (result) => {
         console.log("Updating state.");
+        setExecuting(false);
         console.log(result);
         setRegisters(result.registers);
         setMemory(result.memory);
@@ -152,15 +164,12 @@ const Simulator = ({sim, initialState}) => {
             alert(result.errorMessage);
         } 
 
-        if (result.status !== "RUNNING") {
+        if (result.status !== "RUNNING" || mustStop) {
             setStepsToRun(0);
+            setMustStop(false);
         } else if (stepsToRun > 0) {
             console.log("Steps left: " + stepsToRun)
-            const toRun = Math.min(STEPS_STRIDE, stepsToRun);
-            console.log("Running: " + toRun)
-            const newStepsToRun = stepsToRun - toRun;
-            setStepsToRun(newStepsToRun);
-            sim.step(toRun);
+            stepCode(stepsToRun);
         }
     }
 
@@ -171,8 +180,9 @@ const Simulator = ({sim, initialState}) => {
 
     const stepCode = (n) => {
         console.log("Executing steps: " + n);
-        const toRun = Math.min(n, STEPS_STRIDE);
+        const toRun = Math.min(n, INTERNAL_STEPS_STRIDE);
         setStepsToRun(n - toRun);
+        setExecuting(true);
         sim.step(toRun);
     }
     
@@ -184,9 +194,10 @@ const Simulator = ({sim, initialState}) => {
     return (
         <div id="widgetGrid">
             <Code 
-                onRunClick={runCode} runEnabled={simulatorRunning}
-                onStepClick={stepCode} stepEnabled={simulatorRunning}
+                onRunClick={runCode} runEnabled={simulatorRunning && !executing}
+                onStepClick={stepCode} stepEnabled={simulatorRunning && !executing}
                 onLoadClick={loadCode} loadEnabled={true}
+                onStopClick={() => {setMustStop(true)}} stopEnabled={executing}
                 onChangeValue={(text) => setCode(text)} 
                 code={code}
             />
