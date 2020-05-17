@@ -14,7 +14,6 @@
       <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
       <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
       <script src="https://unpkg.com/@babel/standalone@7.9.6/babel.min.js"></script>
-      <script src="https://unpkg.com/requirejs@2.3.5/require.js" data-main="script"></script>    
 
       <!-- JS initialization code -->
       <script type="text/javascript" language="javascript">
@@ -25,9 +24,6 @@
             urlArgs: "foo=" + (new Date()).getTime()
           });
         }
-
-        // Import the GWT JS code.
-        requirejs(["edumips64.nocache"])
 
         // Initialization code for Materialize.
         document.addEventListener('DOMContentLoaded', () => {

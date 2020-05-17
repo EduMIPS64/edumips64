@@ -107,62 +107,56 @@ const sampleProgram =`; Example program. Loads the value 10 (A) into R1.
     SYSCALL 0
 `;
 
-const Simulator = (props) => {
-    const [simulator, setSimulator] = React.useState(props.simulator);
-    const [registers, setRegisters] = React.useState(JSON.parse(props.simulator.getRegisters()));
-    const [memory, setMemory] = React.useState(props.simulator.getMemory());
-    const [stats, setStats] = React.useState(JSON.parse(props.simulator.getStatistics()));
-    const [code, setCode] = React.useState(sampleProgram);
-    const [status, setStatus] = React.useState(jsedumips64.Status.READY);
-    const [pipeline, setPipeline] = React.useState(props.simulator.getPipeline());
+const parseResult = (result) => {
+    result.registers = JSON.parse(result.registers);
+    result.statistics = JSON.parse(result.statistics);
+    return result;
+}
 
-    const simulatorRunning = status == jsedumips64.Status.RUNNING;
+const Simulator = ({sim, initialState}) => {
+    const [registers, setRegisters] = React.useState(initialState.registers);
+    const [memory, setMemory] = React.useState(initialState.memory);
+    const [stats, setStats] = React.useState(initialState.statistics);
+    const [code, setCode] = React.useState(sampleProgram);
+    const [status, setStatus] = React.useState(initialState.status);
+    const [pipeline, setPipeline] = React.useState(initialState.pipeline);
+
+    const simulatorRunning = status == "RUNNING";
+
+    sim.onmessage = (e) => {
+        console.log("Got message from worker");
+        const result = parseResult(e.data);
+        console.log(result);
+        updateState(result);
+    }
 
     const updateState = (result) => {
-        setRegisters(JSON.parse(simulator.getRegisters()));
-        setMemory(simulator.getMemory());
-        setStats(JSON.parse(simulator.getStatistics()));
+        console.log("Updating state.");
+        console.log(result);
+        setRegisters(result.registers);
+        setMemory(result.memory);
+        setStats(result.statistics);
         setStatus(result.status);
-        setPipeline(props.simulator.getPipeline());
-        console.log(pipeline);
+        setPipeline(result.pipeline);
+
+        if (!result.success) {
+            alert(result.errorMessage);
+        } 
     }
 
     const loadCode = () => {
         console.log("Executing loadCode");
-        simulator.reset();
-        const result = simulator.loadProgram(code);
-        updateState(result);
-        console.log(result);
-
-        if (!result.success) {
-            alert(result.errorMessage);
-        } 
-
-        // Upon loading, run one step.
-        stepCode();
+        sim.load(code);
     }
 
     const stepCode = () => {
         console.log("Executing step");
-        const result = simulator.step();
-        updateState(result);
-        console.log(result);
-
-        if (!result.success) {
-            alert(result.errorMessage);
-        } 
-
+        sim.step();
     }
     
     const runCode = () => {
-        console.log("Executing runCode - " + simulator);
-        const result = simulator.runAll();
-        updateState(result);
-        console.log(result);
-
-        if (!result.success) {
-            alert(result.errorMessage);
-        } 
+        console.log("Executing runCode");
+        sim.runAll();
     }
 
     return (
@@ -182,15 +176,35 @@ const Simulator = (props) => {
     );
 }
 
-// This method is called by WebUI.onModuleLoad, a callback invoked by GWT when the module is loaded.
-// It's necessary to be called by GWT because before the module is loaded the GWT objects cannot be used.
-const onGwtReady = () => {
-    let sim = new jsedumips64.WebUi();
-    sim.init();
+// Worker that runs the EduMIPS64 core.
+// Contains some syntactical sugar methods to make working with the
+// Web Worker API a bit easier.
+let simulator = new Worker("worker.js");
+simulator.reset = () => {
+    simulator.postMessage({"method": "reset"});
+}
+simulator.step = () => {
+    simulator.postMessage({"method": "step"});
+}
+simulator.load = (code) => {
+    simulator.postMessage({"method": "load", "code": code});
+}
+simulator.runAll = () => {
+    simulator.postMessage({"method": "runAll"});
+}
+
+simulator.reset();
+var initializer = (evt) => {
+    console.log("Running the initializer callback");
+
+    // Run this callback only once, to initialize the Simulator
+    // React component which will then handle all subsequent messages.
+    simulator.removeEventListener("message", initializer);
+    var initState = parseResult(evt.data);
 
     ReactDOM.render(
-        <Simulator simulator={sim} />,
+        <Simulator sim={simulator} initialState={initState} />,
         document.getElementById('simulator')
     )
-
 }
+simulator.addEventListener("message", initializer);
