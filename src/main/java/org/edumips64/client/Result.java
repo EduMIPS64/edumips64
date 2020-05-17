@@ -26,7 +26,7 @@ package org.edumips64.client;
 
 import jsinterop.annotations.JsType;
 
-@JsType(namespace="jsedumips64")
+@JsType
 public class Result {
   public boolean success = false;
   public String errorMessage = "";
