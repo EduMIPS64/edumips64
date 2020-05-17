@@ -27,6 +27,8 @@ import com.google.gwt.core.client.EntryPoint;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.MessageEvent;
 
+import jsinterop.base.Js;
+
 import java.util.logging.Logger;
 
 public class Worker implements EntryPoint {
@@ -38,9 +40,9 @@ public class Worker implements EntryPoint {
     simulator = new Simulator();
     DomGlobal.window.addEventListener("message", (evt) -> {
       info("GOT A MESSAGE FROM JS");
-      if (evt instanceof MessageEvent) {
-        String data = ((MessageEvent<String>) evt).data;
-        info(data);
+      if (evt instanceof MessageEvent<?>) {
+        MessageEvent<String> message = Js.cast(evt);
+        info(message.data);
         // Test running a simple program and sending back a serialized result.
         Result result = simulator.runProgram(".code\\ndaddi r1, r0, 0\\nsyscall 0\\n");
         DomGlobal.postMessage(result);
