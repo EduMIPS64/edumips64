@@ -1,6 +1,16 @@
-/* WebUI.java
+/* Worker.java
  *
- * GWT facade for the EduMIPS64 core.
+ * Implements the Web Worker protocol and allows JS code to call Simulator
+ * methods.
+ * 
+ * It expects messages in the form of {"method": NAME_OF_METHOD}, and in case
+ * of methods with parameters the additional methods must be contained in the
+ * dictionary, having key names equal to the parameter names.
+ * 
+ * Methods don't return anything, but instead the worker will always send back
+ * a message containing a Result object, which contains the results of the method
+ * and the current state of the simulator.
+ * 
  * (c) 2020 Andrea Spadaccini
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU

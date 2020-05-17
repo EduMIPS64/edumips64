@@ -1,8 +1,33 @@
+/* Simulator.java
+ *
+ * A facade for the EduMIPS64 core, to be used by Worker.java.
+ * 
+ * All public methods return an instance of Result, which can be sent back
+ * to the JS code.
+ * 
+ * (c) 2020 Andrea Spadaccini
+ *
+ * This file is part of the EduMIPS64 project, and is released under the GNU
+ * General Public License.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 package org.edumips64.client;
 
 import java.util.logging.Logger;
 
-import jsinterop.annotations.JsType;
 import org.edumips64.core.*;
 import org.edumips64.core.CPU.CPUStatus;
 import org.edumips64.core.is.BUBBLE;
@@ -25,21 +50,6 @@ public class Simulator {
    
   private Logger logger = Logger.getLogger("simulator");
 
-  static String FromCpuStatus(CPUStatus s) {
-    switch (s) {
-      case READY:
-        return "READY";
-      case RUNNING:
-      case STOPPING:
-        return "RUNNING";
-      default:
-        return "STOPPED";
-    }
-  }
-
-  /* Public methods - available from JS. */
-
-  /* Initialization / reset */
   public Simulator() {
     info("Initializing the simulator");
     // Simulator initialization.
@@ -64,7 +74,6 @@ public class Simulator {
       return resultFactory.Success();
   }
 
-  /* Program execution control methods */
   public Result runProgram(String code) {
     Result parseResult = loadProgram(code);
     if (!parseResult.success) {
@@ -121,6 +130,7 @@ public class Simulator {
     info("Program parsed.");
     return resultFactory.Success();
   }
+
   /* Private methods */
   private void info(String message) {
     logger.info("[GWT] "+ message);
