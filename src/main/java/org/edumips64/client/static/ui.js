@@ -158,7 +158,7 @@ const Simulator = ({sim, initialState}) => {
             alert(result.errorMessage);
         } 
 
-        if (result.status !== "RUNNING" || mustStop) {
+        if (result.status !== "RUNNING" || mustStop || result.encounteredBreak) {
             setStepsToRun(0);
             setMustStop(false);
             setRunAll(false);

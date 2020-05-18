@@ -35,6 +35,7 @@ public class Result {
   public String registers = "";
   public String statistics = "";
   public Pipeline pipeline;
+  public boolean encounteredBreak = false;
 
   public Result(boolean success, String errorMessage) {
     this.success = success;
