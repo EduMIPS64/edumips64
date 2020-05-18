@@ -16,14 +16,14 @@
     "react-dom": "^16.13.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.9.6",
-    "@babel/preset-env": "^7.9.6",
-    "@babel/preset-react": "^7.9.4",
-    "babel-loader": "^8.1.0",
-    "copyfiles": "^2.2.0",
-    "mkdirp": "^1.0.4",
-    "serve": "^11.3.0",
-    "webpack": "^5.0.0-beta.16",
-    "webpack-cli": "^3.3.11"
+    "@babel/core": "7.9.6",
+    "@babel/preset-env": "7.9.6",
+    "@babel/preset-react": "7.9.4",
+    "babel-loader": "8.1.0",
+    "copyfiles": "2.2.0",
+    "mkdirp": "1.0.4",
+    "serve": "11.3.0",
+    "webpack": "5.0.0-beta.16",
+    "webpack-cli": "3.3.11"
   }
 }
