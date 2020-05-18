@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import org.edumips64.core.*;
 import org.edumips64.core.CPU.CPUStatus;
 import org.edumips64.core.is.BUBBLE;
+import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
@@ -91,6 +92,10 @@ public class Simulator {
       } while (--steps > 0);
     } catch (HaltException e) {
       info("Program terminated successfully.");
+    } catch (BreakException e) {
+      Result res = resultFactory.Success();
+      res.encounteredBreak = true;
+      return res;
     } catch (Exception e) {
       warning("Error: " + e.toString());
       return resultFactory.Failure(e.toString());
