@@ -19,8 +19,6 @@
         });
       </script>
 
-      <!-- Import the React UI code. -->
-      <script type="text/javascript" src="ui.js"></script>
 
     </script>
   </head>
@@ -61,4 +59,8 @@
       </div>
     </div>
   </body>
+  <!-- Import the React UI code. Done after <body> is created
+       because some code in the Monaco Editor depends on <body>
+       to exist when it's initialized. -->
+  <script type="text/javascript" src="ui.js"></script>
 </html>
