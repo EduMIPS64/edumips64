@@ -30,7 +30,4 @@
     <exclude name="MetaInfo.java" />
     <exclude name="JavaPrefsConfigStore.java" />
   </source>
-
-  <!-- Copy static files to the output directory. -->
-  <public path="client/static" />
 </module>
