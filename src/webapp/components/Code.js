@@ -1,14 +1,43 @@
 import React from "react";
 
+import MonacoEditor from 'react-monaco-editor';
+
 // Number of steps to run with the multi-step button.
 const STEP_STRIDE = 500;
+
+const MonacoCode = (props) => {
+    const options = {
+        selectOnLineNumbers: true,
+        roundedSelection: false,
+        readOnly: false,
+        cursorStyle: "line",
+        automaticLayout: false,
+        codelens: false,
+        minimap: {enabled: false},
+    };
+
+    const onChange = (newValue, event) => {
+        props.onChangeValue(newValue);
+    }
+
+    return (
+        <MonacoEditor
+            height="400"
+            language="mips"
+            value={props.code}
+            options={options}
+            onChange={onChange}
+            theme="vs-light"
+        />
+    )
+}
 
 const Code = (props) => {
     return (
         <div id="code">
-            <textarea 
-                value={props.code}
-                onChange={(event) => {props.onChangeValue(event.target.value);}}
+            <MonacoCode 
+                code={props.code}
+                onChangeValue={props.onChangeValue}
                 />
             <div id="controls">
                 <input id="load-button" type="button" value="Load/Reset" onClick={() => {props.onLoadClick()}} disabled={!props.loadEnabled} />

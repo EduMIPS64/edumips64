@@ -1,4 +1,5 @@
 const path = require("path");
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
     entry: "./src/webapp/index.js",
@@ -8,7 +9,14 @@ module.exports = {
     },
     module: {
         rules: [
-            {test: /\.js$/, exclude: /node_modules/, loader: "babel-loader"}
+            {test: /\.js$/, exclude: /node_modules/, loader: "babel-loader"},
+            {test: /\.css$/, use: ['style-loader', 'css-loader']},
+            {test: /\.ttf$/, use: ['file-loader']}
         ]
-    }
+    },
+    plugins: [
+        new MonacoWebpackPlugin({
+            languages: ['mips']
+        })
+    ]
 }

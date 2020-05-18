@@ -4,7 +4,8 @@
   "description": "The web UI for EduMIPS64 (web.edumips.org). Depends on the web worker implementation of the EduMIPS64 core (worker.js).",
   "main": "index.js",
   "scripts": {
-    "build": "webpack -d",
+    "build": "webpack -p",
+    "build-dbg": "webpack -d",
     "deploy": "mkdirp build/gwt/war/edumips64 && copyfiles -f \"src/webapp/static/*\" build/gwt/war/edumips64",
     "serve": "serve build/gwt/war/edumips64/"
   },
@@ -12,8 +13,10 @@
   "author": "Andrea Spadaccini",
   "license": "GPL-2.0-or-later",
   "dependencies": {
+    "monaco-editor-webpack-plugin": "^1.9.0",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "react-monaco-editor": "^0.36.0"
   },
   "devDependencies": {
     "@babel/core": "7.9.6",
@@ -21,8 +24,11 @@
     "@babel/preset-react": "7.9.4",
     "babel-loader": "8.1.0",
     "copyfiles": "2.2.0",
+    "css-loader": "3.5.3",
+    "file-loader": "6.0.0",
     "mkdirp": "1.0.4",
     "serve": "11.3.0",
+    "style-loader": "1.2.1",
     "webpack": "5.0.0-beta.16",
     "webpack-cli": "3.3.11"
   }
