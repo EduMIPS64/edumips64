@@ -1,9 +1,9 @@
 const path = require("path");
 
 module.exports = {
-    entry: "./src/index.js",
+    entry: "./src/webapp/index.js",
     output: {
-        path: path.resolve(__dirname, "dist"),
+        path: path.resolve(__dirname, "build/gwt/war/edumips64"),
         filename: "ui.js"
     },
     module: {

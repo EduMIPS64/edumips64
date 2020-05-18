@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack -d",
-    "deploy": "mkdirp ../../build/gwt/war/edumips64 && copyfiles -f dist/ui.js \"src/static/*\" ../../build/gwt/war/edumips64",
-    "serve": "serve ../../build/gwt/war/edumips64/"
+    "deploy": "mkdirp build/gwt/war/edumips64 && copyfiles -f \"src/webapp/static/*\" build/gwt/war/edumips64",
+    "serve": "serve build/gwt/war/edumips64/"
   },
   "keywords": [],
   "author": "Andrea Spadaccini",
@@ -22,6 +22,7 @@
     "babel-loader": "^8.1.0",
     "copyfiles": "^2.2.0",
     "mkdirp": "^1.0.4",
+    "serve": "^11.3.0",
     "webpack": "^5.0.0-beta.16",
     "webpack-cli": "^3.3.11"
   }
