@@ -18,6 +18,13 @@ jobs:
       run: chmod +x gradlew
     - name: Build Web UI
       run: ./gradlew war
+    - name: Set up Node.JS 12
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+    - run: npm install
+    - run: npm run build
+    - run: npm run deploy
     - name: Deploy
       if: success()
       uses: crazy-max/ghaction-github-pages@v1

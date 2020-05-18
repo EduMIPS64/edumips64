@@ -1,0 +1,29 @@
+{
+  "name": "edumips64-webui",
+  "version": "1.0.0",
+  "description": "The web UI for EduMIPS64 (web.edumips.org). Depends on the web worker implementation of the EduMIPS64 core (worker.js).",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack -d",
+    "deploy": "mkdirp build/gwt/war/edumips64 && copyfiles -f \"src/webapp/static/*\" build/gwt/war/edumips64",
+    "serve": "serve build/gwt/war/edumips64/"
+  },
+  "keywords": [],
+  "author": "Andrea Spadaccini",
+  "license": "GPL-2.0-or-later",
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/preset-react": "^7.9.4",
+    "babel-loader": "^8.1.0",
+    "copyfiles": "^2.2.0",
+    "mkdirp": "^1.0.4",
+    "serve": "^11.3.0",
+    "webpack": "^5.0.0-beta.16",
+    "webpack-cli": "^3.3.11"
+  }
+}
