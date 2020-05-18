@@ -54,7 +54,7 @@ In particular you may find useful these tasks:
  * `./gradlew assemble` - (Java plugin) compile and assemble jar artifacts 
  * `./gradlew check` - (Java plugin) run tests and compile the documentation
  * `./gradlew run` - (Application plugin) run the application
- * `./gradlew war` - (GWT plugin) compile the GWT experimental frontend
+ * `./gradlew war` - (GWT plugin) compile the GWT-based web worker running the EduMIPS64 core
 
 You may also find useful using the `--console=plain` flag to better see what tasks 
 are being executed.  
@@ -77,26 +77,41 @@ If you want to work on EduMIPS64 with Visual Studio Code, you need to download t
 To make it recognize the EduMIPS64 folder as a project, run `./gradlew eclipse` to generate
 Eclipse-style project files, which are readable by the VSCode plugins.
 
-### Working on the GWT frontend
+### Working on the Web UI
 
-An experimental web frontend, based on GWT, is being developed right now.
-Currently, only a prototype is available. The GWT code for it is in the
-`org.edumips64.client` package. 
+An experimental web frontend, based on GWT and React, is being developed
+right now.
 
-The GWT code runs as a Web Worker, to enable concurrency between UI interaction
+#### Web Worker
+
+The core of EduMIPS64 is cross-compiled to Javascript using GWT. It is meant to
+run inside a web worker. The code for the worker is in the `org.edumips64.client`
+package; of course, building the worker also requires building most of the rest
+of the EduMIPS64 core. The GWT configuration is in the `webclient.gwt.xml` file.
+
+The GWT code runs as a Web Worker to enable concurrency between UI interaction
 and the execution of the simulation steps.
 
-To compile it, run the `war` task. Then spin up a web server and browse to the
-`build/gwt/war/edumips64/` directory on the browser to interact with the web application.
+To compile it, run the `war` task, which will produce the file `worker.js` inside
+the directory `build/gwt/war/edumips64/`.
 
-Open the browser's console because it contains lots of information about what's
-happening in the JS and Java code.
+**NOTE:** the `war` gradle task wipes the `build/gwt/war/edumips64` directory.
+So if you re-build the worker, you need to re-build the rest of the web UI as well
+to have a working local test environment (see next section).
 
-If you change the Java code, you'll need to recompile it. If you change the HTML/CSS/JS,
-no recompilation is needed but you'll need to copy the contents of the `static` directory
-onto `build/gwt/war/edumips64`. This is done for you by the `war` task, but it's quicker
-to just copy it over or have a custom long-standing process that automatically copies
-the static files over there.
+#### Web UI
+
+The web UI itself is based on React, and it's compiled / assembled using the NPM and
+webpack tools. The source code is in `src/webapp`.
+
+Custom NPM scripts:
+
+* `build-dbg`: runs `webpack -d` (compile with debugging symbols)
+* `build`: runs `webpack -p` (compile without debugging symbols, minified, etc)
+* `deploy`: copies the static files (HTML, CSS, etc) into `build/gwt/war/edumips64`
+* `serve`: starts a web server which serves the contents of `build/get/war/edumips64`
+
+Both `build` and `build-dbg` produce a `ui.js` file in the `dist` directory.
 
 ### Source code structure
 
