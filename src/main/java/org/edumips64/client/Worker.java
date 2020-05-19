@@ -36,6 +36,7 @@ import com.google.gwt.core.client.EntryPoint;
 
 import elemental2.dom.DomGlobal;
 import elemental2.dom.MessageEvent;
+import static elemental2.core.Global.JSON;
 
 import jsinterop.base.Js;
 import jsinterop.base.JsPropertyMap;
@@ -59,20 +60,21 @@ public class Worker implements EntryPoint {
         String method = data.getAsAny("method").asString().toLowerCase();
         switch(method) {
           case "reset":
-            DomGlobal.postMessage(simulator.reset());
+            postMessage(simulator.reset());
             break;
           case "step":
             int steps = data.getAsAny("steps").asInt();
             info("steps: " + steps);
-            DomGlobal.postMessage(simulator.step(steps));
+            postMessage(simulator.step(steps));
             break;
           case "load":
             String code = data.getAsAny("code").asString();
             Result parseResult = simulator.loadProgram(code);
             if (!parseResult.success) {
-              DomGlobal.postMessage(parseResult);
+              DomGlobal.console.log(parseResult);
+              postMessage(parseResult);
             } else {
-              DomGlobal.postMessage(simulator.step(1));
+              postMessage(simulator.step(1));
             }
             break;
           default:
@@ -80,6 +82,10 @@ public class Worker implements EntryPoint {
         }
       }
     });
+  }
+
+  private void postMessage(Object message) {
+    DomGlobal.postMessage(message);
   }
 
   private void info(String message) {

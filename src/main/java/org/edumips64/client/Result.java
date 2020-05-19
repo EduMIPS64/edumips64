@@ -24,6 +24,7 @@
  */
 package org.edumips64.client;
 
+import elemental2.core.JsArray;
 import jsinterop.annotations.JsType;
 
 @JsType
@@ -36,6 +37,7 @@ public class Result {
   public String statistics = "";
   public Pipeline pipeline;
   public boolean encounteredBreak = false;
+  public JsArray<ParserError> parsingErrors;
 
   public Result(boolean success, String errorMessage) {
     this.success = success;
