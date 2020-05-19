@@ -74,7 +74,7 @@ public class ResultFactory {
 
     public static Result AddParserErrors(Result result, ParserMultiException e) {
         result.parsingErrors = Js.cast(e.getExceptionList().stream()
-            .map(exception -> ParserError.FromParserException(exception)).toArray(ParserError[]::new));
+            .map(exception -> ParserErrorFactory.FromParserException(exception)).toArray(ParserError[]::new));
         return result;
     }
 
