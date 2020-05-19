@@ -3,9 +3,10 @@ package org.edumips64.client;
 import org.edumips64.core.parser.ParserException;
 
 import jsinterop.annotations.JsIgnore;
+import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
-@JsType
+@JsType(namespace=JsPackage.GLOBAL, name="Object", isNative=true)
 public class ParserError {
     public int row;
     public int column;
