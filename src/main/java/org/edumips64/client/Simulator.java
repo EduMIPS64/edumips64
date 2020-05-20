@@ -105,10 +105,8 @@ public class Simulator {
   }
 
   public Result loadProgram(String code) {
-    if (cpu.getStatus() != CPU.CPUStatus.READY) {
-      info("Resetting CPU before loading a new program.");
-      reset();
-    }
+    info("Resetting CPU before loading a new program.");
+    reset();
 
     info("Loading program: " + code);
     try {
