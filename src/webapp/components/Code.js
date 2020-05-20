@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import MonacoEditor from 'react-monaco-editor';
 
@@ -6,6 +6,14 @@ import MonacoEditor from 'react-monaco-editor';
 const STEP_STRIDE = 500;
 
 const MonacoCode = (props) => {
+    const [monaco, setMonaco] = useState(null);
+    const [editor, setEditor] = useState(null);
+
+    const editorDidMount = (editor, monaco) => {
+        setMonaco(monaco);
+        setEditor(editor);
+    }
+
     const options = {
         selectOnLineNumbers: true,
         roundedSelection: false,
@@ -15,6 +23,37 @@ const MonacoCode = (props) => {
         codelens: false,
         minimap: {enabled: false},
     };
+
+    const computeMarkers = parsingErrors => parsingErrors.map(err => ({
+            startLineNumber: err.row,
+            endLineNumber: err.row,
+            startColumn: err.column,
+            endColumn: err.column,
+            message: `${err.description}`,
+            severity: err.isWarning ? 4 : 8,
+            source: 'EduMIPS64',
+          }));
+
+
+    useEffect(() => {
+        console.log("useEffect");
+        if (!monaco) {
+            console.log("Monaco not defined. Bailing out.", monaco)
+            return;
+        }
+        if (!editor) {
+            console.log("Editor not defined. Bailing out.", editor)
+            return;
+        }
+
+        const model = editor.getModel();
+        monaco.editor.setModelMarkers(model, "EduMIPS64", []);
+
+        console.log("Parsing errors");
+        console.log(props.parsingErrors);
+        const markers = computeMarkers(props.parsingErrors);
+        monaco.editor.setModelMarkers(model, "EduMIPS64", markers);
+    }, [props.parsingErrors]);
 
     const onChange = (newValue, event) => {
         props.onChangeValue(newValue);
@@ -28,6 +67,7 @@ const MonacoCode = (props) => {
             options={options}
             onChange={onChange}
             theme="vs-light"
+            editorDidMount={editorDidMount}
         />
     )
 }
@@ -38,6 +78,7 @@ const Code = (props) => {
             <MonacoCode 
                 code={props.code}
                 onChangeValue={props.onChangeValue}
+                parsingErrors={props.parsingErrors}
                 />
             <div id="controls">
                 <input id="load-button" type="button" value="Load/Reset" onClick={() => {props.onLoadClick()}} disabled={!props.loadEnabled} />
