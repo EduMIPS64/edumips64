@@ -22,36 +22,44 @@ const MonacoCode = (props) => {
         automaticLayout: false,
         codelens: false,
         minimap: {enabled: false},
+        tabsize: 4,
     };
 
-    const computeMarkers = parsingErrors => parsingErrors.map(err => ({
-            startLineNumber: err.row,
-            endLineNumber: err.row,
-            startColumn: err.column,
-            endColumn: err.column,
-            message: `${err.description}`,
-            severity: err.isWarning ? 4 : 8,
-            source: 'EduMIPS64',
-          }));
-
+    const computeMarkers = parsingErrors => {
+        // TODO: handle multiple errors in the same line.
+        const lines = editor.getValue().split("\n");
+        return parsingErrors.map(err => {
+            const line = lines[err.row-1];
+            // First non-space character.
+            const startColumn = line.search(/\S/)+1;
+            return {
+                startLineNumber: err.row,
+                endLineNumber: err.row,
+                startColumn: startColumn,
+                endColumn: line.length+1,
+                message: `${err.description}`,
+                severity: err.isWarning ? 4 : 8,
+                source: 'EduMIPS64',
+            };
+        });
+    }
 
     useEffect(() => {
-        console.log("useEffect");
-        if (!monaco) {
-            console.log("Monaco not defined. Bailing out.", monaco)
-            return;
-        }
-        if (!editor) {
-            console.log("Editor not defined. Bailing out.", editor)
+        if (!monaco || !editor) {
             return;
         }
 
         const model = editor.getModel();
         monaco.editor.setModelMarkers(model, "EduMIPS64", []);
 
-        console.log("Parsing errors");
-        console.log(props.parsingErrors);
+        if(!props.parsingErrors) {
+            return;
+        }
+
+        console.log("Parsing errors", props.parsingErrors);
         const markers = computeMarkers(props.parsingErrors);
+        console.log("Markers", markers);
+
         monaco.editor.setModelMarkers(model, "EduMIPS64", markers);
     }, [props.parsingErrors]);
 
