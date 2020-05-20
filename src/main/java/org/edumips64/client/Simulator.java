@@ -35,6 +35,7 @@ import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
+import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.FileUtils;
@@ -104,18 +105,18 @@ public class Simulator {
   }
 
   public Result loadProgram(String code) {
-    if (cpu.getStatus() != CPU.CPUStatus.READY) {
-      info("Resetting CPU before loading a new program.");
-      reset();
-    }
+    info("Resetting CPU before loading a new program.");
+    reset();
 
     info("Loading program: " + code);
     try {
       parser.doParsing(code);
       dinero.setDataOffset(memory.getInstructionsNumber()*4);
-    } catch (Exception e) {
+    } catch (ParserMultiException e) {
       warning("Parsing error: " + e.toString());
-      return resultFactory.Failure(e.toString());
+      Result result = resultFactory.Failure("Parsing errors.");
+      result = ResultFactory.AddParserErrors(result, e);
+      return result;
     }
     cpu.setStatus(CPU.CPUStatus.RUNNING);
     info("Program parsed.");

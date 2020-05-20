@@ -23,9 +23,10 @@
  */
 package org.edumips64.client;
 
+import jsinterop.annotations.JsPackage;
 import jsinterop.annotations.JsType;
 
-@JsType
+@JsType(namespace=JsPackage.GLOBAL, name="Object", isNative=true)
 public class Pipeline {
     public Instruction IF;
     public Instruction ID;

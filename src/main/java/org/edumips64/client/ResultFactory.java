@@ -36,6 +36,9 @@ import org.edumips64.core.CPU.CPUStatus;
 import org.edumips64.core.Pipeline.Stage;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.InstructionInterface;
+import org.edumips64.core.parser.ParserMultiException;
+
+import jsinterop.base.Js;
 
 public class ResultFactory {
     private CPU cpu;
@@ -67,6 +70,12 @@ public class ResultFactory {
     public Result Failure(String errorMessage) {
         Result r = new Result(false, errorMessage);
         return AddCpuInfo(r);
+    }
+
+    public static Result AddParserErrors(Result result, ParserMultiException e) {
+        result.parsingErrors = Js.cast(e.getExceptionList().stream()
+            .map(exception -> ParserErrorFactory.FromParserException(exception)).toArray(ParserError[]::new));
+        return result;
     }
 
     private Result AddCpuInfo(Result r) {
