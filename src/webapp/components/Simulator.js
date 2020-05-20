@@ -18,6 +18,7 @@ const Simulator = ({sim, initialState}) => {
     const [code, setCode] = React.useState(SampleProgram);
     const [status, setStatus] = React.useState(initialState.status);
     const [pipeline, setPipeline] = React.useState(initialState.pipeline);
+    const [parsingErrors, setParsingErrors] = React.useState(initialState.parsingErrors);
 
     // Number of steps left to run. Used to keep track of execution.
     // If set to -1, runs until the execution ends.
@@ -35,21 +36,21 @@ const Simulator = ({sim, initialState}) => {
     const simulatorRunning = status == "RUNNING";
 
     sim.onmessage = (e) => {
-        console.log("Got message from worker");
         const result = sim.parseResult(e.data);
-        console.log(result);
+        console.log("Got message from worker.", result);
         updateState(result);
     }
 
     const updateState = (result) => {
         console.log("Updating state.");
+
         setExecuting(false);
-        console.log(result);
         setRegisters(result.registers);
         setMemory(result.memory);
         setStats(result.statistics);
         setStatus(result.status);
         setPipeline(result.pipeline);
+        setParsingErrors(result.parsingErrors);
 
         if (!result.success) {
             alert(result.errorMessage);
@@ -95,6 +96,7 @@ const Simulator = ({sim, initialState}) => {
                 onStopClick={() => {setMustStop(true)}} stopEnabled={executing}
                 onChangeValue={(text) => setCode(text)} 
                 code={code}
+                parsingErrors={parsingErrors}
             />
             <Registers {...registers}/>
             <Memory memory={memory}/>
