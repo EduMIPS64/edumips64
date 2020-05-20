@@ -1209,14 +1209,17 @@ public class Parser {
     }
   }
 
-  /** Clean multiple tab or spaces in a bad format String //and converts  this String to upper case
-   *  @param s the bad format String
+  /** Clean multiple tab or spaces in a badly formatted String. 
+   *  @param s the badly formatted String
    *  @return the cleaned String
    */
   private String cleanFormat(String s) {
+    if (s == null) {
+      logger.warning("Null string passed to cleanFormat, returning an empty string.");
+      return "";
+    }
+
     if (s.length() > 0 && s.charAt(0) != ';' &&  s.charAt(0) != '\n') {
-      //String[] nocomment=s.split(";");
-      //s=nocomment[0];//.toUpperCase();
       s = s.trim();
       s = s.replace("\t", " ");
 
@@ -1232,7 +1235,7 @@ public class Parser {
       }
     }
 
-    return null;
+    return "";
   }
 
   /** Check if is a valid string for a register
