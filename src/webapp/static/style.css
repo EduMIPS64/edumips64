@@ -56,6 +56,14 @@ div#controls > input {
     padding-left: 10px;
 }
 
+#errorCount {
+    color: #cc6054;
+}
+
+#warningCount {
+    color: #e6ba79;
+}
+
 #nojs {
     width: 22em; 
     position: absolute; 
