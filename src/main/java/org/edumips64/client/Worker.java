@@ -45,11 +45,19 @@ import java.util.logging.Logger;
 
 public class Worker implements EntryPoint {
   private Simulator simulator;
+
+  // A separate Simulator instance, used only for syntax checking.
+  // This is not great, but given how tightly coupled the Parser class is
+  // with the rest of EduMIPS64 core, it's best to just keep another instance
+  // of Simulator just for the parsing.
+  private Simulator parsingSimulator;
   private Logger logger = Logger.getLogger("worker");
   
   @Override
   public void onModuleLoad() {
     simulator = new Simulator();
+    parsingSimulator = new Simulator();
+
     DomGlobal.window.addEventListener("message", (evt) -> {
       info("Got message from the UI");
       if (evt instanceof MessageEvent<?>) {
@@ -58,6 +66,7 @@ public class Worker implements EntryPoint {
         info(data.toString());
 
         String method = data.getAsAny("method").asString().toLowerCase();
+        info("Running worker method " + method);
         switch(method) {
           case "reset":
             postMessage(simulator.reset());
@@ -76,6 +85,23 @@ public class Worker implements EntryPoint {
             } else {
               postMessage(simulator.step(1));
             }
+            break;
+          case "checksyntax":
+            // Use parsingSimulator to do a syntax check, then inject the parsing errors
+            // (if any) in the Status object from the other simulator.
+            String codeString = data.getAsAny("code").asString();
+            Result parsingSimulatorResult = parsingSimulator.loadProgram(codeString);
+            if (parsingSimulatorResult.success) {
+              postMessage(simulator.resultFactory.Success());
+              break;
+            }
+
+            // Create and send back a Result object containing the state of the
+            // running simulator, but with the error message coming from the
+            // parsing.
+            Result finalResult = simulator.resultFactory.Failure(parsingSimulatorResult.errorMessage);
+            finalResult.parsingErrors = parsingSimulatorResult.parsingErrors;
+            postMessage(finalResult);
             break;
           default:
             info("UNKNOWN METHOD: " + method);

@@ -52,7 +52,8 @@ const Simulator = ({sim, initialState}) => {
         setPipeline(result.pipeline);
         setParsingErrors(result.parsingErrors);
 
-        if (!result.success) {
+        // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
+        if (!result.success && result.errorMessage !== "Parsing errors.") {
             alert(result.errorMessage);
         } 
 
@@ -87,6 +88,11 @@ const Simulator = ({sim, initialState}) => {
         stepCode(INTERNAL_STEPS_STRIDE);
     }
 
+    const onCodeChange = (code) => {
+        setCode(code);
+        sim.checkSyntax(code);
+    }
+
     return (
         <div id="widgetGrid">
             <Code 
@@ -94,7 +100,7 @@ const Simulator = ({sim, initialState}) => {
                 onStepClick={stepCode} stepEnabled={simulatorRunning && !executing}
                 onLoadClick={loadCode} loadEnabled={true}
                 onStopClick={() => {setMustStop(true)}} stopEnabled={executing}
-                onChangeValue={(text) => setCode(text)} 
+                onChangeValue={onCodeChange} 
                 code={code}
                 parsingErrors={parsingErrors}
             />
