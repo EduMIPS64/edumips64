@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 import MonacoEditor from 'react-monaco-editor';
-import { debounce } from 'lodash';
 
 import ErrorDisplay from "./ErrorDisplay";
 
@@ -11,9 +10,6 @@ const STEP_STRIDE = 500;
 const MonacoCode = (props) => {
     const [monaco, setMonaco] = useState(null);
     const [editor, setEditor] = useState(null);
-
-    // A debounced version of onChange. Needed to not run props.onChange too often.
-    const debouncedOnChange = debounce(code => props.onChangeValue(code), 500);
 
     const editorDidMount = (editor, monaco) => {
         setMonaco(monaco);
@@ -70,7 +66,7 @@ const MonacoCode = (props) => {
     }, [props.parsingErrors]);
 
     const onChange = (newValue, event) => {
-        debouncedOnChange(newValue);
+        props.onChangeValue(newValue);
     }
 
     return (

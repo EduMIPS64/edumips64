@@ -8,6 +8,8 @@ import Statistics from "./Statistics";
 
 import SampleProgram from "../data/SampleProgram";
 
+import { debounce } from 'lodash';
+
 const Simulator = ({sim, initialState}) => {
     // The amount of steps to run in multi-step executions.
     const INTERNAL_STEPS_STRIDE = 50;
@@ -91,9 +93,12 @@ const Simulator = ({sim, initialState}) => {
         stepCode(INTERNAL_STEPS_STRIDE);
     }
 
+    // A debounced version of syntaxCheck. Needed to not run props.onChange too often.
+    const debouncedSyntaxCheck = debounce(code => sim.checkSyntax(code), 500);
+
     const onCodeChange = (code) => {
         setCode(code);
-        sim.checkSyntax(code);
+        debouncedSyntaxCheck(code);
     }
 
     return (
