@@ -35,6 +35,9 @@ const Simulator = ({sim, initialState}) => {
 
     const simulatorRunning = status == "RUNNING";
 
+    // Tracks if the program has no syntax errors and can be loaded.
+    const isValidProgram = !parsingErrors;
+
     sim.onmessage = (e) => {
         const result = sim.parseResult(e.data);
         console.log("Got message from worker.", result);
@@ -98,7 +101,7 @@ const Simulator = ({sim, initialState}) => {
             <Code 
                 onRunClick={runCode} runEnabled={simulatorRunning && !executing}
                 onStepClick={stepCode} stepEnabled={simulatorRunning && !executing}
-                onLoadClick={loadCode} loadEnabled={true}
+                onLoadClick={loadCode} loadEnabled={isValidProgram}
                 onStopClick={() => {setMustStop(true)}} stopEnabled={executing}
                 onChangeValue={onCodeChange} 
                 code={code}
