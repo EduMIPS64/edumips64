@@ -48,7 +48,7 @@ public class Simulator {
   private Memory memory;
   private Dinero dinero;
 
-  private ResultFactory resultFactory;
+  public ResultFactory resultFactory;
    
   private Logger logger = Logger.getLogger("simulator");
 

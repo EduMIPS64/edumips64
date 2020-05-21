@@ -16,6 +16,9 @@ simulator.step = (n) => {
 simulator.load = (code) => {
     simulator.postMessage({"method": "load", "code": code});
 }
+simulator.checkSyntax = (code) => {
+    simulator.postMessage({"method": "checksyntax", "code": code});
+}
 simulator.parseResult = (result) => {
     result.registers = JSON.parse(result.registers);
     result.statistics = JSON.parse(result.statistics);

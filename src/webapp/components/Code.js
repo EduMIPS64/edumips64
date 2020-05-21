@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 
 import MonacoEditor from 'react-monaco-editor';
 
+import ErrorDisplay from "./ErrorDisplay";
+
 // Number of steps to run with the multi-step button.
 const STEP_STRIDE = 500;
 
@@ -94,6 +96,7 @@ const Code = (props) => {
                 <input id="multi-step-button" type="button" value="Multi Step" onClick={() => {props.onStepClick(STEP_STRIDE)}} disabled={!props.stepEnabled} />
                 <input id="run-button" type="button" value="Run All" onClick={() => {props.onRunClick()}} disabled={!props.runEnabled} />
                 <input id="stop-button" type="button" value="Stop" onClick={() => {props.onStopClick()}} disabled={!props.stopEnabled} />
+                <ErrorDisplay parsingErrors={props.parsingErrors} />
             </div>
         </div>
     );

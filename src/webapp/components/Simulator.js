@@ -8,6 +8,8 @@ import Statistics from "./Statistics";
 
 import SampleProgram from "../data/SampleProgram";
 
+import { debounce } from 'lodash';
+
 const Simulator = ({sim, initialState}) => {
     // The amount of steps to run in multi-step executions.
     const INTERNAL_STEPS_STRIDE = 50;
@@ -35,6 +37,9 @@ const Simulator = ({sim, initialState}) => {
 
     const simulatorRunning = status == "RUNNING";
 
+    // Tracks if the program has no syntax errors and can be loaded.
+    const isValidProgram = !parsingErrors;
+
     sim.onmessage = (e) => {
         const result = sim.parseResult(e.data);
         console.log("Got message from worker.", result);
@@ -52,7 +57,8 @@ const Simulator = ({sim, initialState}) => {
         setPipeline(result.pipeline);
         setParsingErrors(result.parsingErrors);
 
-        if (!result.success) {
+        // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
+        if (!result.success && result.errorMessage !== "Parsing errors.") {
             alert(result.errorMessage);
         } 
 
@@ -87,14 +93,22 @@ const Simulator = ({sim, initialState}) => {
         stepCode(INTERNAL_STEPS_STRIDE);
     }
 
+    // A debounced version of syntaxCheck. Needed to not run props.onChange too often.
+    const debouncedSyntaxCheck = debounce(code => sim.checkSyntax(code), 500);
+
+    const onCodeChange = (code) => {
+        setCode(code);
+        debouncedSyntaxCheck(code);
+    }
+
     return (
         <div id="widgetGrid">
             <Code 
                 onRunClick={runCode} runEnabled={simulatorRunning && !executing}
                 onStepClick={stepCode} stepEnabled={simulatorRunning && !executing}
-                onLoadClick={loadCode} loadEnabled={true}
+                onLoadClick={loadCode} loadEnabled={isValidProgram}
                 onStopClick={() => {setMustStop(true)}} stopEnabled={executing}
-                onChangeValue={(text) => setCode(text)} 
+                onChangeValue={onCodeChange} 
                 code={code}
                 parsingErrors={parsingErrors}
             />
