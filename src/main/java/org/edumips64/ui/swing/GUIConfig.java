@@ -276,6 +276,8 @@ public class GUIConfig extends JDialog {
       cache.put(key, config.getBoolean(key));
 
       cbox.setAction(new AbstractAction() {
+        private static final long serialVersionUID = -6988834483997845598L;
+
         public void actionPerformed(ActionEvent e) {
           logger.info("Changing " + key + " to " + cbox.getModel().isSelected());
           cache.put(key, cbox.getModel().isSelected());
@@ -293,6 +295,8 @@ public class GUIConfig extends JDialog {
       // TODO: more generic handling of radio buttons: currently we have only
       // one and this code is tailored for it.
       rbut.setAction(new AbstractAction() {
+        private static final long serialVersionUID = 5799131562641421466L;
+
         public void actionPerformed(ActionEvent e) {
           LinkedList<ConfigKey> keys = new LinkedList<>();
           keys.add(ConfigKey.FP_NEAREST);
@@ -325,6 +329,8 @@ public class GUIConfig extends JDialog {
         }
       });
       number.setAction(new AbstractAction() {
+        private static final long serialVersionUID = 4922527101744774710L;
+
         public void actionPerformed(ActionEvent e) {
           if (number.isNumber()) {
             cache.put(key, number.getNumber());
@@ -347,7 +353,9 @@ public class GUIConfig extends JDialog {
         }
       });
       text.setAction(new AbstractAction() {
-        public void actionPerformed(ActionEvent e) {
+		private static final long serialVersionUID = -56222320121905876L;
+
+		public void actionPerformed(ActionEvent e) {
           logger.info("abstract");
           cache.put(key, text.getText());
         }

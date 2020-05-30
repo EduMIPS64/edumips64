@@ -36,7 +36,6 @@ import com.google.gwt.core.client.EntryPoint;
 
 import elemental2.dom.DomGlobal;
 import elemental2.dom.MessageEvent;
-import static elemental2.core.Global.JSON;
 
 import jsinterop.base.Js;
 import jsinterop.base.JsPropertyMap;

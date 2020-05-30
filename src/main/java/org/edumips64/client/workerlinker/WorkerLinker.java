@@ -56,7 +56,6 @@ public class WorkerLinker extends AbstractLinker {
 
 		ArtifactSet toReturn = new ArtifactSet(artifacts);
 		DefaultTextOutput out = new DefaultTextOutput(true);
-		long compilationTime = System.currentTimeMillis();
 		out.print("(function(){");
 		out.newline();
 
