@@ -22,8 +22,8 @@
     "react-monaco-editor": "^0.36.0"
   },
   "devDependencies": {
-    "@babel/core": "7.10.1",
-    "@babel/preset-env": "7.10.1",
+    "@babel/core": "7.10.2",
+    "@babel/preset-env": "7.10.2",
     "@babel/preset-react": "7.10.1",
     "babel-loader": "8.1.0",
     "copyfiles": "2.3.0",
