@@ -33,4 +33,18 @@ public class Pipeline {
     public Instruction EX;
     public Instruction MEM;
     public Instruction WB;
+
+    // FPU stages.
+    public Instruction FPDivider;
+    public Instruction FPAdder1;
+    public Instruction FPAdder2;
+    public Instruction FPAdder3;
+    public Instruction FPAdder4;
+    public Instruction FPMultiplier1;
+    public Instruction FPMultiplier2;
+    public Instruction FPMultiplier3;
+    public Instruction FPMultiplier4;
+    public Instruction FPMultiplier5;
+    public Instruction FPMultiplier6;
+    public Instruction FPMultiplier7;
 }

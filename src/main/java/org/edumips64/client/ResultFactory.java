@@ -171,6 +171,19 @@ public class ResultFactory {
         p.EX = Instruction.FromInstruction(cpuPipeline.get(Stage.EX));
         p.MEM = Instruction.FromInstruction(cpuPipeline.get(Stage.MEM));
         p.WB = Instruction.FromInstruction(cpuPipeline.get(Stage.WB));
+        
+        p.FPAdder1 = Instruction.FromInstruction(cpu.getFpuInstruction("ADDER", 1));
+        p.FPAdder2 = Instruction.FromInstruction(cpu.getFpuInstruction("ADDER", 2));
+        p.FPAdder3 = Instruction.FromInstruction(cpu.getFpuInstruction("ADDER", 3));
+        p.FPAdder4 = Instruction.FromInstruction(cpu.getFpuInstruction("ADDER", 4));
+        p.FPMultiplier1 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 1));
+        p.FPMultiplier2 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 2));
+        p.FPMultiplier3 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 3));
+        p.FPMultiplier4 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 4));
+        p.FPMultiplier5 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 5));
+        p.FPMultiplier6 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 6));
+        p.FPMultiplier7 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 7));
+        p.FPDivider = Instruction.FromInstruction(cpu.getFpuInstruction("DIVIDER", 0));
 
         return p;
     }
