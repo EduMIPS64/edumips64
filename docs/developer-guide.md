@@ -3,7 +3,7 @@
 
 [Main Gradle tasks](#main-gradle-tasks)
 
-[Working on the GWT frontend](#working-on-the-gwt-frontend)
+[Working on the Web UI](#working-on-the-web-ui)
 
 [Source code structure](#source-code-structure)
 
@@ -108,10 +108,9 @@ Custom NPM scripts:
 
 * `build-dbg`: runs `webpack -d` (compile with debugging symbols)
 * `build`: runs `webpack -p` (compile without debugging symbols, minified, etc)
-* `deploy`: copies the static files (HTML, CSS, etc) into `build/gwt/war/edumips64`
-* `serve`: starts a web server which serves the contents of `build/get/war/edumips64`
+* `start`: starts the webpack-dev-server with live reloading 
 
-Both `build` and `build-dbg` produce a `ui.js` file in the `dist` directory.
+Both `build` and `build-dbg` produce a `ui.js` file in the `build/gwt/war/edumips64` directory.
 
 ### Source code structure
 
