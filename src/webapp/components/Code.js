@@ -2,12 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import MonacoEditor from 'react-monaco-editor';
 
-import ErrorDisplay from "./ErrorDisplay";
-
-// Number of steps to run with the multi-step button.
-const STEP_STRIDE = 500;
-
-const MonacoCode = (props) => {
+const Code = (props) => {
     const [monaco, setMonaco] = useState(null);
     const [editor, setEditor] = useState(null);
 
@@ -25,6 +20,11 @@ const MonacoCode = (props) => {
         codelens: false,
         minimap: {enabled: false},
         tabsize: 4,
+        lineNumbersMinChars: 3,
+
+        // Note: the documentation mentions this might have a negative performance
+        // impact.
+        automaticLayout: true,
     };
 
     const computeMarkers = parsingErrors => {
@@ -71,7 +71,6 @@ const MonacoCode = (props) => {
 
     return (
         <MonacoEditor
-            height="400"
             language="mips"
             value={props.code}
             options={options}
@@ -80,26 +79,6 @@ const MonacoCode = (props) => {
             editorDidMount={editorDidMount}
         />
     )
-}
-
-const Code = (props) => {
-    return (
-        <div id="code">
-            <MonacoCode 
-                code={props.code}
-                onChangeValue={props.onChangeValue}
-                parsingErrors={props.parsingErrors}
-                />
-            <div id="controls">
-                <input id="load-button" type="button" value="Load/Reset" onClick={() => {props.onLoadClick()}} disabled={!props.loadEnabled} />
-                <input id="step-button" type="button" value="Single Step" onClick={() => {props.onStepClick(1)}} disabled={!props.stepEnabled} />
-                <input id="multi-step-button" type="button" value="Multi Step" onClick={() => {props.onStepClick(STEP_STRIDE)}} disabled={!props.stepEnabled} />
-                <input id="run-button" type="button" value="Run All" onClick={() => {props.onRunClick()}} disabled={!props.runEnabled} />
-                <input id="stop-button" type="button" value="Stop" onClick={() => {props.onStopClick()}} disabled={!props.stopEnabled} />
-                <ErrorDisplay parsingErrors={props.parsingErrors} />
-            </div>
-        </div>
-    );
 }
 
 export default Code;
