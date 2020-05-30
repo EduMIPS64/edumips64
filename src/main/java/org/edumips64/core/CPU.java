@@ -229,7 +229,7 @@ public class CPU {
    *  @param stage The integer that refers to the stage of the functional unit.
    *      ADDER [1,4], MULTIPLIER [1,7], DIVIDER [any] */
 
-  public InstructionInterface getInstructionByFuncUnit(String funcUnit, int stage) {
+  public InstructionInterface getFpuInstruction(String funcUnit, int stage) {
     return fpPipe.getInstructionByFuncUnit(funcUnit, stage);
   }
 

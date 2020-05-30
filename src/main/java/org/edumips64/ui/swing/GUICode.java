@@ -77,18 +77,18 @@ public class GUICode extends GUIComponent {
     memIndex = memory.getInstructionIndex(cpu.getPipeline().get(Pipeline.Stage.MEM));
     wbIndex = memory.getInstructionIndex(cpu.getPipeline().get(Pipeline.Stage.WB));
 
-    A1Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 1));
-    A2Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 2));
-    A3Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 3));
-    A4Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("ADDER", 4));
-    M1Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 1));
-    M2Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 2));
-    M3Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 3));
-    M4Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 4));
-    M5Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 5));
-    M6Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 6));
-    M7Index = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("MULTIPLIER", 7));
-    DIVIndex = memory.getInstructionIndex(cpu.getInstructionByFuncUnit("DIVIDER", 0));
+    A1Index = memory.getInstructionIndex(cpu.getFpuInstruction("ADDER", 1));
+    A2Index = memory.getInstructionIndex(cpu.getFpuInstruction("ADDER", 2));
+    A3Index = memory.getInstructionIndex(cpu.getFpuInstruction("ADDER", 3));
+    A4Index = memory.getInstructionIndex(cpu.getFpuInstruction("ADDER", 4));
+    M1Index = memory.getInstructionIndex(cpu.getFpuInstruction("MULTIPLIER", 1));
+    M2Index = memory.getInstructionIndex(cpu.getFpuInstruction("MULTIPLIER", 2));
+    M3Index = memory.getInstructionIndex(cpu.getFpuInstruction("MULTIPLIER", 3));
+    M4Index = memory.getInstructionIndex(cpu.getFpuInstruction("MULTIPLIER", 4));
+    M5Index = memory.getInstructionIndex(cpu.getFpuInstruction("MULTIPLIER", 5));
+    M6Index = memory.getInstructionIndex(cpu.getFpuInstruction("MULTIPLIER", 6));
+    M7Index = memory.getInstructionIndex(cpu.getFpuInstruction("MULTIPLIER", 7));
+    DIVIndex = memory.getInstructionIndex(cpu.getFpuInstruction("DIVIDER", 0));
 
   }
 

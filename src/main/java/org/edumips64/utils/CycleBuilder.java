@@ -251,13 +251,13 @@ public class CycleBuilder {
 
       // Handle non-terminal adder stages (1-3) with a cycle.
       for (int i = 1; i <= 3; ++i) {
-        el = getElementToUpdate(cpu.getInstructionByFuncUnit("ADDER", i));
+        el = getElementToUpdate(cpu.getFpuInstruction("ADDER", i));
         if (el != null) {
           el.addState("A" + i);
         }
       }
 
-      el = getElementToUpdate(cpu.getInstructionByFuncUnit("ADDER", 4));
+      el = getElementToUpdate(cpu.getFpuInstruction("ADDER", 4));
       if (el != null) {
         boolean A4tagged = false;
         if (el.getLastState().equals("A3")) {
@@ -275,13 +275,13 @@ public class CycleBuilder {
 
       // Handle non-terminal multiplier stages (1-6) with a cycle.
       for (int i = 1; i <= 6; ++i) {
-        el = getElementToUpdate(cpu.getInstructionByFuncUnit("MULTIPLIER", i));
+        el = getElementToUpdate(cpu.getFpuInstruction("MULTIPLIER", i));
         if (el != null) {
           el.addState("M" + i);
         }
       }
 
-      el = getElementToUpdate(cpu.getInstructionByFuncUnit("MULTIPLIER", 7));
+      el = getElementToUpdate(cpu.getFpuInstruction("MULTIPLIER", 7));
       if (el != null) {
         boolean M7tagged = false;
         if (el.getLastState().equals("M6")) {
@@ -296,7 +296,7 @@ public class CycleBuilder {
       }
 
       //DIVIDER ------------------------------------------------------
-      el = getElementToUpdate(cpu.getInstructionByFuncUnit("DIVIDER", 0));
+      el = getElementToUpdate(cpu.getFpuInstruction("DIVIDER", 0));
       if (el != null) {
         boolean DIVtagged = false;
         stage = el.getLastState();
