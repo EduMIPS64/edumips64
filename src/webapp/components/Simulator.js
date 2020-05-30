@@ -1,6 +1,7 @@
 import React from "react";
 
 import Code from "./Code";
+import Controls from "./Controls";
 import Memory from "./Memory";
 import Pipeline from "./Pipeline";
 import Registers from "./Registers";
@@ -102,12 +103,16 @@ const Simulator = ({sim, initialState}) => {
     }
 
     return (
-        <div id="widgetGrid">
-            <Code 
+        <>
+        <Controls
                 onRunClick={runCode} runEnabled={simulatorRunning && !executing}
                 onStepClick={stepCode} stepEnabled={simulatorRunning && !executing}
                 onLoadClick={loadCode} loadEnabled={isValidProgram}
                 onStopClick={() => {setMustStop(true)}} stopEnabled={executing}
+                parsingErrors={parsingErrors}
+        />
+        <div id="widgetGrid">
+            <Code 
                 onChangeValue={onCodeChange} 
                 code={code}
                 parsingErrors={parsingErrors}
@@ -117,6 +122,7 @@ const Simulator = ({sim, initialState}) => {
             <Statistics {...stats}/>
             <Pipeline pipeline={pipeline}/>
         </div>
+        </>
     );
 }
 
