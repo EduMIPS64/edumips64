@@ -36,6 +36,7 @@ import org.edumips64.core.fpu.FPOverflowException;
 import org.edumips64.core.fpu.FPUnderflowException;
 import org.edumips64.core.is.Instruction;
 import org.edumips64.core.is.InstructionBuilder;
+import org.edumips64.core.is.ParsedInstructionMetadata;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.ReadException;
 
@@ -503,7 +504,8 @@ public class Parser {
                 }
               }
 
-              tmpInst = instructionBuilder.buildInstruction(line.substring(i, end).toUpperCase());
+              ParsedInstructionMetadata meta = new ParsedInstructionMetadata(row, instrCount+4);
+              tmpInst = instructionBuilder.buildInstruction(line.substring(i, end).toUpperCase(), meta);
 
               if (tmpInst == null) {
                 numError++;
@@ -1180,7 +1182,8 @@ public class Parser {
 
       try {
         logger.warning("No terminating instruction detected, adding one.");
-        Instruction tmpInst = instructionBuilder.buildInstruction("SYSCALL");
+        ParsedInstructionMetadata meta = new ParsedInstructionMetadata(row, instrCount+4);
+        Instruction tmpInst = instructionBuilder.buildInstruction("SYSCALL", meta);
         tmpInst.getParams().add(0);
         tmpInst.setFullName("SYSCALL 0");
 

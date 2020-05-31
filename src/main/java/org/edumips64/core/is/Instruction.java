@@ -48,6 +48,8 @@ public abstract class Instruction implements InstructionInterface {
   protected static final Logger logger = Logger.getLogger(Instruction.class.getName());
   private int serialNumber;
 
+  private ParsedInstructionMetadata metadata;
+
   /** CPU instance. It is set through setCPU, and it should always be set before the instruction is considered
    * fully built. InstructionBuilder + package-local instruction constructors enforce this.
    */
@@ -267,5 +269,14 @@ public abstract class Instruction implements InstructionInterface {
    */
   public boolean isBubble() {
     return name.equals(" ");
+  }
+
+  public void setParsingMetadata(ParsedInstructionMetadata instructionMetadata) {
+    metadata = instructionMetadata;
+  }
+
+  /** Gets the instruction's parsing-time metadata. Can be null. */
+  public ParsedInstructionMetadata getParsingMetadata() {
+    return metadata;
   }
 }
