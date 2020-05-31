@@ -38,6 +38,7 @@ import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.parser.ParserMultiException;
 
+import elemental2.core.JsArray;
 import jsinterop.base.Js;
 
 public class ResultFactory {
@@ -64,18 +65,27 @@ public class ResultFactory {
 
     public Result Success() {
         Result r = new Result(true, "");
-        return AddCpuInfo(r);
+        return AddParsedInstructions(AddCpuInfo(r));
     }
 
     public Result Failure(String errorMessage) {
         Result r = new Result(false, errorMessage);
-        return AddCpuInfo(r);
+        return AddParsedInstructions(AddCpuInfo(r));
     }
 
     public static Result AddParserErrors(Result result, ParserMultiException e) {
         result.parsingErrors = Js.cast(e.getExceptionList().stream()
             .map(exception -> ParserErrorFactory.FromParserException(exception)).toArray(ParserError[]::new));
         return result;
+    }
+
+    private Result AddParsedInstructions(Result r) {
+        r.parsedInstructions = new JsArray<>();
+        int count = this.memory.getInstructionsNumber();
+        for (int i = 0; i < count; ++i) {
+            r.parsedInstructions.setAt(i, Instruction.FromInstruction(this.memory.getInstruction(i*4)));
+        }
+        return r;
     }
 
     private Result AddCpuInfo(Result r) {

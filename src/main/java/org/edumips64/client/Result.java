@@ -38,6 +38,7 @@ public class Result {
   public Pipeline pipeline;
   public boolean encounteredBreak = false;
   public JsArray<ParserError> parsingErrors;
+  public JsArray<Instruction> parsedInstructions;
 
   public Result(boolean success, String errorMessage) {
     this.success = success;

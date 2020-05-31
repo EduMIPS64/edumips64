@@ -23,6 +23,7 @@
 package org.edumips64.client;
 
 import org.edumips64.core.is.InstructionInterface;
+import org.edumips64.core.is.ParsedInstructionMetadata;
 
 import jsinterop.annotations.JsIgnore;
 import jsinterop.annotations.JsType;
@@ -34,6 +35,8 @@ public class Instruction {
     public String Code;
     public String Comment;
     public int SerialNumber;
+    public int Address;
+    public int Line;
 
     private Instruction() {}
 
@@ -47,6 +50,12 @@ public class Instruction {
         instruction.Code = i.getFullName();
         instruction.SerialNumber = i.getSerialNumber();
         instruction.Comment = i.getComment();
+
+        ParsedInstructionMetadata meta = i.getParsingMetadata();
+        if (meta != null) {
+            instruction.Address = meta.address;
+            instruction.Line = meta.sourceLine;
+        }
 
         return instruction;
     }

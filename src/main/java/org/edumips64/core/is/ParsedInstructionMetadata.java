@@ -26,10 +26,10 @@ package org.edumips64.core.is;
 
 public class ParsedInstructionMetadata {
     public final int sourceLine;
-    public final long address;
+    public final int address;
 
     public ParsedInstructionMetadata(int sourceLine, long address) {
-        this.address = address;
+        this.address = (int)address;
         this.sourceLine = sourceLine;
     }
 }
