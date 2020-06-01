@@ -37,6 +37,8 @@ public class Instruction {
     public int SerialNumber;
     public int Address;
     public int Line;
+    public String BinaryRepresentation;
+    public String OpCode;
 
     private Instruction() {}
 
@@ -50,6 +52,8 @@ public class Instruction {
         instruction.Code = i.getFullName();
         instruction.SerialNumber = i.getSerialNumber();
         instruction.Comment = i.getComment();
+        instruction.BinaryRepresentation = i.getRepr().getBinString();
+        instruction.OpCode = instruction.BinaryRepresentation.substring(0, 6);
 
         ParsedInstructionMetadata meta = i.getParsingMetadata();
         if (meta != null) {

@@ -41,7 +41,9 @@ const Code = (props) => {
                 return {
                     range: new monaco.Range(line, 0, line, model.getLineMaxColumn(line)),
                     contents: [
-                        { value: `**${instruction.Name} @ ${instruction.Address}**` },
+                        { value: `*Address*: \`${instruction.Address}\``},
+                        { value: `*OpCode*: \`${instruction.OpCode}\``},
+                        { value: `*Binary*: \`${instruction.BinaryRepresentation}\``},
                     ]
                 }
             },
