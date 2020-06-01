@@ -12,6 +12,9 @@ const Code = (props) => {
   // Decorations (used for CPU stage indication).
   const [decorations, setDecorations] = useState([]);
 
+  // Maps line of code to CPU stage.
+  const [stageMap, setStageMap] = useState(new Map());
+
   useEffect(() => {
     if (!monaco) {
       return;
@@ -22,6 +25,7 @@ const Code = (props) => {
       return;
     }
 
+    const newStageMap = new Map();
     const newDecorations = [];
     const createDecoration = (instr, className) => {
       return {
@@ -31,79 +35,97 @@ const Code = (props) => {
     };
     if (props.pipeline.IF) {
       newDecorations.push(createDecoration(props.pipeline.IF, 'stageIf'));
+      newStageMap.set(props.pipeline.IF.Line, 'Instruction Fetch (IF)');
     }
     if (props.pipeline.ID) {
       newDecorations.push(createDecoration(props.pipeline.ID, 'stageId'));
+      newStageMap.set(props.pipeline.ID.Line, 'Instruction Decode (ID)');
     }
     if (props.pipeline.EX) {
       newDecorations.push(createDecoration(props.pipeline.EX, 'stageEx'));
+      newStageMap.set(props.pipeline.EX.Line, 'Execute (EX)');
     }
     if (props.pipeline.MEM) {
       newDecorations.push(createDecoration(props.pipeline.MEM, 'stageMem'));
+      newStageMap.set(props.pipeline.MEM.Line, 'Memory Access (MEM)');
     }
     if (props.pipeline.WB) {
       newDecorations.push(createDecoration(props.pipeline.WB, 'stageWb'));
+      newStageMap.set(props.pipeline.WB.Line, 'Write Back (WB)');
     }
     if (props.pipeline.FPDivider) {
       newDecorations.push(
         createDecoration(props.pipeline.FPDivider, 'stageFPDivider'),
       );
+      newStageMap.set(props.pipeline.FPDivider.Line, 'FPU Divider');
     }
     if (props.pipeline.FPAdder1) {
       newDecorations.push(
         createDecoration(props.pipeline.FPAdder1, 'stageFPAdder'),
       );
+      newStageMap.set(props.pipeline.FPAdder1.Line, 'FPU Adder (1)');
     }
     if (props.pipeline.FPAdder2) {
       newDecorations.push(
         createDecoration(props.pipeline.FPAdder2, 'stageFPAdder'),
       );
+      newStageMap.set(props.pipeline.FPAdder2.Line, 'FPU Adder (2)');
     }
     if (props.pipeline.FPAdder3) {
       newDecorations.push(
         createDecoration(props.pipeline.FPAdder3, 'stageFPAdder'),
       );
+      newStageMap.set(props.pipeline.FPAdder3.Line, 'FPU Adder (3)');
     }
     if (props.pipeline.FPAdder4) {
       newDecorations.push(
         createDecoration(props.pipeline.FPAdder4, 'stageFPAdder'),
       );
+      newStageMap.set(props.pipeline.FPAdder4.Line, 'FPU Adder (4)');
     }
     if (props.pipeline.FPMultiplier1) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier1, 'stageFPMultiplier'),
       );
+      newStageMap.set(props.pipeline.FPMultiplier1.Line, 'FPU Muliplier (1)');
     }
     if (props.pipeline.FPMultiplier2) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier2, 'stageFPMultiplier'),
       );
+      newStageMap.set(props.pipeline.FPMultiplier2.Line, 'FPU Muliplier (2)');
     }
     if (props.pipeline.FPMultiplier3) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier3, 'stageFPMultiplier'),
       );
+      newStageMap.set(props.pipeline.FPMultiplier3.Line, 'FPU Muliplier (3)');
     }
     if (props.pipeline.FPMultiplier4) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier4, 'stageFPMultiplier'),
       );
+      newStageMap.set(props.pipeline.FPMultiplier4.Line, 'FPU Muliplier (4)');
     }
     if (props.pipeline.FPMultiplier5) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier5, 'stageFPMultiplier'),
       );
+      newStageMap.set(props.pipeline.FPMultiplier5.Line, 'FPU Muliplier (5)');
     }
     if (props.pipeline.FPMultiplier6) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier6, 'stageFPMultiplier'),
       );
+      newStageMap.set(props.pipeline.FPMultiplier6.Line, 'FPU Muliplier (6)');
     }
     if (props.pipeline.FPMultiplier7) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier7, 'stageFPMultiplier'),
       );
+      newStageMap.set(props.pipeline.FPMultiplier7.Line, 'FPU Muliplier (7)');
     }
+    setStageMap(newStageMap);
     console.log('decorations');
     console.log(newDecorations);
     const appliedDecorations = editor.deltaDecorations(
@@ -142,18 +164,22 @@ const Code = (props) => {
         }
 
         const instruction = map.get(line);
+        const contents = [
+          { value: `*Address*: \`${instruction.Address}\`` },
+          { value: `*OpCode*: \`${instruction.OpCode}\`` },
+          { value: `*Binary*: \`${instruction.BinaryRepresentation}\`` },
+        ];
+        if (stageMap.has(line)) {
+          contents.push({ value: `*CPU Stage* \`${stageMap.get(line)}\`` });
+        }
         return {
           range: new monaco.Range(line, 0, line, model.getLineMaxColumn(line)),
-          contents: [
-            { value: `*Address*: \`${instruction.Address}\`` },
-            { value: `*OpCode*: \`${instruction.OpCode}\`` },
-            { value: `*Binary*: \`${instruction.BinaryRepresentation}\`` },
-          ],
+          contents,
         };
       },
     });
     setHoverCleanup(disposable);
-  }, [props.parsedInstructions, monaco]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [props.parsedInstructions, stageMap, monaco]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const editorDidMount = (editor, monaco) => {
     setMonaco(monaco);
