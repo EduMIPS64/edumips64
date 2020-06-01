@@ -1,5 +1,5 @@
 // Sample MIPS64 program to display.
-const SampleProgram =`; An EduMIPS64 test program kindly donated by Gerardo Puga in Issue #132.
+const SampleProgram = `; An EduMIPS64 test program kindly donated by Gerardo Puga in Issue #132.
 ; https://github.com/lupino3/edumips64/issues/132
 ; Adapted by Andrea Spadaccini by removing all compilation warnings.
 ;
