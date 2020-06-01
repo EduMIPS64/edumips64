@@ -42,21 +42,10 @@
             <a
               class="waves-effect waves-light btn modal-trigger"
               href="#aboutmodal"
-              >About</a
+              >Help</a
             >
           </li>
-          <li>
-            <a
-              href="https://github.com/EduMIPS64/edumips64/issues?q=is%3Aissue+is%3Aopen+label%3Acomponent%3Aweb-ui"
-              target="_blank"
-              >Known Issues</a
-            >
-          </li>
-          <li>
-            <a href="https://github.com/EduMIPS64/edumips64" target="_blank"
-              >Code on GitHub</a
-            >
-          </li>
+          <li></li>
         </ul>
       </div>
     </nav>
@@ -74,13 +63,39 @@
     <div id="aboutmodal" class="modal">
       <div class="modal-content">
         <h4><img src="logo.png" /></h4>
+        <h4>Help</h4>
+        <p>
+          For help on how to use EduMIPS64, please go to
+          <a href="https://edumips64.readthedocs.io/en/latest/">Read the docs</a
+          >.
+        </p>
+        <p>
+          It contains information on the desktop version, but everything except
+          the UI part is applicable to this simulator (with some exceptions like
+          SYSCALL)
+        </p>
+        <p>
+          Once you load a program, hover over any instruction to see information
+          about it. You will be able to see the address, the instruction's
+          binary representation, the opcode and the CPU stage in which the
+          instruction is in the current step, if it is in the pipeline.
+        </p>
+        <p>
+          CPU stages are also encoded by colors. (a legend will be added.)
+        </p>
+        <h4>About</h4>
         <p>
           This is the web version of the
           <a href="https://www.edumips.org">EduMIPS64 CPU simulator</a>.
         </p>
         <p>
           This is currently <strong>work-in-progress</strong>, very early stages
-          and not fully functional.
+          and not fully functional. See
+          <a
+            href="https://github.com/EduMIPS64/edumips64/issues?q=is%3Aissue+is%3Aopen+label%3Acomponent%3Aweb-ui"
+            target="_blank"
+            >known issues</a
+          >
         </p>
         <p>
           The core of the simulator is cross-compiled from Java to JavaScript,
@@ -88,7 +103,10 @@
         </p>
         <p>
           If you are interested in the evolution of this web application or want
-          to contribute to it, please get in touch via GitHub!
+          to contribute to it, please get in touch via
+          <a href="https://github.com/EduMIPS64/edumips64" target="_blank"
+            >GitHub</a
+          >!
         </p>
       </div>
       <div class="modal-footer">
