@@ -134,6 +134,8 @@ const Simulator = ({ sim, initialState }) => {
           code={code}
           parsingErrors={parsingErrors}
           parsedInstructions={parsedInstructions}
+          pipeline={pipeline}
+          running={simulatorRunning}
         />
         <Registers {...registers} />
         <Memory memory={memory} />

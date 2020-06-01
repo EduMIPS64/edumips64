@@ -9,6 +9,110 @@ const Code = (props) => {
   // IDisposable to clean up the hover provider.
   const [hoverDisposable, setHoverCleanup] = useState(null);
 
+  // Decorations (used for CPU stage indication).
+  const [decorations, setDecorations] = useState([]);
+
+  useEffect(() => {
+    if (!monaco) {
+      return;
+    }
+    if (!props.running && decorations) {
+      const newDecorations = editor.deltaDecorations(decorations, []);
+      setDecorations(decorations);
+      return;
+    }
+
+    const newDecorations = [];
+    const createDecoration = (instr, className) => {
+      return {
+        range: new monaco.Range(instr.Line, 1, instr.Line, 1),
+        options: { isWholeLine: true, className },
+      };
+    };
+    if (props.pipeline.IF) {
+      newDecorations.push(createDecoration(props.pipeline.IF, 'stageIf'));
+    }
+    if (props.pipeline.ID) {
+      newDecorations.push(createDecoration(props.pipeline.ID, 'stageId'));
+    }
+    if (props.pipeline.EX) {
+      newDecorations.push(createDecoration(props.pipeline.EX, 'stageEx'));
+    }
+    if (props.pipeline.MEM) {
+      newDecorations.push(createDecoration(props.pipeline.MEM, 'stageMem'));
+    }
+    if (props.pipeline.WB) {
+      newDecorations.push(createDecoration(props.pipeline.WB, 'stageWb'));
+    }
+    if (props.pipeline.FPDivider) {
+      newDecorations.push(
+        createDecoration(props.pipeline.FPDivider, 'stageFPDivider'),
+      );
+    }
+    if (props.pipeline.FPAdder1) {
+      newDecorations.push(
+        createDecoration(props.pipeline.FPAdder1, 'stageFPAdder'),
+      );
+    }
+    if (props.pipeline.FPAdder2) {
+      newDecorations.push(
+        createDecoration(props.pipeline.FPAdder2, 'stageFPAdder'),
+      );
+    }
+    if (props.pipeline.FPAdder3) {
+      newDecorations.push(
+        createDecoration(props.pipeline.FPAdder3, 'stageFPAdder'),
+      );
+    }
+    if (props.pipeline.FPAdder4) {
+      newDecorations.push(
+        createDecoration(props.pipeline.FPAdder4, 'stageFPAdder'),
+      );
+    }
+    if (props.pipeline.FPMultiplier1) {
+      newDecorations.push(
+        createDecoration(props.pipeline.FPMultiplier1, 'stageFPMultiplier'),
+      );
+    }
+    if (props.pipeline.FPMultiplier2) {
+      newDecorations.push(
+        createDecoration(props.pipeline.FPMultiplier2, 'stageFPMultiplier'),
+      );
+    }
+    if (props.pipeline.FPMultiplier3) {
+      newDecorations.push(
+        createDecoration(props.pipeline.FPMultiplier3, 'stageFPMultiplier'),
+      );
+    }
+    if (props.pipeline.FPMultiplier4) {
+      newDecorations.push(
+        createDecoration(props.pipeline.FPMultiplier4, 'stageFPMultiplier'),
+      );
+    }
+    if (props.pipeline.FPMultiplier5) {
+      newDecorations.push(
+        createDecoration(props.pipeline.FPMultiplier5, 'stageFPMultiplier'),
+      );
+    }
+    if (props.pipeline.FPMultiplier6) {
+      newDecorations.push(
+        createDecoration(props.pipeline.FPMultiplier6, 'stageFPMultiplier'),
+      );
+    }
+    if (props.pipeline.FPMultiplier7) {
+      newDecorations.push(
+        createDecoration(props.pipeline.FPMultiplier7, 'stageFPMultiplier'),
+      );
+    }
+    console.log('decorations');
+    console.log(newDecorations);
+    const appliedDecorations = editor.deltaDecorations(
+      decorations,
+      newDecorations,
+    );
+    setDecorations(appliedDecorations);
+  }, [props.pipeline, props.running, monaco]);
+
   // Hook to update the map of source line to instruction.
   useEffect(() => {
     if (!monaco) {

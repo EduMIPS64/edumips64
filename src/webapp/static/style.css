@@ -54,6 +54,32 @@ div#controls > input {
   margin: 0 0.5em;
 }
 
+/* CSS classes for pipeline stages */
+.stageIf {
+  background-color: rgba(255, 255, 0, 0.5);
+}
+.stageId {
+  background-color: rgba(0, 0, 255, 0.5);
+}
+.stageEx {
+  background-color: rgba(255, 0, 0, 0.5);
+}
+.stageMem {
+  background-color: rgba(0, 255, 0, 0.5);
+}
+.stageWb {
+  background-color: rgba(255, 0, 255, 0.5);
+}
+.stageFPAdder {
+  background-color: rgba(0, 128, 0, 0.5);
+}
+.stageFPMultiplier {
+  background-color: rgba(0, 128, 128, 0.5);
+}
+.stageFPMultiplier {
+  background-color: rgba(128, 128, 0, 0.5);
+}
+
 #logo {
   height: 62px;
   display: block;
