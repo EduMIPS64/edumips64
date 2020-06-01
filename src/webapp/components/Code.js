@@ -15,7 +15,7 @@ const Code = (props) => {
       return;
     }
 
-    let map = new Map();
+    const map = new Map();
     if (props.parsedInstructions) {
       props.parsedInstructions
         .filter((instruction) => instruction)
@@ -26,7 +26,7 @@ const Code = (props) => {
       hoverDisposable.dispose();
     }
 
-    let disposable = monaco.languages.registerHoverProvider('mips', {
+    const disposable = monaco.languages.registerHoverProvider('mips', {
       provideHover: (model, position) => {
         if (map.size === 0) {
           return;
