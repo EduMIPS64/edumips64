@@ -5,6 +5,9 @@ import Simulator from './components/Simulator';
 
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
+// Set version from the webpack variables.
+const version = `${BRANCH}-${COMMITHASH.substring(0, 7)}`;
+
 // Initialize AppInsights.
 const appInsights = new ApplicationInsights({
   config: {
@@ -12,6 +15,13 @@ const appInsights = new ApplicationInsights({
   },
 });
 appInsights.loadAppInsights();
+// Add the version dimension to all metrics.
+var telemetryInitializer = (envelope) => {
+  const telemetryItem = envelope.data.baseData;
+  telemetryItem.properties = telemetryItem.properties || {};
+  telemetryItem.properties['version'] = version;
+};
+appInsights.addTelemetryInitializer(telemetryInitializer);
 appInsights.trackPageView();
 console.log('Initialized AppInsights');
 
@@ -36,6 +46,7 @@ simulator.parseResult = (result) => {
   result.statistics = JSON.parse(result.statistics);
   return result;
 };
+simulator.version = version;
 
 simulator.reset();
 var initializer = (evt) => {
