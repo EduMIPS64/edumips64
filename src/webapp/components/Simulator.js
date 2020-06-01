@@ -22,6 +22,7 @@ const Simulator = ({sim, initialState}) => {
     const [status, setStatus] = React.useState(initialState.status);
     const [pipeline, setPipeline] = React.useState(initialState.pipeline);
     const [parsingErrors, setParsingErrors] = React.useState(initialState.parsingErrors);
+    const [parsedInstructions, setParsedInstructions] = React.useState(initialState.parsedInstructions);
 
     // Number of steps left to run. Used to keep track of execution.
     // If set to -1, runs until the execution ends.
@@ -57,6 +58,12 @@ const Simulator = ({sim, initialState}) => {
         setStatus(result.status);
         setPipeline(result.pipeline);
         setParsingErrors(result.parsingErrors);
+
+        if (result.parsingErrors) {
+            setParsedInstructions(null);
+        } else {
+            setParsedInstructions(result.parsedInstructions);
+        }
 
         // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
         if (!result.success && result.errorMessage !== "Parsing errors.") {
@@ -116,6 +123,7 @@ const Simulator = ({sim, initialState}) => {
                 onChangeValue={onCodeChange} 
                 code={code}
                 parsingErrors={parsingErrors}
+                parsedInstructions={parsedInstructions}
             />
             <Registers {...registers}/>
             <Memory memory={memory}/>

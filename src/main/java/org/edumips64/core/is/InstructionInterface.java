@@ -68,6 +68,7 @@ public interface InstructionInterface {
   int getSerialNumber();
   BitSet32 getRepr();
   boolean isBubble();
+  ParsedInstructionMetadata getParsingMetadata();
 
   void setLabel(String label);
 }

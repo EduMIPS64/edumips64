@@ -6,6 +6,52 @@ const Code = (props) => {
     const [monaco, setMonaco] = useState(null);
     const [editor, setEditor] = useState(null);
 
+    // IDisposable to clean up the hover provider.
+    const [hoverDisposable, setHoverCleanup] = useState(null);
+
+    // Hook to update the map of source line to instruction.
+    useEffect(() => {
+        if (!monaco) {
+            return;
+        }
+
+        let map = new Map();
+        if (props.parsedInstructions) {
+            props.parsedInstructions
+                .filter(instruction => instruction)
+                .map(instruction => map.set(instruction.Line, instruction));
+        }
+
+        if (hoverDisposable) {
+            hoverDisposable.dispose();
+        }
+
+        let disposable = monaco.languages.registerHoverProvider("mips", {provideHover:
+            (model, position) => {
+                if (map.size === 0) {
+                    return;
+                }
+
+                const line = position.lineNumber;
+                if (!map.has(line)) {
+                    return;
+                }
+
+                const instruction = map.get(line);
+                return {
+                    range: new monaco.Range(line, 0, line, model.getLineMaxColumn(line)),
+                    contents: [
+                        { value: `*Address*: \`${instruction.Address}\``},
+                        { value: `*OpCode*: \`${instruction.OpCode}\``},
+                        { value: `*Binary*: \`${instruction.BinaryRepresentation}\``},
+                    ]
+                }
+            },
+        });
+        setHoverCleanup(disposable);
+    }, [props.parsedInstructions, monaco, hoverDisposable]);
+
+
     const editorDidMount = (editor, monaco) => {
         setMonaco(monaco);
         setEditor(editor);
@@ -16,7 +62,6 @@ const Code = (props) => {
         roundedSelection: false,
         readOnly: false,
         cursorStyle: "line",
-        automaticLayout: false,
         codelens: false,
         minimap: {enabled: false},
         tabsize: 4,
@@ -27,25 +72,7 @@ const Code = (props) => {
         automaticLayout: true,
     };
 
-    const computeMarkers = parsingErrors => {
-        // TODO: handle multiple errors in the same line.
-        const lines = editor.getValue().split("\n");
-        return parsingErrors.map(err => {
-            const line = lines[err.row-1];
-            // First non-space character.
-            const startColumn = line.search(/\S/)+1;
-            return {
-                startLineNumber: err.row,
-                endLineNumber: err.row,
-                startColumn: startColumn,
-                endColumn: line.length+1,
-                message: `${err.description}`,
-                severity: err.isWarning ? 4 : 8,
-                source: 'EduMIPS64',
-            };
-        });
-    }
-
+    // Hook to compute and set markers for warnings and errors.
     useEffect(() => {
         if (!monaco || !editor) {
             return;
@@ -59,22 +86,32 @@ const Code = (props) => {
         }
 
         console.log("Parsing errors", props.parsingErrors);
-        const markers = computeMarkers(props.parsingErrors);
+        const lines = editor.getValue().split("\n");
+        const markers = props.parsingErrors.map(err => {
+            const line = lines[err.row-1];
+            // First non-space character.
+            const startColumn = line.search(/\S/)+1;
+            return {
+                startLineNumber: err.row,
+                endLineNumber: err.row,
+                startColumn: startColumn,
+                endColumn: line.length+1,
+                message: `${err.description}`,
+                severity: err.isWarning ? 4 : 8,
+                source: 'EduMIPS64',
+            };
+        });
         console.log("Markers", markers);
 
         monaco.editor.setModelMarkers(model, "EduMIPS64", markers);
-    }, [props.parsingErrors]);
-
-    const onChange = (newValue, event) => {
-        props.onChangeValue(newValue);
-    }
+    }, [props.parsingErrors, editor, monaco]);
 
     return (
         <MonacoEditor
             language="mips"
             value={props.code}
             options={options}
-            onChange={onChange}
+            onChange={props.onChangeValue}
             theme="vs-light"
             editorDidMount={editorDidMount}
         />

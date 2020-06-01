@@ -3,6 +3,8 @@ package org.edumips64.core;
 import org.edumips64.BaseTest;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
+import org.edumips64.core.is.InstructionInterface;
+import org.edumips64.core.is.ParsedInstructionMetadata;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.utils.io.LocalFileUtils;
@@ -127,6 +129,30 @@ public class ParserTest extends BaseTest {
   public void FPOverflowNoThrowOnDisabledExceptionsTest() throws Exception {
     parser.getFCSR().setFPExceptions(FCSRRegister.FPExceptions.OVERFLOW, false);
     ParseDouble("4.95E324");
+  }
+
+  @Test
+  public void ParserMetadataTest() throws Exception {
+    parser.doParsing(".code\nnop\nnop\n\nsyscall 0");
+    assertEquals(3, memory.getInstructionsNumber());
+
+    // First instruction: address 0, code line 2 (line 1 has the .code directive).
+    InstructionInterface first = memory.getInstruction(0);
+    ParsedInstructionMetadata firstMeta = first.getParsingMetadata();
+    assertEquals(0, firstMeta.address);
+    assertEquals(2, firstMeta.sourceLine);
+
+    // Second instruction: address 4, code line 3.
+    InstructionInterface second = memory.getInstruction(4);
+    ParsedInstructionMetadata secondMeta = second.getParsingMetadata();
+    assertEquals(4, secondMeta.address);
+    assertEquals(3, secondMeta.sourceLine);
+
+    // Third instruction: address 8, code line 5 (there is an empty line before it).
+    InstructionInterface third = memory.getInstruction(8);
+    ParsedInstructionMetadata thirdMeta = third.getParsingMetadata();
+    assertEquals(8, thirdMeta.address);
+    assertEquals(5, thirdMeta.sourceLine);
   }
 
   /** Regression test for issue #95 */

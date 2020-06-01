@@ -27,13 +27,25 @@ public class InstructionBuilder {
     this.dinero = dinero;
     this.config = config;
   }
+  
   /**
-   * Creates a new instance of an Instruction's subclass
+   * Creates a new instance of an Instruction's subclass, with null parsing-time metadata.
    * @param instructionName string value to pass in order to instantiate an instruction object
    * @return the instruction object, or null if the instruction is not implemented.
    *
    */
   public Instruction buildInstruction(String instructionName) {
+    return buildInstruction(instructionName, null);
+  }
+
+  /**
+   * Creates a new instance of an Instruction's subclass
+   * @param instructionName string value to pass in order to instantiate an instruction object
+   * @param instructionMetadata parsing-time metadata for the instruction. Can be null.
+   * @return the instruction object, or null if the instruction is not implemented.
+   *
+   */
+  public Instruction buildInstruction(String instructionName, ParsedInstructionMetadata instructionMetadata) {
     // If the name of the requested instruction has got a dot, the instruction is FP and an
     // underscore takes the place of the dot because classes names cannot contain dots
     String name = instructionName.replaceAll("\\.", "_");
@@ -395,6 +407,9 @@ public class InstructionBuilder {
     int serialNumber = config.getInt(ConfigKey.SERIAL_NUMBER);
     config.putInt(ConfigKey.SERIAL_NUMBER, serialNumber + 1);
     instruction.setSerialNumber(serialNumber);
+
+    // Parsing-time metadata.
+    instruction.setParsingMetadata(instructionMetadata);
 
     // Inject other dependencies.
     instruction.setCPU(cpu);
