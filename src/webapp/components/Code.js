@@ -49,7 +49,7 @@ const Code = (props) => {
             },
         });
         setHoverCleanup(disposable);
-    }, [props.parsedInstructions, monaco, hoverDisposable]);
+    }, [props.parsedInstructions, monaco]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
     const editorDidMount = (editor, monaco) => {
