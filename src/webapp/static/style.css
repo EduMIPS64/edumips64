@@ -106,3 +106,8 @@ div#controls > input {
   padding: 4px;
   font-family: sans-serif;
 }
+
+footer {
+  color: rgb(167, 167, 167);
+  text-align: right;
+}

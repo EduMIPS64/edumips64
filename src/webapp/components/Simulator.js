@@ -142,6 +142,7 @@ const Simulator = ({ sim, initialState }) => {
         <Statistics {...stats} />
         <Pipeline pipeline={pipeline} />
       </div>
+      <footer>EduMIPS64 Web version {sim.version}</footer>
     </>
   );
 };
