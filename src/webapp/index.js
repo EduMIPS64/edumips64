@@ -15,13 +15,8 @@ const appInsights = new ApplicationInsights({
   },
 });
 appInsights.loadAppInsights();
-// Add the version dimension to all metrics.
-var telemetryInitializer = (envelope) => {
-  const telemetryItem = envelope.data.baseData;
-  telemetryItem.properties = telemetryItem.properties || {};
-  telemetryItem.properties['version'] = version;
-};
-appInsights.addTelemetryInitializer(telemetryInitializer);
+appInsights.context.application.ver = version;
+appInsights.context.application.build = version;
 appInsights.trackPageView();
 console.log('Initialized AppInsights');
 
