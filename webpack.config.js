@@ -29,6 +29,36 @@ module.exports = {
   plugins: [
     new MonacoWebpackPlugin({
       languages: ['mips'],
+      // Only pack a few features for the Monaco Editor.
+      // The removed ones are kept commented as a reminder of what was disabled.
+      features: [
+        //'clipboard',
+        //'codeAction',
+        //'codelens',
+        'comment',
+        //'contextmenu',
+        //'coreCommands',
+        //'cursorUndo',
+        //'dnd',
+        //'find',
+        'folding',
+        //'format',
+        //'gotoError',
+        //'gotoLine',
+        'hover',
+        //'iPadShowKeyboard',
+        //'inPlaceReplace',
+        //'inspectTokens',
+        //'linesOperations',
+        //'links',
+        //'multicursor',
+        //'referenceSearch',
+        //'suggest',
+        //'transpose',
+        //'wordHighlighter',
+        //'wordOperations',
+        //'wordPartOperations',
+      ],
     }),
     new CopyPlugin({
       patterns: [{ from: staticPath, to: outputPath }],
