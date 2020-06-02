@@ -168,6 +168,12 @@ const Code = (props) => {
           { value: `*Address*: \`${instruction.Address}\`` },
           { value: `*OpCode*: \`${instruction.OpCode}\`` },
           { value: `*Binary*: \`${instruction.BinaryRepresentation}\`` },
+          {
+            value: `*Hex*: \`${parseInt(instruction.BinaryRepresentation, 2)
+              .toString(16)
+              .toUpperCase()
+              .padStart(8, '0')}\``,
+          },
         ];
         if (stageMap.has(line)) {
           contents.push({ value: `*CPU Stage* \`${stageMap.get(line)}\`` });
