@@ -36,6 +36,7 @@ const Pipeline = ({ pipeline }) => {
           <Stage name="FPU Multiplier 4" instruction={pipeline.FPMultiplier4} cssClass="stageFPMultiplier"/>
           <Stage name="FPU Multiplier 5" instruction={pipeline.FPMultiplier5} cssClass="stageFPMultiplier"/>
           <Stage name="FPU Multiplier 6" instruction={pipeline.FPMultiplier6} cssClass="stageFPMultiplier"/>
+          <Stage name="FPU Multiplier 7" instruction={pipeline.FPMultiplier7} cssClass="stageFPMultiplier"/>
         </tbody>
       </table>
     </div>
