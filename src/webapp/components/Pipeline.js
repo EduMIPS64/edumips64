@@ -9,7 +9,7 @@ const Stage = ({ name, instruction, cssClass, alwaysDisplay = false }) => {
   }
   return (
     <tr className={shouldHighlight ? cssClass : ""}>
-      <td>{name}</td>
+      <td className="instructionName">{name}</td>
       <td>{instruction?.Code}</td>
     </tr>
   );

@@ -58,6 +58,9 @@ div#controls > input {
 div#pipeline td {
   padding: 0.1em 12px;
 }
+td.instructionName {
+  width: 11em;
+}
 /* CSS classes for pipeline stages */
 .stageIf {
   background-color: rgba(255, 255, 0, 0.5);
