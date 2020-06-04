@@ -55,6 +55,9 @@ div#controls > input {
   margin: 0 0.5em;
 }
 
+div#pipeline td {
+  padding: 0.1em 12px;
+}
 /* CSS classes for pipeline stages */
 .stageIf {
   background-color: rgba(255, 255, 0, 0.5);
@@ -77,7 +80,7 @@ div#controls > input {
 .stageFPMultiplier {
   background-color: rgba(0, 128, 128, 0.5);
 }
-.stageFPMultiplier {
+.stageFPDivider {
   background-color: rgba(128, 128, 0, 0.5);
 }
 
