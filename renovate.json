@@ -4,5 +4,5 @@
     "schedule:weekly",
     "group:allNonMajor"
   ],
-  stabilityDays: 7
+  "stabilityDays": 7
 }
