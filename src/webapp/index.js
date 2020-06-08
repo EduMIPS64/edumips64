@@ -17,6 +17,10 @@ const appInsights = new ApplicationInsights({
 appInsights.loadAppInsights();
 appInsights.context.application.ver = version;
 appInsights.context.application.build = version;
+var telemetryInitializer = (envelope) => {
+  envelope.tags['ai.cloud.role'] = process.env.NODE_ENV;
+};
+appInsights.addTelemetryInitializer(telemetryInitializer);
 appInsights.trackPageView();
 console.log('Initialized AppInsights');
 
