@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { ThemeProvider } from '@material-ui/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
 
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
@@ -63,6 +64,7 @@ var initializer = (evt) => {
 
   ReactDOM.render(
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <Header />
       <Simulator sim={simulator} initialState={initState} />
     </ThemeProvider>,
