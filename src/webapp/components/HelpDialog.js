@@ -85,7 +85,7 @@ export default function HelpDialog(props) {
           </Link>
           !
         </Typography>
-        <Button autoFocus onClick={props.handleClose} variant="text">
+        <Button autoFocus onClick={props.handleClose} variant="outlined">
           Close
         </Button>
       </DialogContent>
