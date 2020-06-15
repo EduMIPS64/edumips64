@@ -5,7 +5,8 @@ import Simulator from './components/Simulator';
 
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
-// Set version from the webpack variables.
+// Set version from the webpack variables. Uses globals defined by webpack.
+/* global BRANCH, COMMITHASH */
 const version = `${BRANCH}-${COMMITHASH.substring(0, 7)}`;
 
 // Initialize AppInsights.
