@@ -10,7 +10,8 @@ import logo from '../static/logo.png';
 
 const useStyles = makeStyles((theme) => ({
   logo: {
-    height: '8em',
+    height: '4em',
+    paddingLeft: '0.5em',
   },
   helpButton: {
     marginLeft: 'auto',
