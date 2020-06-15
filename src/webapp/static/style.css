@@ -3,10 +3,6 @@ body {
   background-color: 'white';
 }
 
-nav {
-  margin-bottom: 1em;
-}
-
 /* Define the grid of widgets. */
 #widgetGrid {
   display: grid;
@@ -85,12 +81,6 @@ td.instructionName {
 }
 .stageFPDivider {
   background-color: rgba(128, 128, 0, 0.5);
-}
-
-#logo {
-  height: 62px;
-  display: block;
-  padding-left: 10px;
 }
 
 #errorCount {

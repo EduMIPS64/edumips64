@@ -1,9 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Simulator from './components/Simulator';
+import { ThemeProvider } from '@material-ui/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
 
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
+
+import Simulator from './components/Simulator';
+import Header from './components/Header';
+import theme from './components/Theme';
 
 // Set version from the webpack variables. Uses globals defined by webpack.
 /* global BRANCH, COMMITHASH */
@@ -58,7 +63,11 @@ var initializer = (evt) => {
   var initState = simulator.parseResult(evt.data);
 
   ReactDOM.render(
-    <Simulator sim={simulator} initialState={initState} />,
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Header />
+      <Simulator sim={simulator} initialState={initState} />
+    </ThemeProvider>,
     document.getElementById('simulator'),
   );
 };
