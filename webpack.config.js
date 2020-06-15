@@ -21,6 +21,7 @@ module.exports = {
       { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' },
       { test: /\.css$/, use: ['style-loader', 'css-loader'] },
       { test: /\.ttf$/, use: ['file-loader'] },
+      { test: /\.png$/, use: ['file-loader'] },
     ],
   },
   devServer: {
