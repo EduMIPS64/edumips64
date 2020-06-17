@@ -112,6 +112,7 @@ public class ResultFactory {
                 jsonGeneralRegisters.set(i++,
                 new FluentJsonObject()
                     .put("name", r.getName())
+                    .put("alias", r.getAlias())
                     .put("hexString", r.getHexString())
                     .put("value", r.getValue())
                     .toJsonObject());

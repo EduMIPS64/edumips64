@@ -25,6 +25,8 @@
  */
 package org.edumips64.core;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -33,7 +35,7 @@ import java.util.logging.Logger;
  */
 public class Register extends BitSet64 {
   private int writeSemaphore;
-  private String reg_name;
+  private String reg_name, reg_alias;
 
   public final static Logger logger = Logger.getLogger(Register.class.getName());
 
@@ -43,10 +45,19 @@ public class Register extends BitSet64 {
   public Register(String name) {
     writeSemaphore = 0;
     reg_name = name;
+    
+    reg_alias = "";
+    if (registerAliases.containsKey(name.toUpperCase())) {
+      reg_alias = registerAliases.get(name.toUpperCase());
+    }
   }
 
   public String getName() {
     return reg_name;
+  }
+
+  public String getAlias() {
+    return reg_alias;
   }
 
   /** Returns the value of the semaphore
@@ -107,5 +118,43 @@ public class Register extends BitSet64 {
     } //Impossibile che si verifichi
 
     return s;
+  }
+  
+  // Used to derive register aliases.
+  private static Map<String, String> registerAliases;
+  static {
+    registerAliases = new HashMap<>();
+    registerAliases.put("R0", "zero");
+    registerAliases.put("R1", "at");
+    registerAliases.put("R2", "v1");
+    registerAliases.put("R3", "v1");
+    registerAliases.put("R4", "a0");
+    registerAliases.put("R5", "a1");
+    registerAliases.put("R6", "a2");
+    registerAliases.put("R7", "a3");
+    registerAliases.put("R8", "t0");
+    registerAliases.put("R9", "t1");
+    registerAliases.put("R10", "t2");
+    registerAliases.put("R11", "t3");
+    registerAliases.put("R12", "t4");
+    registerAliases.put("R13", "t5");
+    registerAliases.put("R14", "t6");
+    registerAliases.put("R15", "t7");
+    registerAliases.put("R16", "s0");
+    registerAliases.put("R17", "s1");
+    registerAliases.put("R18", "s2");
+    registerAliases.put("R19", "s3");
+    registerAliases.put("R20", "s4");
+    registerAliases.put("R21", "s5");
+    registerAliases.put("R22", "s6");
+    registerAliases.put("R23", "s7");
+    registerAliases.put("R24", "t8");
+    registerAliases.put("R25", "t9");
+    registerAliases.put("R26", "k0");
+    registerAliases.put("R27", "k1");
+    registerAliases.put("R28", "gp");
+    registerAliases.put("R29", "sp");
+    registerAliases.put("R30", "fp");
+    registerAliases.put("R31", "ra");
   }
 }
