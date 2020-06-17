@@ -112,7 +112,8 @@ public class ResultFactory {
                 jsonGeneralRegisters.set(i++,
                 new FluentJsonObject()
                     .put("name", r.getName())
-                    .put("value", r.getHexString())
+                    .put("hexString", r.getHexString())
+                    .put("value", r.getValue())
                     .toJsonObject());
             }
             registers.put("gpr", jsonGeneralRegisters);
@@ -124,7 +125,8 @@ public class ResultFactory {
                 jsonFpuRegisters.set(i++,
                 new FluentJsonObject()
                     .put("name", r.getName())
-                    .put("value", r.getHexString())
+                    .put("hexString", r.getHexString())
+                    .put("value", r.getValue())
                     .toJsonObject());
             }
             registers.put("fpu", jsonFpuRegisters);
