@@ -27,6 +27,9 @@ const Register = ({ register }) => {
   return (
     <>
       <td className="registerName">{register.name}</td>
+      <td className="registerName">
+        {register.alias ? `(${register.alias})` : ''}
+      </td>
       <td>
         <BinaryValue hexString={register.hexString} value={register.value} />
       </td>
@@ -52,10 +55,7 @@ const Registers = ({ gpr, fpu, special }) => {
             .filter((r) => r.name != 'FCSR')
             .map((register) => (
               <tr key={register.name}>
-                <td className="registerName">{register.name}</td>
-                <td className="registerValue">{register.value}</td>
-                <td />
-                <td />
+                <Register register={register} />
               </tr>
             ))}
         </tbody>

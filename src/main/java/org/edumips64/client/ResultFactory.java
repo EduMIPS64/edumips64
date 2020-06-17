@@ -138,12 +138,14 @@ public class ResultFactory {
             specialRegisters.set(i++,
                 new FluentJsonObject()
                     .put("name", cpu.getLO().getName())
-                    .put("value", cpu.getLO().getHexString())
+                    .put("hexString", cpu.getLO().getHexString())
+                    .put("value", cpu.getLO().getValue())
                     .toJsonObject());
             specialRegisters.set(i++,
                 new FluentJsonObject()
                     .put("name", cpu.getHI().getName())
-                    .put("value", cpu.getHI().getHexString())
+                    .put("hexString", cpu.getHI().getHexString())
+                    .put("value", cpu.getHI().getValue())
                     .toJsonObject());
             specialRegisters.set(i++,
                 new FluentJsonObject()
