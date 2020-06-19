@@ -33,10 +33,10 @@ jobs:
       - run: npm run build
       - name: Deploy
         if: success()
-        uses: JamesIves/github-pages-deploy-action@releases/v3
+        uses: JamesIves/github-pages-deploy-action@3.5.5
         with:
           BRANCH: master
-          TARGET_FOLDER: 'pr/${{ env.GITHUB_RUN_ID }}'
+          TARGET_FOLDER: ${{ env.GITHUB_RUN_ID }}
           FOLDER: build/gwt/war/edumips64
           REPOSITORY_NAME: EduMIPS64/web.edumips.org
           ACCESS_TOKEN: ${{ secrets.PAT_WEBUI }}
@@ -46,4 +46,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          msg: 'Test URL: https://web.edumips.org/pr/${{ env.GITHUB_RUN_ID }}'
+          msg: 'Test URL: https://web.edumips.org/${{ env.GITHUB_RUN_ID }}'
