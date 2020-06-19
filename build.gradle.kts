@@ -11,7 +11,7 @@ plugins {
     id ("application")
     id ("jacoco")
     id ("com.dorongold.task-tree") version "1.5"
-    id ("us.ascendtech.gwt.classic") version "0.4.39"
+    id ("us.ascendtech.gwt.classic") version "0.5.1"
 }
 
 repositories {
@@ -35,8 +35,8 @@ val version: String by project
 
 // Specify Java source/target version.
 tasks.compileJava {
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
+    sourceCompatibility = "11"
+    targetCompatibility = "11"
 }
 
 /* 
@@ -220,4 +220,5 @@ tasks.register("release") {
  */
 gwt {
     modules.add("org.edumips64.webclient") 
+    sourceLevel = "1.11"
 }

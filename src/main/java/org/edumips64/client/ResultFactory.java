@@ -102,7 +102,7 @@ public class ResultFactory {
     }
 
     private String getRegisters() {
-        FluentJsonObject registers = new FluentJsonObject();
+        var registers = new FluentJsonObject();
 
         try {
             // General Purpose Registers (GPR).
