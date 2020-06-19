@@ -37,7 +37,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           BRANCH: master
-          TARGET_FOLDER: 'pr/${{ env.GITHUB_RUN_ID }'
+          TARGET_FOLDER: 'pr/${{ env.GITHUB_RUN_ID }}'
           FOLDER: build/gwt/war/edumips64
           REPOSITORY_NAME: EduMIPS64/web.edumips.org
           ACCESS_TOKEN: ${{ secrets.PAT_WEBUI }}
