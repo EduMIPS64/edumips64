@@ -31,16 +31,20 @@ jobs:
           node-version: '12.x'
       - run: npm install
       - run: npm run build
+      - name: Copy files to run directory
+      - run: mkdir -p run/${{ env.GITHUB_RUN_ID }} && cp -r build/gwt/war/edumips64/* run/${{ env.GITHUB_RUN_ID }}
       - name: Deploy
         if: success()
-        uses: JamesIves/github-pages-deploy-action@3.5.5
+        uses: crazy-max/ghaction-github-pages@v1
         with:
-          BRANCH: master
-          TARGET_FOLDER: ${{ env.GITHUB_RUN_ID }}
-          FOLDER: build/gwt/war/edumips64
-          REPOSITORY_NAME: EduMIPS64/web.edumips.org
-          ACCESS_TOKEN: ${{ secrets.PAT_WEBUI }}
-          COMMIT_MESSAGE: Push PR run ${{env.GITHUB_RUN_ID}}
+          target_branch: master
+          build_dir: run/
+          repo: EduMIPS64/web.edumips.org
+          keep_history: true
+          commit_message: Deploy PR run ${{ env.GITHUB_RUN_ID }}
+          fqdn: web.edumips.org
+        env:
+          GITHUB_PAT: ${{ secrets.PAT_WEBUI }}
       - name: Comment on PR
         uses: unsplash/comment-on-pr@master
         env:
