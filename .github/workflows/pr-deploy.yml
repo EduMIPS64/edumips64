@@ -1,0 +1,50 @@
+name: Deploy Web UI for each PR
+
+on:
+  pull_request:
+    types: [opened, edited]
+    branches:
+      - master
+    paths:
+      - 'src/main/java/org/edumips64/client/**'
+      - 'src/webapp/**'
+      - '.babelrc'
+      - 'package.json'
+      - 'package.json.lock'
+      - 'webpack.config.js'
+
+jobs:
+  deploy-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build Web UI
+        run: ./gradlew war
+      - name: Set up Node.JS 12
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - run: npm install
+      - run: npm run build
+      - name: Deploy
+        if: success()
+        uses: JamesIves/github-pages-deploy-action@releases/v3
+        with:
+          BRANCH: master
+          TARGET_FOLDER: 'pr/${{ env.GITHUB_RUN_ID }'
+          FOLDER: build/gwt/war/edumips64
+          REPOSITORY_NAME: EduMIPS64/web.edumips.org
+          ACCESS_TOKEN: ${{ secrets.PAT_WEBUI }}
+          COMMIT_MESSAGE: Push PR run ${{env.GITHUB_RUN_ID}}
+      - name: Comment on PR
+        uses: unsplash/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          msg: 'Test URL: https://web.edumips.org/pr/${{ env.GITHUB_RUN_ID }}'
