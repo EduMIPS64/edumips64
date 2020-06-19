@@ -32,7 +32,7 @@ jobs:
       - run: npm install
       - run: npm run build
       - name: Copy files to run directory
-      - run: mkdir -p run/${{ env.GITHUB_RUN_ID }} && cp -r build/gwt/war/edumips64/* run/${{ env.GITHUB_RUN_ID }}
+        run: mkdir -p run/${{ env.GITHUB_RUN_ID }} && cp -r build/gwt/war/edumips64/* run/${{ env.GITHUB_RUN_ID }}
       - name: Deploy
         if: success()
         uses: crazy-max/ghaction-github-pages@v1
