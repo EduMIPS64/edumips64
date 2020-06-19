@@ -41,7 +41,7 @@ jobs:
           build_dir: pr/
           repo: EduMIPS64/web.edumips.org
           keep_history: true
-          commit_message: Deploy PR code ${{ github.event.pull_request.number }}
+          commit_message: Deploy code for PR ${{ github.event.pull_request.number }}
           fqdn: web.edumips.org
         env:
           GITHUB_PAT: ${{ secrets.PAT_WEBUI }}
@@ -50,4 +50,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          msg: 'Test URL: https://web.edumips.org/${{ env.GITHUB_RUN_ID }}'
+          msg: 'Test URL: https://web.edumips.org/${{ github.event.pull_request.number }}'
