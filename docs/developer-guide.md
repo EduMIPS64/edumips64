@@ -1,4 +1,5 @@
 ### Table of Contents
+
 [Requirements](#requirements)
 
 [Main Gradle tasks](#main-gradle-tasks)
@@ -17,9 +18,10 @@
 
 ### Requirements
 
-In order to compile EduMIPS64, you need the Java JDK version 8 or above.
+In order to compile EduMIPS64, you need the Java JDK version 11 or above.
 
 To build the user documentation, you'll need:
+
 - GNU Make
 - Python 3
 - Sphinx (http://www.sphinx-doc.org/) version 2.3.1 or above
@@ -32,6 +34,7 @@ $ pip3 install -r docs/requirements.txt
 ```
 
 [Gradle](https://gradle.org/) will download the following dependencies:
+
 - JUnit
 - JavaHelp
 - GWT (experimental)
@@ -44,30 +47,29 @@ This project uses GitHub Actions for continuous integration
 
 ### Main Gradle tasks
 
-All the tasks of Gradle 
-[Java](https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_tasks) and 
-[Application](https://docs.gradle.org/current/userguide/application_plugin.html#sec:application_tasks) 
+All the tasks of Gradle
+[Java](https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_tasks) and
+[Application](https://docs.gradle.org/current/userguide/application_plugin.html#sec:application_tasks)
 plugins are available to build,
 compile documentation, run tests and run EduMIPS64 itself.  
 In particular you may find useful these tasks:
 
- * `./gradlew assemble` - (Java plugin) compile and assemble jar artifacts 
- * `./gradlew check` - (Java plugin) run tests and compile the documentation
- * `./gradlew run` - (Application plugin) run the application
- * `./gradlew war` - (GWT plugin) compile the GWT-based web worker running the EduMIPS64 core
+- `./gradlew assemble` - (Java plugin) compile and assemble jar artifacts
+- `./gradlew check` - (Java plugin) run tests and compile the documentation
+- `./gradlew run` - (Application plugin) run the application
+- `./gradlew war` - (GWT plugin) compile the GWT-based web worker running the EduMIPS64 core
 
-You may also find useful using the `--console=plain` flag to better see what tasks 
+You may also find useful using the `--console=plain` flag to better see what tasks
 are being executed.  
-Individual tasks for building single documentation (PDF and HTML) and jar targets 
+Individual tasks for building single documentation (PDF and HTML) and jar targets
 are available too: please read `build.gradle` for the complete list.  
 Gradle builds the following jar artifacts:
 
- - `edumips64-<version>-standalone.jar`: GUI executable jar including the JavaHelp dependency
- - `edumips64-<version>.jar`: GUI executable jar
- - `edumips64-<version>-cli.jar`: CLI executable jar 
+- `edumips64-<version>-standalone.jar`: GUI executable jar including the JavaHelp dependency
+- `edumips64-<version>.jar`: GUI executable jar
+- `edumips64-<version>-cli.jar`: CLI executable jar
 
 Gradle is supported by all the main Java IDEs (e.g. IDEA, Eclipse, NetBeans).
-
 
 ### Visual Studio Code
 
@@ -106,9 +108,9 @@ webpack tools. The source code is in `src/webapp`.
 
 Custom NPM scripts:
 
-* `build-dbg`: runs `webpack -d` (compile with debugging symbols)
-* `build`: runs `webpack -p` (compile without debugging symbols, minified, etc)
-* `start`: starts the webpack-dev-server with live reloading 
+- `build-dbg`: runs `webpack -d` (compile with debugging symbols)
+- `build`: runs `webpack -p` (compile without debugging symbols, minified, etc)
+- `start`: starts the webpack-dev-server with live reloading
 
 Both `build` and `build-dbg` produce a `ui.js` file in the `build/gwt/war/edumips64` directory.
 
@@ -122,13 +124,13 @@ the entry points.
 `Main.java` is the code for the main Swing frontend entry point, while `MainCLI.java`
 contains an experimental CLI front-end.
 
-* The `client` package contains Java code for the Web UI. 
-* The `core` package contains all the core classes for the simulator, including
+- The `client` package contains Java code for the Web UI.
+- The `core` package contains all the core classes for the simulator, including
   important bits such as the CPU, the Memory, instructions and the Parser.
-* The `img` package contains a class to load images and the actual images used
+- The `img` package contains a class to load images and the actual images used
   in the simulator.
-* The `ui` package contains the code for the Swing UI.
-* The `utils` package contains miscellaneous code, including abstractions needed
+- The `ui` package contains the code for the Swing UI.
+- The `utils` package contains miscellaneous code, including abstractions needed
   to decouple the core code from packages that are not available in the GWT
   JRE emulation (such as `java.io`).
 
@@ -155,7 +157,7 @@ form of end-to-end unit tests, whereas `java` contains the actual Java code
 that runs unit tests.
 
 The main tests are contained in `EndToEndTests.java`. This class contains unit
-tests that run MIPS64 code (contained in `resources`).  One of the common
+tests that run MIPS64 code (contained in `resources`). One of the common
 patterns in those tests is that, if something goes unexpectedly during the
 execution of unit tests, the MIPS64 code executes a `BREAK` instruction, which
 will trigger a `BreakException` in the Java code and make the test fail. Tests
@@ -187,7 +189,7 @@ Compilation under Windows is possible by using the Windows Subsystem for Linux
 
 ### Mac OS X
 
-The build works under Mac OS X (tested with Catalina 10.15.2, JDK 1.8.0.92).
+The build works under Mac OS X (tested with Catalina 10.15.2, AdoptOpenJDK 11.0.7).
 
 The only thing that might not work out of the box is downloading the Gradle GWT
 plugins, as the Maven repo uses Let's Encrypt as a certificate issuer, which
@@ -201,7 +203,6 @@ Before doing a release, please do the following tasks. Over time, those should
 be automated, but before that is done those checks should be done manually.
 
 - For each released JAR file:
-  - load it with JRE 8
   - verify that the splash screen works
   - verify that the version number, code name, build date and git ID are correct
   - open one .s file (e.g., `div.d.s`)
