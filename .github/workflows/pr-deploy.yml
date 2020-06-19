@@ -2,7 +2,6 @@ name: Deploy Web UI for each PR
 
 on:
   pull_request:
-    types: [opened, edited]
     branches:
       - master
     paths:
