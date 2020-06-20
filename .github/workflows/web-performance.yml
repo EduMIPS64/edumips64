@@ -1,0 +1,38 @@
+name: Check Web Performance (Lighthouse)
+
+on:
+  pull_request:
+    branches:
+      - master
+    #paths:
+    #- 'src/main/java/org/edumips64/client/**'
+    #- 'src/webapp/**'
+    #- '.babelrc'
+    #- 'package.json'
+    #- 'package.json.lock'
+    #- 'webpack.config.js'
+
+jobs:
+  web-performance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build Web UI
+        run: ./gradlew war
+      - name: Set up Node.JS 12
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - run: npm install
+      - run: npm run build
+      - name: Run Lighthouse against a static dist dir
+        uses: treosh/lighthouse-ci-action@v3
+        with:
+          configPath: './lighthouserc.json'
+          runs: 3
