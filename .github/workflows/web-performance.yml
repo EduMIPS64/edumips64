@@ -31,8 +31,7 @@ jobs:
           node-version: '12.x'
       - run: npm install
       - run: npm run build
-      - name: Run Lighthouse against a static dist dir
-        uses: treosh/lighthouse-ci-action@v3
-        with:
-          configPath: './lighthouserc.json'
-          runs: 3
+      - name: run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.4.x
+          lhci autorun
