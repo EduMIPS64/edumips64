@@ -94,7 +94,7 @@ public class CycleElement {
     // " " is the only other valid end state, but it is acceptable only if it's added to IF.
     if (lastState.equals(" ")) {
       Set<String> allStates = new HashSet<>(states);
-      if (allStates.size() == 2 && states.getFirst() == "IF") {
+      if (allStates.size() == 2 && states.getFirst().equals("IF")) {
         return true;
       } else {
         logger.severe("The empty state is not valid as a final state if there are not only IF states. All states: " + states.toString());
