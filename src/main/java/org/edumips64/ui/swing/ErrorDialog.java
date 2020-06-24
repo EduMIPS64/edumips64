@@ -23,7 +23,7 @@
 package org.edumips64.ui.swing;
 
 import org.edumips64.core.parser.ParserException;
-import org.edumips64.utils.*;
+import org.edumips64.utils.CurrentLocale;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.*;

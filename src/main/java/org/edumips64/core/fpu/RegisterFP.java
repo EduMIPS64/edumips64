@@ -27,7 +27,6 @@ package org.edumips64.core.fpu;
 
 
 import org.edumips64.core.IrregularStringOfBitsException;
-import org.edumips64.core.fpu.BitSet64FP;
 
 /** This class models a 64-bit CPU's internal register.
  * @author Massimo Trubia

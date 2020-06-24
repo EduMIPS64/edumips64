@@ -24,9 +24,20 @@
 
 package org.edumips64.ui.swing;
 
-import org.edumips64.core.*;
-import org.edumips64.core.is.*;
-import org.edumips64.utils.*;
+import org.edumips64.core.CPU;
+import org.edumips64.core.MemoryElementNotFoundException;
+import org.edumips64.core.NotAlignException;
+import org.edumips64.core.StoppedCPUException;
+import org.edumips64.core.SynchronousException;
+import org.edumips64.core.is.AddressErrorException;
+import org.edumips64.core.is.BreakException;
+import org.edumips64.core.is.HaltException;
+import org.edumips64.utils.ConfigKey;
+import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.CurrentLocale;
+import org.edumips64.utils.CycleBuilder;
+import org.edumips64.utils.CycleElement;
+import org.edumips64.utils.MetaInfo;
 
 import java.util.function.Supplier;
 import java.util.logging.Logger;

@@ -25,7 +25,11 @@
 
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
+
+import org.edumips64.core.Converter;
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.IrregularWriteOperationException;
+import org.edumips64.core.Register;
 import org.edumips64.core.fpu.FPInvalidOperationException;
 
 

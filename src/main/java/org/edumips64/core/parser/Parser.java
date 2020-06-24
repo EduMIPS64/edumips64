@@ -29,7 +29,19 @@
 
 package org.edumips64.core.parser;
 
-import org.edumips64.core.*;
+import org.edumips64.core.Converter;
+import org.edumips64.core.FCSRRegister;
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.IrregularStringOfHexException;
+import org.edumips64.core.IrregularWriteOperationException;
+import org.edumips64.core.Memory;
+import org.edumips64.core.MemoryElement;
+import org.edumips64.core.MemoryElementNotFoundException;
+import org.edumips64.core.NotAlignException;
+import org.edumips64.core.SameLabelsException;
+import org.edumips64.core.StringFormatException;
+import org.edumips64.core.SymbolTable;
+import org.edumips64.core.SymbolTableOverflowException;
 import org.edumips64.core.fpu.FPInstructionUtils;
 
 import org.edumips64.core.fpu.FPOverflowException;

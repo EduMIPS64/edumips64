@@ -20,7 +20,8 @@
 
 package org.edumips64.core.is;
 
-import org.edumips64.core.*;
+import org.edumips64.core.IOManager;
+import org.edumips64.core.Memory;
 
 /** TRAP instruction, deprecated alias for the SYSCALL instruction.
  *

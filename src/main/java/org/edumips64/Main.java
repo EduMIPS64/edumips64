@@ -22,16 +22,36 @@
  */
 package org.edumips64;
 
-import org.edumips64.core.*;
+import org.edumips64.core.CPU;
+import org.edumips64.core.Dinero;
+import org.edumips64.core.IOManager;
+import org.edumips64.core.Memory;
+import org.edumips64.core.SymbolTable;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.core.parser.ParserMultiWarningException;
-import org.edumips64.ui.swing.img.*;
-import org.edumips64.ui.swing.*;
-import org.edumips64.utils.*;
-import org.edumips64.utils.io.*;
+import org.edumips64.ui.swing.CPUSwingWorker;
+import org.edumips64.ui.swing.DineroFrontend;
+import org.edumips64.ui.swing.ErrorDialog;
+import org.edumips64.ui.swing.GUIAbout;
+import org.edumips64.ui.swing.GUIConfig;
+import org.edumips64.ui.swing.GUIFrontend;
+import org.edumips64.ui.swing.GUIHelp;
+import org.edumips64.ui.swing.GUIIO;
+import org.edumips64.ui.swing.ReportDialog;
+import org.edumips64.ui.swing.StatusBar;
+import org.edumips64.ui.swing.img.IMGLoader;
+import org.edumips64.utils.ConfigKey;
+import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.CurrentLocale;
+import org.edumips64.utils.CycleBuilder;
+import org.edumips64.utils.JavaPrefsConfigStore;
+import org.edumips64.utils.MetaInfo;
+import org.edumips64.utils.io.LocalFileUtils;
+import org.edumips64.utils.io.LocalWriter;
+import org.edumips64.utils.io.ReadException;
 
 import java.awt.*;
 import java.awt.event.*;

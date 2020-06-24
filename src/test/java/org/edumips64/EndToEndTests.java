@@ -25,9 +25,14 @@
  */
 package org.edumips64;
 
-import org.edumips64.core.*;
+import org.edumips64.core.CPU;
+import org.edumips64.core.NotAlignException;
+import org.edumips64.core.SynchronousException;
 import org.edumips64.core.fpu.RegisterFP;
-import org.edumips64.core.is.*;
+import org.edumips64.core.is.AddressErrorException;
+import org.edumips64.core.is.BreakException;
+import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.IntegerOverflowException;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.core.parser.ParserMultiWarningException;
@@ -43,11 +48,15 @@ import java.util.logging.Logger;
 import java.util.Map;
 import java.util.Scanner;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import static org.hamcrest.CoreMatchers.*;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)

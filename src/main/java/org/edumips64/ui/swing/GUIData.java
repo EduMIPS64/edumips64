@@ -22,9 +22,17 @@
  */
 package org.edumips64.ui.swing;
 
-import org.edumips64.core.*;
+import org.edumips64.core.CPU;
+import org.edumips64.core.Converter;
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.IrregularStringOfHexException;
+import org.edumips64.core.Memory;
+import org.edumips64.core.MemoryElement;
+import org.edumips64.core.MemoryElementNotFoundException;
 import org.edumips64.core.fpu.BitSet64FP;
-import org.edumips64.utils.*;
+import org.edumips64.utils.ConfigKey;
+import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.CurrentLocale;
 
 import java.awt.*;
 import java.awt.event.*;

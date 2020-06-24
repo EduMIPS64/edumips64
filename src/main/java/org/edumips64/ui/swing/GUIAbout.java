@@ -21,7 +21,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.edumips64.ui.swing;
-import org.edumips64.ui.swing.img.*;
+
+import org.edumips64.ui.swing.img.IMGLoader;
 
 import java.awt.*;
 import javax.swing.*;

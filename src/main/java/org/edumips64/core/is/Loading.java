@@ -27,7 +27,13 @@ package org.edumips64.core.is;
 
 import java.util.logging.Logger;
 
-import org.edumips64.core.*;
+import org.edumips64.core.Converter;
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.IrregularWriteOperationException;
+import org.edumips64.core.Memory;
+import org.edumips64.core.MemoryElementNotFoundException;
+import org.edumips64.core.NotAlignException;
+import org.edumips64.core.Register;
 import org.edumips64.core.fpu.FPInvalidOperationException;
 
 /** This is the base class for loading instruction

@@ -23,14 +23,29 @@
 
 package org.edumips64.core;
 
+import org.edumips64.core.fpu.EXNotAvailableException;
+import org.edumips64.core.fpu.FPDividerNotAvailableException;
+import org.edumips64.core.fpu.FPFunctionalUnitNotAvailableException;
+import org.edumips64.core.fpu.FPInvalidOperationException;
+import org.edumips64.core.fpu.FPPipeline;
+import org.edumips64.core.fpu.RegisterFP;
+import org.edumips64.core.is.AddressErrorException;
+import org.edumips64.core.is.BreakException;
+import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.InstructionInterface;
+import org.edumips64.core.is.IntegerOverflowException;
+import org.edumips64.core.is.JumpException;
+import org.edumips64.core.is.RAWException;
+import org.edumips64.core.is.StoppingException;
+import org.edumips64.core.is.TwosComplementSumException;
+import org.edumips64.core.is.WAWException;
+import org.edumips64.utils.ConfigKey;
+import org.edumips64.utils.ConfigStore;
+
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-
-import org.edumips64.core.fpu.*;
-import org.edumips64.core.is.*;
-import org.edumips64.utils.*;
 
 /** This class models a MIPS CPU with 32 64-bit General Purpose Registers.
 *  @author Andrea Spadaccini, Simona Ullo, Antonella Scandura, Massimo Trubia (FPU modifications)

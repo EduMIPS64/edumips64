@@ -20,9 +20,16 @@
 
 package org.edumips64.core.is;
 
-import org.edumips64.core.*;
+import org.edumips64.core.Converter;
+import org.edumips64.core.IOManager;
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.IrregularWriteOperationException;
+import org.edumips64.core.Memory;
+import org.edumips64.core.MemoryElement;
+import org.edumips64.core.MemoryElementNotFoundException;
+import org.edumips64.core.Register;
 import org.edumips64.core.fpu.FPInvalidOperationException;
-import org.edumips64.utils.io.*;
+import org.edumips64.utils.io.WriteException;
 import java.util.logging.Logger;
 
 /** SYSCALL instruction, used to issue system calls.
