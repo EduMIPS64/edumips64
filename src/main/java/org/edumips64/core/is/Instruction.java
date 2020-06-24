@@ -21,8 +21,12 @@
 
 package org.edumips64.core.is;
 
-import org.edumips64.core.*;
-import org.edumips64.core.fpu.*;
+import org.edumips64.core.BitSet32;
+import org.edumips64.core.CPU;
+import org.edumips64.core.Dinero;
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.Register;
+import org.edumips64.core.fpu.RegisterFP;
 
 import java.util.LinkedList;
 import java.util.List;

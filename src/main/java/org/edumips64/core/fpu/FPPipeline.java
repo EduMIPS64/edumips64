@@ -27,7 +27,7 @@ package org.edumips64.core.fpu;
 
 import org.edumips64.core.fpu.FPPipeline.Constants.FPAdderStatus;
 import org.edumips64.core.fpu.FPPipeline.Constants.FPMultiplierStatus;
-import org.edumips64.core.is.*;
+import org.edumips64.core.is.InstructionInterface;
 
 import java.util.*;
 

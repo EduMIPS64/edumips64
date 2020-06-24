@@ -24,11 +24,15 @@
 
 package org.edumips64.core.is;
 
-import org.edumips64.core.*;
-import org.edumips64.core.fpu.*;
-import java.math.*;
-//per diagnostica
+import org.edumips64.core.Converter;
+import org.edumips64.core.FCSRRegister;
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.IrregularWriteOperationException;
+import org.edumips64.core.fpu.FPInstructionUtils;
+import org.edumips64.core.fpu.FPInvalidOperationException;
+import org.edumips64.core.fpu.RegisterFP;
 
+import java.math.*;
 
 /**This is the base class for the instructions of the type C.cond.fmt
  *

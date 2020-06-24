@@ -28,8 +28,15 @@
  * @author Trubia Massimo, Russo Daniele
  */
 package org.edumips64.core.is;
-import org.edumips64.core.*;
-import org.edumips64.core.fpu.*;
+
+import org.edumips64.core.Converter;
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.IrregularWriteOperationException;
+import org.edumips64.core.MemoryElementNotFoundException;
+import org.edumips64.core.fpu.FPDivideByZeroException;
+import org.edumips64.core.fpu.FPInvalidOperationException;
+import org.edumips64.core.fpu.FPOverflowException;
+import org.edumips64.core.fpu.FPUnderflowException;
 
 public abstract class ComputationalInstructions extends Instruction {
   public void IF() {

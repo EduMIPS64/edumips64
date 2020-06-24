@@ -24,7 +24,11 @@
  */
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
+
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.IrregularWriteOperationException;
+import org.edumips64.core.Memory;
+import org.edumips64.core.MemoryElementNotFoundException;
 /** <pre>
  *       Syntax: SD rt, offset(base)
  *  Description: memory[base+offset] = rt
@@ -32,6 +36,7 @@ import org.edumips64.core.*;
  * </pre>
  * @author Trubia Massimo, Russo Daniele
  */
+
 /**
  *
  * @author Massimo

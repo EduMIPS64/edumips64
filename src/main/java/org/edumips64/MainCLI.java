@@ -23,11 +23,20 @@
  */
 package org.edumips64;
 
-import org.edumips64.core.*;
-import org.edumips64.core.is.*;
+import org.edumips64.core.CPU;
+import org.edumips64.core.Dinero;
+import org.edumips64.core.IOManager;
+import org.edumips64.core.Memory;
+import org.edumips64.core.SymbolTable;
+import org.edumips64.core.is.BUBBLE;
+import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
-import org.edumips64.utils.*;
+import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.CurrentLocale;
+import org.edumips64.utils.JavaPrefsConfigStore;
+import org.edumips64.utils.MetaInfo;
 import org.edumips64.utils.io.LocalFileUtils;
 
 import java.io.*;

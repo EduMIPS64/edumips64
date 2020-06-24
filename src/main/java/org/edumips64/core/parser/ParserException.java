@@ -24,7 +24,8 @@
  */
 
 package org.edumips64.core.parser;
-import org.edumips64.utils.*;
+
+import org.edumips64.utils.CurrentLocale;
 
 /**
  *

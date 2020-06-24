@@ -23,7 +23,12 @@
  */
 
 package org.edumips64.core.is;
-import org.edumips64.core.*;
+
+import org.edumips64.core.Converter;
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.Memory;
+import org.edumips64.core.MemoryElement;
+import org.edumips64.core.MemoryElementNotFoundException;
 
 /** <pre>
  *       Syntax: SDC1 ft, offset(base)

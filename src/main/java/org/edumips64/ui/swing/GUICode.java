@@ -21,9 +21,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 package org.edumips64.ui.swing;
-import org.edumips64.core.*;
+
+import org.edumips64.core.CPU;
+import org.edumips64.core.Converter;
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.Memory;
+import org.edumips64.core.Pipeline;
 import org.edumips64.core.is.InstructionInterface;
-import org.edumips64.utils.*;
+import org.edumips64.utils.ConfigKey;
+import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.CurrentLocale;
+
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
