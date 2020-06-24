@@ -33,9 +33,6 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
 
 import java.math.BigInteger;
 
-//per diagnostica
-
-
 /**
  * <pre>
  *      Syntax: DMULTU rs, rt

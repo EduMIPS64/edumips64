@@ -33,8 +33,6 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.core.fpu.RegisterFP;
 
 import java.math.*;
-//per diagnostica
-
 
 /**This is the base class for the instructions of the type C.cond.fmt
  *

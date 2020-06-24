@@ -32,10 +32,6 @@ import org.edumips64.core.IrregularWriteOperationException;
 import org.edumips64.core.Register;
 import org.edumips64.core.fpu.FPInvalidOperationException;
 
-
-//per diagnostica
-
-
 /**
  * <pre>
  *      Syntax: MULT rs, rt

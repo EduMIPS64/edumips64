@@ -36,8 +36,6 @@ import org.edumips64.core.fpu.FPOverflowException;
 import org.edumips64.core.fpu.FPUnderflowException;
 import org.edumips64.core.fpu.RegisterFP;
 
-//per diagnostica
-
 /**This is the base class for the floatiing point arithmetic instructions
  *
  * @author Trubia Massimo
