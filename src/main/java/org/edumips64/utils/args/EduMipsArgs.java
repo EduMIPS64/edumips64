@@ -1,0 +1,48 @@
+package org.edumips64.utils.args;
+
+import org.edumips64.Main;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+
+@Command(mixinStandardHelpOptions = true, resourceBundle = "Messages", versionProvider = EduMipsVersion.class)
+public class EduMipsArgs implements Runnable {
+
+    @Option(names = {"-f", "--file"}, descriptionKey = "file")
+    private String fileName;
+
+    @Option(names = {"-d", "--debug"}, descriptionKey = "debug")
+    private boolean debug;
+
+    @Option(names = {"-r", "--reset"}, descriptionKey = "reset")
+    private boolean reset;
+
+    public String getFileName() {
+        return this.fileName;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public boolean isReset() {
+        return debug;
+    }
+
+    @Override
+    public void run() {
+
+        //keep logging level change here to occur when using execute
+        if (!isDebug()) {
+            Logger rootLogger = Logger.getLogger(Main.class.getName()).getParent();
+
+            for (Handler h : rootLogger.getHandlers()) {
+                h.setLevel(Level.WARNING);
+            }
+        }
+    }
+}

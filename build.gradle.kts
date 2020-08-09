@@ -24,6 +24,7 @@ dependencies {
     compileOnly("com.google.elemental2:elemental2-dom:1.1.0")
     implementation("javax.help:javahelp:2.0.05")
     implementation("com.vertispan.rpc:workers:1.0-alpha-5")
+    implementation("info.picocli:picocli:4.5.0")
     testImplementation("junit:junit:4.13")
 }
 
@@ -161,6 +162,9 @@ tasks.create<Jar>("cliJar"){
     dependsOn("jar")
     classifier = "cli"
     from(sourceSets.main.get().output)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") }.map { zipTree(it) }
+    })
     manifest {
         attributes["Main-Class"] = "org.edumips64.MainCLI"
         from(sharedManifest)
@@ -174,6 +178,7 @@ tasks.create<Jar>("standaloneJar"){
     from(sourceSets.main.get().output)
     from({
         configurations.runtimeClasspath.get().filter { it.name.contains("javahelp") && it.name.endsWith("jar") }.map { zipTree(it) }
+        configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") }.map { zipTree(it) }
     })
     manifest {
         attributes["Main-Class"] = application.mainClassName
