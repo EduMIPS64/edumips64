@@ -1,4 +1,4 @@
-package org.edumips64.utils.args;
+package org.edumips64.utils.cli;
 
 import org.edumips64.Main;
 import picocli.CommandLine.Command;
@@ -9,8 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-@Command(mixinStandardHelpOptions = true, resourceBundle = "Messages", versionProvider = EduMipsVersion.class)
-public class EduMipsArgs implements Runnable {
+@Command(mixinStandardHelpOptions = true, resourceBundle = "Messages", versionProvider = Version.class)
+public class Args implements Runnable {
 
     @Option(names = {"-f", "--file"}, descriptionKey = "file")
     private String fileName;
@@ -30,7 +30,7 @@ public class EduMipsArgs implements Runnable {
     }
 
     public boolean isReset() {
-        return debug;
+        return reset;
     }
 
     @Override

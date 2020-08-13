@@ -49,8 +49,8 @@ import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.JavaPrefsConfigStore;
 import org.edumips64.utils.MetaInfo;
-import org.edumips64.utils.args.EduMipsArgs;
-import org.edumips64.utils.args.EduMipsVersion;
+import org.edumips64.utils.cli.Args;
+import org.edumips64.utils.cli.Version;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.LocalWriter;
 import org.edumips64.utils.io.ReadException;
@@ -123,19 +123,23 @@ public class Main {
   private Runnable initCallback, haltCallback, finalizeCallback;
   private Supplier<String> codeSupplier;
 
+  private Main() {
+    this.configStore = new JavaPrefsConfigStore(ConfigStore.defaults);
+    CurrentLocale.setConfig(this.configStore);
+  }
+
   private static void showVersion() {
-    System.out.println(new EduMipsVersion().getVersion()[0]);
+    System.out.println(Version.versionInfo);
   }
 
   public static void main(String args[]) {
-
     Main mm = new Main();
-    EduMipsArgs eduMipsArgs = new EduMipsArgs();
-    CommandLine commandLine = new CommandLine(eduMipsArgs);
+    Args cliArgs = new Args();
+    CommandLine commandLine = new CommandLine(cliArgs);
     if (commandLine.execute(args) != 0 || commandLine.isUsageHelpRequested() || commandLine.isVersionHelpRequested()) {
       System.exit(0);
     }
-    if (eduMipsArgs.isReset()) {
+    if (cliArgs.isReset()) {
       mm.configStore.resetConfiguration();
     }
 
@@ -191,10 +195,10 @@ public class Main {
 
     log.info("Simulator started");
 
-    if (eduMipsArgs.getFileName() != null) {
+    if (cliArgs.getFileName() != null) {
       mm.resetSimulator(false);
-      mm.openFile(eduMipsArgs.getFileName());
-      mm.addFileToRecentMenu(eduMipsArgs.getFileName());
+      mm.openFile(cliArgs.getFileName());
+      mm.addFileToRecentMenu(cliArgs.getFileName());
     }
 
     try {
@@ -235,8 +239,6 @@ public class Main {
     JDialog.setDefaultLookAndFeelDecorated(true);
     LocalFileUtils lfu = new LocalFileUtils();
 
-    configStore = new JavaPrefsConfigStore(ConfigStore.defaults);
-    CurrentLocale.setConfig(configStore);
     jfc = new JFileChooser(new File(configStore.getString(ConfigKey.LAST_DIR)));
     setFileChooserFont(jfc.getComponents());
 

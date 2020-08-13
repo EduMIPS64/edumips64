@@ -1,8 +1,8 @@
 package org.edumips64.utils;
 
 import org.edumips64.Main;
-import org.edumips64.utils.args.EduMipsArgs;
-import org.edumips64.utils.args.EduMipsVersion;
+import org.edumips64.utils.cli.Args;
+import org.edumips64.utils.cli.Version;
 import org.junit.Before;
 import org.junit.Test;
 import picocli.CommandLine;
@@ -10,7 +10,6 @@ import picocli.CommandLine;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.util.List;
 import java.util.Locale;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -18,7 +17,7 @@ import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 
-public class EduMipsArgsTest {
+public class ArgsTest {
 
     private final String expectedItalianUsage = "Usage: <main class> [-dhrV] [-f=<fileName>]\n" +
                                            "  -d, --debug             attiva la modalità di debug\n" +
@@ -34,24 +33,24 @@ public class EduMipsArgsTest {
                                            "  -r, --reset             resets the stored preferences\n" +
                                            "  -V, --version           prints the version\n";
 
-    private EduMipsArgs eduMipsArgs;
+    private Args args;
     
     @Before
     public void setup() {
-        eduMipsArgs = new EduMipsArgs();
+        args = new Args();
     }
     
     @Test
-    public void edu_args_should_display_properly_for_italian() {
+    public void args_should_display_properly_for_italian() {
         Locale.setDefault(Locale.ITALIAN);
-        String message = new CommandLine(eduMipsArgs).getUsageMessage();
+        String message = new CommandLine(args).getUsageMessage();
         assertEquals(expectedItalianUsage, message);
     }
 
     @Test
-    public void edu_args_should_display_properly_for_english() {
+    public void args_should_display_properly_for_english() {
         Locale.setDefault(Locale.ENGLISH);
-        String message = new CommandLine(eduMipsArgs).getUsageMessage();
+        String message = new CommandLine(args).getUsageMessage();
         assertEquals(expectedEnglishUsage, message);
     }
 
@@ -59,8 +58,8 @@ public class EduMipsArgsTest {
     public void properly_displays_version() {
         ByteArrayOutputStream boas = new ByteArrayOutputStream();
         System.setOut(new PrintStream(boas));
-        CommandLine.ParseResult result = new CommandLine(eduMipsArgs).parseArgs("-V");
-        String expected = new EduMipsVersion().getVersion()[0];
+        CommandLine.ParseResult result = new CommandLine(args).parseArgs("-V");
+        String expected = new Version().getVersion()[0];
 
         assertTrue(CommandLine.printHelpIfRequested(result));
         assertTrue(boas.toString().contains(expected));
@@ -68,32 +67,48 @@ public class EduMipsArgsTest {
 
     @Test
     public void should_have_a_filename_debug_and_reset_default_to_false() {
-        CommandLine.populateCommand(eduMipsArgs,"-f", "test.s");
-        assertEquals("test.s", eduMipsArgs.getFileName());
-        assertFalse(eduMipsArgs.isDebug());
-        assertFalse(eduMipsArgs.isReset());
+        CommandLine.populateCommand(args,"-f", "test.s");
+        assertEquals("test.s", args.getFileName());
+        assertFalse(args.isDebug());
+        assertFalse(args.isReset());
     }
 
     @Test
     public void should_have_a_filename_debug_and_reset_are_true() {
-        CommandLine.populateCommand(eduMipsArgs, "-dr","-f=test.s");
-        assertEquals("test.s",eduMipsArgs.getFileName());
-        assertTrue(eduMipsArgs.isDebug());
-        assertTrue(eduMipsArgs.isReset());
+        CommandLine.populateCommand(args, "-dr","-f=test.s");
+        assertEquals("test.s", args.getFileName());
+        assertTrue(args.isDebug());
+        assertTrue(args.isReset());
     }
 
     @Test
     public void should_display_warning_for_missing_file() {
         ByteArrayOutputStream boas = new ByteArrayOutputStream();
-        new CommandLine(eduMipsArgs)
+        new CommandLine(args)
                 .setErr(new PrintWriter(boas))
                 .execute("-f");
         assertTrue(boas.toString().contains("Missing required parameter for option '--file' (<fileName>)"));
     }
 
     @Test
+    public void should_have_a_filename_debug_false_and_reset_true() {
+        CommandLine.populateCommand(args, "-r","-f=test.s");
+        assertEquals("test.s",args.getFileName());
+        assertFalse(args.isDebug());
+        assertTrue(args.isReset());
+    }
+
+    @Test
+    public void should_have_a_filename_debug_true_and_reset_false() {
+        CommandLine.populateCommand(args, "-d","-f=test.s");
+        assertEquals("test.s",args.getFileName());
+        assertTrue(args.isDebug());
+        assertFalse(args.isReset());
+    }
+
+    @Test
     public void handlers_should_be_warning_level_without_debug() {
-        new CommandLine(new EduMipsArgs()).execute();
+        new CommandLine(new Args()).execute();
         Logger log = Logger.getLogger(Main.class.getName()).getParent();
         for (Handler h : log.getHandlers()) {
             assertEquals(Level.WARNING, h.getLevel());

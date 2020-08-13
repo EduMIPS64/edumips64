@@ -37,7 +37,7 @@ import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.JavaPrefsConfigStore;
 import org.edumips64.utils.MetaInfo;
-import org.edumips64.utils.args.EduMipsArgs;
+import org.edumips64.utils.cli.Args;
 import org.edumips64.utils.io.LocalFileUtils;
 import picocli.CommandLine;
 
@@ -53,12 +53,12 @@ public class MainCLI {
       CurrentLocale.setConfig(cfg);
 
       // Parse the args as early as possible, since it will influence logging level as well.
-      EduMipsArgs eduMipsArgs = new EduMipsArgs();
-      CommandLine commandLine = new CommandLine(eduMipsArgs);
+      Args cliArgs = new Args();
+      CommandLine commandLine = new CommandLine(cliArgs);
       if (commandLine.execute(args) != 0 || commandLine.isUsageHelpRequested() || commandLine.isVersionHelpRequested()) {
         System.exit(0);
       }
-      if (eduMipsArgs.isReset()) {
+      if (cliArgs.isReset()) {
         cfg.resetConfiguration();
       }
 
@@ -75,8 +75,8 @@ public class MainCLI {
 
       // Initialization done. Print a welcome message and open the file if needed.
       System.out.println("Welcome to EduMIPS64 CLI shell!");
-      if (eduMipsArgs.getFileName() != null) {
-        String absoluteFilename = new File(eduMipsArgs.getFileName()).getAbsolutePath();
+      if (cliArgs.getFileName() != null) {
+        String absoluteFilename = new File(cliArgs.getFileName()).getAbsolutePath();
         try {
           p.parse(absoluteFilename);
         } catch (ParserMultiException e) {
