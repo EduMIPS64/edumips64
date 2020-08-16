@@ -65,9 +65,8 @@ Individual tasks for building single documentation (PDF and HTML) and jar target
 are available too: please read `build.gradle` for the complete list.  
 Gradle builds the following jar artifacts:
 
-- `edumips64-<version>-standalone.jar`: GUI executable jar including the JavaHelp dependency
-- `edumips64-<version>.jar`: GUI executable jar
-- `edumips64-<version>-cli.jar`: CLI executable jar
+- `edumips64-<version>.jar`: GUI executable jar (includes JavaHelp and picocli)
+- `edumips64-<version>-cli.jar`: CLI executable jar (includes picocli)
 
 Gradle is supported by all the main Java IDEs (e.g. IDEA, Eclipse, NetBeans).
 

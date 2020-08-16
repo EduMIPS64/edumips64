@@ -146,35 +146,9 @@ val sharedManifest = the<JavaPluginConvention>().manifest {
     attributes["Build-Qualifier"] = qualifier
 }
 
-// "Slim / nodeps" jar
+// Main JAR
 tasks.jar {
-    //classifier = "nodeps"
-    manifest {
-        attributes["Main-Class"] = application.mainClassName
-        attributes["SplashScreen-Image"] = "images/splash.png"
-        from(sharedManifest)       
-    }
-    dependsOn("copyHelp")
-}
-
-// Cli jar
-tasks.create<Jar>("cliJar"){
-    dependsOn("jar")
-    classifier = "cli"
-    from(sourceSets.main.get().output)
-    from({
-        configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") }.map { zipTree(it) }
-    })
-    manifest {
-        attributes["Main-Class"] = "org.edumips64.MainCLI"
-        from(sharedManifest)
-    }
-}
-
-// "Fat" / standalone jar (includes all dependencies)
-tasks.create<Jar>("standaloneJar"){
     dependsOn(configurations.runtimeClasspath)
-    classifier = "standalone"
     from(sourceSets.main.get().output)
     from({
         configurations.runtimeClasspath.get().filter { it.name.contains("javahelp") && it.name.endsWith("jar") }.map { zipTree(it) }
@@ -188,8 +162,21 @@ tasks.create<Jar>("standaloneJar"){
     dependsOn("copyHelp")
 }
 
+// CLI JAR
+tasks.create<Jar>("cliJar"){
+    classifier = "cli"
+    from(sourceSets.main.get().output)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") }.map { zipTree(it) }
+    })
+    manifest {
+        attributes["Main-Class"] = "org.edumips64.MainCLI"
+        from(sharedManifest)
+    }
+}
+
 tasks.assemble{
-    dependsOn("standaloneJar") 
+    dependsOn("jar") 
     dependsOn("cliJar") 
 }
 
@@ -212,7 +199,6 @@ tasks.register("release") {
     group = "Release"
     description = "Creates all artifacts for a given EduMIPS64 release"
     dependsOn("allDocs")
-    dependsOn("standaloneJar")
     dependsOn("jar")
 
     doFirst {
