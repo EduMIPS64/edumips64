@@ -206,7 +206,7 @@ be automated, but before that is done those checks should be done manually.
   - verify that the version number, code name, build date and git ID are correct
   - open one .s file (e.g., `div.d.s`)
   - run it
-  - if it's the standalone JAR, open the help
+  - open the help
   - close the application
   - verify the JAR size (should be < 3 MB)
 - open the English manual and check the version
