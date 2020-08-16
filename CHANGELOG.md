@@ -1,5 +1,14 @@
 # EduMIPS64 ChangeLog
 
+## 1.2.8 ()
+### Changed
+- EduMIPS64 now uses Java 11, to benefit from modern Java features
+- Adopted picocli for command-line options
+- Removed the JAR with no bundled dependencies, since start-up now depends on picocli
+
+### Fixed
+- Factor out the argv parsing logic (Issue #199)
+
 ## 1.2.7.1 (13/04/2020) - Hope
 ### Fixed
 - div.d incorrectly emits SEVERE logging statement (Issue #315)

@@ -45,9 +45,7 @@ jobs:
         run: ./gradlew allDocs
 
       # Build JAR files.
-      - name: Build standalone JAR
-        run: ./gradlew standaloneJar
-      - name: Build slim JAR
+      - name: Build JAR
         run: ./gradlew jar
       - name: Build CLI JAR
         run: ./gradlew cliJar
@@ -64,16 +62,10 @@ jobs:
           name: Italian manual (PDF)
           path: ./build/docs/it/latex/EduMIPS64.pdf
 
-      - name: Upload Standalone JAR
+      - name: Upload JAR
         uses: actions/upload-artifact@v1.0.0
         with:
-          name: Standalone JAR
-          path: ./build/libs/edumips64-${{ steps.read_version.outputs.value }}-standalone.jar
-
-      - name: Upload Slim JAR
-        uses: actions/upload-artifact@v1.0.0
-        with:
-          name: Slim JAR
+          name: JAR
           path: ./build/libs/edumips64-${{ steps.read_version.outputs.value }}.jar
 
       - name: Upload CLI JAR
