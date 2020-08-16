@@ -49,9 +49,12 @@ import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.JavaPrefsConfigStore;
 import org.edumips64.utils.MetaInfo;
+import org.edumips64.utils.cli.Args;
+import org.edumips64.utils.cli.Version;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.LocalWriter;
 import org.edumips64.utils.io.ReadException;
+import picocli.CommandLine;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -62,7 +65,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.Handler;
 import java.io.File;
 import java.io.IOException;
 
@@ -121,96 +123,26 @@ public class Main {
   private Runnable initCallback, haltCallback, finalizeCallback;
   private Supplier<String> codeSupplier;
 
-  private static void usage() {
-    showVersion();
-    System.out.println(CurrentLocale.getString("HT.Options"));
-    System.out.println(CurrentLocale.getString("HT.File"));
-    System.out.println(CurrentLocale.getString("HT.Debug"));
-    System.out.println(CurrentLocale.getString("HT.Help"));
-    System.out.println(CurrentLocale.getString("HT.Reset"));
-    System.out.println(CurrentLocale.getString("HT.Version"));
+  private Main() {
+    this.configStore = new JavaPrefsConfigStore(ConfigStore.defaults);
+    CurrentLocale.setConfig(this.configStore);
   }
 
   private static void showVersion() {
-    System.out.println("EduMIPS64 version " + MetaInfo.VERSION + " (codename: " + MetaInfo.CODENAME + ", git revision " + MetaInfo.FULL_BUILDSTRING + ", built on " + MetaInfo.BUILD_DATE + ") - Ciao 'mbare.");
-  }
-
-  public static class ParsedArgs {
-    public String filename;
-    public boolean shouldReset;
-
-    public ParsedArgs(String filename, boolean shouldReset) {
-      this.filename = filename;
-      this.shouldReset = shouldReset;
-    }
-  }
-
-  // Parses the command-line arguments.
-  // Returns the filename to open (if any) and sets parameters such as logging. If necessary, exits.
-  public static ParsedArgs parseArgsOrExit(String[] args) {
-    // Checking CLI parameters.
-    String toOpen = null;
-    boolean printUsageAndExit = false;
-    boolean printVersionAndExit = false;
-    boolean debug_mode = false;
-    boolean should_reset = false;
-
-    if (args.length > 0) {
-      for (int i = 0; i < args.length; ++i) {
-        if (args[i].compareTo("-f") == 0 || args[i].compareTo("--file") == 0) {
-          if (toOpen == null && ++i == args.length) {
-            System.err.println(CurrentLocale.getString("HT.MissingFile") + "\n");
-            printUsageAndExit = true;
-          } else if (toOpen != null) {
-            System.err.println(CurrentLocale.getString("HT.MultipleFile") + "\n");
-            printUsageAndExit = true;
-          } else {
-            toOpen = args[i];
-          }
-        } else if (args[i].compareTo("-d") == 0 || args[i].compareTo("--debug") == 0) {
-          debug_mode = true;
-        } else if (args[i].compareTo("-h") == 0 || args[i].compareTo("--help") == 0) {
-          printUsageAndExit = true;
-        } else if (args[i].compareTo("-v") == 0 || args[i].compareTo("--version") == 0) {
-          printVersionAndExit = true;
-        } else if (args[i].compareTo("-r") == 0 || args[i].compareTo("--reset") == 0) {
-          should_reset = true;
-        } else {
-          System.err.println(CurrentLocale.getString("HT.UnrecognizedArgs") + ": " + args[i] + "\n");
-          printUsageAndExit = true;
-        }
-
-        if (printUsageAndExit) {
-          usage();
-          System.exit(0);
-        }
-
-        if (printVersionAndExit) {
-          showVersion();
-          System.exit(0);
-        }
-      }
-    }
-
-    if (!debug_mode) {
-      // Disable logging message whose level is less than WARNING.
-      Logger rootLogger = log.getParent();
-
-      for (Handler h : rootLogger.getHandlers()) {
-        h.setLevel(Level.WARNING);
-      }
-    }
-    return new ParsedArgs(toOpen, should_reset);
+    System.out.println(Version.versionInfo);
   }
 
   public static void main(String args[]) {
-
     Main mm = new Main();
-    ParsedArgs parsedArgs = Main.parseArgsOrExit(args);
-
-    if (parsedArgs.shouldReset) {
+    Args cliArgs = new Args();
+    CommandLine commandLine = new CommandLine(cliArgs);
+    if (commandLine.execute(args) != 0 || commandLine.isUsageHelpRequested() || commandLine.isVersionHelpRequested()) {
+      System.exit(0);
+    }
+    if (cliArgs.isReset()) {
       mm.configStore.resetConfiguration();
     }
+
     // Configure logger format.
     System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tm%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
 
@@ -263,10 +195,10 @@ public class Main {
 
     log.info("Simulator started");
 
-    if (parsedArgs.filename != null) {
+    if (cliArgs.getFileName() != null) {
       mm.resetSimulator(false);
-      mm.openFile(parsedArgs.filename);
-      mm.addFileToRecentMenu(parsedArgs.filename);
+      mm.openFile(cliArgs.getFileName());
+      mm.addFileToRecentMenu(cliArgs.getFileName());
     }
 
     try {
@@ -307,8 +239,6 @@ public class Main {
     JDialog.setDefaultLookAndFeelDecorated(true);
     LocalFileUtils lfu = new LocalFileUtils();
 
-    configStore = new JavaPrefsConfigStore(ConfigStore.defaults);
-    CurrentLocale.setConfig(configStore);
     jfc = new JFileChooser(new File(configStore.getString(ConfigKey.LAST_DIR)));
     setFileChooserFont(jfc.getComponents());
 

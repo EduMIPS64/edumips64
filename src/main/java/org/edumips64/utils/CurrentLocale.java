@@ -241,11 +241,6 @@ public class CurrentLocale {
     en.put("INPUT", "input");
     en.put("IOEXCEPTION", "I/O error");
     en.put("HT.Options", "Options:");
-    en.put("HT.File", "--file (-f) filename		opens the specified file");
-    en.put("HT.Debug", "--debug (-d) 			activates debug mode");
-    en.put("HT.Help", "--help (-h)			prints this help message");
-    en.put("HT.Reset", "--reset (-r)			resets the stored preferences");
-    en.put("HT.Version", "--version (-v)			prints the version");
     en.put("HT.MissingFile", "Error: File name is missing.");
     en.put("HT.UnrecognizedArgs", "Error: Unrecognized argument");
     en.put("HT.MultipleFile", "Error: -f may be used only once.");
@@ -461,11 +456,6 @@ public class CurrentLocale {
     it.put("INPUT", "input");
     it.put("IOEXCEPTION", "Errore di I/O");
     it.put("HT.Options", "Opzioni:");
-    it.put("HT.File", "--file (-f) file		apre il file specificato");
-    it.put("HT.Debug", "--debug (-d) 			attiva la modalità di debug");
-    it.put("HT.Help", "--help (-h)			stampa questo messaggio");
-    it.put("HT.Reset", "--reset (-r)			elimina le preferenze memorizzate");
-    it.put("HT.Version", "--version (-v)			stampa la versione");
     it.put("HT.MissingFile", "Errore: file non specificato");
     it.put("HT.UnrecognizedArgs", "Errore: parametro non specificato");
     it.put("HT.MultipleFile", "Errore: -f può essere usato una sola volta");

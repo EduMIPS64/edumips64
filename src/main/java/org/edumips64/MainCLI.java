@@ -37,7 +37,9 @@ import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.JavaPrefsConfigStore;
 import org.edumips64.utils.MetaInfo;
+import org.edumips64.utils.cli.Args;
 import org.edumips64.utils.io.LocalFileUtils;
+import picocli.CommandLine;
 
 import java.io.*;
 
@@ -51,9 +53,12 @@ public class MainCLI {
       CurrentLocale.setConfig(cfg);
 
       // Parse the args as early as possible, since it will influence logging level as well.
-      // TODO: extract parseArgsOrExit out of the Main class.
-      Main.ParsedArgs toOpen = Main.parseArgsOrExit(args);
-      if (toOpen.shouldReset) {
+      Args cliArgs = new Args();
+      CommandLine commandLine = new CommandLine(cliArgs);
+      if (commandLine.execute(args) != 0 || commandLine.isUsageHelpRequested() || commandLine.isVersionHelpRequested()) {
+        System.exit(0);
+      }
+      if (cliArgs.isReset()) {
         cfg.resetConfiguration();
       }
 
@@ -70,8 +75,8 @@ public class MainCLI {
 
       // Initialization done. Print a welcome message and open the file if needed.
       System.out.println("Welcome to EduMIPS64 CLI shell!");
-      if (toOpen.filename != null) {
-        String absoluteFilename = new File(toOpen.filename).getAbsolutePath();
+      if (cliArgs.getFileName() != null) {
+        String absoluteFilename = new File(cliArgs.getFileName()).getAbsolutePath();
         try {
           p.parse(absoluteFilename);
         } catch (ParserMultiException e) {
