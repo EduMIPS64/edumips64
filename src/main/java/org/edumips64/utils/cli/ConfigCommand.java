@@ -2,6 +2,7 @@ package org.edumips64.utils.cli;
 
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.CurrentLocale;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 
@@ -18,7 +19,7 @@ public class ConfigCommand implements Runnable {
     @Override
     public void run() {
         configStore = cli.getConfigStore();
-        System.out.println("Configuration values");
+        System.out.println(CurrentLocale.getString("CLI.CONFIG.HEADER"));
         Stream.of(ConfigKey.values()).forEach(ConfigCommand::printValue);
     }
 

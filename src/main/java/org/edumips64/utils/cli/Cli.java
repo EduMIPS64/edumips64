@@ -33,7 +33,6 @@ public class Cli implements Runnable {
 
     private final Memory memory;
     private final CPU c;
-    private final LocalFileUtils localFileUtils;
     private final SymbolTable symTab;
     private final IOManager iom;
     private final Dinero dinero;
@@ -45,12 +44,11 @@ public class Cli implements Runnable {
         this.configStore = cfg;
         memory = new Memory();
         c = new CPU(memory, cfg, new BUBBLE());
-        localFileUtils = new LocalFileUtils();
         symTab = new SymbolTable(memory);
-        iom = new IOManager(localFileUtils, memory);
+        iom = new IOManager(new LocalFileUtils(), memory);
         dinero = new Dinero();
         instructionBuilder = new InstructionBuilder(memory, iom, c, dinero, cfg);
-        p = new Parser(localFileUtils, symTab, memory, instructionBuilder);
+        p = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
         c.setStatus(CPU.CPUStatus.READY);
     }
 
@@ -76,10 +74,6 @@ public class Cli implements Runnable {
 
     public CPU getCPU() {
         return c;
-    }
-
-    public LocalFileUtils getLocalFileUtils() {
-        return localFileUtils;
     }
 
     public SymbolTable getSymTab() {

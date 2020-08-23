@@ -263,7 +263,8 @@ public class CurrentLocale {
     en.put("CLI.FILE.CANT.LOAD", "System currently in execution, finish current program before running new program");
     en.put("DINERO.CANT.WRITE", "Cannot write this output until a program has been executed.");
     en.put("FILE.NOT.FOUND", "Unable to locate file provided, please check location and try again.");
-    en.put("FILE.NOT.WRITEABLE", "File not writable.... please choose another file");
+    en.put("IO.ERROR", "Error occurred when writing file, please try again.");
+    en.put("CLI.CONFIG.HEADER", "Configuration values");
     languages.put("en", en);
 
     // Italian messages.
@@ -488,7 +489,8 @@ public class CurrentLocale {
     it.put("CLI.FILE.CANT.LOAD", "Sistema attualmente in esecuzione, terminare il programma corrente prima di eseguire il nuovo programma");
     it.put("DINERO.CANT.WRITE", "Impossibile scrivere questo output finché non è stato eseguito un programma.");
     it.put("FILE.NOT.FOUND", "Impossibile individuare il file fornito, controlla la posizione e riprova.");
-    it.put("FILE.NOT.WRITEABLE", "File non scrivibile .... scegli un altro file");
+    it.put("IO.ERROR", "Si è verificato un errore durante la scrittura del file, riprova.");
+    it.put("CLI.CONFIG.HEADER", "Valori di configurazione");
     languages.put("it", it);
   }
 

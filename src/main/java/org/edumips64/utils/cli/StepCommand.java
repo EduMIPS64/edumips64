@@ -12,7 +12,7 @@ public class StepCommand implements Runnable {
     @ParentCommand
     private Cli cli;
 
-    @Option(names ={"-h", "--help"}, usageHelp = true, descriptionKey = "step.help")
+    @Option(names ={"-h", "--help"}, usageHelp = true, descriptionKey = ".help.usage.description")
     private boolean help;
 
     @Parameters(defaultValue = "1", descriptionKey = "steps.parameter")

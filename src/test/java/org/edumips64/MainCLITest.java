@@ -8,8 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 import picocli.CommandLine;
 
-import java.awt.desktop.OpenURIEvent;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Locale;
@@ -52,10 +52,13 @@ public class MainCLITest {
 
     @Test
     public void can_write_dinero_after_running_prog() {
-        OutputStream os = getSystemOut();
         CommandLine commandLine = new CommandLine(cli);
         runTestProg(commandLine);
-        commandLine.execute("dinero", "temp_file");
+        commandLine.execute("dinero", "src/test/resources/temp_file");
+        File f = new File("src/test/resources/temp_file.xdin");
+        assertTrue(f.exists());
+        assertTrue(f.isFile());
+        assertTrue(f.delete());
     }
 
     @Test
@@ -68,7 +71,7 @@ public class MainCLITest {
 
     @Test
     public void can_handle_file_not_found() {
-        OutputStream os = getSystemErr();
+        OutputStream os = getSystemOut();
         CommandLine cl = new CommandLine(cli);
         cl.execute("file", "test.s");
         assertTrue(os.toString().contains("Unable to load file: "));
@@ -169,6 +172,7 @@ public class MainCLITest {
                 "  run     Execute the program without intervention\n" +
                 "  file    Provide a new file to execute\n" +
                 "  show    Show various content of the CPU state machine\n" +
+                "  dinero  Write dinero tracefile to a file\n" +
                 "  config  Print the current configuration values to the screen\n" +
                 "  exit    Exit EduMIPS64 CLI shell\n" +
                 "  help    Show this help message";
@@ -182,6 +186,7 @@ public class MainCLITest {
                 "  run     Eseguire il programma senza intervento\n" +
                 "  file    Fornisci un nuovo file da eseguire\n" +
                 "  show    Mostra vari contenuti della macchina a stati della CPU\n" +
+                "  dinero  Scrive dinero tracefile in un file\n" +
                 "  config  Stampa i valori di configurazione correnti sullo schermo\n" +
                 "  exit    Esci dalla shell della CLI di EduMIPS64\n" +
                 "  help    Mostra questo messaggio di aiuto";
@@ -190,7 +195,7 @@ public class MainCLITest {
     private String enShowUsageMsg() {
         return "Usage:  show [-h] [COMMAND]\n" +
                 "Show various content of the CPU state machine\n" +
-                "  -h, --help\n" +
+                "  -h, --help   Show this help message\n" +
                 "Commands:\n" +
                 "  memory     Show the content of memory\n" +
                 "  pipeline   Show the content of the pipeline\n" +
@@ -202,7 +207,7 @@ public class MainCLITest {
     private String itShowUsageMsg() {
         return "Usage:  show [-h] [COMMAND]\n" +
                 "Mostra vari contenuti della macchina a stati della CPU\n" +
-                "  -h, --help\n" +
+                "  -h, --help   Mostra questo messaggio di aiuto\n" +
                 "Commands:\n" +
                 "  memory     Mostra il contenuto della memoria\n" +
                 "  pipeline   Mostra il contenuto della pipeline\n" +

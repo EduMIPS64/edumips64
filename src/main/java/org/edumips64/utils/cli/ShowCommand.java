@@ -11,7 +11,7 @@ public class ShowCommand implements Runnable{
     @ParentCommand
     private Cli cli;
 
-    @Option(names={"-h","--help"}, usageHelp = true)
+    @Option(names={"-h","--help"}, usageHelp = true, descriptionKey= ".help.usage.description")
     private boolean help;
 
     @Command(name="registers")

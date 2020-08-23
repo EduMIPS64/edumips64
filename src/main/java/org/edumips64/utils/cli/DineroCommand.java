@@ -8,11 +8,9 @@ import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Option;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Writer;
 
 @Command(name = "dinero", resourceBundle = "CliMessages")
 public class DineroCommand implements Runnable {
@@ -24,11 +22,11 @@ public class DineroCommand implements Runnable {
     private boolean help;
 
     @Parameters(arity = "1", descriptionKey = "dinero.param", paramLabel = "target_file")
-    private File file;
+    private String file;
 
     @Override
     public void run() {
-        try (PrintWriter pw = new PrintWriter(file)){
+        try (PrintWriter pw = new PrintWriter(appendDineroSuffix(file))){
             if (cli.getCPU().getStatus() == CPU.CPUStatus.HALTED) {
                 cli.getDinero().writeTraceData(new LocalWriterAdapter(pw));
                 pw.flush();
@@ -37,8 +35,18 @@ public class DineroCommand implements Runnable {
             }
         } catch (FileNotFoundException fnfe) {
             System.out.println(CurrentLocale.getString("FILE.NOT.FOUND"));
+        } catch (IOException ioe) {
+            System.out.println(CurrentLocale.getString("IO.ERROR"));
         } catch (Exception e) {
             Cli.printErrorMessage(e);
+        }
+    }
+
+    private String appendDineroSuffix(String s) {
+        if (s.endsWith(".xdin")) {
+            return s;
+        } else {
+            return s + ".xdin";
         }
     }
 }
