@@ -70,6 +70,10 @@ Gradle builds the following jar artifacts:
 
 Gradle is supported by all the main Java IDEs (e.g. IDEA, Eclipse, NetBeans).
 
+For developers that don't want to recompile the help files when creating a JAR, the
+`noHelpJar` Gradle task will produce `edumips64-<version>-nohelp.jar`, which does
+not include the compiled help files.
+
 ### Visual Studio Code
 
 If you want to work on EduMIPS64 with Visual Studio Code, you need to download the Java Extension Pack

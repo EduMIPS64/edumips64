@@ -180,6 +180,21 @@ tasks.assemble{
     dependsOn("cliJar") 
 }
 
+// NoHelp JAR
+tasks.create<Jar>("noHelpJar"){
+    classifier = "nohelp"
+    dependsOn(configurations.runtimeClasspath)
+    from(sourceSets.main.get().output)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") }.map { zipTree(it) }
+    })
+    manifest {
+        attributes["Main-Class"] = application.mainClassName
+        attributes["SplashScreen-Image"] = "images/splash.png"
+        from(sharedManifest)   
+    }
+}
+
 /*
  * Code coverage report tasks
  */
