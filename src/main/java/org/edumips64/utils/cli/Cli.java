@@ -31,13 +31,13 @@ public class Cli implements Runnable {
     @Spec
     private CommandSpec spec;
 
-    private final Memory memory;
-    private final CPU c;
-    private final SymbolTable symTab;
-    private final IOManager iom;
-    private final Dinero dinero;
-    private final InstructionBuilder instructionBuilder;
-    private final Parser p;
+    private Memory memory;
+    private CPU c;
+    private SymbolTable symTab;
+    private IOManager iom;
+    private Dinero dinero;
+    private InstructionBuilder instructionBuilder;
+    private Parser p;
     private final ConfigStore configStore;
 
     public Cli(ConfigStore cfg) {
@@ -55,6 +55,18 @@ public class Cli implements Runnable {
     @Command(name = "help")
     void help() {
         CommandLine.usage(this, System.out);
+    }
+
+    @Command(name = "reset")
+    void reset() {
+        memory = new Memory();
+        c = new CPU(memory, this.configStore, new BUBBLE());
+        symTab = new SymbolTable(memory);
+        iom = new IOManager(new LocalFileUtils(), memory);
+        dinero = new Dinero();
+        instructionBuilder = new InstructionBuilder(memory, iom, c, dinero, this.configStore);
+        p = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
+        c.setStatus(CPU.CPUStatus.READY);
     }
 
     @Command(name = "exit")

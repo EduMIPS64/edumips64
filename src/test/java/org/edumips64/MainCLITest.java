@@ -175,7 +175,8 @@ public class MainCLITest {
                 "  dinero  Write dinero tracefile to a file\n" +
                 "  config  Print the current configuration values to the screen\n" +
                 "  exit    Exit EduMIPS64 CLI shell\n" +
-                "  help    Show this help message";
+                "  help    Show this help message\n" +
+                "  reset   Reset the CPU state machine";
     }
 
     private String itMainUsageMsg() {
@@ -189,7 +190,8 @@ public class MainCLITest {
                 "  dinero  Scrive dinero tracefile in un file\n" +
                 "  config  Stampa i valori di configurazione correnti sullo schermo\n" +
                 "  exit    Esci dalla shell della CLI di EduMIPS64\n" +
-                "  help    Mostra questo messaggio di aiuto";
+                "  help    Mostra questo messaggio di aiuto\n" +
+                "  reset   Resetta la macchina a stati della CPU";
     }
 
     private String enShowUsageMsg() {
