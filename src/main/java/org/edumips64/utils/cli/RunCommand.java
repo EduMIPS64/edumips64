@@ -30,7 +30,7 @@ public class RunCommand implements Runnable {
     }
 
     private void printEndOfExecMsg(int steps, long timeMs) {
-        System.out.printf(CurrentLocale.getString("RUN.EXE_END"), steps, timeMs);
+        System.out.printf(CurrentLocale.getString("CLI.RUN.EXE_END"), steps, timeMs);
         System.out.println();
     }
 }

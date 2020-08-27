@@ -15,6 +15,8 @@ import java.io.PrintWriter;
 @Command(name = "dinero", resourceBundle = "CliMessages")
 public class DineroCommand implements Runnable {
 
+    private static final String DINERO_SUFFIX = ".xdin";
+
     @ParentCommand
     private Cli cli;
 
@@ -31,22 +33,22 @@ public class DineroCommand implements Runnable {
                 cli.getDinero().writeTraceData(new LocalWriterAdapter(pw));
                 pw.flush();
             } else {
-                System.out.println(CurrentLocale.getString("DINERO.CANT.WRITE"));
+                System.out.println(CurrentLocale.getString("CLI.DINERO.CANT.WRITE"));
             }
         } catch (FileNotFoundException fnfe) {
-            System.out.println(CurrentLocale.getString("FILE.NOT.FOUND"));
+            System.out.println(CurrentLocale.getString("CLI.FILE.NOT.FOUND"));
         } catch (IOException ioe) {
-            System.out.println(CurrentLocale.getString("IO.ERROR"));
+            System.out.println(CurrentLocale.getString("CLI.IO.ERROR"));
         } catch (Exception e) {
             Cli.printErrorMessage(e);
         }
     }
 
     private String appendDineroSuffix(String s) {
-        if (s.endsWith(".xdin")) {
+        if (s.endsWith(DINERO_SUFFIX)) {
             return s;
         } else {
-            return s + ".xdin";
+            return s + DINERO_SUFFIX;
         }
     }
 }

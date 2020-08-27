@@ -13,10 +13,7 @@ import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.MetaInfo;
 import org.edumips64.utils.io.LocalFileUtils;
 import picocli.CommandLine;
-import picocli.CommandLine.Spec;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Model.CommandSpec;
-
 
 @Command(name="", resourceBundle = "CliMessages", subcommands = {
         StepCommand.class,
@@ -27,9 +24,6 @@ import picocli.CommandLine.Model.CommandSpec;
         ConfigCommand.class
 })
 public class Cli implements Runnable {
-
-    @Spec
-    private CommandSpec spec;
 
     private Memory memory;
     private CPU c;

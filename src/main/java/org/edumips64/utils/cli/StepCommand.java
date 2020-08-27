@@ -35,7 +35,7 @@ public class StepCommand implements Runnable {
     }
 
     private void printStepMsg() {
-        System.out.printf(CurrentLocale.getString("STEP.NUM"), steps);
+        System.out.printf(CurrentLocale.getString("CLI.STEP.NUM"), steps);
         System.out.println();
     }
 }

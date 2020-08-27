@@ -254,16 +254,16 @@ public class CurrentLocale {
     en.put("RESTART_FONT", "Please restart the simulator to use the new font.");
     en.put("NO_MASK_AND_TERMINATE", "Please choose only one option between masking synchronous exceptions and program termination on synchronous exceptions.");
     en.put("FWD_RESET_WARNING", "Changing the forwarding setting will reset the simulation. Continue?");
-    en.put("RUN.EXE_END", "Execution ended. %d steps were executed in %dms");
-    en.put("STEP.NUM", "I execute %d steps of simulation.");
+    en.put("CLI.RUN.EXE_END", "Execution ended. %d steps were executed in %dms");
+    en.put("CLI.STEP.NUM", "I execute %d steps of simulation.");
     en.put("CLI.EXIT", "Goodbye...");
     en.put("CLI.WELCOME", "Welcome to EduMIPS64 CLI shell!");
     en.put("CLI.FILE.LOADED", "Loaded file %s");
     en.put("CLI.FILE.NOT.LOADED", "Unable to load file: %s");
     en.put("CLI.FILE.CANT.LOAD", "System currently in execution, finish current program before running new program");
-    en.put("DINERO.CANT.WRITE", "Cannot write this output until a program has been executed.");
-    en.put("FILE.NOT.FOUND", "Unable to locate file provided, please check location and try again.");
-    en.put("IO.ERROR", "Error occurred when writing file, please try again.");
+    en.put("CLI.DINERO.CANT.WRITE", "Cannot write this output until a program has been executed.");
+    en.put("CLI.FILE.NOT.FOUND", "Unable to locate file provided, please check location and try again.");
+    en.put("CLI.IO.ERROR", "Error occurred when writing file, please try again.");
     en.put("CLI.CONFIG.HEADER", "Configuration values");
     languages.put("en", en);
 
@@ -480,16 +480,16 @@ public class CurrentLocale {
     it.put("RESTART_FONT", "E' necessario riavviare il simulatore per utilizzare il nuovo font.");
     it.put("NO_MASK_AND_TERMINATE", "Selezionare solo una opzione tra mascheramento eccezioni sincrone e terminazione in seguito ad eccezioni sincrone.");
     it.put("FWD_RESET_WARNING", "Cambiare la modalità di forwarding indurrà un riavvio della simulazione. Continuare?");
-    it.put("RUN.EXE_END", "L'esecuzione è terminata. %d passaggi sono stati eseguiti in %dms");
-    it.put("STEP.NUM", "Eseguo %d passaggi di simulazione.");
+    it.put("CLI.RUN.EXE_END", "L'esecuzione è terminata. %d passaggi sono stati eseguiti in %dms");
+    it.put("CLI.STEP.NUM", "Eseguo %d passaggi di simulazione.");
     it.put("CLI.EXIT", "Addio...");
     it.put("CLI.WELCOME", "Benvenuti nella shell della CLI di EduMIPS64!");
     it.put("CLI.FILE.LOADED", "File caricato %s");
     it.put("CLI.FILE.NOT.LOADED", "Impossibile caricare il file: %s");
     it.put("CLI.FILE.CANT.LOAD", "Sistema attualmente in esecuzione, terminare il programma corrente prima di eseguire il nuovo programma");
-    it.put("DINERO.CANT.WRITE", "Impossibile scrivere questo output finché non è stato eseguito un programma.");
-    it.put("FILE.NOT.FOUND", "Impossibile individuare il file fornito, controlla la posizione e riprova.");
-    it.put("IO.ERROR", "Si è verificato un errore durante la scrittura del file, riprova.");
+    it.put("CLI.DINERO.CANT.WRITE", "Impossibile scrivere questo output finché non è stato eseguito un programma.");
+    it.put("CLI.FILE.NOT.FOUND", "Impossibile individuare il file fornito, controlla la posizione e riprova.");
+    it.put("CLI.IO.ERROR", "Si è verificato un errore durante la scrittura del file, riprova.");
     it.put("CLI.CONFIG.HEADER", "Valori di configurazione");
     languages.put("it", it);
   }
