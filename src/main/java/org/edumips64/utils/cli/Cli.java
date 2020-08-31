@@ -18,7 +18,7 @@ import picocli.CommandLine.Command;
 @Command(name="", resourceBundle = "CliMessages", subcommands = {
         StepCommand.class,
         RunCommand.class,
-        FileCommand.class,
+        LoadCommand.class,
         ShowCommand.class,
         DineroCommand.class,
         ConfigCommand.class
@@ -36,14 +36,7 @@ public class Cli implements Runnable {
 
     public Cli(ConfigStore cfg) {
         this.configStore = cfg;
-        memory = new Memory();
-        c = new CPU(memory, cfg, new BUBBLE());
-        symTab = new SymbolTable(memory);
-        iom = new IOManager(new LocalFileUtils(), memory);
-        dinero = new Dinero();
-        instructionBuilder = new InstructionBuilder(memory, iom, c, dinero, cfg);
-        p = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
-        c.setStatus(CPU.CPUStatus.READY);
+        reset();
     }
 
     @Command(name = "help")
@@ -120,7 +113,7 @@ public class Cli implements Runnable {
         String msg = "EduMIPS64 fatal error!\n" +
                 "Please report the following stacktrace and system information,\n" +
                 "along with the content of the assembly file you were executing\n" +
-                "to the EduMIPS64 GitHub account: https://github.com/lupino3/edumips64/issues/new\n";
+                "to the EduMIPS64 GitHub account: https://github.com/EduMIPS64/edumips64/issues/new\n";
         msg += String.format("Version: %s, %s, %s\n", MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.FULL_BUILDSTRING);
         msg += String.format("JRE version: %s\nOS: %s\n\n", System.getProperty("java.version"), System.getProperty("os.name"));
         return msg;

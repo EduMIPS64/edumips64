@@ -84,14 +84,29 @@ public class MainCLI {
     }
   }
 
-    private static void runReplLoop(CommandLine commandLine) throws IOException {
-        BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
-        System.out.print("> ");
-        while (true) {
+  private static void runReplLoop(CommandLine commandLine) throws IOException {
+      BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
+      printArrow();
+      while (true) {
           String read = keyboard.readLine();
-          String[] tokens = read.split(" ");
-          commandLine.execute(tokens);
-          System.out.print("> ");
+          handleTokens(commandLine, read.split(" "));
+          printArrow();
         }
     }
+
+  private static void printArrow() {
+    System.out.print("> ");
+  }
+
+  private static void handleTokens(CommandLine commandLine, String[] tokens) {
+    if (tokens.length > 0) {
+      commandLine.execute(tokens);
+    } else {
+      printHelp(commandLine);
+    }
+  }
+
+  private static void printHelp(CommandLine c) {
+    c.usage(System.out);
+  }
 }

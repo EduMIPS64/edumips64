@@ -12,8 +12,8 @@ import picocli.CommandLine.Option;
 import java.io.File;
 
 
-@Command(name = "file", resourceBundle = "CliMessages")
-public class FileCommand implements Runnable {
+@Command(name = "load", resourceBundle = "CliMessages")
+public class LoadCommand implements Runnable {
 
     @ParentCommand
     private Cli cli;

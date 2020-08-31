@@ -1,5 +1,6 @@
 package org.edumips64.utils.cli;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Parameters;
@@ -41,6 +42,7 @@ public class ShowCommand implements Runnable{
 
     @Override
     public void run() {
-        //Intentionally blank, to easily print usage
+        //print help with no subcommand
+        new CommandLine(this).usage(System.out);
     }
 }

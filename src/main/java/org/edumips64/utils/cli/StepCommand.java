@@ -1,5 +1,16 @@
 package org.edumips64.utils.cli;
 
+import org.edumips64.core.CPU;
+import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.IrregularWriteOperationException;
+import org.edumips64.core.MemoryElementNotFoundException;
+import org.edumips64.core.NotAlignException;
+import org.edumips64.core.StoppedCPUException;
+import org.edumips64.core.SynchronousException;
+import org.edumips64.core.is.AddressErrorException;
+import org.edumips64.core.is.BreakException;
+import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.TwosComplementSumException;
 import org.edumips64.utils.CurrentLocale;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
@@ -21,21 +32,42 @@ public class StepCommand implements Runnable {
     @Override
     public void run() {
         try {
-            if (steps > 0) {
-                printStepMsg();
-            }
-
-            for (int i = 0; i < steps; ++i) {
-                cli.getCPU().step();
-                System.out.println(cli.getCPU().pipeLineString());
+            if (isCpuRunnable()) {
+                if (steps > 0) {
+                    printStepMsg();
+                    runSteps();
+                } else {
+                    printPositiveStepWarning();
+                }
+            } else {
+                printNotRunnable();
             }
         } catch (Exception e) {
             Cli.printErrorMessage(e);
         }
     }
 
+    private void runSteps() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException {
+        for (int i = 0; i < steps; ++i) {
+            cli.getCPU().step();
+            System.out.println(cli.getCPU().pipeLineString());
+        }
+    }
+
+    private boolean isCpuRunnable() {
+        return cli.getCPU().getStatus() != CPU.CPUStatus.RUNNING && cli.getCPU().getStatus() != CPU.CPUStatus.STOPPING;
+    }
+
     private void printStepMsg() {
         System.out.printf(CurrentLocale.getString("CLI.STEP.NUM"), steps);
         System.out.println();
+    }
+
+    private void printNotRunnable() {
+
+    }
+
+    private void printPositiveStepWarning() {
+
     }
 }
