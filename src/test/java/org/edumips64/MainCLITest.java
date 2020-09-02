@@ -54,9 +54,10 @@ public class MainCLITest {
     public void can_write_dinero_after_running_prog() {
         CommandLine commandLine = new CommandLine(cli);
         runTestProg(commandLine);
-        commandLine.execute("dinero", "src/test/resources/temp_file");
-        File f = new File("src/test/resources/temp_file.xdin");
+        File f = new File("src/test/resources/temp_file");
+        commandLine.execute("dinero", f.getAbsolutePath());
         assertTrue(f.exists());
+        assertTrue(f.getTotalSpace() > 0);
         assertTrue(f.isFile());
         assertTrue(f.delete());
     }

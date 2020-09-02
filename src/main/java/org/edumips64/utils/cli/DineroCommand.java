@@ -8,14 +8,13 @@ import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Option;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 @Command(name = "dinero", resourceBundle = "CliMessages")
 public class DineroCommand implements Runnable {
-
-    private static final String DINERO_SUFFIX = ".xdin";
 
     @ParentCommand
     private Cli cli;
@@ -24,14 +23,15 @@ public class DineroCommand implements Runnable {
     private boolean help;
 
     @Parameters(arity = "1", descriptionKey = "dinero.param", paramLabel = "target_file")
-    private String file;
+    private File file;
 
     @Override
     public void run() {
-        try (PrintWriter pw = new PrintWriter(appendDineroSuffix(file))){
+        try (PrintWriter pw = new PrintWriter(file)){
             if (cli.getCPU().getStatus() == CPU.CPUStatus.HALTED) {
                 cli.getDinero().writeTraceData(new LocalWriterAdapter(pw));
                 pw.flush();
+                System.out.println(CurrentLocale.getString("CLI.DINERO.SAVE") + file.getAbsolutePath());
             } else {
                 System.out.println(CurrentLocale.getString("CLI.DINERO.CANT.WRITE"));
             }
@@ -41,14 +41,6 @@ public class DineroCommand implements Runnable {
             System.out.println(CurrentLocale.getString("CLI.IO.ERROR"));
         } catch (Exception e) {
             Cli.printErrorMessage(e);
-        }
-    }
-
-    private String appendDineroSuffix(String s) {
-        if (s.endsWith(DINERO_SUFFIX)) {
-            return s;
-        } else {
-            return s + DINERO_SUFFIX;
         }
     }
 }

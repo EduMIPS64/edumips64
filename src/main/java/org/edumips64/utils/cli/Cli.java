@@ -118,4 +118,21 @@ public class Cli implements Runnable {
         msg += String.format("JRE version: %s\nOS: %s\n\n", System.getProperty("java.version"), System.getProperty("os.name"));
         return msg;
     }
+
+    public boolean isCpuRunnable() {
+        return getCPU().getStatus() == CPU.CPUStatus.RUNNING || getCPU().getStatus() == CPU.CPUStatus.STOPPING;
+    }
+
+    public String getCpuStatus() {
+        return getCPU().getStatus().toString();
+    }
+
+    public void printNotRunnable() {
+        System.out.println(CurrentLocale.getString("CLI.CPU.NOT.RUNNABLE") + getCpuStatus());
+        System.out.println(CurrentLocale.getString("CLI.NOT.RUNNABLE.LOAD.FILE"));
+    }
+
+    public boolean canLoadFile() {
+        return getCPU().getStatus() == CPU.CPUStatus.HALTED || getCPU().getStatus() == CPU.CPUStatus.READY;
+    }
 }

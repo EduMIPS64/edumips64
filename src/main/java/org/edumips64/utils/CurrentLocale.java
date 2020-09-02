@@ -265,6 +265,12 @@ public class CurrentLocale {
     en.put("CLI.FILE.NOT.FOUND", "Unable to locate file provided, please check location and try again.");
     en.put("CLI.IO.ERROR", "Error occurred when writing file, please try again.");
     en.put("CLI.CONFIG.HEADER", "Configuration values");
+    en.put("CLI.STEP.POSITIVE", "Step must be a positive number");
+    en.put("CLI.CPU.NOT.RUNNABLE", "CPU is not runnable in state: ");
+    en.put("CLI.PARSE.ERROR", "Unable to parse file, errors found:");
+    en.put("CLI.DINERO.SAVE", "File saved! Location: ");
+    en.put("CLI.REG.WARN", "Register numbers are 0-based, valid values are 0-31.");
+    en.put("CLI.NOT.RUNNABLE.LOAD.FILE", "Load a file to make the CPU runnable. Try load --help");
     languages.put("en", en);
 
     // Italian messages.
@@ -491,6 +497,12 @@ public class CurrentLocale {
     it.put("CLI.FILE.NOT.FOUND", "Impossibile individuare il file fornito, controlla la posizione e riprova.");
     it.put("CLI.IO.ERROR", "Si è verificato un errore durante la scrittura del file, riprova.");
     it.put("CLI.CONFIG.HEADER", "Valori di configurazione");
+    it.put("CLI.STEP.POSITIVE", "Il passaggio deve essere un numero positivo");
+    it.put("CLI.CPU.NOT.RUNNABLE", "La CPU non è eseguibile nello stato: ");
+    it.put("CLI.PARSE.ERROR", "Impossibile analizzare il file, sono stati trovati errori:");
+    it.put("CLI.DINERO.SAVE", "File salvato! Posizione:");
+    it.put("CLI.REG.WARN", "I numeri di registro sono in base 0, i valori validi sono 0-31.");
+    it.put("CLI.NOT.RUNNABLE.LOAD.FILE", "Carica un file per rendere la CPU eseguibile. Prova a caricare --help");
     languages.put("it", it);
   }
 

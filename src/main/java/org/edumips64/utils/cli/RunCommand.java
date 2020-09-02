@@ -13,6 +13,14 @@ public class RunCommand implements Runnable {
 
     @Override
     public void run() {
+        if (cli.isCpuRunnable()) {
+            execute();
+        } else {
+            cli.printNotRunnable();
+        }
+    }
+
+    private void execute() {
         int steps = 0;
         long startTimeMs = System.currentTimeMillis();
         try {

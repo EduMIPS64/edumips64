@@ -1,6 +1,5 @@
 package org.edumips64.utils.cli;
 
-import org.edumips64.core.CPU;
 import org.edumips64.core.IrregularStringOfBitsException;
 import org.edumips64.core.IrregularWriteOperationException;
 import org.edumips64.core.MemoryElementNotFoundException;
@@ -32,15 +31,15 @@ public class StepCommand implements Runnable {
     @Override
     public void run() {
         try {
-            if (isCpuRunnable()) {
+            if (cli.isCpuRunnable()) {
                 if (steps > 0) {
                     printStepMsg();
                     runSteps();
                 } else {
-                    printPositiveStepWarning();
+                    printWarning();
                 }
             } else {
-                printNotRunnable();
+                cli.printNotRunnable();
             }
         } catch (Exception e) {
             Cli.printErrorMessage(e);
@@ -54,20 +53,12 @@ public class StepCommand implements Runnable {
         }
     }
 
-    private boolean isCpuRunnable() {
-        return cli.getCPU().getStatus() != CPU.CPUStatus.RUNNING && cli.getCPU().getStatus() != CPU.CPUStatus.STOPPING;
-    }
-
     private void printStepMsg() {
         System.out.printf(CurrentLocale.getString("CLI.STEP.NUM"), steps);
         System.out.println();
     }
 
-    private void printNotRunnable() {
-
-    }
-
-    private void printPositiveStepWarning() {
-
+    private void printWarning() {
+        System.out.println(CurrentLocale.getString("CLI.STEP.POSITIVE"));
     }
 }

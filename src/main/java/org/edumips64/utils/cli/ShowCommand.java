@@ -1,5 +1,6 @@
 package org.edumips64.utils.cli;
 
+import org.edumips64.utils.CurrentLocale;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
@@ -22,7 +23,11 @@ public class ShowCommand implements Runnable{
 
     @Command(name="register")
     private void showRegister(@Parameters(arity="1", paramLabel = "register_number", descriptionKey = "show.reg.param") Integer registerNum) {
-        System.out.println(cli.getCPU().getRegister(registerNum));
+        if (validReg(registerNum)) {
+            System.out.println(cli.getCPU().getRegister(registerNum).toString());
+        } else {
+            printRegMsg();
+        }
     }
 
     @Command(name="memory")
@@ -40,9 +45,46 @@ public class ShowCommand implements Runnable{
         System.out.println(cli.getCPU().pipeLineString());
     }
 
+    @Command(name = "fps")
+    private void showFps() {
+        System.out.println(cli.getCPU().fprString());
+    }
+
+    @Command(name="fp")
+    private void showFp(@Parameters(arity="1", paramLabel = "fp_register_number", descriptionKey = "show.fp.reg.param") Integer registerNum) {
+        if (validReg(registerNum)) {
+            System.out.println(cli.getCPU().getRegisterFP(registerNum).toString());
+        } else {
+            printRegMsg();
+        }
+    }
+
+    @Command(name = "fcsr")
+    private void showFcsr() {
+        System.out.println(cli.getCPU().getFCSR().toString());
+    }
+
+    @Command(name = "hi")
+    private void showHi() {
+        System.out.println(cli.getCPU().getHI().toString());
+    }
+
+    @Command(name = "lo")
+    private void showLo() {
+        System.out.println(cli.getCPU().getLO().toString());
+    }
+
     @Override
     public void run() {
         //print help with no subcommand
-        new CommandLine(this).usage(System.out);
+        new CommandLine(cli).execute("show", "-h");
+    }
+
+    private void printRegMsg() {
+        System.out.println(CurrentLocale.getString("CLI.REG.WARN"));
+    }
+
+    private boolean validReg(int i) {
+        return i >= 0 && i <= 31;
     }
 }

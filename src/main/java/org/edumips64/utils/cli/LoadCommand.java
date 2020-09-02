@@ -28,7 +28,7 @@ public class LoadCommand implements Runnable {
     public void run() {
         String absoluteFilename = file.getAbsolutePath();
         try {
-            if (canLoadFile()) {
+            if (cli.canLoadFile()) {
                 cli.getParser().parse(absoluteFilename);
                 cli.getDinero().setDataOffset(cli.getMemory().getInstructionsNumber() * 4);
                 cli.getCPU().setStatus(CPU.CPUStatus.RUNNING);
@@ -36,17 +36,20 @@ public class LoadCommand implements Runnable {
             } else {
                 printCannotLoad();
             }
-        } catch (ParserMultiException | ReadException e) {
+        } catch (ParserMultiException pme) {
+            printParsingFailed(pme.toString());
+        } catch (ReadException readException) {
             printLoadFailedMsg(absoluteFilename);
         }
     }
 
-    private boolean canLoadFile() {
-        return cli.getCPU().getStatus() == CPU.CPUStatus.HALTED || cli.getCPU().getStatus() == CPU.CPUStatus.READY;
-    }
-
     private void printCannotLoad() {
         System.out.println(CurrentLocale.getString("CLI.FILE.CANT.LOAD"));
+    }
+
+    private void printParsingFailed(String msg) {
+        System.out.println(CurrentLocale.getString("CLI.PARSE.ERROR"));
+        System.out.println(msg);
     }
 
     private void printLoadedFileMsg(String fileName) {
