@@ -73,7 +73,7 @@ public class MainCLI {
       System.out.println(CurrentLocale.getString("CLI.WELCOME"));
       // Initialization done. Print a welcome message and open the file if needed.
       if (cliArgs.getFileName() != null) {
-          commandLine.execute("file", cliArgs.getFileName());
+          commandLine.execute("load", cliArgs.getFileName());
       }
 
       runReplLoop(commandLine);
