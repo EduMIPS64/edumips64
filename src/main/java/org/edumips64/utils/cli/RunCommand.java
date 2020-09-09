@@ -23,10 +23,14 @@ public class RunCommand implements Runnable {
     private void execute() {
         int steps = 0;
         long startTimeMs = System.currentTimeMillis();
+        printStartOfExecMsg();
         try {
             while(true) {
-                steps++;
                 cli.getCPU().step();
+                if (steps % 100 == 0) {
+                    System.out.print(".");
+                }
+                steps++;
             }
         } catch (HaltException e) {
             long endTimeMs = System.currentTimeMillis();
@@ -37,7 +41,13 @@ public class RunCommand implements Runnable {
         }
     }
 
+    private void printStartOfExecMsg() {
+        System.out.println(CurrentLocale.getString("CLI.RUN.EXE_START"));
+        System.out.print(CurrentLocale.getString("CLI.RUNNING"));
+    }
+
     private void printEndOfExecMsg(int steps, long timeMs) {
+        System.out.println();
         System.out.printf(CurrentLocale.getString("CLI.RUN.EXE_END"), steps, timeMs);
         System.out.println();
     }

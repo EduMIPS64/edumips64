@@ -271,6 +271,8 @@ public class CurrentLocale {
     en.put("CLI.DINERO.SAVE", "File saved! Location: ");
     en.put("CLI.REG.WARN", "Register numbers are 0-based, valid values are 0-31.");
     en.put("CLI.NOT.RUNNABLE.LOAD.FILE", "Load a file to make the CPU runnable. Try load --help");
+    en.put("CLI.RUN.EXE_START", "Starting execution.");
+    en.put("CLI.RUNNING", "Running");
     languages.put("en", en);
 
     // Italian messages.
@@ -503,6 +505,8 @@ public class CurrentLocale {
     it.put("CLI.DINERO.SAVE", "File salvato! Posizione:");
     it.put("CLI.REG.WARN", "I numeri di registro sono in base 0, i valori validi sono 0-31.");
     it.put("CLI.NOT.RUNNABLE.LOAD.FILE", "Carica un file per rendere la CPU eseguibile. Prova a caricare --help");
+    it.put("CLI.RUN.EXE_START", "Avvio dell'esecuzione.");
+    it.put("CLI.RUNNING", "In esecuzione");
     languages.put("it", it);
   }
 
