@@ -254,6 +254,25 @@ public class CurrentLocale {
     en.put("RESTART_FONT", "Please restart the simulator to use the new font.");
     en.put("NO_MASK_AND_TERMINATE", "Please choose only one option between masking synchronous exceptions and program termination on synchronous exceptions.");
     en.put("FWD_RESET_WARNING", "Changing the forwarding setting will reset the simulation. Continue?");
+    en.put("CLI.RUN.EXE_END", "Execution ended. %d steps were executed in %dms");
+    en.put("CLI.STEP.NUM", "I execute %d steps of simulation.");
+    en.put("CLI.EXIT", "Goodbye...");
+    en.put("CLI.WELCOME", "Welcome to EduMIPS64 CLI shell!");
+    en.put("CLI.FILE.LOADED", "Loaded file %s");
+    en.put("CLI.FILE.NOT.LOADED", "Unable to load file: %s");
+    en.put("CLI.FILE.CANT.LOAD", "System currently in execution, finish current program before running new program");
+    en.put("CLI.DINERO.CANT.WRITE", "Cannot write this output until a program has been executed.");
+    en.put("CLI.FILE.NOT.FOUND", "Unable to locate file provided, please check location and try again.");
+    en.put("CLI.IO.ERROR", "Error occurred when writing file, please try again.");
+    en.put("CLI.CONFIG.HEADER", "Configuration values");
+    en.put("CLI.STEP.POSITIVE", "Step must be a positive number");
+    en.put("CLI.CPU.NOT.RUNNABLE", "CPU is not runnable in state: ");
+    en.put("CLI.PARSE.ERROR", "Unable to parse file, errors found:");
+    en.put("CLI.DINERO.SAVE", "File saved! Location: ");
+    en.put("CLI.REG.WARN", "Register numbers are 0-based, valid values are 0-31.");
+    en.put("CLI.NOT.RUNNABLE.LOAD.FILE", "Load a file to make the CPU runnable. Try load --help");
+    en.put("CLI.RUN.EXE_START", "Starting execution.");
+    en.put("CLI.RUNNING", "Running");
     languages.put("en", en);
 
     // Italian messages.
@@ -469,6 +488,25 @@ public class CurrentLocale {
     it.put("RESTART_FONT", "E' necessario riavviare il simulatore per utilizzare il nuovo font.");
     it.put("NO_MASK_AND_TERMINATE", "Selezionare solo una opzione tra mascheramento eccezioni sincrone e terminazione in seguito ad eccezioni sincrone.");
     it.put("FWD_RESET_WARNING", "Cambiare la modalità di forwarding indurrà un riavvio della simulazione. Continuare?");
+    it.put("CLI.RUN.EXE_END", "L'esecuzione è terminata. %d passaggi sono stati eseguiti in %dms");
+    it.put("CLI.STEP.NUM", "Eseguo %d passaggi di simulazione.");
+    it.put("CLI.EXIT", "Addio...");
+    it.put("CLI.WELCOME", "Benvenuti nella shell della CLI di EduMIPS64!");
+    it.put("CLI.FILE.LOADED", "File caricato %s");
+    it.put("CLI.FILE.NOT.LOADED", "Impossibile caricare il file: %s");
+    it.put("CLI.FILE.CANT.LOAD", "Sistema attualmente in esecuzione, terminare il programma corrente prima di eseguire il nuovo programma");
+    it.put("CLI.DINERO.CANT.WRITE", "Impossibile scrivere questo output finché non è stato eseguito un programma.");
+    it.put("CLI.FILE.NOT.FOUND", "Impossibile individuare il file fornito, controlla la posizione e riprova.");
+    it.put("CLI.IO.ERROR", "Si è verificato un errore durante la scrittura del file, riprova.");
+    it.put("CLI.CONFIG.HEADER", "Valori di configurazione");
+    it.put("CLI.STEP.POSITIVE", "Il passaggio deve essere un numero positivo");
+    it.put("CLI.CPU.NOT.RUNNABLE", "La CPU non è eseguibile nello stato: ");
+    it.put("CLI.PARSE.ERROR", "Impossibile analizzare il file, sono stati trovati errori:");
+    it.put("CLI.DINERO.SAVE", "File salvato! Posizione:");
+    it.put("CLI.REG.WARN", "I numeri di registro sono in base 0, i valori validi sono 0-31.");
+    it.put("CLI.NOT.RUNNABLE.LOAD.FILE", "Carica un file per rendere la CPU eseguibile. Prova a caricare --help");
+    it.put("CLI.RUN.EXE_START", "Avvio dell'esecuzione.");
+    it.put("CLI.RUNNING", "In esecuzione");
     languages.put("it", it);
   }
 

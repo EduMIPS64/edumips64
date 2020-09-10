@@ -90,13 +90,13 @@ public class ParserMultiException extends Exception {
    * @return a String representation of the ParserMultiException
    */
   public String toString() {
-    String ret = "";
+    StringBuilder sb = new StringBuilder();
 
     for (ParserException e : exception) {
-      ret += e + "\n\n";
+      sb.append(e).append("\n\n");
     }
 
-    return ret;
+    return sb.toString();
   }
 
   /**

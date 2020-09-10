@@ -307,4 +307,17 @@ public class FCSRRegister extends BitSet32 {
       }
     }
   }
+
+  @Override
+  public String toString() {
+    String s = "";
+
+    try {
+      s = getHexString();
+    } catch (IrregularStringOfBitsException e) {
+      e.printStackTrace();
+    }
+
+    return s;
+  }
 }

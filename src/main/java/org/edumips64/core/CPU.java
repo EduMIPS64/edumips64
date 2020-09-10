@@ -798,7 +798,7 @@ public class CPU {
    * FPR.
    * @return a string
    */
-  private String fprString() {
+  public String fprString() {
     StringBuilder s = new StringBuilder();
     int i = 0;
 
