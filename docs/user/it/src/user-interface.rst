@@ -282,7 +282,7 @@ esteso possono essere utilizzati indifferentemente.
 
 * `-d (--debug)` attiva la modalità di debugging.
 
-* `-hl (--headless)` Esegue Edu MIPS 64 in modalità headless (senza interfaccia grafica)
+* `-hl (--headless)` Esegue EduMIPS64 in modalità headless (senza interfaccia grafica)
 
 Nella modalità di debugging è disponibile una nuova finestra, la finestra
 Debug, che mostra il resoconto delle attività interne di  EduMIPS64. Tale
