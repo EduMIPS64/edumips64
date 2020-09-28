@@ -253,7 +253,7 @@ document.
 
 Command line options
 --------------------
-Three command line options are available. They are described in the following
+Four command line options are available. They are described in the following
 list, with the long name enclosed in round brackets. Long and short names can
 be used in the same way.
 
@@ -267,6 +267,8 @@ be used in the same way.
 * `-r (--reset)` resets the stored configuration to the default values
 
 * `-d (--debug)` enters Debug mode
+
+* `-hl (--headless)` Runs Edu MIPS 64 in headless mode (no gui)
 
 The `--debug` flag has the effect to activate Debug mode. In this mode, a new
 frame is available, the Debug frame, and it shows the log of internal

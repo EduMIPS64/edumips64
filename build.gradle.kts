@@ -156,28 +156,13 @@ tasks.jar {
     })
     manifest {
         attributes["Main-Class"] = application.mainClassName
-        attributes["SplashScreen-Image"] = "images/splash.png"
-        from(sharedManifest)   
+        from(sharedManifest)
     }
     dependsOn("copyHelp")
 }
 
-// CLI JAR
-tasks.create<Jar>("cliJar"){
-    classifier = "cli"
-    from(sourceSets.main.get().output)
-    from({
-        configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") }.map { zipTree(it) }
-    })
-    manifest {
-        attributes["Main-Class"] = "org.edumips64.MainCLI"
-        from(sharedManifest)
-    }
-}
-
 tasks.assemble{
     dependsOn("jar") 
-    dependsOn("cliJar") 
 }
 
 // NoHelp JAR
@@ -190,8 +175,7 @@ tasks.create<Jar>("noHelpJar"){
     })
     manifest {
         attributes["Main-Class"] = application.mainClassName
-        attributes["SplashScreen-Image"] = "images/splash.png"
-        from(sharedManifest)   
+        from(sharedManifest)
     }
 }
 

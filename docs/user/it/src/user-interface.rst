@@ -266,7 +266,7 @@ del presente documento.
 
 Opzioni da riga di comando
 --------------------------
-Sono disponibili tre opzioni da linea di comando. Esse sono descritte di
+Quattro disponibili tre opzioni da linea di comando. Esse sono descritte di
 seguito, con il nome per esteso scritto tra parentesi.  Nomi abbreviati e per
 esteso possono essere utilizzati indifferentemente.
 
@@ -281,6 +281,8 @@ esteso possono essere utilizzati indifferentemente.
   configurazione
 
 * `-d (--debug)` attiva la modalità di debugging.
+
+* `-hl (--headless)` Esegue Edu MIPS 64 in modalità headless (senza interfaccia grafica)
 
 Nella modalità di debugging è disponibile una nuova finestra, la finestra
 Debug, che mostra il resoconto delle attività interne di  EduMIPS64. Tale

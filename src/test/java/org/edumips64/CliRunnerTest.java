@@ -16,7 +16,7 @@ import java.util.Locale;
 
 import static org.junit.Assert.*;
 
-public class MainCLITest {
+public class CliRunnerTest {
     private Cli cli;
     private ConfigStore cfg;
 

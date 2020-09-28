@@ -19,39 +19,11 @@ import static org.junit.Assert.*;
 
 public class ArgsTest {
 
-    private final String expectedItalianUsage = "Usage: <main class> [-dhrV] [-f=<fileName>]\n" +
-                                           "  -d, --debug             attiva la modalità di debug\n" +
-                                           "  -f, --file=<fileName>   apre il file specificato\n" +
-                                           "  -h, --help              stampa questo messaggio\n" +
-                                           "  -r, --reset             elimina le preferenze memorizzate\n" +
-                                           "  -V, --version           stampa la versione\n";
-
-    private final String expectedEnglishUsage = "Usage: <main class> [-dhrV] [-f=<fileName>]\n" +
-                                           "  -d, --debug             activates debug mode\n" +
-                                           "  -f, --file=<fileName>   filename - opens the specified file\n" +
-                                           "  -h, --help              prints this help message\n" +
-                                           "  -r, --reset             resets the stored preferences\n" +
-                                           "  -V, --version           prints the version\n";
-
     private Args args;
     
     @Before
     public void setup() {
         args = new Args();
-    }
-    
-    @Test
-    public void args_should_display_properly_for_italian() {
-        Locale.setDefault(Locale.ITALIAN);
-        String message = new CommandLine(args).getUsageMessage();
-        assertEquals(expectedItalianUsage, message);
-    }
-
-    @Test
-    public void args_should_display_properly_for_english() {
-        Locale.setDefault(Locale.ENGLISH);
-        String message = new CommandLine(args).getUsageMessage();
-        assertEquals(expectedEnglishUsage, message);
     }
 
     @Test
