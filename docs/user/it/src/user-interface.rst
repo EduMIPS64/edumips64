@@ -266,7 +266,7 @@ del presente documento.
 
 Opzioni da riga di comando
 --------------------------
-Quattro disponibili tre opzioni da linea di comando. Esse sono descritte di
+Sono disponibili quattro opzioni da linea di comando. Esse sono descritte di
 seguito, con il nome per esteso scritto tra parentesi.  Nomi abbreviati e per
 esteso possono essere utilizzati indifferentemente.
 
