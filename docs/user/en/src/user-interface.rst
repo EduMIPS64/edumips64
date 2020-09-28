@@ -268,7 +268,7 @@ be used in the same way.
 
 * `-d (--debug)` enters Debug mode
 
-* `-hl (--headless)` Runs Edu MIPS 64 in headless mode (no gui)
+* `-hl (--headless)` Runs EduMIPS64 in headless mode (no gui)
 
 The `--debug` flag has the effect to activate Debug mode. In this mode, a new
 frame is available, the Debug frame, and it shows the log of internal
@@ -290,4 +290,3 @@ the `.jar` file.
 To embed it in an HTML, the `<applet>` tag must be used. The EduMIPS64 web
 site contains a page that already contains the applet, so
 that everyone can execute it without the hassle of using the command line.
-
