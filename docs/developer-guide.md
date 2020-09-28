@@ -66,7 +66,6 @@ are available too: please read `build.gradle` for the complete list.
 Gradle builds the following jar artifacts:
 
 - `edumips64-<version>.jar`: GUI executable jar (includes JavaHelp and picocli)
-- `edumips64-<version>-cli.jar`: CLI executable jar (includes picocli)
 
 Gradle is supported by all the main Java IDEs (e.g. IDEA, Eclipse, NetBeans).
 
