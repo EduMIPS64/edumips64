@@ -47,8 +47,6 @@ jobs:
       # Build JAR files.
       - name: Build JAR
         run: ./gradlew jar
-      - name: Build CLI JAR
-        run: ./gradlew cliJar
 
       # Upload artifacts (manuals and JARs)
       - name: Upload English Manual PDF
@@ -67,12 +65,6 @@ jobs:
         with:
           name: JAR
           path: ./build/libs/edumips64-${{ steps.read_version.outputs.value }}.jar
-
-      - name: Upload CLI JAR
-        uses: actions/upload-artifact@v1.0.0
-        with:
-          name: CLI JAR
-          path: ./build/libs/edumips64-${{ steps.read_version.outputs.value }}-cli.jar
 
   # Build the Web UI. Done as a separate job because it's the slowest step
   # and it's worth doing it in parallel.

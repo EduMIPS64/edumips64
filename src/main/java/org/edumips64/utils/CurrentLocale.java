@@ -273,6 +273,7 @@ public class CurrentLocale {
     en.put("CLI.NOT.RUNNABLE.LOAD.FILE", "Load a file to make the CPU runnable. Try load --help");
     en.put("CLI.RUN.EXE_START", "Starting execution.");
     en.put("CLI.RUNNING", "Running");
+    en.put("LOG.HEADLESS_MSG", "Cannot start GUI in a headless environment.");
     languages.put("en", en);
 
     // Italian messages.
@@ -507,6 +508,7 @@ public class CurrentLocale {
     it.put("CLI.NOT.RUNNABLE.LOAD.FILE", "Carica un file per rendere la CPU eseguibile. Prova a caricare --help");
     it.put("CLI.RUN.EXE_START", "Avvio dell'esecuzione.");
     it.put("CLI.RUNNING", "In esecuzione");
+    it.put("LOG.HEADLESS_MSG", "Impossibile avviare la GUI in un ambiente headless.");
     languages.put("it", it);
   }
 

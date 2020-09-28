@@ -157,7 +157,7 @@ public class Main {
 
   private static void checkAndStartGui(Main mm, Args cliArgs) {
     if (GraphicsEnvironment.isHeadless()) {
-      log.log(Level.SEVERE, "Cannot start GUI in a headless environment.");
+      log.log(Level.SEVERE, CurrentLocale.getString("LOG.HEADLESS_MSG"));
       System.exit(1);
     }
     SplashScreen s = new SplashScreen();
