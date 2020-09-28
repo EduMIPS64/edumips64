@@ -1,7 +1,7 @@
 /* SplashScreen.java
  *
  * SplashScreen for EduMIPS64
- * (c) 2006 Andrea Spadaccini, Antonella Scandura, Vanni Rizzo
+ * (c) 2020 Ian Wodder
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
  * General Public License.
