@@ -41,6 +41,7 @@ import org.edumips64.ui.swing.GUIFrontend;
 import org.edumips64.ui.swing.GUIHelp;
 import org.edumips64.ui.swing.GUIIO;
 import org.edumips64.ui.swing.ReportDialog;
+import org.edumips64.ui.swing.SplashScreen;
 import org.edumips64.ui.swing.StatusBar;
 import org.edumips64.ui.swing.img.IMGLoader;
 import org.edumips64.utils.ConfigKey;
@@ -145,8 +146,22 @@ public class Main {
 
     // Configure logger format.
     System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tm%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
-
     Main.showVersion();
+
+    if (cliArgs.isHeadless()) {
+      startCli(mm.configStore, cliArgs);
+    } else {
+      checkAndStartGui(mm, cliArgs);
+    }
+  }
+
+  private static void checkAndStartGui(Main mm, Args cliArgs) {
+    if (GraphicsEnvironment.isHeadless()) {
+      log.log(Level.SEVERE, CurrentLocale.getString("LOG.HEADLESS_MSG"));
+      System.exit(1);
+    }
+    SplashScreen s = new SplashScreen();
+    s.showSplash();
 
     // Creating the main JFrame
     JFrame.setDefaultLookAndFeelDecorated(true);
@@ -165,6 +180,7 @@ public class Main {
 
     mm.mainFrame.setLocation(0, 0);
     mm.init();
+    s.closeSplash();
     mm.mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
     mm.mainFrame.setVisible(true);
     mm.mainFrame.setExtendedState(mm.mainFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
@@ -206,6 +222,11 @@ public class Main {
     } catch (InterruptedException | InvocationTargetException e) {
       log.log(Level.SEVERE, "Could not tile windows.", e);
     }
+  }
+
+  private static void startCli(ConfigStore cfg, Args commandLineArgs) {
+    CliRunner cliRunner = new CliRunner(cfg, commandLineArgs);
+    cliRunner.start();
   }
 
   private void addFrame(String name, JInternalFrame f) {

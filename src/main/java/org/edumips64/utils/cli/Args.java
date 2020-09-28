@@ -21,6 +21,9 @@ public class Args implements Runnable {
     @Option(names = {"-r", "--reset"}, descriptionKey = "reset")
     private boolean reset;
 
+    @Option(names = {"-hl", "--headless"}, descriptionKey = "headless", defaultValue = "false")
+    private boolean headless;
+
     public String getFileName() {
         return this.fileName;
     }
@@ -32,6 +35,8 @@ public class Args implements Runnable {
     public boolean isReset() {
         return reset;
     }
+
+    public boolean isHeadless() { return headless; }
 
     @Override
     public void run() {

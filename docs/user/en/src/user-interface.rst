@@ -253,7 +253,7 @@ document.
 
 Command line options
 --------------------
-Three command line options are available. They are described in the following
+Four command line options are available. They are described in the following
 list, with the long name enclosed in round brackets. Long and short names can
 be used in the same way.
 
@@ -267,6 +267,8 @@ be used in the same way.
 * `-r (--reset)` resets the stored configuration to the default values
 
 * `-d (--debug)` enters Debug mode
+
+* `-hl (--headless)` Runs EduMIPS64 in headless mode (no gui)
 
 The `--debug` flag has the effect to activate Debug mode. In this mode, a new
 frame is available, the Debug frame, and it shows the log of internal
@@ -288,4 +290,3 @@ the `.jar` file.
 To embed it in an HTML, the `<applet>` tag must be used. The EduMIPS64 web
 site contains a page that already contains the applet, so
 that everyone can execute it without the hassle of using the command line.
-
