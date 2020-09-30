@@ -23,6 +23,7 @@ report/
 
 # Zip archives.
 *.zip
+!scripts/Windows_exe_creator/*.zip
 
 # Temporary test file (I should find a way to remove it automatically...)
 syscall-testfile.txt
