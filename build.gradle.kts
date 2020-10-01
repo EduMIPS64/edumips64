@@ -209,7 +209,7 @@ tasks.create<Exec>("exeCreator"){
     group = "Distribution"
     description = "Creates an installable exe file"
     workingDir = File("${projectDir}")
-    //dependsOn("jar")
+    dependsOn("jar")
 
     doFirst{
     	//check if user is on Windows
