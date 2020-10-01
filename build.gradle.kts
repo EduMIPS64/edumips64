@@ -220,12 +220,12 @@ tasks.create<Exec>("exeCreator"){
 
         println("Creating edumips64-"+version+".jar File");
         
-        //check if AdoptOpenJDK is installed
-        var open_jdk = File("C:/Program Files/AdoptOpenJDK")
-        if(!open_jdk.exists())
-            throw GradleException("Please Install AdoptOpenJDK")
+        //check if jdk 14+ is installed
+        if(System.getProperty("java.version").toInt()<14) {
+            throw GradleException("JDK version installed must be 14+")
+        }
         else{
-            println("AdoptOpenJDK Installed!")
+            println("Correct Jdk version Installed!")
         }
         
         //check if Wix is installed
@@ -237,7 +237,7 @@ tasks.create<Exec>("exeCreator"){
         }
 
 	//create script file that creates the executable
-        var script = File("exeCreator.bat")
+        var script = File("./scripts/exeCreator.bat")
         script.createNewFile()
         var version_arr = version.split('.').toMutableList();
         if(version_arr.size>3 && version_arr[3].toInt()>0) {
@@ -246,7 +246,7 @@ tasks.create<Exec>("exeCreator"){
         var jpackage_version = version_arr[0]+'.'+version_arr[1]+'.'+version_arr[2]
         println("Running JPackage!")
         script.writeText("jpackage.exe --main-jar edumips64-"+version+".jar --input ./build/libs/ --app-version "+jpackage_version+" --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright "+LocalDateTime.now().year+", EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install")
-        commandLine("exeCreator.bat");
+        commandLine("./scripts/exeCreator.bat");
     }
 }
 
