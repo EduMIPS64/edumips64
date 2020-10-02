@@ -205,6 +205,53 @@ tasks.register("release") {
     }
 }
 
+tasks.create<Exec>("createMsi"){
+
+    group = "Distribution"
+    description = "Creates an installable exe file"
+    workingDir = File("${projectDir}")
+    dependsOn("jar")
+
+    doFirst{
+    	//check if user is on Windows
+        var os = System.getProperty("os.name") as String;
+        if(!("Windows" in os)){
+            throw GradleException("This tasks shall run on Windows")
+        }
+
+        println("Creating edumips64-"+version+".jar File");
+        
+        //check if jdk 14+ is installed
+        if(System.getProperty("java.version").toInt()<14) {
+            throw GradleException("JDK version installed must be 14+")
+        }
+        else{
+            println("Correct Jdk version Installed!")
+        }
+        
+        //check if Wix is installed
+        if(System.getenv("WIX")==null){
+            throw GradleException("Please Install Wix")
+        }
+        else{
+            println("Wix Installed!")
+        }
+
+	//create script file that creates the executable
+        logger.lifecycle("Version number is being truncated to match jpackage requirements");
+        var script = File("./scripts/exeCreator.bat")
+        script.createNewFile()
+        var version_arr = version.split('.').toMutableList();
+        if(version_arr.size>3 && version_arr[3].toInt()>0) {
+            version_arr[2] = (version_arr[2].toInt()+ 1).toString()
+        }
+        var jpackage_version = version_arr[0]+'.'+version_arr[1]+'.'+version_arr[2]
+        println("Running JPackage!")
+        script.writeText("jpackage.exe --main-jar edumips64-"+version+".jar --input ./build/libs/ --app-version "+jpackage_version+" --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright "+LocalDateTime.now().year+", EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install")
+        commandLine("./scripts/exeCreator.bat");
+    }
+}
+
 /*
  * GWT tasks
  */
