@@ -205,7 +205,8 @@ tasks.register("release") {
     }
 }
 
-tasks.create<Exec>("exeCreator"){
+tasks.create<Exec>("createMsi"){
+
     group = "Distribution"
     description = "Creates an installable exe file"
     workingDir = File("${projectDir}")
