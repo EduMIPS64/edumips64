@@ -238,6 +238,7 @@ tasks.create<Exec>("createMsi"){
         }
 
 	//create script file that creates the executable
+        logger.lifecycle("Version number is being truncated to match jpackage requirements");
         var script = File("./scripts/exeCreator.bat")
         script.createNewFile()
         var version_arr = version.split('.').toMutableList();
