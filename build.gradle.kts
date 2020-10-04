@@ -2,6 +2,7 @@
  * EduMIPS64 Gradle build configuration
  */
 import java.time.LocalDateTime
+import org.gradle.internal.os.OperatingSystem
 
 plugins {
     java
@@ -41,26 +42,36 @@ tasks.compileJava {
 }
 
 /* 
- * Documentation tasks
+ * Documentation tasks. To avoid dependency on GNU Make, these tasks duplicate the commands run by the Sphinx makefiles.
  */
+fun buildDocsCmd(language: String, type: String) : List<String> {
+    val baseDir = "${buildDir}/docs/${language}"
+    val pythonCmd = when (OperatingSystem.current()) {
+        OperatingSystem.WINDOWS -> "py -3"
+        else -> "python3"
+    }
+    val cmd = "${pythonCmd} -m sphinx -N -a -E . ${baseDir}/${type} -b ${type} -d ${baseDir}/doctrees"
+    return cmd.split(" ")
+}
+
 tasks.create<Exec>("htmlDocsEn"){
     workingDir = File("${projectDir}/docs/user/en/src")
-    commandLine("make", "html", "BUILDDIR=${buildDir}/docs/en", "SPHINXOPTS=-N -a -E")
+    commandLine(buildDocsCmd("en", "html"))
 }
 
 tasks.create<Exec>("htmlDocsIt") {
     workingDir = File("${projectDir}/docs/user/it/src")
-    commandLine("make", "html", "BUILDDIR=${buildDir}/docs/it", "SPHINXOPTS=-N -a -E")
+    commandLine(buildDocsCmd("it", "html"))
 }
 
 tasks.create<Exec>("pdfDocsEn") {
     workingDir = File("${projectDir}/docs/user/en/src")
-    commandLine("make", "pdf", "BUILDDIR=${buildDir}/docs/en", "SPHINXOPTS=-N -a -E")
+    commandLine(buildDocsCmd("en", "pdf"))
 }
 
 tasks.create<Exec>("pdfDocsIt") {
     workingDir = File("${projectDir}/docs/user/it/src")
-    commandLine("make", "pdf", "BUILDDIR=${buildDir}/docs/it", "SPHINXOPTS=-N -a -E")
+    commandLine(buildDocsCmd("it", "pdf"))
 }
 
 // Catch-all task for documentation
