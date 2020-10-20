@@ -53,12 +53,12 @@ jobs:
         uses: actions/upload-artifact@v1.0.0
         with:
           name: English manual (PDF)
-          path: ./build/docs/en/latex/EduMIPS64.pdf
+          path: ./build/docs/en/pdf/EduMIPS64.pdf
       - name: Upload Italian Manual PDF
         uses: actions/upload-artifact@v1.0.0
         with:
           name: Italian manual (PDF)
-          path: ./build/docs/it/latex/EduMIPS64.pdf
+          path: ./build/docs/it/pdf/EduMIPS64.pdf
 
       - name: Upload JAR
         uses: actions/upload-artifact@v1.0.0

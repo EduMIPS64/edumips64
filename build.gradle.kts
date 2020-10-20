@@ -2,6 +2,7 @@
  * EduMIPS64 Gradle build configuration
  */
 import java.time.LocalDateTime
+import org.gradle.internal.os.OperatingSystem
 
 plugins {
     java
@@ -22,8 +23,9 @@ dependencies {
     compileOnly("com.google.gwt:gwt-user:2.9.0")
     compileOnly("com.google.gwt:gwt-dev:2.9.0")
     compileOnly("com.google.elemental2:elemental2-dom:1.1.0")
+    compileOnly("com.vertispan.rpc:workers:1.0-alpha-5")
+
     implementation("javax.help:javahelp:2.0.05")
-    implementation("com.vertispan.rpc:workers:1.0-alpha-5")
     implementation("info.picocli:picocli:4.5.1")
     testImplementation("junit:junit:4.13.1")
 }
@@ -41,26 +43,36 @@ tasks.compileJava {
 }
 
 /* 
- * Documentation tasks
+ * Documentation tasks. To avoid dependency on GNU Make, these tasks duplicate the commands run by the Sphinx makefiles.
  */
+fun buildDocsCmd(language: String, type: String) : List<String> {
+    val baseDir = "${buildDir}/docs/${language}"
+    val pythonCmd = when (OperatingSystem.current()) {
+        OperatingSystem.WINDOWS -> "py -3"
+        else -> "python3"
+    }
+    val cmd = "${pythonCmd} -m sphinx -N -a -E . ${baseDir}/${type} -b ${type} -d ${baseDir}/doctrees"
+    return cmd.split(" ")
+}
+
 tasks.create<Exec>("htmlDocsEn"){
     workingDir = File("${projectDir}/docs/user/en/src")
-    commandLine("make", "html", "BUILDDIR=${buildDir}/docs/en", "SPHINXOPTS=-N -a -E")
+    commandLine(buildDocsCmd("en", "html"))
 }
 
 tasks.create<Exec>("htmlDocsIt") {
     workingDir = File("${projectDir}/docs/user/it/src")
-    commandLine("make", "html", "BUILDDIR=${buildDir}/docs/it", "SPHINXOPTS=-N -a -E")
+    commandLine(buildDocsCmd("it", "html"))
 }
 
 tasks.create<Exec>("pdfDocsEn") {
     workingDir = File("${projectDir}/docs/user/en/src")
-    commandLine("make", "pdf", "BUILDDIR=${buildDir}/docs/en", "SPHINXOPTS=-N -a -E")
+    commandLine(buildDocsCmd("en", "pdf"))
 }
 
 tasks.create<Exec>("pdfDocsIt") {
     workingDir = File("${projectDir}/docs/user/it/src")
-    commandLine("make", "pdf", "BUILDDIR=${buildDir}/docs/it", "SPHINXOPTS=-N -a -E")
+    commandLine(buildDocsCmd("it", "pdf"))
 }
 
 // Catch-all task for documentation
@@ -148,11 +160,10 @@ val sharedManifest = the<JavaPluginConvention>().manifest {
 
 // Main JAR
 tasks.jar {
-    dependsOn(configurations.runtimeClasspath)
     from(sourceSets.main.get().output)
     from({
-        configurations.runtimeClasspath.get().filter { it.name.contains("javahelp") && it.name.endsWith("jar") }.map { zipTree(it) }
-        configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") }.map { zipTree(it) }
+        configurations.runtimeClasspath.get().filter { (it.name.contains("picocli") || it.name.contains("javahelp")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
+
     })
     manifest {
         attributes["Main-Class"] = application.mainClassName
@@ -171,7 +182,7 @@ tasks.create<Jar>("noHelpJar"){
     dependsOn(configurations.runtimeClasspath)
     from(sourceSets.main.get().output)
     from({
-        configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") }.map { zipTree(it) }
+        configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") }.map { println("Adding dependency " + it.name); zipTree(it) }
     })
     manifest {
         attributes["Main-Class"] = application.mainClassName
@@ -256,6 +267,6 @@ tasks.create<Exec>("createMsi"){
  * GWT tasks
  */
 gwt {
-    modules.add("org.edumips64.webclient") 
+    modules.add("org.edumips64.webclient")
     sourceLevel = "1.11"
 }

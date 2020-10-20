@@ -22,7 +22,6 @@ In order to compile EduMIPS64, you need the Java JDK version 11 or above.
 
 To build the user documentation, you'll need:
 
-- GNU Make
 - Python 3
 - Sphinx (http://www.sphinx-doc.org/) version 2.3.1 or above
 - rst2pdf (for the PDF files) version 0.9.6 or above
@@ -186,8 +185,7 @@ might be migrating to a new shiny web-based frontend.
 
 ### Windows
 
-Compilation under Windows is possible by using the Windows Subsystem for Linux
-(WSL), exactly in the same way as you would do under Linux.
+EduMIPS64 compiles under Windows, both natively (e.g., using PowerShell) and in WSL.
 
 ### Mac OS X
 
