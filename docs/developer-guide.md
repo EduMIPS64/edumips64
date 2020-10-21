@@ -38,8 +38,8 @@ $ pip3 install -r docs/requirements.txt
 - JavaHelp
 - GWT (experimental)
 
-If you want to use the automatic style checks (pre-commit hook), then you
-should have Automatic Style (astyle) installed.
+To generate an installable Windows MSI package (using the Gradle `msi` task), you will need 
+JDK 14+ and the WiX toolkit.
 
 This project uses GitHub Actions for continuous integration
 (https://github.com/EduMIPS64/edumips64/actions).
@@ -202,7 +202,7 @@ Follow instructions [here](https://dev.cloudburo.net/2018/06/03/install-letsencr
 Before doing a release, please do the following tasks. Over time, those should
 be automated, but before that is done those checks should be done manually.
 
-- For each released JAR file:
+- For each released JAR / MSI file:
   - verify that the splash screen works
   - verify that the version number, code name, build date and git ID are correct
   - open one .s file (e.g., `div.d.s`)
