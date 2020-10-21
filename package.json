@@ -16,6 +16,7 @@
     "@microsoft/applicationinsights-web": "^2.5.4",
     "lodash": "^4.17.15",
     "monaco-editor-webpack-plugin": "^2.0.0",
+    "node-forge": "^0.10.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-icons": "^3.10.0",
