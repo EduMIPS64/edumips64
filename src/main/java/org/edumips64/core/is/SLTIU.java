@@ -40,17 +40,20 @@ import org.edumips64.core.IrregularWriteOperationException;
  */
 
 class SLTIU extends ALU_IType {
-  private final String OPCODE_VALUE = "001011";
   SLTIU() {
-    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.OPCODE_VALUE = "001011";
     this.name = "SLTIU";
   }
 
+  @Override
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException {
     //getting values from temporary registers
     String imm = TR[IMM_FIELD].getBinString();
     String rs = TR[RS_FIELD].getBinString();
-    boolean rsbit, rtbit, diff, slt = false;
+    boolean rsbit;
+    boolean rtbit;
+    boolean diff;
+    boolean slt = false;
 
     //comparison between registers as unsigned integers
     for (int i = 0; i < 64; i++) {

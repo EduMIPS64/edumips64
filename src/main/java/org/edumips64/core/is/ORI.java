@@ -39,13 +39,14 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  */
 
 class ORI extends ALU_IType {
-  private final String OPCODE_VALUE = "001101";
   ORI() {
-    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.OPCODE_VALUE = "001101";
     this.name = "ORI";
   }
+
   //since this operation is carried out with zero padding of immediate, against sign_extend(immediate) methodology
   //of all others instructions in the same category, is necessary the overriding of ID method
+  @Override
   public boolean ID() throws IntegerOverflowException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     checkImmediateForOverflow();
     //if the source register is valid passing its own values into a temporary register
@@ -62,7 +63,7 @@ class ORI extends ALU_IType {
     //writing the immediate value of "params" on a temporary register
     TR[IMM_FIELD].writeHalf(params.get(IMM_FIELD));
     //forcing zero-padding in the same temporary register
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
 
     for (int i = 0; i < 48; i++) {
       sb.append('0');
@@ -72,12 +73,16 @@ class ORI extends ALU_IType {
     TR[IMM_FIELD].setBits(sb.substring(0), 0);
     return false;
   }
+
+  @Override
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException {
     //getting values from temporary registers
     String imm = TR[IMM_FIELD].getBinString();
     String rs = TR[RS_FIELD].getBinString();
-    StringBuffer sb = new StringBuffer();
-    boolean immbit, rsbit, resbit;
+    StringBuilder sb = new StringBuilder();
+    boolean immbit;
+    boolean rsbit;
+    boolean resbit;
 
     //performing bitwise OR between immediate and rs register
     for (int i = 0; i < 64; i++) {
