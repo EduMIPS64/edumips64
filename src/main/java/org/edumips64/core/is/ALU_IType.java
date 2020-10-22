@@ -64,9 +64,7 @@ public abstract class ALU_IType extends ComputationalInstructions {
    * @throws IntegerOverflowException
    */
   protected void checkImmediateForOverflow() throws IntegerOverflowException {
-    int immediateValue = params.get(IMM_FIELD);
-    if (immediateValue > IMM_FIELD_MAX) {
-      logger.log(Level.SEVERE, "The value {0} of the immediate field {1} exceeds the maximum allowed value {2}.", new Object[]{immediateValue, IMM_FIELD, IMM_FIELD_MAX});
+    if (params.get(IMM_FIELD) > IMM_FIELD_MAX) {
       throw new IntegerOverflowException();
     }
   }
