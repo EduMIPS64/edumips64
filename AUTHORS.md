@@ -30,3 +30,6 @@
 * ancbro - [**@ancbro**](http://github.com/ancbro)
 * Grandroid - [**@Grandroid**](http://github.com/Grandroid)
 * Oscar Elhanafey - [**@Ooelhana**](http://github.com/Ooelhana)
+* Miguel Pinto - [**@rocas777**](http://github.com/rocas777)
+* Pimts - [**@pimts**](http://github.com/pimts)
+* iwodder - [**@iwodder**](http://github.com/iwodder)
