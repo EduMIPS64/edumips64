@@ -40,12 +40,12 @@ import org.edumips64.core.IrregularWriteOperationException;
  */
 
 class DADDIU extends ALU_IType {
-  private final String OPCODE_VALUE = "011001";
   DADDIU() {
-    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.OPCODE_VALUE = "011001";
     this.name = "DADDIU";
   }
 
+  @Override
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException {
     //getting values from temporary registers
     long imm = TR[IMM_FIELD].getValue();

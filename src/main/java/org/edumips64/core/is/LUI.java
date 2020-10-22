@@ -39,22 +39,14 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
   * @author Trubia Massimo, Russo Daniele
  */
 class LUI extends ALU_IType {
-  private final static int RT_FIELD = 0;
-  private final static int IMM_FIELD = 1;
-  private final static int RT_FIELD_INIT = 11;
-  private final static int RS_FIELD_INIT = 6;
-  private final static int IMM_FIELD_INIT = 16;
-  private final static int RT_FIELD_LENGTH = 5;
-  private final static int RS_FIELD_LENGTH = 5;
-  private final static int IMM_FIELD_LENGTH = 16;
-  private final String OPCODE_VALUE = "001111";
-
   LUI() {
     syntax = "%R,%I";
-    //super.OPCODE_VALUE = OPCODE_VALUE;
+    super.OPCODE_VALUE = "001111";
+    ALU_IType.IMM_FIELD = 1;
     this.name = "LUI";
   }
 
+  @Override
   public boolean ID() throws IntegerOverflowException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     checkImmediateForOverflow();
     //if the source register is valid passing its own values into a temporary register
@@ -65,17 +57,21 @@ class LUI extends ALU_IType {
     TR[IMM_FIELD].writeHalf(params.get(IMM_FIELD));
     return false;
   }
+
+  @Override
   public void EX() throws IrregularStringOfBitsException, IrregularWriteOperationException {
     //getting strings from temporary registers
     String imm = TR[IMM_FIELD].getBinString().substring(16, 64);
-    String imm_shift = imm + "0000000000000000";
-    long imm_shift_lng = Converter.binToLong(imm_shift, false);
-    TR[RT_FIELD].writeDoubleWord(imm_shift_lng);
+    String shift = imm + "0000000000000000";
+    long shiftLong = Converter.binToLong(shift, false);
+    TR[RT_FIELD].writeDoubleWord(shiftLong);
 
     if (cpu.isEnableForwarding()) {
       doWB();
     }
   }
+
+  @Override
   public void pack() throws IrregularStringOfBitsException {
     repr.setBits(OPCODE_VALUE, 0);
     repr.setBits(Converter.intToBin(RS_FIELD_LENGTH, 0), RS_FIELD_INIT);

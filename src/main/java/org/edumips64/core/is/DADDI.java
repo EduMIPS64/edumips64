@@ -36,12 +36,12 @@ import org.edumips64.core.IrregularStringOfBitsException;
  */
 
 class DADDI extends ALU_IType {
-  private final String OPCODE_VALUE = "011000";
   DADDI() {
-    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.OPCODE_VALUE = "011000";
     this.name = "DADDI";
   }
 
+  @Override
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException {
     //getting strings from temporary registers
     String imm = TR[IMM_FIELD].getBinString();

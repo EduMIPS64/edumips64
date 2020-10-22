@@ -213,3 +213,11 @@ be automated, but before that is done those checks should be done manually.
 - open the English manual and check the version
 - open the Italian manual and check the version
 - check the 'edge' snap and promote it to stable if it works (https://snapcraft.io/edumips64/releases, needs login)
+
+### Overriding instruction field values
+
+Many instruction class contain static fields. This can be confusing and error-prone. If a concrete instruction
+defines any fields that are defined in parent classes (such as, for example, `OPCODE_VALUE`), it is important that
+the constructor also overrides the value of the same attribute for the superclass, or some methods will not work properly.
+
+This is clearly too convoluted and should be redesigned in a way that makes it impossible to make mistakes.

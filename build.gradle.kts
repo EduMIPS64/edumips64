@@ -193,6 +193,9 @@ tasks.create<Jar>("noHelpJar"){
 /*
  * Code coverage report tasks
  */
+jacoco {
+    toolVersion = "0.8.6"
+}
 tasks.jacocoTestReport {
     reports {
         xml.isEnabled = true

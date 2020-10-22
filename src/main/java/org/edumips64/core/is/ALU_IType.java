@@ -29,6 +29,7 @@ import org.edumips64.core.MemoryElementNotFoundException;
 import org.edumips64.core.Register;
 import org.edumips64.core.fpu.FPInvalidOperationException;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** This is the base class for all the immediate ALU instructions
@@ -38,15 +39,17 @@ import java.util.logging.Logger;
 public abstract class ALU_IType extends ComputationalInstructions {
   protected final static int RT_FIELD = 0;
   protected final static int RS_FIELD = 1;
-  protected final static int IMM_FIELD = 2;
-  private final static int RT_FIELD_INIT = 11;
-  private final static int RS_FIELD_INIT = 6;
-  private final static int IMM_FIELD_INIT = 16;
-  private final static int RT_FIELD_LENGTH = 5;
-  private final static int RS_FIELD_LENGTH = 5;
-  private final static int IMM_FIELD_LENGTH = 16;
-  private final static int IMM_FIELD_MAX = (int) Math.pow(2, IMM_FIELD_LENGTH - 1) - 1;
+  protected final static int RT_FIELD_INIT = 11;
+  protected final static int RS_FIELD_INIT = 6;
+  protected final static int IMM_FIELD_INIT = 16;
+  protected final static int RT_FIELD_LENGTH = 5;
+  protected final static int RS_FIELD_LENGTH = 5;
+  protected final static int IMM_FIELD_LENGTH = 16;
+  protected final static int IMM_FIELD_MAX = (int) Math.pow(2, IMM_FIELD_LENGTH - 1) - 1;
   protected String OPCODE_VALUE = "";
+
+  // Needs to be mutable because LUI's syntax is %R,%I, and IMM_FIELD will be 1 in that case.
+  protected static int IMM_FIELD = 2;
 
   private static final Logger logger = Logger.getLogger(ALU_IType.class.getName());
 

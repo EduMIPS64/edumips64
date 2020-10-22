@@ -40,14 +40,14 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  */
 
 class XORI extends ALU_IType {
-  private final String OPCODE_VALUE = "001110";
   XORI() {
-    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.OPCODE_VALUE = "001110";
     this.name = "XORI";
   }
 
   //since this operation is carried out with zero padding of the immediate, //against sign_extend(immediate) methodology
   //of all others instructions in the same category, it is necessary the overriding of the ID method
+  @Override
   public boolean ID() throws IntegerOverflowException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     checkImmediateForOverflow();
     //if the source register is valid passing its own values into a temporary register
@@ -64,7 +64,7 @@ class XORI extends ALU_IType {
     //writing the immediate value of "params" on a temporary register
     TR[IMM_FIELD].writeHalf(params.get(IMM_FIELD));
     //forcing zero-padding in the same temporary register
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
 
     for (int i = 0; i < 48; i++) {
       sb.append('0');
@@ -74,12 +74,16 @@ class XORI extends ALU_IType {
     TR[IMM_FIELD].setBits(sb.substring(0), 0);
     return false;
   }
+
+  @Override
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException {
     //getting values from temporary registers
     String imm = TR[IMM_FIELD].getBinString();
     String rs = TR[RS_FIELD].getBinString();
-    boolean rsbit, immbit, result;
-    StringBuffer sb = new StringBuffer();
+    boolean rsbit;
+    boolean immbit;
+    boolean result;
+    StringBuilder sb = new StringBuilder();
 
     for (int i = 0; i < 64; i++) {
       //XORI

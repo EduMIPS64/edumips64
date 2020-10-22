@@ -37,12 +37,12 @@ import org.edumips64.core.IrregularWriteOperationException;
  */
 
 class SLTI extends ALU_IType {
-  private final String OPCODE_VALUE = "001010";
   SLTI() {
-    super.OPCODE_VALUE = OPCODE_VALUE;
+    super.OPCODE_VALUE = "001010";
     this.name = "SLTI";
   }
 
+  @Override
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, IrregularWriteOperationException {
     //getting values from temporary registers
     long imm = TR[IMM_FIELD].getValue();
