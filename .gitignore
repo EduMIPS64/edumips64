@@ -35,6 +35,8 @@ gwt-unitCache/
 war/WEB-INF/
 war/
 bin/
+docs/user/en/output
+docs/user/it/output
 
 ###############################################################################
 ## Java.gitignore from github/gitignore
