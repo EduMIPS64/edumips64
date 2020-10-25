@@ -917,13 +917,7 @@ public class Main {
     manual = new JMenuItem();
     help.add(manual);
     manual.addActionListener(e -> {
-        String hsPath = CurrentLocale.getString("HELPDIR") + "/";
-        URL helpSetUrl = Main.class.getResource(hsPath);
-        if (helpSetUrl == null) {
-          log.log(Level.SEVERE, "Could not create helpset URL for path: <" + hsPath + ">");
-          return;
-        }
-        GUIHelp.showHelp(null, helpSetUrl, configStore);
+        GUIHelp.showHelp();
     });
 
     aboutUs = new JMenuItem(CurrentLocale.getString("MenuItem.ABOUT_US"));
