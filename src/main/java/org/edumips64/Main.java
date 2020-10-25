@@ -916,9 +916,7 @@ public class Main {
 
     manual = new JMenuItem();
     help.add(manual);
-    manual.addActionListener(e -> {
-        GUIHelp.showHelp();
-    });
+    manual.addActionListener(__ -> GUIHelp.showHelp());
 
     aboutUs = new JMenuItem(CurrentLocale.getString("MenuItem.ABOUT_US"));
     help.add(aboutUs);
