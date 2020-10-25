@@ -25,7 +25,6 @@ dependencies {
     compileOnly("com.google.elemental2:elemental2-dom:1.1.0")
     compileOnly("com.vertispan.rpc:workers:1.0-alpha-5")
 
-    implementation("javax.help:javahelp:2.0.05")
     implementation("info.picocli:picocli:4.5.1")
     testImplementation("junit:junit:4.13.1")
 }
