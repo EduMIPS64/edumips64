@@ -161,7 +161,7 @@ val sharedManifest = the<JavaPluginConvention>().manifest {
 tasks.jar {
     from(sourceSets.main.get().output)
     from({
-        configurations.runtimeClasspath.get().filter { (it.name.contains("picocli") || it.name.contains("javahelp")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
+        configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
 
     })
     manifest {
