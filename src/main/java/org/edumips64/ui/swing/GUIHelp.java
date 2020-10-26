@@ -97,7 +97,8 @@ public class GUIHelp {
     // helpBroker.setFont(newFont);
     // helpBroker.setDisplayed(true);
     //var viewer = new HelpViewerFrame("build/docs/en/singlehtml/index.html", CurrentLocale.getString("Manual.CAPTION"));
-    var viewer = new HelpViewerSwingFrame("build/docs/en/singlehtml/index.html", CurrentLocale.getString("Manual.CAPTION"));
+    //var viewer = new HelpViewerSwingFrame("build/docs/en/singlehtml/index.html", CurrentLocale.getString("Manual.CAPTION"));
+    var viewer = new HelpViewerFlyingSaucer("build/docs/en/singlehtml/index.html", CurrentLocale.getString("Manual.CAPTION"));
     viewer.setVisible(true);
   }
 }

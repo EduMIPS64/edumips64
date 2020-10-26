@@ -33,6 +33,7 @@ dependencies {
 
     implementation("javax.help:javahelp:2.0.05")
     implementation("info.picocli:picocli:4.5.1")
+    implementation("org.xhtmlrenderer:flying-saucer-core:9.1.20")
     testImplementation("junit:junit:4.13.1")
 }
 
@@ -166,7 +167,7 @@ val sharedManifest = the<JavaPluginConvention>().manifest {
 tasks.jar {
     from(sourceSets.main.get().output)
     from({
-        configurations.runtimeClasspath.get().filter { (it.name.contains("javafx") || it.name.contains("picocli") || it.name.contains("javahelp")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
+        configurations.runtimeClasspath.get().filter { (it.name.contains("flying") || it.name.contains("javafx") || it.name.contains("picocli") || it.name.contains("javahelp")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
 
     })
     manifest {
@@ -186,7 +187,7 @@ tasks.create<Jar>("noHelpJar"){
     dependsOn(configurations.runtimeClasspath)
     from(sourceSets.main.get().output)
     from({
-        configurations.runtimeClasspath.get().filter { it.name.contains("javafx") || it.name.contains("picocli") && it.name.endsWith("jar") }.map { println("Adding dependency " + it.name); zipTree(it) }
+        configurations.runtimeClasspath.get().filter { it.name.contains("flying") || it.name.contains("javafx") || it.name.contains("picocli") && it.name.endsWith("jar") }.map { println("Adding dependency " + it.name); zipTree(it) }
     })
     manifest {
         attributes["Main-Class"] = application.mainClassName
