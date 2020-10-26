@@ -96,9 +96,7 @@ public class GUIHelp {
     // helpBroker.initPresentation();
     // helpBroker.setFont(newFont);
     // helpBroker.setDisplayed(true);
-    final JFrame frame = new JFrame();  
-    frame.getContentPane().add(new HelpViewer("build/docs/en/singlehtml/index.html"));  
-    frame.setMinimumSize(new Dimension(800, 600));  
-    frame.setVisible(true);  
+    var viewer = new HelpViewerFrame("build/docs/en/singlehtml/index.html");
+    viewer.setVisible(true);
   }
 }

@@ -1,26 +1,26 @@
 package org.edumips64.ui.swing;
 
-import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.File;
 
-import javax.swing.JPanel;
+import javax.swing.JFrame;
 
 import com.sun.javafx.application.PlatformImpl;
 
 import javafx.embed.swing.JFXPanel;
-import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
-public class HelpViewer extends JPanel {  
+public class HelpViewerFrame extends JFrame {  
   private Stage stage;
   private WebView browser;
   private JFXPanel jfxPanel;
   private WebEngine webEngine;
 
-  public HelpViewer(String helpPath) {
+  public HelpViewerFrame(String helpPath) {
     jfxPanel = new JFXPanel();  
 
     PlatformImpl.startup(() -> {
@@ -28,7 +28,7 @@ public class HelpViewer extends JPanel {
         stage.setTitle("EduMIPS64 Help");
         stage.setResizable(true);
 
-        Group root = new Group();
+        var root = new StackPane();
         Scene scene = new Scene(root);
         stage.setScene(scene);
 
@@ -36,13 +36,12 @@ public class HelpViewer extends JPanel {
         webEngine = browser.getEngine();
         webEngine.load(new File(helpPath).toURI().toString());
 
-        var children = root.getChildren();
-        children.add(browser);
+        root.getChildren().add(browser);
 
         jfxPanel.setScene(scene);
      });
 
-    setLayout(new BorderLayout());
-    add(jfxPanel, BorderLayout.CENTER);
+    getContentPane().add(jfxPanel);
+    setMinimumSize(new Dimension(800, 600));
   }
 }
