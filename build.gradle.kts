@@ -13,6 +13,12 @@ plugins {
     id ("jacoco")
     id ("com.dorongold.task-tree") version "1.5"
     id ("us.ascendtech.gwt.classic") version "0.5.1"
+    id("org.openjfx.javafxplugin") version "0.0.9"
+}
+
+javafx {
+    version = "15"
+    modules("javafx.base", "javafx.swing", "javafx.controls", "javafx.web")
 }
 
 repositories {
@@ -57,12 +63,12 @@ fun buildDocsCmd(language: String, type: String) : List<String> {
 
 tasks.create<Exec>("htmlDocsEn"){
     workingDir = File("${projectDir}/docs/user/en/src")
-    commandLine(buildDocsCmd("en", "html"))
+    commandLine(buildDocsCmd("en", "singlehtml"))
 }
 
 tasks.create<Exec>("htmlDocsIt") {
     workingDir = File("${projectDir}/docs/user/it/src")
-    commandLine(buildDocsCmd("it", "html"))
+    commandLine(buildDocsCmd("it", "singlehtml"))
 }
 
 tasks.create<Exec>("pdfDocsEn") {
@@ -88,8 +94,7 @@ val docsDir = "build/classes/java/main/docs"
 // Include the docs folder at the root of the jar, for JavaHelp
 tasks.create<Copy>("copyHelpEn") {
     from("${buildDir}/docs/en") {
-        include("html/**")
-        exclude("**/_sources/**")
+        include("singlehtml/index.html")
     }
     into ("${docsDir}/user/en")
     dependsOn("htmlDocsEn")
@@ -97,8 +102,7 @@ tasks.create<Copy>("copyHelpEn") {
 
 tasks.create<Copy>("copyHelpIt") {
     from("${buildDir}/docs/it") {
-        include("html/**")
-        exclude("**/_sources/**")
+        include("singlehtml/index.html")
     }
     into ("${docsDir}/user/it")
     dependsOn("htmlDocsIt")
@@ -162,7 +166,7 @@ val sharedManifest = the<JavaPluginConvention>().manifest {
 tasks.jar {
     from(sourceSets.main.get().output)
     from({
-        configurations.runtimeClasspath.get().filter { (it.name.contains("picocli") || it.name.contains("javahelp")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
+        configurations.runtimeClasspath.get().filter { (it.name.contains("javafx") || it.name.contains("picocli") || it.name.contains("javahelp")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
 
     })
     manifest {
@@ -182,7 +186,7 @@ tasks.create<Jar>("noHelpJar"){
     dependsOn(configurations.runtimeClasspath)
     from(sourceSets.main.get().output)
     from({
-        configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") }.map { println("Adding dependency " + it.name); zipTree(it) }
+        configurations.runtimeClasspath.get().filter { it.name.contains("javafx") || it.name.contains("picocli") && it.name.endsWith("jar") }.map { println("Adding dependency " + it.name); zipTree(it) }
     })
     manifest {
         attributes["Main-Class"] = application.mainClassName

@@ -37,6 +37,7 @@ import javax.help.DefaultHelpBroker;
 import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
+import javax.swing.JFrame;
 
 /**
  * This class controls the Edumips64 user guide.
@@ -89,9 +90,15 @@ public class GUIHelp {
     // Update the font.
     helpBroker.setSize(helpBroker.getSize());
     Font newFont = helpBroker.getFont().deriveFont((float)desiredFontSize);
-    ((DefaultHelpBroker) helpBroker).setActivationWindow(parent);
-    helpBroker.initPresentation();
-    helpBroker.setFont(newFont);
-    helpBroker.setDisplayed(true);
+
+    // Display the help window.
+    // ((DefaultHelpBroker) helpBroker).setActivationWindow(parent);
+    // helpBroker.initPresentation();
+    // helpBroker.setFont(newFont);
+    // helpBroker.setDisplayed(true);
+    final JFrame frame = new JFrame();  
+    frame.getContentPane().add(new HelpViewer("build/docs/en/singlehtml/index.html"));  
+    frame.setMinimumSize(new Dimension(800, 600));  
+    frame.setVisible(true);  
   }
 }
