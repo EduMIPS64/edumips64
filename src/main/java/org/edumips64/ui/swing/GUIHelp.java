@@ -25,6 +25,7 @@ package org.edumips64.ui.swing;
 
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.CurrentLocale;
 
 import java.awt.*;
 import java.net.MalformedURLException;
@@ -37,7 +38,6 @@ import javax.help.DefaultHelpBroker;
 import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
-import javax.swing.JFrame;
 
 /**
  * This class controls the Edumips64 user guide.
@@ -96,7 +96,7 @@ public class GUIHelp {
     // helpBroker.initPresentation();
     // helpBroker.setFont(newFont);
     // helpBroker.setDisplayed(true);
-    var viewer = new HelpViewerFrame("build/docs/en/singlehtml/index.html");
+    var viewer = new HelpViewerFrame("build/docs/en/singlehtml/index.html", CurrentLocale.getString("Manual.CAPTION"));
     viewer.setVisible(true);
   }
 }

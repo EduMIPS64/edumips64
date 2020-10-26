@@ -20,7 +20,7 @@ public class HelpViewerFrame extends JFrame {
   private JFXPanel jfxPanel;
   private WebEngine webEngine;
 
-  public HelpViewerFrame(String helpPath) {
+  public HelpViewerFrame(String helpPath, String title) {
     jfxPanel = new JFXPanel();  
 
     PlatformImpl.startup(() -> {
@@ -43,5 +43,6 @@ public class HelpViewerFrame extends JFrame {
 
     getContentPane().add(jfxPanel);
     setMinimumSize(new Dimension(800, 600));
+    setTitle(title);
   }
 }
