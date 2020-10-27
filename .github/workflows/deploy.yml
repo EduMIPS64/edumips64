@@ -26,7 +26,7 @@ jobs:
       - run: npm run build
       - name: Deploy
         if: success()
-        uses: crazy-max/ghaction-github-pages@v1
+        uses: crazy-max/ghaction-github-pages@v2
         with:
           target_branch: master
           build_dir: build/gwt/war/edumips64
