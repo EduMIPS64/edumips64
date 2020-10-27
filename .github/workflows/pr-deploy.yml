@@ -44,7 +44,7 @@ jobs:
           commit_message: Deploy code for PR ${{ github.event.pull_request.number }}
           fqdn: web.edumips.org
         env:
-          GITHUB_PAT: ${{ secrets.PAT_WEBUI }}
+          GH_PAT: ${{ secrets.PAT_WEBUI }}
       - name: Comment on PR
         uses: unsplash/comment-on-pr@master
         env:
