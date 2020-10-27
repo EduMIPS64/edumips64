@@ -25,7 +25,7 @@ jobs:
         run: pip3 install -r docs/requirements.txt -U
       - name: Read version from gradle.properties
         id: read_version
-        uses: christian-draeger/read-properties@1.0.0
+        uses: christian-draeger/read-properties@1.0.1
         with:
           path: 'gradle.properties'
           property: 'version'
@@ -36,7 +36,7 @@ jobs:
       - name: Run unit tests
         run: ./gradlew check
       - name: Codecov
-        uses: codecov/codecov-action@v1.0.5
+        uses: codecov/codecov-action@v1.0.14
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 

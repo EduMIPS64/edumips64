@@ -35,7 +35,7 @@ jobs:
       #   languages: go, javascript, csharp, python, cpp, java
     
     - name: Setup Java JDK
-      uses: actions/setup-java@v1.4.0
+      uses: actions/setup-java@v1.4.3
       with:
         java-version: 11 
 
