@@ -26,7 +26,7 @@ dependencies {
     compileOnly("com.vertispan.rpc:workers:1.0-alpha-5")
 
     implementation("javax.help:javahelp:2.0.05")
-    implementation("info.picocli:picocli:4.5.1")
+    implementation("info.picocli:picocli:4.5.2")
     testImplementation("junit:junit:4.13.1")
 }
 
