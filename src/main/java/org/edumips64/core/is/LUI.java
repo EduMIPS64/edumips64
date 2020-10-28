@@ -42,7 +42,7 @@ class LUI extends ALU_IType {
   LUI() {
     syntax = "%R,%I";
     super.OPCODE_VALUE = "001111";
-    ALU_IType.IMM_FIELD = 1;
+    IMM_FIELD = 1;
     this.name = "LUI";
   }
 
