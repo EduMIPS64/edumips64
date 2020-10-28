@@ -684,4 +684,82 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testIssue304UI() throws Exception {
     runMipsTest("infinite-bug-304.s", false);
   }
+
+  /* Test for instruction DDIVU */
+  @Test(timeout=2000)
+  public void testDdivu() throws Exception {
+    runMipsTest("ddivu.s");
+  }
+
+  /* Test for instruction DMULT */
+  @Test(timeout=2000)
+  public void testDmult() throws Exception {
+    runMipsTest("dmult.s");
+  }
+
+  /* Test for instruction DMULTU */
+  @Test(timeout=2000)
+  public void testDmultu() throws Exception {
+    runMipsTest("dmultu.s");
+  }
+
+  /* Test for instruction DSLLV */
+  @Test(timeout=2000)
+  public void testDsllv() throws Exception {
+    runMipsTest("dsllv.s");
+  }
+
+  /* Test for instruction DSRA */
+  @Test(timeout=2000)
+  public void testDsra() throws Exception {
+    runMipsTest("dsra.s");
+  }
+
+  /* Test for instruction DSRLV */
+  @Test(timeout=2000)
+  public void testDsrlv() throws Exception {
+    runMipsTest("dsrlv.s");
+  }
+
+  /* Test for instruction MULT */
+  @Test(timeout=2000)
+  public void testMult() throws Exception {
+    runMipsTest("mult.s");
+  }
+
+  /* Test for instruction MULTU */
+  @Test(timeout=2000)
+  public void testMultu() throws Exception {
+    runMipsTest("multu.s");
+  }
+  
+  /* Test for instruction ORI */
+  @Test(timeout=2000)
+  public void testOri() throws Exception {
+    runMipsTest("ori.s");
+  }
+
+  /* Test for instruction LUI */
+  @Test(timeout=2000)
+  public void testLui() throws Exception {
+    runMipsTest("lui.s");
+  }
+
+  /* Test for instruction SRA */
+  @Test(timeout=2000)
+  public void testSra() throws Exception {
+    runMipsTest("sra.s");
+  }
+
+  /* Test for instruction SRAV */
+  @Test(timeout=2000)
+  public void testSrav() throws Exception {
+    runMipsTest("srav.s");
+  }
+
+  /* Test for instruction XORI */
+  @Test(timeout=2000)
+  public void testXori() throws Exception {
+    runMipsTest("xori.s");
+  }
 }
