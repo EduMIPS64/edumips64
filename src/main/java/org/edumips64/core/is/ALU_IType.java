@@ -49,7 +49,8 @@ public abstract class ALU_IType extends ComputationalInstructions {
   protected String OPCODE_VALUE = "";
 
   // Needs to be mutable because LUI's syntax is %R,%I, and IMM_FIELD will be 1 in that case.
-  protected static int IMM_FIELD = 2;
+  // Not static because the change pertains to LUI itself, not all ALU I-Type instructions.
+  protected int IMM_FIELD = 2;
 
   private static final Logger logger = Logger.getLogger(ALU_IType.class.getName());
 
