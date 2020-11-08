@@ -1,14 +1,14 @@
 # EduMIPS64
 
-![Java CI](https://github.com/lupino3/edumips64/workflows/Java%20CI/badge.svg)
+![Java CI](https://github.com/EduMIPS64/edumips64/workflows/Java%20CI/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/edumips64/badge/?version=latest)](http://edumips64.readthedocs.io/en/latest/?badge=latest)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1511/badge)](https://bestpractices.coreinfrastructure.org/projects/1511)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/fdbdfcebfdff4f39a4c6249b49c5a947)](https://www.codacy.com/manual/andrea-spadaccini/edumips64?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lupino3/edumips64&amp;utm_campaign=Badge_Grade)
-[![codecov](https://codecov.io/gh/lupino3/edumips64/branch/master/graph/badge.svg)](https://codecov.io/gh/lupino3/edumips64)
+[![codecov](https://codecov.io/gh/EduMIPS64/edumips64/branch/master/graph/badge.svg)](https://codecov.io/gh/EduMIPS64/edumips64)
 
 [![Join the chat at https://gitter.im/lupino3/edumips64](https://badges.gitter.im/lupino3/edumips64.svg)](https://gitter.im/lupino3/edumips64?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Stack Exchange questions](https://img.shields.io/stackexchange/stackoverflow/t/edumips64)](https://stackoverflow.com/questions/tagged/edumips64)
-[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/EduMIPS64/edumips64) 
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/EduMIPS64/edumips64)
 
 EduMIPS64 is a free cross-platform visual MIPS64 CPU simulator written in Java.
 
@@ -18,7 +18,7 @@ EduMIPS64 is a free cross-platform visual MIPS64 CPU simulator written in Java.
 developers' blog at http://edumips64.blogspot.com.
 
 💾 To download the current stable release, go to the [GitHub page for the latest
-release](https://github.com/lupino3/edumips64/releases/latest), which contains
+release](https://github.com/EduMIPS64/edumips64/releases/latest), which contains
 JARs, PDFs with the user documentation and zip/tar.gz files with the source
 code.
 

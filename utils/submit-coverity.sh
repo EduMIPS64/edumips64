@@ -34,13 +34,13 @@ out "Done. Tarball stats:"
 ls -lh ${TARBALL}
 
 out "Uploading tarball to Coverity"
-curl --form project=lupino3%2Fedumips64 \
+curl --form project=EduMIPS64%2Fedumips64 \
      --form token=${TOKEN} \
      --form email=andrea.spadaccini@gmail.com \
      --form file=@${TARBALL} \
      --form version="${VERSION}" \
      --form description="${DESCRIPTION}" \
-     https://scan.coverity.com/builds?project=lupino3%2Fedumips64
+     https://scan.coverity.com/builds?project=EduMIPS64%2Fedumips64
 
 out "Cleaning up.."
 rm -rf ${COVERITY_DIR}

@@ -31,7 +31,7 @@ GH_PAGES_DIR=${HOME}/gh-pages
 echo -n "Cloning gh-pages branch to ${GH_PAGES_DIR}.. "
 git config --global user.email "travis@travis-ci.org"
 git config --global user.name "Travis"
-git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/lupino3/edumips64.git ${GH_PAGES_DIR} > /dev/null
+git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/EduMIPS64/edumips64.git ${GH_PAGES_DIR} > /dev/null
 echo "done."
 
 echo "Git branch: $TRAVIS_BRANCH"
