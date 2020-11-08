@@ -28,6 +28,10 @@ pygments_style = 'sphinx'
 html_theme = 'epub'
 html_static_path = ['_static']
 htmlhelp_basename = 'EduMIPS64doc'
+html_context = {
+    'html5_doctype': False,
+    'use_meta_charset': False,
+}
 latex_preamble = u'''
 \DeclareUnicodeCharacter{22C3}{$\cup$}
 \DeclareUnicodeCharacter{2208}{$\in$}
