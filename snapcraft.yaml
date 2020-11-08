@@ -1,5 +1,5 @@
 name: edumips64
-version: '1.2.8'
+version: '1.2.9'
 summary: A free visual and cross-platform MIPS64 CPU simulator.
 description: EduMIPS64 is a free MIPS64 visual simulator and debugger, used as a teaching tool in Computer Architecture courses.
 grade: stable

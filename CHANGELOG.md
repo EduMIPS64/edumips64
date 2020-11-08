@@ -1,6 +1,14 @@
 # EduMIPS64 ChangeLog
 
-## 1.2.8 (NLMS)
+## 1.2.9 (08/11/2020) - Baby Shark
+### Added
+- Unit tests for multiple instructions (PR 488)
+
+### Fixed
+- LUI modifies static field of `ALU_IType` breaking the simulator every time it is run (Issue #501)
+- Character encoding issues in manual (Issue #489)
+
+## 1.2.8 (22/10/2020) - NLMS
 ### Added
 - New experimental command-line interface, started with the --headless command-line option
 - Windows installer (MSI)
