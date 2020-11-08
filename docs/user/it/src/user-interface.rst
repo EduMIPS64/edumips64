@@ -288,21 +288,3 @@ Nella modalità di debugging è disponibile una nuova finestra, la finestra
 Debug, che mostra il resoconto delle attività interne di  EduMIPS64. Tale
 finestra non è utile per l'utente finale, è stata infatti ideata per
 poter essere utilizzata dagli sviluppatori di EduMIPS64.
-
-Eseguire EduMIPS64
-------------------
-Il file `.jar` di EduMIPS64 può funzionare sia come file .jar
-eseguibile che come applet, quindi può essere eseguito in entrambi i modi,
-che richiedono il Java Runtime Environment, versione 5 o successiva.
-
-Per eseguire il file come applicazione a sè stante, l'eseguibile
-`java` deve essere avviato nel seguente modo: `java -jar
-edumips64-version.jar`, dove la stringa `version` deve essere
-sostituita con la versione attuale del simulatore.  Su alcuni sistemi,
-potrebbe essere possibile eseguire il programma semplicemente con un click sul
-file `.jar`.
-
-Per eseguire il file come applet deve essere utilizzato il tag
-`<applet>`. Il sito web di EduMIPS64 presenta una pagina già contenente
-l'applet, in modo tale che chiunque possa eseguire il programma senza il
-problema dell'utilizzo da linea di comando.
