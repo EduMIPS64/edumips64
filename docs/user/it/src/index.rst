@@ -13,7 +13,7 @@ stalli siano gestiti dalla CPU, lo stato di registri e memoria e molto altro.
 È classificabile sia come simulatore, sia come debugger visuale.
 
 Il sito web del progetto è http://www.edumips.org, ed il codice sorgente è
-disponibile presso http://github.com/lupino3/edumips64. Per segnalare bug o
+disponibile presso http://github.com/EduMIPS64/edumips64. Per segnalare bug o
 inviare suggerimenti sul simulatore, è possibile aprire una issue su github o
 inviare una mail a bugs@edumips.org.
 

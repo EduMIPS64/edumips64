@@ -1,7 +1,7 @@
     ; An EduMIPS64 test program kindly donated by Gerardo Puga in Issue #132.
-    ; https://github.com/lupino3/edumips64/issues/132
+    ; https://github.com/EduMIPS64/edumips64/issues/132
     ; Adapted by Andrea Spadaccini by removing all compilation warnings.
-    
+
 	; ARQUITECTURA DE COMPUTADORES II, 2014
 	; TP 02: Segmented Architectures
 	;
@@ -22,14 +22,14 @@ result: .word32 0
 	; ---
 
 	.text
-	
+
 	; Initialize the main loop index
 	daddi R5,R0,1
 
 	; Load the start address of the results table on R4
 	daddi R4,R0,result
 
-numloop: 
+numloop:
         ; Initialize R2 with the first number of the sequence
 	dadd R2,R0,R5
 
@@ -39,14 +39,14 @@ numloop:
 	; -----------------
 
 	; Start of the loop that calculates the Hailstone sequence
-hailloop: 
+hailloop:
 
 	; Is the current number even or odd?
 	andi R1,R2,1
 	bne  R1,r0,odd   ; if odd, then go to "odd"
 
 	; -----------------
-	
+
 	; Even numbers
 even:
 	; Divide by two
@@ -66,7 +66,7 @@ odd:
 
 	; -----------------
 anynumber:
-	
+
 	; If the new number is higher than the maximum, this is the new maximum
 	dsub R1,R3,R2      ; Calculate the difference between the current sequence number and the max, put it in R1
 	dsrl R1,R1,31      ; Remove all bits, but the one that contains the sign of the result
@@ -83,7 +83,7 @@ skipnewmax:
 	sw R3,0(R4)
 
 	; Increment the table index
-	daddi R4,R4,4 
+	daddi R4,R4,4
 
 	; Increment the current main loop index
 	daddi R5,R5,1

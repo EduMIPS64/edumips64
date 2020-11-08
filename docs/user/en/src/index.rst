@@ -14,7 +14,7 @@ status of registers and memory and much more. It is both a simulator and a
 visual debugger.
 
 The website for the project is http://www.edumips.org, and the code is hosted
-at http://github.com/lupino3/edumips64. If you find any bugs, or have any
+at http://github.com/EduMIPS64/edumips64. If you find any bugs, or have any
 suggestion for improving the simulator, please open an issue on github or send
 an email at bugs@edumips.org.
 
