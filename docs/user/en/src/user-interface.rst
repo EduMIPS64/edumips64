@@ -274,19 +274,3 @@ The `--debug` flag has the effect to activate Debug mode. In this mode, a new
 frame is available, the Debug frame, and it shows the log of internal
 activities of EduMIPS64. It is not useful for the end user, it is meant to be
 used by EduMIPS64 developers.
-
-Running EduMIPS64
------------------
-The EduMIPS64 `.jar` file can act both as a stand-alone executable
-`.jar` file and as an applet, so it can be executed in both ways. Both
-methods need the Java Runtime Environment, version 5 or later.
-
-To run it as a stand-alone application, the `java` executable must be
-issued in this way: `java -jar edumips64-version.jar`, where the
-`version` string must be replaced with the actual version of the
-simulator. On some systems, you may be able to execute it by just clicking on
-the `.jar` file.
-
-To embed it in an HTML, the `<applet>` tag must be used. The EduMIPS64 web
-site contains a page that already contains the applet, so
-that everyone can execute it without the hassle of using the command line.
