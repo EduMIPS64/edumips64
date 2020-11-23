@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack serve",
-    "build": "webpack",
+    "build": "webpack"
   },
   "keywords": [],
   "author": "Andrea Spadaccini",
