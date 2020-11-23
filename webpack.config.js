@@ -1,14 +1,26 @@
 const path = require('path');
 const webpack = require('webpack');
+
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-
 const GitRevisionPlugin = require('git-revision-webpack-plugin');
 
 const outputPath = path.resolve(__dirname, 'build/gwt/war/edumips64');
 const staticPath = path.resolve(__dirname, 'src/webapp/static');
 
+const copyPlugin = new CopyPlugin({
+  patterns: [{ from: staticPath, to: outputPath }],
+});
 const grPlugin = new GitRevisionPlugin();
+const versionsPlugin = new webpack.DefinePlugin({
+  VERSION: JSON.stringify(grPlugin.version()),
+  COMMITHASH: JSON.stringify(grPlugin.commithash()),
+  BRANCH: JSON.stringify(grPlugin.branch()),
+});
+const monacoPlugin = new MonacoWebpackPlugin({
+  languages: ['mips'],
+  features: ['comment', 'foldng', 'hover'],
+});
 
 module.exports = {
   entry: './src/webapp/index.js',
@@ -26,49 +38,8 @@ module.exports = {
   },
   devServer: {
     contentBase: outputPath,
+    publicPath: outputPath,
+    open: true,
   },
-  plugins: [
-    new MonacoWebpackPlugin({
-      languages: ['mips'],
-      // Only pack a few features for the Monaco Editor.
-      // The removed ones are kept commented as a reminder of what was disabled.
-      features: [
-        //'clipboard',
-        //'codeAction',
-        //'codelens',
-        'comment',
-        //'contextmenu',
-        //'coreCommands',
-        //'cursorUndo',
-        //'dnd',
-        //'find',
-        'folding',
-        //'format',
-        //'gotoError',
-        //'gotoLine',
-        'hover',
-        //'iPadShowKeyboard',
-        //'inPlaceReplace',
-        //'inspectTokens',
-        //'linesOperations',
-        //'links',
-        //'multicursor',
-        //'referenceSearch',
-        //'suggest',
-        //'transpose',
-        //'wordHighlighter',
-        //'wordOperations',
-        //'wordPartOperations',
-      ],
-    }),
-    new CopyPlugin({
-      patterns: [{ from: staticPath, to: outputPath }],
-    }),
-    grPlugin,
-    new webpack.DefinePlugin({
-      VERSION: JSON.stringify(grPlugin.version()),
-      COMMITHASH: JSON.stringify(grPlugin.commithash()),
-      BRANCH: JSON.stringify(grPlugin.branch()),
-    }),
-  ],
+  plugins: [monacoPlugin, copyPlugin, grPlugin, versionsPlugin],
 };
