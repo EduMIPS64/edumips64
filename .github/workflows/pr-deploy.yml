@@ -4,13 +4,6 @@ on:
   pull_request:
     branches:
       - master
-    paths:
-      - 'src/main/java/org/edumips64/client/**'
-      - 'src/webapp/**'
-      - '.babelrc'
-      - 'package.json'
-      - 'package.json.lock'
-      - 'webpack.config.js'
 
 jobs:
   deploy-ui:
