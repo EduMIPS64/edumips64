@@ -2,7 +2,7 @@ package org.edumips64;
 
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
-import org.edumips64.utils.JavaPrefsConfigStore;
+import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.cli.Cli;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,14 +18,12 @@ import static org.junit.Assert.*;
 
 public class CliRunnerTest {
     private Cli cli;
-    private ConfigStore cfg;
 
     @Before
     public void setUp() {
-        cfg = new JavaPrefsConfigStore(ConfigStore.defaults);
+        var cfg = new InMemoryConfigStore(ConfigStore.defaults);
         CurrentLocale.setConfig(cfg);
         cli = new Cli(cfg);
-        Locale.setDefault(Locale.ENGLISH);
     }
 
     @Test
