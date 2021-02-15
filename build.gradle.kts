@@ -27,7 +27,7 @@ dependencies {
 
     implementation("javax.help:javahelp:2.0.05")
     implementation("info.picocli:picocli:4.6.1")
-    testImplementation("junit:junit:4.13.1")
+    testImplementation("junit:junit:4.13.2")
 }
 
 application {
