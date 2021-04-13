@@ -39,7 +39,7 @@ python {
 }
 
 application {
-  mainClassName = "org.edumips64.Main"  
+  mainClass.set("org.edumips64.Main")
 }
 val codename: String by project
 val version: String by project
@@ -170,7 +170,7 @@ tasks.jar {
 
     })
     manifest {
-        attributes["Main-Class"] = application.mainClassName
+        attributes["Main-Class"] = application.mainClass.get()
         from(sharedManifest)
     }
     dependsOn("copyHelp")
@@ -189,7 +189,7 @@ tasks.create<Jar>("noHelpJar"){
         configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") }.map { println("Adding dependency " + it.name); zipTree(it) }
     })
     manifest {
-        attributes["Main-Class"] = application.mainClassName
+        attributes["Main-Class"] = application.mainClass.get()
         from(sharedManifest)
     }
 }
