@@ -1,2 +1,7 @@
+# NOTE: those dependencies are duplicated in the Gradle build file because the
+# Gradle module for Python does not support reading requirements from an external
+# file, and having an external file makes it possible to use automatic dependency
+# upgrades, with the caveat that the Gradle build file needs to be manually kept
+# in sync with this file.
 sphinx==3.5.4
 rst2pdf==0.98
