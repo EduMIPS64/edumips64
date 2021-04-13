@@ -2,7 +2,8 @@
  * EduMIPS64 Gradle build configuration
  */
 import java.time.LocalDateTime
-import org.gradle.internal.os.OperatingSystem
+import ru.vyarus.gradle.plugin.python.task.PythonTask
+import ru.vyarus.gradle.plugin.python.PythonExtension.Scope.VIRTUALENV
 
 plugins {
     java
@@ -13,6 +14,7 @@ plugins {
     id ("jacoco")
     id ("com.dorongold.task-tree") version "1.5"
     id ("us.ascendtech.gwt.classic") version "0.5.1"
+    id ("ru.vyarus.use-python") version "2.3.0"
 }
 
 repositories {
@@ -30,6 +32,12 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 }
 
+python {
+    pip("sphinx:3.5.4")
+    pip("rst2pdf:0.98")
+    scope = VIRTUALENV
+}
+
 application {
   mainClassName = "org.edumips64.Main"  
 }
@@ -45,35 +53,31 @@ tasks.compileJava {
 /* 
  * Documentation tasks. To avoid dependency on GNU Make, these tasks duplicate the commands run by the Sphinx makefiles.
  */
-fun buildDocsCmd(language: String, type: String) : List<String> {
+fun buildDocsCmd(language: String, type: String) : String {
     val baseDir = "${buildDir}/docs/${language}"
-    val pythonCmd = when (OperatingSystem.current()) {
-        OperatingSystem.WINDOWS -> "py -3"
-        else -> "python3"
-    }
-    val cmd = "${pythonCmd} -m sphinx -N -a -E . ${baseDir}/${type} -b ${type} -d ${baseDir}/doctrees"
-    return cmd.split(" ")
+    return "-m sphinx -N -a -E . ${baseDir}/${type} -b ${type} -d ${baseDir}/doctrees"
 }
 
-tasks.create<Exec>("htmlDocsEn"){
-    workingDir = File("${projectDir}/docs/user/en/src")
-    commandLine(buildDocsCmd("en", "html"))
+tasks.register<PythonTask>("htmlDocsEn") {
+    workDir = "${projectDir}/docs/user/en/src"
+    command = buildDocsCmd("en", "html")
 }
 
-tasks.create<Exec>("htmlDocsIt") {
-    workingDir = File("${projectDir}/docs/user/it/src")
-    commandLine(buildDocsCmd("it", "html"))
+tasks.register<PythonTask>("htmlDocsIt") {
+    workDir = "${projectDir}/docs/user/en/src"
+    command = buildDocsCmd("it", "html")
 }
 
-tasks.create<Exec>("pdfDocsEn") {
-    workingDir = File("${projectDir}/docs/user/en/src")
-    commandLine(buildDocsCmd("en", "pdf"))
+tasks.register<PythonTask>("pdfDocsEn") {
+    workDir = "${projectDir}/docs/user/en/src"
+    command = buildDocsCmd("en", "pdf")
 }
 
-tasks.create<Exec>("pdfDocsIt") {
-    workingDir = File("${projectDir}/docs/user/it/src")
-    commandLine(buildDocsCmd("it", "pdf"))
+tasks.register<PythonTask>("pdfDocsIt") {
+    workDir = "${projectDir}/docs/user/it/src"
+    command = buildDocsCmd("it", "pdf")
 }
+
 
 // Catch-all task for documentation
 tasks.create<GradleBuild>("allDocs") {

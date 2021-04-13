@@ -20,23 +20,16 @@
 
 In order to compile EduMIPS64, you need the Java JDK version 11 or above.
 
-To build the user documentation, you'll need:
-
-- Python 3
-- Sphinx (http://www.sphinx-doc.org/) version 2.3.1 or above
-- rst2pdf (for the PDF files) version 0.9.6 or above
-
-You can install the Python dependencies using PIP:
-
-```
-$ pip3 install -r docs/requirements.txt
-```
+To build the user documentation, you'll need Python 3 with pip.
 
 [Gradle](https://gradle.org/) will download the following dependencies:
 
 - JUnit
 - JavaHelp
 - GWT (experimental)
+- Python dependencies to build the documentation (they'll be installed in a virtual environment)
+  - Sphinx (http://www.sphinx-doc.org/) version 3.4.3 or above
+  - rst2pdf (for the PDF files) version 0.98 or above
 
 To generate an installable Windows MSI package (using the Gradle `msi` task), you will need 
 JDK 14+ and the WiX toolkit.
