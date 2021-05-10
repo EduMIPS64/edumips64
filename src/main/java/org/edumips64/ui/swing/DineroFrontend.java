@@ -512,7 +512,7 @@ class DineroCacheOptions {
 	this.type = type;
 	this.level = level;
   }
-  
+
   public String toString() {
 	// creates empty builder, capacity 16
 	StringBuilder cacheConfig = new StringBuilder();
@@ -536,6 +536,8 @@ class DineroCacheOptions {
 	}
 
 	catch (Exception e) {
+		e.printStackTrace();
+		System.out.println("- ERROR: in building dinero command line: " + e.toString());
 		return("");
 	}
 	}
