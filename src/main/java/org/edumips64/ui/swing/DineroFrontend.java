@@ -394,106 +394,106 @@ public class DineroFrontend extends JDialog {
 /** Panel with all the necessary controls to modify the options of a Cache.
  */
 class DineroSingleCachePanel extends JPanel {
-	private DineroCacheOptions dco;
-	private JComboBox<String> size, sizeUnit, bsize, bsizeUnit;
-	private JTextField assoc;
-	private JCheckBox ccc;
-	private JLabel cacheSizeLabel, cacheSizeUnitLabel, blockSizeLabel, bsizeUnitLabel, assocLabel, cccLabel;
+  private DineroCacheOptions dco;
+  private JComboBox<String> size, sizeUnit, bsize, bsizeUnit;
+  private JTextField assoc;
+  private JCheckBox ccc;
+  private JLabel cacheSizeLabel, cacheSizeUnitLabel, blockSizeLabel, bsizeUnitLabel, assocLabel, cccLabel;
 
-	public DineroSingleCachePanel(char type, int level) {
-	  dco = new DineroCacheOptions(type, level);
+  public DineroSingleCachePanel(char type, int level) {
+	dco = new DineroCacheOptions(type, level);
 
-	  final String[] sizes = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "512"};
-	  final String[] units = {" ", "k", "M", "G"};
+	final String[] sizes = {"1", "2", "4", "8", "16", "32", "64", "128", "256", "512"};
+	final String[] units = {" ", "k", "M", "G"};
 
-	  size = new JComboBox<String>(sizes);
-	  bsize = new JComboBox<String>(sizes);
+	size = new JComboBox<String>(sizes);
+	bsize = new JComboBox<String>(sizes);
 
-	  sizeUnit = new JComboBox<String>(units);
-	  bsizeUnit = new JComboBox<String>(units);
+	sizeUnit = new JComboBox<String>(units);
+	bsizeUnit = new JComboBox<String>(units);
 
-	  assoc = new JTextField();
-	  ccc = new JCheckBox();
+	assoc = new JTextField();
+	ccc = new JCheckBox();
 
-	  cacheSizeLabel = new JLabel("Cache size");
-	  cacheSizeUnitLabel = new JLabel("Unit (Byte)");
-	  blockSizeLabel = new JLabel("Block size");
-	  bsizeUnitLabel = new JLabel("Unit (Byte)");
-	  assocLabel = new JLabel("N way set associative");
-	  cccLabel = new JLabel("CCC Enable");
+	cacheSizeLabel = new JLabel("Cache size");
+	cacheSizeUnitLabel = new JLabel("Unit (Byte)");
+	blockSizeLabel = new JLabel("Block size");
+	bsizeUnitLabel = new JLabel("Unit (Byte)");
+	assocLabel = new JLabel("N way set associative");
+	cccLabel = new JLabel("CCC Enable");
 
-	  size.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e){
-		  //dco.size = String.valueOf(sizeUnit.getSelectedItem());
-		  sizeUnit.setSelectedIndex(0);
-		}
-	  });
-	  size.setSelectedIndex(0);
-
-	  bsize.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e){
-		  //dco.bsize = String.valueOf(bsize.getSelectedItem());
-		  bsizeUnit.setSelectedIndex(0);
-	    }
-	  });
-	  bsize.setSelectedIndex(0);
-	
-	  sizeUnit.addActionListener(new ActionListener(){
-	    public void actionPerformed(ActionEvent e) {
-		  String sizeMsg = String.valueOf(size.getSelectedItem());
-		  dco.size = sizeMsg + String.valueOf(sizeUnit.getSelectedItem());
-	    }
-	  });
+	size.addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e){
+	  //dco.size = String.valueOf(sizeUnit.getSelectedItem());
 	  sizeUnit.setSelectedIndex(0);
-
-	  bsizeUnit.addActionListener(new ActionListener(){
-	    public void actionPerformed(ActionEvent e){
-		  String bsizeMsg = String.valueOf(bsize.getSelectedItem());
-		  dco.bsize = bsizeMsg + String.valueOf(bsizeUnit.getSelectedItem());
-	    }
-	  });
-	  bsizeUnit.setSelectedIndex(0);
-
-	  //adding components to panel layout
-	  setBorder(BorderFactory.createTitledBorder("Level " + level + " cache (" + type + ")"));
-	  setLayout(new GridLayout(2, 6, 1, 1));
-	  add(cacheSizeLabel);
-	  add(cacheSizeUnitLabel);
-	  add(blockSizeLabel);
-	  add(bsizeUnitLabel);
-	  add(assocLabel);
-	  add(cccLabel);
-	  add(size);
-	  add(sizeUnit);
-	  add(bsize);
-	  add(bsizeUnit);
-	  add(assoc);
-	  add(ccc);
-
-	  //Default dimension set for panel
-	  setPreferredSize(new Dimension(850, 80));
-	  setMaximumSize(new Dimension(850, 90));
-	  setMinimumSize(new Dimension(850, 50));
-	  }
-
-	  //Passes Dinero command parameters with proper syntax
-	  public String toString(){
-		ccc.addItemListener(new ItemListener(){
-		  public void itemStateChanged(ItemEvent e) {
-			Boolean cccFlag =  ccc.isSelected();
-			dco.ccc = cccFlag;
-		  }
-		});
-
-		//Implements try and catch method to only allow numerical value only
-		try{
-		  dco.assoc = Integer.parseInt(assoc.getText());
-		}
-		catch(NumberFormatException exception){
-		  dco.assoc = 0;
-		}
-		return dco.toString();
 	}
+	});
+	size.setSelectedIndex(0);
+
+	bsize.addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e){
+	  //dco.bsize = String.valueOf(bsize.getSelectedItem());
+	  bsizeUnit.setSelectedIndex(0);
+	}
+	});
+	bsize.setSelectedIndex(0);
+
+	sizeUnit.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e) {
+	  String sizeMsg = String.valueOf(size.getSelectedItem());
+	  dco.size = sizeMsg + String.valueOf(sizeUnit.getSelectedItem());
+	}
+	});
+	sizeUnit.setSelectedIndex(0);
+
+	bsizeUnit.addActionListener(new ActionListener(){
+	public void actionPerformed(ActionEvent e){
+	  String bsizeMsg = String.valueOf(bsize.getSelectedItem());
+	  dco.bsize = bsizeMsg + String.valueOf(bsizeUnit.getSelectedItem());
+	}
+	});
+	bsizeUnit.setSelectedIndex(0);
+
+	//adding components to panel layout
+	setBorder(BorderFactory.createTitledBorder("Level " + level + " cache (" + type + ")"));
+	setLayout(new GridLayout(2, 6, 1, 1));
+	add(cacheSizeLabel);
+	add(cacheSizeUnitLabel);
+	add(blockSizeLabel);
+	add(bsizeUnitLabel);
+	add(assocLabel);
+	add(cccLabel);
+	add(size);
+	add(sizeUnit);
+	add(bsize);
+	add(bsizeUnit);
+	add(assoc);
+	add(ccc);
+
+	//Default dimension set for panel
+	setPreferredSize(new Dimension(850, 80));
+	setMaximumSize(new Dimension(850, 90));
+	setMinimumSize(new Dimension(850, 50));
+	}
+
+	//Passes Dinero command parameters with proper syntax
+	public String toString(){
+	ccc.addItemListener(new ItemListener(){
+	  public void itemStateChanged(ItemEvent e) {
+	  Boolean cccFlag =  ccc.isSelected();
+	  dco.ccc = cccFlag;
+	  }
+	});
+
+	//Implements try and catch method to only allow numerical value only
+	try{
+	  dco.assoc = Integer.parseInt(assoc.getText());
+	}
+	catch(NumberFormatException exception){
+	  dco.assoc = 0;
+	}
+	return dco.toString();
+  }
 }
 
 /** Class holding the config options for a Cache.
