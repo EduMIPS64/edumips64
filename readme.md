@@ -35,6 +35,8 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 🧪 The proof-of-concept JS web application (GWT compilation + JS UI) is available at https://web.edumips.org.
 
+💬 Find us on IRC @ Libera.chat - #edumips64. Web client: https://web.libera.chat/
+
 ## Known distribution packages
 
 [Ubuntu Snap](https://snapcraft.io/edumips64): find EduMIPS64 in the Ubuntu app store or install via CLI (`snap install edumips64`).
