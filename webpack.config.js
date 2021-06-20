@@ -3,7 +3,8 @@ const webpack = require('webpack');
 
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const GitRevisionPlugin = require('git-revision-webpack-plugin');
+const { GitRevisionPlugin } = require('git-revision-webpack-plugin')
+
 
 const outputPath = path.resolve(__dirname, 'build/gwt/war/edumips64');
 const staticPath = path.resolve(__dirname, 'src/webapp/static');
