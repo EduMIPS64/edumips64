@@ -37,7 +37,7 @@ jobs:
       - name: Run unit tests
         run: ./gradlew check
       - name: Codecov
-        uses: codecov/codecov-action@v1.5.0
+        uses: codecov/codecov-action@v1.5.2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -51,18 +51,18 @@ jobs:
 
       # Upload artifacts (manuals and JARs)
       - name: Upload English Manual PDF
-        uses: actions/upload-artifact@v2.2.3
+        uses: actions/upload-artifact@v2.2.4
         with:
           name: English manual (PDF)
           path: ./build/docs/en/pdf/EduMIPS64.pdf
       - name: Upload Italian Manual PDF
-        uses: actions/upload-artifact@v2.2.3
+        uses: actions/upload-artifact@v2.2.4
         with:
           name: Italian manual (PDF)
           path: ./build/docs/it/pdf/EduMIPS64.pdf
 
       - name: Upload JAR
-        uses: actions/upload-artifact@v2.2.3
+        uses: actions/upload-artifact@v2.2.4
         with:
           name: JAR
           path: ./build/libs/edumips64-${{ steps.read_version.outputs.value }}.jar
