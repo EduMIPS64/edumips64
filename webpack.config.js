@@ -24,7 +24,9 @@ const monacoPlugin = new MonacoWebpackPlugin({
 });
 
 module.exports = {
+  mode: 'development',
   entry: './src/webapp/index.js',
+  devtool: 'inline-source-map',
   output: {
     path: outputPath,
     filename: 'ui.js',
@@ -39,8 +41,6 @@ module.exports = {
   },
   devServer: {
     contentBase: outputPath,
-    publicPath: outputPath,
-    open: true,
   },
   plugins: [monacoPlugin, copyPlugin, grPlugin, versionsPlugin],
 };
