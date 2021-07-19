@@ -45,3 +45,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           msg: 'Test URL: https://web.edumips.org/${{ github.event.pull_request.number }}'
+      - name: Run web tests against deployed code
+        uses: nick-invision/retry@v2
+        env:
+          PLAYWRIGHT_TARGET_URL: 'https://web.edumips.org/${{ github.event.pull_request.number }}'
+        with:
+          max_attempts: 10
+          timeout_minutes: 2
+          retry_on: error
+          command: npm run test
+

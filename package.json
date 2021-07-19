@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack serve",
-    "build": "webpack"
+    "build-dbg": "webpack",
+    "build": "webpack --mode production",
+    "test": "npx playwright test"
   },
   "keywords": [],
   "author": "Andrea Spadaccini",
@@ -26,6 +28,7 @@
     "@babel/preset-env": "7.14.7",
     "@babel/preset-react": "7.14.5",
     "@babel/runtime": "7.14.6",
+    "@playwright/test": "^1.12.3",
     "babel-eslint": "10.1.0",
     "babel-loader": "8.2.2",
     "copy-webpack-plugin": "9.0.1",
@@ -42,6 +45,7 @@
     "eslint-plugin-standard": "4.1.0",
     "file-loader": "6.2.0",
     "git-revision-webpack-plugin": "5.0.0",
+    "playwright": "^1.12.3",
     "prettier": "2.3.2",
     "style-loader": "3.1.0",
     "webpack": "5.45.1",

@@ -41,6 +41,8 @@ module.exports = {
   },
   devServer: {
     contentBase: outputPath,
+    open: true,
+    openPage: 'webpack-dev-server/'
   },
   plugins: [monacoPlugin, copyPlugin, grPlugin, versionsPlugin],
 };
