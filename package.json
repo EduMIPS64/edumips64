@@ -29,8 +29,8 @@
     "babel-eslint": "10.1.0",
     "babel-loader": "8.2.2",
     "copy-webpack-plugin": "9.0.1",
-    "css-loader": "5.2.6",
-    "eslint": "7.30.0",
+    "css-loader": "5.2.7",
+    "eslint": "7.31.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-config-standard": "16.0.3",
     "eslint-plugin-import": "2.23.4",
@@ -43,8 +43,8 @@
     "file-loader": "6.2.0",
     "git-revision-webpack-plugin": "5.0.0",
     "prettier": "2.3.2",
-    "style-loader": "3.0.0",
-    "webpack": "5.44.0",
+    "style-loader": "3.1.0",
+    "webpack": "5.45.1",
     "webpack-cli": "4.7.2",
     "webpack-dev-server": "3.11.2"
   }
