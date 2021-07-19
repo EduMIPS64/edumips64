@@ -51,6 +51,7 @@ jobs:
           PLAYWRIGHT_TARGET_URL: 'https://web.edumips.org/${{ github.event.pull_request.number }}'
         with:
           max_attempts: 10
+          timeout_minutes: 2
           retry_on: error
           command: npm run test
 
