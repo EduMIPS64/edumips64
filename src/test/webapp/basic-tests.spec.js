@@ -1,9 +1,10 @@
 const { test, expect } = require('@playwright/test');
 
-test('test', async ({ page }) => {
+const targetUri = process.env.PLAYWRIGHT_TARGET_URL || "http://localhost:8080";
 
-  // Go to http://localhost:8080/
-  await page.goto('http://localhost:8080/');
+test('test', async ({ page }) => {
+  console.log("Running tests against", targetUri);
+  await page.goto(targetUri);
 
   // Ensure basic elements are available.
   await page.waitForSelector('#load-button');
