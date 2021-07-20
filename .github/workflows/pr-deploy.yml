@@ -9,15 +9,10 @@ jobs:
   deploy-ui:
     runs-on: ubuntu-latest
     steps:
-      - name: Start deployment
-        uses: bobheadxi/deployments@v0.6.0
-        id: deployment
-        with:
-          step: start
-          token: ${{ secrets.GITHUB_TOKEN }}
-          env: ${{ github.event.number || github.ref }}
-          ref: ${{ github.head_ref || github.ref }}
+      # Check out code.
       - uses: actions/checkout@v2
+      
+      # Set up JDK, Gradle and build the Java code.
       - name: Set up JDK 11
         uses: actions/setup-java@v2
         with:
@@ -27,12 +22,24 @@ jobs:
         run: chmod +x gradlew
       - name: Build Web UI
         run: ./gradlew war
+
+      # Set up Node.JS and build the JS code.
       - name: Set up Node.JS 12
         uses: actions/setup-node@v2
         with:
           node-version: '12.x'
       - run: npm install
       - run: npm run build
+
+      # Deploy the code on Github Pages.
+      - name: Start deployment
+        uses: bobheadxi/deployments@v0.6.0
+        id: deployment
+        with:
+          step: start
+          token: ${{ secrets.GITHUB_TOKEN }}
+          env: ${{ github.event.number || github.ref }}
+          ref: ${{ github.head_ref || github.ref }}
       - name: Copy files to run directory
         run: mkdir -p pr/${{ github.event.pull_request.number }} && cp -r build/gwt/war/edumips64/* pr/${{ github.event.pull_request.number }}
       - name: Deploy
@@ -56,12 +63,8 @@ jobs:
           status: ${{ job.status }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           env_url: https://web.edumips.org/${{github.event.pull_request.number}}
-      - name: Comment on PR
-        uses: unsplash/comment-on-pr@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          msg: 'Test URL: https://web.edumips.org/${{ github.event.pull_request.number }}'
+
+      # Run tests against the deployed code.
       - name: Run web tests against deployed code
         uses: nick-invision/retry@v2
         env:
