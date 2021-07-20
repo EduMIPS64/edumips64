@@ -25,6 +25,13 @@ jobs:
           node-version: '12.x'
       - run: npm install
       - run: npm run build
+      - name: Start deployment
+        uses: bobheadxi/deployments@v0.6.0
+        id: deployment
+        with:
+          step: start
+          token: ${{ secrets.GITHUB_TOKEN }}
+          env: prod
       - name: Deploy
         if: success()
         uses: crazy-max/ghaction-github-pages@v2
@@ -37,3 +44,12 @@ jobs:
           fqdn: web.edumips.org
         env:
           GH_PAT: ${{ secrets.PAT_WEBUI }}
+      - name: Update deployment status
+        uses: bobheadxi/deployments@v0.6.0
+        if: always() && github.head_ref
+        with:
+          step: finish
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          env_url: https://web.edumips.org
