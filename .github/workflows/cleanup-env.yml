@@ -1,0 +1,20 @@
+name: Clean up environment on PR closure
+
+on:
+  pull_request:
+    types: [ closed ]
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+    # 1. TODO: remove directory from the web.edumips.org github repo
+    # ...
+
+    # 2. Deactivate environment
+    - name: Deactivate environment
+      uses: bobheadxi/deployments@v0.4.3
+      with:
+        step: deactivate-env
+        token: ${{ secrets.GITHUB_TOKEN }}
+        env: pr/${{ github.event.number }}
