@@ -51,4 +51,4 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 ## Related projects
 
-[QtMips](https://github.com/cvut/QtMips) educational MIPS CPU based on the Qt toolkit.
+[QtMips](https://github.com/cvut/QtMips) educational MIPS CPU based on the Qt toolkit. 
