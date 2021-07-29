@@ -38,7 +38,8 @@ jobs:
         with:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
-          env: pr/${{ github.event.number || github.ref }}
+          env: ${{ github.event.pull_request.number }}
+          ref: ${{ github.head_ref }}
       - name: Copy files to run directory
         run: mkdir -p pr/${{ github.event.pull_request.number }} && cp -r build/gwt/war/edumips64/* pr/${{ github.event.pull_request.number }}
       - name: Deploy
