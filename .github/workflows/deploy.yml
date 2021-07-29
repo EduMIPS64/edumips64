@@ -32,6 +32,7 @@ jobs:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
           env: prod
+          ref: ${{ github.head_ref }}
       - name: Deploy
         if: success()
         uses: crazy-max/ghaction-github-pages@v2
