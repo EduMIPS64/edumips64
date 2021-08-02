@@ -1,15 +1,22 @@
-name: PR CI
+name: CI
 
 on:
   pull_request:
     branches:
       - master
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 0 * * *'
+
 
 jobs:
   build-desktop:
-    name: Build desktop app and docs
+    name: Build desktop application and docs
     runs-on: ubuntu-latest
     steps:
+      # Set up Java development environment.
       - uses: actions/checkout@v2
       - name: Set up JDK 11
         uses: actions/setup-java@v2
@@ -18,8 +25,8 @@ jobs:
           distribution: 'adopt'
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Install docs dependencies
-        run: pip3 install -r docs/requirements.txt -U
+
+      # Read the application version to use it in the name of the JAR.
       - name: Read version from gradle.properties
         id: read_version
         uses: christian-draeger/read-properties@1.0.1
@@ -38,10 +45,11 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       # Build docs (PDF and HTML for the in-app help)
+      # The Python dependencies are fetched by Gradle.
       - name: Build all docs
         run: ./gradlew allDocs
 
-      # Build JAR files.
+      # Build JAR file.
       - name: Build JAR
         run: ./gradlew jar
 
@@ -64,9 +72,11 @@ jobs:
           path: ./build/libs/edumips64-${{ steps.read_version.outputs.value }}.jar
 
   build-web:
-    name: Build web app
+    name: Build web application
     runs-on: ubuntu-latest
     steps:
+      # Set up JDK (necessary for the core that is cross-compiled to JS)
+      # and Node.JS (for the) web app itself.
       - uses: actions/checkout@v2
       - name: Set up JDK 11
         uses: actions/setup-java@v2
@@ -75,52 +85,82 @@ jobs:
           distribution: 'adopt'
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build Web UI
+      - name: Build JS Worker (Java → JS)
         run: ./gradlew war
       - name: Set up Node.JS 12
         uses: actions/setup-node@v2
         with:
           node-version: '12.x'
-      - run: npm install
-      - run: npm run build
+      - name: Install JS dependencies
+        run: npm install
 
+      # Build JS application and upload artifacts for subsequent steps.
+      - name: Build JS application
+        run: npm run build
       - uses: actions/upload-artifact@v2
+        name: Upload web application artifacts
         with:
           name: web
           path: build/gwt/war/edumips64
   
   deploy-web:
-    name: Deploy web app
+    name: Deploy web application
     runs-on: ubuntu-latest
     needs: build-web
     steps:
+      # This step behaves differently in PRs and on push to master / cron.
+      # Set up environment variables according to the triggering event.
+      - name: Set PR environment variables
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          echo "DEPLOYMENT_ENV=${{github.event.pull_request.number}}" >> $GITHUB_ENV
+          echo "PUSH_DIR=pr/" >> $GITHUB_ENV
+          echo "COMMIT_MESSAGE=Deploy code for PR ${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          echo "ENV_URL=https://web.edumips.org/${{github.event.pull_request.number}}" >> $GITHUB_ENV
+      - name: Set master push environment variables
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          echo "DEPLOYMENT_ENV=prod" >> $GITHUB_ENV
+          echo "PUSH_DIR=build/gwt/war/edumips64" >> $GITHUB_ENV
+          echo "COMMIT_MESSAGE=Update Web Frontend @ ${{ github.sha }}" >> $GITHUB_ENV
+          echo "ENV_URL=https://web.edumips.org" >> $GITHUB_ENV
+
+      # Download web application built in 'build-web'
       - uses: actions/download-artifact@v2
+        name: Download web application artifacts
         with:
           name: web
           path: build/gwt/war/edumips64
-      # Deploy the code on Github Pages.
+
+      # Mark the deployment as started (allows the PR to display "Deployment started" messages.)
       - name: Start deployment
         uses: bobheadxi/deployments@v0.6.0
         id: deployment
         with:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
-          env: ${{ github.event.pull_request.number }}
+          env: ${{ env.DEPLOYMENT_ENV }}
           ref: ${{ github.head_ref }}
+
+      # Deploy the code on Github Pages.
+      # Copy files to a directory to allow pushing to a subdir in the web.edumips.org repo.
       - name: Copy files to run directory
         run: mkdir -p pr/${{ github.event.pull_request.number }} && cp -r build/gwt/war/edumips64/* pr/${{ github.event.pull_request.number }}
-      - name: Deploy
+        if: ${{ github.event_name == 'pull_request' }}
+      - name: Deploy web application
         if: success()
         uses: crazy-max/ghaction-github-pages@v2
         with:
           target_branch: master
-          build_dir: pr/
+          build_dir: ${{ env.PUSH_DIR }}
           repo: EduMIPS64/web.edumips.org
           keep_history: true
-          commit_message: Deploy code for PR ${{ github.event.pull_request.number }}
+          commit_message: ${{ env.COMMIT_MESSAGE }}
           fqdn: web.edumips.org
         env:
           GH_PAT: ${{ secrets.PAT_WEBUI }}
+
+      # Mark the deployment as succeeded or failed.
       - name: Update deployment status
         uses: bobheadxi/deployments@v0.6.0
         if: always() && github.head_ref
@@ -129,24 +169,35 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           status: ${{ job.status }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-          env_url: https://web.edumips.org/${{github.event.pull_request.number}}
+          env_url: ${{ env.ENV_URL }}
 
   test-web:
-    name: Test web app
+    name: Test web application
     runs-on: ubuntu-latest
     needs: deploy-web
     steps:
+      # This step behaves differently in PRs and on push to master / cron.
+      # Set up environment variables according to the triggering event.
+      - name: Set PR environment variables
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          echo "ENV_URL=https://web.edumips.org/${{github.event.pull_request.number}}" >> $GITHUB_ENV
+      - name: Set master push environment variables
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          echo "ENV_URL=https://web.edumips.org" >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - name: Set up Node.JS 12
         uses: actions/setup-node@v2
         with:
           node-version: '12.x'
-      - run: npm install
+      - name: Install JS dependencies
+        run: npm install
       # Run tests against the deployed code.
       - name: Run web tests against deployed code
         uses: nick-invision/retry@v2
         env:
-          PLAYWRIGHT_TARGET_URL: 'https://web.edumips.org/${{ github.event.pull_request.number }}'
+          PLAYWRIGHT_TARGET_URL: ${{ env.ENV_URL }}
         with:
           max_attempts: 10
           timeout_minutes: 2
