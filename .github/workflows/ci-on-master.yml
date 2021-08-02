@@ -1,9 +1,11 @@
-name: Deploy Web UI
+name: Build all and deploy web UI to web.edumips.org
 
 on:
   push:
     branches:
       - master
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   deploy-ui:
@@ -17,6 +19,12 @@ jobs:
           distribution: 'adopt'
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
+      - name: Build all docs
+        run: ./gradlew allDocs
+      - name: Build JAR
+        run: ./gradlew jar
+      
       - name: Build Web UI
         run: ./gradlew war
       - name: Set up Node.JS 12
@@ -25,6 +33,8 @@ jobs:
           node-version: '12.x'
       - run: npm install
       - run: npm run build
+
+      # Deploy web UI to web.edumips.org.
       - name: Start deployment
         uses: bobheadxi/deployments@v0.6.0
         id: deployment
