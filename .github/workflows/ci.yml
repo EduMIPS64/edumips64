@@ -1,9 +1,15 @@
-name: PR CI
+name: CI
 
 on:
   pull_request:
     branches:
       - master
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 0 * * *'
+
 
 jobs:
   build-desktop:
@@ -101,9 +107,24 @@ jobs:
     name: Deploy web application
     runs-on: ubuntu-latest
     needs: build-web
-    env:
-      deployment-env-name: 
     steps:
+      # This step behaves differently in PRs and on push to master / cron.
+      # Set up environment variables according to the triggering event.
+      - name: Set PR environment variables
+        if: ${{ github.event_name == "pull_request" }}
+        run: |
+          echo "DEPLOYMENT_ENV=${{github.event.pull_request.number}}" >> $GITHUB_ENV
+          echo "PUSH_DIR=pr/" >> $GITHUB_ENV
+          echo "COMMIT_MESSAGE=Deploy code for PR ${{ github.event.pull_request.number }}"
+          echo "ENV_URL=https://web.edumips.org/${{github.event.pull_request.number}}"
+      - name: Set master push environment variables
+        if: ${{ github.event_name != "pull_request" }}
+        run: |
+          echo "DEPLOYMENT_ENV=prod" >> $GITHUB_ENV
+          echo "PUSH_DIR=build/gwt/war/edumips64" >> $GITHUB_ENV
+          echo "COMMIT_MESSAGE=Update Web Frontend @ ${{ github.sha }}"
+          echo "ENV_URL=https://web.edumips.org"
+
       # Download web application built in 'build-web'
       - uses: actions/download-artifact@v2
         name: Download web application artifacts
@@ -111,29 +132,35 @@ jobs:
           name: web
           path: build/gwt/war/edumips64
 
-      # Deploy the code on Github Pages.
+      # Mark the deployment as started (allows the PR to display "Deployment started" messages.)
       - name: Start deployment
         uses: bobheadxi/deployments@v0.6.0
         id: deployment
         with:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
-          env: ${{ github.event.pull_request.number }}
+          env: ${{ env.DEPLOYMENT_ENV }}
           ref: ${{ github.head_ref }}
+
+      # Deploy the code on Github Pages.
+      # Copy files to a directory to allow pushing to a subdir in the web.edumips.org repo.
       - name: Copy files to run directory
         run: mkdir -p pr/${{ github.event.pull_request.number }} && cp -r build/gwt/war/edumips64/* pr/${{ github.event.pull_request.number }}
+        if: ${{ github.event_name == "pull_request" }}
       - name: Deploy web application
         if: success()
         uses: crazy-max/ghaction-github-pages@v2
         with:
           target_branch: master
-          build_dir: pr/
+          build_dir: ${{ env.push_dir }}
           repo: EduMIPS64/web.edumips.org
           keep_history: true
-          commit_message: Deploy code for PR ${{ github.event.pull_request.number }}
+          commit_message: ${{ env.COMMIT_MESSAGE }}
           fqdn: web.edumips.org
         env:
           GH_PAT: ${{ secrets.PAT_WEBUI }}
+
+      # Mark the deployment as succeeded or failed.
       - name: Update deployment status
         uses: bobheadxi/deployments@v0.6.0
         if: always() && github.head_ref
@@ -142,13 +169,23 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           status: ${{ job.status }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-          env_url: https://web.edumips.org/${{github.event.pull_request.number}}
+          env_url: ${{ env.ENV_URL }}
 
   test-web:
     name: Test web application
     runs-on: ubuntu-latest
     needs: deploy-web
     steps:
+      # This step behaves differently in PRs and on push to master / cron.
+      # Set up environment variables according to the triggering event.
+      - name: Set PR environment variables
+        if: ${{ github.event_name == "pull_request" }}
+        run: |
+          echo "ENV_URL=https://web.edumips.org/${{github.event.pull_request.number}}"
+      - name: Set master push environment variables
+        if: ${{ github.event_name != "pull_request" }}
+        run: |
+          echo "ENV_URL=https://web.edumips.org"
       - uses: actions/checkout@v2
       - name: Set up Node.JS 12
         uses: actions/setup-node@v2
@@ -160,7 +197,7 @@ jobs:
       - name: Run web tests against deployed code
         uses: nick-invision/retry@v2
         env:
-          PLAYWRIGHT_TARGET_URL: 'https://web.edumips.org/${{ github.event.pull_request.number }}'
+          PLAYWRIGHT_TARGET_URL: ${{ env.ENV_URL }}
         with:
           max_attempts: 10
           timeout_minutes: 2
