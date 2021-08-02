@@ -90,7 +90,7 @@ jobs:
           path: build/gwt/war/edumips64
   
   deploy-web:
-    name: Deploy web app to dev environment
+    name: Deploy web app
     runs-on: ubuntu-latest
     needs: build-web
     steps:
@@ -136,6 +136,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy-web
     steps:
+      - uses: actions/checkout@v2
       - name: Set up Node.JS 12
         uses: actions/setup-node@v2
         with:
