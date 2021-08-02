@@ -68,6 +68,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: deploy-ui
     steps:
+      - name: Set up Node.JS 12
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12.x'
+      - run: npm install
       # Run tests against the deployed code.
       - name: Run web tests against deployed code
         uses: nick-invision/retry@v2
