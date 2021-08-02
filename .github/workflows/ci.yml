@@ -115,15 +115,15 @@ jobs:
         run: |
           echo "DEPLOYMENT_ENV=${{github.event.pull_request.number}}" >> $GITHUB_ENV
           echo "PUSH_DIR=pr/" >> $GITHUB_ENV
-          echo "COMMIT_MESSAGE=Deploy code for PR ${{ github.event.pull_request.number }}"
-          echo "ENV_URL=https://web.edumips.org/${{github.event.pull_request.number}}"
+          echo "COMMIT_MESSAGE=Deploy code for PR ${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          echo "ENV_URL=https://web.edumips.org/${{github.event.pull_request.number}}" >> $GITHUB_ENV
       - name: Set master push environment variables
         if: ${{ github.event_name != 'pull_request' }}
         run: |
           echo "DEPLOYMENT_ENV=prod" >> $GITHUB_ENV
           echo "PUSH_DIR=build/gwt/war/edumips64" >> $GITHUB_ENV
-          echo "COMMIT_MESSAGE=Update Web Frontend @ ${{ github.sha }}"
-          echo "ENV_URL=https://web.edumips.org"
+          echo "COMMIT_MESSAGE=Update Web Frontend @ ${{ github.sha }}" >> $GITHUB_ENV
+          echo "ENV_URL=https://web.edumips.org" >> $GITHUB_ENV
 
       # Download web application built in 'build-web'
       - uses: actions/download-artifact@v2
@@ -152,7 +152,7 @@ jobs:
         uses: crazy-max/ghaction-github-pages@v2
         with:
           target_branch: master
-          build_dir: ${{ env.push_dir }}
+          build_dir: ${{ env.PUSH_DIR }}
           repo: EduMIPS64/web.edumips.org
           keep_history: true
           commit_message: ${{ env.COMMIT_MESSAGE }}
