@@ -91,6 +91,7 @@ jobs:
   
   deploy-web:
     name: Deploy web app to dev environment
+    runs-on: ubuntu-latest
     needs: build-web
     steps:
       - uses: actions/download-artifact@v2
@@ -132,6 +133,7 @@ jobs:
 
   test-web:
     name: Test web app
+    runs-on: ubuntu-latest
     needs: deploy-web
     steps:
       - name: Set up Node.JS 12
