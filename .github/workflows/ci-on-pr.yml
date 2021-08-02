@@ -1,4 +1,4 @@
-name: Build all / deploy web app to dev environment
+name: PR CI
 
 on:
   pull_request:
