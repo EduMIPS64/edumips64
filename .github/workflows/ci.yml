@@ -171,21 +171,21 @@ jobs:
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           env_url: ${{ env.ENV_URL }}
 
+  # Test the deployed web application.
+  # This is only ran on pull request because runs triggered by push and schedule
+  # will deploy to web.edumips.org. Given that the deployment has some latency,
+  # the test will most likely run against the previously-deployed version,
+  # potentially giving a false sense of security if a developer sees the test being
+  # run immediately after the deployment.
+  #
+  # There is a separate job that periodically monitors web.edumips.org, which will
+  # catch regressions.
   test-web:
     name: Test web application
     runs-on: ubuntu-latest
     needs: deploy-web
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
-      # This step behaves differently in PRs and on push to master / cron.
-      # Set up environment variables according to the triggering event.
-      - name: Set PR environment variables
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          echo "ENV_URL=https://web.edumips.org/${{github.event.pull_request.number}}" >> $GITHUB_ENV
-      - name: Set master push environment variables
-        if: ${{ github.event_name != 'pull_request' }}
-        run: |
-          echo "ENV_URL=https://web.edumips.org" >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - name: Set up Node.JS 12
         uses: actions/setup-node@v2
@@ -197,7 +197,7 @@ jobs:
       - name: Run web tests against deployed code
         uses: nick-invision/retry@v2
         env:
-          PLAYWRIGHT_TARGET_URL: ${{ env.ENV_URL }}
+          PLAYWRIGHT_TARGET_URL: https://web.edumips.org/${{github.event.pull_request.number}}
         with:
           max_attempts: 10
           timeout_minutes: 2
