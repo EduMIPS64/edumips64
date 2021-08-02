@@ -181,11 +181,11 @@ jobs:
       - name: Set PR environment variables
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          echo "ENV_URL=https://web.edumips.org/${{github.event.pull_request.number}}"
+          echo "ENV_URL=https://web.edumips.org/${{github.event.pull_request.number}}" >> $GITHUB_ENV
       - name: Set master push environment variables
         if: ${{ github.event_name != 'pull_request' }}
         run: |
-          echo "ENV_URL=https://web.edumips.org"
+          echo "ENV_URL=https://web.edumips.org" >> $GITHUB_ENV
       - uses: actions/checkout@v2
       - name: Set up Node.JS 12
         uses: actions/setup-node@v2
