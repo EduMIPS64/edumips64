@@ -1,4 +1,4 @@
-name: Build all and deploy web UI to dev environment
+name: Build all / deploy web app to dev environment
 
 on:
   pull_request:
@@ -6,8 +6,8 @@ on:
       - master
 
 jobs:
-  desktop-app:
-    name: Build Java desktop application.
+  build-desktop:
+    name: Build desktop app and docs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -63,10 +63,8 @@ jobs:
           name: JAR
           path: ./build/libs/edumips64-${{ steps.read_version.outputs.value }}.jar
 
-  # Build and deploy the web app. Done as a separate job because it's the slowest
-  # step and it's worth doing it in parallel.
-  web-app:
-    name: Build web application and deploy it to dev environment.
+  build-web:
+    name: Build web app
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -86,6 +84,19 @@ jobs:
       - run: npm install
       - run: npm run build
 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: web
+          path: build/gwt/war/edumips64
+  
+  deploy-web:
+    name: Deploy web app to dev environment
+    needs: build-web
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: web
+          path: build/gwt/war/edumips64
       # Deploy the code on Github Pages.
       - name: Start deployment
         uses: bobheadxi/deployments@v0.6.0
@@ -119,6 +130,15 @@ jobs:
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           env_url: https://web.edumips.org/${{github.event.pull_request.number}}
 
+  test-web:
+    name: Test web app
+    needs: deploy-web
+    steps:
+      - name: Set up Node.JS 12
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12.x'
+      - run: npm install
       # Run tests against the deployed code.
       - name: Run web tests against deployed code
         uses: nick-invision/retry@v2
