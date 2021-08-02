@@ -1,17 +1,13 @@
-name: Java CI
+name: Build all and deploy web UI to dev environment
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
-  schedule:
-    - cron: '0 0 * * *'
 
 jobs:
-  build:
+  desktop-app:
+    name: Build Java desktop application.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -67,9 +63,10 @@ jobs:
           name: JAR
           path: ./build/libs/edumips64-${{ steps.read_version.outputs.value }}.jar
 
-  # Build the Web UI. Done as a separate job because it's the slowest step
-  # and it's worth doing it in parallel.
-  webui:
+  # Build and deploy the web app. Done as a separate job because it's the slowest
+  # step and it's worth doing it in parallel.
+  web-app:
+    name: Build web application and deploy it to dev environment.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -88,3 +85,48 @@ jobs:
           node-version: '12.x'
       - run: npm install
       - run: npm run build
+
+      # Deploy the code on Github Pages.
+      - name: Start deployment
+        uses: bobheadxi/deployments@v0.6.0
+        id: deployment
+        with:
+          step: start
+          token: ${{ secrets.GITHUB_TOKEN }}
+          env: ${{ github.event.pull_request.number }}
+          ref: ${{ github.head_ref }}
+      - name: Copy files to run directory
+        run: mkdir -p pr/${{ github.event.pull_request.number }} && cp -r build/gwt/war/edumips64/* pr/${{ github.event.pull_request.number }}
+      - name: Deploy
+        if: success()
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: master
+          build_dir: pr/
+          repo: EduMIPS64/web.edumips.org
+          keep_history: true
+          commit_message: Deploy code for PR ${{ github.event.pull_request.number }}
+          fqdn: web.edumips.org
+        env:
+          GH_PAT: ${{ secrets.PAT_WEBUI }}
+      - name: Update deployment status
+        uses: bobheadxi/deployments@v0.6.0
+        if: always() && github.head_ref
+        with:
+          step: finish
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          env_url: https://web.edumips.org/${{github.event.pull_request.number}}
+
+      # Run tests against the deployed code.
+      - name: Run web tests against deployed code
+        uses: nick-invision/retry@v2
+        env:
+          PLAYWRIGHT_TARGET_URL: 'https://web.edumips.org/${{ github.event.pull_request.number }}'
+        with:
+          max_attempts: 10
+          timeout_minutes: 2
+          retry_on: error
+          command: npm run test
+
