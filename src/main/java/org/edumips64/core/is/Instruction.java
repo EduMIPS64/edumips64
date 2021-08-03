@@ -109,15 +109,22 @@ public abstract class Instruction implements InstructionInterface {
 
   /**
    * <pre>
-   * Gets the syntax of any instruction as string composed by the following simbols
-   * %R   Register
-   * %I   Immediate
-   * %U   Unsigned Immediate
+   * Gets the expected syntax of the instruction.
+   * The syntax can contain type placeholders or separators. 
+   * Type placeholders are composed by the '%' character and an uppercase letter.
+   * Separators are any non-% characters. Common separators are ',' and round parentheses ('(', ')').
+   * 
+   * Valid type placeholders:
+   * %R   General Purpose Register
+   * %F   Floating Point Register
+   * %I   Immediate value (6 bits?)
+   * %U   Unsigned Immediate (5 bits?)
+   * %C   Unsigned Immediate (3 bits)
    * %L   Memory Label
    * %E   Program Label used for Jump Instructions
-   * %B   Program Label used for Brench Instructions
+   * %B   Program Label used for Branch Instructions
    *
-   * examples:
+   * Examples:
    *   Instruction -----> Syntax
    * DADD  R1,R2,R3   |   %R,%R,%R
    * DADDI R1,R2,-3   |   %R,%R,%I

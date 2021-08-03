@@ -516,6 +516,7 @@ public class Parser {
                 }
               }
 
+              // Parsing the instruction name to get the type of parameters to expect.
               ParsedInstructionMetadata meta = new ParsedInstructionMetadata(row, instrCount+4);
               tmpInst = instructionBuilder.buildInstruction(line.substring(i, end).toUpperCase(), meta);
 
@@ -527,6 +528,9 @@ public class Parser {
               }
 
 
+              // Syntax of the instruction. A string in a form like %R,%R,%I.
+              // See @{link Instruction#getSyntax getSyntax} for a list of 
+              // symbols to specify the types of parameters.
               String syntax = tmpInst.getSyntax();
               instrCount += 4;
 
@@ -548,7 +552,8 @@ public class Parser {
                   if (syntax.charAt(z) == '%') {
                     z++;
 
-                    if (syntax.charAt(z) == 'R') {  //register
+                    // %R: General Purpose Register.
+                    if (syntax.charAt(z) == 'R') { 
                       int endPar;
 
                       if (z != syntax.length() - 1) {
@@ -577,7 +582,9 @@ public class Parser {
                         i = line.length();
                         continue;
                       }
-                    } else if (syntax.charAt(z) == 'F') {  //floating point register
+
+                    // %F: Floating Point Register.
+                    } else if (syntax.charAt(z) == 'F') {
                       int endPar;
 
                       if (z != syntax.length() - 1) {
@@ -606,9 +613,9 @@ public class Parser {
                         i = line.length();
                         continue;
                       }
-                    }
-
-                    else if (syntax.charAt(z) == 'I') {  //immediate
+                    
+                    // %I: 16-bit immediate.
+                    } else if (syntax.charAt(z) == 'I') {
                       int endPar;
 
                       if (z != syntax.length() - 1) {
@@ -775,7 +782,9 @@ public class Parser {
                           continue;
                         }
                       }
-                    } else if (syntax.charAt(z) == 'U') {  //Unsigned Immediate (5 bit)
+                    
+                    // %U: Unsigned immediate.
+                    } else if (syntax.charAt(z) == 'U') {
                       int endPar;
 
                       if (z != syntax.length() - 1) {
@@ -860,7 +869,9 @@ public class Parser {
                         tmpInst.getParams().add(0);
                         continue;
                       }
-                    } else if (syntax.charAt(z) == 'C') {  //Unsigned Immediate (3 bit)
+                    
+                    // %C: Unsigned Immediate (3 bit).
+                    } else if (syntax.charAt(z) == 'C') { 
                       int endPar;
 
                       if (z != syntax.length() - 1) {
@@ -945,9 +956,9 @@ public class Parser {
                         tmpInst.getParams().add(0);
                         continue;
                       }
-                    }
-
-                    else if (syntax.charAt(z) == 'L') {  //Memory Label
+                    
+                    // %L: Memory Label.
+                    } else if (syntax.charAt(z) == 'L') {
                       int endPar;
 
                       if (z != syntax.length() - 1) {
@@ -999,7 +1010,9 @@ public class Parser {
                         tmpInst.getParams().add(0);
                         continue;
                       }
-                    } else if (syntax.charAt(z) == 'E') {  //Instruction Label
+
+                    // %E: Program label used for Jump instructions.
+                    } else if (syntax.charAt(z) == 'E') {
                       int endPar;
 
                       if (z != syntax.length() - 1) {
@@ -1032,6 +1045,8 @@ public class Parser {
                         voidJump.add(tmpVoid);
                         doPack = false;
                       }
+
+                    // %B: Program label used for Branch instructions.
                     } else if (syntax.charAt(z) == 'B') {  //Instruction Label for branch
                       int endPar;
 
