@@ -550,14 +550,22 @@ public class Parser {
 
                 for (int z = 0; z < syntax.length(); z++) {
                   if (syntax.charAt(z) == '%') {
-                    z++;
+                    z++; // Skip over the %.
+                    var type = syntax.charAt(z);
+
+                    // If there is another separator (e.g., a comma or a parenthesis)
+                    // save it in nextToken so we can try to find it later.
+                    Character nextToken = ' ';
+                    if (z < syntax.length() - 1) {
+                      nextToken = syntax.charAt(z+1);
+                    }
 
                     // %R: General Purpose Register.
-                    if (syntax.charAt(z) == 'R') { 
+                    if (type == 'R') {
                       int endPar;
 
                       if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(syntax.charAt(++z), indPar);
+                        endPar = param.indexOf(nextToken, indPar);
                       } else {
                         endPar = param.length();
                       }
@@ -584,11 +592,11 @@ public class Parser {
                       }
 
                     // %F: Floating Point Register.
-                    } else if (syntax.charAt(z) == 'F') {
+                    } else if (type == 'F') {
                       int endPar;
 
                       if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(syntax.charAt(++z), indPar);
+                        endPar = param.indexOf(nextToken, indPar);
                       } else {
                         endPar = param.length();
                       }
@@ -615,11 +623,11 @@ public class Parser {
                       }
                     
                     // %I: 16-bit immediate.
-                    } else if (syntax.charAt(z) == 'I') {
+                    } else if (type == 'I') {
                       int endPar;
 
                       if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(syntax.charAt(++z), indPar);
+                        endPar = param.indexOf(nextToken, indPar);
                       } else {
                         endPar = param.length();
                       }
@@ -784,11 +792,11 @@ public class Parser {
                       }
                     
                     // %U: Unsigned immediate.
-                    } else if (syntax.charAt(z) == 'U') {
+                    } else if (type == 'U') {
                       int endPar;
 
                       if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(syntax.charAt(++z), indPar);
+                        endPar = param.indexOf(nextToken, indPar);
                       } else {
                         endPar = param.length();
                       }
@@ -871,11 +879,11 @@ public class Parser {
                       }
                     
                     // %C: Unsigned Immediate (3 bit).
-                    } else if (syntax.charAt(z) == 'C') { 
+                    } else if (type == 'C') {
                       int endPar;
 
                       if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(syntax.charAt(++z), indPar);
+                        endPar = param.indexOf(nextToken, indPar);
                       } else {
                         endPar = param.length();
                       }
@@ -958,11 +966,11 @@ public class Parser {
                       }
                     
                     // %L: Memory Label.
-                    } else if (syntax.charAt(z) == 'L') {
+                    } else if (type == 'L') {
                       int endPar;
 
                       if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(syntax.charAt(++z), indPar);
+                        endPar = param.indexOf(nextToken, indPar);
                       } else {
                         endPar = param.length();
                       }
@@ -1012,11 +1020,11 @@ public class Parser {
                       }
 
                     // %E: Program label used for Jump instructions.
-                    } else if (syntax.charAt(z) == 'E') {
+                    } else if (type == 'E') {
                       int endPar;
 
                       if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(syntax.charAt(++z), indPar);
+                        endPar = param.indexOf(nextToken, indPar);
                       } else {
                         endPar = param.length();
                       }
@@ -1047,11 +1055,11 @@ public class Parser {
                       }
 
                     // %B: Program label used for Branch instructions.
-                    } else if (syntax.charAt(z) == 'B') {  //Instruction Label for branch
+                    } else if (type == 'B') {
                       int endPar;
 
                       if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(syntax.charAt(++z), indPar);
+                        endPar = param.indexOf(nextToken, indPar);
                       } else {
                         endPar = param.length();
                       }
@@ -1081,15 +1089,21 @@ public class Parser {
                         voidJump.add(tmpVoid);
                         doPack = false;
                       }
-                    }
-
-
-                    else {
+                    } else {
                       numError++;
                       error.add("UNKNOWNSYNTAX", row, 1, line);
                       i = line.length();
                       tmpInst.getParams().add(0);
                       continue;
+                    }
+                    
+                    // Ugly hack. The code used to rely on "peeking" behavior inside the
+                    // parsing of every parameter to actually bring forward the index variable
+                    // within each iteration. Since we removed the peeking, we still need to move
+                    // it forward, waiting for a better version of this code that doesn't need
+                    // this index munging.
+                    if (z != syntax.length() - 1) {
+                      z++; 
                     }
                   } else {
                     if (syntax.charAt(z) != param.charAt(indPar++)) {
