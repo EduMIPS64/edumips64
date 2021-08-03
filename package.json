@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.14.8",
-    "@babel/preset-env": "7.14.8",
+    "@babel/preset-env": "7.14.9",
     "@babel/preset-react": "7.14.5",
     "@babel/runtime": "7.14.8",
     "@playwright/test": "1.13.1",
@@ -33,7 +33,7 @@
     "babel-loader": "8.2.2",
     "copy-webpack-plugin": "9.0.1",
     "css-loader": "6.2.0",
-    "eslint": "7.31.0",
+    "eslint": "7.32.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-config-standard": "16.0.3",
     "eslint-plugin-import": "2.23.4",
@@ -48,7 +48,7 @@
     "playwright": "1.13.1",
     "prettier": "2.3.2",
     "style-loader": "3.2.1",
-    "webpack": "5.47.1",
+    "webpack": "5.48.0",
     "webpack-cli": "4.7.2",
     "webpack-dev-server": "3.11.2"
   }
