@@ -44,8 +44,12 @@ public class CliRunnerTest {
     public void cant_write_dinero_without_running_prog() {
         OutputStream os = getSystemOut();
         CommandLine commandLine = new CommandLine(cli);
-        commandLine.execute("dinero", "temp_file");
+        File f = new File("src/test/resources/temp_file");
+        commandLine.execute("dinero", f.getAbsolutePath());
         assertEquals("Cannot write this output until a program has been executed.", os.toString().trim());
+        if (f.exists()) {
+            f.delete();
+        }
     }
 
     @Test
@@ -72,7 +76,9 @@ public class CliRunnerTest {
     public void can_handle_file_not_found() {
         OutputStream os = getSystemOut();
         CommandLine cl = new CommandLine(cli);
-        cl.execute("load", "test.s");
+        File f = new File("src/test/resources/a_nonexistent_file");
+        assertTrue(!f.exists());
+        cl.execute("load", f.getAbsolutePath());
         assertTrue(os.toString().contains("Unable to load file: "));
     }
 

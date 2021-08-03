@@ -29,7 +29,6 @@ import org.edumips64.core.MemoryElementNotFoundException;
 import org.edumips64.core.Register;
 import org.edumips64.core.fpu.FPInvalidOperationException;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** This is the base class for all the immediate ALU instructions

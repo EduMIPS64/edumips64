@@ -29,7 +29,14 @@ dependencies {
 
     implementation("javax.help:javahelp:2.0.05")
     implementation("info.picocli:picocli:4.6.1")
-    testImplementation("junit:junit:4.13.2")
+
+    testImplementation(platform("org.junit:junit-bom:5.7.2"))
+	testImplementation("org.junit.jupiter:junit-jupiter")
+
+    // To run JUnit 4 tests.
+    testImplementation("junit:junit:4.13.2")    
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 python {
@@ -205,6 +212,18 @@ tasks.jacocoTestReport {
         xml.isEnabled = true
         csv.isEnabled = false
         html.isEnabled = false
+    }
+}
+
+// Add logging of all executed tests.
+tasks {
+    withType<Test> {
+        useJUnitPlatform()
+        testLogging.events = setOf(
+            org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
+        )
     }
 }
 
