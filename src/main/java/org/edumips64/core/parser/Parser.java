@@ -560,24 +560,25 @@ public class Parser {
                       nextToken = syntax.charAt(z+1);
                     }
 
+                    // Find the end of the parameter value, and as part of that validate
+                    // that the correct separator is present.
+                    int endPar;
+                    if (z != syntax.length() - 1) {
+                      endPar = param.indexOf(nextToken, indPar);
+                    } else {
+                      endPar = param.length();
+                    }
+
+                    if (endPar == -1) {
+                      numError++;
+                      error.add("SEPARATORMISS", row, indPar, line);
+                      i = line.length();
+                      tmpInst.getParams().add(0);
+                      continue;
+                    }
+
                     // %R: General Purpose Register.
                     if (type == 'R') {
-                      int endPar;
-
-                      if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(nextToken, indPar);
-                      } else {
-                        endPar = param.length();
-                      }
-
-                      if (endPar == -1) {
-                        numError++;
-                        error.add("SEPARATORMISS", row, indPar, line);
-                        i = line.length();
-                        tmpInst.getParams().add(0);
-                        continue;
-                      }
-
                       int reg;
 
                       if ((reg = isRegister(param.substring(indPar, endPar).trim())) >= 0) {
@@ -593,22 +594,6 @@ public class Parser {
 
                     // %F: Floating Point Register.
                     } else if (type == 'F') {
-                      int endPar;
-
-                      if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(nextToken, indPar);
-                      } else {
-                        endPar = param.length();
-                      }
-
-                      if (endPar == -1) {
-                        numError++;
-                        error.add("SEPARATORMISS", row, indPar, line);
-                        i = line.length();
-                        tmpInst.getParams().add(0);
-                        continue;
-                      }
-
                       int reg;
 
                       if ((reg = isRegisterFP(param.substring(indPar, endPar).trim())) >= 0) {
@@ -624,22 +609,6 @@ public class Parser {
                     
                     // %I: 16-bit immediate.
                     } else if (type == 'I') {
-                      int endPar;
-
-                      if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(nextToken, indPar);
-                      } else {
-                        endPar = param.length();
-                      }
-
-                      if (endPar == -1) {
-                        numError++;
-                        error.add("SEPARATORMISS", row, indPar, line);
-                        i = line.length();
-                        tmpInst.getParams().add(0);
-                        continue;
-                      }
-
                       int imm;
 
                       if (Converter.isImmediate(param.substring(indPar, endPar))) {
@@ -793,22 +762,6 @@ public class Parser {
                     
                     // %U: Unsigned immediate.
                     } else if (type == 'U') {
-                      int endPar;
-
-                      if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(nextToken, indPar);
-                      } else {
-                        endPar = param.length();
-                      }
-
-                      if (endPar == -1) {
-                        numError++;
-                        error.add("SEPARATORMISS", row, indPar, line);
-                        i = line.length();
-                        tmpInst.getParams().add(0);
-                        continue;
-                      }
-
                       int imm;
 
                       if (Converter.isImmediate(param.substring(indPar, endPar))) {
@@ -880,22 +833,6 @@ public class Parser {
                     
                     // %C: Unsigned Immediate (3 bit).
                     } else if (type == 'C') {
-                      int endPar;
-
-                      if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(nextToken, indPar);
-                      } else {
-                        endPar = param.length();
-                      }
-
-                      if (endPar == -1) {
-                        numError++;
-                        error.add("SEPARATORMISS", row, indPar, line);
-                        i = line.length();
-                        tmpInst.getParams().add(0);
-                        continue;
-                      }
-
                       int imm;
 
                       if (Converter.isImmediate(param.substring(indPar, endPar))) {
@@ -967,22 +904,6 @@ public class Parser {
                     
                     // %L: Memory Label.
                     } else if (type == 'L') {
-                      int endPar;
-
-                      if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(nextToken, indPar);
-                      } else {
-                        endPar = param.length();
-                      }
-
-                      if (endPar == -1) {
-                        numError++;
-                        error.add("SEPARATORMISS", row, indPar, line);
-                        i = line.length();
-                        tmpInst.getParams().add(0);
-                        continue;
-                      }
-
                       try {
                         MemoryElement tmpMem;
 
@@ -1021,22 +942,6 @@ public class Parser {
 
                     // %E: Program label used for Jump instructions.
                     } else if (type == 'E') {
-                      int endPar;
-
-                      if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(nextToken, indPar);
-                      } else {
-                        endPar = param.length();
-                      }
-
-                      if (endPar == -1) {
-                        numError++;
-                        error.add("SEPARATORMISS", row, indPar, line);
-                        i = line.length();
-                        tmpInst.getParams().add(0);
-                        continue;
-                      }
-
                       String label = param.substring(indPar, endPar).trim();
                       Integer labelAddr = symTab.getInstructionAddress(label);
                       logger.info("Label " + label + " at address " + labelAddr);
@@ -1056,22 +961,6 @@ public class Parser {
 
                     // %B: Program label used for Branch instructions.
                     } else if (type == 'B') {
-                      int endPar;
-
-                      if (z != syntax.length() - 1) {
-                        endPar = param.indexOf(nextToken, indPar);
-                      } else {
-                        endPar = param.length();
-                      }
-
-                      if (endPar == -1) {
-                        numError++;
-                        error.add("SEPARATORMISS", row, indPar, line);
-                        i = line.length();
-                        tmpInst.getParams().add(0);
-                        continue;
-                      }
-
                       Integer labelAddr = symTab.getInstructionAddress(param.substring(indPar, endPar).trim());
 
                       if (labelAddr != null) {
