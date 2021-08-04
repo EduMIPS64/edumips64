@@ -155,6 +155,66 @@ public class ParserTest extends BaseTest {
     assertEquals(5, thirdMeta.sourceLine);
   }
 
+  /** Tests for parsing immediate values. */
+  @Test
+  public void ImmediateNotOutOfBoundsTest() throws Exception {
+    // Test that all the values just before overflow are parsed correctly.
+
+    // 16-bit signed immediate.
+    ParseCode("daddi r1, r0, 32767");
+    ParseCode("daddi r1, r0, -32768");
+
+    // 5-bit unsigned immediate
+    ParseCode("sll r1, r0, 31");
+    ParseCode("sll r1, r0, 0");
+
+    // 3-bit unsigned immediate
+    ParseCode("movf.d f1, f2, 7");
+    ParseCode("movf.d f3, f4, 0");
+  }
+
+  @Test
+  public void ImmediateCanStartWithHashTest() throws Exception {
+    // 16-bit signed immediate.
+    ParseCode("daddi r1, r0, #10");
+
+    // 5-bit unsigned immediate
+    ParseCode("sll r1, r0, #1");
+
+    // 3-bit unsigned immediate
+    ParseCode("movf.d f1, f2, #7");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void Immediate16BitOverflow() throws Exception {
+    ParseCode("daddi r1, r0, 32768");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void Immediate16BitUnderflow() throws Exception {
+    ParseCode("daddi r1, r0, -32769");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void Immediate5BitOverflow() throws Exception {
+    ParseCode("sll r1, r0, 32");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void Immediate5BitUnderflow() throws Exception {
+    ParseCode("sll r1, r0, -1");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void Immediate3BitOverflow() throws Exception {
+    ParseCode("movf.d f1, f2, 8");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void Immediate3BitUnderflow() throws Exception {
+    ParseCode("movf.d f3, f4, -1");
+  }
+
   /** Regression test for issue #95 */
   @Test
   public void CRLFParsingTest() throws Exception {
@@ -163,7 +223,7 @@ public class ParserTest extends BaseTest {
 
   /** Regression tests for issue #1 */
   @Test
-  public void NotOutOfBoundsTest() throws Exception {
+  public void MemoryNotOutOfBoundsTest() throws Exception {
     // Test that all the values just before overflow are parsed correctly.
     ParseData(".byte -128");
     ParseData(".byte 127");

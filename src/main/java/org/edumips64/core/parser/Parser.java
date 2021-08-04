@@ -610,304 +610,68 @@ public class Parser {
                         continue;
                       }
                     
-                    // %I: 16-bit immediate.
+                    // %I: 16-bit signed immediate.
+                    // Also allows a memory label as a parameter -- the address will be used as immediate value.
                     } else if (type == 'I') {
-                      int imm;
+                      long immediateValue = 0;
+                      String errorMessage = "";
 
-                      if (Converter.isImmediate(paramValue)) {
-                        if (param.charAt(paramStart) == '#') {
-                          paramStart++;
-                          paramValue = paramValue.substring(1);
-                        }
-
-                        if (Converter.isInteger(paramValue)) {
-                          try {
-                            imm = Integer.parseInt(paramValue);
-
-                            if (imm < -32768 || imm > 32767) {
-                              throw new NumberFormatException();
-                            }
-                          } catch (NumberFormatException ex) {
-                            imm = 0;
-                            numError++;
-                            error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                          }
-
-                          tmpInst.getParams().add(imm);
-                          paramStart = paramEnd + 1;
-                        } else if (Converter.isHexNumber(paramValue)) {
-                          try {
-                            try {
-                              imm = (int) Long.parseLong(Converter.hexToShort(paramValue));
-                              logger.info("imm = " + imm);
-
-                              if (imm < -32768 || imm > 32767) {
-                                throw new NumberFormatException();
-                              }
-                            } catch (NumberFormatException ex) {
-                              imm = 0;
-                              numError++;
-                              error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                            }
-
-                            tmpInst.getParams().add(imm);
-                            paramStart = paramEnd + 1;
-                          } catch (IrregularStringOfHexException ex) {
-                            //non ci dovrebbe mai arrivare
-                          }
-                        }
-
-                      } else {
+                      try {
+                        immediateValue = Converter.parseImmediate(paramValue);
+                      } catch (NumberFormatException e) {
+                        // Invalid number, try to parse it as a memory label.
+                        MemoryElement tmpMem;
                         try {
-                          int cc;
-                          MemoryElement tmpMem;
-                          cc = param.indexOf("+", paramStart);
-
-                          if (cc != -1) {
-                            tmpMem = symTab.getCell(param.substring(paramStart, cc).trim());
-
-                            if (Converter.isInteger(param.substring(cc + 1, paramEnd))) {
-                              try {
-                                imm = Integer.parseInt(paramValue);
-
-                                if (imm < -32768 || imm > 32767) {
-                                  throw new NumberFormatException();
-                                }
-                              } catch (NumberFormatException ex) {
-                                imm = 0;
-                                numError++;
-                                error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                              }
-
-                              tmpInst.getParams().add(tmpMem.getAddress() + imm);
-                              paramStart = paramEnd + 1;
-                            } else if (Converter.isHexNumber(param.substring(cc + 1, paramEnd))) {
-                              try {
-                                try {
-                                  imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
-
-                                  if (imm < -32768 || imm > 32767) {
-                                    throw new NumberFormatException();
-                                  }
-                                } catch (NumberFormatException ex) {
-                                  imm = 0;
-                                  numError++;
-                                  error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                                }
-
-                                tmpInst.getParams().add(tmpMem.getAddress() + imm);
-                                paramStart = paramEnd + 1;
-                              } catch (IrregularStringOfHexException ex) {
-                                logger.severe("Irregular string of bits: " + ex.getMessage());
-                              }
-                            } else {
-                              MemoryElement tmpMem1 = symTab.getCell(param.substring(cc + 1, paramEnd).trim());
-                              tmpInst.getParams().add(tmpMem.getAddress() + tmpMem1.getAddress());
-                            }
-
-                          } else {
-
-                            cc = param.indexOf("-", paramStart);
-
-                            if (cc != -1) {
-                              tmpMem = symTab.getCell(param.substring(paramStart, cc).trim());
-
-                              if (Converter.isInteger(param.substring(cc + 1, paramEnd))) {
-                                try {
-                                  imm = Integer.parseInt(paramValue);
-
-                                  if (imm < -32768 || imm > 32767) {
-                                    throw new NumberFormatException();
-                                  }
-                                } catch (NumberFormatException ex) {
-                                  imm = 0;
-                                  numError++;
-                                  error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                                }
-
-                                tmpInst.getParams().add(tmpMem.getAddress() - imm);
-                                paramStart = paramEnd + 1;
-                              } else if (Converter.isHexNumber(param.substring(cc + 1, paramEnd))) {
-                                try {
-                                  try {
-                                    imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
-
-                                    if (imm < -32768 || imm > 32767) {
-                                      throw new NumberFormatException();
-                                    }
-                                  } catch (NumberFormatException ex) {
-                                    imm = 0;
-                                    numError++;
-                                    error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                                  }
-
-                                  tmpInst.getParams().add(tmpMem.getAddress() - imm);
-                                  paramStart = paramEnd + 1;
-                                } catch (IrregularStringOfHexException ex) {
-                                  //non ci dovrebbe mai arrivare
-                                }
-                              } else {
-                                MemoryElement tmpMem1 = symTab.getCell(param.substring(cc + 1, paramEnd).trim());
-                                tmpInst.getParams().add(tmpMem.getAddress() - tmpMem1.getAddress());
-                              }
-                            } else {
-                              tmpMem = symTab.getCell(paramValue.trim());
-                              tmpInst.getParams().add(tmpMem.getAddress());
-                            }
-                          }
+                          tmpMem = symTab.getCell(paramValue.trim());
+                          immediateValue = tmpMem.getAddress();
                         } catch (MemoryElementNotFoundException ex) {
-                          numError++;
-                          error.add("INVALIDIMMEDIATE", row, line.indexOf(paramValue) + 1, line);
-                          column = line.length();
-                          tmpInst.getParams().add(0);
-                          continue;
+                          errorMessage = "INVALIDIMMEDIATE";
                         }
                       }
-                    
-                    // %U: Unsigned immediate.
-                    } else if (type == 'U') {
-                      int imm;
 
-                      if (Converter.isImmediate(paramValue)) {
-                        if (param.charAt(paramStart) == '#') {
-                          paramStart++;
-                          paramValue = paramValue.substring(1);
-                        }
+                      if (errorMessage.isEmpty() && (immediateValue < -32768 || immediateValue > 32767)) {
+                        errorMessage = "IMMEDIATE_TOO_LARGE";
+                        immediateValue = 0;
+                      }
 
-                        if (Converter.isInteger(paramValue)) {
-                          try {
-                            imm = Integer.parseInt(paramValue.trim());
-
-                            if (imm < 0) {
-                              numError++;
-                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
-                              column = line.length();
-                              tmpInst.getParams().add(0);
-                              continue;
-                            }
-
-                            if (imm < 0 || imm > 31) {
-                              throw new NumberFormatException();
-                            }
-                          } catch (NumberFormatException ex) {
-                            imm = 0;
-                            numError++;
-                            error.add("5BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                          }
-
-                          tmpInst.getParams().add(imm);
-                          paramStart = paramEnd + 1;
-                        } else if (Converter.isHexNumber(paramValue.trim())) {
-                          try {
-                            imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
-
-                            if (imm < 0) {
-                              numError++;
-                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
-                              column = line.length();
-                              tmpInst.getParams().add(0);
-                              continue;
-                            }
-
-                            tmpInst.getParams().add(imm);
-                            paramStart = paramEnd + 1;
-
-                            if (imm < 0 || imm > 31) {
-                              throw new NumberFormatException();
-                            }
-                          } catch (NumberFormatException ex) {
-                            imm = 0;
-                            numError++;
-                            error.add("5BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-
-                            tmpInst.getParams().add(imm);
-                            paramStart = paramEnd + 1;
-
-                          } catch (IrregularStringOfHexException ex) {
-                            //non ci dovrebbe mai arrivare
-                          }
-                        }
-
-                      } else {
+                      // Casting to int is safe because we know the value is between -32768 and 32767.
+                      tmpInst.getParams().add((int)immediateValue);
+                      if (!errorMessage.isEmpty()) {
                         numError++;
-                        error.add("INVALIDIMMEDIATE", row, line.indexOf(paramValue) + 1, line);
+                        error.add(errorMessage, row, line.indexOf(paramValue) + 1, line);
                         column = line.length();
-                        tmpInst.getParams().add(0);
                         continue;
                       }
-                    
-                    // %C: Unsigned Immediate (3 bit).
-                    } else if (type == 'C') {
-                      int imm;
+                    // %U: 5-bit unsigned immediate.
+                    // %C: 3-bit unsigned immediate.
+                    } else if (type == 'U' || type == 'C') {
+                      // The code for %U and %C is the same, only the upper bound changes (and the overflow error message).
+                      long maxValue = type == 'U' ? 31 : 7;
+                      String overflowErrorMessage = type == 'U' ? "5BIT_IMMEDIATE_TOO_LARGE" : "3BIT_IMMEDIATE_TOO_LARGE";
 
-                      if (Converter.isImmediate(paramValue)) {
-                        if (param.charAt(paramStart) == '#') {
-                          paramStart++;
-                          paramValue = paramValue.substring(1);
-                        }
-
-                        if (Converter.isInteger(paramValue)) {
-                          try {
-                            imm = Integer.parseInt(paramValue.trim());
-
-                            if (imm < 0) {
-                              numError++;
-                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
-                              column = line.length();
-                              tmpInst.getParams().add(0);
-                              continue;
-                            }
-
-                            if (imm < 0 || imm > 7) {
-                              throw new NumberFormatException();
-                            }
-                          } catch (NumberFormatException ex) {
-                            imm = 0;
-                            numError++;
-                            error.add("3BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                          }
-
-                          tmpInst.getParams().add(imm);
+                      long immediateValue = 0;
+                      String errorMessage = ""; // Will be populated with the error message string if there's an error.
+                      try {
+                        immediateValue = Converter.parseImmediate(paramValue);
+                        if (immediateValue < 0) {
+                          errorMessage = "VALUEISNOTUNSIGNED";
+                        } else if (immediateValue > maxValue) {
+                          errorMessage = overflowErrorMessage;
+                          immediateValue = 0;
+                        } else {
                           paramStart = paramEnd + 1;
-                        } else if (Converter.isHexNumber(paramValue.trim())) {
-                          try {
-                            imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
-
-                            if (imm < 0) {
-                              numError++;
-                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
-                              column = line.length();
-                              tmpInst.getParams().add(0);
-                              continue;
-                            }
-
-                            tmpInst.getParams().add(imm);
-                            paramStart = paramEnd + 1;
-
-                            if (imm < 0 || imm > 31) {
-                              throw new NumberFormatException();
-                            }
-                          } catch (NumberFormatException ex) {
-                            imm = 0;
-                            numError++;
-                            error.add("3BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-
-                            tmpInst.getParams().add(imm);
-                            paramStart = paramEnd + 1;
-
-                          } catch (IrregularStringOfHexException ex) {
-                            //non ci dovrebbe mai arrivare
-                          }
                         }
-
-                      } else {
+                      } catch (NumberFormatException e) {
+                        errorMessage = "INVALIDIMMEDIATE";
+                      }
+                      // Casting to int is safe because we know the value is between 0 and 31.
+                      tmpInst.getParams().add((int)immediateValue);
+                      if (!errorMessage.isEmpty()) {
                         numError++;
-                        error.add("INVALIDIMMEDIATE", row, line.indexOf(paramValue) + 1, line);
+                        error.add(errorMessage, row, line.indexOf(paramValue) + 1, line);
                         column = line.length();
-                        tmpInst.getParams().add(0);
                         continue;
                       }
-                    
                     // %L: Memory Label.
                     } else if (type == 'L') {
                       try {

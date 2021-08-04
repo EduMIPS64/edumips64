@@ -672,30 +672,37 @@ public class Converter {
     return true;
   }
 
-/** Check if is a valid string for an immediate value (rough check on number of
- *  digits, the caller is responsible for checking the actual value).
- * 
- * TODO: this is not very clean, this function should be removed and the caller
- * should just convert to a number and check the value.
-   *  @param imm the string to validate
-   *  @return false if imm isn't a valid immediate, else true
+  /**
+   * Parses an immediate value without any overflow/underflow check.
+   * 
+   * The immediate value may be preceded by the # character (which is ignored).
+   * The immediate value may be encoded in base 10 or in base 16. In the latter
+   * case, it must be preceded by the '0x' or '0X' prefix.
+   * 
+   * If the # character is used in a base-16 immediate, it must precede the 0x prefix.
+   * 
+   * @param immediate a string representing an immediate value.
+   * @throws NumberFormatException if the number is not well-formatted.
+   * @return the parsed integer value.
    */
-  public static boolean isImmediate(String imm) {
-    if (imm.length() == 0) {
-      return false;
+  public static long parseImmediate(String immediate) {
+    if (immediate.length() == 0) {
+      throw new NumberFormatException("Invalid immediate: empty string.");
+    }
+    
+    // Skip the initial #, if present.
+    if (immediate.charAt(0) == '#') {
+      immediate = immediate.substring(1);
     }
 
-    if (imm.charAt(0) == '#') {
-      imm = imm.substring(1);
+    // Check if it's a hexadecimal.
+    int base = 10;
+    if (immediate.length() >= 3 && immediate.substring(0, 2).compareToIgnoreCase("0x") == 0) {
+      immediate = immediate.substring(2);
+      base = 16;
     }
 
-    if (isInteger(imm)) {
-      return true;
-    } else if (isHexNumber(imm) && imm.length() <= 6) {
-      return true;
-    }
-
-    return false;
+    return Long.parseLong(immediate, base);
   }
 }
 

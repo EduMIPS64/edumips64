@@ -156,13 +156,19 @@ Le istruzioni possono accettare tre tipi di parametri:
   un'etichetta; il numero può essere specificato in base 10 o in base 16. I
   numeri in base 10 sono inseriti semplicemente scrivendo il numero
   utilizzando l'usuale notazione decimale; i numeri in base 16 si inseriscono
-  aggiungendo all'inizio del numero il prefisso "0x";
+  aggiungendo all'inizio del numero il prefisso "0x". I valori immediati
+  possono essere preceduti dal carattere #;
 * *Indirizzi* un indirizzo è composto da un valore immediato
   seguito dal nome di un registro tra parentesi. Il valore del registro sarà
   usato come base, quello dell'immediato come offset.
 
 La dimensione dei valori immediati è limitata al numero di bit disponibili
 nella codifica associata all'istruzione.
+
+Nel caso di immediati a 16 bit, come ad esempio i valori immediati delle
+istruzioni ALU I-Type, è possibile utilizzare come valore immediato un'etichetta
+di memoria. L'assembler usera come valore immediato l'indirizzo della locazione
+di memoria a cui l'etichetta punta.
 
 è possibile utilizzare gli alias standard MIPS per i primi 32 registri,
 mettendo in coda ai prefissi standard per i registri ("r", "$", "R") uno

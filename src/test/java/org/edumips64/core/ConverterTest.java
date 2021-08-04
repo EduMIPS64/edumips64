@@ -298,5 +298,46 @@ public class ConverterTest {
         assertEquals(0, actual);
     }
 
+    /** Tests for parseImmediate */
+    @Test
+    public void ParseImmediateCorrectValues() throws Exception {
+        assertEquals(Converter.parseImmediate("1"), 1L);
+        assertEquals(Converter.parseImmediate("#1"), 1L);
+        assertEquals(Converter.parseImmediate("0x1"), 1L);
+        assertEquals(Converter.parseImmediate("0X1"), 1L);
+        assertEquals(Converter.parseImmediate("#0x1"), 1L);
+
+        // Hexadecimal.
+        assertEquals(Converter.parseImmediate("0xA"), 10L);
+        assertEquals(Converter.parseImmediate("0xA"), 10L);
+        assertEquals(Converter.parseImmediate("0xDEADBEEF"), 3735928559L);
+
+        // Negative numbers.
+        assertEquals(Converter.parseImmediate("-1"), -1L);
+        assertEquals(Converter.parseImmediate("#-1"), -1L);
+        assertEquals(Converter.parseImmediate("0x-1"), -1L);
+
+        // Explicit plus sign.
+        assertEquals(Converter.parseImmediate("+1"), 1L);
+        assertEquals(Converter.parseImmediate("#+1"), 1L);
+        assertEquals(Converter.parseImmediate("0x+A"), 10L);
+        assertEquals(Converter.parseImmediate("#0x+A"), 10L);
+        assertEquals(Converter.parseImmediate("#0x+A1"), 161L);
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void ParseImmediateEmptyString() throws Exception {
+        Converter.parseImmediate("");
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void ParseImmediateInvalidHex() throws Exception {
+        Converter.parseImmediate("xA");
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void ParseImmediateNonnumericString() throws Exception {
+        Converter.parseImmediate("foo");
+    }
 }
 

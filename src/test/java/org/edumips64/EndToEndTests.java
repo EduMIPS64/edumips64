@@ -659,7 +659,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
 
   /* Issue #255: Trying to store a large memory location in an immediate field
      causes EduMIPS64 to crash */
-  @Test(expected = IntegerOverflowException.class, timeout=2000)
+  @Test(expected = ParserMultiException.class, timeout=2000)
   public void testImmediateOverflow() throws Exception {
     runMipsTest("immediate-overflow.s");
   }
