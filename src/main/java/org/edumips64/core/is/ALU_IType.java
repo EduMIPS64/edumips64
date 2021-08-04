@@ -44,7 +44,7 @@ public abstract class ALU_IType extends ComputationalInstructions {
   protected final static int RT_FIELD_LENGTH = 5;
   protected final static int RS_FIELD_LENGTH = 5;
   protected final static int IMM_FIELD_LENGTH = 16;
-  protected final static int IMM_FIELD_MAX = (int) Math.pow(2, IMM_FIELD_LENGTH - 1) - 1;
+  protected final static int IMM_FIELD_MAX = 32767; // 2^15-1
   protected String OPCODE_VALUE = "";
 
   // Needs to be mutable because LUI's syntax is %R,%I, and IMM_FIELD will be 1 in that case.
