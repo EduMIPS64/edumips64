@@ -1220,6 +1220,7 @@ public class Parser {
           }
         }
 
+      // TODO: is it correct to use those aliases for FP registers?
       if (reg.charAt(0) == '$' && (num = isAlias(reg.substring(1))) != -1) {
         return num;
       }
