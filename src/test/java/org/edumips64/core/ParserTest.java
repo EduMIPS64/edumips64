@@ -173,6 +173,18 @@ public class ParserTest extends BaseTest {
     ParseCode("movf.d f3, f4, 0");
   }
 
+  @Test
+  public void ImmediateCanStartWithHashTest() throws Exception {
+    // 16-bit signed immediate.
+    ParseCode("daddi r1, r0, #10");
+
+    // 5-bit unsigned immediate
+    ParseCode("sll r1, r0, #1");
+
+    // 3-bit unsigned immediate
+    ParseCode("movf.d f1, f2, #7");
+  }
+
   @Test(expected = ParserMultiException.class)
   public void Immediate16BitOverflow() throws Exception {
     ParseCode("daddi r1, r0, 32768");
