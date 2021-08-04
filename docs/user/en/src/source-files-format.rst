@@ -147,7 +147,8 @@ Instructions can take three types of parameters:
 * *Immediate values* an immediate value can be a number or a
   label; the number can be specified in base 10 or in base 16: base 10 numbers
   are simply inserted by writing the number, while base 16 number are inserted
-  by putting before the number the prefix "0x"
+  by putting before the number the prefix "0x". Immediate values can be preceded
+  by the # character.
 * *Address* an address is composed by an immediate value followed
   by a register name enclosed in brackets. The value of the register will be
   used as base, the value of the immediate will be the offset.
