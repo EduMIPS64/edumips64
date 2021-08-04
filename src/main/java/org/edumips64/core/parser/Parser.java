@@ -541,6 +541,7 @@ public class Parser {
                 continue;
               }
 
+              // Parse parameters if needed.
               if (syntax.compareTo("") != 0) {
                 String param = cleanFormat(line.substring(end + 1));
                 param = param.toUpperCase();
