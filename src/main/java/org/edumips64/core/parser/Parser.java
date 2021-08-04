@@ -764,147 +764,34 @@ public class Parser {
                       }
                     
                     // %U: 5-bit unsigned immediate.
-                    } else if (type == 'U') {
-                      int imm;
-
-                      if (Converter.isImmediate(paramValue)) {
-                        if (param.charAt(paramStart) == '#') {
-                          paramValue = paramValue.substring(1);
-                        }
-
-                        if (Converter.isInteger(paramValue)) {
-                          try {
-                            imm = Integer.parseInt(paramValue.trim());
-
-                            if (imm < 0) {
-                              numError++;
-                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
-                              column = line.length();
-                              tmpInst.getParams().add(0);
-                              continue;
-                            }
-
-                            if (imm < 0 || imm > 31) {
-                              throw new NumberFormatException();
-                            }
-                          } catch (NumberFormatException ex) {
-                            imm = 0;
-                            numError++;
-                            error.add("5BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                          }
-
-                          tmpInst.getParams().add(imm);
-                          paramStart = paramEnd + 1;
-                        } else if (Converter.isHexNumber(paramValue.trim())) {
-                          try {
-                            imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
-
-                            if (imm < 0) {
-                              numError++;
-                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
-                              column = line.length();
-                              tmpInst.getParams().add(0);
-                              continue;
-                            }
-
-                            tmpInst.getParams().add(imm);
-                            paramStart = paramEnd + 1;
-
-                            if (imm < 0 || imm > 31) {
-                              throw new NumberFormatException();
-                            }
-                          } catch (NumberFormatException ex) {
-                            imm = 0;
-                            numError++;
-                            error.add("5BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-
-                            tmpInst.getParams().add(imm);
-                            paramStart = paramEnd + 1;
-
-                          } catch (IrregularStringOfHexException ex) {
-                            //non ci dovrebbe mai arrivare
-                          }
-                        }
-
-                      } else {
-                        numError++;
-                        error.add("INVALIDIMMEDIATE", row, line.indexOf(paramValue) + 1, line);
-                        column = line.length();
-                        tmpInst.getParams().add(0);
-                        continue;
-                      }
-                    
                     // %C: 3-bit unsigned immediate.
-                    } else if (type == 'C') {
-                      int imm;
+                    } else if (type == 'U' || type == 'C') {
+                      // The code for %U and %C is the same, only the upper bound changes (and the overflow error message).
+                      long maxValue = type == 'U' ? 31 : 7;
+                      String overflowErrorMessage = type == 'U' ? "5BIT_IMMEDIATE_TOO_LARGE" : "3BIT_IMMEDIATE_TOO_LARGE";
 
-                      if (Converter.isImmediate(paramValue)) {
-                        if (param.charAt(paramStart) == '#') {
-                          paramValue = paramValue.substring(1);
-                        }
-
-                        if (Converter.isInteger(paramValue)) {
-                          try {
-                            imm = Integer.parseInt(paramValue.trim());
-
-                            if (imm < 0) {
-                              numError++;
-                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
-                              column = line.length();
-                              tmpInst.getParams().add(0);
-                              continue;
-                            }
-
-                            if (imm < 0 || imm > 7) {
-                              throw new NumberFormatException();
-                            }
-                          } catch (NumberFormatException ex) {
-                            imm = 0;
-                            numError++;
-                            error.add("3BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                          }
-
-                          tmpInst.getParams().add(imm);
+                      long immediateValue = 0;
+                      String errorMessage = ""; // Will be populated with the error message string if there's an error.
+                      try {
+                        immediateValue = parseImmediate(paramValue);
+                        if (immediateValue < 0) {
+                          errorMessage = "VALUEISNOTUNSIGNED";
+                        } else if (immediateValue > maxValue) {
+                          errorMessage = overflowErrorMessage;
+                        } else {
                           paramStart = paramEnd + 1;
-                        } else if (Converter.isHexNumber(paramValue.trim())) {
-                          try {
-                            imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
-
-                            if (imm < 0) {
-                              numError++;
-                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
-                              column = line.length();
-                              tmpInst.getParams().add(0);
-                              continue;
-                            }
-
-                            tmpInst.getParams().add(imm);
-                            paramStart = paramEnd + 1;
-
-                            if (imm < 0 || imm > 31) {
-                              throw new NumberFormatException();
-                            }
-                          } catch (NumberFormatException ex) {
-                            imm = 0;
-                            numError++;
-                            error.add("3BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-
-                            tmpInst.getParams().add(imm);
-                            paramStart = paramEnd + 1;
-
-                          } catch (IrregularStringOfHexException ex) {
-                            //non ci dovrebbe mai arrivare
-                          }
                         }
-
-                      } else {
+                      } catch (NumberFormatException e) {
+                        errorMessage = "INVALIDIMMEDIATE";
+                      }
+                      // Casting to int is safe because we know the value is between 0 and 31.
+                      tmpInst.getParams().add((int)immediateValue);
+                      if (!errorMessage.isEmpty()) {
                         numError++;
-                        error.add("INVALIDIMMEDIATE", row, line.indexOf(paramValue) + 1, line);
+                        error.add(errorMessage, row, line.indexOf(paramValue) + 1, line);
                         column = line.length();
-                        tmpInst.getParams().add(0);
                         continue;
                       }
-                    
                     // %L: Memory Label.
                     } else if (type == 'L') {
                       try {
@@ -1137,6 +1024,39 @@ public class Parser {
     } else if (numWarning > 0) {
       throw warning;
     }
+  }
+
+  /**
+   * Parses an immediate value without any overflow/underflow check.
+   * 
+   * The immediate value may be preceded by the # character (which is ignored).
+   * The immediate value may be encoded in base 10 or in base 16. In the latter
+   * case, it must be preceded by the '0x' or '0X' prefix.
+   * 
+   * If the # character is used in a base-16 immediate, it must precede the 0x prefix.
+   * 
+   * @param immediate a string representing an immediate value.
+   * @throws NumberFormatException if the number is not well-formatted.
+   * @return the parsed integer value.
+   */
+  public static long parseImmediate(String immediate) {
+    if (immediate.length() == 0) {
+      throw new NumberFormatException("Invalid immediate: empty string.");
+    }
+    
+    // Skip the initial #, if present.
+    if (immediate.charAt(0) == '#') {
+      immediate = immediate.substring(1);
+    }
+
+    // Check if it's a hexadecimal.
+    int base = 10;
+    if (immediate.length() >= 3 && immediate.substring(0, 2).compareToIgnoreCase("0x") == 0) {
+      immediate = immediate.substring(2);
+      base = 16;
+    }
+
+    return Long.parseLong(immediate, base);
   }
 
   /** Clean multiple tab or spaces in a badly formatted String. 

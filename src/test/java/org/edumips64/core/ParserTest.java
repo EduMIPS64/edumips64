@@ -215,6 +215,48 @@ public class ParserTest extends BaseTest {
     ParseCode("movf.d f3, f4, -1");
   }
 
+  /** Tests for parseImmediate */
+  @Test
+  public void ParseImmediateCorrectValues() throws Exception {
+    assertEquals(Parser.parseImmediate("1"), 1L);
+    assertEquals(Parser.parseImmediate("#1"), 1L);
+    assertEquals(Parser.parseImmediate("0x1"), 1L);
+    assertEquals(Parser.parseImmediate("0X1"), 1L);
+    assertEquals(Parser.parseImmediate("#0x1"), 1L);
+
+    // Hexadecimal.
+    assertEquals(Parser.parseImmediate("0xA"), 10L);
+    assertEquals(Parser.parseImmediate("0xA"), 10L);
+    assertEquals(Parser.parseImmediate("0xDEADBEEF"), 3735928559L);
+
+    // Negative numbers.
+    assertEquals(Parser.parseImmediate("-1"), -1L);
+    assertEquals(Parser.parseImmediate("#-1"), -1L);
+    assertEquals(Parser.parseImmediate("0x-1"), -1L);
+
+    // Explicit plus sign.
+    assertEquals(Parser.parseImmediate("+1"), 1L);
+    assertEquals(Parser.parseImmediate("#+1"), 1L);
+    assertEquals(Parser.parseImmediate("0x+A"), 10L);
+    assertEquals(Parser.parseImmediate("#0x+A"), 10L);
+    assertEquals(Parser.parseImmediate("#0x+A1"), 161L);
+  }
+
+  @Test(expected = NumberFormatException.class)
+  public void ParseImmediateEmptyString() throws Exception {
+    Parser.parseImmediate("");
+  }
+
+  @Test(expected = NumberFormatException.class)
+  public void ParseImmediateInvalidHex() throws Exception {
+    Parser.parseImmediate("xA");
+  }
+
+  @Test(expected = NumberFormatException.class)
+  public void ParseImmediateNonnumericString() throws Exception {
+    Parser.parseImmediate("foo");
+  }
+
   /** Regression test for issue #95 */
   @Test
   public void CRLFParsingTest() throws Exception {
