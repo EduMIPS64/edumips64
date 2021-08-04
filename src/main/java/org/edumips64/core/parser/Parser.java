@@ -616,7 +616,6 @@ public class Parser {
 
                       if (Converter.isImmediate(paramValue)) {
                         if (param.charAt(paramStart) == '#') {
-                          paramStart++;
                           paramValue = paramValue.substring(1);
                         }
 
@@ -770,7 +769,6 @@ public class Parser {
 
                       if (Converter.isImmediate(paramValue)) {
                         if (param.charAt(paramStart) == '#') {
-                          paramStart++;
                           paramValue = paramValue.substring(1);
                         }
 
@@ -842,7 +840,6 @@ public class Parser {
 
                       if (Converter.isImmediate(paramValue)) {
                         if (param.charAt(paramStart) == '#') {
-                          paramStart++;
                           paramValue = paramValue.substring(1);
                         }
 
