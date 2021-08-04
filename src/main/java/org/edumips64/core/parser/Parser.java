@@ -610,7 +610,7 @@ public class Parser {
                         continue;
                       }
                     
-                    // %I: 16-bit immediate.
+                    // %I: 16-bit signed immediate.
                     } else if (type == 'I') {
                       int imm;
 
@@ -764,7 +764,7 @@ public class Parser {
                         }
                       }
                     
-                    // %U: Unsigned immediate.
+                    // %U: 5-bit unsigned immediate.
                     } else if (type == 'U') {
                       int imm;
 
@@ -836,7 +836,7 @@ public class Parser {
                         continue;
                       }
                     
-                    // %C: Unsigned Immediate (3 bit).
+                    // %C: 3-bit unsigned immediate.
                     } else if (type == 'C') {
                       int imm;
 
