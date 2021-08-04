@@ -1013,20 +1013,14 @@ public class Parser {
                 if (i == line.length()) {
                   continue;
                 }
+              }
 
-                try {
-                  if (doPack) {
-                    tmpInst.pack();
-                  }
-                } catch (IrregularStringOfBitsException ex) {
-                  logger.severe("Irregular string of bits: " + ex.getMessage());
-                }
-              } else {
-                try {
+              try {
+                if (doPack) {
                   tmpInst.pack();
-                } catch (IrregularStringOfBitsException e) {
-                  logger.severe("Irregular string of bits: " + e.getMessage());
                 }
+              } catch (IrregularStringOfBitsException e) {
+                logger.severe("Irregular string of bits: " + e.getMessage());
               }
 
               logger.info("row: " + line);
