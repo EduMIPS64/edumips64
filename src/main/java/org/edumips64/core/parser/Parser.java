@@ -242,17 +242,17 @@ public class Parser {
       row++;
       logger.info("-- Processing line " + row);
 
-      for (int i = 0; i < line.length(); i++) {
-        if (line.charAt(i) == ';') {  //comments
+      for (int column = 0; column < line.length(); column++) {
+        if (line.charAt(column) == ';') {  //comments
           break;
         }
 
-        if (line.charAt(i) == ' ' || line.charAt(i) == '\t') {
+        if (line.charAt(column) == ' ' || line.charAt(column) == '\t') {
           continue;
         }
 
-        int tab = line.indexOf('\t', i);
-        int space = line.indexOf(' ', i);
+        int tab = line.indexOf('\t', column);
+        int space = line.indexOf(' ', column);
 
         if (tab == -1) {
           tab = line.length();
@@ -264,11 +264,11 @@ public class Parser {
 
         int end = Math.min(tab, space) - 1;
 
-        String instr = line.substring(i, end + 1);
+        String instr = line.substring(column, end + 1);
         String parameters;
 
         try {
-          if (line.charAt(i) == '.') {
+          if (line.charAt(column) == '.') {
             logger.info("Processing " + instr);
 
             if (instr.compareToIgnoreCase(".DATA") == 0) {
@@ -280,8 +280,8 @@ public class Parser {
 
               if (section != FileSection.DATA) {
                 numError++;
-                error.add(name.toUpperCase() + "INCODE", row, i + 1, line);
-                i = line.length();
+                error.add(name.toUpperCase() + "INCODE", row, column + 1, line);
+                column = line.length();
                 continue;
               }
 
@@ -300,17 +300,17 @@ public class Parser {
                 logger.info("parameters: " + parameters);
               } catch (StringIndexOutOfBoundsException e) {
                 numWarning++;
-                warning.add("VALUE_MISS", row, i + 1, line);
-                error.addWarning("VALUE_MISS", row, i + 1, line);
+                warning.add("VALUE_MISS", row, column + 1, line);
+                error.addWarning("VALUE_MISS", row, column + 1, line);
                 memoryCount++;
-                i = line.length();
+                column = line.length();
                 continue;
               }
 
               MemoryElement tmpMem;
               tmpMem = mem.getCellByIndex(memoryCount);
               logger.info("line: " + line);
-              String[] comment = (line.substring(i)).split(";", 2);
+              String[] comment = (line.substring(column)).split(";", 2);
 
               if (comment.length == 2) {
                 logger.info("found comments: " + comment[1]);
@@ -436,11 +436,11 @@ public class Parser {
                   }
                 } catch (NumberFormatException ex) {
                   numError++;
-                  error.add("INVALIDVALUE", row, i + 1, line);
+                  error.add("INVALIDVALUE", row, column + 1, line);
                   continue;
                 } catch (IrregularStringOfHexException ex) {
                   numError++;
-                  error.add("INVALIDVALUE", row, i + 1, line);
+                  error.add("INVALIDVALUE", row, column + 1, line);
                   continue;
                 }
 
@@ -448,29 +448,29 @@ public class Parser {
                 end = line.length();
               } else if (instr.compareToIgnoreCase(".WORD") == 0 || instr.compareToIgnoreCase(".WORD64") == 0) {
                 logger.info("pamword: " + parameters);
-                writeIntegerInMemory(row, i, line, parameters, 64, "WORD");
+                writeIntegerInMemory(row, column, line, parameters, 64, "WORD");
                 end = line.length();
               } else if (instr.compareToIgnoreCase(".WORD32") == 0) {
-                writeIntegerInMemory(row, i, line, parameters, 32, "WORD32");
+                writeIntegerInMemory(row, column, line, parameters, 32, "WORD32");
                 end = line.length();
               } else if (instr.compareToIgnoreCase(".BYTE") == 0) {
-                writeIntegerInMemory(row, i, line, parameters, 8, "BYTE");
+                writeIntegerInMemory(row, column, line, parameters, 8, "BYTE");
                 end = line.length();
               } else if (instr.compareToIgnoreCase(".WORD16") == 0) {
-                writeIntegerInMemory(row, i, line, parameters, 16 , "WORD16");
+                writeIntegerInMemory(row, column, line, parameters, 16 , "WORD16");
                 end = line.length();
               } else if (instr.compareToIgnoreCase(".DOUBLE") == 0) {
-                writeDoubleInMemory(row, i, line, parameters);
+                writeDoubleInMemory(row, column, line, parameters);
                 end = line.length();
               } else {
                 numError++;
-                error.add("INVALIDCODEFORDATA", row, i + 1, line);
-                i = line.length();
+                error.add("INVALIDCODEFORDATA", row, column + 1, line);
+                column = line.length();
                 continue;
               }
             }
           } else if (line.charAt(end) == ':') {
-            String label = line.substring(i, end);
+            String label = line.substring(column, end);
             logger.info("Processing label " + label);
 
             if (section == FileSection.DATA) {
@@ -491,8 +491,8 @@ public class Parser {
           } else {
             if (section != FileSection.TEXT) {
               numError++;
-              error.add("INVALIDCODEFORDATA", row, i + 1, line);
-              i = line.length();
+              error.add("INVALIDCODEFORDATA", row, column + 1, line);
+              column = line.length();
               continue;
 
             } else if (section == FileSection.TEXT) {
@@ -501,7 +501,7 @@ public class Parser {
               Instruction tmpInst;
 
               // Check for halt-like instructions
-              String temp = cleanFormat(line.substring(i)).toUpperCase();
+              String temp = cleanFormat(line.substring(column)).toUpperCase();
 
               if (temp.contains("HALT") || temp.contains("SYSCALL 0") || temp.contains("TRAP 0")) {
                 halt = true;
@@ -509,21 +509,21 @@ public class Parser {
 
               //timmy
               for (int timmy = 0; timmy < deprecateInstruction.length; timmy++) {
-                if (deprecateInstruction[timmy].toUpperCase().equals(line.substring(i, end).toUpperCase())) {
-                  warning.add("WINMIPS64_NOT_MIPS64", row, i + 1, line);
-                  error.addWarning("WINMIPS64_NOT_MIPS64", row, i + 1, line);
+                if (deprecateInstruction[timmy].toUpperCase().equals(line.substring(column, end).toUpperCase())) {
+                  warning.add("WINMIPS64_NOT_MIPS64", row, column + 1, line);
+                  error.addWarning("WINMIPS64_NOT_MIPS64", row, column + 1, line);
                   numWarning++;
                 }
               }
 
               // Parsing the instruction name to get the type of parameters to expect.
               ParsedInstructionMetadata meta = new ParsedInstructionMetadata(row, instrCount+4);
-              tmpInst = instructionBuilder.buildInstruction(line.substring(i, end).toUpperCase(), meta);
+              tmpInst = instructionBuilder.buildInstruction(line.substring(column, end).toUpperCase(), meta);
 
               if (tmpInst == null) {
                 numError++;
-                error.add("INVALIDCODE", row, i + 1, line);
-                i = line.length();
+                error.add("INVALIDCODE", row, column + 1, line);
+                column = line.length();
                 continue;
               }
 
@@ -537,7 +537,7 @@ public class Parser {
               if (syntax.compareTo("") != 0 && (line.length() < end + 1)) {
                 numError++;
                 error.add("UNKNOWNSYNTAX", row, end, line);
-                i = line.length();
+                column = line.length();
                 continue;
               }
 
@@ -547,38 +547,38 @@ public class Parser {
                 param = param.toUpperCase();
                 param = param.split(";") [0].trim();
                 logger.info("param: " + param);
-                int indPar = 0;
+                int paramStart = 0;
 
-                for (int z = 0; z < syntax.length(); z++) {
-                  if (syntax.charAt(z) == '%') {
-                    z++; // Skip over the %.
-                    var type = syntax.charAt(z);
+                for (int syntaxIterator = 0; syntaxIterator < syntax.length(); syntaxIterator++) {
+                  if (syntax.charAt(syntaxIterator) == '%') {
+                    syntaxIterator++; // Skip over the %.
+                    var type = syntax.charAt(syntaxIterator);
 
                     // If there is another separator (e.g., a comma or a parenthesis)
                     // save it in nextToken so we can try to find it later.
                     Character nextToken = ' ';
-                    if (z < syntax.length() - 1) {
-                      nextToken = syntax.charAt(z+1);
+                    if (syntaxIterator < syntax.length() - 1) {
+                      nextToken = syntax.charAt(syntaxIterator+1);
                     }
 
                     // Find the end of the parameter value, and as part of that validate
                     // that the correct separator is present.
-                    int endPar;
-                    if (z != syntax.length() - 1) {
-                      endPar = param.indexOf(nextToken, indPar);
+                    int paramEnd;
+                    if (syntaxIterator != syntax.length() - 1) {
+                      paramEnd = param.indexOf(nextToken, paramStart);
                     } else {
-                      endPar = param.length();
+                      paramEnd = param.length();
                     }
 
-                    if (endPar == -1) {
+                    if (paramEnd == -1) {
                       numError++;
-                      error.add("SEPARATORMISS", row, indPar, line);
-                      i = line.length();
+                      error.add("SEPARATORMISS", row, paramStart, line);
+                      column = line.length();
                       tmpInst.getParams().add(0);
                       continue;
                     }
 
-                    var paramValue = param.substring(indPar, endPar);
+                    var paramValue = param.substring(paramStart, paramEnd);
 
                     // %R: General Purpose Register.
                     if (type == 'R') {
@@ -586,12 +586,12 @@ public class Parser {
 
                       if ((reg = isRegister(paramValue.trim())) >= 0) {
                         tmpInst.getParams().add(reg);
-                        indPar = endPar + 1;
+                        paramStart = paramEnd + 1;
                       } else {
                         numError++;
                         error.add("INVALIDREGISTER", row, line.indexOf(paramValue) + 1, line);
                         tmpInst.getParams().add(0);
-                        i = line.length();
+                        column = line.length();
                         continue;
                       }
 
@@ -601,12 +601,12 @@ public class Parser {
 
                       if ((reg = isRegisterFP(paramValue.trim())) >= 0) {
                         tmpInst.getParams().add(reg);
-                        indPar = endPar + 1;
+                        paramStart = paramEnd + 1;
                       } else {
                         numError++;
                         error.add("INVALIDREGISTER", row, line.indexOf(paramValue) + 1, line);
                         tmpInst.getParams().add(0);
-                        i = line.length();
+                        column = line.length();
                         continue;
                       }
                     
@@ -615,8 +615,8 @@ public class Parser {
                       int imm;
 
                       if (Converter.isImmediate(paramValue)) {
-                        if (param.charAt(indPar) == '#') {
-                          indPar++;
+                        if (param.charAt(paramStart) == '#') {
+                          paramStart++;
                           paramValue = paramValue.substring(1);
                         }
 
@@ -634,7 +634,7 @@ public class Parser {
                           }
 
                           tmpInst.getParams().add(imm);
-                          indPar = endPar + 1;
+                          paramStart = paramEnd + 1;
                         } else if (Converter.isHexNumber(paramValue)) {
                           try {
                             try {
@@ -651,7 +651,7 @@ public class Parser {
                             }
 
                             tmpInst.getParams().add(imm);
-                            indPar = endPar + 1;
+                            paramStart = paramEnd + 1;
                           } catch (IrregularStringOfHexException ex) {
                             //non ci dovrebbe mai arrivare
                           }
@@ -661,12 +661,12 @@ public class Parser {
                         try {
                           int cc;
                           MemoryElement tmpMem;
-                          cc = param.indexOf("+", indPar);
+                          cc = param.indexOf("+", paramStart);
 
                           if (cc != -1) {
-                            tmpMem = symTab.getCell(param.substring(indPar, cc).trim());
+                            tmpMem = symTab.getCell(param.substring(paramStart, cc).trim());
 
-                            if (Converter.isInteger(param.substring(cc + 1, endPar))) {
+                            if (Converter.isInteger(param.substring(cc + 1, paramEnd))) {
                               try {
                                 imm = Integer.parseInt(paramValue);
 
@@ -680,8 +680,8 @@ public class Parser {
                               }
 
                               tmpInst.getParams().add(tmpMem.getAddress() + imm);
-                              indPar = endPar + 1;
-                            } else if (Converter.isHexNumber(param.substring(cc + 1, endPar))) {
+                              paramStart = paramEnd + 1;
+                            } else if (Converter.isHexNumber(param.substring(cc + 1, paramEnd))) {
                               try {
                                 try {
                                   imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
@@ -696,23 +696,23 @@ public class Parser {
                                 }
 
                                 tmpInst.getParams().add(tmpMem.getAddress() + imm);
-                                indPar = endPar + 1;
+                                paramStart = paramEnd + 1;
                               } catch (IrregularStringOfHexException ex) {
                                 logger.severe("Irregular string of bits: " + ex.getMessage());
                               }
                             } else {
-                              MemoryElement tmpMem1 = symTab.getCell(param.substring(cc + 1, endPar).trim());
+                              MemoryElement tmpMem1 = symTab.getCell(param.substring(cc + 1, paramEnd).trim());
                               tmpInst.getParams().add(tmpMem.getAddress() + tmpMem1.getAddress());
                             }
 
                           } else {
 
-                            cc = param.indexOf("-", indPar);
+                            cc = param.indexOf("-", paramStart);
 
                             if (cc != -1) {
-                              tmpMem = symTab.getCell(param.substring(indPar, cc).trim());
+                              tmpMem = symTab.getCell(param.substring(paramStart, cc).trim());
 
-                              if (Converter.isInteger(param.substring(cc + 1, endPar))) {
+                              if (Converter.isInteger(param.substring(cc + 1, paramEnd))) {
                                 try {
                                   imm = Integer.parseInt(paramValue);
 
@@ -726,8 +726,8 @@ public class Parser {
                                 }
 
                                 tmpInst.getParams().add(tmpMem.getAddress() - imm);
-                                indPar = endPar + 1;
-                              } else if (Converter.isHexNumber(param.substring(cc + 1, endPar))) {
+                                paramStart = paramEnd + 1;
+                              } else if (Converter.isHexNumber(param.substring(cc + 1, paramEnd))) {
                                 try {
                                   try {
                                     imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
@@ -742,12 +742,12 @@ public class Parser {
                                   }
 
                                   tmpInst.getParams().add(tmpMem.getAddress() - imm);
-                                  indPar = endPar + 1;
+                                  paramStart = paramEnd + 1;
                                 } catch (IrregularStringOfHexException ex) {
                                   //non ci dovrebbe mai arrivare
                                 }
                               } else {
-                                MemoryElement tmpMem1 = symTab.getCell(param.substring(cc + 1, endPar).trim());
+                                MemoryElement tmpMem1 = symTab.getCell(param.substring(cc + 1, paramEnd).trim());
                                 tmpInst.getParams().add(tmpMem.getAddress() - tmpMem1.getAddress());
                               }
                             } else {
@@ -758,7 +758,7 @@ public class Parser {
                         } catch (MemoryElementNotFoundException ex) {
                           numError++;
                           error.add("INVALIDIMMEDIATE", row, line.indexOf(paramValue) + 1, line);
-                          i = line.length();
+                          column = line.length();
                           tmpInst.getParams().add(0);
                           continue;
                         }
@@ -769,8 +769,8 @@ public class Parser {
                       int imm;
 
                       if (Converter.isImmediate(paramValue)) {
-                        if (param.charAt(indPar) == '#') {
-                          indPar++;
+                        if (param.charAt(paramStart) == '#') {
+                          paramStart++;
                           paramValue = paramValue.substring(1);
                         }
 
@@ -781,7 +781,7 @@ public class Parser {
                             if (imm < 0) {
                               numError++;
                               error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
-                              i = line.length();
+                              column = line.length();
                               tmpInst.getParams().add(0);
                               continue;
                             }
@@ -796,7 +796,7 @@ public class Parser {
                           }
 
                           tmpInst.getParams().add(imm);
-                          indPar = endPar + 1;
+                          paramStart = paramEnd + 1;
                         } else if (Converter.isHexNumber(paramValue.trim())) {
                           try {
                             imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
@@ -804,13 +804,13 @@ public class Parser {
                             if (imm < 0) {
                               numError++;
                               error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
-                              i = line.length();
+                              column = line.length();
                               tmpInst.getParams().add(0);
                               continue;
                             }
 
                             tmpInst.getParams().add(imm);
-                            indPar = endPar + 1;
+                            paramStart = paramEnd + 1;
 
                             if (imm < 0 || imm > 31) {
                               throw new NumberFormatException();
@@ -821,7 +821,7 @@ public class Parser {
                             error.add("5BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
 
                             tmpInst.getParams().add(imm);
-                            indPar = endPar + 1;
+                            paramStart = paramEnd + 1;
 
                           } catch (IrregularStringOfHexException ex) {
                             //non ci dovrebbe mai arrivare
@@ -831,7 +831,7 @@ public class Parser {
                       } else {
                         numError++;
                         error.add("INVALIDIMMEDIATE", row, line.indexOf(paramValue) + 1, line);
-                        i = line.length();
+                        column = line.length();
                         tmpInst.getParams().add(0);
                         continue;
                       }
@@ -841,8 +841,8 @@ public class Parser {
                       int imm;
 
                       if (Converter.isImmediate(paramValue)) {
-                        if (param.charAt(indPar) == '#') {
-                          indPar++;
+                        if (param.charAt(paramStart) == '#') {
+                          paramStart++;
                           paramValue = paramValue.substring(1);
                         }
 
@@ -853,7 +853,7 @@ public class Parser {
                             if (imm < 0) {
                               numError++;
                               error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
-                              i = line.length();
+                              column = line.length();
                               tmpInst.getParams().add(0);
                               continue;
                             }
@@ -868,7 +868,7 @@ public class Parser {
                           }
 
                           tmpInst.getParams().add(imm);
-                          indPar = endPar + 1;
+                          paramStart = paramEnd + 1;
                         } else if (Converter.isHexNumber(paramValue.trim())) {
                           try {
                             imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
@@ -876,13 +876,13 @@ public class Parser {
                             if (imm < 0) {
                               numError++;
                               error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
-                              i = line.length();
+                              column = line.length();
                               tmpInst.getParams().add(0);
                               continue;
                             }
 
                             tmpInst.getParams().add(imm);
-                            indPar = endPar + 1;
+                            paramStart = paramEnd + 1;
 
                             if (imm < 0 || imm > 31) {
                               throw new NumberFormatException();
@@ -893,7 +893,7 @@ public class Parser {
                             error.add("3BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
 
                             tmpInst.getParams().add(imm);
-                            indPar = endPar + 1;
+                            paramStart = paramEnd + 1;
 
                           } catch (IrregularStringOfHexException ex) {
                             //non ci dovrebbe mai arrivare
@@ -903,7 +903,7 @@ public class Parser {
                       } else {
                         numError++;
                         error.add("INVALIDIMMEDIATE", row, line.indexOf(paramValue) + 1, line);
-                        i = line.length();
+                        column = line.length();
                         tmpInst.getParams().add(0);
                         continue;
                       }
@@ -923,8 +923,8 @@ public class Parser {
                             String er = "LABELADDRESSINVALID";
 
                             error.add(er, row, line.indexOf(paramValue) + 1, line);
-                            i = line.length();
-                            indPar = endPar + 1;
+                            column = line.length();
+                            paramStart = paramEnd + 1;
                             tmpInst.getParams().add(0);
                             continue;
                           }
@@ -936,12 +936,12 @@ public class Parser {
 
                         }
 
-                        indPar = endPar + 1;
+                        paramStart = paramEnd + 1;
                       } catch (MemoryElementNotFoundException e) {
                         numError++;
                         error.add("LABELNOTFOUND", row, line.indexOf(paramValue) + 1, line);
-                        i = line.length();
-                        indPar = endPar + 1;
+                        column = line.length();
+                        paramStart = paramEnd + 1;
                         tmpInst.getParams().add(0);
                         continue;
                       }
@@ -959,7 +959,7 @@ public class Parser {
                         tmpVoid.instr = tmpInst;
                         tmpVoid.row = row;
                         tmpVoid.line = line;
-                        tmpVoid.column = indPar;
+                        tmpVoid.column = paramStart;
                         tmpVoid.label = label;
                         voidJump.add(tmpVoid);
                         doPack = false;
@@ -977,7 +977,7 @@ public class Parser {
                         tmpVoid.instr = tmpInst;
                         tmpVoid.row = row;
                         tmpVoid.line = line;
-                        tmpVoid.column = indPar;
+                        tmpVoid.column = paramStart;
                         tmpVoid.label = paramValue;
                         tmpVoid.instrCount = instrCount;
                         tmpVoid.isBranch = true;
@@ -987,7 +987,7 @@ public class Parser {
                     } else {
                       numError++;
                       error.add("UNKNOWNSYNTAX", row, 1, line);
-                      i = line.length();
+                      column = line.length();
                       tmpInst.getParams().add(0);
                       continue;
                     }
@@ -997,21 +997,21 @@ public class Parser {
                     // within each iteration. Since we removed the peeking, we still need to move
                     // it forward, waiting for a better version of this code that doesn't need
                     // this index munging.
-                    if (z != syntax.length() - 1) {
-                      z++; 
+                    if (syntaxIterator != syntax.length() - 1) {
+                      syntaxIterator++; 
                     }
                   } else {
-                    if (syntax.charAt(z) != param.charAt(indPar++)) {
+                    if (syntax.charAt(syntaxIterator) != param.charAt(paramStart++)) {
                       numError++;
                       error.add("UNKNOWNSYNTAX", row, 1, line);
-                      i = line.length();
+                      column = line.length();
                       tmpInst.getParams().add(0);
                       continue;
                     }
                   }
                 }
 
-                if (i == line.length()) {
+                if (column == line.length()) {
                   continue;
                 }
               }
@@ -1026,10 +1026,10 @@ public class Parser {
 
               logger.info("row: " + line);
               String comment[] = line.split(";", 2);
-              tmpInst.setFullName(replaceTab(comment[0].substring(i)));
-              tmpInst.setFullName(replaceTab(comment[0].substring(i)));
-              tmpInst.setFullName(replaceTab(comment[0].substring(i)));
-              tmpInst.setFullName(replaceTab(comment[0].substring(i)));
+              tmpInst.setFullName(replaceTab(comment[0].substring(column)));
+              tmpInst.setFullName(replaceTab(comment[0].substring(column)));
+              tmpInst.setFullName(replaceTab(comment[0].substring(column)));
+              tmpInst.setFullName(replaceTab(comment[0].substring(column)));
 
               if (comment.length == 2) {
                 tmpInst.setComment(comment[1]);
@@ -1045,14 +1045,14 @@ public class Parser {
                 if (isFirstOutOfInstructionMemory) { //is first out of memory?
                   isFirstOutOfInstructionMemory = false;
                   numError++;
-                  error.add("OUTOFINSTRUCTIONMEMORY", row, i + 1, line);
-                  i = line.length();
+                  error.add("OUTOFINSTRUCTIONMEMORY", row, column + 1, line);
+                  column = line.length();
                   continue;
                 }
               } catch (SameLabelsException ex) {
                 numError++;
                 error.add("SAMELABEL", row, 1, line);
-                i = line.length();
+                column = line.length();
               }
               // Il finally e' totalmente inutile, ma Ãš bello utilizzarlo per la
               // prima volta in un programma ;)
@@ -1064,20 +1064,20 @@ public class Parser {
             }
           }
 
-          i = end;
+          column = end;
         } catch (MemoryElementNotFoundException ex) {
           // Even if we don't report the error, advance i to prevent other errors from
           // being generated on this line.
-          i = line.length();
+          column = line.length();
           if (isFirstOutOfMemory) { //is first out of memory?
             isFirstOutOfMemory = false;
             numError++;
-            error.add("OUTOFMEMORY_PARSER", row, i + 1, line);
+            error.add("OUTOFMEMORY_PARSER", row, column + 1, line);
             continue;
           }
         } catch (IrregularWriteOperationException ex) {
           numError++;
-          error.add("INVALIDVALUE", row, i + 1, line);
+          error.add("INVALIDVALUE", row, column + 1, line);
           break;
         }
       }
