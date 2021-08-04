@@ -657,102 +657,18 @@ public class Parser {
                         }
 
                       } else {
+                        MemoryElement tmpMem;
                         try {
-                          int cc;
-                          MemoryElement tmpMem;
-                          cc = param.indexOf("+", paramStart);
-
-                          if (cc != -1) {
-                            tmpMem = symTab.getCell(param.substring(paramStart, cc).trim());
-
-                            if (Converter.isInteger(param.substring(cc + 1, paramEnd))) {
-                              try {
-                                imm = Integer.parseInt(paramValue);
-
-                                if (imm < -32768 || imm > 32767) {
-                                  throw new NumberFormatException();
-                                }
-                              } catch (NumberFormatException ex) {
-                                imm = 0;
-                                numError++;
-                                error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                              }
-
-                              tmpInst.getParams().add(tmpMem.getAddress() + imm);
-                              paramStart = paramEnd + 1;
-                            } else if (Converter.isHexNumber(param.substring(cc + 1, paramEnd))) {
-                              try {
-                                try {
-                                  imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
-
-                                  if (imm < -32768 || imm > 32767) {
-                                    throw new NumberFormatException();
-                                  }
-                                } catch (NumberFormatException ex) {
-                                  imm = 0;
-                                  numError++;
-                                  error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                                }
-
-                                tmpInst.getParams().add(tmpMem.getAddress() + imm);
-                                paramStart = paramEnd + 1;
-                              } catch (IrregularStringOfHexException ex) {
-                                logger.severe("Irregular string of bits: " + ex.getMessage());
-                              }
-                            } else {
-                              MemoryElement tmpMem1 = symTab.getCell(param.substring(cc + 1, paramEnd).trim());
-                              tmpInst.getParams().add(tmpMem.getAddress() + tmpMem1.getAddress());
-                            }
-
+                          tmpMem = symTab.getCell(paramValue.trim());
+                          imm = tmpMem.getAddress();
+                          if (imm < -32768 || imm > 32767) {
+                            imm = 0;
+                            numError++;
+                            error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
+                            tmpInst.getParams().add(0);
+                            continue;
                           } else {
-
-                            cc = param.indexOf("-", paramStart);
-
-                            if (cc != -1) {
-                              tmpMem = symTab.getCell(param.substring(paramStart, cc).trim());
-
-                              if (Converter.isInteger(param.substring(cc + 1, paramEnd))) {
-                                try {
-                                  imm = Integer.parseInt(paramValue);
-
-                                  if (imm < -32768 || imm > 32767) {
-                                    throw new NumberFormatException();
-                                  }
-                                } catch (NumberFormatException ex) {
-                                  imm = 0;
-                                  numError++;
-                                  error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                                }
-
-                                tmpInst.getParams().add(tmpMem.getAddress() - imm);
-                                paramStart = paramEnd + 1;
-                              } else if (Converter.isHexNumber(param.substring(cc + 1, paramEnd))) {
-                                try {
-                                  try {
-                                    imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
-
-                                    if (imm < -32768 || imm > 32767) {
-                                      throw new NumberFormatException();
-                                    }
-                                  } catch (NumberFormatException ex) {
-                                    imm = 0;
-                                    numError++;
-                                    error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
-                                  }
-
-                                  tmpInst.getParams().add(tmpMem.getAddress() - imm);
-                                  paramStart = paramEnd + 1;
-                                } catch (IrregularStringOfHexException ex) {
-                                  //non ci dovrebbe mai arrivare
-                                }
-                              } else {
-                                MemoryElement tmpMem1 = symTab.getCell(param.substring(cc + 1, paramEnd).trim());
-                                tmpInst.getParams().add(tmpMem.getAddress() - tmpMem1.getAddress());
-                              }
-                            } else {
-                              tmpMem = symTab.getCell(paramValue.trim());
-                              tmpInst.getParams().add(tmpMem.getAddress());
-                            }
+                            tmpInst.getParams().add(tmpMem.getAddress());
                           }
                         } catch (MemoryElementNotFoundException ex) {
                           numError++;
@@ -762,7 +678,6 @@ public class Parser {
                           continue;
                         }
                       }
-                    
                     // %U: 5-bit unsigned immediate.
                     // %C: 3-bit unsigned immediate.
                     } else if (type == 'U' || type == 'C') {
