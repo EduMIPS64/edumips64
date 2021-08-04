@@ -617,7 +617,7 @@ public class Parser {
                       String errorMessage = "";
 
                       try {
-                        immediateValue = parseImmediate(paramValue);
+                        immediateValue = Converter.parseImmediate(paramValue);
                       } catch (NumberFormatException e) {
                         // Invalid number, try to parse it as a memory label.
                         MemoryElement tmpMem;
@@ -652,7 +652,7 @@ public class Parser {
                       long immediateValue = 0;
                       String errorMessage = ""; // Will be populated with the error message string if there's an error.
                       try {
-                        immediateValue = parseImmediate(paramValue);
+                        immediateValue = Converter.parseImmediate(paramValue);
                         if (immediateValue < 0) {
                           errorMessage = "VALUEISNOTUNSIGNED";
                         } else if (immediateValue > maxValue) {
@@ -904,39 +904,6 @@ public class Parser {
     } else if (numWarning > 0) {
       throw warning;
     }
-  }
-
-  /**
-   * Parses an immediate value without any overflow/underflow check.
-   * 
-   * The immediate value may be preceded by the # character (which is ignored).
-   * The immediate value may be encoded in base 10 or in base 16. In the latter
-   * case, it must be preceded by the '0x' or '0X' prefix.
-   * 
-   * If the # character is used in a base-16 immediate, it must precede the 0x prefix.
-   * 
-   * @param immediate a string representing an immediate value.
-   * @throws NumberFormatException if the number is not well-formatted.
-   * @return the parsed integer value.
-   */
-  public static long parseImmediate(String immediate) {
-    if (immediate.length() == 0) {
-      throw new NumberFormatException("Invalid immediate: empty string.");
-    }
-    
-    // Skip the initial #, if present.
-    if (immediate.charAt(0) == '#') {
-      immediate = immediate.substring(1);
-    }
-
-    // Check if it's a hexadecimal.
-    int base = 10;
-    if (immediate.length() >= 3 && immediate.substring(0, 2).compareToIgnoreCase("0x") == 0) {
-      immediate = immediate.substring(2);
-      base = 16;
-    }
-
-    return Long.parseLong(immediate, base);
   }
 
   /** Clean multiple tab or spaces in a badly formatted String. 
