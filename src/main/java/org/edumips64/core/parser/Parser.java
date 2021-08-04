@@ -577,16 +577,18 @@ public class Parser {
                       continue;
                     }
 
+                    var paramValue = param.substring(indPar, endPar);
+
                     // %R: General Purpose Register.
                     if (type == 'R') {
                       int reg;
 
-                      if ((reg = isRegister(param.substring(indPar, endPar).trim())) >= 0) {
+                      if ((reg = isRegister(paramValue.trim())) >= 0) {
                         tmpInst.getParams().add(reg);
                         indPar = endPar + 1;
                       } else {
                         numError++;
-                        error.add("INVALIDREGISTER", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                        error.add("INVALIDREGISTER", row, line.indexOf(paramValue) + 1, line);
                         tmpInst.getParams().add(0);
                         i = line.length();
                         continue;
@@ -596,12 +598,12 @@ public class Parser {
                     } else if (type == 'F') {
                       int reg;
 
-                      if ((reg = isRegisterFP(param.substring(indPar, endPar).trim())) >= 0) {
+                      if ((reg = isRegisterFP(paramValue.trim())) >= 0) {
                         tmpInst.getParams().add(reg);
                         indPar = endPar + 1;
                       } else {
                         numError++;
-                        error.add("INVALIDREGISTER", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                        error.add("INVALIDREGISTER", row, line.indexOf(paramValue) + 1, line);
                         tmpInst.getParams().add(0);
                         i = line.length();
                         continue;
@@ -611,14 +613,15 @@ public class Parser {
                     } else if (type == 'I') {
                       int imm;
 
-                      if (Converter.isImmediate(param.substring(indPar, endPar))) {
+                      if (Converter.isImmediate(paramValue)) {
                         if (param.charAt(indPar) == '#') {
                           indPar++;
+                          paramValue = paramValue.substring(1);
                         }
 
-                        if (Converter.isInteger(param.substring(indPar, endPar))) {
+                        if (Converter.isInteger(paramValue)) {
                           try {
-                            imm = Integer.parseInt(param.substring(indPar, endPar));
+                            imm = Integer.parseInt(paramValue);
 
                             if (imm < -32768 || imm > 32767) {
                               throw new NumberFormatException();
@@ -626,15 +629,15 @@ public class Parser {
                           } catch (NumberFormatException ex) {
                             imm = 0;
                             numError++;
-                            error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                            error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
                           }
 
                           tmpInst.getParams().add(imm);
                           indPar = endPar + 1;
-                        } else if (Converter.isHexNumber(param.substring(indPar, endPar))) {
+                        } else if (Converter.isHexNumber(paramValue)) {
                           try {
                             try {
-                              imm = (int) Long.parseLong(Converter.hexToShort(param.substring(indPar, endPar)));
+                              imm = (int) Long.parseLong(Converter.hexToShort(paramValue));
                               logger.info("imm = " + imm);
 
                               if (imm < -32768 || imm > 32767) {
@@ -643,7 +646,7 @@ public class Parser {
                             } catch (NumberFormatException ex) {
                               imm = 0;
                               numError++;
-                              error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                              error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
                             }
 
                             tmpInst.getParams().add(imm);
@@ -664,7 +667,7 @@ public class Parser {
 
                             if (Converter.isInteger(param.substring(cc + 1, endPar))) {
                               try {
-                                imm = Integer.parseInt(param.substring(indPar, endPar));
+                                imm = Integer.parseInt(paramValue);
 
                                 if (imm < -32768 || imm > 32767) {
                                   throw new NumberFormatException();
@@ -672,7 +675,7 @@ public class Parser {
                               } catch (NumberFormatException ex) {
                                 imm = 0;
                                 numError++;
-                                error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                                error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
                               }
 
                               tmpInst.getParams().add(tmpMem.getAddress() + imm);
@@ -680,7 +683,7 @@ public class Parser {
                             } else if (Converter.isHexNumber(param.substring(cc + 1, endPar))) {
                               try {
                                 try {
-                                  imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar, endPar)));
+                                  imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
 
                                   if (imm < -32768 || imm > 32767) {
                                     throw new NumberFormatException();
@@ -688,7 +691,7 @@ public class Parser {
                                 } catch (NumberFormatException ex) {
                                   imm = 0;
                                   numError++;
-                                  error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                                  error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
                                 }
 
                                 tmpInst.getParams().add(tmpMem.getAddress() + imm);
@@ -710,7 +713,7 @@ public class Parser {
 
                               if (Converter.isInteger(param.substring(cc + 1, endPar))) {
                                 try {
-                                  imm = Integer.parseInt(param.substring(indPar, endPar));
+                                  imm = Integer.parseInt(paramValue);
 
                                   if (imm < -32768 || imm > 32767) {
                                     throw new NumberFormatException();
@@ -718,7 +721,7 @@ public class Parser {
                                 } catch (NumberFormatException ex) {
                                   imm = 0;
                                   numError++;
-                                  error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                                  error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
                                 }
 
                                 tmpInst.getParams().add(tmpMem.getAddress() - imm);
@@ -726,7 +729,7 @@ public class Parser {
                               } else if (Converter.isHexNumber(param.substring(cc + 1, endPar))) {
                                 try {
                                   try {
-                                    imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar, endPar)));
+                                    imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
 
                                     if (imm < -32768 || imm > 32767) {
                                       throw new NumberFormatException();
@@ -734,7 +737,7 @@ public class Parser {
                                   } catch (NumberFormatException ex) {
                                     imm = 0;
                                     numError++;
-                                    error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                                    error.add("IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
                                   }
 
                                   tmpInst.getParams().add(tmpMem.getAddress() - imm);
@@ -747,13 +750,13 @@ public class Parser {
                                 tmpInst.getParams().add(tmpMem.getAddress() - tmpMem1.getAddress());
                               }
                             } else {
-                              tmpMem = symTab.getCell(param.substring(indPar, endPar).trim());
+                              tmpMem = symTab.getCell(paramValue.trim());
                               tmpInst.getParams().add(tmpMem.getAddress());
                             }
                           }
                         } catch (MemoryElementNotFoundException ex) {
                           numError++;
-                          error.add("INVALIDIMMEDIATE", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                          error.add("INVALIDIMMEDIATE", row, line.indexOf(paramValue) + 1, line);
                           i = line.length();
                           tmpInst.getParams().add(0);
                           continue;
@@ -764,18 +767,19 @@ public class Parser {
                     } else if (type == 'U') {
                       int imm;
 
-                      if (Converter.isImmediate(param.substring(indPar, endPar))) {
+                      if (Converter.isImmediate(paramValue)) {
                         if (param.charAt(indPar) == '#') {
                           indPar++;
+                          paramValue = paramValue.substring(1);
                         }
 
-                        if (Converter.isInteger(param.substring(indPar, endPar))) {
+                        if (Converter.isInteger(paramValue)) {
                           try {
-                            imm = Integer.parseInt(param.substring(indPar, endPar).trim());
+                            imm = Integer.parseInt(paramValue.trim());
 
                             if (imm < 0) {
                               numError++;
-                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
                               i = line.length();
                               tmpInst.getParams().add(0);
                               continue;
@@ -787,18 +791,18 @@ public class Parser {
                           } catch (NumberFormatException ex) {
                             imm = 0;
                             numError++;
-                            error.add("5BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                            error.add("5BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
                           }
 
                           tmpInst.getParams().add(imm);
                           indPar = endPar + 1;
-                        } else if (Converter.isHexNumber(param.substring(indPar, endPar).trim())) {
+                        } else if (Converter.isHexNumber(paramValue.trim())) {
                           try {
-                            imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar, endPar)));
+                            imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
 
                             if (imm < 0) {
                               numError++;
-                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
                               i = line.length();
                               tmpInst.getParams().add(0);
                               continue;
@@ -813,7 +817,7 @@ public class Parser {
                           } catch (NumberFormatException ex) {
                             imm = 0;
                             numError++;
-                            error.add("5BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                            error.add("5BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
 
                             tmpInst.getParams().add(imm);
                             indPar = endPar + 1;
@@ -825,7 +829,7 @@ public class Parser {
 
                       } else {
                         numError++;
-                        error.add("INVALIDIMMEDIATE", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                        error.add("INVALIDIMMEDIATE", row, line.indexOf(paramValue) + 1, line);
                         i = line.length();
                         tmpInst.getParams().add(0);
                         continue;
@@ -835,18 +839,19 @@ public class Parser {
                     } else if (type == 'C') {
                       int imm;
 
-                      if (Converter.isImmediate(param.substring(indPar, endPar))) {
+                      if (Converter.isImmediate(paramValue)) {
                         if (param.charAt(indPar) == '#') {
                           indPar++;
+                          paramValue = paramValue.substring(1);
                         }
 
-                        if (Converter.isInteger(param.substring(indPar, endPar))) {
+                        if (Converter.isInteger(paramValue)) {
                           try {
-                            imm = Integer.parseInt(param.substring(indPar, endPar).trim());
+                            imm = Integer.parseInt(paramValue.trim());
 
                             if (imm < 0) {
                               numError++;
-                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
                               i = line.length();
                               tmpInst.getParams().add(0);
                               continue;
@@ -858,18 +863,18 @@ public class Parser {
                           } catch (NumberFormatException ex) {
                             imm = 0;
                             numError++;
-                            error.add("3BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                            error.add("3BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
                           }
 
                           tmpInst.getParams().add(imm);
                           indPar = endPar + 1;
-                        } else if (Converter.isHexNumber(param.substring(indPar, endPar).trim())) {
+                        } else if (Converter.isHexNumber(paramValue.trim())) {
                           try {
-                            imm = (int) Long.parseLong(Converter.hexToLong(param.substring(indPar, endPar)));
+                            imm = (int) Long.parseLong(Converter.hexToLong(paramValue));
 
                             if (imm < 0) {
                               numError++;
-                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                              error.add("VALUEISNOTUNSIGNED", row, line.indexOf(paramValue) + 1, line);
                               i = line.length();
                               tmpInst.getParams().add(0);
                               continue;
@@ -884,7 +889,7 @@ public class Parser {
                           } catch (NumberFormatException ex) {
                             imm = 0;
                             numError++;
-                            error.add("3BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                            error.add("3BIT_IMMEDIATE_TOO_LARGE", row, line.indexOf(paramValue) + 1, line);
 
                             tmpInst.getParams().add(imm);
                             indPar = endPar + 1;
@@ -896,7 +901,7 @@ public class Parser {
 
                       } else {
                         numError++;
-                        error.add("INVALIDIMMEDIATE", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                        error.add("INVALIDIMMEDIATE", row, line.indexOf(paramValue) + 1, line);
                         i = line.length();
                         tmpInst.getParams().add(0);
                         continue;
@@ -907,16 +912,16 @@ public class Parser {
                       try {
                         MemoryElement tmpMem;
 
-                        if (param.substring(indPar, endPar).equals("")) {
+                        if (paramValue.equals("")) {
                           tmpInst.getParams().add(0);
-                        } else if (Converter.isInteger(param.substring(indPar, endPar).trim())) {
-                          int tmp = Integer.parseInt(param.substring(indPar, endPar).trim());
+                        } else if (Converter.isInteger(paramValue.trim())) {
+                          int tmp = Integer.parseInt(paramValue.trim());
 
                           if (tmp < Memory.MIN_OFFSET_BYTES || tmp > Memory.MAX_OFFSET_BYTES) {
                             numError++;
                             String er = "LABELADDRESSINVALID";
 
-                            error.add(er, row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                            error.add(er, row, line.indexOf(paramValue) + 1, line);
                             i = line.length();
                             indPar = endPar + 1;
                             tmpInst.getParams().add(0);
@@ -925,7 +930,7 @@ public class Parser {
 
                           tmpInst.getParams().add(tmp);
                         } else {
-                          tmpMem = symTab.getCell(param.substring(indPar, endPar).trim());
+                          tmpMem = symTab.getCell(paramValue.trim());
                           tmpInst.getParams().add(tmpMem.getAddress());
 
                         }
@@ -933,7 +938,7 @@ public class Parser {
                         indPar = endPar + 1;
                       } catch (MemoryElementNotFoundException e) {
                         numError++;
-                        error.add("LABELNOTFOUND", row, line.indexOf(param.substring(indPar, endPar)) + 1, line);
+                        error.add("LABELNOTFOUND", row, line.indexOf(paramValue) + 1, line);
                         i = line.length();
                         indPar = endPar + 1;
                         tmpInst.getParams().add(0);
@@ -942,7 +947,7 @@ public class Parser {
 
                     // %E: Program label used for Jump instructions.
                     } else if (type == 'E') {
-                      String label = param.substring(indPar, endPar).trim();
+                      String label = paramValue.trim();
                       Integer labelAddr = symTab.getInstructionAddress(label);
                       logger.info("Label " + label + " at address " + labelAddr);
 
@@ -961,7 +966,7 @@ public class Parser {
 
                     // %B: Program label used for Branch instructions.
                     } else if (type == 'B') {
-                      Integer labelAddr = symTab.getInstructionAddress(param.substring(indPar, endPar).trim());
+                      Integer labelAddr = symTab.getInstructionAddress(paramValue.trim());
 
                       if (labelAddr != null) {
                         labelAddr -= instrCount + 4;
@@ -972,7 +977,7 @@ public class Parser {
                         tmpVoid.row = row;
                         tmpVoid.line = line;
                         tmpVoid.column = indPar;
-                        tmpVoid.label = param.substring(indPar, endPar);
+                        tmpVoid.label = paramValue;
                         tmpVoid.instrCount = instrCount;
                         tmpVoid.isBranch = true;
                         voidJump.add(tmpVoid);
