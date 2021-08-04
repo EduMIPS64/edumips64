@@ -117,7 +117,7 @@ public abstract class Instruction implements InstructionInterface {
    * Valid type placeholders:
    * %R   General Purpose Register
    * %F   Floating Point Register
-   * %I   Signed Immediate Value      (16 bits)
+   * %I   Signed Immediate Value      (16 bits) [also allows a memory label as a value]
    * %U   Unsigned Immediate Value    (5 bits)
    * %C   Unsigned Immediate Value    (3 bits)
    * %L   Memory Label

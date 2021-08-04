@@ -671,31 +671,5 @@ public class Converter {
     }
     return true;
   }
-
-/** Check if is a valid string for an immediate value (rough check on number of
- *  digits, the caller is responsible for checking the actual value).
- * 
- * TODO: this is not very clean, this function should be removed and the caller
- * should just convert to a number and check the value.
-   *  @param imm the string to validate
-   *  @return false if imm isn't a valid immediate, else true
-   */
-  public static boolean isImmediate(String imm) {
-    if (imm.length() == 0) {
-      return false;
-    }
-
-    if (imm.charAt(0) == '#') {
-      imm = imm.substring(1);
-    }
-
-    if (isInteger(imm)) {
-      return true;
-    } else if (isHexNumber(imm) && imm.length() <= 6) {
-      return true;
-    }
-
-    return false;
-  }
 }
 

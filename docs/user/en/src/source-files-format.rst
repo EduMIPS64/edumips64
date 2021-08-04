@@ -156,6 +156,10 @@ Instructions can take three types of parameters:
 The size of immediate values is limited by the number of bits that are
 available in the bit encoding of the instruction.
 
+When 16-bit immediates can be used, for example in ALU I-Type instructions,
+it's also possible to use as an immediate value a memory label. The assembler
+will put as immediate value the memory address the label points to.
+
 You can use standard MIPS assembly aliases to address the first 32 registers,
 appending the alias to one of the standard register prefixes like "r", "\$"
 and "R". See the next table.

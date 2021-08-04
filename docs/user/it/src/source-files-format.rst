@@ -165,6 +165,11 @@ Le istruzioni possono accettare tre tipi di parametri:
 La dimensione dei valori immediati è limitata al numero di bit disponibili
 nella codifica associata all'istruzione.
 
+Nel caso di immediati a 16 bit, come ad esempio i valori immediati delle
+istruzioni ALU I-Type, è possibile utilizzare come valore immediato un'etichetta
+di memoria. L'assembler usera come valore immediato l'indirizzo della locazione
+di memoria a cui l'etichetta punta.
+
 è possibile utilizzare gli alias standard MIPS per i primi 32 registri,
 mettendo in coda ai prefissi standard per i registri ("r", "$", "R") uno
 degli alias indicati nella seguente tabella.
