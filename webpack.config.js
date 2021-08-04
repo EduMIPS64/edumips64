@@ -5,6 +5,7 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const { GitRevisionPlugin } = require('git-revision-webpack-plugin')
 
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const outputPath = path.resolve(__dirname, 'build/gwt/war/edumips64');
 const staticPath = path.resolve(__dirname, 'src/webapp/static');
@@ -44,5 +45,11 @@ module.exports = {
     open: true,
     openPage: 'webpack-dev-server/'
   },
-  plugins: [monacoPlugin, copyPlugin, grPlugin, versionsPlugin],
+  plugins: [
+    monacoPlugin,
+    copyPlugin,
+    grPlugin,
+    versionsPlugin,
+    //new BundleAnalyzerPlugin(),
+  ],
 };
