@@ -229,7 +229,6 @@ public class Parser {
     int row = 0;
     int instrCount = -4;    // Hack fituso by Andrea
     errors = new ParserMultiException();
-    ParserMultiWarningException warnings = new ParserMultiWarningException();
 
     // Keep track of jumps that couldn't be handled at parsing time,
     // to resolve them after the symbol table is full.
@@ -302,7 +301,6 @@ public class Parser {
                 parameters = parameters.split(";") [0].trim();
                 logger.info("parameters: " + parameters);
               } catch (StringIndexOutOfBoundsException e) {
-                warnings.add("VALUE_MISS", row, column + 1, line);
                 errors.addWarning("VALUE_MISS", row, column + 1, line);
                 memoryCount++;
                 column = line.length();
@@ -507,7 +505,6 @@ public class Parser {
               //timmy
               for (int timmy = 0; timmy < deprecateInstruction.length; timmy++) {
                 if (deprecateInstruction[timmy].toUpperCase().equals(line.substring(column, end).toUpperCase())) {
-                  warnings.add("WINMIPS64_NOT_MIPS64", row, column + 1, line);
                   errors.addWarning("WINMIPS64_NOT_MIPS64", row, column + 1, line);
                 }
               }
@@ -853,7 +850,6 @@ public class Parser {
     }
 
     if (!halt) { //if Halt is not present in code
-      warnings.add("HALT_NOT_PRESENT", row, 0, "");
       errors.addWarning("HALT_NOT_PRESENT", row, 0, "");
 
       try {
@@ -880,10 +876,8 @@ public class Parser {
       } // impossible
     }
 
-    if (errors.hasErrors()) {
+    if (errors.getNumError() > 0) {
       throw errors;
-    } else if (warnings.getNumError() > 0) {
-      throw warnings;
     }
   }
 

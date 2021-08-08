@@ -31,7 +31,6 @@ import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
-import org.edumips64.core.parser.ParserMultiWarningException;
 import org.edumips64.ui.swing.CPUSwingWorker;
 import org.edumips64.ui.swing.DineroFrontend;
 import org.edumips64.ui.swing.ErrorDialog;
@@ -504,7 +503,10 @@ public class Main {
         LocalFileUtils lfu = new LocalFileUtils();
         code = lfu.ReadFile(absoluteFilename);
         parser.parse(absoluteFilename);
-      } catch (ParserMultiWarningException pmwe) {
+      } catch (ParserMultiException pmwe) {
+        if (pmwe.hasErrors()) {
+          throw pmwe;
+        }
         new ErrorDialog(mainFrame, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
       } catch (NullPointerException e) {
         log.info("NullPointerException: " + e.toString());

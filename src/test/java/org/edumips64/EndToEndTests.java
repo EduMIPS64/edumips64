@@ -35,7 +35,6 @@ import org.edumips64.core.is.HaltException;
 import org.edumips64.core.is.IntegerOverflowException;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
-import org.edumips64.core.parser.ParserMultiWarningException;
 import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.CycleElement;
 import org.edumips64.utils.ConfigKey;
@@ -172,8 +171,8 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       try {
         String absoluteFilename = new File(testPath).getAbsolutePath();
         parser.parse(absoluteFilename);
-      } catch (ParserMultiWarningException e) {
-        // This exception is raised even if there are only warnings.
+      } catch (ParserMultiException e) {
+        // This exception may be raised even if there are only warnings.
         // We must raise it only if there are actual errors.
         if (e.hasErrors()) {
           throw e;
