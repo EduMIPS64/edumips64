@@ -163,7 +163,7 @@ public class Parser {
 
         if (a != -1) {
           errors = new ParserMultiException();
-          errors.add("INCLUDE_LOOP", 0, 0, "#include " + data.substring(i + 9, end).trim());
+          errors.addError("INCLUDE_LOOP", 0, 0, "#include " + data.substring(i + 9, end).trim());
           throw errors;
         }
 
@@ -282,7 +282,7 @@ public class Parser {
               String name = instr.substring(1);   // The name, without the dot.
 
               if (section != FileSection.DATA) {
-                errors.add(name.toUpperCase() + "INCODE", row, column + 1, line);
+                errors.addError(name.toUpperCase() + "INCODE", row, column + 1, line);
                 column = line.length();
                 continue;
               }
@@ -405,7 +405,7 @@ public class Parser {
                 } catch (StringFormatException ex) {
                   logger.info("Badly formed string list");
                   // TODO: more descriptive error message
-                  errors.add("INVALIDVALUE", row, 0, line);
+                  errors.addError("INVALIDVALUE", row, 0, line);
                 }
 
                 end = line.length();
@@ -434,10 +434,10 @@ public class Parser {
                     throw new NumberFormatException();
                   }
                 } catch (NumberFormatException ex) {
-                  errors.add("INVALIDVALUE", row, column + 1, line);
+                  errors.addError("INVALIDVALUE", row, column + 1, line);
                   continue;
                 } catch (IrregularStringOfHexException ex) {
-                  errors.add("INVALIDVALUE", row, column + 1, line);
+                  errors.addError("INVALIDVALUE", row, column + 1, line);
                   continue;
                 }
 
@@ -460,7 +460,7 @@ public class Parser {
                 writeDoubleInMemory(row, column, line, parameters);
                 end = line.length();
               } else {
-                errors.add("INVALIDCODEFORDATA", row, column + 1, line);
+                errors.addError("INVALIDCODEFORDATA", row, column + 1, line);
                 column = line.length();
                 continue;
               }
@@ -486,7 +486,7 @@ public class Parser {
             logger.info("done");
           } else {
             if (section != FileSection.TEXT) {
-              errors.add("INVALIDCODEFORDATA", row, column + 1, line);
+              errors.addError("INVALIDCODEFORDATA", row, column + 1, line);
               column = line.length();
               continue;
 
@@ -514,7 +514,7 @@ public class Parser {
               tmpInst = instructionBuilder.buildInstruction(line.substring(column, end).toUpperCase(), meta);
 
               if (tmpInst == null) {
-                errors.add("INVALIDCODE", row, column + 1, line);
+                errors.addError("INVALIDCODE", row, column + 1, line);
                 column = line.length();
                 continue;
               }
@@ -527,7 +527,7 @@ public class Parser {
               instrCount += 4;
 
               if (syntax.compareTo("") != 0 && (line.length() < end + 1)) {
-                errors.add("UNKNOWNSYNTAX", row, end, line);
+                errors.addError("UNKNOWNSYNTAX", row, end, line);
                 column = line.length();
                 continue;
               }
@@ -562,7 +562,7 @@ public class Parser {
                     }
 
                     if (paramEnd == -1) {
-                      errors.add("SEPARATORMISS", row, paramStart, line);
+                      errors.addError("SEPARATORMISS", row, paramStart, line);
                       column = line.length();
                       tmpInst.getParams().add(0);
                       continue;
@@ -578,7 +578,7 @@ public class Parser {
                         tmpInst.getParams().add(reg);
                         paramStart = paramEnd + 1;
                       } else {
-                        errors.add("INVALIDREGISTER", row, line.indexOf(paramValue) + 1, line);
+                        errors.addError("INVALIDREGISTER", row, line.indexOf(paramValue) + 1, line);
                         tmpInst.getParams().add(0);
                         column = line.length();
                         continue;
@@ -592,7 +592,7 @@ public class Parser {
                         tmpInst.getParams().add(reg);
                         paramStart = paramEnd + 1;
                       } else {
-                        errors.add("INVALIDREGISTER", row, line.indexOf(paramValue) + 1, line);
+                        errors.addError("INVALIDREGISTER", row, line.indexOf(paramValue) + 1, line);
                         tmpInst.getParams().add(0);
                         column = line.length();
                         continue;
@@ -625,7 +625,7 @@ public class Parser {
                       // Casting to int is safe because we know the value is between -32768 and 32767.
                       tmpInst.getParams().add((int)immediateValue);
                       if (!errorMessage.isEmpty()) {
-                        errors.add(errorMessage, row, line.indexOf(paramValue) + 1, line);
+                        errors.addError(errorMessage, row, line.indexOf(paramValue) + 1, line);
                         column = line.length();
                         continue;
                       }
@@ -654,7 +654,7 @@ public class Parser {
                       // Casting to int is safe because we know the value is between 0 and 31.
                       tmpInst.getParams().add((int)immediateValue);
                       if (!errorMessage.isEmpty()) {
-                        errors.add(errorMessage, row, line.indexOf(paramValue) + 1, line);
+                        errors.addError(errorMessage, row, line.indexOf(paramValue) + 1, line);
                         column = line.length();
                         continue;
                       }
@@ -671,7 +671,7 @@ public class Parser {
                           if (tmp < Memory.MIN_OFFSET_BYTES || tmp > Memory.MAX_OFFSET_BYTES) {
                             String er = "LABELADDRESSINVALID";
 
-                            errors.add(er, row, line.indexOf(paramValue) + 1, line);
+                            errors.addError(er, row, line.indexOf(paramValue) + 1, line);
                             column = line.length();
                             paramStart = paramEnd + 1;
                             tmpInst.getParams().add(0);
@@ -687,7 +687,7 @@ public class Parser {
 
                         paramStart = paramEnd + 1;
                       } catch (MemoryElementNotFoundException e) {
-                        errors.add("LABELNOTFOUND", row, line.indexOf(paramValue) + 1, line);
+                        errors.addError("LABELNOTFOUND", row, line.indexOf(paramValue) + 1, line);
                         column = line.length();
                         paramStart = paramEnd + 1;
                         tmpInst.getParams().add(0);
@@ -733,7 +733,7 @@ public class Parser {
                         doPack = false;
                       }
                     } else {
-                      errors.add("UNKNOWNSYNTAX", row, 1, line);
+                      errors.addError("UNKNOWNSYNTAX", row, 1, line);
                       column = line.length();
                       tmpInst.getParams().add(0);
                       continue;
@@ -749,7 +749,7 @@ public class Parser {
                     }
                   } else {
                     if (syntax.charAt(syntaxIterator) != param.charAt(paramStart++)) {
-                      errors.add("UNKNOWNSYNTAX", row, 1, line);
+                      errors.addError("UNKNOWNSYNTAX", row, 1, line);
                       column = line.length();
                       tmpInst.getParams().add(0);
                       continue;
@@ -790,12 +790,12 @@ public class Parser {
               } catch (SymbolTableOverflowException ex) {
                 if (isFirstOutOfInstructionMemory) { //is first out of memory?
                   isFirstOutOfInstructionMemory = false;
-                  errors.add("OUTOFINSTRUCTIONMEMORY", row, column + 1, line);
+                  errors.addError("OUTOFINSTRUCTIONMEMORY", row, column + 1, line);
                   column = line.length();
                   continue;
                 }
               } catch (SameLabelsException ex) {
-                errors.add("SAMELABEL", row, 1, line);
+                errors.addError("SAMELABEL", row, 1, line);
                 column = line.length();
               }
               // Il finally e' totalmente inutile, ma Ãš bello utilizzarlo per la
@@ -815,11 +815,11 @@ public class Parser {
           column = line.length();
           if (isFirstOutOfMemory) { //is first out of memory?
             isFirstOutOfMemory = false;
-            errors.add("OUTOFMEMORY_PARSER", row, column + 1, line);
+            errors.addError("OUTOFMEMORY_PARSER", row, column + 1, line);
             continue;
           }
         } catch (IrregularWriteOperationException ex) {
-          errors.add("INVALIDVALUE", row, column + 1, line);
+          errors.addError("INVALIDVALUE", row, column + 1, line);
           break;
         }
       }
@@ -844,7 +844,7 @@ public class Parser {
           logger.severe("Irregular string of bits: " + ex.getMessage());
         }
       } else {
-        errors.add("LABELNOTFOUND", jump.row, jump.column, jump.line);
+        errors.addError("LABELNOTFOUND", jump.row, jump.column, jump.line);
         continue;
       }
     }
@@ -869,14 +869,14 @@ public class Parser {
         symTab.setInstructionLabel((instrCount + 4), "");
       } catch (SymbolTableOverflowException ex) {
         if (isFirstOutOfInstructionMemory) { //is first out of memory?
-          errors.add("OUTOFINSTRUCTIONMEMORY", row, 0, "Halt");
+          errors.addError("OUTOFINSTRUCTIONMEMORY", row, 0, "Halt");
         }
       } catch (SameLabelsException ex) {
         logger.severe("Same labels: " + ex);
       } // impossible
     }
 
-    if (errors.getNumError() > 0) {
+    if (errors.size() > 0) {
       throw errors;
     }
   }
@@ -998,11 +998,11 @@ public class Parser {
         tmpMem.setBits(fpInstructionUtils.doubleToBin(aValue.trim()), 0);
       } catch (FPOverflowException ex) {
         //error.add("DOUBLE_TOO_LARGE",row,i+1,line);
-        errors.add("FP_OVERFLOW", row, i + 1, line);
+        errors.addError("FP_OVERFLOW", row, i + 1, line);
       } catch (FPUnderflowException ex) {
-        errors.add("FP_UNDERFLOW", row, i + 1, line);
+        errors.addError("FP_UNDERFLOW", row, i + 1, line);
       } catch (IrregularStringOfBitsException e) {
-        errors.add("INVALIDVALUE", row, i + 1, line);
+        errors.addError("INVALIDVALUE", row, i + 1, line);
         i = line.length();
       }
     }
@@ -1029,7 +1029,7 @@ public class Parser {
       }
       String val = value[j].trim();
       if(val.isEmpty()) {
-        errors.add("INVALIDVALUE", row, i + 1, line);
+        errors.addError("INVALIDVALUE", row, i + 1, line);
         i = line.length();
         continue;
       }
@@ -1038,7 +1038,7 @@ public class Parser {
         try {
           val = Converter.hexToLong(val);
         } catch (IrregularStringOfHexException e) {
-          errors.add("INVALIDVALUE", row, i + 1, line);
+          errors.addError("INVALIDVALUE", row, i + 1, line);
           i = line.length();
           continue;
         }
@@ -1063,11 +1063,11 @@ public class Parser {
         }
 
       } catch (NumberFormatException ex) {
-        errors.add(name.toUpperCase() + "_TOO_LARGE", row, i + 1, line);
+        errors.addError(name.toUpperCase() + "_TOO_LARGE", row, i + 1, line);
         continue;
       } catch (IrregularWriteOperationException | NotAlignException e) {
         e.printStackTrace();
-        errors.add("INVALIDVALUE", row, i + 1, line);
+        errors.addError("INVALIDVALUE", row, i + 1, line);
         i = line.length();
         continue;
       }

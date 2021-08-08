@@ -26,7 +26,7 @@ import org.edumips64.core.parser.ParserException;
 import org.edumips64.utils.CurrentLocale;
 
 import javax.swing.table.DefaultTableModel;
-import java.util.*;
+import java.util.List;
 import java.awt.*;
 import javax.swing.*;
 
@@ -36,7 +36,7 @@ import javax.swing.*;
 public class ErrorDialog extends JDialog {
   private static final long serialVersionUID = 6756487575875944232L;
 
-  public ErrorDialog(final JFrame owner, LinkedList<ParserException> peList, String title, Boolean showWarning) {
+  public ErrorDialog(final JFrame owner, List<ParserException> peList, String title, Boolean showWarning) {
 
     super(owner, title, true);
 
