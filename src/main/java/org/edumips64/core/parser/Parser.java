@@ -57,6 +57,8 @@ import java.util.List;
 import java.util.Stack;
 import java.util.logging.Logger;
 
+// Wrapper class used to handle jumps to labels
+// that haven't yet been encountered by the parser.
 class VoidJump {
   Instruction instr;
   String label;
@@ -232,11 +234,16 @@ public class Parser {
     error = new ParserMultiException();
     ParserMultiWarningException warning = new ParserMultiWarningException();
 
-    LinkedList<VoidJump> voidJump = new LinkedList<>();
+    // Keep track of jumps that couldn't be handled at parsing time,
+    // to resolve them after the symbol table is full.
+    LinkedList<VoidJump> voidJumps = new LinkedList<>();
 
     memoryCount = 0;
     String lastLabel = "";
 
+    // --------------------------------------------
+    // STAGE 1: PARSE THE SOURCE CODE, LINE BY LINE
+    // --------------------------------------------
     code = code.replaceAll("\r\n", "\n");
     for (String line : code.split("\n")) {
       row++;
@@ -725,7 +732,7 @@ public class Parser {
                         tmpVoid.line = line;
                         tmpVoid.column = paramStart;
                         tmpVoid.label = label;
-                        voidJump.add(tmpVoid);
+                        voidJumps.add(tmpVoid);
                         doPack = false;
                       }
 
@@ -745,7 +752,7 @@ public class Parser {
                         tmpVoid.label = paramValue;
                         tmpVoid.instrCount = instrCount;
                         tmpVoid.isBranch = true;
-                        voidJump.add(tmpVoid);
+                        voidJumps.add(tmpVoid);
                         doPack = false;
                       }
                     } else {
@@ -847,24 +854,27 @@ public class Parser {
       }
     }
 
-    for (int i = 0; i < voidJump.size(); i++) {
-      Integer labelAddr = symTab.getInstructionAddress(voidJump.get(i).label.trim());
+    // ---------------------
+    // STAGE 2: HANDLE JUMPS
+    // ---------------------
+    for (var jump : voidJumps) {
+      Integer labelAddr = symTab.getInstructionAddress(jump.label.trim());
 
       if (labelAddr != null) {
-        if (voidJump.get(i).isBranch) {
-          labelAddr -= voidJump.get(i).instrCount + 4;
+        if (jump.isBranch) {
+          labelAddr -= jump.instrCount + 4;
         }
 
-        voidJump.get(i).instr.getParams().add(labelAddr);
+        jump.instr.getParams().add(labelAddr);
 
         try {
-          voidJump.get(i).instr.pack();
+          jump.instr.pack();
         } catch (IrregularStringOfBitsException ex) {
           logger.severe("Irregular string of bits: " + ex.getMessage());
         }
       } else {
         numError++;
-        error.add("LABELNOTFOUND", voidJump.get(i).row, voidJump.get(i).column , voidJump.get(i).line);
+        error.add("LABELNOTFOUND", jump.row, jump.column, jump.line);
         continue;
       }
     }
