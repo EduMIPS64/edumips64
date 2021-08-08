@@ -162,9 +162,9 @@ public class Parser {
         int a = included.search(data.substring(i + 9, end).trim());
 
         if (a != -1) {
-          errors = new ParserMultiException();
-          errors.addError("INCLUDE_LOOP", 0, 0, "#include " + data.substring(i + 9, end).trim());
-          throw errors;
+          var error = new ParserMultiException();
+          error.addError("INCLUDE_LOOP", 0, 0, "#include " + data.substring(i + 9, end).trim());
+          throw error;
         }
 
         String filename = data.substring(i + 9, end).split(";") [0].trim();
