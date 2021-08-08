@@ -33,6 +33,6 @@ package org.edumips64.core.parser;
 public class ParserWarning extends ParserException {
   ParserWarning(String description, int row, int column, String line) {
     super(description, row, column, line);
-    super.setError(false);
+    setError(false);
   }
 }

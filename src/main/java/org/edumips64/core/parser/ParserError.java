@@ -33,5 +33,6 @@ package org.edumips64.core.parser;
 public class ParserError extends ParserException {
   ParserError(String description, int row, int column, String line) {
     super(description, row, column, Parser.replaceTab(line));
+    setError(true);
   }
 }

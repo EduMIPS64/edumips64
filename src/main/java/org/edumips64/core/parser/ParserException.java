@@ -32,8 +32,7 @@ import org.edumips64.utils.CurrentLocale;
  * @author mancausoft, Vanni
  */
 
-public class ParserException {
-
+public abstract class ParserException {
   private int row, column;
   private String line, description;
   private boolean isError;
@@ -52,7 +51,7 @@ public class ParserException {
 
   }
 
-  public void setError(boolean iserror) {
+  protected void setError(boolean iserror) {
     isError = iserror;
   }
   public boolean isError() {
