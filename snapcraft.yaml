@@ -14,7 +14,6 @@ parts:
     gradle-version: '6.3'
     gradle-options: [jar]
     override-build: |
-      pip3 install -r docs/requirements.txt -U
       snapcraftctl build
     build-packages:
       - git
