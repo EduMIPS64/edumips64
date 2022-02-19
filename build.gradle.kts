@@ -12,7 +12,7 @@ plugins {
     id ("eclipse")
     id ("application")
     id ("jacoco")
-    id ("com.dorongold.task-tree") version "1.5"
+    id ("com.dorongold.task-tree") version "2.1.0"
     id ("us.ascendtech.gwt.classic") version "0.8.15"
     id ("ru.vyarus.use-python") version "2.3.0"
 }
