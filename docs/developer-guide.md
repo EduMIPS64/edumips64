@@ -108,6 +108,8 @@ Custom NPM scripts:
 
 Both `build` and `build-dbg` produce a `ui.js` file in the `build/gwt/war/edumips64` directory.
 
+The code was tested with Node.JS 16. The CI environment uses this version.
+
 ### Source code structure
 
 The source code structure follows the [Gradle project layout conventions](https://docs.gradle.org/current/userguide/java_plugin.html#N152C8).
