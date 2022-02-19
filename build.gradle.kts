@@ -28,9 +28,9 @@ dependencies {
     compileOnly("com.vertispan.rpc:workers:1.0-alpha-6")
 
     implementation("javax.help:javahelp:2.0.05")
-    implementation("info.picocli:picocli:4.6.1")
+    implementation("info.picocli:picocli:4.6.3")
 
-    testImplementation(platform("org.junit:junit-bom:5.7.2"))
+    testImplementation(platform("org.junit:junit-bom:5.8.2"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
 
     // To run JUnit 4 tests.
