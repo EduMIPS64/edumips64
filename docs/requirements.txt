@@ -4,4 +4,4 @@
 # upgrades, with the caveat that the Gradle build file needs to be manually kept
 # in sync with this file.
 sphinx==4.1.2
-rst2pdf==0.98
+rst2pdf==0.99

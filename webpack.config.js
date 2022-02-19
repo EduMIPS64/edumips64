@@ -41,9 +41,8 @@ module.exports = {
     ],
   },
   devServer: {
-    contentBase: outputPath,
+    static: outputPath,
     open: true,
-    openPage: 'webpack-dev-server/'
   },
   plugins: [
     monacoPlugin,
