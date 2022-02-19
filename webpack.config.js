@@ -42,7 +42,7 @@ module.exports = {
   },
   devServer: {
     static: outputPath,
-    open: true
+    open: true,
   },
   plugins: [
     monacoPlugin,
