@@ -9,10 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Node.JS 12
+      - name: Set up Node.JS 16
         uses: actions/setup-node@v2
         with:
-          node-version: '12.x'
+          node-version: '16.x'
       - run: npm install
       - name: Run web tests against deployed code in production
         uses: nick-invision/retry@v2
