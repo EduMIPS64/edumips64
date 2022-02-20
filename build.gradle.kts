@@ -53,8 +53,8 @@ val version: String by project
 
 // Specify Java source/target version.
 tasks.compileJava {
-    sourceCompatibility = "11"
-    targetCompatibility = "11"
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
 }
 
 /* 
