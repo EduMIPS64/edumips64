@@ -11,7 +11,7 @@ parts:
   edumips64:
     plugin: gradle
     source: https://github.com/edumips64/edumips64.git
-    gradle-version: '6.3'
+    gradle-version: '7.4'
     gradle-options: [jar]
     override-build: |
       snapcraftctl build
