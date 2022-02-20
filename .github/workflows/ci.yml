@@ -207,3 +207,16 @@ jobs:
           retry_on: error
           command: npm run test
 
+  build-snap:
+    name: Build Snapcraft build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: snapcore/action-build@v1
+        id: snapcraft
+      - uses: actions/upload-artifact@v2
+        with:
+          name: snap
+          path: ${{ steps.snapcraft.outputs.snap }}
+
+    

@@ -11,7 +11,7 @@ parts:
   edumips64:
     plugin: gradle
     source: https://github.com/edumips64/edumips64.git
-    gradle-version: '6.3'
+    gradle-version: '7.4'
     gradle-options: [jar]
     override-build: |
       snapcraftctl build
@@ -19,6 +19,8 @@ parts:
       - git
       - python3
       - python3-pip
+      - python3-dev
+      - openjdk-17-jdk
     stage-packages:
       # This is required because snap ships the headless version by default,
       # which lacks splashscreen support.
