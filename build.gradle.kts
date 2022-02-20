@@ -53,8 +53,8 @@ val version: String by project
 
 // Specify Java source/target version.
 tasks.compileJava {
-    sourceCompatibility = "11"
-    targetCompatibility = "11"
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
 }
 
 /* 
@@ -205,7 +205,7 @@ tasks.create<Jar>("noHelpJar"){
  * Code coverage report tasks
  */
 jacoco {
-    toolVersion = "0.8.6"
+    toolVersion = "0.8.7"
 }
 tasks.jacocoTestReport {
     reports {

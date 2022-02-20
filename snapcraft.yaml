@@ -22,7 +22,7 @@ parts:
     stage-packages:
       # This is required because snap ships the headless version by default,
       # which lacks splashscreen support.
-      - openjdk-11-jre
+      - openjdk-17-jre
 
   scripts:
     plugin: dump
