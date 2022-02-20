@@ -4,7 +4,7 @@ summary: A free visual and cross-platform MIPS64 CPU simulator.
 description: EduMIPS64 is a free MIPS64 visual simulator and debugger, used as a teaching tool in Computer Architecture courses.
 grade: stable
 
-base: core18
+base: core20
 confinement: strict
 
 parts:
@@ -19,6 +19,7 @@ parts:
       - git
       - python3
       - python3-pip
+      - openjdk-17-jdk
     stage-packages:
       # This is required because snap ships the headless version by default,
       # which lacks splashscreen support.
