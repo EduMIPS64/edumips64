@@ -25,7 +25,7 @@ parts:
       - zlib1g-dev
       - libjpeg-dev
       - libtiff-dev
-      - libfreetype-dev
+      - libfreetype6-dev
       - libcms2-dev
       - libwebp-dev
       - libopenjp2-7-dev
