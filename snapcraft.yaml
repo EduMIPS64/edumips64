@@ -17,11 +17,21 @@ parts:
       snapcraftctl build
     build-packages:
       - git
+      - openjdk-17-jdk
       - python3
       - python3-pip
+      # Needed to build pillow, a rst2pdf dependency.
       - python3-dev
       - zlib1g-dev
-      - openjdk-17-jdk
+      - libjpeg-dev
+      - libtiff-dev
+      - libfreetype-dev
+      - libcms2-dev
+      - libwebp-dev
+      - libopenjp2-7-dev
+      - libimagequant-dev
+      - libraqm-dev
+      - libxcb-dev
     stage-packages:
       # This is required because snap ships the headless version by default,
       # which lacks splashscreen support.
