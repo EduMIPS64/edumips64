@@ -29,7 +29,6 @@ parts:
       - libcms2-dev
       - libwebp-dev
       - libopenjp2-7-dev
-      - libimagequant-dev
       - libraqm-dev
       - libxcb-xfixes0-dev
     stage-packages:
