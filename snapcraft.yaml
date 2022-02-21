@@ -20,6 +20,7 @@ parts:
       - python3
       - python3-pip
       - python3-dev
+      - zlib1g-dev
       - openjdk-17-jdk
     stage-packages:
       # This is required because snap ships the headless version by default,
