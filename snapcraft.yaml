@@ -44,6 +44,9 @@ apps:
   edumips64:
     desktop: edumips64.desktop
     command: edumips64-snap-wrapper.sh
+    environment:
+      JAVA_HOME: $SNAP/usr/lib/jvm/java-17-openjdk-amd64
+      PATH: $JAVA_HOME/jre/bin:$PATH
     plugs:
       - home
       - x11
