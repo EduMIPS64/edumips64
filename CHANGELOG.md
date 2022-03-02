@@ -1,5 +1,9 @@
 # EduMIPS64 ChangeLog
 
+## 1.2.10 (2022) - ?
+### Fixed
+- Some floating-point division cycles missing in Cycles window (Issue #646)
+
 ## 1.2.9 (08/11/2020) - Baby Shark
 ### Added
 - Unit tests for multiple instructions (PR 488)
