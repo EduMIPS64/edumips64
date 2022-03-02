@@ -445,32 +445,41 @@ public class CPU {
       pc.writeDoubleWord((pc.getValue()) + 4);
 
     } catch (RAWException ex) {
+      logger.info("RAW - Read-After-Write");
       if (currentPipeStage == Pipeline.Stage.ID && pipe.EX() == null) {
+        logger.info("Adding a BUBBLE instruction into EX.");
         pipe.setEX(bubble);
       }
       RAWStalls++;
 
     } catch (WAWException ex) {
+      logger.info("WAW - Write-After-Write");
       logger.info(fpPipe.toString());
 
-      if (currentPipeStage == Pipeline.Stage.ID) {
+      if (currentPipeStage == Pipeline.Stage.ID && pipe.EX() == null) {
+        logger.info("Adding a BUBBLE instruction into EX.");
         pipe.setEX(bubble);
       }
       WAWStalls++;
 
     } catch (FPDividerNotAvailableException ex) {
+      logger.info("Structural Stall - FP Divider Unavailable");
       if (currentPipeStage == Pipeline.Stage.ID) {
+        logger.info("Adding a BUBBLE instruction into EX.");
         pipe.setEX(bubble);
       }
       dividerStalls++;
 
     } catch (FPFunctionalUnitNotAvailableException ex) {
+      logger.info("Structural Stall - FP Unavailable");
       if (currentPipeStage == Pipeline.Stage.ID) {
+        logger.info("Adding a BUBBLE instruction into EX.");
         pipe.setEX(bubble);
       }
       funcUnitStalls++;
 
     } catch (EXNotAvailableException ex) {
+      logger.info("Structural Stall - EX Unavailable");
       exStalls++;
 
     } catch (SynchronousException ex) {
