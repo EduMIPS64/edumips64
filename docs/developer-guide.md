@@ -207,3 +207,5 @@ be automated, but before that is done those checks should be done manually.
 - open the English manual and check the version
 - open the Italian manual and check the version
 - check the 'edge' snap and promote it to stable if it works (https://snapcraft.io/edumips64/releases, needs login)
+  - test both on amd64 and armhf (Raspberry PI)
+- update winget manifest on https://github.com/microsoft/winget-pkgs/tree/master/manifests/e/EduMIPS64/EduMIPS64
