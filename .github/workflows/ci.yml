@@ -22,7 +22,7 @@ jobs:
       # Set up Java development environment.
       - uses: actions/checkout@v2
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
           distribution: 'microsoft'
@@ -82,7 +82,7 @@ jobs:
       # and Node.JS (for the) web app itself.
       - uses: actions/checkout@v2
       - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: 'microsoft'
