@@ -1,6 +1,6 @@
 # EduMIPS64 ChangeLog
 
-## 1.2.10 (03/2022) - FP - Freedom and Peace
+## 1.2.10 (05/03/2022) - FP - Freedom and Peace
 
 ### Added
 - New Snapcraft packages for armhf (e.g. Raspberry PI) and other architectures
