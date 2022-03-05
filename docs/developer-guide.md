@@ -196,16 +196,27 @@ Follow instructions [here](https://dev.cloudburo.net/2018/06/03/install-letsencr
 Before doing a release, please do the following tasks. Over time, those should
 be automated, but before that is done those checks should be done manually.
 
-- For each released JAR / MSI file:
+Before committing the release commit:
+
+- run `./gradlew release`
+- JAR and MSI:
   - verify that the splash screen works
   - verify that the version number, code name, build date and git ID are correct
   - open one .s file (e.g., `div.d.s`)
   - run it
   - open the help
   - close the application
-  - verify the JAR size (should be < 3 MB)
-- open the English manual and check the version
-- open the Italian manual and check the version
-- check the 'edge' snap and promote it to stable if it works (https://snapcraft.io/edumips64/releases, needs login)
-  - test both on amd64 and armhf (Raspberry PI)
-- update winget manifest on https://github.com/microsoft/winget-pkgs/tree/master/manifests/e/EduMIPS64/EduMIPS64
+- JAR-only: verify the JAR size (should be < 3 MB)
+- PDF:
+  - open the English manual and check the version
+  - open the Italian manual and check the version
+
+After committing, check out `master` and run `./gradlew release` again.
+
+Trigger builds on snapcraft.
+
+Create release and update artifacts generated from `master`.
+
+Check the 'edge' snap and promote it to stable if it works (https://snapcraft.io/edumips64/releases, needs login)Test both on amd64 and armhf (Raspberry PI)
+
+Update winget manifest on https://github.com/microsoft/winget-pkgs/tree/master/manifests/e/EduMIPS64/EduMIPS64
