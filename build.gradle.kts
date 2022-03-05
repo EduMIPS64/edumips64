@@ -254,8 +254,9 @@ tasks.create<Exec>("msi"){
         if (!("Windows" in os)){
             throw GradleException("MSI creation must be executed on Windows")
         }
+        var majorVersion = System.getProperty("java.version").split(".")[0].toInt()
         
-        if (System.getProperty("java.version").toInt() < 14) {
+        if (majorVersion < 14) {
             throw GradleException("JDK 14+ is required to create the MSI package.")
         }
         

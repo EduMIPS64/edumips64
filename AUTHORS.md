@@ -33,3 +33,5 @@
 * Miguel Pinto - [**@rocas777**](http://github.com/rocas777)
 * Pimts - [**@pimts**](http://github.com/pimts)
 * iwodder - [**@iwodder**](http://github.com/iwodder)
+* jcarletta - [**jcarletta**](http://github.com/jcarletta)
+* hugmanrique - [**hugmanrique**](http://github.com/hugmanrique)
