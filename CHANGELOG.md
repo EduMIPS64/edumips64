@@ -8,6 +8,7 @@
 ### Fixed
 - Parser incorrectly interprets hexadecimal immediates (Issue #450)
 - Some floating-point division cycles missing in Cycles window (Issue #646)
+- Infinite RAW stall in floating-point code (Issue #304) (yes, *again*)
 
 ### Changed
 - Migrated to JDK (and JRE) 17
