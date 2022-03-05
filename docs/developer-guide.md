@@ -211,6 +211,7 @@ Before committing the release commit:
   - open the English manual and check the version
   - open the Italian manual and check the version
 
+Make sure the version number on `snapcraft.yaml` is updated.
 After committing, check out `master` and run `./gradlew release` again.
 
 Trigger builds on snapcraft.
