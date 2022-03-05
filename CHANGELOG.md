@@ -1,8 +1,16 @@
 # EduMIPS64 ChangeLog
 
-## 1.2.10 (2022) - ?
+## 1.2.10 (03/2022) - FP - Freedom and Peace
+
+### Added
+- New Snapcraft packages for armhf (e.g. Raspberry PI) and other architectures
+
 ### Fixed
+- Parser incorrectly interprets hexadecimal immediates (Issue #450)
 - Some floating-point division cycles missing in Cycles window (Issue #646)
+
+### Changed
+- Migrated to JDK (and JRE) 17
 
 ## 1.2.9 (08/11/2020) - Baby Shark
 ### Added
