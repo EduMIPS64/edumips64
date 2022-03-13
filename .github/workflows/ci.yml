@@ -208,8 +208,9 @@ jobs:
           command: npm run test
 
   build-snap:
-    name: Build Snapcraft build
+    name: Build Snapcraft package
     runs-on: ubuntu-latest
+    needs: deploy-web
     steps:
       - uses: actions/checkout@v3
       - uses: snapcore/action-build@v1
@@ -218,5 +219,21 @@ jobs:
         with:
           name: snap
           path: ${{ steps.snapcraft.outputs.snap }}
+  
+  test-snap:
+    name: Test Snapcraft package
+    runs-on: ubuntu-latest
+    needs: build-snap
+    steps:
+      - uses: actions/download-artifact@v2
+        name: Download snap package
+        with:
+          name: snap
+          path: .
+      - name: Unpack and install snap
+        run: |
+          unsquashfs edumips64*.snap
+          sudo snap try squashfs-root/
+          echo "exit" | edumips64.edumips64-cli
 
     
