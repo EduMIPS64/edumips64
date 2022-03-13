@@ -12,9 +12,12 @@ parts:
     plugin: gradle
     source: https://github.com/edumips64/edumips64.git
     gradle-version: '7.4'
-    gradle-options: [jar]
-    override-build: |
-      snapcraftctl build
+    # Remove Java 11, which is not needed and pulled in by default by the Snapcraft Gradle plugin.
+    # This also fixes the issue with a dangling JDK 11 symlink:
+    # https://forum.snapcraft.io/t/resolve-package-contains-external-symlinks-error-when-trying-to-snap/2963/18
+    override-prime: |
+      snapcraftctl prime
+      rm -rvf usr/lib/jvm/java-11-*
     build-packages:
       - git
       - openjdk-17-jdk       
@@ -33,9 +36,8 @@ parts:
       - libopenjp2-7-dev
       - libraqm-dev
       - libxcb-xfixes0-dev
+
     stage-packages:
-      # This is required because snap ships the headless version by default,
-      # which lacks splashscreen support.
       - openjdk-17-jre
 
   scripts:
