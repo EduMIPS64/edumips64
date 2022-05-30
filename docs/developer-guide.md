@@ -163,7 +163,7 @@ Other types of test, e.g., `ParserTest.java` or `MemoryTest.java`, will test
 other components in isolation.
 
 To add a unit test, the first consideration is whether this test should be
-writte in assembly or in Java. Tests in assembly should typically be put in
+written in assembly or in Java. Tests in assembly should typically be put in
 `CpuTests.java`, since it contains already boilerplate for executing and
 verifying assembly programs. Tests which should not be written in assembly,
 and therefore most likely exercise only one component, should pertain to other
