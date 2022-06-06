@@ -137,7 +137,7 @@ jobs:
 
       # Mark the deployment as started (allows the PR to display "Deployment started" messages.)
       - name: Start deployment
-        uses: bobheadxi/deployments@v0.6.2
+        uses: bobheadxi/deployments@v1.2.0
         id: deployment
         with:
           step: start
@@ -165,7 +165,7 @@ jobs:
 
       # Mark the deployment as succeeded or failed.
       - name: Update deployment status
-        uses: bobheadxi/deployments@v0.6.2
+        uses: bobheadxi/deployments@v1.2.0
         if: always() && github.head_ref
         with:
           step: finish
@@ -173,6 +173,8 @@ jobs:
           status: ${{ job.status }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           env_url: ${{ env.ENV_URL }}
+          env: ${{ env.DEPLOYMENT_ENV }}
+
 
   # Test the deployed web application.
   # This is only ran on pull request because runs triggered by push and schedule
