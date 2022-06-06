@@ -173,6 +173,8 @@ jobs:
           status: ${{ job.status }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           env_url: ${{ env.ENV_URL }}
+          env: ${{ env.DEPLOYMENT_ENV }}
+
 
   # Test the deployed web application.
   # This is only ran on pull request because runs triggered by push and schedule
