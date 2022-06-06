@@ -150,6 +150,10 @@ jobs:
       - name: Copy files to run directory
         run: mkdir -p pr/${{ github.event.pull_request.number }} && cp -r build/gwt/war/edumips64/* pr/${{ github.event.pull_request.number }}
         if: ${{ github.event_name == 'pull_request' }}
+        
+      - name: Update local git copy
+        run: git pull --rebase
+      
       - name: Deploy web application
         if: success()
         uses: crazy-max/ghaction-github-pages@v2
