@@ -150,6 +150,21 @@ jobs:
       - name: Copy files to run directory
         run: mkdir -p pr/${{ github.event.pull_request.number }} && cp -r build/gwt/war/edumips64/* pr/${{ github.event.pull_request.number }}
         if: ${{ github.event_name == 'pull_request' }}
+        
+      # Upload to Azure blob if this is a PR.
+      - name: Login to Azure
+        uses: azure/login@v1
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Upload to Azure blob storage
+        uses: azure/CLI@v1
+        if: ${{ github.event_name == 'pull_request' }}
+        with:
+          inlineScript: |
+              az storage blob upload-batch --account-name <STORAGE_ACCOUNT_NAME>  --auth-mode key -d '$web' -s pr/${{ github.event.pull_request.number }}
+      
       - name: Deploy web application
         if: success()
         uses: crazy-max/ghaction-github-pages@v3
