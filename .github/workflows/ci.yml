@@ -217,7 +217,7 @@ jobs:
       - name: Run web tests against deployed code
         uses: nick-invision/retry@v2
         env:
-          PLAYWRIGHT_TARGET_URL: ${{ env.ENV_URL }}
+          PLAYWRIGHT_TARGET_URL: $ENV_URL
         with:
           max_attempts: 10
           timeout_minutes: 2
