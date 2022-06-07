@@ -163,7 +163,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         with:
           inlineScript: |
-              az storage blob upload-batch --account-name edumips64ci --auth-mode key -d '$web/${{ github.event.pull_request.number }}' -s pr/${{ github.event.pull_request.number }}
+              az storage blob upload-batch --account-name edumips64ci --auth-mode key -d '$web/${{ github.event.pull_request.number }}' -s pr/${{ github.event.pull_request.number }} --overwrite
       
       - name: Deploy master web application to web.edumips.org
         if: success() && ${{ github.event_name != 'pull_request' }}
