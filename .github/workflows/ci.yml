@@ -120,6 +120,7 @@ jobs:
           echo "PUSH_DIR=pr/" >> $GITHUB_ENV
           echo "COMMIT_MESSAGE=Deploy code for PR ${{ github.event.pull_request.number }}" >> $GITHUB_ENV
           echo "DEPLOYMENT_ENV_URL=https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}" >> $GITHUB_ENV
+          echo "PLAYWRIGHT_TARGET_URL=$DEPLOYMENT_ENV_URL" >> $GITHUB_ENV
       - name: Set master push environment variables
         if: ${{ github.event_name != 'pull_request' }}
         run: |
@@ -127,6 +128,7 @@ jobs:
           echo "PUSH_DIR=build/gwt/war/edumips64" >> $GITHUB_ENV
           echo "COMMIT_MESSAGE=Update Web Frontend @ ${{ github.sha }}" >> $GITHUB_ENV
           echo "DEPLOYMENT_ENV_URL=https://web.edumips.org" >> $GITHUB_ENV
+          echo "PLAYWRIGHT_TARGET_URL=$DEPLOYMENT_ENV_URL" >> $GITHUB_ENV
 
       # Download web application built in 'build-web'
       - uses: actions/download-artifact@v3
@@ -206,6 +208,8 @@ jobs:
     needs: deploy-web
     if: ${{ github.event_name == 'pull_request' }}
     steps:
+      - name: Dump env context
+        run: echo '${{ toJSON(env) }}'
       - uses: actions/checkout@v3
       - name: Set up Node.JS 16
         uses: actions/setup-node@v3
@@ -216,8 +220,6 @@ jobs:
       # Run tests against the deployed code.
       - name: Run web tests against deployed code
         uses: nick-invision/retry@v2
-        env:
-          PLAYWRIGHT_TARGET_URL: ${{ env.DEPLOYMENT_ENV_URL }}
         with:
           max_attempts: 10
           timeout_minutes: 2
