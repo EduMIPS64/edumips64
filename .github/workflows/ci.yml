@@ -119,14 +119,14 @@ jobs:
           echo "DEPLOYMENT_ENV=${{github.event.pull_request.number}}" >> $GITHUB_ENV
           echo "PUSH_DIR=pr/" >> $GITHUB_ENV
           echo "COMMIT_MESSAGE=Deploy code for PR ${{ github.event.pull_request.number }}" >> $GITHUB_ENV
-          echo "ENV_URL=https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}" >> $GITHUB_ENV
+          echo "DEPLOYMENT_ENV_URL=https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}" >> $GITHUB_ENV
       - name: Set master push environment variables
         if: ${{ github.event_name != 'pull_request' }}
         run: |
           echo "DEPLOYMENT_ENV=prod" >> $GITHUB_ENV
           echo "PUSH_DIR=build/gwt/war/edumips64" >> $GITHUB_ENV
           echo "COMMIT_MESSAGE=Update Web Frontend @ ${{ github.sha }}" >> $GITHUB_ENV
-          echo "ENV_URL=https://web.edumips.org" >> $GITHUB_ENV
+          echo "DEPLOYMENT_ENV_URL=https://web.edumips.org" >> $GITHUB_ENV
 
       # Download web application built in 'build-web'
       - uses: actions/download-artifact@v3
@@ -158,7 +158,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           
-      - name: Upload to Azure blob storage (${{ env.ENV_URL }})
+      - name: Upload to Azure blob storage (${{ env.DEPLOYMENT_ENV_URL }})
         uses: azure/CLI@v1
         if: ${{ github.event_name == 'pull_request' }}
         with:
@@ -187,7 +187,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           status: ${{ job.status }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-          env_url: ${{ env.ENV_URL }}
+          env_url: ${{ env.DEPLOYMENT_ENV_URL }}
           env: ${{ env.DEPLOYMENT_ENV }}
 
 
@@ -217,7 +217,7 @@ jobs:
       - name: Run web tests against deployed code
         uses: nick-invision/retry@v2
         env:
-          PLAYWRIGHT_TARGET_URL: $ENV_URL
+          PLAYWRIGHT_TARGET_URL: ${{ env.DEPLOYMENT_ENV_URL }}
         with:
           max_attempts: 10
           timeout_minutes: 2
