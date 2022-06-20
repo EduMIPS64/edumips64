@@ -3,5 +3,5 @@
 # file, and having an external file makes it possible to use automatic dependency
 # upgrades, with the caveat that the Gradle build file needs to be manually kept
 # in sync with this file.
-sphinx==5.0.1
+sphinx==5.0.2
 rst2pdf==0.99
