@@ -22,8 +22,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.google.gwt:gwt-user:2.9.0")
-    compileOnly("com.google.gwt:gwt-dev:2.9.0")
+    compileOnly("com.google.gwt:gwt-user:2.10.0")
+    compileOnly("com.google.gwt:gwt-dev:2.10.0")
     compileOnly("com.google.elemental2:elemental2-dom:1.1.0")
     compileOnly("com.vertispan.rpc:workers:1.0-alpha-6")
 
