@@ -85,6 +85,9 @@ public class InstructionBuilder {
       case "ADDIU":
         instruction = new ADDIU();
         break;
+      case "MOV":
+        instruction = new MOV();
+        break;
 
       //ALU Shifting 32-bits
       case "SLL":
