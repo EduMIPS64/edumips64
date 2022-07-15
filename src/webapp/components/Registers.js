@@ -1,24 +1,14 @@
 import React from 'react';
 
-import Typography from '@material-ui/core/Typography';
-import Tooltip from '@material-ui/core/Tooltip';
-import { makeStyles } from '@material-ui/core/styles';
+import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
 
-const useStyles = makeStyles((theme) => ({
-  binaryValue: {
-    fontFamily: 'Menlo,Monaco,Courier New,monospace',
-    fontSize: '0.6rem',
-    padding: '0.1em 10px',
-    textAlign: 'right',
-  },
-}));
 
 // Component that shows a binary value.
 const BinaryValue = ({ hexString, value }) => {
-  const classes = useStyles();
   return (
     <Tooltip disableFocusListener title={value ?? ''}>
-      <Typography className={classes.binaryValue}>{hexString}</Typography>
+      <Typography className='binary-value'>{hexString}</Typography>
     </Tooltip>
   );
 };
