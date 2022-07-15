@@ -1,32 +1,22 @@
 import React from 'react';
 
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Link from '@material-ui/core/Link';
-import { Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/styles';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Link from '@mui/material/Link';
+import { Typography } from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
-  dialog: {
-    padding: theme.spacing(1),
-  },
-  title: {
-    padding: theme.spacing(1),
-  },
-}));
 
 export default function HelpDialog(props) {
-  const classes = useStyles();
   return (
     <Dialog onClose={props.handleClose} open={props.open}>
-      <DialogTitle className={classes.title}>
+      <DialogTitle className='help-title'>
         <Typography variant="h4">
           EduMIPS64 Experimental Web Frontend
         </Typography>
       </DialogTitle>
-      <DialogContent classname={classes.dialog}>
+      <DialogContent className='help-content'>
         <Typography gutterBottom variant="h5">
           Help
         </Typography>

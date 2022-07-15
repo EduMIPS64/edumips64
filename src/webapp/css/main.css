@@ -1,0 +1,25 @@
+
+.binary-value {
+    font-family: 'Menlo,Monaco,Courier New,monospace';
+    font-size: 0.6rem;
+    padding: 0.1em 10px;
+    text-align: right;
+}
+
+.logo {
+    height: 4em;
+    padding-left: 0.5em;
+}
+
+.help-button {
+    margin-left: auto;
+    margin-right: 1em;
+}
+
+.help-title {
+     padding: 30px !important;
+}
+
+.help-content {
+     padding: 30px !important;
+}

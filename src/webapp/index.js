@@ -1,14 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { ThemeProvider } from '@material-ui/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import CssBaseline from '@mui/material/CssBaseline';
 
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
 import Simulator from './components/Simulator';
 import Header from './components/Header';
-import theme from './components/Theme';
+
+import './css/main.css'
+
 
 // Set version from the webpack variables. Uses globals defined by webpack.
 /* global BRANCH, COMMITHASH */
@@ -23,7 +24,7 @@ const appInsights = new ApplicationInsights({
 appInsights.loadAppInsights();
 appInsights.context.application.ver = version;
 appInsights.context.application.build = version;
-var telemetryInitializer = (envelope) => {
+const telemetryInitializer = (envelope) => {
   envelope.tags['ai.cloud.role'] = process.env.NODE_ENV;
 };
 appInsights.addTelemetryInitializer(telemetryInitializer);
@@ -54,20 +55,20 @@ simulator.parseResult = (result) => {
 simulator.version = version;
 
 simulator.reset();
-var initializer = (evt) => {
+const initializer = (evt) => {
   console.log('Running the initializer callback');
 
   // Run this callback only once, to initialize the Simulator
   // React component which will then handle all subsequent messages.
   simulator.removeEventListener('message', initializer);
-  var initState = simulator.parseResult(evt.data);
+  const initState = simulator.parseResult(evt.data);
 
   ReactDOM.render(
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Header />
-      <Simulator sim={simulator} initialState={initState} />
-    </ThemeProvider>,
+        <>
+        <CssBaseline />
+        <Header />
+        <Simulator sim={simulator} initialState={initState} />
+        </>,
     document.getElementById('simulator'),
   );
 };

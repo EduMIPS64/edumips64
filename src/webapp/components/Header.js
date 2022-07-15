@@ -1,36 +1,24 @@
 import React from 'react';
 
-import AppBar from '@material-ui/core/AppBar';
-import ToolBar from '@material-ui/core/Toolbar';
-import Button from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/styles';
+import AppBar from '@mui/material/AppBar';
+import ToolBar from '@mui/material/Toolbar';
+import Button from '@mui/material/Button';
 
 import HelpDialog from './HelpDialog';
 import logo from '../static/logo.png';
 
-const useStyles = makeStyles((theme) => ({
-  logo: {
-    height: '4em',
-    paddingLeft: '0.5em',
-  },
-  helpButton: {
-    marginLeft: 'auto',
-    marginRight: '1em',
-  },
-}));
 
 export default function Header() {
-  const classes = useStyles();
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   return (
     <AppBar position="static">
       <ToolBar disableGutters>
-        <img id="logo" alt="EduMIPS64" src={logo} className={classes.logo} />
+        <img id="logo" alt="EduMIPS64" src={logo} className="logo" />
         <Button
           variant="contained"
           color="secondary"
-          className={classes.helpButton}
+          className="help-button"
           onClick={() => setDialogOpen(true)}
         >
           Help
