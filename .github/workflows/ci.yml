@@ -32,7 +32,7 @@ jobs:
       # Read the application version to use it in the name of the JAR.
       - name: Read version from gradle.properties
         id: read_version
-        uses: christian-draeger/read-properties@1.0.1
+        uses: christian-draeger/read-properties@1.1.0
         with:
           path: 'gradle.properties'
           property: 'version'
