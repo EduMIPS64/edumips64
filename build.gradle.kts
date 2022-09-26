@@ -30,7 +30,7 @@ dependencies {
     implementation("javax.help:javahelp:2.0.05")
     implementation("info.picocli:picocli:4.6.3")
 
-    testImplementation(platform("org.junit:junit-bom:5.9.0"))
+    testImplementation(platform("org.junit:junit-bom:5.9.1"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
 
     // To run JUnit 4 tests.
@@ -40,7 +40,7 @@ dependencies {
 }
 
 python {
-    pip("sphinx:5.1.1")
+    pip("sphinx:5.2.1")
     pip("rst2pdf:0.99")
     scope = VIRTUALENV
 }
