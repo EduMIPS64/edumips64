@@ -187,6 +187,9 @@ public class InstructionBuilder {
       case "SLTIU":
         instruction = new SLTIU();
         break;
+      case "SLTUI":
+        instruction = new SLTUI();
+        break;
       case "XORI":
         instruction = new XORI();
         break;
