@@ -323,7 +323,7 @@ Ecco la lista delle istruzioni ALU di tipo I.
   dell'immediato, altrimenti pone rt a 0. Questa operazione effettua un
   confronto con segno.
 
-* `SLTUI rt, rs, immediate`
+* `SLTIU rt, rs, immediate`
 
   Pone il valore di rt ad 1 se il valore di rs è minore di quello
   dell'immediato, altrimenti pone rt a 0. Questa operazione effettua un

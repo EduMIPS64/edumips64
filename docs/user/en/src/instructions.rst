@@ -317,7 +317,7 @@ Here's the list of I-Type ALU Instructions.
   immediate, otherwise sets it to 0. This instruction performs a signed
   comparison.
 
-* `SLTUI rt, rs, immediate`
+* `SLTIU rt, rs, immediate`
 
   Sets the value of rt to 1 if the value of rs is less than the value of the
   immediate, otherwise sets it to 0. This instruction performs an unsigned
