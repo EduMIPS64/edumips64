@@ -40,7 +40,7 @@ dependencies {
 }
 
 python {
-    pip("sphinx:5.2.1")
+    pip("sphinx:5.2.3")
     pip("rst2pdf:0.99")
     scope = VIRTUALENV
 }
