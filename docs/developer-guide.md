@@ -28,8 +28,10 @@ To build the user documentation, you'll need Python 3 with pip.
 - JavaHelp
 - GWT (experimental)
 - Python dependencies to build the documentation (they'll be installed in a virtual environment)
-  - Sphinx (http://www.sphinx-doc.org/) version 3.4.3 or above
-  - rst2pdf (for the PDF files) version 0.98 or above
+  - Sphinx (http://www.sphinx-doc.org/)
+  - rst2pdf (for the PDF files)
+
+See `requirements.txt` for the versions of Python packages.
 
 To generate an installable Windows MSI package (using the Gradle `msi` task), you will need the WiX toolset.
 
