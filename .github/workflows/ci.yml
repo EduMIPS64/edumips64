@@ -32,7 +32,7 @@ jobs:
       # Read the application version to use it in the name of the JAR.
       - name: Read version from gradle.properties
         id: read_version
-        uses: christian-draeger/read-properties@1.1.0
+        uses: christian-draeger/read-properties@1.1.1
         with:
           path: 'gradle.properties'
           property: 'version'
@@ -58,18 +58,18 @@ jobs:
 
       # Upload artifacts (manuals and JARs)
       - name: Upload English Manual PDF
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: English manual (PDF)
           path: ./build/docs/en/pdf/EduMIPS64.pdf
       - name: Upload Italian Manual PDF
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: Italian manual (PDF)
           path: ./build/docs/it/pdf/EduMIPS64.pdf
 
       - name: Upload JAR
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: JAR
           path: ./build/libs/edumips64-${{ steps.read_version.outputs.value }}.jar
