@@ -456,7 +456,7 @@ Ed ecco le istruzioni di controllo del flusso di tipo I:
 
 * `BGEZ rs, offset`
 
-  Effettua un salto relativo al PC ad offset se rs è maggiore di zero.
+  Effettua un salto relativo al PC ad offset se rs è maggiore o uguale a zero.
 
 * `BNE rs, rt, offset`
 
