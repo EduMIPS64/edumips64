@@ -444,7 +444,7 @@ List of I-Type flow control instructions:
 
 * `BGEZ rs, offset`
 
-  If rs is greather than zero, does a PC-relative jump to offset.
+  If rs is greather than or equal to zero, does a PC-relative jump to offset.
 
 * `BNE rs, rt, offset`
 
