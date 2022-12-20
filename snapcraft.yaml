@@ -11,7 +11,7 @@ parts:
   edumips64:
     plugin: gradle
     source: https://github.com/edumips64/edumips64.git
-    gradle-version: '7.5'
+    gradle-version: '7.6'
     # Remove Java 11, which is not needed and pulled in by default by the Snapcraft Gradle plugin.
     # This also fixes the issue with a dangling JDK 11 symlink:
     # https://forum.snapcraft.io/t/resolve-package-contains-external-symlinks-error-when-trying-to-snap/2963/18
