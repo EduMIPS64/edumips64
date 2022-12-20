@@ -26,7 +26,7 @@ code.
 For the italian version, click the selector at the bottom-right corner and choose the
 `it` translation.
 
-🥠 The JAR for the latest development version is available by looking for the last GitHub Actions build that ran on the `master` branch ([full list here](https://github.com/EduMIPS64/edumips64/actions?query=workflow%3A%22Java+CI%22)).
+🥠 The JAR for the latest development version is available by looking for the last GitHub Actions build that ran on the `master` branch ([full list here](https://github.com/EduMIPS64/edumips64/actions/workflows/ci.yml?query=branch%3Amaster+event%3Apush)).
 
 ❤️ This project adheres to the Contributor Covenant [code of conduct](CODE_OF_CONDUCT.md).
 By participating, you are expected to uphold this code. Please report unacceptable behavior to andrea.spadaccini@gmail.com.
