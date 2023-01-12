@@ -15,7 +15,7 @@ parts:
     # Specify Python 3.8 as the default Python version, as Sphinx 6 dropped support for earlier versions.
     override-build: |
       sudo apt --yes install python3.8
-      update-alternatives --set python /usr/bin/python3.8
+      update-alternatives --set python3 /usr/bin/python3.8
       snapcraftctl build
     # Remove Java 11, which is not needed and pulled in by default by the Snapcraft Gradle plugin.
     # This also fixes the issue with a dangling JDK 11 symlink:
