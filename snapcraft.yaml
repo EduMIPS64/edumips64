@@ -13,9 +13,10 @@ parts:
     source: https://github.com/edumips64/edumips64.git
     gradle-version: '7.6'
     # Specify Python 3.8 as the default Python version, as Sphinx 6 dropped support for earlier versions.
-    override-pull: |
-      snapcraftctl pull
+    override-build: |
+      sudo apt --yes install python3.8
       update-alternatives --set python /usr/bin/python3.8
+      snapcraftctl build
     # Remove Java 11, which is not needed and pulled in by default by the Snapcraft Gradle plugin.
     # This also fixes the issue with a dangling JDK 11 symlink:
     # https://forum.snapcraft.io/t/resolve-package-contains-external-symlinks-error-when-trying-to-snap/2963/18
@@ -27,7 +28,6 @@ parts:
       - openjdk-17-jdk       
       - ca-certificates-java
       - ca-certificates
-      - python3.8
       - python3-pip
       # Needed to build pillow, a rst2pdf dependency.
       - python3-dev
