@@ -18,6 +18,7 @@ parts:
     override-prime: |
       snapcraftctl prime
       rm -rvf usr/lib/jvm/java-11-*
+      update-alternatives --set python /usr/bin/python3.8
     build-packages:
       - git
       - openjdk-17-jdk       
