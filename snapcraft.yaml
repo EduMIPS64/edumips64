@@ -23,7 +23,7 @@ parts:
       - openjdk-17-jdk       
       - ca-certificates-java
       - ca-certificates
-      - python3
+      - python3.8
       - python3-pip
       # Needed to build pillow, a rst2pdf dependency.
       - python3-dev
