@@ -42,6 +42,7 @@ dependencies {
 python {
     scope = VIRTUALENV
     requirements.file = "docs/requirements.txt"
+    minPythonVersion = "3.8"
 }
 
 application {
