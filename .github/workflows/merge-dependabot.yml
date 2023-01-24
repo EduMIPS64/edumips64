@@ -1,0 +1,27 @@
+name: Dependabot Merge
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check for Dependabot PR
+      if: |
+        contains(github.event.pull_request.user.login, 'dependabot') &&
+        github.event.pull_request.base.ref == 'main'
+    - name: Check status checks
+      if: github.event.pull_request.mergeable == 'true'
+    - name: Merge PR
+      uses: actions/github-script@v3
+      with:
+        script: |
+          const pr = context.payload.pull_request
+          await github.pulls.merge({
+            owner: pr.base.repo.owner.login,
+            repo: pr.base.repo.name,
+            pull_number: pr.number
+          })
