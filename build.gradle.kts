@@ -189,6 +189,7 @@ tasks.assemble{
 
 // NoHelp JAR
 tasks.create<Jar>("noHelpJar"){
+    archiveClassifier.set("nohelp")
     dependsOn(configurations.runtimeClasspath)
     from(sourceSets.main.get().output)
     from({
