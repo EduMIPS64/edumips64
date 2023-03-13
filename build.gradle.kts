@@ -189,7 +189,7 @@ tasks.assemble{
 
 // NoHelp JAR
 tasks.create<Jar>("noHelpJar"){
-    classifier = "nohelp"
+    archiveClassifier.set("nohelp")
     dependsOn(configurations.runtimeClasspath)
     from(sourceSets.main.get().output)
     from({
@@ -209,9 +209,9 @@ jacoco {
 }
 tasks.jacocoTestReport {
     reports {
-        xml.isEnabled = true
-        csv.isEnabled = false
-        html.isEnabled = false
+        xml.required.set(true)
+        csv.required.set(false)
+        html.required.set(false)
     }
 }
 
