@@ -15,7 +15,7 @@
   "dependencies": {
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
-    "@microsoft/applicationinsights-web": "^2.6.1",
+    "@microsoft/applicationinsights-web": "^3.0.0",
     "@mui/material": "^5.9.0",
     "lodash": "^4.17.19",
     "monaco-editor-webpack-plugin": "^7.0.0",
