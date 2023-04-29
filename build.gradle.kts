@@ -25,10 +25,10 @@ dependencies {
     compileOnly("org.gwtproject:gwt-user:2.10.0")
     compileOnly("org.gwtproject:gwt-dev:2.10.0")
     compileOnly("com.google.elemental2:elemental2-dom:1.1.0")
-    compileOnly("com.vertispan.rpc:workers:1.0-alpha-6")
+    compileOnly("com.vertispan.rpc:workers:1.0-alpha-7")
 
     implementation("javax.help:javahelp:2.0.05")
-    implementation("info.picocli:picocli:4.7.1")
+    implementation("info.picocli:picocli:4.7.3")
 
     testImplementation(platform("org.junit:junit-bom:5.9.2"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
@@ -205,7 +205,7 @@ tasks.create<Jar>("noHelpJar"){
  * Code coverage report tasks
  */
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.9"
 }
 tasks.jacocoTestReport {
     reports {
