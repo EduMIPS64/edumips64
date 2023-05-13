@@ -43,6 +43,10 @@ parts:
       - libopenjp2-7-dev
       - libraqm-dev
       - libxcb-xfixes0-dev
+      # pycairo dependencies
+      - libcairo2-dev
+      - libjpeg-dev
+      - libgif-dev
 
     stage-packages:
       - openjdk-17-jre
