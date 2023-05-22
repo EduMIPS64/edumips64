@@ -50,9 +50,9 @@
     "playwright": "1.33.0",
     "prettier": "2.8.8",
     "style-loader": "3.3.2",
-    "webpack": "5.82.0",
+    "webpack": "5.82.1",
     "webpack-bundle-analyzer": "4.8.0",
-    "webpack-cli": "5.1.0",
+    "webpack-cli": "5.1.1",
     "webpack-dev-server": "4.15.0"
   }
 }
