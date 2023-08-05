@@ -24,13 +24,13 @@ repositories {
 dependencies {
     compileOnly("org.gwtproject:gwt-user:2.10.0")
     compileOnly("org.gwtproject:gwt-dev:2.10.0")
-    compileOnly("com.google.elemental2:elemental2-dom:1.1.0")
+    compileOnly("com.google.elemental2:elemental2-dom:1.2.0")
     compileOnly("com.vertispan.rpc:workers:1.0-alpha-7")
 
     implementation("javax.help:javahelp:2.0.05")
     implementation("info.picocli:picocli:4.7.4")
 
-    testImplementation(platform("org.junit:junit-bom:5.9.3"))
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
 
     // To run JUnit 4 tests.
