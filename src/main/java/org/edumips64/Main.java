@@ -104,7 +104,7 @@ public class Main {
   private JMenuItem stop;
   private StatusBar sb;
   private JMenu file, lastfiles, exec, config, window, help, lang, tools;
-  private JCheckBoxMenuItem lang_en, lang_it;
+  private JCheckBoxMenuItem lang_en, lang_it, lang_zhcn;
   private JCheckBoxMenuItem pipelineJCB, registersJCB, memoryJCB, codeJCB, cyclesJCB, statsJCB, ioJCB;
 
   private GUIIO ioFrame;
@@ -685,6 +685,7 @@ public class Main {
     setMenuItem(multi_cycle, "MenuItem.MULTI_CYCLE");
     setMenuItem(lang_en, "MenuItem.ENGLISH");
     setMenuItem(lang_it, "MenuItem.ITALIAN");
+    setMenuItem(lang_zhcn, "MenuItem.SCHINESE");
     setMenuItem(dinero_tracefile, "MenuItem.DIN_TRACEFILE");
     setMenuItem(aboutUs, "MenuItem.ABOUT_US");
     setMenuItem(dinFrontend, "MenuItem.DIN_FRONTEND");
@@ -885,6 +886,7 @@ public class Main {
     lang_en.addActionListener(e -> {
       lang_en.setState(true);
       lang_it.setState(false);
+      lang_zhcn.setState(false);
       configStore.putString(ConfigKey.LANGUAGE, "en");
       initMenuItems();
       setFrameTitles();
@@ -906,7 +908,30 @@ public class Main {
     lang_it.addActionListener(e -> {
       lang_it.setState(true);
       lang_en.setState(false);
+      lang_zhcn.setState(false);
       configStore.putString(ConfigKey.LANGUAGE, "it");
+      initMenuItems();
+      setFrameTitles();
+      front.updateLanguageStrings();
+      // mainFrame.setVisible(true);
+    });
+
+    try {
+      lang_zhcn = new JCheckBoxMenuItem(
+        CurrentLocale.getString("MenuItem.SCHINESE"),
+        new ImageIcon(IMGLoader.getImage("zhcn.png")),
+        configStore.getString(ConfigKey.LANGUAGE).equals("zhcn"));
+
+      lang.add(lang_zhcn);
+    } catch (IOException e) {
+      log.log(Level.SEVERE, "Could not create chinese (simplified) language checkbox.", e);
+    }
+
+    lang_zhcn.addActionListener(e -> {
+      lang_zhcn.setState(true);
+      lang_en.setState(false);
+      lang_it.setState(false);
+      configStore.putString(ConfigKey.LANGUAGE, "zhcn");
       initMenuItems();
       setFrameTitles();
       front.updateLanguageStrings();
