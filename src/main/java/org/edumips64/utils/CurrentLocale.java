@@ -90,7 +90,7 @@ public class CurrentLocale {
     en.put("MenuItem.RUN_TO", "Run");
     en.put("MenuItem.ITALIAN", "Italian");
     en.put("MenuItem.ENGLISH", "English");
-    en.put("MenuItem.SCHINESE", "Simplified Chinese");
+    en.put("MenuItem.SIMPLIFIED_CHINESE", "Simplified Chinese");
     en.put("MenuItem.DIN_TRACEFILE", "Write _Dinero tracefile...");
     en.put("MenuItem.FORWARDING", "Enable _forwarding");
     en.put("MenuItem.WARNINGS", "Enable _warnings");
@@ -326,7 +326,7 @@ public class CurrentLocale {
     it.put("MenuItem.RUN_TO", "Esegui");
     it.put("MenuItem.ITALIAN", "Italiano");
     it.put("MenuItem.ENGLISH", "Inglese");
-    it.put("MenuItem.SCHINESE", "Cinese semplificato");
+    it.put("MenuItem.SIMPLIFIED_CHINESE", "Cinese semplificato");
     it.put("MenuItem.DIN_TRACEFILE", "Scrivi tracefile _Dinero...");
     it.put("MenuItem.FORWARDING", "Abilita _forwarding");
     it.put("MenuItem.WARNINGS", "Abilita _warning");
@@ -561,7 +561,7 @@ public class CurrentLocale {
     zhcn.put("MenuItem.RUN_TO", "运行");
     zhcn.put("MenuItem.ITALIAN", "意大利语");
     zhcn.put("MenuItem.ENGLISH", "英语");
-    zhcn.put("MenuItem.SCHINESE", "简体中文");
+    zhcn.put("MenuItem.SIMPLIFIED_CHINESE", "简体中文");
     zhcn.put("MenuItem.DIN_TRACEFILE", "写入 Dinero 跟踪文件...(_D)");
     zhcn.put("MenuItem.FORWARDING", "启用转发 (_F)");
     zhcn.put("MenuItem.WARNINGS", "启用警告 (_W)");

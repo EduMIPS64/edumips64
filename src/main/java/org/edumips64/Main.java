@@ -685,7 +685,7 @@ public class Main {
     setMenuItem(multi_cycle, "MenuItem.MULTI_CYCLE");
     setMenuItem(lang_en, "MenuItem.ENGLISH");
     setMenuItem(lang_it, "MenuItem.ITALIAN");
-    setMenuItem(lang_zhcn, "MenuItem.SCHINESE");
+    setMenuItem(lang_zhcn, "MenuItem.SIMPLIFIED_CHINESE");
     setMenuItem(dinero_tracefile, "MenuItem.DIN_TRACEFILE");
     setMenuItem(aboutUs, "MenuItem.ABOUT_US");
     setMenuItem(dinFrontend, "MenuItem.DIN_FRONTEND");
@@ -918,7 +918,7 @@ public class Main {
 
     try {
       lang_zhcn = new JCheckBoxMenuItem(
-        CurrentLocale.getString("MenuItem.SCHINESE"),
+        CurrentLocale.getString("MenuItem.SIMPLIFIED_CHINESE"),
         new ImageIcon(IMGLoader.getImage("zhcn.png")),
         configStore.getString(ConfigKey.LANGUAGE).equals("zhcn"));
 

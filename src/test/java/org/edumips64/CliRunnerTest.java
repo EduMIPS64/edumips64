@@ -126,7 +126,7 @@ public class CliRunnerTest {
     @Test
     public void prints_usage_message_zh() {
         OutputStream os = getSystemOut();
-        Locale.setDefault(Locale.SCHINESE);
+        Locale.setDefault(Locale.SIMPLIFIED_CHINESE);
         new CommandLine(cli).execute("help");
         assertFalse(os.toString().trim().isEmpty());
     }
@@ -171,7 +171,7 @@ public class CliRunnerTest {
     @Test
     public void prints_usage_message_step_zh() {
         OutputStream os = getSystemOut();
-        Locale.setDefault(Locale.SCHINESE);
+        Locale.setDefault(Locale.SIMPLIFIED_CHINESE);
         new CommandLine(cli).execute("step", "--help");
         assertFalse(os.toString().trim().isEmpty());
     }
