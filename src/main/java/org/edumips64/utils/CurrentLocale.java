@@ -523,11 +523,11 @@ public class CurrentLocale {
     zhcn.put("FP_DIV_BY_ZERO", "执行了除以零的操作");
     zhcn.put("FP_OVERFLOW", "浮点溢出，绝对值太大");
     zhcn.put("FP_UNDERFLOW", "浮点下溢，绝对值太小");
-    zhcn.put("BYTEINCODE", ".byte指令出现在代码段中");
-    zhcn.put("WORD16INCODE", ".word16指令出现在代码段中");
+    zhcn.put("BYTEINCODE", ".byte 指令出现在代码段中");
+    zhcn.put("WORD16INCODE", ".word16 指令出现在代码段中");
     zhcn.put("WORDINCODE", ".word指令出现在代码段中");
-    zhcn.put("WORD32INCODE", ".word32指令出现在代码段中");
-    zhcn.put("SPACEINCODE", ".space指令出现在代码段中");
+    zhcn.put("WORD32INCODE", ".word32 指令出现在代码段中");
+    zhcn.put("SPACEINCODE", ".space 指令出现在代码段中");
     zhcn.put("INVALIDVALUE", "无效值");
     zhcn.put("INVALIDCODE", "无效代码");
     zhcn.put("INVALIDCODEFORDATA", "数据的无效代码");
@@ -541,7 +541,7 @@ public class CurrentLocale {
     zhcn.put("GUI_PARSER_ERROR", "解析错误");
     zhcn.put("INCLUDE_LOOP", "包含循环");
     zhcn.put("INT_FORMAT_EXCEPTION", "您必须输入一个整数值");
-    zhcn.put("ERROR_LABEL", "访问内存元素时出错。也许您已经达到了EduMIPS64内存的极限。");
+    zhcn.put("ERROR_LABEL", "访问内存元素时出错。也许您已经达到了 EduMIPS64 内存的极限。");
     zhcn.put("ERROR", "错误");
     zhcn.put("FILE_NOT_FOUND", "找不到文件");
     zhcn.put("SYSCALL5_ERROR", "写入标准输出时出错");
@@ -581,7 +581,7 @@ public class CurrentLocale {
     zhcn.put("IO", "输入/输出");
     zhcn.put("EXCEPTION", "异常");
     zhcn.put("FPUINFO", "浮点单元");
-    zhcn.put("FPUFCSR", "FCSR寄存器");
+    zhcn.put("FPUFCSR", "FCSR 寄存器");
     zhcn.put("ADDRESS", "地址");
     zhcn.put("HEXREPR", "十六进制表示");
     zhcn.put("COMMENT", "注释");
