@@ -102,6 +102,7 @@ public class Main {
   private JMenuItem manual;
   private JMenuItem settings;
   private JMenuItem stop;
+  private JMenuItem tile;
   private StatusBar sb;
   private JMenu file, lastfiles, exec, config, window, help, lang, tools;
   private JCheckBoxMenuItem lang_en, lang_it, lang_zhcn;
@@ -692,6 +693,7 @@ public class Main {
     setMenuItem(manual, "MenuItem.MANUAL");
     setMenuItem(settings, "Config.ITEM");
     setMenuItem(stop, "MenuItem.STOP");
+    setMenuItem(tile, "MenuItem.TILE");
     setMenuItem(pipelineJCB, "PIPELINE");
     setMenuItem(codeJCB, "CODE");
     setMenuItem(cyclesJCB, "CYCLES");
@@ -734,7 +736,7 @@ public class Main {
     run_to = new JMenuItem();
     multi_cycle = new JMenuItem();
     stop = new JMenuItem();
-    JMenuItem tile;
+    tile = new JMenuItem();
     dinFrontend = new JMenuItem();
     manual = new JMenuItem();
     settings = new JMenuItem();
@@ -971,7 +973,6 @@ public class Main {
 
     // ---------------- WINDOW MENU
     //
-    tile = new JMenuItem("Tile");
     tile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
     tile.addActionListener(e -> tileWindows());
     window.add(tile);
