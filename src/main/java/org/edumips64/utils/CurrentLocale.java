@@ -553,8 +553,8 @@ public class CurrentLocale {
     zhcn.put("Menu.CHANGE_PIPELINE_COLORS", "更改流水线颜色");
     zhcn.put("MenuItem.OPEN", "打开...(_O)");
     zhcn.put("MenuItem.OPENLAST", "打开最近的文件...");
-    zhcn.put("MenuItem.RESET", "_重置 (_R)");
-    zhcn.put("MenuItem.EXIT", "Exit (_X)");
+    zhcn.put("MenuItem.RESET", "重置 (_R)");
+    zhcn.put("MenuItem.EXIT", "退出 (_X)");
     zhcn.put("MenuItem.SINGLE_CYCLE", "单周期");
     zhcn.put("MenuItem.MULTI_CYCLE", "多周期");
     zhcn.put("MenuItem.MULTI_STEP", "多步骤");
