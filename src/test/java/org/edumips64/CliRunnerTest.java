@@ -124,6 +124,14 @@ public class CliRunnerTest {
     }
 
     @Test
+    public void prints_usage_message_zhcn() {
+        OutputStream os = getSystemOut();
+        Locale.setDefault(Locale.SCHINESE);
+        new CommandLine(cli).execute("help");
+        assertFalse(os.toString().trim().isEmpty());
+    }
+
+    @Test
     public void prints_usage_message_show_en() {
         OutputStream os = getSystemOut();
         new CommandLine(cli).execute("show", "--help");
@@ -132,6 +140,13 @@ public class CliRunnerTest {
 
     @Test
     public void prints_usage_message_show_it() {
+        OutputStream os = getSystemOut();
+        Locale.setDefault(Locale.ITALIAN);
+        new CommandLine(cli).execute("show", "--help");
+        assertFalse(os.toString().trim().isEmpty());
+    }
+    @Test
+    public void prints_usage_message_show_zhcn() {
         OutputStream os = getSystemOut();
         Locale.setDefault(Locale.ITALIAN);
         new CommandLine(cli).execute("show", "--help");
@@ -149,6 +164,14 @@ public class CliRunnerTest {
     public void prints_usage_message_step_it() {
         OutputStream os = getSystemOut();
         Locale.setDefault(Locale.ITALIAN);
+        new CommandLine(cli).execute("step", "--help");
+        assertFalse(os.toString().trim().isEmpty());
+    }
+
+    @Test
+    public void prints_usage_message_step_zhcn() {
+        OutputStream os = getSystemOut();
+        Locale.setDefault(Locale.SCHINESE);
         new CommandLine(cli).execute("step", "--help");
         assertFalse(os.toString().trim().isEmpty());
     }

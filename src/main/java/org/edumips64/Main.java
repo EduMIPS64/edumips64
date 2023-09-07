@@ -924,7 +924,7 @@ public class Main {
 
       lang.add(lang_zhcn);
     } catch (IOException e) {
-      log.log(Level.SEVERE, "Could not create chinese (simplified) language checkbox.", e);
+      log.log(Level.SEVERE, "Could not create simplified chinese language checkbox.", e);
     }
 
     lang_zhcn.addActionListener(e -> {
