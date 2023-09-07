@@ -286,7 +286,7 @@ public class Main {
     UIManager.put("InternalFrame.titleFont", getScaledFont((Font)UIManager.get("InternalFrame.titleFont")));
 
     // Internal Frames
-    JInternalFrame pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);
+    JInternalFrame pipeFrame = new JInternalFrame(CurrentLocale.getString("PIPELINE"), true, false, true, true);
     pipeFrame.addInternalFrameListener(new InternalFrameAdapter() {
       public void internalFrameIconified(InternalFrameEvent e) {
         pipelineJCB.setState(false);
