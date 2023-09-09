@@ -20,7 +20,7 @@
 
 In order to compile EduMIPS64, you need the Java JDK version 17 or above.
 
-To build the user documentation, you'll need Python 3 with pip.
+To build the user documentation, you'll need Python 3.9+ with pip.
 
 [Gradle](https://gradle.org/) will download the following dependencies:
 
