@@ -18,13 +18,13 @@ parts:
     override-prime: |
       snapcraftctl prime
       rm -rvf usr/lib/jvm/java-11-*
-    # Install Python 3.9 and make it the default Python3 before the build stage,
-    # so that the build can use it and satisfy the Python >= 3.9 dependency from
+    # Install Python 3.8 and make it the default Python3 before the build stage,
+    # so that the build can use it and satisfy the Python >= 3.8 dependency from
     # Sphinx >= 6.
     override-pull: |
       snapcraftctl pull
-      apt install -y python3.9
-      update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+      apt install -y python3.8
+      update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
     build-packages:
       - git
       - pkg-config
@@ -33,7 +33,7 @@ parts:
       - ca-certificates
       - python3-pip
       # Needed to build pillow, a rst2pdf dependency.
-      - python3.9-dev
+      - python3.8-dev
       - zlib1g-dev
       - libjpeg-dev
       - libtiff-dev
