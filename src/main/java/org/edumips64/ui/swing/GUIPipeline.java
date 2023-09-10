@@ -156,7 +156,7 @@ class GUIPipeline extends GUIComponent {
         dimCar = alt / 15;
       }
 
-      Font f1 = new Font("Arial", Font.PLAIN, dimCar);
+      Font f1 = new Font("SansSerif", Font.PLAIN, dimCar);
       g.getFontMetrics(f1);
       g.setFont(f1);
       //Stringhe all'interno dei blocchi
@@ -316,7 +316,7 @@ class GUIPipeline extends GUIComponent {
     *Questo metodo stampa all'interno di ogni blocco della pipeline il nome dell'istruzione che viÃš all'interno.
     */
     void riempiStringhe(Graphics g) {
-      Font f1 = new Font("Arial", Font.PLAIN, dimCar - 3);
+      Font f1 = new Font("SansSerif", Font.PLAIN, dimCar - 3);
       g.getFontMetrics(f1);
       g.setFont(f1);
       g.setColor(Color.blue);
