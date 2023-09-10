@@ -41,7 +41,7 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void cant_write_dinero_without_running_prog() {
+    public void noDineroWithoutRunningFirst() {
         OutputStream os = getSystemOut();
         CommandLine commandLine = new CommandLine(cli);
         File f = new File("src/test/resources/temp_file");
@@ -53,7 +53,7 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void can_write_dinero_after_running_prog() {
+    public void dineroWorksAfterRunning() {
         CommandLine commandLine = new CommandLine(cli);
         runTestProg(commandLine);
         File f = new File("src/test/resources/temp_file");
@@ -65,7 +65,7 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void can_load_file_using_file_command() {
+    public void canLoad() {
         OutputStream os = getSystemOut();
         CommandLine cl = new CommandLine(cli);
         cl.execute("load", "src/test/resources/add.s");
@@ -73,7 +73,7 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void can_handle_file_not_found() {
+    public void handlesNotFound() {
         OutputStream os = getSystemOut();
         CommandLine cl = new CommandLine(cli);
         File f = new File("src/test/resources/a_nonexistent_file");
@@ -83,7 +83,7 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void can_show_registers() {
+    public void canShowRegisters() {
         OutputStream os = getSystemOut();
         CommandLine cl = new CommandLine(cli);
         cl.execute("show", "registers");
@@ -93,7 +93,7 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void can_show_a_register() {
+    public void canShowSingleRegister() {
         OutputStream os = getSystemOut();
         CommandLine cl = new CommandLine(cli);
         cl.execute("show", "register", "1");
@@ -101,7 +101,7 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void show_register_wont_work_with_alpha_chars() {
+    public void showRegisterBreaksWithAlphaCharacter() {
         OutputStream os = getSystemErr();
         CommandLine cl = new CommandLine(cli);
         cl.execute("show", "register", "a");
@@ -109,14 +109,14 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void prints_usage_message_en() {
+    public void printUsageEn() {
         OutputStream os = getSystemOut();
         new CommandLine(cli).execute("help");
         assertFalse(os.toString().trim().isEmpty());
     }
 
     @Test
-    public void prints_usage_message_it() {
+    public void printUsageIt() {
         OutputStream os = getSystemOut();
         Locale.setDefault(Locale.ITALIAN);
         new CommandLine(cli).execute("help");
@@ -124,14 +124,14 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void prints_usage_message_show_en() {
+    public void printUsageShowEn() {
         OutputStream os = getSystemOut();
         new CommandLine(cli).execute("show", "--help");
         assertFalse(os.toString().trim().isEmpty());
     }
 
     @Test
-    public void prints_usage_message_show_it() {
+    public void printUsageShowIt() {
         OutputStream os = getSystemOut();
         Locale.setDefault(Locale.ITALIAN);
         new CommandLine(cli).execute("show", "--help");
@@ -139,14 +139,14 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void prints_usage_message_step_en() {
+    public void printUsageStepEn() {
         OutputStream os = getSystemOut();
         new CommandLine(cli).execute("step", "--help");
         assertFalse(os.toString().trim().isEmpty());
     }
 
     @Test
-    public void prints_usage_message_step_it() {
+    public void printUsageStepIt() {
         OutputStream os = getSystemOut();
         Locale.setDefault(Locale.ITALIAN);
         new CommandLine(cli).execute("step", "--help");
@@ -154,7 +154,7 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void can_print_configuration() {
+    public void printConfig() {
         new CommandLine(cli).execute("config");
     }
 
