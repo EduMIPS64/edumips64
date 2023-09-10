@@ -181,9 +181,9 @@ public class GUIAbout extends JDialog implements Runnable  {
     Graphics2D G;
     BufferedImage I;
 
-    Font font_name = new Font("Verdana", Font.BOLD, 20);
-    Font font_email = new Font("Verdana", Font.ITALIC + Font.BOLD, 15);
-    Font font_role = new Font("Verdana", Font.BOLD, 13);
+    Font font_name = new Font("SansSerif", Font.BOLD, 20);
+    Font font_email = new Font("SansSerif", Font.ITALIC + Font.BOLD, 15);
+    Font font_role = new Font("SansSerif", Font.BOLD, 13);
 
     GradientPaint gradient;
 
@@ -222,9 +222,9 @@ public class GUIAbout extends JDialog implements Runnable  {
       G.drawImage(logo, new AffineTransform(1, 0, 0, 1, 50, 0), this);
       //HEAD: the width value of the logo image. I use it to know when the text must disappear
       G.setColor(new Color(0, 0, 0));
-      G.setFont(new Font("Verdana", Font.BOLD, 15));
+      G.setFont(new Font("SansSerif", Font.BOLD, 15));
       G.drawString("Version " + version + " (" + codename + ")", 150, 92);
-      G.setFont(new Font("Verdana", Font.PLAIN, 12));
+      G.setFont(new Font("SansSerif", Font.PLAIN, 12));
       G.drawString("Built on " + buildDate + ", git rev " + gitRevision, 150, 112);
       head = logo.getHeight(this);
       G.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));

@@ -106,7 +106,7 @@ public class ErrorDialog extends JDialog {
                              ((numError > 0) ? "error.png" : "warning.png")
                            )), SwingConstants.LEFT);
       label.setIconTextGap(50);
-      label.setFont(new Font("Verdana", Font.PLAIN, 20));
+      label.setFont(new Font("SansSerif", Font.PLAIN, 20));
       label.setForeground(new Color(0, 0, 85));
     } catch (java.io.IOException ignored) {}
 
