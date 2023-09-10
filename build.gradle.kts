@@ -51,10 +51,11 @@ application {
 val codename: String by project
 val version: String by project
 
-// Specify Java source/target version.
+// Specify Java source/target version and source encoding.
 tasks.compileJava {
     sourceCompatibility = "17"
     targetCompatibility = "17"
+    options.encoding = "UTF-8"
 }
 
 /* 
