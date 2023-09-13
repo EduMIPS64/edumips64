@@ -20,7 +20,7 @@ sys.path.append(os.path.abspath("../.."))
 from common_conf import *
 
 pdf_stylsheets = ['zh_CN.json']
-pdf_font_path = [os.path.abspath("../../fonts/static")]
+pdf_font_path = [os.path.abspath(".")]
 pdf_language = "zh_CN"
 source_encoding = "utf-8"
 language = "zh_CN"
