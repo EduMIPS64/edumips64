@@ -105,7 +105,9 @@ public class Main {
   private JMenuItem tile;
   private StatusBar sb;
   private JMenu file, lastfiles, exec, config, window, help, lang, tools;
-  private JCheckBoxMenuItem lang_en, lang_it, lang_zhcn;
+  private JCheckBoxMenuItem lang_en;
+  private JCheckBoxMenuItem lang_it;
+  private JCheckBoxMenuItem lang_zhcn;
   private JCheckBoxMenuItem pipelineJCB, registersJCB, memoryJCB, codeJCB, cyclesJCB, statsJCB, ioJCB;
 
   private GUIIO ioFrame;

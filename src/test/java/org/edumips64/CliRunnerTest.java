@@ -146,7 +146,7 @@ public class CliRunnerTest {
         assertFalse(os.toString().trim().isEmpty());
     }
     @Test
-    public void prints_usage_message_show_zh() {
+    public void printUsageMessageShowZh() {
         OutputStream os = getSystemOut();
         Locale.setDefault(Locale.ITALIAN);
         new CommandLine(cli).execute("show", "--help");
