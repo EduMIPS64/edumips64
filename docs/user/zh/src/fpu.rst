@@ -51,7 +51,7 @@ IEEE 浮点运算标准（IEEE 754）规定，无效的运算操作可以在程�
 
 异常配置
 -----------------------
-EduMIPS64 允许用户通过*配置* → *设置*窗口中的*FPU 异常*选项卡，启用或禁用 5 个 IEEE 异常中 4 个的陷阱。
+EduMIPS64 允许用户通过 *配置* → *设置* 窗口中的 *FPU 异常* 选项卡，启用或禁用 5 个 IEEE 异常中 4 个的陷阱。
 如果禁用了其中任何一个，将返回相应的特殊值（如 :ref:`special-values` 中所述）。
 
 .. In the situation depicted in
@@ -109,20 +109,20 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
 启用**字段位通过配置窗口设置，显示启用陷阱的 IEEE 异常。
 
-**Flag** 字段显示已发生的异常，但由于陷阱未针对该异常启用，因此返回了特殊值（:ref:`special-values`中描述的特殊值）。
+**Flag** 字段显示已发生的异常，但由于陷阱未针对该异常启用，因此返回了特殊值（ :ref:`special-values` 中描述的特殊值）。
 
-**RM**字段描述了当前使用的将浮点数转换为整数的舍入方法（请参阅 "CVT.L.D "指令的描述）。
+**RM** 字段描述了当前使用的将浮点数转换为整数的舍入方法（请参阅 "CVT.L.D "指令的描述）。
 
 指令集
 ---------------
-本节介绍 EduMIPS64 实现的 MIPS64 FPU 指令；它们按字母顺序排列。指令执行的操作使用以下符号描述：第 i 个存储单元表示为 ``memory[i]``，FCSR 寄存器的 FCC 字段表示为 ``FCSR_FCC[cc]``，``cc``∈ [0,7]。
+本节介绍 EduMIPS64 实现的 MIPS64 FPU 指令；它们按字母顺序排列。指令执行的操作使用以下符号描述：第 i 个存储单元表示为 ``memory[i]``，FCSR 寄存器的 FCC 字段表示为 ``FCSR_FCC[cc]``， ``cc`` ∈ [0,7]。
 
 在某些指令中，为了避免歧义，寄存器被表示为 ``GPR[i]`` 和 ``FPR[i]``, ``i`` ∈ [0,31]，但在大多数情况下，我们只使用 ``rx`` 或 ``fx`` 符号，其中 ``x``∈ {d,s,t}。三个字母用来表示每个寄存器的用途（目的寄存器、源寄存器、第三寄存器）。最后，转换操作返回的值用以下符号表示：``convert_conversiontype(register[,rounding_type])``、
 其中 ``rounding_type`` 参数是可选的。
 
 有关 FPU 指令的一些示例，请访问 ``http://www.edumips.org/attachment/wiki/Upload/FPUMaxSamples.rar``。
 
-*`ADD.D fd, fs, ft`
+* `ADD.D fd, fs, ft`
 
   *描述*： `fd =fs+ft```。
 
@@ -141,7 +141,7 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
   在本例中，``C.EQ.D`` 检查``f1``和``f2``是否相等，并将比较结果写入 FCSR 寄存器 FCC 字段的第 7 位。之后，如果比较结果为 0（假），`BC1F`` 将跳转到`label`。
 
-* `BC1T cc, 偏移量
+* `BC1T cc, offset`
 
   *描述*： `if FCSR_FCC[cc] == 1 then branch``.
 
@@ -232,21 +232,21 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 ..
 ..    FPU Rounding
 
-... 表格:: 四舍五入示例
+.. table:: 四舍五入示例
 
    =============== ========== ============= =============
-    Tipo RM 字段 f5 寄存器 r6 寄存器
+    Tipo            RM field   f5 register   r6 register
    =============== ========== ============= =============
-    至最近的 0 6.4 6
-    至最近的 0 6.8 7
-    至最近的 0 6.5 6（至偶数）
-    至最近 0 7.5 8（至偶数）
-    向 0 1 7.1 7
-    向 0 1 -2.3 -2
-    向 ∞ 2 4.2 5
-    向 ∞ 2 -3.9 -3
-    朝着 -∞ 3 4.2 4
-    朝向 -∞ 3 -3.9 -4
+    To nearest      0          6.4           6
+    To nearest      0          6.8           7
+    To nearest      0          6.5           6 (to even)
+    To nearest      0          7.5           8 (to even)
+    Towards  0      1          7.1           7
+    Towards  0      1          -2.3          -2
+    Towards  ∞      2          4.2           5
+    Towards  ∞      2          -3.9          -3
+    Towards -∞      3          4.2           4
+    Towards -∞      3          -3.9          -4
    =============== ========== ============= =============
 
 * `CVT.W.D fd, fs`
@@ -281,7 +281,7 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
   从内存中加载一个双字，并将其存储在 ft 中。
 
-注：`L.D`不存在于 MIPS64 ISA 中，它是`LDC1`的别名，存在于 EduMIPS64 中，以便与 WinMIPS64 兼容。
+注： `L.D` 不存在于 MIPS64 ISA 中，它是 `LDC1` 的别名，存在于 EduMIPS64 中，以便与 WinMIPS64 兼容。
 
 * LDC1 ft, offset(base)`
 
@@ -342,7 +342,7 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
 * MTC1 rt, fs
 
-  *描述：*fs = rt :sub:`0..31`
+  *描述：* fs = rt :sub:`0..31`
 
   将 rt 的低 32 位复制到 fs。
 
