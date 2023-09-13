@@ -19,7 +19,7 @@ import sys, os
 sys.path.append(os.path.abspath("../.."))
 from common_conf import *
 
-language = "zh"
+language = "zh_CN"
 copyright = u'2011, Andrea Spadaccini (and the EduMIPS64 development team)'
 man_pages = [
     ('index', 'edumips64', u'EduMIPS64 Documentation',
