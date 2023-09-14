@@ -19,7 +19,7 @@ import sys, os
 sys.path.append(os.path.abspath("../.."))
 from common_conf import *
 
-pdf_stylesheets = ['zh_CN.json', 'chinese']
+pdf_stylesheets = ['sphinx', 'kerning', 'a4', 'zh_CN.json', 'chinese']
 pdf_font_path = [os.path.abspath(".\\docs\\zh\\src"),'C:\\Windows\\Fonts']
 pdf_language = "zh_CN"
 source_encoding = "utf-8"
