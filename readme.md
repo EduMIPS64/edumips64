@@ -1,6 +1,6 @@
 # EduMIPS64
 
-![Java CI](https://github.com/EduMIPS64/edumips64/workflows/Java%20CI/badge.svg)
+![Java CI](https://github.com/EduMIPS64/edumips64/workflows/CI/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/edumips64/badge/?version=latest)](http://edumips64.readthedocs.io/en/latest/?badge=latest)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/1511/badge)](https://bestpractices.coreinfrastructure.org/projects/1511)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/62f0d940fe8940b3926908a08c9ad23e)](https://www.codacy.com/gh/EduMIPS64/edumips64/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=EduMIPS64/edumips64&amp;utm_campaign=Badge_Grade)[![codecov](https://codecov.io/gh/EduMIPS64/edumips64/branch/master/graph/badge.svg)](https://codecov.io/gh/EduMIPS64/edumips64)
