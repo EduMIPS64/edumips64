@@ -35,7 +35,7 @@ jobs:
         uses: christian-draeger/read-properties@1.1.1
         with:
           path: 'gradle.properties'
-          property: 'version'
+          properties: 'version'
 
       # Compile the code, run unit tests, upload code coverage results.
       - name: Compile Java code
