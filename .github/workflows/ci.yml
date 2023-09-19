@@ -116,6 +116,7 @@ jobs:
   
   deploy-web:
     name: Deploy web application
+    permissions: write-all
     runs-on: ubuntu-latest
     needs: build-web
     steps:
