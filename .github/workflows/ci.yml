@@ -72,7 +72,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: JAR
-          path: ./build/libs/edumips64-${{ steps.read_version.outputs.value }}.jar
+          path: ./build/libs/edumips64-${{ steps.read_version.outputs.version }}.jar
 
   build-web:
     name: Build web application
