@@ -3,30 +3,30 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-��ӭ���� EduMIPS64 �ĵ���
+欢迎访问 EduMIPS64 文档！
 =======================================
 
-EduMIPS64 �� MIPS64 ָ��ܹ� (ISA) ģ���������������ִ��ʹ��ģ����ʵ�ֵ� MIPS64 ISA �Ӽ���С���������û��鿴ָ������ˮ���е���Ϊ��CPU ��δ���ͣ�͡��Ĵ������ڴ��״̬�ȡ�������һ��ģ������Ҳ��һ�����ӻ���������
+EduMIPS64 是 MIPS64 指令集架构 (ISA) 模拟器。它设计用于执行使用模拟器实现的 MIPS64 ISA 子集的小程序，允许用户查看指令在流水线中的行为、CPU 如何处理停滞、寄存器和内存的状态等。它既是一个模拟器，也是一个可视化调试器。
 
-����Ŀ����վ�� http://www.edumips.org�������й��� http://github.com/EduMIPS64/edumips64����������κδ��󣬻����κθĽ�ģ�����Ľ��飬���� github �Ϸ������⣬���͵����ʼ��� bugs@edumips.org��
+该项目的网站是 http://www.edumips.org，代码托管在 http://github.com/EduMIPS64/edumips64。如果发现任何错误，或有任何改进模拟器的建议，请在 github 上发布问题，或发送电子邮件至 bugs@edumips.org。
 
-EduMIPS64 ���ɿ������Ǵ�ѧ�����������һȺѧ�������ģ������ WinMIPS64 �Ŀ�¡�棬��������������ģ����֮���кܶ಻֮ͬ����
+EduMIPS64 是由卡塔尼亚大学（意大利）的一群学生开发的，起初是 WinMIPS64 的克隆版，尽管现在这两个模拟器之间有很多不同之处。
 
-���ֲὫ�������� EduMIPS64������ϸ�������ʹ������
+本手册将向您介绍 EduMIPS64，并详细介绍如何使用它。
 
-���ֲ��һ�½�����ģ�������ܵ�Դ�ļ���ʽ�����������в����⣬���������������ͺ�ָ�
+本手册第一章介绍了模拟器接受的源文件格式，除了命令行参数外，还描述了数据类型和指令。
 
-�ڶ��¸����� EduMIPS64 �ɽ��ܵ� MIPS64 ָ��Ӽ����Լ�������Ҫ�Ĳ�����ʹ��˵����
+第二章概述了 EduMIPS64 可接受的 MIPS64 指令集子集，以及所有需要的参数和使用说明。
 
-�����½��ܸ������㵥Ԫ����ָ���
+第三章介绍浮点运算单元及其指令集。
 
-�������� EduMIPS64 �û������˵����������ÿ����ܺͲ˵���Ŀ�ģ��Լ����öԻ���Dinero ǰ�˶Ի����ֲ�Ի����������ѡ���˵����
+第四章是 EduMIPS64 用户界面的说明，解释了每个框架和菜单的目的，以及配置对话框、Dinero 前端对话框、手册对话框和命令行选项的说明。
 
-�����°���һЩ���õ�ʾ����
+第五章包含一些有用的示例。
 
-���ֲ������ EduMIPS64 �汾 |version|��
+本手册介绍了 EduMIPS64 版本 |version|。
 
-**����ע�������ĵ�ʹ���� DeepL ���������ܱ�֤��ȫ׼ȷ���緢�ִ�������Ӣ���ĵ�Ϊ׼������ GitHub ���ύ�޸� Pull Request��**
+**译者注：中文文档使用了 DeepL 机翻，不能保证完全准确。如发现错误，请以英文文档为准，并在 GitHub 上提交修改 Pull Request。**
 
 
 .. toctree::
