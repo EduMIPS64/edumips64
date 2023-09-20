@@ -51,6 +51,9 @@ application {
 val codename: String by project
 val version: String by project
 
+
+
+
 // Specify Java source/target version and source encoding.
 tasks.compileJava {
     sourceCompatibility = "17"
@@ -284,7 +287,7 @@ tasks.create<Exec>("msi"){
         }
 
         println("Creating EduMIPS64-${version}.msi.");
-        val cmd = "jpackage.exe --main-jar edumips64-${version}.jar --input ./build/libs/ --app-version ${version} --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright ${LocalDateTime.now().year}, EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install"
+        val cmd = "jpackage.exe --main-jar edumips64-${version}.jar --input ./build/libs/ --app-version ${version} --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright ${LocalDateTime.now().year}, EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install --java-options -Dfile.encoding=utf-8"
         commandLine(cmd.split(" "));
     }
 }
