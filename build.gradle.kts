@@ -260,7 +260,7 @@ tasks.create<Exec>("msi"){
             throw GradleException("JDK 14+ is required to create the MSI package.")
         }
         if (!File("build/libs/edumips64-${version}.jar").exists()) {
-            throw GradleException("Please execute ./gradlew jar before trying to build the MSI.")
+            throw GradleException("Could not find build/libs/edumips64-${version}.jar. Please execute ./gradlew jar before trying to build the MSI.")
         }
         
         if (System.getenv("WIX") == null){
