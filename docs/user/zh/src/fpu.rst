@@ -124,13 +124,13 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
 * `ADD.D fd, fs, ft`
 
-  *描述*： `fd =fs+ft```。
+  *描述*： `fd =fs+ft`。
 
   *异常*： 如果结果无法根据 IEEE 754 表示，将产生溢出和下溢陷阱。如果fs或ft包含QNaN或SNan，或者执行了无效操作（+∞ - ∞），则会产生无效操作。
 
 * `BC1F cc, offset`.
 
-  *描述*： `if FCSR_FCC[cc] == 0 then branch``.
+  *描述*： `if FCSR_FCC[cc] == 0 then branch`.
 
   如果 ``FCSR_FCC[cc]`` 为 false，则执行 PC 相关分支。
 
@@ -209,7 +209,7 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
   *异常：* 如果 fs 包含 QNaN、SNaN 或无限值，则会抛出无效操作。
 
-* `CVT.L.D fd,fs`。
+* `CVT.L.D fd,fs`
 
   *描述：* ``fd = convert_doubleToLong(fs, CurrentRoundingMode)``
 
@@ -220,7 +220,7 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
     CVT.L.D f5,f5
     DMFC1 r6,f5
 
-  CVT.L.D "将 f5 中的 double 值转换为 long 值；然后 "DMFC1 "将 f5 复制到 r6；此操作的结果取决于当前的舍入模式，可在 "配置 "* → "设置 "* 窗口的 "*FPU 舍入 "* 选项卡中进行设置。
+  `CVT.L.D` 将 f5 中的 double 值转换为 long 值；然后 "DMFC1 "将 f5 复制到 r6；此操作的结果取决于当前的舍入模式，可在 "配置 "* → "设置 "* 窗口的 "*FPU 舍入 "* 选项卡中进行设置。
 
 .. 如图 :ref:`fig:fpu_rounding` 所示。
 
@@ -259,17 +259,17 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
 * `DIV.D fd, fs, ft`
 
-  *描述：* `fd = fs\div ft``
+  *描述：* `fd = fs\div ft`
 
   *异常：* 如果结果不能用 IEEE 754 标准表示，则会出现溢出或下溢。如果fs或ft包含QNaN或SNan，或者执行了无效操作（0\div0,∞ \div ∞），则会出现无效操作。如果试图用非 QNaN 或 SNaN 的红利除以零，则会出现除以零的提示。
 
 * `DMFC1 rt,fs`.
 
-  *描述：* `rt = fs``
+  *描述：* `rt = fs`
 
   将 FPR fs 按位复制到 GPR rt 中。
 
-* `DMTC1 rt, fs``
+* `DMTC1 rt, fs`
 
   *描述：* ``fs = rt``
 
@@ -295,7 +295,7 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
   从内存中加载一个字并将其存储在 ft 中。
 
-* `MFC1 rt,fs`。
+* `MFC1 rt,fs`
 
   *描述：* ``rt = readInt(fs)``
 
@@ -308,25 +308,25 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
   让 ``f5=0xAAAAAAAABBBBBB``; ``MFC1`` 读取 f5 作为 int（低 32 位），将 ``BBBBBBBB`` 解释为 ``-1145324613``，并将值写入 f6（64 位）。执行``MFC1``后，``r6=0xFFFFFFFFBBBBBBBB=-1145324613``。
   因此，由于 r6 中的符号被扩展，`SD`` 指令将向内存写入一个具有此值的双字。
 
-* `MOVF.D fd, fs, cc`.
+* `MOVF.D fd, fs, cc`
 
   *描述：* ``if FCSR_FCC[cc] == 0 then fd=fs``
 
   如果 FCSR_FCC[cc] 为假，则将 fs 复制到 fd。
 
-* `MOVT.D fd, fs, cc``
+* `MOVT.D fd, fs, cc`
 
   *说明：* ``if FCSR_FCC[cc] == 1 then fd=fs``
 
   如果 FCSR_FCC[cc] 为真，则将 fs 复制到 fd。
 
-* `MOV.D fd,fs`。
+* `MOV.D fd,fs`
 
-  *描述：* `fd = fs``
+  *描述：* `fd = fs`
 
   将 fs 复制到 fd。
 
-`MOVN.D fd, fs, rt` *描述：* ``fd = fs`` 将 fs 复制到 fd。
+`MOVN.D fd, fs, rt` 
 
   *描述：* ``if rt != 0 then fd=fs``
 
