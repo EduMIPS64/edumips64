@@ -14,6 +14,12 @@ https://github.com/EduMIPS64/edumips64/issues/785
 
 --------------------------------------
 
+**译者注：**
+
+中文文档使用了 DeepL 机翻，不能保证完全准确。如发现错误，请以英文文档为准，并在 GitHub 上提交修改 Pull Request。
+
+--------------------------------------
+
 EduMIPS64 是 MIPS64 指令集架构 (ISA) 模拟器。它设计用于执行使用模拟器实现的 MIPS64 ISA 子集的小程序，允许用户查看指令在流水线中的行为、CPU 如何处理停滞、寄存器和内存的状态等。它既是一个模拟器，也是一个可视化调试器。
 
 该项目的网站是 http://www.edumips.org，代码托管在 http://github.com/EduMIPS64/edumips64。如果发现任何错误，或有任何改进模拟器的建议，请在 github 上发布问题，或发送电子邮件至 bugs@edumips.org。
@@ -34,7 +40,6 @@ EduMIPS64 是由卡塔尼亚大学（意大利）的一群学生开发的，起�
 
 本手册介绍了 EduMIPS64 版本 |version|。
 
-**译者注：中文文档使用了 DeepL 机翻，不能保证完全准确。如发现错误，请以英文文档为准，并在 GitHub 上提交修改 Pull Request。**
 
 
 .. toctree::
