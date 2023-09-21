@@ -248,7 +248,6 @@ tasks.create<Exec>("msi"){
     group = "Distribution"
     description = "Creates an installable MSI file"
     workingDir = File("${projectDir}")
-    dependsOn("jar")
 
     doFirst{
         var os = System.getProperty("os.name") as String;
@@ -259,6 +258,9 @@ tasks.create<Exec>("msi"){
         
         if (majorVersion < 14) {
             throw GradleException("JDK 14+ is required to create the MSI package.")
+        }
+        if (!File("build/libs/edumips64-${version}.jar").exists()) {
+            throw GradleException("Please execute ./gradlew jar before trying to build the MSI.")
         }
         
         if (System.getenv("WIX") == null){
