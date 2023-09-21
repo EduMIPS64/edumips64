@@ -85,13 +85,6 @@ jobs:
           with:
             repository: fbarresi/wix
             path: wix
-        # Read the application version to use it in the name of the MSI. TODO: set global variable.
-        - name: Read version from gradle.properties
-          id: read_version
-          uses: christian-draeger/read-properties@1.1.1
-          with:
-            path: 'gradle.properties'
-            properties: 'version'
         - name: Download JAR
           uses: actions/download-artifact@v2.1.1
           with:
@@ -108,7 +101,7 @@ jobs:
           uses: actions/upload-artifact@v3.1.2
           with:
             name: MSI
-            path: EduMIPS64-${{ steps.read_version.outputs.version }}.msi
+            path: EduMIPS64-*.msi
         
   build-web:
     name: Build web application
