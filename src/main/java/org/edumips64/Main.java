@@ -102,9 +102,12 @@ public class Main {
   private JMenuItem manual;
   private JMenuItem settings;
   private JMenuItem stop;
+  private JMenuItem tile;
   private StatusBar sb;
   private JMenu file, lastfiles, exec, config, window, help, lang, tools;
-  private JCheckBoxMenuItem lang_en, lang_it;
+  private JCheckBoxMenuItem lang_en;
+  private JCheckBoxMenuItem lang_it;
+  private JCheckBoxMenuItem lang_zhcn;
   private JCheckBoxMenuItem pipelineJCB, registersJCB, memoryJCB, codeJCB, cyclesJCB, statsJCB, ioJCB;
 
   private GUIIO ioFrame;
@@ -286,7 +289,7 @@ public class Main {
     UIManager.put("InternalFrame.titleFont", getScaledFont((Font)UIManager.get("InternalFrame.titleFont")));
 
     // Internal Frames
-    JInternalFrame pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);
+    JInternalFrame pipeFrame = new JInternalFrame(CurrentLocale.getString("PIPELINE"), true, false, true, true);
     pipeFrame.addInternalFrameListener(new InternalFrameAdapter() {
       public void internalFrameIconified(InternalFrameEvent e) {
         pipelineJCB.setState(false);
@@ -685,12 +688,14 @@ public class Main {
     setMenuItem(multi_cycle, "MenuItem.MULTI_CYCLE");
     setMenuItem(lang_en, "MenuItem.ENGLISH");
     setMenuItem(lang_it, "MenuItem.ITALIAN");
+    setMenuItem(lang_zhcn, "MenuItem.SIMPLIFIED_CHINESE");
     setMenuItem(dinero_tracefile, "MenuItem.DIN_TRACEFILE");
     setMenuItem(aboutUs, "MenuItem.ABOUT_US");
     setMenuItem(dinFrontend, "MenuItem.DIN_FRONTEND");
     setMenuItem(manual, "MenuItem.MANUAL");
     setMenuItem(settings, "Config.ITEM");
     setMenuItem(stop, "MenuItem.STOP");
+    setMenuItem(tile, "MenuItem.TILE");
     setMenuItem(pipelineJCB, "PIPELINE");
     setMenuItem(codeJCB, "CODE");
     setMenuItem(cyclesJCB, "CYCLES");
@@ -733,7 +738,7 @@ public class Main {
     run_to = new JMenuItem();
     multi_cycle = new JMenuItem();
     stop = new JMenuItem();
-    JMenuItem tile;
+    tile = new JMenuItem();
     dinFrontend = new JMenuItem();
     manual = new JMenuItem();
     settings = new JMenuItem();
@@ -885,6 +890,7 @@ public class Main {
     lang_en.addActionListener(e -> {
       lang_en.setState(true);
       lang_it.setState(false);
+      lang_zhcn.setState(false);
       configStore.putString(ConfigKey.LANGUAGE, "en");
       initMenuItems();
       setFrameTitles();
@@ -906,7 +912,30 @@ public class Main {
     lang_it.addActionListener(e -> {
       lang_it.setState(true);
       lang_en.setState(false);
+      lang_zhcn.setState(false);
       configStore.putString(ConfigKey.LANGUAGE, "it");
+      initMenuItems();
+      setFrameTitles();
+      front.updateLanguageStrings();
+      // mainFrame.setVisible(true);
+    });
+
+    try {
+      lang_zhcn = new JCheckBoxMenuItem(
+        CurrentLocale.getString("MenuItem.SIMPLIFIED_CHINESE"),
+        new ImageIcon(IMGLoader.getImage("zhcn.png")),
+        configStore.getString(ConfigKey.LANGUAGE).equals("zhcn"));
+
+      lang.add(lang_zhcn);
+    } catch (IOException e) {
+      log.log(Level.SEVERE, "Could not create simplified chinese language checkbox.", e);
+    }
+
+    lang_zhcn.addActionListener(e -> {
+      lang_zhcn.setState(true);
+      lang_en.setState(false);
+      lang_it.setState(false);
+      configStore.putString(ConfigKey.LANGUAGE, "zhcn");
       initMenuItems();
       setFrameTitles();
       front.updateLanguageStrings();
@@ -946,7 +975,6 @@ public class Main {
 
     // ---------------- WINDOW MENU
     //
-    tile = new JMenuItem("Tile");
     tile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
     tile.addActionListener(e -> tileWindows());
     window.add(tile);

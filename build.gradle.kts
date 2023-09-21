@@ -51,6 +51,9 @@ application {
 val codename: String by project
 val version: String by project
 
+
+
+
 // Specify Java source/target version and source encoding.
 tasks.compileJava {
     sourceCompatibility = "17"
@@ -75,6 +78,10 @@ tasks.register<PythonTask>("htmlDocsIt") {
     workDir = "${projectDir}/docs/user/en/src"
     command = buildDocsCmd("it", "html")
 }
+tasks.register<PythonTask>("htmlDocsZh") {
+    workDir = "${projectDir}/docs/user/zh/src"
+    command = buildDocsCmd("zh", "html")
+}
 
 tasks.register<PythonTask>("pdfDocsEn") {
     workDir = "${projectDir}/docs/user/en/src"
@@ -86,10 +93,15 @@ tasks.register<PythonTask>("pdfDocsIt") {
     command = buildDocsCmd("it", "pdf")
 }
 
+tasks.register<PythonTask>("pdfDocsZh") {
+    workDir = "${projectDir}/docs/user/zh/src"
+    command = buildDocsCmd("zh", "pdf")
+}
+
 
 // Catch-all task for documentation
 tasks.create<GradleBuild>("allDocs") {
-    tasks = listOf("htmlDocsIt", "htmlDocsEn", "pdfDocsEn", "pdfDocsIt")
+    tasks = listOf("htmlDocsIt","htmlDocsZh", "htmlDocsEn", "pdfDocsEn", "pdfDocsZh", "pdfDocsIt")
     description = "Run all documentation tasks"
 }
 
@@ -115,6 +127,14 @@ tasks.create<Copy>("copyHelpIt") {
     into ("${docsDir}/user/it")
     dependsOn("htmlDocsIt")
 }
+tasks.create<Copy>("copyHelpZh") {
+    from("${buildDir}/docs/zh") {
+        include("html/**")
+        exclude("**/_sources/**")
+    }
+    into ("${docsDir}/user/zh")
+    dependsOn("htmlDocsZh")
+}
 
 tasks.create<Copy>("copyHelp") {
     from("docs/") {
@@ -124,6 +144,7 @@ tasks.create<Copy>("copyHelp") {
     into ("${docsDir}")
     dependsOn("copyHelpEn")
     dependsOn("copyHelpIt")
+    dependsOn("copyHelpZh")
 }
 
 /*
@@ -268,7 +289,7 @@ tasks.create<Exec>("msi"){
         }
 
         println("Creating EduMIPS64-${version}.msi.");
-        val cmd = "jpackage.exe --main-jar edumips64-${version}.jar --input ./build/libs/ --app-version ${version} --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright ${LocalDateTime.now().year}, EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install"
+        val cmd = "jpackage.exe --main-jar edumips64-${version}.jar --input ./build/libs/ --app-version ${version} --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright ${LocalDateTime.now().year}, EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install --java-options -Dfile.encoding=utf-8"
         commandLine(cmd.split(" "));
     }
 }
