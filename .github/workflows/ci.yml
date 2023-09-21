@@ -90,6 +90,11 @@ jobs:
           with:
             name: JAR
             path: build/libs
+        - name: Set up JDK 17
+          uses: actions/setup-java@v3
+          with:
+            java-version: 17
+            distribution: 'microsoft'
         - name: Build MSI
           run: ./gradlew MSI
         - name: Upload MSI
