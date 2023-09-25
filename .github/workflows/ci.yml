@@ -205,7 +205,7 @@ jobs:
       
       - name: Deploy master web application to web.edumips.org
         if: ${{ success() && github.event_name != 'pull_request' }}
-        uses: crazy-max/ghaction-github-pages@v3
+        uses: crazy-max/ghaction-github-pages@v4
         with:
           target_branch: master
           build_dir: ${{ env.PUSH_DIR }}
