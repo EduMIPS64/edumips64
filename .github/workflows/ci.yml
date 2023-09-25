@@ -94,7 +94,7 @@ jobs:
             repository: fbarresi/wix
             path: wix
         - name: Download JAR
-          uses: actions/download-artifact@v2.1.1
+          uses: actions/download-artifact@v3.0.2
           with:
             name: JAR
             path: build/libs
