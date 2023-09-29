@@ -93,15 +93,15 @@ tasks.register<PythonTask>("pdfDocsIt") {
     command = buildDocsCmd("it", "pdf")
 }
 
-tasks.register<PythonTask>("pdfDocsZh") {
-    workDir = "${projectDir}/docs/user/zh/src"
-    command = buildDocsCmd("zh", "pdf")
+tasks.register<PythonTask>("pdfDocsZhCn") {
+    workDir = "${projectDir}/docs/user/zh_CN/src"
+    command = buildDocsCmd("zh_CN", "pdf")
 }
 
 
 // Catch-all task for documentation
 tasks.create<GradleBuild>("allDocs") {
-    tasks = listOf("htmlDocsIt","htmlDocsZh", "htmlDocsEn", "pdfDocsEn", "pdfDocsZh", "pdfDocsIt")
+    tasks = listOf("htmlDocsIt","htmlDocsZh", "htmlDocsEn", "pdfDocsEn", "pdfDocsZhCn", "pdfDocsIt")
     description = "Run all documentation tasks"
 }
 
@@ -127,13 +127,13 @@ tasks.create<Copy>("copyHelpIt") {
     into ("${docsDir}/user/it")
     dependsOn("htmlDocsIt")
 }
-tasks.create<Copy>("copyHelpZh") {
-    from("${buildDir}/docs/zh") {
+tasks.create<Copy>("copyHelpZhCn") {
+    from("${buildDir}/docs/zh_CN") {
         include("html/**")
         exclude("**/_sources/**")
     }
-    into ("${docsDir}/user/zh")
-    dependsOn("htmlDocsZh")
+    into ("${docsDir}/user/zh_CN")
+    dependsOn("htmlDocsZhCn")
 }
 
 tasks.create<Copy>("copyHelp") {

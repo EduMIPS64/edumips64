@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE map PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 1.0//EN" "http://java.sun.com/products/javahelp/map_2_0.dtd">
 
-<map version="1.0" xml:lang="zh">
+<map version="1.0" xml:lang="zh-cn">
     <mapID target="top" url="html/index.html "/>
     <mapID target="index" url="html/index.html"/>
     <mapID target="user-interface" url="html/user-interface.html"/>
