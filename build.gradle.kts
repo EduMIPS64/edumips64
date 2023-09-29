@@ -78,9 +78,9 @@ tasks.register<PythonTask>("htmlDocsIt") {
     workDir = "${projectDir}/docs/user/en/src"
     command = buildDocsCmd("it", "html")
 }
-tasks.register<PythonTask>("htmlDocsZh") {
-    workDir = "${projectDir}/docs/user/zh/src"
-    command = buildDocsCmd("zh", "html")
+tasks.register<PythonTask>("htmlDocsZhCn") {
+    workDir = "${projectDir}/docs/user/zh_CN/src"
+    command = buildDocsCmd("zh_CN", "html")
 }
 
 tasks.register<PythonTask>("pdfDocsEn") {
@@ -101,7 +101,7 @@ tasks.register<PythonTask>("pdfDocsZhCn") {
 
 // Catch-all task for documentation
 tasks.create<GradleBuild>("allDocs") {
-    tasks = listOf("htmlDocsIt","htmlDocsZh", "htmlDocsEn", "pdfDocsEn", "pdfDocsZhCn", "pdfDocsIt")
+    tasks = listOf("htmlDocsIt","htmlDocsZhCn", "htmlDocsEn", "pdfDocsEn", "pdfDocsZhCn", "pdfDocsIt")
     description = "Run all documentation tasks"
 }
 
