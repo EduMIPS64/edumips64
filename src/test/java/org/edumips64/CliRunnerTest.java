@@ -124,7 +124,7 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void printUsageZh() {
+    public void printUsageZhCn() {
         OutputStream os = getSystemOut();
         Locale.setDefault(Locale.SIMPLIFIED_CHINESE);
         new CommandLine(cli).execute("help");
@@ -146,7 +146,7 @@ public class CliRunnerTest {
         assertFalse(os.toString().trim().isEmpty());
     }
     @Test
-    public void printUsageMessageShowZh() {
+    public void printUsageMessageShowZhCn() {
         OutputStream os = getSystemOut();
         Locale.setDefault(Locale.ITALIAN);
         new CommandLine(cli).execute("show", "--help");
@@ -170,7 +170,7 @@ public class CliRunnerTest {
 
     @Test
 
-    public void printUsageStepZh() {
+    public void printUsageStepZhCn() {
         OutputStream os = getSystemOut();
         Locale.setDefault(Locale.SIMPLIFIED_CHINESE);
         new CommandLine(cli).execute("step", "--help");

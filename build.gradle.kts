@@ -144,7 +144,7 @@ tasks.create<Copy>("copyHelp") {
     into ("${docsDir}")
     dependsOn("copyHelpEn")
     dependsOn("copyHelpIt")
-    dependsOn("copyHelpZh")
+    dependsOn("copyHelpZhCn")
 }
 
 /*
