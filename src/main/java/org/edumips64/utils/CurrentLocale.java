@@ -720,7 +720,7 @@ public class CurrentLocale {
     zhcn.put("HT.MultipleFile", "错误：-f只能使用一次。");
     zhcn.put("CLEAR", "清除");
     zhcn.put("DATA", "数据");
-    zhcn.put("HELPDIR", "/docs/user/zh"); 
+    zhcn.put("HELPDIR", "/docs/user/zh_CN"); 
     zhcn.put("NEGADDRERR", "指令中的负内存地址错误");
     zhcn.put("ALIGNERR", "指令中的对齐错误");
     zhcn.put("THEADDRESS", "该地址");
