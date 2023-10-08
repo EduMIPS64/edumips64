@@ -86,18 +86,23 @@ Here's the list of R-Type ALU Instructions.
   as unsigned values and putting the 32-bits quotient in LO and the 32-bits
   remainder in HI.
 
+* `DMUHU rd, rs, rt`
+
+  Executes the multiplication between 64-bits registers rs and rt,
+  considering them as unsigned values and putting the high-order 64-bits
+  doubleword of the result into register rd.
+
 * `DMULT rs, rt`
 
   Executes the multiplication between 64-bits registers rs and rt, putting
   the low-order 64-bits doubleword of the result into special register LO and
   the high-order 64-bits doubleword of the result into special register HI.
 
-* `DMULU rs, rt`
+* `DMULU rd, rs, rt`
 
   Executes the multiplication between 64-bits registers rs and rt,
   considering them as unsigned values and putting the low-order 64-bits
-  doubleword of the result into special register LO and the high-order
-  64-bits doubleword of the result into special register HI.
+  doubleword of the result into register rd.
 
 * `DMULTU rs, rt`
 
