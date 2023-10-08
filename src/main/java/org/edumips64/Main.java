@@ -70,6 +70,7 @@ import java.io.IOException;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import com.formdev.flatlaf.FlatLightLaf;
 
 /** Entry point of EduMIPS64
  * @author Andrea Spadaccini, Antonella Scandura, Vanni Rizzo
@@ -162,6 +163,18 @@ public class Main {
       log.log(Level.SEVERE, CurrentLocale.getString("LOG.HEADLESS_MSG"));
       System.exit(1);
     }
+
+    // Use a more modern look and feel.
+    // Note that if the JAR is not available to the class loader then the whole application will not start,
+    // we won't be able to recover.
+    try {
+      UIManager.setLookAndFeel( new FlatLightLaf() );
+    } catch( Exception ex ) {
+      log.log(Level.SEVERE, "Could not initialize FlatLightLaF Swing look & feel. Reverting to Swing default.");
+    } catch( NoClassDefFoundError err ) {
+      log.log(Level.SEVERE, "Could not initialize FlatLightLaF Swing look & feel. Reverting to Swing default.");
+    }
+
     SplashScreen s = new SplashScreen();
     s.showSplash();
 
