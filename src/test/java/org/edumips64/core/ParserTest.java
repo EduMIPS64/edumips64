@@ -1,6 +1,6 @@
 package org.edumips64.core;
 
-import org.edumips64.BaseTest;
+import org.edumips64.BaseParsingTest;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.is.InstructionInterface;
@@ -13,34 +13,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class ParserTest extends BaseTest {
-  private Parser parser;
-  private Memory memory;
-
-  @Before
-  public void setUp() throws Exception {
-    memory = new Memory();
-    CPU cpu = new CPU(memory, config, new BUBBLE());
-    SymbolTable symTab = new SymbolTable(memory);
-    IOManager iom = new IOManager(new LocalFileUtils(), memory);
-    Dinero dinero = new Dinero();
-    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
-    parser = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
-  }
-  /** Allows easier testing of .data section contents by adding the ".data" prefix and the "\n.code\nSYSCALL 0" suffix. */
-  private void ParseData(String dataSectionContents) throws Exception {
-    parser.doParsing(".data\n " + dataSectionContents + "\n.code\nSYSCALL 0");
-  }
-  /** Allows easier testing of .code section contents by adding the ".code" prefix and the "\nSYSCALL 0" suffix. */
-  private void ParseCode(String codeSectionContents) throws Exception {
-    parser.doParsing(".code\n " + codeSectionContents + "\nSYSCALL 0");
-  }
-
-  /** Parse a double value */
-  private void ParseDouble(String doubleValue) throws Exception {
-    ParseData(".double " + doubleValue);
-  }
-
+public class ParserTest extends BaseParsingTest {
   @Test
   public void EscapeSequencesTest() throws Exception {
     // Java has no raw srings, so all special characters need to be escaped twice.
