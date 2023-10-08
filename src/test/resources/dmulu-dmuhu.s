@@ -1,9 +1,7 @@
-; dmulu.s - test file for EduMIPS64.
+; dmultu.s - test file for EduMIPS64.
 ;
-; Executes dmulu and tests 2^64-1 * 2^64-1, 2^63 * 2^63 = 2^126, 2^63 * 2^62 = 2^125
+; Executes dmultu and tests 2^64-1 * 2^64-1, 2^63 * 2^63 = 2^126, 2^63 * 2^62 = 2^125
 ; and (2^64-1)^2
-;
-; Adapted from dmultu.s.
 ;
 ; (c) 2020 Leopold Eckert and the EduMIPS64 team
 ;
@@ -34,24 +32,32 @@
     ;2^64-1 * 2^64-1
     addi r1, r0, -1
     dmulu r3, r1, r1
+    dmuhu r2, r1, r1
     addi r4, r0, 1
+    addi r5, r0, -2
+    bne r2, r5, error
     bne r3, r4, error
-
     ;(2^63)^2
     ld r1, 0(r0)
     ld r2, 8(r0)
+    dmuhu r3, r1, r1
     dmulu r4, r1, r1
+    bne r3, r2, error
     bne r4, r0, error
-
     ;2^63 * 2^62
+    dmuhu r3, r1, r2
     dmulu r4, r1, r2
+    ld r5, 16(r0)
+    bne r5, r3, error
     bne r4, r0, error
-
     ;(2^63-1)^2
     ld r1, 24(r0)
     addi r2, r0, 1
+    ld r3, 32(r0)
     dmulu r4, r1, r1
+    dmuhu r5, r1, r1
     bne r2, r4, error
+    bne r3, r5, error
     syscall 0
 
 error:
