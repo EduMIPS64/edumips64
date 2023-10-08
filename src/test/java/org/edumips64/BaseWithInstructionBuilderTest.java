@@ -34,6 +34,8 @@ import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.StringWriter;
 
+import org.junit.Before;
+
 public class BaseWithInstructionBuilderTest extends BaseTest {
   protected CPU cpu;
   protected SymbolTable symTab;
@@ -42,7 +44,8 @@ public class BaseWithInstructionBuilderTest extends BaseTest {
   protected Memory memory;
   protected InstructionBuilder instructionBuilder;
   protected FileUtils lfu;
-
+  
+  @Before
   public void testSetup() {
     memory = new Memory();
     cpu = new CPU(memory, config, new BUBBLE());
