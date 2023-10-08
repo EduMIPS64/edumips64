@@ -716,6 +716,12 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runMipsTest("dmultu.s");
   }
 
+    /* Test for instruction DMULU */
+  @Test(timeout=2000)
+  public void testDmulu() throws Exception {
+    runMipsTest("dmulu.s");
+  }
+
   /* Test for instruction DSLLV */
   @Test(timeout=2000)
   public void testDsllv() throws Exception {
