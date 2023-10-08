@@ -216,7 +216,7 @@ tasks.create<Jar>("noHelpJar"){
     dependsOn(configurations.runtimeClasspath)
     from(sourceSets.main.get().output)
     from({
-        configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") }.map { println("Adding dependency " + it.name); zipTree(it) }
+        configurations.runtimeClasspath.get().filter { it.name.contains("picocli") && it.name.endsWith("jar") || it.name.contains("flatlaf") }.map { println("Adding dependency " + it.name); zipTree(it) }
     })
     manifest {
         attributes["Main-Class"] = application.mainClass.get()

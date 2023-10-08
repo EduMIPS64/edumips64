@@ -165,6 +165,8 @@ public class Main {
     }
 
     // Use a more modern look and feel.
+    // Note that if the JAR is not available to the class loader then the whole application will not start,
+    // we won't be able to recover.
     try {
       UIManager.setLookAndFeel( new FlatLightLaf() );
     } catch( Exception ex ) {
