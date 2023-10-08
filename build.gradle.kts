@@ -26,7 +26,8 @@ dependencies {
     compileOnly("org.gwtproject:gwt-dev:2.10.0")
     compileOnly("com.google.elemental2:elemental2-dom:1.2.1")
     compileOnly("com.vertispan.rpc:workers:1.0-alpha-7")
-
+    
+    implementation("com.formdev:flatlaf:3.2.1")
     implementation("javax.help:javahelp:2.0.05")
     implementation("info.picocli:picocli:4.7.5")
 
@@ -195,7 +196,7 @@ val sharedManifest = the<JavaPluginConvention>().manifest {
 tasks.jar {
     from(sourceSets.main.get().output)
     from({
-        configurations.runtimeClasspath.get().filter { (it.name.contains("picocli") || it.name.contains("javahelp")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
+        configurations.runtimeClasspath.get().filter { (it.name.contains("picocli") || it.name.contains("javahelp") || it.name.contains("flatlaf")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
 
     })
     manifest {
