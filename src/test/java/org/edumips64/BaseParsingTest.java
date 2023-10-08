@@ -7,13 +7,9 @@ import org.edumips64.core.Memory;
 import org.edumips64.core.SymbolTable;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
-import org.edumips64.core.is.InstructionInterface;
-import org.edumips64.core.is.ParsedInstructionMetadata;
 import org.edumips64.core.parser.Parser;
-import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.junit.Before;
-import org.junit.Test;
 
 // Base class for tests that need to run the parser.
 public class BaseParsingTest extends BaseTest {
@@ -33,17 +29,17 @@ public class BaseParsingTest extends BaseTest {
   }
   
   /** Allows easier testing of .data section contents by adding the ".data" prefix and the "\n.code\nSYSCALL 0" suffix. */
-  protected void ParseData(String dataSectionContents) throws Exception {
+  protected void parseData(String dataSectionContents) throws Exception {
     parser.doParsing(".data\n " + dataSectionContents + "\n.code\nSYSCALL 0");
   }
 
   /** Allows easier testing of .code section contents by adding the ".code" prefix and the "\nSYSCALL 0" suffix. */
-  protected void ParseCode(String codeSectionContents) throws Exception {
+  protected void parseCode(String codeSectionContents) throws Exception {
     parser.doParsing(".code\n " + codeSectionContents + "\nSYSCALL 0");
   }
 
   /** Parse a double value */
-  protected void ParseDouble(String doubleValue) throws Exception {
-    ParseData(".double " + doubleValue);
+  protected void parseDouble(String doubleValue) throws Exception {
+    parseData(".double " + doubleValue);
   }
 }

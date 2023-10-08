@@ -8,19 +8,21 @@ import org.junit.Test;
 public class DMULUTest extends BaseParsingTest {
     @Test
     public void testCanParse() throws Exception {
-        ParseCode("dmulu r1, r2, r3");
+        parseCode("dmulu r1, r2, r3");
+        // Will also include SYSCALL 0
+        assertEquals(2, memory.getInstructionsNumber());
     }
 
     @Test
     public void testName() throws Exception {
-        ParseCode("dmulu r1, r2, r3");
+        parseCode("dmulu r1, r2, r3");
         var dmulu = memory.getInstruction(0);
         assertEquals("DMULU", dmulu.getName());
     }
 
     @Test
     public void testRepr() throws Exception {
-        ParseCode("dmulu r1, r2, r3");
+        parseCode("dmulu r1, r2, r3");
         var dmulu = memory.getInstruction(0);       
         // Check the DMULU representation, given the uncommon packing logic.
         var repr = dmulu.getRepr().getBinString();
