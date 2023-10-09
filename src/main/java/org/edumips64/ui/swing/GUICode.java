@@ -251,42 +251,83 @@ public class GUICode extends GUIComponent {
 
       if (rowTable == ifIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.IF_COLOR)));
+        if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
+          label.setForeground(new Color(config.getInt(ConfigKey.IF_COLOR)));
+          label.setBackground(Color.black);
+        } else {
+          label.setBackground(new Color(config.getInt(ConfigKey.IF_COLOR)));
+        }
+        
       }
 
       if (rowTable == idIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.ID_COLOR)));
+        if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
+          label.setForeground(new Color(config.getInt(ConfigKey.ID_COLOR)));
+          label.setBackground(Color.black);
+        } else {
+          label.setBackground(new Color(config.getInt(ConfigKey.ID_COLOR)));
+        }
       }
 
       if (rowTable == exIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.EX_COLOR)));
+        if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
+          label.setForeground(new Color(config.getInt(ConfigKey.EX_COLOR)));
+          label.setBackground(Color.black);
+        } else {
+          label.setBackground(new Color(config.getInt(ConfigKey.EX_COLOR)));
+        }
       }
 
       if (rowTable == memIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.MEM_COLOR)));
+        if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
+          label.setForeground(new Color(config.getInt(ConfigKey.MEM_COLOR)));
+          label.setBackground(Color.black);
+        } else {
+          label.setBackground(new Color(config.getInt(ConfigKey.MEM_COLOR)));
+        }
       }
 
       if (rowTable == wbIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.WB_COLOR)));
+        if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
+          label.setForeground(new Color(config.getInt(ConfigKey.WB_COLOR)));
+          label.setBackground(Color.black);
+        } else {
+          label.setBackground(new Color(config.getInt(ConfigKey.WB_COLOR)));
+        }
       }
 
       if (rowTable == M1Index || rowTable == M2Index || rowTable == M3Index || rowTable == M4Index || rowTable == M5Index || rowTable == M6Index || rowTable == M7Index) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.FP_MULTIPLIER_COLOR)));
+        if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
+          label.setForeground(new Color(config.getInt(ConfigKey.FP_MULTIPLIER_COLOR)));
+          label.setBackground(Color.black);
+        } else {
+          label.setBackground(new Color(config.getInt(ConfigKey.FP_MULTIPLIER_COLOR)));
+        }
       }
 
       if (rowTable == A1Index || rowTable == A2Index || rowTable == A3Index || rowTable == A4Index) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.FP_ADDER_COLOR)));
+        if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
+          label.setForeground(new Color(config.getInt(ConfigKey.FP_ADDER_COLOR)));
+          label.setBackground(Color.black);
+        } else {
+          label.setBackground(new Color(config.getInt(ConfigKey.FP_ADDER_COLOR)));
+        }
       }
 
       if (rowTable == DIVIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.FP_DIVIDER_COLOR)));
+        if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
+          label.setForeground(new Color(config.getInt(ConfigKey.FP_DIVIDER_COLOR)));
+          label.setBackground(Color.black);
+        } else {
+          label.setBackground(new Color(config.getInt(ConfigKey.FP_DIVIDER_COLOR)));
+        }
       }
 
       return label;
