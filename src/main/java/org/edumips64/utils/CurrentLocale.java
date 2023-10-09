@@ -203,6 +203,7 @@ public class CurrentLocale {
     en.put("Config.SYNCEXC-TERMINATE.tip", "Halt the simulation on Division by zero and Integer Overflow exceptions");
     en.put("Config.FONTSIZE", "Font size");
     en.put("Config.FONTSIZE.tip", "Size of the font");
+    en.put("Config.DARKTHEME", "Dark theme (take effect after restart)");
     en.put("StatusBar.WELCOME", "Welcome to EduMIPS64");
     en.put("StatusBar.DECIMALVALUE", "Decimal value");
     en.put("StatusBar.OFREGISTER", "of R");
@@ -440,6 +441,7 @@ public class CurrentLocale {
     it.put("Config.SYNCEXC-TERMINATE.tip", "Ferma la simulazione al verificarsi di eccezioni di tipo Divisione per zero ed Integer overflow");
     it.put("Config.FONTSIZE", "Dimensione font");
     it.put("Config.FONTSIZE.tip", "Dimensione del font");
+    it.put("Config.DARKTHEME", "Dark theme (take effect after restart)");
     it.put("StatusBar.WELCOME", "Benvenuti in EduMIPS64");
     it.put("StatusBar.DECIMALVALUE", "Valore decimale");
     it.put("StatusBar.OFREGISTER", "di R");
@@ -676,6 +678,7 @@ public class CurrentLocale {
     zhcn.put("Config.SYNCEXC-TERMINATE.tip", "在除以零和整数溢出异常时停止模拟");
     zhcn.put("Config.FONTSIZE", "字体大小");
     zhcn.put("Config.FONTSIZE.tip", "字体的大小");
+    zhcn.put("Config.DARKTHEME", "黑暗主题（重启后生效）");
     zhcn.put("StatusBar.WELCOME", "欢迎使用 EduMIPS64");
     zhcn.put("StatusBar.DECIMALVALUE", "十进制值");
     zhcn.put("StatusBar.OFREGISTER", "R 寄存器的值为 ");

@@ -84,10 +84,10 @@ public class GUIConfig extends JDialog {
     JTabbedPane tabPanel = new JTabbedPane();
     scaleFont(tabPanel);
     tabPanel.addTab(MAIN, makeMainPanel());
+    tabPanel.addTab(APPEARANCE, makeAppearancePanel());
     tabPanel.addTab(BEHAVIOR, makeBehaviorPanel());
     tabPanel.addTab(FPUEXCEPTIONS, makeExceptionsPanel());
     tabPanel.addTab(FPUROUNDING, makeRoundingPanel());
-    tabPanel.addTab(APPEARANCE, makeAppearancePanel());
 
     logger.log(Level.INFO, "Current values: " + cache.toString());
 
@@ -243,6 +243,7 @@ public class GUIConfig extends JDialog {
     addRow(panel, row++, ConfigKey.FP_DIVIDER_COLOR, new JButton());
     addRow(panel, row++, ConfigKey.FP_LONG_DOUBLE_VIEW, new JCheckBox());
     addRow(panel, row++, ConfigKey.UI_FONT_SIZE, new JNumberField());
+    addRow(panel, row++, ConfigKey.UI_DARK_THEME, new JCheckBox());
 
     // fill remaining vertical space
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);

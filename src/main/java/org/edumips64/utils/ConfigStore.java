@@ -83,6 +83,7 @@ public abstract class ConfigStore {
 
     // UI font options.
     ConfigStore.defaults.put(ConfigKey.UI_FONT_SIZE, 18);
+    ConfigStore.defaults.put(ConfigKey.UI_DARK_THEME, false);
   }
 
   // The interface exposes getter and setter methods for all the supported
