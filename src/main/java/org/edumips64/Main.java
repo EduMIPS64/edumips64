@@ -169,11 +169,15 @@ public class Main {
     // Note that if the JAR is not available to the class loader then the whole application will not start,
     // we won't be able to recover.
     try {
-      UIManager.setLookAndFeel( new FlatDarkLaf() );
+      if(mm.configStore.getBoolean(ConfigKey.UI_DARK_THEME)){
+        UIManager.setLookAndFeel( new FlatDarkLaf() );
+      } else{
+        UIManager.setLookAndFeel( new FlatLightLaf() );
+      }
     } catch( Exception ex ) {
-      log.log(Level.SEVERE, "Could not initialize FlatLightLaF Swing look & feel. Reverting to Swing default.");
+      log.log(Level.SEVERE, "Could not initialize FlatLaF Swing look & feel. Reverting to Swing default.");
     } catch( NoClassDefFoundError err ) {
-      log.log(Level.SEVERE, "Could not initialize FlatLightLaF Swing look & feel. Reverting to Swing default.");
+      log.log(Level.SEVERE, "Could not initialize FlatLaF Swing look & feel. Reverting to Swing default.");
     }
 
     SplashScreen s = new SplashScreen();

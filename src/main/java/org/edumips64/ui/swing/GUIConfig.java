@@ -429,6 +429,7 @@ public class GUIConfig extends JDialog {
         }
 
         boolean fontChanged = config.getInt(ConfigKey.UI_FONT_SIZE) != (Integer) cache.get(ConfigKey.UI_FONT_SIZE);
+        boolean themeChanged = config.getBoolean(ConfigKey.UI_DARK_THEME) != (Boolean) cache.get(ConfigKey.UI_DARK_THEME);
         boolean fwdChanged = config.getBoolean(ConfigKey.FORWARDING) != (Boolean) cache.get(ConfigKey.FORWARDING);
 
         // Alert the user that the simulation will be restarted if the forwarding setting is changed.
@@ -448,11 +449,12 @@ public class GUIConfig extends JDialog {
         updateCallback.accept(fwdChanged);
 
         // Warn the user that they need to restart the simulator if they changed the font size.
-        if (fontChanged) {
+        if (fontChanged || themeChanged) {
           JOptionPane.showMessageDialog(null,
-              CurrentLocale.getString("RESTART_FONT"), CurrentLocale.getString("GUI_WARNING"),
+              CurrentLocale.getString("RESTART_APPEARANCE"), CurrentLocale.getString("GUI_WARNING"),
               JOptionPane.WARNING_MESSAGE);
         }
+
       } catch (ConfigStoreTypeException ex) {
         logger.severe("Unknown type encountered while storing the configuration.");
       }

@@ -254,7 +254,7 @@ public class CurrentLocale {
     en.put("ALIGNERR", "Alignment error in instruction");
     en.put("THEADDRESS", "the address");
     en.put("ISNOTALIGNED", "is not aligned to");
-    en.put("RESTART_FONT", "Please restart the simulator to use the new font.");
+    en.put("RESTART_APPEARANCE", "Please restart the simulator to use the new appearance.");
     en.put("NO_MASK_AND_TERMINATE", "Please choose only one option between masking synchronous exceptions and program termination on synchronous exceptions.");
     en.put("FWD_RESET_WARNING", "Changing the forwarding setting will reset the simulation. Continue?");
     en.put("CLI.RUN.EXE_END", "Execution ended. %d steps were executed in %dms");
@@ -492,7 +492,7 @@ public class CurrentLocale {
     it.put("ALIGNERR", "Errore di allineamento nell'istruzione");
     it.put("THEADDRESS", "l'indirizzo");
     it.put("ISNOTALIGNED", "non è allineato a");
-    it.put("RESTART_FONT", "E' necessario riavviare il simulatore per utilizzare il nuovo font.");
+    it.put("RESTART_APPEARANCE", "Riavvia il simulatore per utilizzare il nuovo aspetto.");
     it.put("NO_MASK_AND_TERMINATE", "Selezionare solo una opzione tra mascheramento eccezioni sincrone e terminazione in seguito ad eccezioni sincrone.");
     it.put("FWD_RESET_WARNING", "Cambiare la modalità di forwarding indurrà un riavvio della simulazione. Continuare?");
     it.put("CLI.RUN.EXE_END", "L'esecuzione è terminata. %d passaggi sono stati eseguiti in %dms");
@@ -728,7 +728,7 @@ public class CurrentLocale {
     zhcn.put("ALIGNERR", "指令中的对齐错误");
     zhcn.put("THEADDRESS", "该地址");
     zhcn.put("ISNOTALIGNED", "没有对齐到");
-    zhcn.put("RESTART_FONT", "请重新启动模拟器以使用新字体。");
+    zhcn.put("RESTART_APPEARANCE", "请重新启动模拟器以使用新外观。");
     zhcn.put("NO_MASK_AND_TERMINATE", "请在屏蔽同步异常和同步异常终止程序之间只选择一个选项。");
     zhcn.put("FWD_RESET_WARNING", "更改转发设置将重置模拟。继续吗？ ");
     zhcn.put("CLI.RUN.EXE_END", "执行结束。执行了 %d 个步骤，用时 %d 毫秒 ");

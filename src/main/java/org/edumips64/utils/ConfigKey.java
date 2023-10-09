@@ -40,7 +40,7 @@ public enum ConfigKey {
     FP_TOWARDS_MINUS_INFINITY("TOWARDS_MINUS_INFINITY"),
     FP_LONG_DOUBLE_VIEW("LONGDOUBLEVIEW"),
     UI_FONT_SIZE("FONTSIZE"),
-    UI_DARK_THEME("DARK_THEME");
+    UI_DARK_THEME("DARKTHEME");
     
     private final String text;
     

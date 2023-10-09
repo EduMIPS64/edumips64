@@ -52,6 +52,7 @@ public class GUICycles extends GUIComponent {
   private JSplitPane splitPane;
   private CycleBuilder builder;
 
+
   GUICycles(CPU cpu, Memory memory, ConfigStore config, CycleBuilder builder) {
     super(cpu, memory, config);
     this.builder = builder;
@@ -126,8 +127,13 @@ public class GUICycles extends GUIComponent {
     @Override
     public synchronized void paint(Graphics g) {
       super.paint(g);
-      setBackground(Color.darkGray);
-      g.setColor(Color.white);
+      if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
+        setBackground(Color.darkGray);
+        g.setColor(Color.white);
+      }else{
+        setBackground(Color.white);
+        g.setColor(Color.black);
+      }
       g.setFont(font);
 
       fill(g);
@@ -232,8 +238,13 @@ public class GUICycles extends GUIComponent {
     @Override
     public synchronized void paint(Graphics g) {
       super.paint(g);
-      setBackground(Color.darkGray);
-      g.setColor(Color.white);
+      if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
+        setBackground(Color.darkGray);
+        g.setColor(Color.white);
+      }else{
+        setBackground(Color.white);
+        g.setColor(Color.black);
+      }
       g.setFont(font);
 
       Rectangle clip = g.getClipBounds();
