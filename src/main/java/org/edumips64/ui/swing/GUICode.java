@@ -252,8 +252,8 @@ public class GUICode extends GUIComponent {
       if (rowTable == ifIndex) {
         label.setOpaque(true);
         if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
-          label.setForeground(new Color(config.getInt(ConfigKey.IF_COLOR)));
-          label.setBackground(Color.black);
+          label.setBackground(new Color(config.getInt(ConfigKey.IF_COLOR)).darker().darker().darker());
+          
         } else {
           label.setBackground(new Color(config.getInt(ConfigKey.IF_COLOR)));
         }
@@ -263,8 +263,8 @@ public class GUICode extends GUIComponent {
       if (rowTable == idIndex) {
         label.setOpaque(true);
         if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
-          label.setForeground(new Color(config.getInt(ConfigKey.ID_COLOR)));
-          label.setBackground(Color.black);
+          label.setBackground(new Color(config.getInt(ConfigKey.ID_COLOR)).darker().darker().darker());
+          
         } else {
           label.setBackground(new Color(config.getInt(ConfigKey.ID_COLOR)));
         }
@@ -273,8 +273,8 @@ public class GUICode extends GUIComponent {
       if (rowTable == exIndex) {
         label.setOpaque(true);
         if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
-          label.setForeground(new Color(config.getInt(ConfigKey.EX_COLOR)));
-          label.setBackground(Color.black);
+          label.setBackground(new Color(config.getInt(ConfigKey.EX_COLOR)).darker().darker().darker());
+          
         } else {
           label.setBackground(new Color(config.getInt(ConfigKey.EX_COLOR)));
         }
@@ -283,8 +283,8 @@ public class GUICode extends GUIComponent {
       if (rowTable == memIndex) {
         label.setOpaque(true);
         if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
-          label.setForeground(new Color(config.getInt(ConfigKey.MEM_COLOR)));
-          label.setBackground(Color.black);
+          label.setBackground(new Color(config.getInt(ConfigKey.MEM_COLOR)).darker().darker().darker());
+          
         } else {
           label.setBackground(new Color(config.getInt(ConfigKey.MEM_COLOR)));
         }
@@ -293,8 +293,8 @@ public class GUICode extends GUIComponent {
       if (rowTable == wbIndex) {
         label.setOpaque(true);
         if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
-          label.setForeground(new Color(config.getInt(ConfigKey.WB_COLOR)));
-          label.setBackground(Color.black);
+          label.setBackground(new Color(config.getInt(ConfigKey.WB_COLOR)).darker().darker().darker());
+          
         } else {
           label.setBackground(new Color(config.getInt(ConfigKey.WB_COLOR)));
         }
@@ -303,8 +303,8 @@ public class GUICode extends GUIComponent {
       if (rowTable == M1Index || rowTable == M2Index || rowTable == M3Index || rowTable == M4Index || rowTable == M5Index || rowTable == M6Index || rowTable == M7Index) {
         label.setOpaque(true);
         if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
-          label.setForeground(new Color(config.getInt(ConfigKey.FP_MULTIPLIER_COLOR)));
-          label.setBackground(Color.black);
+          label.setBackground(new Color(config.getInt(ConfigKey.FP_MULTIPLIER_COLOR)).darker().darker().darker());
+          
         } else {
           label.setBackground(new Color(config.getInt(ConfigKey.FP_MULTIPLIER_COLOR)));
         }
@@ -313,8 +313,8 @@ public class GUICode extends GUIComponent {
       if (rowTable == A1Index || rowTable == A2Index || rowTable == A3Index || rowTable == A4Index) {
         label.setOpaque(true);
         if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
-          label.setForeground(new Color(config.getInt(ConfigKey.FP_ADDER_COLOR)));
-          label.setBackground(Color.black);
+          label.setBackground(new Color(config.getInt(ConfigKey.FP_ADDER_COLOR)).darker().darker().darker());
+          
         } else {
           label.setBackground(new Color(config.getInt(ConfigKey.FP_ADDER_COLOR)));
         }
@@ -323,8 +323,8 @@ public class GUICode extends GUIComponent {
       if (rowTable == DIVIndex) {
         label.setOpaque(true);
         if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
-          label.setForeground(new Color(config.getInt(ConfigKey.FP_DIVIDER_COLOR)));
-          label.setBackground(Color.black);
+          label.setBackground(new Color(config.getInt(ConfigKey.FP_DIVIDER_COLOR)).darker().darker().darker());
+          
         } else {
           label.setBackground(new Color(config.getInt(ConfigKey.FP_DIVIDER_COLOR)));
         }
