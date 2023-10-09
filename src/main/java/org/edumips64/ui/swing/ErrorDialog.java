@@ -24,6 +24,8 @@ package org.edumips64.ui.swing;
 
 import org.edumips64.core.parser.ParserException;
 import org.edumips64.utils.CurrentLocale;
+import org.edumips64.utils.ConfigKey;
+import org.edumips64.utils.ConfigStore;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
@@ -36,7 +38,7 @@ import javax.swing.*;
 public class ErrorDialog extends JDialog {
   private static final long serialVersionUID = 6756487575875944232L;
 
-  public ErrorDialog(final JFrame owner, List<ParserException> peList, String title, Boolean showWarning) {
+  public ErrorDialog(final JFrame owner, List<ParserException> peList, String title, Boolean showWarning, ConfigStore configStore) {
 
     super(owner, title, true);
 
@@ -107,7 +109,12 @@ public class ErrorDialog extends JDialog {
                            )), SwingConstants.LEFT);
       label.setIconTextGap(50);
       label.setFont(new Font("SansSerif", Font.PLAIN, 20));
-      label.setForeground(new Color(0, 0, 85));
+      
+      if(configStore.getBoolean(ConfigKey.UI_DARK_THEME)){
+        label.setForeground(Color.white);
+      }else{
+        label.setForeground(new Color(0, 0, 85));
+      }
     } catch (java.io.IOException ignored) {}
 
     getRootPane().setDefaultButton(okButton);

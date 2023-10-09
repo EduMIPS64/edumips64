@@ -528,7 +528,7 @@ public class Main {
         if (pmwe.hasErrors()) {
           throw pmwe;
         }
-        new ErrorDialog(mainFrame, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
+        new ErrorDialog(mainFrame, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS), configStore);
       } catch (NullPointerException e) {
         log.info("NullPointerException: " + e.toString());
         log.log(Level.SEVERE, "Could not parse " + file, e);
@@ -563,7 +563,7 @@ public class Main {
       mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
     } catch (ParserMultiException ex) {
       log.info("Error opening " + file);
-      new ErrorDialog(mainFrame, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
+      new ErrorDialog(mainFrame, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS), configStore);
       openedFile = null;
       mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
       resetSimulator(false);
