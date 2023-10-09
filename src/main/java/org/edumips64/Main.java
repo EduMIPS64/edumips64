@@ -71,6 +71,7 @@ import java.io.IOException;
 import javax.swing.*;
 import javax.swing.event.*;
 import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 
 /** Entry point of EduMIPS64
  * @author Andrea Spadaccini, Antonella Scandura, Vanni Rizzo
@@ -168,7 +169,7 @@ public class Main {
     // Note that if the JAR is not available to the class loader then the whole application will not start,
     // we won't be able to recover.
     try {
-      UIManager.setLookAndFeel( new FlatLightLaf() );
+      UIManager.setLookAndFeel( new FlatDarkLaf() );
     } catch( Exception ex ) {
       log.log(Level.SEVERE, "Could not initialize FlatLightLaF Swing look & feel. Reverting to Swing default.");
     } catch( NoClassDefFoundError err ) {

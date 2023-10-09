@@ -78,13 +78,13 @@ class GUIPipeline extends GUIComponent {
 
     public void paintComponent(Graphics g) {
       super.paintComponent(g);  // va fatto sempre
-      setBackground(Color.white);  // fondo bianco
+      setBackground(Color.darkGray);  // fondo bianco
 
       largh = this.getWidth();
       alt = this.getHeight();
       riempiBlocchi(g);
 
-      g.setColor(Color.black);
+      g.setColor(Color.white);
       //Blocco IF
       g.drawRect(largh / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
 
@@ -159,6 +159,7 @@ class GUIPipeline extends GUIComponent {
       Font f1 = new Font("SansSerif", Font.PLAIN, dimCar);
       g.getFontMetrics(f1);
       g.setFont(f1);
+      g.setColor(Color.black);
       //Stringhe all'interno dei blocchi
       g.drawString("IF", largh * 17 / 200, (alt / 2));
       g.drawString("ID", largh * 47 / 200, (alt / 2));
@@ -166,6 +167,8 @@ class GUIPipeline extends GUIComponent {
       g.drawString("WB", largh * 175 / 200, (alt / 2));
       g.drawString("EX", largh * 97 / 200, (alt / 2) - (alt * 40 / 120));
       g.drawString("FP-DIV " + cpu.getDividerCounter(), largh * 87 / 200, (alt / 2) + (alt * 40 / 120));
+
+      g.setColor(Color.white);
       g.drawString("FP Multiplier", largh * 85 / 200, (alt / 2) - (alt * 15 / 120));
       g.drawString("FP Adder", largh * 85 / 200, (alt / 2) + (alt * 23 / 120));
 

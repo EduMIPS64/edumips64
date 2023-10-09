@@ -126,8 +126,8 @@ public class GUICycles extends GUIComponent {
     @Override
     public synchronized void paint(Graphics g) {
       super.paint(g);
-      setBackground(Color.white);
-      g.setColor(Color.black);
+      setBackground(Color.darkGray);
+      g.setColor(Color.white);
       g.setFont(font);
 
       fill(g);
@@ -232,8 +232,8 @@ public class GUICycles extends GUIComponent {
     @Override
     public synchronized void paint(Graphics g) {
       super.paint(g);
-      setBackground(Color.white);
-      g.setColor(Color.black);
+      setBackground(Color.darkGray);
+      g.setColor(Color.white);
       g.setFont(font);
 
       Rectangle clip = g.getClipBounds();
