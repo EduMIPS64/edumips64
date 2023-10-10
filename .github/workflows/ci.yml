@@ -118,6 +118,8 @@ jobs:
       # Set up JDK (necessary for the core that is cross-compiled to JS)
       # and Node.JS (for the) web app itself.
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
