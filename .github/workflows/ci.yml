@@ -268,7 +268,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{github.sha}}
+          ref: ${{ github.event.pull_request.head.sha }}
       - uses: snapcore/action-build@v1
         id: snapcraft
       - uses: actions/upload-artifact@v3
