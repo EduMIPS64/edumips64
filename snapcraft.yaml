@@ -10,7 +10,7 @@ confinement: strict
 parts:
   edumips64:
     plugin: gradle
-    source: https://github.com/edumips64/edumips64.git
+    source: .
     gradle-version: '8.1.1'
     # Remove Java 11, which is not needed and pulled in by default by the Snapcraft Gradle plugin.
     # This also fixes the issue with a dangling JDK 11 symlink:
