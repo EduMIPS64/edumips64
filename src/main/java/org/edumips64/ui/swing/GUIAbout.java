@@ -158,15 +158,15 @@ public class GUIAbout extends JDialog implements Runnable  {
     y = 300;
 
     while (running) {
-      if (y < -1100) {
+      if (y < -1500) {
         y = 300;  //when the text finish reset y value
       }
 
-      y -= 2;     //decrementing y
+      y -= 1;     //decrementing y
       lavagna.repaint();
 
       try {
-        Thread.sleep(40);
+        Thread.sleep(16);
       } catch (InterruptedException ignored) { }
     }
   }
