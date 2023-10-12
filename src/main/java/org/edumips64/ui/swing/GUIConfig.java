@@ -377,6 +377,7 @@ public class GUIConfig extends JDialog {
 
         if (color != null) {
           button.setBackground(color);
+          button.setText("("+color.getRed() + ", "+ color.getGreen() + ", "+ color.getBlue() + ")");
           cache.put(key, button.getBackground().getRGB());
         }
       });
