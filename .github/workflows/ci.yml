@@ -21,8 +21,7 @@ jobs:
     steps:
       # Set up Java development environment.
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
+        
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -122,8 +121,7 @@ jobs:
       # Set up JDK (necessary for the core that is cross-compiled to JS)
       # and Node.JS (for the) web app itself.
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
+        
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -251,8 +249,7 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
+        
       - name: Set up Node.JS 18
         uses: actions/setup-node@v3
         with:
@@ -275,8 +272,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
+        
       - uses: snapcore/action-build@v1
         id: snapcraft
       - uses: actions/upload-artifact@v3
