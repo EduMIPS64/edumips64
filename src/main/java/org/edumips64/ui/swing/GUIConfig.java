@@ -102,7 +102,7 @@ public class GUIConfig extends JDialog {
 
     //pack();
     int width = (int)(700 * scalingFactor);
-    int height = (int)(300 * scalingFactor);
+    int height = (int)(350 * scalingFactor);
     setSize(width, height);
     setVisible(true);
   }
@@ -233,6 +233,9 @@ public class GUIConfig extends JDialog {
     panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
     int row = 2;
 
+    addRow(panel, row++, ConfigKey.FP_LONG_DOUBLE_VIEW, new JCheckBox());
+    addRow(panel, row++, ConfigKey.UI_FONT_SIZE, new JNumberField());
+    addRow(panel, row++, ConfigKey.UI_DARK_THEME, new JCheckBox());
     addRow(panel, row++, ConfigKey.IF_COLOR, new JButton());
     addRow(panel, row++, ConfigKey.ID_COLOR, new JButton());
     addRow(panel, row++, ConfigKey.EX_COLOR, new JButton());
@@ -241,9 +244,6 @@ public class GUIConfig extends JDialog {
     addRow(panel, row++, ConfigKey.FP_ADDER_COLOR, new JButton());
     addRow(panel, row++, ConfigKey.FP_MULTIPLIER_COLOR, new JButton());
     addRow(panel, row++, ConfigKey.FP_DIVIDER_COLOR, new JButton());
-    addRow(panel, row++, ConfigKey.FP_LONG_DOUBLE_VIEW, new JCheckBox());
-    addRow(panel, row++, ConfigKey.UI_FONT_SIZE, new JNumberField());
-    addRow(panel, row++, ConfigKey.UI_DARK_THEME, new JCheckBox());
 
     // fill remaining vertical space
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
