@@ -680,9 +680,9 @@ public class CurrentLocale {
     zhcn.put("Config.FONTSIZE.tip", "字体的大小");
     zhcn.put("Config.DARKTHEME", "黑暗主题（重启后生效）");
     zhcn.put("StatusBar.WELCOME", "欢迎使用 EduMIPS64");
-    zhcn.put("StatusBar.DECIMALVALUE", "十进制值");
-    zhcn.put("StatusBar.OFREGISTER", "R 寄存器的值为 ");
-    zhcn.put("StatusBar.OFREGISTERFP", "F 寄存器的值为 ");
+    zhcn.put("StatusBar.DECIMALVALUE", "十进制值：");
+    zhcn.put("StatusBar.OFREGISTER", "R ");
+    zhcn.put("StatusBar.OFREGISTERFP", "F ");
     zhcn.put("StatusBar.MEMORYCELL", " 的地址为 ");
     zhcn.put("Manual.CAPTION", "用户指南");
     zhcn.put("Manual.INTRO", "介绍");
