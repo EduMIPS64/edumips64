@@ -363,9 +363,10 @@ public class GUIConfig extends JDialog {
       });
     } else if (comp instanceof JButton) {
       final JButton button = (JButton) comp;
-      button.setBounds(0, 0, 50, 10);
-      button.setBackground(new Color(config.getInt(key)));
-
+      button.setBounds(0, 0, 50, 40);
+      Color currentColor = new Color(config.getInt(key));
+      button.setBackground(currentColor);
+      button.setText("("+currentColor.getRed() + ", "+ currentColor.getGreen() + ", "+ currentColor.getBlue() + ")");
       cache.put(key, config.getInt(key));
 
       button.addActionListener(e -> {
