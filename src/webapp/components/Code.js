@@ -251,7 +251,7 @@ const Code = (props) => {
       value={props.code}
       options={options}
       onChange={props.onChangeValue}
-      theme={prefersDarkMode ? "vs-dark" : "vs-light"}
+      theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
       editorDidMount={editorDidMount}
     />
   );

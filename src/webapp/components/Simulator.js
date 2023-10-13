@@ -188,10 +188,7 @@ const Simulator = ({ sim, initialState }) => {
           </Grid>
           <Grid xs={4} id="right-panel" disableEqualOverflow>
             <Accordion defaultExpanded disableGutters>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-
-              >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>Stats</Typography>
               </AccordionSummary>
               <AccordionDetails>

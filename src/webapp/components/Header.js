@@ -46,7 +46,6 @@ export default function Header(props) {
           Load / Reset
         </Button>
         <Button
-
           color="inherit"
           className="step-button"
           id="step-button"
@@ -111,7 +110,7 @@ export default function Header(props) {
           color="inherit"
           className="help-button"
           onClick={() => {
-            setDialogOpen(true)
+            setDialogOpen(true);
           }}
         >
           <HelpIcon />
