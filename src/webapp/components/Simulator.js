@@ -176,7 +176,7 @@ const Simulator = ({ sim, initialState }) => {
         parsingErrors={parsingErrors}
         version={sim.version}
       />
-      <Grid container  id="main-grid" disableEqualOverflow spacing={0} direction={{xs:'column', lg:'row'}}>
+      <Grid container  id="main-grid" disableEqualOverflow spacing={0} >
         <Grid id="left-panel" sx={{flexGrow: 1}}>
           <Code
             onChangeValue={onCodeChange}
