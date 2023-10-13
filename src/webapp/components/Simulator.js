@@ -175,7 +175,7 @@ const Simulator = ({ sim, initialState }) => {
           parsingErrors={parsingErrors}
           version={sim.version}
         />
-        <Grid container id="main-grid" disableEqualOverflow spacing={0} >
+        <Grid container id="main-grid" disableEqualOverflow spacing={0}>
           <Grid id="left-panel" xs={8}>
             <Code
               onChangeValue={onCodeChange}
@@ -196,9 +196,7 @@ const Simulator = ({ sim, initialState }) => {
               </AccordionDetails>
             </Accordion>
             <Accordion defaultExpanded disableGutters>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-              >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>Pipeline</Typography>
               </AccordionSummary>
               <AccordionDetails>
@@ -206,9 +204,7 @@ const Simulator = ({ sim, initialState }) => {
               </AccordionDetails>
             </Accordion>
             <Accordion disableGutters>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-              >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>Registers</Typography>
               </AccordionSummary>
               <AccordionDetails>
@@ -216,9 +212,7 @@ const Simulator = ({ sim, initialState }) => {
               </AccordionDetails>
             </Accordion>
             <Accordion disableGutters>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-              >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>Memory</Typography>
               </AccordionSummary>
               <AccordionDetails>

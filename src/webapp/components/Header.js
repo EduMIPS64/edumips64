@@ -63,7 +63,7 @@ export default function Header(props) {
           id="multi-step-button"
           onClick={() => {
             let userInputValue = prompt(
-              'Please input your desired step count:'
+              'Please input your desired step count:', 10
             );
             if (!isNaN(userInputValue)) {
               if (userInputValue > 0) {
@@ -93,7 +93,6 @@ export default function Header(props) {
           Run All
         </Button>
         <Button
-
           color="inherit"
           className="stop-button"
           id="stop-button"
