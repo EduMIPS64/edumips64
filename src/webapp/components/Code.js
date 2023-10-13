@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import MonacoEditor from 'react-monaco-editor';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const Code = (props) => {
   const [monaco, setMonaco] = useState(null);
@@ -241,13 +242,15 @@ const Code = (props) => {
     monaco.editor.setModelMarkers(model, 'EduMIPS64', markers);
   }, [props.parsingErrors, editor, monaco]);
 
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
   return (
     <MonacoEditor
       language="mips"
       value={props.code}
       options={options}
       onChange={props.onChangeValue}
-      theme="vs-light"
+      theme={(prefersDarkMode)?"vs-dark":"vs-light"}
       editorDidMount={editorDidMount}
     />
   );

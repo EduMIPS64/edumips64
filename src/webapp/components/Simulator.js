@@ -1,11 +1,11 @@
 import React from 'react';
 
 import Code from './Code';
-import Controls from './Controls';
 import Memory from './Memory';
 import Pipeline from './Pipeline';
 import Registers from './Registers';
 import Statistics from './Statistics';
+import Header from './Header';
 
 import SampleProgram from '../data/SampleProgram';
 
@@ -115,7 +115,7 @@ const Simulator = ({ sim, initialState }) => {
 
   return (
     <>
-      <Controls
+      <Header
         onRunClick={runCode}
         runEnabled={simulatorRunning && !executing}
         onStepClick={stepCode}
