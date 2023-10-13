@@ -18,6 +18,13 @@
 
 ### Requirements
 
+#### Dev Container
+All requirements are available in the Development Container image described in the `.devcontainer/devcontainer.json` dev container. See https://code.visualstudio.com/docs/devcontainers/containers for documentation on dev containers.
+
+Github codespaces will use the dev container by default and give you a fully set up dev enviroment, useable for desktop, web and documentation development work.
+
+#### List of requirements
+
 In order to compile EduMIPS64, you need the Java JDK version 17 or above.
 
 To build the user documentation, you'll need Python 3.9+ with pip.
