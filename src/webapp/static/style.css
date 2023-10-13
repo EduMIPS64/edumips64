@@ -143,6 +143,10 @@ footer {
     border-left-color: rgba(255, 255, 255, 0.188);
   }
   
+  textarea{
+    background: transparent;
+    color: white;
+  }
   ::-webkit-scrollbar{
     background-color: #1e1e1e;
   }
