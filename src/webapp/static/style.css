@@ -139,17 +139,10 @@ footer {
 
 /* Dark Mode Specific Styles */
 @media screen and (prefers-color-scheme: dark){
-  body{
-    background-color: black !important;
-    color: white !important;
-  }
-  textarea {
-    color: white !important;
-    background-color: transparent !important;
-  }
   #right-panel{
     border-left-color: rgba(255, 255, 255, 0.188);
   }
+  
   ::-webkit-scrollbar{
     background-color: #1e1e1e;
   }

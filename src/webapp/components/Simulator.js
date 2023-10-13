@@ -160,82 +160,76 @@ const Simulator = ({ sim, initialState }) => {
   return (
     <>
       <ThemeProvider theme={theme}>
-      <CssBaseline />
-    
-      <Header
-        onRunClick={runCode}
-        runEnabled={simulatorRunning && !executing}
-        onStepClick={stepCode}
-        stepEnabled={simulatorRunning && !executing}
-        onLoadClick={loadCode}
-        loadEnabled={isValidProgram}
-        onStopClick={() => {
-          setMustStop(true);
-        }}
-        stopEnabled={executing}
-        parsingErrors={parsingErrors}
-        version={sim.version}
-      />
-      <Grid container  id="main-grid" disableEqualOverflow spacing={0} >
-        <Grid id="left-panel" xs={8}>
-          <Code
-            onChangeValue={onCodeChange}
-            code={code}
-            parsingErrors={parsingErrors}
-            parsedInstructions={parsedInstructions}
-            pipeline={pipeline}
-            running={simulatorRunning}
-          />
+        <CssBaseline />
+        <Header
+          onRunClick={runCode}
+          runEnabled={simulatorRunning && !executing}
+          onStepClick={stepCode}
+          stepEnabled={simulatorRunning && !executing}
+          onLoadClick={loadCode}
+          loadEnabled={isValidProgram}
+          onStopClick={() => {
+            setMustStop(true);
+          }}
+          stopEnabled={executing}
+          parsingErrors={parsingErrors}
+          version={sim.version}
+        />
+        <Grid container id="main-grid" disableEqualOverflow spacing={0} >
+          <Grid id="left-panel" xs={8}>
+            <Code
+              onChangeValue={onCodeChange}
+              code={code}
+              parsingErrors={parsingErrors}
+              parsedInstructions={parsedInstructions}
+              pipeline={pipeline}
+              running={simulatorRunning}
+            />
+          </Grid>
+          <Grid xs={4} id="right-panel" disableEqualOverflow>
+            <Accordion defaultExpanded disableGutters>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+
+              >
+                <Typography>Stats</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Statistics {...stats} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion defaultExpanded disableGutters>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+              >
+                <Typography>Pipeline</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Pipeline pipeline={pipeline} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion disableGutters>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+              >
+                <Typography>Registers</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Registers {...registers} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion disableGutters>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+              >
+                <Typography>Memory</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Memory memory={memory} />
+              </AccordionDetails>
+            </Accordion>
+          </Grid>
         </Grid>
-        <Grid xs={4} id="right-panel" disableEqualOverflow>
-          <Accordion defaultExpanded  disableGutters>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-
-            >
-              <Typography>Stats</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-            <Statistics {...stats} />
-            </AccordionDetails>
-          </Accordion>
-          <Accordion defaultExpanded disableGutters>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-
-            >
-              <Typography>Pipeline</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-            <Pipeline pipeline={pipeline} />
-            </AccordionDetails>
-          </Accordion>
-          <Accordion disableGutters>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-
-            >
-              <Typography>Registers</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-            <Registers {...registers} />
-            </AccordionDetails>
-          </Accordion>
-          <Accordion disableGutters>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-
-            >
-              <Typography>Memory</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-            <Memory memory={memory} />
-            </AccordionDetails>
-          </Accordion>
-          
-          
-        </Grid>
-      </Grid>
       </ThemeProvider>
     </>
   );

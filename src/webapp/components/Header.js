@@ -16,10 +16,6 @@ import FastForwardIcon from '@mui/icons-material/FastForward';
 import SyncIcon from '@mui/icons-material/Sync';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
-import { Height } from '@mui/icons-material';
-
-// Number of steps to run with the multi-step button.
-const STEP_STRIDE = 500;
 
 export default function Header(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -41,7 +37,9 @@ export default function Header(props) {
           color="inherit"
           className="load-button"
           id="load-button"
-          onClick={() => { props.onLoadClick(1); }}
+          onClick={() => {
+            props.onLoadClick(1);
+          }}
           startIcon={<SyncIcon />}
           disabled={!props.loadEnabled}
         >
@@ -52,27 +50,30 @@ export default function Header(props) {
           color="inherit"
           className="step-button"
           id="step-button"
-          onClick={() => { props.onStepClick(1); }}
+          onClick={() => {
+            props.onStepClick(1);
+          }}
           startIcon={<PlayArrowIcon />}
           disabled={!props.stepEnabled}
         >
           Single Step
         </Button>
         <Button
-
           color="inherit"
           className="multi-step-button"
           id="multi-step-button"
           onClick={() => {
-            let userInputValue = prompt("Please input your desired step count:");
+            let userInputValue = prompt(
+              'Please input your desired step count:'
+            );
             if (!isNaN(userInputValue)) {
               if (userInputValue > 0) {
                 props.onStepClick(userInputValue);
               } else {
-                console.warn("User Input Non-positive Value for MultiStep");
+                console.warn('User Input Non-positive Value for MultiStep');
               }
             } else {
-              console.warn("User Input Invalid Value for MultiStep");
+              console.warn('User Input Invalid Value for MultiStep');
             }
           }}
           startIcon={<FastForwardIcon />}
@@ -81,11 +82,12 @@ export default function Header(props) {
           Multi Step
         </Button>
         <Button
-
           color="inherit"
           className="run-button"
           id="run-button"
-          onClick={() => { props.onRunClick(); }}
+          onClick={() => {
+            props.onRunClick();
+          }}
           startIcon={<PlayCircleIcon />}
           disabled={!props.runEnabled}
         >
@@ -96,7 +98,9 @@ export default function Header(props) {
           color="inherit"
           className="stop-button"
           id="stop-button"
-          onClick={() => { props.onStopClick(); }}
+          onClick={() => {
+            props.onStopClick();
+          }}
           startIcon={<StopCircleIcon />}
           disabled={!props.stopEnabled}
         >
@@ -106,7 +110,9 @@ export default function Header(props) {
         <IconButton
           color="inherit"
           className="help-button"
-          onClick={() => { setDialogOpen(true) }}
+          onClick={() => {
+            setDialogOpen(true)
+          }}
         >
           <HelpIcon />
         </IconButton>
