@@ -242,6 +242,7 @@ const Code = (props) => {
     monaco.editor.setModelMarkers(model, 'EduMIPS64', markers);
   }, [props.parsingErrors, editor, monaco]);
 
+  // Set the dark theme if necessary
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   return (

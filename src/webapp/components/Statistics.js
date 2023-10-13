@@ -34,14 +34,12 @@ const Statistics = ({
           per Instructions (CPI)
         </div>
       </div>
-      <br />
       <div>
         <b>Stalls</b>
         <PluralLabel value={rawStalls} label="RAW Stall" />
         <PluralLabel value={wawStalls} label="WAW Stall" />
         <PluralLabel value={memoryStalls} label="Memory Stall" />
       </div>
-      <br />
       <div>
         <b>Code size</b>
         <div>{codeSizeBytes} Bytes</div>

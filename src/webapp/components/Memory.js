@@ -1,10 +1,9 @@
 import React from 'react';
+import { Typography } from '@mui/material';
 
 const Memory = (props) => {
   return (
-    <div id="memory">
-      <textarea readOnly value={props.memory} />
-    </div>
+      <textarea readOnly value={props.memory} id="memory-view"/>
   );
 };
 

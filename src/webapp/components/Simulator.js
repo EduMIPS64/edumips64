@@ -6,6 +6,19 @@ import Pipeline from './Pipeline';
 import Registers from './Registers';
 import Statistics from './Statistics';
 import Header from './Header';
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import MuiAccordionSummary from '@mui/material/AccordionSummary';
+import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
+import Grid from '@mui/material/Unstable_Grid2';
+import { styled } from '@mui/material/styles';
+
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Typography from '@mui/material/Typography';
 
 import SampleProgram from '../data/SampleProgram';
 
@@ -113,8 +126,42 @@ const Simulator = ({ sim, initialState }) => {
     debouncedSyntaxCheck(code);
   };
 
+  const AccordionSummary = styled((props) => (
+    <MuiAccordionSummary
+      expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem' }} />}
+      {...props}
+    />
+  ))(({ theme }) => ({
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, .05)'
+        : 'rgba(227, 245, 254, 1)',
+    flexDirection: 'row-reverse',
+    '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+      transform: 'rotate(180deg)',
+    },
+    '& .MuiAccordionSummary-content': {
+      marginLeft: theme.spacing(1),
+    },
+  }));
+
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
+  const theme = React.useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: prefersDarkMode ? 'dark' : 'light',
+        },
+      }),
+    [prefersDarkMode],
+  );
+
   return (
     <>
+      <ThemeProvider theme={theme}>
+      <CssBaseline />
+    
       <Header
         onRunClick={runCode}
         runEnabled={simulatorRunning && !executing}
@@ -127,22 +174,69 @@ const Simulator = ({ sim, initialState }) => {
         }}
         stopEnabled={executing}
         parsingErrors={parsingErrors}
+        version={sim.version}
       />
-      <div id="widgetGrid">
-        <Code
-          onChangeValue={onCodeChange}
-          code={code}
-          parsingErrors={parsingErrors}
-          parsedInstructions={parsedInstructions}
-          pipeline={pipeline}
-          running={simulatorRunning}
-        />
-        <Registers {...registers} />
-        <Memory memory={memory} />
-        <Statistics {...stats} />
-        <Pipeline pipeline={pipeline} />
-      </div>
-      <footer>EduMIPS64 Web version {sim.version}</footer>
+      <Grid container  id="main-grid" disableEqualOverflow spacing={0} direction={{xs:'column', lg:'row'}}>
+        <Grid id="left-panel" sx={{flexGrow: 1}}>
+          <Code
+            onChangeValue={onCodeChange}
+            code={code}
+            parsingErrors={parsingErrors}
+            parsedInstructions={parsedInstructions}
+            pipeline={pipeline}
+            running={simulatorRunning}
+          />
+        </Grid>
+        <Grid xs={4} id="right-panel" disableEqualOverflow>
+          <Accordion defaultExpanded  disableGutters>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+
+            >
+              <Typography>Stats</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+            <Statistics {...stats} />
+            </AccordionDetails>
+          </Accordion>
+          <Accordion defaultExpanded disableGutters>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+
+            >
+              <Typography>Pipeline</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+            <Pipeline pipeline={pipeline} />
+            </AccordionDetails>
+          </Accordion>
+          <Accordion disableGutters>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+
+            >
+              <Typography>Registers</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+            <Registers {...registers} />
+            </AccordionDetails>
+          </Accordion>
+          <Accordion disableGutters>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+
+            >
+              <Typography>Memory</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+            <Memory memory={memory} />
+            </AccordionDetails>
+          </Accordion>
+          
+          
+        </Grid>
+      </Grid>
+      </ThemeProvider>
     </>
   );
 };
