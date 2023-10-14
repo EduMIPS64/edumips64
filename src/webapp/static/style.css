@@ -156,6 +156,7 @@ div.error-accordion {
   position: sticky;
   top: 0;
   z-index: 10000;
+  border-bottom: 1px solid rgb(33, 150, 243);
 }
 
 /* Dark Mode Specific Styles */
@@ -164,6 +165,10 @@ div.error-accordion {
     border-left-color: rgba(255, 255, 255, 0.188);
   }
 
+  div.error-accordion{
+    border-bottom-color: rgba(255, 255, 255, 0.188);
+  }
+  
   textarea {
     background: transparent;
     color: white;
