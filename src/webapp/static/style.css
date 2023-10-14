@@ -147,6 +147,7 @@ footer {
     background: transparent;
     color: white;
   }
+  
   ::-webkit-scrollbar{
     background-color: #1e1e1e;
   }

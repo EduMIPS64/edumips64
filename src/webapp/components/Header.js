@@ -63,7 +63,8 @@ export default function Header(props) {
           id="multi-step-button"
           onClick={() => {
             let userInputValue = prompt(
-              'Please input your desired step count:', 10
+              'Please input your desired step count:', 
+              10
             );
             if (!isNaN(userInputValue)) {
               if (userInputValue > 0) {
