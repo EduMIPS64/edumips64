@@ -43,7 +43,7 @@ const ErrorList = ({ parsingErrors, AccordionSummary }) => {
                                 <ListItemIcon className='error-list-item'>
                                     <DecideIconType errorType={value.isWarning} />
                                 </ListItemIcon>
-                                <ListItemText primary={`Column ${value.column} Row ${value.row}: ${value.description}`} />
+                                <ListItemText primary={`Line ${value.row} Position ${value.column}: ${value.description}`} />
                             </ListItem>
                         ))}
                     </List>
