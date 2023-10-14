@@ -60,7 +60,14 @@ const Simulator = ({ sim, initialState }) => {
   const simulatorRunning = status == 'RUNNING';
 
   // Tracks if the program has no syntax errors and can be loaded.
-  const isValidProgram = !parsingErrors;
+  // TODO: Allow code execution w/ warnings in the worker, then uncomment the line below
+  const isValidProgram = (parsingErrors) => {
+    if (!parsingErrors) { return true; }
+    else {
+      // return (parsingErrors.filter((e) => !e.isWarning).length == 0);
+      return false;
+    }
+  };
 
   sim.onmessage = (e) => {
     const result = sim.parseResult(e.data);
