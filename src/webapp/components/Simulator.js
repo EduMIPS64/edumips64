@@ -193,7 +193,8 @@ const Simulator = ({ sim, initialState }) => {
 
             <ErrorList
               parsingErrors={parsingErrors}
-              AccordionSummary={AccordionSummary} />
+              AccordionSummary={AccordionSummary}
+            />
             <Accordion defaultExpanded disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>Stats</Typography>

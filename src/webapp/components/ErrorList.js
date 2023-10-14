@@ -12,12 +12,11 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 
-
 const DecideIconType = ({ errorType }) => {
     if (errorType) {
-        return (<WarningAmberOutlinedIcon />);
+        return <WarningAmberOutlinedIcon />;
     } else {
-        return (<ErrorOutlineOutlinedIcon />);
+        return <ErrorOutlineOutlinedIcon />;
     }
 }
 
@@ -43,7 +42,9 @@ const ErrorList = ({ parsingErrors, AccordionSummary }) => {
                                 <ListItemIcon className='error-list-item'>
                                     <DecideIconType errorType={value.isWarning} />
                                 </ListItemIcon>
-                                <ListItemText primary={`Line ${value.row} Position ${value.column}: ${value.description}`} />
+                                <ListItemText
+                                    primary={`Line ${value.row} Position ${value.column}: ${value.description}`}
+                                />
                             </ListItem>
                         ))}
                     </List>

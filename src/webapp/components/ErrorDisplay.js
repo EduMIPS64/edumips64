@@ -8,7 +8,13 @@ const ErrorCount = ({ count }) => {
     return <React.Fragment />;
   }
   return (
-    <Chip icon={<ErrorIcon />} label={count} size="small" color='error' style={{ marginRight: '5px' }} />
+    <Chip
+      icon={<ErrorIcon />}
+      label={count}
+      size="small"
+      color='error'
+      style={{ marginRight: '5px' }}
+    />
   );
 };
 const WarningCount = ({ count }) => {
@@ -16,7 +22,13 @@ const WarningCount = ({ count }) => {
     return <React.Fragment />;
   }
   return (
-    <Chip icon={<WarningIcon />} label={count} size="small" color='warning' style={{ marginRight: '5px' }} />
+    <Chip
+      icon={<WarningIcon />}
+      label={count}
+      size="small"
+      color='warning'
+      style={{ marginRight: '5px' }}
+    />
   );
 };
 
