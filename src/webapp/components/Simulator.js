@@ -9,8 +9,11 @@ import Header from './Header';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
-import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import Grid from '@mui/material/Unstable_Grid2';
+import ErrorList from './ErrorList';
+
+import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
+
 import { styled } from '@mui/material/styles';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -187,6 +190,10 @@ const Simulator = ({ sim, initialState }) => {
             />
           </Grid>
           <Grid xs={4} id="right-panel" disableEqualOverflow>
+
+            <ErrorList
+              parsingErrors={parsingErrors}
+              AccordionSummary={AccordionSummary} />
             <Accordion defaultExpanded disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>Stats</Typography>

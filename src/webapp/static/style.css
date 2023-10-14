@@ -8,29 +8,29 @@ body {
 
 /* Define the grid of widgets. */
 
-#main-grid{
+#main-grid {
   height: calc(100vh - 64px);
   overflow: hidden;
 }
 
-#left-panel{
+#left-panel {
   height: 100%;
   resize: horizontal;
 }
 
-#right-panel{
+#right-panel {
   overflow: auto;
   height: 100%;
   border-left: 1px solid rgb(33, 150, 243);
 }
 
-::-webkit-scrollbar{
+::-webkit-scrollbar {
   width: 8px;
   height: 8px;
   background-color: #fff;
 }
 
-::-webkit-scrollbar-thumb{
+::-webkit-scrollbar-thumb {
   background-color: rgb(33, 150, 243);
   border-radius: 5px 0 0 5px;
 }
@@ -42,7 +42,7 @@ body {
   justify-content: stretch;
 }
 
-#widgetGrid > div {
+#widgetGrid>div {
   height: 100%;
   font-family: monospace;
   border: 1px solid gray;
@@ -51,7 +51,7 @@ body {
 
 /* The React Monaco Editor container doesn't work well with padding,
    and also has some built-in padding. removing it. Also, set min height. */
-#widgetGrid > div.react-monaco-editor-container {
+#widgetGrid>div.react-monaco-editor-container {
   padding: 0px;
   min-height: 500px;
 }
@@ -70,7 +70,8 @@ textarea {
 div#controls {
   margin: 0.5em 0;
 }
-div#controls > input {
+
+div#controls>input {
   padding: 0.5em;
   margin: 0 0.5em;
 }
@@ -78,31 +79,40 @@ div#controls > input {
 div#pipeline td {
   padding: 0.1em 12px;
 }
+
 td.instructionName {
   width: 11em;
 }
+
 /* CSS classes for pipeline stages */
 .stageIf {
   background-color: rgba(255, 255, 0, 0.5);
 }
+
 .stageId {
   background-color: rgba(0, 0, 255, 0.5);
 }
+
 .stageEx {
   background-color: rgba(255, 0, 0, 0.5);
 }
+
 .stageMem {
   background-color: rgba(0, 255, 0, 0.5);
 }
+
 .stageWb {
   background-color: rgba(255, 0, 255, 0.5);
 }
+
 .stageFPAdder {
   background-color: rgba(0, 128, 0, 0.5);
 }
+
 .stageFPMultiplier {
   background-color: rgba(0, 128, 128, 0.5);
 }
+
 .stageFPDivider {
   background-color: rgba(128, 128, 0, 0.5);
 }
@@ -132,27 +142,38 @@ footer {
   text-align: right;
 }
 
-#memory-view{
+#memory-view {
   box-sizing: border-box;
   margin: 5px 0;
 }
 
+div.error-list-item {
+  min-width: unset;
+  margin-right: 10px;
+}
+
+div.error-accordion {
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+}
+
 /* Dark Mode Specific Styles */
-@media screen and (prefers-color-scheme: dark){
-  #right-panel{
+@media screen and (prefers-color-scheme: dark) {
+  #right-panel {
     border-left-color: rgba(255, 255, 255, 0.188);
   }
-  
-  textarea{
+
+  textarea {
     background: transparent;
     color: white;
   }
-  
-  ::-webkit-scrollbar{
+
+  ::-webkit-scrollbar {
     background-color: #1e1e1e;
   }
-  
-  ::-webkit-scrollbar-thumb{
+
+  ::-webkit-scrollbar-thumb {
     background-color: rgb(97, 97, 97);
   }
 }

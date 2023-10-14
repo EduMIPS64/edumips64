@@ -8,7 +8,6 @@ import Typography from '@mui/material/Typography';
 
 import HelpDialog from './HelpDialog';
 import logo from '../static/logo.png';
-import ErrorDisplay from './ErrorDisplay';
 
 import HelpIcon from '@mui/icons-material/Help';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -105,7 +104,6 @@ export default function Header(props) {
         >
           Stop
         </Button>
-        <ErrorDisplay parsingErrors={props.parsingErrors} />
         <IconButton
           color="inherit"
           className="help-button"
