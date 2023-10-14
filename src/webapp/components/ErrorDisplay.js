@@ -12,7 +12,7 @@ const ErrorCount = ({ count }) => {
       icon={<ErrorIcon />}
       label={count}
       size="small"
-      color='error'
+      color="error"
       style={{ marginRight: '5px' }}
     />
   );
@@ -26,7 +26,7 @@ const WarningCount = ({ count }) => {
       icon={<WarningIcon />}
       label={count}
       size="small"
-      color='warning'
+      color="warning"
       style={{ marginRight: '5px' }}
     />
   );

@@ -190,7 +190,6 @@ const Simulator = ({ sim, initialState }) => {
             />
           </Grid>
           <Grid xs={4} id="right-panel" disableEqualOverflow>
-
             <ErrorList
               parsingErrors={parsingErrors}
               AccordionSummary={AccordionSummary}
