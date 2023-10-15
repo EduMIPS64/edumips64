@@ -8,7 +8,7 @@ test('test', async ({ page }) => {
 
   // Ensure basic elements are available.
   await page.waitForSelector('#load-button');
-  await page.waitForSelector('#widgetGrid');
+  await page.waitForSelector('#main-grid');
   await page.waitForSelector('.monaco-editor');
 
   // Click text=Load/Reset
