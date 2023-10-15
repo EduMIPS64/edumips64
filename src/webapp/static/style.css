@@ -35,27 +35,6 @@ body {
   border-radius: 5px 0 0 5px;
 }
 
-#widgetGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
-  grid-gap: 1rem;
-  justify-content: stretch;
-}
-
-#widgetGrid>div {
-  height: 100%;
-  font-family: monospace;
-  border: 1px solid gray;
-  padding: 0.5em;
-}
-
-/* The React Monaco Editor container doesn't work well with padding,
-   and also has some built-in padding. removing it. Also, set min height. */
-#widgetGrid>div.react-monaco-editor-container {
-  padding: 0px;
-  min-height: 500px;
-}
-
 textarea {
   font-family: monospace;
   width: 100%;
