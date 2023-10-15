@@ -1,11 +1,27 @@
 import React from 'react';
 
 import Code from './Code';
-import Controls from './Controls';
 import Memory from './Memory';
 import Pipeline from './Pipeline';
 import Registers from './Registers';
 import Statistics from './Statistics';
+import Header from './Header';
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import MuiAccordionSummary from '@mui/material/AccordionSummary';
+import Grid from '@mui/material/Unstable_Grid2';
+import ErrorList from './ErrorList';
+
+import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
+
+import { styled } from '@mui/material/styles';
+
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Typography from '@mui/material/Typography';
 
 import SampleProgram from '../data/SampleProgram';
 
@@ -44,7 +60,14 @@ const Simulator = ({ sim, initialState }) => {
   const simulatorRunning = status == 'RUNNING';
 
   // Tracks if the program has no syntax errors and can be loaded.
-  const isValidProgram = !parsingErrors;
+  // TODO: Allow code execution w/ warnings in the worker, then uncomment the line below
+  const isValidProgram = (parsingErrors) => {
+    if (!parsingErrors) { return true; }
+    else {
+      // return (parsingErrors.filter((e) => !e.isWarning).length == 0);
+      return false;
+    }
+  };
 
   sim.onmessage = (e) => {
     const result = sim.parseResult(e.data);
@@ -113,36 +136,106 @@ const Simulator = ({ sim, initialState }) => {
     debouncedSyntaxCheck(code);
   };
 
+  const AccordionSummary = styled((props) => (
+    <MuiAccordionSummary
+      expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem' }} />}
+      {...props}
+    />
+  ))(({ theme }) => ({
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, .05)'
+        : 'rgba(227, 245, 254, 1)',
+    flexDirection: 'row-reverse',
+    '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+      transform: 'rotate(180deg)',
+    },
+    '& .MuiAccordionSummary-content': {
+      marginLeft: theme.spacing(1),
+    },
+  }));
+
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
+  const theme = React.useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: prefersDarkMode ? 'dark' : 'light',
+        },
+      }),
+    [prefersDarkMode],
+  );
+
   return (
     <>
-      <Controls
-        onRunClick={runCode}
-        runEnabled={simulatorRunning && !executing}
-        onStepClick={stepCode}
-        stepEnabled={simulatorRunning && !executing}
-        onLoadClick={loadCode}
-        loadEnabled={isValidProgram}
-        onStopClick={() => {
-          setMustStop(true);
-        }}
-        stopEnabled={executing}
-        parsingErrors={parsingErrors}
-      />
-      <div id="widgetGrid">
-        <Code
-          onChangeValue={onCodeChange}
-          code={code}
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Header
+          onRunClick={runCode}
+          runEnabled={simulatorRunning && !executing}
+          onStepClick={stepCode}
+          stepEnabled={simulatorRunning && !executing}
+          onLoadClick={loadCode}
+          loadEnabled={isValidProgram}
+          onStopClick={() => {
+            setMustStop(true);
+          }}
+          stopEnabled={executing}
           parsingErrors={parsingErrors}
-          parsedInstructions={parsedInstructions}
-          pipeline={pipeline}
-          running={simulatorRunning}
+          version={sim.version}
         />
-        <Registers {...registers} />
-        <Memory memory={memory} />
-        <Statistics {...stats} />
-        <Pipeline pipeline={pipeline} />
-      </div>
-      <footer>EduMIPS64 Web version {sim.version}</footer>
+        <Grid container id="main-grid" disableEqualOverflow spacing={0}>
+          <Grid id="left-panel" xs={8}>
+            <Code
+              onChangeValue={onCodeChange}
+              code={code}
+              parsingErrors={parsingErrors}
+              parsedInstructions={parsedInstructions}
+              pipeline={pipeline}
+              running={simulatorRunning}
+            />
+          </Grid>
+          <Grid xs={4} id="right-panel" disableEqualOverflow>
+            <ErrorList
+              parsingErrors={parsingErrors}
+              AccordionSummary={AccordionSummary}
+            />
+            <Accordion defaultExpanded disableGutters>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>Stats</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Statistics {...stats} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion defaultExpanded disableGutters>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>Pipeline</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Pipeline pipeline={pipeline} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion disableGutters>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>Registers</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Registers {...registers} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion disableGutters>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>Memory</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Memory memory={memory} />
+              </AccordionDetails>
+            </Accordion>
+          </Grid>
+        </Grid>
+      </ThemeProvider>
     </>
   );
 };

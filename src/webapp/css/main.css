@@ -7,8 +7,9 @@
 }
 
 .logo {
-    height: 4em;
+    height: 30px;
     padding-left: 0.5em;
+    margin-right: 10px;
 }
 
 .help-button {
@@ -23,3 +24,4 @@
 .help-content {
      padding: 30px !important;
 }
+
