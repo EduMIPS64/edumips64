@@ -12,5 +12,10 @@
       "version": 3.11
     }
   },
-  "postCreateCommand": "./gradlew init && npm install"
+  "customizations": {
+    "vscode": {
+      "extensions": ["vscjava.vscode-java-pack", "mathematic.vscode-pdf" ]
+    }
+  },
+  "postCreateCommand": "./gradlew init && npm install && npx playwright install"
 }

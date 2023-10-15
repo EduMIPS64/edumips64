@@ -78,8 +78,7 @@ not include the compiled help files.
 If you want to work on EduMIPS64 with Visual Studio Code, you need to download the Java Extension Pack
 (see [Java in Visual Studio Code](https://code.visualstudio.com/docs/languages/java)).
 
-To make it recognize the EduMIPS64 folder as a project, run `./gradlew eclipse` to generate
-Eclipse-style project files, which are readable by the VSCode plugins.
+With the Java Extension Pack, you can directly import the Gradle project and use auto-complete, run unit tests, etc.
 
 ### Working on the Web UI
 
@@ -117,6 +116,8 @@ Custom NPM scripts:
 Both `build` and `build-dbg` produce a `ui.js` file in the `build/gwt/war/edumips64` directory.
 
 The code was tested with Node.JS 16. The CI environment uses this version.
+
+There are some basic Playwright tests for the web UI, which can be run with `npx run playwright`.
 
 ### Source code structure
 
