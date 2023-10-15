@@ -66,7 +66,6 @@ const initializer = (evt) => {
   ReactDOM.render(
         <>
         <CssBaseline />
-        <Header />
         <Simulator sim={simulator} initialState={initState} />
         </>,
     document.getElementById('simulator'),

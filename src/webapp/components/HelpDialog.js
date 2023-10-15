@@ -17,6 +17,7 @@ export default function HelpDialog(props) {
         </Typography>
       </DialogTitle>
       <DialogContent className='help-content'>
+        <Typography>Version: {props.ver}</Typography>
         <Typography gutterBottom variant="h5">
           Help
         </Typography>
