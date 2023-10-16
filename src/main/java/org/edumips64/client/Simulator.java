@@ -108,23 +108,29 @@ public class Simulator {
     return resultFactory.Success();
   }
 
+  // TODO: add unit tests.
   public Result loadProgram(String code) {
     info("Resetting CPU before loading a new program.");
     reset();
 
     info("Loading program: " + code);
+    Result result = resultFactory.Success();
+    boolean success = true;
     try {
       parser.doParsing(code);
       dinero.setDataOffset(memory.getInstructionsNumber()*4);
     } catch (ParserMultiException e) {
-      warning("Parsing error: " + e.toString());
-      Result result = resultFactory.Failure("Parsing errors.");
+      warning("Parsing errors / warnings: " + e.toString());
+      success &= e.hasErrors();
       result = ResultFactory.AddParserErrors(result, e);
-      return result;
     }
-    cpu.setStatus(CPU.CPUStatus.RUNNING);
+    if (success) {
+      cpu.setStatus(CPU.CPUStatus.RUNNING);
+    } else {
+      result = resultFactory.Failure("Parsing errors.");      
+    }
     info("Program parsed.");
-    return resultFactory.Success();
+    return result;
   }
 
   /* Private methods */
