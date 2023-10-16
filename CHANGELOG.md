@@ -1,5 +1,25 @@
 # EduMIPS64 ChangeLog
 
+## 1.3.0 (16/10/2023) - Lourdes
+
+## Added
+- Simplified Chinese translation, both the in-application help and the HTML/PDF docs. (@smallg0at)
+- `DMUHU` instruction.
+- New, modern look & feel.
+- Dev container for easier development.
+
+## Fixed
+- Documentation: fixed name of `SLTIU` (@galloj)
+- Documentation: fixed `BGEZ`
+- Documentation: fixed typo in dev docs (@winstonpurnomo)
+- Lots of dependency updates :)
+
+## Changed
+- **BREAKING CHANGE**: `DMULU` is now correctly implemented according to MIPS64
+  Release 6 ISA, and not using the old WinMIPS64 syntax. This will break older
+  programs using the old syntax.
+- Major update to web UI dependencies (@pviotti)
+
 ## 1.2.10 (05/03/2022) - FP - Freedom and Peace
 
 ### Added
