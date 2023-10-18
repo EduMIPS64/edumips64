@@ -61,19 +61,8 @@ export default function Header(props) {
           className="multi-step-button"
           id="multi-step-button"
           onClick={() => {
-            let userInputValue = prompt(
-              'Please input your desired step count:', 
-              10
-            );
-            if (!isNaN(userInputValue)) {
-              if (userInputValue > 0) {
-                props.onStepClick(userInputValue);
-              } else {
-                console.warn('User Input Non-positive Value for MultiStep');
-              }
-            } else {
-              console.warn('User Input Invalid Value for MultiStep');
-            }
+            // TODO: make this customizable
+            props.onStepClick(500);
           }}
           startIcon={<FastForwardIcon />}
           disabled={!props.stepEnabled}

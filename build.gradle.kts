@@ -76,7 +76,7 @@ tasks.register<PythonTask>("htmlDocsEn") {
 }
 
 tasks.register<PythonTask>("htmlDocsIt") {
-    workDir = "${projectDir}/docs/user/en/src"
+    workDir = "${projectDir}/docs/user/it/src"
     command = buildDocsCmd("it", "html")
 }
 tasks.register<PythonTask>("htmlDocsZh") {
