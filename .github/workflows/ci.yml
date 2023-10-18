@@ -251,6 +251,8 @@ jobs:
           node-version: '18.12.1'
       - name: Install JS dependencies
         run: npm install
+      - name: Install Playwright dependencies
+        run: npx playwright install
       # Run tests against the deployed code.
       - name: Run web tests against deployed code
         uses: nick-fields/retry@v2
