@@ -46,16 +46,16 @@ public abstract class ConfigStore {
     ConfigStore.defaults.put(ConfigKey.SERIAL_NUMBER, 0);
 
     // Colors.
-    ConfigStore.defaults.put(ConfigKey.IF_COLOR, -256);                // Color.yellow.getRGB())
-    ConfigStore.defaults.put(ConfigKey.ID_COLOR, -16746256);           // Color(0, 120, 240).getRGB());
-    ConfigStore.defaults.put(ConfigKey.EX_COLOR, -65536);              // Color.red.getRGB());
-    ConfigStore.defaults.put(ConfigKey.MEM_COLOR, -16711936);          // Color.green.getRGB());
+    ConfigStore.defaults.put(ConfigKey.IF_COLOR, -5317);                // 235, 235, 59
+    ConfigStore.defaults.put(ConfigKey.ID_COLOR, -14575885);           // 33, 150, 243
+    ConfigStore.defaults.put(ConfigKey.EX_COLOR, -769226);              // 244, 67, 54
+    ConfigStore.defaults.put(ConfigKey.MEM_COLOR, -11751600);          // 76, 175, 80
     ConfigStore.defaults.put(ConfigKey.FP_ADDER_COLOR, -16744448);      // Color(0, 128, 0).getRGB());
     ConfigStore.defaults.put(ConfigKey.FP_MULTIPLIER_COLOR,-16744320);  // Color(0, 128, 128).getRGB());
     ConfigStore.defaults.put(ConfigKey.FP_DIVIDER_COLOR, -8355840);     // Color(128, 128, 0).getRGB());
-    ConfigStore.defaults.put(ConfigKey.WB_COLOR, -5111630);            // Color.magenta.darker().getRGB());
-    ConfigStore.defaults.put(ConfigKey.RAW_COLOR, -16776961);          // Color.blue.brighter().getRGB());
-    ConfigStore.defaults.put(ConfigKey.SAME_IF_COLOR, -6908236);        // Color(150, 150, 180).getRGB());
+    ConfigStore.defaults.put(ConfigKey.WB_COLOR, -5552196);            // 171, 71, 188
+    ConfigStore.defaults.put(ConfigKey.RAW_COLOR, -16776961);          // UNUSED: Color.blue.brighter().getRGB()); 
+    ConfigStore.defaults.put(ConfigKey.SAME_IF_COLOR, -6908236);       // UNUSED: Color(150, 150, 180).getRGB());
 
     // Simulation parameters.
     ConfigStore.defaults.put(ConfigKey.FORWARDING, false);

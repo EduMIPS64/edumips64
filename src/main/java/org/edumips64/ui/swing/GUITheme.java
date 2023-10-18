@@ -19,6 +19,18 @@ public class GUITheme {
     public GUITheme(ConfigStore config){
         usingDarkTheme = config.getBoolean(ConfigKey.UI_DARK_THEME);
         this.config = config;
+        
+        // For Current Setting Exporting
+        // System.out.println(config.getInt(ConfigKey.IF_COLOR));
+        // System.out.println(config.getInt(ConfigKey.ID_COLOR));
+        // System.out.println(config.getInt(ConfigKey.EX_COLOR));
+        // System.out.println(config.getInt(ConfigKey.MEM_COLOR));
+        // System.out.println(config.getInt(ConfigKey.FP_ADDER_COLOR));
+        // System.out.println(config.getInt(ConfigKey.FP_MULTIPLIER_COLOR));
+        // System.out.println(config.getInt(ConfigKey.FP_DIVIDER_COLOR));
+        // System.out.println(config.getInt(ConfigKey.WB_COLOR));
+        // System.out.println(config.getInt(ConfigKey.RAW_COLOR));
+        // System.out.println(config.getInt(ConfigKey.SAME_IF_COLOR));
     }
 
     // Make the current color darker.
