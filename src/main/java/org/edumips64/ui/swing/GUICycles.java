@@ -134,13 +134,9 @@ public class GUICycles extends GUIComponent {
     @Override
     public synchronized void paint(Graphics g) {
       super.paint(g);
-      if (config.getBoolean(ConfigKey.UI_DARK_THEME)) {
-        setBackground(GUITheme.darkBackground);
-        g.setColor(GUITheme.darkText);
-      } else {
-        setBackground(GUITheme.lightBackground);
-        g.setColor(GUITheme.lightText);
-      }
+      setBackground(theme.getBackgroundColor());
+      g.setColor(theme.getTextColor());
+
       g.setFont(font);
 
       fill(g);
@@ -190,11 +186,8 @@ public class GUICycles extends GUIComponent {
             // Draw the colored rectangle and a outline.
             g.fillRect(x, y, width, height);
 
-            if (config.getBoolean(ConfigKey.UI_DARK_THEME)) {
-              g.setColor(GUITheme.darkText);
-            } else {
-              g.setColor(GUITheme.lightText);
-            }
+            g.setColor(theme.getTextColor());
+
 
             g.drawRect(x, y, width, height);
 

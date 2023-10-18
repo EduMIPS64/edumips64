@@ -83,9 +83,8 @@ class GUIPipeline extends GUIComponent {
     public void paintComponent(Graphics g) {
       super.paintComponent(g); // va fatto sempre
 
-        setBackground(theme.getBackgroundColor()); // fondo bianco
-        g.setColor(theme.getTextColor());
-
+      setBackground(theme.getBackgroundColor()); // fondo bianco
+      g.setColor(theme.getTextColor());
 
       largh = this.getWidth();
       alt = this.getHeight();
@@ -183,9 +182,7 @@ class GUIPipeline extends GUIComponent {
       g.drawString("EX", largh * 97 / 200, (alt / 2) - (alt * 40 / 120));
       g.drawString("FP-DIV " + cpu.getDividerCounter(), largh * 87 / 200, (alt / 2) + (alt * 40 / 120));
 
-      if (config.getBoolean(ConfigKey.UI_DARK_THEME)) {
-        g.setColor(GUITheme.darkText);
-      }
+      g.setColor(theme.getTextColor());
       g.drawString("FP Multiplier", largh * 85 / 200, (alt / 2) - (alt * 15 / 120));
       g.drawString("FP Adder", largh * 85 / 200, (alt / 2) + (alt * 23 / 120));
 
@@ -200,11 +197,8 @@ class GUIPipeline extends GUIComponent {
      * dell'istruzione
      */
     void riempiBlocchi(Graphics g) {
-      if (config.getBoolean(ConfigKey.UI_DARK_THEME)) {
-        g.setColor(GUITheme.darkBackground);
-      } else {
-        g.setColor(GUITheme.lightBackground);
-      }
+      g.setColor(theme.getBackgroundColor());
+
       g.fillRect(largh / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       g.fillRect(largh * 4 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       g.fillRect(largh * 14 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
