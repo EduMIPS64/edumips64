@@ -14,6 +14,7 @@ jobs:
         with:
           node-version: '18.12.1'
       - run: npm install
+      - run: npx playwright install
       - name: Run web tests against deployed code in production
         uses: nick-invision/retry@v2
         env:
