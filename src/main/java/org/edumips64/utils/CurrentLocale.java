@@ -441,7 +441,7 @@ public class CurrentLocale {
     it.put("Config.SYNCEXC-TERMINATE.tip", "Ferma la simulazione al verificarsi di eccezioni di tipo Divisione per zero ed Integer overflow");
     it.put("Config.FONTSIZE", "Dimensione font");
     it.put("Config.FONTSIZE.tip", "Dimensione del font");
-    it.put("Config.DARKTHEME", "Dark theme (take effect after restart)");
+    it.put("Config.DARKTHEME", "Tema scuro (applicato al prossimo avvio)");
     it.put("StatusBar.WELCOME", "Benvenuti in EduMIPS64");
     it.put("StatusBar.DECIMALVALUE", "Valore decimale");
     it.put("StatusBar.OFREGISTER", "di R");
