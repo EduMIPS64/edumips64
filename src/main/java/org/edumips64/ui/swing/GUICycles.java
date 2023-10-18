@@ -246,13 +246,8 @@ public class GUICycles extends GUIComponent {
     @Override
     public synchronized void paint(Graphics g) {
       super.paint(g);
-      if (config.getBoolean(ConfigKey.UI_DARK_THEME)) {
-        setBackground(new Color(70, 73, 75));
-        g.setColor(new Color(187, 187, 187));
-      } else {
-        setBackground(Color.white);
-        g.setColor(Color.black);
-      }
+      setBackground(theme.getBackgroundColor());
+      g.setColor(theme.getTextColor());
       g.setFont(font);
 
       Rectangle clip = g.getClipBounds();
