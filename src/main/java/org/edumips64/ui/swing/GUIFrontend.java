@@ -59,7 +59,7 @@ public class GUIFrontend {
 
     cycles = new GUICycles(cpu, memory, config, builder, theme);
     regs = new GUIRegisters(cpu, memory, config, sb);
-    stats = new GUIStatistics(cpu, memory, config);
+    stats = new GUIStatistics(cpu, memory, config, theme);
     pipe = new GUIPipeline(cpu, memory, config, theme);
     data = new GUIData(cpu, memory, config, sb);
     code = new GUICode(cpu, memory, config, theme);
