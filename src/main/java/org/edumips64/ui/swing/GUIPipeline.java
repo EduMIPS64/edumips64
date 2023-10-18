@@ -79,8 +79,8 @@ class GUIPipeline extends GUIComponent {
     public void paintComponent(Graphics g) {
       super.paintComponent(g);  // va fatto sempre
       if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
-        setBackground(Color.darkGray);  // fondo bianco
-        g.setColor(Color.white);
+        setBackground(new Color(70, 73, 75));  // fondo bianco
+        g.setColor(new Color(187, 187, 187));
       } else{
         setBackground(Color.white);
         g.setColor(Color.black);

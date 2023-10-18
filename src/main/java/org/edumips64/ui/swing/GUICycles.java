@@ -128,8 +128,8 @@ public class GUICycles extends GUIComponent {
     public synchronized void paint(Graphics g) {
       super.paint(g);
       if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
-        setBackground(Color.darkGray);
-        g.setColor(Color.white);
+        setBackground(new Color(70, 73, 75));
+        g.setColor(new Color(187, 187, 187));
       }else{
         setBackground(Color.white);
         g.setColor(Color.black);
@@ -239,8 +239,8 @@ public class GUICycles extends GUIComponent {
     public synchronized void paint(Graphics g) {
       super.paint(g);
       if(config.getBoolean(ConfigKey.UI_DARK_THEME)){
-        setBackground(Color.darkGray);
-        g.setColor(Color.white);
+        setBackground(new Color(70, 73, 75));
+        g.setColor(new Color(187, 187, 187));
       }else{
         setBackground(Color.white);
         g.setColor(Color.black);
