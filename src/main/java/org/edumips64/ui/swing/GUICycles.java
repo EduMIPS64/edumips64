@@ -187,10 +187,7 @@ public class GUICycles extends GUIComponent {
 
             // Draw the colored rectangle and a outline.
             g.fillRect(x, y, width, height);
-
             g.setColor(theme.getTextColor());
-
-
             g.drawRect(x, y, width, height);
 
             // Write the stage name.
