@@ -133,13 +133,15 @@ public class GUICycles extends GUIComponent {
 
     @Override
     public synchronized void paint(Graphics g) {
-      super.paint(g);
+      Graphics2D g2d = (Graphics2D) g;
+      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+      super.paint(g2d);
       setBackground(theme.getBackgroundColor());
-      g.setColor(theme.getTextColor());
+      g2d.setColor(theme.getTextColor());
 
-      g.setFont(font);
+      g2d.setFont(font);
 
-      fill(g);
+      fill(g2d);
     }
 
     private boolean shouldDraw(CycleElement el, int row, Rectangle clipBounds) {
@@ -152,7 +154,7 @@ public class GUICycles extends GUIComponent {
       return clipBounds.intersects(elRectangle);
     }
 
-    synchronized void fill(Graphics g) {
+    synchronized void fill(Graphics2D g) {
       int row = 0;
 
       Rectangle clipBounds = g.getClipBounds();
@@ -245,12 +247,13 @@ public class GUICycles extends GUIComponent {
 
     @Override
     public synchronized void paint(Graphics g) {
-      super.paint(g);
+      Graphics2D g2d = (Graphics2D) g;
+      super.paint(g2d);
       setBackground(theme.getBackgroundColor());
-      g.setColor(theme.getTextColor());
-      g.setFont(font);
-
-      Rectangle clip = g.getClipBounds();
+      g2d.setColor(theme.getTextColor());
+      g2d.setFont(font);
+      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+      Rectangle clip = g2d.getClipBounds();
 
       java.util.List<CycleElement> elements = builder.getElementsList();
       synchronized (elements) {
@@ -265,7 +268,7 @@ public class GUICycles extends GUIComponent {
             continue;
           }
 
-          g.drawString(el.getName(), x, y);
+          g2d.drawString(el.getName(), x, y);
           row++;
         }
       }

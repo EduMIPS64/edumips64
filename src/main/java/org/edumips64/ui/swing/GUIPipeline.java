@@ -80,7 +80,9 @@ class GUIPipeline extends GUIComponent {
     private static final long serialVersionUID = -1873304516301831571L;
     int alt, largh;
 
-    public void paintComponent(Graphics g) {
+    public void paintComponent(Graphics graphicsOriginal) {
+      Graphics2D g = (Graphics2D) graphicsOriginal;
+      g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
       super.paintComponent(g); // va fatto sempre
 
       setBackground(theme.getBackgroundColor()); // fondo bianco
