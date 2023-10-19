@@ -24,7 +24,6 @@ package org.edumips64.ui.swing;
 
 import org.edumips64.core.parser.ParserException;
 import org.edumips64.utils.CurrentLocale;
-import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 
 import javax.swing.table.DefaultTableModel;
@@ -37,10 +36,10 @@ import javax.swing.*;
 */
 public class ErrorDialog extends JDialog {
   private static final long serialVersionUID = 6756487575875944232L;
-
+  private GUITheme theme;
   public ErrorDialog(final JFrame owner, List<ParserException> peList, String title, Boolean showWarning, ConfigStore configStore) {
-
     super(owner, title, true);
+    this.theme = new GUITheme(configStore);
 
     boolean[] lineIsError = new boolean[peList.size() * 10];
     JPanel buttonPanel = new JPanel();
@@ -60,7 +59,7 @@ public class ErrorDialog extends JDialog {
     DefaultTableModel dft = new DefaultTableModel(columnNames, 0);
 
     MultiLineTable table = new MultiLineTable(dft);
-    MultiLineCellRenderer renderer = new MultiLineCellRenderer(lineIsError);
+    MultiLineCellRenderer renderer = new MultiLineCellRenderer(lineIsError, theme);
 
     table.setCellSelectionEnabled(false);
     table.setFocusable(false);
@@ -103,18 +102,17 @@ public class ErrorDialog extends JDialog {
     JLabel label = new JLabel(msg);
 
     try {
-      label = new JLabel(msg, new ImageIcon(
+      ImageIcon mainImageIcon = new ImageIcon(
                            org.edumips64.ui.swing.img.IMGLoader.getImage(
                              ((numError > 0) ? "error.png" : "warning.png")
-                           )), SwingConstants.LEFT);
-      label.setIconTextGap(50);
-      label.setFont(new Font("SansSerif", Font.PLAIN, 20));
-      
-      if(configStore.getBoolean(ConfigKey.UI_DARK_THEME)){
-        label.setForeground(Color.white);
-      }else{
-        label.setForeground(new Color(0, 0, 85));
-      }
+                           ));
+      mainImageIcon = new ImageIcon(mainImageIcon.getImage().getScaledInstance(81, 64, java.awt.Image.SCALE_SMOOTH));
+      label = new JLabel(msg, mainImageIcon, SwingConstants.LEFT);
+      label.setIconTextGap(5);
+      label.setFont(new Font("SansSerif", Font.BOLD, 20));
+
+      label.setForeground(theme.getTextColor());
+
     } catch (java.io.IOException ignored) {}
 
     getRootPane().setDefaultButton(okButton);
