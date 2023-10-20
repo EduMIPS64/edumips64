@@ -62,6 +62,6 @@ public class GUITheme {
     }
 
     public Color getWarningColor(){
-        return usingDarkTheme ? new Color(245, 127, 23) : new Color(255, 255, 141);
+        return usingDarkTheme ? new Color(92, 81, 25) : new Color(255, 255, 141);
     }
 }

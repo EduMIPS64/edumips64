@@ -96,7 +96,7 @@ public class ErrorDialog extends JDialog {
     }
 
     JScrollPane scrollTable = new JScrollPane(table);
-    String msg = CurrentLocale.getString("ErrorDialog.MSG0") + " " + numError + " " +
+    String msg = numError + " " +
                  CurrentLocale.getString("ErrorDialog.MSG1") + " " + (peList.size() - numError) + " " +
                  CurrentLocale.getString("ErrorDialog.MSG2");
     JLabel label = new JLabel(msg);
@@ -104,9 +104,9 @@ public class ErrorDialog extends JDialog {
     try {
       ImageIcon mainImageIcon = new ImageIcon(
                            org.edumips64.ui.swing.img.IMGLoader.getImage(
-                             ((numError > 0) ? "error.png" : "warning.png")
+                             ((numError > 0) ? "error-hires.png" : "warning-hires.png")
                            ));
-      mainImageIcon = new ImageIcon(mainImageIcon.getImage().getScaledInstance(81, 64, java.awt.Image.SCALE_SMOOTH));
+      mainImageIcon = new ImageIcon(mainImageIcon.getImage().getScaledInstance(130, 100, java.awt.Image.SCALE_SMOOTH));
       label = new JLabel(msg, mainImageIcon, SwingConstants.LEFT);
       label.setIconTextGap(5);
       label.setFont(new Font("SansSerif", Font.BOLD, 20));
