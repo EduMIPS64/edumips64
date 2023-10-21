@@ -35,17 +35,22 @@ import org.edumips64.utils.CurrentLocale;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
+
 /**
-* This class draws the code memory representation in a window with five columns.
-*/
+ * This class draws the code memory representation in a window with five
+ * columns.
+ */
 public class GUICode extends GUIComponent {
   private CodePanel codePanel;
   private String[] memoryAddress = new String[Memory.CODELIMIT];
-  private static int ifIndex, idIndex, exIndex, memIndex, wbIndex, A1Index, A2Index, A3Index, A4Index, M1Index, M2Index, M3Index, M4Index, M5Index, M6Index, M7Index, DIVIndex;
+  private static int ifIndex, idIndex, exIndex, memIndex, wbIndex, A1Index, A2Index, A3Index, A4Index, M1Index, M2Index,
+      M3Index, M4Index, M5Index, M6Index, M7Index, DIVIndex;
+  private GUITheme theme;
 
-  public GUICode(CPU cpu, Memory memory, ConfigStore config) {
+  public GUICode(CPU cpu, Memory memory, ConfigStore config, GUITheme theme) {
     super(cpu, memory, config);
     codePanel = new CodePanel();
+    this.theme = theme;
   }
 
   public void setContainer(Container co) {
@@ -58,7 +63,8 @@ public class GUICode extends GUIComponent {
   }
 
   public void update() {
-    //codePanel.scrollTable.getViewport().setViewPosition(new Point(0,position+15));
+    // codePanel.scrollTable.getViewport().setViewPosition(new
+    // Point(0,position+15));
 
     TableColumn column0 = codePanel.theTable.getColumnModel().getColumn(0);
     column0.setCellRenderer(new MyTableCellRenderer());
@@ -128,7 +134,8 @@ public class GUICode extends GUIComponent {
       theTable.setFont(font);
 
       Font headerFont = theTable.getTableHeader().getFont();
-      theTable.getTableHeader().setFont(new Font(headerFont.getName(), headerFont.getStyle(), config.getInt(ConfigKey.UI_FONT_SIZE)));
+      theTable.getTableHeader()
+          .setFont(new Font(headerFont.getName(), headerFont.getStyle(), config.getInt(ConfigKey.UI_FONT_SIZE)));
       theTable.getColumnModel().getColumn(0).setPreferredWidth(scale(60));
       theTable.getColumnModel().getColumn(1).setPreferredWidth(scale(130));
       theTable.getColumnModel().getColumn(2).setPreferredWidth(scale(80));
@@ -143,7 +150,7 @@ public class GUICode extends GUIComponent {
     class MyTableModel extends AbstractTableModel {
       private static final long serialVersionUID = -1790316554473776594L;
       private String[] columnLocaleStrings = { "ADDRESS", "HEXREPR", "LABEL", "INSTRUCTION", "COMMENT" };
-      private Class<?>[] columnClasses = {String.class, String.class, String.class, String.class, String.class};
+      private Class<?>[] columnClasses = { String.class, String.class, String.class, String.class, String.class };
       private String memoryAddress[];
 
       MyTableModel(String[] memoryAddress) {
@@ -176,7 +183,7 @@ public class GUICode extends GUIComponent {
 
         InstructionInterface instruction = memory.getInstruction(row * 4);
         if (instruction == null) {
-            return "";
+          return "";
         }
 
         switch (col) {
@@ -251,42 +258,43 @@ public class GUICode extends GUIComponent {
 
       if (rowTable == ifIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.IF_COLOR)));
+        label.setBackground(theme.getColor(ConfigKey.IF_COLOR));
       }
 
       if (rowTable == idIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.ID_COLOR)));
+        label.setBackground(theme.getColor(ConfigKey.ID_COLOR));
       }
 
       if (rowTable == exIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.EX_COLOR)));
+        label.setBackground(theme.getColor(ConfigKey.EX_COLOR));
       }
 
       if (rowTable == memIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.MEM_COLOR)));
+        label.setBackground(theme.getColor(ConfigKey.MEM_COLOR));
       }
 
       if (rowTable == wbIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.WB_COLOR)));
+        label.setBackground(theme.getColor(ConfigKey.WB_COLOR));
+        
       }
 
       if (rowTable == M1Index || rowTable == M2Index || rowTable == M3Index || rowTable == M4Index || rowTable == M5Index || rowTable == M6Index || rowTable == M7Index) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.FP_MULTIPLIER_COLOR)));
+        label.setBackground(theme.getColor(ConfigKey.FP_MULTIPLIER_COLOR));
       }
 
       if (rowTable == A1Index || rowTable == A2Index || rowTable == A3Index || rowTable == A4Index) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.FP_ADDER_COLOR)));
+        label.setBackground(theme.getColor(ConfigKey.FP_ADDER_COLOR));
       }
 
       if (rowTable == DIVIndex) {
         label.setOpaque(true);
-        label.setBackground(new Color(config.getInt(ConfigKey.FP_DIVIDER_COLOR)));
+        label.setBackground(theme.getColor(ConfigKey.FP_DIVIDER_COLOR));
       }
 
       return label;

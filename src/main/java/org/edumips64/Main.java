@@ -71,6 +71,7 @@ import java.io.IOException;
 import javax.swing.*;
 import javax.swing.event.*;
 import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 
 /** Entry point of EduMIPS64
  * @author Andrea Spadaccini, Antonella Scandura, Vanni Rizzo
@@ -168,11 +169,15 @@ public class Main {
     // Note that if the JAR is not available to the class loader then the whole application will not start,
     // we won't be able to recover.
     try {
-      UIManager.setLookAndFeel( new FlatLightLaf() );
+      if(mm.configStore.getBoolean(ConfigKey.UI_DARK_THEME)){
+        UIManager.setLookAndFeel( new FlatDarkLaf() );
+      } else{
+        UIManager.setLookAndFeel( new FlatLightLaf() );
+      }
     } catch( Exception ex ) {
-      log.log(Level.SEVERE, "Could not initialize FlatLightLaF Swing look & feel. Reverting to Swing default.");
+      log.log(Level.SEVERE, "Could not initialize FlatLaF Swing look & feel. Reverting to Swing default.");
     } catch( NoClassDefFoundError err ) {
-      log.log(Level.SEVERE, "Could not initialize FlatLightLaF Swing look & feel. Reverting to Swing default.");
+      log.log(Level.SEVERE, "Could not initialize FlatLaF Swing look & feel. Reverting to Swing default.");
     }
 
     SplashScreen s = new SplashScreen();
@@ -523,7 +528,7 @@ public class Main {
         if (pmwe.hasErrors()) {
           throw pmwe;
         }
-        new ErrorDialog(mainFrame, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
+        new ErrorDialog(mainFrame, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS), configStore);
       } catch (NullPointerException e) {
         log.info("NullPointerException: " + e.toString());
         log.log(Level.SEVERE, "Could not parse " + file, e);
@@ -558,7 +563,7 @@ public class Main {
       mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
     } catch (ParserMultiException ex) {
       log.info("Error opening " + file);
-      new ErrorDialog(mainFrame, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
+      new ErrorDialog(mainFrame, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS), configStore);
       openedFile = null;
       mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
       resetSimulator(false);

@@ -44,11 +44,12 @@ public class GUIStatistics extends GUIComponent {
   JScrollPane jsp;
   private int nCycles, nInstructions, rawStalls, codeSize, WAWStalls, dividerStalls, memoryStalls;
   private float cpi;
+  GUITheme theme;
 
-  GUIStatistics(CPU cpu, Memory memory, ConfigStore config) {
+  GUIStatistics(CPU cpu, Memory memory, ConfigStore config, GUITheme theme) {
     super(cpu, memory, config);
+    this.theme = theme;
     statPanel = new StatPanel();
-
     jsp = new JScrollPane(statPanel);
     jsp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     jsp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -65,7 +66,7 @@ public class GUIStatistics extends GUIComponent {
     StatPanel() {
       super();
       setLayout(new BorderLayout());
-      setBackground(Color.WHITE);
+      setBackground(theme.getBackgroundColor());
       statList = new JList<String>(statistics);
       statList.setFixedCellWidth(scale(400)) ;
       statList.setCellRenderer(new MyListCellRenderer());

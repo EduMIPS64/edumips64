@@ -24,6 +24,7 @@ package org.edumips64.ui.swing;
 
 import org.edumips64.core.parser.ParserException;
 import org.edumips64.utils.CurrentLocale;
+import org.edumips64.utils.ConfigStore;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
@@ -35,10 +36,10 @@ import javax.swing.*;
 */
 public class ErrorDialog extends JDialog {
   private static final long serialVersionUID = 6756487575875944232L;
-
-  public ErrorDialog(final JFrame owner, List<ParserException> peList, String title, Boolean showWarning) {
-
+  private GUITheme theme;
+  public ErrorDialog(final JFrame owner, List<ParserException> peList, String title, Boolean showWarning, ConfigStore configStore) {
     super(owner, title, true);
+    this.theme = new GUITheme(configStore);
 
     boolean[] lineIsError = new boolean[peList.size() * 10];
     JPanel buttonPanel = new JPanel();
@@ -58,7 +59,7 @@ public class ErrorDialog extends JDialog {
     DefaultTableModel dft = new DefaultTableModel(columnNames, 0);
 
     MultiLineTable table = new MultiLineTable(dft);
-    MultiLineCellRenderer renderer = new MultiLineCellRenderer(lineIsError);
+    MultiLineCellRenderer renderer = new MultiLineCellRenderer(lineIsError, theme);
 
     table.setCellSelectionEnabled(false);
     table.setFocusable(false);
@@ -95,19 +96,23 @@ public class ErrorDialog extends JDialog {
     }
 
     JScrollPane scrollTable = new JScrollPane(table);
-    String msg = CurrentLocale.getString("ErrorDialog.MSG0") + " " + numError + " " +
+    String msg = numError + " " +
                  CurrentLocale.getString("ErrorDialog.MSG1") + " " + (peList.size() - numError) + " " +
                  CurrentLocale.getString("ErrorDialog.MSG2");
     JLabel label = new JLabel(msg);
 
     try {
-      label = new JLabel(msg, new ImageIcon(
+      ImageIcon mainImageIcon = new ImageIcon(
                            org.edumips64.ui.swing.img.IMGLoader.getImage(
-                             ((numError > 0) ? "error.png" : "warning.png")
-                           )), SwingConstants.LEFT);
-      label.setIconTextGap(50);
-      label.setFont(new Font("SansSerif", Font.PLAIN, 20));
-      label.setForeground(new Color(0, 0, 85));
+                             ((numError > 0) ? "error-hires.png" : "warning-hires.png")
+                           ));
+      mainImageIcon = new ImageIcon(mainImageIcon.getImage().getScaledInstance(130, 100, java.awt.Image.SCALE_SMOOTH));
+      label = new JLabel(msg, mainImageIcon, SwingConstants.LEFT);
+      label.setIconTextGap(5);
+      label.setFont(new Font("SansSerif", Font.BOLD, 20));
+
+      label.setForeground(theme.getTextColor());
+
     } catch (java.io.IOException ignored) {}
 
     getRootPane().setDefaultButton(okButton);

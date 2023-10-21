@@ -38,10 +38,8 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
   protected static Border noFocusBorder;
 
   boolean[] lineIsError;
-  private Color errorForeground = Color.white;
-  private Color errorBackground = Color.red;
-  private Color warningForeground = new Color(0, 0, 85);
-  private Color warningBackground =  Color.yellow;
+  private Color errorBackground ;
+  private Color warningBackground;
 
   public MultiLineCellRenderer() {
     super();
@@ -53,14 +51,16 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
     setBorder(noFocusBorder);
   }
 
-  public MultiLineCellRenderer(boolean[] lineIsError) {
+  public MultiLineCellRenderer(boolean[] lineIsError, GUITheme theme) {
     super();
     noFocusBorder = new EmptyBorder(1, 2, 1, 2);
     setLineWrap(true);
     setWrapStyleWord(true);
     setOpaque(true);
     setBorder(noFocusBorder);
-
+    
+    this.errorBackground = theme.getErrorColor();
+    this.warningBackground = theme.getWarningColor();
     this.lineIsError = lineIsError;
   }
 
@@ -69,10 +69,8 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
       int row, int column) {
 
     if (lineIsError[row]) {
-      super.setForeground(errorForeground);
       super.setBackground(errorBackground);
     } else {
-      super.setForeground(warningForeground);
       super.setBackground(warningBackground);
     }
 

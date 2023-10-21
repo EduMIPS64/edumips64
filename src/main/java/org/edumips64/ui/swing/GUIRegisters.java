@@ -354,10 +354,11 @@ class GUIRegisters extends GUIComponent {
       super();
       rowCurrent = row;
       valueCurrent = value;
-      setTitle("Register");
+      setTitle("Edit Register");
+      // TODO: Make this string localizable
       GridBagLayout GBL = new GridBagLayout();
       GridBagConstraints GBC = new GridBagConstraints();
-      Dimension d = new Dimension(150, 20);
+      Dimension d = new Dimension(170, 20);
       Container c = getContentPane();
       c.setLayout(GBL);
       JLabel label = null;

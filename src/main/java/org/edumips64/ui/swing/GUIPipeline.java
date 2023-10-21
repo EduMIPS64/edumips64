@@ -35,24 +35,28 @@ import javax.swing.*;
 import java.util.*;
 
 /**
-* This class draw the pipeline, composed of five stages of the MIPS64 processor
-* and the units for floating point operations.
-* @author Filippo Mondello
-*/
+ * This class draw the pipeline, composed of five stages of the MIPS64 processor
+ * and the units for floating point operations.
+ * 
+ * @author Filippo Mondello
+ */
 class GUIPipeline extends GUIComponent {
   private Pannello1 pannello;
 
   private int numMultiplier;
   private int numAdder;
 
-  private Map <Pipeline.Stage, InstructionInterface> pipeline;
+  private Map<Pipeline.Stage, InstructionInterface> pipeline;
 
-  GUIPipeline(CPU cpu, Memory memory, ConfigStore config) {
+  private GUITheme theme;
+
+  GUIPipeline(CPU cpu, Memory memory, ConfigStore config, GUITheme theme) {
     super(cpu, memory, config);
     numMultiplier = 7;
     numAdder = 4;
     pannello = new Pannello1();
     pipeline = new HashMap<>();
+    this.theme = theme;
   }
 
   public void setContainer(Container co) {
@@ -76,79 +80,91 @@ class GUIPipeline extends GUIComponent {
     private static final long serialVersionUID = -1873304516301831571L;
     int alt, largh;
 
-    public void paintComponent(Graphics g) {
-      super.paintComponent(g);  // va fatto sempre
-      setBackground(Color.white);  // fondo bianco
+    public void paintComponent(Graphics graphicsOriginal) {
+      Graphics2D g = (Graphics2D) graphicsOriginal;
+      g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+      super.paintComponent(g); // va fatto sempre
+
+      setBackground(theme.getBackgroundColor()); // fondo bianco
+      g.setColor(theme.getTextColor());
 
       largh = this.getWidth();
       alt = this.getHeight();
       riempiBlocchi(g);
-
-      g.setColor(Color.black);
-      //Blocco IF
+      g.setColor(theme.getTextColor());
+      // Blocco IF
       g.drawRect(largh / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
 
       g.drawLine(largh * 3 / 20, alt / 2, largh * 4 / 20, alt / 2);
-      //Blocco ID
+      // Blocco ID
       g.drawRect(largh * 4 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
 
-      //Blocco MEM
+      // Blocco MEM
       g.drawRect(largh * 14 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
 
       g.drawLine(largh * 16 / 20, alt / 2, largh * 17 / 20, alt / 2);
-      //Blocco WB
+      // Blocco WB
       g.drawRect(largh * 17 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
 
-      //Blocco EX
+      // Blocco EX
       g.drawRect(largh * 9 / 20, (alt / 2) - (alt * 5 / 12), largh / 10, alt / 6);
 
-      //Blocco FP-DIV 0
+      // Blocco FP-DIV 0
       g.drawRect(largh * 8 / 20, (alt / 2) + (alt * 3 / 12), largh * 2 / 10, alt / 6);
 
-      //IF---FPDIV0
+      // IF---FPDIV0
       g.drawLine(largh * 6 / 20, alt / 2 + alt / 20, largh * 8 / 20, alt / 2 + alt / 3);
-      //FPDIV0---MEM
+      // FPDIV0---MEM
       g.drawLine(largh * 12 / 20, alt / 2 + alt / 3, largh * 14 / 20, (alt / 2) + (alt / 20));
 
-      //IF---EX
+      // IF---EX
       g.drawLine(largh * 6 / 20, alt / 2 - alt / 20, largh * 9 / 20, alt / 2 - alt / 3);
-      //EX---MEM
+      // EX---MEM
       g.drawLine(largh * 11 / 20, alt / 2 - alt / 3, largh * 14 / 20, (alt / 2) - (alt / 20));
 
-//MULTIPLIER
+      // MULTIPLIER
       int spiazzMul = (largh * 20 / 60) / numMultiplier;
 
       for (int j = 0; j < numMultiplier; j++) {
-        g.drawRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10), spiazzMul * 5 / 8, alt / 10);
+        g.drawRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10),
+            spiazzMul * 5 / 8, alt / 10);
       }
 
       for (int j = 0; j < numMultiplier - 1; j++) {
-        //FP MULTIPLIER(j)---FP MULTIPLIER(j+1)
-        g.drawLine((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)) + spiazzMul * 5 / 8, alt / 2 - alt / 20, (largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)) + spiazzMul, alt / 2 - alt / 20);
+        // FP MULTIPLIER(j)---FP MULTIPLIER(j+1)
+        g.drawLine((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)) + spiazzMul * 5 / 8,
+            alt / 2 - alt / 20, (largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)) + spiazzMul,
+            alt / 2 - alt / 20);
       }
 
-      //IF---FP MULTIPLIER1
-      g.drawLine(largh * 6 / 20, alt / 2 - alt / 30, (largh * 20 / 60) + (largh / (10 * numMultiplier)), alt / 2 - alt / 20);
-      //MEM---FP MULTIPLIER7
-      g.drawLine((largh * 20 / 60) + ((numMultiplier - 1) * spiazzMul) + (largh / (10 * numMultiplier)) + spiazzMul * 5 / 8, alt / 2 - alt / 20, largh * 14 / 20, alt / 2 - alt / 30);
-
+      // IF---FP MULTIPLIER1
+      g.drawLine(largh * 6 / 20, alt / 2 - alt / 30, (largh * 20 / 60) + (largh / (10 * numMultiplier)),
+          alt / 2 - alt / 20);
+      // MEM---FP MULTIPLIER7
+      g.drawLine(
+          (largh * 20 / 60) + ((numMultiplier - 1) * spiazzMul) + (largh / (10 * numMultiplier)) + spiazzMul * 5 / 8,
+          alt / 2 - alt / 20, largh * 14 / 20, alt / 2 - alt / 30);
 
       int spiazzAdd = (largh * 20 / 60) / numAdder;
 
       for (int j = 0; j < numAdder; j++) {
-        g.drawRect((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)), (alt / 2) + (alt / 40), spiazzAdd * 5 / 8, alt / 10);
+        g.drawRect((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)), (alt / 2) + (alt / 40),
+            spiazzAdd * 5 / 8, alt / 10);
       }
 
       for (int j = 0; j < numAdder - 1; j++) {
-        //FP ADDER(j)---FP ADDER(j+1)
-        g.drawLine((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)) + spiazzAdd * 5 / 8, alt / 2 + alt / 40 + alt / 20, (largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)) + spiazzAdd, alt / 2 + alt / 40 + alt / 20);
+        // FP ADDER(j)---FP ADDER(j+1)
+        g.drawLine((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)) + spiazzAdd * 5 / 8,
+            alt / 2 + alt / 40 + alt / 20, (largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)) + spiazzAdd,
+            alt / 2 + alt / 40 + alt / 20);
       }
 
-      //IF---FP ADDER1
-      g.drawLine(largh * 6 / 20, alt / 2 + alt / 30, (largh * 20 / 60) + (largh / (10 * numAdder)), alt / 2 + alt / 40 + alt / 20);
-      //MEM---FP ADDER4
-      g.drawLine((largh * 20 / 60) + ((numAdder - 1) * spiazzAdd) + (largh / (10 * numAdder)) + spiazzAdd * 5 / 8, alt / 2 + alt / 40 + alt / 20, largh * 14 / 20, alt / 2 + alt / 30);
-
+      // IF---FP ADDER1
+      g.drawLine(largh * 6 / 20, alt / 2 + alt / 30, (largh * 20 / 60) + (largh / (10 * numAdder)),
+          alt / 2 + alt / 40 + alt / 20);
+      // MEM---FP ADDER4
+      g.drawLine((largh * 20 / 60) + ((numAdder - 1) * spiazzAdd) + (largh / (10 * numAdder)) + spiazzAdd * 5 / 8,
+          alt / 2 + alt / 40 + alt / 20, largh * 14 / 20, alt / 2 + alt / 30);
 
       if (largh / 30 < alt / 15) {
         dimCar = largh / 30;
@@ -159,13 +175,16 @@ class GUIPipeline extends GUIComponent {
       Font f1 = new Font("SansSerif", Font.PLAIN, dimCar);
       g.getFontMetrics(f1);
       g.setFont(f1);
-      //Stringhe all'interno dei blocchi
+      g.setColor(theme.getTextColor());
+      // Stringhe all'interno dei blocchi
       g.drawString("IF", largh * 17 / 200, (alt / 2));
       g.drawString("ID", largh * 47 / 200, (alt / 2));
       g.drawString("MEM", largh * 142 / 200, (alt / 2));
       g.drawString("WB", largh * 175 / 200, (alt / 2));
       g.drawString("EX", largh * 97 / 200, (alt / 2) - (alt * 40 / 120));
       g.drawString("FP-DIV " + cpu.getDividerCounter(), largh * 87 / 200, (alt / 2) + (alt * 40 / 120));
+
+      g.setColor(theme.getTextColor());
       g.drawString("FP Multiplier", largh * 85 / 200, (alt / 2) - (alt * 15 / 120));
       g.drawString("FP Adder", largh * 85 / 200, (alt / 2) + (alt * 23 / 120));
 
@@ -173,139 +192,153 @@ class GUIPipeline extends GUIComponent {
 
     }
 
-    /*Per ogni blocco della pipeline, all'interno di questa funzione dovrÃ² controllare se c'Ãš
-    qualche istruzione, e in tal caso colorare il blocco e scrivere il nome dell'istruzione
-    */
+    /*
+     * Per ogni blocco della pipeline, all'interno di questa funzione dovrÃ²
+     * controllare se c'Ãš
+     * qualche istruzione, e in tal caso colorare il blocco e scrivere il nome
+     * dell'istruzione
+     */
     void riempiBlocchi(Graphics g) {
-      g.setColor(Color.white);
+      g.setColor(theme.getBackgroundColor());
+
       g.fillRect(largh / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       g.fillRect(largh * 4 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       g.fillRect(largh * 14 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       g.fillRect(largh * 9 / 20, (alt / 2) - (alt * 5 / 12), largh / 10, alt / 6);
       g.fillRect(largh * 17 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
 
-      //Filling FPU elements
-      //divider
+      // Filling FPU elements
+      // divider
       g.fillRect(largh * 8 / 20, (alt / 2) + (alt * 3 / 12), largh * 2 / 10, alt / 6);
-      //multiplier
+      // multiplier
       int spiazzMul = (largh * 20 / 60) / numMultiplier;
 
       for (int j = 0; j < numMultiplier; j++) {
-        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10), spiazzMul * 5 / 8, alt / 10);
+        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10),
+            spiazzMul * 5 / 8, alt / 10);
       }
 
-      //adder
+      // adder
       int spiazzAdd = (largh * 20 / 60) / numAdder;
 
       for (int j = 0; j < numAdder; j++) {
-        g.fillRect((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)), (alt / 2) + (alt / 40), spiazzAdd * 5 / 8, alt / 10);
+        g.fillRect((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)), (alt / 2) + (alt / 40),
+            spiazzAdd * 5 / 8, alt / 10);
       }
-
-
 
       InstructionInterface i = pipeline.get(Pipeline.Stage.IF);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(new Color(config.getInt(ConfigKey.IF_COLOR)));
+        g.setColor(theme.getColor(ConfigKey.IF_COLOR));
         g.fillRect(largh / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(Pipeline.Stage.ID);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(new Color(config.getInt(ConfigKey.ID_COLOR)));
+        g.setColor(theme.getColor(ConfigKey.ID_COLOR));
         g.fillRect(largh * 4 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(Pipeline.Stage.EX);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(new Color(config.getInt(ConfigKey.EX_COLOR)));
+        g.setColor(theme.getColor(ConfigKey.EX_COLOR));
         g.fillRect(largh * 9 / 20, (alt / 2) - (alt * 5 / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(Pipeline.Stage.MEM);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(new Color(config.getInt(ConfigKey.MEM_COLOR)));
+        g.setColor(theme.getColor(ConfigKey.MEM_COLOR));
         g.fillRect(largh * 14 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
       i = pipeline.get(Pipeline.Stage.WB);
 
       if ((i != null) && ((i.getName() != null)) && !i.isBubble()) {
-        g.setColor(new Color(config.getInt(ConfigKey.WB_COLOR)));
+        g.setColor(theme.getColor(ConfigKey.WB_COLOR));
         g.fillRect(largh * 17 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
       }
 
-
-      //filling FPU elements
-      //ADDER
-      g.setColor(new Color(config.getInt(ConfigKey.FP_ADDER_COLOR)));
+      // filling FPU elements
+      // ADDER
+      g.setColor(theme.getColor(ConfigKey.FP_ADDER_COLOR));
       spiazzAdd = (largh * 20 / 60) / numAdder;
       int j;
 
       if (cpu.isFuncUnitFilled("ADDER", 1)) {
         j = 0;
-        g.fillRect((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)), (alt / 2) + (alt / 40), spiazzAdd * 5 / 8, alt / 10);
+        g.fillRect((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)), (alt / 2) + (alt / 40),
+            spiazzAdd * 5 / 8, alt / 10);
       }
 
       if (cpu.isFuncUnitFilled("ADDER", 2)) {
         j = 1;
-        g.fillRect((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)), (alt / 2) + (alt / 40), spiazzAdd * 5 / 8, alt / 10);
+        g.fillRect((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)), (alt / 2) + (alt / 40),
+            spiazzAdd * 5 / 8, alt / 10);
       }
 
       if (cpu.isFuncUnitFilled("ADDER", 3)) {
         j = 2;
-        g.fillRect((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)), (alt / 2) + (alt / 40), spiazzAdd * 5 / 8, alt / 10);
+        g.fillRect((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)), (alt / 2) + (alt / 40),
+            spiazzAdd * 5 / 8, alt / 10);
       }
 
       if (cpu.isFuncUnitFilled("ADDER", 4)) {
         j = 3;
-        g.fillRect((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)), (alt / 2) + (alt / 40), spiazzAdd * 5 / 8, alt / 10);
+        g.fillRect((largh * 20 / 60) + (j * spiazzAdd) + (largh / (10 * numAdder)), (alt / 2) + (alt / 40),
+            spiazzAdd * 5 / 8, alt / 10);
       }
 
-//MULTIPLIER
-      g.setColor(new Color(config.getInt(ConfigKey.FP_MULTIPLIER_COLOR)));
+      // MULTIPLIER
+      g.setColor(theme.getColor(ConfigKey.FP_MULTIPLIER_COLOR));
       spiazzMul = (largh * 20 / 60) / numMultiplier;
 
       if (cpu.isFuncUnitFilled("MULTIPLIER", 1)) {
         j = 0;
-        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10), spiazzMul * 5 / 8, alt / 10);
+        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10),
+            spiazzMul * 5 / 8, alt / 10);
       }
 
       if (cpu.isFuncUnitFilled("MULTIPLIER", 2)) {
         j = 1;
-        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10), spiazzMul * 5 / 8, alt / 10);
+        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10),
+            spiazzMul * 5 / 8, alt / 10);
       }
 
       if (cpu.isFuncUnitFilled("MULTIPLIER", 3)) {
         j = 2;
-        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10), spiazzMul * 5 / 8, alt / 10);
+        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10),
+            spiazzMul * 5 / 8, alt / 10);
       }
 
       if (cpu.isFuncUnitFilled("MULTIPLIER", 4)) {
         j = 3;
-        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10), spiazzMul * 5 / 8, alt / 10);
+        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10),
+            spiazzMul * 5 / 8, alt / 10);
       }
 
       if (cpu.isFuncUnitFilled("MULTIPLIER", 5)) {
         j = 4;
-        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10), spiazzMul * 5 / 8, alt / 10);
+        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10),
+            spiazzMul * 5 / 8, alt / 10);
       }
 
       if (cpu.isFuncUnitFilled("MULTIPLIER", 6)) {
         j = 5;
-        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10), spiazzMul * 5 / 8, alt / 10);
+        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10),
+            spiazzMul * 5 / 8, alt / 10);
       }
 
       if (cpu.isFuncUnitFilled("MULTIPLIER", 7)) {
         j = 6;
-        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10), spiazzMul * 5 / 8, alt / 10);
+        g.fillRect((largh * 20 / 60) + (j * spiazzMul) + (largh / (10 * numMultiplier)), (alt / 2) - (alt / 10),
+            spiazzMul * 5 / 8, alt / 10);
       }
 
-      //DIVIDER
-      g.setColor(new Color(config.getInt(ConfigKey.FP_DIVIDER_COLOR)));
+      // DIVIDER
+      g.setColor(theme.getColor(ConfigKey.FP_DIVIDER_COLOR));
 
       if (cpu.isFuncUnitFilled("DIVIDER", 0)) {
         g.fillRect(largh * 8 / 20, (alt / 2) + (alt * 3 / 12), largh * 2 / 10, alt / 6);
@@ -313,13 +346,14 @@ class GUIPipeline extends GUIComponent {
     }
 
     /**
-    *Questo metodo stampa all'interno di ogni blocco della pipeline il nome dell'istruzione che viÃš all'interno.
-    */
+     * Questo metodo stampa all'interno di ogni blocco della pipeline il nome
+     * dell'istruzione che viÃš all'interno.
+     */
     void riempiStringhe(Graphics g) {
       Font f1 = new Font("SansSerif", Font.PLAIN, dimCar - 3);
       g.getFontMetrics(f1);
       g.setFont(f1);
-      g.setColor(Color.blue);
+      g.setColor(theme.getTextColor());
       InstructionInterface i = pipeline.get(Pipeline.Stage.IF);
 
       if (i != null) {

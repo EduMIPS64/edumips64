@@ -84,10 +84,10 @@ public class GUIConfig extends JDialog {
     JTabbedPane tabPanel = new JTabbedPane();
     scaleFont(tabPanel);
     tabPanel.addTab(MAIN, makeMainPanel());
+    tabPanel.addTab(APPEARANCE, makeAppearancePanel());
     tabPanel.addTab(BEHAVIOR, makeBehaviorPanel());
     tabPanel.addTab(FPUEXCEPTIONS, makeExceptionsPanel());
     tabPanel.addTab(FPUROUNDING, makeRoundingPanel());
-    tabPanel.addTab(APPEARANCE, makeAppearancePanel());
 
     logger.log(Level.INFO, "Current values: " + cache.toString());
 
@@ -102,7 +102,7 @@ public class GUIConfig extends JDialog {
 
     //pack();
     int width = (int)(700 * scalingFactor);
-    int height = (int)(300 * scalingFactor);
+    int height = (int)(350 * scalingFactor);
     setSize(width, height);
     setVisible(true);
   }
@@ -233,6 +233,9 @@ public class GUIConfig extends JDialog {
     panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
     int row = 2;
 
+    addRow(panel, row++, ConfigKey.FP_LONG_DOUBLE_VIEW, new JCheckBox());
+    addRow(panel, row++, ConfigKey.UI_FONT_SIZE, new JNumberField());
+    addRow(panel, row++, ConfigKey.UI_DARK_THEME, new JCheckBox());
     addRow(panel, row++, ConfigKey.IF_COLOR, new JButton());
     addRow(panel, row++, ConfigKey.ID_COLOR, new JButton());
     addRow(panel, row++, ConfigKey.EX_COLOR, new JButton());
@@ -241,8 +244,6 @@ public class GUIConfig extends JDialog {
     addRow(panel, row++, ConfigKey.FP_ADDER_COLOR, new JButton());
     addRow(panel, row++, ConfigKey.FP_MULTIPLIER_COLOR, new JButton());
     addRow(panel, row++, ConfigKey.FP_DIVIDER_COLOR, new JButton());
-    addRow(panel, row++, ConfigKey.FP_LONG_DOUBLE_VIEW, new JCheckBox());
-    addRow(panel, row++, ConfigKey.UI_FONT_SIZE, new JNumberField());
 
     // fill remaining vertical space
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
@@ -362,9 +363,10 @@ public class GUIConfig extends JDialog {
       });
     } else if (comp instanceof JButton) {
       final JButton button = (JButton) comp;
-      button.setBounds(0, 0, 50, 10);
-      button.setBackground(new Color(config.getInt(key)));
-
+      button.setBounds(0, 0, 50, 40);
+      Color currentColor = new Color(config.getInt(key));
+      button.setBackground(currentColor);
+      button.setText("("+currentColor.getRed() + ", "+ currentColor.getGreen() + ", "+ currentColor.getBlue() + ")");
       cache.put(key, config.getInt(key));
 
       button.addActionListener(e -> {
@@ -375,6 +377,7 @@ public class GUIConfig extends JDialog {
 
         if (color != null) {
           button.setBackground(color);
+          button.setText("("+color.getRed() + ", "+ color.getGreen() + ", "+ color.getBlue() + ")");
           cache.put(key, button.getBackground().getRGB());
         }
       });
@@ -428,6 +431,7 @@ public class GUIConfig extends JDialog {
         }
 
         boolean fontChanged = config.getInt(ConfigKey.UI_FONT_SIZE) != (Integer) cache.get(ConfigKey.UI_FONT_SIZE);
+        boolean themeChanged = config.getBoolean(ConfigKey.UI_DARK_THEME) != (Boolean) cache.get(ConfigKey.UI_DARK_THEME);
         boolean fwdChanged = config.getBoolean(ConfigKey.FORWARDING) != (Boolean) cache.get(ConfigKey.FORWARDING);
 
         // Alert the user that the simulation will be restarted if the forwarding setting is changed.
@@ -447,11 +451,12 @@ public class GUIConfig extends JDialog {
         updateCallback.accept(fwdChanged);
 
         // Warn the user that they need to restart the simulator if they changed the font size.
-        if (fontChanged) {
+        if (fontChanged || themeChanged) {
           JOptionPane.showMessageDialog(null,
-              CurrentLocale.getString("RESTART_FONT"), CurrentLocale.getString("GUI_WARNING"),
+              CurrentLocale.getString("RESTART_APPEARANCE"), CurrentLocale.getString("GUI_WARNING"),
               JOptionPane.WARNING_MESSAGE);
         }
+
       } catch (ConfigStoreTypeException ex) {
         logger.severe("Unknown type encountered while storing the configuration.");
       }
