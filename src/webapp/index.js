@@ -18,7 +18,7 @@ const version = `${BRANCH}-${COMMITHASH.substring(0, 7)}`;
 // Initialize AppInsights.
 const appInsights = new ApplicationInsights({
   config: {
-    instrumentationKey: '4fdd6b3c-15fb-4fd2-910e-0bd297b8d293',
+    connectionString: 'InstrumentationKey=ae180a87-f990-410c-a51c-8077c240e265;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/',
   },
 });
 appInsights.loadAppInsights();
