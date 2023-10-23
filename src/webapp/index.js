@@ -25,7 +25,8 @@ appInsights.loadAppInsights();
 appInsights.context.application.ver = version;
 appInsights.context.application.build = version;
 const telemetryInitializer = (envelope) => {
-  envelope.tags['ai.cloud.role'] = process.env.NODE_ENV;
+  envelope.tags['ai.cloud.role'] = process.env.NODE_ENV,
+  envelope.tags['ai.cloud.roleInstance'] = version;
 };
 appInsights.addTelemetryInitializer(telemetryInitializer);
 appInsights.trackPageView();
@@ -33,19 +34,23 @@ console.log('Initialized AppInsights');
 
 // Web Worker that runs the EduMIPS64 core, built from the Java codebase.
 // Contains some syntactical sugar methods to make working with the
-// Web Worker API a bit easier.
+// Web Worker API a bit easier, and some telemetry.
 let simulator = new Worker('worker.js');
 simulator.reset = () => {
   simulator.postMessage({ method: 'reset' });
+  appInsights.trackEvent({name: "reset"});
 };
 simulator.step = (n) => {
   simulator.postMessage({ method: 'step', steps: n });
+  appInsights.trackEvent({name: 'step', properties: {steps: n}});
 };
 simulator.load = (code) => {
   simulator.postMessage({ method: 'load', code });
+  appInsights.trackEvent({name: "load"});
 };
 simulator.checkSyntax = (code) => {
   simulator.postMessage({ method: 'checksyntax', code });
+  appInsights.trackEvent({name: "checkSyntax"});
 };
 simulator.parseResult = (result) => {
   result.registers = JSON.parse(result.registers);
