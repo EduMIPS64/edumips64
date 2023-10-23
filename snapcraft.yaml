@@ -4,7 +4,7 @@ summary: A free visual and cross-platform MIPS64 CPU simulator.
 description: EduMIPS64 is a free MIPS64 visual simulator and debugger, used as a teaching tool in Computer Architecture courses.
 grade: stable
 
-base: core20
+base: core22
 confinement: strict
 
 parts:
@@ -27,7 +27,7 @@ parts:
       - ca-certificates
       - python3-pip
       # Needed to build pillow, a rst2pdf dependency.
-      - python3.8-dev
+      - python3.10-dev
       - zlib1g-dev
       - libjpeg-dev
       - libtiff-dev
