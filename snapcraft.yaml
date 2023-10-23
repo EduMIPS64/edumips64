@@ -4,14 +4,14 @@ summary: A free visual and cross-platform MIPS64 CPU simulator.
 description: EduMIPS64 is a free MIPS64 visual simulator and debugger, used as a teaching tool in Computer Architecture courses.
 grade: stable
 
-base: core18
+base: core22
 confinement: strict
 
 parts:
   edumips64:
-    plugin: gradle
+    plugin: nil
+    override-build: ./gradlew jar
     source: .
-    gradle-version: '8.1.1'
     # Remove Java 11, which is not needed and pulled in by default by the Snapcraft Gradle plugin.
     # This also fixes the issue with a dangling JDK 11 symlink:
     # https://forum.snapcraft.io/t/resolve-package-contains-external-symlinks-error-when-trying-to-snap/2963/18
