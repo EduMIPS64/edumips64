@@ -10,7 +10,11 @@ confinement: strict
 parts:
   edumips64:
     plugin: nil
-    override-build: ./gradlew jar
+    override-build: |
+      bash gradlew jar && \
+      mkdir -p "$CRAFT_PART_INSTALL"/jar && \
+        ls -ld build/libs/*
+        mv build/libs/edumips64-*.jar "$CRAFT_PART_INSTALL"/jar/edumips64-1.3.0.jar
     source: .
     # Install Python 3.10 and make it the default Python3 before the build stage,
     # so that the build can use it and satisfy the Python >= 3.8 dependency from
