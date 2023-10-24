@@ -27,7 +27,7 @@ import SampleProgram from '../data/SampleProgram';
 
 import { debounce } from 'lodash';
 
-const Simulator = ({ sim, initialState }) => {
+const Simulator = ({ sim, initialState, appInsights }) => {
   // The amount of steps to run in multi-step executions.
   const INTERNAL_STEPS_STRIDE = 50;
 
@@ -109,23 +109,40 @@ const Simulator = ({ sim, initialState }) => {
     }
   };
 
-  const loadCode = () => {
+  // Click handlers. Decoupled from business logic to place the telemetry hooks in the right place.
+  const clickRun = () => {
+    appInsights.trackEvent({name: "click", properties: {action: "run"}});
+    console.log('Executing runCode');
+    runCode()
+  }
+
+  const clickStep = (n) => {
+    appInsights.trackEvent({name: "click", properties: {action: "step"}});
+    console.log('Executing steps: ' + n);
+    stepCode(n)
+  }
+
+  const clickLoad = () => {
+    appInsights.trackEvent({name: "click", properties: {action: "load"}});
     console.log('Executing loadCode');
-    sim.load(code);
+    loadCode();
+  }
+
+  // Business logic for click handlers.
+  const runCode = () => {
+    setRunAll(true);
+    stepCode(INTERNAL_STEPS_STRIDE);
   };
 
   const stepCode = (n) => {
-    console.log('Executing steps: ' + n);
     const toRun = Math.min(n, INTERNAL_STEPS_STRIDE);
     setStepsToRun(n - toRun);
     setExecuting(true);
     sim.step(toRun);
   };
 
-  const runCode = () => {
-    console.log('Executing runCode');
-    setRunAll(true);
-    stepCode(INTERNAL_STEPS_STRIDE);
+  const loadCode = () => {
+    sim.load(code);
   };
 
   // A debounced version of syntaxCheck. Needed to not run props.onChange too often.
@@ -172,13 +189,14 @@ const Simulator = ({ sim, initialState }) => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Header
-          onRunClick={runCode}
+          onRunClick={clickRun}
           runEnabled={simulatorRunning && !executing}
-          onStepClick={stepCode}
+          onStepClick={clickStep}
           stepEnabled={simulatorRunning && !executing}
           onLoadClick={loadCode}
           loadEnabled={isValidProgram}
           onStopClick={() => {
+            appInsights.trackEvent({name: "stop"})
             setMustStop(true);
           }}
           stopEnabled={executing}
