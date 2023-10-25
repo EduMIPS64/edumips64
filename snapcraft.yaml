@@ -11,9 +11,31 @@ parts:
   edumips64:
     plugin: nil
     override-build: |
-      craftctl default && \
-      bash gradlew jar && \
-      mkdir -p "$CRAFT_PART_INSTALL"/jar && \
+      # Gets the host and port from a proxy URL
+      #   $1 = the proxy URL, such as "http://10.10.10.1:8222/"
+      # stolen from https://github.com/jgneff/openjfx/blob/30aadb4f29638171a259c47cc2b9cddc6b4aea6c/snap/snapcraft.yaml#L131
+      getproxy () {
+          # Parses the URL using shell parameter expansion
+          tail=${1#http*://}
+          head=${tail%%/*}
+          host=${head%:*}
+          port=${head##*:}
+      }
+
+      # Adds Java system properties using shell positional parameters
+      set --
+      if [ -n "${http_proxy:-}" ]; then
+          getproxy "$http_proxy"
+          set -- "$@" "-Dhttp.proxyHost=$host" "-Dhttp.proxyPort=$port"
+      fi
+      if [ -n "${https_proxy:-}" ]; then
+          getproxy "$https_proxy"
+          set -- "$@" "-Dhttps.proxyHost=$host" "-Dhttps.proxyPort=$port"
+      fi
+
+      craftctl default
+      mkdir -p "$CRAFT_PART_INSTALL"/jar
+      bash gradlew --no-daemon "$@" jar && \
         ls -ld build/libs/* && \
         mv build/libs/edumips64-*.jar "$CRAFT_PART_INSTALL"/jar/edumips64-1.3.0.jar && \
         ls $CRAFT_PART_INSTALL/jar/*.jar -ld
