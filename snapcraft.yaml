@@ -37,7 +37,7 @@ parts:
       mkdir -p "$CRAFT_PART_INSTALL"/jar
       bash gradlew --no-daemon "$@" jar && \
         ls -ld build/libs/* && \
-        mv build/libs/edumips64-*.jar "$CRAFT_PART_INSTALL"/jar/edumips64-1.3.0.jar && \
+        mv build/libs/edumips64-*.jar "$CRAFT_PART_INSTALL"/jar/edumips64.jar && \
         ls $CRAFT_PART_INSTALL/jar/*.jar -ld
     source: .
     # Install Python 3.10 and make it the default Python3 before the build stage,
