@@ -60,7 +60,7 @@ public class GUIStatistics extends GUIComponent {
     private static final long serialVersionUID = 81105844698513914L;
     JList<? extends String> statList;
     String [] statistics = {" Execution", " 0 Cycles", " 0 Instructions", " ", " Stalls", " 0 RAW Stalls", " 0 WAW Stalls",
-                            " 0 WAR Stalls", " 0 Structural Stalls(Divider not available)", "0 Structural Stalls (Memory not available)", " 0 Branch Taken Stalls", " 0 Branch Misprediction Stalls",
+                            " 0 Structural Stalls(Divider not available)", "0 Structural Stalls (Memory not available)",
                             " Code Size", " 0 Bytes", "FPU info", "FCSR", "FCSRGroups", "FCSRMnemonics", "FCSRValues"
                            };
     StatPanel() {
@@ -160,41 +160,32 @@ public class GUIStatistics extends GUIComponent {
         label.setText(" " + WAWStalls + " " + CurrentLocale.getString("WAWS"));
         return label;
       case 7:
-        label.setText(" 0 " + CurrentLocale.getString("WARS"));
-        return label;
-      case 8:
         label.setText(" " + dividerStalls + " " + CurrentLocale.getString("STRUCTS_DIVNOTAVAILABLE"));
         return label;
-      case 9:
+      case 8:
         label.setText(" " + memoryStalls  + " " + CurrentLocale.getString("STRUCTS_MEMNOTAVAILABLE"));
         return label;
-      case 10:
-        label.setText(" 0 " + CurrentLocale.getString("BTS"));
-        return label;
-      case 11:
-        label.setText(" 0 " + CurrentLocale.getString("BMS"));
-        return label;
-      case 12:
+      case 9:
         label.setText(" " + CurrentLocale.getString("CSIZE"));
         label.setForeground(Color.red);
         return label;
-      case 13:
+      case 10:
         label.setText(" " + codeSize + " " + CurrentLocale.getString("BYTES"));
         return label;
-      case 14:
+      case 11:
         label.setText(" " + CurrentLocale.getString("FPUINFO"));
         label.setForeground(Color.red);
         return label;
-      case 15:
+      case 12:
         label.setText(" " + CurrentLocale.getString("FPUFCSR"));
         return label;
-      case 16:
+      case 13:
         label.setText(" " + "    FCC       Cause EnablFlag RM");
         return label;
-      case 17:
+      case 14:
         label.setText(" " + "7654321 0      VZOUIVZOUIVZOUI");
         return label;
-      case 18:
+      case 15:
         label.setText(" " + cpu.getFCSR().getBinString());
         return label;
       }
