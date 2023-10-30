@@ -196,7 +196,7 @@ const Code = (props) => {
   const options = {
     selectOnLineNumbers: true,
     roundedSelection: false,
-    readOnly: false,
+    readOnly: props.running,
     cursorStyle: 'line',
     codelens: false,
     minimap: { enabled: false },
