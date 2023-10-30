@@ -34,93 +34,93 @@ const Code = (props) => {
         options: { isWholeLine: true, className },
       };
     };
-    if (props.pipeline.IF) {
+    if (props.pipeline.IF && props.pipeline.IF.Line) {
       newDecorations.push(createDecoration(props.pipeline.IF, 'stageIf'));
       newStageMap.set(props.pipeline.IF.Line, 'Instruction Fetch (IF)');
     }
-    if (props.pipeline.ID) {
+    if (props.pipeline.ID && props.pipeline.ID.Line) {
       newDecorations.push(createDecoration(props.pipeline.ID, 'stageId'));
       newStageMap.set(props.pipeline.ID.Line, 'Instruction Decode (ID)');
     }
-    if (props.pipeline.EX) {
+    if (props.pipeline.EX && props.pipeline.EX.Line) {
       newDecorations.push(createDecoration(props.pipeline.EX, 'stageEx'));
       newStageMap.set(props.pipeline.EX.Line, 'Execute (EX)');
     }
-    if (props.pipeline.MEM) {
+    if (props.pipeline.MEM && props.pipeline.MEM.Line) {
       newDecorations.push(createDecoration(props.pipeline.MEM, 'stageMem'));
       newStageMap.set(props.pipeline.MEM.Line, 'Memory Access (MEM)');
     }
-    if (props.pipeline.WB) {
+    if (props.pipeline.WB && props.pipeline.WB.Line) {
       newDecorations.push(createDecoration(props.pipeline.WB, 'stageWb'));
       newStageMap.set(props.pipeline.WB.Line, 'Write Back (WB)');
     }
-    if (props.pipeline.FPDivider) {
+    if (props.pipeline.FPDivider && props.pipeline.FPDivider.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPDivider, 'stageFPDivider'),
       );
       newStageMap.set(props.pipeline.FPDivider.Line, 'FPU Divider');
     }
-    if (props.pipeline.FPAdder1) {
+    if (props.pipeline.FPAdder1 && props.pipeline.FPAdder1.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPAdder1, 'stageFPAdder'),
       );
       newStageMap.set(props.pipeline.FPAdder1.Line, 'FPU Adder (1)');
     }
-    if (props.pipeline.FPAdder2) {
+    if (props.pipeline.FPAdder2 && props.pipeline.FPAdder2.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPAdder2, 'stageFPAdder'),
       );
       newStageMap.set(props.pipeline.FPAdder2.Line, 'FPU Adder (2)');
     }
-    if (props.pipeline.FPAdder3) {
+    if (props.pipeline.FPAdder3 && props.pipeline.FPAdder3.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPAdder3, 'stageFPAdder'),
       );
       newStageMap.set(props.pipeline.FPAdder3.Line, 'FPU Adder (3)');
     }
-    if (props.pipeline.FPAdder4) {
+    if (props.pipeline.FPAdder4 && props.pipeline.FPAdder4.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPAdder4, 'stageFPAdder'),
       );
       newStageMap.set(props.pipeline.FPAdder4.Line, 'FPU Adder (4)');
     }
-    if (props.pipeline.FPMultiplier1) {
+    if (props.pipeline.FPMultiplier1 && props.pipeline.FPMultiplier1.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier1, 'stageFPMultiplier'),
       );
       newStageMap.set(props.pipeline.FPMultiplier1.Line, 'FPU Muliplier (1)');
     }
-    if (props.pipeline.FPMultiplier2) {
+    if (props.pipeline.FPMultiplier2 && props.pipeline.FPMultiplier2.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier2, 'stageFPMultiplier'),
       );
       newStageMap.set(props.pipeline.FPMultiplier2.Line, 'FPU Muliplier (2)');
     }
-    if (props.pipeline.FPMultiplier3) {
+    if (props.pipeline.FPMultiplier3 && props.pipeline.FPMultiplier3.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier3, 'stageFPMultiplier'),
       );
       newStageMap.set(props.pipeline.FPMultiplier3.Line, 'FPU Muliplier (3)');
     }
-    if (props.pipeline.FPMultiplier4) {
+    if (props.pipeline.FPMultiplier4 && props.pipeline.FPMultiplier4.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier4, 'stageFPMultiplier'),
       );
       newStageMap.set(props.pipeline.FPMultiplier4.Line, 'FPU Muliplier (4)');
     }
-    if (props.pipeline.FPMultiplier5) {
+    if (props.pipeline.FPMultiplier5 && props.pipeline.FPMultiplier5.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier5, 'stageFPMultiplier'),
       );
       newStageMap.set(props.pipeline.FPMultiplier5.Line, 'FPU Muliplier (5)');
     }
-    if (props.pipeline.FPMultiplier6) {
+    if (props.pipeline.FPMultiplier6 && props.pipeline.FPMultiplier6.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier6, 'stageFPMultiplier'),
       );
       newStageMap.set(props.pipeline.FPMultiplier6.Line, 'FPU Muliplier (6)');
     }
-    if (props.pipeline.FPMultiplier7) {
+    if (props.pipeline.FPMultiplier7 && props.pipeline.FPMultiplier7.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier7, 'stageFPMultiplier'),
       );
