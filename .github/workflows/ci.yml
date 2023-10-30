@@ -128,7 +128,7 @@ jobs:
       - name: Build JS Worker (Java → JS)
         run: ./gradlew war
       - name: Set up Node.JS 18
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18.12.1'
       - name: Install JS dependencies
@@ -246,7 +246,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.JS 18
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18.12.1'
       - name: Install JS dependencies
