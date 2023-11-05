@@ -1,12 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import CssBaseline from '@mui/material/CssBaseline';
 
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
 import Simulator from './components/Simulator';
-import Header from './components/Header';
 
 import './css/main.css'
 
@@ -67,13 +66,14 @@ const initializer = (evt) => {
   // React component which will then handle all subsequent messages.
   simulator.removeEventListener('message', initializer);
   const initState = simulator.parseResult(evt.data);
-
-  ReactDOM.render(
+  const container = document.getElementById('simulator');
+  const root = createRoot(container);
+  
+  root.render(
         <>
         <CssBaseline />
         <Simulator sim={simulator} initialState={initState} appInsights={appInsights} />
-        </>,
-    document.getElementById('simulator'),
+        </>
   );
 };
 simulator.addEventListener('message', initializer);
