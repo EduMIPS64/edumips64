@@ -61,11 +61,10 @@ const Simulator = ({ sim, initialState, appInsights }) => {
 
   // Tracks if the program has no syntax errors and can be loaded.
   // TODO: Allow code execution w/ warnings in the worker, then uncomment the line below
-  const isValidProgram = (parsingErrors) => {
+  const isValidProgram = () => {
     if (!parsingErrors) { return true; }
     else {
-      // return (parsingErrors.filter((e) => !e.isWarning).length == 0);
-      return false;
+      return (parsingErrors.filter((e) => !e.isWarning).length == 0);
     }
   };
 
@@ -194,7 +193,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
           onStepClick={clickStep}
           stepEnabled={simulatorRunning && !executing}
           onLoadClick={loadCode}
-          loadEnabled={isValidProgram}
+          loadEnabled={isValidProgram()}
           onStopClick={() => {
             appInsights.trackEvent({name: "stop"})
             setMustStop(true);

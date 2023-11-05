@@ -52,6 +52,9 @@ public class Simulator {
   private Memory memory;
   private Dinero dinero;
 
+  // TODO: handle these errors more elegantly.
+  private ParserMultiException lastParsingErrors = null;
+
   public ResultFactory resultFactory;
    
   private Logger logger = Logger.getLogger("simulator");
@@ -99,13 +102,14 @@ public class Simulator {
       info("Program terminated successfully.");
     } catch (BreakException e) {
       Result res = resultFactory.Success();
+      res = ResultFactory.AddParserErrors(res, lastParsingErrors);
       res.encounteredBreak = true;
       return res;
     } catch (Exception e) {
       warning("Error: " + e.toString());
-      return resultFactory.Failure(e.toString());
+      return ResultFactory.AddParserErrors(resultFactory.Failure(e.toString()), lastParsingErrors);
     }
-    return resultFactory.Success();
+    return ResultFactory.AddParserErrors(resultFactory.Success(), lastParsingErrors);
   }
 
   public Result loadProgram(String code) {
@@ -113,18 +117,26 @@ public class Simulator {
     reset();
 
     info("Loading program: " + code);
+    boolean hadErrors = false;
     try {
       parser.doParsing(code);
       dinero.setDataOffset(memory.getInstructionsNumber()*4);
     } catch (ParserMultiException e) {
+      hadErrors = true;
       warning("Parsing error: " + e.toString());
-      Result result = resultFactory.Failure("Parsing errors.");
-      result = ResultFactory.AddParserErrors(result, e);
-      return result;
+      lastParsingErrors = e;
+      if (e.hasErrors()) {
+        Result result = resultFactory.Failure("Parsing errors.");
+        result = ResultFactory.AddParserErrors(result, e);
+        return result;
+      }
+    }
+    if (!hadErrors) {
+      lastParsingErrors = null;
     }
     cpu.setStatus(CPU.CPUStatus.RUNNING);
     info("Program parsed.");
-    return resultFactory.Success();
+    return ResultFactory.AddParserErrors(resultFactory.Success(), lastParsingErrors);
   }
 
   /* Private methods */

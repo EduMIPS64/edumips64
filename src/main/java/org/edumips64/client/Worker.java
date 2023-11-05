@@ -91,7 +91,9 @@ public class Worker implements EntryPoint {
             String codeString = data.getAsAny("code").asString();
             Result parsingSimulatorResult = parsingSimulator.loadProgram(codeString);
             if (parsingSimulatorResult.success) {
-              postMessage(simulator.resultFactory.Success());
+              Result finalResult = simulator.resultFactory.Success();
+              finalResult.parsingErrors = parsingSimulatorResult.parsingErrors;
+              postMessage(finalResult);
               break;
             }
 
