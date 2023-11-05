@@ -202,6 +202,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
           stopEnabled={executing}
           parsingErrors={parsingErrors}
           version={sim.version}
+          status={status}
         />
         <Grid container id="main-grid" disableEqualOverflow spacing={0}>
           <Grid id="left-panel" xs={8}>

@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
 import HelpDialog from './HelpDialog';
+import CpuStatusDisplay from './CpuStatusDisplay';
 import logo from '../static/logo.png';
 
 import HelpIcon from '@mui/icons-material/Help';
@@ -31,6 +32,7 @@ export default function Header(props) {
         >
           Web Version
         </Typography>
+        <CpuStatusDisplay status={props.status} />
         <Button
 
           color="inherit"
