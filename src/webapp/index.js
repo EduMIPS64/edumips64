@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
 
 import CssBaseline from '@mui/material/CssBaseline';
@@ -7,10 +6,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
 import Simulator from './components/Simulator';
-import Header from './components/Header';
 
 import './css/main.css'
-import { create } from 'lodash';
 
 
 // Set version from the webpack variables. Uses globals defined by webpack.
