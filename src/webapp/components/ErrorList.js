@@ -36,7 +36,7 @@ const ErrorList = ({ parsingErrors, AccordionSummary }) => {
                     <List sx={{ width: '100%' }} dense>
                         {parsingErrors.map((value) => (
                             <ListItem
-                                key={value}
+                                key={JSON.stringify(value)}
                                 disableGutters
                             >
                                 <ListItemIcon className='error-list-item'>
