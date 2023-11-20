@@ -160,7 +160,6 @@ public class CycleBuilder {
 
 
       // IF
-      // TODO: DOES NOT WORK ON RESET.
       InstructionInterface ifInstruction = pipeline.get(Pipeline.Stage.IF);
       if (ifInstruction != null) {
         // We must instantiate a new CycleElement only if no input stalls occurred or if it is the first cycle.
