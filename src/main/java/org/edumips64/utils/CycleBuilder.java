@@ -160,11 +160,11 @@ public class CycleBuilder {
 
 
       // IF
+      // TODO: DOES NOT WORK ON RESET.
       InstructionInterface ifInstruction = pipeline.get(Pipeline.Stage.IF);
       if (ifInstruction != null) {
-        // We must instantiate a new CycleElement only if the CPU is running or there was a JumpException and the the
-        // IF instruction was changed (i.e., if no input stalls occurred).
-        if (!inputStallOccurred) {
+        // We must instantiate a new CycleElement only if no input stalls occurred or if it is the first cycle.
+        if (!inputStallOccurred || curTime == 1) {
           synchronized(elementsList) {
             logger.info("Adding a new element to the list of elements");
             CycleElement newElement = new CycleElement(ifInstruction, curTime);
