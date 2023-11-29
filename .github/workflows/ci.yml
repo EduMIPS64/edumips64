@@ -127,10 +127,11 @@ jobs:
         run: chmod +x gradlew
       - name: Build JS Worker (Java → JS)
         run: ./gradlew war
-      - name: Set up Node.JS 18
+      - name: Set up Node.JS
         uses: actions/setup-node@v4
         with:
-          node-version: '18.12.1'
+          node-version-file: '.nvmrc'
+          
       - name: Install JS dependencies
         run: npm install
 
@@ -245,10 +246,10 @@ jobs:
     if: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Node.JS 18
+      - name: Set up Node.JS
         uses: actions/setup-node@v4
         with:
-          node-version: '18.12.1'
+          node-version-file: '.nvmrc'
       - name: Install JS dependencies
         run: npm install
       - name: Install Playwright dependencies
