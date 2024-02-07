@@ -16,7 +16,7 @@ jobs:
       - run: npm install
       - run: npx playwright install
       - name: Run web tests against deployed code in production
-        uses: nick-invision/retry@v2
+        uses: nick-invision/retry@v3
         env:
           PLAYWRIGHT_TARGET_URL: 'https://web.edumips.org'
         with:
