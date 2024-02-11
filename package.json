@@ -50,7 +50,7 @@
     "file-loader": "6.2.0",
     "git-revision-webpack-plugin": "5.0.0",
     "playwright": "1.41.2",
-    "prettier": "3.2.4",
+    "prettier": "3.2.5",
     "style-loader": "3.3.4",
     "webpack": "5.90.1",
     "webpack-bundle-analyzer": "4.10.1",
