@@ -1,0 +1,21 @@
+{
+  "extends": [
+    "config:recommended",
+  ],
+  "stabilityDays": 2,
+
+  // Automerge low-risk lock file maintenance PRs.
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
+
+  // Automerge linters, unit test libraries.
+  "packageRules": [
+    {
+      "matchDepTypes": ["devDependencies"],
+      "matchPackagePatterns": ["lint", "prettier", "junit", "eslint"],
+      "automerge": true
+    }
+  ]
+}
