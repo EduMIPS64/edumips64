@@ -192,7 +192,7 @@ jobs:
         
       # Upload to Azure blob if this is a PR.
       - name: Login to Azure
-        uses: azure/login@v1
+        uses: azure/login@v2
         if: ${{ github.event_name == 'pull_request' }}
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
