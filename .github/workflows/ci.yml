@@ -200,7 +200,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           
       - name: Upload to Azure blob storage (${{ env.DEPLOYMENT_ENV_URL }})
-        uses: azure/CLI@v1
+        uses: azure/CLI@v2
         if: ${{ github.event_name == 'pull_request' }}
         with:
           inlineScript: |
