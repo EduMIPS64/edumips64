@@ -46,7 +46,7 @@
     "eslint-plugin-promise": "6.1.1",
     "eslint-plugin-react": "7.34.1",
     "eslint-plugin-react-hooks": "4.6.0",
-    "eslint-plugin-standard": "4.1.0",
+    "eslint-plugin-standard": "5.0.0",
     "file-loader": "6.2.0",
     "git-revision-webpack-plugin": "5.0.0",
     "playwright": "1.42.1",
