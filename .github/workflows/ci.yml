@@ -176,7 +176,7 @@ jobs:
 
       # Mark the deployment as started (allows the PR to display "Deployment started" messages.)
       - name: Start deployment
-        uses: bobheadxi/deployments@v1.4.0
+        uses: bobheadxi/deployments@v1.5.0
         id: deployment
         with:
           step: start
@@ -221,7 +221,7 @@ jobs:
 
       # Mark the deployment as succeeded or failed.
       - name: Update deployment status
-        uses: bobheadxi/deployments@v1.4.0
+        uses: bobheadxi/deployments@v1.5.0
         if: always() && github.head_ref
         with:
           step: finish
