@@ -13,7 +13,7 @@ jobs:
 
     # 2. Deactivate environment
     - name: Deactivate environment
-      uses: bobheadxi/deployments@v1.4.0
+      uses: bobheadxi/deployments@v1.5.0
       with:
         step: deactivate-env
         token: ${{ secrets.GITHUB_TOKEN }}
