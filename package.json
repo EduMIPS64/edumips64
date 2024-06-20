@@ -51,7 +51,7 @@
     "git-revision-webpack-plugin": "5.0.0",
     "playwright": "1.43.1",
     "prettier": "3.3.2",
-    "style-loader": "3.3.4",
+    "style-loader": "4.0.0",
     "webpack": "5.91.0",
     "webpack-bundle-analyzer": "4.10.2",
     "webpack-cli": "5.1.4",
