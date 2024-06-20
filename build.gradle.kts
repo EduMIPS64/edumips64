@@ -14,7 +14,7 @@ plugins {
     id ("jacoco")
     id ("com.dorongold.task-tree") version "3.0.0"
     id ("us.ascendtech.gwt.classic") version "0.9.2"
-    id ("ru.vyarus.use-python") version "3.0.0"
+    id ("ru.vyarus.use-python") version "4.0.0"
 }
 
 repositories {
