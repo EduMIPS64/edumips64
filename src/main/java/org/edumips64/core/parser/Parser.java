@@ -243,7 +243,7 @@ public class Parser {
     code = code.replaceAll("\r\n", "\n");
     for (String line : code.split("\n")) {
       row++;
-      logger.info("-- Processing line " + row);
+      logger.info("-- Processing line " + row + ": ##" + line + "##");
 
       for (int column = 0; column < line.length(); column++) {
         if (line.charAt(column) == ';') {  //comments
@@ -272,6 +272,7 @@ public class Parser {
 
         try {
           if (line.charAt(column) == '.') {
+            // Processing directives starting with a dot.
             logger.info("Processing " + instr);
 
             if (instr.compareToIgnoreCase(".DATA") == 0) {
@@ -748,7 +749,7 @@ public class Parser {
                       syntaxIterator++; 
                     }
                   } else {
-                    if (syntax.charAt(syntaxIterator) != param.charAt(paramStart++)) {
+                    if (param.length() <= paramStart || (syntax.charAt(syntaxIterator) != param.charAt(paramStart++))) {
                       errors.addError("UNKNOWNSYNTAX", row, 1, line);
                       column = line.length();
                       tmpInst.getParams().add(0);
