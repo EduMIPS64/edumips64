@@ -129,6 +129,7 @@ public class CurrentLocale {
     en.put("5BIT_IMMEDIATE_TOO_LARGE", "5 bit immediate value too large");
     en.put("3BIT_IMMEDIATE_TOO_LARGE", "3 bit immediate value too large");
     en.put("VALUE_MISS", "Missing value for memory cell");
+    en.put("INVALID_DIRECTIVE_IN_CODE", "Invalid directive in the code section");
     en.put("SAMELABEL", "Label already exists");
     en.put("CHOOSE_COLOR", "Select a color ");
     en.put("EXECUTION", "Execution");
@@ -277,6 +278,7 @@ public class CurrentLocale {
     en.put("CLI.RUN.EXE_START", "Starting execution.");
     en.put("CLI.RUNNING", "Running");
     en.put("LOG.HEADLESS_MSG", "Cannot start GUI in a headless environment.");
+    en.put("TEST_MESSAGE_ONLY_IN_ENGLISH_DO_NOT_TRANSLATE", "This message is only in English, used in unit tests, and should not be translated.");
     languages.put("en", en);
 
     // Italian messages.
@@ -293,7 +295,7 @@ public class CurrentLocale {
     it.put("WORDINCODE", "Direttiva .word trovata nella sezione codice");
     it.put("WORD32INCODE", "Direttiva .word32 trovata nella sezione codice");
     it.put("SPACEINCODE", "Direttiva .space trovata nella sezione codice");
-    it.put("INVALIDVALUE", "Valore non valido ");
+    it.put("INVALIDVALUE", "Valore non valido");
     it.put("INVALIDCODE", "Codice non valido");
     it.put("INVALIDCODEFORDATA", "Codice non valido per il data");
     it.put("INVALIDREGISTER", "Registro non valido");
@@ -367,6 +369,7 @@ public class CurrentLocale {
     it.put("5BIT_IMMEDIATE_TOO_LARGE", "Numero troppo grande per un campo immediato a 5 bit");
     it.put("3BIT_IMMEDIATE_TOO_LARGE", "Numero troppo grande per un campo immediato a 3 bit");
     it.put("VALUE_MISS", "Manca il valore da assegnare alla cella di memoria");
+    it.put("INVALID_DIRECTIVE_IN_CODE", "Direttiva non valida nella sezione codice");
     it.put("SAMELABEL", "Etichetta già esistente");
     it.put("CHOOSE_COLOR", "Seleziona un colore ");
     it.put("EXECUTION", "Esecuzione");
@@ -604,6 +607,7 @@ public class CurrentLocale {
     zhcn.put("5BIT_IMMEDIATE_TOO_LARGE", "5位立即数值太大");
     zhcn.put("3BIT_IMMEDIATE_TOO_LARGE", "3位立即数值太大");
     zhcn.put("VALUE_MISS", "缺少内存单元的值");
+    // missing: INVALID_DIRECTIVE_IN_CODE
     zhcn.put("SAMELABEL", "标签已存在");
     zhcn.put("CHOOSE_COLOR", "选择一种颜色");
     zhcn.put("EXECUTION", "执行");
@@ -756,17 +760,33 @@ public class CurrentLocale {
   }
 
   public static String getString(String key) {
-    String lang_name = "en";
+    var lang_name = "en";
+    var default_language = languages.get("en");
+    var language = default_language;
+    
     if (config != null) {
       lang_name = config.getString(ConfigKey.LANGUAGE);
+      if (languages.containsKey(lang_name)) {
+        language = languages.get(lang_name);
+      } else {
+        logger.severe("Could not find language " + lang_name + ", defaulting to English");
+      }
     }
 
-    try {
-      Map<String, String> lang = languages.get(lang_name);
-      return lang.get(key);
-    } catch (Exception e) {
-      logger.severe("Could not look up key " + key + " in language " + lang_name);
-      return key;
+    var value = language.get(key);
+    if (value != null) {
+      return value;
     }
+
+    var english_value = default_language.get(key);
+    logger.severe("Language " + lang_name + " does not contain message " + key + ", falling back to English.");
+    if (english_value != null) {
+      return english_value;
+    }
+
+    logger.severe("Could not find message " + key + " neither in language " + lang_name + " nor in English.");
+    // Return the key to avoid the UI to show a blank, and also to make it very evident in the UI that something
+    // is very wrong.
+    return key;
   }
 }
