@@ -280,10 +280,10 @@ public class Parser {
             } else if (instr.compareToIgnoreCase(".TEXT") == 0 || instr.compareToIgnoreCase(".CODE") == 0) {
               section = FileSection.TEXT;
             } else {
-              String name = instr.substring(1);   // The name, without the dot.
-
+              // All valid directives except for .data, .code and .text
+              // can only be in the .data section. 
               if (section != FileSection.DATA) {
-                errors.addError(name.toUpperCase() + "INCODE", row, column + 1, line);
+                errors.addError("INVALID_DIRECTIVE_IN_CODE", row, column + 1, line);
                 column = line.length();
                 continue;
               }
