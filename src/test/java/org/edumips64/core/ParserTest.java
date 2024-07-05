@@ -1,14 +1,9 @@
 package org.edumips64.core;
 
 import org.edumips64.BaseParsingTest;
-import org.edumips64.core.is.BUBBLE;
-import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.is.ParsedInstructionMetadata;
-import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
-import org.edumips64.utils.io.LocalFileUtils;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -268,5 +263,12 @@ public class ParserTest extends BaseParsingTest {
   @Test(expected = ParserMultiException.class)
   public void OffsetTooLargeNegativeTest() throws Exception {
     parseCode("LW r1, -32768(r0)");
+  }
+
+  /** Regression tests for #1048 */
+  @Test(expected = ParserMultiException.class)
+  public void MissingParmeterTest() throws Exception {
+    // Fully missing parameter. Before the fix for #1048, this would throw StringIndexOutOfBoundsException.
+    parseCode("LW r1");
   }
 }
