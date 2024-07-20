@@ -1,2 +1,2 @@
-sphinx==7.3.7
+sphinx==7.4.6
 rst2pdf==0.102
