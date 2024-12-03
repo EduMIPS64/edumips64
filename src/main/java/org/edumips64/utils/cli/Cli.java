@@ -12,6 +12,7 @@ import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.MetaInfo;
 import org.edumips64.utils.io.LocalFileUtils;
+import org.edumips64.utils.io.StdOutWriter;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -50,6 +51,10 @@ public class Cli implements Runnable {
         c = new CPU(memory, this.configStore, new BUBBLE());
         symTab = new SymbolTable(memory);
         iom = new IOManager(new LocalFileUtils(), memory);
+
+        // Allow SYSCALL 5 to go to stdout.
+        iom.setStdOutput(new StdOutWriter());
+
         dinero = new Dinero();
         instructionBuilder = new InstructionBuilder(memory, iom, c, dinero, this.configStore);
         p = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
