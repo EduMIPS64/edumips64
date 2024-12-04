@@ -22,16 +22,16 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.gwtproject:gwt-user:2.11.0")
-    compileOnly("org.gwtproject:gwt-dev:2.11.0")
-    compileOnly("com.google.elemental2:elemental2-dom:1.2.1")
+    compileOnly("org.gwtproject:gwt-user:2.12.1")
+    compileOnly("org.gwtproject:gwt-dev:2.12.1")
+    compileOnly("com.google.elemental2:elemental2-dom:1.2.3")
     compileOnly("com.vertispan.rpc:workers:1.0-alpha-8")
     
-    implementation("com.formdev:flatlaf:3.5.1")
+    implementation("com.formdev:flatlaf:3.5.2")
     implementation("javax.help:javahelp:2.0.05")
     implementation("info.picocli:picocli:4.7.6")
 
-    testImplementation(platform("org.junit:junit-bom:5.11.0"))
+    testImplementation(platform("org.junit:junit-bom:5.11.3"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
 
     // To run JUnit 4 tests.
