@@ -10,7 +10,7 @@ build:
     python: "3.11"
 
 sphinx:
-  configuration: "docs/user/zh/conf.py"
+  configuration: "docs/user/zh/src/conf.py"
 
 formats:
   - pdf
