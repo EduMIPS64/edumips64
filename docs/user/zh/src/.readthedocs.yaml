@@ -10,7 +10,7 @@ build:
     python: "3.11"
 
 sphinx:
-  configuration: "conf.py"
+  configuration: "docs/user/zh/src/conf.py"
 
 formats:
   - pdf
@@ -18,4 +18,4 @@ formats:
 
 python:
    install:
-   - requirements: "../../../requirements.txt"
+   - requirements: "docs/requirements.txt"
