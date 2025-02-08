@@ -97,9 +97,10 @@ public class SymbolTable {
       if (temp == null) {
         // TODO: throw exception?
         logger.severe("No instruction at address " + address);
+      } else {
+        // TODO: attualmente l'istruzione si prende l'ultima etichetta
+        temp.setLabel(label);
       }
-      // TODO: attualmente l'istruzione si prende l'ultima etichetta
-      temp.setLabel(label);
       logger.info("Added instruction label " + label + " to address " + address);
     }
   }

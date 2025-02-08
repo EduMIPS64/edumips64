@@ -28,6 +28,8 @@ import org.edumips64.utils.ConfigStore;
 
 import java.awt.*;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.logging.Level;
@@ -60,7 +62,10 @@ public class GUIHelp {
     URL cleanUrl;
 
     try {
-      cleanUrl = new URL(clean);
+      cleanUrl = new URI(clean).toURL();
+    } catch (URISyntaxException e) {
+      log.log(Level.SEVERE, "Could not parse Help URL_" + clean, e);
+      return;
     } catch (MalformedURLException e) {
       log.log(Level.SEVERE, "Could not parse Help URL_" + clean, e);
       return;
