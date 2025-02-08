@@ -207,8 +207,8 @@ public class IOManager {
     }
 
     byte[] bytes_array = new byte[count];
-    MemoryElement memEl = null;
     StringBuffer buff = null ;
+    MemoryElement memEl = null;
 
     try {
       buff = new StringBuffer();
@@ -222,6 +222,7 @@ public class IOManager {
           address += 8;
         }
 
+        @SuppressWarnings("null") // memEl will never be null if we enter the for loop.
         byte rb = (byte) memEl.readByte(posInWord++);
         bytes_array[i] = rb;
         buff.append((char) rb);
@@ -251,6 +252,7 @@ public class IOManager {
    *  @param address the address to write the data to
    *  @param count the number of bytes to read
    */
+  @SuppressWarnings("null")   // memEl will never be null.
   public int read(int fd, long address, int count) throws IOManagerException, IOException, ReadException {
     if (!ins.containsKey(fd)) {
       logger.info("File descriptor " + fd + " not valid for reading");

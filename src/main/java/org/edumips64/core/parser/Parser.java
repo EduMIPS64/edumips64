@@ -1017,6 +1017,7 @@ public class Parser {
    *  @param numBit
    *  @param name type of data
    */
+  @SuppressWarnings("null")   // tmpMem will never be null.
   private void writeIntegerInMemory(int row, int i, String line, String instr, int numBit, String name) throws MemoryElementNotFoundException {
     int posInWord = 0; //position of byte to write into a doubleword
     String value[] = instr.split(",");
