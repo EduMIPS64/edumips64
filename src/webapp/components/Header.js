@@ -15,10 +15,11 @@ import logo from '../static/logo.png';
 import HelpIcon from '@mui/icons-material/Help';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import FastForwardIcon from '@mui/icons-material/FastForward';
-import SyncIcon from '@mui/icons-material/Sync';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import StopCircleIcon from '@mui/icons-material/StopCircle';
+import UploadIcon from '@mui/icons-material/Upload';
 
 export default function Header(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -41,18 +42,16 @@ export default function Header(props) {
             <CpuStatusDisplay status={props.status} />
           </div>
         </Tooltip>
-        <Tooltip title="Loads the current code into the simulator. If a program is running, it resets the simulator and starts from the first cycle" arrow placement="top">
+        <Tooltip title="Load the current code into the simulator" arrow placement="top">
           <Button
             color="inherit"
             className="load-button"
             id="load-button"
-            onClick={() => {
-              props.onLoadClick(1);
-            }}
-            startIcon={<SyncIcon />}
-            disabled={!props.loadEnabled || props.pauseEnabled}
+            onClick={() => props.onLoadClick()}
+            startIcon={<UploadIcon />}
+            disabled={!props.loadEnabled || props.status === 'RUNNING'}  // Modified condition
           >
-            Load / Reset
+            Load
           </Button>
         </Tooltip>
         <Tooltip title="Runs a single step of simulation" arrow placement="top">
@@ -140,6 +139,20 @@ export default function Header(props) {
             disabled={!props.pauseEnabled}
           >
             Pause
+          </Button>
+        </Tooltip>
+        <Tooltip title="Stop the simulation and reset the CPU" arrow placement="top">
+          <Button
+            color="inherit"
+            className="stop-button"
+            id="stop-button"
+            onClick={() => {
+              props.onStopClick();
+            }}
+            startIcon={<StopCircleIcon />}
+            disabled={!props.stopEnabled}
+          >
+            Stop
           </Button>
         </Tooltip>
         <Tooltip title="Remove all the code from the editor, leaving only an empty assembly file" arrow placement="top">

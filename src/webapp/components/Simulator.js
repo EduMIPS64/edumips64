@@ -127,6 +127,12 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     loadCode();
   }
 
+  const clickStop = () => {
+    appInsights.trackEvent({name: "click", properties: {action: "stop"}});
+    console.log('Stopping simulation');
+    stopCode();
+  }
+
   // Business logic for click handlers.
   const runCode = () => {
     setRunAll(true);
@@ -138,6 +144,13 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     setStepsToRun(n - toRun);
     setExecuting(true);
     sim.step(toRun);
+  };
+
+  const stopCode = () => {
+    setMustPause(true);
+    setRunAll(false);
+    setStepsToRun(0);
+    sim.reset();  // Assuming simulator has a reset method
   };
 
   const clearCode = () => {
@@ -204,6 +217,8 @@ const Simulator = ({ sim, initialState, appInsights }) => {
           }}
           pauseEnabled={executing}
           onClearClick ={clearCode}
+          onStopClick={clickStop}
+          stopEnabled={simulatorRunning && !executing}
           parsingErrors={parsingErrors}
           version={sim.version}
           status={status}
