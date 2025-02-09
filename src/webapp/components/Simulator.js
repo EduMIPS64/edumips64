@@ -216,12 +216,13 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             setMustPause(true);
           }}
           pauseEnabled={executing}
-          onClearClick ={clearCode}
+          onClearClick={clearCode}
           onStopClick={clickStop}
           stopEnabled={simulatorRunning && !executing}
           parsingErrors={parsingErrors}
           version={sim.version}
           status={status}
+          prefersDarkMode={prefersDarkMode}
         />
         <Grid container id="main-grid" disableEqualOverflow spacing={0}>
           <Grid id="left-panel" size={8}>

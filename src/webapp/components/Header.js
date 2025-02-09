@@ -10,7 +10,8 @@ import Tooltip from '@mui/material/Tooltip';
 
 import HelpDialog from './HelpDialog';
 import CpuStatusDisplay from './CpuStatusDisplay';
-import logo from '../static/logo.png';
+import logoDark from '../static/logo-dark.png';
+import logoBright from '../static/logo.png';
 
 import HelpIcon from '@mui/icons-material/Help';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -28,7 +29,12 @@ export default function Header(props) {
   return (
     <AppBar position="static">
       <ToolBar>
-        <img id="logo" alt="EduMIPS64" src={logo} className="logo" />
+        <img 
+          id="logo" 
+          alt="EduMIPS64" 
+          src={props.prefersDarkMode ? logoDark : logoBright} 
+          className="logo" 
+        />
         <Typography
           variant="h6"
           noWrap
@@ -49,7 +55,10 @@ export default function Header(props) {
             id="load-button"
             onClick={() => props.onLoadClick()}
             startIcon={<UploadIcon />}
-            disabled={!props.loadEnabled || props.status === 'RUNNING'}  // Modified condition
+            disabled={!props.loadEnabled}
+            sx={{ 
+              display: props.status === 'RUNNING' ? 'none' : 'inline-flex'
+            }}
           >
             Load
           </Button>
