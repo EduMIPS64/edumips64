@@ -50,7 +50,7 @@ export default function Header(props) {
               props.onLoadClick(1);
             }}
             startIcon={<SyncIcon />}
-            disabled={!props.loadEnabled}
+            disabled={!props.loadEnabled || props.stopEnabled}  // Added stopEnabled condition
           >
             Load / Reset
           </Button>
