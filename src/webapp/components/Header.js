@@ -17,7 +17,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import FastForwardIcon from '@mui/icons-material/FastForward';
 import SyncIcon from '@mui/icons-material/Sync';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
-import StopCircleIcon from '@mui/icons-material/StopCircle';
+import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 export default function Header(props) {
@@ -50,7 +50,7 @@ export default function Header(props) {
               props.onLoadClick(1);
             }}
             startIcon={<SyncIcon />}
-            disabled={!props.loadEnabled || props.stopEnabled}  // Added stopEnabled condition
+            disabled={!props.loadEnabled || props.pauseEnabled}
           >
             Load / Reset
           </Button>
@@ -80,7 +80,7 @@ export default function Header(props) {
                 setMultiStepCount(value);
               }
             }}
-            disabled={props.stopEnabled}
+            disabled={props.pauseEnabled}
             sx={{
               width: '100px',
               mx: 1,
@@ -128,18 +128,18 @@ export default function Header(props) {
             Run All
           </Button>
         </Tooltip>
-        <Tooltip title="Stop the simulation" arrow placement="top">
+        <Tooltip title="Pause the simulation" arrow placement="top">
           <Button
             color="inherit"
-            className="stop-button"
-            id="stop-button"
+            className="pause-button"
+            id="pause-button"
             onClick={() => {
-              props.onStopClick();
+              props.onPauseClick();
             }}
-            startIcon={<StopCircleIcon />}
-            disabled={!props.stopEnabled}
+            startIcon={<PauseCircleIcon />}
+            disabled={!props.pauseEnabled}
           >
-            Stop
+            Pause
           </Button>
         </Tooltip>
         <Tooltip title="Remove all the code from the editor, leaving only an empty assembly file" arrow placement="top">

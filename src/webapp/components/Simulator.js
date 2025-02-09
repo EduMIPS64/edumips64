@@ -48,8 +48,8 @@ const Simulator = ({ sim, initialState, appInsights }) => {
   // If set to -1, runs until the execution ends.
   const [stepsToRun, setStepsToRun] = React.useState(0);
 
-  // Signals that the simulation must stop.
-  const [mustStop, setMustStop] = React.useState(false);
+  // Signals that the simulation must pause.
+  const [mustPause, setMustPause] = React.useState(false);
 
   // Tracks whether the worker is currently running code.
   const [executing, setExecuting] = React.useState(false);
@@ -96,9 +96,9 @@ const Simulator = ({ sim, initialState, appInsights }) => {
       alert(result.errorMessage);
     }
 
-    if (result.status !== 'RUNNING' || mustStop || result.encounteredBreak) {
+    if (result.status !== 'RUNNING' || mustPause || result.encounteredBreak) {
       setStepsToRun(0);
-      setMustStop(false);
+      setMustPause(false);
       setRunAll(false);
     } else if (stepsToRun > 0) {
       console.log('Steps left: ' + stepsToRun);
@@ -198,11 +198,11 @@ const Simulator = ({ sim, initialState, appInsights }) => {
           stepEnabled={simulatorRunning && !executing}
           onLoadClick={loadCode}
           loadEnabled={isValidProgram()}
-          onStopClick={() => {
-            appInsights.trackEvent({name: "stop"})
-            setMustStop(true);
+          onPauseClick={() => {
+            appInsights.trackEvent({name: "pause"})
+            setMustPause(true);
           }}
-          stopEnabled={executing}
+          pauseEnabled={executing}
           onClearClick ={clearCode}
           parsingErrors={parsingErrors}
           version={sim.version}
