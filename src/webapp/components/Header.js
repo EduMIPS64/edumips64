@@ -5,6 +5,7 @@ import ToolBar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
 
 import HelpDialog from './HelpDialog';
 import CpuStatusDisplay from './CpuStatusDisplay';
@@ -20,6 +21,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 export default function Header(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [multiStepCount, setMultiStepCount] = React.useState(500);
 
   return (
     <AppBar position="static">
@@ -59,13 +61,41 @@ export default function Header(props) {
         >
           Single Step
         </Button>
+        <TextField
+          type="number"
+          size="small"
+          value={multiStepCount}
+          onChange={(e) => {
+            const value = parseInt(e.target.value, 10);
+            if (value > 0 && value <= 10000) {
+              setMultiStepCount(value);
+            }
+          }}
+          disabled={props.stopEnabled}
+          sx={{
+            width: '100px',
+            mx: 1,
+            input: {
+              color: 'inherit'
+            },
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: 'rgba(255, 255, 255, 0.23)',
+              },
+            },
+          }}
+          inputProps={{
+            min: 1,
+            max: 100000,
+            'aria-label': 'Steps count'
+          }}
+        />
         <Button
           color="inherit"
           className="multi-step-button"
           id="multi-step-button"
           onClick={() => {
-            // TODO: make this customizable
-            props.onStepClick(500);
+            props.onStepClick(multiStepCount);
           }}
           startIcon={<FastForwardIcon />}
           disabled={!props.stepEnabled}
