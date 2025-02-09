@@ -16,6 +16,7 @@ import FastForwardIcon from '@mui/icons-material/FastForward';
 import SyncIcon from '@mui/icons-material/Sync';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 export default function Header(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -94,6 +95,17 @@ export default function Header(props) {
           disabled={!props.stopEnabled}
         >
           Stop
+        </Button>
+        <Button
+          color="inherit"
+          className="clear-code-button"
+          id="clear-code-button"
+          startIcon={<DeleteForeverIcon />}
+          onClick={() => {
+            props.onClearClick();
+          }}
+          disabled={props.status === 'RUNNING'}
+        > Clear Code
         </Button>
         <IconButton
           color="inherit"

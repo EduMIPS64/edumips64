@@ -140,6 +140,10 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     sim.step(toRun);
   };
 
+  const clearCode = () => {
+    setCode(".data\n\n.code\n  SYSCALL 0\n");
+  }
+
   const loadCode = () => {
     sim.load(code);
   };
@@ -199,6 +203,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             setMustStop(true);
           }}
           stopEnabled={executing}
+          onClearClick ={clearCode}
           parsingErrors={parsingErrors}
           version={sim.version}
           status={status}
