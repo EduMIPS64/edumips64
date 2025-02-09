@@ -11,6 +11,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import Grid from '@mui/material/Grid2';
 import ErrorList from './ErrorList';
+import StdOut from './StdOut';
 
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 
@@ -43,6 +44,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
   const [parsedInstructions, setParsedInstructions] = React.useState(
     initialState.parsedInstructions,
   );
+  const [stdout, setStdout] = React.useState('');
 
   // Number of steps left to run. Used to keep track of execution.
   // If set to -1, runs until the execution ends.
@@ -89,6 +91,10 @@ const Simulator = ({ sim, initialState, appInsights }) => {
       setParsedInstructions(null);
     } else {
       setParsedInstructions(result.parsedInstructions);
+    }
+
+    if (result.stdout) {
+      setStdout(result.stdout);
     }
 
     // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
@@ -158,6 +164,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
   }
 
   const loadCode = () => {
+    setStdout("");
     sim.load(code);
   };
 
@@ -270,6 +277,14 @@ const Simulator = ({ sim, initialState, appInsights }) => {
               </AccordionSummary>
               <AccordionDetails>
                 <Memory memory={memory} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion defaultExpanded disableGutters>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>Standard Output</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <StdOut stdout={stdout} />
               </AccordionDetails>
             </Accordion>
           </Grid>

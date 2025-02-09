@@ -37,6 +37,7 @@ import org.edumips64.core.Pipeline.Stage;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.parser.ParserMultiException;
+import org.edumips64.utils.io.StringWriter;
 
 import elemental2.core.JsArray;
 import jsinterop.base.Js;
@@ -45,7 +46,8 @@ public class ResultFactory {
     private CPU cpu;
     private Memory memory;
     private Logger logger = Logger.getLogger("ResultFactory");
-
+    private StringWriter stdout;
+    
     static String FromCpuStatus(CPUStatus s) {
         switch (s) {
         case READY:
@@ -58,18 +60,19 @@ public class ResultFactory {
         }
     }
 
-    public ResultFactory(CPU cpu, Memory memory) {
+    public ResultFactory(CPU cpu, Memory memory, StringWriter stdout) {
         this.cpu = cpu;
         this.memory = memory;
+        this.stdout = stdout;
     }
 
     public Result Success() {
-        Result r = new Result(true, "");
+        Result r = new Result(true, "", stdout.toString());
         return AddParsedInstructions(AddCpuInfo(r));
     }
 
     public Result Failure(String errorMessage) {
-        Result r = new Result(false, errorMessage);
+        Result r = new Result(false, errorMessage, stdout.toString());
         return AddParsedInstructions(AddCpuInfo(r));
     }
 

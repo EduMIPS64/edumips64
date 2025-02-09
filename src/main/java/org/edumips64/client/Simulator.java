@@ -44,6 +44,7 @@ import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.NullFileUtils;
+import org.edumips64.utils.io.StringWriter;
 
 public class Simulator {
   private CPU cpu;
@@ -51,6 +52,8 @@ public class Simulator {
   private SymbolTable symTab;
   private Memory memory;
   private Dinero dinero;
+  private StringWriter stdout;
+  private IOManager iom;
 
   // TODO: handle these errors more elegantly.
   private ParserMultiException lastParsingErrors = null;
@@ -65,13 +68,15 @@ public class Simulator {
     ConfigStore config = new InMemoryConfigStore(ConfigStore.defaults);
     memory = new Memory();
     symTab = new SymbolTable(memory);
+    stdout = new StringWriter();
     FileUtils fu = new NullFileUtils();
-    IOManager iom = new IOManager(fu, memory);
+    iom = new IOManager(fu, memory);
+    iom.setStdOutput(stdout);
     cpu = new CPU(memory, config, new BUBBLE());
     dinero = new Dinero();
     InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
-    resultFactory = new ResultFactory(cpu, memory);
+    resultFactory = new ResultFactory(cpu, memory, stdout);
     info("initialization complete!");
   }
 
@@ -80,6 +85,9 @@ public class Simulator {
       cpu.reset();
       dinero.reset();
       symTab.reset();
+      stdout = new StringWriter();
+      iom.setStdOutput(stdout);
+      resultFactory = new ResultFactory(cpu, memory, stdout);
       return resultFactory.Success();
   }
 
