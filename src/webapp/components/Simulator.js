@@ -48,8 +48,8 @@ const Simulator = ({ sim, initialState, appInsights }) => {
   // If set to -1, runs until the execution ends.
   const [stepsToRun, setStepsToRun] = React.useState(0);
 
-  // Signals that the simulation must stop.
-  const [mustStop, setMustStop] = React.useState(false);
+  // Signals that the simulation must pause.
+  const [mustPause, setMustPause] = React.useState(false);
 
   // Tracks whether the worker is currently running code.
   const [executing, setExecuting] = React.useState(false);
@@ -96,9 +96,9 @@ const Simulator = ({ sim, initialState, appInsights }) => {
       alert(result.errorMessage);
     }
 
-    if (result.status !== 'RUNNING' || mustStop || result.encounteredBreak) {
+    if (result.status !== 'RUNNING' || mustPause || result.encounteredBreak) {
       setStepsToRun(0);
-      setMustStop(false);
+      setMustPause(false);
       setRunAll(false);
     } else if (stepsToRun > 0) {
       console.log('Steps left: ' + stepsToRun);
@@ -127,6 +127,12 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     loadCode();
   }
 
+  const clickStop = () => {
+    appInsights.trackEvent({name: "click", properties: {action: "stop"}});
+    console.log('Stopping simulation');
+    stopCode();
+  }
+
   // Business logic for click handlers.
   const runCode = () => {
     setRunAll(true);
@@ -139,6 +145,17 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     setExecuting(true);
     sim.step(toRun);
   };
+
+  const stopCode = () => {
+    setMustPause(true);
+    setRunAll(false);
+    setStepsToRun(0);
+    sim.reset();  // Assuming simulator has a reset method
+  };
+
+  const clearCode = () => {
+    setCode(".data\n\n.code\n  SYSCALL 0\n");
+  }
 
   const loadCode = () => {
     sim.load(code);
@@ -194,14 +211,18 @@ const Simulator = ({ sim, initialState, appInsights }) => {
           stepEnabled={simulatorRunning && !executing}
           onLoadClick={loadCode}
           loadEnabled={isValidProgram()}
-          onStopClick={() => {
-            appInsights.trackEvent({name: "stop"})
-            setMustStop(true);
+          onPauseClick={() => {
+            appInsights.trackEvent({name: "pause"})
+            setMustPause(true);
           }}
-          stopEnabled={executing}
+          pauseEnabled={executing}
+          onClearClick={clearCode}
+          onStopClick={clickStop}
+          stopEnabled={simulatorRunning && !executing}
           parsingErrors={parsingErrors}
           version={sim.version}
           status={status}
+          prefersDarkMode={prefersDarkMode}
         />
         <Grid container id="main-grid" disableEqualOverflow spacing={0}>
           <Grid id="left-panel" size={8}>
