@@ -9,7 +9,7 @@ import Header from './Header';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid2';
 import ErrorList from './ErrorList';
 
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
@@ -204,7 +204,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
           status={status}
         />
         <Grid container id="main-grid" disableEqualOverflow spacing={0}>
-          <Grid id="left-panel" xs={8}>
+          <Grid id="left-panel" size={8}>
             <Code
               onChangeValue={onCodeChange}
               code={code}
@@ -214,7 +214,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
               running={simulatorRunning}
             />
           </Grid>
-          <Grid xs={4} id="right-panel" disableEqualOverflow>
+          <Grid size={4} id="right-panel" disableEqualOverflow>
             <ErrorList
               parsingErrors={parsingErrors}
               AccordionSummary={AccordionSummary}
