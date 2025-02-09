@@ -12,7 +12,7 @@ test('test', async ({ page }) => {
   await page.waitForSelector('.monaco-editor');
 
   // Click text=Load/Reset
-  await page.click('text=Load / Reset');
+  await page.click('text=Load');
 
   // Click text=Single Step
   await page.click('text=Single Step');
