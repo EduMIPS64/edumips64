@@ -5,9 +5,7 @@
     "ghcr.io/devcontainers/features/java:1": {
       "version": "17"
     },
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "18"
-    },
+    "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/devcontainers/features/python:1": {
       "version": 3.11
     }
@@ -17,5 +15,5 @@
       "extensions": ["vscjava.vscode-java-pack", "mathematic.vscode-pdf" ]
     }
   },
-  "postCreateCommand": "./gradlew init && npm install && npx playwright install"
+  "postCreateCommand": "./gradlew init && bash -i -c 'nvm install && npm install && npx playwright install"
 }
