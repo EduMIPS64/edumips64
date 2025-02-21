@@ -40,13 +40,13 @@ parts:
         mv build/libs/edumips64-*.jar "$CRAFT_PART_INSTALL"/jar/edumips64.jar && \
         ls $CRAFT_PART_INSTALL/jar/*.jar -ld
     source: .
-    # Install Python 3.10 and make it the default Python3 before the build stage,
-    # so that the build can use it and satisfy the Python >= 3.8 dependency from
-    # Sphinx >= 6.
+    # Install Python 3.11 and make it the default Python3 before the build stage,
+    # so that the build can use it and satisfy the Python >= 3.11 dependency from
+    # Sphinx >= 8.2.0.
     override-pull: |
       snapcraftctl pull
-      apt install -y python3.10
-      update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
+      apt install -y python3.11
+      update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
     build-packages:
       - git
       - pkg-config
@@ -55,8 +55,8 @@ parts:
       - ca-certificates
       - python3-pip
       # Needed to build pillow, a rst2pdf dependency.
-      - python3.10-dev
-      - python3.10-venv
+      - python3.11-dev
+      - python3.11-venv
       - zlib1g-dev
       - libjpeg-dev
       - libtiff-dev
