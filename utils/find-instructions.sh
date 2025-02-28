@@ -1,3 +1,5 @@
+#!/bin/sh
+
 TESTDIR="src/test/resources"
 TESTED_FILENAME="/tmp/tested-instructions$(date +%F-%T).txt"
 ISDIR="src/main/java/org/edumips64/core/is"
