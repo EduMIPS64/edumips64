@@ -1,16 +1,16 @@
 import React from 'react';
 
-const Row = ({label, value}) => {
+const Row = ({ label, value }) => {
     return (
     <tr>
-    <td >{label}</td>
+    <td>{label}</td>
     <td style={{ 
         fontFamily: "Menlo, Monaco, 'Courier New', monospace",
         width: '20%',
     }}>{value}</td>
     </tr>
-    )
-}
+    );
+};
 
 // A toy component that appends a final "s" to the label if
 // the given value is != 1. Of course this is not proper
@@ -30,12 +30,11 @@ const Statistics = ({
   fcsr,
 }) => {
   // Common table style to ensure consistent layout
-  const tableStyle = { 
-    border: 'none', 
+const tableStyle = {
+    border: 'none',
     width: '100%',
-    tableLayout: 'fixed' // Forces consistent column widths
-  };
-  
+    tableLayout: 'fixed', // Forces consistent column widths
+};
   // TODO: FCSR.
   return (
     <div id="statistics">

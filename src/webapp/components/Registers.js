@@ -10,8 +10,8 @@ const BinaryValue = ({ hexString, value }) => {
     <Tooltip disableFocusListener title={value ?? ''}>
     <Typography sx={{
     fontFamily: "Menlo, Monaco, 'Courier New', monospace",
-    padding: "0.1em 10px",
-    textAlign: "right"
+    padding: '0.1em 10px',
+    textAlign: 'right',
     }}>
     {hexString}
     </Typography>
