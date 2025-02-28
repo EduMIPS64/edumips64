@@ -94,7 +94,7 @@ jobs:
             repository: fbarresi/wix
             path: wix
         - name: Download JAR
-          uses: actions/download-artifact@v4.1.8
+          uses: actions/download-artifact@v4.1.9
           with:
             name: JAR
             path: build/libs
@@ -168,7 +168,7 @@ jobs:
           echo "DEPLOYMENT_ENV_URL=https://web.edumips.org" >> $GITHUB_ENV
 
       # Download web application built in 'build-web'
-      - uses: actions/download-artifact@v4.1.8
+      - uses: actions/download-artifact@v4.1.9
         name: Download web application artifacts
         with:
           name: web
@@ -284,7 +284,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-snap
     steps:
-      - uses: actions/download-artifact@v4.1.8
+      - uses: actions/download-artifact@v4.1.9
         name: Download snap package
         with:
           name: snap
