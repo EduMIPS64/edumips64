@@ -1,0 +1,33 @@
+# Set default behavior to automatically normalize line endings.
+* text=auto eol=crlf
+
+# Explicitly declare text files you want to always be normalized and converted
+# to native line endings on checkout.
+*.txt text
+*.java text
+*.gradle text
+*.xml text
+*.md text
+*.html text
+*.css text
+*.js text
+*.json text
+*.properties text
+*.yml text
+*.yaml text
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Declare files that will always have CRLF line endings on checkout.
+# *.sln text eol=crlf
+
+# Denote all files that are truly binary and should not be modified.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.zip binary
+*.jar binary
+*.class binary
+*.pdf binary
