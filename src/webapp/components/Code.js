@@ -301,30 +301,40 @@ const Code = (props) => {
   return (
       <div>
         {/* Toggle Button for Vim Mode */}
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+        <div style={{display: 'flex', gap: '10px', marginBottom: '10px'}}>
           <button
               onClick={toggleVimMode}
-              style={{ padding: '5px', cursor: 'pointer' }}
+              style={{padding: '5px', cursor: 'pointer'}}
           >
             {vimMode ? 'Disable Vim Mode' : 'Enable Vim Mode'}
           </button>
 
           <button
-            onClick={saveCodeToFile}
-            style={{ padding: '5px', cursor: 'pointer' }}
+              onClick={saveCodeToFile}
+              style={{padding: '5px', cursor: 'pointer'}}
           >
             Save Code
           </button>
 
-          <label style={{ padding: '5px', cursor: 'pointer', background: '#ddd', borderRadius: '5px' }}>
+          <label style={{
+            padding: '5px',
+            cursor: 'pointer',
+            background: '#ddd',
+            borderRadius: '5px',
+            color: 'black',  // 🔥 Fix: Ensures text is black
+            display: 'inline-block',
+            textAlign: 'center'
+          }}>
             Load Code
             <input
-              type="file"
-              accept=".txt,.s"
-              onChange={loadCodeFromFile}
-              style={{ display: 'none' }}
+                type="file"
+                accept=".txt,.s"
+                onChange={loadCodeFromFile}
+                style={{display: 'none'}}
             />
           </label>
+
+
         </div>
 
         {/* Code Editor */}
