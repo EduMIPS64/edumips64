@@ -1,11 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import { initVimMode } from 'monaco-vim';
 
 // new
 import MonacoEditor from 'react-monaco-editor';
 import useMediaQuery from '@mui/material/useMediaQuery';
-
 
 const Code = (props) => {
 
@@ -196,13 +194,26 @@ const Code = (props) => {
     setHoverCleanup(disposable);
   }, [props.parsedInstructions, stageMap, monaco]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* OLDEST
-  const editorDidMount = (editor, monaco) => {
-    setMonaco(monaco);
-    setEditor(editor);
+  const saveCodeToFile = () => {
+    const blob = new Blob([props.code], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'code.s';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
-   */
+  const loadCodeFromFile = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      props.onChangeValue(e.target.result);
+    };
+    reader.readAsText(file);
+  };
 
   const toggleVimMode = () => {
     if (vimInstance) {
@@ -234,22 +245,6 @@ const Code = (props) => {
       setVimInstance(vim);
     }
   };
-
-
-
-  /* OLD NEW
-  const editorDidMount = (editor, monaco) => {
-    setMonaco(monaco);
-    setEditor(editor);
-
-    // Initialize Vim Mode
-    const vimMode = initVimMode(editor);
-    console.log("Vim Mode enabled:", vimMode);
-  };
-
-   */
-
-
 
   const options = {
     selectOnLineNumbers: true,
@@ -306,12 +301,31 @@ const Code = (props) => {
   return (
       <div>
         {/* Toggle Button for Vim Mode */}
-        <button
-            onClick={toggleVimMode}
-            style={{ marginBottom: '10px', padding: '5px', cursor: 'pointer' }}
-        >
-          {vimMode ? 'Disable Vim Mode' : 'Enable Vim Mode'}
-        </button>
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+          <button
+              onClick={toggleVimMode}
+              style={{ padding: '5px', cursor: 'pointer' }}
+          >
+            {vimMode ? 'Disable Vim Mode' : 'Enable Vim Mode'}
+          </button>
+
+          <button
+            onClick={saveCodeToFile}
+            style={{ padding: '5px', cursor: 'pointer' }}
+          >
+            Save Code
+          </button>
+
+          <label style={{ padding: '5px', cursor: 'pointer', background: '#ddd', borderRadius: '5px' }}>
+            Load Code
+            <input
+              type="file"
+              accept=".txt,.s"
+              onChange={loadCodeFromFile}
+              style={{ display: 'none' }}
+            />
+          </label>
+        </div>
 
         {/* Code Editor */}
         <MonacoEditor
@@ -324,20 +338,6 @@ const Code = (props) => {
         />
       </div>
   );
-  /* OLD NEW
-  return (
-    <MonacoEditor
-      language="mips"
-      value={props.code}
-      options={options}
-      onChange={props.onChangeValue}
-      theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
-      editorDidMount={editorDidMount}
-    />
-  );
-
-   */
-
 };
 
 export default Code;
