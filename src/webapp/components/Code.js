@@ -10,6 +10,7 @@ const Code = (props) => {
   // new 2
   const [vimMode, setVimMode] = useState(false);
   const [vimInstance, setVimInstance] = useState(null);
+  const [fontSize, setFontSize] = useState(14); // new state variable for font size
 
   const [monaco, setMonaco] = useState(null);
   const [editor, setEditor] = useState(null);
@@ -21,6 +22,9 @@ const Code = (props) => {
 
   // Maps line of code to CPU stage.
   const [stageMap, setStageMap] = useState(new Map());
+
+  const increaseFontSize = () => setFontSize((size) => Math.min(size + 2, 30)); // increase font size
+  const decreaseFontSize = () => setFontSize((size) => Math.max(size - 2, 8)); // decrease font size
 
   useEffect(() => {
     if (!monaco) {
@@ -255,10 +259,8 @@ const Code = (props) => {
     minimap: { enabled: false },
     tabsize: 4,
     lineNumbersMinChars: 3,
-
-    // Note: the documentation mentions this might have a negative performance
-    // impact.
     automaticLayout: true,
+    fontSize: fontSize, // 🔥 Dynamically set font size
   };
 
   // Hook to compute and set markers for warnings and errors.
@@ -301,17 +303,17 @@ const Code = (props) => {
   return (
       <div>
         {/* Toggle Button for Vim Mode */}
-        <div style={{display: 'flex', gap: '10px', marginBottom: '10px'}}>
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
           <button
               onClick={toggleVimMode}
-              style={{padding: '5px', cursor: 'pointer'}}
+              style={{ padding: '5px', cursor: 'pointer' }}
           >
             {vimMode ? 'Disable Vim Mode' : 'Enable Vim Mode'}
           </button>
 
           <button
               onClick={saveCodeToFile}
-              style={{padding: '5px', cursor: 'pointer'}}
+              style={{ padding: '5px', cursor: 'pointer' }}
           >
             Save Code
           </button>
@@ -330,11 +332,15 @@ const Code = (props) => {
                 type="file"
                 accept=".txt,.s"
                 onChange={loadCodeFromFile}
-                style={{display: 'none'}}
+                style={{ display: 'none' }}
             />
           </label>
 
-
+          {/* 🔥 Font Size Controls */}
+          <span>Font Size:</span>
+          <button onClick={decreaseFontSize} style={{ padding: '5px', cursor: 'pointer' }}>-</button>
+          <span>{fontSize}px</span>
+          <button onClick={increaseFontSize} style={{ padding: '5px', cursor: 'pointer' }}>+</button>
         </div>
 
         {/* Code Editor */}
