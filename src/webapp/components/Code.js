@@ -9,6 +9,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 
 const Code = (props) => {
 
+  // new 2
+  const [vimMode, setVimMode] = useState(false);
+  const [vimInstance, setVimInstance] = useState(null);
+
   const [monaco, setMonaco] = useState(null);
   const [editor, setEditor] = useState(null);
   // IDisposable to clean up the hover provider.
@@ -192,7 +196,7 @@ const Code = (props) => {
     setHoverCleanup(disposable);
   }, [props.parsedInstructions, stageMap, monaco]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /*
+  /* OLDEST
   const editorDidMount = (editor, monaco) => {
     setMonaco(monaco);
     setEditor(editor);
@@ -200,7 +204,31 @@ const Code = (props) => {
 
    */
 
+  const toggleVimMode = () => {
+    if (vimInstance) {
+      vimInstance.dispose(); // Disable Vim mode
+      setVimInstance(null);
+      setVimMode(false);
+    } else {
+      const vim = initVimMode(editor);
+      setVimInstance(vim);
+      setVimMode(true);
+    }
+  };
+  const editorDidMount = (editor, monaco) => {
+    setMonaco(monaco);
+    setEditor(editor);
 
+    // Initialize Vim mode if enabled
+    if (vimMode) {
+      const vim = initVimMode(editor);
+      setVimInstance(vim);
+    }
+  };
+
+
+
+  /* OLD NEW
   const editorDidMount = (editor, monaco) => {
     setMonaco(monaco);
     setEditor(editor);
@@ -209,6 +237,8 @@ const Code = (props) => {
     const vimMode = initVimMode(editor);
     console.log("Vim Mode enabled:", vimMode);
   };
+
+   */
 
 
 
@@ -265,6 +295,28 @@ const Code = (props) => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   return (
+      <div>
+        {/* Toggle Button for Vim Mode */}
+        <button
+            onClick={toggleVimMode}
+            style={{ marginBottom: '10px', padding: '5px', cursor: 'pointer' }}
+        >
+          {vimMode ? 'Disable Vim Mode' : 'Enable Vim Mode'}
+        </button>
+
+        {/* Code Editor */}
+        <MonacoEditor
+            language="mips"
+            value={props.code}
+            options={options}
+            onChange={props.onChangeValue}
+            theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
+            editorDidMount={editorDidMount}
+        />
+      </div>
+  );
+  /* OLD NEW
+  return (
     <MonacoEditor
       language="mips"
       value={props.code}
@@ -274,6 +326,9 @@ const Code = (props) => {
       editorDidMount={editorDidMount}
     />
   );
+
+   */
+
 };
 
 export default Code;
