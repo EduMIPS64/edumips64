@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from 'react';
 
+import React, { useEffect, useState } from 'react';
+import { initVimMode } from 'monaco-vim';
+
+// new
 import MonacoEditor from 'react-monaco-editor';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
+
 const Code = (props) => {
+
   const [monaco, setMonaco] = useState(null);
   const [editor, setEditor] = useState(null);
-
   // IDisposable to clean up the hover provider.
   const [hoverDisposable, setHoverCleanup] = useState(null);
 
@@ -188,10 +192,25 @@ const Code = (props) => {
     setHoverCleanup(disposable);
   }, [props.parsedInstructions, stageMap, monaco]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /*
   const editorDidMount = (editor, monaco) => {
     setMonaco(monaco);
     setEditor(editor);
   };
+
+   */
+
+
+  const editorDidMount = (editor, monaco) => {
+    setMonaco(monaco);
+    setEditor(editor);
+
+    // Initialize Vim Mode
+    const vimMode = initVimMode(editor);
+    console.log("Vim Mode enabled:", vimMode);
+  };
+
+
 
   const options = {
     selectOnLineNumbers: true,
