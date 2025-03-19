@@ -219,6 +219,15 @@ const Code = (props) => {
     setMonaco(monaco);
     setEditor(editor);
 
+    // ✅ Ensure the required command is registered
+    editor.addAction({
+      id: "editor.action.insertLineAfter",
+      label: "Insert Line After",
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
+      run: function (ed) {
+        ed.trigger("keyboard", "type", { text: "\n" });
+      },
+    });
     // Initialize Vim mode if enabled
     if (vimMode) {
       const vim = initVimMode(editor);
