@@ -12,6 +12,8 @@ import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import Grid from '@mui/material/Grid2';
 import ErrorList from './ErrorList';
 import StdOut from './StdOut';
+import Switch from '@mui/material/Switch';
+import Button from '@mui/material/Button';
 
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 
@@ -27,6 +29,7 @@ import Typography from '@mui/material/Typography';
 import SampleProgram from '../data/SampleProgram';
 
 import { debounce } from 'lodash';
+import Settings from './Settings';
 
 const Simulator = ({ sim, initialState, appInsights }) => {
   // The amount of steps to run in multi-step executions.
@@ -45,6 +48,9 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     initialState.parsedInstructions,
   );
   const [stdout, setStdout] = React.useState('');
+
+  const [viMode, setViMode] = React.useState(false);
+  const [fontSize, setFontSize] = React.useState(14);
 
   // Number of steps left to run. Used to keep track of execution.
   // If set to -1, runs until the execution ends.
@@ -240,6 +246,8 @@ const Simulator = ({ sim, initialState, appInsights }) => {
               parsedInstructions={parsedInstructions}
               pipeline={pipeline}
               running={simulatorRunning}
+              viMode={viMode}
+              fontSize={fontSize}
             />
           </Grid>
           <Grid size={4} id="right-panel" disableEqualOverflow>
@@ -287,6 +295,12 @@ const Simulator = ({ sim, initialState, appInsights }) => {
                 <StdOut stdout={stdout} />
               </AccordionDetails>
             </Accordion>
+            <Settings
+              viMode={viMode}
+              setViMode={setViMode}
+              fontSize={fontSize}
+              setFontSize={setFontSize}
+            />
           </Grid>
         </Grid>
       </ThemeProvider>

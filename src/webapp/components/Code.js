@@ -3,17 +3,12 @@ import { initVimMode } from 'monaco-vim';
 
 // new
 import MonacoEditor from 'react-monaco-editor';
-import useMediaQuery from '@mui/material/useMediaQuery';
 
 const Code = (props) => {
 
-  // new 2
-  const [vimMode, setVimMode] = useState(false);
-  const [vimInstance, setVimInstance] = useState(null);
-  const [fontSize, setFontSize] = useState(14); // new state variable for font size
-
   const [monaco, setMonaco] = useState(null);
   const [editor, setEditor] = useState(null);
+  const [vimInstance, setVimInstance] = useState(null); // new state for Vim instance
   // IDisposable to clean up the hover provider.
   const [hoverDisposable, setHoverCleanup] = useState(null);
 
@@ -22,9 +17,6 @@ const Code = (props) => {
 
   // Maps line of code to CPU stage.
   const [stageMap, setStageMap] = useState(new Map());
-
-  const increaseFontSize = () => setFontSize((size) => Math.min(size + 2, 30)); // increase font size
-  const decreaseFontSize = () => setFontSize((size) => Math.max(size - 2, 8)); // decrease font size
 
   useEffect(() => {
     if (!monaco) {
@@ -219,22 +211,17 @@ const Code = (props) => {
     reader.readAsText(file);
   };
 
-  const toggleVimMode = () => {
-    if (vimInstance) {
-      vimInstance.dispose(); // Disable Vim mode
-      setVimInstance(null);
-      setVimMode(false);
-    } else {
-      const vim = initVimMode(editor);
-      setVimInstance(vim);
-      setVimMode(true);
-    }
-  };
   const editorDidMount = (editor, monaco) => {
     setMonaco(monaco);
     setEditor(editor);
 
-    // ✅ Ensure the required command is registered
+    // Enable Vi mode if viMode prop is true
+    if (props.viMode) {
+      const vim = initVimMode(editor);
+      setVimInstance(vim);
+    }
+
+    // Ensure the required command is registered
     editor.addAction({
       id: "editor.action.insertLineAfter",
       label: "Insert Line After",
@@ -243,12 +230,19 @@ const Code = (props) => {
         ed.trigger("keyboard", "type", { text: "\n" });
       },
     });
-    // Initialize Vim mode if enabled
-    if (vimMode) {
+  };
+
+  // Hook to dynamically toggle Vi mode when viMode prop changes
+  useEffect(() => {
+    if (!editor) return;
+    if (props.viMode) {
       const vim = initVimMode(editor);
       setVimInstance(vim);
+    } else if (vimInstance) {
+      vimInstance.dispose();
+      setVimInstance(null);
     }
-  };
+  }, [props.viMode]);
 
   const options = {
     selectOnLineNumbers: true,
@@ -260,7 +254,7 @@ const Code = (props) => {
     tabsize: 4,
     lineNumbersMinChars: 3,
     automaticLayout: true,
-    fontSize: fontSize, // 🔥 Dynamically set font size
+    fontSize: props.fontSize,  // Set font size from props
   };
 
   // Hook to compute and set markers for warnings and errors.
@@ -297,20 +291,9 @@ const Code = (props) => {
     monaco.editor.setModelMarkers(model, 'EduMIPS64', markers);
   }, [props.parsingErrors, editor, monaco]);
 
-  // Set the dark theme if necessary
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-
   return (
       <div>
-        {/* Toggle Button for Vim Mode */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
-          <button
-              onClick={toggleVimMode}
-              style={{ padding: '5px', cursor: 'pointer' }}
-          >
-            {vimMode ? 'Disable Vim Mode' : 'Enable Vim Mode'}
-          </button>
-
           <button
               onClick={saveCodeToFile}
               style={{ padding: '5px', cursor: 'pointer' }}
@@ -335,12 +318,6 @@ const Code = (props) => {
                 style={{ display: 'none' }}
             />
           </label>
-
-          {/* 🔥 Font Size Controls */}
-          <span>Font Size:</span>
-          <button onClick={decreaseFontSize} style={{ padding: '5px', cursor: 'pointer' }}>-</button>
-          <span>{fontSize}px</span>
-          <button onClick={increaseFontSize} style={{ padding: '5px', cursor: 'pointer' }}>+</button>
         </div>
 
         {/* Code Editor */}
@@ -349,7 +326,7 @@ const Code = (props) => {
             value={props.code}
             options={options}
             onChange={props.onChangeValue}
-            theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
+            theme={'vs-light'}
             editorDidMount={editorDidMount}
         />
       </div>
