@@ -21,6 +21,7 @@ import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import UploadIcon from '@mui/icons-material/Upload';
+import DownloadIcon from '@mui/icons-material/Download';
 
 export default function Header(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -212,7 +213,7 @@ export default function Header(props) {
               color="inherit"
               className="save-code-button"
               id="save-code-button"
-              startIcon={<UploadIcon />}
+              startIcon={<DownloadIcon />}
               onClick={() => {
                 props.onSaveClick();
               }}
