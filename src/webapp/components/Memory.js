@@ -37,18 +37,18 @@ const Memory = (props) => {
         <table>
           <thead>
             <tr>
-              <th>ADDRESS</th>
-              <th>VALUE</th>
-              <th>LABEL</th>
-              <th>CODE</th>
-              <th>COMMENT</th>
+              <th style={{ textAlign: "left" }}>ADDRESS</th>
+              <th style={{ textAlign: "left" }}>VALUE</th>
+              <th style={{ textAlign: "left" }}>LABEL</th>
+              <th style={{ textAlign: "left" }}>CODE</th>
+              <th style={{ textAlign: "left" }}>COMMENT</th>
             </tr>
           </thead>
           <tbody>
             {dataRows.map((row, index) => (
               <tr key={index}>
                 <td>{row.address}</td>
-                <td>{row.value}</td>
+                <td title={parseInt(row.value, 16)}>{row.value}</td>
                 <td>{row.label}</td>
                 <td>{row.code}</td>
                 <td>{row.comment}</td>
