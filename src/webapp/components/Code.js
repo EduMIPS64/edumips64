@@ -296,44 +296,14 @@ const Code = (props) => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   return (
-      <div>
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
-          <button
-              onClick={saveCodeToFile}
-              style={{ padding: '5px', cursor: 'pointer' }}
-          >
-            Save Code
-          </button>
-
-          <label style={{
-            padding: '5px',
-            cursor: 'pointer',
-            background: '#ddd',
-            borderRadius: '5px',
-            color: 'black',  // 🔥 Fix: Ensures text is black
-            display: 'inline-block',
-            textAlign: 'center'
-          }}>
-            Load Code
-            <input
-                type="file"
-                accept=".txt,.s"
-                onChange={loadCodeFromFile}
-                style={{ display: 'none' }}
-            />
-          </label>
-        </div>
-
-        {/* Code Editor */}
         <MonacoEditor
             language="mips"
             value={props.code}
             options={options}
             onChange={props.onChangeValue}
-            theme={'vs-light'}
+            theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
             editorDidMount={editorDidMount}
         />
-      </div>
   );
 };
 

@@ -25,15 +25,29 @@ import UploadIcon from '@mui/icons-material/Upload';
 export default function Header(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [multiStepCount, setMultiStepCount] = React.useState(500);
+  const [fileContent, setFileContent] = React.useState('');
+
+
+  const handleFileLoad = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        props.onChangeValue(e.target.result);
+      };
+
+      reader.readAsText(file);
+    }
+  };
 
   return (
     <AppBar position="static">
       <ToolBar>
-        <img 
-          id="logo" 
-          alt="EduMIPS64" 
-          src={props.prefersDarkMode ? logoDark : logoBright} 
-          className="logo" 
+        <img
+          id="logo"
+          alt="EduMIPS64"
+          src={props.prefersDarkMode ? logoDark : logoBright}
+          className="logo"
         />
         <Typography
           variant="h6"
@@ -56,7 +70,7 @@ export default function Header(props) {
             onClick={() => props.onLoadClick()}
             startIcon={<UploadIcon />}
             disabled={!props.loadEnabled}
-            sx={{ 
+            sx={{
               display: props.status === 'RUNNING' ? 'none' : 'inline-flex'
             }}
           >
@@ -176,6 +190,36 @@ export default function Header(props) {
             disabled={props.status === 'RUNNING'}
           >
             Clear Code
+          </Button>
+        </Tooltip>
+        <Tooltip title="Open code from file" arrow placement="top">
+          <Button
+            color="inherit"
+            className="load-code-button"
+            id="load-code-button"
+            startIcon={<UploadIcon />}
+            onClick={() => {
+              props.onOpenClick();
+            }}
+            disabled={props.status === 'RUNNING'}
+            component="label"
+          >
+            Open Code
+          </Button>
+        </Tooltip>
+        <Tooltip title="Save code to file" arrow placement="top">
+          <Button
+              color="inherit"
+              className="save-code-button"
+              id="save-code-button"
+              startIcon={<UploadIcon />}
+              onClick={() => {
+                props.onSaveClick();
+              }}
+              disabled={props.status === 'RUNNING'}
+              component="label"
+          >
+            Save Code
           </Button>
         </Tooltip>
         <IconButton

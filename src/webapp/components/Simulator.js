@@ -169,9 +169,37 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     setCode(".data\n\n.code\n  SYSCALL 0\n");
   }
 
+
+  const openCode = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.asm,.txt,.s';
+    fileInput.onchange = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setCode(e.target.result);
+        };
+        reader.readAsText(file);
+      }
+    };
+    fileInput.click();
+  }
+
   const loadCode = () => {
     setStdout("");
     sim.load(code);
+  };
+
+  const saveCode = () => {
+    const file = new Blob([code], { type: 'text/plain' });
+    const fileURL = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = fileURL;
+    link.download = 'code.s';
+    link.click();
+    URL.revokeObjectURL(fileURL);
   };
 
   // A debounced version of syntaxCheck. Needed to not run props.onChange too often.
@@ -230,6 +258,8 @@ const Simulator = ({ sim, initialState, appInsights }) => {
           }}
           pauseEnabled={executing}
           onClearClick={clearCode}
+          onOpenClick={openCode}
+          onSaveClick={saveCode}
           onStopClick={clickStop}
           stopEnabled={simulatorRunning && !executing}
           parsingErrors={parsingErrors}
