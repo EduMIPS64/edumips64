@@ -12,6 +12,8 @@ import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import Grid from '@mui/material/Grid2';
 import ErrorList from './ErrorList';
 import StdOut from './StdOut';
+import Switch from '@mui/material/Switch';
+import Button from '@mui/material/Button';
 
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 
@@ -27,6 +29,7 @@ import Typography from '@mui/material/Typography';
 import SampleProgram from '../data/SampleProgram';
 
 import { debounce } from 'lodash';
+import Settings from './Settings';
 
 const Simulator = ({ sim, initialState, appInsights }) => {
   // The amount of steps to run in multi-step executions.
@@ -45,6 +48,9 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     initialState.parsedInstructions,
   );
   const [stdout, setStdout] = React.useState('');
+
+  const [viMode, setViMode] = React.useState(false);
+  const [fontSize, setFontSize] = React.useState(14);
 
   // Number of steps left to run. Used to keep track of execution.
   // If set to -1, runs until the execution ends.
@@ -163,9 +169,37 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     setCode(".data\n\n.code\n  SYSCALL 0\n");
   }
 
+
+  const openCode = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.asm,.txt,.s';
+    fileInput.onchange = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setCode(e.target.result);
+        };
+        reader.readAsText(file);
+      }
+    };
+    fileInput.click();
+  }
+
   const loadCode = () => {
     setStdout("");
     sim.load(code);
+  };
+
+  const saveCode = () => {
+    const file = new Blob([code], { type: 'text/plain' });
+    const fileURL = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = fileURL;
+    link.download = 'code.s';
+    link.click();
+    URL.revokeObjectURL(fileURL);
   };
 
   // A debounced version of syntaxCheck. Needed to not run props.onChange too often.
@@ -224,6 +258,8 @@ const Simulator = ({ sim, initialState, appInsights }) => {
           }}
           pauseEnabled={executing}
           onClearClick={clearCode}
+          onOpenClick={openCode}
+          onSaveClick={saveCode}
           onStopClick={clickStop}
           stopEnabled={simulatorRunning && !executing}
           parsingErrors={parsingErrors}
@@ -240,6 +276,8 @@ const Simulator = ({ sim, initialState, appInsights }) => {
               parsedInstructions={parsedInstructions}
               pipeline={pipeline}
               running={simulatorRunning}
+              viMode={viMode}
+              fontSize={fontSize}
             />
           </Grid>
           <Grid size={4} id="right-panel" disableEqualOverflow>
@@ -287,6 +325,12 @@ const Simulator = ({ sim, initialState, appInsights }) => {
                 <StdOut stdout={stdout} />
               </AccordionDetails>
             </Accordion>
+            <Settings
+              viMode={viMode}
+              setViMode={setViMode}
+              fontSize={fontSize}
+              setFontSize={setFontSize}
+            />
           </Grid>
         </Grid>
       </ThemeProvider>
