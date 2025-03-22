@@ -243,7 +243,7 @@ jobs:
       
       # Fallback for external contributors when deployment API can't be triggered
       - name: Post deployment URL as PR comment
-        if: ${{ env.IS_PR == 'true' && env.IS_PR_SAFE == 'true'}}
+        if: ${{ env.IS_PR == 'true' && env.IS_PR_SAFE == 'true' && steps.deployment.outcome != 'success'}}
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
