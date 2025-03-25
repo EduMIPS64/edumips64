@@ -287,7 +287,9 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             />
             <Accordion defaultExpanded disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Stats</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Stats
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Statistics {...stats} />
@@ -295,7 +297,9 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             </Accordion>
             <Accordion disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Pipeline</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Pipeline
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Pipeline pipeline={pipeline} />
@@ -303,7 +307,9 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             </Accordion>
             <Accordion disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Registers</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Registers
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Registers {...registers} />
@@ -311,7 +317,9 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             </Accordion>
             <Accordion disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Memory</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Memory
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Memory memory={memory} />
@@ -319,7 +327,9 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             </Accordion>
             <Accordion defaultExpanded disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Standard Output</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Standard Output
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <StdOut stdout={stdout} />
@@ -327,7 +337,9 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             </Accordion>
             <Accordion defaultExpanded disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Settings</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Settings
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Settings
