@@ -347,6 +347,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
                   setViMode={setViMode}
                   fontSize={fontSize}
                   setFontSize={setFontSize}
+                  showTitle={false}
                 />
               </AccordionDetails>
             </Accordion>
