@@ -293,7 +293,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
                 <Statistics {...stats} />
               </AccordionDetails>
             </Accordion>
-            <Accordion defaultExpanded disableGutters>
+            <Accordion disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>Pipeline</Typography>
               </AccordionSummary>
@@ -325,12 +325,19 @@ const Simulator = ({ sim, initialState, appInsights }) => {
                 <StdOut stdout={stdout} />
               </AccordionDetails>
             </Accordion>
-            <Settings
-              viMode={viMode}
-              setViMode={setViMode}
-              fontSize={fontSize}
-              setFontSize={setFontSize}
-            />
+            <Accordion defaultExpanded disableGutters>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>Settings</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Settings
+                  viMode={viMode}
+                  setViMode={setViMode}
+                  fontSize={fontSize}
+                  setFontSize={setFontSize}
+                />
+              </AccordionDetails>
+            </Accordion>
           </Grid>
         </Grid>
       </ThemeProvider>
