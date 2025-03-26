@@ -11,7 +11,8 @@ function createWindow() {
   // Se hai una webapp che gira su un server locale (npm start),
   // qui potresti puntare all'URL http://localhost:8080
   // Oppure, se vuoi tutto offline, punta direttamente ai file HTML
-  mainWindow.loadURL('http://localhost:8080');
+   mainWindow.loadURL('http://localhost:8080');
+  // mainWindow.loadURL(`file://${path.join(__dirname, 'src','webapp', 'static', 'index.html')}`);
   
   mainWindow.on('closed', function () {
     mainWindow = null;

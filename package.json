@@ -2,7 +2,7 @@
   "name": "edumips64-webui",
   "version": "1.0.0",
   "description": "The web UI for EduMIPS64 (web.edumips.org). Depends on the web worker implementation of the EduMIPS64 core (worker.js).",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "start": "webpack serve",
     "build-dbg": "webpack",
@@ -40,6 +40,7 @@
     "copy-webpack-plugin": "13.0.0",
     "css-loader": "7.1.2",
     "electron": "^35.1.0",
+    "electron-packager": "^17.1.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "10.1.1",
     "eslint-plugin-import": "2.31.0",
