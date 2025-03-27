@@ -1,8 +1,8 @@
 /* ResultFactory.java
  *
  * A factory class to generate Result objects.
- * Injects a representation of the CPU status in every Result object that's created. 
- * 
+ * Injects a representation of the CPU status in every Result object that's created.
+ *
  * (c) 2020 Andrea Spadaccini
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -47,7 +47,7 @@ public class ResultFactory {
     private Memory memory;
     private Logger logger = Logger.getLogger("ResultFactory");
     private StringWriter stdout;
-    
+
     static String FromCpuStatus(CPUStatus s) {
         switch (s) {
         case READY:
@@ -102,7 +102,42 @@ public class ResultFactory {
     }
 
     private String getMemory() {
-        return memory.toString();
+        var memoryJson = new FluentJsonObject();
+        try {
+            var memory = cpu.getMemory();
+            var cells = memory.getCells();
+            var instructions = memory.getInstructions();
+
+            JSONArray cellArray = new JSONArray();
+            cells.forEach((address, element) -> {
+                cellArray.set(cellArray.size(), new FluentJsonObject()
+                        .put("address", element.getAddressHex())
+                        .put("value", element.getValueHex())
+                        .put("label", element.getLabel())
+                        .put("code", element.getCode())
+                        .put("comment",element.getComment())
+                        .toJsonObject());
+            });
+            memoryJson.put("cells", cellArray);
+
+            JSONArray instructionArray = new JSONArray();
+
+            for (var instruction: instructions.values()) {
+                String label = instruction.getLabel();
+                String comment = instruction.getComment();
+                instructionArray.set(instructionArray.size(), new FluentJsonObject()
+                        .put("address", instruction.getParsingMetadata().address)
+                        .put("code",instruction.getFullName())
+                        .put("label", label != null ? label : "")
+                        .put("comment", comment != null ? comment : "")
+                        .toJsonObject());
+            }
+
+            memoryJson.put("instructions", instructionArray);
+        } catch (Exception e) {
+            logger.warning("Error fetching memory: " + e.toString());
+        }
+        return memoryJson.toString();
     }
 
     private String getRegisters() {
