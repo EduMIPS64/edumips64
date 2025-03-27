@@ -202,6 +202,10 @@ public class CPU {
     return gpr;
   }
 
+  public Memory getMemory() {
+    return mem;
+  }
+
   public RegisterFP[] getRegistersFP() {
     return fpr;
   }
