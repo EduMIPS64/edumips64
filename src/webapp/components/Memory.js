@@ -35,7 +35,7 @@ const MemoryElement = ({memoryelement}) => {
 
 const Memory = (props) => {
     const memory = props.memory;
-    const {cells = [], instructions = []} = memory;
+    const {cells = []} = memory;
     return (
         <div>
             <table id="memory">
@@ -52,11 +52,6 @@ const Memory = (props) => {
                 {cells.map((memoryelement, i) => (
                     <tr key={i}>
                         <MemoryElement memoryelement={cells[i]}/>
-                    </tr>
-                ))}
-                {instructions.map((memoryelement, i) => (
-                    <tr key={i}>
-                        <MemoryElement memoryelement={instructions[i]}/>
                     </tr>
                 ))}
                 </tbody>
