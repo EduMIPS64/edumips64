@@ -53,6 +53,7 @@ simulator.checkSyntax = (code) => {
 };
 simulator.parseResult = (result) => {
   result.registers = JSON.parse(result.registers);
+  result.memory = JSON.parse(result.memory);
   result.statistics = JSON.parse(result.statistics);
   return result;
 };

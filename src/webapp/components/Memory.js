@@ -21,34 +21,44 @@ const BinaryValue = ({ hexString, value }) => {
 
 
 const MemoryElement = ({memoryelement}) => {
-  return (
-      <>
-          <td className="elementName">{memoryelement.address}</td>
-      </>
-  );
+    return (
+        <>
+            <td className="elementAddress">{memoryelement.address}</td>
+            <td className="elementValue">{memoryelement.value}</td>
+            <td className="elementLabel">{memoryelement.label}</td>
+            <td className="elementCode">{memoryelement.code}</td>
+            <td className="elementComment">{memoryelement.comment}</td>
+        </>
+    );
 };
 
-const Memory = ({ cells = [], instructions =[]}) => {
+
+const Memory = (props) => {
+    const memory = props.memory;
+    const {cells = [], instructions = []} = memory;
     return (
         <div>
             <table id="memory">
+                <thead>
+                <tr>
+                    <th style={{textAlign: 'left'}}>Address</th>
+                    <th style={{textAlign: 'left'}}>Value</th>
+                    <th style={{textAlign: 'left'}}>Label</th>
+                    <th style={{textAlign: 'left'}}>Code</th>
+                    <th style={{textAlign: 'left'}}>Comment</th>
+                </tr>
+                </thead>
                 <tbody>
-                {
-                    cells.map((memoryelement, i) => (
-                        <tr key={i}>
-                            <MemoryElement memoryelement={memoryelement} />
-                            <MemoryElement memoryelement={cells[i]} />
-                        </tr>
-                    ))
-                }
-                {
-                    instructions.map((memoryelement, i) => (
-                        <tr key={i}>
-                            <MemoryElement memoryelement={memoryelement} />
-                            <MemoryElement memoryelement={instructions[i]} />
-                        </tr>
-                    ))
-                }
+                {cells.map((memoryelement, i) => (
+                    <tr key={i}>
+                        <MemoryElement memoryelement={cells[i]}/>
+                    </tr>
+                ))}
+                {instructions.map((memoryelement, i) => (
+                    <tr key={i}>
+                        <MemoryElement memoryelement={instructions[i]}/>
+                    </tr>
+                ))}
                 </tbody>
             </table>
         </div>

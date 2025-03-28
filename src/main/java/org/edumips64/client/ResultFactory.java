@@ -126,8 +126,9 @@ public class ResultFactory {
                 String comment = instruction.getComment();
                 instructionArray.set(instructionArray.size(), new FluentJsonObject()
                         .put("address", instruction.getParsingMetadata().address)
-                        .put("code",instruction.getFullName())
+                        .put("value",instruction.getRepr().getHexString())
                         .put("label", label != null ? label : "")
+                        .put("code",instruction.getFullName())
                         .put("comment", comment != null ? comment : "")
                         .toJsonObject());
             }
