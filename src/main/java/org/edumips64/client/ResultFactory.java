@@ -110,8 +110,10 @@ public class ResultFactory {
             JSONArray cellArray = new JSONArray();
             cells.forEach((address, element) -> {
                 cellArray.set(cellArray.size(), new FluentJsonObject()
-                        .put("address", element.getAddressHex())
-                        .put("value", element.getValueHex())
+                        .put("address_hex", element.getAddressHex())
+                        .put("address", element.getAddress())
+                        .put("value", element.getValue())
+                        .put("value_hex", element.getValueHex())
                         .put("label", element.getLabel())
                         .put("code", element.getCode())
                         .put("comment",element.getComment())
