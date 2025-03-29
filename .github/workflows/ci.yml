@@ -154,11 +154,6 @@ jobs:
       name: Staging
       url: https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/
     steps:
-      - name: Set PR environment variables
-        run: |
-          echo "DEPLOYMENT_ENV=${{github.event.pull_request.number}}" >> $GITHUB_ENV
-          echo "DEPLOYMENT_ENV_URL=https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/" >> $GITHUB_ENV
-
       # Download web application built in 'build-web'
       - uses: actions/download-artifact@v4.2.1
         name: Download web application artifacts
@@ -179,7 +174,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           
-      - name: Upload to Azure blob storage (${{ env.DEPLOYMENT_ENV_URL }})
+      - name: Upload to Azure blob storage (https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/)
         uses: azure/CLI@v2
         with:
           inlineScript: |
