@@ -108,6 +108,21 @@ public class MemoryElement extends BitSet64 {
     }
   }
 
+  public String getAddressHex() {
+      try {
+          return Converter.binToHex(Converter.positiveIntToBin(32, this.getAddress()));
+      } catch (IrregularStringOfBitsException e) {
+          throw new RuntimeException(e);
+      }
+  }
+  public String getValueHex() {
+    try {
+      return Converter.binToHex(Converter.positiveIntToBin(32, this.getValue()));
+    } catch (IrregularStringOfBitsException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   /** Returns a string represention of this MemoryElement, formatted with the address and
    * the value (in hexadecimal digits).
    * That is, if the address is 16 and the value stored within is 256 the string will be
@@ -130,6 +145,7 @@ public class MemoryElement extends BitSet64 {
 
     return "ERRORE";
   }
+
 }
 
 
