@@ -166,16 +166,6 @@ jobs:
           name: web
           path: build/gwt/war/edumips64
 
-      # Mark the deployment as started (allows the PR to display "Deployment started" messages.)
-      - name: Start deployment
-        uses: bobheadxi/deployments@v1.5.0
-        id: deployment
-        with:
-          step: start
-          token: ${{ secrets.GITHUB_TOKEN }}
-          env: Staging
-          ref: ${{ github.head_ref }}
-
       # Deploy the code on Github Pages.
       # Copy files to a directory to allow pushing to a subdir in the web.edumips.org repo.
       - name: Copy files to run directory
@@ -195,18 +185,6 @@ jobs:
           inlineScript: |
               az storage blob upload-batch --account-name edumips64ci --auth-mode key -d '$web/${{ github.event.pull_request.number }}' -s pr/${{ github.event.pull_request.number }} --overwrite
       
-      # Mark the deployment as succeeded or failed.
-      - name: Update deployment status
-        uses: bobheadxi/deployments@v1.5.0
-        if: always() && github.head_ref
-        with:
-          step: finish
-          token: ${{ secrets.GITHUB_TOKEN }}
-          status: ${{ job.status }}
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-          env_url: ${{ env.DEPLOYMENT_ENV_URL }}
-          env: ${{ env.DEPLOYMENT_ENV }}
-  
   deploy-prod:
     name: Deploy web application to production
     permissions: write-all
