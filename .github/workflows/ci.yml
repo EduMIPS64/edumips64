@@ -178,7 +178,6 @@ jobs:
       - name: Start deployment
         uses: bobheadxi/deployments@v1.5.0
         id: deployment
-        continue-on-error: true
         with:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -223,7 +222,7 @@ jobs:
       # Mark the deployment as succeeded or failed.
       - name: Update deployment status
         uses: bobheadxi/deployments@v1.5.0
-        if: always() && github.head_ref && steps.deployment.outcome == 'success'
+        if: always() && github.head_ref
         with:
           step: finish
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -231,20 +230,6 @@ jobs:
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           env_url: ${{ env.DEPLOYMENT_ENV_URL }}
           env: ${{ env.DEPLOYMENT_ENV }}
-      
-      # Fallback for external contributors when deployment API can't be triggered
-      - name: Post deployment URL as PR comment
-        if: github.event_name == 'pull_request' && (steps.deployment.outcome == 'failure' || steps.deployment.outputs.deployment_id == '')
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `Web UI link for this PR: ${{ env.DEPLOYMENT_ENV_URL }}`
-            })
 
 
   # Test the deployed web application.
