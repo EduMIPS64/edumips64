@@ -143,29 +143,21 @@ jobs:
         with:
           name: web
           path: build/gwt/war/edumips64
-  
-  deploy-web:
-    name: Deploy web application
+
+  deploy-staging:
+    name: Deploy web application to staging environment
     permissions: write-all
     runs-on: ubuntu-latest
     needs: build-web
+    if: ${{ github.event_name == 'pull_request' }}
+    environment:
+      name: Staging
+      url: https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/
     steps:
-      # This step behaves differently in PRs and on push to master / cron.
-      # Set up environment variables according to the triggering event.
       - name: Set PR environment variables
-        if: ${{ github.event_name == 'pull_request' }}
         run: |
           echo "DEPLOYMENT_ENV=${{github.event.pull_request.number}}" >> $GITHUB_ENV
-          echo "PUSH_DIR=pr/" >> $GITHUB_ENV
-          echo "COMMIT_MESSAGE=Deploy code for PR ${{ github.event.pull_request.number }}" >> $GITHUB_ENV
           echo "DEPLOYMENT_ENV_URL=https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/" >> $GITHUB_ENV
-      - name: Set master push environment variables
-        if: ${{ github.event_name != 'pull_request' }}
-        run: |
-          echo "DEPLOYMENT_ENV=prod" >> $GITHUB_ENV
-          echo "PUSH_DIR=build/gwt/war/edumips64" >> $GITHUB_ENV
-          echo "COMMIT_MESSAGE=Update Web Frontend @ ${{ github.sha }}" >> $GITHUB_ENV
-          echo "DEPLOYMENT_ENV_URL=https://web.edumips.org" >> $GITHUB_ENV
 
       # Download web application built in 'build-web'
       - uses: actions/download-artifact@v4.2.1
@@ -181,19 +173,17 @@ jobs:
         with:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
-          env: ${{ env.DEPLOYMENT_ENV }}
+          env: Staging
           ref: ${{ github.head_ref }}
 
       # Deploy the code on Github Pages.
       # Copy files to a directory to allow pushing to a subdir in the web.edumips.org repo.
       - name: Copy files to run directory
         run: mkdir -p pr/${{ github.event.pull_request.number }} && cp -r build/gwt/war/edumips64/* pr/${{ github.event.pull_request.number }}
-        if: ${{ github.event_name == 'pull_request' }}
         
       # Upload to Azure blob if this is a PR.
       - name: Login to Azure
         uses: azure/login@v2
-        if: ${{ github.event_name == 'pull_request' }}
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -201,24 +191,10 @@ jobs:
           
       - name: Upload to Azure blob storage (${{ env.DEPLOYMENT_ENV_URL }})
         uses: azure/CLI@v2
-        if: ${{ github.event_name == 'pull_request' }}
         with:
           inlineScript: |
               az storage blob upload-batch --account-name edumips64ci --auth-mode key -d '$web/${{ github.event.pull_request.number }}' -s pr/${{ github.event.pull_request.number }} --overwrite
       
-      - name: Deploy master web application to web.edumips.org
-        if: ${{ success() && github.event_name != 'pull_request' }}
-        uses: crazy-max/ghaction-github-pages@v4
-        with:
-          target_branch: master
-          build_dir: ${{ env.PUSH_DIR }}
-          repo: EduMIPS64/web.edumips.org
-          keep_history: true
-          commit_message: ${{ env.COMMIT_MESSAGE }}
-          fqdn: web.edumips.org
-        env:
-          GH_PAT: ${{ secrets.PAT_WEBUI }}
-
       # Mark the deployment as succeeded or failed.
       - name: Update deployment status
         uses: bobheadxi/deployments@v1.5.0
@@ -230,7 +206,33 @@ jobs:
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           env_url: ${{ env.DEPLOYMENT_ENV_URL }}
           env: ${{ env.DEPLOYMENT_ENV }}
+  
+  deploy-prod:
+    name: Deploy web application to production
+    permissions: write-all
+    runs-on: ubuntu-latest
+    needs: build-web
+    if: ${{ github.event_name != 'pull_request' }}
+    steps:
+      # Download web application built in 'build-web'
+      - uses: actions/download-artifact@v4.2.1
+        name: Download web application artifacts
+        with:
+          name: web
+          path: build/gwt/war/edumips64
 
+      - name: Deploy master web application to web.edumips.org
+        if: ${{ success() && github.event_name != 'pull_request' }}
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: master
+          build_dir: "build/gwt/war/edumips64" 
+          repo: EduMIPS64/web.edumips.org
+          keep_history: true
+          commit_message: "Update Web Frontend @ ${{ github.sha }}" 
+          fqdn: web.edumips.org
+        env:
+          GH_PAT: ${{ secrets.PAT_WEBUI }}
 
   # Test the deployed web application.
   # This is only ran on pull request because runs triggered by push and schedule
@@ -244,7 +246,7 @@ jobs:
   test-web:
     name: Test web application
     runs-on: ubuntu-latest
-    needs: deploy-web
+    needs: deploy-staging
     if: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
