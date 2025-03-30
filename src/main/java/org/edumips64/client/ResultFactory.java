@@ -102,10 +102,10 @@ public class ResultFactory {
     }
 
     private String getMemory() {
-        var memory = new FluentJsonObject();
+        var memoryJson = new FluentJsonObject();
         try {
-            var cells = cpu.getMemory().getCells();
-            var instructions = cpu.getMemory().getInstructions();
+            var cells = memory.getCells();
+            var instructions = memory.getInstructions();
 
             JSONArray cellArray = new JSONArray();
             cells.forEach((address, element) -> {
@@ -119,7 +119,7 @@ public class ResultFactory {
                         .put("comment",element.getComment())
                         .toJsonObject());
             });
-            memory.put("cells", cellArray);
+            memoryJson.put("cells", cellArray);
 
             JSONArray instructionArray = new JSONArray();
 
@@ -135,11 +135,11 @@ public class ResultFactory {
                         .toJsonObject());
             }
 
-            memory.put("instructions", instructionArray);
+            memoryJson.put("instructions", instructionArray);
         } catch (Exception e) {
             logger.warning("Error fetching memory: " + e.toString());
         }
-        return memory.toString();
+        return memoryJson.toString();
     }
 
     private String getRegisters() {
