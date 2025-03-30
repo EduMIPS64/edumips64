@@ -79,7 +79,19 @@ const Simulator = ({ sim, initialState, appInsights }) => {
   sim.onmessage = (e) => {
     const result = sim.parseResult(e.data);
     console.log('Got message from worker.', result);
-    updateState(result);
+    // Handle stdin here, without updating state.
+    // TODO: handle "get exactly N bytes" logic.
+    if (result.stdinCount > 0) {
+      const stdin = window.prompt('stdin: ', '');
+      if (stdin) {
+        sim.stdin(stdin);
+      } else {
+        sim.stdin('');
+      }
+    }
+    else {
+      updateState(result);
+    }
   };
 
   const updateState = (result) => {

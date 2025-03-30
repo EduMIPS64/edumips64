@@ -40,6 +40,7 @@ public class Result {
   public JsArray<ParserError> parsingErrors;
   public JsArray<Instruction> parsedInstructions;
   public String stdout;
+  public int stdinCount = 0;    // set to > 0 if data is needed from stdin. the rest of the object will be ignored by the JS UI.
 
   public Result(boolean success, String errorMessage, String stdout) {
     this.success = success;

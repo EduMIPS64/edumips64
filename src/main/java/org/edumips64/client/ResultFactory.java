@@ -76,6 +76,12 @@ public class ResultFactory {
         return AddParsedInstructions(AddCpuInfo(r));
     }
 
+    public Result NeedStdin(int stdinCount) {
+        Result r = new Result(true, "", stdout.toString());
+        r.stdinCount = stdinCount;
+        return AddParsedInstructions(AddCpuInfo(r));
+    }
+
     public static Result AddParserErrors(Result result, ParserMultiException e) {
         if (e == null) return result;
         result.parsingErrors = Js.cast(e.getExceptionList().stream()
