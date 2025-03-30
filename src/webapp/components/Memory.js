@@ -42,24 +42,28 @@ const Memory = (props) => {
     const {cells = []} = memory;
     return (
         <div>
-            <table id="memory">
-                <thead>
-                <tr>
-                    <th style={{textAlign: 'left'}}>Address</th>
-                    <th style={{textAlign: 'left'}}>Value</th>
-                    <th style={{textAlign: 'left'}}>Label</th>
-                    <th style={{textAlign: 'left'}}>Code</th>
-                    <th style={{textAlign: 'left'}}>Comment</th>
-                </tr>
-                </thead>
-                <tbody>
-                {cells.map((memoryelement, i) => (
-                    <tr key={i}>
-                        <MemoryElement memoryelement={cells[i]}/>
+            {cells.length === 0 ? (
+                <Typography>No program loaded</Typography>
+            ) : (
+                <table id="memory">
+                    <thead>
+                    <tr>
+                        <th style={{textAlign: 'left'}}>Address</th>
+                        <th style={{textAlign: 'left'}}>Value</th>
+                        <th style={{textAlign: 'left'}}>Label</th>
+                        <th style={{textAlign: 'left'}}>Code</th>
+                        <th style={{textAlign: 'left'}}>Comment</th>
                     </tr>
-                ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {cells.map((memoryelement, i) => (
+                        <tr key={i}>
+                            <MemoryElement memoryelement={cells[i]} />
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            )}
         </div>
     );
 };
