@@ -62,6 +62,14 @@ public class Memory {
     logger.info("Memory built: " + this.hashCode());
   }
 
+  public SortedMap<Integer, MemoryElement> getCells() {
+    return cells;
+  }
+
+  public SortedMap<Integer, InstructionInterface> getInstructions() {
+    return instructions;
+  }
+
   /** Gets the number of instructions of the Symbol Table.
    *  @return an integer
    */

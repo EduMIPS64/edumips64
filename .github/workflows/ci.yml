@@ -1,7 +1,7 @@
 name: CI
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - master
   push:
@@ -9,11 +9,7 @@ on:
       - master
   schedule:
     - cron: '0 0 * * *'
-  # The pull_request event, by default, does not allow access to repo secrets by external contributors.
-  # The pull_request_target provides access to secrets, runs the workflow @ base branch (thus preventing from possible changes
-  # to the workflow) and therefore allows safe check for a given label, which can be added by maintainers.
-  pull_request_target:
-    types: [labeled]
+
 
 jobs:
   build-desktop:
@@ -25,6 +21,9 @@ jobs:
     steps:
       # Set up Java development environment.
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ github.event.pull_request.merge_commit_sha }}"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -92,13 +91,15 @@ jobs:
     needs: build-desktop
     steps:
         - uses: actions/checkout@v4
+          with:
+            ref: "${{ github.event.pull_request.merge_commit_sha }}"
         - name: Install Wix
           uses: actions/checkout@v4
           with:
             repository: fbarresi/wix
             path: wix
         - name: Download JAR
-          uses: actions/download-artifact@v4.1.9
+          uses: actions/download-artifact@v4.2.1
           with:
             name: JAR
             path: build/libs
@@ -122,6 +123,8 @@ jobs:
       # Set up JDK (necessary for the core that is cross-compiled to JS)
       # and Node.JS (for the) web app itself.
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ github.event.pull_request.merge_commit_sha }}"
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -147,114 +150,69 @@ jobs:
         with:
           name: web
           path: build/gwt/war/edumips64
-  
-  deploy-web:
-    name: Deploy web application
+
+  deploy-staging:
+    name: Deploy web application to staging environment
     permissions: write-all
     runs-on: ubuntu-latest
     needs: build-web
+    if: ${{ github.event_name == 'pull_request_target' }}
+    environment:
+      name: Staging
+      url: https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/
     steps:
-      # This step behaves differently in PRs and on push to master / cron.
-      # Set up environment variables according to the triggering event.
-      - name: Set PR environment variables
-        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
-        run: |
-          echo "DEPLOYMENT_ENV=${{github.event.pull_request.number}}" >> $GITHUB_ENV
-          echo "PUSH_DIR=pr/" >> $GITHUB_ENV
-          echo "COMMIT_MESSAGE=Deploy code for PR ${{ github.event.pull_request.number }}" >> $GITHUB_ENV
-          echo "DEPLOYMENT_ENV_URL=https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/" >> $GITHUB_ENV
-          echo "IS_PR=true" >> $GITHUB_ENV
-          echo "IS_PR_SAFE=${{github.event_name == 'pull_request' || contains(github.event.pull_request.labels.*.name, 'safe to test')}}" >> $GITHUB_ENV
-
-      - name: Set master push environment variables
-        if: github.event_name == 'push' || github.event_name == 'schedule'
-        run: |
-          echo "DEPLOYMENT_ENV=prod" >> $GITHUB_ENV
-          echo "PUSH_DIR=build/gwt/war/edumips64" >> $GITHUB_ENV
-          echo "COMMIT_MESSAGE=Update Web Frontend @ ${{ github.sha }}" >> $GITHUB_ENV
-          echo "DEPLOYMENT_ENV_URL=https://web.edumips.org" >> $GITHUB_ENV
-          echo "IS_PR=false" >> $GITHUB_ENV
-
       # Download web application built in 'build-web'
-      - uses: actions/download-artifact@v4.1.9
+      - uses: actions/download-artifact@v4.2.1
         name: Download web application artifacts
         with:
           name: web
           path: build/gwt/war/edumips64
 
-      # Mark the PR deployment as started (allows the PR to display "Deployment started" messages.)
-      - name: Start deployment
-        uses: bobheadxi/deployments@v1.5.0
-        id: deployment
-        if: ${{ env.IS_PR == 'true'}}
-        continue-on-error: true
-        with:
-          step: start
-          token: ${{ secrets.GITHUB_TOKEN }}
-          env: ${{ env.DEPLOYMENT_ENV }}
-          ref: ${{ github.head_ref }}
-
       # Deploy the code on Github Pages.
       # Copy files to a directory to allow pushing to a subdir in the web.edumips.org repo.
       - name: Copy files to run directory
         run: mkdir -p pr/${{ github.event.pull_request.number }} && cp -r build/gwt/war/edumips64/* pr/${{ github.event.pull_request.number }}
-        if: ${{ env.IS_PR == 'true' && env.IS_PR_SAFE == 'true'}}
         
       # Upload to Azure blob if this is a PR.
       - name: Login to Azure
         uses: azure/login@v2
-        if: ${{ env.IS_PR == 'true' && env.IS_PR_SAFE == 'true'}}
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           
-      - name: Upload to Azure blob storage (${{ env.DEPLOYMENT_ENV_URL }})
+      - name: Upload to Azure blob storage (https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/)
         uses: azure/CLI@v2
-        if: ${{ env.IS_PR == 'true' && env.IS_PR_SAFE == 'true'}}
         with:
           inlineScript: |
               az storage blob upload-batch --account-name edumips64ci --auth-mode key -d '$web/${{ github.event.pull_request.number }}' -s pr/${{ github.event.pull_request.number }} --overwrite
       
+  deploy-prod:
+    name: Deploy web application to production
+    permissions: write-all
+    runs-on: ubuntu-latest
+    needs: build-web
+    if: ${{ github.event_name != 'pull_request_target' }}
+    steps:
+      # Download web application built in 'build-web'
+      - uses: actions/download-artifact@v4.2.1
+        name: Download web application artifacts
+        with:
+          name: web
+          path: build/gwt/war/edumips64
+
       - name: Deploy master web application to web.edumips.org
-        if: ${{ success() && env.IS_PR == 'false'}}
+        if: ${{ success() && github.event_name != 'pull_request' }}
         uses: crazy-max/ghaction-github-pages@v4
         with:
           target_branch: master
-          build_dir: ${{ env.PUSH_DIR }}
+          build_dir: "build/gwt/war/edumips64" 
           repo: EduMIPS64/web.edumips.org
           keep_history: true
-          commit_message: ${{ env.COMMIT_MESSAGE }}
+          commit_message: "Update Web Frontend @ ${{ github.sha }}" 
           fqdn: web.edumips.org
         env:
           GH_PAT: ${{ secrets.PAT_WEBUI }}
-
-      # Mark the PR deployment as succeeded or failed.
-      - name: Update deployment status
-        uses: bobheadxi/deployments@v1.5.0
-        if: always() && github.head_ref && steps.deployment.outcome == 'success' && env.IS_PR == 'true' && env.IS_PR_SAFE == 'true'
-        with:
-          step: finish
-          token: ${{ secrets.GITHUB_TOKEN }}
-          status: ${{ job.status }}
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-          env_url: ${{ env.DEPLOYMENT_ENV_URL }}
-          env: ${{ env.DEPLOYMENT_ENV }}
-      
-      # Fallback for external contributors when deployment API can't be triggered
-      - name: Post deployment URL as PR comment
-        if: ${{ env.IS_PR == 'true' && env.IS_PR_SAFE == 'true' && steps.deployment.outcome != 'success'}}
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `Web UI link for this PR: ${{ env.DEPLOYMENT_ENV_URL }}`
-            })
-
 
   # Test the deployed web application.
   # This is only ran on pull request because runs triggered by push and schedule
@@ -268,10 +226,12 @@ jobs:
   test-web:
     name: Test web application
     runs-on: ubuntu-latest
-    needs: deploy-web
-    if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target'}}
+    needs: deploy-staging
+    if: ${{ github.event_name == 'pull_request_target' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ github.event.pull_request.merge_commit_sha }}"
       - name: Set up Node.JS
         uses: actions/setup-node@v4
         with:
@@ -296,6 +256,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ github.event.pull_request.merge_commit_sha }}"
       - uses: snapcore/action-build@v1
         id: snapcraft
       - uses: actions/upload-artifact@v4
@@ -308,7 +270,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-snap
     steps:
-      - uses: actions/download-artifact@v4.1.9
+      - uses: actions/download-artifact@v4.2.1
         name: Download snap package
         with:
           name: snap
