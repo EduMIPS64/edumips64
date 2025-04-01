@@ -1,23 +1,32 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+
+require('./server.js'); 
+
 let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1400,
-    height: 900
+    width: 1024,
+    height: 768
   });
-   mainWindow.loadURL('http://localhost:8080');
-  
-  mainWindow.on('closed', function () {
+
+  mainWindow.loadURL('http://localhost:8081');
+//  mainWindow.webContents.openDevTools();
+
+  mainWindow.on('closed', () => {
     mainWindow = null;
   });
 }
 
 app.on('ready', createWindow);
-app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit();
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
 });
-app.on('activate', function () {
+
+app.on('activate', () => {
   if (mainWindow === null) createWindow();
 });
