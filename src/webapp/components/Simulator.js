@@ -325,7 +325,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
                 <Memory memory={memory} />
               </AccordionDetails>
             </Accordion>
-            <Accordion defaultExpanded disableGutters>
+            <Accordion disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                   Standard Output
