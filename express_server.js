@@ -10,7 +10,6 @@ app.use(express.static(path.join(__dirname, 'build', 'gwt', 'war', 'edumips64'))
 //res.sendFile(path.join(__dirname, 'build', 'gwt', 'war', 'edumips64', 'index.html'));
 //});
 
-// Avvia il server
 app.listen(port, () => {
-  console.log(`Server avviato su http://localhost:${port}`);
+  console.log(`Server express started at http://localhost:${port}`);
 });

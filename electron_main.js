@@ -1,7 +1,7 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 
-require('./server.js'); 
+require('./express_server.js'); 
 
 let mainWindow;
 
