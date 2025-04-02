@@ -2,13 +2,13 @@
   "name": "edumips64-webui",
   "version": "1.0.0",
   "description": "The web UI for EduMIPS64 (web.edumips.org). Depends on the web worker implementation of the EduMIPS64 core (worker.js).",
-  "main": "main.js",
+  "main": "index.js",
   "scripts": {
     "start": "webpack serve",
     "build-dbg": "webpack",
     "build": "webpack --mode production",
     "test": "npx playwright test",
-    "electron": "electron main.js"
+    "electron": "electron electron_main.js"
   },
   "keywords": [],
   "author": "Andrea Spadaccini",
@@ -19,6 +19,7 @@
     "@microsoft/applicationinsights-web": "^3.0.0",
     "@mui/icons-material": "^6.0.0",
     "@mui/material": "^6.0.0",
+    "express": "^5.1.0",
     "lodash": "^4.17.19",
     "monaco-editor-webpack-plugin": "^7.0.0",
     "monaco-vim": "^0.4.2",
