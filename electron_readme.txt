@@ -23,8 +23,10 @@ Creating Desktop App Executable
 ------------------------------------
 WORK IN PROGRESS: macosx only at the moment
 
-Just run:
+Just run one of these:
 ./gen_electron_app_macos.sh
+./gen_electron_app_win32.sh (TO BE TESTED)
+./gen_electron_app_linux.sh (TO BE TESTED)
 
 an clickable app will be created at: dist/WebEduMips64-darwin-arm64
 
