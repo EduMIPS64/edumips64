@@ -8,7 +8,7 @@
     "build-dbg": "webpack",
     "build": "webpack --mode production",
     "test": "npx playwright test",
-    "electron": "electron electron_main.js"
+    "electron": "electron electron/electron_main.js"
   },
   "keywords": [],
   "author": "Andrea Spadaccini",

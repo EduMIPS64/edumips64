@@ -1,7 +1,7 @@
 The details of the approach:
 -----------------------------------
 
-Launching app manually with command "npm run electron":
+Testing app manually with command "npm run electron":
 
 Sequence of events:
 
@@ -23,12 +23,12 @@ Creating Desktop App Executable
 ------------------------------------
 WORK IN PROGRESS: macosx only at the moment
 
-Just run one of these:
+Just run one of these from the electron dir:
 ./gen_electron_app_macos.sh
 ./gen_electron_app_win32.sh (TO BE TESTED)
 ./gen_electron_app_linux.sh (TO BE TESTED)
 
-an clickable app will be created at: dist/WebEduMips64-darwin-arm64
+an clickable app will be created at: electron/dist/WebEduMips64-darwin-arm64
 
 TODO:
 - linux, windows versions of the script (should be trivial)
