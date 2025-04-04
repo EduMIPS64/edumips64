@@ -117,7 +117,7 @@ public class MemoryElement extends BitSet64 {
   }
   public String getValueHex() {
     try {
-      return Converter.binToHex(Converter.positiveIntToBin(32, this.getValue()));
+      return Converter.binToHex(Converter.positiveIntToBin(64, this.getValue()));
     } catch (IrregularStringOfBitsException e) {
       throw new RuntimeException(e);
     }
