@@ -9,26 +9,11 @@ import java.util.List;
 public class CacheSimulator {
 
     public static void main(String[] args) {
-        /* Ignored for quickly testing
-
-        if (args.length != 5) {
-            System.out.println("Usage: java CacheSimulator <cacheSize> <blockSize> <associativity> <cacheType> <traceFile>");
-            System.exit(1);
-        }
-         */
         var cache = new CacheSimulator();
-        String args2[] = {"1024", "16", "2", "d", "code.s.xdin"};
-        cache.Simulate(args2);
+        cache.Simulate(1024,16,2,"d","code.s.xdin");
     }
 
-    public void Simulate(String[] args) {
-
-        // Parse command line arguments
-        int cacheSize = Integer.parseInt(args[0]);
-        int blockSize = Integer.parseInt(args[1]);
-        int associativity = Integer.parseInt(args[2]);
-        String cacheType = args[3].toLowerCase(); // expected "data" or "instruction"
-        String traceFile = args[4];
+    public void Simulate(int cacheSize, int blockSize, int associativity,String cacheType, String traceFile ) {
 
         // Initialize the cache
         Cache cache = new Cache(cacheSize, blockSize, associativity);
