@@ -50,12 +50,15 @@ public class Worker implements EntryPoint {
   // with the rest of EduMIPS64 core, it's best to just keep another instance
   // of Simulator just for the parsing.
   private Simulator parsingSimulator;
+  private BrowserWindowReader reader;
   private Logger logger = Logger.getLogger("worker");
   
   @Override
   public void onModuleLoad() {
     simulator = new Simulator();
     parsingSimulator = new Simulator();
+    reader = new BrowserWindowReader(this);
+    simulator.setStdIn(reader);
 
     DomGlobal.window.addEventListener("message", (evt) -> {
       info("Got message from the UI");
@@ -104,6 +107,11 @@ public class Worker implements EntryPoint {
             finalResult.parsingErrors = parsingSimulatorResult.parsingErrors;
             postMessage(finalResult);
             break;
+          case "stdin":
+            String input = data.getAsAny("input").asString();
+            info("stdin: " + input);
+            reader.addData(input);
+            break;
           default:
             info("UNKNOWN METHOD: " + method);
         }
@@ -111,11 +119,15 @@ public class Worker implements EntryPoint {
     });
   }
 
+  public void readData(int count) {
+    postMessage(simulator.resultFactory.NeedStdin(count));
+  }
+
   private void postMessage(Object message) {
     DomGlobal.postMessage(message);
   }
 
-  private void info(String message) {
+  public void info(String message) {
     logger.info("[GWT] "+ message);
   }
 }
