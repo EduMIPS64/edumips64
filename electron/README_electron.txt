@@ -21,21 +21,19 @@ The user interacts with the resulting UI within the Electron window, all running
 
 Creating Desktop App Executable
 ------------------------------------
-WORK IN PROGRESS: macosx only at the moment
 
-Just run one of these from the electron dir:
+From edumips64 root dir: 
+
+npm run build
+
+Then, just run one of these from the electron dir:
+
 ./gen_electron_app_macos.sh
-./gen_electron_app_win32.sh (TO BE TESTED)
-./gen_electron_app_linux.sh (TO BE TESTED)
+./gen_electron_app_linux.sh
+./gen_electron_app_win32_SHELLVERSION (3 versions)
 
-an clickable app will be created at: electron/dist/WebEduMips64-darwin-arm64
+an clickable app will be created at: electron/dist/WebEduMips64-PLATFORM-ARCH
 
 TODO:
-- linux, windows versions of the script (should be trivial)
 - appropriate icons for the app
-
-
-
-
-
 
