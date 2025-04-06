@@ -9,7 +9,8 @@ const StdOut = (props) => {
       style={{
         width: '100%',
         minHeight: '100px',
-        fontFamily: 'monospace'
+        fontFamily: 'monospace',
+        fontSize: '0.75rem'
       }}
     />
   );

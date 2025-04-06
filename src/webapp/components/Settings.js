@@ -8,7 +8,7 @@ const Settings = ({ viMode, setViMode, fontSize, setFontSize }) => {
     return (
         <Grid2 container spacing={2} alignItems="center">
             <Grid2 item>
-                <Typography>Vi Mode</Typography>
+                <Typography sx={{ fontSize: '0.75rem' }}>Vi Mode</Typography>
             </Grid2>
             <Grid2 item>
                 <Switch
@@ -18,7 +18,7 @@ const Settings = ({ viMode, setViMode, fontSize, setFontSize }) => {
                 />
             </Grid2>
             <Grid2 item>
-                <Typography>Font Size</Typography>
+                <Typography sx={{ fontSize: '0.75rem' }}>Font Size</Typography>
             </Grid2>
             <Grid2 item>
                 <Button variant="contained" onClick={() => setFontSize(fontSize + 1)}>+</Button>

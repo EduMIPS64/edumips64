@@ -3,10 +3,11 @@ import React from 'react';
 const Row = ({ label, value }) => {
     return (
     <tr>
-    <td>{label}</td>
+    <td style={{ fontSize: '0.9rem' }}>{label}</td>
     <td style={{ 
         fontFamily: "Menlo, Monaco, 'Courier New', monospace",
         width: '20%',
+        fontSize: '0.75rem',
     }}>{value}</td>
     </tr>
     );
@@ -39,7 +40,6 @@ const tableStyle = {
   return (
     <div id="statistics">
       <div>
-        <h3>Execution</h3>
         <table style={tableStyle}>
           <tbody>
             <PluralRow value={cycles} label="Cycle" />
@@ -51,21 +51,11 @@ const tableStyle = {
       </div>
       
       <div>
-        <h3>Stalls</h3>
         <table style={tableStyle}>
           <tbody>
             <PluralRow value={rawStalls} label="RAW Stall" />
             <PluralRow value={wawStalls} label="WAW Stall" />
             <PluralRow value={memoryStalls} label="Memory Stall" />
-          </tbody>
-        </table>
-      </div>
-      
-      <div>
-        <h3>Code size</h3>
-        <table style={tableStyle}>
-          <tbody>
-            <Row value={codeSizeBytes} label="Bytes" />
           </tbody>
         </table>
       </div>
