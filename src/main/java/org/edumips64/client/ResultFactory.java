@@ -238,7 +238,7 @@ public class ResultFactory {
                 .put("L1I_reads", cachesim.getL1InstructionCache().getStats().getReadAccesses())
                 .put("L1I_misses", cachesim.getL1InstructionCache().getStats().getReadMisses())
                 .put("L1D_reads", cachesim.getL1DataCache().getStats().getReadAccesses())
-                .put("L1D_read_misses", cachesim.getL1DataCache().getStats().getReadMisses())
+                .put("L1D_reads_misses", cachesim.getL1DataCache().getStats().getReadMisses())
                 .put("L1D_writes", cachesim.getL1DataCache().getStats().getWriteAccesses())
                 .put("L1D_writes_misses", cachesim.getL1DataCache().getStats().getWriteMisses())
             // Code size

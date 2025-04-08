@@ -161,7 +161,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     log.warning("================================= Starting test " + testPath + " (forwarding: " +
         config.getBoolean(ConfigKey.FORWARDING)+ ")");
     cpu.reset();
-    dinero.reset();
+    cachesim.reset();
     symTab.reset();
     builder.reset();
     testPath = testsLocation + testPath;
@@ -179,7 +179,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
         }
       }
 
-      dinero.setDataOffset(memory.getInstructionsNumber()*4);
+      cachesim.setDataOffset(memory.getInstructionsNumber()*4);
       cpu.setStatus(CPU.CPUStatus.RUNNING);
 
       while (true) {
@@ -195,7 +195,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
         tracefile = tmp.getAbsolutePath();
         tmp.deleteOnExit();
         LocalWriter w = new LocalWriter(tmp.getAbsolutePath(), false);
-        dinero.writeTraceData(w);
+        cachesim.writeTraceData(w);
         w.close();
       }
 
@@ -211,7 +211,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       return new CpuTestStatus(cpu, tracefile);
     } finally {
       cpu.reset();
-      dinero.reset();
+      cachesim.reset();
       symTab.reset();
     }
   }

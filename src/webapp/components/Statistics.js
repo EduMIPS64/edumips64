@@ -26,7 +26,7 @@ const Statistics = ({
   instructions,
   rawStalls,
   wawStalls,
-  memoryStalls,
+  memoryStalls, L1I_reads, L1I_misses,L1D_reads,L1D_reads_misses,L1D_writes,L1D_writes_misses,
   codeSizeBytes,
   fcsr,
 }) => {
@@ -56,6 +56,12 @@ const tableStyle = {
             <PluralRow value={rawStalls} label="RAW Stall" />
             <PluralRow value={wawStalls} label="WAW Stall" />
             <PluralRow value={memoryStalls} label="Memory Stall" />
+            <PluralRow value={L1I_reads} label="L1 Instr Cache Read" />
+            <PluralRow value={L1I_misses} label="L1 Instr Cache Misses" />
+            <PluralRow value={L1D_reads} label="L1 Data Cache Read" />
+            <PluralRow value={L1D_reads_misses} label="L1 Data Cache Read Misses" />
+            <PluralRow value={L1D_writes} label="L1 Data Cache Write" />
+            <PluralRow value={L1D_writes_misses} label="L1 Data Cache Write Misses" />
           </tbody>
         </table>
       </div>
