@@ -73,7 +73,7 @@ public class Simulator {
 
     InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, cachesim, config);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
-    resultFactory = new ResultFactory(cpu, memory, stdout);
+    resultFactory = new ResultFactory(cpu, memory, cachesim, stdout);
     info("initialization complete!");
   }
 
@@ -84,7 +84,7 @@ public class Simulator {
       symTab.reset();
       stdout = new StringWriter();
       iom.setStdOutput(stdout);
-      resultFactory = new ResultFactory(cpu, memory, stdout);
+      resultFactory = new ResultFactory(cpu, memory, cachesim,stdout);
       return resultFactory.Success();
   }
 
