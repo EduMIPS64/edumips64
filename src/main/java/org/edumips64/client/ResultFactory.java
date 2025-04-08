@@ -34,6 +34,7 @@ import org.edumips64.core.Memory;
 import org.edumips64.core.Register;
 import org.edumips64.core.CPU.CPUStatus;
 import org.edumips64.core.Pipeline.Stage;
+import org.edumips64.core.CacheSimulator;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.parser.ParserMultiException;
@@ -201,6 +202,11 @@ public class ResultFactory {
     }
 
     private String getStatistics() {
+        // not the right place... executed at every update ?
+        CacheSimulator tr = new CacheSimulator();
+        tr.setConfig(1024,16,2,"data");
+        tr.SimulateTrace("code.s.xdin");
+
         return new FluentJsonObject()
             // Execution
             .put("cycles", cpu.getCycles())
@@ -210,6 +216,7 @@ public class ResultFactory {
             .put("wawStalls", cpu.getWAWStalls())
             .put("dividerStalls", cpu.getStructuralStallsDivider())
             .put("memoryStalls", cpu.getStructuralStallsMemory())
+                .put("cacheStalls", tr.getReadAccesses())
             // Code size
             .put("codeSizeBytes",memory.getInstructionsNumber() * 4)
             // FPU Control Status Register (FCSR)

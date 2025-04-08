@@ -30,7 +30,7 @@ import SampleProgram from '../data/SampleProgram';
 
 import { debounce } from 'lodash';
 import Settings from './Settings';
-import Parameters from "./Parameters";
+import CacheConfig from "./CacheConfig";
 
 const Simulator = ({ sim, initialState, appInsights }) => {
   // The amount of steps to run in multi-step executions.
@@ -339,11 +339,11 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             <Accordion defaultExpanded disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  Architectural Parameters
+                  Cache Configuration
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Parameters
+                <CacheConfig
                     showTitle={false}
                 />
               </AccordionDetails>
@@ -351,7 +351,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             <Accordion defaultExpanded disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  Editor Settings
+                  General Settings
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
