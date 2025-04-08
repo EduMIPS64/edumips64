@@ -61,6 +61,10 @@ public class CacheSimulator {
             blockOffsetBits = (int)(Math.log(blockSize) / Math.log(2));
             // Calculate number of index bits (log2(numSets)) if more than one set exists
             indexBits = (numSets > 1) ? (int)(Math.log(numSets) / Math.log(2)) : 0;
+            resetStats();
+        }
+        public void resetStats() {
+            this.stats = new CacheStatistics(0, 0, 0, 0);
         }
 
         // Simulate a cache access. The parameter isWrite indicates if the access is a write.
@@ -173,6 +177,7 @@ public class CacheSimulator {
 
     public void SimulateTrace(CacheMemory cache, String traceFile) {
 
+        cache.resetStats();
         // Statistics counters
         long readAccesses = 0, writeAccesses = 0, readMisses = 0, writeMisses = 0;
 
@@ -242,6 +247,8 @@ public class CacheSimulator {
     public void reset() {
         offset = 0;
         dineroData = new LinkedList <>();
+        if (L1DataCache!=null) L1DataCache.resetStats();
+        if (L1InstructionCache!=null) L1InstructionCache.resetStats();
     }
 
     /** Add a read Instruction
