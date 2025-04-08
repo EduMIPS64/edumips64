@@ -4,6 +4,7 @@ import org.edumips64.utils.io.WriteException;
 import org.edumips64.utils.io.Writer;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,7 +27,15 @@ public class CacheSimulator {
         L1DataCache = new CacheMemory(1024,16,2, CacheMemory.CacheType.L1_DATA);
     }
 
-    static class CacheMemory {
+    public CacheMemory getL1DataCache() {
+        return L1DataCache;
+    }
+
+    public CacheMemory getL1InstructionCache() {
+        return L1InstructionCache;
+    }
+
+    public static class CacheMemory {
         public enum CacheType {
             L1_DATA,
             L1_INSTRUCTION,
@@ -45,6 +54,7 @@ public class CacheSimulator {
         private CacheStatistics stats;
 
         public CacheMemory(int cacheSize, int blockSize, int associativity, CacheType type) {
+            stats = new CacheStatistics();
             setConfig(cacheSize,blockSize,associativity,type);
         }
         public void setConfig(int cacheSize, int blockSize, int associativity, CacheType cacheType) {
@@ -64,7 +74,7 @@ public class CacheSimulator {
             resetStats();
         }
         public void resetStats() {
-            this.stats = new CacheStatistics(0, 0, 0, 0);
+            this.stats.reset();
         }
 
         // Simulate a cache access. The parameter isWrite indicates if the access is a write.
@@ -90,11 +100,37 @@ public class CacheSimulator {
     public static void main(String[] args) {
         var cache = new CacheMemory(1024, 16, 2, CacheMemory.CacheType.L1_DATA);
         CacheSimulator cache_sim = new CacheSimulator();
-        cache_sim.SimulateTrace(cache,"code.s.xdin");
+        //cache_sim.SimulateTrace(cache,"code.s.xdin");
         System.out.println(cache.getStats());
     }
 
-    record CacheStatistics(long readAccesses, long writeAccesses, long readMisses, long writeMisses) {
+   public static class CacheStatistics {
+        private long readAccesses;
+        private long writeAccesses;
+        private long readMisses;
+        private long writeMisses;
+
+        public CacheStatistics() {
+            reset();
+        }
+
+        public void reset() {
+            this.readAccesses = 0;
+            this.writeAccesses = 0;
+            this.readMisses = 0;
+            this.writeMisses = 0;
+        }
+
+        public long getReadAccesses() { return readAccesses; }
+        public long getWriteAccesses() { return writeAccesses; }
+        public long getReadMisses() { return readMisses; }
+        public long getWriteMisses() { return writeMisses; }
+
+        public void incrementReadAccesses() { readAccesses++; }
+        public void incrementWriteAccesses() { writeAccesses++; }
+        public void incrementReadMisses() { readMisses++; }
+        public void incrementWriteMisses() { writeMisses++; }
+
         @Override
         public String toString() {
             return "CacheStatistics{" +
@@ -105,6 +141,7 @@ public class CacheSimulator {
                     '}';
         }
     }
+
 
     // A cache set holds a number of cache lines equal to the associativity.
     static class CacheSet {
@@ -174,66 +211,77 @@ public class CacheSimulator {
         }
     }
 
+    private void processDineroTraceEntry(CacheMemory cache, String line) {
+        if (line.trim().isEmpty())
+            return;
 
+        // Each line should contain 3 space-separated fields:
+        // <refType> <address> <size>
+        String[] parts = line.split("\\s+");
+        if (parts.length != 3) {
+            System.err.println("Invalid trace line: " + line);
+            return;
+        }
+
+        char refType = parts[0].charAt(0);
+        // Filter lines based on the specified cache type
+        // mismatching cache types should not happen, this is a sanity check
+        if (cache.type == CacheMemory.CacheType.L1_DATA && (refType != 'r' && refType != 'w')) {
+            System.err.println("Invalid trace line: " + line+ " for cache type: "+cache.type);
+            return;
+        }
+        if (cache.type == CacheMemory.CacheType.L1_INSTRUCTION && refType != 'i') {
+            System.err.println("Invalid trace line: " + line+ " for cache type: "+cache.type);
+            return;
+        }
+
+        String addressStr = parts[1];
+        // Use Long.decode to support both hex (with 0x) and decimal
+        long address = Long.decode("0x"+addressStr);
+        int size = Integer.parseInt(parts[2]); // size is parsed but not used in this simple simulator
+
+        // Process access based on operation type.
+        // 'i' and 'r' are treated as reads; 'w' is treated as a write.
+        if (refType == 'i' || refType == 'r') {
+            cache.stats.incrementReadAccesses();
+            boolean hit = cache.access(address, false);
+            if (!hit) {
+                cache.stats.incrementReadMisses();
+            }
+        } else if (refType == 'w') {
+            cache.stats.incrementWriteAccesses();
+            boolean hit = cache.access(address, true);
+            if (!hit) {
+                cache.stats.incrementWriteMisses();
+            }
+        }
+
+    }
+
+    /* For testing
     public void SimulateTrace(CacheMemory cache, String traceFile) {
 
         cache.resetStats();
-        // Statistics counters
-        long readAccesses = 0, writeAccesses = 0, readMisses = 0, writeMisses = 0;
-
         // Process the trace file line by line
-        try (BufferedReader br = new BufferedReader(new FileReader(traceFile))) {
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(traceFile));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        };
+        try  {
             String line;
             while ((line = br.readLine()) != null) {
-                if (line.trim().isEmpty())
-                    continue;
-
-                // Each line should contain 3 space-separated fields:
-                // <refType> <address> <size>
-                String[] parts = line.split("\\s+");
-                if (parts.length != 3) {
-                    System.err.println("Invalid trace line: " + line);
-                    continue;
-                }
-
-                char refType = parts[0].charAt(0);
-                // Filter lines based on the specified cache type
-                if (cache.type == CacheMemory.CacheType.L1_DATA && (refType != 'r' && refType != 'w')) {
-                    continue;
-                }
-                if (cache.type == CacheMemory.CacheType.L1_INSTRUCTION && refType != 'i') {
-                    continue;
-                }
-
-                String addressStr = parts[1];
-                // Use Long.decode to support both hex (with 0x) and decimal
-                long address = Long.decode("0x"+addressStr);
-                int size = Integer.parseInt(parts[2]); // size is parsed but not used in this simple simulator
-
-                // Process access based on operation type.
-                // 'i' and 'r' are treated as reads; 'w' is treated as a write.
-                if (refType == 'i' || refType == 'r') {
-                    readAccesses++;
-                    boolean hit = cache.access(address, false);
-                    if (!hit) {
-                        readMisses++;
-                    }
-                } else if (refType == 'w') {
-                    writeAccesses++;
-                    boolean hit = cache.access(address, true);
-                    if (!hit) {
-                        writeMisses++;
-                    }
-                }
+                processDineroTraceEntry(cache, line);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // Output the results as a data structure
-        cache.stats = new CacheStatistics(readAccesses, writeAccesses, readMisses, writeMisses);
         System.out.println(cache.stats);
+
     }
+     */
+
     /** Sets the data offset.
      * @param dataOffset offset of the data section. Should be after the code
      *                   section. Typically this is the number of instructions
@@ -255,14 +303,18 @@ public class CacheSimulator {
      * @param address address of the read Instruction
      */
     public void IF(String address) {
-        dineroData.add("i " + address + " 4");
+        String entry = "i " + address + " 4";
+        dineroData.add(entry);
+        processDineroTraceEntry(this.getL1InstructionCache(),entry);
     }
 
     public void Load(String address, int nByte) {
         try {
             long addr = Long.parseLong(Converter.hexToLong("0x" + address));
             addr += offset;
-            dineroData.add("r " + Converter.binToHex(Converter.intToBin(64, addr)) + " " + nByte);
+            String entry = "r " + Converter.binToHex(Converter.intToBin(64, addr)) + " " + nByte;
+            dineroData.add(entry);
+            processDineroTraceEntry(this.getL1DataCache(),entry);
         } catch (IrregularStringOfHexException | IrregularStringOfBitsException ex) {
             ex.printStackTrace();
         }
@@ -272,7 +324,9 @@ public class CacheSimulator {
         try {
             long addr = Long.parseLong(Converter.hexToLong("0x" + address));
             addr += offset;
-            dineroData.add("w " + Converter.binToHex(Converter.intToBin(64, addr)) + " " + nByte);
+            String entry = "w " + Converter.binToHex(Converter.intToBin(64, addr)) + " " + nByte;
+            dineroData.add(entry);
+            processDineroTraceEntry(this.getL1DataCache(),entry);
         } catch (IrregularStringOfHexException | IrregularStringOfBitsException ex) {
             ex.printStackTrace();
         }
