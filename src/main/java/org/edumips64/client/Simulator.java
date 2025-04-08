@@ -77,6 +77,15 @@ public class Simulator {
     info("initialization complete!");
   }
 
+  public Result setCacheConfig(int l1dSize, int l1dBlockSize, int l1dAssoc, int l1dPenalty,
+                 int l1iSize, int l1iBlockSize, int l1iAssoc, int l1iPenalty)  {
+    cpu.reset();
+    cachesim.getL1InstructionCache().setConfig(l1iSize,l1iBlockSize,l1iAssoc,l1iPenalty, CacheSimulator.CacheMemory.CacheType.L1_INSTRUCTION);
+    cachesim.getL1DataCache().setConfig(l1dSize,l1dBlockSize,l1dAssoc,l1dPenalty, CacheSimulator.CacheMemory.CacheType.L1_DATA);
+    resultFactory = new ResultFactory(cpu, memory, cachesim,stdout);
+    return resultFactory.Success();
+  }
+
   public Result reset() {
       info("Resetting the CPU");
       cpu.reset();

@@ -23,8 +23,8 @@ public class CacheSimulator {
 
     public CacheSimulator() {
         // todo, use data from interface
-        L1InstructionCache = new CacheMemory(1024,16,2, CacheMemory.CacheType.L1_INSTRUCTION);
-        L1DataCache = new CacheMemory(1024,16,2, CacheMemory.CacheType.L1_DATA);
+        L1InstructionCache = new CacheMemory(1024,16,2,40, CacheMemory.CacheType.L1_INSTRUCTION);
+        L1DataCache = new CacheMemory(1024,16,2,40, CacheMemory.CacheType.L1_DATA);
     }
 
     public CacheMemory getL1DataCache() {
@@ -53,14 +53,15 @@ public class CacheSimulator {
         private int indexBits;
         private CacheStatistics stats;
 
-        public CacheMemory(int cacheSize, int blockSize, int associativity, CacheType type) {
+        public CacheMemory(int cacheSize, int blockSize, int associativity, int penaly, CacheType type) {
             stats = new CacheStatistics();
-            setConfig(cacheSize,blockSize,associativity,type);
+            setConfig(cacheSize,blockSize,associativity,penaly, type);
         }
-        public void setConfig(int cacheSize, int blockSize, int associativity, CacheType cacheType) {
+        public void setConfig(int cacheSize, int blockSize, int associativity, int penaly, CacheType cacheType) {
             this.cacheSize = cacheSize;
             this.blockSize = blockSize;
             this.associativity = associativity;
+            this.penaly = penaly;
             this.type = cacheType;
             this.numSets = cacheSize / (blockSize * associativity);
             sets = new CacheSet[numSets];
@@ -98,7 +99,7 @@ public class CacheSimulator {
     }
 
     public static void main(String[] args) {
-        var cache = new CacheMemory(1024, 16, 2, CacheMemory.CacheType.L1_DATA);
+        var cache = new CacheMemory(1024, 16, 2, 40, CacheMemory.CacheType.L1_DATA);
         CacheSimulator cache_sim = new CacheSimulator();
         //cache_sim.SimulateTrace(cache,"code.s.xdin");
         System.out.println(cache.getStats());

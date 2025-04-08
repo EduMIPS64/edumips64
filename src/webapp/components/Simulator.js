@@ -171,6 +171,10 @@ const Simulator = ({ sim, initialState, appInsights }) => {
   }
 
 
+  const setCacheConfig = (config) => {
+    sim.setCacheConfig(config);
+  };
+
   const openCode = () => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
@@ -344,7 +348,8 @@ const Simulator = ({ sim, initialState, appInsights }) => {
               </AccordionSummary>
               <AccordionDetails>
                 <CacheConfig
-                    showTitle={false}
+                  showTitle={false}
+                  onChange={setCacheConfig}
                 />
               </AccordionDetails>
             </Accordion>

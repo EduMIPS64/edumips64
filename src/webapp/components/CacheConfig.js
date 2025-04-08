@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 
-const CacheConfig = ({ enableCache, onChange }) => {
+const CacheConfig = ({onChange}) => {
     const [l1d, setL1D] = useState({ size: 1024, blockSize: 16, associativity: 1, penalty: 0 });
     const [l1i, setL1I] = useState({ size: 1024, blockSize: 16, associativity: 1, penalty: 40 });
 
