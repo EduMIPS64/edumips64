@@ -342,7 +342,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             </Accordion>
             <Accordion defaultExpanded disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: status === 'RUNNING' ? 'gray' : '#1976d2' }}>
                   Cache Configuration
                 </Typography>
               </AccordionSummary>
@@ -350,6 +350,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
                 <CacheConfig
                   showTitle={false}
                   onChange={setCacheConfig}
+                  status={status}
                 />
               </AccordionDetails>
             </Accordion>
