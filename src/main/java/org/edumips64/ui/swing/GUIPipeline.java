@@ -24,6 +24,7 @@
 package org.edumips64.ui.swing;
 
 import org.edumips64.core.CPU;
+import org.edumips64.core.CacheSimulator;
 import org.edumips64.core.Memory;
 import org.edumips64.core.Pipeline;
 import org.edumips64.core.is.InstructionInterface;
@@ -50,8 +51,8 @@ class GUIPipeline extends GUIComponent {
 
   private GUITheme theme;
 
-  GUIPipeline(CPU cpu, Memory memory, ConfigStore config, GUITheme theme) {
-    super(cpu, memory, config);
+  GUIPipeline(CPU cpu, Memory memory, CacheSimulator cacheSimulator, ConfigStore config, GUITheme theme) {
+    super(cpu, memory, cacheSimulator, config);
     numMultiplier = 7;
     numAdder = 4;
     pannello = new Pannello1();

@@ -24,6 +24,7 @@
 package org.edumips64.ui.swing;
 
 import org.edumips64.core.CPU;
+import org.edumips64.core.CacheSimulator;
 import org.edumips64.core.Memory;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
@@ -39,15 +40,17 @@ abstract class GUIComponent {
   protected CPU cpu;
   protected Memory memory;
   protected ConfigStore config;
+  protected CacheSimulator cachesim;
 
   Font font;
   float scalingDenominator = 12.0f;
 
-  GUIComponent(CPU cpu, Memory memory, ConfigStore config) {
+  GUIComponent(CPU cpu, Memory memory, CacheSimulator cacheSimulator, ConfigStore config) {
     cont = null;
     this.cpu = cpu;
     this.memory = memory;
     this.config = config;
+    this.cachesim = cacheSimulator;
 
     font = new Font("Monospaced", Font.PLAIN, config.getInt(ConfigKey.UI_FONT_SIZE));
   }

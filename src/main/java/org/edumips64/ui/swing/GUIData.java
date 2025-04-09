@@ -22,13 +22,7 @@
  */
 package org.edumips64.ui.swing;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.Converter;
-import org.edumips64.core.IrregularStringOfBitsException;
-import org.edumips64.core.IrregularStringOfHexException;
-import org.edumips64.core.Memory;
-import org.edumips64.core.MemoryElement;
-import org.edumips64.core.MemoryElementNotFoundException;
+import org.edumips64.core.*;
 import org.edumips64.core.fpu.BitSet64FP;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
@@ -52,8 +46,8 @@ public class GUIData extends GUIComponent {
 
   private static final Logger LOGGER = Logger.getLogger(CPU.class.getName());
 
-  public GUIData(CPU cpu, Memory memory, ConfigStore config, StatusBar sb) {
-    super(cpu, memory, config);
+  public GUIData(CPU cpu, Memory memory, CacheSimulator cacheSimulator, ConfigStore config, StatusBar sb) {
+    super(cpu, memory, cacheSimulator, config);
     statusbar = sb;
     dataPanel = new DataPanel();
   }

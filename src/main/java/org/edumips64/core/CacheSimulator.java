@@ -1,5 +1,7 @@
 package org.edumips64.core;
 
+import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.io.WriteException;
 import org.edumips64.utils.io.Writer;
 
@@ -22,18 +24,18 @@ public class CacheSimulator {
     private int offset;
 
     public CacheSimulator() {
-        // todo, use data from interface
-        L1InstructionCache = new CacheMemory(1024,16,2,40, CacheMemory.CacheType.L1_INSTRUCTION);
-        L1DataCache = new CacheMemory(1024,16,2,40, CacheMemory.CacheType.L1_DATA);
+        // fake values to be replaced
+        L1InstructionCache = new CacheMemory(1025,17,2,40, CacheMemory.CacheType.L1_INSTRUCTION);
+        L1DataCache = new CacheMemory(1025,17,2,40, CacheMemory.CacheType.L1_DATA);
     }
 
     public CacheMemory getL1DataCache() {
         return L1DataCache;
     }
-
     public CacheMemory getL1InstructionCache() {
         return L1InstructionCache;
     }
+
 
     public static class CacheMemory {
         public enum CacheType {
@@ -57,6 +59,8 @@ public class CacheSimulator {
             stats = new CacheStatistics();
             setConfig(cacheSize,blockSize,associativity,penaly, type);
         }
+
+
         public void setConfig(int cacheSize, int blockSize, int associativity, int penaly, CacheType cacheType) {
             this.cacheSize = cacheSize;
             this.blockSize = blockSize;
@@ -74,6 +78,16 @@ public class CacheSimulator {
             indexBits = (numSets > 1) ? (int)(Math.log(numSets) / Math.log(2)) : 0;
             resetStats();
         }
+
+        public void setConfig(ConfigStore config) {
+            String prefix = (type == CacheType.L1_DATA) ? "L1D" : "L1I";
+            int cacheSize = config.getInt(ConfigKey.valueOf(prefix + "_SIZE"));
+            int blockSize = config.getInt(ConfigKey.valueOf(prefix + "_BLOCK_SIZE"));
+            int associativity = config.getInt(ConfigKey.valueOf(prefix + "_ASSOCIATIVITY"));
+            int penaly = config.getInt(ConfigKey.valueOf(prefix + "_PENALTY"));
+            setConfig(cacheSize, blockSize, associativity, penaly, type);
+        }
+
         public void resetStats() {
             this.stats.reset();
         }

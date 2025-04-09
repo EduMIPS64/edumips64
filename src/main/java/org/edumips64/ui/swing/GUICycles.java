@@ -25,6 +25,7 @@
 package org.edumips64.ui.swing;
 
 import org.edumips64.core.CPU;
+import org.edumips64.core.CacheSimulator;
 import org.edumips64.core.Memory;
 import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.CycleElement;
@@ -57,8 +58,8 @@ public class GUICycles extends GUIComponent {
 
   private GUITheme theme;
 
-  GUICycles(CPU cpu, Memory memory, ConfigStore config, CycleBuilder builder, GUITheme guiTheme) {
-    super(cpu, memory, config);
+  GUICycles(CPU cpu, Memory memory, CacheSimulator cacheSimulator, ConfigStore config, CycleBuilder builder, GUITheme guiTheme) {
+    super(cpu, memory, cacheSimulator, config);
     this.builder = builder;
     this.theme = guiTheme;
 

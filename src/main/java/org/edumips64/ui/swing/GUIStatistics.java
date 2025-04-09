@@ -24,6 +24,7 @@
 package org.edumips64.ui.swing;
 
 import org.edumips64.core.CPU;
+import org.edumips64.core.CacheSimulator;
 import org.edumips64.core.Memory;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
@@ -43,11 +44,14 @@ public class GUIStatistics extends GUIComponent {
   StatPanel statPanel;
   JScrollPane jsp;
   private int nCycles, nInstructions, rawStalls, codeSize, WAWStalls, dividerStalls, memoryStalls;
+
+  private int L1I_reads, L1I_reads_misses, L1D_reads, L1D_reads_misses, L1D_writes, L1D_writes_misses;
+
   private float cpi;
   GUITheme theme;
 
-  GUIStatistics(CPU cpu, Memory memory, ConfigStore config, GUITheme theme) {
-    super(cpu, memory, config);
+  GUIStatistics(CPU cpu, Memory memory, CacheSimulator cachesim, ConfigStore config, GUITheme theme) {
+    super(cpu, memory, cachesim, config);
     this.theme = theme;
     statPanel = new StatPanel();
     jsp = new JScrollPane(statPanel);
@@ -61,7 +65,9 @@ public class GUIStatistics extends GUIComponent {
     JList<? extends String> statList;
     String [] statistics = {" Execution", " 0 Cycles", " 0 Instructions", " ", " Stalls", " 0 RAW Stalls", " 0 WAW Stalls",
                             " 0 Structural Stalls(Divider not available)", "0 Structural Stalls (Memory not available)",
-                            " Code Size", " 0 Bytes", "FPU info", "FCSR", "FCSRGroups", "FCSRMnemonics", "FCSRValues"
+                            " Code Size", " 0 Bytes", "FPU info", "FCSR", "FCSRGroups", "FCSRMnemonics", "FCSRValues",
+                            " L1 Cache Stats", " 0 L1I Reads", " 0 L1I Read Misses",
+                            " 0 L1D Reads", " 0 L1D Read Misses", " 0 L1D Writes", " 0 L1D Write Misses"
                            };
     StatPanel() {
       super();
@@ -92,6 +98,13 @@ public class GUIStatistics extends GUIComponent {
     WAWStalls = cpu.getWAWStalls();
     dividerStalls = cpu.getStructuralStallsDivider();
     memoryStalls = cpu.getStructuralStallsMemory();
+    L1I_reads = (int) cachesim.getL1InstructionCache().getStats().getReadAccesses();
+    L1I_reads_misses = (int) cachesim.getL1InstructionCache().getStats().getReadMisses();
+    L1D_reads = (int) cachesim.getL1DataCache().getStats().getReadAccesses();
+    L1D_reads_misses = (int) cachesim.getL1DataCache().getStats().getReadMisses();
+    L1D_writes = (int) cachesim.getL1DataCache().getStats().getWriteAccesses();
+    L1D_writes_misses = (int) cachesim.getL1DataCache().getStats().getWriteMisses();
+
   }
 
   public void draw() {
@@ -187,6 +200,28 @@ public class GUIStatistics extends GUIComponent {
         return label;
       case 15:
         label.setText(" " + cpu.getFCSR().getBinString());
+        return label;
+      case 16:
+        label.setText(" " + CurrentLocale.getString("L1CACHESTATS"));
+        label.setForeground(Color.red);
+        return label;
+      case 17:
+        label.setText(" " + L1I_reads + " " + CurrentLocale.getString("L1I READS"));
+        return label;
+      case 18:
+        label.setText(" " + L1I_reads_misses + " " + CurrentLocale.getString("L1I READ MISSES"));
+        return label;
+      case 19:
+        label.setText(" " + L1D_reads + " " + CurrentLocale.getString("L1D READS"));
+        return label;
+      case 20:
+        label.setText(" " + L1D_reads_misses + " " + CurrentLocale.getString("L1D READ MISSES"));
+        return label;
+      case 21:
+        label.setText(" " + L1D_writes + " " + CurrentLocale.getString("L1D WRITES"));
+        return label;
+      case 22:
+        label.setText(" " + L1D_writes_misses + " " + CurrentLocale.getString("L1D WRITE MISSES"));
         return label;
       }
 

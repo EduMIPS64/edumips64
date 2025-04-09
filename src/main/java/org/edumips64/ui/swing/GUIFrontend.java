@@ -24,6 +24,7 @@
 package org.edumips64.ui.swing;
 
 import org.edumips64.core.CPU;
+import org.edumips64.core.CacheSimulator;
 import org.edumips64.core.Memory;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CycleBuilder;
@@ -54,15 +55,15 @@ public class GUIFrontend {
 
   /**Creates the six internal component
   */
-  public GUIFrontend(CPU cpu, Memory memory, ConfigStore config, CycleBuilder builder, StatusBar sb) {
+  public GUIFrontend(CPU cpu, Memory memory, CacheSimulator cacheSimulator, ConfigStore config, CycleBuilder builder, StatusBar sb) {
     theme = new GUITheme(config);
 
-    cycles = new GUICycles(cpu, memory, config, builder, theme);
-    regs = new GUIRegisters(cpu, memory, config, sb);
-    stats = new GUIStatistics(cpu, memory, config, theme);
-    pipe = new GUIPipeline(cpu, memory, config, theme);
-    data = new GUIData(cpu, memory, config, sb);
-    code = new GUICode(cpu, memory, config, theme);
+    cycles = new GUICycles(cpu, memory, cacheSimulator, config, builder, theme);
+    regs = new GUIRegisters(cpu, memory, cacheSimulator, config, sb);
+    stats = new GUIStatistics(cpu, memory, cacheSimulator, config, theme);
+    pipe = new GUIPipeline(cpu, memory, cacheSimulator, config, theme);
+    data = new GUIData(cpu, memory, cacheSimulator, config, sb);
+    code = new GUICode(cpu, memory, cacheSimulator, config, theme);
 
     components = new GUIComponent[6];
     components[0] = cycles;

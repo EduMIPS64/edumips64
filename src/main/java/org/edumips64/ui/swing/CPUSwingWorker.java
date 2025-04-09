@@ -24,11 +24,7 @@
 
 package org.edumips64.ui.swing;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.MemoryElementNotFoundException;
-import org.edumips64.core.NotAlignException;
-import org.edumips64.core.StoppedCPUException;
-import org.edumips64.core.SynchronousException;
+import org.edumips64.core.*;
 import org.edumips64.core.is.AddressErrorException;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
@@ -80,13 +76,14 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
   private GUIUpdateThread guiUpdateThread;
   private CycleBuilder builder;
   private Supplier<String> codeSupplier;
+  private CacheSimulator cachesim;
 
   private static final Logger logger = Logger.getLogger(CPUSwingWorker.class.getName());
 
   /** Callbacks */
   private Runnable initCallback, haltCallback, finalizeCallback;
 
-  public CPUSwingWorker(CPU cpu, GUIFrontend front, JFrame mainFrame, ConfigStore config, CycleBuilder builder, Runnable initCallback, Runnable haltCallback, Runnable finalizeCallback, Supplier<String> codeSupplier) {
+  public CPUSwingWorker(CPU cpu, CacheSimulator cacheSimulator, GUIFrontend front, JFrame mainFrame, ConfigStore config, CycleBuilder builder, Runnable initCallback, Runnable haltCallback, Runnable finalizeCallback, Supplier<String> codeSupplier) {
     externalStop = false;
     this.builder = builder;
     this.cpu = cpu;
@@ -94,6 +91,7 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
     this.mainFrame = mainFrame;
     this.config = config;
     this.codeSupplier = codeSupplier;
+    this.cachesim = cacheSimulator;
     updateConfigValues();
 
     this.haltCallback = haltCallback;
@@ -114,6 +112,8 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
     masked = config.getBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED);
     terminateOnSynchronousExceptions = config.getBoolean(ConfigKey.SYNC_EXCEPTIONS_TERMINATE);
     logger.info("Terminate = " + terminateOnSynchronousExceptions + "; masked = " + masked);
+    cachesim.getL1DataCache().setConfig(config);
+    cachesim.getL1InstructionCache().setConfig(config);
   }
 
   /**
