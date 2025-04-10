@@ -4,6 +4,23 @@ import { initVimMode } from 'monaco-vim';
 // new
 import MonacoEditor from 'react-monaco-editor';
 import useMediaQuery from '@mui/material/useMediaQuery';
+// Definizione globale del linguaggio MIPS per Monaco
+import * as monaco from 'monaco-editor';
+
+monaco.languages.register({ id: 'mips' });
+
+monaco.languages.setMonarchTokensProvider('mips', {
+  tokenizer: {
+    root: [
+      [/\b(?:add|addi|dadd|daddi|sub|mul|div|and|or|nor|sll|srl|lw|sw|ld|sd|li|move|syscall)\b/, 'keyword'],
+      [/[#,]/, 'delimiter'],
+      [/\$[a-z0-9]+/, 'variable'],
+      [/\d+/, 'number'],
+      [/".*?"/, 'string'],
+      [/[a-zA-Z_][\w]*/, 'identifier'],
+    ]
+  }
+});
 
 const Code = (props) => {
 
