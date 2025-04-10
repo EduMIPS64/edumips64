@@ -12,11 +12,14 @@ monaco.languages.register({ id: 'mips' });
 monaco.languages.setMonarchTokensProvider('mips', {
   tokenizer: {
     root: [
+      [/^[ \t]*[a-zA-Z_][\w]*:/, 'type.identifier'], // label
       [/\b(?:add|addi|dadd|daddi|sub|mul|div|and|or|nor|sll|srl|lw|sw|ld|sd|li|move|syscall)\b/, 'keyword'],
+      [/\\.[a-zA-Z_][\w]*/, 'strong'], // direttive con punto
       [/[#,]/, 'delimiter'],
       [/\$[a-z0-9]+/, 'variable'],
       [/\d+/, 'number'],
       [/".*?"/, 'string'],
+      [/;.*/, 'comment'], // commento
       [/[a-zA-Z_][\w]*/, 'identifier'],
     ]
   }
