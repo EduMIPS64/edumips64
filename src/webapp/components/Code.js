@@ -13,13 +13,13 @@ monaco.languages.setMonarchTokensProvider('mips', {
   tokenizer: {
     root: [
       [/^[ \t]*[a-zA-Z_][\w]*:/, 'type.identifier'], // label
-      [/\b(?:add|addi|dadd|daddi|sub|mul|div|and|or|nor|sll|srl|lw|sw|ld|sd|li|move|syscall)\b/, 'keyword'],
-      [/\\.[a-zA-Z_][\w]*/, 'strong'], // direttive con punto
+      [/\b(?:add|dadd|daddi|daddui|dsub|dsubu|dmult|dmultu|mflo|mfhi|ddiv|and|andi|or|nor|dsll|dsslv|dsrl|dsrlv|dsra|dsrav|slt|sltu|slti|sltui|lb|lbu|sb|lw|lwu|sw|ld|sd|lh|lhu|sh|lui|j|jr|jal|jalr|beq|bne|move|syscall)\b/, 'keyword'],
+      [/\.[a-zA-Z_][\w]*/, 'strong'], // directives
       [/[#,]/, 'delimiter'],
-      [/\$[a-z0-9]+/, 'variable'],
+      [/\br(?:\d{1,2})\b/, 'string'],
       [/\d+/, 'number'],
-      [/".*?"/, 'string'],
-      [/;.*/, 'comment'], // commento
+      [/".*?"/, 'regexp'],
+      [/;.*/, 'comment'],
       [/[a-zA-Z_][\w]*/, 'identifier'],
     ]
   }
