@@ -44,6 +44,7 @@ import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.NullFileUtils;
+import org.edumips64.utils.io.Reader;
 import org.edumips64.utils.io.StringWriter;
 
 public class Simulator {
@@ -78,6 +79,12 @@ public class Simulator {
     parser = new Parser(fu, symTab, memory, instructionBuilder);
     resultFactory = new ResultFactory(cpu, memory, stdout);
     info("initialization complete!");
+  }
+
+  // This is necessary because the Reader object will likely
+  // be created after the Simulator object.
+  public void setStdIn(Reader reader) {
+    iom.setStdInput(reader);
   }
 
   public Result reset() {
