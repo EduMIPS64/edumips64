@@ -52,7 +52,7 @@ class LDC1 extends FPLoading {
     //restoring the address from the temporary register
     long address = TR[OFFSET_PLUS_BASE].getValue();
     //For the trace file
-    dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), 8);
+    cachesim.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), 8);
 
     MemoryElement memEl = memory.getCellByAddress(address);
     //reading from the memory element and saving values on LMD register

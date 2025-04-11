@@ -84,6 +84,16 @@ public abstract class ConfigStore {
     // UI font options.
     ConfigStore.defaults.put(ConfigKey.UI_FONT_SIZE, 18);
     ConfigStore.defaults.put(ConfigKey.UI_DARK_THEME, false);
+
+    // Cache options
+    ConfigStore.defaults.put(ConfigKey.L1D_SIZE, 1024);
+    ConfigStore.defaults.put(ConfigKey.L1I_SIZE, 1024);
+    ConfigStore.defaults.put(ConfigKey.L1D_BLOCK_SIZE, 8);
+    ConfigStore.defaults.put(ConfigKey.L1I_BLOCK_SIZE, 8);
+    ConfigStore.defaults.put(ConfigKey.L1D_ASSOCIATIVITY, 1);
+    ConfigStore.defaults.put(ConfigKey.L1I_ASSOCIATIVITY, 1);
+    ConfigStore.defaults.put(ConfigKey.L1D_PENALTY, 40);
+    ConfigStore.defaults.put(ConfigKey.L1I_PENALTY, 40);
   }
 
   // The interface exposes getter and setter methods for all the supported

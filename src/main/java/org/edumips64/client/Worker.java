@@ -75,6 +75,26 @@ public class Worker implements EntryPoint {
             info("steps: " + steps);
             postMessage(simulator.step(steps));
             break;
+          case "setcacheconfig":
+            JsPropertyMap<Object> config = Js.cast(data.get("config"));
+            JsPropertyMap<Object> l1d = Js.cast(config.get("l1d"));
+            JsPropertyMap<Object> l1i = Js.cast(config.get("l1i"));
+
+            int l1dSize = ((Double) l1d.get("size")).intValue();
+            int l1dBlockSize = ((Double) l1d.get("blockSize")).intValue();
+            int l1dAssoc = ((Double) l1d.get("associativity")).intValue();
+            int l1dPenalty = ((Double) l1d.get("penalty")).intValue();
+
+            int l1iSize = ((Double) l1i.get("size")).intValue();
+            int l1iBlockSize = ((Double) l1i.get("blockSize")).intValue();
+            int l1iAssoc = ((Double) l1i.get("associativity")).intValue();
+            int l1iPenalty = ((Double) l1i.get("penalty")).intValue();
+
+            simulator.setCacheConfig(l1dSize, l1dBlockSize, l1dAssoc, l1dPenalty,
+                    l1iSize, l1iBlockSize, l1iAssoc, l1iPenalty);
+
+            postMessage(simulator.resultFactory.Success());
+            break;
           case "load":
             String code = data.getAsAny("code").asString();
             Result parseResult = simulator.loadProgram(code);

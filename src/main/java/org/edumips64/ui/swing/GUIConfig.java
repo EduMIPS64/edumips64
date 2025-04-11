@@ -78,6 +78,7 @@ public class GUIConfig extends JDialog {
     String BEHAVIOR = CurrentLocale.getString("Config.BEHAVIOR");
     String FPUEXCEPTIONS = CurrentLocale.getString("Config.FPUEXCEPTIONS");
     String FPUROUNDING = CurrentLocale.getString("Config.FPUROUNDING");
+    String CACHE = CurrentLocale.getString("Config.CACHE");
 
     cache = new HashMap<>();
 
@@ -88,6 +89,7 @@ public class GUIConfig extends JDialog {
     tabPanel.addTab(BEHAVIOR, makeBehaviorPanel());
     tabPanel.addTab(FPUEXCEPTIONS, makeExceptionsPanel());
     tabPanel.addTab(FPUROUNDING, makeRoundingPanel());
+    tabPanel.addTab(CACHE, makeCachePanel());
 
     logger.log(Level.INFO, "Current values: " + cache.toString());
 
@@ -463,5 +465,32 @@ public class GUIConfig extends JDialog {
 
       setVisible(false);
     });
+  }
+
+  private JPanel makeCachePanel() {
+    gbl = new GridBagLayout();
+    gbc = new GridBagConstraints();
+
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.insets = new Insets(0, 10, 0, 10);
+
+    JPanel panel = new JPanel();
+
+    panel.setLayout(gbl);
+    panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
+    int row = 2;
+
+    addRow(panel, row++, ConfigKey.L1D_SIZE, new JNumberField());
+    addRow(panel, row++, ConfigKey.L1I_SIZE, new JNumberField());
+    addRow(panel, row++, ConfigKey.L1D_BLOCK_SIZE, new JNumberField());
+    addRow(panel, row++, ConfigKey.L1I_BLOCK_SIZE, new JNumberField());
+    addRow(panel, row++, ConfigKey.L1D_ASSOCIATIVITY, new JNumberField());
+    addRow(panel, row++, ConfigKey.L1I_ASSOCIATIVITY, new JNumberField());
+    addRow(panel, row++, ConfigKey.L1D_PENALTY, new JNumberField());
+    addRow(panel, row++, ConfigKey.L1I_PENALTY, new JNumberField());
+
+    grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
+    return panel;
   }
 }

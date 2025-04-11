@@ -61,7 +61,7 @@ public class SYSCALL extends Instruction {
     logger.info("SYSCALL " + syscall_n + " (" + this.hashCode() + ") is in IF");
 
     try {
-      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+      cachesim.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }
@@ -108,7 +108,7 @@ public class SYSCALL extends Instruction {
 
       // Memory access for the string and the flags (note the <=)
       for (int i = (int) address; i <= flags_address; i += 8) {
-        dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, i)), 8);
+        cachesim.Load(Converter.binToHex(Converter.positiveIntToBin(64, i)), 8);
       }
 
       logger.info("We must open " + filename + " with flags " + flags);
@@ -170,7 +170,7 @@ public class SYSCALL extends Instruction {
       int format_string_address = (int) tempMemCell.getValue();
 
       // Recording in the tracefile the last memory access
-      dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), 8);
+      cachesim.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), 8);
 
       // Fetching the format string
       String format_string = fetchString(format_string_address);
@@ -186,7 +186,7 @@ public class SYSCALL extends Instruction {
       t1 += 8 - (t1 % 8);
 
       for (int i = format_string_address; i < t1; i += 8) {
-        dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, i)), 8);
+        cachesim.Load(Converter.binToHex(Converter.positiveIntToBin(64, i)), 8);
       }
 
       int oldIndex = 0;
@@ -216,7 +216,7 @@ public class SYSCALL extends Instruction {
           t2 += 8 - (t2 % 8);
 
           for (int i = str_address; i < t2; i += 8) {
-            dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, i)), 8);
+            cachesim.Load(Converter.binToHex(Converter.positiveIntToBin(64, i)), 8);
           }
 
           logger.info("Got " + param);
@@ -228,7 +228,7 @@ public class SYSCALL extends Instruction {
           MemoryElement memCell = memory.getCellByAddress(next_param_address);
 
           // Tracefile entry for this memory access
-          dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, next_param_address)), 8);
+          cachesim.Load(Converter.binToHex(Converter.positiveIntToBin(64, next_param_address)), 8);
 
           Long val = memCell.getValue();
           next_param_address += 8;

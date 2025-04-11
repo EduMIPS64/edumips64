@@ -29,7 +29,7 @@ public class DineroCommand implements Runnable {
     public void run() {
         try (PrintWriter pw = new PrintWriter(file)){
             if (cli.getCPU().getStatus() == CPU.CPUStatus.HALTED) {
-                cli.getDinero().writeTraceData(new LocalWriterAdapter(pw));
+                cli.getCacheSimulator().writeTraceData(new LocalWriterAdapter(pw));
                 pw.flush();
                 System.out.println(CurrentLocale.getString("CLI.DINERO.SAVE") + file.getAbsolutePath());
             } else {

@@ -30,6 +30,7 @@ import SampleProgram from '../data/SampleProgram';
 
 import { debounce } from 'lodash';
 import Settings from './Settings';
+import CacheConfig from "./CacheConfig";
 
 const Simulator = ({ sim, initialState, appInsights }) => {
   // The amount of steps to run in multi-step executions.
@@ -170,6 +171,10 @@ const Simulator = ({ sim, initialState, appInsights }) => {
   }
 
 
+  const setCacheConfig = (config) => {
+    sim.setCacheConfig(config);
+  };
+
   const openCode = () => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
@@ -212,7 +217,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
 
   const AccordionSummary = styled((props) => (
     <MuiAccordionSummary
-      expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem' }} />}
+      expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.8rem' }} />}
       {...props}
     />
   ))(({ theme }) => ({
@@ -287,7 +292,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             />
             <Accordion defaultExpanded disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                   Stats
                 </Typography>
               </AccordionSummary>
@@ -297,7 +302,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             </Accordion>
             <Accordion disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                   Pipeline
                 </Typography>
               </AccordionSummary>
@@ -307,7 +312,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             </Accordion>
             <Accordion disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                   Registers
                 </Typography>
               </AccordionSummary>
@@ -317,7 +322,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             </Accordion>
             <Accordion disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                   Memory
                 </Typography>
               </AccordionSummary>
@@ -327,7 +332,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             </Accordion>
             <Accordion disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                   Standard Output
                 </Typography>
               </AccordionSummary>
@@ -337,8 +342,22 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             </Accordion>
             <Accordion defaultExpanded disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  Settings
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: status === 'RUNNING' ? 'gray' : '#1976d2' }}>
+                  Cache Configuration
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <CacheConfig
+                  showTitle={false}
+                  onChange={setCacheConfig}
+                  status={status}
+                />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion defaultExpanded disableGutters>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  General Settings
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
