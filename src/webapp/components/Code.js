@@ -4,7 +4,7 @@ import { initVimMode } from 'monaco-vim';
 // new
 import MonacoEditor from 'react-monaco-editor';
 import useMediaQuery from '@mui/material/useMediaQuery';
-// Definizione globale del linguaggio MIPS per Monaco
+// Global MIPS language definition for the Monaco editor.
 import * as monaco from 'monaco-editor';
 
 monaco.languages.register({ id: 'mips' });
