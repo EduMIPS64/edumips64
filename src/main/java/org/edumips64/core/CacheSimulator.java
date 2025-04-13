@@ -273,7 +273,6 @@ public class CacheSimulator {
 
     }
 
-    /* For testing
     public void SimulateTrace(CacheMemory cache, String traceFile) {
 
         cache.resetStats();
@@ -293,9 +292,7 @@ public class CacheSimulator {
             e.printStackTrace();
         }
         System.out.println(cache.stats);
-
     }
-     */
 
     /** Sets the data offset.
      * @param dataOffset offset of the data section. Should be after the code
