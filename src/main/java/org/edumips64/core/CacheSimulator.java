@@ -12,11 +12,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class CacheSimulator {
 
-    private CacheMemory L1InstructionCache;
-    private CacheMemory L1DataCache;
+    final private CacheMemory L1InstructionCache;
+    final private CacheMemory L1DataCache;
 
     private LinkedList<String> dineroData = new LinkedList<>();
     // Offset of the data segment. This class writes a trace file that assumes
@@ -25,8 +26,8 @@ public class CacheSimulator {
 
     public CacheSimulator() {
         // fake values to be replaced
-        L1InstructionCache = new CacheMemory(1025,17,2,40, CacheMemory.CacheType.L1_INSTRUCTION);
-        L1DataCache = new CacheMemory(1025,17,2,40, CacheMemory.CacheType.L1_DATA);
+        L1InstructionCache = new CacheMemory(new CacheConfig(1025, 17, 2, 40), CacheType.L1_INSTRUCTION);
+        L1DataCache = new CacheMemory(new CacheConfig(1025, 17, 2, 40), CacheType.L1_DATA);
     }
 
     public CacheMemory getL1DataCache() {
@@ -36,56 +37,81 @@ public class CacheSimulator {
         return L1InstructionCache;
     }
 
+    public enum CacheType {
+        L1_DATA,
+        L1_INSTRUCTION,
+        L1_UNIFIED
+    }
 
-    public static class CacheMemory {
-        public enum CacheType {
-            L1_DATA,
-            L1_INSTRUCTION,
-            L1_UNIFIED
+
+    public static class CacheConfig {
+        public int size, blockSize, associativity, penalty;
+
+        public CacheConfig(int size, int blockSize, int associativity, int penalty) {
+            this.size = size;
+            this.blockSize = blockSize;
+            this.associativity = associativity;
+            this.penalty = penalty;
         }
 
-        private CacheType type;
-        private int cacheSize;
-        private int blockSize;
-        private int associativity;
-        private int penaly;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CacheConfig that = (CacheConfig) o;
+            return size == that.size &&
+                    blockSize == that.blockSize &&
+                    associativity == that.associativity &&
+                    penalty == that.penalty;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(size, blockSize, associativity, penalty);
+        }
+    }
+
+
+    public static class CacheMemory {
+
+        private CacheSimulator.CacheType type;
+        private CacheConfig config;
         private int numSets;
         private CacheSet[] sets;
         private int blockOffsetBits;
         private int indexBits;
-        private CacheStatistics stats;
+        private Stats stats;
 
-        public CacheMemory(int cacheSize, int blockSize, int associativity, int penaly, CacheType type) {
-            stats = new CacheStatistics();
-            setConfig(cacheSize,blockSize,associativity,penaly, type);
+        public CacheMemory(CacheConfig config, CacheSimulator.CacheType type) {
+            stats = new Stats();
+            this.type = type;
+            this.config = config;
+            setConfig(config);
         }
 
 
-        public void setConfig(int cacheSize, int blockSize, int associativity, int penaly, CacheType cacheType) {
-            this.cacheSize = cacheSize;
-            this.blockSize = blockSize;
-            this.associativity = associativity;
-            this.penaly = penaly;
-            this.type = cacheType;
-            this.numSets = cacheSize / (blockSize * associativity);
+        public void setConfig(CacheConfig config) {
+            this.config = config;
+            this.numSets = config.size / (config.blockSize * config.associativity);
             sets = new CacheSet[numSets];
             for (int i = 0; i < numSets; i++) {
-                sets[i] = new CacheSet(associativity);
+                sets[i] = new CacheSet(config.associativity);
             }
             // Calculate number of bits for block offset (log2(blockSize))
-            blockOffsetBits = (int)(Math.log(blockSize) / Math.log(2));
+            blockOffsetBits = (int)(Math.log(config.blockSize) / Math.log(2));
             // Calculate number of index bits (log2(numSets)) if more than one set exists
             indexBits = (numSets > 1) ? (int)(Math.log(numSets) / Math.log(2)) : 0;
             resetStats();
         }
 
         public void setConfig(ConfigStore config) {
-            String prefix = (type == CacheType.L1_DATA) ? "L1D" : "L1I";
+            String prefix = (type == CacheSimulator.CacheType.L1_DATA) ? "L1D" : "L1I";
             int cacheSize = config.getInt(ConfigKey.valueOf(prefix + "_SIZE"));
             int blockSize = config.getInt(ConfigKey.valueOf(prefix + "_BLOCK_SIZE"));
             int associativity = config.getInt(ConfigKey.valueOf(prefix + "_ASSOCIATIVITY"));
-            int penaly = config.getInt(ConfigKey.valueOf(prefix + "_PENALTY"));
-            setConfig(cacheSize, blockSize, associativity, penaly, type);
+            int penalty = config.getInt(ConfigKey.valueOf(prefix + "_PENALTY"));
+            CacheConfig cc = new CacheConfig(cacheSize, blockSize, associativity, penalty);
+            setConfig(cc);
         }
 
         public void resetStats() {
@@ -107,38 +133,47 @@ public class CacheSimulator {
             return set.access(tag, isWrite);
         }
 
-        public CacheStatistics getStats() {
+        public Stats getStats() {
             return stats;
         }
     }
 
     public static void main(String[] args) {
-        var cache = new CacheMemory(1024, 16, 2, 40, CacheMemory.CacheType.L1_DATA);
+        var cache = new CacheMemory(new CacheConfig(1024, 16, 2, 40), CacheType.L1_DATA);
         CacheSimulator cache_sim = new CacheSimulator();
         //cache_sim.SimulateTrace(cache,"code.s.xdin");
         System.out.println(cache.getStats());
     }
 
-   public static class CacheStatistics {
+   public static class Stats {
         private long readAccesses;
         private long writeAccesses;
         private long readMisses;
         private long writeMisses;
 
-        public CacheStatistics() {
+        public Stats() {
             reset();
+        }
+
+        public static Stats of(long readAccesses, long readMisses, long writeAccesses, long writeMisses) {
+            Stats stats = new Stats();
+            stats.readAccesses = readAccesses;
+            stats.readMisses = readMisses;
+            stats.writeAccesses = writeAccesses;
+            stats.writeMisses = writeMisses;
+            return stats;
         }
 
         public void reset() {
             this.readAccesses = 0;
-            this.writeAccesses = 0;
             this.readMisses = 0;
+            this.writeAccesses = 0;
             this.writeMisses = 0;
         }
 
         public long getReadAccesses() { return readAccesses; }
-        public long getWriteAccesses() { return writeAccesses; }
         public long getReadMisses() { return readMisses; }
+       public long getWriteAccesses() { return writeAccesses; }
         public long getWriteMisses() { return writeMisses; }
 
         public void incrementReadAccesses() { readAccesses++; }
@@ -150,8 +185,8 @@ public class CacheSimulator {
         public String toString() {
             return "CacheStatistics{" +
                     "readAccesses=" + readAccesses +
-                    ", writeAccesses=" + writeAccesses +
                     ", readMisses=" + readMisses +
+                    ", writeAccesses=" + writeAccesses +
                     ", writeMisses=" + writeMisses +
                     '}';
         }
@@ -226,7 +261,7 @@ public class CacheSimulator {
         }
     }
 
-    private void processDineroTraceEntry(CacheMemory cache, String line) {
+    private static void processDineroTraceEntry(CacheMemory cache, String line) {
         if (line.trim().isEmpty())
             return;
 
@@ -241,11 +276,11 @@ public class CacheSimulator {
         char refType = parts[0].charAt(0);
         // Filter lines based on the specified cache type
         // mismatching cache types should not happen, this is a sanity check
-        if (cache.type == CacheMemory.CacheType.L1_DATA && (refType != 'r' && refType != 'w')) {
+        if (cache.type == CacheType.L1_DATA && (refType != 'r' && refType != 'w')) {
             System.err.println("Invalid trace line: " + line+ " for cache type: "+cache.type);
             return;
         }
-        if (cache.type == CacheMemory.CacheType.L1_INSTRUCTION && refType != 'i') {
+        if (cache.type == CacheType.L1_INSTRUCTION && refType != 'i') {
             System.err.println("Invalid trace line: " + line+ " for cache type: "+cache.type);
             return;
         }
@@ -273,7 +308,7 @@ public class CacheSimulator {
 
     }
 
-    public void SimulateTrace(CacheMemory cache, String traceFile) {
+    public static Stats SimulateTrace(CacheMemory cache, String traceFile) {
 
         cache.resetStats();
         // Process the trace file line by line
@@ -291,7 +326,7 @@ public class CacheSimulator {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(cache.stats);
+        return cache.stats;
     }
 
     /** Sets the data offset.
