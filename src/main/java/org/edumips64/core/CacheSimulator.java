@@ -5,14 +5,8 @@ import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.io.WriteException;
 import org.edumips64.utils.io.Writer;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.io.*;
+import java.util.*;
 
 public class CacheSimulator {
 
@@ -28,6 +22,52 @@ public class CacheSimulator {
         // fake values to be replaced
         L1InstructionCache = new CacheMemory(new CacheConfig(1025, 17, 2, 40), CacheType.L1_INSTRUCTION);
         L1DataCache = new CacheMemory(new CacheConfig(1025, 17, 2, 40), CacheType.L1_DATA);
+    }
+
+    // Save stats to a CSV file
+    public static void saveStatsToCSV(Map<CacheConfig, Stats> statsMap, String filename) throws IOException {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
+            writer.println("size,blockSize,associativity,penalty,readAccesses,readMisses,writeAccesses,writeMisses");
+            for (Map.Entry<CacheConfig, Stats> entry : statsMap.entrySet()) {
+                CacheConfig config = entry.getKey();
+                Stats stats = entry.getValue();
+                writer.printf("%d,%d,%d,%d,%d,%d,%d,%d%n",
+                        config.size,
+                        config.blockSize,
+                        config.associativity,
+                        config.penalty,
+                        stats.getReadAccesses(),
+                        stats.getReadMisses(),
+                        stats.getWriteAccesses(),
+                        stats.getWriteMisses()
+                );
+            }
+        }
+    }
+
+    // Load stats from a CSV file
+    public static Map<CacheConfig, Stats> loadStatsFromCSV(String filename) throws IOException {
+        Map<CacheConfig, Stats> map = new HashMap<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line = reader.readLine(); // skip header
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                int size = Integer.parseInt(parts[0]);
+                int blockSize = Integer.parseInt(parts[1]);
+                int associativity = Integer.parseInt(parts[2]);
+                int penalty = Integer.parseInt(parts[3]);
+                int readAccesses = Integer.parseInt(parts[4]);
+                int readMisses = Integer.parseInt(parts[5]);
+                int writeAccesses = Integer.parseInt(parts[6]);
+                int writeMisses = Integer.parseInt(parts[7]);
+
+                CacheConfig config = new CacheConfig(size, blockSize, associativity, penalty);
+                Stats stats = Stats.of(readAccesses, readMisses,  writeAccesses, writeMisses);
+
+                map.put(config, stats);
+            }
+        }
+        return map;
     }
 
     public CacheMemory getL1DataCache() {
