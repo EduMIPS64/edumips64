@@ -25,9 +25,7 @@
  */
 package org.edumips64;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.NotAlignException;
-import org.edumips64.core.SynchronousException;
+import org.edumips64.core.*;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.AddressErrorException;
 import org.edumips64.core.is.BreakException;
@@ -38,10 +36,10 @@ import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.CycleElement;
 import org.edumips64.utils.ConfigKey;
-import org.edumips64.core.IrregularStringOfBitsException;
 import org.edumips64.utils.io.LocalWriter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import java.util.Map;
@@ -211,7 +209,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       return new CpuTestStatus(cpu, tracefile);
     } finally {
       cpu.reset();
-      cachesim.reset();
+      //cachesim.reset();
       symTab.reset();
     }
   }
@@ -612,6 +610,44 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runTestAndCompareTracefileWithGolden("tracefile-ldst.s");
     runTestAndCompareTracefileWithGolden("tracefile-noldst.s");
     runTestAndCompareTracefileWithGolden("tracefile-st.s");
+  }
+
+
+  // Check that cache stats generated during exectution are correct are coherent with
+  // those generated when running a tracefile
+  @Test
+  public void testCacheSimStats() throws Exception {
+
+    String tracefile = "sample.s.xdin";
+
+    Map<CacheSimulator.CacheConfig, CacheSimulator.Stats> l1iGoldenStats = null;
+    Map<CacheSimulator.CacheConfig, CacheSimulator.Stats> l1dGoldenStats = null;
+
+    l1iGoldenStats = CacheSimulator.loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1I.csv");
+    l1dGoldenStats = CacheSimulator.loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1D.csv");
+
+    var l1i_cache = cachesim.getL1InstructionCache();
+    var l1d_cache = cachesim.getL1DataCache();
+
+    for (Map.Entry<CacheSimulator.CacheConfig, CacheSimulator.Stats> entry : l1iGoldenStats.entrySet()) {
+      CacheSimulator.CacheConfig config = entry.getKey();
+      CacheSimulator.Stats expected = entry.getValue();
+      l1i_cache.setConfig(config);
+      runMipsTest("sample.s");
+      var actual_l1i = cachesim.getL1InstructionCache().getStats();
+
+      collector.checkThat("L1I cache mismatch for config " + config, actual_l1i, equalTo(expected));
+    }
+
+    for (Map.Entry<CacheSimulator.CacheConfig, CacheSimulator.Stats> entry : l1dGoldenStats.entrySet()) {
+      CacheSimulator.CacheConfig config = entry.getKey();
+      CacheSimulator.Stats expected = entry.getValue();
+      l1d_cache.setConfig(config);
+      runMipsTest("sample.s");
+      var actual_l1d = cachesim.getL1DataCache().getStats();
+
+      collector.checkThat("L1D cache mismatch for config " + config, actual_l1d, equalTo(expected));
+    }
   }
 
   /* Issue #36: StringIndexOutOfBoundsException raised at run-time. */
