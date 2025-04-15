@@ -104,8 +104,12 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     }
 
     // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
+    // Runtime errors should not cause multiple alert prompting to avoid webui getting stuck
     if (!result.success && result.errorMessage !== 'Parsing errors.') {
       alert(result.errorMessage);
+      setMustPause(true);
+      setRunAll(false);
+      setStepsToRun(0);
     }
 
     if (result.status !== 'RUNNING' || mustPause || result.encounteredBreak) {
