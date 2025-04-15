@@ -35,6 +35,8 @@ public class CacheSimulatorTests {
     public void runCacheSimulatorTests() {
         String tracefile ="sample.s.xdin";
         checkTraceOnCacheConfigStats(tracefile);
+        tracefile ="sample2.s.xdin";
+        checkTraceOnCacheConfigStats(tracefile);
     }
 
     // Used to generate reference stats for a tracefile
