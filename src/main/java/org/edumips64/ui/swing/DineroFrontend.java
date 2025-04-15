@@ -23,7 +23,7 @@
 
 package org.edumips64.ui.swing;
 
-import org.edumips64.core.Dinero;
+import org.edumips64.core.CacheSimulator;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.io.LocalWriterAdapter;
@@ -108,7 +108,7 @@ public class DineroFrontend extends JDialog {
     return result;
   }
 
-  public DineroFrontend(Frame owner, Dinero dinero, ConfigStore config) {
+  public DineroFrontend(Frame owner, CacheSimulator cacheSimulator, ConfigStore config) {
     super(owner);
     setTitle("Dinero frontend");
     Container cp = rootPane.getContentPane();
@@ -179,7 +179,7 @@ public class DineroFrontend extends JDialog {
         logger.info("Sending the tracefile to Dinero via stdin");
         // Let's send the tracefile to Dinero
         PrintWriter dineroIn = new PrintWriter(process.getOutputStream());
-        dinero.writeTraceData(new LocalWriterAdapter(dineroIn));
+        cacheSimulator.writeTraceData(new LocalWriterAdapter(dineroIn));
         dineroIn.flush();
         dineroIn.close();
 

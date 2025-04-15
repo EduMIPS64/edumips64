@@ -71,7 +71,7 @@ public abstract class Loading extends LDSTInstructions {
     super.EX();
 
     // Save memory access for Dinero trace file
-    dinero.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), memoryOpSize);
+    cachesim.Load(Converter.binToHex(Converter.positiveIntToBin(64, address)), memoryOpSize);
   }
 
   public void WB() throws IrregularStringOfBitsException {

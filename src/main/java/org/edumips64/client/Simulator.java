@@ -28,12 +28,8 @@ package org.edumips64.client;
 
 import java.util.logging.Logger;
 
-import org.edumips64.core.CPU;
+import org.edumips64.core.*;
 import org.edumips64.core.CPU.CPUStatus;
-import org.edumips64.core.Dinero;
-import org.edumips64.core.IOManager;
-import org.edumips64.core.Memory;
-import org.edumips64.core.SymbolTable;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
@@ -51,7 +47,7 @@ public class Simulator {
   private Parser parser;
   private SymbolTable symTab;
   private Memory memory;
-  private Dinero dinero;
+  private CacheSimulator cachesim;
   private StringWriter stdout;
   private IOManager iom;
 
@@ -73,21 +69,30 @@ public class Simulator {
     iom = new IOManager(fu, memory);
     iom.setStdOutput(stdout);
     cpu = new CPU(memory, config, new BUBBLE());
-    dinero = new Dinero();
-    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
+    cachesim = new CacheSimulator();
+
+    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, cachesim, config);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
-    resultFactory = new ResultFactory(cpu, memory, stdout);
+    resultFactory = new ResultFactory(cpu, memory, cachesim, stdout);
     info("initialization complete!");
+  }
+
+  public Result setCacheConfig(CacheSimulator.CacheConfig l1d_config, CacheSimulator.CacheConfig l1i_config)  {
+    cpu.reset();
+    cachesim.getL1InstructionCache().setConfig(l1i_config);
+    cachesim.getL1DataCache().setConfig(l1d_config);
+    resultFactory = new ResultFactory(cpu, memory, cachesim,stdout);
+    return resultFactory.Success();
   }
 
   public Result reset() {
       info("Resetting the CPU");
       cpu.reset();
-      dinero.reset();
+      cachesim.reset();
       symTab.reset();
       stdout = new StringWriter();
       iom.setStdOutput(stdout);
-      resultFactory = new ResultFactory(cpu, memory, stdout);
+      resultFactory = new ResultFactory(cpu, memory, cachesim,stdout);
       return resultFactory.Success();
   }
 
@@ -128,7 +133,7 @@ public class Simulator {
     boolean hadErrors = false;
     try {
       parser.doParsing(code);
-      dinero.setDataOffset(memory.getInstructionsNumber()*4);
+      cachesim.setDataOffset(memory.getInstructionsNumber()*4);
     } catch (ParserMultiException e) {
       hadErrors = true;
       warning("Parsing error: " + e.toString());

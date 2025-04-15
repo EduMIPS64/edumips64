@@ -47,6 +47,11 @@ simulator.load = (code) => {
   simulator.postMessage({ method: 'load', code });
   appInsights.trackEvent({name: "load"});
 };
+
+simulator.setCacheConfig = (config) => {
+  simulator.postMessage({ method: 'setCacheConfig', config });
+};
+
 simulator.checkSyntax = (code) => {
   simulator.postMessage({ method: 'checksyntax', code });
   appInsights.trackEvent({name: "checkSyntax"});
