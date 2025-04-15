@@ -69,6 +69,11 @@ public class CacheSimulator {
         public int hashCode() {
             return Objects.hash(size, blockSize, associativity, penalty);
         }
+
+        @Override
+        public String toString() {
+            return "{size:" + size + ", bsize:" + blockSize +" assoc:"+ associativity+'}';
+        }
     }
 
 
@@ -133,6 +138,11 @@ public class CacheSimulator {
             return set.access(tag, isWrite);
         }
 
+        @Override
+        public String toString() {
+            return "CacheMemory{" + type + config + '}';
+        }
+
         public Stats getStats() {
             return stats;
         }
@@ -141,8 +151,6 @@ public class CacheSimulator {
     public static void main(String[] args) {
         var cache = new CacheMemory(new CacheConfig(1024, 16, 2, 40), CacheType.L1_DATA);
         CacheSimulator cache_sim = new CacheSimulator();
-        //cache_sim.SimulateTrace(cache,"code.s.xdin");
-        System.out.println(cache.getStats());
     }
 
    public static class Stats {
@@ -181,7 +189,20 @@ public class CacheSimulator {
         public void incrementReadMisses() { readMisses++; }
         public void incrementWriteMisses() { writeMisses++; }
 
-        @Override
+       @Override
+       public boolean equals(Object o) {
+           if (this == o) return true;
+           if (o == null || getClass() != o.getClass()) return false;
+           Stats stats = (Stats) o;
+           return readAccesses == stats.readAccesses && writeAccesses == stats.writeAccesses && readMisses == stats.readMisses && writeMisses == stats.writeMisses;
+       }
+
+       @Override
+       public int hashCode() {
+           return Objects.hash(readAccesses, writeAccesses, readMisses, writeMisses);
+       }
+
+       @Override
         public String toString() {
             return "CacheStatistics{" +
                     "readAccesses=" + readAccesses +
@@ -274,41 +295,40 @@ public class CacheSimulator {
         }
 
         char refType = parts[0].charAt(0);
-        // Filter lines based on the specified cache type
-        // mismatching cache types should not happen, this is a sanity check
-        if (cache.type == CacheType.L1_DATA && (refType != 'r' && refType != 'w')) {
-            System.err.println("Invalid trace line: " + line+ " for cache type: "+cache.type);
-            return;
-        }
-        if (cache.type == CacheType.L1_INSTRUCTION && refType != 'i') {
-            System.err.println("Invalid trace line: " + line+ " for cache type: "+cache.type);
-            return;
-        }
-
         String addressStr = parts[1];
         // Use Long.decode to support both hex (with 0x) and decimal
         long address = Long.decode("0x"+addressStr);
         int size = Integer.parseInt(parts[2]); // size is parsed but not used in this simple simulator
 
-        // Process access based on operation type.
-        // 'i' and 'r' are treated as reads; 'w' is treated as a write.
-        if (refType == 'i' || refType == 'r') {
+        if (refType == 'i' && cache.type == CacheType.L1_INSTRUCTION) {
             cache.stats.incrementReadAccesses();
             boolean hit = cache.access(address, false);
             if (!hit) {
                 cache.stats.incrementReadMisses();
             }
-        } else if (refType == 'w') {
+            return;
+        }
+
+        if (refType == 'r' && cache.type == CacheType.L1_DATA) {
+            cache.stats.incrementReadAccesses();
+            boolean hit = cache.access(address, true);
+            if (!hit) {
+                cache.stats.incrementReadMisses();
+            }
+            return;
+        }
+
+        if (refType == 'w' && cache.type == CacheType.L1_DATA) {
             cache.stats.incrementWriteAccesses();
             boolean hit = cache.access(address, true);
             if (!hit) {
                 cache.stats.incrementWriteMisses();
             }
+            return;
         }
-
     }
 
-    public static Stats SimulateTrace(CacheMemory cache, String traceFile) {
+    public static Stats runTraceOnCache(CacheMemory cache, String traceFile) {
 
         cache.resetStats();
         // Process the trace file line by line
@@ -326,7 +346,12 @@ public class CacheSimulator {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return cache.stats;
+        return Stats.of(
+                cache.stats.getReadAccesses(),
+                cache.stats.getReadMisses(),
+                cache.stats.getWriteAccesses(),
+                cache.stats.getWriteMisses()
+        );
     }
 
     /** Sets the data offset.
