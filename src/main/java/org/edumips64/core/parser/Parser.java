@@ -618,9 +618,14 @@ public class Parser {
                         }
                       }
 
-                      if (errorMessage.isEmpty() && (immediateValue < -32768 || immediateValue > 32767)) {
+                      // too large if converted as unsigned 16 bits
+                      if (errorMessage.isEmpty() && (immediateValue > 65535)) {
                         errorMessage = "IMMEDIATE_TOO_LARGE";
                         immediateValue = 0;
+                      }
+                      // valid 16 unsigned that should be interpreted as signed
+                      if (immediateValue >= 32768 && immediateValue<=65535) {
+                        immediateValue -= 65536;
                       }
 
                       // Casting to int is safe because we know the value is between -32768 and 32767.
