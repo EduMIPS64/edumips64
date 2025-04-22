@@ -604,8 +604,6 @@ public class Parser {
                     } else if (type == 'I') {
                       long immediateValue = 0;
                       String errorMessage = "";
-                      boolean is_label = false;
-                      boolean is_hex =  (paramValue.length() >= 3 && paramValue.substring(0, 2).compareToIgnoreCase("0x") == 0);
 
                       try {
                         immediateValue = Converter.parseImmediate(paramValue);
@@ -615,22 +613,22 @@ public class Parser {
                         try {
                           tmpMem = symTab.getCell(paramValue.trim());
                           immediateValue = tmpMem.getAddress();
-                          is_label = true;
                         } catch (MemoryElementNotFoundException ex) {
                           errorMessage = "INVALIDIMMEDIATE";
                         }
                       }
-                      // when hexadecimal, the range 32768 to 65536 is actually
-                      // the signed value will be between -32738 and -1
-                      // for example: 0xffff is not 65536 but -1
-                      if ( is_hex ) {
-                        if ( immediateValue >= 32768 && immediateValue<=65535)
+                      // when hexadecimal, the range 32768 to 65536 is actually the signed value will be between -32738 and -1
+                      // for example: 0xffff is not 65535, but -1
+                      if ( Converter.isHexNumber(paramValue) ) {
+                        if ( immediateValue >= 32768 && immediateValue<=65535) {
                           immediateValue -= 65536;
-                        else if (immediateValue>65535)
+                        }
+                        else if (immediateValue>65535) {
                           errorMessage = "IMMEDIATE_TOO_LARGE";
+                        }
                       }
 
-                      // after all, the decimal should not exceed the 16 bit signed range
+                      // after all parsing, the resulting value should not exceed the 16 bit signed range anyway
                       if (errorMessage.isEmpty() && ( immediateValue< -32768 || immediateValue > 32767)) {
                         errorMessage = "IMMEDIATE_TOO_LARGE";
                         immediateValue = 0;
@@ -1049,7 +1047,8 @@ public class Parser {
         continue;
       }
 
-      if (Converter.isHexNumber(val)) {
+      boolean is_hex = (Converter.isHexNumber(val));
+      if (is_hex) {
         try {
           val = Converter.hexToLong(val);
         } catch (IrregularStringOfHexException e) {
@@ -1063,9 +1062,15 @@ public class Parser {
         // Convert the integer to a long, and then check for overflow.
         long num = Long.parseLong(val);
 
-        if ((num < - (Converter.powLong(2, numBit - 1)) || num > (Converter.powLong(2, numBit - 1) - 1)) &&  numBit != 64) {
+        if (!is_hex && (num < - (Converter.powLong(2, numBit - 1)) || num > (Converter.powLong(2, numBit - 1) - 1)) &&  numBit != 64) {
           throw new NumberFormatException();
         }
+
+        // hex string values should be allowed independently of signed/unsigned interpretation
+        if (is_hex && (num > (Converter.powLong(2, numBit) - 1)) && numBit!=64) {
+          throw new NumberFormatException();
+        }
+
 
         if (numBit == 8) {
           tmpMem.writeByte((int) num, posInWord);
