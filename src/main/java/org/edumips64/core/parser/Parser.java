@@ -1050,6 +1050,10 @@ public class Parser {
       boolean is_hex = (Converter.isHexNumber(val));
       if (is_hex) {
         try {
+          // handle the corner case of unlimited hex strings
+          if (numBit ==64 && is_hex && val.length()>18) {
+            throw new IrregularStringOfHexException();
+          }
           val = Converter.hexToLong(val);
         } catch (IrregularStringOfHexException e) {
           errors.addError("INVALIDVALUE", row, i + 1, line);
