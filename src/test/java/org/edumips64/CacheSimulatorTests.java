@@ -20,6 +20,78 @@ public class CacheSimulatorTests {
     @Rule
     public ErrorCollector collector = new ErrorCollector();
 
+    // Save stats to a CSV file
+    public static void saveStatsToCSV(Map<CacheSimulator.CacheConfig, CacheSimulator.Stats> statsMap, String filename) throws IOException {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
+            writer.println("size,blockSize,associativity,penalty,readAccesses,readMisses,writeAccesses,writeMisses");
+            for (Map.Entry<CacheSimulator.CacheConfig, CacheSimulator.Stats> entry : statsMap.entrySet()) {
+                CacheSimulator.CacheConfig config = entry.getKey();
+                CacheSimulator.Stats stats = entry.getValue();
+                writer.printf("%d,%d,%d,%d,%d,%d,%d,%d%n",
+                        config.size,
+                        config.blockSize,
+                        config.associativity,
+                        config.penalty,
+                        stats.getReadAccesses(),
+                        stats.getReadMisses(),
+                        stats.getWriteAccesses(),
+                        stats.getWriteMisses()
+                );
+            }
+        }
+    }
+
+    // Load stats from a CSV file
+    public static Map<CacheSimulator.CacheConfig, CacheSimulator.Stats> loadStatsFromCSV(String filename) throws IOException {
+        Map<CacheSimulator.CacheConfig, CacheSimulator.Stats> map = new HashMap<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line = reader.readLine(); // skip header
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                int size = Integer.parseInt(parts[0]);
+                int blockSize = Integer.parseInt(parts[1]);
+                int associativity = Integer.parseInt(parts[2]);
+                int penalty = Integer.parseInt(parts[3]);
+                int readAccesses = Integer.parseInt(parts[4]);
+                int readMisses = Integer.parseInt(parts[5]);
+                int writeAccesses = Integer.parseInt(parts[6]);
+                int writeMisses = Integer.parseInt(parts[7]);
+
+                CacheSimulator.CacheConfig config = new CacheSimulator.CacheConfig(size, blockSize, associativity, penalty);
+                CacheSimulator.Stats stats = CacheSimulator.Stats.of(readAccesses, readMisses,  writeAccesses, writeMisses);
+
+                map.put(config, stats);
+            }
+        }
+        return map;
+    }
+
+    public static CacheSimulator.Stats runTraceOnCache(CacheSimulator.CacheMemory cache, String traceFile) {
+
+        cache.resetStats();
+        // Process the trace file line by line
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(traceFile));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        };
+        try  {
+            String line;
+            while ((line = br.readLine()) != null) {
+                CacheSimulator.processDineroTraceEntry(cache, line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return CacheSimulator.Stats.of(
+                cache.stats.getReadAccesses(),
+                cache.stats.getReadMisses(),
+                cache.stats.getWriteAccesses(),
+                cache.stats.getWriteMisses()
+        );
+    }
+
     @Before
     public void setUp() {
     }
@@ -55,19 +127,19 @@ public class CacheSimulatorTests {
                     var config = new CacheSimulator.CacheConfig(size, blockSize, assoc, penalty);
 
                     cachesim.getL1InstructionCache().setConfig(config);
-                    var statsI = CacheSimulator.runTraceOnCache(cachesim.getL1InstructionCache(), testsLocation+tracefile);
+                    var statsI = runTraceOnCache(cachesim.getL1InstructionCache(), testsLocation+tracefile);
                     L1I_stats.put(config, statsI);
 
                     cachesim.getL1DataCache().setConfig(config);
-                    CacheSimulator.Stats statsD = CacheSimulator.runTraceOnCache(cachesim.getL1DataCache(), testsLocation+tracefile);
+                    CacheSimulator.Stats statsD = runTraceOnCache(cachesim.getL1DataCache(), testsLocation+tracefile);
                     L1D_stats.put(config, statsD);
                 }
             }
         }
 
         try {
-            CacheSimulator.saveStatsToCSV(L1I_stats, testsLocation+tracefile+"_golden_stats_L1I.csv");
-            CacheSimulator.saveStatsToCSV(L1D_stats, testsLocation+tracefile+"_golden_stats_L1D.csv");
+            saveStatsToCSV(L1I_stats, testsLocation+tracefile+"_golden_stats_L1I.csv");
+            saveStatsToCSV(L1D_stats, testsLocation+tracefile+"_golden_stats_L1D.csv");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -80,8 +152,8 @@ public class CacheSimulatorTests {
         Map<CacheSimulator.CacheConfig, CacheSimulator.Stats> l1iGoldenStats = null;
         Map<CacheSimulator.CacheConfig, CacheSimulator.Stats> l1dGoldenStats = null;
         try {
-            l1iGoldenStats = CacheSimulator.loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1I.csv");
-            l1dGoldenStats = CacheSimulator.loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1D.csv");
+            l1iGoldenStats = loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1I.csv");
+            l1dGoldenStats = loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1D.csv");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -92,7 +164,7 @@ public class CacheSimulatorTests {
             CacheSimulator.Stats expected = entry.getValue();
 
             l1i_cache.setConfig(config);
-            var actual = CacheSimulator.runTraceOnCache(l1i_cache, testsLocation+tracefile);
+            var actual = runTraceOnCache(l1i_cache, testsLocation+tracefile);
 
             collector.checkThat("L1I cache mismatch for config " + config, actual, equalTo(expected));
 
@@ -109,7 +181,7 @@ public class CacheSimulatorTests {
             CacheSimulator.Stats expected = entry.getValue();
 
             l1d_cache.setConfig(config);
-            var actual = CacheSimulator.runTraceOnCache(l1d_cache, testsLocation+tracefile);
+            var actual = runTraceOnCache(l1d_cache, testsLocation+tracefile);
             collector.checkThat("L1D cache mismatch for config " + config, actual, equalTo(expected));
         }
     }

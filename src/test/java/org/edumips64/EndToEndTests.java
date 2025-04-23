@@ -30,7 +30,6 @@ import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.AddressErrorException;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
-import org.edumips64.core.is.IntegerOverflowException;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.utils.CycleBuilder;
@@ -39,7 +38,6 @@ import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.io.LocalWriter;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import java.util.Map;
@@ -623,8 +621,8 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     Map<CacheSimulator.CacheConfig, CacheSimulator.Stats> l1iGoldenStats = null;
     Map<CacheSimulator.CacheConfig, CacheSimulator.Stats> l1dGoldenStats = null;
 
-    l1iGoldenStats = CacheSimulator.loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1I.csv");
-    l1dGoldenStats = CacheSimulator.loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1D.csv");
+    l1iGoldenStats = CacheSimulatorTests.loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1I.csv");
+    l1dGoldenStats = CacheSimulatorTests.loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1D.csv");
 
     var l1i_cache = cachesim.getL1InstructionCache();
     var l1d_cache = cachesim.getL1DataCache();

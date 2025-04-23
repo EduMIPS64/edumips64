@@ -5,7 +5,6 @@ import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.io.WriteException;
 import org.edumips64.utils.io.Writer;
 
-import java.io.*;
 import java.util.*;
 
 public class CacheSimulator {
@@ -22,52 +21,6 @@ public class CacheSimulator {
         // fake values to be replaced
         L1InstructionCache = new CacheMemory(new CacheConfig(1025, 17, 2, 40), CacheType.L1_INSTRUCTION);
         L1DataCache = new CacheMemory(new CacheConfig(1025, 17, 2, 40), CacheType.L1_DATA);
-    }
-
-    // Save stats to a CSV file
-    public static void saveStatsToCSV(Map<CacheConfig, Stats> statsMap, String filename) throws IOException {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
-            writer.println("size,blockSize,associativity,penalty,readAccesses,readMisses,writeAccesses,writeMisses");
-            for (Map.Entry<CacheConfig, Stats> entry : statsMap.entrySet()) {
-                CacheConfig config = entry.getKey();
-                Stats stats = entry.getValue();
-                writer.printf("%d,%d,%d,%d,%d,%d,%d,%d%n",
-                        config.size,
-                        config.blockSize,
-                        config.associativity,
-                        config.penalty,
-                        stats.getReadAccesses(),
-                        stats.getReadMisses(),
-                        stats.getWriteAccesses(),
-                        stats.getWriteMisses()
-                );
-            }
-        }
-    }
-
-    // Load stats from a CSV file
-    public static Map<CacheConfig, Stats> loadStatsFromCSV(String filename) throws IOException {
-        Map<CacheConfig, Stats> map = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-            String line = reader.readLine(); // skip header
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                int size = Integer.parseInt(parts[0]);
-                int blockSize = Integer.parseInt(parts[1]);
-                int associativity = Integer.parseInt(parts[2]);
-                int penalty = Integer.parseInt(parts[3]);
-                int readAccesses = Integer.parseInt(parts[4]);
-                int readMisses = Integer.parseInt(parts[5]);
-                int writeAccesses = Integer.parseInt(parts[6]);
-                int writeMisses = Integer.parseInt(parts[7]);
-
-                CacheConfig config = new CacheConfig(size, blockSize, associativity, penalty);
-                Stats stats = Stats.of(readAccesses, readMisses,  writeAccesses, writeMisses);
-
-                map.put(config, stats);
-            }
-        }
-        return map;
     }
 
     public CacheMemory getL1DataCache() {
@@ -125,7 +78,7 @@ public class CacheSimulator {
         private CacheSet[] sets;
         private int blockOffsetBits;
         private int indexBits;
-        private Stats stats;
+        public Stats stats;
 
         public CacheMemory(CacheConfig config, CacheSimulator.CacheType type) {
             stats = new Stats();
@@ -322,7 +275,7 @@ public class CacheSimulator {
         }
     }
 
-    private static void processDineroTraceEntry(CacheMemory cache, String line) {
+    public static void processDineroTraceEntry(CacheMemory cache, String line) {
         if (line.trim().isEmpty())
             return;
 
@@ -366,32 +319,6 @@ public class CacheSimulator {
             }
             return;
         }
-    }
-
-    public static Stats runTraceOnCache(CacheMemory cache, String traceFile) {
-
-        cache.resetStats();
-        // Process the trace file line by line
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new FileReader(traceFile));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        };
-        try  {
-            String line;
-            while ((line = br.readLine()) != null) {
-                processDineroTraceEntry(cache, line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Stats.of(
-                cache.stats.getReadAccesses(),
-                cache.stats.getReadMisses(),
-                cache.stats.getWriteAccesses(),
-                cache.stats.getWriteMisses()
-        );
     }
 
     /** Sets the data offset.
