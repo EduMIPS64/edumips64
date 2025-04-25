@@ -18,43 +18,18 @@ import org.edumips64.utils.ConfigStore;
  * will refuse to build it.
  */
 public class InstructionBuilder {
-  private Memory memory;
-  private IOManager iom;
   private CPU cpu;
   private Dinero dinero;
   private ConfigStore config;
 
+  private Map<String, Supplier<Instruction>> instructionDictionary;
+
   public InstructionBuilder(Memory memory, IOManager iom, CPU cpu, Dinero dinero, ConfigStore config) {
-    this.memory = memory;
-    this.iom = iom;
     this.cpu = cpu;
     this.dinero = dinero;
     this.config = config;
-  }
-  
-  /**
-   * Creates a new instance of an Instruction's subclass, with null parsing-time metadata.
-   * @param instructionName string value to pass in order to instantiate an instruction object
-   * @return the instruction object, or null if the instruction is not implemented.
-   *
-   */
-  public Instruction buildInstruction(String instructionName) {
-    return buildInstruction(instructionName, null);
-  }
 
-  /**
-   * Creates a new instance of an Instruction's subclass
-   * @param instructionName string value to pass in order to instantiate an instruction object
-   * @param instructionMetadata parsing-time metadata for the instruction. Can be null.
-   * @return the instruction object, or null if the instruction is not implemented.
-   *
-   */
-  public Instruction buildInstruction(String instructionName, ParsedInstructionMetadata instructionMetadata) {
-    // If the name of the requested instruction has got a dot, the instruction is FP and an
-    // underscore takes the place of the dot because classes names cannot contain dots
-    String name = instructionName.replaceAll("\\.", "_");
-
-    Map<String, Supplier<Instruction>> instructionDictionary = Map.ofEntries(
+    instructionDictionary = Map.ofEntries(
       //ALU R-Type 32-bits
       entry("ADD", ADD::new),
       entry("ADDU", ADDU::new),
@@ -199,6 +174,41 @@ public class InstructionBuilder {
       entry("CVT_W_D", CVT_W_D::new),
       entry("CVT_D_W", CVT_D_W::new)
     );
+  }
+
+/**
+ * Gets a string containing all supported instructions in lowercase, separated by '|'.
+ * The string includes all instructions from the instruction dictionary plus 'BUBBLE'.
+ * 
+ * @return A string containing all supported instructions in lowercase, with each instruction
+ *         separated by the '|' character
+ */
+  public String getSupportedInstructionString() {
+    String instructions = String.join("|", instructionDictionary.keySet()) + "|BUBBLE";
+    return instructions.toLowerCase();
+  }
+  
+  /**
+   * Creates a new instance of an Instruction's subclass, with null parsing-time metadata.
+   * @param instructionName string value to pass in order to instantiate an instruction object
+   * @return the instruction object, or null if the instruction is not implemented.
+   *
+   */
+  public Instruction buildInstruction(String instructionName) {
+    return buildInstruction(instructionName, null);
+  }
+
+  /**
+   * Creates a new instance of an Instruction's subclass
+   * @param instructionName string value to pass in order to instantiate an instruction object
+   * @param instructionMetadata parsing-time metadata for the instruction. Can be null.
+   * @return the instruction object, or null if the instruction is not implemented.
+   *
+   */
+  public Instruction buildInstruction(String instructionName, ParsedInstructionMetadata instructionMetadata) {
+    // If the name of the requested instruction has got a dot, the instruction is FP and an
+    // underscore takes the place of the dot because classes names cannot contain dots
+    String name = instructionName.replaceAll("\\.", "_");
   
     // If the instruction is not implemented, return null
     if (!instructionDictionary.containsKey(name)) {
