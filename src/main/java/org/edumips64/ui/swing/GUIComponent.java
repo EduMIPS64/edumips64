@@ -40,17 +40,15 @@ abstract class GUIComponent {
   protected CPU cpu;
   protected Memory memory;
   protected ConfigStore config;
-  protected CacheSimulator cachesim;
 
   Font font;
   float scalingDenominator = 12.0f;
 
-  GUIComponent(CPU cpu, Memory memory, CacheSimulator cacheSimulator, ConfigStore config) {
+  GUIComponent(CPU cpu, Memory memory, ConfigStore config) {
     cont = null;
     this.cpu = cpu;
     this.memory = memory;
     this.config = config;
-    this.cachesim = cacheSimulator;
 
     font = new Font("Monospaced", Font.PLAIN, config.getInt(ConfigKey.UI_FONT_SIZE));
   }

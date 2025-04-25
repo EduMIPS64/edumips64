@@ -46,8 +46,8 @@ public class GUIData extends GUIComponent {
 
   private static final Logger LOGGER = Logger.getLogger(CPU.class.getName());
 
-  public GUIData(CPU cpu, Memory memory, CacheSimulator cacheSimulator, ConfigStore config, StatusBar sb) {
-    super(cpu, memory, cacheSimulator, config);
+  public GUIData(CPU cpu, Memory memory, ConfigStore config, StatusBar sb) {
+    super(cpu, memory, config);
     statusbar = sb;
     dataPanel = new DataPanel();
   }

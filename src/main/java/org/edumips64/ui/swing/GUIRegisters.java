@@ -73,8 +73,8 @@ class GUIRegisters extends GUIComponent {
 
   private StatusBar statusbar;
 
-  GUIRegisters(CPU cpu, Memory memory, CacheSimulator cacheSimulator, ConfigStore config, StatusBar sb) {
-    super(cpu, memory, cacheSimulator,  config);
+  GUIRegisters(CPU cpu, Memory memory, ConfigStore config, StatusBar sb) {
+    super(cpu, memory, config);
     registers = cpu.getRegisters();
     registersFP = cpu.getRegistersFP();
     statusbar = sb;

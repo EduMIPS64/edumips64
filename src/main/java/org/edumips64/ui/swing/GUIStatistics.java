@@ -49,14 +49,16 @@ public class GUIStatistics extends GUIComponent {
 
   private float cpi;
   GUITheme theme;
+  private CacheSimulator cachesim;
 
   GUIStatistics(CPU cpu, Memory memory, CacheSimulator cachesim, ConfigStore config, GUITheme theme) {
-    super(cpu, memory, cachesim, config);
+    super(cpu, memory, config);
     this.theme = theme;
     statPanel = new StatPanel();
     jsp = new JScrollPane(statPanel);
     jsp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     jsp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    this.cachesim = cachesim;
 
   }
 

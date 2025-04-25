@@ -58,8 +58,8 @@ public class GUICycles extends GUIComponent {
 
   private GUITheme theme;
 
-  GUICycles(CPU cpu, Memory memory, CacheSimulator cacheSimulator, ConfigStore config, CycleBuilder builder, GUITheme guiTheme) {
-    super(cpu, memory, cacheSimulator, config);
+  GUICycles(CPU cpu, Memory memory, ConfigStore config, CycleBuilder builder, GUITheme guiTheme) {
+    super(cpu, memory, config);
     this.builder = builder;
     this.theme = guiTheme;
 

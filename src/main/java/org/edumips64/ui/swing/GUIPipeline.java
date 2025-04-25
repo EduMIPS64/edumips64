@@ -51,8 +51,8 @@ class GUIPipeline extends GUIComponent {
 
   private GUITheme theme;
 
-  GUIPipeline(CPU cpu, Memory memory, CacheSimulator cacheSimulator, ConfigStore config, GUITheme theme) {
-    super(cpu, memory, cacheSimulator, config);
+  GUIPipeline(CPU cpu, Memory memory, ConfigStore config, GUITheme theme) {
+    super(cpu, memory, config);
     numMultiplier = 7;
     numAdder = 4;
     pannello = new Pannello1();
