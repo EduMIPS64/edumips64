@@ -51,6 +51,10 @@ simulator.checkSyntax = (code) => {
   simulator.postMessage({ method: 'checksyntax', code });
   appInsights.trackEvent({name: "checkSyntax"});
 };
+simulator.stdin = (input) => {
+  simulator.postMessage({ method: 'stdin', input });
+  appInsights.trackEvent({name: "stdin"});
+}
 simulator.parseResult = (result) => {
   result.registers = JSON.parse(result.registers);
   result.memory = JSON.parse(result.memory);
