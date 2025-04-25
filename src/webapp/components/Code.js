@@ -4,26 +4,10 @@ import { initVimMode } from 'monaco-vim';
 // new
 import MonacoEditor from 'react-monaco-editor';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import * as monacoEditor from 'monaco-editor';
+
 // Global MIPS language definition for the Monaco editor.
-import * as monaco from 'monaco-editor';
-
-monaco.languages.register({ id: 'mips' });
-
-monaco.languages.setMonarchTokensProvider('mips', {
-  tokenizer: {
-    root: [
-      [/^[ \t]*[a-zA-Z_][\w]*:/, 'type.identifier'], // label
-      [/\b(?:add|dadd|daddi|daddui|dsub|dsubu|dmult|dmultu|mflo|mfhi|ddiv|and|andi|or|nor|dsll|dsslv|dsrl|dsrlv|dsra|dsrav|slt|sltu|slti|sltui|lb|lbu|sb|lw|lwu|sw|ld|sd|lh|lhu|sh|lui|j|jr|jal|jalr|beq|bne|move|syscall)\b/, 'keyword'],
-      [/\.[a-zA-Z_][\w]*/, 'strong'], // directives
-      [/[#,]/, 'delimiter'],
-      [/\br(?:\d{1,2})\b/, 'string'],
-      [/\d+/, 'number'],
-      [/".*?"/, 'regexp'],
-      [/;.*/, 'comment'],
-      [/[a-zA-Z_][\w]*/, 'identifier'],
-    ]
-  }
-});
+monacoEditor.languages.register({ id: 'mips' });
 
 const Code = (props) => {
 
@@ -38,6 +22,24 @@ const Code = (props) => {
 
   // Maps line of code to CPU stage.
   const [stageMap, setStageMap] = useState(new Map());
+
+  // Dynamically build the syntax highlighting regex for instructions.
+  var instructionRegex = new RegExp(`\\b(${props.validInstructions})\\b`)
+  monacoEditor.languages.setMonarchTokensProvider('mips', {
+    tokenizer: {
+      root: [
+        [/^[ \t]*[a-zA-Z_][\w]*:/, 'type.identifier'], // label
+        [instructionRegex, 'keyword'],
+        [/\.[a-zA-Z_][\w]*/, 'strong'], // directives
+        [/[#,]/, 'delimiter'],
+        [/\br(?:\d{1,2})\b/, 'string'],
+        [/\d+/, 'number'],
+        [/".*?"/, 'regexp'],
+        [/;.*/, 'comment'],
+        [/[a-zA-Z_][\w]*/, 'identifier'],
+      ]
+    }
+  });
 
   useEffect(() => {
     if (!monaco) {
