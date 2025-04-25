@@ -2,6 +2,7 @@ package org.edumips64.utils.cli;
 
 import org.edumips64.core.is.HaltException;
 import org.edumips64.utils.CurrentLocale;
+
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 
@@ -27,7 +28,7 @@ public class RunCommand implements Runnable {
         try {
             while(true) {
                 cli.getCPU().step();
-                if (steps % 100 == 0) {
+                if (steps+1 % 1000 == 0) {  // do not print the first dot, so short programs do not litter stdout.
                     System.out.print(".");
                 }
                 steps++;
@@ -43,7 +44,7 @@ public class RunCommand implements Runnable {
 
     private void printStartOfExecMsg() {
         System.out.println(CurrentLocale.getString("CLI.RUN.EXE_START"));
-        System.out.print(CurrentLocale.getString("CLI.RUNNING"));
+        System.out.println(CurrentLocale.getString("CLI.RUNNING"));
     }
 
     private void printEndOfExecMsg(int steps, long timeMs) {

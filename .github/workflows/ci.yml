@@ -1,7 +1,7 @@
 name: CI
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - master
   push:
@@ -21,6 +21,10 @@ jobs:
     steps:
       # Set up Java development environment.
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - run: git log -1
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -43,7 +47,7 @@ jobs:
       - name: Run unit tests
         run: ./gradlew check
       - name: Codecov
-        uses: codecov/codecov-action@v4.5.0
+        uses: codecov/codecov-action@v5.4.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -58,12 +62,12 @@ jobs:
 
       # Upload artifacts (manuals and JARs)
       - name: Upload English Manual PDF
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: English manual (PDF)
           path: ./build/docs/en/pdf/EduMIPS64.pdf
       - name: Upload Italian Manual PDF
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: Italian manual (PDF)
           path: ./build/docs/it/pdf/EduMIPS64.pdf
@@ -77,7 +81,7 @@ jobs:
       #     path: ./build/docs/zh/pdf/EduMIPS64.pdf
 
       - name: Upload JAR
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: JAR
           path: ./build/libs/edumips64-${{ steps.read_version.outputs.version }}.jar
@@ -88,13 +92,16 @@ jobs:
     needs: build-desktop
     steps:
         - uses: actions/checkout@v4
+          with:
+            ref: ${{ github.event.pull_request.head.sha }}
+        - run: git log -1
         - name: Install Wix
           uses: actions/checkout@v4
           with:
             repository: fbarresi/wix
             path: wix
         - name: Download JAR
-          uses: actions/download-artifact@v4.1.7
+          uses: actions/download-artifact@v4.2.1
           with:
             name: JAR
             path: build/libs
@@ -106,7 +113,7 @@ jobs:
         - name: Build MSI
           run: ./gradlew MSI
         - name: Upload MSI
-          uses: actions/upload-artifact@v4.3.3
+          uses: actions/upload-artifact@v4.6.2
           with:
             name: MSI
             path: EduMIPS64-*.msi
@@ -118,6 +125,9 @@ jobs:
       # Set up JDK (necessary for the core that is cross-compiled to JS)
       # and Node.JS (for the) web app itself.
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - run: git log -1
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -143,94 +153,69 @@ jobs:
         with:
           name: web
           path: build/gwt/war/edumips64
-  
-  deploy-web:
-    name: Deploy web application
+
+  deploy-staging:
+    name: Deploy web application to staging environment
     permissions: write-all
     runs-on: ubuntu-latest
     needs: build-web
+    if: ${{ github.event_name == 'pull_request_target' }}
+    environment:
+      name: Staging
+      url: https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/
     steps:
-      # This step behaves differently in PRs and on push to master / cron.
-      # Set up environment variables according to the triggering event.
-      - name: Set PR environment variables
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          echo "DEPLOYMENT_ENV=${{github.event.pull_request.number}}" >> $GITHUB_ENV
-          echo "PUSH_DIR=pr/" >> $GITHUB_ENV
-          echo "COMMIT_MESSAGE=Deploy code for PR ${{ github.event.pull_request.number }}" >> $GITHUB_ENV
-          echo "DEPLOYMENT_ENV_URL=https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/" >> $GITHUB_ENV
-      - name: Set master push environment variables
-        if: ${{ github.event_name != 'pull_request' }}
-        run: |
-          echo "DEPLOYMENT_ENV=prod" >> $GITHUB_ENV
-          echo "PUSH_DIR=build/gwt/war/edumips64" >> $GITHUB_ENV
-          echo "COMMIT_MESSAGE=Update Web Frontend @ ${{ github.sha }}" >> $GITHUB_ENV
-          echo "DEPLOYMENT_ENV_URL=https://web.edumips.org" >> $GITHUB_ENV
-
       # Download web application built in 'build-web'
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4.2.1
         name: Download web application artifacts
         with:
           name: web
           path: build/gwt/war/edumips64
 
-      # Mark the deployment as started (allows the PR to display "Deployment started" messages.)
-      - name: Start deployment
-        uses: bobheadxi/deployments@v1.5.0
-        id: deployment
-        with:
-          step: start
-          token: ${{ secrets.GITHUB_TOKEN }}
-          env: ${{ env.DEPLOYMENT_ENV }}
-          ref: ${{ github.head_ref }}
-
       # Deploy the code on Github Pages.
       # Copy files to a directory to allow pushing to a subdir in the web.edumips.org repo.
       - name: Copy files to run directory
         run: mkdir -p pr/${{ github.event.pull_request.number }} && cp -r build/gwt/war/edumips64/* pr/${{ github.event.pull_request.number }}
-        if: ${{ github.event_name == 'pull_request' }}
         
       # Upload to Azure blob if this is a PR.
       - name: Login to Azure
         uses: azure/login@v2
-        if: ${{ github.event_name == 'pull_request' }}
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           
-      - name: Upload to Azure blob storage (${{ env.DEPLOYMENT_ENV_URL }})
+      - name: Upload to Azure blob storage (https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/)
         uses: azure/CLI@v2
-        if: ${{ github.event_name == 'pull_request' }}
         with:
           inlineScript: |
               az storage blob upload-batch --account-name edumips64ci --auth-mode key -d '$web/${{ github.event.pull_request.number }}' -s pr/${{ github.event.pull_request.number }} --overwrite
       
+  deploy-prod:
+    name: Deploy web application to production
+    permissions: write-all
+    runs-on: ubuntu-latest
+    needs: build-web
+    if: ${{ github.event_name != 'pull_request_target' }}
+    steps:
+      # Download web application built in 'build-web'
+      - uses: actions/download-artifact@v4.2.1
+        name: Download web application artifacts
+        with:
+          name: web
+          path: build/gwt/war/edumips64
+
       - name: Deploy master web application to web.edumips.org
         if: ${{ success() && github.event_name != 'pull_request' }}
         uses: crazy-max/ghaction-github-pages@v4
         with:
           target_branch: master
-          build_dir: ${{ env.PUSH_DIR }}
+          build_dir: "build/gwt/war/edumips64" 
           repo: EduMIPS64/web.edumips.org
           keep_history: true
-          commit_message: ${{ env.COMMIT_MESSAGE }}
+          commit_message: "Update Web Frontend @ ${{ github.sha }}" 
           fqdn: web.edumips.org
         env:
           GH_PAT: ${{ secrets.PAT_WEBUI }}
-
-      # Mark the deployment as succeeded or failed.
-      - name: Update deployment status
-        uses: bobheadxi/deployments@v1.5.0
-        if: always() && github.head_ref
-        with:
-          step: finish
-          token: ${{ secrets.GITHUB_TOKEN }}
-          status: ${{ job.status }}
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-          env_url: ${{ env.DEPLOYMENT_ENV_URL }}
-          env: ${{ env.DEPLOYMENT_ENV }}
-
 
   # Test the deployed web application.
   # This is only ran on pull request because runs triggered by push and schedule
@@ -244,10 +229,13 @@ jobs:
   test-web:
     name: Test web application
     runs-on: ubuntu-latest
-    needs: deploy-web
-    if: ${{ github.event_name == 'pull_request' }}
+    needs: deploy-staging
+    if: ${{ github.event_name == 'pull_request_target' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - run: git log -1
       - name: Set up Node.JS
         uses: actions/setup-node@v4
         with:
@@ -272,6 +260,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - run: git log -1
       - uses: snapcore/action-build@v1
         id: snapcraft
       - uses: actions/upload-artifact@v4
@@ -284,7 +275,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-snap
     steps:
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4.2.1
         name: Download snap package
         with:
           name: snap

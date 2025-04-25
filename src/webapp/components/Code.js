@@ -1,12 +1,35 @@
 import React, { useEffect, useState } from 'react';
+import { initVimMode } from 'monaco-vim';
 
+// new
 import MonacoEditor from 'react-monaco-editor';
 import useMediaQuery from '@mui/material/useMediaQuery';
+// Global MIPS language definition for the Monaco editor.
+import * as monaco from 'monaco-editor';
+
+monaco.languages.register({ id: 'mips' });
+
+monaco.languages.setMonarchTokensProvider('mips', {
+  tokenizer: {
+    root: [
+      [/^[ \t]*[a-zA-Z_][\w]*:/, 'type.identifier'], // label
+      [/\b(?:add|dadd|daddi|daddui|dsub|dsubu|dmult|dmultu|mflo|mfhi|ddiv|and|andi|or|nor|dsll|dsslv|dsrl|dsrlv|dsra|dsrav|slt|sltu|slti|sltui|lb|lbu|sb|lw|lwu|sw|ld|sd|lh|lhu|sh|lui|j|jr|jal|jalr|beq|bne|move|syscall)\b/, 'keyword'],
+      [/\.[a-zA-Z_][\w]*/, 'strong'], // directives
+      [/[#,]/, 'delimiter'],
+      [/\br(?:\d{1,2})\b/, 'string'],
+      [/\d+/, 'number'],
+      [/".*?"/, 'regexp'],
+      [/;.*/, 'comment'],
+      [/[a-zA-Z_][\w]*/, 'identifier'],
+    ]
+  }
+});
 
 const Code = (props) => {
+
   const [monaco, setMonaco] = useState(null);
   const [editor, setEditor] = useState(null);
-
+  const [vimInstance, setVimInstance] = useState(null); // new state for Vim instance
   // IDisposable to clean up the hover provider.
   const [hoverDisposable, setHoverCleanup] = useState(null);
 
@@ -188,10 +211,59 @@ const Code = (props) => {
     setHoverCleanup(disposable);
   }, [props.parsedInstructions, stageMap, monaco]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const saveCodeToFile = () => {
+    const blob = new Blob([props.code], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'code.s';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const loadCodeFromFile = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      props.onChangeValue(e.target.result);
+    };
+    reader.readAsText(file);
+  };
+
   const editorDidMount = (editor, monaco) => {
     setMonaco(monaco);
     setEditor(editor);
+
+    // Enable Vi mode if viMode prop is true
+    if (props.viMode) {
+      const vim = initVimMode(editor);
+      setVimInstance(vim);
+    }
+
+    // Ensure the required command is registered
+    editor.addAction({
+      id: "editor.action.insertLineAfter",
+      label: "Insert Line After",
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
+      run: function (ed) {
+        ed.trigger("keyboard", "type", { text: "\n" });
+      },
+    });
   };
+
+  // Hook to dynamically toggle Vi mode when viMode prop changes
+  useEffect(() => {
+    if (!editor) return;
+    if (props.viMode) {
+      const vim = initVimMode(editor);
+      setVimInstance(vim);
+    } else if (vimInstance) {
+      vimInstance.dispose();
+      setVimInstance(null);
+    }
+  }, [props.viMode]);
 
   const options = {
     selectOnLineNumbers: true,
@@ -202,10 +274,8 @@ const Code = (props) => {
     minimap: { enabled: false },
     tabsize: 4,
     lineNumbersMinChars: 3,
-
-    // Note: the documentation mentions this might have a negative performance
-    // impact.
     automaticLayout: true,
+    fontSize: props.fontSize,  // Set font size from props
   };
 
   // Hook to compute and set markers for warnings and errors.
@@ -246,14 +316,14 @@ const Code = (props) => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   return (
-    <MonacoEditor
-      language="mips"
-      value={props.code}
-      options={options}
-      onChange={props.onChangeValue}
-      theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
-      editorDidMount={editorDidMount}
-    />
+        <MonacoEditor
+            language="mips"
+            value={props.code}
+            options={options}
+            onChange={props.onChangeValue}
+            theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
+            editorDidMount={editorDidMount}
+        />
   );
 };
 

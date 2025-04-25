@@ -385,7 +385,7 @@ List of load instructions:
 * `LWU rt, offset(base)`
 
   Loads the content of the memory cell at address specified by offset and
-  base in register rt, treating it as a signed word.
+  base in register rt, treating it as an unsigned word.
 
 List of store instructions:
 

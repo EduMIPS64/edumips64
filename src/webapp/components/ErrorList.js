@@ -29,7 +29,7 @@ const ErrorList = ({ parsingErrors, AccordionSummary }) => {
         <>
             <Accordion defaultExpanded disableGutters className='error-accordion'>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography sx={{ flexGrow: 1 }}>Issues</Typography>
+                    <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold', color: '#1976d2' }}>Issues</Typography>
                     <ErrorDisplay parsingErrors={parsingErrors} />
                 </AccordionSummary>
                 <AccordionDetails>

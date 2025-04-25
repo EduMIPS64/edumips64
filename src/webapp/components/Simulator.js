@@ -9,8 +9,11 @@ import Header from './Header';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid2';
 import ErrorList from './ErrorList';
+import StdOut from './StdOut';
+import Switch from '@mui/material/Switch';
+import Button from '@mui/material/Button';
 
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 
@@ -26,6 +29,7 @@ import Typography from '@mui/material/Typography';
 import SampleProgram from '../data/SampleProgram';
 
 import { debounce } from 'lodash';
+import Settings from './Settings';
 
 const Simulator = ({ sim, initialState, appInsights }) => {
   // The amount of steps to run in multi-step executions.
@@ -43,13 +47,17 @@ const Simulator = ({ sim, initialState, appInsights }) => {
   const [parsedInstructions, setParsedInstructions] = React.useState(
     initialState.parsedInstructions,
   );
+  const [stdout, setStdout] = React.useState('');
+
+  const [viMode, setViMode] = React.useState(false);
+  const [fontSize, setFontSize] = React.useState(14);
 
   // Number of steps left to run. Used to keep track of execution.
   // If set to -1, runs until the execution ends.
   const [stepsToRun, setStepsToRun] = React.useState(0);
 
-  // Signals that the simulation must stop.
-  const [mustStop, setMustStop] = React.useState(false);
+  // Signals that the simulation must pause.
+  const [mustPause, setMustPause] = React.useState(false);
 
   // Tracks whether the worker is currently running code.
   const [executing, setExecuting] = React.useState(false);
@@ -91,14 +99,18 @@ const Simulator = ({ sim, initialState, appInsights }) => {
       setParsedInstructions(result.parsedInstructions);
     }
 
+    if (result.stdout) {
+      setStdout(result.stdout);
+    }
+
     // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
     if (!result.success && result.errorMessage !== 'Parsing errors.') {
       alert(result.errorMessage);
     }
 
-    if (result.status !== 'RUNNING' || mustStop || result.encounteredBreak) {
+    if (result.status !== 'RUNNING' || mustPause || result.encounteredBreak) {
       setStepsToRun(0);
-      setMustStop(false);
+      setMustPause(false);
       setRunAll(false);
     } else if (stepsToRun > 0) {
       console.log('Steps left: ' + stepsToRun);
@@ -127,6 +139,12 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     loadCode();
   }
 
+  const clickStop = () => {
+    appInsights.trackEvent({name: "click", properties: {action: "stop"}});
+    console.log('Stopping simulation');
+    stopCode();
+  }
+
   // Business logic for click handlers.
   const runCode = () => {
     setRunAll(true);
@@ -140,8 +158,48 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     sim.step(toRun);
   };
 
+  const stopCode = () => {
+    setMustPause(true);
+    setRunAll(false);
+    setStepsToRun(0);
+    sim.reset();  // Assuming simulator has a reset method
+  };
+
+  const clearCode = () => {
+    setCode(".data\n\n.code\n  SYSCALL 0\n");
+  }
+
+
+  const openCode = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.asm,.txt,.s';
+    fileInput.onchange = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setCode(e.target.result);
+        };
+        reader.readAsText(file);
+      }
+    };
+    fileInput.click();
+  }
+
   const loadCode = () => {
+    setStdout("");
     sim.load(code);
+  };
+
+  const saveCode = () => {
+    const file = new Blob([code], { type: 'text/plain' });
+    const fileURL = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = fileURL;
+    link.download = 'code.s';
+    link.click();
+    URL.revokeObjectURL(fileURL);
   };
 
   // A debounced version of syntaxCheck. Needed to not run props.onChange too often.
@@ -194,17 +252,23 @@ const Simulator = ({ sim, initialState, appInsights }) => {
           stepEnabled={simulatorRunning && !executing}
           onLoadClick={loadCode}
           loadEnabled={isValidProgram()}
-          onStopClick={() => {
-            appInsights.trackEvent({name: "stop"})
-            setMustStop(true);
+          onPauseClick={() => {
+            appInsights.trackEvent({name: "pause"})
+            setMustPause(true);
           }}
-          stopEnabled={executing}
+          pauseEnabled={executing}
+          onClearClick={clearCode}
+          onOpenClick={openCode}
+          onSaveClick={saveCode}
+          onStopClick={clickStop}
+          stopEnabled={simulatorRunning && !executing}
           parsingErrors={parsingErrors}
           version={sim.version}
           status={status}
+          prefersDarkMode={prefersDarkMode}
         />
         <Grid container id="main-grid" disableEqualOverflow spacing={0}>
-          <Grid id="left-panel" xs={8}>
+          <Grid id="left-panel" size={8}>
             <Code
               onChangeValue={onCodeChange}
               code={code}
@@ -212,24 +276,30 @@ const Simulator = ({ sim, initialState, appInsights }) => {
               parsedInstructions={parsedInstructions}
               pipeline={pipeline}
               running={simulatorRunning}
+              viMode={viMode}
+              fontSize={fontSize}
             />
           </Grid>
-          <Grid xs={4} id="right-panel" disableEqualOverflow>
+          <Grid size={4} id="right-panel" disableEqualOverflow>
             <ErrorList
               parsingErrors={parsingErrors}
               AccordionSummary={AccordionSummary}
             />
             <Accordion defaultExpanded disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Stats</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Stats
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Statistics {...stats} />
               </AccordionDetails>
             </Accordion>
-            <Accordion defaultExpanded disableGutters>
+            <Accordion disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Pipeline</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Pipeline
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Pipeline pipeline={pipeline} />
@@ -237,7 +307,9 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             </Accordion>
             <Accordion disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Registers</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Registers
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Registers {...registers} />
@@ -245,10 +317,38 @@ const Simulator = ({ sim, initialState, appInsights }) => {
             </Accordion>
             <Accordion disableGutters>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Memory</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Memory
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Memory memory={memory} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion disableGutters>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Standard Output
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <StdOut stdout={stdout} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion defaultExpanded disableGutters>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Settings
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Settings
+                  viMode={viMode}
+                  setViMode={setViMode}
+                  fontSize={fontSize}
+                  setFontSize={setFontSize}
+                  showTitle={false}
+                />
               </AccordionDetails>
             </Accordion>
           </Grid>

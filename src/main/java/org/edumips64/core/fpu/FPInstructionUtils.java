@@ -450,6 +450,8 @@ public class FPInstructionUtils {
   /**
    * Returns a string with a double value or the name of a special value
    * it is recommended the use of this method only for the visualisation of the double value because it may return an alphanumeric value
+   * 
+   * If the value is not a valid string encoding a 64-bit binary value, it returns an empty string.
    *
    * @param value the 64 bit binary string in the IEEE754 format to convert
    * @return the double value or the special values "Quiet NaN","Signaling NaN", "Positive infinity", "Negative infinity","Positive zero","Negative zero"
@@ -466,6 +468,7 @@ public class FPInstructionUtils {
           new_value_d = Double.longBitsToDouble(Converter.binToLong(value, false));
         } catch (IrregularStringOfBitsException ex) {
           ex.printStackTrace();
+          return "";
         }
 
         return new_value_d.toString();
@@ -474,7 +477,7 @@ public class FPInstructionUtils {
       return new_value;
     }
 
-    return null;
+    return "";
   }
 
   /**

@@ -39,10 +39,12 @@ public class Result {
   public boolean encounteredBreak = false;
   public JsArray<ParserError> parsingErrors;
   public JsArray<Instruction> parsedInstructions;
+  public String stdout;
 
-  public Result(boolean success, String errorMessage) {
+  public Result(boolean success, String errorMessage, String stdout) {
     this.success = success;
     this.errorMessage = errorMessage;
+    this.stdout = stdout;
   }
 
   public String toString() {
