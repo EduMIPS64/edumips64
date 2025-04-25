@@ -112,8 +112,6 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
     masked = config.getBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED);
     terminateOnSynchronousExceptions = config.getBoolean(ConfigKey.SYNC_EXCEPTIONS_TERMINATE);
     logger.info("Terminate = " + terminateOnSynchronousExceptions + "; masked = " + masked);
-    cachesim.getL1DataCache().setConfig(config);
-    cachesim.getL1InstructionCache().setConfig(config);
   }
 
   /**

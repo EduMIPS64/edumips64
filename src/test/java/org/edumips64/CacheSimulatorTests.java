@@ -68,7 +68,7 @@ public class CacheSimulatorTests {
 
     public static CacheSimulator.Stats runTraceOnCache(CacheSimulator.CacheMemory cache, String traceFile) {
 
-        cache.resetStats();
+        cache.resetStatus();
         // Process the trace file line by line
         BufferedReader br = null;
         try {

@@ -83,7 +83,6 @@ public class CacheSimulator {
         public CacheMemory(CacheConfig config, CacheSimulator.CacheType type) {
             stats = new Stats();
             this.type = type;
-            this.config = config;
             setConfig(config);
         }
 
@@ -99,7 +98,7 @@ public class CacheSimulator {
             blockOffsetBits = (int)(Math.log(config.blockSize) / Math.log(2));
             // Calculate number of index bits (log2(numSets)) if more than one set exists
             indexBits = (numSets > 1) ? (int)(Math.log(numSets) / Math.log(2)) : 0;
-            resetStats();
+            this.stats.reset();
         }
 
         public void setConfig(ConfigStore config) {
@@ -112,7 +111,8 @@ public class CacheSimulator {
             setConfig(cc);
         }
 
-        public void resetStats() {
+        public void resetStatus() {
+            setConfig(this.config);
             this.stats.reset();
         }
 
@@ -334,8 +334,8 @@ public class CacheSimulator {
     public void reset() {
         offset = 0;
         dineroData = new LinkedList <>();
-        if (L1DataCache!=null) L1DataCache.resetStats();
-        if (L1InstructionCache!=null) L1InstructionCache.resetStats();
+        if (L1DataCache!=null) L1DataCache.resetStatus();
+        if (L1InstructionCache!=null) L1InstructionCache.resetStatus();
     }
 
     /** Add a read Instruction
