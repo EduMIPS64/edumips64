@@ -207,7 +207,6 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       return new CpuTestStatus(cpu, tracefile);
     } finally {
       cpu.reset();
-      //cachesim.reset();
       symTab.reset();
     }
   }
