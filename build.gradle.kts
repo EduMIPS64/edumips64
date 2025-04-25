@@ -29,7 +29,7 @@ dependencies {
     
     implementation("com.formdev:flatlaf:3.5.4")
     implementation("javax.help:javahelp:2.0.05")
-    implementation("info.picocli:picocli:4.7.6")
+    implementation("info.picocli:picocli:4.7.7")
 
     testImplementation(platform("org.junit:junit-bom:5.12.2"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
