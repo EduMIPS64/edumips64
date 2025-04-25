@@ -12,9 +12,9 @@ plugins {
     id ("eclipse")
     id ("application")
     id ("jacoco")
-    id ("com.dorongold.task-tree") version "4.0.0"
+    id ("com.dorongold.task-tree") version "4.0.1"
     id ("us.ascendtech.gwt.classic") version "0.9.2"
-    id ("ru.vyarus.use-python") version "4.0.0"
+    id ("ru.vyarus.use-python") version "4.1.0"
 }
 
 repositories {
@@ -228,7 +228,7 @@ tasks.create<Jar>("noHelpJar"){
  * Code coverage report tasks
  */
 jacoco {
-    toolVersion = "0.8.12"
+    toolVersion = "0.8.13"
 }
 tasks.jacocoTestReport {
     reports {
