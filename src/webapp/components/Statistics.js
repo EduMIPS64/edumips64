@@ -41,30 +41,45 @@ const tableStyle = {
     <div id="statistics">
       <div>
         <table style={tableStyle}>
-          <tbody>
-            <PluralRow value={cycles} label="Cycle" />
-            <PluralRow value={instructions} label="Instruction" />
-            <Row value={instructions == 0 ? 0 : (cycles/instructions).toFixed(2)}
-                 label="Cycles per Instructions (CPI)" />
-          </tbody>
+            <tbody>
+            <tr>
+                <th colSpan="2" style={{textAlign: 'left', fontSize: '1rem', padding: '0.5rem 0'}}>
+                    Execution
+                </th>
+            </tr>
+            <PluralRow value={cycles} label="Cycle"/>
+            <PluralRow value={instructions} label="Instruction"/>
+            <Row value={instructions == 0 ? 0 : (cycles / instructions).toFixed(2)}
+                 label="Cycles per Instructions (CPI)"/>
+            </tbody>
         </table>
       </div>
-      
-      <div>
-        <table style={tableStyle}>
-          <tbody>
-            <PluralRow value={rawStalls} label="RAW Stall" />
-            <PluralRow value={wawStalls} label="WAW Stall" />
-            <PluralRow value={memoryStalls} label="Memory Stall" />
-            <PluralRow value={L1I_reads} label="L1 Instr Cache Read" />
-            <PluralRow value={L1I_misses} label="L1 Instr Cache Misses" />
-            <PluralRow value={L1D_reads} label="L1 Data Cache Read" />
-            <PluralRow value={L1D_reads_misses} label="L1 Data Cache Read Misses" />
-            <PluralRow value={L1D_writes} label="L1 Data Cache Write" />
-            <PluralRow value={L1D_writes_misses} label="L1 Data Cache Write Misses" />
-          </tbody>
-        </table>
-      </div>
+
+        <div>
+            <table style={tableStyle}>
+                <tbody>
+                <tr>
+                    <th colSpan="2" style={{textAlign: 'left', fontSize: '1rem', padding: '0.5rem 0'}}>
+                        Stalls
+                    </th>
+                </tr>
+                <PluralRow value={rawStalls} label="RAW Stall"/>
+                <PluralRow value={wawStalls} label="WAW Stall"/>
+                <PluralRow value={memoryStalls} label="Structural Stall"/>
+                <tr>
+                    <th colSpan="2" style={{textAlign: 'left', fontSize: '1rem', padding: '0.5rem 0'}}>
+                        Cache Memory Statistics
+                    </th>
+                </tr>
+                <Row value={L1I_reads} label="L1 Instruction Reads"/>
+                <Row value={L1I_misses} label="L1 Instruction Misses"/>
+                <Row value={L1D_reads} label="L1 Data Reads"/>
+                <Row value={L1D_reads_misses} label="L1 Data Read Misses"/>
+                <Row value={L1D_writes} label="L1 Data Writes"/>
+                <Row value={L1D_writes_misses} label="L1 Data Write Misses"/>
+                </tbody>
+            </table>
+        </div>
     </div>
   );
 };

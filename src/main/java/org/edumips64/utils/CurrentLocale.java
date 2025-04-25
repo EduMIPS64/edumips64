@@ -148,6 +148,13 @@ public class CurrentLocale {
     en.put("BTS", "Branch Taken Stalls");
     en.put("BMS", "Branch Misprediction Stalls");
     en.put("CSIZE", "Code size");
+    en.put("L1CACHESTATS", "Cache Memory Statistics");
+    en.put("L1I READS", "L1 Instruction Reads");
+    en.put("L1I READ MISSES", "L1 Instruction Misses");
+    en.put("L1D READS", "L1 Data Reads");
+    en.put("L1D READ MISSES", "L1 Data Read Misses");
+    en.put("L1D WRITES", "L1 Data Writes");
+    en.put("L1D WRITE MISSES", "L1 Data Write Misses");
     en.put("Config.APPEARANCE", "Appearance");
     en.put("Config.BEHAVIOR", "Behavior");
     en.put("Config.MAIN", "Main settings");
