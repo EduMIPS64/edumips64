@@ -179,6 +179,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
+          sim.reset();
           setCode(e.target.result);
         };
         reader.readAsText(file);
