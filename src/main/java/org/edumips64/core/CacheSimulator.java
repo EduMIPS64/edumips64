@@ -9,8 +9,14 @@ import java.util.*;
 
 public class CacheSimulator {
 
+    private static final int DEFAULT_CACHE_SIZE = 1024;
+    private static final int DEFAULT_BLOCK_SIZE = 16;
+    private static final int DEFAULT_ASSOCIATIVITY = 1;
+    private static final int DEFAULT_PENALTY = 40;
+
     final private CacheMemory L1InstructionCache;
     final private CacheMemory L1DataCache;
+
 
     private LinkedList<String> dineroData = new LinkedList<>();
     // Offset of the data segment. This class writes a trace file that assumes
@@ -18,9 +24,14 @@ public class CacheSimulator {
     private int offset;
 
     public CacheSimulator() {
-        // fake values to be replaced
-        L1InstructionCache = new CacheMemory(new CacheConfig(1025, 17, 2, 40), CacheType.L1_INSTRUCTION);
-        L1DataCache = new CacheMemory(new CacheConfig(1025, 17, 2, 40), CacheType.L1_DATA);
+        L1InstructionCache = new CacheMemory(
+            new CacheConfig(DEFAULT_CACHE_SIZE, DEFAULT_BLOCK_SIZE, DEFAULT_ASSOCIATIVITY, DEFAULT_PENALTY),
+            CacheType.L1_INSTRUCTION
+        );
+        L1DataCache = new CacheMemory(
+            new CacheConfig(DEFAULT_CACHE_SIZE, DEFAULT_BLOCK_SIZE, DEFAULT_ASSOCIATIVITY, DEFAULT_PENALTY),
+            CacheType.L1_DATA
+        );
     }
 
     public CacheMemory getL1DataCache() {
