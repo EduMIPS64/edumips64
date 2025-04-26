@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import static java.util.Map.entry;    
 
-import org.edumips64.core.*
+import org.edumips64.core.*;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 
