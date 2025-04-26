@@ -1,10 +1,6 @@
 package org.edumips64.utils.cli;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.Dinero;
-import org.edumips64.core.IOManager;
-import org.edumips64.core.Memory;
-import org.edumips64.core.SymbolTable;
+import org.edumips64.core.*;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
@@ -30,7 +26,7 @@ public class Cli implements Runnable {
     private CPU c;
     private SymbolTable symTab;
     private IOManager iom;
-    private Dinero dinero;
+    private CacheSimulator cachesim;
     private InstructionBuilder instructionBuilder;
     private Parser p;
     private final ConfigStore configStore;
@@ -55,8 +51,8 @@ public class Cli implements Runnable {
         // Allow SYSCALL 5 to go to stdout.
         iom.setStdOutput(new StdOutWriter());
 
-        dinero = new Dinero();
-        instructionBuilder = new InstructionBuilder(memory, iom, c, dinero, this.configStore);
+        cachesim = new CacheSimulator();
+        instructionBuilder = new InstructionBuilder(memory, iom, c, cachesim, this.configStore);
         p = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
         c.setStatus(CPU.CPUStatus.READY);
     }
@@ -88,8 +84,8 @@ public class Cli implements Runnable {
         return iom;
     }
 
-    public Dinero getDinero() {
-        return dinero;
+    public CacheSimulator getCacheSimulator() {
+        return cachesim;
     }
 
     public InstructionBuilder getInstructionBuilder() {

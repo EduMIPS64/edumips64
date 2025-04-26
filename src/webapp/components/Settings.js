@@ -6,9 +6,10 @@ import Button from '@mui/material/Button';
 
 const Settings = ({ viMode, setViMode, fontSize, setFontSize }) => {
     return (
+
         <Grid container spacing={2} alignItems="center">
             <Grid item>
-                <Typography>Vi Mode</Typography>
+                <Typography sx={{ fontSize: '0.75rem' }}>Editor Vi Mode</Typography>
             </Grid>
             <Grid item>
                 <Switch
@@ -18,7 +19,7 @@ const Settings = ({ viMode, setViMode, fontSize, setFontSize }) => {
                 />
             </Grid>
             <Grid item>
-                <Typography>Font Size</Typography>
+                <Typography sx={{ fontSize: '0.75rem' }}>Font Size</Typography>
             </Grid>
             <Grid item>
                 <Button variant="contained" onClick={() => setFontSize(fontSize + 1)}>+</Button>

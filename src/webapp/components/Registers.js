@@ -12,6 +12,7 @@ const BinaryValue = ({ hexString, value }) => {
     fontFamily: "Menlo, Monaco, 'Courier New', monospace",
     padding: '0.1em 10px',
     textAlign: 'right',
+    fontSize: '0.75rem',
     }}>
     {hexString}
     </Typography>

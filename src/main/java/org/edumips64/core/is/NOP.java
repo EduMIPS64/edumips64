@@ -44,7 +44,7 @@ public class NOP extends Instruction {
   }
   public void IF() {
     try {
-      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+      cachesim.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }

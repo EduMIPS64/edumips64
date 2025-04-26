@@ -34,6 +34,7 @@ import org.edumips64.core.Memory;
 import org.edumips64.core.Register;
 import org.edumips64.core.CPU.CPUStatus;
 import org.edumips64.core.Pipeline.Stage;
+import org.edumips64.core.CacheSimulator;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.parser.ParserMultiException;
@@ -45,6 +46,7 @@ import jsinterop.base.Js;
 public class ResultFactory {
     private CPU cpu;
     private Memory memory;
+    private CacheSimulator cachesim;
     private Logger logger = Logger.getLogger("ResultFactory");
     private StringWriter stdout;
 
@@ -60,10 +62,11 @@ public class ResultFactory {
         }
     }
 
-    public ResultFactory(CPU cpu, Memory memory, StringWriter stdout) {
+    public ResultFactory(CPU cpu, Memory memory, CacheSimulator cachesim, StringWriter stdout) {
         this.cpu = cpu;
         this.memory = memory;
         this.stdout = stdout;
+        this.cachesim = cachesim;
     }
 
     public Result Success() {
@@ -98,7 +101,28 @@ public class ResultFactory {
         r.memory = getMemory();
         r.registers = getRegisters();
         r.statistics = getStatistics();
+        r.cachestats = getCacheStats();
         return r;
+    }
+
+    private String getCacheStats() {
+        var cachestatsJson = new FluentJsonObject();
+
+        try {
+            var L1I_cache = cachesim.getL1InstructionCache();
+            var L1D_cache = cachesim.getL1DataCache();
+
+            JSONArray l1i_jsonArray = new JSONArray();
+            JSONArray l1d_jsonArray = new JSONArray();
+            l1i_jsonArray.set(0,new FluentJsonObject().put("reads", L1I_cache.getStats().getReadAccesses()).toJsonObject());
+            l1d_jsonArray.set(0,new FluentJsonObject().put("reads", L1D_cache.getStats().getReadAccesses()).toJsonObject());
+            cachestatsJson.put("L1I",l1i_jsonArray);
+            cachestatsJson.put("L1D",l1d_jsonArray);
+
+        } catch (Exception e) {
+            logger.warning("Error fetching cache: " + e.toString());
+        }
+        return cachestatsJson.toString();
     }
 
     private String getMemory() {
@@ -201,6 +225,7 @@ public class ResultFactory {
     }
 
     private String getStatistics() {
+
         return new FluentJsonObject()
             // Execution
             .put("cycles", cpu.getCycles())
@@ -210,6 +235,12 @@ public class ResultFactory {
             .put("wawStalls", cpu.getWAWStalls())
             .put("dividerStalls", cpu.getStructuralStallsDivider())
             .put("memoryStalls", cpu.getStructuralStallsMemory())
+                .put("L1I_reads", cachesim.getL1InstructionCache().getStats().getReadAccesses())
+                .put("L1I_misses", cachesim.getL1InstructionCache().getStats().getReadMisses())
+                .put("L1D_reads", cachesim.getL1DataCache().getStats().getReadAccesses())
+                .put("L1D_reads_misses", cachesim.getL1DataCache().getStats().getReadMisses())
+                .put("L1D_writes", cachesim.getL1DataCache().getStats().getWriteAccesses())
+                .put("L1D_writes_misses", cachesim.getL1DataCache().getStats().getWriteMisses())
             // Code size
             .put("codeSizeBytes",memory.getInstructionsNumber() * 4)
             // FPU Control Status Register (FCSR)

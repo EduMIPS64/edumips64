@@ -46,7 +46,7 @@ public class BREAK extends Instruction {
   }
   public void IF() throws BreakException {
     try {
-      dinero.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
+      cachesim.IF(Converter.binToHex(Converter.intToBin(64, cpu.getLastPC().getValue())));
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
     }
