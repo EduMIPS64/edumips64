@@ -97,6 +97,11 @@ public class CacheSimulator {
             setConfig(config);
         }
 
+        public void eraseCacheContent() {
+            for (int i = 0; i < numSets; i++) {
+                sets[i] = new CacheSet(config.associativity);
+            }
+        }
 
         public void setConfig(CacheConfig config) {
             this.config = config;
@@ -123,7 +128,7 @@ public class CacheSimulator {
         }
 
         public void resetStatus() {
-            setConfig(this.config);
+            eraseCacheContent();
             this.stats.reset();
         }
 
@@ -150,11 +155,6 @@ public class CacheSimulator {
         public Stats getStats() {
             return stats;
         }
-    }
-
-    public static void main(String[] args) {
-        var cache = new CacheMemory(new CacheConfig(1024, 16, 2, 40), CacheType.L1_DATA);
-        CacheSimulator cache_sim = new CacheSimulator();
     }
 
    public static class Stats {

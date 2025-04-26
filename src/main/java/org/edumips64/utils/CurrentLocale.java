@@ -412,6 +412,13 @@ public class CurrentLocale {
     it.put("BTS", "Stalli 'Branch Taken'");
     it.put("BMS", "Stalli 'Branch Misprediction'");
     it.put("CSIZE", "Dimensione del codice");
+    it.put("L1CACHESTATS", "Statistiche Memorie Cache");
+    it.put("L1I READS", "Letture L1 Istruzioni");
+    it.put("L1I READ MISSES", "Miss L1 Istruzioni");
+    it.put("L1D READS", "Letture L1 Dati");
+    it.put("L1D READ MISSES", "Miss in Lettura L1 Dati");
+    it.put("L1D WRITES", "Scritture L1 Dati");
+    it.put("L1D WRITE MISSES", "Miss in Scrittura L1 Dati");
     it.put("Config.APPEARANCE", "Aspetto");
     it.put("Config.BEHAVIOR", "Comportamento");
     it.put("Config.MAIN", "Impost. generali");

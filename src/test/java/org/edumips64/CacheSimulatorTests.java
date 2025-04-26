@@ -96,13 +96,6 @@ public class CacheSimulatorTests {
     public void setUp() {
     }
 
-    public static void main(String[] args) {
-        var cs = new CacheSimulatorTests();
-        String tracefile ="sample.s.xdin";
-        cs.runTraceOnCacheConfigs(tracefile);
-        cs.checkTraceOnCacheConfigStats(tracefile);
-    }
-
     @Test
     public void runCacheSimulatorTests() {
         String tracefile ="sample.s.xdin";
