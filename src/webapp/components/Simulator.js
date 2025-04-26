@@ -9,7 +9,7 @@ import Header from './Header';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
-import Grid from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid';
 import ErrorList from './ErrorList';
 import StdOut from './StdOut';
 import Switch from '@mui/material/Switch';
@@ -32,7 +32,7 @@ import { debounce } from 'lodash';
 import Settings from './Settings';
 import CacheConfig from "./CacheConfig";
 
-const Simulator = ({ sim, initialState, appInsights }) => {
+const Simulator = ({worker, initialState, appInsights}) => {
   // The amount of steps to run in multi-step executions.
   const INTERNAL_STEPS_STRIDE = 50;
 
@@ -77,8 +77,8 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     }
   };
 
-  sim.onmessage = (e) => {
-    const result = sim.parseResult(e.data);
+  worker.onmessage = (e) => {
+    const result = worker.parseResult(e.data);
     console.log('Got message from worker.', result);
     updateState(result);
   };
@@ -156,14 +156,14 @@ const Simulator = ({ sim, initialState, appInsights }) => {
     const toRun = Math.min(n, INTERNAL_STEPS_STRIDE);
     setStepsToRun(n - toRun);
     setExecuting(true);
-    sim.step(toRun);
+    worker.step(toRun);
   };
 
   const stopCode = () => {
     setMustPause(true);
     setRunAll(false);
     setStepsToRun(0);
-    sim.reset();  // Assuming simulator has a reset method
+    worker.reset();  // Assuming simulator has a reset method
   };
 
   const clearCode = () => {
@@ -194,7 +194,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
 
   const loadCode = () => {
     setStdout("");
-    sim.load(code);
+    worker.load(code);
   };
 
   const saveCode = () => {
@@ -208,7 +208,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
   };
 
   // A debounced version of syntaxCheck. Needed to not run props.onChange too often.
-  const debouncedSyntaxCheck = debounce((code) => sim.checkSyntax(code), 500);
+  const debouncedSyntaxCheck = debounce((code) => worker.checkSyntax(code), 500);
 
   const onCodeChange = (code) => {
     setCode(code);
@@ -268,7 +268,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
           onStopClick={clickStop}
           stopEnabled={simulatorRunning && !executing}
           parsingErrors={parsingErrors}
-          version={sim.version}
+          version={worker.version}
           status={status}
           prefersDarkMode={prefersDarkMode}
         />
@@ -283,6 +283,7 @@ const Simulator = ({ sim, initialState, appInsights }) => {
               running={simulatorRunning}
               viMode={viMode}
               fontSize={fontSize}
+              validInstructions={initialState.validInstructions}
             />
           </Grid>
           <Grid size={4} id="right-panel" disableEqualOverflow>

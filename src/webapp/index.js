@@ -34,52 +34,53 @@ console.log('Initialized AppInsights');
 // Web Worker that runs the EduMIPS64 core, built from the Java codebase.
 // Contains some syntactical sugar methods to make working with the
 // Web Worker API a bit easier, and some telemetry.
-let simulator = new Worker('worker.js');
-simulator.reset = () => {
-  simulator.postMessage({ method: 'reset' });
+let worker = new Worker('worker.js');
+worker.reset = () => {
+  worker.postMessage({ method: 'reset' });
   appInsights.trackEvent({name: "reset"});
 };
-simulator.step = (n) => {
-  simulator.postMessage({ method: 'step', steps: n });
+worker.step = (n) => {
+  worker.postMessage({ method: 'step', steps: n });
   appInsights.trackEvent({name: 'step', properties: {steps: n}});
 };
-simulator.load = (code) => {
-  simulator.postMessage({ method: 'load', code });
+worker.load = (code) => {
+  worker.postMessage({ method: 'load', code });
   appInsights.trackEvent({name: "load"});
 };
 
-simulator.setCacheConfig = (config) => {
-  simulator.postMessage({ method: 'setCacheConfig', config });
+worker.setCacheConfig = (config) => {
+  worker.postMessage({ method: 'setCacheConfig', config });
 };
 
-simulator.checkSyntax = (code) => {
-  simulator.postMessage({ method: 'checksyntax', code });
+worker.checkSyntax = (code) => {
+  worker.postMessage({ method: 'checksyntax', code });
+
   appInsights.trackEvent({name: "checkSyntax"});
 };
-simulator.parseResult = (result) => {
+worker.parseResult = (result) => {
   result.registers = JSON.parse(result.registers);
   result.memory = JSON.parse(result.memory);
   result.statistics = JSON.parse(result.statistics);
   return result;
 };
-simulator.version = version;
+worker.version = version;
 
-simulator.reset();
+worker.reset();
 const initializer = (evt) => {
   console.log('Running the initializer callback');
 
   // Run this callback only once, to initialize the Simulator
   // React component which will then handle all subsequent messages.
-  simulator.removeEventListener('message', initializer);
-  const initState = simulator.parseResult(evt.data);
+  worker.removeEventListener('message', initializer);
+  const initState = worker.parseResult(evt.data);
   const container = document.getElementById('simulator');
   const root = createRoot(container);
   
   root.render(
         <>
         <CssBaseline />
-        <Simulator sim={simulator} initialState={initState} appInsights={appInsights} />
+        <Simulator worker={worker} initialState={initState} appInsights={appInsights} />
         </>
   );
 };
-simulator.addEventListener('message', initializer);
+worker.addEventListener('message', initializer);

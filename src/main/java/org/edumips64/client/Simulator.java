@@ -57,6 +57,7 @@ public class Simulator {
   public ResultFactory resultFactory;
    
   private Logger logger = Logger.getLogger("simulator");
+  private String supportedInstructions;
 
   public Simulator() {
     info("Initializing the simulator");
@@ -74,6 +75,7 @@ public class Simulator {
     InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, cachesim, config);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
     resultFactory = new ResultFactory(cpu, memory, cachesim, stdout);
+    supportedInstructions = instructionBuilder.getSupportedInstructionString();
     info("initialization complete!");
   }
 
@@ -92,8 +94,14 @@ public class Simulator {
       symTab.reset();
       stdout = new StringWriter();
       iom.setStdOutput(stdout);
-      resultFactory = new ResultFactory(cpu, memory, cachesim,stdout);
-      return resultFactory.Success();
+
+      resultFactory = new ResultFactory(cpu, memory, cachesim, stdout);
+      var result = resultFactory.Success();
+
+      // reset() provides the JS simulator's initial state. Therefore, we pass the
+      // list of supported instructions, so we can set up the syntax highlighting.
+      result.validInstructions = supportedInstructions;
+      return result;
   }
 
   public Result step(int steps) {

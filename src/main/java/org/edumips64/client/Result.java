@@ -41,6 +41,7 @@ public class Result {
   public JsArray<ParserError> parsingErrors;
   public JsArray<Instruction> parsedInstructions;
   public String stdout;
+  public String validInstructions;
 
   public Result(boolean success, String errorMessage, String stdout) {
     this.success = success;

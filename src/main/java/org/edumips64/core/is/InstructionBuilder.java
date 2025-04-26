@@ -1,6 +1,10 @@
 package org.edumips64.core.is;
 
-import org.edumips64.core.*;
+import java.util.Map;
+import java.util.function.Supplier;
+import static java.util.Map.entry;    
+
+import org.edumips64.core.*
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 
@@ -11,18 +15,175 @@ import org.edumips64.utils.ConfigStore;
  * will refuse to build it.
  */
 public class InstructionBuilder {
-  private Memory memory;
-  private IOManager iom;
   private CPU cpu;
   private CacheSimulator cachesim;
   private ConfigStore config;
 
+  private Map<String, Supplier<Instruction>> instructionDictionary;
+
   public InstructionBuilder(Memory memory, IOManager iom, CPU cpu, CacheSimulator cachesim, ConfigStore config) {
-    this.memory = memory;
-    this.iom = iom;
     this.cpu = cpu;
     this.cachesim = cachesim;
     this.config = config;
+
+    instructionDictionary = Map.ofEntries(
+      //ALU R-Type 32-bits
+      entry("ADD", ADD::new),
+      entry("ADDU", ADDU::new),
+      
+      entry("SUB", SUB::new),
+      entry("SUBU", SUBU::new),
+      entry("DIV", DIV::new),
+      entry("DIVU", DIVU::new),
+      entry("MULT", MULT::new),
+      entry("MULTU", MULTU::new),
+
+      //ALU I-Type 32-bits
+      entry("ADDI", ADDI::new),
+      entry("ADDIU", ADDIU::new),
+
+      //ALU Shifting 32-bits
+      entry("SLL", SLL::new),
+      entry("SLLV", SLLV::new),
+      entry("SRA", SRA::new),
+      entry("SRAV", SRAV::new),
+      entry("SRL", SRL::new),
+      entry("SRLV", SRLV::new),
+
+      //ALU R-Type
+      entry("AND", AND::new),
+      entry("DADD", DADD::new),
+      entry("DADDU", DADDU::new),
+      entry("DSUB", DSUB::new),
+      entry("DSUBU", DSUBU::new),
+      entry("OR", OR::new),
+      entry("SLT", SLT::new),
+      entry("SLTU", SLTU::new),
+      entry("XOR", XOR::new),
+      entry("MOVN", MOVN::new),
+      entry("MOVZ", MOVZ::new),
+      entry("DDIV", DDIV::new),
+      entry("DDIVU", DDIVU::new),
+      entry("DMUHU", DMUHU::new),
+      entry("DMULT", DMULT::new),
+      entry("DMULU", DMULU::new),
+      entry("DMULTU", DMULTU::new),
+      entry("MFLO", MFLO::new),
+      entry("MFHI", MFHI::new),
+
+      //ALU I-Type
+      entry("ANDI", ANDI::new),
+      entry("DADDI", DADDI::new),
+      entry("DADDUI", DADDUI::new),
+      entry("DADDIU", DADDIU::new),
+      entry("LUI", LUI::new),
+      entry("ORI", ORI::new),
+      entry("SLTI", SLTI::new),
+      entry("SLTIU", SLTIU::new),
+      entry("XORI", XORI::new),
+
+      //ALU Shifting
+      entry("DSLL", DSLL::new),
+      entry("DSLLV", DSLLV::new),
+      entry("DSRA", DSRA::new),
+      entry("DSRAV", DSRAV::new),
+      entry("DSRL", DSRL::new),
+      entry("DSRLV", DSRLV::new),
+
+      //Load-Signed
+      entry("LB", () -> new LB(memory)),
+      entry("LH", () -> new LH(memory)),
+      entry("LW", () -> new LW(memory)),
+      entry("LD", () -> new LD(memory)),
+
+      //Load-Unsigned
+      entry("LBU", () -> new LBU(memory)),
+      entry("LHU", () -> new LHU(memory)),
+      entry("LWU", () -> new LWU(memory)),
+
+      //Store
+      entry("SB", () -> new SB(memory)),
+      entry("SH", () -> new SH(memory)),
+      entry("SW", () -> new SW(memory)),
+      entry("SD", () -> new SD(memory)),
+
+      //Unconditional branches
+      entry("J", J::new),
+      entry("JAL", JAL::new),
+      entry("JALR", JALR::new),
+      entry("JR", JR::new),
+      entry("B", B::new),
+
+      //Conditional branches
+      entry("BEQ", BEQ::new),
+      entry("BNE", BNE::new),
+      entry("BNEZ", BNEZ::new),
+      entry("BEQZ", BEQZ::new),
+      entry("BGEZ", BGEZ::new),
+
+      //Special instructions
+      entry("NOP", NOP::new),
+      entry("HALT", HALT::new),
+      entry("TRAP", () -> new TRAP(memory, iom)),
+      entry("SYSCALL", () -> new SYSCALL(memory, iom)),
+      entry("BREAK", BREAK::new),
+
+      //Floating point instructions
+      //Arithmetic
+      entry("ADD_D", () -> new ADD_D(cpu.getFCSR())),
+      entry("SUB_D", () -> new SUB_D(cpu.getFCSR())),
+      entry("MUL_D", () -> new MUL_D(cpu.getFCSR())),
+      entry("DIV_D", () -> new DIV_D(cpu.getFCSR())),
+
+      //Load store
+      entry("LDC1", () -> new LDC1(memory)),
+      entry("L_D", () -> new L_D(memory)),
+      entry("SDC1", () -> new SDC1(memory)),
+      entry("S_D", () -> new S_D(memory)),
+      entry("LWC1", () -> new LWC1(memory)),
+      entry("SWC1", () -> new SWC1(memory)),
+
+      //Move to and from
+      entry("DMTC1", DMTC1::new),
+      entry("DMFC1", DMFC1::new),
+      entry("MTC1", MTC1::new),
+      entry("MFC1", MFC1::new),
+
+      //Formatted operand move
+      entry("MOV_D", MOV_D::new),
+      entry("MOVZ_D", MOVZ_D::new),
+      entry("MOVN_D", MOVN_D::new),
+
+      //Special arithmetic instructions
+      entry("C_LT_D", C_LT_D::new),
+      entry("C_EQ_D", C_EQ_D::new),
+
+      //Conditional branches instructions
+      entry("BC1T", BC1T::new),
+      entry("BC1F", BC1F::new),
+
+      //Conditional move on CC instructions
+      entry("MOVT_D", MOVT_D::new),
+      entry("MOVF_D", MOVF_D::new),
+
+      //Conversion instructions
+      entry("CVT_L_D", CVT_L_D::new),
+      entry("CVT_D_L", CVT_D_L::new),
+      entry("CVT_W_D", CVT_W_D::new),
+      entry("CVT_D_W", CVT_D_W::new)
+    );
+  }
+
+/**
+ * Gets a string containing all supported instructions in lowercase, separated by '|'.
+ * The string includes all instructions from the instruction dictionary plus 'BUBBLE'.
+ * 
+ * @return A string containing all supported instructions in lowercase, with each instruction
+ *         separated by the '|' character
+ */
+  public String getSupportedInstructionString() {
+    String instructions = String.join("|", instructionDictionary.keySet()) + "|BUBBLE";
+    return instructions.toLowerCase();
   }
   
   /**
@@ -46,362 +207,13 @@ public class InstructionBuilder {
     // If the name of the requested instruction has got a dot, the instruction is FP and an
     // underscore takes the place of the dot because classes names cannot contain dots
     String name = instructionName.replaceAll("\\.", "_");
-
-    Instruction instruction;
-    switch(name) {
-      //ALU R-Type 32-bits
-      case "ADD":
-        instruction = new ADD();
-        break;
-      case "ADDU":
-        instruction = new ADDU();
-        break;
-      case "SUB":
-        instruction = new SUB();
-        break;
-      case "SUBU":
-        instruction = new SUBU();
-        break;
-      case "DIV":
-        instruction = new DIV();
-        break;
-      case "DIVU":
-        instruction = new DIVU();
-        break;
-      case "MULT":
-        instruction = new MULT();
-        break;
-      case "MULTU":
-        instruction = new MULTU();
-        break;
-
-      //ALU I-Type 32-bits
-      case "ADDI":
-        instruction = new ADDI();
-        break;
-      case "ADDIU":
-        instruction = new ADDIU();
-        break;
-
-      //ALU Shifting 32-bits
-      case "SLL":
-        instruction = new SLL();
-        break;
-      case "SLLV":
-        instruction = new SLLV();
-        break;
-      case "SRA":
-        instruction = new SRA();
-        break;
-      case "SRAV":
-        instruction = new SRAV();
-        break;
-      case "SRL":
-        instruction = new SRL();
-        break;
-      case "SRLV":
-        instruction = new SRLV();
-        break;
-
-      //ALU R-Type
-      case "AND":
-        instruction = new AND();
-        break;
-      case "DADD":
-        instruction = new DADD();
-        break;
-      case "DADDU":
-        instruction = new DADDU();
-        break;
-      case "DSUB":
-        instruction = new DSUB();
-        break;
-      case "DSUBU":
-        instruction = new DSUBU();
-        break;
-      case "OR":
-        instruction = new OR();
-        break;
-      case "SLT":
-        instruction = new SLT();
-        break;
-      case "SLTU":
-        instruction = new SLTU();
-        break;
-      case "XOR":
-        instruction = new XOR();
-        break;
-      case "MOVN":
-        instruction = new MOVN();
-        break;
-      case "MOVZ":
-        instruction = new MOVZ();
-        break;
-      case "DDIV":
-        instruction = new DDIV();
-        break;
-      case "DDIVU":
-        instruction = new DDIVU();
-        break;
-      case "DMUHU":
-        instruction = new DMUHU();
-        break;
-      case "DMULT":
-        instruction = new DMULT();
-        break;
-      case "DMULU":
-        instruction = new DMULU();
-        break;
-      case "DMULTU":
-        instruction = new DMULTU();
-        break;
-      case "MFLO":
-        instruction = new MFLO();
-        break;
-      case "MFHI":
-        instruction = new MFHI();
-        break;
-
-      //ALU I-Type
-      case "ANDI":
-        instruction = new ANDI();
-        break;
-      case "DADDI":
-        instruction = new DADDI();
-        break;
-      case "DADDUI":
-        instruction = new DADDUI();
-        break;
-      case "DADDIU":
-        instruction = new DADDIU();
-        break;
-      case "LUI":
-        instruction = new LUI();
-        break;
-      case "ORI":
-        instruction = new ORI();
-        break;
-      case "SLTI":
-        instruction = new SLTI();
-        break;
-      case "SLTIU":
-        instruction = new SLTIU();
-        break;
-      case "XORI":
-        instruction = new XORI();
-        break;
-
-      //ALU Shifting
-      case "DSLL":
-        instruction = new DSLL();
-        break;
-      case "DSLLV":
-        instruction = new DSLLV();
-        break;
-      case "DSRA":
-        instruction = new DSRA();
-        break;
-      case "DSRAV":
-        instruction = new DSRAV();
-        break;
-      case "DSRL":
-        instruction = new DSRL();
-        break;
-      case "DSRLV":
-        instruction = new DSRLV();
-        break;
-
-      //Load-Signed
-      case "LB":
-        instruction = new LB(memory);
-        break;
-      case "LH":
-        instruction = new LH(memory);
-        break;
-      case "LW":
-        instruction = new LW(memory);
-        break;
-      case "LD":
-        instruction = new LD(memory);
-        break;
-
-      //Load-Unsigned
-      case "LBU":
-        instruction = new LBU(memory);
-        break;
-      case "LHU":
-        instruction = new LHU(memory);
-        break;
-      case "LWU":
-        instruction = new LWU(memory);
-        break;
-
-      //Store
-      case "SB":
-        instruction = new SB(memory);
-        break;
-      case "SH":
-        instruction = new SH(memory);
-        break;
-      case "SW":
-        instruction = new SW(memory);
-        break;
-      case "SD":
-        instruction = new SD(memory);
-        break;
-
-      //Unconditional branches
-      case "J":
-        instruction = new J();
-        break;
-      case "JAL":
-        instruction = new JAL();
-        break;
-      case "JALR":
-        instruction = new JALR();
-        break;
-      case "JR":
-        instruction = new JR();
-        break;
-      case "B":
-        instruction = new B();
-        break;
-
-      //Conditional branches
-      case "BEQ":
-        instruction = new BEQ();
-        break;
-      case "BNE":
-        instruction = new BNE();
-        break;
-      case "BNEZ":
-        instruction = new BNEZ();
-        break;
-      case "BEQZ":
-        instruction = new BEQZ();
-        break;
-      case "BGEZ":
-        instruction = new BGEZ();
-        break;
-
-      //Special instructions
-      case "NOP":
-        instruction = new NOP();
-        break;
-      case "HALT":
-        instruction = new HALT();
-        break;
-      case "TRAP":
-        instruction = new TRAP(memory, iom);
-        break;
-      case "SYSCALL":
-        instruction = new SYSCALL(memory, iom);
-        break;
-      case "BREAK":
-        instruction = new BREAK();
-        break;
-
-      //Floating point instructions
-      //Arithmetic
-      case "ADD_D":
-        instruction = new ADD_D(cpu.getFCSR());
-        break;
-      case "SUB_D":
-        instruction = new SUB_D(cpu.getFCSR());
-        break;
-      case "MUL_D":
-        instruction = new MUL_D(cpu.getFCSR());
-        break;
-      case "DIV_D":
-        instruction = new DIV_D(cpu.getFCSR());
-        break;
-
-      //Load store
-      case "LDC1":
-        instruction = new LDC1(memory);
-        break;
-      case "L_D":
-        instruction = new L_D(memory);
-        break;
-      case "SDC1":
-        instruction = new SDC1(memory);
-        break;
-      case "S_D":
-        instruction = new S_D(memory);
-        break;
-      case "LWC1":
-        instruction = new LWC1(memory);
-        break;
-      case "SWC1":
-        instruction = new SWC1(memory);
-        break;
-
-      //Move to and from
-      case "DMTC1":
-        instruction = new DMTC1();
-        break;
-      case "DMFC1":
-        instruction = new DMFC1();
-        break;
-      case "MTC1":
-        instruction = new MTC1();
-        break;
-      case "MFC1":
-        instruction = new MFC1();
-        break;
-
-      //Formatted operand move
-      case "MOV_D":
-        instruction = new MOV_D();
-        break;
-      case "MOVZ_D":
-        instruction = new MOVZ_D();
-        break;
-      case "MOVN_D":
-        instruction = new MOVN_D();
-        break;
-
-      //Special arithmetic instructions
-      case "C_LT_D":
-        instruction = new C_LT_D();
-        break;
-      case "C_EQ_D":
-        instruction = new C_EQ_D();
-        break;
-
-      //Conditional branches instructions
-      case "BC1T":
-        instruction = new BC1T();
-        break;
-      case "BC1F":
-        instruction = new BC1F();
-        break;
-
-      //Conditional move on CC instructions
-      case "MOVT_D":
-        instruction = new MOVT_D();
-        break;
-      case "MOVF_D":
-        instruction = new MOVF_D();
-        break;
-
-      //Conversion instructions
-      case "CVT_L_D":
-        instruction = new CVT_L_D();
-        break;
-      case "CVT_D_L":
-        instruction = new CVT_D_L();
-        break;
-      case "CVT_W_D":
-        instruction = new CVT_W_D();
-        break;
-      case "CVT_D_W":
-        instruction = new CVT_D_W();
-        break;
-
-      default:
-        return null;
+  
+    // If the instruction is not implemented, return null
+    if (!instructionDictionary.containsKey(name)) {
+      return null;
     }
+
+    Instruction instruction = instructionDictionary.get(name).get();
 
     // Serial number for the instruction being built.
     int serialNumber = config.getInt(ConfigKey.SERIAL_NUMBER);

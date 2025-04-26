@@ -12,9 +12,9 @@ plugins {
     id ("eclipse")
     id ("application")
     id ("jacoco")
-    id ("com.dorongold.task-tree") version "4.0.0"
+    id ("com.dorongold.task-tree") version "4.0.1"
     id ("us.ascendtech.gwt.classic") version "0.9.2"
-    id ("ru.vyarus.use-python") version "4.0.0"
+    id ("ru.vyarus.use-python") version "4.1.0"
 }
 
 repositories {
@@ -27,11 +27,11 @@ dependencies {
     compileOnly("com.google.elemental2:elemental2-dom:1.2.3")
     compileOnly("com.vertispan.rpc:workers:1.0-alpha-8")
     
-    implementation("com.formdev:flatlaf:3.5.4")
+    implementation("com.formdev:flatlaf:3.6")
     implementation("javax.help:javahelp:2.0.05")
-    implementation("info.picocli:picocli:4.7.6")
+    implementation("info.picocli:picocli:4.7.7")
 
-    testImplementation(platform("org.junit:junit-bom:5.12.1"))
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
 
     // To run JUnit 4 tests.
@@ -228,7 +228,7 @@ tasks.create<Jar>("noHelpJar"){
  * Code coverage report tasks
  */
 jacoco {
-    toolVersion = "0.8.12"
+    toolVersion = "0.8.13"
 }
 tasks.jacocoTestReport {
     reports {
