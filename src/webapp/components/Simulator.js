@@ -172,7 +172,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
 
   const setCacheConfig = (config) => {
-    sim.setCacheConfig(config);
+    worker.setCacheConfig(config);
   };
 
   const openCode = () => {
