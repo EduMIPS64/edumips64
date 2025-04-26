@@ -1,32 +1,32 @@
 import React from 'react';
-import Grid2 from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 
 const Settings = ({ viMode, setViMode, fontSize, setFontSize }) => {
     return (
-        <Grid2 container spacing={2} alignItems="center">
-            <Grid2 item>
+        <Grid container spacing={2} alignItems="center">
+            <Grid item>
                 <Typography>Vi Mode</Typography>
-            </Grid2>
-            <Grid2 item>
+            </Grid>
+            <Grid item>
                 <Switch
                     checked={viMode}
                     onChange={(e) => setViMode(e.target.checked)}
                     color="primary"
                 />
-            </Grid2>
-            <Grid2 item>
+            </Grid>
+            <Grid item>
                 <Typography>Font Size</Typography>
-            </Grid2>
-            <Grid2 item>
+            </Grid>
+            <Grid item>
                 <Button variant="contained" onClick={() => setFontSize(fontSize + 1)}>+</Button>
-            </Grid2>
-            <Grid2 item>
+            </Grid>
+            <Grid item>
                 <Button variant="contained" onClick={() => setFontSize(Math.max(fontSize - 1, 1))}>-</Button>
-            </Grid2>
-        </Grid2>
+            </Grid>
+        </Grid>
     );
 };
 
