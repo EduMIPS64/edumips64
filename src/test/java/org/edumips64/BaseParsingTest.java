@@ -1,10 +1,6 @@
 package org.edumips64;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.Dinero;
-import org.edumips64.core.IOManager;
-import org.edumips64.core.Memory;
-import org.edumips64.core.SymbolTable;
+import org.edumips64.core.*;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
@@ -23,8 +19,8 @@ public class BaseParsingTest extends BaseTest {
     CPU cpu = new CPU(memory, config, new BUBBLE());
     symTab = new SymbolTable(memory);
     IOManager iom = new IOManager(new LocalFileUtils(), memory);
-    Dinero dinero = new Dinero();
-    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
+    CacheSimulator cachesim = new CacheSimulator();
+    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, cachesim, config);
     parser = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
   }
   

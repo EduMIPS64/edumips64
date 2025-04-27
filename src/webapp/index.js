@@ -47,8 +47,14 @@ worker.load = (code) => {
   worker.postMessage({ method: 'load', code });
   appInsights.trackEvent({name: "load"});
 };
+
+worker.setCacheConfig = (config) => {
+  worker.postMessage({ method: 'setCacheConfig', config });
+};
+
 worker.checkSyntax = (code) => {
   worker.postMessage({ method: 'checksyntax', code });
+
   appInsights.trackEvent({name: "checkSyntax"});
 };
 worker.parseResult = (result) => {

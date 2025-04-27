@@ -30,7 +30,7 @@ public class LoadCommand implements Runnable {
         try {
             if (cli.canLoadFile()) {
                 cli.getParser().parse(absoluteFilename);
-                cli.getDinero().setDataOffset(cli.getMemory().getInstructionsNumber() * 4);
+                cli.getCacheSimulator().setDataOffset(cli.getMemory().getInstructionsNumber() * 4);
                 cli.getCPU().setStatus(CPU.CPUStatus.RUNNING);
                 printLoadedFileMsg(absoluteFilename);
             } else {

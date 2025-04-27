@@ -4,10 +4,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import static java.util.Map.entry;    
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.Dinero;
-import org.edumips64.core.IOManager;
-import org.edumips64.core.Memory;
+import org.edumips64.core.*;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 
@@ -19,20 +16,21 @@ import org.edumips64.utils.ConfigStore;
  */
 public class InstructionBuilder {
   private CPU cpu;
-  private Dinero dinero;
+  private CacheSimulator cachesim;
   private ConfigStore config;
 
   private Map<String, Supplier<Instruction>> instructionDictionary;
 
-  public InstructionBuilder(Memory memory, IOManager iom, CPU cpu, Dinero dinero, ConfigStore config) {
+  public InstructionBuilder(Memory memory, IOManager iom, CPU cpu, CacheSimulator cachesim, ConfigStore config) {
     this.cpu = cpu;
-    this.dinero = dinero;
+    this.cachesim = cachesim;
     this.config = config;
 
     instructionDictionary = Map.ofEntries(
       //ALU R-Type 32-bits
       entry("ADD", ADD::new),
       entry("ADDU", ADDU::new),
+      
       entry("SUB", SUB::new),
       entry("SUBU", SUBU::new),
       entry("DIV", DIV::new),
@@ -227,7 +225,7 @@ public class InstructionBuilder {
 
     // Inject other dependencies.
     instruction.setCPU(cpu);
-    instruction.setDinero(dinero);
+    instruction.setCachesim(cachesim);
     return instruction;
   }
 }

@@ -22,11 +22,7 @@
  */
 package org.edumips64.ui.swing;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.Converter;
-import org.edumips64.core.IrregularStringOfBitsException;
-import org.edumips64.core.Memory;
-import org.edumips64.core.Pipeline;
+import org.edumips64.core.*;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
@@ -47,7 +43,7 @@ public class GUICode extends GUIComponent {
       M3Index, M4Index, M5Index, M6Index, M7Index, DIVIndex;
   private GUITheme theme;
 
-  public GUICode(CPU cpu, Memory memory, ConfigStore config, GUITheme theme) {
+  public GUICode(CPU cpu, Memory memory,  ConfigStore config, GUITheme theme) {
     super(cpu, memory, config);
     codePanel = new CodePanel();
     this.theme = theme;

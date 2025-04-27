@@ -35,6 +35,7 @@ public class Result {
   public String memory = "";
   public String registers = "";
   public String statistics = "";
+  public String cachestats = "";
   public Pipeline pipeline;
   public boolean encounteredBreak = false;
   public JsArray<ParserError> parsingErrors;
