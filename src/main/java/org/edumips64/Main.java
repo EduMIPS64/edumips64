@@ -22,11 +22,7 @@
  */
 package org.edumips64;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.Dinero;
-import org.edumips64.core.IOManager;
-import org.edumips64.core.Memory;
-import org.edumips64.core.SymbolTable;
+import org.edumips64.core.*;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
@@ -86,7 +82,7 @@ public class Main {
   private SymbolTable symTab;
   private Memory memory;
   private CycleBuilder builder;
-  private Dinero dinero;
+  private CacheSimulator cachesim;
   private GUIFrontend front;
   private ConfigStore configStore;
   private JFileChooser jfc;
@@ -294,13 +290,13 @@ public class Main {
 
     symTab = new SymbolTable(memory);
     iom = new IOManager(lfu, memory);
-    dinero = new Dinero();
-    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, configStore);
+    cachesim = new CacheSimulator();
+    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, cachesim, configStore);
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
     builder = new CycleBuilder(cpu);
     sb = new StatusBar(configStore);
-    front = new GUIFrontend(cpu, memory, configStore, builder, sb);
+    front = new GUIFrontend(cpu, memory, cachesim, configStore, builder, sb);
 
     cpu.setCpuStatusChangeCallback(sb::setCpuStatusText);
 
@@ -507,7 +503,7 @@ public class Main {
     log.info("Trying to open " + file);
     cpu.reset();
     symTab.reset();
-    dinero.reset();
+    cachesim.reset();
     try {
       // Update GUI components
       front.updateComponents();
@@ -539,12 +535,12 @@ public class Main {
       log.info("After parsing");
 
       // The file has correctly been parsed
-      dinero.setDataOffset(memory.getInstructionsNumber() * 4);
+      cachesim.setDataOffset(memory.getInstructionsNumber() * 4);
       cpu.setStatus(CPU.CPUStatus.RUNNING);
       log.info("Set the status to RUNNING");
 
       // Let's fetch the first instruction
-      cpuWorker = new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
+      cpuWorker = new CPUSwingWorker(cpu, cachesim, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
       cpuWorker.setSteps(1);
       cpuWorker.execute();
       while (cpuWorker.isDone()) {
@@ -666,7 +662,7 @@ public class Main {
   private void resetSimulator(boolean reopenFile) {
     cpu.reset();
     symTab.reset();
-    dinero.reset();
+    cachesim.reset();
     builder.reset();
 
     try {
@@ -822,7 +818,7 @@ public class Main {
 
         try {
           LocalWriter w = new LocalWriter(filename, false);
-          dinero.writeTraceData(w);
+          cachesim.writeTraceData(w);
           w.close();
           log.info("Wrote dinero tracefile");
         } catch (Exception ex) {
@@ -839,7 +835,7 @@ public class Main {
     // Lambda to create a CPUSwingWorker. Used to have a single place where CPUSwingWorker is
     // created.
     Supplier<CPUSwingWorker> workerBuilder = () ->
-        new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
+        new CPUSwingWorker(cpu, cachesim, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
 
     // ---------------- EXECUTE MENU
     // Execute a single simulation step
@@ -985,7 +981,7 @@ public class Main {
     // ---------------- TOOLS MENU
     dinFrontend.setEnabled(false);
     dinFrontend.addActionListener(e -> {
-      JDialog dinFrame = new DineroFrontend(mainFrame, dinero, configStore);
+      JDialog dinFrame = new DineroFrontend(mainFrame, cachesim, configStore);
       dinFrame.setModal(true);
       dinFrame.setVisible(true);
     });

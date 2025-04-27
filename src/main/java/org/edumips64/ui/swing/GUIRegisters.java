@@ -23,11 +23,7 @@
 
 package org.edumips64.ui.swing;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.Converter;
-import org.edumips64.core.IrregularStringOfHexException;
-import org.edumips64.core.Memory;
-import org.edumips64.core.Register;
+import org.edumips64.core.*;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;

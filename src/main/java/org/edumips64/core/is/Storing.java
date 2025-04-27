@@ -79,7 +79,7 @@ public abstract class Storing extends LDSTInstructions {
     super.EX();
 
     // Save memory access for Dinero trace file
-    dinero.Store(Converter.binToHex(Converter.positiveIntToBin(64, address)), memoryOpSize);
+    cachesim.Store(Converter.binToHex(Converter.positiveIntToBin(64, address)), memoryOpSize);
   }
 
   public void MEM() throws IrregularStringOfBitsException, MemoryElementNotFoundException, NotAlignException, AddressErrorException, IrregularWriteOperationException {

@@ -39,6 +39,7 @@ import elemental2.dom.MessageEvent;
 
 import jsinterop.base.Js;
 import jsinterop.base.JsPropertyMap;
+import org.edumips64.core.CacheSimulator;
 
 import java.util.logging.Logger;
 
@@ -74,6 +75,27 @@ public class Worker implements EntryPoint {
             int steps = data.getAsAny("steps").asInt();
             info("steps: " + steps);
             postMessage(simulator.step(steps));
+            break;
+          case "setcacheconfig":
+            JsPropertyMap<Object> config = Js.cast(data.get("config"));
+            JsPropertyMap<Object> l1d = Js.cast(config.get("l1d"));
+            JsPropertyMap<Object> l1i = Js.cast(config.get("l1i"));
+
+            int l1dSize = ((Double) l1d.get("size")).intValue();
+            int l1dBlockSize = ((Double) l1d.get("blockSize")).intValue();
+            int l1dAssoc = ((Double) l1d.get("associativity")).intValue();
+            int l1dPenalty = ((Double) l1d.get("penalty")).intValue();
+            var l1d_config = new CacheSimulator.CacheConfig(l1dSize,l1dBlockSize,l1dAssoc,l1dPenalty);
+
+            int l1iSize = ((Double) l1i.get("size")).intValue();
+            int l1iBlockSize = ((Double) l1i.get("blockSize")).intValue();
+            int l1iAssoc = ((Double) l1i.get("associativity")).intValue();
+            int l1iPenalty = ((Double) l1i.get("penalty")).intValue();
+            var l1i_config = new CacheSimulator.CacheConfig(l1iSize,l1iBlockSize,l1iAssoc,l1iPenalty);
+
+            simulator.setCacheConfig(l1d_config,l1i_config);
+
+            postMessage(simulator.resultFactory.Success());
             break;
           case "load":
             String code = data.getAsAny("code").asString();
