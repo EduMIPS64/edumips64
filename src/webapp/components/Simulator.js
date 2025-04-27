@@ -108,9 +108,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
     // Runtime errors should not cause multiple alert prompting to avoid webui getting stuck
     if (!result.success && result.errorMessage !== 'Parsing errors.') {
       alert(result.errorMessage);
-      setMustPause(true);
-      setRunAll(false);
-      setStepsToRun(0);
+      stopCode();
     }
 
     if (result.status !== 'RUNNING' || mustPause || result.encounteredBreak) {
