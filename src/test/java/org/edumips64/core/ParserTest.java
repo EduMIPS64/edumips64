@@ -305,7 +305,7 @@ public class ParserTest extends BaseParsingTest {
 
   @Test(expected = ParserMultiException.class)
   public void tooLargeImmediate16BitsHexTest() throws Exception {
-    parseData("daddi r1,r0,0x10000");
+    parseCode("daddi r1,r0,0x10000");
   }
 
 }
