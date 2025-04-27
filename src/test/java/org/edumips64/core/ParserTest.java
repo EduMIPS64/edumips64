@@ -277,9 +277,21 @@ public class ParserTest extends BaseParsingTest {
   public void unlimitedHexStringTest() throws Exception {
     parseData(".word 0xdeadbeeffffffffffffffffff");
   }
+  @Test(expected = ParserMultiException.class)
+  public void tooLargeByteHexDataTest() throws Exception {
+    parseData(".byte 0x100");
+  }
+  @Test(expected = ParserMultiException.class)
+  public void tooLarge16BitsHexDataTest() throws Exception {
+    parseData(".word16 0x10000");
+  }
+  @Test(expected = ParserMultiException.class)
+  public void tooLarge32BitsHexDataTest() throws Exception {
+    parseData(".word32 0x100000000");
+  }
 
   @Test
-  public void hexStringLimitData() throws Exception {
+  public void hexStringLimitsDataTest() throws Exception {
     parseData(".word 0xffffffffffffffff");
     parseData(".word32 0xffffffff");
     parseData(".word16 0xffff");
@@ -289,6 +301,11 @@ public class ParserTest extends BaseParsingTest {
   @Test
   public void immediate16BitsHexLimitTest() throws Exception {
     parseCode("daddi r1,r0,0xffff");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void tooLargeImmediate16BitsHexTest() throws Exception {
+    parseData("daddi r1,r0,0x10000");
   }
 
 }
