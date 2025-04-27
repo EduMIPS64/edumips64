@@ -272,6 +272,7 @@ public class ParserTest extends BaseParsingTest {
     parseCode("LW r1");
   }
 
+  /** Regression tests for #1317 */
   @Test(expected = ParserMultiException.class)
   public void unlimitedHexStringTest() throws Exception {
     parseData(".word 0xdeadbeeffffffffffffffffff");
