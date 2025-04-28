@@ -115,13 +115,6 @@ public class MemoryElement extends BitSet64 {
           throw new RuntimeException(e);
       }
   }
-  public String getValueHex() {
-    try {
-      return Converter.binToHex(Converter.positiveIntToBin(64, this.getValue()));
-    } catch (IrregularStringOfBitsException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
   /** Returns a string represention of this MemoryElement, formatted with the address and
    * the value (in hexadecimal digits).

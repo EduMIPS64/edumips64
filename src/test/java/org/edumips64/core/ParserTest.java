@@ -271,4 +271,41 @@ public class ParserTest extends BaseParsingTest {
     // Fully missing parameter. Before the fix for #1048, this would throw StringIndexOutOfBoundsException.
     parseCode("LW r1");
   }
+
+  /** Regression tests for #1317 */
+  @Test(expected = ParserMultiException.class)
+  public void unlimitedHexStringTest() throws Exception {
+    parseData(".word 0xdeadbeeffffffffffffffffff");
+  }
+  @Test(expected = ParserMultiException.class)
+  public void tooLargeByteHexDataTest() throws Exception {
+    parseData(".byte 0x100");
+  }
+  @Test(expected = ParserMultiException.class)
+  public void tooLarge16BitsHexDataTest() throws Exception {
+    parseData(".word16 0x10000");
+  }
+  @Test(expected = ParserMultiException.class)
+  public void tooLarge32BitsHexDataTest() throws Exception {
+    parseData(".word32 0x100000000");
+  }
+
+  @Test
+  public void hexStringLimitsDataTest() throws Exception {
+    parseData(".word 0xffffffffffffffff");
+    parseData(".word32 0xffffffff");
+    parseData(".word16 0xffff");
+    parseData(".byte 0xff");
+  }
+
+  @Test
+  public void immediate16BitsHexLimitTest() throws Exception {
+    parseCode("daddi r1,r0,0xffff");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void tooLargeImmediate16BitsHexTest() throws Exception {
+    parseCode("daddi r1,r0,0x10000");
+  }
+
 }

@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import com.google.gwt.json.client.JSONArray;
 
 import org.edumips64.core.CPU;
+import org.edumips64.core.IrregularStringOfBitsException;
 import org.edumips64.core.Memory;
 import org.edumips64.core.Register;
 import org.edumips64.core.CPU.CPUStatus;
@@ -133,15 +134,19 @@ public class ResultFactory {
 
             JSONArray cellArray = new JSONArray();
             cells.forEach((address, element) -> {
-                cellArray.set(cellArray.size(), new FluentJsonObject()
-                        .put("address_hex", element.getAddressHex())
-                        .put("address", element.getAddress())
-                        .put("value", element.getValue())
-                        .put("value_hex", element.getValueHex())
-                        .put("label", element.getLabel())
-                        .put("code", element.getCode())
-                        .put("comment",element.getComment())
-                        .toJsonObject());
+                try {
+                    cellArray.set(cellArray.size(), new FluentJsonObject()
+                            .put("address_hex", element.getAddressHex())
+                            .put("address", element.getAddress())
+                            .put("value", element.getValue())
+                            .put("value_hex", element.getHexString())
+                            .put("label", element.getLabel())
+                            .put("code", element.getCode())
+                            .put("comment",element.getComment())
+                            .toJsonObject());
+                } catch (IrregularStringOfBitsException e) {
+                    throw new RuntimeException(e);
+                }
             });
             memoryJson.put("cells", cellArray);
 

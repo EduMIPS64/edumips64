@@ -617,8 +617,19 @@ public class Parser {
                           errorMessage = "INVALIDIMMEDIATE";
                         }
                       }
+                      // when hexadecimal, the range 32768 to 65536 is actually the signed value will be between -32738 and -1
+                      // for example: 0xffff is not 65535, but -1
+                      if ( Converter.isHexNumber(paramValue) ) {
+                        if ( immediateValue >= 32768 && immediateValue<=65535) {
+                          immediateValue -= 65536;
+                        }
+                        else if (immediateValue>65535) {
+                          errorMessage = "IMMEDIATE_TOO_LARGE";
+                        }
+                      }
 
-                      if (errorMessage.isEmpty() && (immediateValue < -32768 || immediateValue > 32767)) {
+                      // after all parsing, the resulting value should not exceed the 16 bit signed range anyway
+                      if (errorMessage.isEmpty() && ( immediateValue< -32768 || immediateValue > 32767)) {
                         errorMessage = "IMMEDIATE_TOO_LARGE";
                         immediateValue = 0;
                       }
@@ -1036,8 +1047,13 @@ public class Parser {
         continue;
       }
 
-      if (Converter.isHexNumber(val)) {
+      boolean is_hex = (Converter.isHexNumber(val));
+      if (is_hex) {
         try {
+          // handle the corner case of unlimited hex strings
+          if (numBit ==64 && is_hex && val.length()>18) {
+            throw new IrregularStringOfHexException();
+          }
           val = Converter.hexToLong(val);
         } catch (IrregularStringOfHexException e) {
           errors.addError("INVALIDVALUE", row, i + 1, line);
@@ -1050,9 +1066,15 @@ public class Parser {
         // Convert the integer to a long, and then check for overflow.
         long num = Long.parseLong(val);
 
-        if ((num < - (Converter.powLong(2, numBit - 1)) || num > (Converter.powLong(2, numBit - 1) - 1)) &&  numBit != 64) {
+        if (!is_hex && (num < - (Converter.powLong(2, numBit - 1)) || num > (Converter.powLong(2, numBit - 1) - 1)) &&  numBit != 64) {
           throw new NumberFormatException();
         }
+
+        // hex string values should be allowed independently of signed/unsigned interpretation
+        if (is_hex && (num > (Converter.powLong(2, numBit) - 1)) && numBit!=64) {
+          throw new NumberFormatException();
+        }
+
 
         if (numBit == 8) {
           tmpMem.writeByte((int) num, posInWord);
