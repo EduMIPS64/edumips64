@@ -68,29 +68,103 @@ public class CacheSimulator {
 
 
     // Re-export CacheMemory for backward compatibility
-    public static class CacheMemory extends org.edumips64.core.cache.CacheMemory {
+    public static class CacheMemory {
+        private org.edumips64.core.cache.CacheMemory impl;
+        public Stats stats;
+        
         public CacheMemory(CacheConfig config, CacheSimulator.CacheType type) {
-            super(config, type.toCacheType());
+            impl = new org.edumips64.core.cache.CacheMemory(config, type.toCacheType());
+            // Create a wrapper stats that delegates to the impl stats
+            stats = new Stats();
+            // Manually sync the stats references 
+            stats.setImpl(impl.stats);
+        }
+
+        // Delegate all method calls to impl
+        public void eraseCacheContent() {
+            impl.eraseCacheContent();
+        }
+
+        public void setConfig(org.edumips64.core.cache.CacheConfig config) {
+            impl.setConfig(config);
+        }
+
+        public void setConfig(ConfigStore config) {
+            impl.setConfig(config);
+        }
+
+        public void resetStatus() {
+            impl.resetStatus();
+        }
+
+        public boolean access(long address, boolean isWrite) {
+            return impl.access(address, isWrite);
+        }
+
+        @Override
+        public String toString() {
+            return impl.toString();
+        }
+
+        public Stats getStats() {
+            return stats;
         }
         
-        // Override getStats to return the wrapper Stats class
-        @Override
-        public Stats getStats() {
-            CacheStats cacheStats = super.getStats();
-            return Stats.of(cacheStats.getReadAccesses(), cacheStats.getReadMisses(), 
-                           cacheStats.getWriteAccesses(), cacheStats.getWriteMisses());
+        // Expose the underlying implementation for processDineroTraceEntry
+        public org.edumips64.core.cache.CacheMemory getImpl() {
+            return impl;
         }
     }
 
    // Re-export Stats for backward compatibility
-   public static class Stats extends org.edumips64.core.cache.CacheStats {
+   public static class Stats {
+        private org.edumips64.core.cache.CacheStats impl;
+        
+        public Stats() {
+            impl = new org.edumips64.core.cache.CacheStats();
+        }
+        
+        // Set the implementation to delegate to
+        public void setImpl(org.edumips64.core.cache.CacheStats impl) {
+            this.impl = impl;
+        }
+        
+        // Delegate all methods to impl
+        public void reset() {
+            impl.reset();
+        }
+        
+        public long getReadAccesses() { return impl.getReadAccesses(); }
+        public long getReadMisses() { return impl.getReadMisses(); }
+        public long getWriteAccesses() { return impl.getWriteAccesses(); }
+        public long getWriteMisses() { return impl.getWriteMisses(); }
+
+        public void incrementReadAccesses() { impl.incrementReadAccesses(); }
+        public void incrementWriteAccesses() { impl.incrementWriteAccesses(); }
+        public void incrementReadMisses() { impl.incrementReadMisses(); }
+        public void incrementWriteMisses() { impl.incrementWriteMisses(); }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Stats stats = (Stats) o;
+            return impl.equals(stats.impl);
+        }
+
+        @Override
+        public int hashCode() {
+            return impl.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return impl.toString();
+        }
+        
         public static Stats of(long readAccesses, long readMisses, long writeAccesses, long writeMisses) {
             Stats stats = new Stats();
-            // Copy the values by calling the appropriate increments
-            for (int i = 0; i < readAccesses; i++) stats.incrementReadAccesses();
-            for (int i = 0; i < readMisses; i++) stats.incrementReadMisses();
-            for (int i = 0; i < writeAccesses; i++) stats.incrementWriteAccesses();
-            for (int i = 0; i < writeMisses; i++) stats.incrementWriteMisses();
+            stats.impl = org.edumips64.core.cache.CacheStats.of(readAccesses, readMisses, writeAccesses, writeMisses);
             return stats;
         }
     }
@@ -113,32 +187,32 @@ public class CacheSimulator {
         long address = Long.decode("0x"+addressStr);
         int size = Integer.parseInt(parts[2]); // size is parsed but not used in this simple simulator
 
-        // Need to access the underlying cache to get type and stats
-        org.edumips64.core.cache.CacheMemory cacheImpl = (org.edumips64.core.cache.CacheMemory) cache;
+        // Access the underlying cache implementation
+        org.edumips64.core.cache.CacheMemory cacheImpl = cache.getImpl();
         
         if (refType == 'i' && cacheImpl.getType() == org.edumips64.core.cache.CacheType.L1_INSTRUCTION) {
-            cacheImpl.getStats().incrementReadAccesses();
-            boolean hit = cacheImpl.access(address, false);
+            cache.stats.incrementReadAccesses();
+            boolean hit = cache.access(address, false);
             if (!hit) {
-                cacheImpl.getStats().incrementReadMisses();
+                cache.stats.incrementReadMisses();
             }
             return;
         }
 
         if (refType == 'r' && cacheImpl.getType() == org.edumips64.core.cache.CacheType.L1_DATA) {
-            cacheImpl.getStats().incrementReadAccesses();
-            boolean hit = cacheImpl.access(address, true);
+            cache.stats.incrementReadAccesses();
+            boolean hit = cache.access(address, true);
             if (!hit) {
-                cacheImpl.getStats().incrementReadMisses();
+                cache.stats.incrementReadMisses();
             }
             return;
         }
 
         if (refType == 'w' && cacheImpl.getType() == org.edumips64.core.cache.CacheType.L1_DATA) {
-            cacheImpl.getStats().incrementWriteAccesses();
-            boolean hit = cacheImpl.access(address, true);
+            cache.stats.incrementWriteAccesses();
+            boolean hit = cache.access(address, true);
             if (!hit) {
-                cacheImpl.getStats().incrementWriteMisses();
+                cache.stats.incrementWriteMisses();
             }
             return;
         }
