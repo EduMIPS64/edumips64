@@ -9,7 +9,7 @@ import org.edumips64.utils.io.Writer;
 import org.edumips64.core.cache.CacheConfig;
 import org.edumips64.core.cache.CacheMemory;
 import org.edumips64.core.cache.CacheStats;
-import org.edumips64.core.cache.CacheType;
+import org.edumips64.core.cache.CacheConfig;
 
 import java.util.*;
 
@@ -47,19 +47,14 @@ public class CacheSimulator {
         return L1InstructionCache;
     }
 
-    // Re-export CacheType for backward compatibility
+    // Cache type enumeration
     public enum CacheType {
         L1_DATA,
         L1_INSTRUCTION,
-        L1_UNIFIED;
-
-        public org.edumips64.core.cache.CacheType toCacheType() {
-            return org.edumips64.core.cache.CacheType.valueOf(this.name());
-        }
+        L1_UNIFIED
     }
 
-
-    // Re-export CacheConfig for backward compatibility
+    // Backward compatibility alias for CacheConfig
     public static class CacheConfig extends org.edumips64.core.cache.CacheConfig {
         public CacheConfig(int size, int blockSize, int associativity, int penalty) {
             super(size, blockSize, associativity, penalty);
@@ -73,7 +68,7 @@ public class CacheSimulator {
         public Stats stats;
         
         public CacheMemory(CacheConfig config, CacheSimulator.CacheType type) {
-            impl = new org.edumips64.core.cache.CacheMemory(config, type.toCacheType());
+            impl = new org.edumips64.core.cache.CacheMemory(config, type);
             // Create a wrapper stats that delegates to the impl stats
             stats = new Stats();
             // Manually sync the stats references 
@@ -190,7 +185,7 @@ public class CacheSimulator {
         // Access the underlying cache implementation
         org.edumips64.core.cache.CacheMemory cacheImpl = cache.getImpl();
         
-        if (refType == 'i' && cacheImpl.getType() == org.edumips64.core.cache.CacheType.L1_INSTRUCTION) {
+        if (refType == 'i' && cacheImpl.getType() == CacheType.L1_INSTRUCTION) {
             cache.stats.incrementReadAccesses();
             boolean hit = cache.access(address, false);
             if (!hit) {
@@ -199,7 +194,7 @@ public class CacheSimulator {
             return;
         }
 
-        if (refType == 'r' && cacheImpl.getType() == org.edumips64.core.cache.CacheType.L1_DATA) {
+        if (refType == 'r' && cacheImpl.getType() == CacheType.L1_DATA) {
             cache.stats.incrementReadAccesses();
             boolean hit = cache.access(address, true);
             if (!hit) {
@@ -208,7 +203,7 @@ public class CacheSimulator {
             return;
         }
 
-        if (refType == 'w' && cacheImpl.getType() == org.edumips64.core.cache.CacheType.L1_DATA) {
+        if (refType == 'w' && cacheImpl.getType() == CacheType.L1_DATA) {
             cache.stats.incrementWriteAccesses();
             boolean hit = cache.access(address, true);
             if (!hit) {
