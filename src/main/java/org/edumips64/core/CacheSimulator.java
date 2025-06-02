@@ -61,84 +61,42 @@ public class CacheSimulator {
         }
     }
 
-
-    // Re-export CacheMemory for backward compatibility
-    public static class CacheMemory {
-        private org.edumips64.core.cache.CacheMemory impl;
-        public Stats stats;
+    // Backward compatibility aliases
+    public static class CacheMemory extends org.edumips64.core.cache.CacheMemory {
+        public final Stats stats;
         
         public CacheMemory(CacheConfig config, CacheSimulator.CacheType type) {
-            impl = new org.edumips64.core.cache.CacheMemory(config, type);
-            // Create a wrapper stats that delegates to the impl stats
-            stats = new Stats();
-            // Manually sync the stats references 
-            stats.setImpl(impl.stats);
-        }
-
-        // Delegate all method calls to impl
-        public void eraseCacheContent() {
-            impl.eraseCacheContent();
-        }
-
-        public void setConfig(org.edumips64.core.cache.CacheConfig config) {
-            impl.setConfig(config);
-        }
-
-        public void setConfig(ConfigStore config) {
-            impl.setConfig(config);
-        }
-
-        public void resetStatus() {
-            impl.resetStatus();
-        }
-
-        public boolean access(long address, boolean isWrite) {
-            return impl.access(address, isWrite);
-        }
-
-        @Override
-        public String toString() {
-            return impl.toString();
-        }
-
-        public Stats getStats() {
-            return stats;
-        }
-        
-        // Expose the underlying implementation for processDineroTraceEntry
-        public org.edumips64.core.cache.CacheMemory getImpl() {
-            return impl;
+            super(config, type);
+            this.stats = new Stats(super.stats);
         }
     }
 
-   // Re-export Stats for backward compatibility
-   public static class Stats {
+    public static class Stats {
         private org.edumips64.core.cache.CacheStats impl;
         
         public Stats() {
             impl = new org.edumips64.core.cache.CacheStats();
         }
         
-        // Set the implementation to delegate to
-        public void setImpl(org.edumips64.core.cache.CacheStats impl) {
+        private Stats(org.edumips64.core.cache.CacheStats impl) {
             this.impl = impl;
         }
         
-        // Delegate all methods to impl
-        public void reset() {
-            impl.reset();
+        public static Stats of(long readAccesses, long readMisses, long writeAccesses, long writeMisses) {
+            return new Stats(org.edumips64.core.cache.CacheStats.of(readAccesses, readMisses, writeAccesses, writeMisses));
         }
+        
+        // Delegate all methods
+        public void incrementReadAccesses() { impl.incrementReadAccesses(); }
+        public void incrementReadMisses() { impl.incrementReadMisses(); }
+        public void incrementWriteAccesses() { impl.incrementWriteAccesses(); }
+        public void incrementWriteMisses() { impl.incrementWriteMisses(); }
         
         public long getReadAccesses() { return impl.getReadAccesses(); }
         public long getReadMisses() { return impl.getReadMisses(); }
         public long getWriteAccesses() { return impl.getWriteAccesses(); }
         public long getWriteMisses() { return impl.getWriteMisses(); }
-
-        public void incrementReadAccesses() { impl.incrementReadAccesses(); }
-        public void incrementWriteAccesses() { impl.incrementWriteAccesses(); }
-        public void incrementReadMisses() { impl.incrementReadMisses(); }
-        public void incrementWriteMisses() { impl.incrementWriteMisses(); }
-
+        
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -146,23 +104,18 @@ public class CacheSimulator {
             Stats stats = (Stats) o;
             return impl.equals(stats.impl);
         }
-
+        
         @Override
         public int hashCode() {
             return impl.hashCode();
         }
-
+        
         @Override
         public String toString() {
             return impl.toString();
         }
-        
-        public static Stats of(long readAccesses, long readMisses, long writeAccesses, long writeMisses) {
-            Stats stats = new Stats();
-            stats.impl = org.edumips64.core.cache.CacheStats.of(readAccesses, readMisses, writeAccesses, writeMisses);
-            return stats;
-        }
     }
+
 
     public static void processDineroTraceEntry(CacheMemory cache, String line) {
         if (line.trim().isEmpty())
@@ -182,10 +135,8 @@ public class CacheSimulator {
         long address = Long.decode("0x"+addressStr);
         int size = Integer.parseInt(parts[2]); // size is parsed but not used in this simple simulator
 
-        // Access the underlying cache implementation
-        org.edumips64.core.cache.CacheMemory cacheImpl = cache.getImpl();
-        
-        if (refType == 'i' && cacheImpl.getType() == CacheType.L1_INSTRUCTION) {
+        // Access cache implementation directly
+        if (refType == 'i' && cache.getType() == CacheType.L1_INSTRUCTION) {
             cache.stats.incrementReadAccesses();
             boolean hit = cache.access(address, false);
             if (!hit) {
@@ -194,7 +145,7 @@ public class CacheSimulator {
             return;
         }
 
-        if (refType == 'r' && cacheImpl.getType() == CacheType.L1_DATA) {
+        if (refType == 'r' && cache.getType() == CacheType.L1_DATA) {
             cache.stats.incrementReadAccesses();
             boolean hit = cache.access(address, true);
             if (!hit) {
@@ -203,7 +154,7 @@ public class CacheSimulator {
             return;
         }
 
-        if (refType == 'w' && cacheImpl.getType() == CacheType.L1_DATA) {
+        if (refType == 'w' && cache.getType() == CacheType.L1_DATA) {
             cache.stats.incrementWriteAccesses();
             boolean hit = cache.access(address, true);
             if (!hit) {

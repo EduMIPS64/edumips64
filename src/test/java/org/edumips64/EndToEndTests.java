@@ -631,7 +631,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       CacheSimulator.Stats expected = entry.getValue();
       l1i_cache.setConfig(config);
       runMipsTest("sample.s");
-      var actual_l1i = cachesim.getL1InstructionCache().getStats();
+      var actual_l1i = cachesim.getL1InstructionCache().stats;
 
       collector.checkThat("L1I cache mismatch for config " + config, actual_l1i, equalTo(expected));
     }
@@ -641,7 +641,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       CacheSimulator.Stats expected = entry.getValue();
       l1d_cache.setConfig(config);
       runMipsTest("sample.s");
-      var actual_l1d = cachesim.getL1DataCache().getStats();
+      var actual_l1d = cachesim.getL1DataCache().stats;
 
       collector.checkThat("L1D cache mismatch for config " + config, actual_l1d, equalTo(expected));
     }
