@@ -1,0 +1,22 @@
+# Copilot Coding Agent setup steps workflow
+# 
+# This workflow demonstrates the setup steps for GitHub Copilot Coding Agent.
+# For more information, see:
+# - General Copilot setup steps: https://docs.github.com/en/copilot/customizing-copilot/customizing-the-development-environment-for-copilot-coding-agent
+# - Copilot firewall configuration: https://docs.github.com/en/copilot/customizing-copilot/configuring-the-copilot-agent-firewall
+
+name: Copilot Setup Steps
+
+on:
+  workflow_dispatch:
+
+env:
+  COPILOT_AGENT_FIREWALL_ALLOW_LIST_ADDITIONS: 'maven.ascend-tech.us'
+
+jobs:
+  setup:
+    name: Copilot setup example
+    runs-on: ubuntu-latest
+    steps:
+      - name: Example setup step
+        run: echo "This is an example setup step for GitHub Copilot Coding Agent"
