@@ -14,7 +14,7 @@ env:
   COPILOT_AGENT_FIREWALL_ALLOW_LIST_ADDITIONS: 'maven.ascend-tech.us'
 
 jobs:
-  setup:
+  copilot-setup-steps:
     name: Copilot setup example
     runs-on: ubuntu-latest
     steps:
