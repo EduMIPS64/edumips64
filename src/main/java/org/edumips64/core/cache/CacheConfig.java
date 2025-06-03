@@ -30,6 +30,6 @@ public class CacheConfig {
 
     @Override
     public String toString() {
-        return "{size:" + size + ", bsize:" + blockSize +" assoc:"+ associativity+'}';
+        return "{size:" + size + ", bsize:" + blockSize + ", assoc:" + associativity + ", penalty:" + penalty + '}';
     }
 }
