@@ -2,11 +2,10 @@ package org.edumips64.core.cache;
 
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.ConfigKey;
-import org.edumips64.core.CacheSimulator;
 
 public class CacheMemory {
 
-    private CacheSimulator.CacheType type;
+    private CacheType type;
     private CacheConfig config;
     private int numSets;
     private CacheSet[] sets;
@@ -14,7 +13,7 @@ public class CacheMemory {
     private int indexBits;
     public CacheStats stats;
 
-    public CacheMemory(CacheConfig config, CacheSimulator.CacheType type) {
+    public CacheMemory(CacheConfig config, CacheType type) {
         stats = new CacheStats();
         this.type = type;
         setConfig(config);
@@ -41,7 +40,7 @@ public class CacheMemory {
     }
 
     public void setConfig(ConfigStore config) {
-        String prefix = (type == CacheSimulator.CacheType.L1_DATA) ? "L1D" : "L1I";
+        String prefix = (type == CacheType.L1_DATA) ? "L1D" : "L1I";
         int cacheSize = config.getInt(ConfigKey.valueOf(prefix + "_SIZE"));
         int blockSize = config.getInt(ConfigKey.valueOf(prefix + "_BLOCK_SIZE"));
         int associativity = config.getInt(ConfigKey.valueOf(prefix + "_ASSOCIATIVITY"));
@@ -79,7 +78,7 @@ public class CacheMemory {
         return stats;
     }
 
-    public CacheSimulator.CacheType getType() {
+    public CacheType getType() {
         return type;
     }
 }

@@ -1,6 +1,5 @@
 package org.edumips64.core.cache;
 
-// A cache line represents a block in the cache.
 class CacheLine {
     public long tag;
     public boolean valid;

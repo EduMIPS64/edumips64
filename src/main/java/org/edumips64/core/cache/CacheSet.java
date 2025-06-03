@@ -1,9 +1,9 @@
 package org.edumips64.core.cache;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-// A cache set holds a number of cache lines equal to the associativity.
-public class CacheSet {
+class CacheSet {
     private int associativity;
     private List<CacheLine> lines;
     private int timestamp = 0; // used to implement LRU
