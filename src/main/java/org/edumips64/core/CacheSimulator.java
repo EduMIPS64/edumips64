@@ -61,28 +61,28 @@ public class CacheSimulator {
         int size = Integer.parseInt(parts[2]); // size is parsed but not used in this simple simulator
 
         if (refType == 'i' && cache.getType() == CacheType.L1_INSTRUCTION) {
-            cache.stats.incrementReadAccesses();
+            cache.getStats().incrementReadAccesses();
             boolean hit = cache.access(address, false);
             if (!hit) {
-                cache.stats.incrementReadMisses();
+                cache.getStats().incrementReadMisses();
             }
             return;
         }
 
         if (refType == 'r' && cache.getType() == CacheType.L1_DATA) {
-            cache.stats.incrementReadAccesses();
+            cache.getStats().incrementReadAccesses();
             boolean hit = cache.access(address, true);
             if (!hit) {
-                cache.stats.incrementReadMisses();
+                cache.getStats().incrementReadMisses();
             }
             return;
         }
 
         if (refType == 'w' && cache.getType() == CacheType.L1_DATA) {
-            cache.stats.incrementWriteAccesses();
+            cache.getStats().incrementWriteAccesses();
             boolean hit = cache.access(address, true);
             if (!hit) {
-                cache.stats.incrementWriteMisses();
+                cache.getStats().incrementWriteMisses();
             }
             return;
         }

@@ -89,10 +89,10 @@ public class CacheSimulatorTests {
             e.printStackTrace();
         }
         return CacheStats.of(
-                cache.stats.getReadAccesses(),
-                cache.stats.getReadMisses(),
-                cache.stats.getWriteAccesses(),
-                cache.stats.getWriteMisses()
+                cache.getStats().getReadAccesses(),
+                cache.getStats().getReadMisses(),
+                cache.getStats().getWriteAccesses(),
+                cache.getStats().getWriteMisses()
         );
     }
 
