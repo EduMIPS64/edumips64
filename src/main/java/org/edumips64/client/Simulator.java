@@ -36,6 +36,7 @@ import org.edumips64.core.is.HaltException;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
+import org.edumips64.core.cache.CacheConfig;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.FileUtils;
@@ -79,7 +80,7 @@ public class Simulator {
     info("initialization complete!");
   }
 
-  public Result setCacheConfig(CacheSimulator.CacheConfig l1d_config, CacheSimulator.CacheConfig l1i_config)  {
+  public Result setCacheConfig(CacheConfig l1d_config, CacheConfig l1i_config)  {
     cpu.reset();
     cachesim.getL1InstructionCache().setConfig(l1i_config);
     cachesim.getL1DataCache().setConfig(l1d_config);

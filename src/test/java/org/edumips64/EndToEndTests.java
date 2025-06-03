@@ -26,6 +26,8 @@
 package org.edumips64;
 
 import org.edumips64.core.*;
+import org.edumips64.core.cache.CacheConfig;
+import org.edumips64.core.cache.CacheStats;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.AddressErrorException;
 import org.edumips64.core.is.BreakException;
@@ -617,8 +619,8 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
 
     String tracefile = "sample.s.xdin";
 
-    Map<CacheSimulator.CacheConfig, CacheSimulator.Stats> l1iGoldenStats = null;
-    Map<CacheSimulator.CacheConfig, CacheSimulator.Stats> l1dGoldenStats = null;
+    Map<CacheConfig, CacheStats> l1iGoldenStats = null;
+    Map<CacheConfig, CacheStats> l1dGoldenStats = null;
 
     l1iGoldenStats = CacheSimulatorTests.loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1I.csv");
     l1dGoldenStats = CacheSimulatorTests.loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1D.csv");
@@ -626,9 +628,9 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     var l1i_cache = cachesim.getL1InstructionCache();
     var l1d_cache = cachesim.getL1DataCache();
 
-    for (Map.Entry<CacheSimulator.CacheConfig, CacheSimulator.Stats> entry : l1iGoldenStats.entrySet()) {
-      CacheSimulator.CacheConfig config = entry.getKey();
-      CacheSimulator.Stats expected = entry.getValue();
+    for (Map.Entry<CacheConfig, CacheStats> entry : l1iGoldenStats.entrySet()) {
+      CacheConfig config = entry.getKey();
+      CacheStats expected = entry.getValue();
       l1i_cache.setConfig(config);
       runMipsTest("sample.s");
       var actual_l1i = cachesim.getL1InstructionCache().getStats();
@@ -636,9 +638,9 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       collector.checkThat("L1I cache mismatch for config " + config, actual_l1i, equalTo(expected));
     }
 
-    for (Map.Entry<CacheSimulator.CacheConfig, CacheSimulator.Stats> entry : l1dGoldenStats.entrySet()) {
-      CacheSimulator.CacheConfig config = entry.getKey();
-      CacheSimulator.Stats expected = entry.getValue();
+    for (Map.Entry<CacheConfig, CacheStats> entry : l1dGoldenStats.entrySet()) {
+      CacheConfig config = entry.getKey();
+      CacheStats expected = entry.getValue();
       l1d_cache.setConfig(config);
       runMipsTest("sample.s");
       var actual_l1d = cachesim.getL1DataCache().getStats();
