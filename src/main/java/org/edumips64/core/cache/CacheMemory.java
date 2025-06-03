@@ -11,7 +11,7 @@ public class CacheMemory {
     private CacheSet[] sets;
     private int blockOffsetBits;
     private int indexBits;
-    public CacheStats stats;
+    private CacheStats stats;
 
     public CacheMemory(CacheConfig config, CacheType type) {
         stats = new CacheStats();
