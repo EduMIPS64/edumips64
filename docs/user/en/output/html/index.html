@@ -1,0 +1,97 @@
+
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Welcome to the EduMIPS64 documentation! &#8212; EduMIPS64 1.3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/epub.css?v=e4d0adb4" />
+    <script src="_static/documentation_options.js?v=1f29e9d3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script> 
+  </head><body>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="welcome-to-the-edumips64-documentation">
+<h1>Welcome to the EduMIPS64 documentation!<a class="headerlink" href="#welcome-to-the-edumips64-documentation" title="Link to this heading">¶</a></h1>
+<p>EduMIPS64 is a MIPS64 Instruction Set Architecture (ISA) simulator. It is
+designed to be used to execute small programs that use the subset of the
+MIPS64 ISA implemented by the simulator, allowing the user to see how
+instructions behave in the pipeline, how stalls are handled by the CPU, the
+status of registers and memory and much more. It is both a simulator and a
+visual debugger.</p>
+<p>The website for the project is <a class="reference external" href="http://www.edumips.org">http://www.edumips.org</a>, and the code is hosted
+at <a class="reference external" href="http://github.com/EduMIPS64/edumips64">http://github.com/EduMIPS64/edumips64</a>. If you find any bugs, or have any
+suggestion for improving the simulator, please open an issue on github or send
+an email at <a class="reference external" href="mailto:bugs&#37;&#52;&#48;edumips&#46;org">bugs<span>&#64;</span>edumips<span>&#46;</span>org</a>.</p>
+<p>EduMIPS64 is developed by a group of students of the University of Catania
+(Italy), and started as a clone of WinMIPS64, even if now there are lots of
+differences between the two simulators.</p>
+<p>This manual will introduce you to EduMIPS64, and will cover some details on
+how to use it.</p>
+<p>The first chapter of this manual covers the format of source files accepted
+by the simulator, describing the data types and the directives, in addition
+to command line parameters. In the second chapter there’s an overview of the
+subset of the MIPS64 instruction set that is accepted by EduMIPS64, with all
+the needed parameters and indications to use them. The third chapter is a
+description of the Floating Point Unit and its instruction set.
+The fourth chapter is a description of the user interface of EduMIPS64, that
+explains the purpose of each frame and menu, along with a description of the
+configuration dialog, the Dinero frontend dialog, the Manual dialog and
+command line options. The fifth chapter contains some useful examples.</p>
+<p>This manual describes EduMIPS64 version 1.3.0.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="source-files-format.html">Source files format</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-files-format.html#memory-limits">Memory limits</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-files-format.html#the-data-section">The <cite>.data</cite> section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-files-format.html#the-code-section">The <cite>.code</cite> section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-files-format.html#the-include-command">The <cite>#include</cite> command</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="instructions.html">The instruction set</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#alu-instructions">ALU Instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#load-store-instructions">Load/Store instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#flow-control-instructions">Flow control instructions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#the-syscall-instruction">The <cite>SYSCALL</cite> instruction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#other-instructions">Other instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fpu.html">Floating Point Unit</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fpu.html#special-values">Special values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fpu.html#exception-configuration">Exception configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fpu.html#the-double-directive">The .double directive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fpu.html#the-fcsr-register">The FCSR register</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fpu.html#instruction-set">Instruction set</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user-interface.html">The user interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user-interface.html#the-menu-bar">The menu bar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-interface.html#frames">Frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-interface.html#dialogs">Dialogs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-interface.html#command-line-options">Command line options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Code Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#syscall">SYSCALL</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

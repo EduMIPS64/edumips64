@@ -1,0 +1,374 @@
+
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Source files format &#8212; EduMIPS64 1.3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/epub.css?v=e4d0adb4" />
+    <script src="_static/documentation_options.js?v=1f29e9d3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script> 
+  </head><body>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="source-files-format">
+<h1>Source files format<a class="headerlink" href="#source-files-format" title="Link to this heading">¶</a></h1>
+<p>EduMIPS64 tries to follow the conventions used in other MIPS64 and DLX
+simulators, so that old time users will not be confused by its syntax.</p>
+<p>There are two sections in a source file, the <em>data</em> section and the
+<em>code</em> section, introduced respectively by the <em>.data</em> and the
+<em>.code</em> directives. In the following listing you can see a very basic
+EduMIPS64 program:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">;</span> <span class="n">This</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">comment</span>
+        <span class="o">.</span><span class="n">data</span>
+<span class="n">label</span><span class="p">:</span>  <span class="o">.</span><span class="n">word</span>   <span class="mi">15</span>     <span class="p">;</span> <span class="n">This</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">inline</span> <span class="n">comment</span>
+
+        <span class="o">.</span><span class="n">code</span>
+        <span class="n">daddi</span>   <span class="n">r1</span><span class="p">,</span> <span class="n">r0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="n">syscall</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>To distinguish the various parts of each source code line, any combination of
+spaces and tabs can be used, as the parser ignores multiple spaces and only
+detects whitespaces to separate tokens.</p>
+<p>Comments can be specified using the “;” character, everything that follows
+that character will be ignored. So a comment can be used “inline” (after the
+directive) or on a row by itself.</p>
+<p>Labels can be used in the code to reference a memory cell or an
+instruction.  They are case insensitive. Only a label for each source code line
+can be used.  The label can be specified one or more rows above the effective
+data declaration or instruction, provided that there’s nothing, except for
+comments and empty lines, between the label and the declaration.</p>
+<section id="memory-limits">
+<h2>Memory limits<a class="headerlink" href="#memory-limits" title="Link to this heading">¶</a></h2>
+<p>EduMIPS64 has a fixed memory size for both data (the <cite>.data</cite> section, capped
+at 640 kB – i.e., 80000 64-bit values) and instructions (the <cite>.code</cite> section,
+capped at 128 kB – i.e., 32000 instructions, each occupying 32 bits).</p>
+<p>These limits are hardcoded in the simulator.</p>
+</section>
+<section id="the-data-section">
+<h2>The <cite>.data</cite> section<a class="headerlink" href="#the-data-section" title="Link to this heading">¶</a></h2>
+<p>The <em>data</em> section contains commands that specify how the memory must be
+filled before program execution starts. The general form of a <cite>.data</cite> command
+is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">label</span><span class="p">:]</span> <span class="o">.</span><span class="n">datatype</span> <span class="n">value1</span> <span class="p">[,</span> <span class="n">value2</span> <span class="p">[,</span> <span class="o">...</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>EduMIPS64 supports different data types, that are described in the following
+table.</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Type</p></th>
+<th class="head"><p>Directive</p></th>
+<th class="head"><p>Bits required</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Byte</p></td>
+<td><p><cite>.byte</cite></p></td>
+<td><p>8</p></td>
+</tr>
+<tr class="row-odd"><td><p>Half word</p></td>
+<td><p><cite>.word16</cite></p></td>
+<td><p>16</p></td>
+</tr>
+<tr class="row-even"><td><p>Word</p></td>
+<td><p><cite>.word32</cite></p></td>
+<td><p>32</p></td>
+</tr>
+<tr class="row-odd"><td><p>Double Word</p></td>
+<td><p><cite>.word</cite> or <cite>.word64</cite></p></td>
+<td><p>64</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Please note that a double word can be introduced either by the <cite>.word</cite>
+directive or by the <cite>.word64</cite> directive.</p>
+<p>All the data types are interpreted as signed. This means that integer literals
+in the <cite>.data</cite> section must be between -2^(n-1) and 2^(n-1) - 1 (inclusive).</p>
+<p>There is a big difference between declaring a list of data elements using a
+single directive or by using multiple directives of the same type. EduMIPS64
+starts writing from the next 64-bit double word as soon as it finds a
+datatype identifier, so the first <cite>.byte</cite> statement in the following listing
+will put the numbers 1, 2, 3 and 4 in the space of 4 bytes, taking 32 bits,
+while code in the next four rows will put each number in a different memory
+cell, occupying 32 bytes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">.</span><span class="n">data</span>
+<span class="o">.</span><span class="n">byte</span>    <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span>
+<span class="o">.</span><span class="n">byte</span>    <span class="mi">1</span>
+<span class="o">.</span><span class="n">byte</span>    <span class="mi">2</span>
+<span class="o">.</span><span class="n">byte</span>    <span class="mi">3</span>
+<span class="o">.</span><span class="n">byte</span>    <span class="mi">4</span>
+</pre></div>
+</div>
+<p>In the following table, the memory is represented using byte-sized cells
+and each row is 64 bits wide. The address on the left side of each row of the
+table refers to the right-most memory cell, that has the lowest address of the
+eight cells in each line.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><em>0</em></p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>4</p></td>
+<td><p>3</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p><em>8</em></p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>16</em></p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p><em>24</em></p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>36</em></p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>4</p></td>
+</tr>
+</tbody>
+</table>
+<p>There are some special directives that need to be discussed: <cite>.space</cite>,
+<cite>.ascii</cite> and <cite>.asciiz</cite>.</p>
+<p>The <cite>.space</cite> directive is used to leave some free space in memory. It
+accepts as a parameter an integer, that indicates the number of bytes that must
+be left empty. It is handy when you must save some space in memory for the
+results of your computations.</p>
+<p>The <cite>.ascii</cite> directive accepts strings containing any of the ASCII
+characters, and some special C-like escaping sequences, that are described in
+the following table, and puts those strings in memory.</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Escaping sequence</p></th>
+<th class="head"><p>Meaning</p></th>
+<th class="head"><p>ASCII code</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>\0</p></td>
+<td><p>Null byte</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>\t</p></td>
+<td><p>Horizontal tabulation</p></td>
+<td><p>9</p></td>
+</tr>
+<tr class="row-even"><td><p>\n</p></td>
+<td><p>Newline character</p></td>
+<td><p>10</p></td>
+</tr>
+<tr class="row-odd"><td><p>\”</p></td>
+<td><p>Literal quote character</p></td>
+<td><p>34</p></td>
+</tr>
+<tr class="row-even"><td><p>\</p></td>
+<td><p>Literal backslash character</p></td>
+<td><p>92</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>The <cite>.asciiz</cite> directive behaves exactly like the <cite>.ascii</cite> command,
+with the difference that it automatically ends the string with a null byte.</p>
+</section>
+<section id="the-code-section">
+<h2>The <cite>.code</cite> section<a class="headerlink" href="#the-code-section" title="Link to this heading">¶</a></h2>
+<p>The <em>code</em> section contains commands that specify how the memory must be
+filled when the program will start. The general form of a <cite>.code</cite> command
+is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">label</span><span class="p">:]</span> <span class="n">instruction</span> <span class="p">[</span><span class="n">param1</span> <span class="p">[,</span> <span class="n">param2</span> <span class="p">[,</span> <span class="n">param3</span><span class="p">]]]</span>
+</pre></div>
+</div>
+<p>The <em>code</em> section can be specified with the <cite>.text</cite> alias.</p>
+<p>The number and the type of parameters depends on the instruction itself.</p>
+<p>Instructions can take three types of parameters:</p>
+<ul class="simple">
+<li><p><em>Registers</em> a register parameter is indicated by an uppercase
+or lowercase “r”, or a $, followed by the number of the register (between
+0 and 31), as in “r4”, “R4” or “$4”;</p></li>
+<li><p><em>Immediate values</em> an immediate value can be a number or a
+label; the number can be specified in base 10 or in base 16: base 10 numbers
+are simply inserted by writing the number, while base 16 number are inserted
+by putting before the number the prefix “0x”. Immediate values can be preceded
+by the # character.</p></li>
+<li><p><em>Address</em> an address is composed by an immediate value followed
+by a register name enclosed in brackets. The value of the register will be
+used as base, the value of the immediate will be the offset.</p></li>
+</ul>
+<p>The size of immediate values is limited by the number of bits that are
+available in the bit encoding of the instruction.</p>
+<p>When 16-bit immediates can be used, for example in ALU I-Type instructions,
+it’s also possible to use as an immediate value a memory label. The assembler
+will put as immediate value the memory address the label points to.</p>
+<p>You can use standard MIPS assembly aliases to address the first 32 registers,
+appending the alias to one of the standard register prefixes like “r”, “$”
+and “R”. See the next table.</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Register</p></th>
+<th class="head"><p>Alias</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p><cite>zero</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p><cite>at</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p><cite>v0</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p><cite>v1</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p><cite>a0</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p><cite>a1</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p><cite>a2</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p><cite>a3</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p><cite>t0</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p><cite>t1</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p><cite>t2</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>11</p></td>
+<td><p><cite>t3</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>12</p></td>
+<td><p><cite>t4</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>13</p></td>
+<td><p><cite>t5</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>14</p></td>
+<td><p><cite>t6</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>15</p></td>
+<td><p><cite>t7</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>16</p></td>
+<td><p><cite>s0</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>17</p></td>
+<td><p><cite>s1</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>18</p></td>
+<td><p><cite>s2</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>19</p></td>
+<td><p><cite>s3</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>20</p></td>
+<td><p><cite>s4</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>21</p></td>
+<td><p><cite>s5</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>22</p></td>
+<td><p><cite>s6</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>23</p></td>
+<td><p><cite>s7</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>24</p></td>
+<td><p><cite>t8</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>25</p></td>
+<td><p><cite>t9</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>26</p></td>
+<td><p><cite>k0</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>27</p></td>
+<td><p><cite>k1</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>28</p></td>
+<td><p><cite>gp</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>29</p></td>
+<td><p><cite>sp</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>30</p></td>
+<td><p><cite>fp</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>31</p></td>
+<td><p><cite>ra</cite></p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</section>
+<section id="the-include-command">
+<h2>The <cite>#include</cite> command<a class="headerlink" href="#the-include-command" title="Link to this heading">¶</a></h2>
+<p>Source files can contain the <cite>#include filename</cite> command, which has the
+effect of putting in place of the command row the content of the file
+<cite>filename</cite>.
+It is useful if you want to include external routines, and it comes with a
+loop-detection algorithm that will warn you if you try to do something like
+“<cite>#include A.s</cite>” in file <cite>B.s</cite> and “<cite>#include B.s</cite>” in file <cite>A.s</cite>.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>
