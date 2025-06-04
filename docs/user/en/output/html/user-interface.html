@@ -157,6 +157,19 @@ the value of the register.</p>
 incremented, because the last execution cycle is not a full CPU cycle but
 rather a pseudo-cycle whose only duties are to remove the last instruction
 from the pipeline and increment the counter of executed instructions.</p>
+<p>The Statistics frame also displays L1 cache statistics when the cache
+simulator is enabled:</p>
+<ul class="simple">
+<li><p><strong>L1I Reads</strong> - Number of read accesses to the L1 instruction cache</p></li>
+<li><p><strong>L1I Read Misses</strong> - Number of read misses in the L1 instruction cache</p></li>
+<li><p><strong>L1D Reads</strong> - Number of read accesses to the L1 data cache</p></li>
+<li><p><strong>L1D Read Misses</strong> - Number of read misses in the L1 data cache</p></li>
+<li><p><strong>L1D Writes</strong> - Number of write accesses to the L1 data cache</p></li>
+<li><p><strong>L1D Write Misses</strong> - Number of write misses in the L1 data cache</p></li>
+</ul>
+<p>These statistics help analyze cache performance and understand memory access
+patterns in your program. Cache misses indicate when the processor needs to
+access slower main memory instead of the faster cache.</p>
 </section>
 <section id="pipeline">
 <h3>Pipeline<a class="headerlink" href="#pipeline" title="Link to this heading">¶</a></h3>
@@ -225,8 +238,54 @@ simulation will be stopped as soon as the dialog is closed.</p>
 options to change the colors associated to the different pipeline stages, an
 option to choose whether memory cells are shown as long or double values and
 an option to set the UI font size.</p>
+<p>The Cache tab allows you to configure the L1 cache simulator settings:</p>
+<ul class="simple">
+<li><p><strong>L1 Data Cache Size</strong> - Size of the L1 data cache in bytes (default: 1024)</p></li>
+<li><p><strong>L1 Instruction Cache Size</strong> - Size of the L1 instruction cache in bytes (default: 1024)</p></li>
+<li><p><strong>L1 Data Cache Block Size</strong> - Size of each cache block in bytes (default: 16)</p></li>
+<li><p><strong>L1 Instruction Cache Block Size</strong> - Size of each cache block in bytes (default: 16)</p></li>
+<li><p><strong>L1 Data Cache Associativity</strong> - Number of cache ways, determining cache organization (default: 1)</p></li>
+<li><p><strong>L1 Instruction Cache Associativity</strong> - Number of cache ways, determining cache organization (default: 1)</p></li>
+<li><p><strong>L1 Data Cache Penalty</strong> - Number of additional cycles for cache misses (default: 40)</p></li>
+<li><p><strong>L1 Instruction Cache Penalty</strong> - Number of additional cycles for cache misses (default: 40)</p></li>
+</ul>
+<p>These settings allow you to experiment with different cache configurations to
+understand their impact on program performance. The cache simulator models
+separate L1 data and instruction caches, which is common in modern processors.</p>
 <p>Note that the UI scaling with font size is far from perfect, but it should be
 enough to make the simulator usable with high-resolution displays (e.g., 4k).</p>
+</section>
+<section id="l1-cache-simulator">
+<h3>L1 Cache Simulator<a class="headerlink" href="#l1-cache-simulator" title="Link to this heading">¶</a></h3>
+<p>EduMIPS64 includes an integrated L1 cache simulator that models the behavior
+of separate instruction and data caches. The cache simulator operates
+automatically during program execution and provides detailed statistics about
+cache performance.</p>
+<p>The cache simulator models:</p>
+<ul class="simple">
+<li><p><strong>L1 Instruction Cache</strong> - Caches instruction fetches from memory</p></li>
+<li><p><strong>L1 Data Cache</strong> - Caches data reads and writes from memory operations</p></li>
+</ul>
+<p>Each cache can be independently configured with different parameters:</p>
+<ul class="simple">
+<li><p><strong>Size</strong> - Total capacity of the cache in bytes</p></li>
+<li><p><strong>Block Size</strong> - Size of each cache line in bytes (also called cache block)</p></li>
+<li><p><strong>Associativity</strong> - Number of ways in the cache set (1 = direct-mapped, &gt;1 = set-associative)</p></li>
+<li><p><strong>Penalty</strong> - Additional CPU cycles incurred on cache misses</p></li>
+</ul>
+<p>The cache simulator uses a Least Recently Used (LRU) replacement policy for
+set-associative caches. Cache statistics are updated in real-time during
+execution and displayed in the Statistics frame.</p>
+<p>Cache performance can significantly impact program execution time, especially
+for programs with poor memory locality. Use the cache simulator to:</p>
+<ul class="simple">
+<li><p>Analyze memory access patterns in your programs</p></li>
+<li><p>Experiment with different cache configurations</p></li>
+<li><p>Understand the performance impact of cache misses</p></li>
+<li><p>Learn about cache behavior in real processors</p></li>
+</ul>
+<p>The cache configuration can be changed through the Settings dialog (Cache tab)
+and takes effect when the simulation is reset.</p>
 </section>
 <section id="dinero-frontend">
 <h3>Dinero Frontend<a class="headerlink" href="#dinero-frontend" title="Link to this heading">¶</a></h3>
