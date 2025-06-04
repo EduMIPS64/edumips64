@@ -27,6 +27,9 @@ report/
 # Temporary test file (I should find a way to remove it automatically...)
 syscall-testfile.txt
 
+# Playwright test results
+test-results/
+
 # Miscellaneous output directories.
 build
 build/*
