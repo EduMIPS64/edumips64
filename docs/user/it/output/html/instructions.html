@@ -1,0 +1,567 @@
+
+
+<html lang="it" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Il set di istruzioni &#8212; Documentazione EduMIPS64 1.3.0 </title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/epub.css?v=e4d0adb4" />
+    <script src="_static/documentation_options.js?v=79d73783"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=45930005"></script> 
+  </head><body>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="il-set-di-istruzioni">
+<h1>Il set di istruzioni<a class="headerlink" href="#il-set-di-istruzioni" title="Link to this heading">¶</a></h1>
+<p>In questa sezione verrà illustrato il repertorio delle istruzioni MIPS64
+riconosciute da EduMIPS64. è possibile effettuare due differenti
+classificazioni: una basata sulla funzionalità delle istruzioni e l’altra
+basata sul tipo di parametri.</p>
+<p>La prima classificazione suddivide le istruzioni in tre categorie: istruzioni
+ALU, istruzioni Load/Store, istruzioni di controllo del flusso. I prossimi tre
+paragrafi descriveranno ciascuna categoria e le istruzioni che vi
+appartengono.</p>
+<p>Il quarto paragrafo descriverà le istruzioni che non rientrano in nessuna
+delle tre categorie sopraelencate.</p>
+<section id="le-istruzioni-alu">
+<h2>Le istruzioni ALU<a class="headerlink" href="#le-istruzioni-alu" title="Link to this heading">¶</a></h2>
+<p>L’unità logico-aritmetica (ALU) fa parte dell’unità esecutiva di una
+CPU ed assume il ruolo di esecuzione di operazioni logiche ed aritmetiche. Il
+gruppo di istruzioni ALU conterrà quindi quelle istruzioni che effettuano
+questo tipo di operazioni.</p>
+<p>Le istruzioni ALU possono essere suddivise in due gruppi: <em>tipo R</em> e
+<em>tipo I</em>.</p>
+<p>Quattro di esse utilizzano due registri speciali: LO e HI. Tali registri sono
+interni alla CPU ed è possibile accedere al loro valore mediante le
+istruzioni <cite>MFLO</cite> e <cite>MFHI</cite>.</p>
+<p>Ecco la lista delle istruzioni ALU di tipo R.</p>
+<ul>
+<li><p><cite>AND rd, rs, rt</cite></p>
+<p>Esegue un AND bit a bit tra rs ed rt, e pone il risultato in rd.</p>
+</li>
+<li><p><cite>ADD rd, rs, rt</cite></p>
+<p>Somma il contenuto dei registri a 32-bit rs ed rt, considerandoli come
+valori con segno, e pone il risultato in rd.  Lancia un’eccezione in caso di
+overflow.</p>
+</li>
+<li><p><cite>ADDU rd, rs, rt</cite></p>
+<p>Somma il contenuto dei registri a 32-bit rs ed rt, e pone il risultato in
+rd. Non si verificano eccezioni di overflow.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>DADD rd, rs, rt</cite></p>
+<p>Somma il contenuto dei registri a 64-bit rs ed rt, considerandoli come
+valori con segno, e pone il risultato in rd.  Lancia un’eccezione in caso di
+overflow.</p>
+</li>
+<li><p><cite>DADDU rd, rs, rt</cite></p>
+<p>Somma il contenuto dei registri a 64-bit rs ed rt, e pone il risultato in rd.
+Non si verificano eccezioni di overflow.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>DDIV rs, rt</cite></p>
+<p>Esegue la divisione tra i registri a 64-bit rs ed rt, ponendo i 64-bit del
+quoziente in LO ed i 64-bit del resto in HI.</p>
+</li>
+<li><p><cite>DDIVU rs, rt</cite></p>
+<p>Esegue la divisione tra i registri a 64-bit rs ed rt, considerandoli come
+valori senza segno e ponendo i 64-bit del quoziente in LO ed i 64-bit del
+resto in HI.</p>
+</li>
+<li><p><cite>DIV rs, rt</cite></p>
+<p>Esegue la divisione tra i registri a 32-bit rs ed rt, ponendo i 32-bit del
+quoziente in LO ed i 32-bit del resto in HI.</p>
+</li>
+<li><p><cite>DIVU rs, rt</cite></p>
+<p>Esegue la divisione tra i registri a 32-bit rs ed rt, considerandoli come
+valori senza segno e pone i 32-bit del quoziente in LO ed i 32-bit del resto
+in HI.</p>
+</li>
+<li><p><cite>DMUHU rd, rs, rt</cite></p>
+<p>Esegue il prodotto tra i registri a 64-bit rs ed rt, considerandoli come
+valori senza segno e ponendo i 64 bit alti del risultato nel registro rd.</p>
+</li>
+<li><p><cite>DMULT rs, rt</cite></p>
+<p>Esegue il prodotto tra i registri a 64-bit rs ed rt, ponendo i 64 bit bassi
+del risultato nel registro speciale LO e i 64 bit alti del risultato nel
+registro speciale HI.</p>
+</li>
+<li><p><cite>DMULTU rs, rt</cite></p>
+<p>Esegue il prodotto tra i registri a 64-bit rs ed rt, considerandoli come
+valori senza segno e ponendo i 64 bit bassi del risultato nel registro
+speciale LO e i 64 bit alti del risultato nel registro speciale HI.</p>
+</li>
+<li><p><cite>DMULU rd, rs, rt</cite></p>
+<p>Esegue il prodotto tra i registri a 64-bit rs ed rt, considerandoli come
+valori senza segno e ponendo i 64 bit bassi del risultato nel registro rd.</p>
+</li>
+<li><p><cite>DSLL rd, rt, sa</cite></p>
+<p>Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di
+bit indicato nel valore immediato (positivo compreso tra 0 e 63) sa, e pone
+il risultato in rd. I bit liberi vengono posti a zero.</p>
+</li>
+<li><p><cite>DSLLV rd, rt, rs</cite></p>
+<p>Effettua uno shift verso sinistra del registro a 64-bit rt, di un numero di
+bit specificato nei 6 bit bassi del registro rs che verrà letto come valore
+senza segno, e pone il risultato in rd. I bit liberi vengono posti a zero.</p>
+</li>
+<li><p><cite>DSRA rd, rt, sa</cite></p>
+<p>Effettua uno shift verso destra del registro a 64-bit rt, di un numero di
+bit specificato nel valore senza segno immediato (positivo compreso tra 0 e
+63) sa, e pone il risultato in rd. I bit liberi vengono posti a zero se il
+bit più a sinistra di rs è zero, altrimenti vengono posti a uno.</p>
+</li>
+<li><p><cite>DSRAV rd, rt, rs</cite></p>
+<p>Effettua uno shift verso destra del registro a 64-bit rt, di un numero di
+bit specificato nei 6 bit bassi del registro rs che verrà letto come valore
+senza segno,e pone il risultato in rd.  I bit liberi vengono posti a zero se
+il bit più a sinistra di rs è zero, altrimenti vengono posti a uno.</p>
+</li>
+<li><p><cite>DSRL rd, rs, sa</cite></p>
+<p>Effettua uno shift verso destra del registro a 64-bit rt, di un numero di
+bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, e
+pone il risultato in rd. I bit liberi vengono posti a zero.</p>
+</li>
+<li><p><cite>DSRLV rd, rt, rs</cite></p>
+<p>Effettua uno shift verso destra del registro a 64-bit rt, di un numero di
+bit specificato nei 6 bit bassi del registro rs che verrà letto come valore
+senza segno, e pone il risultato in rd. I bit liberi vengono posti a zero.</p>
+</li>
+<li><p><cite>DSUB rd, rs, rt</cite></p>
+<p>Sottrae il valore del registro a 64-bit rt al valore del registro a 64-bit
+rs, considerandoli come valori con segno, e pone il risultato in rd. Lancia
+un’eccezione in caso di overflow.</p>
+</li>
+<li><p><cite>DSUBU rd, rs, rt</cite></p>
+<p>Sottrae il valore del registro a 64-bit rt al valore del registro a 64-bit
+rs, e pone il risultato in rd.  Non si verificano eccezioni di overflow.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>MFLO rd</cite></p>
+<p>Copia il contenuto del registro speciale LO in rd.</p>
+</li>
+<li><p><cite>MFHI rd</cite></p>
+<p>Copia il contenuto del registro speciale HI in rd.</p>
+</li>
+<li><p><cite>MOVN rd, rs, rt</cite></p>
+<p>Se rt è diverso da zero, copia il contenuto di rs in rd.</p>
+</li>
+<li><p><cite>MOVZ rd, rs, rt</cite></p>
+<p>Se rt è uguale a zero, copia il contenuto di rs in rd.</p>
+</li>
+<li><p><cite>MULT rs, rt</cite></p>
+<p>Esegue il prodotto tra i registri a 32-bit rs ed rt, ponendo i 32 bit bassi
+del risultato nel registro speciale LO e i 32 bit alti del risultato nel
+registro speciale HI.</p>
+</li>
+<li><p><cite>MULTU rs, rt</cite></p>
+<p>Esegue il prodotto tra i registri a 32-bit rs ed rt, considerandoli come
+valori senza segno e ponendo i 32 bit bassi del risultato nel registro
+speciale LO e i 32 bit alti del risultato nel registro speciale HI.</p>
+</li>
+<li><p><cite>OR rd, rs, rt</cite></p>
+<p>Esegue un OR bit a bit tra rs ed rt, e pone il risultato in rd.</p>
+</li>
+<li><p><cite>SLL rd, rt, sa</cite></p>
+<p>Effettua uno shift verso sinistra del registro a 32-bit rt, di un numero di
+bit indicati nel valore immediato (positivo compreso tra 0 e 63) sa, e pone
+il risultato nel registro a 32-bit rd. I bit liberi vengono posti a zero.</p>
+</li>
+<li><p><cite>SLLV rd, rt, rs</cite></p>
+<p>Effettua uno shift verso sinistra del registro a 32-bit rt, di un numero di
+bit specificato nei 5 bit bassi del registro rs che verrà letto come
+valore senza segno, e pone il risultato nel registro a 32-bit rd. I bit
+liberi vengono posti a zero.</p>
+</li>
+<li><p><cite>SRA rd, rt, sa</cite></p>
+<p>Effettua uno shift verso destra del registro a 32-bit rt, di un numero di
+bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, e
+pone il risultato nel registro a 32-bit rd.  I bit liberi vengono posti a
+zero se il bit più a sinistra di rs è zero, altrimenti vengono posti
+a uno.</p>
+</li>
+<li><p><cite>SRAV rd, rt, rs</cite></p>
+<p>Effettua uno shift verso destra del registro a 32-bit rt, di un numero di
+bit specificato nei 5 bit bassi del registro rs che verrà letto come
+valore senza segno, e pone il risultato nel registro a 32-bit in rd.  I bit
+liberi vengono posti a zero se il bit più a sinistra di rs è zero,
+altrimenti vengono posti a uno.</p>
+</li>
+<li><p><cite>SRL rd, rs, sa</cite></p>
+<p>Effettua uno shift verso destra del registro a 32-bit rt, di un numero di
+bit specificato nel valore immediato (positivo compreso tra 0 e 63) sa, e
+pone il risultato nel registro a 32-bit rd. I bit liberi vengono posti a
+zero.</p>
+</li>
+<li><p><cite>SRLV rd, rt, rs</cite></p>
+<p>Effettua uno shift verso destra del registro a 32-bit rt, del numero di bit
+specificato nei 5 bit bassi del registro rs che verrà letto come valore
+senza segno, e pone il risultato nel registro a 32-bit rd. I bit liberi
+vengono posti a zero.</p>
+</li>
+<li><p><cite>SUB rd, rs, rt</cite></p>
+<p>Sottrae il valore del registro a 32-bit rt al valore del registro a 32-bit
+rs, considerandoli come valori con segno, e pone il risultato in rd. Lancia
+un’eccezione in caso di overflow.</p>
+</li>
+<li><p><cite>SUBU rd, rs, rt</cite></p>
+<p>Sottrae il valore del registro a 32-bit rt al valore del registro a 32-bit
+rs, e pone il risultato in rd.
+Non si verificano eccezioni di overflow.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>SLT rd, rs, rt</cite></p>
+<p>Pone il valore di rd ad 1 se il valore contenuto in rs è minore di
+quello contenuto in rt, altrimenti pone rd a 0. Questa istruzione esegue un
+confronto con segno.</p>
+</li>
+<li><p><cite>SLTU rd, rs, rt</cite></p>
+<p>Pone il valore di rd ad 1 se il valore contenuto in rs è minore di
+quello contenuto in rt, altrimenti pone rd a 0. Questa istruzione esegue un
+confronto senza segno.</p>
+</li>
+<li><p><cite>XOR rd, rs, rt</cite></p>
+<p>Esegue un OR esclusivo (XOR) bit a bit tra rs ed rt, e pone il risultato in
+rd.</p>
+</li>
+</ul>
+<p>Ecco la lista delle istruzioni ALU di tipo I.</p>
+<ul>
+<li><p><cite>ADDI rt, rs, immediate</cite></p>
+<p>Effettua la somma tra il registro a 32 bit rs ed il valore immediato,
+ponendo il risultato in rt.  Questa istruzione considera gli operandi come
+valori con segno.  Lancia un’eccezione in caso di overflow.</p>
+</li>
+<li><p><cite>ADDIU rt, rs, immediate</cite></p>
+<p>Effettua la somma tra il registro a 32 bit rs ed il valore immediato,
+ponendo il risultato in rt.  Non si verificano eccezioni di overflow.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>ANDI rt, rs, immediate</cite></p>
+<p>Esegue un AND bit a bit tra rs ed il valore immediato, ponendo il risultato
+in rt.</p>
+</li>
+<li><p><cite>DADDI rt, rs, immediate</cite></p>
+<p>Effettua la somma tra il registro a 64 bit rs ed il valore immediato,
+ponendo il risultato in rt.  Questa istruzione considera gli operandi come
+valori con segno.  Lancia un’eccezione in caso di overflow.</p>
+</li>
+<li><p><cite>DADDIU rt, rs, immediate</cite></p>
+<p>Effettua la somma tra il registro a 64 bit rs ed il valore immediato,
+ponendo il risultato in rt.  Non si verificano eccezioni di overflow.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>DADDUI rt, rs, immediate</cite></p>
+<p>Effettua la somma tra il registro a 64 bit rs ed il valore immediato,
+ponendo il risultato in rt.  Non si verificano eccezioni di overflow.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>LUI rt, immediate</cite></p>
+<p>Carica la costante definita dal valore immediato nella metà superiore dei 32
+bit inferiori di rt, effettuando l’estensione del segno sui 32 bit superiori
+del registro.</p>
+</li>
+<li><p><cite>ORI rt, rs, immediate</cite></p>
+<p>Effettua l’OR bit a bit tra rs ed il valore immediato, ponendo il risultato
+in rt.</p>
+</li>
+<li><p><cite>SLTI rt, rs, immediate</cite></p>
+<p>Pone il valore di rt ad 1 se il valore di rs è minore di quello
+dell’immediato, altrimenti pone rt a 0. Questa operazione effettua un
+confronto con segno.</p>
+</li>
+<li><p><cite>SLTIU rt, rs, immediate</cite></p>
+<p>Pone il valore di rt ad 1 se il valore di rs è minore di quello
+dell’immediato, altrimenti pone rt a 0. Questa operazione effettua un
+confronto senza segno.</p>
+</li>
+<li><p><cite>XORI rt, rs, immediate</cite></p>
+<p>Effettua l’OR esclusivo bit a bit tra rs ed il valore immediato, ponendo il
+risultato in rt.</p>
+</li>
+</ul>
+</section>
+<section id="istruzioni-load-store">
+<h2>Istruzioni load/store<a class="headerlink" href="#istruzioni-load-store" title="Link to this heading">¶</a></h2>
+<p>Questa categoria contiene tutte le istruzioni che effettuano trasferimenti di
+dati tra i registri e la memoria. Ognuna di esse è espressa nella forma:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">etichetta</span><span class="p">]</span> <span class="n">istruzione</span> <span class="n">rt</span><span class="p">,</span> <span class="n">offset</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In base all’utilizzo di un’istruzione load oppure store, rt rappresenterà di
+volta in volta il registro sorgente o destinazione; offset è un’etichetta o un
+valore immediato e base è un registro.  L’indirizzo è ottenuto sommando al
+valore del registro`base` il valore immediato di <cite>offset</cite>.</p>
+<p>L’indirizzo specificato deve essere allineato in base al tipo di dato che si
+sta trattando.  Le istruzioni di caricamento che terminano con «U» considerano
+il contenuto del registro rt come un valore senza segno.</p>
+<p>Ecco la lista delle istruzioni di caricamento (LOAD):</p>
+<ul>
+<li><p><cite>LB rt, offset(base)</cite></p>
+<p>Carica il contenuto della cella di memoria all’indirizzo specificato da
+offset e base nel registro rt, considerando tale valore come byte con segno.</p>
+</li>
+<li><p><cite>LBU rt, offset(base)</cite></p>
+<p>Carica il contenuto della cella di memoria all’indirizzo specificato da
+offset e base nel registro rt, considerando tale valore come byte senza
+segno.</p>
+</li>
+<li><p><cite>LD rt, offset(base)</cite></p>
+<p>Carica il contenuto della cella di memoria all’indirizzo specificato da
+offset e base nel registro rt, considerando tale valore come una double
+word.</p>
+</li>
+<li><p><cite>LH rt, offset(base)</cite></p>
+<p>Carica il contenuto della cella di memoria all’indirizzo specificato da
+offset e base nel registro rt, considerando tale valore come una half word
+con segno.</p>
+</li>
+<li><p><cite>LHU rt, offset(base)</cite></p>
+<p>Carica il contenuto della cella di memoria all’indirizzo specificato da
+offset e base nel registro rt, considerando tale valore come una half word
+senza segno.</p>
+</li>
+<li><p><cite>LW rt, offset(base)</cite></p>
+<p>Carica il contenuto della cella di memoria all’indirizzo specificato da
+offset e base nel registro rt, considerando tale valore come una word con
+segno.</p>
+</li>
+<li><p><cite>LWU rt, offset(base)</cite></p>
+<p>Carica il contenuto della cella di memoria all’indirizzo specificato da
+offset e base nel registro rt, considerando tale valore come una word senza
+segno.</p>
+</li>
+</ul>
+<p>Ecco la lista delle istruzioni di memorizzazione (STORE):</p>
+<ul>
+<li><p><cite>SB rt, offset(base)</cite></p>
+<p>Memorizza il contenuto del registro rt nella cella di memoria specificata da
+offset e base, considerando tale valore come un byte.</p>
+</li>
+<li><p><cite>SD rt, offset(base)</cite></p>
+<p>Memorizza il contenuto del registro rt nella cella di memoria specificata da
+offset e base, considerando tale valore come una double word.</p>
+</li>
+<li><p><cite>SH rt, offset(base)</cite></p>
+<p>Memorizza il contenuto del registro rt nella cella di memoria specificata da
+offset e base, considerando tale valore come una half word.</p>
+</li>
+<li><p><cite>SW rt, offset(base)</cite></p>
+<p>Memorizza il contenuto del registro rt nella cella di memoria specificata da
+offset e base, considerando tale valore come una word.</p>
+</li>
+</ul>
+</section>
+<section id="istruzioni-di-controllo-del-flusso">
+<h2>Istruzioni di controllo del flusso<a class="headerlink" href="#istruzioni-di-controllo-del-flusso" title="Link to this heading">¶</a></h2>
+<p>Le istruzioni di controllo del flusso sono utilizzate per alterare l’ordine
+delle istruzioni prelevate dalla CPU nella fase di fetch. è possibile fare una
+distinzione tra tali istruzioni: tipo R, tipo I e tipo J.</p>
+<p>Tali istruzioni eseguono il salto alla fase di Instruction Decode (ID), ogni
+qual volta viene effettuato un fetch inutile. In tal caso, due istruzioni
+vengono rimosse dalla pipeline, ed il contatore degli stalli dovuti ai salti
+effettuati viene incrementato di due unità.</p>
+<p>Ecco la lista delle istruzioni di controllo del flusso di tipo R:</p>
+<ul>
+<li><p><cite>JALR rs</cite></p>
+<p>Pone il contenuto di rs nel program counter, e salva in R31 l’indirizzo
+dell’istruzione che segue l’istruzione JALR, che rappresenta il valore di
+ritorno.</p>
+</li>
+<li><p><cite>JR rs</cite></p>
+<p>Pone il contenuto di rs nel program counter.</p>
+</li>
+</ul>
+<p>Ed ecco le istruzioni di controllo del flusso di tipo I:</p>
+<ul>
+<li><p><cite>B offset</cite></p>
+<p>Salto incondizionato ad offset.</p>
+</li>
+<li><p><cite>BEQ rs, rt, offset</cite></p>
+<p>Salta ad offset se rs è uguale ad rt.</p>
+</li>
+<li><p><cite>BEQZ rs, offset</cite></p>
+<p>Salta ad offset se rs è uguale a zero.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>BGEZ rs, offset</cite></p>
+<p>Effettua un salto relativo al PC ad offset se rs è maggiore o uguale a zero.</p>
+</li>
+<li><p><cite>BNE rs, rt, offset</cite></p>
+<p>Salta ad offset se rs non è uguale ad rt.</p>
+</li>
+<li><p><cite>BNEZ rs, offset</cite></p>
+<p>Salta ad offset se rs non è uguale a zero.</p>
+</li>
+</ul>
+<p>Ecco la lista delle istruzioni di controllo del flusso di tipo J:</p>
+<ul>
+<li><p><cite>J target</cite></p>
+<p>Pone il valore immediato nel program counter</p>
+</li>
+<li><p><cite>JAL target</cite></p>
+<p>Pone il valore immediato nel program counter, e salva in R31 l’indirizzo
+dell’istruzione che segue l’istruzione JAL, che rappresenta il valore di
+ritorno.</p>
+</li>
+</ul>
+</section>
+<section id="l-istruzione-syscall">
+<h2>L’istruzione <cite>SYSCALL</cite><a class="headerlink" href="#l-istruzione-syscall" title="Link to this heading">¶</a></h2>
+<p>L’istruzione SYSCALL offre al programmatore un’interfaccia simile a quella
+offerta da un sistema operativo, rendendo disponibili sei differenti chiamate
+di sistema (system call).</p>
+<p>Le system call richiedono che l’indirizzo dei loro parametri sia memorizzato
+nel registro R14 ($t6), e pongono il loro valore di ritorno nel registro R1
+($at). Tali system call sono il più possibile fedeli alla convenzione POSIX.</p>
+<section id="syscall-0-exit">
+<h3><cite>SYSCALL 0 - exit()</cite><a class="headerlink" href="#syscall-0-exit" title="Link to this heading">¶</a></h3>
+<p>SYSCALL 0 non richiede alcun parametro nè ritorna nulla, semplicemente ferma
+il simulatore.</p>
+<p>è opportuno notare che se il simulatore non trova SYSCALL 0 nel codice
+sorgente, o una qualsiasi istruzione equivalente (HALT  TRAP 0), terminerà
+automaticamente alla fine del sorgente.</p>
+</section>
+<section id="syscall-1-open">
+<h3><cite>SYSCALL 1 - open()</cite><a class="headerlink" href="#syscall-1-open" title="Link to this heading">¶</a></h3>
+<p>SYSCALL 1 richiede due parametri: una stringa (che termini con valore zero) che
+indica il percorso del file che deve essere aperto, ed una double word
+contenente un intero che indica i parametri che devono essere usati per
+specificare come aprire il file.</p>
+<p>Tale intero può essere costruito sommando i parametri che si vogliono
+utilizzare, scelti dalla seguente lista:</p>
+<ul class="simple">
+<li><p><cite>O_RDONLY (0x01)</cite> Apre il file in modalità sola lettura;</p></li>
+<li><p><cite>O_WRONLY (0x02)</cite> Apre il file in modalità sola scrittura;</p></li>
+<li><p><cite>O_RDWR (0x03)</cite> Apre il file in modalità di lettura/scrittura;</p></li>
+<li><p><cite>O_CREAT (0x04)</cite> Crea il file se non esiste;</p></li>
+<li><p><cite>O_APPEND (0x08)</cite> In modalità di scrittura, aggiunge il testo alla fine del
+file;</p></li>
+<li><p><cite>O_TRUNC (0x08)</cite> In modalità di scrittura, cancella il contenuto del file al
+momento della sua apertura.</p></li>
+</ul>
+<p>È obbligatorio specificare una delle prime tre modalità. La quinta e
+la sesta sono esclusive, non è possibile specificare O_APPEND se si
+specifica O_TRUNC (e viceversa).Inoltre non si puo” specificare O_CREAT se
+si specifica O_RDONLY (oppure O_RDWR).</p>
+<p>È possibile specificare una combinazione di modalità semplicemente
+sommando i valori interi ad esse associati.  Ad esempio, se si vuole aprire un
+file in modalità di sola scrittura ed aggiungere il testo alla fine del
+file, si dovrà specificare la modalità 2 + 8 = 10.</p>
+<p>Il valore di ritorno delle chiamate di sistema è il nuovo descrittore del
+file (file descriptor) associato al file, che potrà essere utilizzato con
+le altre chiamate di sistema. Qualora si verifichi un errore, il valore di
+ritorno sarà -1.</p>
+</section>
+<section id="syscall-2-close">
+<h3><cite>SYSCALL 2 - close()</cite><a class="headerlink" href="#syscall-2-close" title="Link to this heading">¶</a></h3>
+<p>SYSCALL 2 richiede solo un parametro, il file descriptor del file che deve
+essere chiuso.</p>
+<p>Qualora l’operazione termini con successo, SYSCALL 2 ritornerà 0, altrimenti
+-1.  Possibili cause di errore sono il tentativo di chiudere un file
+inesistente, o di chiudere i file descriptor 0, 1 o 2, che sono associati
+rispettivamente allo standard input, allo standard output ed allo standard
+error.</p>
+</section>
+<section id="syscall-3-read">
+<h3><cite>SYSCALL 3 - read()</cite><a class="headerlink" href="#syscall-3-read" title="Link to this heading">¶</a></h3>
+<p>SYSCALL 3 richiede tre parametri: il file descriptor da cui leggere,
+l’indirizzo nel quale i dati letti dovranno essere copiati, il numero di byte
+da leggere.</p>
+<p>Se il primo parametro è 0, il simulatore permetterà all’utente di
+inserire un valore mediante un’apposita finestra di dialogo.  Se la lunghezza
+del valore immesso è maggiore del numero di byte che devono essere letti,
+il simulatore mostrerà nuovamente la finestra.</p>
+<p>La chiamata di sistema ritorna il numero di byte effettivamente letti, o -1 se
+l’operazione di lettura fallisce. Possibili cause di errore sono il tentativo
+di leggere da un file inesistente, o di leggere dai file descriptor 1
+(standard output) o 2 (standard error), oppure il tentativo di leggere da un
+file di sola scrittura.</p>
+</section>
+<section id="syscall-4-write">
+<h3><cite>SYSCALL 4 - write()</cite><a class="headerlink" href="#syscall-4-write" title="Link to this heading">¶</a></h3>
+<p>SYSCALL 4 richiede tre parametri: il file descriptor su cui scrivere,
+l’indirizzo dal quale i dati dovranno essere letti, il numero di byte da
+scrivere.</p>
+<p>Se il primo parametro è 2 o 3, il simulatore mostrerà la finestra di
+input/output dove scriverà i dati letti.</p>
+<p>Questa chiamata di sistema ritorna il numero di byte che sono stati scritti, o
+-1 se l’operazione di scrittura fallisce.  Possibili cause di errore sono il
+tentativo di scrivere su un file inesistente, o sul file descriptor 0
+(standard input), oppure il tentativo di scrivere su un file di sola lettura.</p>
+</section>
+<section id="syscall-5-printf">
+<h3><cite>SYSCALL 5 - printf()</cite><a class="headerlink" href="#syscall-5-printf" title="Link to this heading">¶</a></h3>
+<p>SYSCALL 5 richiede un numero variabile di parametri, il primo è la
+cosiddetta «format string» o stringa di formato. Nella stringa di formato
+possono essere inseriti alcuni segnaposto, descritti nella seguente lista:</p>
+<ul class="simple">
+<li><p><cite>%s</cite> parametro di tipo stringa;</p></li>
+<li><p><cite>%i</cite> parametro di tipo intero;</p></li>
+<li><p><cite>%d</cite> si comporta come <cite>%i</cite>;</p></li>
+<li><p><cite>%%</cite> carattere <cite>%</cite></p></li>
+</ul>
+<p>Per ciascuno dei segnaposto <cite>%s</cite>, <cite>%d</cite> o <cite>%i</cite> la SYSCALL 5
+si aspetta un parametro, partendo dall’indirizzo del precedente.</p>
+<p>Quando la SYSCALL trova un segnaposto per un parametro intero, si aspetta che
+il corrispondente parametro sia un valore intero, quando trova un segnaposto
+per un parametro stringa, si aspetta come parametro l’indirizzo della stringa
+stessa.</p>
+<p>Il risultato  visualizzato nella finestra di input/output, ed il numero di
+byte scritti posto in R1.</p>
+<p>Qualora si verifichi un errore, R1 avrà valore -1.</p>
+</section>
+</section>
+<section id="altre-istruzioni">
+<h2>Altre istruzioni<a class="headerlink" href="#altre-istruzioni" title="Link to this heading">¶</a></h2>
+<p>In questa sezione sono descritte istruzioni che non rientrano nelle precedenti
+categorie.</p>
+<section id="break">
+<h3><cite>BREAK</cite><a class="headerlink" href="#break" title="Link to this heading">¶</a></h3>
+<p>L’istruzione BREAK solleva un’eccezione che ha l’effetto di fermare
+l’esecuzione se il simulatore è in esecuzione. Può essere utilizzata per
+il debugging.</p>
+</section>
+<section id="nop">
+<h3><cite>NOP</cite><a class="headerlink" href="#nop" title="Link to this heading">¶</a></h3>
+<p>L’istruzione NOP non fa nulla, ed è utilizzata per creare pause nel codice
+sorgente.</p>
+</section>
+<section id="trap">
+<h3><cite>TRAP</cite><a class="headerlink" href="#trap" title="Link to this heading">¶</a></h3>
+<p>L’istruzione TRAP è deprecated, rappresenta un’alternativa all’istruzione
+SYSCALL.</p>
+</section>
+<section id="halt">
+<h3><cite>HALT</cite><a class="headerlink" href="#halt" title="Link to this heading">¶</a></h3>
+<p>L’istruzione HALT è deprecated, rappresenta un’alternativa all’istruzione
+SYSCALL 0, che ferma il simulatore.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>
