@@ -1,0 +1,544 @@
+
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The instruction set &#8212; EduMIPS64 1.3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/epub.css?v=e4d0adb4" />
+    <script src="_static/documentation_options.js?v=1f29e9d3"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script> 
+  </head><body>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="the-instruction-set">
+<h1>The instruction set<a class="headerlink" href="#the-instruction-set" title="Link to this heading">¶</a></h1>
+<p>In this section we will the subset of the MIPS64 instruction set that EduMIPS64
+recognizes. We can operate two different taxonomic classification: one based on
+the functionality of the instructions and one based on the type of the
+parameters of the instructions.</p>
+<p>The first classification divides instruction into three categories: ALU
+instructions, Load/Store instructions, Flow control instructions. The next
+three subsections will describe each category and every instruction that
+belongs to those categories.</p>
+<p>The fourth subsection will describe instructions that do not fit in any of the
+three categories.</p>
+<section id="alu-instructions">
+<h2>ALU Instructions<a class="headerlink" href="#alu-instructions" title="Link to this heading">¶</a></h2>
+<p>The Arithmetic Logic Unit (in short, ALU) is a part of the execution unit of
+a CPU, that has the duty of doing arithmetical and logic operations. So in
+the ALU instructions group we will find those instructions that do this kind
+of operations.</p>
+<p>ALU Instructions can be divided in two groups: <em>R-Type</em> and <em>I-Type</em>.</p>
+<p>Four of those instructions make use of two special registers: LO and HI. They
+are internal CPU registers, whose value can be accessed through the
+<cite>MFLO</cite> and <cite>MFHI</cite> instructions.</p>
+<p>Here’s the list of R-Type ALU Instructions.</p>
+<ul>
+<li><p><cite>AND rd, rs, rt</cite></p>
+<p>Executes a bitwise AND between rs and rt, and puts the result into rd.</p>
+</li>
+<li><p><cite>ADD rd, rs, rt</cite></p>
+<p>Sums the content of 32-bits registers rs and rt, considering them as signed
+values, and puts the result into rd. If an overflow occurs then trap.</p>
+</li>
+<li><p><cite>ADDU rd, rs, rt</cite></p>
+<p>Sums the content of 32-bits registers rs and rt, and puts the result into rd.
+No integer overflow occurs under any circumstances.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>DADD rd, rs, rt</cite></p>
+<p>Sums the content of 64-bits registers rs and rt, considering them as signed
+values, and puts the result into rd. If an overflow occurs then trap.</p>
+</li>
+<li><p><cite>DADDU rd, rs, rt</cite></p>
+<p>Sums the content of 64-bits registers rs and rt, and puts the result into rd.
+No integer overflow occurs under any circumstances.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>DDIV rs, rt</cite></p>
+<p>Executes the division between 64-bits registers rs and rt, putting the
+64-bits quotient in LO and the 64-bits remainder in HI.</p>
+</li>
+<li><p><cite>DDIVU rs, rt</cite></p>
+<p>Executes the division between 64-bits registers rs and rt, considering them
+as unsigned values and putting the 64-bits quotient in LO and the 64-bits
+remainder in HI.</p>
+</li>
+<li><p><cite>DIV rs, rt</cite></p>
+<p>Executes the division between 32-bits registers rs and rt, putting the
+32-bits quotient in LO and the 32-bits remainder in HI.</p>
+</li>
+<li><p><cite>DIVU rs, rt</cite></p>
+<p>Executes the division between 32-bits registers rs and rt, considering them
+as unsigned values and putting the 32-bits quotient in LO and the 32-bits
+remainder in HI.</p>
+</li>
+<li><p><cite>DMUHU rd, rs, rt</cite></p>
+<p>Executes the multiplication between 64-bits registers rs and rt,
+considering them as unsigned values and putting the high-order 64-bits
+doubleword of the result into register rd.</p>
+</li>
+<li><p><cite>DMULT rs, rt</cite></p>
+<p>Executes the multiplication between 64-bits registers rs and rt, putting
+the low-order 64-bits doubleword of the result into special register LO and
+the high-order 64-bits doubleword of the result into special register HI.</p>
+</li>
+<li><p><cite>DMULU rd, rs, rt</cite></p>
+<p>Executes the multiplication between 64-bits registers rs and rt,
+considering them as unsigned values and putting the low-order 64-bits
+doubleword of the result into register rd.</p>
+</li>
+<li><p><cite>DMULTU rs, rt</cite></p>
+<p>Executes the multiplication between 64-bits registers rs and rt,
+considering them as unsigned values and putting the low-order 64-bits
+doubleword of the result into special register LO and the high-order
+64-bits doubleword of the result into special register HI.</p>
+</li>
+<li><p><cite>DSLL rd, rt, sa</cite></p>
+<p>Does a left shift of 64-bits register rt, by the amount specified in the
+immediate (positive) value sa, and puts the result into 64-bits register
+rd. Empty bits are padded with zeros.</p>
+</li>
+<li><p><cite>DSLLV rd, rt, rs</cite></p>
+<p>Does a left shift of 64-bits register rt, by the amount specified in
+low-order 6-bits of rs threatd as unsigned value, and puts the result into
+64-bits register rd. Empty bits are padded with zeros.</p>
+</li>
+<li><p><cite>DSRA rd, rt, sa</cite></p>
+<p>Does a right shift of 64-bits register rt, by the amount specified in the
+immediate (positive) value sa, and puts the result into 64-bits register
+rd. Empty bits are padded with zeros if the leftmost bit of rt is zero,
+otherwise they are padded with ones.</p>
+</li>
+<li><p><cite>DSRAV rd, rt, rs</cite></p>
+<p>Does a right shift of 64-bits register rt, by the amount specified in
+low-order 6-bits of rs threatd as unsigned value, and puts the result into
+64-bits register rd. Empty bits are padded with zeros if the leftmost bit
+of rt is zero, otherwise they are padded with ones.</p>
+</li>
+<li><p><cite>DSRL rd, rs, sa</cite></p>
+<p>Does a right shift of 64-bits register rs, by the amount specified in the
+immediate (positive) value sa, and puts the result into 64-bits register
+rd. Empty bits are padded with zeros.</p>
+</li>
+<li><p><cite>DSRLV rd, rt, rs</cite></p>
+<p>Does a right shift of 64-bits register rt, by the amount specified in
+low-order 6-bits of rs threatd as unsigned value, and puts the result into
+64-bits register rd. Empty bits are padded with zeros.</p>
+</li>
+<li><p><cite>DSUB rd, rs, rt</cite></p>
+<p>Subtracts the value of 64-bits register rt to 64-bits register rs,
+considering them as signed values, and puts the result in rd. If an
+overflow occurs then trap.</p>
+</li>
+<li><p><cite>DSUBU rd, rs, rt</cite></p>
+<p>Subtracts the value of 64-bits register rt to 64-bits register rs, and puts
+the result in rd. No integer overflow occurs under any circumstances.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>MFLO rd</cite></p>
+<p>Moves the content of the special register LO into rd.</p>
+</li>
+<li><p><cite>MFHI rd</cite></p>
+<p>Moves the content of the special register HI into rd.</p>
+</li>
+<li><p><cite>MOVN rd, rs, rt</cite></p>
+<p>If rt is different from zero, then moves the content of rs into rd.</p>
+</li>
+<li><p><cite>MOVZ rd, rs, rt</cite></p>
+<p>If rt is equal to zero, then moves the content of rs into rd.</p>
+</li>
+<li><p><cite>MULT rs, rt</cite></p>
+<p>Executes the multiplication between 32-bits registers rs and rt, putting
+the low-order 32-bits word of the result into special register LO and the
+high-order 32-bits word of the result into special register HI.</p>
+</li>
+<li><p><cite>MULTU rs, rt</cite></p>
+<p>Executes the multiplication between 32-bits registers rs and rt,
+considering them as unsigned values and putting the low-order 32-bits word
+of the result into special register LO and the high-order 32-bits word of
+the result into special register HI.</p>
+</li>
+<li><p><cite>OR rd, rs, rt</cite></p>
+<p>Executes a bitwise OR between rs and rt, and puts the result into rd.</p>
+</li>
+<li><p><cite>SLL rd, rt, sa</cite></p>
+<p>Does a left shift of 32-bits register rt, by the amount specified in the
+immediate (positive) value sa, and puts the result into 32-bits register
+rd. Empty bits are padded with zeros.</p>
+</li>
+<li><p><cite>SLLV rd, rt, rs</cite></p>
+<p>Does a left shift of 32-bits register rt, by the amount specified in
+low-order 5-bits of rs threatd as unsigned value, and puts the result into
+32-bits register rd. Empty bits are padded with zeros.</p>
+</li>
+<li><p><cite>SRA rd, rt, sa</cite></p>
+<p>Does a right shift of 32-bits register rt, by the amount specified in the
+immediate (positive) value sa, and puts the result into 32-bits register
+rd. Empty bits are padded with zeros if the leftmost bit of rt is zero,
+otherwise they are padded with ones.</p>
+</li>
+<li><p><cite>SRAV rd, rt, rs</cite></p>
+<p>Does a right shift of 32-bits register rt, by the amount specified in
+low-order 5-bits of rs threatd as unsigned value, and puts the result into
+32-bits register rd. Empty bits are padded with zeros if the leftmost bit
+of rt is zero, otherwise they are padded with ones.</p>
+</li>
+<li><p><cite>SRL rd, rs, sa</cite></p>
+<p>Does a right shift of 32-bits register rs, by the amount specified in the
+immediate (positive) value sa, and puts the result into 32-bits register
+rd. Empty bits are padded with zeros.</p>
+</li>
+<li><p><cite>SRLV rd, rt, rs</cite></p>
+<p>Does a right shift of 32-bits register rt, by the amount specified in
+low-order 5-bits of rs threatd as unsigned value, and puts the result into
+32-bits register rd. Empty bits are padded with zeros.</p>
+</li>
+<li><p><cite>SUB rd, rs, rt</cite></p>
+<p>Subtracts the value of 32-bits register rt to 32-bits register rs,
+considering them as signed values, and puts the result in rd. If an
+overflow occurs then trap.</p>
+</li>
+<li><p><cite>SUBU rd, rs, rt</cite></p>
+<p>Subtracts the value of 32-bits register rt to 32-bits register rs, and puts
+the result in rd. No integer overflow occurs under any circumstances.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>SLT rd, rs, rt</cite></p>
+<p>Sets the value of rd to 1 if the value of rs is less than the value of rt,
+otherwise sets it to 0. This instruction performs a signed comparison.</p>
+</li>
+<li><p><cite>SLTU rd, rs, rt</cite></p>
+<p>Sets the value of rd to 1 if the value of rs is less than the value of rt,
+otherwise sets it to 0. This instruction performs an unsigned comparison.</p>
+</li>
+<li><p><cite>XOR rd, rs, rt</cite></p>
+<p>Executes a bitwise exclusive OR (XOR) between rs and rt, and puts the
+result into rd.</p>
+</li>
+</ul>
+<p>Here’s the list of I-Type ALU Instructions.</p>
+<ul>
+<li><p><cite>ADDI rt, rs, immediate</cite></p>
+<p>Executes the sum between 32-bits register rs and the immediate value,
+putting the result in rt. This instruction considers rs and the immediate
+value as signed values. If an overflow occurs then trap.</p>
+</li>
+<li><p><cite>ADDIU rt, rs, immediate</cite></p>
+<p>Executes the sum between 32-bits register rs and the immediate value,
+putting the result in rt. No integer overflow occurs under any
+circumstances.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>ANDI rt, rs, immediate</cite></p>
+<p>Executes the bitwise AND between rs and the immediate value, putting the
+result in rt.</p>
+</li>
+<li><p><cite>DADDI rt, rs, immediate</cite></p>
+<p>Executes the sum between 64-bits register rs and the immediate value,
+putting the result in rt. This instruction considers rs and the immediate
+value as signed values. If an overflow occurs then trap.</p>
+</li>
+<li><p><cite>DADDIU rt, rs, immediate</cite></p>
+<p>Executes the sum between 64-bits register rs and the immediate value,
+putting the result in rt. No integer overflow occurs under any
+circumstances.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>DADDUI rt, rs, immediate</cite></p>
+<p>Executes the sum between 64-bits register rs and the immediate value,
+putting the result in rt. No integer overflow occurs under any
+circumstances.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>LUI rt, immediate</cite></p>
+<p>Loads the constant defined in the immediate value in the upper half (16
+bit) of the lower 32 bits of rt, sign-extending the upper 32 bits of the
+register.</p>
+</li>
+<li><p><cite>ORI rt, rs, immediate</cite></p>
+<p>Executes the bitwise OR between rs and the immediate value, putting the
+result in rt.</p>
+</li>
+<li><p><cite>SLTI rt, rs, immediate</cite></p>
+<p>Sets the value of rt to 1 if the value of rs is less than the value of the
+immediate, otherwise sets it to 0. This instruction performs a signed
+comparison.</p>
+</li>
+<li><p><cite>SLTIU rt, rs, immediate</cite></p>
+<p>Sets the value of rt to 1 if the value of rs is less than the value of the
+immediate, otherwise sets it to 0. This instruction performs an unsigned
+comparison.</p>
+</li>
+<li><p><cite>XORI rt, rs, immediate</cite></p>
+<p>Executes a bitwise exclusive OR (XOR) between rs and the immediate value,
+and puts the result into rt.</p>
+</li>
+</ul>
+</section>
+<section id="load-store-instructions">
+<h2>Load/Store instructions<a class="headerlink" href="#load-store-instructions" title="Link to this heading">¶</a></h2>
+<p>This category contains all the instructions that operate transfers between
+registers and the memory. All of these instructions are in the form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">label</span><span class="p">:]</span> <span class="n">instruction</span> <span class="n">rt</span><span class="p">,</span> <span class="n">offset</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where rt is the source or destination register, depending if we are using a
+store or a load instruction; offset is a label or an immediate value and base
+is a register. The address is obtained by adding to the value of the register
+<cite>base</cite> the immediate value <cite>offset</cite>.</p>
+<p>The address specified must be aligned according to the data type that is
+treated. Load instructions ending with “U” treat the content of the register
+rt as an unsigned value.</p>
+<p>List of load instructions:</p>
+<ul>
+<li><p><cite>LB rt, offset(base)</cite></p>
+<p>Loads the content of the memory cell at address specified by offset and
+base in register rt, treating it as a signed byte.</p>
+</li>
+<li><p><cite>LBU rt, offset(base)</cite></p>
+<p>Loads the content of the memory cell at address specified by offset and
+base in register rt, treating it as an unsigned byte.</p>
+</li>
+<li><p><cite>LD rt, offset(base)</cite></p>
+<p>Loads the content of the memory cell at address specified by offset and
+base in register rt, treating it as a double word.</p>
+</li>
+<li><p><cite>LH rt, offset(base)</cite></p>
+<p>Loads the content of the memory cell at address specified by offset and
+base in register rt, treating it as a signed half word.</p>
+</li>
+<li><p><cite>LHU rt, offset(base)</cite></p>
+<p>Loads the content of the memory cell at address specified by offset and
+base in register rt, treating it as an unsigned half word.</p>
+</li>
+<li><p><cite>LW rt, offset(base)</cite></p>
+<p>Loads the content of the memory cell at address specified by offset and
+base in register rt, treating it as a signed word.</p>
+</li>
+<li><p><cite>LWU rt, offset(base)</cite></p>
+<p>Loads the content of the memory cell at address specified by offset and
+base in register rt, treating it as an unsigned word.</p>
+</li>
+</ul>
+<p>List of store instructions:</p>
+<ul>
+<li><p><cite>SB rt, offset(base)</cite></p>
+<p>Stores the content of register rt in the memory cell specified by offset
+and base, treating it as a byte.</p>
+</li>
+<li><p><cite>SD rt, offset(base)</cite></p>
+<p>Stores the content of register rt in the memory cell specified by offset
+and base, treating it as a double word.</p>
+</li>
+<li><p><cite>SH rt, offset(base)</cite></p>
+<p>Stores the content of register rt in the memory cell specified by offset
+and base, treating it as a half word.</p>
+</li>
+<li><p><cite>SW rt, offset(base)</cite></p>
+<p>Stores the content of register rt in the memory cell specified by offset
+and base, treating it as a word.</p>
+</li>
+</ul>
+</section>
+<section id="flow-control-instructions">
+<h2>Flow control instructions<a class="headerlink" href="#flow-control-instructions" title="Link to this heading">¶</a></h2>
+<p>Flow control instructions are used to alter the order of instructions that
+are fetched by the CPU. We can make a distinction between these instructions:
+R-Type, I-Type and J-Type.</p>
+<p>Those instructions effectively executes the jump in the ID stage, so often an
+useless fetch is executed. In this case, two instructions are removed from the
+pipeline, and the branch taken stalls counter is incremented by two units.</p>
+<p>List of R-Type flow control instructions:</p>
+<ul>
+<li><p><cite>JALR rs</cite></p>
+<p>Puts the content of rs into the program counter, and puts into R31 the
+address of the instruction that follows the JALR instruction, the return
+value.</p>
+</li>
+<li><p><cite>JR rs</cite></p>
+<p>Puts the content of rs into the program counter.</p>
+</li>
+</ul>
+<p>List of I-Type flow control instructions:</p>
+<ul>
+<li><p><cite>B offset</cite></p>
+<p>Unconditionally jumps to offset</p>
+</li>
+<li><p><cite>BEQ rs, rt, offset</cite></p>
+<p>Jumps to offset if rs is equal to rt.</p>
+</li>
+<li><p><cite>BEQZ rs, offset</cite></p>
+<p>Jumps to offset if rs is equal to zero.</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>BGEZ rs, offset</cite></p>
+<p>If rs is greather than or equal to zero, does a PC-relative jump to offset.</p>
+</li>
+<li><p><cite>BNE rs, rt, offset</cite></p>
+<p>Jumps to offset if rs is not equal to rt.</p>
+</li>
+<li><p><cite>BNEZ rs, offset</cite></p>
+<p>Jumps to offset if rs is not equal to zero.</p>
+</li>
+</ul>
+<p>List of J-Type flow control instructions:</p>
+<ul>
+<li><p><cite>J target</cite></p>
+<p>Puts the immediate value target into the program counter.</p>
+</li>
+<li><p><cite>JAL target</cite></p>
+<p>Puts the immediate value target into the program counter, and puts into R31
+the address of the instruction that follows the JAL instruction, the return
+value.</p>
+</li>
+</ul>
+</section>
+<section id="the-syscall-instruction">
+<h2>The <cite>SYSCALL</cite> instruction<a class="headerlink" href="#the-syscall-instruction" title="Link to this heading">¶</a></h2>
+<p>The SYSCALL instruction offers to the programmer an operating-system-like
+interface, making available six different system calls.</p>
+<p>System calls expect that the address of their parameters is stored in register
+R14 ($t6), and will put their return value in register R1 ($at).</p>
+<p>System calls follow as much as possible the POSIX convention.</p>
+<section id="syscall-0-exit">
+<h3><cite>SYSCALL 0 - exit()</cite><a class="headerlink" href="#syscall-0-exit" title="Link to this heading">¶</a></h3>
+<p>SYSCALL 0 does not expect any parameter, nor it returns anything. It simply
+stops the simulator.</p>
+<p>Note that if the simulator does not find SYSCALL 0 in the source code, or any
+of its equivalents (HALT - TRAP 0), it will be added automatically at the end
+of the source.</p>
+</section>
+<section id="syscall-1-open">
+<h3><cite>SYSCALL 1 - open()</cite><a class="headerlink" href="#syscall-1-open" title="Link to this heading">¶</a></h3>
+<p>The SYSCALL 1 expects two parameters: a zero-terminated string that indicates
+the pathname of the file that must be opened, and a double word containing an
+integer that indicates the flags that must be used to specify how to open the
+file.</p>
+<p>This integer must be built summing the flags that you want to use, choosing
+them from the following list:</p>
+<ul class="simple">
+<li><p><cite>O_RDONLY (0x01)</cite> Opens the file in read only mode;</p></li>
+<li><p><cite>O_WRONLY (0x02)</cite> Opens the file in write only mode;</p></li>
+<li><p><cite>O_RDWR (0x03)</cite> Opens the file in read/write mode;</p></li>
+<li><p><cite>O_CREAT (0x04)</cite> Creates the file if it does not exist;</p></li>
+<li><p><cite>O_APPEND (0x08)</cite> In write mode, appends written text at the end of the file;</p></li>
+<li><p><cite>O_TRUNC (0x08)</cite> In write mode, deletes the content of the file as soon as it
+is opened.</p></li>
+</ul>
+<p>It is mandatory to specify one of the first three modes. The fourth and the
+fifth modes are exclusive, you can not specify O_APPEND if you specify O_TRUNC
+(and vice versa).</p>
+<p>You can specify a combination of modes by simply adding the integer values of
+those flags. For instance, if you want to open a file in write only mode and
+append the written text to the end of file, you should specify the mode 2 + 8
+= 10.</p>
+<p>The return value of the system call is the new file descriptor associated with
+the file, that can be further used with the other system calls. If there is an
+error, the return value will be -1.</p>
+</section>
+<section id="syscall-2-close">
+<h3><cite>SYSCALL 2 - close()</cite><a class="headerlink" href="#syscall-2-close" title="Link to this heading">¶</a></h3>
+<p>SYSCALL 2 expects only one parameter, the file descriptor of the file that is
+closed.</p>
+<p>If the operation ends successfully, SYSCALL 2 will return 0, otherwise it will
+return -1. Possible causes of failure are the attempt to close a non-existent
+file descriptor or the attempt to close file descriptors 0, 1 or 2, that are
+associated respectively to standard input, standard output and standard error.</p>
+</section>
+<section id="syscall-3-read">
+<h3><cite>SYSCALL 3 - read()</cite><a class="headerlink" href="#syscall-3-read" title="Link to this heading">¶</a></h3>
+<p>SYSCALL 3 expects three parameters: the file descriptor to read from, the
+address where the read data must be put into, the number of bytes to read.</p>
+<p>If the first parameter is 0, the simulator will prompt the user for an input,
+via an input dialog. If the length of the input is greater than the number of
+bytes that have to be read, the simulator will show again the message dialog.</p>
+<p>It returns the number of bytes that have effectively been read, or -1 if the
+read operation fails. Possible causes of failure are the attempt to read from
+a non-existent file descriptor, the attempt to read from file descriptors 1
+(standard output) or 2 (standard error) or the attempt to read from a
+write-only file descriptor.</p>
+</section>
+<section id="syscall-4-write">
+<h3><cite>SYSCALL 4 - write()</cite><a class="headerlink" href="#syscall-4-write" title="Link to this heading">¶</a></h3>
+<p>SYSCALL 4 expects three parameters: the file descriptor to write to, the
+address where the data must be read from, the number of bytes to write.</p>
+<p>If the first parameter is two or three, the simulator will pop the input/output
+frame, and write there the read data.</p>
+<p>It returns the number of bytes that have been written, or -1 if the write
+operation fails. Possible causes of failure are the attempt to write to a
+non-existent file descriptor, the attempt to write to file descriptor 0
+(standard input) or the attempt to write to a read-only file descriptor.</p>
+</section>
+<section id="syscall-5-printf">
+<h3><cite>SYSCALL 5 - printf()</cite><a class="headerlink" href="#syscall-5-printf" title="Link to this heading">¶</a></h3>
+<p>SYSCALL 5 expects a variable number of parameters, the first being the address
+of the so-called “format string”. In the format string can be included some
+placeholders, described in the following list:</p>
+<ul class="simple">
+<li><p><cite>%s</cite> indicates a string parameter;</p></li>
+<li><p><cite>%i</cite> indicates an integer parameter;</p></li>
+<li><p><cite>%d</cite> behaves like <cite>%i</cite>;</p></li>
+<li><p><cite>%%</cite> literal <cite>%</cite></p></li>
+</ul>
+<p>For each <cite>%s</cite>, <cite>%d</cite> or <cite>%i</cite> placeholder, SYSCALL 5 expects a parameter,
+starting from the address of the previous one.</p>
+<p>When the SYSCALL finds a placeholder for an integer parameter, it expects that
+the corresponding parameter is an integer value, when if it finds a placeholder
+for a string parameter, it expects as a parameter the address of the string.</p>
+<p>The result is printed in the input/output frame, and the number of bytes
+written is put into R1.</p>
+<p>If there’s an error, -1 is written to R1.</p>
+</section>
+</section>
+<section id="other-instructions">
+<h2>Other instructions<a class="headerlink" href="#other-instructions" title="Link to this heading">¶</a></h2>
+<p>In this section there are instructions that do not fit in the previous
+categories.</p>
+<section id="break">
+<h3><cite>BREAK</cite><a class="headerlink" href="#break" title="Link to this heading">¶</a></h3>
+<p>The BREAK instruction throws an exception that has the effect to stop the
+execution if the simulator is running. It can be used for debugging purposes.</p>
+</section>
+<section id="nop">
+<h3><cite>NOP</cite><a class="headerlink" href="#nop" title="Link to this heading">¶</a></h3>
+<p>The NOP instruction does not do anything, and it’s used to create gaps in the
+source code.</p>
+</section>
+<section id="trap">
+<h3><cite>TRAP</cite><a class="headerlink" href="#trap" title="Link to this heading">¶</a></h3>
+<p>The TRAP instruction is a deprecated alias for the SYSCALL instruction.</p>
+</section>
+<section id="halt">
+<h3><cite>HALT</cite><a class="headerlink" href="#halt" title="Link to this heading">¶</a></h3>
+<p>The HALT instruction is a deprecated alias for the SYSCALL 0 instruction, that
+halts the simulator.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

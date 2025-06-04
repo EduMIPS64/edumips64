@@ -1,0 +1,504 @@
+
+
+<html lang="it" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Floating Point Unit &#8212; Documentazione EduMIPS64 1.3.0 </title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/epub.css?v=e4d0adb4" />
+    <script src="_static/documentation_options.js?v=79d73783"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=45930005"></script> 
+  </head><body>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="floating-point-unit">
+<h1>Floating Point Unit<a class="headerlink" href="#floating-point-unit" title="Link to this heading">¶</a></h1>
+<p>Questo capitolo <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> descrive le caratteristiche della Floating Point Unit
+(FPU) di EduMIPS64.</p>
+<p>Nel primo paragrafo vengono introdotti il formato double, i valori
+speciali floating point definiti dallo standard che ne disciplina il
+trattamento nei calcolatori (IEEE 754), e le condizioni di eccezioni che i
+calcoli floating point possono provocare.</p>
+<p>Nel secondo paragrafo viene illustrato come EduMIPS64 consenta di attivare e
+disattivare le trap relative alle condizioni di eccezione IEEE.</p>
+<p>Nel terzo paragrafo si parla del modo in cui i valori double e i valori
+speciali vengono accettati dal simulatore per essere caricati in memoria.</p>
+<p>Nel quarto paragrafo è introdotto il registro FCSR, usato dalla FPU per
+autogestirsi. In esso vengono memorizzate le informazioni riguardanti
+l’arrotondamento, i risultati booleani delle istruzioni di confronto  e le
+politiche di gestione delle eccezioni IEEE.</p>
+<p>Infine, nel quinto paragrafo sono elencate tutte le istruzioni dell’ISA MIPS64
+implementate in EduMIPS64.</p>
+<p>Prima di iniziare la trattazione della FPU, definiamo il dominio dei numeri in
+virgola mobile (floating point) a doppia precisione come
+[-1.79E308,-4.94E-324] ⋃  {0} ⋃ [4.94E-324,1.79E308].</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Il presente capitolo è tratto della tesi di laurea di Massimo Trubia:
+«Progetto e implementazione di un modello di Floating Point Unit per un
+simulatore di CPU MIPS64».</p>
+</aside>
+</aside>
+<section id="valori-speciali">
+<span id="special-values"></span><h2>Valori speciali<a class="headerlink" href="#valori-speciali" title="Link to this heading">¶</a></h2>
+<p>L’aritmetica in virgola mobile dei calcolatori è caratterizzata dal fatto che,
+anche in presenza di un’operazione matematica non valida, si potrebbe
+scegliere di continuare la computazione ignorando quanto è accaduto. In questo
+scenario, operazioni come divisioni tra zeri, oppure radici quadrate di numeri
+negativi devono generare comunque un risultato che, non essendo un numero (Not
+a Number), è trattato come qualcosa di diverso.</p>
+<section id="nan-o-invalid-operation">
+<span id="nan"></span><h3>NaN o Invalid Operation<a class="headerlink" href="#nan-o-invalid-operation" title="Link to this heading">¶</a></h3>
+<p>Lo standard IEEE 754, il quale regolamenta la manipolazione dei numeri
+floating point nei calcolatori, ha definito che le  operazioni matematiche non
+valide possono sia provocare una segnalazione durante l’esecuzione del
+programma (trap per la condizione di eccezione IEEE <strong>Invalid Operation</strong>),
+che fornire, come risultato, il valore speciale QNaN (Quit Not a
+Number).  Un altro valore NaN, che genera incondizionatamente la stessa trap
+appena viene rilevato come operando, è SNaN (Signalling NaN). Tale valore è
+raramente utilizzato nelle applicazioni, e storicamente è stato usato per
+inizializzare le variabili.</p>
+</section>
+<section id="zeri-o-underflow">
+<span id="zeroes"></span><h3>Zeri o Underflow<a class="headerlink" href="#zeri-o-underflow" title="Link to this heading">¶</a></h3>
+<p>Un altro valore speciale definito dallo standard è lo zero. Dal momento che il
+formato double non include lo zero nel dominio dei valori rappresentati, esso
+è considerato alla stregua di un valore speciale. Esistono uno zero positivo e
+uno negativo: quando si tenta di rappresentare un valore negativo molto vicino
+allo zero, ma fuori dal dominio rappresentabile dai double
+(∈ ]-4.94E-324,0[), e si desidera a tutti i costi un risultato (non una
+trap per la condizione di eccezione <strong>Underflow</strong>), allora il numero
+restituito è -0. Analogamente, viene restituito +0 se si tenta di
+rappresentare un numero nell’intervallo [0,4.94E-324[, e non si è preferito
+avere la stessa trap.</p>
+</section>
+<section id="infiniti-od-overflow">
+<span id="infinites"></span><h3>Infiniti od Overflow<a class="headerlink" href="#infiniti-od-overflow" title="Link to this heading">¶</a></h3>
+<p>Quando si tenta di rappresentare un numero estremamente grande
+(∈ ]1.79E308,+∞[), o estrememente piccolo (∈ ]-∞,-1.79E308[),
+al di fuori cioè del dominio rappresentabile dal formato double, vengono
+restituiti i valori speciali +∞, nel primo caso, e -∞ nel
+secondo caso. In alternativa, si può avere una trap per via della condizione
+di eccezione <strong>Overflow</strong>.</p>
+<p>Gli infiniti potrebbero anche essere restituiti da una divisione per zero,
+nelle quali si effettua il prodotto tra il segno dello zero e quello del
+divisore, per restituire un opportuno infinito. Nel caso in cui non si voglia
+alcun valore restituito, si verifica la trap per la condizione di eccezione
+<strong>Divide by zero</strong>.</p>
+</section>
+</section>
+<section id="configurazione-delle-eccezioni">
+<span id="exception-configuration"></span><h2>Configurazione delle eccezioni<a class="headerlink" href="#configurazione-delle-eccezioni" title="Link to this heading">¶</a></h2>
+<p>EduMIPS64 consente di abilitare o disabilitare le trap relative alle 4 delle 5
+condizioni di eccezione IEEE, implementate dalla scheda <em>Eccezioni FPU</em>
+della finestra <em>Configura</em> → <em>Impostazioni</em>. Se esse
+sono disabilitate, verrà fornito un risultato per qualunque operazione
+speciale la FPU effettui (si veda il Paragrafo <a class="reference internal" href="#special-values"><span class="std std-ref">Valori speciali</span></a>.</p>
+</section>
+<section id="direttiva-double">
+<span id="double-directive"></span><h2>Direttiva .double<a class="headerlink" href="#direttiva-double" title="Link to this heading">¶</a></h2>
+<p>La direttiva <code class="docutils literal notranslate"><span class="pre">.double</span></code>, da inserire nella sezione <code class="docutils literal notranslate"><span class="pre">.data</span></code> del file
+sorgente (.s), consente di allocare una cella della memoria di EduMIPS64, dove
+inserire un valore formattato <em>double</em>.</p>
+<p>Le sintassi valide del comando sono:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nome_variabile</span><span class="p">:</span> <span class="o">.</span><span class="n">double</span> <span class="n">numero_double</span>
+<span class="n">nome_variabile</span><span class="p">:</span> <span class="o">.</span><span class="n">double</span> <span class="n">parola_chiave</span>
+</pre></div>
+</div>
+<p>dove <code class="docutils literal notranslate"><span class="pre">numero_double</span></code> può essere rappresentato sia in forma estesa
+(<code class="docutils literal notranslate"><span class="pre">1.0,0.003</span></code>), oppure in notazione scientifica (<code class="docutils literal notranslate"><span class="pre">3.7E-12,0.5E32</span></code>). Invece,
+<code class="docutils literal notranslate"><span class="pre">parola_chiave</span></code> può assumere i valori <code class="docutils literal notranslate"><span class="pre">POSITIVEINFINITY</span></code>,
+<code class="docutils literal notranslate"><span class="pre">NEGATIVEINFINITY</span></code>, <code class="docutils literal notranslate"><span class="pre">POSITIVEZERO</span></code>, <code class="docutils literal notranslate"><span class="pre">NEGATIVEZERO</span></code>, <code class="docutils literal notranslate"><span class="pre">SNAN</span></code> e <code class="docutils literal notranslate"><span class="pre">QNAN</span></code>,
+consentendo l’inserimento diretto in memoria dei valori speciali.</p>
+</section>
+<section id="registro-fcsr">
+<h2>Registro FCSR<a class="headerlink" href="#registro-fcsr" title="Link to this heading">¶</a></h2>
+<p>L’FCSR (Floating point Control Status Register) è il registro che controlla i
+diversi aspetti funzionali della FPU. Esso è lungo 32 bit e, fino alla
+ridisegnazione grafica di EduMIPS64, sarà posto nella finestra delle
+statistiche.</p>
+<p>Il campo <strong>FCC</strong> è costituito da 8 bit, identificati con numeri da 0 a 7. Le
+istruzioni condizionali (<code class="docutils literal notranslate"><span class="pre">C.EQ.D,C.LT.D</span></code>) lo utilizzano per memorizzare il
+risultato booleano di un confronto tra due registri.</p>
+<p>I campi Cause, Enables e Flag gestiscono la dinamica delle eccezioni IEEE,
+illustrate nel Paragrafo <a class="reference internal" href="#special-values"><span class="std std-ref">Valori speciali</span></a>. Essi sono costituiti,
+ognuno, da 5 bit identificati con le lettere V (Invalid operation), Z (Divide
+by zero), O (Overflow),U (Underflow) e I (Inexact); quest’ultimo bit non viene
+al momento utilizzato.</p>
+<p>Il campo <strong>Cause</strong> indica se si è verificata una qualunque eccezione IEEE
+durante la simulazione, presentando un 1 nel relativo bit. È utile quando si
+esegue un programma dall’inizio alla fine senza fermarlo, per determinare se
+si è verificata una qualunque eccezione.</p>
+<p>Il campo <strong>Enable</strong> mostra le eccezioni IEEE per le quali è attiva la trap. I
+bit di questo campo vengono modificati, anche senza resettare il simulatore,
+dalla finestra di configurazione.</p>
+<p>Il campo <strong>Flag</strong> mostra le eccezioni IEEE che si sono verificate ma, non
+avendo la relativa trap attivata, hanno fornito come risultato dei valori
+speciali, illustrati nel Paragrafo <a class="reference internal" href="#special-values"><span class="std std-ref">Valori speciali</span></a>.</p>
+<p>Il campo <strong>RM</strong> mostra la modalità di arrotondamento corrente usata, in
+EduMIPS64, per le istruzioni che convertono numeri floating point in interi
+(si veda l’istruzione CVT.L.D per ulteriori dettagli).</p>
+</section>
+<section id="instruction-set">
+<h2>Instruction set<a class="headerlink" href="#instruction-set" title="Link to this heading">¶</a></h2>
+<p>Per una consultazione efficiente, le istruzioni dell’ISA MIPS64, implementate
+in EduMIPS64, vengono elencate in ordine alfabetico. Le operazioni eseguite
+vengono rappresentate mediante uno pseudocodice in cui l’i-esima cella di
+memoria è  indicata con <code class="docutils literal notranslate"><span class="pre">memory[i]</span></code>, i bit del campo FCC del registro FCSR
+mediante <code class="docutils literal notranslate"><span class="pre">FCSR_FCC[cc]</span></code>, con <code class="docutils literal notranslate"><span class="pre">cc</span></code> ∈ [0,7].</p>
+<p>In alcune istruzioni, per evitare ambiguità, i registri sono indicati come
+<code class="docutils literal notranslate"><span class="pre">GPR[i]</span></code> e <code class="docutils literal notranslate"><span class="pre">FPR[i]</span></code>, con <code class="docutils literal notranslate"><span class="pre">i</span></code> ∈ [0,31], ma nella maggior parte dei casi
+essi vengono indicati qualitativamente con la notazione <code class="docutils literal notranslate"><span class="pre">rx</span></code> o <code class="docutils literal notranslate"><span class="pre">fx</span></code>, dove
+<code class="docutils literal notranslate"><span class="pre">x</span></code> ∈ {d,s,t}. Le tre lettere servono solo a distinguere, al più, tre
+registri per ogni istruzione. Infine, i valori ritornati dalle operazioni di
+conversione vengono indicati con la notazione
+<code class="docutils literal notranslate"><span class="pre">convert_tipoconversione(registro[,tipo</span> <span class="pre">arrotondamento])</span></code>, dove il parametro
+tra parentesi quadre è presente solo in certe circostanze.</p>
+<p>Per prendere confidenza con le istruzioni floating point, alcuni file sorgenti
+possono essere scaricati dal link
+<code class="docutils literal notranslate"><span class="pre">http://www.edumips.org/attachment/wiki/Upload/FPUMaxSamples.rar</span></code>.</p>
+<ul>
+<li><p><cite>ADD.D fd, fs, ft</cite></p>
+<p><em>Descrizione</em>: <code class="docutils literal notranslate"><span class="pre">fd</span> <span class="pre">=</span> <span class="pre">fs</span> <span class="pre">+</span> <span class="pre">ft</span></code></p>
+<p><em>Eccezioni</em>: Le trap di Overflow e Underflow vengono generate se il
+risultato non può essere rappresentato secondo lo standard IEEE 754. Invalid
+Operation è generata se fs o ft contengono QNaN o SNaN, o se viene eseguita
+un’operazione non valida (+∞ - ∞).</p>
+</li>
+<li><p><cite>BC1F cc, offset</cite></p>
+<p><em>Descrizione</em>: <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">FCSR_FCC[cc]</span> <span class="pre">==</span> <span class="pre">0</span> <span class="pre">then</span> <span class="pre">branch</span></code></p>
+<p>Verifica se il valore booleano FCSR_FCC[cc] è falso ed effettua, in tal
+caso, un salto PC-relative. Questa istruzione può accedere al registro FCSR
+solo in lettura; l’informazione dev’essere scritta da una precedente
+istruzione condizionale del tipo <code class="docutils literal notranslate"><span class="pre">C.condizione.D</span></code>.</p>
+<p><em>Esempio</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">C</span><span class="o">.</span><span class="n">EQ</span><span class="o">.</span><span class="n">D</span> <span class="mi">7</span><span class="p">,</span><span class="n">f1</span><span class="p">,</span><span class="n">f2</span>
+<span class="n">BC1F</span> <span class="mi">7</span><span class="p">,</span><span class="n">label</span>
+</pre></div>
+</div>
+<p>In questo esempio <code class="docutils literal notranslate"><span class="pre">C.EQ.D</span></code> verifica l’uguaglianza tra i registri f1 ed f2,
+scrivendo il risultato booleano del confronto nel bit 7 del campo FCC del
+registro FCSR. Dopodichè <code class="docutils literal notranslate"><span class="pre">BC1F</span></code> verifica se quel bit vale 0 (falso) e
+salta a label.</p>
+</li>
+<li><p><cite>BC1T cc, offset</cite></p>
+<p><em>Descrizione</em>: <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">FCSR_FCC[cc]</span> <span class="pre">==</span> <span class="pre">1</span> <span class="pre">then</span> <span class="pre">branch</span></code></p>
+<p>Verifica se il valore booleano FCSR_FCC[cc] è vero ed effettua, in tal caso,
+un salto PC-relative. Questa istruzione può accedere al registro FCSR solo in
+lettura;  l’informazione dev’essere scritta da una precedente istruzione
+condizionale del tipo  <code class="docutils literal notranslate"><span class="pre">C.condizione.D</span></code>.</p>
+<p><em>Esempio</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">C</span><span class="o">.</span><span class="n">EQ</span><span class="o">.</span><span class="n">D</span> <span class="mi">7</span><span class="p">,</span><span class="n">f1</span><span class="p">,</span><span class="n">f2</span>
+<span class="n">BC1T</span> <span class="mi">7</span><span class="p">,</span><span class="n">label</span>
+</pre></div>
+</div>
+<p>In questo esempio, <code class="docutils literal notranslate"><span class="pre">C.EQ.D</span></code> verifica l’uguaglianza tra i registri f1 ed
+f2, scrivendo il risultato booleano del confronto nel bit 7 del campo FCC
+del registro FCSR. Dopodichè <code class="docutils literal notranslate"><span class="pre">BC1T</span></code> verifica se quel bit vale 1 (vero) e
+salta a label.</p>
+</li>
+<li><p><cite>C.EQ.D cc, fs, ft</cite></p>
+<p><em>Descrizione</em>: <code class="docutils literal notranslate"><span class="pre">FCSR_FCC[cc]</span> <span class="pre">=</span> <span class="pre">(fs==ft)</span></code></p>
+<p>Verifica il predicato «uguale a» tra i due registri fs ed ft e salva il
+risultato booleano in FCSR_FCC[cc].
+Questo valore verrà utilizzato da un’istruzione successiva per effettuare
+un salto condizionato (branch) o un movimento di dati condizionato tra
+registri floating point.</p>
+<p><em>Esempio</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">C</span><span class="o">.</span><span class="n">EQ</span><span class="o">.</span><span class="n">D</span> <span class="mi">2</span><span class="p">,</span><span class="n">f1</span><span class="p">,</span><span class="n">f2</span>
+<span class="n">MOVT</span><span class="o">.</span><span class="n">D</span> <span class="n">f8</span><span class="p">,</span><span class="n">f9</span><span class="p">,</span><span class="mi">2</span>
+</pre></div>
+</div>
+<p>In questo esempio <code class="docutils literal notranslate"><span class="pre">C.EQ.D</span></code> verifica l’uguaglianza tra i registri f1 ed f2,
+scrivendo il risultato booleano del confronto nel bit 2 del campo FCC del
+registro FCSR. Dopodichè <code class="docutils literal notranslate"><span class="pre">MOVT.D</span></code> verifica se quel bit vale 1 (vero), e
+copia il registro f9 su f8.</p>
+<p><em>Eccezioni</em>: Invalid Operation è lanciata quando fs o ft contengono valori
+QNaN (se attiva, si ha una trap) o SNaN (si ha sempre una trap).</p>
+</li>
+<li><p><cite>C.LT.D cc, fs, ft</cite></p>
+<p><em>Descrizione</em>: <code class="docutils literal notranslate"><span class="pre">FCSR_FCC[cc]</span> <span class="pre">=</span> <span class="pre">(fs&lt;ft)</span></code></p>
+<p>Verifica il predicato «minore di» (Less Than) tra i due registri fs ed ft, e
+salva il risultato booleano in FCSR_FCC[cc].  Questo valore verrà utilizzato
+da un’istruzione successiva, per effettuare un salto condizionato (branch), o
+per un movimento di dati condizionato tra registri floating point.</p>
+<p><em>Esempio</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">C</span><span class="o">.</span><span class="n">LT</span><span class="o">.</span><span class="n">D</span> <span class="mi">2</span><span class="p">,</span><span class="n">f1</span><span class="p">,</span><span class="n">f2</span>
+<span class="n">BC1T</span> <span class="mi">2</span><span class="p">,</span><span class="n">target</span>
+</pre></div>
+</div>
+<p>In questo esempio, <code class="docutils literal notranslate"><span class="pre">C.LT.D</span></code> verifica se f1 è minore di  f2, scrivendo il
+risultato booleano del confronto nel bit 2 del campo FCC del registro FCSR.
+Dopodichè, <code class="docutils literal notranslate"><span class="pre">BC1T</span></code> verifica se quel bit vale 1 (vero), e salta a <code class="docutils literal notranslate"><span class="pre">target</span></code></p>
+<p><em>Eccezioni:</em> Invalid Operation è lanciata quando fs o ft contengono valori
+QNaN (se attiva, si ha una trap) o SNaN (si ha sempre una trap).</p>
+</li>
+<li><p><cite>CVT.D.L fd, fs</cite></p>
+<p><em>Descrizione</em>: <code class="docutils literal notranslate"><span class="pre">fd</span> <span class="pre">=</span> <span class="pre">convert_longToDouble(fs)</span></code></p>
+<p>Converte un long in un double.</p>
+<p><em>Esempio</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DMTC1</span> <span class="n">r6</span><span class="p">,</span><span class="n">f5</span>
+<span class="n">CVT</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">L</span> <span class="n">f5</span><span class="p">,</span><span class="n">f5</span>
+</pre></div>
+</div>
+<p>In questo esempio, <code class="docutils literal notranslate"><span class="pre">DMTC1</span></code> copia il valore del GPR r6 nell’FPR f5.
+Successivamente, <code class="docutils literal notranslate"><span class="pre">CVT.D.L</span></code> converte il numero in f5 da long a double.
+Supponendo r6=52, dopo l’esecuzione di <code class="docutils literal notranslate"><span class="pre">DMTC1</span></code>, l’equivalente binario di
+52 viene copiato nel registro f5 (f5 non contiene ancora il valore 52.0
+perchè non è stato formattato ancora come double). Dopo l’esecuzione di
+<code class="docutils literal notranslate"><span class="pre">CVT.D.L</span></code>, f5=52.0.</p>
+<p><em>Eccezioni:</em> Invalid Operation è lanciata quando fs contiene QNaN,SNaN o
+Infinito</p>
+</li>
+<li><p><cite>CVT.D.W fd, fs</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">fd</span> <span class="pre">=</span> <span class="pre">convert_IntToDouble(fs)</span></code></p>
+<p>Converte un int in un double</p>
+<p><em>Esempio</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MTC1</span> <span class="n">r6</span><span class="p">,</span><span class="n">f5</span>
+<span class="n">CVT</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">W</span> <span class="n">f5</span><span class="p">,</span><span class="n">f5</span>
+</pre></div>
+</div>
+<p>In questo esempio, <code class="docutils literal notranslate"><span class="pre">MTC1</span></code> copia i 32 bit più bassi del GPR r6 nell’FPR f5.
+Successivamente, <code class="docutils literal notranslate"><span class="pre">CVT.D.W</span></code>, leggendo prima f5 come int, lo sovrascrive in
+double.</p>
+<p>Supponendo <code class="docutils literal notranslate"><span class="pre">r6=0xAAAAAAAABBBBBBBB</span></code>, dopo l’esecuzione di <code class="docutils literal notranslate"><span class="pre">MTC1</span></code> si ha che
+<code class="docutils literal notranslate"><span class="pre">f5=0xXXXXXXXXBBBBBBBB</span></code>; si noti che i suoi 32 bit più alti (<code class="docutils literal notranslate"><span class="pre">XX..X</span></code>)
+sono UNDEFINED (non sono stati sovrascritti). <code class="docutils literal notranslate"><span class="pre">CVT.D.W</span></code> legge f5 come int
+(<code class="docutils literal notranslate"><span class="pre">f5=-1145324613</span></code>), formattandolo poi in double (<code class="docutils literal notranslate"><span class="pre">f5=0xC1D1111111400000</span>
+<span class="pre">=-1.145324613E9</span></code>).</p>
+<p><em>Eccezioni:</em> Invalid Operation è lanciata quando fs contiene QNaN,SNaN o
+Infinito</p>
+</li>
+<li><p><cite>CVT.L.D fd, fs</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">fd</span> <span class="pre">=</span> <span class="pre">convert_doubleToLong(fs,</span> <span class="pre">CurrentRoundingMode)</span></code></p>
+<p>Converte, dapprima arrotondandolo, un double in un long</p>
+<p><em>Esempio</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CVT</span><span class="o">.</span><span class="n">L</span><span class="o">.</span><span class="n">D</span> <span class="n">f5</span><span class="p">,</span><span class="n">f5</span>
+<span class="n">DMFC1</span> <span class="n">r6</span><span class="p">,</span><span class="n">f5</span>
+</pre></div>
+</div>
+<p>In questo esempio, <code class="docutils literal notranslate"><span class="pre">CVT.L.D</span></code> converte il double in f5 in un long.
+Dopodichè, <code class="docutils literal notranslate"><span class="pre">DMFC1</span></code> copia l’FPR f5 nel GPR r6. Il risultato di questa
+istruzione dipende dalla modalità di arrotondamento corrente, che viene
+impostata dalla scheda <em>Arrotondamenti FPU</em> della finestra <em>Configura</em> →
+<em>Impostazioni</em>.</p>
+</li>
+</ul>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Esempi sui tipi di arrotondamento</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Tipo</p></th>
+<th class="head"><p>Campo RM</p></th>
+<th class="head"><p>Registro f5</p></th>
+<th class="head"><p>Registro r6</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Al più vicino</p></td>
+<td><p>0</p></td>
+<td><p>6.4</p></td>
+<td><p>6</p></td>
+</tr>
+<tr class="row-odd"><td><p>Al più vicino</p></td>
+<td><p>0</p></td>
+<td><p>6.8</p></td>
+<td><p>7</p></td>
+</tr>
+<tr class="row-even"><td><p>Al più vicino</p></td>
+<td><p>0</p></td>
+<td><p>6.5</p></td>
+<td><p>6 (al pari)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Al più vicino</p></td>
+<td><p>0</p></td>
+<td><p>7.5</p></td>
+<td><p>8 (al pari)</p></td>
+</tr>
+<tr class="row-even"><td><p>Verso lo zero</p></td>
+<td><p>1</p></td>
+<td><p>7.1</p></td>
+<td><p>7</p></td>
+</tr>
+<tr class="row-odd"><td><p>Verso lo zero</p></td>
+<td><p>1</p></td>
+<td><p>-2.3</p></td>
+<td><p>-2</p></td>
+</tr>
+<tr class="row-even"><td><p>Verso  ∞</p></td>
+<td><p>2</p></td>
+<td><p>4.2</p></td>
+<td><p>5</p></td>
+</tr>
+<tr class="row-odd"><td><p>Verso  ∞</p></td>
+<td><p>2</p></td>
+<td><p>-3.9</p></td>
+<td><p>-3</p></td>
+</tr>
+<tr class="row-even"><td><p>Verso -∞</p></td>
+<td><p>3</p></td>
+<td><p>4.2</p></td>
+<td><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>Verso -∞</p></td>
+<td><p>3</p></td>
+<td><p>-3.9</p></td>
+<td><p>-4</p></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p><cite>CVT.W.D fd, fs</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">fd</span> <span class="pre">=</span> <span class="pre">convert_DoubleToInt(fs,</span> <span class="pre">CurrentRoundingMode)</span></code></p>
+<p>Converte un double in un int utilizzando la modalità di arrotondamento
+corrente, illustrata per l’istruzione <code class="docutils literal notranslate"><span class="pre">CVT.L.D</span></code></p>
+<p><em>Eccezioni:</em> Invalid Operation è lanciata quando fs è Infinito, XNaN, o il
+risultato è fuori dall’intervallo degli interi con segno [-2 <sup>31</sup>, 2
+<sup>31</sup>-1]</p>
+</li>
+<li><p><cite>DIV.D fd, fs, ft</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">fd</span> <span class="pre">=</span> <span class="pre">fs</span> <span class="pre">\div</span> <span class="pre">ft</span></code></p>
+<p><em>Eccezioni:</em> Le trap di Overflow e Underflow vengono generate se il
+risultato non può essere rappresentato secondo lo standard IEEE 754. Invalid
+Operation è generata se fs o ft contengono QNaN o SNaN, o se viene eseguita
+un’operazione non valida (0div0,∞ div ∞). Divide by zero è generata se è
+eseguita una divisione per zero che non ha per dividendo un XNaN (5div0).</p>
+</li>
+<li><p><cite>DMFC1 rt,fs</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">rt</span> <span class="pre">=</span> <span class="pre">fs</span></code></p>
+<p>Copia l’intero contenuto binario dell’FPR fs nel GPR rt. Nessun controllo
+di formato viene eseguito su fs prima della copia.</p>
+</li>
+<li><p><cite>DMTC1 rt, fs</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">fs</span> <span class="pre">=</span> <span class="pre">rt</span></code></p>
+<p>Copia il contenuto binario del GPR rt nell” FPR fs.</p>
+</li>
+<li><p><cite>L.D ft, offset(base)</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">ft</span> <span class="pre">=</span> <span class="pre">memory[GPR[base]</span> <span class="pre">+</span> <span class="pre">offset]</span></code></p>
+<p>Carica una doubleword (64 bit) dalla memoria all’FPR ft. Questa istruzione
+non appartiene all’ISA MIPS64; si consiglia l’utilizzo di <code class="docutils literal notranslate"><span class="pre">LDC1</span></code>.</p>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p><cite>L.D</cite> è un’istruzione non presente nell’ISA MIPS64, inclusa in
+EduMIPS64, solo per compabitibilità con WinMIPS64</p>
+</div>
+<ul>
+<li><p><cite>LDC1 ft, offset(base)</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">ft</span> <span class="pre">=</span> <span class="pre">memory[GPR[base]</span> <span class="pre">+</span> <span class="pre">offset]</span></code></p>
+<p>Carica una doubleword (64 bit) dalla memoria all’FPR ft</p>
+</li>
+<li><p><cite>LWC1 ft, offset(base)</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">ft</span> <span class="pre">=</span> <span class="pre">memory[GPR[base]</span> <span class="pre">+</span> <span class="pre">offset]</span></code></p>
+<p>Carica una word (32 bit) dalla memoria all’FPR ft</p>
+</li>
+<li><p><cite>MFC1 rt, fs</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">rt</span> <span class="pre">=</span> <span class="pre">readInt(fs)</span></code></p>
+<p>Legge l’FPR fs come int e scrive il GPR rt come long
+<em>Esempio</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MFC1</span> <span class="n">r6</span><span class="p">,</span><span class="n">f5</span>
+<span class="n">SD</span> <span class="n">r6</span><span class="p">,</span><span class="n">inmemoria</span><span class="p">(</span><span class="n">R0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Si supponga <code class="docutils literal notranslate"><span class="pre">f5=0xAAAAAAAABBBBBBBB</span></code>;  <code class="docutils literal notranslate"><span class="pre">MFC1</span></code> legge f5 come int, cioè i
+32 bit più bassi (interpreta <code class="docutils literal notranslate"><span class="pre">BBBBBBBB</span></code> come <code class="docutils literal notranslate"><span class="pre">-1145324613</span></code>), e lo scrive
+in r6 (64 bit). Dopo l’esecuzione di <code class="docutils literal notranslate"><span class="pre">MFC1</span></code>, <code class="docutils literal notranslate"><span class="pre">r6=0xFFFFFFFFBBBBBBBB</span></code>,
+che equivale a <code class="docutils literal notranslate"><span class="pre">-1145324613</span></code> leggendo questo registro come long. Quindi in
+memoria, pur utilizzando l’istruzione SD, verrà scritta una doubleword con
+valore <code class="docutils literal notranslate"><span class="pre">-1145324613</span></code>.  Questa operazione di conversione è chiamata
+<em>estensione del segno</em>, il cui approfondimento esula dagli scopi di questo
+manuale.</p>
+</li>
+<li><p><cite>MOVF.D fd, fs, cc</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">FCSR_FCC[cc]</span> <span class="pre">==</span> <span class="pre">0</span> <span class="pre">then</span> <span class="pre">fd=fs</span></code></p>
+<p>Verifica se la condizione di confronto booleana in FCSR_FCC[cc] è falsa e
+copia fs su fd. Nessun controllo sul formato viene realizzato su fs.</p>
+</li>
+<li><p><cite>MOVT.D fd, fs, cc</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">FCSR_FCC[cc]</span> <span class="pre">==</span> <span class="pre">1</span> <span class="pre">then</span> <span class="pre">fd=fs</span></code></p>
+<p>Verifica se la condizione di confronto booleana in FCSR_FCC[cc] è vera, e
+copia fs su fd. Nessun controllo sul formato viene realizzato su fs.</p>
+</li>
+<li><p><cite>MOV.D fd, fs</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">fd</span> <span class="pre">=</span> <span class="pre">fs</span></code></p>
+<p>Copia fs su fd senza alcun controllo del formato di fs</p>
+</li>
+<li><p><cite>MOVN.D fd, fs, rt</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">rt</span> <span class="pre">!=</span> <span class="pre">0</span> <span class="pre">then</span> <span class="pre">fd=fs</span></code></p>
+<p>Copia fs su fd, senza alcun controllo del formato di fs, se il GPR rt è
+diverso da zero</p>
+</li>
+<li><p><cite>MOVZ.D fd, fs, rt</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">rt</span> <span class="pre">==</span> <span class="pre">0</span> <span class="pre">then</span> <span class="pre">fd=fs</span></code></p>
+<p>Copia fs su fd, senza alcun controllo del formato di fs, se il il GPR rt è
+uguale a zero</p>
+</li>
+</ul>
+<ul>
+<li><p><cite>MTC1 rt, fs</cite></p>
+<p><em>Descrizione:</em> fs = rt <sub>0..31</sub></p>
+<p>Copia la word più bassa di rt scrivendola sull’FPR fs.</p>
+<p><em>Esempio</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MTC1</span> <span class="n">r6</span><span class="p">,</span><span class="n">f5</span>
+</pre></div>
+</div>
+<p>Si supponga <code class="docutils literal notranslate"><span class="pre">r5=0xAAAAAAAABBBBBBBB</span></code>;  <code class="docutils literal notranslate"><span class="pre">MTC1</span></code> legge i 32 bit più bassi
+di r5 copiandoli nei 32 bit più bassi di f5. Dopo l’esecuzione di <code class="docutils literal notranslate"><span class="pre">MTC1</span></code>,
+<code class="docutils literal notranslate"><span class="pre">f5=0xXXXXXXXXBBBBBBBB</span></code>; si noti che i suoi 32 bit più alti (<code class="docutils literal notranslate"><span class="pre">XX..X</span></code>)
+sono UNDEFINED (non sono stati sovrascritti).</p>
+</li>
+<li><p><cite>MUL.D fd, fs, ft</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">fd</span> <span class="pre">=</span> <span class="pre">fs</span> <span class="pre">×</span> <span class="pre">ft</span></code></p>
+<p><em>Eccezioni:</em> Overflow e Underflow vengono generati se il risultato non può
+essere rappresentato secondo lo standard IEEE754. Invalid Operation è
+generata se fs o ft contiene  QNaN o SNaN, o se si effettua un’operazione
+× ∞, QNaN × numero)</p>
+</li>
+<li><p><cite>S.D ft, offset(base)</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">memory[base+offset]</span> <span class="pre">=</span> <span class="pre">ft</span></code></p>
+<p>Copia la doubleword (64 bit) dell’FPR ft in memoria.</p>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p><cite>S.D</cite> è un’istruzione non presente nell’ISA MIPS64, inclusa in
+EduMIPS64, solo per compabitibilità con WinMIPS64</p>
+</div>
+<ul>
+<li><p><cite>SDC1 ft, offset(base)</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">memory[base+offset]</span> <span class="pre">=</span> <span class="pre">ft</span></code></p>
+<p>Salva la doubleword (64 bit) dell’FPR ft in memoria.</p>
+</li>
+<li><p><cite>SUB.D fd, fs, ft</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">fd</span> <span class="pre">=</span> <span class="pre">fs-ft</span></code></p>
+<p><em>Eccezioni:</em> Overflow and Underflow vengono generati se il risultato non può
+essere rappresentato secondo lo standard IEEE754. Invalid Operation è
+generata se fs o ft contengono QNaN o SNaN, o se viene eseguita
+un’operazione non valida (∞-∞).</p>
+</li>
+<li><p><cite>SWC1 ft, offset(base)</cite></p>
+<p><em>Descrizione:</em> <code class="docutils literal notranslate"><span class="pre">memory[base+offset]</span> <span class="pre">=</span> <span class="pre">ft</span></code></p>
+<p>Salva la word (32 bit) dell’FPR ft in memoria.</p>
+</li>
+</ul>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

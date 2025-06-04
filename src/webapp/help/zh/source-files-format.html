@@ -1,0 +1,328 @@
+
+
+<html lang="zh" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>源文件格式 &#8212; EduMIPS64 1.3.0 文档</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/epub.css?v=e4d0adb4" />
+    <script src="_static/documentation_options.js?v=6acfd120"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script> 
+  </head><body>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="id1">
+<h1>源文件格式<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h1>
+<p>EduMIPS64 尝试遵循其他 MIPS64 和 DLX 模拟器中使用的惯例，这样老用户就不会对其语法感到困惑。</p>
+<p>源文件中有两个部分，即 <em>data</em> 部分和 <em>code</em> 部分，分别由 <em>.data</em> 和 <em>.code</em> 指令引入。在下面的列表中，你可以看到一个非常基本的 EduMIPS64 程序:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">;</span> <span class="n">这是注释</span>
+        <span class="o">.</span><span class="n">data</span>
+<span class="n">label</span><span class="p">:</span>  <span class="o">.</span><span class="n">word</span>   <span class="mi">15</span>     <span class="p">;</span> <span class="n">This</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">inline</span> <span class="n">comment</span>
+
+        <span class="o">.</span><span class="n">code</span>
+        <span class="n">daddi</span>   <span class="n">r1</span><span class="p">,</span> <span class="n">r0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="n">syscall</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>为了区分每行源代码的不同部分，可以使用空格和制表符的任意组合，因为解析器会忽略多个空格，只
+空格来分隔标记。</p>
+<p>注释可以使用 &quot;;&quot; 字符指定，该字符后面的所有内容都将被忽略。因此，注释可以内联（指令之后）或单独一行中使用。</p>
+<p>标签可在代码中用于引用内存单元或指令。 标签不区分大小写。每行源代码只能使用一个标签。
+标签可以在有效数据声明或指令的上方指定一行或多行，前提是标签和声明之间除了注释和空行外没有其他内容。</p>
+<section id="id2">
+<h2>内存限制<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>EduMIPS64 为数据（ <cite>.data</cite> 部分，上限为 640 kB，即 80000 个 64 位值）和指令（ <cite>.code</cite> 部分，上限为 128 kB，即 32000 条指令，每条指令占用 32 位）设置了固定的内存大小。</p>
+<p>这些限制是模拟器硬编码的。</p>
+</section>
+<section id="data">
+<h2><cite>.data</cite> 部分<a class="headerlink" href="#data" title="Link to this heading">¶</a></h2>
+<p><cite>.data</cite> 部分包含的命令指定了程序执行开始前内存的填充方式。<cite>.data</cite> 命令的一般格式为:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">label</span><span class="p">:]</span> <span class="o">.</span><span class="n">datatype</span> <span class="n">value1</span> <span class="p">[,</span> <span class="n">value2</span> <span class="p">[,</span> <span class="o">...</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>EduMIPS64 支持不同的数据类型，详见下表。</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Type</p></th>
+<th class="head"><p>Directive</p></th>
+<th class="head"><p>Bits required</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Byte</p></td>
+<td><p><cite>.byte</cite></p></td>
+<td><p>8</p></td>
+</tr>
+<tr class="row-odd"><td><p>Half word</p></td>
+<td><p><cite>.word16</cite></p></td>
+<td><p>16</p></td>
+</tr>
+<tr class="row-even"><td><p>Word</p></td>
+<td><p><cite>.word32</cite></p></td>
+<td><p>32</p></td>
+</tr>
+<tr class="row-odd"><td><p>Double Word</p></td>
+<td><p><cite>.word</cite> or <cite>.word64</cite></p></td>
+<td><p>64</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>请注意，双字可以由 <cite>.word</cite> 指令或 <cite>.word64</cite> 指令引入。</p>
+<p>所有数据类型都解释为带符号。这意味着， <cite>.data</cite> 部分中的整数字面量必须介于 -2^(n-1) 和 2^(n-1) - 1 之间（包括 2^(n-1)）。</p>
+<p>使用单个指令声明数据元素列表与使用相同类型的多个指令声明数据元素列表有很大区别。EduMIPS64 一旦发现数据类型标识符，
+就会从下一个 64 位双字开始写入，因此下面列表中的第一条 <cite>.byte</cite> 语句将把数字 1、2、3 和 4 放在 4 个字节的空间中，
+占用 32 位，而后面四行的代码将把每个数字放在不同的内存单元中，占用 32 个字节:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">.</span><span class="n">data</span>
+<span class="o">.</span><span class="n">byte</span>    <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span>
+<span class="o">.</span><span class="n">byte</span>    <span class="mi">1</span>
+<span class="o">.</span><span class="n">byte</span>    <span class="mi">2</span>
+<span class="o">.</span><span class="n">byte</span>    <span class="mi">3</span>
+<span class="o">.</span><span class="n">byte</span>    <span class="mi">4</span>
+</pre></div>
+</div>
+<p>在下表中，内存使用字节大小的单元表示，每行宽 64 位。
+表中每行左侧的地址指的是最右侧的内存单元，它是每行 8 个单元中地址最低的单元。</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><em>0</em></p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>4</p></td>
+<td><p>3</p></td>
+<td><p>2</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-even"><td><p><em>8</em></p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>1</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>16</em></p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p><em>24</em></p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>3</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>36</em></p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>0</p></td>
+<td><p>4</p></td>
+</tr>
+</tbody>
+</table>
+<p>有一些特殊指令需要讨论： <cite>.space</cite>、<cite>.ascii</cite> 和 <cite>.asciiz</cite>。</p>
+<p><cite>.space</cite> 指令用于在内存中留出一些空余空间。它接受一个整数作为参数，表示必须留空的字节数。当您必须为计算结果在内存中留出一些空间时，该指令非常方便。</p>
+<p><cite>.ascii</cite> 指令接受包含任何 ASCII 字符的字符串，以及下表中描述的一些类似 C 语言的特殊转义序列，并将这些字符串存入内存。</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Escaping sequence</p></th>
+<th class="head"><p>Meaning</p></th>
+<th class="head"><p>ASCII code</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>\0</p></td>
+<td><p>Null byte</p></td>
+<td><p>0</p></td>
+</tr>
+<tr class="row-odd"><td><p>\t</p></td>
+<td><p>Horizontal tabulation</p></td>
+<td><p>9</p></td>
+</tr>
+<tr class="row-even"><td><p>\n</p></td>
+<td><p>Newline character</p></td>
+<td><p>10</p></td>
+</tr>
+<tr class="row-odd"><td><p>\&quot;</p></td>
+<td><p>Literal quote character</p></td>
+<td><p>34</p></td>
+</tr>
+<tr class="row-even"><td><p>\</p></td>
+<td><p>Literal backslash character</p></td>
+<td><p>92</p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>.asciiz &quot;指令的行为与&quot;.ascii &quot;命令完全相同，不同之处在于它会自动以空字节结束字符串。</p>
+</section>
+<section id="code">
+<h2><cite>.code</cite> 部分<a class="headerlink" href="#code" title="Link to this heading">¶</a></h2>
+<p><cite>.code</cite> 部分包含的命令指定了程序启动时内存的填充方式。 <cite>.code</cite> 命令的一般形式是:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">label</span><span class="p">:]</span> <span class="n">instruction</span> <span class="p">[</span><span class="n">param1</span> <span class="p">[,</span> <span class="n">param2</span> <span class="p">[,</span> <span class="n">param3</span><span class="p">]]]</span>
+</pre></div>
+</div>
+<p>代码*部分可以用 <cite>.text</cite> 别名指定。</p>
+<p>参数的数量和类型取决于指令本身。</p>
+<p>指令可以使用三种类型的参数：</p>
+<ul class="simple">
+<li><p><em>寄存器</em> 寄存器参数用大写或小写的 <cite>r</cite> 或 <cite>$</cite> 表示，后面跟寄存器的编号（0 到 31 之间），如 &quot;r4&quot;、&quot;R4&quot;或&quot;$4&quot;；</p></li>
+<li><p><em>立即值</em> 立即值可以是一个数字或标签；数字可以以 10 进制或 16 进制指定：10 进制数字只需写入数字即可，而 16 进制数字则需在数字前加上前缀 &quot;0x&quot;。立即值的前面可以
+字符。</p></li>
+<li><p><em>地址</em> 地址由一个立即值和一个寄存器名称组成，寄存器名称用括号括起来。寄存器的值将作为基数，立即值将作为偏移量。</p></li>
+</ul>
+<p>立即值的大小受指令位编码中可用位数的限制。</p>
+<p>当可以使用 16 位立即值时，例如在 ALU I-Type 指令中，也可以使用内存标签作为立即值。汇编程序
+将把标签指向的内存地址作为立即值。</p>
+<p>你可以使用标准的 MIPS 汇编别名来寻址前 32 个寄存器，将别名附加到标准寄存器前缀之一，如 &quot;r&quot;、&quot;$&quot;
+和 &quot;R &quot;等标准寄存器前缀。请参见下表。</p>
+<blockquote>
+<div><table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Register</p></th>
+<th class="head"><p>Alias</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p><cite>zero</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p><cite>at</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p><cite>v0</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p><cite>v1</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p><cite>a0</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p><cite>a1</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p><cite>a2</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p><cite>a3</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p><cite>t0</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p><cite>t1</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p><cite>t2</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>11</p></td>
+<td><p><cite>t3</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>12</p></td>
+<td><p><cite>t4</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>13</p></td>
+<td><p><cite>t5</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>14</p></td>
+<td><p><cite>t6</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>15</p></td>
+<td><p><cite>t7</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>16</p></td>
+<td><p><cite>s0</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>17</p></td>
+<td><p><cite>s1</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>18</p></td>
+<td><p><cite>s2</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>19</p></td>
+<td><p><cite>s3</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>20</p></td>
+<td><p><cite>s4</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>21</p></td>
+<td><p><cite>s5</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>22</p></td>
+<td><p><cite>s6</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>23</p></td>
+<td><p><cite>s7</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>24</p></td>
+<td><p><cite>t8</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>25</p></td>
+<td><p><cite>t9</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>26</p></td>
+<td><p><cite>k0</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>27</p></td>
+<td><p><cite>k1</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>28</p></td>
+<td><p><cite>gp</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>29</p></td>
+<td><p><cite>sp</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>30</p></td>
+<td><p><cite>fp</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>31</p></td>
+<td><p><cite>ra</cite></p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</section>
+<section id="include">
+<h2><cite>#include</cite> 命令<a class="headerlink" href="#include" title="Link to this heading">¶</a></h2>
+<p>源文件可以包含 <cite>#include filename</cite> 命令，其作用是将文件 <cite>filename</cite> 中的内容替换为命令行。</p>
+<p>如果你想包含外部例程，这条命令是非常有用的，而且它还带有循环检测算法，如果你试图在文件 <cite>B.s</cite> 中执行&quot;<cite>#include A.s</cite>&quot;，又在文件 <cite>A.s</cite> 中执行&quot;<cite>#include B.s</cite>&quot;，它就会发出警告。</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

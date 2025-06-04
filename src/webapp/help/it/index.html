@@ -1,0 +1,101 @@
+
+
+<html lang="it" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Benvenuti nella documentazione di EduMIPS64! &#8212; Documentazione EduMIPS64 1.3.0 </title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/epub.css?v=e4d0adb4" />
+    <script src="_static/documentation_options.js?v=79d73783"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=45930005"></script> 
+  </head><body>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="benvenuti-nella-documentazione-di-edumips64">
+<h1>Benvenuti nella documentazione di EduMIPS64!<a class="headerlink" href="#benvenuti-nella-documentazione-di-edumips64" title="Link to this heading">¶</a></h1>
+<p>EduMIPS64 è un simulatore di Instruction Set Architecture (ISA) MIPS64,
+progettato per eseguire piccoli programmi che utilizzino il sottoinsieme
+dell’Instruction Set MIPS64 implementato dal simulatore stesso; permette
+all’utente di vedere come le istruzioni si comportino nella pipeline, come gli
+stalli siano gestiti dalla CPU, lo stato di registri e memoria e molto altro.
+È classificabile sia come simulatore, sia come debugger visuale.</p>
+<p>Il sito web del progetto è <a class="reference external" href="http://www.edumips.org">http://www.edumips.org</a>, ed il codice sorgente è
+disponibile presso <a class="reference external" href="http://github.com/EduMIPS64/edumips64">http://github.com/EduMIPS64/edumips64</a>. Per segnalare bug o
+inviare suggerimenti sul simulatore, è possibile aprire una issue su github o
+inviare una mail a <a class="reference external" href="mailto:bugs&#37;&#52;&#48;edumips&#46;org">bugs<span>&#64;</span>edumips<span>&#46;</span>org</a>.</p>
+<p>EduMIPS64 è stato progettato e sviluppato da un gruppo di studenti
+dell’Università degli Studi di Catania, ed ha tratto spunto, come interfaccia
+e come funzionamento, dal simulatore WinMIPS64, sebbene vi siano alcune
+differenze importanti con quest’ultimo.</p>
+<p>Questo manuale vi introdurrà ad EduMIPS64, e spiegherà come utilizzarlo.</p>
+<p>Il primo capitolo del manuale riguarda il formato dei file sorgente accettato
+dal simulatore, descrivendo i tipi di dato e le direttive, oltre ai parametri
+da linea di comando.</p>
+<p>Nel secondo capitolo è presentata una panoramica del set di istruzioni MIPS64
+utilizzato da EduMIPS64, con tutti i parametri richiesti e le indicazioni per
+il loro utilizzo.</p>
+<p>Il terzo capitolo descrive la Floating Point Unit ed il suo insieme di
+istruzioni.</p>
+<p>Il quarto capitolo è una descrizione dell’interfaccia utente di EduMIPS64,
+che espone lo scopo di ciascuna finestra e di ciascun menù, insieme ad una
+descrizione delle finestre di configurazione, del Dinero frontend, del
+manuale e delle opzioni da linea di comando.</p>
+<p>Il quinto capitolo contiene alcune esempi pratici di utilizzo del simulatore.</p>
+<p>Questo manuale si riferisce ad EduMIPS64 versione 1.3.0.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="source-files-format.html">Formato dei file sorgenti</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="source-files-format.html#limiti-di-memoria">Limiti di memoria</a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-files-format.html#la-sezione-data">La sezione <cite>.data</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-files-format.html#la-sezione-code">La sezione <cite>.code</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="source-files-format.html#il-comando-include">Il comando <cite>#include</cite></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="instructions.html">Il set di istruzioni</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#le-istruzioni-alu">Le istruzioni ALU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#istruzioni-load-store">Istruzioni load/store</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#istruzioni-di-controllo-del-flusso">Istruzioni di controllo del flusso</a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#l-istruzione-syscall">L’istruzione <cite>SYSCALL</cite></a></li>
+<li class="toctree-l2"><a class="reference internal" href="instructions.html#altre-istruzioni">Altre istruzioni</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="fpu.html">Floating Point Unit</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fpu.html#valori-speciali">Valori speciali</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fpu.html#configurazione-delle-eccezioni">Configurazione delle eccezioni</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fpu.html#direttiva-double">Direttiva .double</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fpu.html#registro-fcsr">Registro FCSR</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fpu.html#instruction-set">Instruction set</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user-interface.html">L’interfaccia utente</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user-interface.html#la-barra-dei-menu">La barra dei menù</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-interface.html#finestre">Finestre</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-interface.html#finestre-di-dialogo">Finestre di dialogo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-interface.html#opzioni-da-riga-di-comando">Opzioni da riga di comando</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Listati di esempio</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#syscall">SYSCALL</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>
