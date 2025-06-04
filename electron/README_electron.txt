@@ -34,6 +34,27 @@ Then, just run one of these from the electron dir:
 
 an clickable app will be created at: electron/dist/WebEduMips64-PLATFORM-ARCH
 
+
+Running the Built Desktop App
+------------------------------------
+
+After building the desktop app using the scripts above, you can run the app by navigating to the created directory and launching the executable.
+
+Linux: 
+./dist/WebEduMips64-linux-x64/WebEdumips64
+
+macOS:
+./dist/WebEduMips64-darwin-arm64/WebEduMips64.app/Contents/MacOS/WebEduMips64
+
+Note for macOS users: Due to macOS security restrictions, you may need to remove the quarantine attribute from downloaded applications before they can be run. If you encounter a security warning when trying to run the app, execute the following command in Terminal:
+
+xattr -dr com.apple.quarantine /path/to/WebEduMips64.app
+
+Replace "/path/to/WebEduMips64.app" with the actual path to your WebEduMips64.app file.
+
+Windows:
+.\dist\WebEdumips64-win32-x64\WebEdumips64.exe
+
 TODO:
 - appropriate icons for the app
 
