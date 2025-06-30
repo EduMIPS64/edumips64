@@ -62,19 +62,19 @@ EduMIPS64 允许用户通过 *配置* → *设置* 窗口中的 *FPU 异常* 选
 .. :ref:`fig-invalid_operation_trap`).
 
 .. TODO: see how to include it in the resulting in-app help
-.. .. _fig-exception_cfg:
+.. _fig-exception_cfg:
    .. figure:: ../../../img/exception_cfg.png
       :scale: 50%
 
       Trap configuration for IEEE exceptions
 
-   .. _fig-exception_mask_cfg:
+.. _fig-exception_mask_cfg:
    .. figure:: ../../../img/exception_mask_cfg.png
       :scale: 50%
 
       Option that masks all the synchronous exceptions
 
-   .. _fig-invalid_operation_trap:
+.. _fig-invalid_operation_trap:
    .. figure:: ../../../img/invalid_operation_trap.png
       :scale: 50%
 
@@ -226,11 +226,11 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
   *异常：* 如果 fs 包含无限值、任何 NaN 或结果超出长域 [-2 :sup:`63`, 2 :sup:`63` -1] 则抛出无效操作。
 
-.. .. _fig-fpu_rounding:
-.. .. figure:: ../../../img/fpu_rounding.png
-..    :scale: 50%
-..
-..    FPU Rounding
+.. _fig-fpu_rounding:
+.. figure:: ../../../img/fpu_rounding.png
+   :scale: 50%
+
+   FPU Rounding
 
 .. table:: 四舍五入示例
 
