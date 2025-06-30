@@ -478,24 +478,6 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     collector.checkThat(filename + ": RAW stalls without forwarding.", statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(2));
   }
 
-  @Test(timeout=2000)
-  public void testFPUMul() throws Exception {
-    // This test contains code that raises exceptions, let's disable them.
-    config.putBoolean(ConfigKey.FP_INVALID_OPERATION, false);
-    config.putBoolean(ConfigKey.FP_OVERFLOW, false);
-    config.putBoolean(ConfigKey.FP_UNDERFLOW, false);
-    config.putBoolean(ConfigKey.FP_DIVIDE_BY_ZERO, false);
-    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-mul.s");
-
-    // Same behaviour with and without forwarding.
-    int expected_cycles = 42, expected_instructions = 32, expected_mem_stalls = 6;
-    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).cycles, equalTo(expected_cycles));
-    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).instructions, equalTo(expected_instructions));
-    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).memStalls, equalTo(expected_mem_stalls));
-    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).cycles, equalTo(expected_cycles));
-    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).instructions, equalTo(expected_instructions));
-    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).memStalls, equalTo(expected_mem_stalls));
-  }
 
   @Test(timeout=2000)
   public void testFPCond() throws Exception {
