@@ -585,10 +585,15 @@ public class Converter {
       return false;
     }
     
+    // Skip the 'x'/'X' prefix
+    cur++;
+
     // Check the rest of the number.
     for (; cur < num.length(); cur++) {
       char c = num.charAt(cur);
-      boolean isHexDigit = (c >= '0' || c <= '9') || (c >= 'a' || c <= 'f') || (c >= 'A' || c <= 'F');
+      boolean isHexDigit = (c >= '0' && c <= '9')
+          || (c >= 'a' && c <= 'f')
+          || (c >= 'A' && c <= 'F');
       if (!isHexDigit) {
         return false;
       }
