@@ -19,6 +19,7 @@ public class ConverterIsHexNumberTest {
             {"", false}, {"+", false}, {"-", false}, {" ", false}, {"++", false},
             {"0", false}, {"+0", false}, {"-0", false}, {"00000000000", false},
             {"0x", false}, {"0X", false},
+            {"0xG", false}, {"0xhello", false}, {"0x1G3", false},
             {"0xFF", true}, {"0XFF", true}, {"0x1", true}, {"0x0", true}
         });
 
