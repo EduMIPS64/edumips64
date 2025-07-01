@@ -158,6 +158,20 @@ incremented, because the last execution cycle is not a full CPU cycle but
 rather a pseudo-cycle whose only duties are to remove the last instruction
 from the pipeline and increment the counter of executed instructions.
 
+The Statistics frame also displays L1 cache statistics when the cache 
+simulator is enabled:
+
+* **L1I Reads** - Number of read accesses to the L1 instruction cache
+* **L1I Read Misses** - Number of read misses in the L1 instruction cache
+* **L1D Reads** - Number of read accesses to the L1 data cache
+* **L1D Read Misses** - Number of read misses in the L1 data cache
+* **L1D Writes** - Number of write accesses to the L1 data cache
+* **L1D Write Misses** - Number of write misses in the L1 data cache
+
+These statistics help analyze cache performance and understand memory access
+patterns in your program. Cache misses indicate when the processor needs to
+access slower main memory instead of the faster cache.
+
 Pipeline
 ~~~~~~~~
 The Pipeline frame shows the actual status of the pipeline, showing which
@@ -230,8 +244,57 @@ options to change the colors associated to the different pipeline stages, an
 option to choose whether memory cells are shown as long or double values and
 an option to set the UI font size.
 
+The Cache tab allows you to configure the L1 cache simulator settings:
+
+* **L1 Data Cache Size** - Size of the L1 data cache in bytes (default: 1024)
+* **L1 Instruction Cache Size** - Size of the L1 instruction cache in bytes (default: 1024)
+* **L1 Data Cache Block Size** - Size of each cache block in bytes (default: 16)
+* **L1 Instruction Cache Block Size** - Size of each cache block in bytes (default: 16)
+* **L1 Data Cache Associativity** - Number of cache ways, determining cache organization (default: 1)
+* **L1 Instruction Cache Associativity** - Number of cache ways, determining cache organization (default: 1)
+* **L1 Data Cache Penalty** - Number of additional cycles for cache misses (default: 40)
+* **L1 Instruction Cache Penalty** - Number of additional cycles for cache misses (default: 40)
+
+These settings allow you to experiment with different cache configurations to
+understand their impact on program performance. The cache simulator models
+separate L1 data and instruction caches, which is common in modern processors.
+
 Note that the UI scaling with font size is far from perfect, but it should be
 enough to make the simulator usable with high-resolution displays (e.g., 4k).
+
+L1 Cache Simulator
+~~~~~~~~~~~~~~~~~~
+EduMIPS64 includes an integrated L1 cache simulator that models the behavior
+of separate instruction and data caches. The cache simulator operates
+automatically during program execution and provides detailed statistics about
+cache performance.
+
+The cache simulator models:
+
+* **L1 Instruction Cache** - Caches instruction fetches from memory
+* **L1 Data Cache** - Caches data reads and writes from memory operations
+
+Each cache can be independently configured with different parameters:
+
+* **Size** - Total capacity of the cache in bytes
+* **Block Size** - Size of each cache line in bytes (also called cache block)
+* **Associativity** - Number of ways in the cache set (1 = direct-mapped, >1 = set-associative)
+* **Penalty** - Additional CPU cycles incurred on cache misses
+
+The cache simulator uses a Least Recently Used (LRU) replacement policy for
+set-associative caches. Cache statistics are updated in real-time during
+execution and displayed in the Statistics frame.
+
+Cache performance can significantly impact program execution time, especially
+for programs with poor memory locality. Use the cache simulator to:
+
+* Analyze memory access patterns in your programs
+* Experiment with different cache configurations
+* Understand the performance impact of cache misses
+* Learn about cache behavior in real processors
+
+The cache configuration can be changed through the Settings dialog (Cache tab)
+and takes effect when the simulation is reset.
 
 Dinero Frontend
 ~~~~~~~~~~~~~~~
