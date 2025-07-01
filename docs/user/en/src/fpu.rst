@@ -96,19 +96,19 @@ returned (as described in :ref:`special-values`).
 .. TODO: see how to include it in the resulting in-app help
 .. _fig-exception_cfg:
    .. figure:: ../img/exception_cfg.png
-      :scale: 50%
+      :scale: 100%
 
       Trap configuration for IEEE exceptions
 
 .. _fig-exception_mask_cfg:
    .. figure:: ../img/exception_mask_cfg.png
-      :scale: 50%
+      :scale: 100%
 
       Option that masks all the synchronous exceptions
 
 .. _fig-invalid_operation_trap:
    .. figure:: ../img/invalid_operation_trap.png
-      :scale: 50%
+      :scale: 100%
 
       Trap notification window
 
@@ -138,7 +138,7 @@ controls several functional aspects of the FPU. It is 32 bits long and it is
 represented in the statistics window.
 
 .. figure:: ../img/fcsr_register.png
-   :scale: 50%
+   :scale: 100%
 
    FCSR register in EduMIPS64
 
@@ -325,7 +325,7 @@ Some examples for the FPU instructions are available at
 
 .. _fig-fpu_rounding:
 .. figure:: ../img/fpu_rounding.png
-   :scale: 50%
+   :scale: 100%
 
    FPU Rounding
 

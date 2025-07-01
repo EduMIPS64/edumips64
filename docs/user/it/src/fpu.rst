@@ -108,19 +108,19 @@ speciale la FPU effettui (si veda il Paragrafo :ref:`special-values`.
 
 .. _fig-exception_cfg:
 .. figure:: ../img/exception_cfg.png
-   :scale: 50%
+   :scale: 100%
 
    Configurazione delle trap per le eccezioni IEEE
 
 .. _fig-exception_mask_cfg:
 .. figure:: ../img/exception_mask_cfg.png
-   :scale: 50%
+   :scale: 100%
 
    Opzione che maschera le eccezioni sincrone (disabilita tutte le trap)
 
 .. _fig-invalid_operation_trap:
 .. figure:: ../img/invalid_operation_trap.png
-   :scale: 50%
+   :scale: 100%
 
    Finestra che notifica la trap
 
@@ -151,7 +151,7 @@ ridisegnazione grafica di EduMIPS64, sarà posto nella finestra delle
 statistiche.
 
 .. figure:: ../img/fcsr_register.png
-   :scale: 50%
+   :scale: 100%
 
    Registro FCSR in EduMIPS64
 
@@ -366,7 +366,7 @@ possono essere scaricati dal link
 
 .. _fig-fpu_rounding:
 .. figure:: ../img/fpu_rounding.png
-   :scale: 50%
+   :scale: 100%
 
    Arrotondamento FPU
 

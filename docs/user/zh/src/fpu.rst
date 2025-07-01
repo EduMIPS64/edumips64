@@ -64,19 +64,19 @@ EduMIPS64 允许用户通过 *配置* → *设置* 窗口中的 *FPU 异常* 选
 .. TODO: see how to include it in the resulting in-app help
 .. _fig-exception_cfg:
    .. figure:: ../img/exception_cfg.png
-      :scale: 50%
+      :scale: 100%
 
       Trap configuration for IEEE exceptions
 
 .. _fig-exception_mask_cfg:
    .. figure:: ../img/exception_mask_cfg.png
-      :scale: 50%
+      :scale: 100%
 
       Option that masks all the synchronous exceptions
 
 .. _fig-invalid_operation_trap:
    .. figure:: ../img/invalid_operation_trap.png
-      :scale: 50%
+      :scale: 100%
 
       Trap notification window
 
@@ -228,7 +228,7 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
 .. _fig-fpu_rounding:
 .. figure:: ../img/fpu_rounding.png
-   :scale: 50%
+   :scale: 100%
 
    FPU Rounding
 
