@@ -21,11 +21,14 @@ export default function HelpBrowserDialog(props) {
   const iframeRef = useRef(null);
   const theme = useTheme();
 
+  const isValidLanguage = (lang) => HELP_LANGUAGES.some((language) => language.code === lang);
+
   const handleLanguageChange = (event) => {
-    setSelectedLanguage(event.target.value);
+    const newLanguage = isValidLanguage(event.target.value) ? event.target.value : 'en';
+    setSelectedLanguage(newLanguage);
     // Navigate to index page when language changes
     if (iframeRef.current) {
-      iframeRef.current.src = `help/${event.target.value}/index.html`;
+      iframeRef.current.src = `help/${newLanguage}/index.html`;
     }
   };
 
@@ -201,7 +204,7 @@ export default function HelpBrowserDialog(props) {
     injectThemeStyles();
   }, [theme.palette.mode]);
 
-  const helpUrl = `help/${selectedLanguage}/index.html`;
+  const helpUrl = `help/${isValidLanguage(selectedLanguage) ? selectedLanguage : 'en'}/index.html`;
 
   return (
     <Dialog onClose={props.handleClose} open={props.open} maxWidth="lg" fullWidth>
