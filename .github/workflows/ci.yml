@@ -137,6 +137,8 @@ jobs:
         run: chmod +x gradlew
       - name: Build JS Worker (Java → JS)
         run: ./gradlew war
+      - name: Build HTML documentation for web UI
+        run: ./gradlew htmlDocsEn htmlDocsIt htmlDocsZh
       - name: Set up Node.JS
         uses: actions/setup-node@v4
         with:
@@ -321,6 +323,8 @@ jobs:
         run: chmod +x gradlew
       - name: Build JS Worker (Java → JS)
         run: ./gradlew war
+      - name: Build HTML documentation for web UI
+        run: ./gradlew htmlDocsEn htmlDocsIt htmlDocsZh
       
       # Set up Node.js
       - name: Set up Node.JS
