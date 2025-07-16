@@ -21,7 +21,7 @@
 #### Dev Container
 All requirements are available in the Development Container image described in the `.devcontainer/devcontainer.json` dev container. See https://containers.dev/ for documentation on dev containers.
 
-Github codespaces will use the dev container by default and give you a fully set up dev enviroment, useable for desktop, web and documentation development work.
+Github codespaces will use the dev container by default and give you a fully set up dev environment, useable for desktop, web and documentation development work.
 
 #### List of requirements
 
