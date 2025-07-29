@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -6,9 +6,19 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Link from '@mui/material/Link';
 import { Typography } from '@mui/material';
+import HelpBrowserDialog from './HelpBrowserDialog';
 
 
 export default function HelpDialog(props) {
+  const [helpBrowserOpen, setHelpBrowserOpen] = useState(false);
+
+  const handleOpenHelpBrowser = () => {
+    setHelpBrowserOpen(true);
+  };
+
+  const handleCloseHelpBrowser = () => {
+    setHelpBrowserOpen(false);
+  };
   return (
     <Dialog onClose={props.handleClose} open={props.open}>
       <DialogTitle className='help-title'>
@@ -22,16 +32,25 @@ export default function HelpDialog(props) {
           Help
         </Typography>
         <Typography gutterBottom>
-          For help on how to use EduMIPS64, please go to{' '}
-          <Link href="https://edumips64.readthedocs.io/en/latest/">
-            Read the docs
-          </Link>
-          .
+          <Button 
+            variant="contained" 
+            onClick={handleOpenHelpBrowser}
+            sx={{ mr: 2, mb: 1 }}
+          >
+            Open EduMIPS64 Documentation
+          </Button>
         </Typography>
         <Typography gutterBottom>
-          It contains information on the desktop version, but everything except
-          the UI part is applicable to this simulator (with some exceptions like
-          SYSCALL)
+          The documentation contains information on how to use EduMIPS64, including
+          detailed descriptions of all supported instructions, the user interface, 
+          and file formats.
+        </Typography>
+        <Typography gutterBottom>
+          For additional help, you can also visit{' '}
+          <Link href="https://edumips64.readthedocs.io/en/latest/">
+            the online documentation
+          </Link>
+          {' '}(requires internet connection).
         </Typography>
         <Typography gutterBottom>
           Once you load a program, hover over any instruction to see information
@@ -80,6 +99,10 @@ export default function HelpDialog(props) {
           Close
         </Button>
       </DialogContent>
+      <HelpBrowserDialog 
+        open={helpBrowserOpen}
+        handleClose={handleCloseHelpBrowser}
+      />
     </Dialog>
   );
 }
