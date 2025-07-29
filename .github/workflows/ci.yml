@@ -12,9 +12,72 @@ on:
 
 
 jobs:
-  build-desktop:
-    name: Build desktop application and docs
+  build-docs:
+    name: Build documentation
     runs-on: ubuntu-latest
+    steps:
+      # Set up Java development environment.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - run: git log -1
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'microsoft'
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # Build docs (PDF and HTML for the in-app help)
+      # The Python dependencies are fetched by Gradle.
+      - name: Build all docs
+        run: ./gradlew allDocs
+
+      # Upload artifacts (manuals)
+      - name: Upload English Manual PDF
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: English manual (PDF)
+          path: ./build/docs/en/pdf/EduMIPS64.pdf
+
+      - name: Upload Italian Manual PDF
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: Italian manual (PDF)
+          path: ./build/docs/it/pdf/EduMIPS64.pdf
+            
+      # Disabled due to not working properly
+      #
+      # - name: Upload Simplified Chinese Manual PDF 
+      #   uses: actions/upload-artifact@v3.1.2
+      #   with:
+      #     name: Chinese manual (PDF)
+      #     path: ./build/docs/zh/pdf/EduMIPS64.pdf
+
+      - name: Upload English Manual (HTML)
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: English manual (HTML)
+          path: ./build/docs/en/html
+
+      - name: Upload Italian Manual (HTML)
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: Italian manual (HTML)
+          path: ./build/docs/it/html
+
+      - name: Upload Chinese Manual (HTML)
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: Chinese manual (HTML)
+          path: ./build/docs/zh/html
+          
+  build-desktop:
+    name: Build desktop application JAR
+    runs-on: ubuntu-latest
+    needs: build-docs
     strategy:
       matrix:
         java: [17]    
@@ -51,34 +114,28 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      # Build docs (PDF and HTML for the in-app help)
-      # The Python dependencies are fetched by Gradle.
-      - name: Build all docs
-        run: ./gradlew allDocs
+      # Download HTML docs
+      - name: Download HTML docs (Italian)
+        uses: actions/download-artifact@v4.3.0
+        with:
+          name: Italian manual (HTML)
+          path: build/docs/it/html
+
+      - name: Download HTML docs (English)
+        uses: actions/download-artifact@v4.3.0
+        with:
+          name: English manual (HTML)
+          path: build/docs/en/html
+      
+      - name: Download HTML docs (Chinese)
+        uses: actions/download-artifact@v4.3.0
+        with:
+          name: Chinese manual (HTML)
+          path: build/docs/zh/html
 
       # Build JAR file.
       - name: Build JAR
         run: ./gradlew jar
-
-      # Upload artifacts (manuals and JARs)
-      - name: Upload English Manual PDF
-        uses: actions/upload-artifact@v4.6.2
-        with:
-          name: English manual (PDF)
-          path: ./build/docs/en/pdf/EduMIPS64.pdf
-      - name: Upload Italian Manual PDF
-        uses: actions/upload-artifact@v4.6.2
-        with:
-          name: Italian manual (PDF)
-          path: ./build/docs/it/pdf/EduMIPS64.pdf
-      #
-      # Disabled due to not working properly
-      #
-      # - name: Upload Simplified Chinese Manual PDF 
-      #   uses: actions/upload-artifact@v3.1.2
-      #   with:
-      #     name: Chinese manual (PDF)
-      #     path: ./build/docs/zh/pdf/EduMIPS64.pdf
 
       - name: Upload JAR
         uses: actions/upload-artifact@v4.6.2
@@ -121,6 +178,7 @@ jobs:
   build-web:
     name: Build web application
     runs-on: ubuntu-latest
+    needs: build-docs
     steps:
       # Set up JDK (necessary for the core that is cross-compiled to JS)
       # and Node.JS (for the) web app itself.
@@ -147,6 +205,25 @@ jobs:
       - name: Install JS dependencies
         run: npm install
 
+      # Download HTML docs
+      - name: Download HTML docs (Italian)
+        uses: actions/download-artifact@v4.3.0
+        with:
+          name: Italian manual (HTML)
+          path: build/docs/it/html
+
+      - name: Download HTML docs (English)
+        uses: actions/download-artifact@v4.3.0
+        with:
+          name: English manual (HTML)
+          path: build/docs/en/html
+      
+      - name: Download HTML docs (Chinese)
+        uses: actions/download-artifact@v4.3.0
+        with:
+          name: Chinese manual (HTML)
+          path: build/docs/zh/html
+      
       # Build JS application and upload artifacts for subsequent steps.
       - name: Build JS application
         run: npm run build
@@ -368,4 +445,4 @@ jobs:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.artifact-path }}
 
-    
+
