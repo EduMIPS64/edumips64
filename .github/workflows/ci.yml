@@ -163,7 +163,7 @@ jobs:
     environment:
       # Use staging-dependabot environment for dependabot and renovate PRs to avoid approval requirements
       # Use Staging environment for regular PRs
-      name: ${{ (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'renovate[bot]') && 'staging-dependabot' || 'Staging' }}
+      name: ${{ (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'renovate[bot]' || github.event.pull_request.user.login == 'dependabot' || github.event.pull_request.user.login == 'renovate') && 'staging-dependabot' || 'Staging' }}
       url: https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/
     steps:
       # Download web application built in 'build-web'
