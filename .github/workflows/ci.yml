@@ -161,7 +161,7 @@ jobs:
     needs: build-web
     if: ${{ github.event_name == 'pull_request_target' }}
     environment:
-      name: Staging
+      name: ${{ github.actor == 'dependabot[bot]' && 'staging-dependabot' || 'Staging' }}
       url: https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/
     steps:
       # Download web application built in 'build-web'
