@@ -30,7 +30,8 @@ syscall-testfile.txt
 # Miscellaneous output directories.
 build
 build/*
-docs/*/output
+docs/user/*/output/
+docs/user/*/output/**
 gwt-unitCache/
 war/WEB-INF/
 war/
