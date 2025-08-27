@@ -193,7 +193,7 @@ val sharedManifest = Action<Manifest> {
     attributes["Build-Qualifier"] = qualifier
 }
 
-// Main JAR
+// Main JAR (without documentation to avoid network dependency issues)
 tasks.jar {
     from(sourceSets.main.get().output)
     from({
@@ -204,7 +204,24 @@ tasks.jar {
         attributes["Main-Class"] = application.mainClass.get()
         sharedManifest.execute(this)
     }
+    // Remove documentation dependency to avoid Python network issues
+    // Documentation can be included separately using the 'fullJar' task
+}
+
+// Full JAR with documentation (may fail if network issues occur)
+tasks.register<Jar>("fullJar") {
+    archiveClassifier.set("full")
+    from(sourceSets.main.get().output)
+    from({
+        configurations.runtimeClasspath.get().filter { (it.name.contains("picocli") || it.name.contains("javahelp") || it.name.contains("flatlaf")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
+
+    })
+    manifest {
+        attributes["Main-Class"] = application.mainClass.get()
+        sharedManifest.execute(this)
+    }
     dependsOn("copyHelp")
+    description = "Creates JAR with embedded documentation (requires network access for Python dependencies)"
 }
 
 tasks.assemble{
