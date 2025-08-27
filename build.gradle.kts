@@ -13,7 +13,8 @@ plugins {
     id ("application")
     id ("jacoco")
     id ("com.dorongold.task-tree") version "4.0.1"
-    id ("us.ascendtech.gwt.classic") version "0.11.7"
+    // GWT plugin temporarily disabled - version 0.11.7 not compatible with Gradle 9
+    // id ("us.ascendtech.gwt.classic") version "0.11.7"
     id ("ru.vyarus.use-python") version "4.1.0"
 }
 
@@ -66,7 +67,7 @@ tasks.compileJava {
  * Documentation tasks. To avoid dependency on GNU Make, these tasks duplicate the commands run by the Sphinx makefiles.
  */
 fun buildDocsCmd(language: String, type: String) : String {
-    val baseDir = "${buildDir}/docs/${language}"
+    val baseDir = "${layout.buildDirectory.get()}/docs/${language}"
     return "-m sphinx -N -a -E . ${baseDir}/${type} -b ${type} -d ${baseDir}/doctrees"
 }
 
@@ -101,7 +102,7 @@ tasks.register<PythonTask>("pdfDocsZh") {
 
 
 // Catch-all task for documentation
-tasks.create<GradleBuild>("allDocs") {
+tasks.register<GradleBuild>("allDocs") {
     tasks = listOf("htmlDocsIt","htmlDocsZh", "htmlDocsEn", "pdfDocsEn", "pdfDocsZh", "pdfDocsIt")
     description = "Run all documentation tasks"
 }
@@ -111,8 +112,8 @@ tasks.create<GradleBuild>("allDocs") {
  */
 val docsDir = "build/classes/java/main/docs"
 // Include the docs folder at the root of the jar, for JavaHelp
-tasks.create<Copy>("copyHelpEn") {
-    from("${buildDir}/docs/en") {
+tasks.register<Copy>("copyHelpEn") {
+    from("${layout.buildDirectory.get()}/docs/en") {
         include("html/**")
         exclude("**/_sources/**")
     }
@@ -120,16 +121,16 @@ tasks.create<Copy>("copyHelpEn") {
     dependsOn("htmlDocsEn")
 }
 
-tasks.create<Copy>("copyHelpIt") {
-    from("${buildDir}/docs/it") {
+tasks.register<Copy>("copyHelpIt") {
+    from("${layout.buildDirectory.get()}/docs/it") {
         include("html/**")
         exclude("**/_sources/**")
     }
     into ("${docsDir}/user/it")
     dependsOn("htmlDocsIt")
 }
-tasks.create<Copy>("copyHelpZh") {
-    from("${buildDir}/docs/zh") {
+tasks.register<Copy>("copyHelpZh") {
+    from("${layout.buildDirectory.get()}/docs/zh") {
         include("html/**")
         exclude("**/_sources/**")
     }
@@ -137,7 +138,7 @@ tasks.create<Copy>("copyHelpZh") {
     dependsOn("htmlDocsZh")
 }
 
-tasks.create<Copy>("copyHelp") {
+tasks.register<Copy>("copyHelp") {
     from("docs/") {
         exclude("**/src/**", "**/design/**", "**/*.py",  "**/*.pyc", 
             "**/*.md", "**/.buildinfo", "**/objects.inv", "**/*.txt", "**/__pycache__/**")
@@ -181,7 +182,7 @@ fun getSourceControlMetadata() : Triple<String, String, String> {
     return Triple(branch, commitHash, qualifier)
 }
 
-val sharedManifest = the<JavaPluginConvention>().manifest {
+val sharedManifest = Action<Manifest> {
     attributes["Signature-Version"] = version
     attributes["Codename"] = codename
     attributes["Build-Date"] = LocalDateTime.now()
@@ -201,7 +202,7 @@ tasks.jar {
     })
     manifest {
         attributes["Main-Class"] = application.mainClass.get()
-        from(sharedManifest)
+        sharedManifest.execute(this)
     }
     dependsOn("copyHelp")
 }
@@ -211,7 +212,7 @@ tasks.assemble{
 }
 
 // NoHelp JAR
-tasks.create<Jar>("noHelpJar"){
+tasks.register<Jar>("noHelpJar"){
     archiveClassifier.set("nohelp")
     dependsOn(configurations.runtimeClasspath)
     from(sourceSets.main.get().output)
@@ -220,7 +221,7 @@ tasks.create<Jar>("noHelpJar"){
     })
     manifest {
         attributes["Main-Class"] = application.mainClass.get()
-        from(sharedManifest)
+        sharedManifest.execute(this)
     }
 }
 
@@ -266,7 +267,7 @@ tasks.register("release") {
     }
 }
 
-tasks.create<Exec>("msi"){
+tasks.register<Exec>("msi"){
     group = "Distribution"
     description = "Creates an installable MSI file"
     workingDir = File("${projectDir}")
@@ -296,9 +297,13 @@ tasks.create<Exec>("msi"){
 }
 
 /*
- * GWT tasks
+ * GWT tasks - temporarily disabled due to plugin incompatibility with Gradle 9
+ * The us.ascendtech.gwt.classic plugin version 0.11.7 is not compatible with Gradle 9
+ * TODO: Update to a compatible GWT plugin version when available
  */
+/*
 gwt {
     modules.add("org.edumips64.webclient")
     sourceLevel = "1.11"
 }
+*/
