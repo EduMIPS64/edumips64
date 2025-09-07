@@ -1,6 +1,6 @@
 {
   "name": "edumips64-devcontainer",
-  "image": "mcr.microsoft.com/devcontainers/universal:3",
+  "image": "mcr.microsoft.com/devcontainers/universal:4",
   "features": {
     "ghcr.io/devcontainers/features/java:1": {
       "version": "17"
