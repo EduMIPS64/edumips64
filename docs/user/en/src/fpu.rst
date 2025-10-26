@@ -94,19 +94,19 @@ returned (as described in :ref:`special-values`).
 .. :ref:`fig-invalid_operation_trap`).
 
 .. TODO: see how to include it in the resulting in-app help
-.. .. _fig-exception_cfg:
+.. _fig-exception_cfg:
    .. figure:: ../../../img/exception_cfg.png
       :scale: 50%
 
       Trap configuration for IEEE exceptions
 
-   .. _fig-exception_mask_cfg:
+.. _fig-exception_mask_cfg:
    .. figure:: ../../../img/exception_mask_cfg.png
       :scale: 50%
 
       Option that masks all the synchronous exceptions
 
-   .. _fig-invalid_operation_trap:
+.. _fig-invalid_operation_trap:
    .. figure:: ../../../img/invalid_operation_trap.png
       :scale: 50%
 
@@ -137,10 +137,10 @@ The FCSR (Floating point Control Status Register) is the register that
 controls several functional aspects of the FPU. It is 32 bits long and it is
 represented in the statistics window.
 
-.. .. figure:: ../../../img/fcsr_register.png
-..    :scale: 50%
-..
-..    FCSR register in EduMIPS64
+.. figure:: ../../../img/fcsr_register.png
+   :scale: 50%
+
+   FCSR register in EduMIPS64
 
 The **FCC** field is 8 bits wide, from 0 to 7. The conditional instructions
 (``C.EQ.D,C.LT.D``) use it to save the boolean result of comparisons between
@@ -323,11 +323,11 @@ Some examples for the FPU instructions are available at
   -1]
 
 
-.. .. _fig-fpu_rounding:
-.. .. figure:: ../../../img/fpu_rounding.png
-..    :scale: 50%
-..
-..    FPU Rounding
+.. _fig-fpu_rounding:
+.. figure:: ../../../img/fpu_rounding.png
+   :scale: 50%
+
+   FPU Rounding
 
 .. table:: Rounding examples
 

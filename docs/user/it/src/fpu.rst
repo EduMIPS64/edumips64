@@ -105,24 +105,24 @@ speciale la FPU effettui (si veda il Paragrafo :ref:`special-values`.
 .. sincrone nel simulatore (Figura :ref:`fig-exception_mask_cfg`),
 .. verrà simulata una trap relativa alla condizione di eccezione IEEE che si è
 .. verificata (Figura :ref:`fig-invalid_operation_trap`).
-..
-.. .. _fig-exception_cfg:
-.. .. figure:: ../../../img/exception_cfg.png
-..    :scale: 50%
-..
-..    Configurazione delle trap per le eccezioni IEEE
-..
-.. .. _fig-exception_mask_cfg:
-.. .. figure:: ../../../img/exception_mask_cfg.png
-..    :scale: 50%
-..
-..    Opzione che maschera le eccezioni sincrone (disabilita tutte le trap)
-..
-.. .. _fig-invalid_operation_trap:
-.. .. figure:: ../../../img/invalid_operation_trap.png
-..    :scale: 50%
-..
-..    Finestra che notifica la trap
+
+.. _fig-exception_cfg:
+.. figure:: ../../../img/exception_cfg.png
+   :scale: 50%
+
+   Configurazione delle trap per le eccezioni IEEE
+
+.. _fig-exception_mask_cfg:
+.. figure:: ../../../img/exception_mask_cfg.png
+   :scale: 50%
+
+   Opzione che maschera le eccezioni sincrone (disabilita tutte le trap)
+
+.. _fig-invalid_operation_trap:
+.. figure:: ../../../img/invalid_operation_trap.png
+   :scale: 50%
+
+   Finestra che notifica la trap
 
 .. _double-directive:
 
@@ -150,10 +150,10 @@ diversi aspetti funzionali della FPU. Esso è lungo 32 bit e, fino alla
 ridisegnazione grafica di EduMIPS64, sarà posto nella finestra delle
 statistiche.
 
-.. .. figure:: ../../../img/fcsr_register.png
-..    :scale: 50%
-..
-..    Registro FCSR in EduMIPS64
+.. figure:: ../../../img/fcsr_register.png
+   :scale: 50%
+
+   Registro FCSR in EduMIPS64
 
 Il campo **FCC** è costituito da 8 bit, identificati con numeri da 0 a 7. Le
 istruzioni condizionali (``C.EQ.D,C.LT.D``) lo utilizzano per memorizzare il
@@ -364,11 +364,11 @@ possono essere scaricati dal link
   il risultato è fuori dall'intervallo dei long [-2 :sup:`63`, 2 :sup:`63` -1]
 
 
-.. .. _fig-fpu_rounding:
-.. .. figure:: ../../../img/fpu_rounding.png
-..    :scale: 50%
-..
-..    Arrotondamento FPU
+.. _fig-fpu_rounding:
+.. figure:: ../../../img/fpu_rounding.png
+   :scale: 50%
+
+   Arrotondamento FPU
 
 .. table:: Esempi sui tipi di arrotondamento
 
