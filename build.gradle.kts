@@ -228,7 +228,7 @@ tasks.create<Jar>("noHelpJar"){
  * Code coverage report tasks
  */
 jacoco {
-    toolVersion = "0.8.13"
+    toolVersion = "0.8.14"
 }
 tasks.jacocoTestReport {
     reports {
