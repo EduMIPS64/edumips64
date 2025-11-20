@@ -138,7 +138,7 @@ jobs:
       - name: Build JS Worker (Java → JS)
         run: ./gradlew war
       - name: Set up Node.JS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
           
@@ -239,7 +239,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - run: git log -1
       - name: Set up Node.JS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
       - name: Install JS dependencies
@@ -326,7 +326,7 @@ jobs:
       
       # Set up Node.js
       - name: Set up Node.JS
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
           
