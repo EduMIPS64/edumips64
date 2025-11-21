@@ -24,7 +24,7 @@ repositories {
 dependencies {
     compileOnly("org.gwtproject:gwt-user:2.12.2")
     compileOnly("org.gwtproject:gwt-dev:2.12.2")
-    compileOnly("com.google.elemental2:elemental2-dom:1.2.3")
+    compileOnly("com.google.elemental2:elemental2-dom:1.3.2")
     compileOnly("com.vertispan.rpc:workers:1.0-alpha-8")
     
     implementation("com.formdev:flatlaf:3.6.2")
