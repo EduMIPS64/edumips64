@@ -76,6 +76,8 @@ val docsDir = "build/resources/main/docs"
 // Generate documentation tasks for all languages
 val languages = listOf("en", "it", "zh")
 val docTypes = listOf("html", "pdf")
+val allDocsTaskNames = mutableListOf<String>()
+val copyHelpTaskNames = mutableListOf<String>()
 
 for (language in languages) {
     for (type in docTypes) {
@@ -84,6 +86,7 @@ for (language in languages) {
             workDir = "${projectDir}/docs/user/${language}/src"
             command = buildDocsCmd(language, type)
         }
+        allDocsTaskNames.add(taskName)
     }
     
     // Generate copy tasks for each language
@@ -97,11 +100,12 @@ for (language in languages) {
         dependsOn("htmlDocs${language.capitalize()}")
         mustRunAfter("compileJava")
     }
+    copyHelpTaskNames.add(copyTaskName)
 }
 
 // Catch-all task for documentation
 tasks.register<GradleBuild>("allDocs") {
-    tasks = listOf("htmlDocsIt","htmlDocsZh", "htmlDocsEn", "pdfDocsEn", "pdfDocsZh", "pdfDocsIt")
+    tasks = allDocsTaskNames
     description = "Run all documentation tasks"
 }
 
@@ -113,9 +117,7 @@ tasks.register<Copy>("copyHelp") {
             "**/*.md", "**/.buildinfo", "**/objects.inv", "**/*.txt", "**/__pycache__/**")
     }
     into ("${docsDir}")
-    dependsOn("copyHelpEn")
-    dependsOn("copyHelpIt")
-    dependsOn("copyHelpZh")
+    copyHelpTaskNames.forEach { dependsOn(it) }
 }
 
 /*
