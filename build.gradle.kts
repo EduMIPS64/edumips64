@@ -203,8 +203,7 @@ tasks.jar {
         attributes["Main-Class"] = application.mainClass.get()
         sharedManifest.execute(this)
     }
-    // Removed documentation dependency to avoid network/build issues
-    // Use fullJar task if you need documentation embedded
+    dependsOn("copyHelp")
 }
 
 tasks.assemble{
@@ -223,21 +222,6 @@ tasks.register<Jar>("noHelpJar"){
         attributes["Main-Class"] = application.mainClass.get()
         sharedManifest.execute(this)
     }
-}
-
-// Full JAR with embedded documentation
-tasks.register<Jar>("fullJar"){
-    archiveClassifier.set("full")
-    dependsOn(configurations.runtimeClasspath)
-    from(sourceSets.main.get().output)
-    from({
-        configurations.runtimeClasspath.get().filter { (it.name.contains("picocli") || it.name.contains("javahelp") || it.name.contains("flatlaf")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
-    })
-    manifest {
-        attributes["Main-Class"] = application.mainClass.get()
-        sharedManifest.execute(this)
-    }
-    dependsOn("copyHelp")
 }
 
 /*
@@ -312,11 +296,19 @@ tasks.register<Exec>("msi"){
 }
 
 /*
- * GWT tasks - temporarily disabled due to plugin incompatibility with Gradle 9
- * The us.ascendtech.gwt.classic plugin version 0.11.7 is not compatible with Gradle 9
- * TODO: Update to a compatible GWT plugin version when available
+ * GWT tasks
  */
 gwt {
     modules.add("org.edumips64.webclient")
     sourceLevel = "1.11"
+}
+
+// Ensure proper task ordering for Gradle 9's stricter dependency checking
+// Documentation tasks write to build/classes/java/main, so other tasks that read from it need proper ordering
+tasks.named("war") {
+    mustRunAfter("copyHelp", "copyHelpEn", "copyHelpIt", "copyHelpZh")
+}
+
+tasks.named("compileTestJava") {
+    mustRunAfter("copyHelp", "copyHelpEn", "copyHelpIt", "copyHelpZh")
 }
