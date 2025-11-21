@@ -106,7 +106,7 @@ tasks.register<GradleBuild>("allDocs") {
 /*
  * Jar tasks
  */
-val docsDir = "build/classes/java/main/docs"
+val docsDir = "build/resources/main/docs"
 // Include the docs folder at the root of the jar, for JavaHelp
 tasks.register<Copy>("copyHelpEn") {
     from("${layout.buildDirectory.get()}/docs/en") {
@@ -115,6 +115,7 @@ tasks.register<Copy>("copyHelpEn") {
     }
     into ("${docsDir}/user/en")
     dependsOn("htmlDocsEn")
+    mustRunAfter("compileJava")
 }
 
 tasks.register<Copy>("copyHelpIt") {
@@ -124,6 +125,7 @@ tasks.register<Copy>("copyHelpIt") {
     }
     into ("${docsDir}/user/it")
     dependsOn("htmlDocsIt")
+    mustRunAfter("compileJava")
 }
 tasks.register<Copy>("copyHelpZh") {
     from("${layout.buildDirectory.get()}/docs/zh") {
@@ -132,6 +134,7 @@ tasks.register<Copy>("copyHelpZh") {
     }
     into ("${docsDir}/user/zh")
     dependsOn("htmlDocsZh")
+    mustRunAfter("compileJava")
 }
 
 tasks.register<Copy>("copyHelp") {
@@ -192,6 +195,9 @@ val sharedManifest = Action<Manifest> {
 // Main JAR
 tasks.jar {
     from(sourceSets.main.get().output)
+    from(docsDir) {
+        into("docs")
+    }
     from({
         configurations.runtimeClasspath.get().filter { (it.name.contains("picocli") || it.name.contains("javahelp") || it.name.contains("flatlaf")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
 
