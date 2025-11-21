@@ -13,8 +13,7 @@ plugins {
     id ("application")
     id ("jacoco")
     id ("com.dorongold.task-tree") version "4.0.1"
-    // GWT plugin temporarily disabled - version 0.11.7 not compatible with Gradle 9
-    // id ("us.ascendtech.gwt.classic") version "0.11.7"
+    id ("us.ascendtech.gwt.classic") version "0.12.2"
     id ("ru.vyarus.use-python") version "4.1.0"
 }
 
@@ -25,14 +24,14 @@ repositories {
 dependencies {
     compileOnly("org.gwtproject:gwt-user:2.12.2")
     compileOnly("org.gwtproject:gwt-dev:2.12.2")
-    compileOnly("com.google.elemental2:elemental2-dom:1.2.3")
+    compileOnly("com.google.elemental2:elemental2-dom:1.3.2")
     compileOnly("com.vertispan.rpc:workers:1.0-alpha-8")
     
-    implementation("com.formdev:flatlaf:3.6.1")
+    implementation("com.formdev:flatlaf:3.6.2")
     implementation("javax.help:javahelp:2.0.05")
     implementation("info.picocli:picocli:4.7.7")
 
-    testImplementation(platform("org.junit:junit-bom:5.13.4"))
+    testImplementation(platform("org.junit:junit-bom:6.0.1"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
 
     // To run JUnit 4 tests.
@@ -245,7 +244,7 @@ tasks.register<Jar>("fullJar"){
  * Code coverage report tasks
  */
 jacoco {
-    toolVersion = "0.8.13"
+    toolVersion = "0.8.14"
 }
 tasks.jacocoTestReport {
     reports {
@@ -317,9 +316,7 @@ tasks.register<Exec>("msi"){
  * The us.ascendtech.gwt.classic plugin version 0.11.7 is not compatible with Gradle 9
  * TODO: Update to a compatible GWT plugin version when available
  */
-/*
 gwt {
     modules.add("org.edumips64.webclient")
     sourceLevel = "1.11"
 }
-*/
