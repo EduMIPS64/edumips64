@@ -13,7 +13,7 @@ plugins {
     id ("application")
     id ("jacoco")
     id ("com.dorongold.task-tree") version "4.0.1"
-    id ("us.ascendtech.gwt.classic") version "0.11.7"
+    id ("us.ascendtech.gwt.classic") version "0.12.2"
     id ("ru.vyarus.use-python") version "4.1.0"
 }
 
