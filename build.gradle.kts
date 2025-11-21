@@ -68,6 +68,11 @@ fun buildDocsCmd(language: String, type: String) : String {
     return "-m sphinx -N -a -E . ${baseDir}/${type} -b ${type} -d ${baseDir}/doctrees"
 }
 
+/*
+ * Jar tasks
+ */
+val docsDir = "build/resources/main/docs"
+
 // Generate documentation tasks for all languages
 val languages = listOf("en", "it", "zh")
 val docTypes = listOf("html", "pdf")
@@ -80,6 +85,18 @@ for (language in languages) {
             command = buildDocsCmd(language, type)
         }
     }
+    
+    // Generate copy tasks for each language
+    val copyTaskName = "copyHelp${language.capitalize()}"
+    tasks.register<Copy>(copyTaskName) {
+        from("${layout.buildDirectory.get()}/docs/${language}") {
+            include("html/**")
+            exclude("**/_sources/**")
+        }
+        into ("${docsDir}/user/${language}")
+        dependsOn("htmlDocs${language.capitalize()}")
+        mustRunAfter("compileJava")
+    }
 }
 
 // Catch-all task for documentation
@@ -88,39 +105,7 @@ tasks.register<GradleBuild>("allDocs") {
     description = "Run all documentation tasks"
 }
 
-/*
- * Jar tasks
- */
-val docsDir = "build/resources/main/docs"
 // Include the docs folder at the root of the jar, for JavaHelp
-tasks.register<Copy>("copyHelpEn") {
-    from("${layout.buildDirectory.get()}/docs/en") {
-        include("html/**")
-        exclude("**/_sources/**")
-    }
-    into ("${docsDir}/user/en")
-    dependsOn("htmlDocsEn")
-    mustRunAfter("compileJava")
-}
-
-tasks.register<Copy>("copyHelpIt") {
-    from("${layout.buildDirectory.get()}/docs/it") {
-        include("html/**")
-        exclude("**/_sources/**")
-    }
-    into ("${docsDir}/user/it")
-    dependsOn("htmlDocsIt")
-    mustRunAfter("compileJava")
-}
-tasks.register<Copy>("copyHelpZh") {
-    from("${layout.buildDirectory.get()}/docs/zh") {
-        include("html/**")
-        exclude("**/_sources/**")
-    }
-    into ("${docsDir}/user/zh")
-    dependsOn("htmlDocsZh")
-    mustRunAfter("compileJava")
-}
 
 tasks.register<Copy>("copyHelp") {
     from("docs/") {
