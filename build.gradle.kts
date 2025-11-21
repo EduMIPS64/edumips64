@@ -2,6 +2,7 @@
  * EduMIPS64 Gradle build configuration
  */
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 import ru.vyarus.gradle.plugin.python.task.PythonTask
 import ru.vyarus.gradle.plugin.python.PythonExtension.Scope.VIRTUALENV
 
@@ -32,7 +33,7 @@ dependencies {
     implementation("info.picocli:picocli:4.7.7")
 
     testImplementation(platform("org.junit:junit-bom:6.0.1"))
-	testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.jupiter:junit-jupiter")
 
     // To run JUnit 4 tests.
     testImplementation("junit:junit:4.13.2")    
@@ -52,9 +53,6 @@ application {
 val codename: String by project
 val version: String by project
 
-
-
-
 // Specify Java source/target version and source encoding.
 tasks.compileJava {
     sourceCompatibility = "17"
@@ -66,86 +64,60 @@ tasks.compileJava {
  * Documentation tasks. To avoid dependency on GNU Make, these tasks duplicate the commands run by the Sphinx makefiles.
  */
 fun buildDocsCmd(language: String, type: String) : String {
-    val baseDir = "${buildDir}/docs/${language}"
+    val baseDir = "${layout.buildDirectory.get()}/docs/${language}"
     return "-m sphinx -N -a -E . ${baseDir}/${type} -b ${type} -d ${baseDir}/doctrees"
-}
-
-tasks.register<PythonTask>("htmlDocsEn") {
-    workDir = "${projectDir}/docs/user/en/src"
-    command = buildDocsCmd("en", "html")
-}
-
-tasks.register<PythonTask>("htmlDocsIt") {
-    workDir = "${projectDir}/docs/user/it/src"
-    command = buildDocsCmd("it", "html")
-}
-tasks.register<PythonTask>("htmlDocsZh") {
-    workDir = "${projectDir}/docs/user/zh/src"
-    command = buildDocsCmd("zh", "html")
-}
-
-tasks.register<PythonTask>("pdfDocsEn") {
-    workDir = "${projectDir}/docs/user/en/src"
-    command = buildDocsCmd("en", "pdf")
-}
-
-tasks.register<PythonTask>("pdfDocsIt") {
-    workDir = "${projectDir}/docs/user/it/src"
-    command = buildDocsCmd("it", "pdf")
-}
-
-tasks.register<PythonTask>("pdfDocsZh") {
-    workDir = "${projectDir}/docs/user/zh/src"
-    command = buildDocsCmd("zh", "pdf")
-}
-
-
-// Catch-all task for documentation
-tasks.create<GradleBuild>("allDocs") {
-    tasks = listOf("htmlDocsIt","htmlDocsZh", "htmlDocsEn", "pdfDocsEn", "pdfDocsZh", "pdfDocsIt")
-    description = "Run all documentation tasks"
 }
 
 /*
  * Jar tasks
  */
-val docsDir = "build/classes/java/main/docs"
+val docsDir = "build/resources/main/docs"
+
+// Generate documentation tasks for all languages
+val languages = listOf("en", "it", "zh")
+val docTypes = listOf("html", "pdf")
+val allDocsTaskNames = mutableListOf<String>()
+val copyHelpTaskNames = mutableListOf<String>()
+
+for (language in languages) {
+    for (type in docTypes) {
+        val taskName = "${type}Docs${language.capitalize()}"
+        tasks.register<PythonTask>(taskName) {
+            workDir = "${projectDir}/docs/user/${language}/src"
+            command = buildDocsCmd(language, type)
+        }
+        allDocsTaskNames.add(taskName)
+    }
+    
+    // Generate copy tasks for each language
+    val copyTaskName = "copyHelp${language.capitalize()}"
+    tasks.register<Copy>(copyTaskName) {
+        from("${layout.buildDirectory.get()}/docs/${language}") {
+            include("html/**")
+            exclude("**/_sources/**")
+        }
+        into ("${docsDir}/user/${language}")
+        dependsOn("htmlDocs${language.capitalize()}")
+        mustRunAfter("compileJava")
+    }
+    copyHelpTaskNames.add(copyTaskName)
+}
+
+// Catch-all task for documentation
+tasks.register<GradleBuild>("allDocs") {
+    tasks = allDocsTaskNames
+    description = "Run all documentation tasks"
+}
+
 // Include the docs folder at the root of the jar, for JavaHelp
-tasks.create<Copy>("copyHelpEn") {
-    from("${buildDir}/docs/en") {
-        include("html/**")
-        exclude("**/_sources/**")
-    }
-    into ("${docsDir}/user/en")
-    dependsOn("htmlDocsEn")
-}
 
-tasks.create<Copy>("copyHelpIt") {
-    from("${buildDir}/docs/it") {
-        include("html/**")
-        exclude("**/_sources/**")
-    }
-    into ("${docsDir}/user/it")
-    dependsOn("htmlDocsIt")
-}
-tasks.create<Copy>("copyHelpZh") {
-    from("${buildDir}/docs/zh") {
-        include("html/**")
-        exclude("**/_sources/**")
-    }
-    into ("${docsDir}/user/zh")
-    dependsOn("htmlDocsZh")
-}
-
-tasks.create<Copy>("copyHelp") {
+tasks.register<Copy>("copyHelp") {
     from("docs/") {
         exclude("**/src/**", "**/design/**", "**/*.py",  "**/*.pyc", 
             "**/*.md", "**/.buildinfo", "**/objects.inv", "**/*.txt", "**/__pycache__/**")
     }
     into ("${docsDir}")
-    dependsOn("copyHelpEn")
-    dependsOn("copyHelpIt")
-    dependsOn("copyHelpZh")
+    copyHelpTaskNames.forEach { dependsOn(it) }
 }
 
 /*
@@ -181,7 +153,7 @@ fun getSourceControlMetadata() : Triple<String, String, String> {
     return Triple(branch, commitHash, qualifier)
 }
 
-val sharedManifest = the<JavaPluginConvention>().manifest {
+val sharedManifest = Action<Manifest> {
     attributes["Signature-Version"] = version
     attributes["Codename"] = codename
     attributes["Build-Date"] = LocalDateTime.now()
@@ -195,13 +167,16 @@ val sharedManifest = the<JavaPluginConvention>().manifest {
 // Main JAR
 tasks.jar {
     from(sourceSets.main.get().output)
+    from(docsDir) {
+        into("docs")
+    }
     from({
         configurations.runtimeClasspath.get().filter { (it.name.contains("picocli") || it.name.contains("javahelp") || it.name.contains("flatlaf")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
 
     })
     manifest {
         attributes["Main-Class"] = application.mainClass.get()
-        from(sharedManifest)
+        sharedManifest.execute(this)
     }
     dependsOn("copyHelp")
 }
@@ -211,7 +186,7 @@ tasks.assemble{
 }
 
 // NoHelp JAR
-tasks.create<Jar>("noHelpJar"){
+tasks.register<Jar>("noHelpJar"){
     archiveClassifier.set("nohelp")
     dependsOn(configurations.runtimeClasspath)
     from(sourceSets.main.get().output)
@@ -220,7 +195,7 @@ tasks.create<Jar>("noHelpJar"){
     })
     manifest {
         attributes["Main-Class"] = application.mainClass.get()
-        from(sharedManifest)
+        sharedManifest.execute(this)
     }
 }
 
@@ -266,7 +241,7 @@ tasks.register("release") {
     }
 }
 
-tasks.create<Exec>("msi"){
+tasks.register<Exec>("msi"){
     group = "Distribution"
     description = "Creates an installable MSI file"
     workingDir = File("${projectDir}")
