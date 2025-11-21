@@ -68,33 +68,18 @@ fun buildDocsCmd(language: String, type: String) : String {
     return "-m sphinx -N -a -E . ${baseDir}/${type} -b ${type} -d ${baseDir}/doctrees"
 }
 
-tasks.register<PythonTask>("htmlDocsEn") {
-    workDir = "${projectDir}/docs/user/en/src"
-    command = buildDocsCmd("en", "html")
-}
+// Generate documentation tasks for all languages
+val languages = listOf("en", "it", "zh")
+val docTypes = listOf("html", "pdf")
 
-tasks.register<PythonTask>("htmlDocsIt") {
-    workDir = "${projectDir}/docs/user/it/src"
-    command = buildDocsCmd("it", "html")
-}
-tasks.register<PythonTask>("htmlDocsZh") {
-    workDir = "${projectDir}/docs/user/zh/src"
-    command = buildDocsCmd("zh", "html")
-}
-
-tasks.register<PythonTask>("pdfDocsEn") {
-    workDir = "${projectDir}/docs/user/en/src"
-    command = buildDocsCmd("en", "pdf")
-}
-
-tasks.register<PythonTask>("pdfDocsIt") {
-    workDir = "${projectDir}/docs/user/it/src"
-    command = buildDocsCmd("it", "pdf")
-}
-
-tasks.register<PythonTask>("pdfDocsZh") {
-    workDir = "${projectDir}/docs/user/zh/src"
-    command = buildDocsCmd("zh", "pdf")
+for (language in languages) {
+    for (type in docTypes) {
+        val taskName = "${type}Docs${language.capitalize()}"
+        tasks.register<PythonTask>(taskName) {
+            workDir = "${projectDir}/docs/user/${language}/src"
+            command = buildDocsCmd(language, type)
+        }
+    }
 }
 
 // Catch-all task for documentation
