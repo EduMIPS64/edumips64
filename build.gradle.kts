@@ -193,7 +193,7 @@ val sharedManifest = Action<Manifest> {
     attributes["Build-Qualifier"] = qualifier
 }
 
-// Main JAR (without documentation to avoid network dependency issues)
+// Main JAR
 tasks.jar {
     from(sourceSets.main.get().output)
     from({
@@ -204,24 +204,8 @@ tasks.jar {
         attributes["Main-Class"] = application.mainClass.get()
         sharedManifest.execute(this)
     }
-    // Remove documentation dependency to avoid Python network issues
-    // Documentation can be included separately using the 'fullJar' task
-}
-
-// Full JAR with documentation (may fail if network issues occur)
-tasks.register<Jar>("fullJar") {
-    archiveClassifier.set("full")
-    from(sourceSets.main.get().output)
-    from({
-        configurations.runtimeClasspath.get().filter { (it.name.contains("picocli") || it.name.contains("javahelp") || it.name.contains("flatlaf")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
-
-    })
-    manifest {
-        attributes["Main-Class"] = application.mainClass.get()
-        sharedManifest.execute(this)
-    }
-    dependsOn("copyHelp")
-    description = "Creates JAR with embedded documentation (requires network access for Python dependencies)"
+    // Removed documentation dependency to avoid network/build issues
+    // Use fullJar task if you need documentation embedded
 }
 
 tasks.assemble{
@@ -240,6 +224,21 @@ tasks.register<Jar>("noHelpJar"){
         attributes["Main-Class"] = application.mainClass.get()
         sharedManifest.execute(this)
     }
+}
+
+// Full JAR with embedded documentation
+tasks.register<Jar>("fullJar"){
+    archiveClassifier.set("full")
+    dependsOn(configurations.runtimeClasspath)
+    from(sourceSets.main.get().output)
+    from({
+        configurations.runtimeClasspath.get().filter { (it.name.contains("picocli") || it.name.contains("javahelp") || it.name.contains("flatlaf")) && it.name.endsWith("jar") }.map {  println("Adding dependency " + it.name); zipTree(it) }
+    })
+    manifest {
+        attributes["Main-Class"] = application.mainClass.get()
+        sharedManifest.execute(this)
+    }
+    dependsOn("copyHelp")
 }
 
 /*
