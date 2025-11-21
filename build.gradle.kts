@@ -33,7 +33,7 @@ dependencies {
     implementation("info.picocli:picocli:4.7.7")
 
     testImplementation(platform("org.junit:junit-bom:6.0.1"))
-	testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.jupiter:junit-jupiter")
 
     // To run JUnit 4 tests.
     testImplementation("junit:junit:4.13.2")    
@@ -52,9 +52,6 @@ application {
 }
 val codename: String by project
 val version: String by project
-
-
-
 
 // Specify Java source/target version and source encoding.
 tasks.compileJava {
@@ -99,7 +96,6 @@ tasks.register<PythonTask>("pdfDocsZh") {
     workDir = "${projectDir}/docs/user/zh/src"
     command = buildDocsCmd("zh", "pdf")
 }
-
 
 // Catch-all task for documentation
 tasks.register<GradleBuild>("allDocs") {
@@ -302,14 +298,4 @@ tasks.register<Exec>("msi"){
 gwt {
     modules.add("org.edumips64.webclient")
     sourceLevel = "1.11"
-}
-
-// Ensure proper task ordering for Gradle 9's stricter dependency checking
-// Documentation tasks write to build/classes/java/main, so other tasks that read from it need proper ordering
-tasks.named("war") {
-    mustRunAfter("copyHelp", "copyHelpEn", "copyHelpIt", "copyHelpZh")
-}
-
-tasks.named("compileTestJava") {
-    mustRunAfter("copyHelp", "copyHelpEn", "copyHelpIt", "copyHelpZh")
 }
