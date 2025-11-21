@@ -2,6 +2,7 @@
  * EduMIPS64 Gradle build configuration
  */
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 import ru.vyarus.gradle.plugin.python.task.PythonTask
 import ru.vyarus.gradle.plugin.python.PythonExtension.Scope.VIRTUALENV
 
