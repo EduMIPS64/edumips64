@@ -20,7 +20,7 @@ jobs:
         java: [17]    
     steps:
       # Set up Java development environment.
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - run: git log -1
@@ -91,12 +91,12 @@ jobs:
     runs-on: windows-latest
     needs: build-desktop
     steps:
-        - uses: actions/checkout@v5
+        - uses: actions/checkout@v6
           with:
             ref: ${{ github.event.pull_request.head.sha }}
         - run: git log -1
         - name: Install Wix
-          uses: actions/checkout@v5
+          uses: actions/checkout@v6
           with:
             repository: fbarresi/wix
             path: wix
@@ -124,7 +124,7 @@ jobs:
     steps:
       # Set up JDK (necessary for the core that is cross-compiled to JS)
       # and Node.JS (for the) web app itself.
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - run: git log -1
@@ -234,7 +234,7 @@ jobs:
     needs: deploy-staging
     if: ${{ github.event_name == 'pull_request_target' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - run: git log -1
@@ -260,7 +260,7 @@ jobs:
     name: Build Snapcraft package
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - run: git log -1
@@ -309,7 +309,7 @@ jobs:
             artifact-name: Electron Windows x64
             artifact-path: electron/dist/WebEduMips64-win32-x64
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - run: git log -1
