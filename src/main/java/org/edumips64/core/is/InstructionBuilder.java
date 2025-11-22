@@ -64,6 +64,7 @@ public class InstructionBuilder {
       entry("MOVZ", MOVZ::new),
       entry("DDIV", DDIV::new),
       entry("DDIVU", DDIVU::new),
+      entry("DMUL", DMUL::new),
       entry("DMUHU", DMUHU::new),
       entry("DMULT", DMULT::new),
       entry("DMULU", DMULU::new),
