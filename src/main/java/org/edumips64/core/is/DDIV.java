@@ -28,7 +28,6 @@ package org.edumips64.core.is;
 import org.edumips64.core.Converter;
 import org.edumips64.core.IrregularStringOfBitsException;
 import org.edumips64.core.IrregularWriteOperationException;
-import org.edumips64.core.fpu.FPInvalidOperationException;
 
 /**
  * <pre>
@@ -48,16 +47,14 @@ import org.edumips64.core.fpu.FPInvalidOperationException;
  * @author Trubia Massimo, Russo Daniele
  */
 class DDIV extends ALU_RType {
-  // Three-operand form uses SPECIAL encoding with function code
+  // DDIV uses SPECIAL (000000) opcode with sa field and function field.
+  // sa = 00010 (2), function = 011110 (30)
+  // The complete encoding is: SPECIAL | rs | rt | rd | sa | function
   private final String OPCODE_VALUE = "00010" + "011110";
 
   DDIV() {
     super.OPCODE_VALUE = OPCODE_VALUE;
     name = "DDIV";
-  }
-  public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
-    // Use standard ALU_RType ID logic for 3-operand form
-    return super.ID();
   }
   
   public void EX() throws IrregularStringOfBitsException, IntegerOverflowException, TwosComplementSumException, DivisionByZeroException {

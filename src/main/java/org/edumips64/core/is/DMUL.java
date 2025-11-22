@@ -44,9 +44,10 @@ import org.edumips64.core.IrregularStringOfBitsException;
  * </pre>
  */
 class DMUL extends ALU_RType {
-    // DMUL encoding: SPECIAL (000000) + rs + rt + rd + sa(00010) + function(011100)
-    // Following the same pattern as DMULU, we combine sa and function fields.
+    // DMUL uses SPECIAL (000000) opcode with sa field and function field.
     // sa = 00010 (2), function = 011100 (28)
+    // The complete encoding is: SPECIAL | rs | rt | rd | sa | function
+    // Following the same pattern as DMULU, we combine sa and function fields.
     private final String OPCODE_VALUE = "00010" + "011100";
 
     DMUL() {
