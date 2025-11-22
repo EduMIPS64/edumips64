@@ -64,10 +64,11 @@ Here's the list of R-Type ALU Instructions.
 
 .. \MISN{}
 
-* `DDIV rs, rt`
+* `DDIV rd, rs, rt`
 
   Executes the division between 64-bits registers rs and rt, putting the
-  64-bits quotient in LO and the 64-bits remainder in HI.
+  64-bits quotient into register rd. Note: This is the MIPS64 Release 6 version.
+  To store the result in LO/HI registers, use DMULT followed by MFLO/MFHI.
 
 * `DDIVU rs, rt`
 
@@ -91,6 +92,13 @@ Here's the list of R-Type ALU Instructions.
   Executes the multiplication between 64-bits registers rs and rt,
   considering them as unsigned values and putting the high-order 64-bits
   doubleword of the result into register rd.
+
+* `DMUL rd, rs, rt`
+
+  Executes the multiplication between 64-bits registers rs and rt, putting
+  the low-order 64-bits doubleword of the result into register rd. Note: This
+  is the MIPS64 Release 6 version. To store the result in LO/HI registers, use
+  DMULT instead.
 
 * `DMULT rs, rt`
 
