@@ -333,6 +333,12 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
         runMipsTest("dmulu-simple-test.s");
     }
 
+  /* Test for instructions DMUL and DDIV */
+  @Test(timeout=2000)
+  public void testDMULandDDIV() throws Exception {
+        runMipsTest("dmul-ddiv-test.s");
+    }
+
   /* Test for the instruction JAL */
   @Test(timeout=2000)
   public void testJAL() throws Exception {
