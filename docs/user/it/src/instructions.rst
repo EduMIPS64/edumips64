@@ -68,11 +68,15 @@ Ecco la lista delle istruzioni ALU di tipo R.
 
 .. \MISN{}
 
-* `DDIV rd, rs, rt`
+* `DDIV rs, rt` O `DDIV rd, rs, rt`
 
-  Esegue la divisione tra i registri a 64-bit rs ed rt, ponendo i 64-bit del
-  quoziente nel registro rd. Nota: Questa è la versione MIPS64 Release 6.
-  Per memorizzare il risultato nei registri LO/HI, usare DMULT seguito da MFLO/MFHI.
+  Esegue la divisione tra i registri a 64-bit rs ed rt.
+  
+  Forma a due operandi (DDIV rs, rt): Pone i 64-bit del quoziente in LO ed i
+  64-bit del resto in HI.
+  
+  Forma a tre operandi (DDIV rd, rs, rt): Pone i 64-bit del quoziente nel
+  registro rd. Questa è la versione MIPS64 Release 6.
 
 * `DDIVU rs, rt`
 
