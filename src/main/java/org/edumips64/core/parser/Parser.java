@@ -512,7 +512,23 @@ public class Parser {
 
               // Parsing the instruction name to get the type of parameters to expect.
               ParsedInstructionMetadata meta = new ParsedInstructionMetadata(row, instrCount+4);
-              tmpInst = instructionBuilder.buildInstruction(line.substring(column, end).toUpperCase(), meta);
+              
+              // Special handling for DDIV: check parameter count to determine which variant to use
+              String instructionName = line.substring(column, end).toUpperCase();
+              if (instructionName.equals("DDIV") && line.length() > end + 1) {
+                // Count commas in the parameter string to determine if it's 2-param or 3-param form
+                String paramPart = line.substring(end + 1).split(";")[0].trim();
+                int commaCount = 0;
+                for (char c : paramPart.toCharArray()) {
+                  if (c == ',') commaCount++;
+                }
+                // If 2 commas, it's 3 parameters (rd, rs, rt), use DDIV3
+                if (commaCount == 2) {
+                  instructionName = "DDIV3";
+                }
+              }
+              
+              tmpInst = instructionBuilder.buildInstruction(instructionName, meta);
 
               if (tmpInst == null) {
                 errors.addError("INVALIDCODE", row, column + 1, line);

@@ -339,6 +339,12 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
         runMipsTest("dmul-ddiv-test.s");
     }
 
+  /* Test for both DDIV forms (2-param and 3-param) */
+  @Test(timeout=2000)
+  public void testDDIVBothForms() throws Exception {
+        runMipsTest("ddiv-both-forms-test.s");
+    }
+
   /* Test for the instruction JAL */
   @Test(timeout=2000)
   public void testJAL() throws Exception {

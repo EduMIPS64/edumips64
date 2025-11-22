@@ -48,10 +48,14 @@ ALU 指令可分为两组： *R型*和I型*。
 
 .. \MISN{}
 
-* `DDIV rd, rs, rt`
+* `DDIV rs, rt` 或 `DDIV rd, rs, rt`
 
-  执行 64 位寄存器 rs 和 rt 之间的除法运算，将 64 位商放入寄存器 rd。
-  注意：这是 MIPS64 Release 6 版本。要将结果存储在 LO/HI 寄存器中，请使用 DMULT 后跟 MFLO/MFHI。
+  执行 64 位寄存器 rs 和 rt 之间的除法运算。
+  
+  双操作数形式（DDIV rs, rt）：将 64 位商放入 LO，将 64 位余数放入 HI。
+  
+  三操作数形式（DDIV rd, rs, rt）：将 64 位商放入寄存器 rd。
+  这是 MIPS64 Release 6 版本。
 
 * `DDIVU rs, rt`
 
