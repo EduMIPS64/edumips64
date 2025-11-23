@@ -333,6 +333,24 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
         runMipsTest("dmulu-simple-test.s");
     }
 
+  /* Test for instructions DMUL and DDIV */
+  @Test(timeout=2000)
+  public void testDMULandDDIV() throws Exception {
+        runMipsTest("dmul-ddiv-test.s");
+    }
+
+  /* Test for both DDIV forms (2-param and 3-param) */
+  @Test(timeout=2000)
+  public void testDDIVBothForms() throws Exception {
+        runMipsTest("ddiv-both-forms-test.s");
+    }
+
+  /* Test for instruction DMOD */
+  @Test(timeout=2000)
+  public void testDMOD() throws Exception {
+        runMipsTest("dmod-test.s");
+    }
+
   /* Test for the instruction JAL */
   @Test(timeout=2000)
   public void testJAL() throws Exception {
@@ -523,6 +541,19 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testDivisionByZeroNoThrowException() throws Exception {
     config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, true);
     runMipsTest("div0.s");
+  }
+
+  /* Tests for division by zero with 3-parameter DDIV form */
+  @Test(expected = SynchronousException.class, timeout=2000)
+  public void testDivisionByZeroThrowException3Param() throws Exception {
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
+    runMipsTest("ddiv3-div0.s");
+  }
+
+  @Test(timeout=2000)
+  public void testDivisionByZeroNoThrowException3Param() throws Exception {
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, true);
+    runMipsTest("ddiv3-div0.s");
   }
 
   /* ------- REGRESSION TESTS -------- */
