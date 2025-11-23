@@ -537,6 +537,19 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runMipsTest("div0.s");
   }
 
+  /* Tests for division by zero with 3-parameter DDIV form */
+  @Test(expected = SynchronousException.class, timeout=2000)
+  public void testDivisionByZeroThrowException3Param() throws Exception {
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
+    runMipsTest("ddiv3-div0.s");
+  }
+
+  @Test(timeout=2000)
+  public void testDivisionByZeroNoThrowException3Param() throws Exception {
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, true);
+    runMipsTest("ddiv3-div0.s");
+  }
+
   /* ------- REGRESSION TESTS -------- */
   /* Issue #7 */
   @Test(timeout=2000)

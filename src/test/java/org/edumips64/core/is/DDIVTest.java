@@ -41,6 +41,14 @@ public class DDIVTest extends BaseParsingTest {
         assertEquals("011110", repr.substring(26, 32));
     }
 
+    @Test
+    public void testDivisionByZero3Param() throws Exception {
+        // Test that division by zero is parsed correctly for 3-param form
+        // The actual exception behavior is tested in end-to-end tests
+        parseCode("daddi r1, r0, 10\nddiv r3, r1, r0");
+        assertEquals(3, memory.getInstructionsNumber()); // 2 instructions + SYSCALL
+    }
+
     // Tests for 2-parameter form (legacy)
     @Test
     public void testCanParse2Param() throws Exception {
@@ -68,5 +76,13 @@ public class DDIVTest extends BaseParsingTest {
         assertEquals("00001", repr.substring(6, 11));
         // RT = 2 = 00010
         assertEquals("00010", repr.substring(11, 16));
+    }
+
+    @Test
+    public void testDivisionByZero2Param() throws Exception {
+        // Test that division by zero is parsed correctly for 2-param form
+        // The actual exception behavior is tested in end-to-end tests
+        parseCode("daddi r1, r0, 10\nddiv r1, r0");
+        assertEquals(3, memory.getInstructionsNumber()); // 2 instructions + SYSCALL
     }
 }
