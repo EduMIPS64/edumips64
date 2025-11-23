@@ -97,6 +97,13 @@ Here's the list of R-Type ALU Instructions.
   considering them as unsigned values and putting the high-order 64-bits
   doubleword of the result into register rd.
 
+* `DMOD rd, rs, rt`
+
+  Computes the signed modulo (remainder) of 64-bits register rs divided by
+  64-bits register rt, and puts the result into register rd. This is the
+  MIPS64 Release 6 version. For the legacy form that stores remainder in HI,
+  use DDIV rs, rt followed by MFHI.
+
 * `DMUL rd, rs, rt`
 
   Executes the multiplication between 64-bits registers rs and rt, putting

@@ -65,6 +65,7 @@ public class InstructionBuilder {
       entry("DDIV", DDIV::new),
       entry("DDIV3", DDIV3::new),  // Three-operand form of DDIV
       entry("DDIVU", DDIVU::new),
+      entry("DMOD", DMOD::new),
       entry("DMUL", DMUL::new),
       entry("DMUHU", DMUHU::new),
       entry("DMULT", DMULT::new),

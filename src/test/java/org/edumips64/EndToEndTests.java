@@ -345,6 +345,12 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
         runMipsTest("ddiv-both-forms-test.s");
     }
 
+  /* Test for instruction DMOD */
+  @Test(timeout=2000)
+  public void testDMOD() throws Exception {
+        runMipsTest("dmod-test.s");
+    }
+
   /* Test for the instruction JAL */
   @Test(timeout=2000)
   public void testJAL() throws Exception {
