@@ -2,7 +2,7 @@
 ;
 ; Tests both the legacy DDIV rs, rt (2-param) form and the new DDIV rd, rs, rt (3-param) form
 ;
-; (c) 2024 EduMIPS64 project
+; (c) 2025 EduMIPS64 project
 
 .code
 ; Test 2-param DDIV: divide 100 / 4, result in LO
