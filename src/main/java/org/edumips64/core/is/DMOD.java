@@ -48,7 +48,7 @@ class DMOD extends ALU_RType {
     // DMOD uses SPECIAL (000000) opcode with sa field and function field.
     // sa = 00010 (2), function = 011011 (27)
     // The complete encoding is: SPECIAL | rs | rt | rd | sa | function
-    private final String OPCODE_VALUE = "00010" + "011011";
+    private final String OPCODE_VALUE = "00011" + "011110";
 
     DMOD() {
         super.OPCODE_VALUE = OPCODE_VALUE;

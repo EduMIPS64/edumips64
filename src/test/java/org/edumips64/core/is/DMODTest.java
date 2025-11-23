@@ -34,10 +34,10 @@ public class DMODTest extends BaseParsingTest {
         assertEquals("00011", repr.substring(11, 16));
         // RD = 1 = 00001
         assertEquals("00001", repr.substring(16, 21));
-        // sa = 00010
-        assertEquals("00010", repr.substring(21, 26));
+        // sa = 00011
+        assertEquals("00011", repr.substring(21, 26));
         // function = 011011 (27)
-        assertEquals("011011", repr.substring(26, 32));
+        assertEquals("011110", repr.substring(26, 32));
     }
 
     @Test
