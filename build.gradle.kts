@@ -3,6 +3,8 @@
  */
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
+import org.gradle.api.tasks.bundling.War
+import org.gradle.internal.os.OperatingSystem
 import ru.vyarus.gradle.plugin.python.task.PythonTask
 import ru.vyarus.gradle.plugin.python.PythonExtension.Scope.VIRTUALENV
 
@@ -78,6 +80,7 @@ val languages = listOf("en", "it", "zh")
 val docTypes = listOf("html", "pdf")
 val allDocsTaskNames = mutableListOf<String>()
 val copyHelpTaskNames = mutableListOf<String>()
+val htmlTaskNames = mutableListOf<String>()
 
 for (language in languages) {
     for (type in docTypes) {
@@ -87,6 +90,10 @@ for (language in languages) {
             command = buildDocsCmd(language, type)
         }
         allDocsTaskNames.add(taskName)
+
+        if (type == "html") {
+            htmlTaskNames.add(taskName)
+        }
     }
     
     // Generate copy tasks for each language
@@ -103,10 +110,14 @@ for (language in languages) {
     copyHelpTaskNames.add(copyTaskName)
 }
 
-// Catch-all task for documentation
+// Catch-all tasks for documentation
 tasks.register<GradleBuild>("allDocs") {
     tasks = allDocsTaskNames
     description = "Run all documentation tasks"
+}
+tasks.register<GradleBuild>("htmlDocs") {
+    tasks = htmlTaskNames
+    description = "Run all HTML documentation tasks"
 }
 
 // Include the docs folder at the root of the jar, for JavaHelp
@@ -276,4 +287,41 @@ tasks.register<Exec>("msi"){
 gwt {
     modules.add("org.edumips64.webclient")
     sourceLevel = "1.11"
+}
+
+val npmExecutable = if (OperatingSystem.current().isWindows) "npm.cmd" else "npm"
+
+val npmBuild by tasks.registering(Exec::class) {
+    group = "Web"
+    description = "Builds the EduMIPS64 React frontend"
+    workingDir = projectDir
+    commandLine(npmExecutable, "run", "build")
+    inputs.files(
+        "package.json",
+        "package-lock.json",
+        "webpack.config.js"
+    )
+    inputs.dir("src/webapp")
+    outputs.dir(layout.buildDirectory.dir("gwt/war/edumips64"))
+}
+
+val copyWebHelp by tasks.registering(Copy::class) {
+    group = "Web"
+    description = "Copies generated HTML help into the web UI bundle"
+    dependsOn("htmlDocs")
+    from(layout.buildDirectory.dir("docs")) {
+        exclude("**/doctrees/**", "**/.buildinfo", "**/objects.inv", "**/_sources/**")
+    }
+    into(layout.buildDirectory.dir("gwt/war/edumips64/docs"))
+}
+
+tasks.register("webapp") {
+    group = "Web"
+    description = "Builds the EduMIPS64 web application with bundled documentation"
+    dependsOn("war", "htmlDocs", npmBuild, copyWebHelp)
+}
+
+tasks.named<War>("war") {
+    dependsOn(npmBuild)
+    dependsOn(copyWebHelp)
 }
