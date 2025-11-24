@@ -285,7 +285,7 @@ export default function HelpDialog(props) {
   const handleNavigate = (url) => {
     setCurrentPage(url);
     if (iframeRef.current) {
-      iframeRef.current.src = `docs/${language}/html/${url}`;
+      iframeRef.current.src = `/docs/${language}/html/${url}`;
     }
   };
 
@@ -440,7 +440,7 @@ export default function HelpDialog(props) {
             <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
               <iframe
                 ref={iframeRef}
-                src={`docs/${language}/html/${currentPage}`}
+                src={`/docs/${language}/html/${currentPage}`}
                 onLoad={handleIframeLoad}
                 style={{
                   width: '100%',
