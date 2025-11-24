@@ -43,14 +43,14 @@ test('help dialog shows embedded documentation with navigation', async ({ page }
   await page.waitForFunction(
     () => {
       const iframe = document.querySelector('#help-iframe');
-      return iframe && iframe.src.includes('/docs/it/html/index.html');
+      return iframe && iframe.src.includes('docs/it/html/index.html');
     },
     { timeout: 5000 }
   );
   
   // Verify the iframe src changed to Italian
   const iframeSrc = await page.getAttribute('#help-iframe', 'src');
-  expect(iframeSrc).toContain('/docs/it/html/index.html');
+  expect(iframeSrc).toContain('docs/it/html/index.html');
 
   // Switch to About tab
   await page.click('#help-tab-1');
@@ -119,7 +119,7 @@ test('help navigation allows browsing different sections', async ({ page }) => {
 
   // Verify the iframe src changed
   const iframeSrc = await page.getAttribute('#help-iframe', 'src');
-  expect(iframeSrc).toContain('/docs/en/html/instructions.html#alu-instructions');
+  expect(iframeSrc).toContain('docs/en/html/instructions.html#alu-instructions');
 
   await page.close();
 });
