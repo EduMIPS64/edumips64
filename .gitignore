@@ -161,4 +161,5 @@ dist/
 scripts/exeCreator.bat
 
 #msi installer
-*.msitest-results/
+*.msi
+test-results/
