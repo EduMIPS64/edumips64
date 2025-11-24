@@ -35,8 +35,14 @@ test('help dialog shows embedded documentation', async ({ page }) => {
   await page.click('#language-select');
   await page.click('li[data-value="it"]');
   
-  // Wait for iframe to update
-  await page.waitForTimeout(500);
+  // Wait for iframe src to change to Italian
+  await page.waitForFunction(
+    () => {
+      const iframe = document.querySelector('#help-iframe');
+      return iframe && iframe.src.includes('docs/it/html/index.html');
+    },
+    { timeout: 5000 }
+  );
   
   // Verify the iframe src changed to Italian
   const iframeSrc = await page.getAttribute('#help-iframe', 'src');
