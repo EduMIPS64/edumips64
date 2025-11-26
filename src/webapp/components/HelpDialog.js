@@ -23,6 +23,9 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Typography } from '@mui/material';
 
 
+// Define the set of allowed languages (should match what's shown in the language Select)
+const ALLOWED_LANGUAGES = ['en', 'fr']; // Add supported language codes here
+
 function TabPanel(props) {
   const { children, value, index, ...other} = props;
 
@@ -290,8 +293,11 @@ export default function HelpDialog(props) {
   };
 
   const handleLanguageChange = (event) => {
-    setLanguage(event.target.value);
-    setCurrentPage('index.html');
+    const newLang = event.target.value;
+    if (ALLOWED_LANGUAGES.includes(newLang)) {
+      setLanguage(newLang);
+      setCurrentPage('index.html');
+    } // else ignore invalid value
   };
 
   const handleNavigate = (url) => {
