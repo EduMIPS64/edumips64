@@ -33,6 +33,13 @@ const INTRODUCTION_LABELS = {
   zh: '简介',
 };
 
+// Sphinx HTML structure CSS selectors
+const SPHINX_SELECTORS = {
+  tocWrapper: '.toctree-wrapper',
+  topLevelItem: ':scope > ul > li.toctree-l1',
+  nestedItem: ':scope > li.toctree-l2',
+};
+
 /**
  * Parse the Sphinx-generated toctree HTML into a structured ToC format.
  * The toctree-wrapper contains nested ul/li elements with links.
@@ -40,9 +47,12 @@ const INTRODUCTION_LABELS = {
 function parseTocFromHtml(htmlString, language) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlString, 'text/html');
-  const toctreeWrapper = doc.querySelector('.toctree-wrapper');
+  const toctreeWrapper = doc.querySelector(SPHINX_SELECTORS.tocWrapper);
 
   if (!toctreeWrapper) {
+    console.warn(
+      'Could not find toctree-wrapper in documentation HTML. The documentation structure may have changed.',
+    );
     return [];
   }
 
@@ -56,7 +66,7 @@ function parseTocFromHtml(htmlString, language) {
 
   // Parse the top-level list items (toctree-l1)
   const topLevelItems = toctreeWrapper.querySelectorAll(
-    ':scope > ul > li.toctree-l1',
+    SPHINX_SELECTORS.topLevelItem,
   );
 
   topLevelItems.forEach((li) => {
@@ -72,7 +82,9 @@ function parseTocFromHtml(htmlString, language) {
     const nestedList = li.querySelector(':scope > ul');
     if (nestedList) {
       const children = [];
-      const nestedItems = nestedList.querySelectorAll(':scope > li.toctree-l2');
+      const nestedItems = nestedList.querySelectorAll(
+        SPHINX_SELECTORS.nestedItem,
+      );
       nestedItems.forEach((nestedLi) => {
         const nestedLink = nestedLi.querySelector(':scope > a');
         if (nestedLink) {
@@ -102,26 +114,34 @@ function useToc(language) {
   const [error, setError] = React.useState(null);
 
   React.useEffect(() => {
-    let cancelled = false;
+    const abortController = new AbortController();
 
     async function fetchToc() {
       setLoading(true);
       setError(null);
 
       try {
-        const response = await fetch(`docs/${language}/html/index.html`);
+        const response = await fetch(`docs/${language}/html/index.html`, {
+          signal: abortController.signal,
+        });
         if (!response.ok) {
-          throw new Error(`Failed to fetch ToC: ${response.status}`);
+          throw new Error(
+            `Failed to fetch ToC: ${response.status} ${response.statusText}`,
+          );
         }
         const htmlString = await response.text();
         const parsedToc = parseTocFromHtml(htmlString, language);
 
-        if (!cancelled) {
+        if (!abortController.signal.aborted) {
           setToc(parsedToc);
           setLoading(false);
         }
       } catch (err) {
-        if (!cancelled) {
+        // Ignore abort errors (expected when language changes quickly)
+        if (err.name === 'AbortError') {
+          return;
+        }
+        if (!abortController.signal.aborted) {
           setError(err.message);
           setLoading(false);
         }
@@ -131,7 +151,7 @@ function useToc(language) {
     fetchToc();
 
     return () => {
-      cancelled = true;
+      abortController.abort();
     };
   }, [language]);
 
