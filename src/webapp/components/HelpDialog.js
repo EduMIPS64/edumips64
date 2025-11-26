@@ -32,6 +32,12 @@ function TabPanel(props) {
       hidden={value !== index}
       id={`help-tabpanel-${index}`}
       aria-labelledby={`help-tab-${index}`}
+      style={{ 
+        display: value === index ? 'flex' : 'none',
+        flexGrow: 1,
+        height: '100%',
+        width: '100%',
+      }}
       {...other}
     >
       {value === index && children}
@@ -400,9 +406,9 @@ export default function HelpDialog(props) {
           <Tab label="About" id="help-tab-1" />
         </Tabs>
       </Box>
-      <DialogContent className='help-content' sx={{ p: 0, display: 'flex', height: '100%' }}>
+      <DialogContent className='help-content' sx={{ p: 0, display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
         <TabPanel value={tabValue} index={0}>
-          <Box sx={{ display: 'flex', height: '100%' }}>
+          <Box sx={{ display: 'flex', height: '100%', width: '100%' }}>
             {/* Navigation Drawer */}
             <Box
               sx={{
