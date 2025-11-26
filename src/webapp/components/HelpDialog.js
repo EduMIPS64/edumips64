@@ -402,9 +402,7 @@ export default function HelpDialog(props) {
       }}
     >
       <DialogTitle className='help-title'>
-        <Typography variant="h4">
-          EduMIPS64 Web Frontend
-        </Typography>
+        EduMIPS64 Web Frontend
       </DialogTitle>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={tabValue} onChange={handleTabChange} aria-label="help tabs">
