@@ -255,6 +255,7 @@ jobs:
           timeout_minutes: 2
           retry_on: error
           command: npm run test
+
   build-snap:
     name: Build Snapcraft package
     runs-on: ubuntu-latest
@@ -289,6 +290,7 @@ jobs:
   build-electron:
     name: Build Electron applications
     runs-on: ${{ matrix.os }}
+    needs: build-web
     strategy:
       matrix:
         include:
@@ -313,21 +315,13 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
       - run: git log -1
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v5
+      # Download web application built in 'build-web'
+      - uses: actions/download-artifact@v6.0.0
+        name: Download web application artifacts
         with:
-          java-version: 17
-          distribution: 'microsoft'
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Build JS Worker (Java → JS)
-        run: ./gradlew war
-      
-      # Build HTML docs for embedding in the web application
-      # The Python dependencies are fetched by Gradle.
-      - name: Build HTML docs (en, it, zh)
-        run: ./gradlew htmlDocsEn htmlDocsIt htmlDocsZh
-      
+          name: web
+          path: build/gwt/war/edumips64
+
       # Set up Node.js
       - name: Set up Node.JS
         uses: actions/setup-node@v6
@@ -337,10 +331,6 @@ jobs:
       # Install dependencies
       - name: Install JS dependencies
         run: npm install
-
-      # Build web application (this ensures all assets are available)
-      - name: Build JS application
-        run: npm run build
 
       # Build Electron application
       - name: Build Electron application for ${{ matrix.platform }}-${{ matrix.arch }}
