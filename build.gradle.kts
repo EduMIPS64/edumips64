@@ -302,6 +302,7 @@ val npmBuild by tasks.registering(Exec::class) {
     )
     inputs.dir("src/webapp")
     outputs.dir(layout.buildDirectory.dir("gwt/war/edumips64"))
+    mustRunAfter("war")
 }
 
 val copyWebHelp by tasks.registering(Copy::class) {
@@ -312,6 +313,7 @@ val copyWebHelp by tasks.registering(Copy::class) {
         exclude("**/doctrees/**", "**/.buildinfo", "**/objects.inv", "**/_sources/**")
     }
     into(layout.buildDirectory.dir("gwt/war/edumips64/docs"))
+    mustRunAfter("war")
 }
 
 tasks.register("webapp") {
