@@ -27,7 +27,7 @@ Github codespaces will use the dev container by default and give you a fully set
 
 In order to compile EduMIPS64, you need the Java JDK version 17 or above.
 
-To build the user documentation, you'll need Python 3.9+ with pip.
+To build the user documentation, you'll need Python 3.11+ with pip.
 
 [Gradle](https://gradle.org/) will download the following dependencies:
 
