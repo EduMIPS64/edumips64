@@ -109,7 +109,7 @@ for (language in languages) {
     copyHelpTaskNames.add(copyTaskName)
 }
 
-// Catch-all task for documentation
+// Catch-all tasks for documentation
 tasks.register<GradleBuild>("allDocs") {
     tasks = allDocsTaskNames
     description = "Run all documentation tasks"

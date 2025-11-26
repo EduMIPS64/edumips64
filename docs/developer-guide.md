@@ -58,6 +58,7 @@ In particular you may find useful these tasks:
 - `./gradlew check` - (Java plugin) run tests and compile the documentation
 - `./gradlew run` - (Application plugin) run the application
 - `./gradlew war` - (GWT plugin) compile the GWT-based web worker running the EduMIPS64 core
+- `./gradlew webapp` - (Custom task) compile the GWT-based web worker, the React frontend, and bundle the documentation
 
 You may also find useful using the `--console=plain` flag to better see what tasks
 are being executed.  
@@ -106,6 +107,13 @@ to have a working local test environment (see next section).
 
 The web UI itself is based on React, and it's compiled / assembled using the NPM and
 webpack tools. The source code is in `src/webapp`.
+
+The `webapp` Gradle task automates the build process for the web UI. It:
+1. Compiles the GWT worker (`war` task)
+2. Generates the HTML documentation (`htmlDocs` task)
+3. Installs NPM dependencies (`npmInstall` task)
+4. Builds the React frontend (`npmBuild` task)
+5. Copies the generated documentation into the web app bundle (`copyWebHelp` task)
 
 Custom NPM scripts:
 
