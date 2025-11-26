@@ -3,7 +3,6 @@
  */
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
-import org.gradle.api.tasks.bundling.War
 import org.gradle.internal.os.OperatingSystem
 import ru.vyarus.gradle.plugin.python.task.PythonTask
 import ru.vyarus.gradle.plugin.python.PythonExtension.Scope.VIRTUALENV
@@ -319,9 +318,4 @@ tasks.register("webapp") {
     group = "Web"
     description = "Builds the EduMIPS64 web application with bundled documentation"
     dependsOn("war", "htmlDocs", npmBuild, copyWebHelp)
-}
-
-tasks.named<War>("war") {
-    dependsOn(npmBuild)
-    dependsOn(copyWebHelp)
 }
