@@ -218,7 +218,7 @@ function NavigationDrawer({ language, onNavigate, currentPage }) {
   const toc = tocStructure[language] || tocStructure.en;
 
   return (
-    <Box sx={{ width: 280, height: '100%', overflowY: 'auto' }}>
+    <Box sx={{ width: 280, height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
       <List dense>
         {toc.map((item, index) => (
           <React.Fragment key={index}>
@@ -238,6 +238,9 @@ function NavigationDrawer({ language, onNavigate, currentPage }) {
                   primaryTypographyProps={{
                     fontSize: '0.9rem',
                     fontWeight: currentPage === item.url ? 600 : 400,
+                    noWrap: true,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
                   }}
                 />
                 {item.children && (openItems[index] ? <ExpandLess /> : <ExpandMore />)}
@@ -258,6 +261,9 @@ function NavigationDrawer({ language, onNavigate, currentPage }) {
                           primaryTypographyProps={{
                             fontSize: '0.85rem',
                             fontWeight: currentPage === child.url ? 600 : 400,
+                            noWrap: true,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
                           }}
                         />
                       </ListItemButton>
@@ -413,10 +419,15 @@ export default function HelpDialog(props) {
             <Box
               sx={{
                 width: 280,
+                minWidth: 280,
+                maxWidth: 280,
                 flexShrink: 0,
                 borderRight: 1,
                 borderColor: 'divider',
                 bgcolor: 'background.paper',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
               }}
             >
               <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
