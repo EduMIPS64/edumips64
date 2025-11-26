@@ -24,7 +24,7 @@ import { Typography } from '@mui/material';
 
 
 // Define the set of allowed languages (should match what's shown in the language Select)
-const ALLOWED_LANGUAGES = ['en', 'fr']; // Add supported language codes here
+const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
 
 function TabPanel(props) {
   const { children, value, index, ...other} = props;
