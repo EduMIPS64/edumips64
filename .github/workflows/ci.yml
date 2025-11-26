@@ -135,19 +135,18 @@ jobs:
           distribution: 'microsoft'
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build JS Worker (Java → JS)
-        run: ./gradlew war
+
+      - name: Install JS dependencies
+        run: npm install
+
       - name: Set up Node.JS
         uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
-          
-      - name: Install JS dependencies
-        run: npm install
 
-      # Build JS application and upload artifacts for subsequent steps.
-      - name: Build JS application
-        run: npm run build
+      - name: Build JS Worker (Java → JS), including HTML docs
+        run: ./gradlew webapp
+      
       - uses: actions/upload-artifact@v5
         name: Upload web application artifacts
         with:
@@ -323,6 +322,11 @@ jobs:
         run: chmod +x gradlew
       - name: Build JS Worker (Java → JS)
         run: ./gradlew war
+      
+      # Build HTML docs for embedding in the web application
+      # The Python dependencies are fetched by Gradle.
+      - name: Build HTML docs (en, it, zh)
+        run: ./gradlew htmlDocsEn htmlDocsIt htmlDocsZh
       
       # Set up Node.js
       - name: Set up Node.JS

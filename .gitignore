@@ -162,3 +162,4 @@ scripts/exeCreator.bat
 
 #msi installer
 *.msi
+test-results/
