@@ -12,7 +12,7 @@ The repository includes a dev container configuration (`.devcontainer/devcontain
 ### Requirements
 - Java JDK 17 or above
 - Node.js 16+ (for web UI development)
-- Python 3.9+ with pip (for documentation)
+- Python 3.11+ with pip (for documentation)
 - Gradle (wrapper included in the repository)
 
 ## Project Structure
