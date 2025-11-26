@@ -20,14 +20,126 @@ import ListItemText from '@mui/material/ListItemText';
 import Collapse from '@mui/material/Collapse';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import CircularProgress from '@mui/material/CircularProgress';
 import { Typography } from '@mui/material';
-
 
 // Define the set of allowed languages (should match what's shown in the language Select)
 const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
 
+// Localized "Introduction" labels for each language
+const INTRODUCTION_LABELS = {
+  en: 'Introduction',
+  it: 'Introduzione',
+  zh: '简介',
+};
+
+/**
+ * Parse the Sphinx-generated toctree HTML into a structured ToC format.
+ * The toctree-wrapper contains nested ul/li elements with links.
+ */
+function parseTocFromHtml(htmlString, language) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlString, 'text/html');
+  const toctreeWrapper = doc.querySelector('.toctree-wrapper');
+
+  if (!toctreeWrapper) {
+    return [];
+  }
+
+  const toc = [];
+
+  // Add Introduction as the first item (links to index.html)
+  toc.push({
+    title: INTRODUCTION_LABELS[language] || INTRODUCTION_LABELS.en,
+    url: 'index.html',
+  });
+
+  // Parse the top-level list items (toctree-l1)
+  const topLevelItems = toctreeWrapper.querySelectorAll(
+    ':scope > ul > li.toctree-l1',
+  );
+
+  topLevelItems.forEach((li) => {
+    const link = li.querySelector(':scope > a');
+    if (!link) return;
+
+    const item = {
+      title: link.textContent.trim(),
+      url: link.getAttribute('href'),
+    };
+
+    // Check for nested items (toctree-l2)
+    const nestedList = li.querySelector(':scope > ul');
+    if (nestedList) {
+      const children = [];
+      const nestedItems = nestedList.querySelectorAll(':scope > li.toctree-l2');
+      nestedItems.forEach((nestedLi) => {
+        const nestedLink = nestedLi.querySelector(':scope > a');
+        if (nestedLink) {
+          children.push({
+            title: nestedLink.textContent.trim(),
+            url: nestedLink.getAttribute('href'),
+          });
+        }
+      });
+      if (children.length > 0) {
+        item.children = children;
+      }
+    }
+
+    toc.push(item);
+  });
+
+  return toc;
+}
+
+/**
+ * Custom hook to fetch and parse the ToC for a given language.
+ */
+function useToc(language) {
+  const [toc, setToc] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    async function fetchToc() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`docs/${language}/html/index.html`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ToC: ${response.status}`);
+        }
+        const htmlString = await response.text();
+        const parsedToc = parseTocFromHtml(htmlString, language);
+
+        if (!cancelled) {
+          setToc(parsedToc);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err.message);
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchToc();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [language]);
+
+  return { toc, loading, error };
+}
+
 function TabPanel(props) {
-  const { children, value, index, ...other} = props;
+  const { children, value, index, ...other } = props;
 
   return (
     <div
@@ -35,7 +147,7 @@ function TabPanel(props) {
       hidden={value !== index}
       id={`help-tabpanel-${index}`}
       aria-labelledby={`help-tab-${index}`}
-      style={{ 
+      style={{
         display: value === index ? 'flex' : 'none',
         flexGrow: 1,
         height: '100%',
@@ -48,167 +160,7 @@ function TabPanel(props) {
   );
 }
 
-// Table of contents structure for the documentation
-const tocStructure = {
-  en: [
-    { title: 'Introduction', url: 'index.html' },
-    {
-      title: 'Source Files Format',
-      url: 'source-files-format.html',
-      children: [
-        { title: 'Memory Limits', url: 'source-files-format.html#memory-limits' },
-        { title: 'The .data Section', url: 'source-files-format.html#the-data-section' },
-        { title: 'The .code Section', url: 'source-files-format.html#the-code-section' },
-        { title: 'The #include Command', url: 'source-files-format.html#the-include-command' },
-      ],
-    },
-    {
-      title: 'Instruction Set',
-      url: 'instructions.html',
-      children: [
-        { title: 'ALU Instructions', url: 'instructions.html#alu-instructions' },
-        { title: 'Load/Store Instructions', url: 'instructions.html#load-store-instructions' },
-        { title: 'Flow Control Instructions', url: 'instructions.html#flow-control-instructions' },
-        { title: 'SYSCALL Instruction', url: 'instructions.html#the-syscall-instruction' },
-        { title: 'Other Instructions', url: 'instructions.html#other-instructions' },
-      ],
-    },
-    {
-      title: 'Floating Point Unit',
-      url: 'fpu.html',
-      children: [
-        { title: 'Special Values', url: 'fpu.html#special-values' },
-        { title: 'Exception Configuration', url: 'fpu.html#exception-configuration' },
-        { title: 'The .double Directive', url: 'fpu.html#the-double-directive' },
-        { title: 'The FCSR Register', url: 'fpu.html#the-fcsr-register' },
-        { title: 'Instruction Set', url: 'fpu.html#instruction-set' },
-      ],
-    },
-    {
-      title: 'User Interface',
-      url: 'user-interface.html',
-      children: [
-        { title: 'The Menu Bar', url: 'user-interface.html#the-menu-bar' },
-        { title: 'Frames', url: 'user-interface.html#frames' },
-        { title: 'Dialogs', url: 'user-interface.html#dialogs' },
-        { title: 'Command Line Options', url: 'user-interface.html#command-line-options' },
-      ],
-    },
-    {
-      title: 'Code Examples',
-      url: 'examples.html',
-      children: [
-        { title: 'SYSCALL', url: 'examples.html#syscall' },
-      ],
-    },
-  ],
-  it: [
-    { title: 'Introduzione', url: 'index.html' },
-    {
-      title: 'Formato dei File Sorgente',
-      url: 'source-files-format.html',
-      children: [
-        { title: 'Limiti di Memoria', url: 'source-files-format.html#memory-limits' },
-        { title: 'La Sezione .data', url: 'source-files-format.html#the-data-section' },
-        { title: 'La Sezione .code', url: 'source-files-format.html#the-code-section' },
-        { title: 'Il Comando #include', url: 'source-files-format.html#the-include-command' },
-      ],
-    },
-    {
-      title: 'Set di Istruzioni',
-      url: 'instructions.html',
-      children: [
-        { title: 'Istruzioni ALU', url: 'instructions.html#alu-instructions' },
-        { title: 'Istruzioni Load/Store', url: 'instructions.html#load-store-instructions' },
-        { title: 'Istruzioni di Controllo del Flusso', url: 'instructions.html#flow-control-instructions' },
-        { title: 'Istruzione SYSCALL', url: 'instructions.html#the-syscall-instruction' },
-        { title: 'Altre Istruzioni', url: 'instructions.html#other-instructions' },
-      ],
-    },
-    {
-      title: 'Unità a Virgola Mobile',
-      url: 'fpu.html',
-      children: [
-        { title: 'Valori Speciali', url: 'fpu.html#special-values' },
-        { title: 'Configurazione Eccezioni', url: 'fpu.html#exception-configuration' },
-        { title: 'La Direttiva .double', url: 'fpu.html#the-double-directive' },
-        { title: 'Il Registro FCSR', url: 'fpu.html#the-fcsr-register' },
-        { title: 'Set di Istruzioni', url: 'fpu.html#instruction-set' },
-      ],
-    },
-    {
-      title: 'Interfaccia Utente',
-      url: 'user-interface.html',
-      children: [
-        { title: 'La Barra dei Menu', url: 'user-interface.html#the-menu-bar' },
-        { title: 'Frame', url: 'user-interface.html#frames' },
-        { title: 'Dialoghi', url: 'user-interface.html#dialogs' },
-        { title: 'Opzioni da Riga di Comando', url: 'user-interface.html#command-line-options' },
-      ],
-    },
-    {
-      title: 'Esempi di Codice',
-      url: 'examples.html',
-      children: [
-        { title: 'SYSCALL', url: 'examples.html#syscall' },
-      ],
-    },
-  ],
-  zh: [
-    { title: '简介', url: 'index.html' },
-    {
-      title: '源文件格式',
-      url: 'source-files-format.html',
-      children: [
-        { title: '内存限制', url: 'source-files-format.html#memory-limits' },
-        { title: '.data 部分', url: 'source-files-format.html#the-data-section' },
-        { title: '.code 部分', url: 'source-files-format.html#the-code-section' },
-        { title: '#include 命令', url: 'source-files-format.html#the-include-command' },
-      ],
-    },
-    {
-      title: '指令集',
-      url: 'instructions.html',
-      children: [
-        { title: 'ALU 指令', url: 'instructions.html#alu-instructions' },
-        { title: '加载/存储指令', url: 'instructions.html#load-store-instructions' },
-        { title: '流程控制指令', url: 'instructions.html#flow-control-instructions' },
-        { title: 'SYSCALL 指令', url: 'instructions.html#the-syscall-instruction' },
-        { title: '其他指令', url: 'instructions.html#other-instructions' },
-      ],
-    },
-    {
-      title: '浮点单元',
-      url: 'fpu.html',
-      children: [
-        { title: '特殊值', url: 'fpu.html#special-values' },
-        { title: '异常配置', url: 'fpu.html#exception-configuration' },
-        { title: '.double 指令', url: 'fpu.html#the-double-directive' },
-        { title: 'FCSR 寄存器', url: 'fpu.html#the-fcsr-register' },
-        { title: '指令集', url: 'fpu.html#instruction-set' },
-      ],
-    },
-    {
-      title: '用户界面',
-      url: 'user-interface.html',
-      children: [
-        { title: '菜单栏', url: 'user-interface.html#the-menu-bar' },
-        { title: '框架', url: 'user-interface.html#frames' },
-        { title: '对话框', url: 'user-interface.html#dialogs' },
-        { title: '命令行选项', url: 'user-interface.html#command-line-options' },
-      ],
-    },
-    {
-      title: '代码示例',
-      url: 'examples.html',
-      children: [
-        { title: 'SYSCALL', url: 'examples.html#syscall' },
-      ],
-    },
-  ],
-};
-
-function NavigationDrawer({ language, onNavigate, currentPage }) {
+function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }) {
   const [openItems, setOpenItems] = React.useState({});
 
   const handleToggle = (index) => {
@@ -218,10 +170,41 @@ function NavigationDrawer({ language, onNavigate, currentPage }) {
     }));
   };
 
-  const toc = tocStructure[language] || tocStructure.en;
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          width: 280,
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ width: 280, height: '100%', p: 2 }}>
+        <Typography color="error" variant="body2">
+          Failed to load navigation: {error}
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
-    <Box sx={{ width: 280, height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
+    <Box
+      sx={{
+        width: 280,
+        height: '100%',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+      }}
+    >
       <List dense>
         {toc.map((item, index) => (
           <React.Fragment key={index}>
@@ -236,7 +219,7 @@ function NavigationDrawer({ language, onNavigate, currentPage }) {
                 }}
                 selected={currentPage === item.url}
               >
-                <ListItemText 
+                <ListItemText
                   primary={item.title}
                   primaryTypographyProps={{
                     fontSize: '0.9rem',
@@ -246,7 +229,8 @@ function NavigationDrawer({ language, onNavigate, currentPage }) {
                     textOverflow: 'ellipsis',
                   }}
                 />
-                {item.children && (openItems[index] ? <ExpandLess /> : <ExpandMore />)}
+                {item.children &&
+                  (openItems[index] ? <ExpandLess /> : <ExpandMore />)}
               </ListItemButton>
             </ListItem>
             {item.children && (
@@ -288,6 +272,9 @@ export default function HelpDialog(props) {
   const [currentPage, setCurrentPage] = React.useState('index.html');
   const iframeRef = React.useRef(null);
 
+  // Dynamically fetch and parse the ToC based on the selected language
+  const { toc, loading, error } = useToc(language);
+
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -313,7 +300,7 @@ export default function HelpDialog(props) {
       const iframe = iframeRef.current;
       if (iframe && iframe.contentDocument) {
         const doc = iframe.contentDocument;
-        
+
         // Check if custom CSS is already injected
         if (!doc.getElementById('custom-help-styles')) {
           const style = doc.createElement('style');
@@ -396,8 +383,8 @@ export default function HelpDialog(props) {
   };
 
   return (
-    <Dialog 
-      onClose={props.handleClose} 
+    <Dialog
+      onClose={props.handleClose}
       open={props.open}
       maxWidth="xl"
       fullWidth
@@ -407,16 +394,21 @@ export default function HelpDialog(props) {
         },
       }}
     >
-      <DialogTitle className='help-title'>
-        EduMIPS64 Web Frontend
-      </DialogTitle>
+      <DialogTitle className="help-title">EduMIPS64 Web Frontend</DialogTitle>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="help tabs">
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          aria-label="help tabs"
+        >
           <Tab label="User Manual" id="help-tab-0" />
           <Tab label="About" id="help-tab-1" />
         </Tabs>
       </Box>
-      <DialogContent className='help-content' sx={{ p: 0, display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
+      <DialogContent
+        className="help-content"
+        sx={{ p: 0, display: 'flex', flexGrow: 1, overflow: 'hidden' }}
+      >
         <TabPanel value={tabValue} index={0}>
           <Box sx={{ display: 'flex', height: '100%', width: '100%' }}>
             {/* Navigation Drawer */}
@@ -451,9 +443,11 @@ export default function HelpDialog(props) {
                 </FormControl>
               </Box>
               <NavigationDrawer
-                language={language}
+                toc={toc}
                 onNavigate={handleNavigate}
                 currentPage={currentPage}
+                loading={loading}
+                error={error}
               />
             </Box>
 
@@ -481,10 +475,10 @@ export default function HelpDialog(props) {
               Quick Start
             </Typography>
             <Typography gutterBottom>
-              Once you load a program, hover over any instruction to see information
-              about it. You will be able to see the address, its binary
-              representation, the opcode and the CPU stage in which the instruction
-              is in the current step, if it is in the pipeline.
+              Once you load a program, hover over any instruction to see
+              information about it. You will be able to see the address, its
+              binary representation, the opcode and the CPU stage in which the
+              instruction is in the current step, if it is in the pipeline.
             </Typography>
             <Typography gutterBottom>
               CPU stages are also encoded by colors.
@@ -494,11 +488,14 @@ export default function HelpDialog(props) {
             </Typography>
             <Typography gutterBottom>
               This is the web version of the{' '}
-              <Link href="https://www.edumips.org">EduMIPS64 CPU simulator</Link>.
+              <Link href="https://www.edumips.org">
+                EduMIPS64 CPU simulator
+              </Link>
+              .
             </Typography>
             <Typography gutterBottom>
-              This is currently <strong>work-in-progress</strong>, very early stages
-              and not fully functional. See{' '}
+              This is currently <strong>work-in-progress</strong>, very early
+              stages and not fully functional. See{' '}
               <Link
                 href="https://github.com/EduMIPS64/edumips64/issues?q=is%3Aissue+is%3Aopen+label%3Acomponent%3Aweb-ui"
                 target="_blank"
@@ -509,12 +506,12 @@ export default function HelpDialog(props) {
               .
             </Typography>
             <Typography gutterBottom>
-              The core of the simulator is cross-compiled from Java to JavaScript,
-              and the UI is developed with React.
+              The core of the simulator is cross-compiled from Java to
+              JavaScript, and the UI is developed with React.
             </Typography>
             <Typography gutterBottom>
-              If you are interested in the evolution of this web application or want
-              to contribute to it, please get in touch via{' '}
+              If you are interested in the evolution of this web application or
+              want to contribute to it, please get in touch via{' '}
               <Link
                 href="https://github.com/EduMIPS64/edumips64"
                 target="_blank"
