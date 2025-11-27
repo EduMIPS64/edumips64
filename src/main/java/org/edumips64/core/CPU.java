@@ -811,7 +811,7 @@ public class CPU {
     StringBuilder s = new StringBuilder();
     int i = 0;
 
-    for (Register r: fpr) {
+    for (RegisterFP r: fpr) {
       s.append("FP Register ").append(i++).append(":\t").append(r.toString()).append("\n");
     }
 
