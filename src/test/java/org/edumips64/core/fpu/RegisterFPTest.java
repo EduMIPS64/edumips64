@@ -1,10 +1,8 @@
 package org.edumips64.core.fpu;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import org.edumips64.BaseTest;
-import org.edumips64.core.IrregularStringOfBitsException;
 import org.junit.Before;
 import org.junit.Test;
 
