@@ -829,4 +829,10 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testXori() throws Exception {
     runMipsTest("xori.s");
   }
+
+  /* Test for circular #include detection (issue with inclusion loop not being detected) */
+  @Test(expected = ParserMultiException.class, timeout=2000)
+  public void testCircularInclude() throws Exception {
+    runMipsTest("include-1.s");
+  }
 }
