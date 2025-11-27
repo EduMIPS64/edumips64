@@ -22,6 +22,7 @@
 package org.edumips64.core.is;
 
 import org.edumips64.core.*;
+import org.edumips64.core.fpu.RegisterFP;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -41,7 +42,7 @@ public abstract class Instruction implements InstructionInterface {
   private String comment;
   //protected static CPU cpu;
   protected Register[] TR; //is not static because each instruction has got its own registers
-  protected Register[] TRfp;
+  protected RegisterFP[] TRfp;
   protected String fullname;
   protected String label;
   protected static final Logger logger = Logger.getLogger(Instruction.class.getName());
@@ -73,7 +74,7 @@ public abstract class Instruction implements InstructionInterface {
   Instruction() {
     params = new LinkedList<>();
     TR = new Register[5];
-    TRfp = new Register[5];
+    TRfp = new RegisterFP[5];
     repr = new BitSet32();
     syntax = "";
     repr.reset(false);
@@ -81,7 +82,7 @@ public abstract class Instruction implements InstructionInterface {
     //initialization of temporary registers
     for (int i = 0; i < TR.length; i++) {
       TR[i] = new Register("TR " + i + "(Instruction " + serialNumber + ")");
-      TRfp[i] = new Register("TR (float) " + i + "(Instruction " + serialNumber + ")");
+      TRfp[i] = new RegisterFP("TR (float) " + i + "(Instruction " + serialNumber + ")");
     }
   }
 
