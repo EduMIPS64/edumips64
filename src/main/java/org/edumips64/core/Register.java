@@ -130,10 +130,11 @@ public class Register extends BitSet64 {
   /** Returns a string with a double value or the name of a special value.
    * It is recommended to use this method only for the visualisation of the double value 
    * because it may return an alphanumeric value.
+   * This is a FP-specific feature used for displaying FP register values.
    * @return the double value or the special values "Quiet NaN","Signaling NaN", 
    *         "Positive infinity", "Negative infinity","Positive zero","Negative zero"
    */
-  public String getValueString() {
+  public String getFPDoubleValueAsString() {
     return readDouble();
   }
 

@@ -26,19 +26,19 @@ public class RegisterTest extends BaseTest {
   @Test
   public void testWriteAndReadDouble() throws Exception {
     register.writeDouble(3.14);
-    assertEquals("3.14", register.getValueString());
+    assertEquals("3.14", register.getFPDoubleValueAsString());
   }
 
   @Test
   public void testWriteAndReadDoubleZero() throws Exception {
     register.writeDouble(0.0);
-    assertEquals("Positive zero", register.getValueString());
+    assertEquals("Positive zero", register.getFPDoubleValueAsString());
   }
 
   @Test
   public void testWriteAndReadDoubleNegative() throws Exception {
     register.writeDouble(-42.5);
-    assertEquals("-42.5", register.getValueString());
+    assertEquals("-42.5", register.getFPDoubleValueAsString());
   }
 
   @Test
@@ -51,7 +51,7 @@ public class RegisterTest extends BaseTest {
     
     assertEquals(0, register.getWriteSemaphore());
     assertEquals(0, register.getWAWSemaphore());
-    assertEquals("Positive zero", register.getValueString());
+    assertEquals("Positive zero", register.getFPDoubleValueAsString());
   }
 
   @Test
