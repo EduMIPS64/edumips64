@@ -159,7 +159,13 @@ public class Parser {
           end = data.length();
         }
 
-        int a = included.search(data.substring(i + 9, end).trim());
+        String filename = data.substring(i + 9, end).split(";") [0].trim();
+
+        if (!fileUtils.isAbsolute(filename)) {
+          filename = basePath + filename;
+        }
+
+        int a = included.search(filename);
 
         if (a != -1) {
           var error = new ParserMultiException();
@@ -167,14 +173,10 @@ public class Parser {
           throw error;
         }
 
-        String filename = data.substring(i + 9, end).split(";") [0].trim();
-
-        if (!fileUtils.isAbsolute(filename)) {
-          filename = basePath + filename;
-        }
-
         String filetmp = fileToString(filename);
+        included.push(filename);
         checkLoop(filetmp , included);
+        included.pop();
         i ++;
       }
     } while (i != -1);
