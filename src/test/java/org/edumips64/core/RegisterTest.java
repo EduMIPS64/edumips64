@@ -3,42 +3,46 @@ package org.edumips64.core;
 import static org.junit.Assert.assertEquals;
 
 import org.edumips64.BaseTest;
+import org.edumips64.core.fpu.RegisterFP;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Unit tests for Register class.
- * Tests that Register supports both integer and FP register functionality.
+ * Tests Register functionality and RegisterFP-specific FP features.
  */
 public class RegisterTest extends BaseTest {
   private Register register;
+  private RegisterFP registerFP;
 
   @Before
   public void setUp() {
-    register = new Register("F0");
+    register = new Register("R0");
+    registerFP = new RegisterFP("F0");
   }
 
   @Test
   public void testGetName() {
-    assertEquals("F0", register.getName());
+    assertEquals("R0", register.getName());
+    assertEquals("F0", registerFP.getName());
   }
 
   @Test
   public void testWriteAndReadDouble() throws Exception {
-    register.writeDouble(3.14);
-    assertEquals("3.14", register.getFPDoubleValueAsString());
+    registerFP.writeDouble(3.14);
+    assertEquals("3.14", registerFP.getFPDoubleValueAsString());
   }
 
   @Test
   public void testWriteAndReadDoubleZero() throws Exception {
-    register.writeDouble(0.0);
-    assertEquals("Positive zero", register.getFPDoubleValueAsString());
+    registerFP.writeDouble(0.0);
+    assertEquals("Positive zero", registerFP.getFPDoubleValueAsString());
   }
 
   @Test
   public void testWriteAndReadDoubleNegative() throws Exception {
-    register.writeDouble(-42.5);
-    assertEquals("-42.5", register.getFPDoubleValueAsString());
+    registerFP.writeDouble(-42.5);
+    assertEquals("-42.5", registerFP.getFPDoubleValueAsString());
   }
 
   @Test
@@ -51,7 +55,19 @@ public class RegisterTest extends BaseTest {
     
     assertEquals(0, register.getWriteSemaphore());
     assertEquals(0, register.getWAWSemaphore());
-    assertEquals("Positive zero", register.getFPDoubleValueAsString());
+  }
+
+  @Test
+  public void testResetFP() throws Exception {
+    registerFP.writeDouble(123.456);
+    registerFP.incrWriteSemaphore();
+    registerFP.incrWAWSemaphore();
+    
+    registerFP.reset();
+    
+    assertEquals(0, registerFP.getWriteSemaphore());
+    assertEquals(0, registerFP.getWAWSemaphore());
+    assertEquals("Positive zero", registerFP.getFPDoubleValueAsString());
   }
 
   @Test
@@ -114,5 +130,17 @@ public class RegisterTest extends BaseTest {
   public void testGetValue() {
     register.reset();
     assertEquals(0L, register.getValue());
+  }
+
+  @Test
+  public void testRegisterFPExtendsRegister() {
+    // RegisterFP should inherit all Register functionality
+    assertEquals(0, registerFP.getWriteSemaphore());
+    registerFP.incrWriteSemaphore();
+    assertEquals(1, registerFP.getWriteSemaphore());
+    
+    assertEquals(0, registerFP.getWAWSemaphore());
+    registerFP.incrWAWSemaphore();
+    assertEquals(1, registerFP.getWAWSemaphore());
   }
 }
