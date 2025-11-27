@@ -22,53 +22,21 @@
  */
 package org.edumips64.core.fpu;
 
-import org.edumips64.core.FCSRRegister;
-import org.edumips64.core.FixedBitSet;
-import org.edumips64.core.IrregularStringOfBitsException;
-import org.edumips64.core.IrregularWriteOperationException;
+import org.edumips64.core.BitSet64;
 
-/** This class models a 64-bit array, useful for floating point registers
+/** This class models a 64-bit array, useful for floating point registers.
+ * 
+ * This class now extends BitSet64 which provides writeDouble and readDouble methods.
+ * It is kept for backward compatibility.
+ * 
  * @author Massimo Trubia
  * */
 
-public class BitSet64FP extends FixedBitSet {
-  private FPInstructionUtils fpInstructionUtils;
+public class BitSet64FP extends BitSet64 {
 
   /** Creates a default new instance of BitSet64FP. */
   public BitSet64FP() {
-    super(64);
-    fpInstructionUtils = new FPInstructionUtils(new FCSRRegister());
+    super();
   }
-
-  /** Writes a floating point double precision number into this FixedBitSet: the value to be written must be in the range
-   * [A=-1.797693134862315708145274237317E308,B=-4.9406564584124654417656879286822E-324] U [C=4.9406564584124654417656879286822E-324, D=1.797693134862315708145274237317E308].
-   * For values that belong to ]-Infinity,A[ U ]D,+ Infinity[  an overflow exception will be thrown, on the contrary
-   * values that belong to ]B,C[ an underflow exception will be thrown.
-   * @param value double number to be written: must be on the format  "2.345" or "2345E-3"
-   * @throws FPUnderflowException,FPOverflowException, IrregularWriteOperationException,FPInvalidOperationException
-   */
-  public void writeDouble(double value) throws FPUnderflowException, FPOverflowException, FPInvalidOperationException, IrregularWriteOperationException, IrregularStringOfBitsException {
-    this.reset(false);
-    String bits = fpInstructionUtils.doubleToBin(value + "");
-
-    try {
-      this.setBits(bits, 0);
-    } catch (IrregularStringOfBitsException e) {
-      e.printStackTrace();
-      throw new IrregularWriteOperationException();
-    }
-  }
-
-  /**Returns a string with a double value or the name of a special value
-    * it is recommended the use of this method only for the visualisation of the double value because it may return an alphanumeric value
-    * @return the double value or the special values "Quiet NaN","Signaling NaN", "Positive infinity", "Negative infinity","Positive zero","Negative zero"
-    */
-  public String readDouble() {
-    return FPInstructionUtils.binToDouble(this.getBinString());
-  }
-
-
 }
-
-
 
