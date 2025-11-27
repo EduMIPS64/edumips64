@@ -3,6 +3,38 @@ const { test, expect } = require('@playwright/test');
 const targetUri = process.env.PLAYWRIGHT_TARGET_URL || "http://localhost:8080";
 
 /**
+ * Helper function to wait for the page to be ready
+ */
+async function waitForPageReady(page) {
+  await page.waitForSelector('#load-button');
+  await page.waitForSelector('.monaco-editor');
+}
+
+/**
+ * Helper function to wait for simulator to enter RUNNING state
+ */
+async function waitForRunningState(page) {
+  // Wait for the Single Step button to become enabled (indicates RUNNING state)
+  await page.waitForSelector('button:has-text("Single Step"):not([disabled])', { timeout: 10000 });
+}
+
+/**
+ * Helper function to wait for simulator to finish execution
+ */
+async function waitForSimulationComplete(page) {
+  // Wait for the Stop button to become disabled (indicates simulation ended)
+  await page.waitForSelector('button:has-text("Stop")[disabled]', { timeout: 30000 });
+}
+
+/**
+ * Helper function to expand Memory accordion and wait for table
+ */
+async function expandMemoryAndWaitForTable(page) {
+  await page.getByRole('button', { name: 'Memory' }).click();
+  await page.waitForSelector('#memory tbody tr', { timeout: 5000 });
+}
+
+/**
  * Regression test for issue #1306: Memory values should be displayed with consistent 64-bit hex width.
  * 
  * Before the fix, memory values were displayed with 32-bit hex widths (8 characters),
@@ -15,26 +47,16 @@ test('memory values should have consistent 64-bit hex width', async ({ page }) =
   await page.goto(targetUri);
 
   // Wait for the page to load
-  await page.waitForSelector('#load-button');
-  await page.waitForSelector('.monaco-editor');
+  await waitForPageReady(page);
 
   // Click Load button to load the default sample program
   await page.click('text=Load');
 
-  // Wait for the simulator to enter RUNNING state (indicates program loaded)
-  await page.waitForFunction(() => {
-    const text = document.body.textContent;
-    return text.includes('RUNNING');
-  }, { timeout: 10000 });
+  // Wait for the simulator to enter RUNNING state
+  await waitForRunningState(page);
 
-  // Give time for the state to update
-  await page.waitForTimeout(500);
-
-  // Expand the Memory accordion by clicking the Memory button
-  await page.getByRole('button', { name: 'Memory' }).click();
-
-  // Wait for the memory table to be visible
-  await page.waitForSelector('#memory tbody tr', { timeout: 5000 });
+  // Expand the Memory accordion and wait for table
+  await expandMemoryAndWaitForTable(page);
 
   // Get all value cells from the memory table (second column)
   // The memory table has columns: Address, Value, Label, Code, Comment
@@ -69,8 +91,7 @@ test('memory values remain 64-bit width after store byte instruction', async ({ 
   await page.goto(targetUri);
 
   // Wait for the page to load
-  await page.waitForSelector('#load-button');
-  await page.waitForSelector('.monaco-editor');
+  await waitForPageReady(page);
 
   // Program that stores a byte value in memory (test case from issue #1306)
   const testProgram = `.data
@@ -93,25 +114,16 @@ test('memory values remain 64-bit width after store byte instruction', async ({ 
   await page.click('text=Load');
 
   // Wait for the simulator to enter RUNNING state
-  await page.waitForFunction(() => {
-    const text = document.body.textContent;
-    return text.includes('RUNNING');
-  }, { timeout: 10000 });
-
-  // Wait a bit for loading
-  await page.waitForTimeout(500);
+  await waitForRunningState(page);
 
   // Execute the program by clicking Run All button
   await page.getByRole('button', { name: 'Run until the simulation ends' }).click();
   
-  // Wait for execution to complete (status changes to STOPPED or similar)
-  await page.waitForTimeout(2000);
+  // Wait for execution to complete
+  await waitForSimulationComplete(page);
 
-  // Expand the Memory accordion
-  await page.getByRole('button', { name: 'Memory' }).click();
-
-  // Wait for the memory table to be visible
-  await page.waitForSelector('#memory tbody tr', { timeout: 5000 });
+  // Expand the Memory accordion and wait for table
+  await expandMemoryAndWaitForTable(page);
 
   // Get all value cells from the memory table
   const valueElements = await page.$$('#memory tbody tr td:nth-child(2)');
