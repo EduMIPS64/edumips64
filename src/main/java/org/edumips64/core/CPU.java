@@ -28,7 +28,6 @@ import org.edumips64.core.fpu.FPDividerNotAvailableException;
 import org.edumips64.core.fpu.FPFunctionalUnitNotAvailableException;
 import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.core.fpu.FPPipeline;
-import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.AddressErrorException;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
@@ -56,7 +55,7 @@ public class CPU {
   private static final Logger logger = Logger.getLogger(CPU.class.getName());
 
   /** FPU Elements*/
-  private RegisterFP[] fpr;
+  private Register[] fpr;
   private FCSRRegister FCSR;
   private FPPipeline fpPipe;
 
@@ -134,10 +133,10 @@ public class CPU {
     HI = new Register("HI");
 
     //Floating point registers initialization
-    fpr = new RegisterFP[32];
+    fpr = new Register[32];
 
     for (int i = 0; i < 32; i++) {
-      fpr[i] = new RegisterFP("F" + i);
+      fpr[i] = new Register("F" + i);
     }
 
     FCSR = new FCSRRegister();
@@ -202,7 +201,7 @@ public class CPU {
     return gpr;
   }
 
-  public RegisterFP[] getRegistersFP() {
+  public Register[] getRegistersFP() {
     return fpr;
   }
 
@@ -213,7 +212,7 @@ public class CPU {
     return gpr[index];
   }
 
-  public RegisterFP getRegisterFP(int index) {
+  public Register getRegisterFP(int index) {
     return fpr[index];
   }
 
@@ -811,7 +810,7 @@ public class CPU {
     StringBuilder s = new StringBuilder();
     int i = 0;
 
-    for (RegisterFP r: fpr) {
+    for (Register r: fpr) {
       s.append("FP Register ").append(i++).append(":\t").append(r.toString()).append("\n");
     }
 
