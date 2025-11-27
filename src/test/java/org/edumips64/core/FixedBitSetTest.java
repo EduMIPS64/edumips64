@@ -47,4 +47,42 @@ public class FixedBitSetTest {
           assertEquals(expected, bitset.getBinString());
       }
   }
+
+  // Tests for writeDouble and readDouble methods added during RegisterFP refactoring
+
+  @Test
+  public void testWriteDoubleAndReadDouble() throws Exception {
+    bitset.writeDouble(3.14);
+    assertEquals("3.14", bitset.readDouble());
+  }
+
+  @Test
+  public void testWriteDoubleZero() throws Exception {
+    bitset.writeDouble(0.0);
+    assertEquals("Positive zero", bitset.readDouble());
+  }
+
+  @Test
+  public void testWriteDoubleNegative() throws Exception {
+    bitset.writeDouble(-1.5);
+    assertEquals("-1.5", bitset.readDouble());
+  }
+
+  @Test
+  public void testWriteDoubleOne() throws Exception {
+    bitset.writeDouble(1.0);
+    assertEquals("1.0", bitset.readDouble());
+  }
+
+  @Test
+  public void testWriteDoubleLargeNumber() throws Exception {
+    bitset.writeDouble(1.0E100);
+    assertEquals("1.0E100", bitset.readDouble());
+  }
+
+  @Test
+  public void testReadDoubleAfterReset() throws Exception {
+    bitset.reset(false);
+    assertEquals("Positive zero", bitset.readDouble());
+  }
 }
