@@ -28,7 +28,6 @@ package org.edumips64;
 import org.edumips64.core.*;
 import org.edumips64.core.cache.CacheConfig;
 import org.edumips64.core.cache.CacheStats;
-import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.AddressErrorException;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
@@ -74,7 +73,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     int instructions;
     int rawStalls, wawStalls, memStalls, divStalls;
     String traceFile;
-    RegisterFP[] fpRegisters;
+    Register[] fpRegisters;
 
     CpuTestStatus(CPU cpu, String dineroTrace) {
       cycles = cpu.getCycles();
@@ -86,12 +85,12 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       traceFile = dineroTrace;
 
       // Deep copy the FP Registers.
-      RegisterFP cpuFPRegisters[] = cpu.getRegistersFP();
-      fpRegisters = new RegisterFP[cpuFPRegisters.length];
+      Register cpuFPRegisters[] = cpu.getRegistersFP();
+      fpRegisters = new Register[cpuFPRegisters.length];
       log.info("Deep copying " + cpuFPRegisters.length + " FP registers");
       for (int i = 0; i < cpuFPRegisters.length; ++i) {
-        RegisterFP r = cpuFPRegisters[i];
-        fpRegisters[i] = new RegisterFP("F" + i);
+        Register r = cpuFPRegisters[i];
+        fpRegisters[i] = new Register("F" + i);
         try {
           log.info(i + ": " + r.getBinString());
           fpRegisters[i].setBits(r.getBinString(), 0);

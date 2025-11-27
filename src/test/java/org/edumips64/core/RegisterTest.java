@@ -1,4 +1,4 @@
-package org.edumips64.core.fpu;
+package org.edumips64.core;
 
 import static org.junit.Assert.assertEquals;
 
@@ -7,15 +7,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit tests for RegisterFP class.
- * Tests that RegisterFP properly extends Register and adds FP-specific functionality.
+ * Unit tests for Register class.
+ * Tests that Register supports both integer and FP register functionality.
  */
-public class RegisterFPTest extends BaseTest {
-  private RegisterFP register;
+public class RegisterTest extends BaseTest {
+  private Register register;
 
   @Before
   public void setUp() {
-    register = new RegisterFP("F0");
+    register = new Register("F0");
   }
 
   @Test
@@ -100,7 +100,6 @@ public class RegisterFPTest extends BaseTest {
 
   @Test
   public void testToString() throws Exception {
-    // Reset should give all zeros
     register.reset();
     assertEquals("0000000000000000", register.toString());
   }
@@ -112,9 +111,7 @@ public class RegisterFPTest extends BaseTest {
   }
 
   @Test
-  public void testInheritsFromRegister() {
-    // Test that RegisterFP inherits Register's getValue() method
-    // which returns a long representation of the bits
+  public void testGetValue() {
     register.reset();
     assertEquals(0L, register.getValue());
   }

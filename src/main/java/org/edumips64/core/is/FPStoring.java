@@ -30,7 +30,6 @@ import org.edumips64.core.MemoryElementNotFoundException;
 import org.edumips64.core.NotAlignException;
 import org.edumips64.core.Register;
 import org.edumips64.core.fpu.FPInvalidOperationException;
-import org.edumips64.core.fpu.RegisterFP;
 
 
 /** This is the base class for the storing instructions
@@ -46,7 +45,7 @@ public abstract class FPStoring extends FPLDSTInstructions {
   public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if the base register and the ft register are valid passing value of ft register into a temporary floating point register
     Register base = cpu.getRegister(params.get(BASE_FIELD));
-    RegisterFP ft = cpu.getRegisterFP(params.get(FT_FIELD));
+    Register ft = cpu.getRegisterFP(params.get(FT_FIELD));
 
     if (base.getWriteSemaphore() > 0 || ft.getWriteSemaphore() > 0) {
       return true;

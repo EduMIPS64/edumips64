@@ -36,7 +36,6 @@ import org.edumips64.core.Register;
 import org.edumips64.core.CPU.CPUStatus;
 import org.edumips64.core.Pipeline.Stage;
 import org.edumips64.core.CacheSimulator;
-import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.utils.io.StringWriter;
@@ -192,7 +191,7 @@ public class ResultFactory {
             // FPU registers.
             i = 0;
             JSONArray jsonFpuRegisters = new JSONArray();
-            for(RegisterFP r : cpu.getRegistersFP()) {
+            for(Register r : cpu.getRegistersFP()) {
                 jsonFpuRegisters.set(i++,
                 new FluentJsonObject()
                     .put("name", r.getName())

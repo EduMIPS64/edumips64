@@ -24,7 +24,6 @@
 package org.edumips64.ui.swing;
 
 import org.edumips64.core.*;
-import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
 
@@ -58,7 +57,7 @@ import javax.swing.table.AbstractTableModel;
 
 class GUIRegisters extends GUIComponent {
   private Register registers[];
-  private RegisterFP registersFP[];
+  private Register registersFP[];
   private RegPanel regPanel;
   private JTextArea text;
   private String[] value = new String[34];

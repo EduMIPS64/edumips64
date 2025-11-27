@@ -28,9 +28,9 @@ import org.edumips64.core.Converter;
 import org.edumips64.core.FCSRRegister;
 import org.edumips64.core.IrregularStringOfBitsException;
 import org.edumips64.core.IrregularWriteOperationException;
+import org.edumips64.core.Register;
 import org.edumips64.core.fpu.FPInstructionUtils;
 import org.edumips64.core.fpu.FPInvalidOperationException;
-import org.edumips64.core.fpu.RegisterFP;
 
 import java.math.*;
 
@@ -65,8 +65,8 @@ public abstract class FPC_cond_DInstructions extends ComputationalInstructions {
 
   public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if source registers are valid passing their own values into temporary registers
-    RegisterFP fs = cpu.getRegisterFP(params.get(FS_FIELD));
-    RegisterFP ft = cpu.getRegisterFP(params.get(FT_FIELD));
+    Register fs = cpu.getRegisterFP(params.get(FS_FIELD));
+    Register ft = cpu.getRegisterFP(params.get(FT_FIELD));
 
     if (fs.getWriteSemaphore() > 0 || ft.getWriteSemaphore() > 0) {
       return true;
@@ -78,8 +78,8 @@ public abstract class FPC_cond_DInstructions extends ComputationalInstructions {
   }
 
   public void EX() throws IrregularStringOfBitsException, FPInvalidOperationException {
-    RegisterFP fs = TRfp[FS_FIELD];
-    RegisterFP ft = TRfp[FT_FIELD];
+    Register fs = TRfp[FS_FIELD];
+    Register ft = TRfp[FT_FIELD];
     boolean less;
     boolean equal;
     boolean unordered;
