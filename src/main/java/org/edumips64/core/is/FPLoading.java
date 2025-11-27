@@ -32,6 +32,7 @@ import org.edumips64.core.MemoryElementNotFoundException;
 import org.edumips64.core.NotAlignException;
 import org.edumips64.core.Register;
 import org.edumips64.core.fpu.FPInvalidOperationException;
+import org.edumips64.core.fpu.RegisterFP;
 
 /** This is the base class for loading instruction
  *
@@ -56,7 +57,7 @@ public abstract class FPLoading extends FPLDSTInstructions {
     //saving address into a temporary register
     TR[OFFSET_PLUS_BASE].writeDoubleWord(address);
     //locking ft register either in write mode or in read mode
-    Register ft = cpu.getRegisterFP(params.get(FT_FIELD));
+    RegisterFP ft = cpu.getRegisterFP(params.get(FT_FIELD));
 
     if (ft.getWAWSemaphore() > 0) {
       throw new WAWException();

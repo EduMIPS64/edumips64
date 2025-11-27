@@ -29,6 +29,7 @@ import org.edumips64.core.IrregularWriteOperationException;
 import org.edumips64.core.MemoryElementNotFoundException;
 import org.edumips64.core.Register;
 import org.edumips64.core.fpu.FPInvalidOperationException;
+import org.edumips64.core.fpu.RegisterFP;
 
 /**This is the base class of the move to and from instructions
  *
@@ -42,7 +43,7 @@ public abstract class FPMoveToInstructions extends FPMoveToAndFromInstructions {
 
   public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if source registers are valid we pass their own values into temporary registers
-    Register fs = cpu.getRegisterFP(params.get(FS_FIELD));
+    RegisterFP fs = cpu.getRegisterFP(params.get(FS_FIELD));
     Register rt = cpu.getRegister(params.get(RT_FIELD));
 
     if (rt.getWriteSemaphore() > 0) {

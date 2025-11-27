@@ -35,6 +35,7 @@ import org.edumips64.core.fpu.FPInstructionUtils;
 import org.edumips64.core.fpu.FPInvalidOperationException;
 import org.edumips64.core.fpu.FPOverflowException;
 import org.edumips64.core.fpu.FPUnderflowException;
+import org.edumips64.core.fpu.RegisterFP;
 
 /**This is the base class for the floatiing point arithmetic instructions
  *
@@ -68,8 +69,8 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
 
   public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //if source registers are valid passing their own values into temporary registers
-    Register fs = cpu.getRegisterFP(params.get(FS_FIELD));
-    Register ft = cpu.getRegisterFP(params.get(FT_FIELD));
+    RegisterFP fs = cpu.getRegisterFP(params.get(FS_FIELD));
+    RegisterFP ft = cpu.getRegisterFP(params.get(FT_FIELD));
 
     if (fs.getWriteSemaphore() > 0 || ft.getWriteSemaphore() > 0) {
       return true;
@@ -78,7 +79,7 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
     TRfp[FS_FIELD].setBits(fs.getBinString(), 0);
     TRfp[FT_FIELD].setBits(ft.getBinString(), 0);
     //locking the destination register
-    Register fd = cpu.getRegisterFP(params.get(FD_FIELD));
+    RegisterFP fd = cpu.getRegisterFP(params.get(FD_FIELD));
 
     if (fd.getWAWSemaphore() > 0) {
       throw new WAWException();
