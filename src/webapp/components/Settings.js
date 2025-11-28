@@ -34,13 +34,25 @@ const Settings = ({ viMode, setViMode, fontSize, setFontSize }) => {
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <Typography sx={{ fontSize: '0.85rem' }}>Font Size</Typography>
         <ButtonGroup size="small" variant="contained">
-          <Button onClick={() => setFontSize(Math.max(fontSize - 1, 1))}>
-            −
+          <Button
+            onClick={() => setFontSize(Math.max(fontSize - 1, 1))}
+            aria-label="Decrease font size"
+          >
+            -
           </Button>
-          <Button disabled sx={{ minWidth: '40px' }}>
+          <Button
+            disabled
+            sx={{ minWidth: '40px' }}
+            aria-label={`Current font size: ${fontSize}`}
+          >
             {fontSize}
           </Button>
-          <Button onClick={() => setFontSize(fontSize + 1)}>+</Button>
+          <Button
+            onClick={() => setFontSize(fontSize + 1)}
+            aria-label="Increase font size"
+          >
+            +
+          </Button>
         </ButtonGroup>
       </Box>
     </Box>
