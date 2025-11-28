@@ -3,7 +3,9 @@ const { test, expect } = require('@playwright/test');
 const targetUri = process.env.PLAYWRIGHT_TARGET_URL || 'http://localhost:8080';
 
 /**
- * Helper function to remove webpack dev server overlay if present
+ * Helper function to remove webpack dev server overlay if present.
+ * The overlay can intercept pointer events and cause test failures.
+ * @param {import('@playwright/test').Page} page - Playwright page object
  */
 async function removeOverlay(page) {
   await page.evaluate(() => {
@@ -18,6 +20,7 @@ async function removeOverlay(page) {
 
 /**
  * Helper function to wait for the page to be ready
+ * @param {import('@playwright/test').Page} page - Playwright page object
  */
 async function waitForPageReady(page) {
   await page.waitForSelector('#load-button');
@@ -29,6 +32,7 @@ async function waitForPageReady(page) {
 
 /**
  * Helper function to wait for simulator to enter RUNNING state
+ * @param {import('@playwright/test').Page} page - Playwright page object
  */
 async function waitForRunningState(page) {
   // Wait for the Single Step button to become enabled (indicates RUNNING state)
@@ -39,6 +43,7 @@ async function waitForRunningState(page) {
 
 /**
  * Helper function to wait for simulator to finish execution
+ * @param {import('@playwright/test').Page} page - Playwright page object
  */
 async function waitForSimulationComplete(page) {
   // Wait for the Stop button to become disabled (indicates simulation ended)
@@ -48,16 +53,19 @@ async function waitForSimulationComplete(page) {
 }
 
 /**
- * Helper function to set cache configuration values
- * @param {Page} page - Playwright page object
+ * Helper function to set cache configuration values.
+ * Uses positional selectors within each cache section to find the correct input fields.
+ * The order of inputs is: Size, Block Size, Associativity, Penalty.
+ * @param {import('@playwright/test').Page} page - Playwright page object
  * @param {string} cacheType - 'L1 Data Cache' or 'L1 Instruction Cache'
  * @param {object} config - { size, blockSize, associativity, penalty }
  */
 async function setCacheConfig(page, cacheType, config) {
-  // Find the cache configuration section
+  // Find the cache configuration section by its label
   const cacheSection = page.locator(`text=${cacheType}`).locator('..');
 
-  // Set each config value
+  // Set each config value using positional selectors
+  // The inputs appear in order: Size, Block Size, Associativity, Penalty
   if (config.size !== undefined) {
     const sizeInput = cacheSection.locator('input[type="number"]').nth(0);
     await sizeInput.fill(String(config.size));
@@ -78,8 +86,8 @@ async function setCacheConfig(page, cacheType, config) {
 
 /**
  * Helper function to get cache statistics from the Statistics panel
- * @param {Page} page - Playwright page object
- * @returns {object} - { l1iReads, l1iMisses, l1dReads, l1dReadMisses, l1dWrites, l1dWriteMisses }
+ * @param {import('@playwright/test').Page} page - Playwright page object
+ * @returns {Promise<object>} - { l1iReads, l1iMisses, l1dReads, l1dReadMisses, l1dWrites, l1dWriteMisses }
  */
 async function getCacheStats(page) {
   // Get the statistics div
@@ -98,22 +106,28 @@ async function getCacheStats(page) {
   );
 
   const l1iReads = parseInt(
-    (await l1iReadsRow.locator('td').nth(1).textContent()) || '0'
+    (await l1iReadsRow.locator('td').nth(1).textContent()) || '0',
+    10
   );
   const l1iMisses = parseInt(
-    (await l1iMissesRow.locator('td').nth(1).textContent()) || '0'
+    (await l1iMissesRow.locator('td').nth(1).textContent()) || '0',
+    10
   );
   const l1dReads = parseInt(
-    (await l1dReadsRow.locator('td').nth(1).textContent()) || '0'
+    (await l1dReadsRow.locator('td').nth(1).textContent()) || '0',
+    10
   );
   const l1dReadMisses = parseInt(
-    (await l1dReadMissesRow.locator('td').nth(1).textContent()) || '0'
+    (await l1dReadMissesRow.locator('td').nth(1).textContent()) || '0',
+    10
   );
   const l1dWrites = parseInt(
-    (await l1dWritesRow.locator('td').nth(1).textContent()) || '0'
+    (await l1dWritesRow.locator('td').nth(1).textContent()) || '0',
+    10
   );
   const l1dWriteMisses = parseInt(
-    (await l1dWriteMissesRow.locator('td').nth(1).textContent()) || '0'
+    (await l1dWriteMissesRow.locator('td').nth(1).textContent()) || '0',
+    10
   );
 
   return {
@@ -128,7 +142,7 @@ async function getCacheStats(page) {
 
 /**
  * Helper function to load a MIPS program into the editor
- * @param {Page} page - Playwright page object
+ * @param {import('@playwright/test').Page} page - Playwright page object
  * @param {string} program - MIPS assembly code
  */
 async function loadProgram(page, program) {
@@ -138,18 +152,15 @@ async function loadProgram(page, program) {
   // Click on the Monaco editor to focus it
   await page.click('.monaco-editor');
 
-  // Select all text and replace with our program
-  await page.keyboard.press('Control+a');
+  // Select all text using cross-platform modifier (ControlOrMeta works on both Win/Linux and Mac)
+  await page.keyboard.press('ControlOrMeta+a');
   await page.keyboard.type(program);
-
-  // Wait a moment for syntax check to complete
-  await page.waitForTimeout(1000);
 
   // Remove overlay again before clicking Load
   await removeOverlay(page);
 
-  // Wait for Load button to be enabled (syntax valid)
-  await page.waitForSelector('#load-button:not([disabled])', { timeout: 5000 });
+  // Wait for Load button to be enabled (syntax valid) - this implicitly waits for syntax check
+  await page.waitForSelector('#load-button:not([disabled])', { timeout: 10000 });
 
   // Click Load button using the id selector for precision
   await page.click('#load-button');
@@ -160,7 +171,7 @@ async function loadProgram(page, program) {
 
 /**
  * Helper function to run the simulation to completion
- * @param {Page} page - Playwright page object
+ * @param {import('@playwright/test').Page} page - Playwright page object
  */
 async function runToCompletion(page) {
   // Remove overlay before clicking
@@ -275,9 +286,6 @@ test('changing cache configuration affects cache misses', async ({ page }) => {
   await page.goto(targetUri);
 
   await waitForPageReady(page);
-
-  // Expand the Cache Configuration accordion if it's not already expanded
-  // The accordion is defaultExpanded, so it should be visible
 
   // Configure L1 Data Cache with a small size to cause more misses
   await setCacheConfig(page, 'L1 Data Cache', {
