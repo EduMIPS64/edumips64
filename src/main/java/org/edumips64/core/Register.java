@@ -31,10 +31,12 @@ import java.util.logging.Logger;
 
 
 /** This class models a 64-bit CPU's internal register.
+ * Supports both integer and floating point registers.
  * @author Salvatore Scellato
  */
 public class Register extends BitSet64 {
   private int writeSemaphore;
+  private int WAWSemaphore;
   private String reg_name, reg_alias;
 
   public final static Logger logger = Logger.getLogger(Register.class.getName());
@@ -44,6 +46,7 @@ public class Register extends BitSet64 {
      */
   public Register(String name) {
     writeSemaphore = 0;
+    WAWSemaphore = 0;
     reg_name = name;
     
     reg_alias = "";
@@ -67,11 +70,24 @@ public class Register extends BitSet64 {
     return writeSemaphore;
   }
 
+  /** Returns the value of the WAW semaphore
+   *  @return the numerical value of the WAW semaphore
+   */
+  public int getWAWSemaphore() {
+    return WAWSemaphore;
+  }
+
   /** Increments the value of the semaphore
    */
   public void incrWriteSemaphore() {
     writeSemaphore++;
     logger.info("Incremented write semaphore for " + reg_name + ": " + writeSemaphore);
+  }
+
+  /** Increments the value of the WAW semaphore
+   */
+  public void incrWAWSemaphore() {
+    WAWSemaphore++;
   }
 
   /** Decrements the value of the semaphore.
@@ -85,6 +101,17 @@ public class Register extends BitSet64 {
     }
 
     logger.info("Decremented write semaphore for " + reg_name + ": " + writeSemaphore);
+  }
+
+  /** Decrements the value of the WAW semaphore.
+   *  It throws a <code>RuntimeException</code> if the semaphore value gets below zero, because
+   *  the value becomes negative only in case of programming errors, and the EduMIPS64 team
+   *  doesn't make any programming error.
+   */
+  public void decrWAWSemaphore() {
+    if (--WAWSemaphore < 0) {
+      throw new RuntimeException("WAW semaphore for " + reg_name + " reached a negative value.");
+    }
   }
 
   /** Returns the signed numeric decimal value stored in this register.
@@ -105,6 +132,7 @@ public class Register extends BitSet64 {
   public void reset() {
     super.reset(false);
     writeSemaphore = 0;
+    WAWSemaphore = 0;
   }
 
 

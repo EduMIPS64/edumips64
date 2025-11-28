@@ -197,7 +197,7 @@ public class ResultFactory {
                 new FluentJsonObject()
                     .put("name", r.getName())
                     .put("hexString", r.getHexString())
-                    .put("value", r.getValue())
+                    .put("value", r.getFPDoubleValueAsString())
                     .toJsonObject());
             }
             registers.put("fpu", jsonFpuRegisters);

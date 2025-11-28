@@ -23,7 +23,6 @@
 package org.edumips64.ui.swing;
 
 import org.edumips64.core.*;
-import org.edumips64.core.fpu.BitSet64FP;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
@@ -140,7 +139,7 @@ public class GUIData extends GUIComponent {
             if (config.getBoolean(ConfigKey.FP_LONG_DOUBLE_VIEW)) {
               value += Converter.hexToLong("0X" + tableModel.getValueAt(theTable.getSelectedRow(), 1));
             } else { //the current memory cell visualization in the status bar is double, we build a temp. bitset in order to read the double value
-              BitSet64FP bs = new BitSet64FP();
+              BitSet64 bs = new BitSet64();
 
               try {
                 bs.setBits(Converter.hexToBin("" + tableModel.getValueAt(theTable.getSelectedRow(), 1)), 0);
