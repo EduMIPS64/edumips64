@@ -1,120 +1,103 @@
 import React, { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
 
 const CacheConfig = ({ onChange, status }) => {
-    const [l1d, setL1D] = useState({ size: 1024, blockSize: 16, associativity: 1, penalty: 40 });
-    const [l1i, setL1I] = useState({ size: 1024, blockSize: 16, associativity: 1, penalty: 40 });
+  const [l1d, setL1D] = useState({
+    size: 1024,
+    blockSize: 16,
+    associativity: 1,
+    penalty: 40,
+  });
+  const [l1i, setL1I] = useState({
+    size: 1024,
+    blockSize: 16,
+    associativity: 1,
+    penalty: 40,
+  });
 
-    const labelStyle = {
-        fontSize: '0.75rem',
-        color: status === 'RUNNING' ? 'gray' : 'inherit'
-    };
+  const isDisabled = status === 'RUNNING';
 
-    useEffect(() => {
-        if (onChange) {
-            onChange({ l1d, l1i });
-        }
-    }, [l1d, l1i]);
+  useEffect(() => {
+    if (onChange) {
+      onChange({ l1d, l1i });
+    }
+  }, [l1d, l1i]);
 
-    return (
-        <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                <Typography sx={{ ...labelStyle, fontWeight: 'bold', minWidth: '130px' }}>L1 Data Cache</Typography>
-                <div>
-                    <Typography sx={labelStyle}>Size</Typography>
-                    <input
-                      type="number"
-                      size="8"
-                      value={l1d.size}
-                      onChange={e => setL1D({ ...l1d, size: parseInt(e.target.value) })}
-                      style={{ width: '8ch' }}
-                      disabled={status === 'RUNNING'}
-                    />
-                </div>
-                <div>
-                    <Typography sx={labelStyle}>Block Size</Typography>
-                    <input
-                      type="number"
-                      size="8"
-                      value={l1d.blockSize}
-                      onChange={e => setL1D({ ...l1d, blockSize: parseInt(e.target.value) })}
-                      style={{ width: '8ch' }}
-                      disabled={status === 'RUNNING'}
-                    />
-                </div>
-                <div>
-                    <Typography sx={labelStyle}>Associativity</Typography>
-                    <input
-                      type="number"
-                      size="4"
-                      value={l1d.associativity}
-                      onChange={e => setL1D({ ...l1d, associativity: parseInt(e.target.value) })}
-                      style={{ width: '4ch' }}
-                      disabled={status === 'RUNNING'}
-                    />
-                </div>
-                <div>
-                    <Typography sx={labelStyle}>Penalty</Typography>
-                    <input
-                      type="number"
-                      size="8"
-                      value={l1d.penalty}
-                      onChange={e => setL1D({ ...l1d, penalty: parseInt(e.target.value) })}
-                      style={{ width: '8ch' }}
-                      disabled={status === 'RUNNING'}
-                    />
-                </div>
-            </div>
+  const CacheRow = ({ label, cache, setCache }) => (
+    <Box sx={{ mb: 2 }}>
+      <Typography
+        sx={{
+          fontSize: '0.85rem',
+          fontWeight: 'bold',
+          color: isDisabled ? 'text.disabled' : 'text.primary',
+          mb: 1,
+        }}
+      >
+        {label}
+      </Typography>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+          gap: 1.5,
+        }}
+      >
+        <TextField
+          label="Size"
+          type="number"
+          size="small"
+          value={cache.size}
+          onChange={(e) =>
+            setCache({ ...cache, size: parseInt(e.target.value) || 0 })
+          }
+          disabled={isDisabled}
+          slotProps={{ htmlInput: { min: 0 } }}
+        />
+        <TextField
+          label="Block Size"
+          type="number"
+          size="small"
+          value={cache.blockSize}
+          onChange={(e) =>
+            setCache({ ...cache, blockSize: parseInt(e.target.value) || 0 })
+          }
+          disabled={isDisabled}
+          slotProps={{ htmlInput: { min: 0 } }}
+        />
+        <TextField
+          label="Associativity"
+          type="number"
+          size="small"
+          value={cache.associativity}
+          onChange={(e) =>
+            setCache({ ...cache, associativity: parseInt(e.target.value) || 0 })
+          }
+          disabled={isDisabled}
+          slotProps={{ htmlInput: { min: 0 } }}
+        />
+        <TextField
+          label="Penalty"
+          type="number"
+          size="small"
+          value={cache.penalty}
+          onChange={(e) =>
+            setCache({ ...cache, penalty: parseInt(e.target.value) || 0 })
+          }
+          disabled={isDisabled}
+          slotProps={{ htmlInput: { min: 0 } }}
+        />
+      </Box>
+    </Box>
+  );
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <Typography sx={{ ...labelStyle, fontWeight: 'bold', minWidth: '130px' }}>L1 Instruction Cache</Typography>
-                <div>
-                    <Typography sx={labelStyle}>Size</Typography>
-                    <input
-                      type="number"
-                      size="8"
-                      value={l1i.size}
-                      onChange={e => setL1I({ ...l1i, size: parseInt(e.target.value) })}
-                      style={{ width: '8ch' }}
-                      disabled={status === 'RUNNING'}
-                    />
-                </div>
-                <div>
-                    <Typography sx={labelStyle}>Block Size</Typography>
-                    <input
-                      type="number"
-                      size="8"
-                      value={l1i.blockSize}
-                      onChange={e => setL1I({ ...l1i, blockSize: parseInt(e.target.value) })}
-                      style={{ width: '8ch' }}
-                      disabled={status === 'RUNNING'}
-                    />
-                </div>
-                <div>
-                    <Typography sx={labelStyle}>Associativity</Typography>
-                    <input
-                      type="number"
-                      size="4"
-                      value={l1i.associativity}
-                      onChange={e => setL1I({ ...l1i, associativity: parseInt(e.target.value) })}
-                      style={{ width: '4ch' }}
-                      disabled={status === 'RUNNING'}
-                    />
-                </div>
-                <div>
-                    <Typography sx={labelStyle}>Penalty</Typography>
-                    <input
-                      type="number"
-                      size="8"
-                      value={l1i.penalty}
-                      onChange={e => setL1I({ ...l1i, penalty: parseInt(e.target.value) })}
-                      style={{ width: '8ch' }}
-                      disabled={status === 'RUNNING'}
-                    />
-                </div>
-            </div>
-        </div>
-    );
+  return (
+    <Box>
+      <CacheRow label="L1 Data Cache" cache={l1d} setCache={setL1D} />
+      <CacheRow label="L1 Instruction Cache" cache={l1i} setCache={setL1I} />
+    </Box>
+  );
 };
 
 export default CacheConfig;
