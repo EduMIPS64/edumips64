@@ -40,6 +40,12 @@ dependencies {
     testImplementation("junit:junit:4.13.2")    
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // GWT Testing
+    testImplementation("org.gwtproject:gwt-user:2.12.2")
+    testImplementation("org.gwtproject:gwt-dev:2.12.2")
+    testImplementation("com.google.elemental2:elemental2-dom:1.3.2")
+    testImplementation("com.vertispan.rpc:workers:1.0-alpha-8")
 }
 
 python {
@@ -56,6 +62,12 @@ val version: String by project
 
 // Specify Java source/target version and source encoding.
 tasks.compileJava {
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+    options.encoding = "UTF-8"
+}
+
+tasks.compileTestJava {
     sourceCompatibility = "17"
     targetCompatibility = "17"
     options.encoding = "UTF-8"
@@ -232,6 +244,19 @@ tasks {
             org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
             org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
         )
+        
+        // GWTTestCase requires source files on the classpath to compile the module
+        classpath += files(project.sourceSets.main.get().java.srcDirs)
+        classpath += files(project.sourceSets.test.get().java.srcDirs)
+        
+        // Increase memory for GWT compilation
+        maxHeapSize = "1024m"
+        
+        // Pass system property to allow GWT to find the module
+        systemProperty("gwt.args", "-war " + layout.buildDirectory.dir("gwt-tests").get().asFile.absolutePath)
+        
+        // Ensure UTF-8 encoding for tests
+        systemProperty("file.encoding", "UTF-8")
     }
 }
 

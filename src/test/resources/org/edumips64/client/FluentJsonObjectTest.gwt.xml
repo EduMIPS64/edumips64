@@ -1,0 +1,5 @@
+<module>
+  <inherits name="com.google.gwt.core.Core" />
+  <inherits name="com.google.gwt.json.JSON" />
+  <source path="" />
+</module>
