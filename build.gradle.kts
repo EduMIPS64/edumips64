@@ -46,6 +46,9 @@ dependencies {
     testImplementation("org.gwtproject:gwt-dev:2.12.2")
     testImplementation("com.google.elemental2:elemental2-dom:1.3.2")
     testImplementation("com.vertispan.rpc:workers:1.0-alpha-8")
+
+    // Swing UI Testing
+    testImplementation("org.assertj:assertj-swing:3.17.1")
 }
 
 python {
