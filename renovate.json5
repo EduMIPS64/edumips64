@@ -6,10 +6,55 @@
     automerge: true,
   },
   packageRules: [
+    // Automerge all devDependencies - they don't affect production builds
     {
       matchDepTypes: ["devDependencies"],
       automerge: true,
-      matchPackageNames: ["/lint/", "/prettier/", "/junit/", "/eslint/"],
+    },
+    // Automerge patch updates for all dependencies - patches are backward-compatible
+    {
+      matchUpdateTypes: ["patch"],
+      automerge: true,
+    },
+    // Automerge minor updates for test dependencies
+    {
+      matchPackageNames: ["/junit/", "/@playwright/", "/playwright/"],
+      matchUpdateTypes: ["minor"],
+      automerge: true,
+    },
+    // Automerge minor updates for Gradle plugins
+    {
+      matchManagers: ["gradle"],
+      matchDepTypes: ["plugin"],
+      matchUpdateTypes: ["minor"],
+      automerge: true,
+    },
+    // Group React-related dependencies together
+    {
+      groupName: "React packages",
+      matchPackageNames: ["react", "react-dom", "react-redux", "/react-/"],
+    },
+    // Group MUI packages together
+    {
+      groupName: "MUI packages",
+      matchPackageNames: ["/@mui/", "/@emotion/"],
+    },
+    // Group Babel packages together
+    {
+      groupName: "Babel packages",
+      matchPackageNames: ["/@babel/"],
+    },
+    // Group webpack packages together
+    {
+      groupName: "webpack packages",
+      matchPackageNames: ["/webpack/"],
+    },
+    // Group ESLint packages together and automerge minor updates
+    {
+      groupName: "ESLint packages",
+      matchPackageNames: ["/eslint/"],
+      matchUpdateTypes: ["minor"],
+      automerge: true,
     },
   ],
 }
