@@ -36,7 +36,7 @@
 - Documentation: fixed typo in `LWU` instruction description.
 
 ### Changed
-- Lots of dependency updates :)
+- Updated various dependencies for security and compatibility improvements.
 
 ## 1.3.0 (16/10/2023) - Lourdes
 
