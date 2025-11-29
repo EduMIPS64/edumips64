@@ -1,0 +1,36 @@
+name: Pre-build Dev Container
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - '.devcontainer/**'
+  schedule:
+    # Rebuild weekly on Sunday at midnight to pick up base image updates
+    - cron: '0 0 * * 0'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pre-build dev container image
+        uses: devcontainers/ci@v0.3
+        with:
+          imageName: ghcr.io/edumips64/edumips64-devcontainer
+          cacheFrom: ghcr.io/edumips64/edumips64-devcontainer
+          push: always
