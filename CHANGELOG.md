@@ -5,35 +5,41 @@
 ### Added
 - Electron desktop application for Windows, macOS, and Linux, allowing the web
   UI to run offline without requiring a browser or internet connection.
+  (@davidepatti)
 - Embedded cache simulator as an alternative to external DineroIV, with
   configurable L1 data and instruction cache parameters (size, block size,
-  associativity, miss penalty).
+  associativity, miss penalty). (@davidepatti)
 - `DMUL`, `DMOD`, and `DDIV` instructions with three-operand syntax (`rd, rs,
   rt`) from MIPS64 Release 6 ISA. The legacy two-operand `DDIV rs, rt` form
-  remains supported.
+  remains supported. (Issue #867)
 - Dark mode toggle in the desktop (Swing) UI with redesigned icons.
+  (@smallg0at, Issue #796)
 - Web UI: SYSCALL 5 (printf-like output) now displays output in a dedicated
   panel.
 - Web UI: syntax highlighting for all MIPS64 instructions, registers, and
-  directives in the code editor.
+  directives in the code editor. (@davidepatti)
 - Web UI: code editor supports loading and saving files, configurable font
-  size, and optional vi-mode keybindings.
-- Web UI: embedded offline documentation accessible via Help menu.
+  size, and optional vi-mode keybindings. (@davidepatti)
+- Web UI: embedded offline documentation accessible via Help menu. (Issue #1365)
 - Web UI: pause, stop, and configurable multi-step execution controls.
-- CLI: SYSCALL 5 support for printf-like output.
+- CLI: SYSCALL 5 support for printf-like output. (Issue #1178)
 
 ### Fixed
 - Circular `#include` detection now correctly detects both direct and indirect
-  include loops instead of crashing.
+  include loops instead of crashing. (Issue #610)
 - Parser now provides a proper error message when instructions have missing
-  parameters instead of throwing an exception.
+  parameters instead of throwing an exception. (Issue #1048)
 - Hexadecimal values in `.data` section are now properly validated according to
   the declared data type size (e.g., `.byte 0xff` now works correctly).
+  (@davidepatti)
 - Hexadecimal immediates now support the full 16-bit range in instructions.
+  (@davidepatti)
 - Web UI: memory panel now displays consistent 64-bit hex value widths.
+  (@davidepatti)
 - Web UI: CPU state is now properly reset when loading a new file.
 - Desktop UI: Cycles window now always shows the first instruction correctly.
-- Documentation: fixed typo in `LWU` instruction description.
+  (Issue #875)
+- Documentation: fixed typo in `LWU` instruction description. (@AptInit)
 
 ### Changed
 - Updated various dependencies for security and compatibility improvements.
