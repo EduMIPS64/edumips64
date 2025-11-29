@@ -15,11 +15,23 @@ jobs:
   build-desktop:
     name: Build desktop application and docs
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [17]    
     steps:
+      # Set up Java development environment.
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - run: git log -1
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'microsoft'
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
       # Read the application version to use it in the name of the JAR.
       - name: Read version from gradle.properties
@@ -29,32 +41,24 @@ jobs:
           path: 'gradle.properties'
           properties: 'version'
 
-      # Login to GitHub Container Registry to pull prebuilt dev container
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      # Build and test using prebuilt dev container
-      - name: Build and test in dev container
-        uses: devcontainers/ci@v0.3
-        with:
-          imageName: ghcr.io/edumips64/edumips64-devcontainer
-          cacheFrom: ghcr.io/edumips64/edumips64-devcontainer
-          push: never
-          runCmd: |
-            chmod +x gradlew
-            ./gradlew compileJava
-            ./gradlew check
-            ./gradlew allDocs
-            ./gradlew jar
-
+      # Compile the code, run unit tests, upload code coverage results.
+      - name: Compile Java code
+        run: ./gradlew compileJava
+      - name: Run unit tests
+        run: ./gradlew check
       - name: Codecov
         uses: codecov/codecov-action@v5.5.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      # Build docs (PDF and HTML for the in-app help)
+      # The Python dependencies are fetched by Gradle.
+      - name: Build all docs
+        run: ./gradlew allDocs
+
+      # Build JAR file.
+      - name: Build JAR
+        run: ./gradlew jar
 
       # Upload artifacts (manuals and JARs)
       - name: Upload English Manual PDF
@@ -118,30 +122,30 @@ jobs:
     name: Build web application
     runs-on: ubuntu-latest
     steps:
+      # Set up JDK (necessary for the core that is cross-compiled to JS)
+      # and Node.JS (for the) web app itself.
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - run: git log -1
-
-      # Login to GitHub Container Registry to pull prebuilt dev container
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
         with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          java-version: 17
+          distribution: 'microsoft'
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-      # Build using prebuilt dev container
-      - name: Build web application in dev container
-        uses: devcontainers/ci@v0.3
+      - name: Install JS dependencies
+        run: npm install
+
+      - name: Set up Node.JS
+        uses: actions/setup-node@v6
         with:
-          imageName: ghcr.io/edumips64/edumips64-devcontainer
-          cacheFrom: ghcr.io/edumips64/edumips64-devcontainer
-          push: never
-          runCmd: |
-            chmod +x gradlew
-            npm install
-            ./gradlew webapp
+          node-version-file: '.nvmrc'
+
+      - name: Build JS Worker (Java → JS), including HTML docs
+        run: ./gradlew webapp
       
       - uses: actions/upload-artifact@v5
         name: Upload web application artifacts
