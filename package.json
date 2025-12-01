@@ -19,7 +19,7 @@
     "@microsoft/applicationinsights-web": "^3.0.0",
     "@mui/icons-material": "^7.0.0",
     "@mui/material": "^7.0.0",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "lodash": "^4.17.19",
     "monaco-editor-webpack-plugin": "^7.0.0",
     "monaco-vim": "^0.4.2",
