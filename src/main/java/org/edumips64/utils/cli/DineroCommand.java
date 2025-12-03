@@ -31,7 +31,9 @@ public class DineroCommand implements Runnable {
             if (cli.getCPU().getStatus() == CPU.CPUStatus.HALTED) {
                 cli.getCacheSimulator().writeTraceData(new LocalWriterAdapter(pw));
                 pw.flush();
-                System.out.println(CurrentLocale.getString("CLI.DINERO.SAVE") + file.getAbsolutePath());
+                if (cli.isVerbose()) {
+                    System.out.println(CurrentLocale.getString("CLI.DINERO.SAVE") + file.getAbsolutePath());
+                }
             } else {
                 System.out.println(CurrentLocale.getString("CLI.DINERO.CANT.WRITE"));
             }

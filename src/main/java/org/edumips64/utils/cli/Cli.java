@@ -30,9 +30,15 @@ public class Cli implements Runnable {
     private InstructionBuilder instructionBuilder;
     private Parser p;
     private final ConfigStore configStore;
+    private final boolean verbose;
 
     public Cli(ConfigStore cfg) {
+        this(cfg, false);
+    }
+
+    public Cli(ConfigStore cfg, boolean verbose) {
         this.configStore = cfg;
+        this.verbose = verbose;
         reset();
     }
 
@@ -94,6 +100,10 @@ public class Cli implements Runnable {
 
     public Parser getParser() {
         return p;
+    }
+
+    public boolean isVerbose() {
+        return verbose;
     }
 
     public ConfigStore getConfigStore() {
