@@ -28,7 +28,7 @@ import Typography from '@mui/material/Typography';
 
 import SampleProgram from '../data/SampleProgram';
 
-import { debounce } from 'lodash';
+import { debounce, isEqual } from 'lodash';
 import Settings from './Settings';
 import CacheConfig from "./CacheConfig";
 
@@ -52,6 +52,91 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   const [viMode, setViMode] = React.useState(false);
   const [fontSize, setFontSize] = React.useState(14);
+  const [accordionAlerts, setAccordionAlerts] = React.useState(true);
+
+  // Track expanded state for each accordion
+  const [expandedAccordions, setExpandedAccordions] = React.useState({
+    stats: true,
+    pipeline: false,
+    registers: false,
+    memory: false,
+    stdout: false,
+    cache: true,
+    settings: true,
+  });
+
+  // Track if data has changed while accordion was collapsed
+  const [accordionChanges, setAccordionChanges] = React.useState({
+    stats: false,
+    pipeline: false,
+    registers: false,
+    memory: false,
+    stdout: false,
+  });
+
+  // Refs to track previous values for change detection
+  const prevStats = React.useRef(stats);
+  const prevPipeline = React.useRef(pipeline);
+  const prevRegisters = React.useRef(registers);
+  const prevMemory = React.useRef(memory);
+  const prevStdout = React.useRef(stdout);
+
+  // Detect changes in accordion data when collapsed
+  React.useEffect(() => {
+    if (!accordionAlerts) {
+      prevStats.current = stats;
+      prevPipeline.current = pipeline;
+      prevRegisters.current = registers;
+      prevMemory.current = memory;
+      prevStdout.current = stdout;
+      return;
+    }
+    
+    const statsChanged = !isEqual(stats, prevStats.current);
+    const pipelineChanged = !isEqual(pipeline, prevPipeline.current);
+    const registersChanged = !isEqual(registers, prevRegisters.current);
+    const memoryChanged = !isEqual(memory, prevMemory.current);
+    const stdoutChanged = stdout !== prevStdout.current;
+    
+    // Update refs first
+    prevStats.current = stats;
+    prevPipeline.current = pipeline;
+    prevRegisters.current = registers;
+    prevMemory.current = memory;
+    prevStdout.current = stdout;
+    
+    // Only update state if there are actual changes for collapsed accordions
+    if ((!expandedAccordions.stats && statsChanged) ||
+        (!expandedAccordions.pipeline && pipelineChanged) ||
+        (!expandedAccordions.registers && registersChanged) ||
+        (!expandedAccordions.memory && memoryChanged) ||
+        (!expandedAccordions.stdout && stdoutChanged)) {
+      setAccordionChanges(prev => ({
+        ...prev,
+        stats: prev.stats || (!expandedAccordions.stats && statsChanged),
+        pipeline: prev.pipeline || (!expandedAccordions.pipeline && pipelineChanged),
+        registers: prev.registers || (!expandedAccordions.registers && registersChanged),
+        memory: prev.memory || (!expandedAccordions.memory && memoryChanged),
+        stdout: prev.stdout || (!expandedAccordions.stdout && stdoutChanged),
+      }));
+    }
+  }, [stats, pipeline, registers, memory, stdout, accordionAlerts, expandedAccordions]);
+
+  // Handle accordion expansion change
+  const handleAccordionChange = (panel) => (event, isExpanded) => {
+    setExpandedAccordions(prev => ({
+      ...prev,
+      [panel]: isExpanded,
+    }));
+    
+    // Clear change indicator when accordion is opened
+    if (isExpanded) {
+      setAccordionChanges(prev => ({
+        ...prev,
+        [panel]: false,
+      }));
+    }
+  };
 
   // Number of steps left to run. Used to keep track of execution.
   // If set to -1, runs until the execution ends.
@@ -293,57 +378,86 @@ const Simulator = ({worker, initialState, appInsights}) => {
               parsingErrors={parsingErrors}
               AccordionSummary={AccordionSummary}
             />
-            <Accordion defaultExpanded disableGutters>
+            <Accordion 
+              expanded={expandedAccordions.stats} 
+              onChange={handleAccordionChange('stats')} 
+              disableGutters
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                   Stats
+                  {accordionAlerts && accordionChanges.stats && <span className="accordion-change-indicator" />}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Statistics {...stats} />
               </AccordionDetails>
             </Accordion>
-            <Accordion disableGutters>
+            <Accordion 
+              expanded={expandedAccordions.pipeline} 
+              onChange={handleAccordionChange('pipeline')} 
+              disableGutters
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                   Pipeline
+                  {accordionAlerts && accordionChanges.pipeline && <span className="accordion-change-indicator" />}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Pipeline pipeline={pipeline} />
               </AccordionDetails>
             </Accordion>
-            <Accordion disableGutters>
+            <Accordion 
+              expanded={expandedAccordions.registers} 
+              onChange={handleAccordionChange('registers')} 
+              disableGutters
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                   Registers
+                  {accordionAlerts && accordionChanges.registers && <span className="accordion-change-indicator" />}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Registers {...registers} />
               </AccordionDetails>
             </Accordion>
-            <Accordion disableGutters>
+            <Accordion 
+              expanded={expandedAccordions.memory} 
+              onChange={handleAccordionChange('memory')} 
+              disableGutters
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                   Memory
+                  {accordionAlerts && accordionChanges.memory && <span className="accordion-change-indicator" />}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Memory memory={memory} />
               </AccordionDetails>
             </Accordion>
-            <Accordion disableGutters>
+            <Accordion 
+              expanded={expandedAccordions.stdout} 
+              onChange={handleAccordionChange('stdout')} 
+              disableGutters
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                   Standard Output
+                  {accordionAlerts && accordionChanges.stdout && <span className="accordion-change-indicator" />}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <StdOut stdout={stdout} />
               </AccordionDetails>
             </Accordion>
-            <Accordion defaultExpanded disableGutters>
+            <Accordion 
+              expanded={expandedAccordions.cache} 
+              onChange={handleAccordionChange('cache')} 
+              disableGutters
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h7" sx={{ fontWeight: 'bold', color: status === 'RUNNING' ? 'gray' : '#1976d2' }}>
                   Cache Configuration
@@ -357,7 +471,11 @@ const Simulator = ({worker, initialState, appInsights}) => {
                 />
               </AccordionDetails>
             </Accordion>
-            <Accordion defaultExpanded disableGutters>
+            <Accordion 
+              expanded={expandedAccordions.settings} 
+              onChange={handleAccordionChange('settings')} 
+              disableGutters
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                   General Settings
@@ -369,6 +487,8 @@ const Simulator = ({worker, initialState, appInsights}) => {
                   setViMode={setViMode}
                   fontSize={fontSize}
                   setFontSize={setFontSize}
+                  accordionAlerts={accordionAlerts}
+                  setAccordionAlerts={setAccordionAlerts}
                   showTitle={false}
                 />
               </AccordionDetails>
