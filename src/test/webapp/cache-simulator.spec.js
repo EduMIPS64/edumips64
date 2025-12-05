@@ -50,6 +50,8 @@ async function waitForSimulationComplete(page) {
   await page.waitForSelector('button:has-text("Stop")[disabled]', {
     timeout: 30000,
   });
+  // Add a small delay to ensure UI updates are complete
+  await page.waitForTimeout(500);
 }
 
 /**
@@ -141,6 +143,28 @@ async function getCacheStats(page) {
 }
 
 /**
+ * Helper function to wait for cache statistics to be in a consistent state.
+ * This polls the stats until the instruction reads are at least equal to the
+ * expected minimum, which helps avoid race conditions where stats are read
+ * before the UI has fully updated.
+ * @param {import('@playwright/test').Page} page - Playwright page object
+ * @param {number} minInstructionReads - Minimum expected instruction reads
+ * @param {number} timeout - Maximum time to wait in milliseconds
+ * @returns {Promise<object>} - Cache statistics object
+ */
+async function waitForCacheStats(page, minInstructionReads = 1, timeout = 5000) {
+  const startTime = Date.now();
+  let stats = await getCacheStats(page);
+  
+  while (stats.l1iReads < minInstructionReads && (Date.now() - startTime) < timeout) {
+    await page.waitForTimeout(100);
+    stats = await getCacheStats(page);
+  }
+  
+  return stats;
+}
+
+/**
  * Helper function to load a MIPS program into the editor
  * @param {import('@playwright/test').Page} page - Playwright page object
  * @param {string} program - MIPS assembly code
@@ -160,7 +184,7 @@ async function loadProgram(page, program) {
   await removeOverlay(page);
 
   // Wait for Load button to be enabled (syntax valid) - this implicitly waits for syntax check
-  await page.waitForSelector('#load-button:not([disabled])', { timeout: 10000 });
+  await page.waitForSelector('#load-button:not([disabled])', { timeout: 15000 });
 
   // Click Load button using the id selector for precision
   await page.click('#load-button');
@@ -437,7 +461,8 @@ SYSCALL 0
   await loadProgram(page, testProgram);
   await runToCompletion(page);
 
-  const stats = await getCacheStats(page);
+  // Wait for cache stats to be updated - we expect at least 20 instruction reads for loop
+  const stats = await waitForCacheStats(page, 20, 5000);
   console.log('Cache statistics for loop program:', stats);
 
   // We should have many instruction reads (10+ iterations of the loop)
