@@ -255,6 +255,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   const clearCode = () => {
     setCode(".data\n\n.code\n  SYSCALL 0\n");
+    worker.reset();
   }
 
 
