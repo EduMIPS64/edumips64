@@ -53,8 +53,10 @@ public class LoadCommand implements Runnable {
     }
 
     private void printLoadedFileMsg(String fileName) {
-        System.out.printf(CurrentLocale.getString("CLI.FILE.LOADED"), fileName);
-        System.out.println();
+        if (cli.isVerbose()) {
+            System.out.printf(CurrentLocale.getString("CLI.FILE.LOADED"), fileName);
+            System.out.println();
+        }
     }
 
     private void printLoadFailedMsg(String fileName) {

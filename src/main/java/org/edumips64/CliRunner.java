@@ -45,10 +45,12 @@ public class CliRunner {
 
   public void start() {
     try {
-      Cli cli = new Cli(configStore);
+      Cli cli = new Cli(configStore, args.isVerbose());
       CommandLine commandLine = new CommandLine(cli);
 
-      System.out.println(CurrentLocale.getString("CLI.WELCOME"));
+      if (args.isVerbose()) {
+        System.out.println(CurrentLocale.getString("CLI.WELCOME"));
+      }
       if (args.getFileName() != null) {
           commandLine.execute("load", args.getFileName());
       }
