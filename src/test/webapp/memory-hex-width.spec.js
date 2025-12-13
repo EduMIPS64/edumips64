@@ -49,8 +49,11 @@ test('memory values should have consistent 64-bit hex width', async ({ page }) =
   // Wait for the page to load
   await waitForPageReady(page);
 
+  // Hide webpack overlay if present
+  await page.addStyleTag({ content: '#webpack-dev-server-client-overlay { display: none !important; }' });
+
   // Click Load button to load the default sample program
-  await page.click('text=Load');
+  await page.click('#load-button');
 
   // Wait for the simulator to enter RUNNING state
   await waitForRunningState(page);
@@ -110,8 +113,11 @@ test('memory values remain 64-bit width after store byte instruction', async ({ 
   await page.keyboard.press('Control+a');
   await page.keyboard.type(testProgram);
 
+  // Hide webpack overlay if present
+  await page.addStyleTag({ content: '#webpack-dev-server-client-overlay { display: none !important; }' });
+
   // Click Load button to load the program
-  await page.click('text=Load');
+  await page.click('#load-button');
 
   // Wait for the simulator to enter RUNNING state
   await waitForRunningState(page);
