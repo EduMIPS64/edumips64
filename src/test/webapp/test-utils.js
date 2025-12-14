@@ -64,9 +64,13 @@ async function loadProgram(page, program) {
   // Click on the Monaco editor to focus it
   await page.click('.monaco-editor');
 
-  // Select all text using cross-platform modifier (ControlOrMeta works on both Win/Linux and Mac)
+  // Select all existing text
   await page.keyboard.press('ControlOrMeta+a');
-  await page.keyboard.type(program);
+
+  // Use execCommand to insert text - this preserves newlines better than keyboard.type()
+  await page.evaluate((code) => {
+    document.execCommand('insertText', false, code);
+  }, program);
 
   // Remove overlay again before clicking Load
   await removeOverlay(page);
