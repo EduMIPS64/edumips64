@@ -428,7 +428,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               onChange={handleAccordionChange('memory')} 
               disableGutters
             >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} id="memory-accordion-summary">
                 <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                   Memory
                   {accordionAlerts && accordionChanges.memory && <span className="accordion-change-indicator" />}

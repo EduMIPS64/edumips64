@@ -1,21 +1,18 @@
 const { test, expect } = require('@playwright/test');
+const { targetUri, waitForPageReady } = require('./test-utils');
 
-const targetUri = process.env.PLAYWRIGHT_TARGET_URL || "http://localhost:8080";
-
-test('test', async ({ page }) => {
-  console.log("Running tests against", targetUri);
+test('single step works', async ({ page }) => {
   await page.goto(targetUri);
 
   // Ensure basic elements are available.
-  await page.waitForSelector('#load-button');
+  await waitForPageReady(page);
   await page.waitForSelector('#main-grid');
-  await page.waitForSelector('.monaco-editor');
 
   // Click text=Load/Reset
   await page.click('#load-button');
 
   // Click text=Single Step
-  await page.click('text=Single Step');
+  await page.click('#step-button');
 
   await page.close();
 });
