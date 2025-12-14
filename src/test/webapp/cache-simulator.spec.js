@@ -1,56 +1,13 @@
 const { test, expect } = require('@playwright/test');
-
-const targetUri = process.env.PLAYWRIGHT_TARGET_URL || 'http://localhost:8080';
-
-/**
- * Helper function to remove webpack dev server overlay if present.
- * The overlay can intercept pointer events and cause test failures.
- * @param {import('@playwright/test').Page} page - Playwright page object
- */
-async function removeOverlay(page) {
-  await page.evaluate(() => {
-    const overlay = document.getElementById(
-      'webpack-dev-server-client-overlay'
-    );
-    if (overlay) {
-      overlay.remove();
-    }
-  });
-}
-
-/**
- * Helper function to wait for the page to be ready
- * @param {import('@playwright/test').Page} page - Playwright page object
- */
-async function waitForPageReady(page) {
-  await page.waitForSelector('#load-button');
-  await page.waitForSelector('.monaco-editor');
-
-  // Close the webpack dev server overlay if present
-  await removeOverlay(page);
-}
-
-/**
- * Helper function to wait for simulator to enter RUNNING state
- * @param {import('@playwright/test').Page} page - Playwright page object
- */
-async function waitForRunningState(page) {
-  // Wait for the Single Step button to become enabled (indicates RUNNING state)
-  await page.waitForSelector('button:has-text("Single Step"):not([disabled])', {
-    timeout: 10000,
-  });
-}
-
-/**
- * Helper function to wait for simulator to finish execution
- * @param {import('@playwright/test').Page} page - Playwright page object
- */
-async function waitForSimulationComplete(page) {
-  // Wait for the Stop button to become disabled (indicates simulation ended)
-  await page.waitForSelector('button:has-text("Stop")[disabled]', {
-    timeout: 30000,
-  });
-}
+const {
+  targetUri,
+  removeOverlay,
+  waitForPageReady,
+  waitForRunningState,
+  waitForSimulationComplete,
+  loadProgram,
+  runToCompletion
+} = require('./test-utils');
 
 /**
  * Helper function to set cache configuration values.
@@ -140,51 +97,7 @@ async function getCacheStats(page) {
   };
 }
 
-/**
- * Helper function to load a MIPS program into the editor
- * @param {import('@playwright/test').Page} page - Playwright page object
- * @param {string} program - MIPS assembly code
- */
-async function loadProgram(page, program) {
-  // Remove the overlay if present before interacting
-  await removeOverlay(page);
 
-  // Click on the Monaco editor to focus it
-  await page.click('.monaco-editor');
-
-  // Select all text using cross-platform modifier (ControlOrMeta works on both Win/Linux and Mac)
-  await page.keyboard.press('ControlOrMeta+a');
-  await page.keyboard.type(program);
-
-  // Remove overlay again before clicking Load
-  await removeOverlay(page);
-
-  // Wait for Load button to be enabled (syntax valid) - this implicitly waits for syntax check
-  await page.waitForSelector('#load-button:not([disabled])', { timeout: 10000 });
-
-  // Click Load button using the id selector for precision
-  await page.click('#load-button');
-
-  // Wait for the simulator to enter RUNNING state
-  await waitForRunningState(page);
-}
-
-/**
- * Helper function to run the simulation to completion
- * @param {import('@playwright/test').Page} page - Playwright page object
- */
-async function runToCompletion(page) {
-  // Remove overlay before clicking
-  await removeOverlay(page);
-
-  // Click the Run All button
-  await page
-    .getByRole('button', { name: 'Run until the simulation ends' })
-    .click();
-
-  // Wait for execution to complete
-  await waitForSimulationComplete(page);
-}
 
 /**
  * Test: Verify cache statistics are displayed and updated after running a simple program
@@ -192,7 +105,6 @@ async function runToCompletion(page) {
 test('cache statistics are displayed after running a program', async ({
   page,
 }) => {
-  console.log('Running cache statistics display test against', targetUri);
   await page.goto(targetUri);
 
   await waitForPageReady(page);
@@ -214,8 +126,6 @@ SYSCALL 0
   // Get cache statistics
   const stats = await getCacheStats(page);
 
-  console.log('Cache statistics:', stats);
-
   // Verify that we have some instruction reads (from fetching instructions)
   expect(stats.l1iReads).toBeGreaterThan(0);
 
@@ -233,7 +143,6 @@ SYSCALL 0
  * Based on CacheSimulatorTests.java patterns
  */
 test('cache misses are recorded for memory accesses', async ({ page }) => {
-  console.log('Running cache misses test against', targetUri);
   await page.goto(targetUri);
 
   await waitForPageReady(page);
@@ -262,8 +171,6 @@ SYSCALL 0
   // Get cache statistics
   const stats = await getCacheStats(page);
 
-  console.log('Cache statistics after memory access program:', stats);
-
   // Verify instruction cache had some reads
   expect(stats.l1iReads).toBeGreaterThan(0);
 
@@ -282,7 +189,6 @@ SYSCALL 0
  * This test uses a smaller cache size to ensure more cache misses
  */
 test('changing cache configuration affects cache misses', async ({ page }) => {
-  console.log('Running cache configuration test against', targetUri);
   await page.goto(targetUri);
 
   await waitForPageReady(page);
@@ -319,8 +225,6 @@ SYSCALL 0
   // Get cache statistics
   const stats = await getCacheStats(page);
 
-  console.log('Cache statistics with small cache configuration:', stats);
-
   // With a small cache (256 bytes, block size 8, direct-mapped)
   // and writes to 8 different cache lines spread 64 bytes apart,
   // we should see write misses
@@ -337,7 +241,6 @@ SYSCALL 0
 test('larger block size reduces misses for sequential access', async ({
   page,
 }) => {
-  console.log('Running block size comparison test against', targetUri);
   await page.goto(targetUri);
 
   await waitForPageReady(page);
@@ -372,14 +275,9 @@ SYSCALL 0
   await runToCompletion(page);
 
   const statsSmallBlock = await getCacheStats(page);
-  console.log('Stats with block size 8:', statsSmallBlock);
 
   // Reset and test with larger block size
   // After simulation complete, stop is disabled but load should still work
-  // We need to reload the page for a clean test
-  await page.reload();
-  await waitForPageReady(page);
-
   await setCacheConfig(page, 'L1 Data Cache', {
     size: 1024,
     blockSize: 64,
@@ -391,7 +289,6 @@ SYSCALL 0
   await runToCompletion(page);
 
   const statsLargeBlock = await getCacheStats(page);
-  console.log('Stats with block size 64:', statsLargeBlock);
 
   // Both should have 8 writes
   expect(statsSmallBlock.l1dWrites).toBe(8);
@@ -412,7 +309,6 @@ SYSCALL 0
  * Loops should show instruction cache hits after initial load
  */
 test('instruction cache shows hits for loop iterations', async ({ page }) => {
-  console.log('Running instruction cache loop test against', targetUri);
   await page.goto(targetUri);
 
   await waitForPageReady(page);
@@ -438,7 +334,6 @@ SYSCALL 0
   await runToCompletion(page);
 
   const stats = await getCacheStats(page);
-  console.log('Cache statistics for loop program:', stats);
 
   // We should have many instruction reads (10+ iterations of the loop)
   expect(stats.l1iReads).toBeGreaterThan(20);
@@ -458,7 +353,6 @@ SYSCALL 0
  * Test: Verify that cache statistics reset when loading a new program
  */
 test('cache statistics reset when loading new program', async ({ page }) => {
-  console.log('Running cache statistics reset test against', targetUri);
   await page.goto(targetUri);
 
   await waitForPageReady(page);
@@ -476,7 +370,6 @@ SYSCALL 0
   await runToCompletion(page);
 
   const stats1 = await getCacheStats(page);
-  console.log('Stats after first program:', stats1);
 
   expect(stats1.l1dReads).toBeGreaterThan(0);
 
@@ -493,7 +386,6 @@ SYSCALL 0
   await runToCompletion(page);
 
   const stats2 = await getCacheStats(page);
-  console.log('Stats after second program:', stats2);
 
   // After loading the second program which has no data accesses,
   // the data cache stats should be 0
