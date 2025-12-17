@@ -62,12 +62,12 @@ jobs:
 
       # Upload artifacts (manuals and JARs)
       - name: Upload English Manual PDF
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: English manual (PDF)
           path: ./build/docs/en/pdf/EduMIPS64.pdf
       - name: Upload Italian Manual PDF
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: Italian manual (PDF)
           path: ./build/docs/it/pdf/EduMIPS64.pdf
@@ -81,7 +81,7 @@ jobs:
       #     path: ./build/docs/zh/pdf/EduMIPS64.pdf
 
       - name: Upload JAR
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: JAR
           path: ./build/libs/edumips64-${{ steps.read_version.outputs.version }}.jar
@@ -101,7 +101,7 @@ jobs:
             repository: fbarresi/wix
             path: wix
         - name: Download JAR
-          uses: actions/download-artifact@v6.0.0
+          uses: actions/download-artifact@v7.0.0
           with:
             name: JAR
             path: build/libs
@@ -113,7 +113,7 @@ jobs:
         - name: Build MSI
           run: ./gradlew MSI
         - name: Upload MSI
-          uses: actions/upload-artifact@v5.0.0
+          uses: actions/upload-artifact@v6.0.0
           with:
             name: MSI
             path: EduMIPS64-*.msi
@@ -147,7 +147,7 @@ jobs:
       - name: Build JS Worker (Java → JS), including HTML docs
         run: ./gradlew webapp
       
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         name: Upload web application artifacts
         with:
           name: web
@@ -166,7 +166,7 @@ jobs:
       url: https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/
     steps:
       # Download web application built in 'build-web'
-      - uses: actions/download-artifact@v6.0.0
+      - uses: actions/download-artifact@v7.0.0
         name: Download web application artifacts
         with:
           name: web
@@ -199,7 +199,7 @@ jobs:
     if: ${{ github.event_name != 'pull_request_target' }}
     steps:
       # Download web application built in 'build-web'
-      - uses: actions/download-artifact@v6.0.0
+      - uses: actions/download-artifact@v7.0.0
         name: Download web application artifacts
         with:
           name: web
@@ -266,7 +266,7 @@ jobs:
       - run: git log -1
       - uses: snapcore/action-build@v1
         id: snapcraft
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: snap
           path: ${{ steps.snapcraft.outputs.snap }}
@@ -276,7 +276,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-snap
     steps:
-      - uses: actions/download-artifact@v6.0.0
+      - uses: actions/download-artifact@v7.0.0
         name: Download snap package
         with:
           name: snap
@@ -316,7 +316,7 @@ jobs:
       - run: git log -1
 
       # Download web application built in 'build-web'
-      - uses: actions/download-artifact@v6.0.0
+      - uses: actions/download-artifact@v7.0.0
         name: Download web application artifacts
         with:
           name: web
@@ -355,7 +355,7 @@ jobs:
 
       # Upload Electron application artifacts
       - name: Upload ${{ matrix.artifact-name }}
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.artifact-path }}
