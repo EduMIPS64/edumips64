@@ -61,16 +61,17 @@ async function loadProgram(page, program) {
   // Remove the overlay if present before interacting
   await removeOverlay(page);
 
-  // Click on the Monaco editor to focus it
-  await page.click('.monaco-editor');
+  const inputArea = page.locator('.monaco-editor textarea.inputarea');
 
-  // Select all existing text
+  // Focus Monaco's hidden textarea (the real input target)
+  await inputArea.click();
+
+  // Clear existing text
   await page.keyboard.press('ControlOrMeta+a');
+  await page.keyboard.press('Backspace');
 
-  // Use execCommand to insert text - this preserves newlines better than keyboard.type()
-  await page.evaluate((code) => {
-    document.execCommand('insertText', false, code);
-  }, program);
+  // Insert text in one go (more reliable than typing, preserves newlines)
+  await page.keyboard.insertText(program);
 
   // Remove overlay again before clicking Load
   await removeOverlay(page);

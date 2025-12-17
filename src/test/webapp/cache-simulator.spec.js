@@ -47,43 +47,26 @@ async function setCacheConfig(page, cacheType, config) {
  * @returns {Promise<object>} - { l1iReads, l1iMisses, l1dReads, l1dReadMisses, l1dWrites, l1dWriteMisses }
  */
 async function getCacheStats(page) {
-  // Get the statistics div
-  const statsDiv = page.locator('#statistics');
+  const l1iReadsCell = page.locator('#stat-l1i-reads');
+  const l1iMissesCell = page.locator('#stat-l1i-misses');
+  const l1dReadsCell = page.locator('#stat-l1d-reads');
+  const l1dReadMissesCell = page.locator('#stat-l1d-read-misses');
+  const l1dWritesCell = page.locator('#stat-l1d-writes');
+  const l1dWriteMissesCell = page.locator('#stat-l1d-write-misses');
 
-  // Extract cache statistics using text matching
-  const l1iReadsRow = statsDiv.locator('tr:has-text("L1 Instruction Reads")');
-  const l1iMissesRow = statsDiv.locator('tr:has-text("L1 Instruction Misses")');
-  const l1dReadsRow = statsDiv.locator('tr:has-text("L1 Data Reads")');
-  const l1dReadMissesRow = statsDiv.locator(
-    'tr:has-text("L1 Data Read Misses")'
-  );
-  const l1dWritesRow = statsDiv.locator('tr:has-text("L1 Data Writes")');
-  const l1dWriteMissesRow = statsDiv.locator(
-    'tr:has-text("L1 Data Write Misses")'
-  );
+  // After the simulation ends, React state can still be settling; wait until we see non-zero reads.
+  await expect(l1iReadsCell).not.toHaveText('0', { timeout: 10000 });
 
-  const l1iReads = parseInt(
-    (await l1iReadsRow.locator('td').nth(1).textContent()) || '0',
-    10
-  );
-  const l1iMisses = parseInt(
-    (await l1iMissesRow.locator('td').nth(1).textContent()) || '0',
-    10
-  );
-  const l1dReads = parseInt(
-    (await l1dReadsRow.locator('td').nth(1).textContent()) || '0',
-    10
-  );
+  const l1iReads = parseInt((await l1iReadsCell.textContent()) || '0', 10);
+  const l1iMisses = parseInt((await l1iMissesCell.textContent()) || '0', 10);
+  const l1dReads = parseInt((await l1dReadsCell.textContent()) || '0', 10);
   const l1dReadMisses = parseInt(
-    (await l1dReadMissesRow.locator('td').nth(1).textContent()) || '0',
+    (await l1dReadMissesCell.textContent()) || '0',
     10
   );
-  const l1dWrites = parseInt(
-    (await l1dWritesRow.locator('td').nth(1).textContent()) || '0',
-    10
-  );
+  const l1dWrites = parseInt((await l1dWritesCell.textContent()) || '0', 10);
   const l1dWriteMisses = parseInt(
-    (await l1dWriteMissesRow.locator('td').nth(1).textContent()) || '0',
+    (await l1dWriteMissesCell.textContent()) || '0',
     10
   );
 
