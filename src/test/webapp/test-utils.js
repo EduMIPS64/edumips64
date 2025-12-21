@@ -64,7 +64,8 @@ async function loadProgram(page, program) {
   const inputArea = page.locator('.monaco-editor textarea.inputarea');
 
   // Focus Monaco's hidden textarea (the real input target)
-  await inputArea.click();
+  // Use force: true because Monaco's text layer intercepts pointer events
+  await inputArea.click({ force: true });
 
   // Clear existing text
   await page.keyboard.press('ControlOrMeta+a');
