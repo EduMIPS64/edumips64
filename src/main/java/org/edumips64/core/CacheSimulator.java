@@ -58,7 +58,6 @@ public class CacheSimulator {
         String addressStr = parts[1];
         // Use Long.decode to support both hex (with 0x) and decimal
         long address = Long.decode("0x"+addressStr);
-        int size = Integer.parseInt(parts[2]); // size is parsed but not used in this simple simulator
 
         if (refType == 'i' && cache.getType() == CacheType.L1_INSTRUCTION) {
             cache.getStats().incrementReadAccesses();
