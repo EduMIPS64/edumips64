@@ -46,8 +46,13 @@ async function waitForRunningState(page) {
  * @param {import('@playwright/test').Page} page - Playwright page object
  */
 async function waitForSimulationComplete(page) {
-  // Wait for the Stop button to become disabled (indicates simulation ended)
-  await page.waitForSelector('#stop-button[disabled]', {
+  // Wait for the simulation to have run at least one cycle
+  // This ensures we don't check for completion before the simulation has actually started
+  // We use a regex to ensure it's a positive number (not 0, not empty)
+  await expect(page.locator('#stat-cycles')).toHaveText(/^[1-9][0-9]*$/, { timeout: 30000 });
+
+  // Wait for the Clear Code button to become enabled (indicates simulation ended)
+  await page.waitForSelector('#clear-code-button:not([disabled])', {
     timeout: 30000,
   });
 }
@@ -95,6 +100,13 @@ async function runToCompletion(page) {
   // Remove overlay before clicking
   await removeOverlay(page);
 
+  // Wait for the Run button to be enabled before clicking
+  await page.waitForSelector('#run-button:not([disabled])');
+
+  // Add a small delay to ensure the UI is fully settled after the button becomes enabled
+  // This helps avoid race conditions where the click might be ignored during a re-render
+  await page.waitForTimeout(500);
+
   // Click the Run All button
   await page.click('#run-button');
 
@@ -104,7 +116,7 @@ async function runToCompletion(page) {
   // Also wait for cycles to be updated in the UI (confirms stats have been rendered)
   // This prevents race conditions where the button is disabled but React hasn't re-rendered stats yet
   const cyclesCell = page.locator('#stat-cycles');
-  await expect(cyclesCell).not.toHaveText('0', { timeout: 10000 });
+  await expect(cyclesCell).toHaveText(/^[1-9][0-9]*$/, { timeout: 10000 });
 }
 
 module.exports = {
