@@ -1,36 +1,17 @@
 const { test, expect } = require('@playwright/test');
-
-const targetUri = process.env.PLAYWRIGHT_TARGET_URL || "http://localhost:8080";
-
-/**
- * Helper function to wait for the page to be ready
- */
-async function waitForPageReady(page) {
-  await page.waitForSelector('#load-button');
-  await page.waitForSelector('.monaco-editor');
-}
-
-/**
- * Helper function to wait for simulator to enter RUNNING state
- */
-async function waitForRunningState(page) {
-  // Wait for the Single Step button to become enabled (indicates RUNNING state)
-  await page.waitForSelector('button:has-text("Single Step"):not([disabled])', { timeout: 10000 });
-}
-
-/**
- * Helper function to wait for simulator to finish execution
- */
-async function waitForSimulationComplete(page) {
-  // Wait for the Stop button to become disabled (indicates simulation ended)
-  await page.waitForSelector('button:has-text("Stop")[disabled]', { timeout: 30000 });
-}
+const {
+  targetUri,
+  waitForPageReady,
+  waitForRunningState,
+  loadProgram,
+  runToCompletion
+} = require('./test-utils');
 
 /**
  * Helper function to expand Memory accordion and wait for table
  */
 async function expandMemoryAndWaitForTable(page) {
-  await page.getByRole('button', { name: 'Memory' }).click();
+  await page.click('#memory-accordion-summary');
   await page.waitForSelector('#memory tbody tr', { timeout: 5000 });
 }
 
@@ -43,14 +24,13 @@ async function expandMemoryAndWaitForTable(page) {
  * After the fix, all memory values should be displayed with 64-bit hex widths (16 characters).
  */
 test('memory values should have consistent 64-bit hex width', async ({ page }) => {
-  console.log("Running memory hex width test against", targetUri);
   await page.goto(targetUri);
 
   // Wait for the page to load
   await waitForPageReady(page);
 
   // Click Load button to load the default sample program
-  await page.click('text=Load');
+  await page.click('#load-button');
 
   // Wait for the simulator to enter RUNNING state
   await waitForRunningState(page);
@@ -64,7 +44,6 @@ test('memory values should have consistent 64-bit hex width', async ({ page }) =
   const valueElements = await page.$$('#memory tbody tr td:nth-child(2)');
   
   expect(valueElements.length).toBeGreaterThan(0);
-  console.log(`Found ${valueElements.length} memory value cells`);
 
   // Verify each value_hex has exactly 16 hex characters (64-bit)
   for (let i = 0; i < valueElements.length; i++) {
@@ -74,8 +53,6 @@ test('memory values should have consistent 64-bit hex width', async ({ page }) =
     // A valid 64-bit hex value should have exactly 16 hex characters
     // The format should match: 0000000000000006 (for value 6)
     expect(trimmedValue).toMatch(/^[0-9A-Fa-f]{16}$/);
-    
-    console.log(`Memory value ${i}: ${trimmedValue} (length: ${trimmedValue.length})`);
   }
 
   await page.close();
@@ -87,7 +64,6 @@ test('memory values should have consistent 64-bit hex width', async ({ page }) =
  * caused inconsistent hex display.
  */
 test('memory values remain 64-bit width after store byte instruction', async ({ page }) => {
-  console.log("Running store byte test against", targetUri);
   await page.goto(targetUri);
 
   // Wait for the page to load
@@ -103,24 +79,8 @@ test('memory values remain 64-bit width after store byte instruction', async ({ 
   SYSCALL 0
 `;
 
-  // Click on the Monaco editor to focus it
-  await page.click('.monaco-editor');
-  
-  // Select all text and replace with our program
-  await page.keyboard.press('Control+a');
-  await page.keyboard.type(testProgram);
-
-  // Click Load button to load the program
-  await page.click('text=Load');
-
-  // Wait for the simulator to enter RUNNING state
-  await waitForRunningState(page);
-
-  // Execute the program by clicking Run All button
-  await page.getByRole('button', { name: 'Run until the simulation ends' }).click();
-  
-  // Wait for execution to complete
-  await waitForSimulationComplete(page);
+  await loadProgram(page, testProgram);
+  await runToCompletion(page);
 
   // Expand the Memory accordion and wait for table
   await expandMemoryAndWaitForTable(page);
@@ -129,7 +89,6 @@ test('memory values remain 64-bit width after store byte instruction', async ({ 
   const valueElements = await page.$$('#memory tbody tr td:nth-child(2)');
   
   expect(valueElements.length).toBeGreaterThan(0);
-  console.log(`Found ${valueElements.length} memory value cells after store byte`);
 
   // Verify each value_hex has exactly 16 hex characters (64-bit)
   // This is the key test for issue #1306 - after storing a byte, 
@@ -140,8 +99,6 @@ test('memory values remain 64-bit width after store byte instruction', async ({ 
     
     // A valid 64-bit hex value should have exactly 16 hex characters
     expect(trimmedValue).toMatch(/^[0-9A-Fa-f]{16}$/);
-    
-    console.log(`Memory value ${i}: ${trimmedValue} (length: ${trimmedValue.length})`);
   }
 
   // Verify that the stored value 6 appears in one of the memory cells
@@ -149,7 +106,6 @@ test('memory values remain 64-bit width after store byte instruction', async ({ 
   const memoryContent = await page.textContent('#memory');
   // The value 6 stored as a byte at the beginning of an 8-byte cell 
   // should show up as 0600000000000000 (little-endian) or similar
-  console.log(`Memory table content includes data: ${memoryContent.includes('06')}`);
 
   await page.close();
 });
