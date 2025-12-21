@@ -1,24 +1,29 @@
 import React from 'react';
 
-const Row = ({ label, value }) => {
-    return (
+const Row = ({ label, value, valueId }) => {
+  return (
     <tr>
-    <td style={{ fontSize: '0.9rem' }}>{label}</td>
-    <td style={{ 
-        fontFamily: "Menlo, Monaco, 'Courier New', monospace",
-        width: '20%',
-        fontSize: '0.75rem',
-    }}>{value}</td>
+      <td style={{ fontSize: '0.9rem' }}>{label}</td>
+      <td
+        id={valueId}
+        style={{
+          fontFamily: "Menlo, Monaco, 'Courier New', monospace",
+          width: '20%',
+          fontSize: '0.75rem',
+        }}
+      >
+        {value}
+      </td>
     </tr>
-    );
+  );
 };
 
 // A toy component that appends a final "s" to the label if
 // the given value is != 1. Of course this is not proper
 // pluralization, just me playing around with React.
-const PluralRow = ({ label, value }) => {
+const PluralRow = ({ label, value, valueId }) => {
   const pluralSuffix = value != 1 ? 's' : '';
-  return <Row label={`${label}${pluralSuffix}`} value={value} />;
+  return <Row label={`${label}${pluralSuffix}`} value={value} valueId={valueId} />;
 };
 
 const Statistics = ({
@@ -47,8 +52,8 @@ const tableStyle = {
                     Execution
                 </th>
             </tr>
-            <PluralRow value={cycles} label="Cycle"/>
-            <PluralRow value={instructions} label="Instruction"/>
+              <PluralRow value={cycles} label="Cycle" valueId="stat-cycles"/>
+              <PluralRow value={instructions} label="Instruction" valueId="stat-instructions"/>
             <Row value={instructions == 0 ? 0 : (cycles / instructions).toFixed(2)}
                  label="Cycles per Instructions (CPI)"/>
             </tbody>
@@ -71,12 +76,12 @@ const tableStyle = {
                         Cache Memory Statistics
                     </th>
                 </tr>
-                <Row value={L1I_reads} label="L1 Instruction Reads"/>
-                <Row value={L1I_misses} label="L1 Instruction Misses"/>
-                <Row value={L1D_reads} label="L1 Data Reads"/>
-                <Row value={L1D_reads_misses} label="L1 Data Read Misses"/>
-                <Row value={L1D_writes} label="L1 Data Writes"/>
-                <Row value={L1D_writes_misses} label="L1 Data Write Misses"/>
+                <Row value={L1I_reads} label="L1 Instruction Reads" valueId="stat-l1i-reads"/>
+                <Row value={L1I_misses} label="L1 Instruction Misses" valueId="stat-l1i-misses"/>
+                <Row value={L1D_reads} label="L1 Data Reads" valueId="stat-l1d-reads"/>
+                <Row value={L1D_reads_misses} label="L1 Data Read Misses" valueId="stat-l1d-read-misses"/>
+                <Row value={L1D_writes} label="L1 Data Writes" valueId="stat-l1d-writes"/>
+                <Row value={L1D_writes_misses} label="L1 Data Write Misses" valueId="stat-l1d-write-misses"/>
                 </tbody>
             </table>
         </div>

@@ -39,7 +39,6 @@ import elemental2.dom.MessageEvent;
 
 import jsinterop.base.Js;
 import jsinterop.base.JsPropertyMap;
-import org.edumips64.core.CacheSimulator;
 import org.edumips64.core.cache.CacheConfig;
 
 import java.util.logging.Logger;

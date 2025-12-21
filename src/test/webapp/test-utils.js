@@ -61,12 +61,18 @@ async function loadProgram(page, program) {
   // Remove the overlay if present before interacting
   await removeOverlay(page);
 
-  // Click on the Monaco editor to focus it
-  await page.click('.monaco-editor');
+  const inputArea = page.locator('.monaco-editor textarea.inputarea');
 
-  // Select all text using cross-platform modifier (ControlOrMeta works on both Win/Linux and Mac)
+  // Focus Monaco's hidden textarea (the real input target)
+  // Use force: true because Monaco's text layer intercepts pointer events
+  await inputArea.click({ force: true });
+
+  // Clear existing text
   await page.keyboard.press('ControlOrMeta+a');
-  await page.keyboard.type(program);
+  await page.keyboard.press('Backspace');
+
+  // Insert text in one go (more reliable than typing, preserves newlines)
+  await page.keyboard.insertText(program);
 
   // Remove overlay again before clicking Load
   await removeOverlay(page);
@@ -92,8 +98,13 @@ async function runToCompletion(page) {
   // Click the Run All button
   await page.click('#run-button');
 
-  // Wait for execution to complete
+  // Wait for execution to complete (stop button disabled)
   await waitForSimulationComplete(page);
+
+  // Also wait for cycles to be updated in the UI (confirms stats have been rendered)
+  // This prevents race conditions where the button is disabled but React hasn't re-rendered stats yet
+  const cyclesCell = page.locator('#stat-cycles');
+  await expect(cyclesCell).not.toHaveText('0', { timeout: 10000 });
 }
 
 module.exports = {
