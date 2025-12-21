@@ -52,8 +52,8 @@ const tableStyle = {
                     Execution
                 </th>
             </tr>
-              <PluralRow value={cycles} label="Cycle"/>
-              <PluralRow value={instructions} label="Instruction"/>
+              <PluralRow value={cycles} label="Cycle" valueId="stat-cycles"/>
+              <PluralRow value={instructions} label="Instruction" valueId="stat-instructions"/>
             <Row value={instructions == 0 ? 0 : (cycles / instructions).toFixed(2)}
                  label="Cycles per Instructions (CPI)"/>
             </tbody>

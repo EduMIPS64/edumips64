@@ -98,8 +98,13 @@ async function runToCompletion(page) {
   // Click the Run All button
   await page.click('#run-button');
 
-  // Wait for execution to complete
+  // Wait for execution to complete (stop button disabled)
   await waitForSimulationComplete(page);
+
+  // Also wait for cycles to be updated in the UI (confirms stats have been rendered)
+  // This prevents race conditions where the button is disabled but React hasn't re-rendered stats yet
+  const cyclesCell = page.locator('#stat-cycles');
+  await expect(cyclesCell).not.toHaveText('0', { timeout: 10000 });
 }
 
 module.exports = {
