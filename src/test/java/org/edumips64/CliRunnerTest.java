@@ -19,11 +19,10 @@ import static org.junit.Assert.*;
 public class CliRunnerTest {
     private Cli cli;
     private Cli verboseCli;
-    private ConfigStore cfg;
 
     @Before
     public void setUp() {
-        cfg = new InMemoryConfigStore(ConfigStore.defaults);
+        var cfg = new InMemoryConfigStore(ConfigStore.defaults);
         CurrentLocale.setConfig(cfg);
         cli = new Cli(cfg);
         verboseCli = new Cli(cfg, true);
