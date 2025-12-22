@@ -334,7 +334,7 @@ del presente documento.
 
 Opzioni da riga di comando
 --------------------------
-Sono disponibili quattro opzioni da linea di comando. Esse sono descritte di
+Sono disponibili diverse opzioni da linea di comando. Esse sono descritte di
 seguito, con il nome per esteso scritto tra parentesi.  Nomi abbreviati e per
 esteso possono essere utilizzati indifferentemente.
 
@@ -351,6 +351,12 @@ esteso possono essere utilizzati indifferentemente.
 * `-d (--debug)` attiva la modalità di debugging.
 
 * `-hl (--headless)` Esegue EduMIPS64 in modalità headless (senza interfaccia grafica)
+
+* `--verbose` abilita la modalità verbose nella modalità headless/CLI, mostrando
+  l'output dettagliato del simulatore come messaggi di inizio/fine e indicatori
+  di progresso. Per impostazione predefinita, la CLI funziona in modalità
+  silenziosa, che minimizza l'output del simulatore per evitare confusione con
+  l'output del programma (ad esempio, da SYSCALL 5).
 
 Nella modalità di debugging è disponibile una nuova finestra, la finestra
 Debug, che mostra il resoconto delle attività interne di  EduMIPS64. Tale
