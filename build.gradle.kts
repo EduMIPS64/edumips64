@@ -260,6 +260,11 @@ tasks {
         
         // Ensure UTF-8 encoding for tests
         systemProperty("file.encoding", "UTF-8")
+        
+        // Explicitly disable headless mode for AWT/Swing tests
+        // This allows GUI tests to run with Xvfb in CI environments
+        // Without this, tests would fail with HeadlessException even when xvfb-run is used
+        systemProperty("java.awt.headless", "false")
     }
 }
 
