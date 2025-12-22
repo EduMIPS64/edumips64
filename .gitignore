@@ -10,6 +10,9 @@
 # project,
 /*.s
 
+# PDF files.
+*.pdf
+
 # Vim temporary files.
 *.un~
 *.sw*

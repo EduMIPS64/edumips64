@@ -18,12 +18,14 @@ import static org.junit.Assert.*;
 
 public class CliRunnerTest {
     private Cli cli;
+    private Cli verboseCli;
 
     @Before
     public void setUp() {
         var cfg = new InMemoryConfigStore(ConfigStore.defaults);
         CurrentLocale.setConfig(cfg);
         cli = new Cli(cfg);
+        verboseCli = new Cli(cfg, true);
     }
 
     @Test
@@ -65,11 +67,19 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void canLoad() {
+    public void canLoadVerbose() {
+        OutputStream os = getSystemOut();
+        CommandLine cl = new CommandLine(verboseCli);
+        cl.execute("load", "src/test/resources/add.s");
+        assertTrue(os.toString().contains("Loaded file "));
+    }
+
+    @Test
+    public void canLoadQuiet() {
         OutputStream os = getSystemOut();
         CommandLine cl = new CommandLine(cli);
         cl.execute("load", "src/test/resources/add.s");
-        assertTrue(os.toString().contains("Loaded file "));
+        assertFalse(os.toString().contains("Loaded file "));
     }
 
     @Test
@@ -179,6 +189,30 @@ public class CliRunnerTest {
 
     public void printConfig() {
         new CommandLine(cli).execute("config");
+    }
+
+    @Test
+    public void quietModeDoesNotPrintRunMessages() {
+        OutputStream os = getSystemOut();
+        CommandLine cl = new CommandLine(cli);
+        cl.execute("load", "src/test/resources/add.s");
+        cl.execute("run");
+        String output = os.toString();
+        assertFalse(output.contains("Starting execution"));
+        assertFalse(output.contains("Running"));
+        assertFalse(output.contains("Execution ended"));
+    }
+
+    @Test
+    public void verboseModePrintsRunMessages() {
+        OutputStream os = getSystemOut();
+        CommandLine cl = new CommandLine(verboseCli);
+        cl.execute("load", "src/test/resources/add.s");
+        cl.execute("run");
+        String output = os.toString();
+        assertTrue(output.contains("Starting execution"));
+        assertTrue(output.contains("Running"));
+        assertTrue(output.contains("Execution ended"));
     }
 
     private OutputStream getSystemOut() {

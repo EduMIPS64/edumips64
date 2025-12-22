@@ -154,11 +154,15 @@ public class Main {
 
     // Configure logger format.
     System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tm%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
-    Main.showVersion();
 
     if (cliArgs.isHeadless()) {
+      // Only show version in verbose mode for CLI
+      if (cliArgs.isVerbose()) {
+        Main.showVersion();
+      }
       startCli(mm.configStore, cliArgs);
     } else {
+      Main.showVersion();
       checkAndStartGui(mm, cliArgs);
     }
   }
@@ -548,7 +552,7 @@ public class Main {
       log.info("Set the status to RUNNING");
 
       // Let's fetch the first instruction
-      cpuWorker = new CPUSwingWorker(cpu, cachesim, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
+      cpuWorker = new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
       cpuWorker.setSteps(1);
       cpuWorker.execute();
       while (cpuWorker.isDone()) {
@@ -843,7 +847,7 @@ public class Main {
     // Lambda to create a CPUSwingWorker. Used to have a single place where CPUSwingWorker is
     // created.
     Supplier<CPUSwingWorker> workerBuilder = () ->
-        new CPUSwingWorker(cpu, cachesim, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
+        new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
 
     // ---------------- EXECUTE MENU
     // Execute a single simulation step

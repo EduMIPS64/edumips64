@@ -5,10 +5,6 @@ import org.edumips64.core.FCSRRegister;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.edumips64.core.fpu.FPInvalidOperationException;
-import org.edumips64.core.fpu.FPOverflowException;
-import org.edumips64.core.fpu.FPUnderflowException;
-
 import static org.junit.Assert.assertEquals;
 
 /** Unit tests covering multiplication edge cases originally tested by fpu-mul.s */

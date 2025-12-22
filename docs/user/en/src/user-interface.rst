@@ -316,7 +316,7 @@ document.
 
 Command line options
 --------------------
-Four command line options are available. They are described in the following
+Several command line options are available. They are described in the following
 list, with the long name enclosed in round brackets. Long and short names can
 be used in the same way.
 
@@ -332,6 +332,11 @@ be used in the same way.
 * `-d (--debug)` enters Debug mode
 
 * `-hl (--headless)` Runs EduMIPS64 in headless mode (no gui)
+
+* `--verbose` enables verbose mode in headless/CLI mode, showing detailed
+  simulator output such as start/end messages and progress indicators. By
+  default, the CLI runs in quiet mode, which minimizes simulator output to
+  avoid confusion with program output (e.g., from SYSCALL 5).
 
 The `--debug` flag has the effect to activate Debug mode. In this mode, a new
 frame is available, the Debug frame, and it shows the log of internal

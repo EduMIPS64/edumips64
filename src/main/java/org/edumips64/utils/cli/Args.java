@@ -24,6 +24,9 @@ public class Args implements Runnable {
     @Option(names = {"-hl", "--headless"}, descriptionKey = "headless", defaultValue = "false")
     private boolean headless;
 
+    @Option(names = {"-v", "--verbose"}, descriptionKey = "verbose", defaultValue = "false")
+    private boolean verbose;
+
     public String getFileName() {
         return this.fileName;
     }
@@ -37,6 +40,8 @@ public class Args implements Runnable {
     }
 
     public boolean isHeadless() { return headless; }
+
+    public boolean isVerbose() { return verbose; }
 
     @Override
     public void run() {
