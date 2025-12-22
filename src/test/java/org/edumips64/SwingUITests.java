@@ -42,7 +42,6 @@ import java.awt.*;
 import java.io.File;
 
 import static org.junit.Assert.*;
-import static org.junit.Assume.assumeFalse;
 
 /**
  * Basic Swing UI tests for EduMIPS64.
@@ -83,9 +82,8 @@ public class SwingUITests {
   
   @BeforeClass
   public static void setUpOnce() {
-    // Skip tests if running in a true headless environment without display
-    assumeFalse("Skipping Swing tests in headless environment without display", 
-        GraphicsEnvironment.isHeadless());
+    // These tests require a graphical environment (real display or Xvfb).
+    // They will fail if truly headless, but that's expected and will show as test failures.
   }
   
   @Before
