@@ -25,6 +25,7 @@ async function removeOverlay(page) {
 async function waitForPageReady(page) {
   await page.waitForSelector('#load-button');
   await page.waitForSelector('.monaco-editor');
+  await page.waitForFunction(() => window.monaco);
 
   // Close the webpack dev server overlay if present
   await removeOverlay(page);
