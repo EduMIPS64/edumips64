@@ -81,6 +81,9 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const prevMemory = React.useRef(memory);
   const prevStdout = React.useRef(stdout);
 
+  // Ref to track if we are resetting the simulator (clearing code)
+  const isResetting = React.useRef(false);
+
   // Detect changes in accordion data when collapsed
   React.useEffect(() => {
     if (!accordionAlerts) {
@@ -89,6 +92,17 @@ const Simulator = ({worker, initialState, appInsights}) => {
       prevRegisters.current = registers;
       prevMemory.current = memory;
       prevStdout.current = stdout;
+      return;
+    }
+
+    // If we are resetting, update refs but don't trigger changes
+    if (isResetting.current) {
+      prevStats.current = stats;
+      prevPipeline.current = pipeline;
+      prevRegisters.current = registers;
+      prevMemory.current = memory;
+      prevStdout.current = stdout;
+      isResetting.current = false;
       return;
     }
     
@@ -255,6 +269,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   const clearCode = () => {
     setCode(".data\n\n.code\n  SYSCALL 0\n");
+    isResetting.current = true;
     worker.reset();
     // Clear accordion change markers
     setAccordionChanges({
