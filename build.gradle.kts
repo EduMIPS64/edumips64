@@ -265,6 +265,9 @@ tasks {
         // This allows GUI tests to run with Xvfb in CI environments
         // Without this, tests would fail with HeadlessException even when xvfb-run is used
         systemProperty("java.awt.headless", "false")
+        
+        // Pass through DISPLAY environment variable for X11 connection (needed for xvfb-run)
+        environment("DISPLAY", System.getenv("DISPLAY") ?: ":99")
     }
 }
 
