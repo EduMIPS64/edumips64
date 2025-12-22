@@ -256,6 +256,14 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const clearCode = () => {
     setCode(".data\n\n.code\n  SYSCALL 0\n");
     worker.reset();
+    // Clear accordion change markers
+    setAccordionChanges({
+      stats: false,
+      pipeline: false,
+      registers: false,
+      memory: false,
+      stdout: false,
+    });
   }
 
 
