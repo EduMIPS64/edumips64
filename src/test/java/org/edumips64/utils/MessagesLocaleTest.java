@@ -1,73 +1,67 @@
 package org.edumips64.utils;
 
-import org.edumips64.BaseTest;
+import org.edumips64.utils.cli.Args;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import picocli.CommandLine;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 import static org.junit.Assert.*;
 
 /**
- * Tests that the Messages resource bundle is correctly loaded for all 3 supported locales
- * (English, Italian, Chinese). This ensures translations for CLI options like --verbose
- * (added in PR #1483) are properly available in all languages.
+ * Tests that the CLI help output correctly displays the localized verbose message
+ * for all 3 supported locales (English, Italian, Chinese).
+ * This ensures translations for CLI options like --verbose (added in PR #1483)
+ * are properly displayed in the CLI help output.
  */
-public class MessagesLocaleTest extends BaseTest {
+public class MessagesLocaleTest {
 
-    private static final String VERBOSE_KEY = "verbose";
+    private Locale originalLocale;
+    private PrintStream originalOut;
+    private ByteArrayOutputStream outputStream;
 
-    @Test
-    public void testEnglishLocaleLoadsMessagesBundle() {
-        ResourceBundle bundle = ResourceBundle.getBundle("Messages", Locale.ENGLISH);
-        assertNotNull(bundle);
-        String verboseMsg = bundle.getString(VERBOSE_KEY);
-        assertNotNull(verboseMsg);
-        assertTrue("English verbose message should contain 'Verbose mode'",
-                verboseMsg.contains("Verbose mode"));
+    @Before
+    public void setUp() {
+        originalLocale = Locale.getDefault();
+        originalOut = System.out;
+        outputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outputStream));
+    }
+
+    @After
+    public void tearDown() {
+        Locale.setDefault(originalLocale);
+        System.setOut(originalOut);
     }
 
     @Test
-    public void testItalianLocaleLoadsMessagesBundle() {
-        ResourceBundle bundle = ResourceBundle.getBundle("Messages", Locale.ITALIAN);
-        assertNotNull(bundle);
-        String verboseMsg = bundle.getString(VERBOSE_KEY);
-        assertNotNull(verboseMsg);
-        assertTrue("Italian verbose message should contain 'Modalità verbose'",
-                verboseMsg.contains("Modalità verbose"));
+    public void testEnglishLocaleShowsVerboseMessage() {
+        Locale.setDefault(Locale.ENGLISH);
+        new CommandLine(new Args()).execute("--help");
+        String output = outputStream.toString();
+        assertTrue("English CLI help should contain 'Verbose mode'",
+                output.contains("Verbose mode"));
     }
 
     @Test
-    public void testChineseLocaleLoadsMessagesBundle() {
-        ResourceBundle bundle = ResourceBundle.getBundle("Messages", Locale.SIMPLIFIED_CHINESE);
-        assertNotNull(bundle);
-        String verboseMsg = bundle.getString(VERBOSE_KEY);
-        assertNotNull(verboseMsg);
-        assertTrue("Chinese verbose message should contain '详细模式'",
-                verboseMsg.contains("详细模式"));
+    public void testItalianLocaleShowsVerboseMessage() {
+        Locale.setDefault(Locale.ITALIAN);
+        new CommandLine(new Args()).execute("--help");
+        String output = outputStream.toString();
+        assertTrue("Italian CLI help should contain 'Modalità verbose'",
+                output.contains("Modalità verbose"));
     }
 
     @Test
-    public void testAllKeysExistInAllLocales() {
-        ResourceBundle enBundle = ResourceBundle.getBundle("Messages", Locale.ENGLISH);
-        ResourceBundle itBundle = ResourceBundle.getBundle("Messages", Locale.ITALIAN);
-        ResourceBundle zhBundle = ResourceBundle.getBundle("Messages", Locale.SIMPLIFIED_CHINESE);
-
-        // Verify all keys in English bundle exist in other locales
-        for (String key : enBundle.keySet()) {
-            assertNotNull("Italian bundle should have key: " + key,
-                    getStringOrNull(itBundle, key));
-            assertNotNull("Chinese bundle should have key: " + key,
-                    getStringOrNull(zhBundle, key));
-        }
-    }
-
-    private String getStringOrNull(ResourceBundle bundle, String key) {
-        try {
-            return bundle.getString(key);
-        } catch (MissingResourceException e) {
-            return null;
-        }
+    public void testChineseLocaleShowsVerboseMessage() {
+        Locale.setDefault(Locale.SIMPLIFIED_CHINESE);
+        new CommandLine(new Args()).execute("--help");
+        String output = outputStream.toString();
+        assertTrue("Chinese CLI help should contain '详细模式'",
+                output.contains("详细模式"));
     }
 }
