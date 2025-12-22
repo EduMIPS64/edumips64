@@ -83,19 +83,9 @@ public class SwingUITests {
   @BeforeClass
   public static void setUpOnce() {
     // These tests require a graphical environment (real display or Xvfb).
-    // Skip them if we can't initialize the graphics environment
-    try {
-      // Try to get the graphics configuration - this will fail if X11 is unavailable
-      GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-      if (ge.isHeadlessInstance()) {
-        org.junit.Assume.assumeTrue("Skipping Swing tests - headless environment detected", false);
-      }
-      // Try to get screen devices to verify X11 is actually working
-      ge.getDefaultScreenDevice();
-    } catch (java.awt.AWTError | java.awt.HeadlessException e) {
-      // X11 is not available, skip these tests
-      org.junit.Assume.assumeTrue("Skipping Swing tests - X11 not available: " + e.getMessage(), false);
-    }
+    // The build configuration sets java.awt.headless=false and passes DISPLAY variable.
+    // In CI, tests run with xvfb-run which provides the necessary X11 display.
+    // If tests fail with AWTError, it indicates a CI configuration issue, not a test problem.
   }
   
   @Before
