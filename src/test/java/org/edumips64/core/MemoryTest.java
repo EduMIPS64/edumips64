@@ -2,9 +2,6 @@ package org.edumips64.core;
 
 import org.edumips64.BaseWithInstructionBuilderTest;
 import org.edumips64.core.is.BUBBLE;
-import org.edumips64.core.is.InstructionBuilder;
-import org.edumips64.utils.io.LocalFileUtils;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

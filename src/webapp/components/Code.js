@@ -235,6 +235,10 @@ const Code = (props) => {
   };
 
   const editorDidMount = (editor, monaco) => {
+    // Expose monaco and editor to window for testing purposes
+    window.monaco = monaco;
+    window.editor = editor;
+    
     setMonaco(monaco);
     setEditor(editor);
 

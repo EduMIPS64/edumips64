@@ -230,6 +230,7 @@ function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }) {
           <React.Fragment key={index}>
             <ListItem disablePadding>
               <ListItemButton
+                id={`toc-item-${item.title.replace(/\s+/g, '-').toLowerCase()}`}
                 onClick={() => {
                   if (item.children) {
                     handleToggle(index);
@@ -259,6 +260,7 @@ function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }) {
                   {item.children.map((child, childIndex) => (
                     <ListItem key={childIndex} disablePadding>
                       <ListItemButton
+                        id={`toc-item-${child.title.replace(/\s+/g, '-').toLowerCase()}`}
                         sx={{ pl: 4 }}
                         onClick={() => onNavigate(child.url)}
                         selected={currentPage === child.url}
@@ -545,7 +547,7 @@ export default function HelpDialog(props) {
         </TabPanel>
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.handleClose} variant="outlined">
+        <Button onClick={props.handleClose} variant="outlined" id="help-close-button">
           Close
         </Button>
       </DialogActions>

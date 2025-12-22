@@ -544,7 +544,7 @@ public class Main {
       log.info("Set the status to RUNNING");
 
       // Let's fetch the first instruction
-      cpuWorker = new CPUSwingWorker(cpu, cachesim, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
+      cpuWorker = new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
       cpuWorker.setSteps(1);
       cpuWorker.execute();
       while (cpuWorker.isDone()) {
@@ -839,7 +839,7 @@ public class Main {
     // Lambda to create a CPUSwingWorker. Used to have a single place where CPUSwingWorker is
     // created.
     Supplier<CPUSwingWorker> workerBuilder = () ->
-        new CPUSwingWorker(cpu, cachesim, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
+        new CPUSwingWorker(cpu, front, mainFrame, configStore, builder, initCallback, haltCallback, finalizeCallback, codeSupplier);
 
     // ---------------- EXECUTE MENU
     // Execute a single simulation step
