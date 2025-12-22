@@ -1,5 +1,6 @@
 package org.edumips64.utils;
 
+import org.edumips64.BaseTest;
 import org.junit.Test;
 
 import java.util.Locale;
@@ -13,7 +14,7 @@ import static org.junit.Assert.*;
  * (English, Italian, Chinese). This ensures translations for CLI options like --verbose
  * (added in PR #1483) are properly available in all languages.
  */
-public class MessagesLocaleTest {
+public class MessagesLocaleTest extends BaseTest {
 
     private static final String VERBOSE_KEY = "verbose";
 
