@@ -122,13 +122,17 @@ for (language in languages) {
 }
 
 // Catch-all tasks for documentation
-tasks.register<GradleBuild>("allDocs") {
-    tasks = allDocsTaskNames
+// Using standard lifecycle tasks with dependsOn instead of GradleBuild
+// to enable parallel execution of documentation tasks with other tasks.
+tasks.register("allDocs") {
+    group = "Documentation"
     description = "Run all documentation tasks"
+    allDocsTaskNames.forEach { dependsOn(it) }
 }
-tasks.register<GradleBuild>("htmlDocs") {
-    tasks = htmlTaskNames
+tasks.register("htmlDocs") {
+    group = "Documentation"
     description = "Run all HTML documentation tasks"
+    htmlTaskNames.forEach { dependsOn(it) }
 }
 
 // Include the docs folder at the root of the jar, for JavaHelp
