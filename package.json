@@ -31,11 +31,11 @@
     "react-redux": "^9.0.0"
   },
   "devDependencies": {
-    "@babel/core": "7.28.5",
+    "@babel/core": "7.28.6",
     "@babel/eslint-parser": "7.28.5",
-    "@babel/preset-env": "7.28.5",
+    "@babel/preset-env": "7.28.6",
     "@babel/preset-react": "7.28.5",
-    "@babel/runtime": "7.28.4",
+    "@babel/runtime": "7.28.6",
     "@playwright/test": "1.57.0",
     "@babel/eslint-parser": "^7.11.0",
     "babel-loader": "10.0.0",
