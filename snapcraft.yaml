@@ -4,7 +4,7 @@ summary: A free visual and cross-platform MIPS64 CPU simulator.
 description: EduMIPS64 is a free MIPS64 visual simulator and debugger, used as a teaching tool in Computer Architecture courses.
 grade: stable
 
-base: core22
+base: core24
 confinement: strict
 
 parts:
@@ -40,13 +40,10 @@ parts:
         mv build/libs/edumips64-*.jar "$CRAFT_PART_INSTALL"/jar/edumips64.jar && \
         ls $CRAFT_PART_INSTALL/jar/*.jar -ld
     source: .
-    # Install Python 3.12 and make it the default Python3 before the build stage,
-    # so that the build can use it and satisfy the Python >= 3.12 dependency from
-    # Sphinx >= 9.1.0.
+    # Core24 (Ubuntu 24.04) has Python 3.12 as the default, which satisfies
+    # the Python >= 3.12 dependency from Sphinx >= 9.1.0.
     override-pull: |
-      snapcraftctl pull
-      apt install -y python3.12
-      update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
+      craftctl default
     build-packages:
       - git
       - pkg-config
