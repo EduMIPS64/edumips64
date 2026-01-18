@@ -53,6 +53,10 @@ jobs:
 
       # Build docs (PDF and HTML for the in-app help)
       # The Python dependencies are fetched by Gradle.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
       - name: Build all docs
         run: ./gradlew allDocs
 
