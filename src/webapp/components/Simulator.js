@@ -179,6 +179,18 @@ const Simulator = ({worker, initialState, appInsights}) => {
   worker.onmessage = (e) => {
     const result = worker.parseResult(e.data);
     console.log('Got message from worker.', result);
+    
+    // For syntax check responses, only update parsing errors to avoid unnecessary re-renders
+    if (result.method === 'checksyntax') {
+      setParsingErrors(result.parsingErrors);
+      if (result.parsingErrors) {
+        setParsedInstructions(null);
+      } else {
+        setParsedInstructions(result.parsedInstructions);
+      }
+      return;
+    }
+    
     updateState(result);
   };
 
