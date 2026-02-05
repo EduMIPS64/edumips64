@@ -299,20 +299,26 @@ const Code = (props) => {
 
     console.log('Parsing errors', props.parsingErrors);
     const lines = editor.getValue().split('\n');
-    const markers = props.parsingErrors.map((err) => {
-      const line = lines[err.row - 1];
-      // First non-space character.
-      const startColumn = line.search(/\S/) + 1;
-      return {
-        startLineNumber: err.row,
-        endLineNumber: err.row,
-        startColumn: startColumn,
-        endColumn: line.length + 1,
-        message: `${err.description}`,
-        severity: err.isWarning ? 4 : 8,
-        source: 'EduMIPS64',
-      };
-    });
+    const markers = props.parsingErrors
+      .filter((err) => {
+        // Skip errors for lines that no longer exist in the editor
+        // (can happen due to race conditions during rapid editing)
+        return err.row >= 1 && err.row <= lines.length;
+      })
+      .map((err) => {
+        const line = lines[err.row - 1];
+        // First non-space character (or column 1 if line is empty/whitespace)
+        const startColumn = Math.max(line.search(/\S/) + 1, 1);
+        return {
+          startLineNumber: err.row,
+          endLineNumber: err.row,
+          startColumn: startColumn,
+          endColumn: line.length + 1,
+          message: `${err.description}`,
+          severity: err.isWarning ? 4 : 8,
+          source: 'EduMIPS64',
+        };
+      });
     console.log('Markers', markers);
 
     monaco.editor.setModelMarkers(model, 'EduMIPS64', markers);

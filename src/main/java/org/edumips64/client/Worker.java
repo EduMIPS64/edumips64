@@ -69,12 +69,12 @@ public class Worker implements EntryPoint {
         info("Running worker method " + method);
         switch(method) {
           case "reset":
-            postMessage(simulator.reset());
+            postMessage(withMethod(simulator.reset(), method));
             break;
           case "step":
             int steps = data.getAsAny("steps").asInt();
             info("steps: " + steps);
-            postMessage(simulator.step(steps));
+            postMessage(withMethod(simulator.step(steps), method));
             break;
           case "setcacheconfig":
             JsPropertyMap<Object> config = Js.cast(data.get("config"));
@@ -95,16 +95,16 @@ public class Worker implements EntryPoint {
 
             simulator.setCacheConfig(l1d_config,l1i_config);
 
-            postMessage(simulator.resultFactory.Success());
+            postMessage(withMethod(simulator.resultFactory.Success(), method));
             break;
           case "load":
             String code = data.getAsAny("code").asString();
             Result parseResult = simulator.loadProgram(code);
             if (!parseResult.success) {
               DomGlobal.console.log(parseResult);
-              postMessage(parseResult);
+              postMessage(withMethod(parseResult, method));
             } else {
-              postMessage(simulator.step(1));
+              postMessage(withMethod(simulator.step(1), method));
             }
             break;
           case "checksyntax":
@@ -115,7 +115,7 @@ public class Worker implements EntryPoint {
             if (parsingSimulatorResult.success) {
               Result finalResult = simulator.resultFactory.Success();
               finalResult.parsingErrors = parsingSimulatorResult.parsingErrors;
-              postMessage(finalResult);
+              postMessage(withMethod(finalResult, method));
               break;
             }
 
@@ -124,7 +124,7 @@ public class Worker implements EntryPoint {
             // parsing.
             Result finalResult = simulator.resultFactory.Failure(parsingSimulatorResult.errorMessage);
             finalResult.parsingErrors = parsingSimulatorResult.parsingErrors;
-            postMessage(finalResult);
+            postMessage(withMethod(finalResult, method));
             break;
           default:
             info("UNKNOWN METHOD: " + method);
@@ -135,6 +135,11 @@ public class Worker implements EntryPoint {
 
   private void postMessage(Object message) {
     DomGlobal.postMessage(message);
+  }
+
+  private Result withMethod(Result result, String method) {
+    result.method = method;
+    return result;
   }
 
   private void info(String message) {
