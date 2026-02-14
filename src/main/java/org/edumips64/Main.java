@@ -125,7 +125,15 @@ public class Main {
   private Supplier<String> codeSupplier;
 
   private Main() {
-    this.configStore = new JavaPrefsConfigStore(ConfigStore.defaults);
+    this(new JavaPrefsConfigStore(ConfigStore.defaults));
+  }
+
+  /**
+   * Constructor for testing purposes. Allows injecting a custom ConfigStore.
+   * @param configStore the configuration store to use
+   */
+  Main(ConfigStore configStore) {
+    this.configStore = configStore;
     CurrentLocale.setConfig(this.configStore);
   }
 
@@ -201,7 +209,7 @@ public class Main {
     mm.mainFrame.setLocation(0, 0);
     mm.init();
     s.closeSplash();
-    mm.mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
+    mm.mainFrame.setTitle(getDefaultTitle());
     mm.mainFrame.setVisible(true);
     mm.mainFrame.setExtendedState(mm.mainFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
     // Auto-minimze the log window and the I/O window
@@ -560,12 +568,12 @@ public class Main {
         nome_file = token.nextToken();
       }
 
-      mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
+      mainFrame.setTitle(getDefaultTitle() + " - " + nome_file);
     } catch (ParserMultiException ex) {
       log.info("Error opening " + file);
       new ErrorDialog(mainFrame, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS), configStore);
       openedFile = null;
-      mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
+      mainFrame.setTitle(getDefaultTitle());
       resetSimulator(false);
     } catch (ReadException ex) {
       String tmpfile;
@@ -576,11 +584,11 @@ public class Main {
         tmpfile = ex.getMessage();
       }
 
-      mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
+      mainFrame.setTitle(getDefaultTitle());
       log.info("File not found: " + tmpfile);
       JOptionPane.showMessageDialog(mainFrame, CurrentLocale.getString("FILE_NOT_FOUND") + ": " + tmpfile, "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE);
     } catch (Exception e) {
-      mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
+      mainFrame.setTitle(getDefaultTitle());
       log.info("Error opening " + file);
       new ReportDialog(mainFrame, e, CurrentLocale.getString("ERROR"), MetaInfo.VERSION, MetaInfo.BUILD_DATE, MetaInfo.FULL_BUILDSTRING, code);
     }
@@ -653,9 +661,9 @@ public class Main {
   /** Sets the frame titles. Used when the locale is changed. */
   private void setFrameTitles() {
     if (openedFile != null) {
-      mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + openedFile);
+      mainFrame.setTitle(getDefaultTitle() + " - " + openedFile);
     } else {
-      mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
+      mainFrame.setTitle(getDefaultTitle());
     }
 
     for (Map.Entry<String, JInternalFrame>e : mapped_frames.entrySet()) {
@@ -1162,5 +1170,50 @@ public class Main {
 
   private void stopPB() {
     sb.stopPB();
+  }
+
+  /**
+   * Returns the default window title (without filename).
+   * @return the default title string
+   */
+  static String getDefaultTitle() {
+    return "EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM");
+  }
+
+  // Package-private getters for testing
+  JFrame getMainFrame() {
+    return mainFrame;
+  }
+
+  CPU getCpu() {
+    return cpu;
+  }
+
+  Memory getMemory() {
+    return memory;
+  }
+
+  Parser getParser() {
+    return parser;
+  }
+
+  CacheSimulator getCacheSimulator() {
+    return cachesim;
+  }
+
+  CycleBuilder getCycleBuilder() {
+    return builder;
+  }
+
+  StatusBar getStatusBar() {
+    return sb;
+  }
+
+  /**
+   * Initializes the main frame for testing. Call this before init().
+   * @param frame the JFrame to use as the main window
+   */
+  void setMainFrame(JFrame frame) {
+    this.mainFrame = frame;
   }
 }

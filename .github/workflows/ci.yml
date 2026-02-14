@@ -44,8 +44,10 @@ jobs:
       # Compile the code, run unit tests, upload code coverage results.
       - name: Compile Java code
         run: ./gradlew compileJava
+      - name: Install Xvfb for Swing tests
+        run: sudo apt-get update && sudo apt-get install -y xvfb
       - name: Run unit tests
-        run: ./gradlew check
+        run: xvfb-run --auto-servernum ./gradlew check
       - name: Codecov
         uses: codecov/codecov-action@v5.5.2
         with:

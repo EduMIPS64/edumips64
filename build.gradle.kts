@@ -46,6 +46,9 @@ dependencies {
     testImplementation("org.gwtproject:gwt-dev:2.12.2")
     testImplementation("com.google.elemental2:elemental2-dom:1.3.2")
     testImplementation("com.vertispan.rpc:workers:1.0-alpha-8")
+
+    // Swing UI Testing
+    testImplementation("org.assertj:assertj-swing:3.17.1")
 }
 
 python {
@@ -257,6 +260,14 @@ tasks {
         
         // Ensure UTF-8 encoding for tests
         systemProperty("file.encoding", "UTF-8")
+        
+        // Explicitly disable headless mode for AWT/Swing tests
+        // This allows GUI tests to run with Xvfb in CI environments
+        // Without this, tests would fail with HeadlessException even when xvfb-run is used
+        systemProperty("java.awt.headless", "false")
+        
+        // Pass through DISPLAY environment variable for X11 connection (needed for xvfb-run)
+        environment("DISPLAY", System.getenv("DISPLAY") ?: ":99")
     }
 }
 
