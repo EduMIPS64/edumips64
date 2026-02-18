@@ -1,0 +1,7 @@
+<module>
+  <!-- Inherit the core GWT module -->
+  <inherits name="com.google.gwt.core.Core" />
+  
+  <!-- Specify the source path for the test -->
+  <source path="" />
+</module>
