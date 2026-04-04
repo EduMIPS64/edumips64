@@ -136,13 +136,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Install JS dependencies
-        run: npm install
-
       - name: Set up Node.JS
         uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
+
+      - name: Install JS dependencies
+        run: npm install
 
       - name: Build JS Worker (Java → JS), including HTML docs
         run: ./gradlew webapp
