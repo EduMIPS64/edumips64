@@ -1,85 +1,76 @@
-# GWT 2.13.0 Bug Reproduction
+# GWT Bug: `gwt-user:2.12.2` + `gwt-dev:2.13.0` version mismatch causes `InternalCompilerException`
 
-This is a minimal reproduction case for the GWT 2.13.0 compiler bug that causes `InternalCompilerException` with double-cast operations in GWTTestCase tests.
+## Summary
 
-## Bug Description
+When `gwt-user` resolves to version **2.12.2** but `gwt-dev` is at version **2.13.0**, all
+`GWTTestCase`-based tests fail with an `InternalCompilerException` during GWT's
+Java-to-JavaScript compilation phase.
 
-GWT 2.13.0 fails to compile GWTTestCase-based tests in certain scenarios with an `InternalCompilerException`. The error occurs in the GWT test infrastructure itself when the compiler generates a double-cast operation in `GWTRunner.java`.
+## Root Cause
 
-**Note:** The bug manifests differently depending on the test execution mode:
-- In **HtmlUnit mode** (default): Tests may pass but the bug exists in the compiler
-- In **WebMode** (production mode): The bug causes compilation to fail
-- In complex projects with multiple GWT modules: The bug is more likely to appear
+`gwt-dev:2.13.0` removed the class:
+```
+com.google.gwt.dev.util.log.speedtracer.SpeedTracerLogger$EventType
+```
+but `gwt-user:2.12.2`'s JUnit / `GWTTestCase` infrastructure still references it.  This
+causes a `NoClassDefFoundError` at test-compilation time, which is then wrapped in an
+`InternalCompilerException`.
 
-This reproduction demonstrates the minimal setup. The bug was discovered in the EduMIPS64 project where it consistently causes `FluentJsonObjectTest` to fail.
+### How EduMIPS64 triggers this
+
+The EduMIPS64 project uses the `us.ascendtech.gwt.classic` Gradle plugin (version 0.13.0),
+which pulls in `gwt-servlet:2.12.2` as a transitive dependency.  When Renovate upgraded
+only `gwt-dev` to 2.13.0, Gradle's conflict-resolution strategy kept `gwt-user` at 2.12.2
+(forced by the lower `gwt-servlet:2.12.2`), creating the mismatch silently.
+
+## Reproducing
+
+```bash
+cd gwt-bug-repro
+./gradlew clean test --tests "SimpleGWTTest"
+```
+
+This should fail with:
+```
+[ERROR] An internal compiler exception occurred
+    com.google.gwt.dev.jjs.InternalCompilerException: Unexpected error during visit.
+        ...
+    Caused by: java.lang.NoClassDefFoundError:
+        com/google/gwt/dev/util/log/speedtracer/SpeedTracerLogger$EventType
+```
+
+### To verify the fix
+
+Edit `build.gradle.kts` and change **both** versions to 2.12.2 (or both to 2.13.0):
+
+```bash
+# Match both versions → tests pass
+sed -i 's/val gwtUserVersion = "2.12.2"/val gwtUserVersion = "2.13.0"/' build.gradle.kts
+./gradlew clean test --tests "SimpleGWTTest"
+```
 
 ## Environment
 
-- **GWT version:** 2.13.0
-- **Java version:** 17+
-- **Build tool:** Gradle
+- **gwt-user:** 2.12.2
+- **gwt-dev:** 2.13.0
+- **Java:** 17+
+- **Build tool:** Gradle (wrapper included)
 
-## Steps to Reproduce
-
-1. Build the project:
-   ```bash
-   cd gwt-bug-repro
-   ./gradlew build
-   ```
-
-2. Run the test with GWT 2.13.0:
-   ```bash
-   ./gradlew test --tests "SimpleGWTTest"
-   ```
-
-3. To force WebMode compilation (more likely to trigger the bug):
-   ```bash
-   ./gradlew test --tests "SimpleGWTTest" -Dgwt.args="-prod"
-   ```
-
-## The Actual Bug (from EduMIPS64 project)
-
-In the EduMIPS64 project, this bug consistently causes test failures:
+## Error Log (abbreviated)
 
 ```
-[ERROR] com.google.gwt.dev.jjs.InternalCompilerException: Unexpected error during visit.
-  at com.google.gwt.dev.jjs.ast.JCastOperation.traverse(JCastOperation.java:76)
+[ERROR] An internal compiler exception occurred
+    com.google.gwt.dev.jjs.InternalCompilerException: Unexpected error during visit.
+      at com.google.gwt.dev.jjs.ast.JVisitor.translateException(JVisitor.java:111)
+      at com.google.gwt.dev.jjs.ast.JModVisitor.accept(JModVisitor.java:276)
+      at com.google.gwt.dev.jjs.ast.JCastOperation.traverse(JCastOperation.java:76)
+      ...
+    Caused by: java.lang.NoClassDefFoundError:
+      com/google/gwt/dev/util/log/speedtracer/SpeedTracerLogger$EventType
 ```
 
-The root cause is in `GWTRunner.java` line 163:
-```java
-junitHost = (JUnitHostAsync) (JUnitHostAsync) GWT.create(JUnitHost.class);
-```
+## Suggested Fix
 
-## Switching Between Versions
-
-To test with GWT 2.12.2 (working version):
-```bash
-sed -i 's/2.13.0/2.12.2/g' build.gradle.kts
-./gradlew clean test --tests "SimpleGWTTest"
-```
-
-To test with GWT 2.13.0 (broken version):
-```bash
-sed -i 's/2.12.2/2.13.0/g' build.gradle.kts
-./gradlew clean test --tests "SimpleGWTTest"
-```
-
-## Full Reproduction
-
-For the full reproduction that consistently demonstrates the bug, see the EduMIPS64 project:
-- Repository: https://github.com/EduMIPS64/edumips64
-- Branch: `copilot/sub-pr-1561`
-- Test file: `src/test/java/org/edumips64/client/FluentJsonObjectTest.java`
-
-To reproduce the bug there:
-1. Clone the repository
-2. Edit `build.gradle.kts` to set both `gwt-user` and `gwt-dev` to `2.13.0`
-3. Run: `./gradlew test --tests "FluentJsonObjectTest"`
-4. Observe the InternalCompilerException
-
-## Related Issues
-
-- GWT Milestone: 2.13.1 (planned fixes)
-- Affects all GWTTestCase-based tests in certain configurations
-- This is a regression from GWT 2.12.2 which works correctly
+`gwt-dev:2.13.0` should not remove classes that are still part of `gwt-user:2.12.x`'s
+public API surface (or `gwt-user:2.13.0` should be required to match), so that mixed
+version combinations produce a clear error rather than an internal compiler crash.
