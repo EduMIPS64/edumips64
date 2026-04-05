@@ -2,8 +2,6 @@
  * EduMIPS64 Gradle build configuration
  */
 import java.time.LocalDateTime
-import java.util.concurrent.TimeUnit
-import org.gradle.internal.os.OperatingSystem
 import ru.vyarus.gradle.plugin.python.task.PythonTask
 import ru.vyarus.gradle.plugin.python.PythonExtension.Scope.VIRTUALENV
 
@@ -60,16 +58,14 @@ application {
 val codename: String by project
 val version: String by project
 
-// Specify Java source/target version and source encoding.
-tasks.compileJava {
-    sourceCompatibility = "17"
-    targetCompatibility = "17"
-    options.encoding = "UTF-8"
+// Use Java toolchain for consistent JDK version across all compilations.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
-tasks.compileTestJava {
-    sourceCompatibility = "17"
-    targetCompatibility = "17"
+tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
 }
 
@@ -84,7 +80,7 @@ fun buildDocsCmd(language: String, type: String) : String {
 /*
  * Jar tasks
  */
-val docsDir = "build/resources/main/docs"
+val docsDir = layout.buildDirectory.dir("resources/main/docs")
 
 // Generate documentation tasks for all languages
 val languages = listOf("en", "it", "zh")
@@ -95,7 +91,7 @@ val htmlTaskNames = mutableListOf<String>()
 
 for (language in languages) {
     for (type in docTypes) {
-        val taskName = "${type}Docs${language.capitalize()}"
+        val taskName = "${type}Docs${language.replaceFirstChar { it.uppercase() }}"
         tasks.register<PythonTask>(taskName) {
             workDir = "${projectDir}/docs/user/${language}/src"
             command = buildDocsCmd(language, type)
@@ -108,26 +104,26 @@ for (language in languages) {
     }
     
     // Generate copy tasks for each language
-    val copyTaskName = "copyHelp${language.capitalize()}"
+    val copyTaskName = "copyHelp${language.replaceFirstChar { it.uppercase() }}"
     tasks.register<Copy>(copyTaskName) {
         from("${layout.buildDirectory.get()}/docs/${language}") {
             include("html/**")
             exclude("**/_sources/**")
         }
-        into ("${docsDir}/user/${language}")
-        dependsOn("htmlDocs${language.capitalize()}")
+        into(docsDir.map { it.dir("user/$language") })
+        dependsOn("htmlDocs${language.replaceFirstChar { it.uppercase() }}")
         mustRunAfter("compileJava")
     }
     copyHelpTaskNames.add(copyTaskName)
 }
 
 // Catch-all tasks for documentation
-tasks.register<GradleBuild>("allDocs") {
-    tasks = allDocsTaskNames
+tasks.register("allDocs") {
+    dependsOn(allDocsTaskNames)
     description = "Run all documentation tasks"
 }
-tasks.register<GradleBuild>("htmlDocs") {
-    tasks = htmlTaskNames
+tasks.register("htmlDocs") {
+    dependsOn(htmlTaskNames)
     description = "Run all HTML documentation tasks"
 }
 
@@ -138,52 +134,37 @@ tasks.register<Copy>("copyHelp") {
         exclude("**/src/**", "**/design/**", "**/*.py",  "**/*.pyc", 
             "**/*.md", "**/.buildinfo", "**/objects.inv", "**/*.txt", "**/__pycache__/**")
     }
-    into ("${docsDir}")
+    into(docsDir)
     copyHelpTaskNames.forEach { dependsOn(it) }
 }
 
 /*
- * Helper function to execute a command and return its output.
+ * Source control metadata, using Gradle providers for configuration-cache compatibility.
+ * On CI (GitHub Actions), values come from environment variables.
+ * Locally, values are obtained by running git commands.
  */
-fun String.runCommand(workingDir: File = file("./")): String {
-    val parts = this.split("\\s".toRegex())
-    val proc = ProcessBuilder(*parts.toTypedArray())
-            .directory(workingDir)
-            .redirectOutput(ProcessBuilder.Redirect.PIPE)
-            .redirectError(ProcessBuilder.Redirect.PIPE)
-            .start()
+val gitBranch: Provider<String> = providers.environmentVariable("GITHUB_REF")
+    .orElse(providers.exec {
+        commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
+    }.standardOutput.asText.map { it.trim() })
 
-    proc.waitFor(1, TimeUnit.MINUTES)
-    return proc.inputStream.bufferedReader().readText().trim()
-}
+val gitCommitHash: Provider<String> = providers.environmentVariable("GITHUB_SHA")
+    .map { it.substring(0, 7) }
+    .orElse(providers.exec {
+        commandLine("git", "rev-parse", "--verify", "--short", "HEAD")
+    }.standardOutput.asText.map { it.trim() })
 
-fun getSourceControlMetadata() : Triple<String, String, String> {
-    val branch: String
-    val commitHash: String
-    val qualifier: String
-    if(System.getenv("GITHUB_ACTIONS").isNullOrEmpty()) {
-        println("Running locally")
-        branch = "git rev-parse --abbrev-ref HEAD".runCommand()
-        commitHash = "git rev-parse --verify --short HEAD".runCommand()
-        qualifier = ""
-    } else {
-        println("Running under GitHub Actions")
-        branch = System.getenv("GITHUB_REF")
-        commitHash = System.getenv("GITHUB_SHA").substring(0, 7)
-        qualifier = "alpha"
-    }
-    return Triple(branch, commitHash, qualifier)
-}
+val buildQualifier: Provider<String> = providers.environmentVariable("GITHUB_ACTIONS")
+    .map { "alpha" }
+    .orElse("")
 
 val sharedManifest = Action<Manifest> {
     attributes["Signature-Version"] = version
     attributes["Codename"] = codename
     attributes["Build-Date"] = LocalDateTime.now()
-
-    val (branch, gitRevision, qualifier) = getSourceControlMetadata()
-    attributes["Full-Buildstring"] = "$branch@$gitRevision"
-    attributes["Git-Revision"] = gitRevision
-    attributes["Build-Qualifier"] = qualifier
+    attributes["Full-Buildstring"] = "${gitBranch.get()}@${gitCommitHash.get()}"
+    attributes["Git-Revision"] = gitCommitHash.get()
+    attributes["Build-Qualifier"] = buildQualifier.get()
 }
 
 // Main JAR
@@ -201,10 +182,6 @@ tasks.jar {
         sharedManifest.execute(this)
     }
     dependsOn("copyHelp")
-}
-
-tasks.assemble{
-    dependsOn("jar") 
 }
 
 // NoHelp JAR
@@ -279,7 +256,7 @@ tasks.register("release") {
 tasks.register<Exec>("msi"){
     group = "Distribution"
     description = "Creates an installable MSI file"
-    workingDir = File("${projectDir}")
+    workingDir = projectDir
 
     doFirst{
         var os = System.getProperty("os.name") as String;
@@ -291,7 +268,7 @@ tasks.register<Exec>("msi"){
         if (majorVersion < 14) {
             throw GradleException("JDK 14+ is required to create the MSI package.")
         }
-        if (!File("build/libs/edumips64-${version}.jar").exists()) {
+        if (!layout.buildDirectory.file("libs/edumips64-${version}.jar").get().asFile.exists()) {
             throw GradleException("Could not find build/libs/edumips64-${version}.jar. Please execute ./gradlew jar before trying to build the MSI.")
         }
         
@@ -300,7 +277,7 @@ tasks.register<Exec>("msi"){
         }
 
         println("Creating EduMIPS64-${version}.msi.");
-        val cmd = "jpackage.exe --main-jar edumips64-${version}.jar --input ./build/libs/ --app-version ${version} --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright ${LocalDateTime.now().year}, EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install --java-options -Dfile.encoding=utf-8"
+        val cmd = "jpackage.exe --main-jar edumips64-${version}.jar --input ./${layout.buildDirectory.get().asFile.name}/libs/ --app-version ${version} --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright ${LocalDateTime.now().year}, EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install --java-options -Dfile.encoding=utf-8"
         commandLine(cmd.split(" "));
     }
 }
@@ -313,7 +290,7 @@ gwt {
     sourceLevel = "1.11"
 }
 
-val npmExecutable = if (OperatingSystem.current().isWindows) "npm.cmd" else "npm"
+val npmExecutable = if (System.getProperty("os.name").lowercase().contains("windows")) "npm.cmd" else "npm"
 
 val npmBuild by tasks.registering(Exec::class) {
     group = "Web"
