@@ -116,19 +116,19 @@ jobs:
         run: ./gradlew jar
 
       - name: Upload JAR
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: JAR
           path: ./build/libs/edumips64-${{ needs.prepare.outputs.version }}.jar
 
       - name: Upload English Manual PDF
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: English manual (PDF)
           path: ./build/docs/en/pdf/EduMIPS64.pdf
 
       - name: Upload Italian Manual PDF
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: Italian manual (PDF)
           path: ./build/docs/it/pdf/EduMIPS64.pdf
@@ -152,7 +152,7 @@ jobs:
           path: wix
 
       - name: Download JAR
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8.0.1
         with:
           name: JAR
           path: build/libs
@@ -167,7 +167,7 @@ jobs:
         run: ./gradlew MSI
 
       - name: Upload MSI
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: MSI
           path: EduMIPS64-*.msi
@@ -215,7 +215,7 @@ jobs:
         run: ./gradlew webapp
 
       - name: Upload web application artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: web
           path: build/gwt/war/edumips64
@@ -251,7 +251,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Download web application artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8.0.1
         with:
           name: web
           path: build/gwt/war/edumips64
@@ -284,7 +284,7 @@ jobs:
           rm ../index.js
 
       - name: Upload ${{ matrix.artifact-name }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.artifact-path }}
@@ -306,7 +306,7 @@ jobs:
       - uses: actions/checkout@v6
 
       # Download every artifact into its own subdirectory.
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8.0.1
         with:
           path: release-artifacts
 

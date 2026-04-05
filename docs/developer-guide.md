@@ -45,6 +45,15 @@ To generate an installable Windows MSI package (using the Gradle `msi` task), yo
 This project uses GitHub Actions for continuous integration
 (https://github.com/EduMIPS64/edumips64/actions).
 
+There are two main workflows:
+
+- **CI** (`ci.yml`) — runs on every pull request, push to `master`, and on a daily schedule.
+  Builds and tests the desktop application, builds the web application, deploys to
+  staging/production, and builds/tests the Snap package.
+- **Release** (`release.yml`) — runs on every push to `master` to build all release artifacts
+  (JAR, MSI, Electron apps). Can also be triggered manually to create a tagged GitHub release
+  with all artifacts attached.
+
 ### Main Gradle tasks
 
 All the tasks of Gradle
@@ -211,12 +220,20 @@ Follow instructions [here](https://dev.cloudburo.net/2018/06/03/install-letsencr
 
 ### Manual release checklist
 
-Before doing a release, please do the following tasks. Over time, those should
-be automated, but before that is done those checks should be done manually.
+Most of the release process is automated via the `release.yml` GitHub Actions workflow.
+To create a release, trigger the workflow manually from the Actions tab with `create_release: true`.
+This will build all artifacts (JAR, PDF manuals, MSI, Electron apps), create a Git tag (`vX.Y.Z`),
+and publish a GitHub release with all assets attached. The release body comes from `RELEASE_NOTES.md`.
 
-Before committing the release commit:
+Before triggering a release:
 
-- run `./gradlew release`
+- Bump the version in `gradle.properties`
+- Update `RELEASE_NOTES.md` with notes for the new version
+- Update the version in `snapcraft.yaml`
+- Merge all changes to `master`
+
+After the automated release completes, manually verify:
+
 - JAR and MSI:
   - verify that the splash screen works
   - verify that the version number, code name, build date and git ID are correct
@@ -229,13 +246,9 @@ Before committing the release commit:
   - open the English manual and check the version
   - open the Italian manual and check the version
 
-Make sure the version number on `snapcraft.yaml` is updated.
-After committing, check out `master` and run `./gradlew release` again.
-
 Trigger builds on snapcraft.
 
-Create release and update artifacts generated from `master`.
-
-Check the 'edge' snap and promote it to stable if it works (https://snapcraft.io/edumips64/releases, needs login)Test both on amd64 and armhf (Raspberry PI)
+Check the 'edge' snap and promote it to stable if it works (https://snapcraft.io/edumips64/releases, needs login)
+Test both on amd64 and armhf (Raspberry Pi)
 
 Update winget manifest on https://github.com/microsoft/winget-pkgs/tree/master/manifests/e/EduMIPS64/EduMIPS64
