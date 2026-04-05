@@ -25,6 +25,8 @@ jobs:
   prepare:
     name: Prepare release metadata
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       version: ${{ steps.read_version.outputs.version }}
       is_release: ${{ steps.set_mode.outputs.is_release }}
@@ -70,7 +72,8 @@ jobs:
             LATEST_VERSION="${LATEST_TAG#v}"
             echo "Latest released version: ${LATEST_VERSION}"
 
-            # Use sort -V to verify the new version is strictly greater
+            # Use sort -V to verify the new version is strictly greater.
+            # This project uses simple X.Y.Z versioning (no pre-release suffixes).
             HIGHEST=$(printf '%s\n%s' "${LATEST_VERSION}" "${VERSION}" | sort -V | tail -n1)
             if [ "${HIGHEST}" = "${LATEST_VERSION}" ]; then
               echo "::error::Version ${VERSION} is not greater than the latest release ${LATEST_VERSION}. Please bump the version in gradle.properties."
@@ -88,6 +91,8 @@ jobs:
     name: Build desktop application and docs
     runs-on: ubuntu-latest
     needs: prepare
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v6
 
@@ -135,10 +140,12 @@ jobs:
     name: Build Windows MSI
     runs-on: windows-latest
     needs: [prepare, build-desktop]
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v6
 
-      - name: Install Wix
+      - name: Checkout Wix repository
         uses: actions/checkout@v6
         with:
           repository: fbarresi/wix
@@ -172,6 +179,8 @@ jobs:
     name: Build web application
     runs-on: ubuntu-latest
     needs: prepare
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v6
 
@@ -218,6 +227,8 @@ jobs:
     name: Build Electron (${{ matrix.platform }}-${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
     needs: [prepare, build-web]
+    permissions:
+      contents: read
     strategy:
       matrix:
         include:
@@ -239,8 +250,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: actions/download-artifact@v7
-        name: Download web application artifacts
+      - name: Download web application artifacts
+        uses: actions/download-artifact@v7
         with:
           name: web
           path: build/gwt/war/edumips64
