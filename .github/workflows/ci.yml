@@ -267,7 +267,7 @@ jobs:
         run: npx playwright install
       # Run tests against the deployed code.
       - name: Run web tests against deployed code
-        uses: nick-fields/retry@v3
+        uses: nick-fields/retry@v4
         env:
           PLAYWRIGHT_TARGET_URL: https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/
         with:
