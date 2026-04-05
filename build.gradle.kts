@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.gwtproject:gwt-user:2.12.2")
+    compileOnly("org.gwtproject:gwt-user:2.13.0")
     compileOnly("org.gwtproject:gwt-dev:2.12.2")
     compileOnly("com.google.elemental2:elemental2-dom:1.3.2")
     compileOnly("com.vertispan.rpc:workers:1.0-alpha-8")
@@ -42,7 +42,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // GWT Testing
-    testImplementation("org.gwtproject:gwt-user:2.12.2")
+    testImplementation("org.gwtproject:gwt-user:2.13.0")
     testImplementation("org.gwtproject:gwt-dev:2.12.2")
     testImplementation("com.google.elemental2:elemental2-dom:1.3.2")
     testImplementation("com.vertispan.rpc:workers:1.0-alpha-8")
