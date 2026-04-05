@@ -11,6 +11,11 @@ on:
         required: true
         type: boolean
         default: true
+      commit_sha:
+        description: 'Commit SHA to build and release (defaults to the latest commit on the selected branch)'
+        required: false
+        type: string
+        default: ''
 
 # Only allow one release workflow to run at a time.
 concurrency:
@@ -30,9 +35,23 @@ jobs:
     outputs:
       version: ${{ steps.read_version.outputs.version }}
       is_release: ${{ steps.set_mode.outputs.is_release }}
+      target_ref: ${{ steps.resolve_ref.outputs.target_ref }}
     steps:
+      - name: Resolve target commit
+        id: resolve_ref
+        run: |
+          # Use the explicitly-provided commit SHA when available, otherwise
+          # fall back to the commit that triggered the workflow.
+          REF="${{ inputs.commit_sha }}"
+          if [ -z "$REF" ]; then
+            REF="${{ github.sha }}"
+          fi
+          echo "target_ref=${REF}" >> "$GITHUB_OUTPUT"
+          echo "Target ref: ${REF}"
+
       - uses: actions/checkout@v6
         with:
+          ref: ${{ steps.resolve_ref.outputs.target_ref }}
           fetch-depth: 0          # full history so we can see tags
 
       - name: Read version from gradle.properties
@@ -95,6 +114,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.target_ref }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v5
@@ -144,6 +165,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.target_ref }}
 
       - name: Checkout Wix repository
         uses: actions/checkout@v6
@@ -183,6 +206,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.target_ref }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v5
@@ -249,6 +274,8 @@ jobs:
             artifact-path: electron/dist/WebEduMips64-win32-x64
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.target_ref }}
 
       - name: Download web application artifacts
         uses: actions/download-artifact@v8.0.1
@@ -304,6 +331,8 @@ jobs:
       VERSION: ${{ needs.prepare.outputs.version }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.target_ref }}
 
       # Download every artifact into its own subdirectory.
       - uses: actions/download-artifact@v8.0.1
@@ -338,6 +367,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.VERSION }}
+          target_commitish: ${{ needs.prepare.outputs.target_ref }}
           name: EduMIPS64 v${{ env.VERSION }}
           body_path: RELEASE_NOTES.md
           draft: false

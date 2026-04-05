@@ -222,6 +222,8 @@ Follow instructions [here](https://dev.cloudburo.net/2018/06/03/install-letsencr
 
 Most of the release process is automated via the `release.yml` GitHub Actions workflow.
 To create a release, trigger the workflow manually from the Actions tab with `create_release: true`.
+You can optionally provide a specific `commit_sha` to build and release from a particular commit
+(defaults to the latest commit on the selected branch if left empty).
 This will build all artifacts (JAR, PDF manuals, MSI, Electron apps), create a Git tag (`vX.Y.Z`),
 and publish a GitHub release with all assets attached. The release body comes from `RELEASE_NOTES.md`.
 
