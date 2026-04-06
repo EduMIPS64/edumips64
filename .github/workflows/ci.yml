@@ -148,14 +148,8 @@ jobs:
     needs: detect-changes
     if: >-
       needs.detect-changes.outputs.snap == 'true' &&
-      (
-        github.event_name == 'schedule' ||
-        (
-          github.event_name == 'pull_request_target' &&
-          github.event.pull_request.user.login != 'dependabot[bot]' &&
-          github.event.pull_request.user.login != 'renovate[bot]'
-        )
-      )
+      github.event.pull_request.user.login != 'dependabot[bot]' &&
+      github.event.pull_request.user.login != 'renovate[bot]'
     permissions:
       contents: read
     uses: ./.github/workflows/build-snap.yml
