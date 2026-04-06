@@ -195,6 +195,8 @@ jobs:
   # ---------------------------------------------------------------------------
   build-electron:
     needs: [prepare, build-web]
+    permissions:
+      contents: read
     uses: ./.github/workflows/build-electron.yml
     with:
       ref: ${{ needs.prepare.outputs.target_ref }}
@@ -204,6 +206,8 @@ jobs:
   # ---------------------------------------------------------------------------
   build-and-test-snap:
     needs: prepare
+    permissions:
+      contents: read
     uses: ./.github/workflows/build-snap.yml
     with:
       ref: ${{ needs.prepare.outputs.target_ref }}
