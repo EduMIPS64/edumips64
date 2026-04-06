@@ -9,6 +9,39 @@ on:
 
 
 jobs:
+  # Detect which files changed in the PR to conditionally run expensive builds.
+  # On schedule runs, all outputs are set to 'true' so every build runs.
+  detect-changes:
+    name: Detect file changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      snap: ${{ github.event_name == 'schedule' && 'true' || steps.changes.outputs.snap }}
+      electron: ${{ github.event_name == 'schedule' && 'true' || steps.changes.outputs.electron }}
+    steps:
+      - uses: actions/checkout@v6
+        if: github.event_name == 'pull_request_target'
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Check changed paths
+        if: github.event_name == 'pull_request_target'
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            snap:
+              - 'snapcraft.yaml'
+              - 'scripts/**'
+              - 'docs/requirements.txt'
+              - 'gradle.properties'
+            electron:
+              - 'electron/**'
+              - 'package.json'
+              - 'package-lock.json'
+
   build-desktop:
     permissions:
       contents: read
@@ -112,12 +145,16 @@ jobs:
 
   # Build and test Snapcraft package when relevant files change.
   build-and-test-snap:
+    needs: detect-changes
     if: >-
-      github.event_name == 'schedule' ||
+      needs.detect-changes.outputs.snap == 'true' &&
       (
-        github.event_name == 'pull_request_target' &&
-        github.event.pull_request.user.login != 'dependabot[bot]' &&
-        github.event.pull_request.user.login != 'renovate[bot]'
+        github.event_name == 'schedule' ||
+        (
+          github.event_name == 'pull_request_target' &&
+          github.event.pull_request.user.login != 'dependabot[bot]' &&
+          github.event.pull_request.user.login != 'renovate[bot]'
+        )
       )
     permissions:
       contents: read
@@ -127,10 +164,8 @@ jobs:
 
   # Build Electron applications when relevant files change.
   build-electron:
-    needs: build-web
-    if: >-
-      github.event_name == 'schedule' ||
-      github.event_name == 'pull_request_target'
+    needs: [detect-changes, build-web]
+    if: needs.detect-changes.outputs.electron == 'true'
     permissions:
       contents: read
     uses: ./.github/workflows/build-electron.yml
