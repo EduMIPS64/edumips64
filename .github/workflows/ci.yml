@@ -39,8 +39,7 @@ jobs:
               - 'gradle.properties'
             electron:
               - 'electron/**'
-              - 'package.json'
-              - 'package-lock.json'
+              - '.nvmrc'
 
   build-desktop:
     permissions:
