@@ -13,157 +13,21 @@ on:
 
 jobs:
   build-desktop:
-    name: Build desktop application and docs
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java: [17]    
-    steps:
-      # Set up Java development environment.
-      - uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - run: git log -1
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build-desktop.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      upload_codecov: true
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v5
-        with:
-          java-version: ${{ matrix.java }}
-          distribution: 'microsoft'
-          cache: 'gradle'
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      # Read the application version to use it in the name of the JAR.
-      - name: Read version from gradle.properties
-        id: read_version
-        uses: christian-draeger/read-properties@1.1.1
-        with:
-          path: 'gradle.properties'
-          properties: 'version'
-
-      # Compile the code, run unit tests, upload code coverage results.
-      - name: Compile Java code
-        run: ./gradlew compileJava
-      - name: Run unit tests
-        run: ./gradlew check
-      - name: Codecov
-        uses: codecov/codecov-action@v6.0.0
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-      # Build docs (PDF and HTML for the in-app help)
-      # The Python dependencies are fetched by Gradle.
-      - name: Build all docs
-        run: ./gradlew allDocs
-
-      # Build JAR file.
-      - name: Build JAR
-        run: ./gradlew jar
-
-      # Upload artifacts (manuals and JARs)
-      - name: Upload English Manual PDF
-        uses: actions/upload-artifact@v7.0.0
-        with:
-          name: English manual (PDF)
-          path: ./build/docs/en/pdf/EduMIPS64.pdf
-      - name: Upload Italian Manual PDF
-        uses: actions/upload-artifact@v7.0.0
-        with:
-          name: Italian manual (PDF)
-          path: ./build/docs/it/pdf/EduMIPS64.pdf
-      #
-      # Disabled due to not working properly
-      #
-      # - name: Upload Simplified Chinese Manual PDF 
-      #   uses: actions/upload-artifact@v3.1.2
-      #   with:
-      #     name: Chinese manual (PDF)
-      #     path: ./build/docs/zh/pdf/EduMIPS64.pdf
-
-      - name: Upload JAR
-        uses: actions/upload-artifact@v7.0.0
-        with:
-          name: JAR
-          path: ./build/libs/edumips64-${{ steps.read_version.outputs.version }}.jar
-
-  build-msi:
-    name: Build Windows MSI
-    runs-on: windows-latest
-    needs: build-desktop
-    if: ${{ github.event_name != 'pull_request_target' || (github.event.pull_request.user.login != 'dependabot[bot]' && github.event.pull_request.user.login != 'renovate[bot]') }}
-    steps:
-        - uses: actions/checkout@v6
-          with:
-            ref: ${{ github.event.pull_request.head.sha }}
-        - run: git log -1
-        - name: Install Wix
-          uses: actions/checkout@v6
-          with:
-            repository: fbarresi/wix
-            path: wix
-        - name: Download JAR
-          uses: actions/download-artifact@v8.0.1
-          with:
-            name: JAR
-            path: build/libs
-        - name: Set up JDK 17
-          uses: actions/setup-java@v5
-          with:
-            java-version: 17
-            distribution: 'microsoft'
-        - name: Build MSI
-          run: ./gradlew MSI
-        - name: Upload MSI
-          uses: actions/upload-artifact@v7.0.0
-          with:
-            name: MSI
-            path: EduMIPS64-*.msi
-        
   build-web:
-    name: Build web application
-    runs-on: ubuntu-latest
-    steps:
-      # Set up JDK (necessary for the core that is cross-compiled to JS)
-      # and Node.JS (for the) web app itself.
-      - uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - run: git log -1
-      - name: Set up JDK 17
-        uses: actions/setup-java@v5
-        with:
-          java-version: 17
-          distribution: 'microsoft'
-          cache: 'gradle'
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Set up Node.JS
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: Install JS dependencies
-        run: npm install
-
-      - name: Cache GWT unit cache
-        uses: actions/cache@v5
-        with:
-          path: gwt-unitCache
-          key: gwt-${{ hashFiles('src/main/java/**/*.java') }}
-          restore-keys: |
-            gwt-
-
-      - name: Build JS Worker (Java → JS), including HTML docs
-        run: ./gradlew webapp
-      
-      - uses: actions/upload-artifact@v7
-        name: Upload web application artifacts
-        with:
-          name: web
-          path: build/gwt/war/edumips64
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build-web.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
   deploy-staging:
     name: Deploy web application to staging environment
@@ -308,80 +172,3 @@ jobs:
           unsquashfs edumips64*.snap
           sudo snap try squashfs-root/
           echo "exit" | edumips64.edumips64-cli
-
-  build-electron:
-    name: Build Electron applications
-    runs-on: ${{ matrix.os }}
-    needs: build-web
-    if: ${{ github.event_name != 'pull_request_target' || (github.event.pull_request.user.login != 'dependabot[bot]' && github.event.pull_request.user.login != 'renovate[bot]') }}
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            platform: linux
-            arch: x64
-            artifact-name: Electron Linux x64
-            artifact-path: electron/dist/WebEduMips64-linux-x64
-          - os: macos-latest
-            platform: darwin
-            arch: arm64
-            artifact-name: Electron macOS ARM64
-            artifact-path: electron/dist/WebEduMips64-darwin-arm64
-          - os: windows-latest
-            platform: win32
-            arch: x64
-            artifact-name: Electron Windows x64
-            artifact-path: electron/dist/WebEduMips64-win32-x64
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - run: git log -1
-
-      # Download web application built in 'build-web'
-      - uses: actions/download-artifact@v8.0.1
-        name: Download web application artifacts
-        with:
-          name: web
-          path: build/gwt/war/edumips64
-
-      # Set up Node.js
-      - name: Set up Node.JS
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          
-      # Install dependencies
-      - name: Install JS dependencies
-        run: npm install
-
-      # Build Electron application
-      - name: Build Electron application for ${{ matrix.platform }}-${{ matrix.arch }}
-        working-directory: electron
-        shell: bash
-        run: |
-          # Remove any existing dist folder
-          rm -rf ./dist/WebEduMips64-${{ matrix.platform }}-${{ matrix.arch }}
-          
-          # Copy index.js to root directory (required by electron-packager)
-          cp index.js ..
-          
-          # Build the Electron app
-          if [ "${{ matrix.platform }}" = "linux" ]; then
-            npx electron-packager ../ WebEduMips64 --platform=${{ matrix.platform }} --arch=${{ matrix.arch }} --out dist
-          else
-            npx electron-packager ../ WebEduMips64 --asar --platform=${{ matrix.platform }} --arch=${{ matrix.arch }} --out dist
-          fi
-          
-          # Clean up
-          rm ../index.js
-
-      # Upload Electron application artifacts
-      - name: Upload ${{ matrix.artifact-name }}
-        uses: actions/upload-artifact@v7.0.0
-        with:
-          name: ${{ matrix.artifact-name }}
-          path: ${{ matrix.artifact-path }}
-
-    
