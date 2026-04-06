@@ -1,0 +1,271 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create a GitHub release with tag and artifacts'
+        required: true
+        type: boolean
+        default: true
+      commit_sha:
+        description: 'Commit SHA to build and release (defaults to the latest commit on the selected branch)'
+        required: false
+        type: string
+        default: ''
+
+# Only allow one release workflow to run at a time.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Read the version from gradle.properties, and optionally validate it
+  #    against the latest existing tag when running a full release.
+  # ---------------------------------------------------------------------------
+  prepare:
+    name: Prepare release metadata
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.read_version.outputs.version }}
+      is_release: ${{ steps.set_mode.outputs.is_release }}
+      target_ref: ${{ steps.resolve_ref.outputs.target_ref }}
+    steps:
+      - name: Resolve target commit
+        id: resolve_ref
+        run: |
+          # Use the explicitly-provided commit SHA when available, otherwise
+          # fall back to the commit that triggered the workflow.
+          REF="${{ inputs.commit_sha }}"
+          if [ -z "$REF" ]; then
+            REF="${{ github.sha }}"
+          fi
+          echo "target_ref=${REF}" >> "$GITHUB_OUTPUT"
+          echo "Target ref: ${REF}"
+
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.resolve_ref.outputs.target_ref }}
+          fetch-depth: 0          # full history so we can see tags
+
+      - name: Read version from gradle.properties
+        id: read_version
+        uses: christian-draeger/read-properties@1.1.1
+        with:
+          path: 'gradle.properties'
+          properties: 'version'
+
+      - name: Determine workflow mode
+        id: set_mode
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.create_release }}" == "true" ]]; then
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate version for release
+        if: steps.set_mode.outputs.is_release == 'true'
+        run: |
+          VERSION="${{ steps.read_version.outputs.version }}"
+          TAG="v${VERSION}"
+
+          echo "Current version : ${VERSION}"
+          echo "Expected tag    : ${TAG}"
+
+          # Check that the tag does not already exist
+          if git rev-parse "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "::error::Tag ${TAG} already exists. Please bump the version in gradle.properties before releasing."
+            exit 1
+          fi
+
+          # Fetch the latest semver tag and compare
+          LATEST_TAG=$(git tag --list 'v*' --sort=-version:refname | head -n1)
+          if [ -n "${LATEST_TAG}" ]; then
+            LATEST_VERSION="${LATEST_TAG#v}"
+            echo "Latest released version: ${LATEST_VERSION}"
+
+            # Use sort -V to verify the new version is strictly greater.
+            # This project uses simple X.Y.Z versioning (no pre-release suffixes).
+            HIGHEST=$(printf '%s\n%s' "${LATEST_VERSION}" "${VERSION}" | sort -V | tail -n1)
+            if [ "${HIGHEST}" = "${LATEST_VERSION}" ]; then
+              echo "::error::Version ${VERSION} is not greater than the latest release ${LATEST_VERSION}. Please bump the version in gradle.properties."
+              exit 1
+            fi
+            echo "✅ Version ${VERSION} is greater than ${LATEST_VERSION}"
+          else
+            echo "No previous release tags found – this will be the first release."
+          fi
+
+  # ---------------------------------------------------------------------------
+  # 2. Build the desktop JAR and PDF manuals.
+  # ---------------------------------------------------------------------------
+  build-desktop:
+    needs: prepare
+    uses: ./.github/workflows/build-desktop.yml
+    with:
+      ref: ${{ needs.prepare.outputs.target_ref }}
+
+  # ---------------------------------------------------------------------------
+  # 3. Build the Windows MSI installer.
+  # ---------------------------------------------------------------------------
+  build-msi:
+    name: Build Windows MSI
+    runs-on: windows-latest
+    needs: [prepare, build-desktop]
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.target_ref }}
+
+      - name: Checkout Wix repository
+        uses: actions/checkout@v6
+        with:
+          repository: fbarresi/wix
+          path: wix
+
+      - name: Download JAR
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: JAR
+          path: build/libs
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: 17
+          distribution: 'microsoft'
+
+      - name: Build MSI
+        run: ./gradlew MSI
+
+      - name: Upload MSI
+        uses: actions/upload-artifact@v7
+        with:
+          name: MSI
+          path: EduMIPS64-*.msi
+
+  # ---------------------------------------------------------------------------
+  # 4. Build the web application (needed for Electron and deploy-prod).
+  # ---------------------------------------------------------------------------
+  build-web:
+    needs: prepare
+    uses: ./.github/workflows/build-web.yml
+    with:
+      ref: ${{ needs.prepare.outputs.target_ref }}
+
+  # ---------------------------------------------------------------------------
+  # 5. Deploy web application to production.
+  # ---------------------------------------------------------------------------
+  deploy-prod:
+    name: Deploy web application to production
+    permissions: write-all
+    runs-on: ubuntu-latest
+    needs: build-web
+    steps:
+      # Download web application built in 'build-web'
+      - uses: actions/download-artifact@v8.0.1
+        name: Download web application artifacts
+        with:
+          name: web
+          path: build/gwt/war/edumips64
+
+      - name: Deploy master web application to web.edumips.org
+        uses: crazy-max/ghaction-github-pages@v5
+        with:
+          target_branch: master
+          build_dir: "build/gwt/war/edumips64"
+          repo: EduMIPS64/web.edumips.org
+          keep_history: true
+          commit_message: "Update Web Frontend @ ${{ github.sha }}"
+          fqdn: web.edumips.org
+        env:
+          GH_PAT: ${{ secrets.PAT_WEBUI }}
+
+  # ---------------------------------------------------------------------------
+  # 6. Build Electron applications for Linux, macOS and Windows.
+  # ---------------------------------------------------------------------------
+  build-electron:
+    needs: [prepare, build-web]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build-electron.yml
+    with:
+      ref: ${{ needs.prepare.outputs.target_ref }}
+
+  # ---------------------------------------------------------------------------
+  # 7. Build and test Snapcraft package.
+  # ---------------------------------------------------------------------------
+  build-and-test-snap:
+    needs: prepare
+    permissions:
+      contents: read
+    uses: ./.github/workflows/build-snap.yml
+    with:
+      ref: ${{ needs.prepare.outputs.target_ref }}
+
+  # ---------------------------------------------------------------------------
+  # 8. Create a GitHub release (only on manual dispatch with create_release).
+  #    Tags the commit and uploads all artifacts.
+  # ---------------------------------------------------------------------------
+  create-release:
+    name: Create GitHub release
+    if: needs.prepare.outputs.is_release == 'true'
+    runs-on: ubuntu-latest
+    needs: [prepare, build-desktop, build-msi, build-electron, build-and-test-snap]
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.prepare.outputs.target_ref }}
+
+      # Download every artifact into its own subdirectory.
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          path: release-artifacts
+
+      # Prepare a flat directory with well-named files for the release.
+      - name: Stage release assets
+        run: |
+          mkdir -p staged
+
+          # JAR
+          cp release-artifacts/JAR/edumips64-${VERSION}.jar staged/
+
+          # PDF manuals
+          cp "release-artifacts/English manual (PDF)/EduMIPS64.pdf" staged/EduMIPS64-manual-en.pdf
+          cp "release-artifacts/Italian manual (PDF)/EduMIPS64.pdf" staged/EduMIPS64-manual-it.pdf
+
+          # MSI
+          cp release-artifacts/MSI/EduMIPS64-*.msi staged/
+
+          # Electron – zip each platform build
+          for dir in "Electron Linux x64" "Electron macOS ARM64" "Electron Windows x64"; do
+            platform_slug=$(echo "$dir" | tr '[:upper:] ' '[:lower:]-')
+            (cd "release-artifacts/${dir}" && zip -r "../../staged/edumips64-${VERSION}-${platform_slug}.zip" .)
+          done
+
+          echo "Staged artifacts:"
+          ls -lh staged/
+
+      - name: Create tag and GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          target_commitish: ${{ needs.prepare.outputs.target_ref }}
+          name: EduMIPS64 v${{ env.VERSION }}
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+          files: staged/*
