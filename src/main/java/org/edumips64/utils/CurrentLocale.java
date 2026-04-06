@@ -296,6 +296,7 @@ public class CurrentLocale {
     en.put("CLI.STEP.POSITIVE", "Step must be a positive number");
     en.put("CLI.CPU.NOT.RUNNABLE", "CPU is not runnable in state: ");
     en.put("CLI.PARSE.ERROR", "Unable to parse file, errors found:");
+    en.put("CLI.PARSE.WARNING", "File loaded with warnings:");
     en.put("CLI.DINERO.SAVE", "File saved! Location: ");
     en.put("CLI.REG.WARN", "Register numbers are 0-based, valid values are 0-31.");
     en.put("CLI.NOT.RUNNABLE.LOAD.FILE", "Load a file to make the CPU runnable. Try load --help");
@@ -543,6 +544,7 @@ public class CurrentLocale {
     it.put("CLI.STEP.POSITIVE", "Il passaggio deve essere un numero positivo");
     it.put("CLI.CPU.NOT.RUNNABLE", "La CPU non è eseguibile nello stato: ");
     it.put("CLI.PARSE.ERROR", "Impossibile analizzare il file, sono stati trovati errori:");
+    it.put("CLI.PARSE.WARNING", "File caricato con avvisi:");
     it.put("CLI.DINERO.SAVE", "File salvato! Posizione:");
     it.put("CLI.REG.WARN", "I numeri di registro sono in base 0, i valori validi sono 0-31.");
     it.put("CLI.NOT.RUNNABLE.LOAD.FILE", "Carica un file per rendere la CPU eseguibile. Prova a caricare --help");
@@ -780,6 +782,7 @@ public class CurrentLocale {
     zhcn.put("CLI.STEP.POSITIVE", "步骤必须是正数 ");
     zhcn.put("CLI.CPU.NOT.RUNNABLE", "CPU在状态下不可运行： ");
     zhcn.put("CLI.PARSE.ERROR", "无法解析文件，发现错误： ");
+    zhcn.put("CLI.PARSE.WARNING", "文件已加载，但有警告：");
     zhcn.put("CLI.DINERO.SAVE", "文件已保存！位置：");
     zhcn.put("LOG.HEADLESS_MSG", "无法在无头环境中启动 GUI。");
     zhcn.put("CLI.REG.WARN", "寄存器编号从 0 开始，有效值为 0-31。");
