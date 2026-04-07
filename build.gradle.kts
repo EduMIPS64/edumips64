@@ -47,6 +47,10 @@ dependencies {
 }
 
 python {
+    // Use empty pythonPath so the plugin resolves python3 from PATH,
+    // picking up the version installed by actions/setup-python in CI
+    // or the devcontainer feature locally.
+    pythonPath = ""
     scope = VIRTUALENV
     requirements.file = "docs/requirements.txt"
     minPythonVersion = "3.14"
