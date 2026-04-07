@@ -1,6 +1,6 @@
 {
   "name": "edumips64-devcontainer",
-  "image": "mcr.microsoft.com/devcontainers/universal:5",
+  "image": "mcr.microsoft.com/devcontainers/universal:6",
   "features": {
     "ghcr.io/devcontainers/features/java:1": {
       "version": "17"
@@ -12,8 +12,8 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": ["vscjava.vscode-java-pack", "mathematic.vscode-pdf" ]
+      "extensions": ["vscjava.vscode-java-pack", "mathematic.vscode-pdf"]
     }
   },
-  "postCreateCommand": "./gradlew init && bash -i -c 'nvm install && npm install && npx playwright install"
+  "postCreateCommand": "bash -i -c './gradlew --version && nvm install && npm install && npx playwright install --with-deps'"
 }
