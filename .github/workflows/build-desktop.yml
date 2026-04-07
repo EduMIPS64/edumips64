@@ -35,9 +35,15 @@ jobs:
           cache: 'gradle'
 
       - name: Set up Python 3.14
+        id: setup-python
         uses: actions/setup-python@v5
         with:
           python-version: '3.14'
+
+      - name: Configure Python path for Gradle
+        run: |
+          PYTHON_DIR=$(dirname "${{ steps.setup-python.outputs.python-path }}")
+          echo "ORG_GRADLE_PROJECT_pythonPath=$PYTHON_DIR" >> "$GITHUB_ENV"
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
