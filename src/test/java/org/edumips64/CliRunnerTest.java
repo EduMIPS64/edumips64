@@ -1,5 +1,6 @@
 package org.edumips64;
 
+import org.edumips64.core.CPU;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.InMemoryConfigStore;
@@ -213,6 +214,42 @@ public class CliRunnerTest {
         assertTrue(output.contains("Starting execution"));
         assertTrue(output.contains("Running"));
         assertTrue(output.contains("Execution ended"));
+    }
+
+    @Test
+    public void canLoadFileWithWarnings() {
+        CommandLine commandLine = new CommandLine(cli);
+        commandLine.execute("load", "src/test/resources/add-with-halt.s");
+        assertEquals(CPU.CPUStatus.RUNNING, cli.getCPU().getStatus());
+    }
+
+    @Test
+    public void canRunFileWithWarnings() {
+        CommandLine commandLine = new CommandLine(cli);
+        commandLine.execute("load", "src/test/resources/add-with-halt.s");
+        commandLine.execute("run");
+        assertEquals(5L, cli.getCPU().getRegister(1).getValue());
+        assertEquals(2L, cli.getCPU().getRegister(2).getValue());
+        assertEquals(7L, cli.getCPU().getRegister(3).getValue());
+    }
+
+    @Test
+    public void verboseModeShowsWarningsOnLoad() {
+        OutputStream os = getSystemOut();
+        CommandLine cl = new CommandLine(verboseCli);
+        cl.execute("load", "src/test/resources/add-with-halt.s");
+        String output = os.toString();
+        assertTrue(output.contains("Loaded file "));
+        assertTrue(output.contains("File loaded with warnings:"));
+    }
+
+    @Test
+    public void quietModeDoesNotShowWarningsOnLoad() {
+        OutputStream os = getSystemOut();
+        CommandLine cl = new CommandLine(cli);
+        cl.execute("load", "src/test/resources/add-with-halt.s");
+        String output = os.toString();
+        assertFalse(output.contains("File loaded with warnings:"));
     }
 
     private OutputStream getSystemOut() {
