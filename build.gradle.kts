@@ -47,10 +47,13 @@ dependencies {
 }
 
 python {
-    // Use empty pythonPath so the plugin resolves python3 from PATH,
-    // picking up the version installed by actions/setup-python in CI
-    // or the devcontainer feature locally.
-    pythonPath = ""
+    // Allow overriding pythonPath via Gradle project property (e.g., -PpythonPath=... or
+    // ORG_GRADLE_PROJECT_pythonPath env var). Used in CI to point to the Python installed
+    // by actions/setup-python rather than the system Python.
+    val customPythonPath = findProperty("pythonPath") as String?
+    if (customPythonPath != null) {
+        pythonPath = customPythonPath
+    }
     scope = VIRTUALENV
     requirements.file = "docs/requirements.txt"
     minPythonVersion = "3.14"
