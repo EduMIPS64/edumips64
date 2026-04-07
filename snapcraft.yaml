@@ -40,8 +40,8 @@ parts:
         mv build/libs/edumips64-*.jar "$CRAFT_PART_INSTALL"/jar/edumips64.jar && \
         ls $CRAFT_PART_INSTALL/jar/*.jar -ld
     source: .
-    # Core24 (Ubuntu 24.04) has Python 3.12 as the default, which satisfies
-    # the Python >= 3.12 dependency from Sphinx >= 9.1.0.
+    # Core24 (Ubuntu 24.04) has Python 3.12 as the default. The snap build
+    # uses Python 3.12 to satisfy the Python >= 3.12 dependency from Sphinx >= 9.1.0.
     override-pull: |
       craftctl default
     build-packages:
