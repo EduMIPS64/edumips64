@@ -34,6 +34,20 @@ inserita una o più righe al di sopra dell'effettiva dichiarazione del dato
 o dell'istruzione, facendo in modo che non ci sia nulla, eccetto commenti e
 linee vuote, tra l'etichetta stessa e la dichiarazione.
 
+Più etichette possono fare riferimento allo stesso indirizzo. Questo è utile
+quando due o più etichette sono posizionate su righe consecutive prima di
+un'istruzione, ad esempio::
+
+            .code
+            daddi   r1, r0, 1
+    loop_end:
+    loop_begin:
+            daddi   r1, r1, -1
+
+In questo caso, sia `loop_end` che `loop_begin` punteranno alla stessa
+istruzione. Ogni etichetta deve comunque avere un nome univoco; l'utilizzo
+dello stesso nome di etichetta due volte causerà un errore del parser.
+
 Limiti di memoria
 -----------------
 

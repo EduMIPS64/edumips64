@@ -32,6 +32,19 @@ can be used.  The label can be specified one or more rows above the effective
 data declaration or instruction, provided that there's nothing, except for
 comments and empty lines, between the label and the declaration.
 
+Multiple labels can refer to the same address. This is useful when two or more
+labels are placed on consecutive lines before an instruction, for example::
+
+            .code
+            daddi   r1, r0, 1
+    loop_end:
+    loop_begin:
+            daddi   r1, r1, -1
+
+In this case, both `loop_end` and `loop_begin` will point to the same
+instruction. Each label must still have a unique name; using the same label
+name twice will result in a parser error.
+
 Memory limits
 -------------
 
