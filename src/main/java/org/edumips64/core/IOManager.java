@@ -33,6 +33,7 @@ import org.edumips64.utils.io.OpenException;
 import org.edumips64.utils.io.ReadException;
 import org.edumips64.utils.io.WriteException;
 import org.edumips64.utils.io.Reader;
+import org.edumips64.utils.io.StringInputReader;
 import org.edumips64.utils.io.Writer;
 
 /** Class used as a proxy for I/O operations.
@@ -260,9 +261,19 @@ public class IOManager {
     }
 
     Reader r = ins.get(fd);
-    char buffer[] = new char[count];
-    int read_byte = r.read(buffer, count);
-    String read_str = new String(buffer);
+    String read_str;
+    int read_byte;
+
+    if (r instanceof StringInputReader) {
+      read_str = ((StringInputReader) r).readString(count);
+      read_byte = read_str.length();
+    } else {
+      char[] buffer = new char[count];
+      read_byte = r.read(buffer, count);
+      read_str = new String(buffer, 0, Math.max(read_byte, 0));
+    }
+
+    int bytesToWrite = Math.max(read_byte, 0);
 
     logger.info("Read the string " + read_str + " from fd " + fd);
     MemoryElement memEl = null;
@@ -270,7 +281,7 @@ public class IOManager {
     try {
       int posInWord = 0;
 
-      for (int i = 0; i < read_str.length(); ++i) {
+      for (int i = 0; i < bytesToWrite; ++i) {
         if (i % 8 == 0) {
           posInWord = 0;
           logger.info("read(): getting a new cell at address " + address);

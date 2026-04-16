@@ -39,6 +39,7 @@ import org.edumips64.core.CacheSimulator;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.parser.ParserMultiException;
+import org.edumips64.utils.io.InputNeededException;
 import org.edumips64.utils.io.StringWriter;
 
 import elemental2.core.JsArray;
@@ -78,6 +79,17 @@ public class ResultFactory {
     public Result Failure(String errorMessage) {
         Result r = new Result(false, errorMessage, stdout.toString());
         return AddParsedInstructions(AddCpuInfo(r));
+    }
+
+    public Result InputRequested(InputNeededException inputNeeded, int resumeSteps) {
+        Result r = Success();
+        r.inputRequested = true;
+        r.inputMaxLength = inputNeeded.getMaxLength();
+        r.inputResumeSteps = resumeSteps;
+        r.inputDialogTitle = inputNeeded.getDialogTitle();
+        r.inputPromptMessage = inputNeeded.getPromptMessage();
+        r.inputTooLongMessage = inputNeeded.getTooLongMessage();
+        return r;
     }
 
     public static Result AddParserErrors(Result result, ParserMultiException e) {

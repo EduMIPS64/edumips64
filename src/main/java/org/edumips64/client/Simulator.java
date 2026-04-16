@@ -39,6 +39,7 @@ import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.core.cache.CacheConfig;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.InMemoryConfigStore;
+import org.edumips64.utils.io.InputNeededException;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.NullFileUtils;
 import org.edumips64.utils.io.StringWriter;
@@ -51,6 +52,7 @@ public class Simulator {
   private CacheSimulator cachesim;
   private StringWriter stdout;
   private IOManager iom;
+  private WebInputReader stdin;
 
   // TODO: handle these errors more elegantly.
   private ParserMultiException lastParsingErrors = null;
@@ -67,9 +69,11 @@ public class Simulator {
     memory = new Memory();
     symTab = new SymbolTable(memory);
     stdout = new StringWriter();
+    stdin = new WebInputReader();
     FileUtils fu = new NullFileUtils();
     iom = new IOManager(fu, memory);
     iom.setStdOutput(stdout);
+    iom.setStdInput(stdin);
     cpu = new CPU(memory, config, new BUBBLE());
     cachesim = new CacheSimulator();
 
@@ -94,7 +98,9 @@ public class Simulator {
       cachesim.reset();
       symTab.reset();
       stdout = new StringWriter();
+      stdin.reset();
       iom.setStdOutput(stdout);
+      iom.setStdInput(stdin);
 
       resultFactory = new ResultFactory(cpu, memory, cachesim, stdout);
       var result = resultFactory.Success();
@@ -127,6 +133,8 @@ public class Simulator {
       res = ResultFactory.AddParserErrors(res, lastParsingErrors);
       res.encounteredBreak = true;
       return res;
+    } catch (InputNeededException e) {
+      return ResultFactory.AddParserErrors(resultFactory.InputRequested(e, steps), lastParsingErrors);
     } catch (Exception e) {
       warning("Error: " + e.toString());
       return ResultFactory.AddParserErrors(resultFactory.Failure(e.toString()), lastParsingErrors);
@@ -159,6 +167,10 @@ public class Simulator {
     cpu.setStatus(CPU.CPUStatus.RUNNING);
     info("Program parsed.");
     return ResultFactory.AddParserErrors(resultFactory.Success(), lastParsingErrors);
+  }
+
+  public void provideInput(String input) {
+    stdin.setNextInput(input);
   }
 
   /* Private methods */
