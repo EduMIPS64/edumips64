@@ -77,7 +77,7 @@ public class Worker implements EntryPoint {
           case "step":
             int steps = data.getAsAny("steps").asInt();
             info("steps: " + steps);
-            postSimulationResult(simulator.step(steps), method, steps);
+            postSimulationResult(simulator.step(steps), method);
             break;
           case "setcacheconfig":
             JsPropertyMap<Object> config = Js.cast(data.get("config"));
@@ -108,7 +108,7 @@ public class Worker implements EntryPoint {
               DomGlobal.console.log(parseResult);
               postMessage(withMethod(parseResult, method));
             } else {
-              postSimulationResult(simulator.step(1), method, 1);
+              postSimulationResult(simulator.step(1), method);
             }
             break;
           case "provideinput":
@@ -121,7 +121,7 @@ public class Worker implements EntryPoint {
             }
             simulator.provideInput(input);
             clearPendingInput();
-            postSimulationResult(simulator.step(stepsToResume), methodToResume, stepsToResume);
+            postSimulationResult(simulator.step(stepsToResume), methodToResume);
             break;
           case "checksyntax":
             // Use parsingSimulator to do a syntax check, then inject the parsing errors
@@ -153,7 +153,7 @@ public class Worker implements EntryPoint {
     DomGlobal.postMessage(message);
   }
 
-  private void postSimulationResult(Result result, String method, int steps) {
+  private void postSimulationResult(Result result, String method) {
     if (result.inputRequested) {
       pendingSteps = result.inputResumeSteps;
       pendingMethod = method;
