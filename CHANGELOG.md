@@ -3,8 +3,8 @@
 ## Unreleased
 
 ### Added
-- Electron desktop application for Windows, macOS, and Linux, allowing the web
-  UI to run offline without requiring a browser or internet connection.
+- Electron desktop application for Windows, macOS, and Linux, allowing the
+  simulator to run offline without requiring a browser or internet connection.
   (@davidepatti)
 - Embedded cache simulator as an alternative to external DineroIV, with
   configurable L1 data and instruction cache parameters (size, block size,
@@ -14,17 +14,6 @@
   remains supported. (Issue #867)
 - Dark mode toggle in the desktop (Swing) UI with redesigned icons.
   (@smallg0at, Issue #796)
-- Web UI: SYSCALL 5 (printf-like output) now displays output in a dedicated
-  panel.
-- Web UI: syntax highlighting for all MIPS64 instructions, registers, and
-  directives in the code editor. (@davidepatti)
-- Web UI: code editor supports loading and saving files, configurable font
-  size, and optional vi-mode keybindings. (@davidepatti)
-- Web UI: embedded offline documentation accessible via Help menu. (Issue #1365)
-- Web UI: pause, stop, and configurable multi-step execution controls.
-- Web UI: pulsing dot indicator on collapsed accordion panels when their
-  content changes during simulation, with a settings toggle to disable it.
-  (Issue #1300)
 - CLI: SYSCALL 5 support for printf-like output. (Issue #1178)
 - CLI: quiet mode is now the default, preventing simulator messages from mixing
   with program output; use `--verbose` to restore the previous behaviour.
@@ -44,14 +33,6 @@
   (@davidepatti)
 - Hexadecimal immediates now support the full 16-bit range in instructions.
   (@davidepatti)
-- Web UI: holding backspace no longer causes crashes or visual jitter. (Issue #1548)
-- Web UI: clicking the Clear button after execution now fully resets the
-  simulator status and UI back to the initial state. (Issue #1327)
-- Web UI: memory panel now displays consistent 64-bit hex value widths.
-  (@davidepatti)
-- Web UI: CPU state is now properly reset when loading a new file.
-- Web UI: cache configuration settings are now responsive and wrap correctly at
-  narrow viewport widths. (Issue #1331)
 - Desktop UI: Cycles window now always shows the first instruction correctly.
   (Issue #875)
 - Documentation: fixed typo in `LWU` instruction description. (@AptInit)
