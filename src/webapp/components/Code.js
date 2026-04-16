@@ -211,7 +211,7 @@ const Code = (props) => {
       },
     });
     setHoverCleanup(disposable);
-  }, [props.parsedInstructions, stageMap, monaco]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [props.parsedInstructions, stageMap, monaco]); // eslint-disable-line @eslint-react/exhaustive-deps
 
   const saveCodeToFile = () => {
     const blob = new Blob([props.code], { type: 'text/plain' });
