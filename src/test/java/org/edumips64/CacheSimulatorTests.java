@@ -26,15 +26,14 @@ public class CacheSimulatorTests {
     // Save stats to a CSV file
     public static void saveStatsToCSV(Map<CacheConfig, CacheStats> statsMap, String filename) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
-            writer.println("size,blockSize,associativity,penalty,readAccesses,readMisses,writeAccesses,writeMisses");
+            writer.println("size,blockSize,associativity,readAccesses,readMisses,writeAccesses,writeMisses");
             for (Map.Entry<CacheConfig, CacheStats> entry : statsMap.entrySet()) {
                 CacheConfig config = entry.getKey();
                 CacheStats stats = entry.getValue();
-                writer.printf("%d,%d,%d,%d,%d,%d,%d,%d%n",
+                writer.printf("%d,%d,%d,%d,%d,%d,%d%n",
                         config.size,
                         config.blockSize,
                         config.associativity,
-                        config.penalty,
                         stats.getReadAccesses(),
                         stats.getReadMisses(),
                         stats.getWriteAccesses(),
@@ -54,13 +53,12 @@ public class CacheSimulatorTests {
                 int size = Integer.parseInt(parts[0]);
                 int blockSize = Integer.parseInt(parts[1]);
                 int associativity = Integer.parseInt(parts[2]);
-                int penalty = Integer.parseInt(parts[3]);
-                int readAccesses = Integer.parseInt(parts[4]);
-                int readMisses = Integer.parseInt(parts[5]);
-                int writeAccesses = Integer.parseInt(parts[6]);
-                int writeMisses = Integer.parseInt(parts[7]);
+                int readAccesses = Integer.parseInt(parts[3]);
+                int readMisses = Integer.parseInt(parts[4]);
+                int writeAccesses = Integer.parseInt(parts[5]);
+                int writeMisses = Integer.parseInt(parts[6]);
 
-                CacheConfig config = new CacheConfig(size, blockSize, associativity, penalty);
+                CacheConfig config = new CacheConfig(size, blockSize, associativity);
                 CacheStats stats = CacheStats.of(readAccesses, readMisses,  writeAccesses, writeMisses);
 
                 map.put(config, stats);
@@ -115,12 +113,11 @@ public class CacheSimulatorTests {
         int[] sizes = {256, 512, 1024, 2048};
         int[] blockSizes = {4, 8, 16};
         int[] associativities = {1, 2, 4};
-        int penalty = 50;
 
         for (int size : sizes) {
             for (int blockSize : blockSizes) {
                 for (int assoc : associativities) {
-                    var config = new CacheConfig(size, blockSize, assoc, penalty);
+                    var config = new CacheConfig(size, blockSize, assoc);
 
                     cachesim.getL1InstructionCache().setConfig(config);
                     var statsI = runTraceOnCache(cachesim.getL1InstructionCache(), testsLocation+tracefile);
