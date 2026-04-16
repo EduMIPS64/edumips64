@@ -22,21 +22,36 @@
   size, and optional vi-mode keybindings. (@davidepatti)
 - Web UI: embedded offline documentation accessible via Help menu. (Issue #1365)
 - Web UI: pause, stop, and configurable multi-step execution controls.
+- Web UI: pulsing dot indicator on collapsed accordion panels when their
+  content changes during simulation, with a settings toggle to disable it.
+  (Issue #1300)
 - CLI: SYSCALL 5 support for printf-like output. (Issue #1178)
+- CLI: quiet mode is now the default, preventing simulator messages from mixing
+  with program output; use `--verbose` to restore the previous behaviour.
+  (Issue #1181)
 
 ### Fixed
+- Parser now supports multiple adjacent labels pointing to the same address,
+  instead of reporting a misleading "label not found" error. (Issue #1341)
 - Circular `#include` detection now correctly detects both direct and indirect
   include loops instead of crashing. (Issue #610)
 - Parser now provides a proper error message when instructions have missing
   parameters instead of throwing an exception. (Issue #1048)
+- CLI: loading a program that has parser warnings (e.g., deprecated
+  instructions) no longer fails.
 - Hexadecimal values in `.data` section are now properly validated according to
   the declared data type size (e.g., `.byte 0xff` now works correctly).
   (@davidepatti)
 - Hexadecimal immediates now support the full 16-bit range in instructions.
   (@davidepatti)
+- Web UI: holding backspace no longer causes crashes or visual jitter. (Issue #1548)
+- Web UI: clicking the Clear button after execution now fully resets the
+  simulator status and UI back to the initial state. (Issue #1327)
 - Web UI: memory panel now displays consistent 64-bit hex value widths.
   (@davidepatti)
 - Web UI: CPU state is now properly reset when loading a new file.
+- Web UI: cache configuration settings are now responsive and wrap correctly at
+  narrow viewport widths. (Issue #1331)
 - Desktop UI: Cycles window now always shows the first instruction correctly.
   (Issue #875)
 - Documentation: fixed typo in `LWU` instruction description. (@AptInit)
