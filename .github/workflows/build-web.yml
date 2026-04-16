@@ -1,0 +1,67 @@
+name: Build Web Application
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: 'Git ref to checkout'
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build web application
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          java-version: 17
+          distribution: 'microsoft'
+          cache: 'gradle'
+
+      - name: Set up Python 3.14
+        id: setup-python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - name: Configure Python path for Gradle
+        run: |
+          PYTHON_DIR=$(dirname "${{ steps.setup-python.outputs.python-path }}")
+          echo "ORG_GRADLE_PROJECT_pythonPath=$PYTHON_DIR" >> "$GITHUB_ENV"
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Set up Node.JS
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install JS dependencies
+        run: npm install
+
+      - name: Cache GWT unit cache
+        uses: actions/cache@v5
+        with:
+          path: gwt-unitCache
+          key: gwt-${{ hashFiles('src/main/java/**/*.java') }}
+          restore-keys: |
+            gwt-
+
+      - name: Build JS Worker (Java → JS), including HTML docs
+        run: ./gradlew webapp
+
+      - name: Upload web application artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: web
+          path: build/gwt/war/edumips64

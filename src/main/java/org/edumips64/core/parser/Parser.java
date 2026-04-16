@@ -237,7 +237,7 @@ public class Parser {
     LinkedList<VoidJump> voidJumps = new LinkedList<>();
 
     memoryCount = 0;
-    String lastLabel = "";
+    List<String> pendingLabels = new LinkedList<>();
 
     // --------------------------------------------
     // STAGE 1: PARSE THE SOURCE CODE, LINE BY LINE
@@ -483,7 +483,7 @@ public class Parser {
               }
             } else if (section == FileSection.TEXT) {
               logger.info("in .text section");
-              lastLabel = label;
+              pendingLabels.add(label);
             }
 
             logger.info("done");
@@ -813,9 +813,9 @@ public class Parser {
 
               try {
                 mem.addInstruction(tmpInst, instrCount);
-                if (lastLabel != null && !lastLabel.equals("")) {
-                  logger.info("About to add label: " + lastLabel);
-                  symTab.setInstructionLabel(instrCount, lastLabel.toUpperCase());
+                for (String pendingLabel : pendingLabels) {
+                  logger.info("About to add label: " + pendingLabel);
+                  symTab.setInstructionLabel(instrCount, pendingLabel.toUpperCase());
                 }
               } catch (SymbolTableOverflowException ex) {
                 if (isFirstOutOfInstructionMemory) { //is first out of memory?
@@ -828,10 +828,10 @@ public class Parser {
                 errors.addError("SAMELABEL", row, 1, line);
                 column = line.length();
               }
-              // Il finally e' totalmente inutile, ma Ãš bello utilizzarlo per la
+              // Il finally e' totalmente inutile, ma è bello utilizzarlo per la
               // prima volta in un programma ;)
               finally {
-                lastLabel = "";
+                pendingLabels.clear();
               }
 
               end = line.length();

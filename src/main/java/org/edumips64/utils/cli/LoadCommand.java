@@ -37,7 +37,18 @@ public class LoadCommand implements Runnable {
                 printCannotLoad();
             }
         } catch (ParserMultiException pme) {
-            printParsingFailed(pme.toString());
+            if (pme.hasErrors()) {
+                printParsingFailed(pme.toString());
+            } else {
+                // The file was parsed successfully, but with warnings.
+                // Continue loading as the GUI does.
+                cli.getCacheSimulator().setDataOffset(cli.getMemory().getInstructionsNumber() * 4);
+                cli.getCPU().setStatus(CPU.CPUStatus.RUNNING);
+                printLoadedFileMsg(absoluteFilename);
+                if (cli.isVerbose()) {
+                    printParsingWarnings(pme.toString());
+                }
+            }
         } catch (ReadException readException) {
             printLoadFailedMsg(absoluteFilename);
         }
@@ -53,8 +64,15 @@ public class LoadCommand implements Runnable {
     }
 
     private void printLoadedFileMsg(String fileName) {
-        System.out.printf(CurrentLocale.getString("CLI.FILE.LOADED"), fileName);
-        System.out.println();
+        if (cli.isVerbose()) {
+            System.out.printf(CurrentLocale.getString("CLI.FILE.LOADED"), fileName);
+            System.out.println();
+        }
+    }
+
+    private void printParsingWarnings(String msg) {
+        System.out.println(CurrentLocale.getString("CLI.PARSE.WARNING"));
+        System.out.println(msg);
     }
 
     private void printLoadFailedMsg(String fileName) {

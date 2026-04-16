@@ -76,14 +76,13 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
   private GUIUpdateThread guiUpdateThread;
   private CycleBuilder builder;
   private Supplier<String> codeSupplier;
-  private CacheSimulator cachesim;
 
   private static final Logger logger = Logger.getLogger(CPUSwingWorker.class.getName());
 
   /** Callbacks */
   private Runnable initCallback, haltCallback, finalizeCallback;
 
-  public CPUSwingWorker(CPU cpu, CacheSimulator cacheSimulator, GUIFrontend front, JFrame mainFrame, ConfigStore config, CycleBuilder builder, Runnable initCallback, Runnable haltCallback, Runnable finalizeCallback, Supplier<String> codeSupplier) {
+  public CPUSwingWorker(CPU cpu, GUIFrontend front, JFrame mainFrame, ConfigStore config, CycleBuilder builder, Runnable initCallback, Runnable haltCallback, Runnable finalizeCallback, Supplier<String> codeSupplier) {
     externalStop = false;
     this.builder = builder;
     this.cpu = cpu;
@@ -91,7 +90,6 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
     this.mainFrame = mainFrame;
     this.config = config;
     this.codeSupplier = codeSupplier;
-    this.cachesim = cacheSimulator;
     updateConfigValues();
 
     this.haltCallback = haltCallback;

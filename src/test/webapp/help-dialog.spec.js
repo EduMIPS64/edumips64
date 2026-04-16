@@ -3,14 +3,13 @@ const { test, expect } = require('@playwright/test');
 const targetUri = process.env.PLAYWRIGHT_TARGET_URL || "http://localhost:8080";
 
 test('help dialog shows embedded documentation with navigation', async ({ page }) => {
-  console.log("Running help dialog tests against", targetUri);
   await page.goto(targetUri);
 
   // Wait for the page to load
   await page.waitForSelector('#load-button');
 
   // Click the help button
-  await page.click('.help-button');
+  await page.click('#help-button');
 
   // Wait for the help dialog to appear
   await page.waitForSelector('.help-title');
@@ -32,7 +31,7 @@ test('help dialog shows embedded documentation with navigation', async ({ page }
   await page.waitForSelector('#language-select');
   
   // Verify navigation is present (check for at least one navigation item)
-  const navigationItems = await page.$$('text=Introduction');
+  const navigationItems = await page.$$('#toc-item-introduction');
   expect(navigationItems.length).toBeGreaterThan(0);
 
   // Test language switching
@@ -61,20 +60,19 @@ test('help dialog shows embedded documentation with navigation', async ({ page }
   expect(aboutContent).toContain('Quick Start');
 
   // Close the dialog
-  await page.click('text=Close');
+  await page.click('#help-close-button');
 
   await page.close();
 });
 
 test('help documentation loads correctly in iframe', async ({ page }) => {
-  console.log("Running documentation loading test against", targetUri);
   await page.goto(targetUri);
 
   // Wait for the page to load
   await page.waitForSelector('#load-button');
 
   // Click the help button
-  await page.click('.help-button');
+  await page.click('#help-button');
 
   // Wait for the iframe
   await page.waitForSelector('#help-iframe');
@@ -93,26 +91,25 @@ test('help documentation loads correctly in iframe', async ({ page }) => {
 });
 
 test('help navigation allows browsing different sections', async ({ page }) => {
-  console.log("Running navigation test against", targetUri);
   await page.goto(targetUri);
 
   // Wait for the page to load
   await page.waitForSelector('#load-button');
 
   // Click the help button
-  await page.click('.help-button');
+  await page.click('#help-button');
 
   // Wait for the iframe
   await page.waitForSelector('#help-iframe');
 
   // Click to expand "Instruction Set" section
-  await page.click('text=Instruction Set');
+  await page.click('#toc-item-the-instruction-set');
   
   // Wait for the submenu to expand
   await page.waitForTimeout(500);
   
   // Click on a sub-item "ALU Instructions"
-  await page.click('text=ALU Instructions');
+  await page.click('#toc-item-alu-instructions');
 
   // Wait for navigation
   await page.waitForTimeout(500);

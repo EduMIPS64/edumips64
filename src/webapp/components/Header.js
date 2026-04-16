@@ -190,7 +190,7 @@ export default function Header(props) {
             }}
             disabled={props.status === 'RUNNING'}
           >
-            Clear Code
+            clear
           </Button>
         </Tooltip>
         <Tooltip title="Open code from file" arrow placement="top">
@@ -226,6 +226,7 @@ export default function Header(props) {
         <IconButton
           color="inherit"
           className="help-button"
+          id="help-button"
           onClick={() => {
             setDialogOpen(true);
           }}

@@ -42,6 +42,8 @@ public class Result {
   public JsArray<Instruction> parsedInstructions;
   public String stdout;
   public String validInstructions;
+  // Indicates the operation that generated this result (e.g., "checksyntax", "step", "load", "reset")
+  public String method = "";
 
   public Result(boolean success, String errorMessage, String stdout) {
     this.success = success;

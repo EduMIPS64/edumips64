@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
-const Settings = ({ viMode, setViMode, fontSize, setFontSize }) => {
+const Settings = ({ viMode, setViMode, fontSize, setFontSize, accordionAlerts, setAccordionAlerts }) => {
   return (
     <Box
       sx={{
@@ -54,6 +54,21 @@ const Settings = ({ viMode, setViMode, fontSize, setFontSize }) => {
             +
           </Button>
         </ButtonGroup>
+      </Box>
+      <Box>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={accordionAlerts}
+              onChange={(e) => setAccordionAlerts(e.target.checked)}
+              color="primary"
+              size="small"
+            />
+          }
+          label={
+            <Typography sx={{ fontSize: '0.85rem' }}>Accordion Change Alerts</Typography>
+          }
+        />
       </Box>
     </Box>
   );

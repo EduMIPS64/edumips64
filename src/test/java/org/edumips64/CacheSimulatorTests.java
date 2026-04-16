@@ -4,7 +4,6 @@ import org.edumips64.core.CacheSimulator;
 import org.edumips64.core.cache.CacheConfig;
 import org.edumips64.core.cache.CacheMemory;
 import org.edumips64.core.cache.CacheStats;
-import org.edumips64.core.cache.CacheType;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
