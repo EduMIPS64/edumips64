@@ -92,8 +92,6 @@ public abstract class ConfigStore {
     ConfigStore.defaults.put(ConfigKey.L1I_BLOCK_SIZE, 8);
     ConfigStore.defaults.put(ConfigKey.L1D_ASSOCIATIVITY, 1);
     ConfigStore.defaults.put(ConfigKey.L1I_ASSOCIATIVITY, 1);
-    ConfigStore.defaults.put(ConfigKey.L1D_PENALTY, 40);
-    ConfigStore.defaults.put(ConfigKey.L1I_PENALTY, 40);
   }
 
   // The interface exposes getter and setter methods for all the supported

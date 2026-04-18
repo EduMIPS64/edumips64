@@ -225,10 +225,6 @@ public class CurrentLocale {
     en.put("Config.L1D_ASSOCIATIVITY.tip", "Number of ways in the L1 Data cache");
     en.put("Config.L1I_ASSOCIATIVITY", "L1I Associativity");
     en.put("Config.L1I_ASSOCIATIVITY.tip", "Number of ways in the L1 Instruction cache");
-    en.put("Config.L1D_PENALTY", "L1D Penalty");
-    en.put("Config.L1D_PENALTY.tip", "Number of cycles for a L1 Data cache miss");
-    en.put("Config.L1I_PENALTY", "L1I Penalty");
-    en.put("Config.L1I_PENALTY.tip", "Number of cycles for a L1 Instruction cache miss");
     en.put("StatusBar.WELCOME", "Welcome to EduMIPS64");
     en.put("StatusBar.DECIMALVALUE", "Decimal value");
     en.put("StatusBar.OFREGISTER", "of R");

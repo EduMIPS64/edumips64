@@ -252,8 +252,6 @@ The Cache tab allows you to configure the L1 cache simulator settings:
 * **L1 Instruction Cache Block Size** - Size of each cache block in bytes (default: 16)
 * **L1 Data Cache Associativity** - Number of cache ways, determining cache organization (default: 1)
 * **L1 Instruction Cache Associativity** - Number of cache ways, determining cache organization (default: 1)
-* **L1 Data Cache Penalty** - Number of additional cycles for cache misses (default: 40)
-* **L1 Instruction Cache Penalty** - Number of additional cycles for cache misses (default: 40)
 
 These settings allow you to experiment with different cache configurations to
 understand their impact on program performance. The cache simulator models
@@ -279,7 +277,6 @@ Each cache can be independently configured with different parameters:
 * **Size** - Total capacity of the cache in bytes
 * **Block Size** - Size of each cache line in bytes (also called cache block)
 * **Associativity** - Number of ways in the cache set (1 = direct-mapped, >1 = set-associative)
-* **Penalty** - Additional CPU cycles incurred on cache misses
 
 The cache simulator uses a Least Recently Used (LRU) replacement policy for
 set-associative caches. Cache statistics are updated in real-time during

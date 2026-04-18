@@ -13,7 +13,6 @@ public class CacheSimulator {
     private static final int DEFAULT_CACHE_SIZE = 1024;
     private static final int DEFAULT_BLOCK_SIZE = 16;
     private static final int DEFAULT_ASSOCIATIVITY = 1;
-    private static final int DEFAULT_PENALTY = 40;
 
     final private CacheMemory L1InstructionCache;
     final private CacheMemory L1DataCache;
@@ -25,11 +24,11 @@ public class CacheSimulator {
 
     public CacheSimulator() {
         L1InstructionCache = new CacheMemory(
-            new CacheConfig(DEFAULT_CACHE_SIZE, DEFAULT_BLOCK_SIZE, DEFAULT_ASSOCIATIVITY, DEFAULT_PENALTY),
+            new CacheConfig(DEFAULT_CACHE_SIZE, DEFAULT_BLOCK_SIZE, DEFAULT_ASSOCIATIVITY),
             CacheType.L1_INSTRUCTION
         );
         L1DataCache = new CacheMemory(
-            new CacheConfig(DEFAULT_CACHE_SIZE, DEFAULT_BLOCK_SIZE, DEFAULT_ASSOCIATIVITY, DEFAULT_PENALTY),
+            new CacheConfig(DEFAULT_CACHE_SIZE, DEFAULT_BLOCK_SIZE, DEFAULT_ASSOCIATIVITY),
             CacheType.L1_DATA
         );
     }

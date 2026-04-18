@@ -8,13 +8,11 @@ const CacheConfig = ({ onChange, status }) => {
     size: 1024,
     blockSize: 16,
     associativity: 1,
-    penalty: 40,
   });
   const [l1i, setL1I] = useState({
     size: 1024,
     blockSize: 16,
     associativity: 1,
-    penalty: 40,
   });
 
   const isDisabled = status === 'RUNNING';
@@ -73,17 +71,6 @@ const CacheConfig = ({ onChange, status }) => {
           value={cache.associativity}
           onChange={(e) =>
             setCache({ ...cache, associativity: parseInt(e.target.value) || 0 })
-          }
-          disabled={isDisabled}
-          slotProps={{ htmlInput: { min: 0 } }}
-        />
-        <TextField
-          label="Penalty"
-          type="number"
-          size="small"
-          value={cache.penalty}
-          onChange={(e) =>
-            setCache({ ...cache, penalty: parseInt(e.target.value) || 0 })
           }
           disabled={isDisabled}
           slotProps={{ htmlInput: { min: 0 } }}
