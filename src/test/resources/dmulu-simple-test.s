@@ -25,8 +25,7 @@
     ADDI    r1, r0, 2
     ADDI    r2, r0, 3
     ADDI    r10, r0, 6
-    DMULU   r1, r2
-    MFLO    r3
+    DMULU   r3, r1, r2
     BNE     r3, r10, error
     DMULTU  r1, r2
     MFLO    r4

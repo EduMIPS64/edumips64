@@ -1,0 +1,77 @@
+name: Build Electron
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: 'Git ref to checkout'
+        required: true
+        type: string
+
+jobs:
+  build-electron:
+    name: Build Electron (${{ matrix.platform }}-${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            artifact-name: Electron Linux x64
+            artifact-path: electron/dist/WebEduMips64-linux-x64
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+            artifact-name: Electron macOS ARM64
+            artifact-path: electron/dist/WebEduMips64-darwin-arm64
+          - os: windows-latest
+            platform: win32
+            arch: x64
+            artifact-name: Electron Windows x64
+            artifact-path: electron/dist/WebEduMips64-win32-x64
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Download web application artifacts
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: web
+          path: build/gwt/war/edumips64
+
+      - name: Set up Node.JS
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install JS dependencies
+        run: npm install
+
+      - name: Build Electron application for ${{ matrix.platform }}-${{ matrix.arch }}
+        working-directory: electron
+        shell: bash
+        run: |
+          rm -rf ./dist/WebEduMips64-${{ matrix.platform }}-${{ matrix.arch }}
+
+          # Copy index.js to root directory (required by electron-packager)
+          cp index.js ..
+
+          # Build the Electron app
+          if [ "${{ matrix.platform }}" = "linux" ]; then
+            npx electron-packager ../ WebEduMips64 --platform=${{ matrix.platform }} --arch=${{ matrix.arch }} --out dist
+          else
+            npx electron-packager ../ WebEduMips64 --asar --platform=${{ matrix.platform }} --arch=${{ matrix.arch }} --out dist
+          fi
+
+          rm ../index.js
+
+      - name: Upload ${{ matrix.artifact-name }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.artifact-path }}

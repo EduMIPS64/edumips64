@@ -24,11 +24,7 @@
 
 package org.edumips64.ui.swing;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.MemoryElementNotFoundException;
-import org.edumips64.core.NotAlignException;
-import org.edumips64.core.StoppedCPUException;
-import org.edumips64.core.SynchronousException;
+import org.edumips64.core.*;
 import org.edumips64.core.is.AddressErrorException;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;

@@ -277,7 +277,7 @@ public class MultiLineBasicTableUI extends javax.swing.plaf.basic.BasicTableUI {
     }
 
     // paint the dragged cell if we are dragging
-    if (draggedColumnIndex != -1 && draggedCellRect != null) {
+    if (draggedColumnIndex != -1 && draggedCellRect != null && header != null) {
       draggedCellRect.x += header.getDraggedDistance();
 
       // Fill the background

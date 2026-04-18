@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE map PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 1.0//EN" "http://java.sun.com/products/javahelp/map_2_0.dtd">
+
+<map version="1.0" xml:lang="zh">
+    <mapID target="top" url="html/index.html "/>
+    <mapID target="index" url="html/index.html"/>
+    <mapID target="user-interface" url="html/user-interface.html"/>
+    <mapID target="instructions" url="html/instructions.html"/>
+    <mapID target="fpu" url="html/fpu.html"/>
+    <mapID target="search" url="html/search.html"/>
+    <mapID target="source-files-format" url="html/source-files-format.html"/>
+    <mapID target="genindex" url="html/genindex.html"/>
+    <mapID target="examples" url="html/examples.html"/>
+    <mapID target="_static.file" url="html/_static/file.png"/>
+    <mapID target="_static.minus" url="html/_static/minus.png"/>
+    <mapID target="_static.plus" url="html/_static/plus.png"/>
+    <mapID target="img_back" url="img/Back.png"/>
+    <mapID target="img_fwd" url="img/Forward.png"/>
+    <mapID target="img_home" url="img/Home.png"/>
+    <mapID target="img_print" url="img/Print.png"/>
+</map>

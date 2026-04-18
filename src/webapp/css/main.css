@@ -1,14 +1,7 @@
-
-.binary-value {
-    font-family: 'Menlo,Monaco,Courier New,monospace';
-    font-size: 0.6rem;
-    padding: 0.1em 10px;
-    text-align: right;
-}
-
 .logo {
-    height: 4em;
+    height: 30px;
     padding-left: 0.5em;
+    margin-right: 10px;
 }
 
 .help-button {
@@ -23,3 +16,23 @@
 .help-content {
      padding: 30px !important;
 }
+
+.accordion-change-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #1976d2;
+    border-radius: 50%;
+    margin-left: 8px;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+

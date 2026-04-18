@@ -37,8 +37,8 @@ istruzioni.
 
 Il quarto capitolo è una descrizione dell'interfaccia utente di EduMIPS64,
 che espone lo scopo di ciascuna finestra e di ciascun menù, insieme ad una
-descrizione delle finestre di configurazione, del Dinero frontend, del
-manuale e delle opzioni da linea di comando.
+descrizione delle finestre di configurazione, del simulatore di cache L1, del 
+Dinero frontend, del manuale e delle opzioni da linea di comando.
 
 Il quinto capitolo contiene alcune esempi pratici di utilizzo del simulatore.
 

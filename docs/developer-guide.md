@@ -18,9 +18,16 @@
 
 ### Requirements
 
+#### Dev Container
+All requirements are available in the Development Container image described in the `.devcontainer/devcontainer.json` dev container. See https://containers.dev/ for documentation on dev containers.
+
+Github codespaces will use the dev container by default and give you a fully set up dev environment, useable for desktop, web and documentation development work.
+
+#### List of requirements
+
 In order to compile EduMIPS64, you need the Java JDK version 17 or above.
 
-To build the user documentation, you'll need Python 3.9+ with pip.
+To build the user documentation, you'll need Python 3.14+ with pip.
 
 [Gradle](https://gradle.org/) will download the following dependencies:
 
@@ -38,6 +45,15 @@ To generate an installable Windows MSI package (using the Gradle `msi` task), yo
 This project uses GitHub Actions for continuous integration
 (https://github.com/EduMIPS64/edumips64/actions).
 
+There are two main workflows:
+
+- **CI** (`ci.yml`) — runs on every pull request, push to `master`, and on a daily schedule.
+  Builds and tests the desktop application, builds the web application, deploys to
+  staging/production, and builds/tests the Snap package.
+- **Release** (`release.yml`) — runs on every push to `master` to build all release artifacts
+  (JAR, MSI, Electron apps). Can also be triggered manually to create a tagged GitHub release
+  with all artifacts attached.
+
 ### Main Gradle tasks
 
 All the tasks of Gradle
@@ -51,6 +67,7 @@ In particular you may find useful these tasks:
 - `./gradlew check` - (Java plugin) run tests and compile the documentation
 - `./gradlew run` - (Application plugin) run the application
 - `./gradlew war` - (GWT plugin) compile the GWT-based web worker running the EduMIPS64 core
+- `./gradlew webapp` - (Custom task) compile the GWT-based web worker, the React frontend, and bundle the documentation
 
 You may also find useful using the `--console=plain` flag to better see what tasks
 are being executed.  
@@ -71,8 +88,7 @@ not include the compiled help files.
 If you want to work on EduMIPS64 with Visual Studio Code, you need to download the Java Extension Pack
 (see [Java in Visual Studio Code](https://code.visualstudio.com/docs/languages/java)).
 
-To make it recognize the EduMIPS64 folder as a project, run `./gradlew eclipse` to generate
-Eclipse-style project files, which are readable by the VSCode plugins.
+With the Java Extension Pack, you can directly import the Gradle project and use auto-complete, run unit tests, etc.
 
 ### Working on the Web UI
 
@@ -101,6 +117,13 @@ to have a working local test environment (see next section).
 The web UI itself is based on React, and it's compiled / assembled using the NPM and
 webpack tools. The source code is in `src/webapp`.
 
+The `webapp` Gradle task automates the build process for the web UI. It:
+1. Compiles the GWT worker (`war` task)
+2. Generates the HTML documentation (`htmlDocs` task)
+3. Installs NPM dependencies (`npmInstall` task)
+4. Builds the React frontend (`npmBuild` task)
+5. Copies the generated documentation into the web app bundle (`copyWebHelp` task)
+
 Custom NPM scripts:
 
 - `build-dbg`: runs `webpack -d` (compile with debugging symbols)
@@ -110,6 +133,8 @@ Custom NPM scripts:
 Both `build` and `build-dbg` produce a `ui.js` file in the `build/gwt/war/edumips64` directory.
 
 The code was tested with Node.JS 16. The CI environment uses this version.
+
+There are some basic Playwright tests for the web UI, which can be run with `npx run playwright`.
 
 ### Source code structure
 
@@ -195,12 +220,22 @@ Follow instructions [here](https://dev.cloudburo.net/2018/06/03/install-letsencr
 
 ### Manual release checklist
 
-Before doing a release, please do the following tasks. Over time, those should
-be automated, but before that is done those checks should be done manually.
+Most of the release process is automated via the `release.yml` GitHub Actions workflow.
+To create a release, trigger the workflow manually from the Actions tab with `create_release: true`.
+You can optionally provide a specific `commit_sha` to build and release from a particular commit
+(defaults to the latest commit on the selected branch if left empty).
+This will build all artifacts (JAR, PDF manuals, MSI, Electron apps), create a Git tag (`vX.Y.Z`),
+and publish a GitHub release with all assets attached. The release body comes from `RELEASE_NOTES.md`.
 
-Before committing the release commit:
+Before triggering a release:
 
-- run `./gradlew release`
+- Bump the version in `gradle.properties`
+- Update `RELEASE_NOTES.md` with notes for the new version
+- Update the version in `snapcraft.yaml`
+- Merge all changes to `master`
+
+After the automated release completes, manually verify:
+
 - JAR and MSI:
   - verify that the splash screen works
   - verify that the version number, code name, build date and git ID are correct
@@ -213,13 +248,9 @@ Before committing the release commit:
   - open the English manual and check the version
   - open the Italian manual and check the version
 
-Make sure the version number on `snapcraft.yaml` is updated.
-After committing, check out `master` and run `./gradlew release` again.
-
 Trigger builds on snapcraft.
 
-Create release and update artifacts generated from `master`.
-
-Check the 'edge' snap and promote it to stable if it works (https://snapcraft.io/edumips64/releases, needs login)Test both on amd64 and armhf (Raspberry PI)
+Check the 'edge' snap and promote it to stable if it works (https://snapcraft.io/edumips64/releases, needs login)
+Test both on amd64 and armhf (Raspberry Pi)
 
 Update winget manifest on https://github.com/microsoft/winget-pkgs/tree/master/manifests/e/EduMIPS64/EduMIPS64

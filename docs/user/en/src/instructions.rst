@@ -64,10 +64,15 @@ Here's the list of R-Type ALU Instructions.
 
 .. \MISN{}
 
-* `DDIV rs, rt`
+* `DDIV rs, rt` OR `DDIV rd, rs, rt`
 
-  Executes the division between 64-bits registers rs and rt, putting the
-  64-bits quotient in LO and the 64-bits remainder in HI.
+  Executes the division between 64-bits registers rs and rt.
+  
+  Two-operand form (DDIV rs, rt): Puts the 64-bits quotient in LO and the
+  64-bits remainder in HI.
+  
+  Three-operand form (DDIV rd, rs, rt): Puts the 64-bits quotient in register rd.
+  This is the MIPS64 Release 6 version.
 
 * `DDIVU rs, rt`
 
@@ -86,18 +91,37 @@ Here's the list of R-Type ALU Instructions.
   as unsigned values and putting the 32-bits quotient in LO and the 32-bits
   remainder in HI.
 
+* `DMUHU rd, rs, rt`
+
+  Executes the multiplication between 64-bits registers rs and rt,
+  considering them as unsigned values and putting the high-order 64-bits
+  doubleword of the result into register rd.
+
+* `DMOD rd, rs, rt`
+
+  Computes the signed modulo (remainder) of 64-bits register rs divided by
+  64-bits register rt, and puts the result into register rd. This is the
+  MIPS64 Release 6 version. For the legacy form that stores remainder in HI,
+  use DDIV rs, rt followed by MFHI.
+
+* `DMUL rd, rs, rt`
+
+  Executes the multiplication between 64-bits registers rs and rt, putting
+  the low-order 64-bits doubleword of the result into register rd. Note: This
+  is the MIPS64 Release 6 version. To store the result in LO/HI registers, use
+  DMULT instead.
+
 * `DMULT rs, rt`
 
   Executes the multiplication between 64-bits registers rs and rt, putting
   the low-order 64-bits doubleword of the result into special register LO and
   the high-order 64-bits doubleword of the result into special register HI.
 
-* `DMULU rs, rt`
+* `DMULU rd, rs, rt`
 
   Executes the multiplication between 64-bits registers rs and rt,
   considering them as unsigned values and putting the low-order 64-bits
-  doubleword of the result into special register LO and the high-order
-  64-bits doubleword of the result into special register HI.
+  doubleword of the result into register rd.
 
 * `DMULTU rs, rt`
 
@@ -380,7 +404,7 @@ List of load instructions:
 * `LWU rt, offset(base)`
 
   Loads the content of the memory cell at address specified by offset and
-  base in register rt, treating it as a signed word.
+  base in register rt, treating it as an unsigned word.
 
 List of store instructions:
 

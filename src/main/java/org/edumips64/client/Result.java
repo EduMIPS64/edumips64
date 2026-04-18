@@ -35,14 +35,20 @@ public class Result {
   public String memory = "";
   public String registers = "";
   public String statistics = "";
+  public String cachestats = "";
   public Pipeline pipeline;
   public boolean encounteredBreak = false;
   public JsArray<ParserError> parsingErrors;
   public JsArray<Instruction> parsedInstructions;
+  public String stdout;
+  public String validInstructions;
+  // Indicates the operation that generated this result (e.g., "checksyntax", "step", "load", "reset")
+  public String method = "";
 
-  public Result(boolean success, String errorMessage) {
+  public Result(boolean success, String errorMessage, String stdout) {
     this.success = success;
     this.errorMessage = errorMessage;
+    this.stdout = stdout;
   }
 
   public String toString() {

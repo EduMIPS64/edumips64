@@ -1,15 +1,20 @@
 import React from 'react';
-import { MdWarning, MdError } from 'react-icons/md';
+import ErrorIcon from '@mui/icons-material/Error';
+import WarningIcon from '@mui/icons-material/Warning';
+import Chip from '@mui/material/Chip';
 
 const ErrorCount = ({ count }) => {
   if (count == 0) {
     return <React.Fragment />;
   }
   return (
-    <span id="errorCount">
-      <MdError />
-      {count}{' '}
-    </span>
+    <Chip
+      icon={<ErrorIcon />}
+      label={count}
+      size="small"
+      color="error"
+      style={{ marginRight: '5px' }}
+    />
   );
 };
 const WarningCount = ({ count }) => {
@@ -17,10 +22,13 @@ const WarningCount = ({ count }) => {
     return <React.Fragment />;
   }
   return (
-    <span id="warningCount">
-      <MdWarning />
-      {count}{' '}
-    </span>
+    <Chip
+      icon={<WarningIcon />}
+      label={count}
+      size="small"
+      color="warning"
+      style={{ marginRight: '5px' }}
+    />
   );
 };
 

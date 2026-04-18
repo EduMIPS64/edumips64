@@ -23,36 +23,35 @@
  */
 package org.edumips64;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.Dinero;
-import org.edumips64.core.IOManager;
-import org.edumips64.core.Memory;
-import org.edumips64.core.SymbolTable;
+import org.edumips64.core.*;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.utils.io.FileUtils;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.StringWriter;
 
+import org.junit.Before;
+
 public class BaseWithInstructionBuilderTest extends BaseTest {
   protected CPU cpu;
   protected SymbolTable symTab;
-  protected Dinero dinero;
+  protected CacheSimulator cachesim;
   protected StringWriter stdOut;
   protected Memory memory;
   protected InstructionBuilder instructionBuilder;
   protected FileUtils lfu;
-
+  
+  @Before
   public void testSetup() {
     memory = new Memory();
     cpu = new CPU(memory, config, new BUBBLE());
     cpu.setStatus(CPU.CPUStatus.READY);
-    dinero = new Dinero();
+    cachesim = new CacheSimulator();
     symTab = new SymbolTable(memory);
     stdOut = new StringWriter();
     lfu = new LocalFileUtils();
     IOManager iom = new IOManager(lfu, memory);
     iom.setStdOutput(stdOut);
-    instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, config);
+    instructionBuilder = new InstructionBuilder(memory, iom, cpu, cachesim, config);
   }
 }

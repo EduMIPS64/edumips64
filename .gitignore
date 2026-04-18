@@ -10,6 +10,9 @@
 # project,
 /*.s
 
+# PDF files.
+*.pdf
+
 # Vim temporary files.
 *.un~
 *.sw*
@@ -30,7 +33,8 @@ syscall-testfile.txt
 # Miscellaneous output directories.
 build
 build/*
-docs/*/output
+docs/user/*/output/
+docs/user/*/output/**
 gwt-unitCache/
 war/WEB-INF/
 war/
@@ -161,3 +165,4 @@ scripts/exeCreator.bat
 
 #msi installer
 *.msi
+test-results/

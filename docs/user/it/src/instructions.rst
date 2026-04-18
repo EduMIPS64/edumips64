@@ -68,10 +68,15 @@ Ecco la lista delle istruzioni ALU di tipo R.
 
 .. \MISN{}
 
-* `DDIV rs, rt`
+* `DDIV rs, rt` O `DDIV rd, rs, rt`
 
-  Esegue la divisione tra i registri a 64-bit rs ed rt, ponendo i 64-bit del
-  quoziente in LO ed i 64-bit del resto in HI.
+  Esegue la divisione tra i registri a 64-bit rs ed rt.
+  
+  Forma a due operandi (DDIV rs, rt): Pone i 64-bit del quoziente in LO ed i
+  64-bit del resto in HI.
+  
+  Forma a tre operandi (DDIV rd, rs, rt): Pone i 64-bit del quoziente nel
+  registro rd. Questa è la versione MIPS64 Release 6.
 
 * `DDIVU rs, rt`
 
@@ -90,6 +95,24 @@ Ecco la lista delle istruzioni ALU di tipo R.
   valori senza segno e pone i 32-bit del quoziente in LO ed i 32-bit del resto
   in HI.
 
+* `DMUHU rd, rs, rt`
+
+  Esegue il prodotto tra i registri a 64-bit rs ed rt, considerandoli come
+  valori senza segno e ponendo i 64 bit alti del risultato nel registro rd.
+
+* `DMOD rd, rs, rt`
+
+  Calcola il modulo (resto) con segno del registro a 64-bit rs diviso per
+  il registro a 64-bit rt, e pone il risultato nel registro rd. Questa è la
+  versione MIPS64 Release 6. Per la forma legacy che memorizza il resto in HI,
+  usare DDIV rs, rt seguito da MFHI.
+
+* `DMUL rd, rs, rt`
+
+  Esegue il prodotto tra i registri a 64-bit rs ed rt, ponendo i 64 bit bassi
+  del risultato nel registro rd. Nota: Questa è la versione MIPS64 Release 6.
+  Per memorizzare il risultato nei registri LO/HI, usare DMULT invece.
+
 * `DMULT rs, rt`
 
   Esegue il prodotto tra i registri a 64-bit rs ed rt, ponendo i 64 bit bassi
@@ -102,11 +125,10 @@ Ecco la lista delle istruzioni ALU di tipo R.
   valori senza segno e ponendo i 64 bit bassi del risultato nel registro
   speciale LO e i 64 bit alti del risultato nel registro speciale HI.
 
-* `DMULU rs, rt`
+* `DMULU rd, rs, rt`
 
   Esegue il prodotto tra i registri a 64-bit rs ed rt, considerandoli come
-  valori senza segno e ponendo i 64 bit bassi del risultato nel registro
-  speciale LO e i 64 bit alti del risultato nel registro speciale HI.
+  valori senza segno e ponendo i 64 bit bassi del risultato nel registro rd.
 
 * `DSLL rd, rt, sa`
 

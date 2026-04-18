@@ -1,17 +1,38 @@
 import React from 'react';
 
 import Code from './Code';
-import Controls from './Controls';
 import Memory from './Memory';
 import Pipeline from './Pipeline';
 import Registers from './Registers';
 import Statistics from './Statistics';
+import Header from './Header';
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import MuiAccordionSummary from '@mui/material/AccordionSummary';
+import Grid from '@mui/material/Grid';
+import ErrorList from './ErrorList';
+import StdOut from './StdOut';
+import Switch from '@mui/material/Switch';
+import Button from '@mui/material/Button';
+
+import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
+
+import { styled } from '@mui/material/styles';
+
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Typography from '@mui/material/Typography';
 
 import SampleProgram from '../data/SampleProgram';
 
-import { debounce } from 'lodash';
+import { debounce, isEqual } from 'lodash';
+import Settings from './Settings';
+import CacheConfig from "./CacheConfig";
 
-const Simulator = ({ sim, initialState }) => {
+const Simulator = ({worker, initialState, appInsights}) => {
   // The amount of steps to run in multi-step executions.
   const INTERNAL_STEPS_STRIDE = 50;
 
@@ -27,13 +48,116 @@ const Simulator = ({ sim, initialState }) => {
   const [parsedInstructions, setParsedInstructions] = React.useState(
     initialState.parsedInstructions,
   );
+  const [stdout, setStdout] = React.useState('');
+
+  const [viMode, setViMode] = React.useState(false);
+  const [fontSize, setFontSize] = React.useState(14);
+  const [accordionAlerts, setAccordionAlerts] = React.useState(true);
+
+  // Track expanded state for each accordion
+  const [expandedAccordions, setExpandedAccordions] = React.useState({
+    stats: true,
+    pipeline: false,
+    registers: false,
+    memory: false,
+    stdout: false,
+    cache: true,
+    settings: true,
+  });
+
+  // Track if data has changed while accordion was collapsed
+  const [accordionChanges, setAccordionChanges] = React.useState({
+    stats: false,
+    pipeline: false,
+    registers: false,
+    memory: false,
+    stdout: false,
+  });
+
+  // Refs to track previous values for change detection
+  const prevStats = React.useRef(stats);
+  const prevPipeline = React.useRef(pipeline);
+  const prevRegisters = React.useRef(registers);
+  const prevMemory = React.useRef(memory);
+  const prevStdout = React.useRef(stdout);
+
+  // Ref to track if we are resetting the simulator (clearing code)
+  const isResetting = React.useRef(false);
+
+  // Detect changes in accordion data when collapsed
+  React.useEffect(() => {
+    if (!accordionAlerts) {
+      prevStats.current = stats;
+      prevPipeline.current = pipeline;
+      prevRegisters.current = registers;
+      prevMemory.current = memory;
+      prevStdout.current = stdout;
+      return;
+    }
+
+    // If we are resetting, update refs but don't trigger changes
+    if (isResetting.current) {
+      prevStats.current = stats;
+      prevPipeline.current = pipeline;
+      prevRegisters.current = registers;
+      prevMemory.current = memory;
+      prevStdout.current = stdout;
+      isResetting.current = false;
+      return;
+    }
+    
+    const statsChanged = !isEqual(stats, prevStats.current);
+    const pipelineChanged = !isEqual(pipeline, prevPipeline.current);
+    const registersChanged = !isEqual(registers, prevRegisters.current);
+    const memoryChanged = !isEqual(memory, prevMemory.current);
+    const stdoutChanged = stdout !== prevStdout.current;
+    
+    // Update refs first
+    prevStats.current = stats;
+    prevPipeline.current = pipeline;
+    prevRegisters.current = registers;
+    prevMemory.current = memory;
+    prevStdout.current = stdout;
+    
+    // Only update state if there are actual changes for collapsed accordions
+    if ((!expandedAccordions.stats && statsChanged) ||
+        (!expandedAccordions.pipeline && pipelineChanged) ||
+        (!expandedAccordions.registers && registersChanged) ||
+        (!expandedAccordions.memory && memoryChanged) ||
+        (!expandedAccordions.stdout && stdoutChanged)) {
+      setAccordionChanges(prev => ({
+        ...prev,
+        stats: prev.stats || (!expandedAccordions.stats && statsChanged),
+        pipeline: prev.pipeline || (!expandedAccordions.pipeline && pipelineChanged),
+        registers: prev.registers || (!expandedAccordions.registers && registersChanged),
+        memory: prev.memory || (!expandedAccordions.memory && memoryChanged),
+        stdout: prev.stdout || (!expandedAccordions.stdout && stdoutChanged),
+      }));
+    }
+  }, [stats, pipeline, registers, memory, stdout, accordionAlerts, expandedAccordions]);
+
+  // Handle accordion expansion change
+  const handleAccordionChange = (panel) => (event, isExpanded) => {
+    setExpandedAccordions(prev => ({
+      ...prev,
+      [panel]: isExpanded,
+    }));
+    
+    // Clear change indicator when accordion is opened
+    if (isExpanded) {
+      setAccordionChanges(prev => ({
+        ...prev,
+        [panel]: false,
+      }));
+    }
+  };
 
   // Number of steps left to run. Used to keep track of execution.
   // If set to -1, runs until the execution ends.
   const [stepsToRun, setStepsToRun] = React.useState(0);
 
-  // Signals that the simulation must stop.
-  const [mustStop, setMustStop] = React.useState(false);
+  // Signals that the simulation must pause.
+  const [mustPause, setMustPause] = React.useState(false);
 
   // Tracks whether the worker is currently running code.
   const [executing, setExecuting] = React.useState(false);
@@ -44,11 +168,29 @@ const Simulator = ({ sim, initialState }) => {
   const simulatorRunning = status == 'RUNNING';
 
   // Tracks if the program has no syntax errors and can be loaded.
-  const isValidProgram = !parsingErrors;
+  // TODO: Allow code execution w/ warnings in the worker, then uncomment the line below
+  const isValidProgram = () => {
+    if (!parsingErrors) { return true; }
+    else {
+      return (parsingErrors.filter((e) => !e.isWarning).length == 0);
+    }
+  };
 
-  sim.onmessage = (e) => {
-    const result = sim.parseResult(e.data);
+  worker.onmessage = (e) => {
+    const result = worker.parseResult(e.data);
     console.log('Got message from worker.', result);
+    
+    // For syntax check responses, only update parsing errors to avoid unnecessary re-renders
+    if (result.method === 'checksyntax') {
+      setParsingErrors(result.parsingErrors);
+      if (result.parsingErrors) {
+        setParsedInstructions(null);
+      } else {
+        setParsedInstructions(result.parsedInstructions);
+      }
+      return;
+    }
+    
     updateState(result);
   };
 
@@ -69,14 +211,20 @@ const Simulator = ({ sim, initialState }) => {
       setParsedInstructions(result.parsedInstructions);
     }
 
-    // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
-    if (!result.success && result.errorMessage !== 'Parsing errors.') {
-      alert(result.errorMessage);
+    if (result.stdout) {
+      setStdout(result.stdout);
     }
 
-    if (result.status !== 'RUNNING' || mustStop || result.encounteredBreak) {
+    // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
+    // Runtime errors should not cause multiple alert prompting to avoid webui getting stuck
+    if (!result.success && result.errorMessage !== 'Parsing errors.') {
+      alert(result.errorMessage);
+      stopCode();
+    }
+
+    if (result.status !== 'RUNNING' || mustPause || result.encounteredBreak) {
       setStepsToRun(0);
-      setMustStop(false);
+      setMustPause(false);
       setRunAll(false);
     } else if (stepsToRun > 0) {
       console.log('Steps left: ' + stepsToRun);
@@ -86,63 +234,304 @@ const Simulator = ({ sim, initialState }) => {
     }
   };
 
-  const loadCode = () => {
-    console.log('Executing loadCode');
-    sim.load(code);
-  };
-
-  const stepCode = (n) => {
-    console.log('Executing steps: ' + n);
-    const toRun = Math.min(n, INTERNAL_STEPS_STRIDE);
-    setStepsToRun(n - toRun);
-    setExecuting(true);
-    sim.step(toRun);
-  };
-
-  const runCode = () => {
+  // Click handlers. Decoupled from business logic to place the telemetry hooks in the right place.
+  const clickRun = () => {
+    appInsights.trackEvent({name: "click", properties: {action: "run"}});
     console.log('Executing runCode');
+    runCode()
+  }
+
+  const clickStep = (n) => {
+    appInsights.trackEvent({name: "click", properties: {action: "step"}});
+    console.log('Executing steps: ' + n);
+    stepCode(n)
+  }
+
+  const clickLoad = () => {
+    appInsights.trackEvent({name: "click", properties: {action: "load"}});
+    console.log('Executing loadCode');
+    loadCode();
+  }
+
+  const clickStop = () => {
+    appInsights.trackEvent({name: "click", properties: {action: "stop"}});
+    console.log('Stopping simulation');
+    stopCode();
+  }
+
+  // Business logic for click handlers.
+  const runCode = () => {
     setRunAll(true);
     stepCode(INTERNAL_STEPS_STRIDE);
   };
 
+  const stepCode = (n) => {
+    const toRun = Math.min(n, INTERNAL_STEPS_STRIDE);
+    setStepsToRun(n - toRun);
+    setExecuting(true);
+    worker.step(toRun);
+  };
+
+  const stopCode = () => {
+    setMustPause(true);
+    setRunAll(false);
+    setStepsToRun(0);
+    worker.reset();  // Assuming simulator has a reset method
+  };
+
+  const clearCode = () => {
+    setCode(".data\n\n.code\n  SYSCALL 0\n");
+    isResetting.current = true;
+    worker.reset();
+    // Clear accordion change markers
+    setAccordionChanges({
+      stats: false,
+      pipeline: false,
+      registers: false,
+      memory: false,
+      stdout: false,
+    });
+  }
+
+
+  const setCacheConfig = (config) => {
+    worker.setCacheConfig(config);
+  };
+
+  const openCode = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.asm,.txt,.s';
+    fileInput.onchange = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setCode(e.target.result);
+        };
+        reader.readAsText(file);
+      }
+    };
+    fileInput.click();
+  }
+
+  const loadCode = () => {
+    setStdout("");
+    worker.load(code);
+  };
+
+  const saveCode = () => {
+    const file = new Blob([code], { type: 'text/plain' });
+    const fileURL = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = fileURL;
+    link.download = 'code.s';
+    link.click();
+    URL.revokeObjectURL(fileURL);
+  };
+
   // A debounced version of syntaxCheck. Needed to not run props.onChange too often.
-  const debouncedSyntaxCheck = debounce((code) => sim.checkSyntax(code), 500);
+  const debouncedSyntaxCheck = debounce((code) => worker.checkSyntax(code), 500);
 
   const onCodeChange = (code) => {
     setCode(code);
     debouncedSyntaxCheck(code);
   };
 
+  const AccordionSummary = styled((props) => (
+    <MuiAccordionSummary
+      expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.8rem' }} />}
+      {...props}
+    />
+  ))(({ theme }) => ({
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, .05)'
+        : 'rgba(227, 245, 254, 1)',
+    flexDirection: 'row-reverse',
+    '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+      transform: 'rotate(180deg)',
+    },
+    '& .MuiAccordionSummary-content': {
+      marginLeft: theme.spacing(1),
+    },
+  }));
+
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
+  const theme = React.useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: prefersDarkMode ? 'dark' : 'light',
+        },
+      }),
+    [prefersDarkMode],
+  );
+
   return (
     <>
-      <Controls
-        onRunClick={runCode}
-        runEnabled={simulatorRunning && !executing}
-        onStepClick={stepCode}
-        stepEnabled={simulatorRunning && !executing}
-        onLoadClick={loadCode}
-        loadEnabled={isValidProgram}
-        onStopClick={() => {
-          setMustStop(true);
-        }}
-        stopEnabled={executing}
-        parsingErrors={parsingErrors}
-      />
-      <div id="widgetGrid">
-        <Code
-          onChangeValue={onCodeChange}
-          code={code}
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Header
+          onRunClick={clickRun}
+          runEnabled={simulatorRunning && !executing}
+          onStepClick={clickStep}
+          stepEnabled={simulatorRunning && !executing}
+          onLoadClick={loadCode}
+          loadEnabled={isValidProgram()}
+          onPauseClick={() => {
+            appInsights.trackEvent({name: "pause"})
+            setMustPause(true);
+          }}
+          pauseEnabled={executing}
+          onClearClick={clearCode}
+          onOpenClick={openCode}
+          onSaveClick={saveCode}
+          onStopClick={clickStop}
+          stopEnabled={simulatorRunning && !executing}
           parsingErrors={parsingErrors}
-          parsedInstructions={parsedInstructions}
-          pipeline={pipeline}
-          running={simulatorRunning}
+          version={worker.version}
+          status={status}
+          prefersDarkMode={prefersDarkMode}
         />
-        <Registers {...registers} />
-        <Memory memory={memory} />
-        <Statistics {...stats} />
-        <Pipeline pipeline={pipeline} />
-      </div>
-      <footer>EduMIPS64 Web version {sim.version}</footer>
+        <Grid container id="main-grid" disableEqualOverflow spacing={0}>
+          <Grid id="left-panel" size={8}>
+            <Code
+              onChangeValue={onCodeChange}
+              code={code}
+              parsingErrors={parsingErrors}
+              parsedInstructions={parsedInstructions}
+              pipeline={pipeline}
+              running={simulatorRunning}
+              viMode={viMode}
+              fontSize={fontSize}
+              validInstructions={initialState.validInstructions}
+            />
+          </Grid>
+          <Grid size={4} id="right-panel" disableEqualOverflow>
+            <ErrorList
+              parsingErrors={parsingErrors}
+              AccordionSummary={AccordionSummary}
+            />
+            <Accordion 
+              expanded={expandedAccordions.stats} 
+              onChange={handleAccordionChange('stats')} 
+              disableGutters
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Stats
+                  {accordionAlerts && accordionChanges.stats && <span className="accordion-change-indicator" />}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Statistics {...stats} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion 
+              expanded={expandedAccordions.pipeline} 
+              onChange={handleAccordionChange('pipeline')} 
+              disableGutters
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Pipeline
+                  {accordionAlerts && accordionChanges.pipeline && <span className="accordion-change-indicator" />}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Pipeline pipeline={pipeline} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion 
+              expanded={expandedAccordions.registers} 
+              onChange={handleAccordionChange('registers')} 
+              disableGutters
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Registers
+                  {accordionAlerts && accordionChanges.registers && <span className="accordion-change-indicator" />}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Registers {...registers} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion 
+              expanded={expandedAccordions.memory} 
+              onChange={handleAccordionChange('memory')} 
+              disableGutters
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} id="memory-accordion-summary">
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Memory
+                  {accordionAlerts && accordionChanges.memory && <span className="accordion-change-indicator" />}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Memory memory={memory} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion 
+              expanded={expandedAccordions.stdout} 
+              onChange={handleAccordionChange('stdout')} 
+              disableGutters
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Standard Output
+                  {accordionAlerts && accordionChanges.stdout && <span className="accordion-change-indicator" />}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <StdOut stdout={stdout} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion 
+              expanded={expandedAccordions.cache} 
+              onChange={handleAccordionChange('cache')} 
+              disableGutters
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: status === 'RUNNING' ? 'gray' : '#1976d2' }}>
+                  Cache Configuration
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <CacheConfig
+                  showTitle={false}
+                  onChange={setCacheConfig}
+                  status={status}
+                />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion 
+              expanded={expandedAccordions.settings} 
+              onChange={handleAccordionChange('settings')} 
+              disableGutters
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  General Settings
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Settings
+                  viMode={viMode}
+                  setViMode={setViMode}
+                  fontSize={fontSize}
+                  setFontSize={setFontSize}
+                  accordionAlerts={accordionAlerts}
+                  setAccordionAlerts={setAccordionAlerts}
+                  showTitle={false}
+                />
+              </AccordionDetails>
+            </Accordion>
+          </Grid>
+        </Grid>
+      </ThemeProvider>
     </>
   );
 };

@@ -1,8 +1,0 @@
-{
-  "extends": [
-    "config:base",
-    "schedule:weekly",
-    "group:allNonMajor"
-  ],
-  "stabilityDays": 7
-}

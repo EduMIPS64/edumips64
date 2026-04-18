@@ -76,7 +76,7 @@ public class Parser {
 
   private enum AliasRegister
   {zero, at, v0, v1, a0, a1, a2, a3, t0, t1, t2, t3, t4, t5, t6, t7, s0, s1, s2, s3, s4, s5, s6, s7, t8, t9, k0, k1, gp, sp, fp, ra}
-  private static final String deprecateInstruction[] = {"BNEZ", "BEQZ", "HALT", "DADDUI", "DMULU", "L.D", "S.D"};
+  private static final String deprecateInstruction[] = {"BNEZ", "BEQZ", "HALT", "DADDUI", "L.D", "S.D"};
 
   private ParserMultiException errors;
   /** Base basePath to use for further #include directives. */
@@ -159,7 +159,13 @@ public class Parser {
           end = data.length();
         }
 
-        int a = included.search(data.substring(i + 9, end).trim());
+        String filename = data.substring(i + 9, end).split(";") [0].trim();
+
+        if (!fileUtils.isAbsolute(filename)) {
+          filename = basePath + filename;
+        }
+
+        int a = included.search(filename);
 
         if (a != -1) {
           var error = new ParserMultiException();
@@ -167,14 +173,10 @@ public class Parser {
           throw error;
         }
 
-        String filename = data.substring(i + 9, end).split(";") [0].trim();
-
-        if (!fileUtils.isAbsolute(filename)) {
-          filename = basePath + filename;
-        }
-
         String filetmp = fileToString(filename);
+        included.push(filename);
         checkLoop(filetmp , included);
+        included.pop();
         i ++;
       }
     } while (i != -1);
@@ -235,7 +237,7 @@ public class Parser {
     LinkedList<VoidJump> voidJumps = new LinkedList<>();
 
     memoryCount = 0;
-    String lastLabel = "";
+    List<String> pendingLabels = new LinkedList<>();
 
     // --------------------------------------------
     // STAGE 1: PARSE THE SOURCE CODE, LINE BY LINE
@@ -243,7 +245,7 @@ public class Parser {
     code = code.replaceAll("\r\n", "\n");
     for (String line : code.split("\n")) {
       row++;
-      logger.info("-- Processing line " + row);
+      logger.info("-- Processing line " + row + ": ##" + line + "##");
 
       for (int column = 0; column < line.length(); column++) {
         if (line.charAt(column) == ';') {  //comments
@@ -272,6 +274,7 @@ public class Parser {
 
         try {
           if (line.charAt(column) == '.') {
+            // Processing directives starting with a dot.
             logger.info("Processing " + instr);
 
             if (instr.compareToIgnoreCase(".DATA") == 0) {
@@ -279,10 +282,10 @@ public class Parser {
             } else if (instr.compareToIgnoreCase(".TEXT") == 0 || instr.compareToIgnoreCase(".CODE") == 0) {
               section = FileSection.TEXT;
             } else {
-              String name = instr.substring(1);   // The name, without the dot.
-
+              // All valid directives except for .data, .code and .text
+              // can only be in the .data section. 
               if (section != FileSection.DATA) {
-                errors.addError(name.toUpperCase() + "INCODE", row, column + 1, line);
+                errors.addError("INVALID_DIRECTIVE_IN_CODE", row, column + 1, line);
                 column = line.length();
                 continue;
               }
@@ -480,7 +483,7 @@ public class Parser {
               }
             } else if (section == FileSection.TEXT) {
               logger.info("in .text section");
-              lastLabel = label;
+              pendingLabels.add(label);
             }
 
             logger.info("done");
@@ -511,7 +514,23 @@ public class Parser {
 
               // Parsing the instruction name to get the type of parameters to expect.
               ParsedInstructionMetadata meta = new ParsedInstructionMetadata(row, instrCount+4);
-              tmpInst = instructionBuilder.buildInstruction(line.substring(column, end).toUpperCase(), meta);
+              
+              // Special handling for DDIV: check parameter count to determine which variant to use
+              String instructionName = line.substring(column, end).toUpperCase();
+              if (instructionName.equals("DDIV") && line.length() > end + 1) {
+                // Count commas in the parameter string to determine if it's 2-param or 3-param form
+                String paramPart = line.substring(end + 1).split(";")[0].trim();
+                int commaCount = 0;
+                for (char c : paramPart.toCharArray()) {
+                  if (c == ',') commaCount++;
+                }
+                // If 2 commas, it's 3 parameters (rd, rs, rt), use DDIV3
+                if (commaCount == 2) {
+                  instructionName = "DDIV3";
+                }
+              }
+              
+              tmpInst = instructionBuilder.buildInstruction(instructionName, meta);
 
               if (tmpInst == null) {
                 errors.addError("INVALIDCODE", row, column + 1, line);
@@ -616,8 +635,19 @@ public class Parser {
                           errorMessage = "INVALIDIMMEDIATE";
                         }
                       }
+                      // when hexadecimal, the range 32768 to 65536 is actually the signed value will be between -32738 and -1
+                      // for example: 0xffff is not 65535, but -1
+                      if ( Converter.isHexNumber(paramValue) ) {
+                        if ( immediateValue >= 32768 && immediateValue<=65535) {
+                          immediateValue -= 65536;
+                        }
+                        else if (immediateValue>65535) {
+                          errorMessage = "IMMEDIATE_TOO_LARGE";
+                        }
+                      }
 
-                      if (errorMessage.isEmpty() && (immediateValue < -32768 || immediateValue > 32767)) {
+                      // after all parsing, the resulting value should not exceed the 16 bit signed range anyway
+                      if (errorMessage.isEmpty() && ( immediateValue< -32768 || immediateValue > 32767)) {
                         errorMessage = "IMMEDIATE_TOO_LARGE";
                         immediateValue = 0;
                       }
@@ -748,7 +778,7 @@ public class Parser {
                       syntaxIterator++; 
                     }
                   } else {
-                    if (syntax.charAt(syntaxIterator) != param.charAt(paramStart++)) {
+                    if (param.length() <= paramStart || (syntax.charAt(syntaxIterator) != param.charAt(paramStart++))) {
                       errors.addError("UNKNOWNSYNTAX", row, 1, line);
                       column = line.length();
                       tmpInst.getParams().add(0);
@@ -783,9 +813,9 @@ public class Parser {
 
               try {
                 mem.addInstruction(tmpInst, instrCount);
-                if (lastLabel != null && !lastLabel.equals("")) {
-                  logger.info("About to add label: " + lastLabel);
-                  symTab.setInstructionLabel(instrCount, lastLabel.toUpperCase());
+                for (String pendingLabel : pendingLabels) {
+                  logger.info("About to add label: " + pendingLabel);
+                  symTab.setInstructionLabel(instrCount, pendingLabel.toUpperCase());
                 }
               } catch (SymbolTableOverflowException ex) {
                 if (isFirstOutOfInstructionMemory) { //is first out of memory?
@@ -798,10 +828,10 @@ public class Parser {
                 errors.addError("SAMELABEL", row, 1, line);
                 column = line.length();
               }
-              // Il finally e' totalmente inutile, ma Ãš bello utilizzarlo per la
+              // Il finally e' totalmente inutile, ma è bello utilizzarlo per la
               // prima volta in un programma ;)
               finally {
-                lastLabel = "";
+                pendingLabels.clear();
               }
 
               end = line.length();
@@ -1016,6 +1046,7 @@ public class Parser {
    *  @param numBit
    *  @param name type of data
    */
+  @SuppressWarnings("null")   // tmpMem will never be null.
   private void writeIntegerInMemory(int row, int i, String line, String instr, int numBit, String name) throws MemoryElementNotFoundException {
     int posInWord = 0; //position of byte to write into a doubleword
     String value[] = instr.split(",");
@@ -1034,8 +1065,13 @@ public class Parser {
         continue;
       }
 
-      if (Converter.isHexNumber(val)) {
+      boolean is_hex = (Converter.isHexNumber(val));
+      if (is_hex) {
         try {
+          // handle the corner case of unlimited hex strings
+          if (numBit ==64 && is_hex && val.length()>18) {
+            throw new IrregularStringOfHexException();
+          }
           val = Converter.hexToLong(val);
         } catch (IrregularStringOfHexException e) {
           errors.addError("INVALIDVALUE", row, i + 1, line);
@@ -1048,9 +1084,15 @@ public class Parser {
         // Convert the integer to a long, and then check for overflow.
         long num = Long.parseLong(val);
 
-        if ((num < - (Converter.powLong(2, numBit - 1)) || num > (Converter.powLong(2, numBit - 1) - 1)) &&  numBit != 64) {
+        if (!is_hex && (num < - (Converter.powLong(2, numBit - 1)) || num > (Converter.powLong(2, numBit - 1) - 1)) &&  numBit != 64) {
           throw new NumberFormatException();
         }
+
+        // hex string values should be allowed independently of signed/unsigned interpretation
+        if (is_hex && (num > (Converter.powLong(2, numBit) - 1)) && numBit!=64) {
+          throw new NumberFormatException();
+        }
+
 
         if (numBit == 8) {
           tmpMem.writeByte((int) num, posInWord);

@@ -39,6 +39,7 @@ import elemental2.dom.MessageEvent;
 
 import jsinterop.base.Js;
 import jsinterop.base.JsPropertyMap;
+import org.edumips64.core.cache.CacheConfig;
 
 import java.util.logging.Logger;
 
@@ -68,21 +69,40 @@ public class Worker implements EntryPoint {
         info("Running worker method " + method);
         switch(method) {
           case "reset":
-            postMessage(simulator.reset());
+            postMessage(withMethod(simulator.reset(), method));
             break;
           case "step":
             int steps = data.getAsAny("steps").asInt();
             info("steps: " + steps);
-            postMessage(simulator.step(steps));
+            postMessage(withMethod(simulator.step(steps), method));
+            break;
+          case "setcacheconfig":
+            JsPropertyMap<Object> config = Js.cast(data.get("config"));
+            JsPropertyMap<Object> l1d = Js.cast(config.get("l1d"));
+            JsPropertyMap<Object> l1i = Js.cast(config.get("l1i"));
+
+            int l1dSize = ((Double) l1d.get("size")).intValue();
+            int l1dBlockSize = ((Double) l1d.get("blockSize")).intValue();
+            int l1dAssoc = ((Double) l1d.get("associativity")).intValue();
+            var l1d_config = new CacheConfig(l1dSize,l1dBlockSize,l1dAssoc);
+
+            int l1iSize = ((Double) l1i.get("size")).intValue();
+            int l1iBlockSize = ((Double) l1i.get("blockSize")).intValue();
+            int l1iAssoc = ((Double) l1i.get("associativity")).intValue();
+            var l1i_config = new CacheConfig(l1iSize,l1iBlockSize,l1iAssoc);
+
+            simulator.setCacheConfig(l1d_config,l1i_config);
+
+            postMessage(withMethod(simulator.resultFactory.Success(), method));
             break;
           case "load":
             String code = data.getAsAny("code").asString();
             Result parseResult = simulator.loadProgram(code);
             if (!parseResult.success) {
               DomGlobal.console.log(parseResult);
-              postMessage(parseResult);
+              postMessage(withMethod(parseResult, method));
             } else {
-              postMessage(simulator.step(1));
+              postMessage(withMethod(simulator.step(1), method));
             }
             break;
           case "checksyntax":
@@ -91,7 +111,9 @@ public class Worker implements EntryPoint {
             String codeString = data.getAsAny("code").asString();
             Result parsingSimulatorResult = parsingSimulator.loadProgram(codeString);
             if (parsingSimulatorResult.success) {
-              postMessage(simulator.resultFactory.Success());
+              Result finalResult = simulator.resultFactory.Success();
+              finalResult.parsingErrors = parsingSimulatorResult.parsingErrors;
+              postMessage(withMethod(finalResult, method));
               break;
             }
 
@@ -100,7 +122,7 @@ public class Worker implements EntryPoint {
             // parsing.
             Result finalResult = simulator.resultFactory.Failure(parsingSimulatorResult.errorMessage);
             finalResult.parsingErrors = parsingSimulatorResult.parsingErrors;
-            postMessage(finalResult);
+            postMessage(withMethod(finalResult, method));
             break;
           default:
             info("UNKNOWN METHOD: " + method);
@@ -111,6 +133,11 @@ public class Worker implements EntryPoint {
 
   private void postMessage(Object message) {
     DomGlobal.postMessage(message);
+  }
+
+  private Result withMethod(Result result, String method) {
+    result.method = method;
+    return result;
   }
 
   private void info(String message) {

@@ -198,7 +198,7 @@ usual, the strings containing the error message and the success message.
 In the .text section, we save the params_sys4 address to register r14, we save
 in the memory cells for the SYSCALL parameters the file descriptor (that we
 suppose to have in $s2) and the address from where we must take the bytes to
-weite.
+write.
 
 Next we can call SYSCALL 3, and then we call the print_string function
 passing as argument error_3 or ok_message, according to the success of the

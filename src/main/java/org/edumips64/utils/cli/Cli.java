@@ -1,10 +1,6 @@
 package org.edumips64.utils.cli;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.Dinero;
-import org.edumips64.core.IOManager;
-import org.edumips64.core.Memory;
-import org.edumips64.core.SymbolTable;
+import org.edumips64.core.*;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
@@ -12,6 +8,7 @@ import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.MetaInfo;
 import org.edumips64.utils.io.LocalFileUtils;
+import org.edumips64.utils.io.StdOutWriter;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
@@ -29,13 +26,19 @@ public class Cli implements Runnable {
     private CPU c;
     private SymbolTable symTab;
     private IOManager iom;
-    private Dinero dinero;
+    private CacheSimulator cachesim;
     private InstructionBuilder instructionBuilder;
     private Parser p;
     private final ConfigStore configStore;
+    private final boolean verbose;
 
     public Cli(ConfigStore cfg) {
+        this(cfg, false);
+    }
+
+    public Cli(ConfigStore cfg, boolean verbose) {
         this.configStore = cfg;
+        this.verbose = verbose;
         reset();
     }
 
@@ -50,8 +53,12 @@ public class Cli implements Runnable {
         c = new CPU(memory, this.configStore, new BUBBLE());
         symTab = new SymbolTable(memory);
         iom = new IOManager(new LocalFileUtils(), memory);
-        dinero = new Dinero();
-        instructionBuilder = new InstructionBuilder(memory, iom, c, dinero, this.configStore);
+
+        // Allow SYSCALL 5 to go to stdout.
+        iom.setStdOutput(new StdOutWriter());
+
+        cachesim = new CacheSimulator();
+        instructionBuilder = new InstructionBuilder(memory, iom, c, cachesim, this.configStore);
         p = new Parser(new LocalFileUtils(), symTab, memory, instructionBuilder);
         c.setStatus(CPU.CPUStatus.READY);
     }
@@ -83,8 +90,8 @@ public class Cli implements Runnable {
         return iom;
     }
 
-    public Dinero getDinero() {
-        return dinero;
+    public CacheSimulator getCacheSimulator() {
+        return cachesim;
     }
 
     public InstructionBuilder getInstructionBuilder() {
@@ -93,6 +100,10 @@ public class Cli implements Runnable {
 
     public Parser getParser() {
         return p;
+    }
+
+    public boolean isVerbose() {
+        return verbose;
     }
 
     public ConfigStore getConfigStore() {

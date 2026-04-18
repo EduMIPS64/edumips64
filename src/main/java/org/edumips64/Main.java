@@ -22,11 +22,7 @@
  */
 package org.edumips64;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.Dinero;
-import org.edumips64.core.IOManager;
-import org.edumips64.core.Memory;
-import org.edumips64.core.SymbolTable;
+import org.edumips64.core.*;
 import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
@@ -70,6 +66,8 @@ import java.io.IOException;
 
 import javax.swing.*;
 import javax.swing.event.*;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 
 /** Entry point of EduMIPS64
  * @author Andrea Spadaccini, Antonella Scandura, Vanni Rizzo
@@ -84,7 +82,7 @@ public class Main {
   private SymbolTable symTab;
   private Memory memory;
   private CycleBuilder builder;
-  private Dinero dinero;
+  private CacheSimulator cachesim;
   private GUIFrontend front;
   private ConfigStore configStore;
   private JFileChooser jfc;
@@ -102,9 +100,12 @@ public class Main {
   private JMenuItem manual;
   private JMenuItem settings;
   private JMenuItem stop;
+  private JMenuItem tile;
   private StatusBar sb;
   private JMenu file, lastfiles, exec, config, window, help, lang, tools;
-  private JCheckBoxMenuItem lang_en, lang_it;
+  private JCheckBoxMenuItem lang_en;
+  private JCheckBoxMenuItem lang_it;
+  private JCheckBoxMenuItem lang_zhcn;
   private JCheckBoxMenuItem pipelineJCB, registersJCB, memoryJCB, codeJCB, cyclesJCB, statsJCB, ioJCB;
 
   private GUIIO ioFrame;
@@ -145,11 +146,15 @@ public class Main {
 
     // Configure logger format.
     System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tm%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
-    Main.showVersion();
 
     if (cliArgs.isHeadless()) {
+      // Only show version in verbose mode for CLI
+      if (cliArgs.isVerbose()) {
+        Main.showVersion();
+      }
       startCli(mm.configStore, cliArgs);
     } else {
+      Main.showVersion();
       checkAndStartGui(mm, cliArgs);
     }
   }
@@ -159,6 +164,22 @@ public class Main {
       log.log(Level.SEVERE, CurrentLocale.getString("LOG.HEADLESS_MSG"));
       System.exit(1);
     }
+
+    // Use a more modern look and feel.
+    // Note that if the JAR is not available to the class loader then the whole application will not start,
+    // we won't be able to recover.
+    try {
+      if(mm.configStore.getBoolean(ConfigKey.UI_DARK_THEME)){
+        UIManager.setLookAndFeel( new FlatDarkLaf() );
+      } else{
+        UIManager.setLookAndFeel( new FlatLightLaf() );
+      }
+    } catch( Exception ex ) {
+      log.log(Level.SEVERE, "Could not initialize FlatLaF Swing look & feel. Reverting to Swing default.");
+    } catch( NoClassDefFoundError err ) {
+      log.log(Level.SEVERE, "Could not initialize FlatLaF Swing look & feel. Reverting to Swing default.");
+    }
+
     SplashScreen s = new SplashScreen();
     s.showSplash();
 
@@ -273,20 +294,20 @@ public class Main {
 
     symTab = new SymbolTable(memory);
     iom = new IOManager(lfu, memory);
-    dinero = new Dinero();
-    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, dinero, configStore);
+    cachesim = new CacheSimulator();
+    InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, cachesim, configStore);
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
 
     builder = new CycleBuilder(cpu);
     sb = new StatusBar(configStore);
-    front = new GUIFrontend(cpu, memory, configStore, builder, sb);
+    front = new GUIFrontend(cpu, memory, cachesim, configStore, builder, sb);
 
     cpu.setCpuStatusChangeCallback(sb::setCpuStatusText);
 
     UIManager.put("InternalFrame.titleFont", getScaledFont((Font)UIManager.get("InternalFrame.titleFont")));
 
     // Internal Frames
-    JInternalFrame pipeFrame = new JInternalFrame("Pipeline", true, false, true, true);
+    JInternalFrame pipeFrame = new JInternalFrame(CurrentLocale.getString("PIPELINE"), true, false, true, true);
     pipeFrame.addInternalFrameListener(new InternalFrameAdapter() {
       public void internalFrameIconified(InternalFrameEvent e) {
         pipelineJCB.setState(false);
@@ -486,7 +507,7 @@ public class Main {
     log.info("Trying to open " + file);
     cpu.reset();
     symTab.reset();
-    dinero.reset();
+    cachesim.reset();
     try {
       // Update GUI components
       front.updateComponents();
@@ -507,7 +528,7 @@ public class Main {
         if (pmwe.hasErrors()) {
           throw pmwe;
         }
-        new ErrorDialog(mainFrame, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
+        new ErrorDialog(mainFrame, pmwe.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS), configStore);
       } catch (NullPointerException e) {
         log.info("NullPointerException: " + e.toString());
         log.log(Level.SEVERE, "Could not parse " + file, e);
@@ -518,7 +539,7 @@ public class Main {
       log.info("After parsing");
 
       // The file has correctly been parsed
-      dinero.setDataOffset(memory.getInstructionsNumber() * 4);
+      cachesim.setDataOffset(memory.getInstructionsNumber() * 4);
       cpu.setStatus(CPU.CPUStatus.RUNNING);
       log.info("Set the status to RUNNING");
 
@@ -542,7 +563,7 @@ public class Main {
       mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM") + " - " + nome_file);
     } catch (ParserMultiException ex) {
       log.info("Error opening " + file);
-      new ErrorDialog(mainFrame, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS));
+      new ErrorDialog(mainFrame, ex.getExceptionList(), CurrentLocale.getString("GUI_PARSER_ERROR"), configStore.getBoolean(ConfigKey.WARNINGS), configStore);
       openedFile = null;
       mainFrame.setTitle("EduMIPS64 v. " + MetaInfo.VERSION + " - " + CurrentLocale.getString("PROSIM"));
       resetSimulator(false);
@@ -645,7 +666,7 @@ public class Main {
   private void resetSimulator(boolean reopenFile) {
     cpu.reset();
     symTab.reset();
-    dinero.reset();
+    cachesim.reset();
     builder.reset();
 
     try {
@@ -685,12 +706,14 @@ public class Main {
     setMenuItem(multi_cycle, "MenuItem.MULTI_CYCLE");
     setMenuItem(lang_en, "MenuItem.ENGLISH");
     setMenuItem(lang_it, "MenuItem.ITALIAN");
+    setMenuItem(lang_zhcn, "MenuItem.SIMPLIFIED_CHINESE");
     setMenuItem(dinero_tracefile, "MenuItem.DIN_TRACEFILE");
     setMenuItem(aboutUs, "MenuItem.ABOUT_US");
     setMenuItem(dinFrontend, "MenuItem.DIN_FRONTEND");
     setMenuItem(manual, "MenuItem.MANUAL");
     setMenuItem(settings, "Config.ITEM");
     setMenuItem(stop, "MenuItem.STOP");
+    setMenuItem(tile, "MenuItem.TILE");
     setMenuItem(pipelineJCB, "PIPELINE");
     setMenuItem(codeJCB, "CODE");
     setMenuItem(cyclesJCB, "CYCLES");
@@ -733,7 +756,7 @@ public class Main {
     run_to = new JMenuItem();
     multi_cycle = new JMenuItem();
     stop = new JMenuItem();
-    JMenuItem tile;
+    tile = new JMenuItem();
     dinFrontend = new JMenuItem();
     manual = new JMenuItem();
     settings = new JMenuItem();
@@ -799,7 +822,7 @@ public class Main {
 
         try {
           LocalWriter w = new LocalWriter(filename, false);
-          dinero.writeTraceData(w);
+          cachesim.writeTraceData(w);
           w.close();
           log.info("Wrote dinero tracefile");
         } catch (Exception ex) {
@@ -885,6 +908,7 @@ public class Main {
     lang_en.addActionListener(e -> {
       lang_en.setState(true);
       lang_it.setState(false);
+      lang_zhcn.setState(false);
       configStore.putString(ConfigKey.LANGUAGE, "en");
       initMenuItems();
       setFrameTitles();
@@ -906,7 +930,30 @@ public class Main {
     lang_it.addActionListener(e -> {
       lang_it.setState(true);
       lang_en.setState(false);
+      lang_zhcn.setState(false);
       configStore.putString(ConfigKey.LANGUAGE, "it");
+      initMenuItems();
+      setFrameTitles();
+      front.updateLanguageStrings();
+      // mainFrame.setVisible(true);
+    });
+
+    try {
+      lang_zhcn = new JCheckBoxMenuItem(
+        CurrentLocale.getString("MenuItem.SIMPLIFIED_CHINESE"),
+        new ImageIcon(IMGLoader.getImage("zhcn.png")),
+        configStore.getString(ConfigKey.LANGUAGE).equals("zhcn"));
+
+      lang.add(lang_zhcn);
+    } catch (IOException e) {
+      log.log(Level.SEVERE, "Could not create simplified chinese language checkbox.", e);
+    }
+
+    lang_zhcn.addActionListener(e -> {
+      lang_zhcn.setState(true);
+      lang_en.setState(false);
+      lang_it.setState(false);
+      configStore.putString(ConfigKey.LANGUAGE, "zhcn");
       initMenuItems();
       setFrameTitles();
       front.updateLanguageStrings();
@@ -938,7 +985,7 @@ public class Main {
     // ---------------- TOOLS MENU
     dinFrontend.setEnabled(false);
     dinFrontend.addActionListener(e -> {
-      JDialog dinFrame = new DineroFrontend(mainFrame, dinero, configStore);
+      JDialog dinFrame = new DineroFrontend(mainFrame, cachesim, configStore);
       dinFrame.setModal(true);
       dinFrame.setVisible(true);
     });
@@ -946,7 +993,6 @@ public class Main {
 
     // ---------------- WINDOW MENU
     //
-    tile = new JMenuItem("Tile");
     tile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK));
     tile.addActionListener(e -> tileWindows());
     window.add(tile);

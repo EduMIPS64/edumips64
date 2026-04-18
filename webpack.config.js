@@ -9,9 +9,20 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 const outputPath = path.resolve(__dirname, 'build/gwt/war/edumips64');
 const staticPath = path.resolve(__dirname, 'src/webapp/static');
+const docsPath = path.resolve(__dirname, 'build/docs');
 
 const copyPlugin = new CopyPlugin({
-  patterns: [{ from: staticPath, to: outputPath }],
+  patterns: [
+    { from: staticPath, to: outputPath },
+    { 
+      from: docsPath, 
+      to: path.join(outputPath, 'docs'),
+      globOptions: {
+        ignore: ['**/doctrees/**', '**/.buildinfo', '**/objects.inv', '**/_sources/**']
+      },
+      noErrorOnMissing: true
+    }
+  ],
 });
 const grPlugin = new GitRevisionPlugin();
 const versionsPlugin = new webpack.DefinePlugin({

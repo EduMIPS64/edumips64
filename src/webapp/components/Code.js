@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import { initVimMode } from 'monaco-vim';
 
+// new
 import MonacoEditor from 'react-monaco-editor';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import * as monacoEditor from 'monaco-editor';
+
+// Global MIPS language definition for the Monaco editor.
+monacoEditor.languages.register({ id: 'mips' });
 
 const Code = (props) => {
+
   const [monaco, setMonaco] = useState(null);
   const [editor, setEditor] = useState(null);
-
+  const [vimInstance, setVimInstance] = useState(null); // new state for Vim instance
   // IDisposable to clean up the hover provider.
   const [hoverDisposable, setHoverCleanup] = useState(null);
 
@@ -14,6 +22,24 @@ const Code = (props) => {
 
   // Maps line of code to CPU stage.
   const [stageMap, setStageMap] = useState(new Map());
+
+  // Dynamically build the syntax highlighting regex for instructions.
+  var instructionRegex = new RegExp(`\\b(${props.validInstructions})\\b`)
+  monacoEditor.languages.setMonarchTokensProvider('mips', {
+    tokenizer: {
+      root: [
+        [/^[ \t]*[a-zA-Z_][\w]*:/, 'type.identifier'], // label
+        [instructionRegex, 'keyword'],
+        [/\.[a-zA-Z_][\w]*/, 'strong'], // directives
+        [/[#,]/, 'delimiter'],
+        [/\br(?:\d{1,2})\b/, 'string'],
+        [/\d+/, 'number'],
+        [/".*?"/, 'regexp'],
+        [/;.*/, 'comment'],
+        [/[a-zA-Z_][\w]*/, 'identifier'],
+      ]
+    }
+  });
 
   useEffect(() => {
     if (!monaco) {
@@ -33,93 +59,93 @@ const Code = (props) => {
         options: { isWholeLine: true, className },
       };
     };
-    if (props.pipeline.IF) {
+    if (props.pipeline.IF && props.pipeline.IF.Line) {
       newDecorations.push(createDecoration(props.pipeline.IF, 'stageIf'));
       newStageMap.set(props.pipeline.IF.Line, 'Instruction Fetch (IF)');
     }
-    if (props.pipeline.ID) {
+    if (props.pipeline.ID && props.pipeline.ID.Line) {
       newDecorations.push(createDecoration(props.pipeline.ID, 'stageId'));
       newStageMap.set(props.pipeline.ID.Line, 'Instruction Decode (ID)');
     }
-    if (props.pipeline.EX) {
+    if (props.pipeline.EX && props.pipeline.EX.Line) {
       newDecorations.push(createDecoration(props.pipeline.EX, 'stageEx'));
       newStageMap.set(props.pipeline.EX.Line, 'Execute (EX)');
     }
-    if (props.pipeline.MEM) {
+    if (props.pipeline.MEM && props.pipeline.MEM.Line) {
       newDecorations.push(createDecoration(props.pipeline.MEM, 'stageMem'));
       newStageMap.set(props.pipeline.MEM.Line, 'Memory Access (MEM)');
     }
-    if (props.pipeline.WB) {
+    if (props.pipeline.WB && props.pipeline.WB.Line) {
       newDecorations.push(createDecoration(props.pipeline.WB, 'stageWb'));
       newStageMap.set(props.pipeline.WB.Line, 'Write Back (WB)');
     }
-    if (props.pipeline.FPDivider) {
+    if (props.pipeline.FPDivider && props.pipeline.FPDivider.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPDivider, 'stageFPDivider'),
       );
       newStageMap.set(props.pipeline.FPDivider.Line, 'FPU Divider');
     }
-    if (props.pipeline.FPAdder1) {
+    if (props.pipeline.FPAdder1 && props.pipeline.FPAdder1.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPAdder1, 'stageFPAdder'),
       );
       newStageMap.set(props.pipeline.FPAdder1.Line, 'FPU Adder (1)');
     }
-    if (props.pipeline.FPAdder2) {
+    if (props.pipeline.FPAdder2 && props.pipeline.FPAdder2.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPAdder2, 'stageFPAdder'),
       );
       newStageMap.set(props.pipeline.FPAdder2.Line, 'FPU Adder (2)');
     }
-    if (props.pipeline.FPAdder3) {
+    if (props.pipeline.FPAdder3 && props.pipeline.FPAdder3.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPAdder3, 'stageFPAdder'),
       );
       newStageMap.set(props.pipeline.FPAdder3.Line, 'FPU Adder (3)');
     }
-    if (props.pipeline.FPAdder4) {
+    if (props.pipeline.FPAdder4 && props.pipeline.FPAdder4.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPAdder4, 'stageFPAdder'),
       );
       newStageMap.set(props.pipeline.FPAdder4.Line, 'FPU Adder (4)');
     }
-    if (props.pipeline.FPMultiplier1) {
+    if (props.pipeline.FPMultiplier1 && props.pipeline.FPMultiplier1.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier1, 'stageFPMultiplier'),
       );
       newStageMap.set(props.pipeline.FPMultiplier1.Line, 'FPU Muliplier (1)');
     }
-    if (props.pipeline.FPMultiplier2) {
+    if (props.pipeline.FPMultiplier2 && props.pipeline.FPMultiplier2.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier2, 'stageFPMultiplier'),
       );
       newStageMap.set(props.pipeline.FPMultiplier2.Line, 'FPU Muliplier (2)');
     }
-    if (props.pipeline.FPMultiplier3) {
+    if (props.pipeline.FPMultiplier3 && props.pipeline.FPMultiplier3.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier3, 'stageFPMultiplier'),
       );
       newStageMap.set(props.pipeline.FPMultiplier3.Line, 'FPU Muliplier (3)');
     }
-    if (props.pipeline.FPMultiplier4) {
+    if (props.pipeline.FPMultiplier4 && props.pipeline.FPMultiplier4.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier4, 'stageFPMultiplier'),
       );
       newStageMap.set(props.pipeline.FPMultiplier4.Line, 'FPU Muliplier (4)');
     }
-    if (props.pipeline.FPMultiplier5) {
+    if (props.pipeline.FPMultiplier5 && props.pipeline.FPMultiplier5.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier5, 'stageFPMultiplier'),
       );
       newStageMap.set(props.pipeline.FPMultiplier5.Line, 'FPU Muliplier (5)');
     }
-    if (props.pipeline.FPMultiplier6) {
+    if (props.pipeline.FPMultiplier6 && props.pipeline.FPMultiplier6.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier6, 'stageFPMultiplier'),
       );
       newStageMap.set(props.pipeline.FPMultiplier6.Line, 'FPU Muliplier (6)');
     }
-    if (props.pipeline.FPMultiplier7) {
+    if (props.pipeline.FPMultiplier7 && props.pipeline.FPMultiplier7.Line) {
       newDecorations.push(
         createDecoration(props.pipeline.FPMultiplier7, 'stageFPMultiplier'),
       );
@@ -185,26 +211,77 @@ const Code = (props) => {
       },
     });
     setHoverCleanup(disposable);
-  }, [props.parsedInstructions, stageMap, monaco]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [props.parsedInstructions, stageMap, monaco]); // eslint-disable-line @eslint-react/exhaustive-deps
+
+  const saveCodeToFile = () => {
+    const blob = new Blob([props.code], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'code.s';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const loadCodeFromFile = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      props.onChangeValue(e.target.result);
+    };
+    reader.readAsText(file);
+  };
 
   const editorDidMount = (editor, monaco) => {
+    // Expose monaco and editor to window for testing purposes
+    window.monaco = monaco;
+    window.editor = editor;
+    
     setMonaco(monaco);
     setEditor(editor);
+
+    // Enable Vi mode if viMode prop is true
+    if (props.viMode) {
+      const vim = initVimMode(editor);
+      setVimInstance(vim);
+    }
+
+    // Ensure the required command is registered
+    editor.addAction({
+      id: "editor.action.insertLineAfter",
+      label: "Insert Line After",
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
+      run: function (ed) {
+        ed.trigger("keyboard", "type", { text: "\n" });
+      },
+    });
   };
+
+  // Hook to dynamically toggle Vi mode when viMode prop changes
+  useEffect(() => {
+    if (!editor) return;
+    if (props.viMode) {
+      const vim = initVimMode(editor);
+      setVimInstance(vim);
+    } else if (vimInstance) {
+      vimInstance.dispose();
+      setVimInstance(null);
+    }
+  }, [props.viMode]);
 
   const options = {
     selectOnLineNumbers: true,
     roundedSelection: false,
-    readOnly: false,
+    readOnly: props.running,
     cursorStyle: 'line',
     codelens: false,
     minimap: { enabled: false },
     tabsize: 4,
     lineNumbersMinChars: 3,
-
-    // Note: the documentation mentions this might have a negative performance
-    // impact.
     automaticLayout: true,
+    fontSize: props.fontSize,  // Set font size from props
   };
 
   // Hook to compute and set markers for warnings and errors.
@@ -222,34 +299,43 @@ const Code = (props) => {
 
     console.log('Parsing errors', props.parsingErrors);
     const lines = editor.getValue().split('\n');
-    const markers = props.parsingErrors.map((err) => {
-      const line = lines[err.row - 1];
-      // First non-space character.
-      const startColumn = line.search(/\S/) + 1;
-      return {
-        startLineNumber: err.row,
-        endLineNumber: err.row,
-        startColumn: startColumn,
-        endColumn: line.length + 1,
-        message: `${err.description}`,
-        severity: err.isWarning ? 4 : 8,
-        source: 'EduMIPS64',
-      };
-    });
+    const markers = props.parsingErrors
+      .filter((err) => {
+        // Skip errors for lines that no longer exist in the editor
+        // (can happen due to race conditions during rapid editing)
+        return err.row >= 1 && err.row <= lines.length;
+      })
+      .map((err) => {
+        const line = lines[err.row - 1];
+        // First non-space character (or column 1 if line is empty/whitespace)
+        const startColumn = Math.max(line.search(/\S/) + 1, 1);
+        return {
+          startLineNumber: err.row,
+          endLineNumber: err.row,
+          startColumn: startColumn,
+          endColumn: line.length + 1,
+          message: `${err.description}`,
+          severity: err.isWarning ? 4 : 8,
+          source: 'EduMIPS64',
+        };
+      });
     console.log('Markers', markers);
 
     monaco.editor.setModelMarkers(model, 'EduMIPS64', markers);
   }, [props.parsingErrors, editor, monaco]);
 
+  // Set the dark theme if necessary
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
   return (
-    <MonacoEditor
-      language="mips"
-      value={props.code}
-      options={options}
-      onChange={props.onChangeValue}
-      theme="vs-light"
-      editorDidMount={editorDidMount}
-    />
+        <MonacoEditor
+            language="mips"
+            value={props.code}
+            options={options}
+            onChange={props.onChangeValue}
+            theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
+            editorDidMount={editorDidMount}
+        />
   );
 };
 

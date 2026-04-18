@@ -41,7 +41,7 @@ public class Memory {
 
   /** Instruction offset limits in bytes */
   public static final int MAX_OFFSET_BYTES = 32768;  // 2^15
-  public static final int MIN_OFFSET_BYTES = -32767; // -2^15 - 1
+  public static final int MIN_OFFSET_BYTES = -32767; // -(2^15) + 1
 
   // Data structures for the data and code memory. In both maps, the key is represented by the index of the element.
   // The index is derived by taking the address of the given element and dividing it by its width (8 for the memory,
@@ -60,6 +60,14 @@ public class Memory {
     cells = new TreeMap<>();
     instructions = new TreeMap<>();
     logger.info("Memory built: " + this.hashCode());
+  }
+
+  public SortedMap<Integer, MemoryElement> getCells() {
+    return cells;
+  }
+
+  public SortedMap<Integer, InstructionInterface> getInstructions() {
+    return instructions;
   }
 
   /** Gets the number of instructions of the Symbol Table.

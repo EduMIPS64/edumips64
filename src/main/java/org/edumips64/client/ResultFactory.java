@@ -1,8 +1,8 @@
 /* ResultFactory.java
  *
  * A factory class to generate Result objects.
- * Injects a representation of the CPU status in every Result object that's created. 
- * 
+ * Injects a representation of the CPU status in every Result object that's created.
+ *
  * (c) 2020 Andrea Spadaccini
  *
  * This file is part of the EduMIPS64 project, and is released under the GNU
@@ -30,13 +30,16 @@ import java.util.logging.Logger;
 import com.google.gwt.json.client.JSONArray;
 
 import org.edumips64.core.CPU;
+import org.edumips64.core.IrregularStringOfBitsException;
 import org.edumips64.core.Memory;
 import org.edumips64.core.Register;
 import org.edumips64.core.CPU.CPUStatus;
 import org.edumips64.core.Pipeline.Stage;
+import org.edumips64.core.CacheSimulator;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.parser.ParserMultiException;
+import org.edumips64.utils.io.StringWriter;
 
 import elemental2.core.JsArray;
 import jsinterop.base.Js;
@@ -44,7 +47,9 @@ import jsinterop.base.Js;
 public class ResultFactory {
     private CPU cpu;
     private Memory memory;
+    private CacheSimulator cachesim;
     private Logger logger = Logger.getLogger("ResultFactory");
+    private StringWriter stdout;
 
     static String FromCpuStatus(CPUStatus s) {
         switch (s) {
@@ -58,22 +63,25 @@ public class ResultFactory {
         }
     }
 
-    public ResultFactory(CPU cpu, Memory memory) {
+    public ResultFactory(CPU cpu, Memory memory, CacheSimulator cachesim, StringWriter stdout) {
         this.cpu = cpu;
         this.memory = memory;
+        this.stdout = stdout;
+        this.cachesim = cachesim;
     }
 
     public Result Success() {
-        Result r = new Result(true, "");
+        Result r = new Result(true, "", stdout.toString());
         return AddParsedInstructions(AddCpuInfo(r));
     }
 
     public Result Failure(String errorMessage) {
-        Result r = new Result(false, errorMessage);
+        Result r = new Result(false, errorMessage, stdout.toString());
         return AddParsedInstructions(AddCpuInfo(r));
     }
 
     public static Result AddParserErrors(Result result, ParserMultiException e) {
+        if (e == null) return result;
         result.parsingErrors = Js.cast(e.getExceptionList().stream()
             .map(exception -> ParserErrorFactory.FromParserException(exception)).toArray(ParserError[]::new));
         return result;
@@ -94,11 +102,73 @@ public class ResultFactory {
         r.memory = getMemory();
         r.registers = getRegisters();
         r.statistics = getStatistics();
+        r.cachestats = getCacheStats();
         return r;
     }
 
+    private String getCacheStats() {
+        var cachestatsJson = new FluentJsonObject();
+
+        try {
+            var L1I_cache = cachesim.getL1InstructionCache();
+            var L1D_cache = cachesim.getL1DataCache();
+
+            JSONArray l1i_jsonArray = new JSONArray();
+            JSONArray l1d_jsonArray = new JSONArray();
+            l1i_jsonArray.set(0,new FluentJsonObject().put("reads", L1I_cache.getStats().getReadAccesses()).toJsonObject());
+            l1d_jsonArray.set(0,new FluentJsonObject().put("reads", L1D_cache.getStats().getReadAccesses()).toJsonObject());
+            cachestatsJson.put("L1I",l1i_jsonArray);
+            cachestatsJson.put("L1D",l1d_jsonArray);
+
+        } catch (Exception e) {
+            logger.warning("Error fetching cache: " + e.toString());
+        }
+        return cachestatsJson.toString();
+    }
+
     private String getMemory() {
-        return memory.toString();
+        var memoryJson = new FluentJsonObject();
+        try {
+            var cells = memory.getCells();
+            var instructions = memory.getInstructions();
+
+            JSONArray cellArray = new JSONArray();
+            cells.forEach((address, element) -> {
+                try {
+                    cellArray.set(cellArray.size(), new FluentJsonObject()
+                            .put("address_hex", element.getAddressHex())
+                            .put("address", element.getAddress())
+                            .put("value", element.getValue())
+                            .put("value_hex", element.getHexString())
+                            .put("label", element.getLabel())
+                            .put("code", element.getCode())
+                            .put("comment",element.getComment())
+                            .toJsonObject());
+                } catch (IrregularStringOfBitsException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            memoryJson.put("cells", cellArray);
+
+            JSONArray instructionArray = new JSONArray();
+
+            for (var instruction: instructions.values()) {
+                String label = instruction.getLabel();
+                String comment = instruction.getComment();
+                instructionArray.set(instructionArray.size(), new FluentJsonObject()
+                        .put("address", instruction.getParsingMetadata().address)
+                        .put("value",instruction.getRepr().getHexString())
+                        .put("label", label != null ? label : "")
+                        .put("code",instruction.getFullName())
+                        .put("comment", comment != null ? comment : "")
+                        .toJsonObject());
+            }
+
+            memoryJson.put("instructions", instructionArray);
+        } catch (Exception e) {
+            logger.warning("Error fetching memory: " + e.toString());
+        }
+        return memoryJson.toString();
     }
 
     private String getRegisters() {
@@ -127,7 +197,7 @@ public class ResultFactory {
                 new FluentJsonObject()
                     .put("name", r.getName())
                     .put("hexString", r.getHexString())
-                    .put("value", r.getValue())
+                    .put("value", r.getFPDoubleValueAsString())
                     .toJsonObject());
             }
             registers.put("fpu", jsonFpuRegisters);
@@ -160,6 +230,7 @@ public class ResultFactory {
     }
 
     private String getStatistics() {
+
         return new FluentJsonObject()
             // Execution
             .put("cycles", cpu.getCycles())
@@ -169,6 +240,12 @@ public class ResultFactory {
             .put("wawStalls", cpu.getWAWStalls())
             .put("dividerStalls", cpu.getStructuralStallsDivider())
             .put("memoryStalls", cpu.getStructuralStallsMemory())
+                .put("L1I_reads", cachesim.getL1InstructionCache().getStats().getReadAccesses())
+                .put("L1I_misses", cachesim.getL1InstructionCache().getStats().getReadMisses())
+                .put("L1D_reads", cachesim.getL1DataCache().getStats().getReadAccesses())
+                .put("L1D_reads_misses", cachesim.getL1DataCache().getStats().getReadMisses())
+                .put("L1D_writes", cachesim.getL1DataCache().getStats().getWriteAccesses())
+                .put("L1D_writes_misses", cachesim.getL1DataCache().getStats().getWriteMisses())
             // Code size
             .put("codeSizeBytes",memory.getInstructionsNumber() * 4)
             // FPU Control Status Register (FCSR)

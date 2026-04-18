@@ -34,10 +34,13 @@ import org.edumips64.utils.ConfigStore;
 import java.awt.*;
 import javax.swing.*;
 
-/** This class draws the cycles component. It gives a representation of the timing
-* behaviour of the pipeline.
-* @author Filippo Mondello, Massimo Trubia (FPU modifications)
-*/
+/**
+ * This class draws the cycles component. It gives a representation of the
+ * timing
+ * behaviour of the pipeline.
+ * 
+ * @author Filippo Mondello, Massimo Trubia (FPU modifications)
+ */
 public class GUICycles extends GUIComponent {
   private static final int DY = 15;
   private static final int DX = 35;
@@ -52,9 +55,12 @@ public class GUICycles extends GUIComponent {
   private JSplitPane splitPane;
   private CycleBuilder builder;
 
-  GUICycles(CPU cpu, Memory memory, ConfigStore config, CycleBuilder builder) {
+  private GUITheme theme;
+
+  GUICycles(CPU cpu, Memory memory, ConfigStore config, CycleBuilder builder, GUITheme guiTheme) {
     super(cpu, memory, config);
     this.builder = builder;
+    this.theme = guiTheme;
 
     // Initialize the left panel (list of instructions).
     instructionPanel = new InstructionPanel();
@@ -77,10 +83,12 @@ public class GUICycles extends GUIComponent {
     splitPane.setOneTouchExpandable(true);
     splitPane.setDividerLocation(150);
 
-    // Reset the component's font. This window has a different font type and is slightly smaller than the rest of the UI.
+    // Reset the component's font. This window has a different font type and is
+    // slightly smaller than the rest of the UI.
     this.font = new Font("SansSerif", Font.PLAIN, font.getSize() - 1);
 
-    // This component has a scaling factor of 11, since the original numbers were derived with a font size of 11.
+    // This component has a scaling factor of 11, since the original numbers were
+    // derived with a font size of 11.
     this.scalingDenominator = 11.0f;
   }
 
@@ -125,12 +133,15 @@ public class GUICycles extends GUIComponent {
 
     @Override
     public synchronized void paint(Graphics g) {
-      super.paint(g);
-      setBackground(Color.white);
-      g.setColor(Color.black);
-      g.setFont(font);
+      Graphics2D g2d = (Graphics2D) g;
+      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+      super.paint(g2d);
+      setBackground(theme.getBackgroundColor());
+      g2d.setColor(theme.getTextColor());
 
-      fill(g);
+      g2d.setFont(font);
+
+      fill(g2d);
     }
 
     private boolean shouldDraw(CycleElement el, int row, Rectangle clipBounds) {
@@ -143,13 +154,13 @@ public class GUICycles extends GUIComponent {
       return clipBounds.intersects(elRectangle);
     }
 
-    synchronized void fill(Graphics g) {
+    synchronized void fill(Graphics2D g) {
       int row = 0;
 
       Rectangle clipBounds = g.getClipBounds();
 
       java.util.List<CycleElement> elements = builder.getElementsList();
-      synchronized(elements) {
+      synchronized (elements) {
         for (CycleElement el : elements) {
           if (!el.shouldRender()) {
             continue;
@@ -174,15 +185,15 @@ public class GUICycles extends GUIComponent {
             int width = scale(DX);
             int height = scale(DY - 2);
 
-            // Draw the colored rectangle and a black outline.
+            // Draw the colored rectangle and a outline.
             g.fillRect(x, y, width, height);
-            g.setColor(Color.black);
+            g.setColor(theme.getTextColor());
             g.drawRect(x, y, width, height);
 
             // Write the stage name.
             int fontXOffset = scale(1);
             int fontYOffset = scale(11);
-            g.drawString(st, x+fontXOffset, y+fontYOffset);
+            g.drawString(st, x + fontXOffset, y + fontYOffset);
             column++;
 
             if ((!st.equals(" ")) && (!st.equals("RAW"))) {
@@ -196,33 +207,35 @@ public class GUICycles extends GUIComponent {
 
     private Color getColorByState(String st, String pre) {
       if (st.equals("IF")) {
-        return new Color(config.getInt(ConfigKey.IF_COLOR));
+        return theme.getColor(ConfigKey.IF_COLOR);
       } else if (st.equals("ID")) {
-        return new Color(config.getInt(ConfigKey.ID_COLOR));
+        return theme.getColor(ConfigKey.ID_COLOR);
       } else if (st.equals("EX")) {
-        return new Color(config.getInt(ConfigKey.EX_COLOR));
+        return theme.getColor(ConfigKey.EX_COLOR);
       } else if (st.equals("MEM")) {
-        return new Color(config.getInt(ConfigKey.MEM_COLOR));
+        return theme.getColor(ConfigKey.MEM_COLOR);
       } else if (st.equals("WB")) {
-        return new Color(config.getInt(ConfigKey.WB_COLOR));
+        return theme.getColor(ConfigKey.WB_COLOR);
       } else if (st.equals("Str")) {
-        return new Color(config.getInt(ConfigKey.EX_COLOR));
+        return theme.getColor(ConfigKey.EX_COLOR);
       } else if (st.equals("A1") || st.equals("A2") || st.equals("A3") || st.equals("A4") || st.equals("StAdd")) {
-        return new Color(config.getInt(ConfigKey.FP_ADDER_COLOR));
-      } else if (st.equals("M1") || st.equals("M2") || st.equals("M3") || st.equals("M4") || st.equals("M5") || st.equals("M6") || st.equals("M7") || st.equals("StMul")) {
-        return new Color(config.getInt(ConfigKey.FP_MULTIPLIER_COLOR));
+        return theme.getColor(ConfigKey.FP_ADDER_COLOR);
+      } else if (st.equals("M1") || st.equals("M2") || st.equals("M3") || st.equals("M4") || st.equals("M5")
+          || st.equals("M6") || st.equals("M7") || st.equals("StMul")) {
+        return theme.getColor(ConfigKey.FP_MULTIPLIER_COLOR);
       } else if (st.matches("D[0-2][0-9]") || st.matches("DIV")) {
-        return new Color(config.getInt(ConfigKey.FP_DIVIDER_COLOR));
+        return theme.getColor(ConfigKey.FP_DIVIDER_COLOR);
       } else if (st.equals("RAW")) {
-        return new Color(config.getInt(ConfigKey.ID_COLOR));
+        return theme.getColor(ConfigKey.ID_COLOR);
       } else if (st.equals("WAW") || st.equals("StDiv") || st.equals("StEx") || st.equals("StFun")) {
-        return new Color(config.getInt(ConfigKey.ID_COLOR));
+        return theme.getColor(ConfigKey.ID_COLOR);
       } else if (st.equals(" ")) {
         if (pre.equals("IF")) {
-          return new Color(config.getInt(ConfigKey.IF_COLOR));
+          return theme.getColor(ConfigKey.IF_COLOR);
         }
       }
-      return null;
+        return null;
+
     }
   }
 
@@ -231,15 +244,16 @@ public class GUICycles extends GUIComponent {
 
     @Override
     public synchronized void paint(Graphics g) {
-      super.paint(g);
-      setBackground(Color.white);
-      g.setColor(Color.black);
-      g.setFont(font);
-
-      Rectangle clip = g.getClipBounds();
+      Graphics2D g2d = (Graphics2D) g;
+      super.paint(g2d);
+      setBackground(theme.getBackgroundColor());
+      g2d.setColor(theme.getTextColor());
+      g2d.setFont(font);
+      g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+      Rectangle clip = g2d.getClipBounds();
 
       java.util.List<CycleElement> elements = builder.getElementsList();
-      synchronized(elements) {
+      synchronized (elements) {
         int row = 0;
         for (CycleElement el : elements) {
           int x = scale(5);
@@ -251,7 +265,7 @@ public class GUICycles extends GUIComponent {
             continue;
           }
 
-          g.drawString(el.getName(), x, y);
+          g2d.drawString(el.getName(), x, y);
           row++;
         }
       }

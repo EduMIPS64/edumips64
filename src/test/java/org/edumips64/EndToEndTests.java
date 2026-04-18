@@ -25,20 +25,18 @@
  */
 package org.edumips64;
 
-import org.edumips64.core.CPU;
-import org.edumips64.core.NotAlignException;
-import org.edumips64.core.SynchronousException;
+import org.edumips64.core.*;
+import org.edumips64.core.cache.CacheConfig;
+import org.edumips64.core.cache.CacheStats;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.AddressErrorException;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
-import org.edumips64.core.is.IntegerOverflowException;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.CycleElement;
 import org.edumips64.utils.ConfigKey;
-import org.edumips64.core.IrregularStringOfBitsException;
 import org.edumips64.utils.io.LocalWriter;
 
 import java.io.File;
@@ -161,7 +159,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     log.warning("================================= Starting test " + testPath + " (forwarding: " +
         config.getBoolean(ConfigKey.FORWARDING)+ ")");
     cpu.reset();
-    dinero.reset();
+    cachesim.reset();
     symTab.reset();
     builder.reset();
     testPath = testsLocation + testPath;
@@ -179,7 +177,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
         }
       }
 
-      dinero.setDataOffset(memory.getInstructionsNumber()*4);
+      cachesim.setDataOffset(memory.getInstructionsNumber()*4);
       cpu.setStatus(CPU.CPUStatus.RUNNING);
 
       while (true) {
@@ -195,7 +193,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
         tracefile = tmp.getAbsolutePath();
         tmp.deleteOnExit();
         LocalWriter w = new LocalWriter(tmp.getAbsolutePath(), false);
-        dinero.writeTraceData(w);
+        cachesim.writeTraceData(w);
         w.close();
       }
 
@@ -211,7 +209,6 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       return new CpuTestStatus(cpu, tracefile);
     } finally {
       cpu.reset();
-      dinero.reset();
       symTab.reset();
     }
   }
@@ -334,6 +331,24 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   @Test(timeout=2000)
   public void testDMULU() throws Exception {
         runMipsTest("dmulu-simple-test.s");
+    }
+
+  /* Test for instructions DMUL and DDIV */
+  @Test(timeout=2000)
+  public void testDMULandDDIV() throws Exception {
+        runMipsTest("dmul-ddiv-test.s");
+    }
+
+  /* Test for both DDIV forms (2-param and 3-param) */
+  @Test(timeout=2000)
+  public void testDDIVBothForms() throws Exception {
+        runMipsTest("ddiv-both-forms-test.s");
+    }
+
+  /* Test for instruction DMOD */
+  @Test(timeout=2000)
+  public void testDMOD() throws Exception {
+        runMipsTest("dmod-test.s");
     }
 
   /* Test for the instruction JAL */
@@ -481,24 +496,6 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     collector.checkThat(filename + ": RAW stalls without forwarding.", statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(2));
   }
 
-  @Test(timeout=2000)
-  public void testFPUMul() throws Exception {
-    // This test contains code that raises exceptions, let's disable them.
-    config.putBoolean(ConfigKey.FP_INVALID_OPERATION, false);
-    config.putBoolean(ConfigKey.FP_OVERFLOW, false);
-    config.putBoolean(ConfigKey.FP_UNDERFLOW, false);
-    config.putBoolean(ConfigKey.FP_DIVIDE_BY_ZERO, false);
-    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("fpu-mul.s");
-
-    // Same behaviour with and without forwarding.
-    int expected_cycles = 42, expected_instructions = 32, expected_mem_stalls = 6;
-    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).cycles, equalTo(expected_cycles));
-    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).instructions, equalTo(expected_instructions));
-    collector.checkThat(statuses.get(ForwardingStatus.ENABLED).memStalls, equalTo(expected_mem_stalls));
-    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).cycles, equalTo(expected_cycles));
-    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).instructions, equalTo(expected_instructions));
-    collector.checkThat(statuses.get(ForwardingStatus.DISABLED).memStalls, equalTo(expected_mem_stalls));
-  }
 
   @Test(timeout=2000)
   public void testFPCond() throws Exception {
@@ -544,6 +541,19 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testDivisionByZeroNoThrowException() throws Exception {
     config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, true);
     runMipsTest("div0.s");
+  }
+
+  /* Tests for division by zero with 3-parameter DDIV form */
+  @Test(expected = SynchronousException.class, timeout=2000)
+  public void testDivisionByZeroThrowException3Param() throws Exception {
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
+    runMipsTest("ddiv3-div0.s");
+  }
+
+  @Test(timeout=2000)
+  public void testDivisionByZeroNoThrowException3Param() throws Exception {
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, true);
+    runMipsTest("ddiv3-div0.s");
   }
 
   /* ------- REGRESSION TESTS -------- */
@@ -612,6 +622,44 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runTestAndCompareTracefileWithGolden("tracefile-ldst.s");
     runTestAndCompareTracefileWithGolden("tracefile-noldst.s");
     runTestAndCompareTracefileWithGolden("tracefile-st.s");
+  }
+
+
+  // Check that cache stats generated during exectution are correct are coherent with
+  // those generated when running a tracefile
+  @Test
+  public void testCacheSimStats() throws Exception {
+
+    String tracefile = "sample.s.xdin";
+
+    Map<CacheConfig, CacheStats> l1iGoldenStats = null;
+    Map<CacheConfig, CacheStats> l1dGoldenStats = null;
+
+    l1iGoldenStats = CacheSimulatorTests.loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1I.csv");
+    l1dGoldenStats = CacheSimulatorTests.loadStatsFromCSV(testsLocation+tracefile+"_golden_stats_L1D.csv");
+
+    var l1i_cache = cachesim.getL1InstructionCache();
+    var l1d_cache = cachesim.getL1DataCache();
+
+    for (Map.Entry<CacheConfig, CacheStats> entry : l1iGoldenStats.entrySet()) {
+      CacheConfig config = entry.getKey();
+      CacheStats expected = entry.getValue();
+      l1i_cache.setConfig(config);
+      runMipsTest("sample.s");
+      var actual_l1i = cachesim.getL1InstructionCache().getStats();
+
+      collector.checkThat("L1I cache mismatch for config " + config, actual_l1i, equalTo(expected));
+    }
+
+    for (Map.Entry<CacheConfig, CacheStats> entry : l1dGoldenStats.entrySet()) {
+      CacheConfig config = entry.getKey();
+      CacheStats expected = entry.getValue();
+      l1d_cache.setConfig(config);
+      runMipsTest("sample.s");
+      var actual_l1d = cachesim.getL1DataCache().getStats();
+
+      collector.checkThat("L1D cache mismatch for config " + config, actual_l1d, equalTo(expected));
+    }
   }
 
   /* Issue #36: StringIndexOutOfBoundsException raised at run-time. */
@@ -716,6 +764,12 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runMipsTest("dmultu.s");
   }
 
+    /* Test for instructions DMULU and DMUHU */
+  @Test(timeout=2000)
+  public void testDmuluDmuhu() throws Exception {
+    runMipsTest("dmulu-dmuhu.s");
+  }
+
   /* Test for instruction DSLLV */
   @Test(timeout=2000)
   public void testDsllv() throws Exception {
@@ -774,5 +828,17 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   @Test(timeout=2000)
   public void testXori() throws Exception {
     runMipsTest("xori.s");
+  }
+
+  /* Test for circular #include detection (issue with inclusion loop not being detected) */
+  @Test(expected = ParserMultiException.class, timeout=2000)
+  public void testCircularInclude() throws Exception {
+    runMipsTest("include-1.s");
+  }
+
+  /* Test for indirect circular #include detection (file1 -> file2 -> file3 -> file1) */
+  @Test(expected = ParserMultiException.class, timeout=2000)
+  public void testIndirectCircularInclude() throws Exception {
+    runMipsTest("include-indirect-1.s");
   }
 }

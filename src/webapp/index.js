@@ -1,12 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import CssBaseline from '@mui/material/CssBaseline';
 
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
 import Simulator from './components/Simulator';
-import Header from './components/Header';
 
 import './css/main.css'
 
@@ -18,14 +17,15 @@ const version = `${BRANCH}-${COMMITHASH.substring(0, 7)}`;
 // Initialize AppInsights.
 const appInsights = new ApplicationInsights({
   config: {
-    instrumentationKey: '4fdd6b3c-15fb-4fd2-910e-0bd297b8d293',
+    connectionString: 'InstrumentationKey=ae180a87-f990-410c-a51c-8077c240e265;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/',
   },
 });
 appInsights.loadAppInsights();
 appInsights.context.application.ver = version;
 appInsights.context.application.build = version;
 const telemetryInitializer = (envelope) => {
-  envelope.tags['ai.cloud.role'] = process.env.NODE_ENV;
+  envelope.tags['ai.cloud.role'] = process.env.NODE_ENV,
+  envelope.tags['ai.cloud.roleInstance'] = version;
 };
 appInsights.addTelemetryInitializer(telemetryInitializer);
 appInsights.trackPageView();
@@ -33,43 +33,54 @@ console.log('Initialized AppInsights');
 
 // Web Worker that runs the EduMIPS64 core, built from the Java codebase.
 // Contains some syntactical sugar methods to make working with the
-// Web Worker API a bit easier.
-let simulator = new Worker('worker.js');
-simulator.reset = () => {
-  simulator.postMessage({ method: 'reset' });
+// Web Worker API a bit easier, and some telemetry.
+let worker = new Worker('worker.js');
+worker.reset = () => {
+  worker.postMessage({ method: 'reset' });
+  appInsights.trackEvent({name: "reset"});
 };
-simulator.step = (n) => {
-  simulator.postMessage({ method: 'step', steps: n });
+worker.step = (n) => {
+  worker.postMessage({ method: 'step', steps: n });
+  appInsights.trackEvent({name: 'step', properties: {steps: n}});
 };
-simulator.load = (code) => {
-  simulator.postMessage({ method: 'load', code });
+worker.load = (code) => {
+  worker.postMessage({ method: 'load', code });
+  appInsights.trackEvent({name: "load"});
 };
-simulator.checkSyntax = (code) => {
-  simulator.postMessage({ method: 'checksyntax', code });
+
+worker.setCacheConfig = (config) => {
+  worker.postMessage({ method: 'setCacheConfig', config });
 };
-simulator.parseResult = (result) => {
+
+worker.checkSyntax = (code) => {
+  worker.postMessage({ method: 'checksyntax', code });
+
+  appInsights.trackEvent({name: "checkSyntax"});
+};
+worker.parseResult = (result) => {
   result.registers = JSON.parse(result.registers);
+  result.memory = JSON.parse(result.memory);
   result.statistics = JSON.parse(result.statistics);
   return result;
 };
-simulator.version = version;
+worker.version = version;
 
-simulator.reset();
+worker.reset();
 const initializer = (evt) => {
   console.log('Running the initializer callback');
 
   // Run this callback only once, to initialize the Simulator
   // React component which will then handle all subsequent messages.
-  simulator.removeEventListener('message', initializer);
-  const initState = simulator.parseResult(evt.data);
-
-  ReactDOM.render(
+  worker.removeEventListener('message', initializer);
+  const initState = worker.parseResult(evt.data);
+  const container = document.getElementById('simulator');
+  const root = createRoot(container);
+  
+  root.render(
         <>
         <CssBaseline />
-        <Header />
-        <Simulator sim={simulator} initialState={initState} />
-        </>,
-    document.getElementById('simulator'),
+        <Simulator worker={worker} initialState={initState} appInsights={appInsights} />
+        </>
   );
 };
-simulator.addEventListener('message', initializer);
+worker.addEventListener('message', initializer);

@@ -1,5 +1,6 @@
 package org.edumips64;
 
+import org.edumips64.core.CPU;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.InMemoryConfigStore;
@@ -18,12 +19,14 @@ import static org.junit.Assert.*;
 
 public class CliRunnerTest {
     private Cli cli;
+    private Cli verboseCli;
 
     @Before
     public void setUp() {
         var cfg = new InMemoryConfigStore(ConfigStore.defaults);
         CurrentLocale.setConfig(cfg);
         cli = new Cli(cfg);
+        verboseCli = new Cli(cfg, true);
     }
 
     @Test
@@ -65,11 +68,19 @@ public class CliRunnerTest {
     }
 
     @Test
-    public void canLoad() {
+    public void canLoadVerbose() {
+        OutputStream os = getSystemOut();
+        CommandLine cl = new CommandLine(verboseCli);
+        cl.execute("load", "src/test/resources/add.s");
+        assertTrue(os.toString().contains("Loaded file "));
+    }
+
+    @Test
+    public void canLoadQuiet() {
         OutputStream os = getSystemOut();
         CommandLine cl = new CommandLine(cli);
         cl.execute("load", "src/test/resources/add.s");
-        assertTrue(os.toString().contains("Loaded file "));
+        assertFalse(os.toString().contains("Loaded file "));
     }
 
     @Test
@@ -124,6 +135,14 @@ public class CliRunnerTest {
     }
 
     @Test
+    public void printUsageZh() {
+        OutputStream os = getSystemOut();
+        Locale.setDefault(Locale.SIMPLIFIED_CHINESE);
+        new CommandLine(cli).execute("help");
+        assertFalse(os.toString().trim().isEmpty());
+    }
+    
+    @Test
     public void printUsageShowEn() {
         OutputStream os = getSystemOut();
         new CommandLine(cli).execute("show", "--help");
@@ -132,6 +151,13 @@ public class CliRunnerTest {
 
     @Test
     public void printUsageShowIt() {
+        OutputStream os = getSystemOut();
+        Locale.setDefault(Locale.ITALIAN);
+        new CommandLine(cli).execute("show", "--help");
+        assertFalse(os.toString().trim().isEmpty());
+    }
+    @Test
+    public void printUsageMessageShowZh() {
         OutputStream os = getSystemOut();
         Locale.setDefault(Locale.ITALIAN);
         new CommandLine(cli).execute("show", "--help");
@@ -154,8 +180,76 @@ public class CliRunnerTest {
     }
 
     @Test
+
+    public void printUsageStepZh() {
+        OutputStream os = getSystemOut();
+        Locale.setDefault(Locale.SIMPLIFIED_CHINESE);
+        new CommandLine(cli).execute("step", "--help");
+        assertFalse(os.toString().trim().isEmpty());
+    }
+
     public void printConfig() {
         new CommandLine(cli).execute("config");
+    }
+
+    @Test
+    public void quietModeDoesNotPrintRunMessages() {
+        OutputStream os = getSystemOut();
+        CommandLine cl = new CommandLine(cli);
+        cl.execute("load", "src/test/resources/add.s");
+        cl.execute("run");
+        String output = os.toString();
+        assertFalse(output.contains("Starting execution"));
+        assertFalse(output.contains("Running"));
+        assertFalse(output.contains("Execution ended"));
+    }
+
+    @Test
+    public void verboseModePrintsRunMessages() {
+        OutputStream os = getSystemOut();
+        CommandLine cl = new CommandLine(verboseCli);
+        cl.execute("load", "src/test/resources/add.s");
+        cl.execute("run");
+        String output = os.toString();
+        assertTrue(output.contains("Starting execution"));
+        assertTrue(output.contains("Running"));
+        assertTrue(output.contains("Execution ended"));
+    }
+
+    @Test
+    public void canLoadFileWithWarnings() {
+        CommandLine commandLine = new CommandLine(cli);
+        commandLine.execute("load", "src/test/resources/add-with-halt.s");
+        assertEquals(CPU.CPUStatus.RUNNING, cli.getCPU().getStatus());
+    }
+
+    @Test
+    public void canRunFileWithWarnings() {
+        CommandLine commandLine = new CommandLine(cli);
+        commandLine.execute("load", "src/test/resources/add-with-halt.s");
+        commandLine.execute("run");
+        assertEquals(5L, cli.getCPU().getRegister(1).getValue());
+        assertEquals(2L, cli.getCPU().getRegister(2).getValue());
+        assertEquals(7L, cli.getCPU().getRegister(3).getValue());
+    }
+
+    @Test
+    public void verboseModeShowsWarningsOnLoad() {
+        OutputStream os = getSystemOut();
+        CommandLine cl = new CommandLine(verboseCli);
+        cl.execute("load", "src/test/resources/add-with-halt.s");
+        String output = os.toString();
+        assertTrue(output.contains("Loaded file "));
+        assertTrue(output.contains("File loaded with warnings:"));
+    }
+
+    @Test
+    public void quietModeDoesNotShowWarningsOnLoad() {
+        OutputStream os = getSystemOut();
+        CommandLine cl = new CommandLine(cli);
+        cl.execute("load", "src/test/resources/add-with-halt.s");
+        String output = os.toString();
+        assertFalse(output.contains("File loaded with warnings:"));
     }
 
     private OutputStream getSystemOut() {

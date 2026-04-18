@@ -90,6 +90,7 @@ public class CurrentLocale {
     en.put("MenuItem.RUN_TO", "Run");
     en.put("MenuItem.ITALIAN", "Italian");
     en.put("MenuItem.ENGLISH", "English");
+    en.put("MenuItem.SIMPLIFIED_CHINESE", "Simplified Chinese");
     en.put("MenuItem.DIN_TRACEFILE", "Write _Dinero tracefile...");
     en.put("MenuItem.FORWARDING", "Enable _forwarding");
     en.put("MenuItem.WARNINGS", "Enable _warnings");
@@ -97,6 +98,7 @@ public class CurrentLocale {
     en.put("MenuItem.DIN_FRONTEND", "_Dinero frontend...");
     en.put("MenuItem.MANUAL", "_Manual...");
     en.put("MenuItem.STOP", "Stop");
+    en.put("MenuItem.TILE", "Tile");
     en.put("ABOUT", "About EduMIPS64");
     en.put("REGISTERS", "Registers");
     en.put("MEMORY", "Data");
@@ -127,6 +129,7 @@ public class CurrentLocale {
     en.put("5BIT_IMMEDIATE_TOO_LARGE", "5 bit immediate value too large");
     en.put("3BIT_IMMEDIATE_TOO_LARGE", "3 bit immediate value too large");
     en.put("VALUE_MISS", "Missing value for memory cell");
+    en.put("INVALID_DIRECTIVE_IN_CODE", "Invalid directive in the code section");
     en.put("SAMELABEL", "Label already exists");
     en.put("CHOOSE_COLOR", "Select a color ");
     en.put("EXECUTION", "Execution");
@@ -145,6 +148,13 @@ public class CurrentLocale {
     en.put("BTS", "Branch Taken Stalls");
     en.put("BMS", "Branch Misprediction Stalls");
     en.put("CSIZE", "Code size");
+    en.put("L1CACHESTATS", "Cache Memory Statistics");
+    en.put("L1I READS", "L1 Instruction Reads");
+    en.put("L1I READ MISSES", "L1 Instruction Misses");
+    en.put("L1D READS", "L1 Data Reads");
+    en.put("L1D READ MISSES", "L1 Data Read Misses");
+    en.put("L1D WRITES", "L1 Data Writes");
+    en.put("L1D WRITE MISSES", "L1 Data Write Misses");
     en.put("Config.APPEARANCE", "Appearance");
     en.put("Config.BEHAVIOR", "Behavior");
     en.put("Config.MAIN", "Main settings");
@@ -201,6 +211,20 @@ public class CurrentLocale {
     en.put("Config.SYNCEXC-TERMINATE.tip", "Halt the simulation on Division by zero and Integer Overflow exceptions");
     en.put("Config.FONTSIZE", "Font size");
     en.put("Config.FONTSIZE.tip", "Size of the font");
+    en.put("Config.DARKTHEME", "Dark theme (take effect after restart)");
+    en.put("Config.CACHE", "Cache");
+    en.put("Config.L1D_SIZE", "L1D Size");
+    en.put("Config.L1D_SIZE.tip", "Size in bytes of the L1 Data cache");
+    en.put("Config.L1I_SIZE", "L1I Size");
+    en.put("Config.L1I_SIZE.tip", "Size in bytes of the L1 Instruction cache");
+    en.put("Config.L1D_BLOCK_SIZE", "L1D Block Size");
+    en.put("Config.L1D_BLOCK_SIZE.tip", "Size in bytes of a block in the L1 Data cache");
+    en.put("Config.L1I_BLOCK_SIZE", "L1I Block Size");
+    en.put("Config.L1I_BLOCK_SIZE.tip", "Size in bytes of a block in the L1 Instruction cache");
+    en.put("Config.L1D_ASSOCIATIVITY", "L1D Associativity");
+    en.put("Config.L1D_ASSOCIATIVITY.tip", "Number of ways in the L1 Data cache");
+    en.put("Config.L1I_ASSOCIATIVITY", "L1I Associativity");
+    en.put("Config.L1I_ASSOCIATIVITY.tip", "Number of ways in the L1 Instruction cache");
     en.put("StatusBar.WELCOME", "Welcome to EduMIPS64");
     en.put("StatusBar.DECIMALVALUE", "Decimal value");
     en.put("StatusBar.OFREGISTER", "of R");
@@ -251,7 +275,7 @@ public class CurrentLocale {
     en.put("ALIGNERR", "Alignment error in instruction");
     en.put("THEADDRESS", "the address");
     en.put("ISNOTALIGNED", "is not aligned to");
-    en.put("RESTART_FONT", "Please restart the simulator to use the new font.");
+    en.put("RESTART_APPEARANCE", "Please restart the simulator to use the new appearance.");
     en.put("NO_MASK_AND_TERMINATE", "Please choose only one option between masking synchronous exceptions and program termination on synchronous exceptions.");
     en.put("FWD_RESET_WARNING", "Changing the forwarding setting will reset the simulation. Continue?");
     en.put("CLI.RUN.EXE_END", "Execution ended. %d steps were executed in %dms");
@@ -268,12 +292,14 @@ public class CurrentLocale {
     en.put("CLI.STEP.POSITIVE", "Step must be a positive number");
     en.put("CLI.CPU.NOT.RUNNABLE", "CPU is not runnable in state: ");
     en.put("CLI.PARSE.ERROR", "Unable to parse file, errors found:");
+    en.put("CLI.PARSE.WARNING", "File loaded with warnings:");
     en.put("CLI.DINERO.SAVE", "File saved! Location: ");
     en.put("CLI.REG.WARN", "Register numbers are 0-based, valid values are 0-31.");
     en.put("CLI.NOT.RUNNABLE.LOAD.FILE", "Load a file to make the CPU runnable. Try load --help");
     en.put("CLI.RUN.EXE_START", "Starting execution.");
     en.put("CLI.RUNNING", "Running");
     en.put("LOG.HEADLESS_MSG", "Cannot start GUI in a headless environment.");
+    en.put("TEST_MESSAGE_ONLY_IN_ENGLISH_DO_NOT_TRANSLATE", "This message is only in English, used in unit tests, and should not be translated.");
     languages.put("en", en);
 
     // Italian messages.
@@ -290,7 +316,7 @@ public class CurrentLocale {
     it.put("WORDINCODE", "Direttiva .word trovata nella sezione codice");
     it.put("WORD32INCODE", "Direttiva .word32 trovata nella sezione codice");
     it.put("SPACEINCODE", "Direttiva .space trovata nella sezione codice");
-    it.put("INVALIDVALUE", "Valore non valido ");
+    it.put("INVALIDVALUE", "Valore non valido");
     it.put("INVALIDCODE", "Codice non valido");
     it.put("INVALIDCODEFORDATA", "Codice non valido per il data");
     it.put("INVALIDREGISTER", "Registro non valido");
@@ -325,6 +351,7 @@ public class CurrentLocale {
     it.put("MenuItem.RUN_TO", "Esegui");
     it.put("MenuItem.ITALIAN", "Italiano");
     it.put("MenuItem.ENGLISH", "Inglese");
+    it.put("MenuItem.SIMPLIFIED_CHINESE", "Cinese semplificato");
     it.put("MenuItem.DIN_TRACEFILE", "Scrivi tracefile _Dinero...");
     it.put("MenuItem.FORWARDING", "Abilita _forwarding");
     it.put("MenuItem.WARNINGS", "Abilita _warning");
@@ -332,6 +359,7 @@ public class CurrentLocale {
     it.put("MenuItem.DIN_FRONTEND", "_Dinero frontend...");
     it.put("MenuItem.MANUAL", "_Manuale...");
     it.put("MenuItem.STOP", "Ferma");
+    it.put("MenuItem.TILE", "Tile");
     it.put("ABOUT", "Informazioni su EduMIPS64");
     it.put("REGISTERS", "Registri");
     it.put("MEMORY", "Memoria");
@@ -362,6 +390,7 @@ public class CurrentLocale {
     it.put("5BIT_IMMEDIATE_TOO_LARGE", "Numero troppo grande per un campo immediato a 5 bit");
     it.put("3BIT_IMMEDIATE_TOO_LARGE", "Numero troppo grande per un campo immediato a 3 bit");
     it.put("VALUE_MISS", "Manca il valore da assegnare alla cella di memoria");
+    it.put("INVALID_DIRECTIVE_IN_CODE", "Direttiva non valida nella sezione codice");
     it.put("SAMELABEL", "Etichetta già esistente");
     it.put("CHOOSE_COLOR", "Seleziona un colore ");
     it.put("EXECUTION", "Esecuzione");
@@ -380,6 +409,13 @@ public class CurrentLocale {
     it.put("BTS", "Stalli 'Branch Taken'");
     it.put("BMS", "Stalli 'Branch Misprediction'");
     it.put("CSIZE", "Dimensione del codice");
+    it.put("L1CACHESTATS", "Statistiche Memorie Cache");
+    it.put("L1I READS", "Letture L1 Istruzioni");
+    it.put("L1I READ MISSES", "Miss L1 Istruzioni");
+    it.put("L1D READS", "Letture L1 Dati");
+    it.put("L1D READ MISSES", "Miss in Lettura L1 Dati");
+    it.put("L1D WRITES", "Scritture L1 Dati");
+    it.put("L1D WRITE MISSES", "Miss in Scrittura L1 Dati");
     it.put("Config.APPEARANCE", "Aspetto");
     it.put("Config.BEHAVIOR", "Comportamento");
     it.put("Config.MAIN", "Impost. generali");
@@ -436,6 +472,7 @@ public class CurrentLocale {
     it.put("Config.SYNCEXC-TERMINATE.tip", "Ferma la simulazione al verificarsi di eccezioni di tipo Divisione per zero ed Integer overflow");
     it.put("Config.FONTSIZE", "Dimensione font");
     it.put("Config.FONTSIZE.tip", "Dimensione del font");
+    it.put("Config.DARKTHEME", "Tema scuro (applicato al prossimo avvio)");
     it.put("StatusBar.WELCOME", "Benvenuti in EduMIPS64");
     it.put("StatusBar.DECIMALVALUE", "Valore decimale");
     it.put("StatusBar.OFREGISTER", "di R");
@@ -486,7 +523,7 @@ public class CurrentLocale {
     it.put("ALIGNERR", "Errore di allineamento nell'istruzione");
     it.put("THEADDRESS", "l'indirizzo");
     it.put("ISNOTALIGNED", "non è allineato a");
-    it.put("RESTART_FONT", "E' necessario riavviare il simulatore per utilizzare il nuovo font.");
+    it.put("RESTART_APPEARANCE", "Riavvia il simulatore per utilizzare il nuovo aspetto.");
     it.put("NO_MASK_AND_TERMINATE", "Selezionare solo una opzione tra mascheramento eccezioni sincrone e terminazione in seguito ad eccezioni sincrone.");
     it.put("FWD_RESET_WARNING", "Cambiare la modalità di forwarding indurrà un riavvio della simulazione. Continuare?");
     it.put("CLI.RUN.EXE_END", "L'esecuzione è terminata. %d passaggi sono stati eseguiti in %dms");
@@ -503,6 +540,7 @@ public class CurrentLocale {
     it.put("CLI.STEP.POSITIVE", "Il passaggio deve essere un numero positivo");
     it.put("CLI.CPU.NOT.RUNNABLE", "La CPU non è eseguibile nello stato: ");
     it.put("CLI.PARSE.ERROR", "Impossibile analizzare il file, sono stati trovati errori:");
+    it.put("CLI.PARSE.WARNING", "File caricato con avvisi:");
     it.put("CLI.DINERO.SAVE", "File salvato! Posizione:");
     it.put("CLI.REG.WARN", "I numeri di registro sono in base 0, i valori validi sono 0-31.");
     it.put("CLI.NOT.RUNNABLE.LOAD.FILE", "Carica un file per rendere la CPU eseguibile. Prova a caricare --help");
@@ -510,20 +548,275 @@ public class CurrentLocale {
     it.put("CLI.RUNNING", "In esecuzione");
     it.put("LOG.HEADLESS_MSG", "Impossibile avviare la GUI in un ambiente headless.");
     languages.put("it", it);
+
+    //Chinese Hashmap
+    HashMap<String, String> zhcn = new HashMap<>();
+    zhcn.put("DOUBLE_EXT_TOO_LARGE", "指数超过32位");
+    zhcn.put("LABELADDRESSINVALID", "无效偏移量：应在-32767和32768之间（16位有符号）");
+    zhcn.put("FP_INVALID_OPERATION", "执行了无效操作");
+    zhcn.put("FP_DIV_BY_ZERO", "执行了除以零的操作");
+    zhcn.put("FP_OVERFLOW", "浮点溢出，绝对值太大");
+    zhcn.put("FP_UNDERFLOW", "浮点下溢，绝对值太小");
+    zhcn.put("BYTEINCODE", ".byte 指令出现在代码段中");
+    zhcn.put("WORD16INCODE", ".word16 指令出现在代码段中");
+    zhcn.put("WORDINCODE", ".word指令出现在代码段中");
+    zhcn.put("WORD32INCODE", ".word32 指令出现在代码段中");
+    zhcn.put("SPACEINCODE", ".space 指令出现在代码段中");
+    zhcn.put("INVALIDVALUE", "无效值");
+    zhcn.put("INVALIDCODE", "无效代码");
+    zhcn.put("INVALIDCODEFORDATA", "数据的无效代码");
+    zhcn.put("INVALIDREGISTER", "无效寄存器");
+    zhcn.put("INVALIDIMMEDIATE", "无效立即数值");
+    zhcn.put("UNKNOWNSYNTAX", "未知语法");
+    zhcn.put("SEPARATORMISS", "缺少分隔符");
+    zhcn.put("LABELNOTFOUND", "找不到标签");
+    zhcn.put("VALUEISNOTUNSIGNED", "有符号值：需要一个无符号值");
+    zhcn.put("GUI_STEP_ERROR", "CPU步进错误");
+    zhcn.put("GUI_PARSER_ERROR", "解析错误");
+    zhcn.put("INCLUDE_LOOP", "包含循环");
+    zhcn.put("INT_FORMAT_EXCEPTION", "您必须输入一个整数值");
+    zhcn.put("ERROR_LABEL", "访问内存元素时出错。也许您已经达到了 EduMIPS64 内存的极限。");
+    zhcn.put("ERROR", "错误");
+    zhcn.put("FILE_NOT_FOUND", "找不到文件");
+    zhcn.put("SYSCALL5_ERROR", "写入标准输出时出错");
+    zhcn.put("Menu.FILE", "文件 (_F)");
+    zhcn.put("Menu.EXECUTE", "执行 (_X)");
+    zhcn.put("Menu.CONFIGURE", "配置 (_C)");
+    zhcn.put("Menu.WINDOW", "窗口 (_W)");
+    zhcn.put("Menu.HELP", "帮助 (_H)");
+    zhcn.put("Menu.CHANGE_LANGUAGE", "更改语言");
+    zhcn.put("Menu.TOOLS", "工具 (_T)");
+    zhcn.put("Menu.CHANGE_PIPELINE_COLORS", "更改流水线颜色");
+    zhcn.put("MenuItem.OPEN", "打开...(_O)");
+    zhcn.put("MenuItem.OPENLAST", "打开最近的文件...");
+    zhcn.put("MenuItem.RESET", "重置 (_R)");
+    zhcn.put("MenuItem.EXIT", "退出 (_X)");
+    zhcn.put("MenuItem.SINGLE_CYCLE", "单周期");
+    zhcn.put("MenuItem.MULTI_CYCLE", "多周期");
+    zhcn.put("MenuItem.MULTI_STEP", "多步骤");
+    zhcn.put("MenuItem.RUN_TO", "运行");
+    zhcn.put("MenuItem.ITALIAN", "意大利语");
+    zhcn.put("MenuItem.ENGLISH", "英语");
+    zhcn.put("MenuItem.SIMPLIFIED_CHINESE", "简体中文");
+    zhcn.put("MenuItem.DIN_TRACEFILE", "写入 Dinero 跟踪文件...(_D)");
+    zhcn.put("MenuItem.FORWARDING", "启用转发 (_F)");
+    zhcn.put("MenuItem.WARNINGS", "启用警告 (_W)");
+    zhcn.put("MenuItem.ABOUT_US", "关于我们... (_A)");
+    zhcn.put("MenuItem.DIN_FRONTEND", "Dinero 前端... (_D)");
+    zhcn.put("MenuItem.MANUAL", "手册... (_M)");
+    zhcn.put("MenuItem.STOP", "停止");
+    zhcn.put("MenuItem.TILE", "平铺");
+    zhcn.put("ABOUT", "关于 EduMIPS64");
+    zhcn.put("REGISTERS", "寄存器");
+    zhcn.put("MEMORY", "数据");
+    zhcn.put("CODE", "代码");
+    zhcn.put("PIPELINE", "流水线");
+    zhcn.put("LOGGER", "日志");
+    zhcn.put("IO", "输入/输出");
+    zhcn.put("EXCEPTION", "异常");
+    zhcn.put("FPUINFO", "浮点单元");
+    zhcn.put("FPUFCSR", "FCSR 寄存器");
+    zhcn.put("ADDRESS", "地址");
+    zhcn.put("HEXREPR", "十六进制表示");
+    zhcn.put("COMMENT", "注释");
+    zhcn.put("LABEL", "标签");
+    zhcn.put("INSTRUCTION", "指令");
+    zhcn.put("STATS", "统计数据");
+    zhcn.put("PROSIM", "MIPS64 处理器模拟器");
+    zhcn.put("GUI_WARNING", "警告");
+    zhcn.put("WINMIPS64_NOT_MIPS64", "该指令属于 WinMIPS64 指令集，但不是合法的 MIPS64 指令");
+    zhcn.put("HALT_NOT_PRESENT", "缺少HALT指令：它将自动插入到文件的末尾");
+    zhcn.put("ROW", "行");
+    zhcn.put("COLUMN", "列");
+    zhcn.put("IMMEDIATE_TOO_LARGE", "立即数值太大");
+    zhcn.put("WORD_TOO_LARGE", "字值太大");
+    zhcn.put("WORD32_TOO_LARGE", "字32值太大");
+    zhcn.put("WORD16_TOO_LARGE", "字16值太大");
+    zhcn.put("BYTE_TOO_LARGE", "字节值太大");
+    zhcn.put("5BIT_IMMEDIATE_TOO_LARGE", "5位立即数值太大");
+    zhcn.put("3BIT_IMMEDIATE_TOO_LARGE", "3位立即数值太大");
+    zhcn.put("VALUE_MISS", "缺少内存单元的值");
+    // missing: INVALID_DIRECTIVE_IN_CODE
+    zhcn.put("SAMELABEL", "标签已存在");
+    zhcn.put("CHOOSE_COLOR", "选择一种颜色");
+    zhcn.put("EXECUTION", "执行");
+    zhcn.put("CYCLES", "周期");
+    zhcn.put("CYCLE", "周期");
+    zhcn.put("INSTRUCTIONS", "指令");
+    zhcn.put("CPI", "CPI (每条指令的周期数)");
+    zhcn.put("RAWS", "RAW 停顿");
+    zhcn.put("RAW", "RAW 停顿");
+    zhcn.put("BYTES", "字节");
+    zhcn.put("STALLS", "停顿");
+    zhcn.put("WAWS", "WAW 停顿");
+    zhcn.put("WARS", "WAR 停顿");
+    zhcn.put("STRUCTS_DIVNOTAVAILABLE", "结构停顿（除法器不可用）");
+    zhcn.put("STRUCTS_MEMNOTAVAILABLE", "结构停顿（内存不可用）");
+    zhcn.put("BTS", "分支已采用停顿");
+    zhcn.put("BMS", "分支错误预测停顿");
+    zhcn.put("CSIZE", "代码大小");
+    zhcn.put("Config.APPEARANCE", "外观");
+    zhcn.put("Config.BEHAVIOR", "行为");
+    zhcn.put("Config.MAIN", "主要设置");
+    zhcn.put("Config.ITEM", "设置...");
+    zhcn.put("Config.WARNINGS", "启用警告");
+    zhcn.put("Config.WARNINGS.tip", "在编译时启用警告");
+    zhcn.put("Config.FORWARDING", "启用转发");
+    zhcn.put("Config.FORWARDING.tip", "在流水线中启用转发");
+    zhcn.put("Config.LONGDOUBLEVIEW", "长/双精度内存单元视图");
+    zhcn.put("Config.LONGDOUBLEVIEW.tip", "在状态栏中切换长和双精度内存单元的可视化方式");
+    zhcn.put("Config.VERBOSE", "在多步骤执行中与 CPU 同步图形显示");
+    zhcn.put("Config.VERBOSE.tip", "启用详细的多步骤执行模式");
+    zhcn.put("Config.N_STEP", "步骤数目");
+    zhcn.put("Config.N_STEP.tip", "每条指令的步骤数目");
+    zhcn.put("Config.FPUEXCEPTIONS", "FPU 异常");
+    zhcn.put("Config.INVALID_OPERATION", "无效操作异常");
+    zhcn.put("Config.INVALID_OPERATION.tip", "启用浮点无效操作异常");
+    zhcn.put("Config.OVERFLOW", "溢出异常");
+    zhcn.put("Config.OVERFLOW.tip", "启用浮点溢出异常 ");
+    zhcn.put("Config.UNDERFLOW", "下溢异常");
+    zhcn.put("Config.UNDERFLOW.tip", "启用浮点下溢异常 ");
+    zhcn.put("Config.DIVIDE_BY_ZERO", "除以零异常");
+    zhcn.put("Config.DIVIDE_BY_ZERO.tip", "启用浮点除以零异常");
+    zhcn.put("Config.FPUROUNDING", "FPU 舍入");
+    zhcn.put("Config.NEAREST", "最近");
+    zhcn.put("Config.NEAREST.tip", "将结果舍入到最接近的可表示值，当值相等时舍入到偶数");
+    zhcn.put("Config.TOWARDZERO", "向零舍入");
+    zhcn.put("Config.TOWARDZERO.tip", "永远不会增加被舍弃小数前的数字（即截断）");
+    zhcn.put("Config.TOWARDS_PLUS_INFINITY", "向正无穷舍入");
+    zhcn.put("Config.TOWARDS_PLUS_INFINITY.tip", "向正无穷舍入");
+    zhcn.put("Config.TOWARDS_MINUS_INFINITY", "向负无穷舍入");
+    zhcn.put("Config.TOWARDS_MINUS_INFINITY.tip", "向负无穷舍入");
+    zhcn.put("Config.IFCOLOR", "取指颜色");
+    zhcn.put("Config.IFCOLOR.tip", "设置IF颜色");
+    zhcn.put("Config.IDCOLOR", "译码颜色");
+    zhcn.put("Config.IDCOLOR.tip", "设置译码颜色");
+    zhcn.put("Config.EXCOLOR", "执行颜色");
+    zhcn.put("Config.EXCOLOR.tip", "设置执行颜色");
+    zhcn.put("Config.MEMCOLOR", "存储器颜色");
+    zhcn.put("Config.MEMCOLOR.tip", "设置存储器颜色");
+    zhcn.put("Config.WBCOLOR", "写回颜色");
+    zhcn.put("Config.WBCOLOR.tip", "设置写回颜色");
+    zhcn.put("Config.FPADDERCOLOR", "FP 加法器颜色");
+    zhcn.put("Config.FPADDERCOLOR.tip", "设置 FP 加法器颜色");
+    zhcn.put("Config.FPMULTIPLIERCOLOR", "FP乘法器颜色");
+    zhcn.put("Config.FPMULTIPLIERCOLOR.tip", "设置FP乘法器颜色");
+    zhcn.put("Config.FPDIVIDERCOLOR", "FP 除法器颜色");
+    zhcn.put("Config.FPDIVIDERCOLOR.tip", "设置 FP 除法器颜色");
+    zhcn.put("Config.SLEEP_INTERVAL", "周期间隔（毫秒）");
+    zhcn.put("Config.SLEEP_INTERVAL.tip", "在详细模式下，每个周期执行前要经过的毫秒数");
+    zhcn.put("Config.SYNCEXC-MASKED", "屏蔽同步异常");
+    zhcn.put("Config.SYNCEXC-MASKED.tip", "使模拟器忽略除以零和整数溢出异常");
+    zhcn.put("Config.SYNCEXC-TERMINATE", "同步异常终止");
+    zhcn.put("Config.SYNCEXC-TERMINATE.tip", "在除以零和整数溢出异常时停止模拟");
+    zhcn.put("Config.FONTSIZE", "字体大小");
+    zhcn.put("Config.FONTSIZE.tip", "字体的大小");
+    zhcn.put("Config.DARKTHEME", "黑暗主题（重启后生效）");
+    zhcn.put("StatusBar.WELCOME", "欢迎使用 EduMIPS64");
+    zhcn.put("StatusBar.DECIMALVALUE", "十进制值：");
+    zhcn.put("StatusBar.OFREGISTER", "R ");
+    zhcn.put("StatusBar.OFREGISTERFP", "F ");
+    zhcn.put("StatusBar.MEMORYCELL", " 的地址为 ");
+    zhcn.put("Manual.CAPTION", "用户指南");
+    zhcn.put("Manual.INTRO", "介绍");
+    zhcn.put("Manual.GUI", "图形用户界面");
+    zhcn.put("Manual.IS", "指令");
+    zhcn.put("Manual.SYSCALL", "系统调用");
+    zhcn.put("ErrorDialog.ROW", "行");
+    zhcn.put("ErrorDialog.COLUMN", "列");
+    zhcn.put("ErrorDialog.LINE", "行");
+    zhcn.put("ErrorDialog.DESCRIPTION", "描述");
+    zhcn.put("ErrorDialog.MSG0", "代码包含");
+    zhcn.put("ErrorDialog.MSG1", "个错误和");
+    zhcn.put("ErrorDialog.MSG2", "个警告");
+    zhcn.put("ReportDialog.MSG", "EduMIPS64 致命错误！<br/>请通过在 GitHub 上<a href='https://github.com/EduMIPS64/edumips64/issues/new'>建立一个新 Issue</a>并附上以下文本，或者通过发送电子邮件到<a href='mailto:bugs@edumips.org'>bugs@edumips.org</a>来帮助开发人员。");
+    zhcn.put("ReportDialog.BUTTON", "关闭");
+    zhcn.put("DIVZERO.Message", "除以零");
+    zhcn.put("INTOVERFLOW.Message", "整数溢出");
+    zhcn.put("FPOVERFLOW.Message", "浮点溢出");
+    zhcn.put("FPUNDERFLOW.Message", "浮点下溢");
+    zhcn.put("FPINVALID.Message", "浮点无效操作");
+    zhcn.put("FPDIVBYZERO.Message", "浮点除以零");
+    zhcn.put("NOOPENMODE", "没有指定打开文件的模式（读/写）");
+    zhcn.put("WRITETOSTDIN", "试图写入标准输入");
+    zhcn.put("FILENOTOPENED", "文件描述符无效。可能文件没有正确打开");
+    zhcn.put("OUTOFMEMORY", "写（或读）操作导致无效的内存访问");
+    zhcn.put("OUTOFMEMORY_PARSER", "输入文件中的数据超过了EduMIPS64的内存");
+    zhcn.put("OUTOFINSTRUCTIONMEMORY", "指令内存耗尽");
+    zhcn.put("READFROMSTDOUT", "试图从标准输出（或标准错误）读取");
+    zhcn.put("OPENREADANDCREATE", "试图以读模式打开一个不存在的文件（O_CREAT在读或读/写模式下不起作用）");
+    zhcn.put("INPUTNOTEXCEED", "输入不能超过");
+    zhcn.put("CHARACTERS", "个字符");
+    zhcn.put("ENTERINPUT", "请输入您的文本");
+    zhcn.put("INPUT", "输入");
+    zhcn.put("IOEXCEPTION", "I/O 错误");
+    zhcn.put("HT.Options", "选项：");
+    zhcn.put("HT.MissingFile", "错误：缺少文件名。");
+    zhcn.put("HT.UnrecognizedArgs", "错误：无法识别的参数");
+    zhcn.put("HT.MultipleFile", "错误：-f只能使用一次。");
+    zhcn.put("CLEAR", "清除");
+    zhcn.put("DATA", "数据");
+    zhcn.put("HELPDIR", "/docs/user/zh"); 
+    zhcn.put("NEGADDRERR", "指令中的负内存地址错误");
+    zhcn.put("ALIGNERR", "指令中的对齐错误");
+    zhcn.put("THEADDRESS", "该地址");
+    zhcn.put("ISNOTALIGNED", "没有对齐到");
+    zhcn.put("RESTART_APPEARANCE", "请重新启动模拟器以使用新外观。");
+    zhcn.put("NO_MASK_AND_TERMINATE", "请在屏蔽同步异常和同步异常终止程序之间只选择一个选项。");
+    zhcn.put("FWD_RESET_WARNING", "更改转发设置将重置模拟。继续吗？ ");
+    zhcn.put("CLI.RUN.EXE_END", "执行结束。执行了 %d 个步骤，用时 %d 毫秒 ");
+    zhcn.put("CLI.STEP.NUM", "我执行了%d个模拟步骤。 ");
+    zhcn.put("CLI.EXIT", "再见...");
+    zhcn.put("CLI.WELCOME", "欢迎使用 EduMIPS64 命令行界面！");
+    zhcn.put("CLI.FILE.LOADED", "加载了文件%s ");
+    zhcn.put("CLI.FILE.NOT.LOADED", "无法加载文件：%s ");
+    zhcn.put("CLI.FILE.CANT.LOAD", "系统正在执行中，完成当前程序后再运行新程序 ");
+    zhcn.put("CLI.DINERO.CANT.WRITE", "在程序执行之前不能写入此输出。 ");
+    zhcn.put("CLI.FILE.NOT.FOUND", "找不到提供的文件，请检查位置并重试。 ");
+    zhcn.put("CLI.IO.ERROR", "写入文件时发生错误，请重试。 ");
+    zhcn.put("CLI.CONFIG.HEADER", "配置值 ");
+    zhcn.put("CLI.STEP.POSITIVE", "步骤必须是正数 ");
+    zhcn.put("CLI.CPU.NOT.RUNNABLE", "CPU在状态下不可运行： ");
+    zhcn.put("CLI.PARSE.ERROR", "无法解析文件，发现错误： ");
+    zhcn.put("CLI.PARSE.WARNING", "文件已加载，但有警告：");
+    zhcn.put("CLI.DINERO.SAVE", "文件已保存！位置：");
+    zhcn.put("LOG.HEADLESS_MSG", "无法在无头环境中启动 GUI。");
+    zhcn.put("CLI.REG.WARN", "寄存器编号从 0 开始，有效值为 0-31。");
+    zhcn.put("CLI.NOT.RUNNABLE.LOAD.FILE", "加载文件以使 CPU 可运行。尝试 load --help");
+    zhcn.put("CLI.RUN.EXE_START", "开始执行。");
+    zhcn.put("CLI.RUNNING", "运行中");
+    zhcn.put("LOG.HEADLESS_MSG", "无法在无头环境中启动图形用户界面");
+    languages.put("zhcn", zhcn);
   }
 
   public static String getString(String key) {
-    String lang_name = "en";
+    var lang_name = "en";
+    var default_language = languages.get("en");
+    var language = default_language;
+    
     if (config != null) {
       lang_name = config.getString(ConfigKey.LANGUAGE);
+      if (languages.containsKey(lang_name)) {
+        language = languages.get(lang_name);
+      } else {
+        logger.severe("Could not find language " + lang_name + ", defaulting to English");
+      }
     }
 
-    try {
-      Map<String, String> lang = languages.get(lang_name);
-      return lang.get(key);
-    } catch (Exception e) {
-      logger.severe("Could not look up key " + key + " in language " + lang_name);
-      return key;
+    var value = language.get(key);
+    if (value != null) {
+      return value;
     }
+
+    var english_value = default_language.get(key);
+    logger.severe("Language " + lang_name + " does not contain message " + key + ", falling back to English.");
+    if (english_value != null) {
+      return english_value;
+    }
+
+    logger.severe("Could not find message " + key + " neither in language " + lang_name + " nor in English.");
+    // Return the key to avoid the UI to show a blank, and also to make it very evident in the UI that something
+    // is very wrong.
+    return key;
   }
 }

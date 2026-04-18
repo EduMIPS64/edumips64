@@ -1,16 +1,29 @@
 import React from 'react';
 
+const Row = ({ label, value, valueId }) => {
+  return (
+    <tr>
+      <td style={{ fontSize: '0.9rem' }}>{label}</td>
+      <td
+        id={valueId}
+        style={{
+          fontFamily: "Menlo, Monaco, 'Courier New', monospace",
+          width: '20%',
+          fontSize: '0.75rem',
+        }}
+      >
+        {value}
+      </td>
+    </tr>
+  );
+};
+
 // A toy component that appends a final "s" to the label if
 // the given value is != 1. Of course this is not proper
 // pluralization, just me playing around with React.
-const PluralLabel = ({ label, value }) => {
-  const pluralize = (value) => (value != 1 ? 's' : '');
-  return (
-    <div>
-      {value} {label}
-      {pluralize(value)}
-    </div>
-  );
+const PluralRow = ({ label, value, valueId }) => {
+  const pluralSuffix = value != 1 ? 's' : '';
+  return <Row label={`${label}${pluralSuffix}`} value={value} valueId={valueId} />;
 };
 
 const Statistics = ({
@@ -18,34 +31,60 @@ const Statistics = ({
   instructions,
   rawStalls,
   wawStalls,
-  memoryStalls,
+  memoryStalls, L1I_reads, L1I_misses,L1D_reads,L1D_reads_misses,L1D_writes,L1D_writes_misses,
   codeSizeBytes,
   fcsr,
 }) => {
+  // Common table style to ensure consistent layout
+const tableStyle = {
+    border: 'none',
+    width: '100%',
+    tableLayout: 'fixed', // Forces consistent column widths
+};
   // TODO: FCSR.
   return (
     <div id="statistics">
       <div>
-        <b>Execution</b>
-        <PluralLabel value={cycles} label="Cycle" />
-        <PluralLabel value={instructions} label="Instruction" />
+        <table style={tableStyle}>
+            <tbody>
+            <tr>
+                <th colSpan="2" style={{textAlign: 'left', fontSize: '1rem', padding: '0.5rem 0'}}>
+                    Execution
+                </th>
+            </tr>
+              <PluralRow value={cycles} label="Cycle" valueId="stat-cycles"/>
+              <PluralRow value={instructions} label="Instruction" valueId="stat-instructions"/>
+            <Row value={instructions == 0 ? 0 : (cycles / instructions).toFixed(2)}
+                 label="Cycles per Instructions (CPI)"/>
+            </tbody>
+        </table>
+      </div>
+
         <div>
-          {instructions == 0 ? 0 : (cycles / instructions).toFixed(2)} Cycles
-          per Instructions (CPI)
+            <table style={tableStyle}>
+                <tbody>
+                <tr>
+                    <th colSpan="2" style={{textAlign: 'left', fontSize: '1rem', padding: '0.5rem 0'}}>
+                        Stalls
+                    </th>
+                </tr>
+                <PluralRow value={rawStalls} label="RAW Stall" valueId="stat-raw-stalls"/>
+                <PluralRow value={wawStalls} label="WAW Stall" valueId="stat-waw-stalls"/>
+                <PluralRow value={memoryStalls} label="Structural Stall" valueId="stat-structural-stalls"/>
+                <tr>
+                    <th colSpan="2" style={{textAlign: 'left', fontSize: '1rem', padding: '0.5rem 0'}}>
+                        Cache Memory Statistics
+                    </th>
+                </tr>
+                <Row value={L1I_reads} label="L1 Instruction Reads" valueId="stat-l1i-reads"/>
+                <Row value={L1I_misses} label="L1 Instruction Misses" valueId="stat-l1i-misses"/>
+                <Row value={L1D_reads} label="L1 Data Reads" valueId="stat-l1d-reads"/>
+                <Row value={L1D_reads_misses} label="L1 Data Read Misses" valueId="stat-l1d-read-misses"/>
+                <Row value={L1D_writes} label="L1 Data Writes" valueId="stat-l1d-writes"/>
+                <Row value={L1D_writes_misses} label="L1 Data Write Misses" valueId="stat-l1d-write-misses"/>
+                </tbody>
+            </table>
         </div>
-      </div>
-      <br />
-      <div>
-        <b>Stalls</b>
-        <PluralLabel value={rawStalls} label="RAW Stall" />
-        <PluralLabel value={wawStalls} label="WAW Stall" />
-        <PluralLabel value={memoryStalls} label="Memory Stall" />
-      </div>
-      <br />
-      <div>
-        <b>Code size</b>
-        <div>{codeSizeBytes} Bytes</div>
-      </div>
     </div>
   );
 };

@@ -168,6 +168,21 @@ incrementato, perché l'ultimo ciclo non è un vero ciclo di CPU ma solo uno
 pseudo-ciclo che ha l'unico compito di rimuovere l'ultima istruzione dalla
 pipeline ed incrementare il contatore delle istruzioni eseguite.
 
+La finestra Statistiche mostra anche le statistiche della cache L1 quando il 
+simulatore di cache è abilitato:
+
+* **L1I Reads** - Numero di accessi in lettura alla cache L1 delle istruzioni
+* **L1I Read Misses** - Numero di miss di lettura nella cache L1 delle istruzioni
+* **L1D Reads** - Numero di accessi in lettura alla cache L1 dei dati
+* **L1D Read Misses** - Numero di miss di lettura nella cache L1 dei dati
+* **L1D Writes** - Numero di accessi in scrittura alla cache L1 dei dati
+* **L1D Write Misses** - Numero di miss di scrittura nella cache L1 dei dati
+
+Queste statistiche aiutano ad analizzare le prestazioni della cache e a 
+comprendere i pattern di accesso alla memoria nel vostro programma. I miss della 
+cache indicano quando il processore deve accedere alla memoria principale più 
+lenta invece della cache più veloce.
+
 Pipeline
 ~~~~~~~~
 La finestra Pipeline mostra lo stato attuale della pipeline, visualizzando
@@ -242,9 +257,59 @@ un'opzione per scegliere se mostrare i valori delle celle di memoria come long
 o come double ed un'opzione per impostare la dimensione del font
 dell'interfaccia.
 
+La scheda Cache permette di configurare le impostazioni del simulatore di cache L1:
+
+* **L1 Data Cache Size** - Dimensione della cache L1 dei dati in byte (predefinito: 1024)
+* **L1 Instruction Cache Size** - Dimensione della cache L1 delle istruzioni in byte (predefinito: 1024)
+* **L1 Data Cache Block Size** - Dimensione di ogni blocco di cache in byte (predefinito: 16)
+* **L1 Instruction Cache Block Size** - Dimensione di ogni blocco di cache in byte (predefinito: 16)
+* **L1 Data Cache Associativity** - Numero di vie della cache, che determina l'organizzazione della cache (predefinito: 1)
+* **L1 Instruction Cache Associativity** - Numero di vie della cache, che determina l'organizzazione della cache (predefinito: 1)
+
+Queste impostazioni consentono di sperimentare con diverse configurazioni di 
+cache per comprendere il loro impatto sulle prestazioni del programma. Il 
+simulatore di cache modella cache L1 separate per dati e istruzioni, che è 
+comune nei processori moderni.
+
 Nota: lo scaling proporzionale dell'interfaccia rispetto alla dimensione del
 font non funziona benissimo, ma dovrebbe essere sufficiente a rendere il
 simulatore utilizzabile su schermi ad alta risoluzione (e.g., 4k).
+
+Simulatore di Cache L1
+~~~~~~~~~~~~~~~~~~~~~~
+EduMIPS64 include un simulatore di cache L1 integrato che modella il 
+comportamento di cache separate per istruzioni e dati. Il simulatore di cache 
+opera automaticamente durante l'esecuzione del programma e fornisce statistiche 
+dettagliate sulle prestazioni della cache.
+
+Il simulatore di cache modella:
+
+* **Cache L1 delle Istruzioni** - Mette in cache i fetch delle istruzioni dalla memoria
+* **Cache L1 dei Dati** - Mette in cache le letture e scritture di dati dalle operazioni di memoria
+
+Ogni cache può essere configurata indipendentemente con parametri diversi:
+
+* **Size** - Capacità totale della cache in byte
+* **Block Size** - Dimensione di ogni linea di cache in byte (chiamata anche blocco di cache)
+* **Associativity** - Numero di vie nel set della cache (1 = mappatura diretta, >1 = associativa per insiemi)
+
+Il simulatore di cache utilizza una politica di sostituzione Least Recently Used 
+(LRU) per le cache associative per insiemi. Le statistiche della cache vengono 
+aggiornate in tempo reale durante l'esecuzione e visualizzate nella finestra 
+Statistiche.
+
+Le prestazioni della cache possono impattare significativamente sui tempi di 
+esecuzione del programma, specialmente per programmi con scarsa località di 
+memoria. Utilizzate il simulatore di cache per:
+
+* Analizzare i pattern di accesso alla memoria nei vostri programmi
+* Sperimentare con diverse configurazioni di cache
+* Comprendere l'impatto delle prestazioni dei miss della cache
+* Apprendere il comportamento della cache nei processori reali
+
+La configurazione della cache può essere modificata tramite la finestra di 
+dialogo Impostazioni (scheda Cache) e ha effetto quando la simulazione viene 
+resettata.
 
 Dinero Frontend
 ~~~~~~~~~~~~~~~
@@ -266,7 +331,7 @@ del presente documento.
 
 Opzioni da riga di comando
 --------------------------
-Sono disponibili quattro opzioni da linea di comando. Esse sono descritte di
+Sono disponibili diverse opzioni da linea di comando. Esse sono descritte di
 seguito, con il nome per esteso scritto tra parentesi.  Nomi abbreviati e per
 esteso possono essere utilizzati indifferentemente.
 
@@ -283,6 +348,12 @@ esteso possono essere utilizzati indifferentemente.
 * `-d (--debug)` attiva la modalità di debugging.
 
 * `-hl (--headless)` Esegue EduMIPS64 in modalità headless (senza interfaccia grafica)
+
+* `--verbose` abilita la modalità verbose nella modalità headless/CLI, mostrando
+  l'output dettagliato del simulatore come messaggi di inizio/fine e indicatori
+  di progresso. Per impostazione predefinita, la CLI funziona in modalità
+  silenziosa, che minimizza l'output del simulatore per evitare confusione con
+  l'output del programma (ad esempio, da SYSCALL 5).
 
 Nella modalità di debugging è disponibile una nuova finestra, la finestra
 Debug, che mostra il resoconto delle attività interne di  EduMIPS64. Tale

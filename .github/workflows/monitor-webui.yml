@@ -8,14 +8,15 @@ jobs:
   monitor-ui:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Node.JS 18
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - name: Set up Node.JS
+        uses: actions/setup-node@v6
         with:
-          node-version: '18.12.1'
+          node-version-file: '.nvmrc'
       - run: npm install
+      - run: npx playwright install
       - name: Run web tests against deployed code in production
-        uses: nick-invision/retry@v2
+        uses: nick-fields/retry@v4
         env:
           PLAYWRIGHT_TARGET_URL: 'https://web.edumips.org'
         with:

@@ -26,102 +26,30 @@
 package org.edumips64.core.fpu;
 
 
-import org.edumips64.core.IrregularStringOfBitsException;
+import org.edumips64.core.Register;
 
-/** This class models a 64-bit CPU's internal register.
+/** This class models a 64-bit CPU's internal floating point register.
+ * 
+ * This class extends Register, which provides common register functionality
+ * (writeSemaphore, WAWSemaphore, name, reset, toString). It adds the 
+ * getFPDoubleValueAsString() method specific to floating point registers.
+ * 
  * @author Massimo Trubia
  */
-public class RegisterFP extends BitSet64FP {
-  private int writeSemaphore;
-  private int WAWSemaphore;
-  private String name;
+public class RegisterFP extends Register {
 
-  /** Creates a default new instance of Register. */
+  /** Creates a default new instance of RegisterFP. */
   public RegisterFP(String name) {
-    writeSemaphore = 0;
-    WAWSemaphore = 0;
-    this.name = name;
+    super(name);
   }
 
-  public String getName() {
-    return this.name;
-  }
-
-  /** Returns the value of the semaphore
-   *  @return the numerical value of the semaphore
+  /** Returns a string with a double value or the name of a special value.
+   * It is recommended to use this method only for the visualisation of the double value 
+   * because it may return an alphanumeric value.
+   * @return the double value or the special values "Quiet NaN","Signaling NaN", 
+   *         "Positive infinity", "Negative infinity","Positive zero","Negative zero"
    */
-  public int getWriteSemaphore() {
-    return writeSemaphore;
+  public String getFPDoubleValueAsString() {
+    return readDouble();
   }
-
-  /** Returns the value of the semaphore
-   *  @return the numerical value of the semaphore
-   */
-  public int getWAWSemaphore() {
-    return WAWSemaphore;
-  }
-
-  /** Increments the value of the semaphore
-   */
-  public void incrWAWSemaphore() {
-    WAWSemaphore++;
-  }
-
-  /** Increments the value of the semaphore
-   */
-  public void incrWriteSemaphore() {
-    writeSemaphore++;
-  }
-
-  /** Decrements the value of the semaphore.
-   *  It throws a <code>RuntimeException</code> if the semaphore value gets below zero, because
-   *  the value becomes negative only in case of programming errors, and the EduMIPS64 team
-   *  doesn't make any programming error.
-   */
-  public void decrWriteSemaphore() {
-    if (--writeSemaphore < 0) {
-      throw new RuntimeException("write semaphore for " + name + " reached a negative value.");
-    }
-  }
-
-  /** Decrements the value of the semaphore.
-   *  It throws a <code>RuntimeException</code> if the semaphore value gets below zero, because
-   *  the value becomes negative only in case of programming errors, and the EduMIPS64 team
-   *  doesn't make any programming error.
-   */
-  public void decrWAWSemaphore() {
-    if (--WAWSemaphore < 0) {
-      throw new RuntimeException("WAW semaphore for " + name + " reached a negative value.");
-    }
-  }
-
-  /**Returns a string with a double value or the name of a special value
-    * it is recommended the use of this method only for the visualisation of the double value because it may return an alphanumeric value
-    * @return the double value or the special values "Quiet NaN","Signaling NaN", "Positive infinity", "Negative infinity","Positive zero","Negative zero"
-    */
-  public String getValue() {
-    return super.readDouble();
-  }
-
-  /** Reset the register and its associated semaphores
-   */
-  public void reset() {
-    super.reset(false);
-    writeSemaphore = 0;
-    WAWSemaphore = 0;
-  }
-
-
-  public String toString() {
-    String s = "";
-
-    try {
-      s = getHexString();
-    } catch (IrregularStringOfBitsException e) {
-      e.printStackTrace();
-    } //Impossibile che si verifichi
-
-    return s;
-  }
-
 }
