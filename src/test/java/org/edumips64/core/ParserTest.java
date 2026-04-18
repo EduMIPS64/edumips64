@@ -308,4 +308,90 @@ public class ParserTest extends BaseParsingTest {
     parseCode("daddi r1,r0,0x10000");
   }
 
+  /** Tests for issue #1376: Support multiple labels for each given address */
+  @Test
+  public void AdjacentLabelsForwardJumpTest() throws Exception {
+    // Two adjacent labels should both be resolvable via forward jump.
+    parser.doParsing(
+        ".code\n" +
+        "j label_two\n" +
+        "label_one:\n" +
+        "label_two:\n" +
+        "SYSCALL 0\n");
+  }
+
+  @Test
+  public void AdjacentLabelsBackwardJumpTest() throws Exception {
+    // Two adjacent labels should both be resolvable via backward jump.
+    parser.doParsing(
+        ".code\n" +
+        "label_one:\n" +
+        "label_two:\n" +
+        "daddi r1, r0, 1\n" +
+        "j label_one\n" +
+        "SYSCALL 0\n");
+  }
+
+  @Test
+  public void AdjacentLabelsBothJumpTargetsTest() throws Exception {
+    // Both adjacent labels can be used as jump targets.
+    parser.doParsing(
+        ".code\n" +
+        "j label_one\n" +
+        "daddi r1, r0, 1\n" +
+        "label_one:\n" +
+        "label_two:\n" +
+        "j label_two\n" +
+        "SYSCALL 0\n");
+  }
+
+  @Test
+  public void ThreeAdjacentLabelsTest() throws Exception {
+    // Three adjacent labels should all resolve to the same address.
+    parser.doParsing(
+        ".code\n" +
+        "j label_three\n" +
+        "label_one:\n" +
+        "label_two:\n" +
+        "label_three:\n" +
+        "SYSCALL 0\n");
+  }
+
+  @Test
+  public void AdjacentLabelsBranchTest() throws Exception {
+    // Adjacent labels should work with branch instructions too.
+    parser.doParsing(
+        ".code\n" +
+        "daddi r1, r0, 0\n" +
+        "bne r1, r0, target_b\n" +
+        "target_a:\n" +
+        "target_b:\n" +
+        "SYSCALL 0\n");
+  }
+
+  @Test
+  public void AdjacentLabelsAddressVerificationTest() throws Exception {
+    // Verify both adjacent labels resolve to the same instruction address.
+    parser.doParsing(
+        ".code\n" +
+        "daddi r1, r0, 1\n" +
+        "label_a:\n" +
+        "label_b:\n" +
+        "SYSCALL 0\n");
+    Integer addrA = symTab.getInstructionAddress("LABEL_A");
+    Integer addrB = symTab.getInstructionAddress("LABEL_B");
+    assertEquals(addrA, addrB);
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void DuplicateLabelStillFailsTest() throws Exception {
+    // Using the same label name twice should still be an error.
+    parser.doParsing(
+        ".code\n" +
+        "dup_label:\n" +
+        "daddi r1, r0, 1\n" +
+        "dup_label:\n" +
+        "SYSCALL 0\n");
+  }
+
 }

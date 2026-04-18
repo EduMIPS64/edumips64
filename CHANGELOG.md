@@ -1,8 +1,48 @@
 # EduMIPS64 ChangeLog
 
+## Unreleased
+
+### Added
+- Electron desktop application for Windows, macOS, and Linux, allowing the
+  simulator to run offline without requiring a browser or internet connection.
+  (@davidepatti)
+- Embedded cache simulator as an alternative to external DineroIV, with
+  configurable L1 data and instruction cache parameters (size, block size,
+  associativity, miss penalty). (@davidepatti)
+- `DMUL`, `DMOD`, and `DDIV` instructions with three-operand syntax (`rd, rs,
+  rt`) from MIPS64 Release 6 ISA. The legacy two-operand `DDIV rs, rt` form
+  remains supported. (Issue #867)
+- Dark mode toggle in the desktop (Swing) UI with redesigned icons.
+  (@smallg0at, Issue #796)
+- CLI: SYSCALL 5 support for printf-like output. (Issue #1178)
+- CLI: quiet mode is now the default, preventing simulator messages from mixing
+  with program output; use `--verbose` to restore the previous behaviour.
+  (Issue #1181)
+
+### Fixed
+- Parser now supports multiple adjacent labels pointing to the same address,
+  instead of reporting a misleading "label not found" error. (Issue #1341)
+- Circular `#include` detection now correctly detects both direct and indirect
+  include loops instead of crashing. (Issue #610)
+- Parser now provides a proper error message when instructions have missing
+  parameters instead of throwing an exception. (Issue #1048)
+- CLI: loading a program that has parser warnings (e.g., deprecated
+  instructions) no longer fails.
+- Hexadecimal values in `.data` section are now properly validated according to
+  the declared data type size (e.g., `.byte 0xff` now works correctly).
+  (@davidepatti)
+- Hexadecimal immediates now support the full 16-bit range in instructions.
+  (@davidepatti)
+- Desktop UI: Cycles window now always shows the first instruction correctly.
+  (Issue #875)
+- Documentation: fixed typo in `LWU` instruction description. (@AptInit)
+
+### Changed
+- Updated various dependencies for security and compatibility improvements.
+
 ## 1.3.0 (16/10/2023) - Lourdes
 
-## Added
+### Added
 - Simplified Chinese translation, both the in-application help and the HTML/PDF docs. (@smallg0at)
 - `DMUHU` instruction.
 - New, modern look & feel.
