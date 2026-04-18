@@ -42,6 +42,12 @@ public class Result {
   public JsArray<Instruction> parsedInstructions;
   public String stdout;
   public String validInstructions;
+  public boolean inputRequested = false;
+  public int inputMaxLength = 0;
+  public int inputResumeSteps = 0;
+  public String inputDialogTitle = "";
+  public String inputPromptMessage = "";
+  public String inputTooLongMessage = "";
   // Indicates the operation that generated this result (e.g., "checksyntax", "step", "load", "reset")
   public String method = "";
 

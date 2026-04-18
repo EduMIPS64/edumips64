@@ -29,6 +29,7 @@ import org.edumips64.core.MemoryElement;
 import org.edumips64.core.MemoryElementNotFoundException;
 import org.edumips64.core.Register;
 import org.edumips64.core.fpu.FPInvalidOperationException;
+import org.edumips64.utils.io.InputNeededException;
 import org.edumips64.utils.io.WriteException;
 import java.util.logging.Logger;
 
@@ -133,18 +134,18 @@ public class SYSCALL extends Instruction {
       // int write(int fd, void* buf, int count)
       int fd, count;
       long buf_addr;
+      long paramsAddress = address;
 
-      MemoryElement temp = memory.getCellByAddress(address);
+      MemoryElement temp = memory.getCellByAddress(paramsAddress);
       fd = (int) temp.getValue();
-      address += 8;
+      paramsAddress += 8;
 
-      temp = memory.getCellByAddress(address);
+      temp = memory.getCellByAddress(paramsAddress);
       buf_addr = temp.getValue();
-      address += 8;
+      paramsAddress += 8;
 
-      temp = memory.getCellByAddress(address);
+      temp = memory.getCellByAddress(paramsAddress);
       count = (int) temp.getValue();
-      address += 8;
 
       return_value = -1;
 
@@ -156,6 +157,8 @@ public class SYSCALL extends Instruction {
           logger.info("SYSCALL (" + this.hashCode() + "): trying to write to fd " + fd + " " + count + " bytes, reading them from address " + buf_addr);
           return_value = iom.write(fd, buf_addr, count);
         }
+      } catch (InputNeededException e) {
+        throw e;
       } catch (Exception e) {
         logger.info("Error in executing the read(), the syscall will fail.");
         logger.info(e.toString());

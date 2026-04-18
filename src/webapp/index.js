@@ -57,6 +57,9 @@ worker.checkSyntax = (code) => {
 
   appInsights.trackEvent({name: "checkSyntax"});
 };
+worker.provideInput = (input) => {
+  worker.postMessage({ method: 'provideInput', input });
+};
 worker.parseResult = (result) => {
   result.registers = JSON.parse(result.registers);
   result.memory = JSON.parse(result.memory);
