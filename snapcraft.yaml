@@ -34,15 +34,30 @@ parts:
       fi
 
       craftctl default
+      # Point the ru.vyarus.use-python Gradle plugin at Python 3.14 (installed
+      # from deadsnakes in override-pull), since the system python3 on core24 is 3.12.
+      export ORG_GRADLE_PROJECT_pythonPath=/usr/local/bin
       mkdir -p "$CRAFT_PART_INSTALL"/jar
       bash gradlew --no-daemon "$@" jar && \
         ls -ld build/libs/* && \
         mv build/libs/edumips64-*.jar "$CRAFT_PART_INSTALL"/jar/edumips64.jar && \
         ls $CRAFT_PART_INSTALL/jar/*.jar -ld
     source: .
-    # Core24 (Ubuntu 24.04) build environment uses Python 3.14 to build the documentation.
+    # Core24 (Ubuntu 24.04) only ships Python 3.12 in its default repos, so Python 3.14
+    # (required by the Gradle build for the documentation) is installed from the
+    # deadsnakes PPA in override-pull below.
     override-pull: |
       craftctl default
+      apt-get update
+      apt-get install -y software-properties-common
+      add-apt-repository -y ppa:deadsnakes/ppa
+      apt-get update
+      apt-get install -y python3.14-dev python3.14-venv
+      # The ru.vyarus.use-python Gradle plugin looks for a `python`/`python3`
+      # binary in pythonPath; deadsnakes only ships `python3.14`, so expose
+      # it under the conventional names in /usr/local/bin.
+      ln -sf /usr/bin/python3.14 /usr/local/bin/python3
+      ln -sf /usr/bin/python3.14 /usr/local/bin/python
     build-packages:
       - git
       - pkg-config
@@ -51,8 +66,6 @@ parts:
       - ca-certificates
       - python3-pip
       # Needed to build pillow, a rst2pdf dependency.
-      - python3.14-dev
-      - python3.14-venv
       - zlib1g-dev
       - libjpeg-dev
       - libtiff-dev
