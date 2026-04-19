@@ -63,6 +63,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -134,9 +138,20 @@ public class Main {
   }
 
   public static void main(String args[]) {
+    // Force stdout/stderr to UTF-8 so localized strings (e.g. CLI help in
+    // Chinese) render correctly even when the JVM's default file.encoding
+    // is a non-UTF-8 codepage (common on Windows or with LANG=C).
+    System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8));
+    System.setErr(new PrintStream(System.err, true, StandardCharsets.UTF_8));
+
     Main mm = new Main();
     Args cliArgs = new Args();
     CommandLine commandLine = new CommandLine(cliArgs);
+    // Picocli wraps the output streams in PrintWriters that use Charset.defaultCharset(),
+    // which can drop non-ASCII characters from localized usage messages on systems where
+    // the default charset is not UTF-8 (e.g. Windows or LANG=C). Force UTF-8 explicitly.
+    commandLine.setOut(new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true));
+    commandLine.setErr(new PrintWriter(new OutputStreamWriter(System.err, StandardCharsets.UTF_8), true));
     if (commandLine.execute(args) != 0 || commandLine.isUsageHelpRequested() || commandLine.isVersionHelpRequested()) {
       System.exit(0);
     }
