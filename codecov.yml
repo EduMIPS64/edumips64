@@ -5,3 +5,9 @@ status:
   project:
     default:
       threshold: 1
+
+# The Swing UI is explicitly excluded from code coverage reports (see
+# docs/developer-guide.md). Main.java is the Swing entry point.
+ignore:
+  - "src/main/java/org/edumips64/ui/swing/**"
+  - "src/main/java/org/edumips64/Main.java"

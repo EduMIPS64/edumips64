@@ -50,12 +50,14 @@ public class GUIHelp {
   /**
    * Shows the EduMIPS64 help window.
    *
-   * In case of error, logs a SEVERE error statement and returns without showing the help window.
+   * In case of error, logs a SEVERE error statement and returns false so the caller can
+   * surface the problem to the user.
    *
    * @param parent the window that owns this help dialog
    * @param helpSetUrl the URL to the directory of the help set.
+   * @return true if the help window was displayed, false otherwise.
    */
-  public static void showHelp(Window parent, URL helpSetUrl, ConfigStore cfg) {
+  public static boolean showHelp(Window parent, URL helpSetUrl, ConfigStore cfg) {
     // Clean up the URL from spaces.
     log.info("Got helpSetUrl: <"+helpSetUrl+">");
     String clean = helpSetUrl.getProtocol() + ":" + helpSetUrl.getPath().replace("%20", " ");
@@ -65,10 +67,10 @@ public class GUIHelp {
       cleanUrl = new URI(clean).toURL();
     } catch (URISyntaxException e) {
       log.log(Level.SEVERE, "Could not parse Help URL_" + clean, e);
-      return;
+      return false;
     } catch (MalformedURLException e) {
       log.log(Level.SEVERE, "Could not parse Help URL_" + clean, e);
-      return;
+      return false;
     }
     log.info("Cleaned: <" + cleanUrl + ">");
 
@@ -77,12 +79,17 @@ public class GUIHelp {
     URL url = HelpSet.findHelpSet(urlclassloader, HELPSET);
     log.info("Final Helpset Url: <" + url + ">");
 
+    if (url == null) {
+      log.log(Level.SEVERE, "Could not find helpset " + HELPSET + " under " + cleanUrl);
+      return false;
+    }
+
     HelpSet helpset;
     try {
       helpset = new HelpSet(urlclassloader, url);
     } catch (HelpSetException e) {
       log.log(Level.SEVERE, "Could not load helpset " + url, e);
-      return;
+      return false;
     }
 
     int desiredFontSize = cfg.getInt(ConfigKey.UI_FONT_SIZE);
@@ -98,5 +105,6 @@ public class GUIHelp {
     helpBroker.initPresentation();
     helpBroker.setFont(newFont);
     helpBroker.setDisplayed(true);
+    return true;
   }
 }

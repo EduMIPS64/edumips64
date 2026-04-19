@@ -980,14 +980,28 @@ public class Main {
 
     manual = new JMenuItem();
     help.add(manual);
+    // Resolve the helpset directory once. If it's unavailable (e.g. noHelpJar build),
+    // disable the menu item and show a tooltip so the user isn't left wondering why
+    // clicking "Manual" does nothing.
+    String hsPath = CurrentLocale.getString("HELPDIR") + "/";
+    URL helpSetUrl = Main.class.getResource(hsPath);
+    if (helpSetUrl == null) {
+      log.warning("Help resources not found under " + hsPath + " - disabling Manual menu item.");
+      manual.setEnabled(false);
+      manual.setToolTipText(CurrentLocale.getString("MANUAL_UNAVAILABLE"));
+    }
     manual.addActionListener(e -> {
-        String hsPath = CurrentLocale.getString("HELPDIR") + "/";
-        URL helpSetUrl = Main.class.getResource(hsPath);
         if (helpSetUrl == null) {
-          log.log(Level.SEVERE, "Could not create helpset URL for path: <" + hsPath + ">");
           return;
         }
-        GUIHelp.showHelp(null, helpSetUrl, configStore);
+        boolean shown = GUIHelp.showHelp(null, helpSetUrl, configStore);
+        if (!shown) {
+          JOptionPane.showMessageDialog(
+              mainFrame,
+              CurrentLocale.getString("MANUAL_ERROR"),
+              "EduMIPS64 - " + CurrentLocale.getString("ERROR"),
+              JOptionPane.ERROR_MESSAGE);
+        }
     });
 
     aboutUs = new JMenuItem(CurrentLocale.getString("MenuItem.ABOUT_US"));
@@ -1085,7 +1099,7 @@ public class Main {
     });
     window.add(codeJCB);
 
-    ioJCB.setText(CurrentLocale.getString("log".toUpperCase()));
+    ioJCB.setText(CurrentLocale.getString("io".toUpperCase()));
     ioJCB.setState(true);
     ioJCB.addActionListener(e -> {
       boolean cur_state = mapped_frames.get("io").isIcon();
