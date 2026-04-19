@@ -151,7 +151,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: MSI
-          path: EduMIPS64-*.msi
+          path: build/libs/EduMIPS64-*.msi
 
   # ---------------------------------------------------------------------------
   # 4. Build the web application (needed for Electron and deploy-prod).

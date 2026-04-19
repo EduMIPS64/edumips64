@@ -283,8 +283,10 @@ tasks.register<Exec>("msi"){
             throw GradleException("Wix is required to create the MSI package.")
         }
 
-        println("Creating EduMIPS64-${version}.msi.");
-        val cmd = "jpackage.exe --main-jar edumips64-${version}.jar --input ./${layout.buildDirectory.get().asFile.name}/libs/ --app-version ${version} --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright ${LocalDateTime.now().year}, EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install --java-options -Dfile.encoding=utf-8"
+        val buildDirName = layout.buildDirectory.get().asFile.name
+        val destDir = "./${buildDirName}/libs"
+        println("Creating ${destDir}/EduMIPS64-${version}.msi.");
+        val cmd = "jpackage.exe --main-jar edumips64-${version}.jar --input ./${buildDirName}/libs/ --dest ${destDir} --app-version ${version} --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright ${LocalDateTime.now().year}, EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install --java-options -Dfile.encoding=utf-8"
         commandLine(cmd.split(" "));
     }
 }
