@@ -1099,7 +1099,7 @@ public class Main {
     });
     window.add(codeJCB);
 
-    ioJCB.setText(CurrentLocale.getString("log".toUpperCase()));
+    ioJCB.setText(CurrentLocale.getString("io".toUpperCase()));
     ioJCB.setState(true);
     ioJCB.addActionListener(e -> {
       boolean cur_state = mapped_frames.get("io").isIcon();
