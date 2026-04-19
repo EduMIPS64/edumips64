@@ -434,6 +434,12 @@ Flow control instructions are used to alter the order of instructions that
 are fetched by the CPU. We can make a distinction between these instructions:
 R-Type, I-Type and J-Type.
 
+EduMIPS64 uses a **branch-not-taken** prediction strategy. When a conditional
+branch instruction is encountered, the processor assumes the branch will not
+be taken and continues fetching the next sequential instructions. If the
+branch is actually taken, the speculatively fetched instructions are squashed
+from the pipeline and execution resumes from the branch target.
+
 Those instructions effectively executes the jump in the ID stage, so often an
 useless fetch is executed. In this case, two instructions are removed from the
 pipeline, and the branch taken stalls counter is incremented by two units.

@@ -443,6 +443,13 @@ Le istruzioni di controllo del flusso sono utilizzate per alterare l'ordine
 delle istruzioni prelevate dalla CPU nella fase di fetch. è possibile fare una
 distinzione tra tali istruzioni: tipo R, tipo I e tipo J.
 
+EduMIPS64 adotta una strategia di predizione dei salti **branch-not-taken**.
+Quando viene incontrata un'istruzione di salto condizionale, il processore
+assume che il salto non verrà effettuato e continua a prelevare le istruzioni
+sequenziali successive. Se il salto viene effettivamente eseguito, le
+istruzioni prelevate speculativamente vengono rimosse dalla pipeline e
+l'esecuzione riprende dall'indirizzo di destinazione del salto.
+
 Tali istruzioni eseguono il salto alla fase di Instruction Decode (ID), ogni
 qual volta viene effettuato un fetch inutile. In tal caso, due istruzioni
 vengono rimosse dalla pipeline, ed il contatore degli stalli dovuti ai salti
