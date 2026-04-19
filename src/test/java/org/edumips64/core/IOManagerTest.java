@@ -41,4 +41,30 @@ public class IOManagerTest extends BaseTest {
     assertEquals(0, element.readByte(3));
     assertEquals(0, element.readByte(4));
   }
+
+  @Test
+  public void readUsesPlainReaderFallbackForNonStringInputReader() throws Exception {
+    Memory memory = new Memory();
+    IOManager ioManager = new IOManager(new NullFileUtils(), memory);
+    ioManager.setStdInput(new org.edumips64.utils.io.Reader() {
+      @Override
+      public int read(char[] buffer, int count) throws ReadException {
+        buffer[0] = 'X';
+        buffer[1] = 'Y';
+        return 2;
+      }
+
+      @Override
+      public void close() {}
+    });
+
+    int bytesRead = ioManager.read(0, 0, 4);
+    MemoryElement element = memory.getCellByAddress(0);
+
+    assertEquals(2, bytesRead);
+    assertEquals('X', element.readByte(0));
+    assertEquals('Y', element.readByte(1));
+    assertEquals(0, element.readByte(2));
+    assertEquals(0, element.readByte(3));
+  }
 }
