@@ -7,19 +7,24 @@ const {
   loadProgram,
 } = require('./test-utils');
 
+// The parser's .word64 directive only accepts integer/hex literals, not
+// label names, so the buffer address is populated at runtime via sd.
 const syscall3Program = `.data
-params_read:  .word64 0
-              .word64 buffer
-              .word64 5
-params_write: .word64 1
-              .word64 buffer
-              .word64 5
-buffer:       .space 8
+params_read_fd:     .word64 0
+params_read_buf:    .space  8
+params_read_count:  .word64 5
+params_write_fd:    .word64 1
+params_write_buf:   .space  8
+params_write_count: .word64 5
+buffer:             .space  8
 
 .code
-              daddi $t6, $zero, params_read
+              daddi $t0, $zero, buffer
+              sd    $t0, params_read_buf($zero)
+              sd    $t0, params_write_buf($zero)
+              daddi $t6, $zero, params_read_fd
               syscall 3
-              daddi $t6, $zero, params_write
+              daddi $t6, $zero, params_write_fd
               syscall 4
               syscall 0
 `;
