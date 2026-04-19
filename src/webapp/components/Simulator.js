@@ -12,6 +12,7 @@ import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import Grid from '@mui/material/Grid';
 import ErrorList from './ErrorList';
 import StdOut from './StdOut';
+import InputDialog from './InputDialog';
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 
@@ -49,6 +50,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
     initialState.parsedInstructions,
   );
   const [stdout, setStdout] = React.useState('');
+  const [inputRequest, setInputRequest] = React.useState(null);
 
   const [viMode, setViMode] = React.useState(false);
   const [fontSize, setFontSize] = React.useState(14);
@@ -190,14 +192,18 @@ const Simulator = ({worker, initialState, appInsights}) => {
       }
       return;
     }
+
+    if (result.inputRequested) {
+      applyResultState(result);
+      setExecuting(false);
+      setInputRequest(result);
+      return;
+    }
     
     updateState(result);
   };
 
-  const updateState = (result) => {
-    console.log('Updating state.');
-
-    setExecuting(false);
+  const applyResultState = (result) => {
     setRegisters(result.registers);
     setMemory(result.memory);
     setStats(result.statistics);
@@ -214,6 +220,13 @@ const Simulator = ({worker, initialState, appInsights}) => {
     if (result.stdout) {
       setStdout(result.stdout);
     }
+  };
+
+  const updateState = (result) => {
+    console.log('Updating state.');
+
+    setExecuting(false);
+    applyResultState(result);
 
     // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
     // Runtime errors should not cause multiple alert prompting to avoid webui getting stuck
@@ -276,12 +289,14 @@ const Simulator = ({worker, initialState, appInsights}) => {
     setMustPause(true);
     setRunAll(false);
     setStepsToRun(0);
+    setInputRequest(null);
     worker.reset();  // Assuming simulator has a reset method
   };
 
   const clearCode = () => {
     setCode(".data\n\n.code\n  SYSCALL 0\n");
     isResetting.current = true;
+    setInputRequest(null);
     worker.reset();
     // Clear accordion change markers
     setAccordionChanges({
@@ -318,6 +333,16 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const loadCode = () => {
     setStdout("");
     worker.load(code);
+  };
+
+  const submitInput = (input) => {
+    setInputRequest(null);
+    setExecuting(true);
+    worker.provideInput(input);
+  };
+
+  const cancelInput = () => {
+    submitInput('');
   };
 
   const saveCode = () => {
@@ -373,6 +398,11 @@ const Simulator = ({worker, initialState, appInsights}) => {
     <>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        <InputDialog
+          request={inputRequest}
+          onSubmit={submitInput}
+          onCancel={cancelInput}
+        />
         <Header
           onRunClick={clickRun}
           runEnabled={simulatorRunning && !executing}

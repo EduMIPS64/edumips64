@@ -45,6 +45,8 @@ import java.util.logging.Logger;
 
 public class Worker implements EntryPoint {
   private Simulator simulator;
+  private int pendingSteps;
+  private String pendingMethod = "";
 
   // A separate Simulator instance, used only for syntax checking.
   // This is not great, but given how tightly coupled the Parser class is
@@ -69,12 +71,13 @@ public class Worker implements EntryPoint {
         info("Running worker method " + method);
         switch(method) {
           case "reset":
+            clearPendingInput();
             postMessage(withMethod(simulator.reset(), method));
             break;
           case "step":
             int steps = data.getAsAny("steps").asInt();
             info("steps: " + steps);
-            postMessage(withMethod(simulator.step(steps), method));
+            postSimulationResult(simulator.step(steps), method);
             break;
           case "setcacheconfig":
             JsPropertyMap<Object> config = Js.cast(data.get("config"));
@@ -96,14 +99,27 @@ public class Worker implements EntryPoint {
             postMessage(withMethod(simulator.resultFactory.Success(), method));
             break;
           case "load":
+            clearPendingInput();
             String code = data.getAsAny("code").asString();
             Result parseResult = simulator.loadProgram(code);
             if (!parseResult.success) {
               DomGlobal.console.log(parseResult);
               postMessage(withMethod(parseResult, method));
             } else {
-              postMessage(withMethod(simulator.step(1), method));
+              postSimulationResult(simulator.step(1), method);
             }
+            break;
+          case "provideinput":
+            String input = data.getAsAny("input").asString();
+            int stepsToResume = pendingSteps;
+            String methodToResume = pendingMethod;
+            if (stepsToResume <= 0 || methodToResume.isEmpty()) {
+              postMessage(withMethod(simulator.resultFactory.Failure("No pending input request."), method));
+              break;
+            }
+            simulator.provideInput(input);
+            clearPendingInput();
+            postSimulationResult(simulator.step(stepsToResume), methodToResume);
             break;
           case "checksyntax":
             // Use parsingSimulator to do a syntax check, then inject the parsing errors
@@ -133,6 +149,21 @@ public class Worker implements EntryPoint {
 
   private void postMessage(Object message) {
     DomGlobal.postMessage(message);
+  }
+
+  private void postSimulationResult(Result result, String method) {
+    if (result.inputRequested) {
+      pendingSteps = result.inputResumeSteps;
+      pendingMethod = method;
+    } else {
+      clearPendingInput();
+    }
+    postMessage(withMethod(result, method));
+  }
+
+  private void clearPendingInput() {
+    pendingSteps = 0;
+    pendingMethod = "";
   }
 
   private Result withMethod(Result result, String method) {
