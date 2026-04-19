@@ -54,7 +54,7 @@ test('syscall 3 opens an input dialog and resumes execution', async ({ page }) =
   await expect(page.locator('#stdout-view')).toHaveValue('abcde');
 });
 
-test('syscall 3 enforces the same maximum input length as the desktop app', async ({ page }) => {
+test('syscall 3 caps the input at the maximum allowed length', async ({ page }) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
 
@@ -65,12 +65,23 @@ test('syscall 3 enforces the same maximum input length as the desktop app', asyn
 
   const inputDialog = page.getByRole('dialog');
   await expect(inputDialog).toBeVisible();
+  await expect(inputDialog).toContainText('max 5 characters');
 
-  await inputDialog.getByRole('textbox').fill('abcdef');
-  await inputDialog.getByRole('button', { name: 'OK' }).click();
-  await expect(inputDialog).toContainText('Input must not exceed 5 characters');
+  // Counter starts at 0 / 5
+  const counter = inputDialog.getByTestId('input-counter');
+  await expect(counter).toHaveText('0 / 5');
 
-  await inputDialog.getByRole('textbox').fill('vwxyz');
+  // Attempting to enter more than 5 characters is silently truncated to 5.
+  const textbox = inputDialog.getByRole('textbox');
+  await textbox.fill('abcdefgh');
+  await expect(textbox).toHaveValue('abcde');
+  await expect(counter).toHaveText('5 / 5');
+
+  // Clear and re-enter a valid value to complete the syscall.
+  await textbox.fill('');
+  await expect(counter).toHaveText('0 / 5');
+  await textbox.fill('vwxyz');
+  await expect(counter).toHaveText('5 / 5');
   await inputDialog.getByRole('button', { name: 'OK' }).click();
 
   await waitForSimulationComplete(page);
