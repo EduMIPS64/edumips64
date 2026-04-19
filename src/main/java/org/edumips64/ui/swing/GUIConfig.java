@@ -487,8 +487,6 @@ public class GUIConfig extends JDialog {
     addRow(panel, row++, ConfigKey.L1I_BLOCK_SIZE, new JNumberField());
     addRow(panel, row++, ConfigKey.L1D_ASSOCIATIVITY, new JNumberField());
     addRow(panel, row++, ConfigKey.L1I_ASSOCIATIVITY, new JNumberField());
-    addRow(panel, row++, ConfigKey.L1D_PENALTY, new JNumberField());
-    addRow(panel, row++, ConfigKey.L1I_PENALTY, new JNumberField());
 
     grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
     return panel;

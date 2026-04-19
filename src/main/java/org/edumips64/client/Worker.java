@@ -87,14 +87,12 @@ public class Worker implements EntryPoint {
             int l1dSize = ((Double) l1d.get("size")).intValue();
             int l1dBlockSize = ((Double) l1d.get("blockSize")).intValue();
             int l1dAssoc = ((Double) l1d.get("associativity")).intValue();
-            int l1dPenalty = ((Double) l1d.get("penalty")).intValue();
-            var l1d_config = new CacheConfig(l1dSize,l1dBlockSize,l1dAssoc,l1dPenalty);
+            var l1d_config = new CacheConfig(l1dSize,l1dBlockSize,l1dAssoc);
 
             int l1iSize = ((Double) l1i.get("size")).intValue();
             int l1iBlockSize = ((Double) l1i.get("blockSize")).intValue();
             int l1iAssoc = ((Double) l1i.get("associativity")).intValue();
-            int l1iPenalty = ((Double) l1i.get("penalty")).intValue();
-            var l1i_config = new CacheConfig(l1iSize,l1iBlockSize,l1iAssoc,l1iPenalty);
+            var l1i_config = new CacheConfig(l1iSize,l1iBlockSize,l1iAssoc);
 
             simulator.setCacheConfig(l1d_config,l1i_config);
 

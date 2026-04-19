@@ -44,8 +44,7 @@ public class CacheMemory {
         int cacheSize = config.getInt(ConfigKey.valueOf(prefix + "_SIZE"));
         int blockSize = config.getInt(ConfigKey.valueOf(prefix + "_BLOCK_SIZE"));
         int associativity = config.getInt(ConfigKey.valueOf(prefix + "_ASSOCIATIVITY"));
-        int penalty = config.getInt(ConfigKey.valueOf(prefix + "_PENALTY"));
-        CacheConfig cc = new CacheConfig(cacheSize, blockSize, associativity, penalty);
+        CacheConfig cc = new CacheConfig(cacheSize, blockSize, associativity);
         setConfig(cc);
     }
 

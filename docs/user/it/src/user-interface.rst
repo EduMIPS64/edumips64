@@ -265,8 +265,6 @@ La scheda Cache permette di configurare le impostazioni del simulatore di cache 
 * **L1 Instruction Cache Block Size** - Dimensione di ogni blocco di cache in byte (predefinito: 16)
 * **L1 Data Cache Associativity** - Numero di vie della cache, che determina l'organizzazione della cache (predefinito: 1)
 * **L1 Instruction Cache Associativity** - Numero di vie della cache, che determina l'organizzazione della cache (predefinito: 1)
-* **L1 Data Cache Penalty** - Numero di cicli addizionali per i miss della cache (predefinito: 40)
-* **L1 Instruction Cache Penalty** - Numero di cicli addizionali per i miss della cache (predefinito: 40)
 
 Queste impostazioni consentono di sperimentare con diverse configurazioni di 
 cache per comprendere il loro impatto sulle prestazioni del programma. Il 
@@ -294,7 +292,6 @@ Ogni cache può essere configurata indipendentemente con parametri diversi:
 * **Size** - Capacità totale della cache in byte
 * **Block Size** - Dimensione di ogni linea di cache in byte (chiamata anche blocco di cache)
 * **Associativity** - Numero di vie nel set della cache (1 = mappatura diretta, >1 = associativa per insiemi)
-* **Penalty** - Cicli di CPU addizionali sostenuti sui miss della cache
 
 Il simulatore di cache utilizza una politica di sostituzione Least Recently Used 
 (LRU) per le cache associative per insiemi. Le statistiche della cache vengono 

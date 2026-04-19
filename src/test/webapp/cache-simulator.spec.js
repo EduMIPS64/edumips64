@@ -12,17 +12,17 @@ const {
 /**
  * Helper function to set cache configuration values.
  * Uses positional selectors within each cache section to find the correct input fields.
- * The order of inputs is: Size, Block Size, Associativity, Penalty.
+ * The order of inputs is: Size, Block Size, Associativity.
  * @param {import('@playwright/test').Page} page - Playwright page object
  * @param {string} cacheType - 'L1 Data Cache' or 'L1 Instruction Cache'
- * @param {object} config - { size, blockSize, associativity, penalty }
+ * @param {object} config - { size, blockSize, associativity }
  */
 async function setCacheConfig(page, cacheType, config) {
   // Find the cache configuration section by its label
   const cacheSection = page.locator(`text=${cacheType}`).locator('..');
 
   // Set each config value using positional selectors
-  // The inputs appear in order: Size, Block Size, Associativity, Penalty
+  // The inputs appear in order: Size, Block Size, Associativity
   if (config.size !== undefined) {
     const sizeInput = cacheSection.locator('input[type="number"]').nth(0);
     await sizeInput.fill(String(config.size));
@@ -34,10 +34,6 @@ async function setCacheConfig(page, cacheType, config) {
   if (config.associativity !== undefined) {
     const assocInput = cacheSection.locator('input[type="number"]').nth(2);
     await assocInput.fill(String(config.associativity));
-  }
-  if (config.penalty !== undefined) {
-    const penaltyInput = cacheSection.locator('input[type="number"]').nth(3);
-    await penaltyInput.fill(String(config.penalty));
   }
 }
 
@@ -181,7 +177,6 @@ test('changing cache configuration affects cache misses', async ({ page }) => {
     size: 256,
     blockSize: 8,
     associativity: 1,
-    penalty: 50,
   });
 
   // Program that accesses memory locations spread apart using register offsets
@@ -251,7 +246,6 @@ SYSCALL 0
     size: 1024,
     blockSize: 8,
     associativity: 1,
-    penalty: 50,
   });
 
   await loadProgram(page, testProgram);
@@ -265,7 +259,6 @@ SYSCALL 0
     size: 1024,
     blockSize: 64,
     associativity: 1,
-    penalty: 50,
   });
 
   await loadProgram(page, testProgram);
@@ -301,7 +294,6 @@ test('instruction cache shows hits for loop iterations', async ({ page }) => {
     size: 1024,
     blockSize: 16,
     associativity: 1,
-    penalty: 40,
   });
 
   // Program with a loop - should have many instruction reads but few misses
