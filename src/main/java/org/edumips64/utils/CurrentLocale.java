@@ -271,6 +271,8 @@ public class CurrentLocale {
     en.put("CLEAR", "Clear");
     en.put("DATA", "Data");
     en.put("HELPDIR", "/docs/user/en");
+    en.put("MANUAL_UNAVAILABLE", "The user manual is not bundled with this build.");
+    en.put("MANUAL_ERROR", "Could not open the user manual.");
     en.put("NEGADDRERR", "Negative memory address error in instruction");
     en.put("ALIGNERR", "Alignment error in instruction");
     en.put("THEADDRESS", "the address");
@@ -519,6 +521,8 @@ public class CurrentLocale {
     it.put("CLEAR", "Pulisci");
     it.put("DATA", "Dati");
     it.put("HELPDIR", "/docs/user/it");
+    it.put("MANUAL_UNAVAILABLE", "Il manuale utente non è incluso in questa versione.");
+    it.put("MANUAL_ERROR", "Impossibile aprire il manuale utente.");
     it.put("NEGADDRERR", "Tentativo di accesso ad indirizzo di memoria negativo nell'istruzione");
     it.put("ALIGNERR", "Errore di allineamento nell'istruzione");
     it.put("THEADDRESS", "l'indirizzo");
@@ -757,6 +761,8 @@ public class CurrentLocale {
     zhcn.put("CLEAR", "清除");
     zhcn.put("DATA", "数据");
     zhcn.put("HELPDIR", "/docs/user/zh"); 
+    zhcn.put("MANUAL_UNAVAILABLE", "此版本不包含用户手册。");
+    zhcn.put("MANUAL_ERROR", "无法打开用户手册。");
     zhcn.put("NEGADDRERR", "指令中的负内存地址错误");
     zhcn.put("ALIGNERR", "指令中的对齐错误");
     zhcn.put("THEADDRESS", "该地址");
