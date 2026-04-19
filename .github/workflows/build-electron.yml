@@ -58,14 +58,14 @@ jobs:
         run: |
           rm -rf ./dist/WebEduMips64-${{ matrix.platform }}-${{ matrix.arch }}
 
-          # Copy index.js to root directory (required by electron-packager)
+          # Copy index.js to root directory (required by @electron/packager)
           cp index.js ..
 
           # Build the Electron app
           if [ "${{ matrix.platform }}" = "linux" ]; then
-            npx electron-packager ../ WebEduMips64 --platform=${{ matrix.platform }} --arch=${{ matrix.arch }} --out dist
+            npx @electron/packager ../ WebEduMips64 --platform=${{ matrix.platform }} --arch=${{ matrix.arch }} --out dist
           else
-            npx electron-packager ../ WebEduMips64 --asar --platform=${{ matrix.platform }} --arch=${{ matrix.arch }} --out dist
+            npx @electron/packager ../ WebEduMips64 --asar --platform=${{ matrix.platform }} --arch=${{ matrix.arch }} --out dist
           fi
 
           rm ../index.js
