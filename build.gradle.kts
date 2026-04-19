@@ -289,6 +289,119 @@ tasks.register<Exec>("msi"){
     }
 }
 
+tasks.register<Exec>("dmg"){
+    group = "Distribution"
+    description = "Creates an installable DMG file for macOS"
+    workingDir = projectDir
+
+    doFirst{
+        val os = System.getProperty("os.name") as String
+        if (!os.contains("Mac", ignoreCase = true)){
+            throw GradleException("DMG creation must be executed on macOS")
+        }
+        val majorVersion = System.getProperty("java.version").split(".")[0].toInt()
+
+        if (majorVersion < 14) {
+            throw GradleException("JDK 14+ is required to create the DMG package.")
+        }
+        if (!layout.buildDirectory.file("libs/edumips64-${version}.jar").get().asFile.exists()) {
+            throw GradleException("Could not find build/libs/edumips64-${version}.jar. Please execute ./gradlew jar before trying to build the DMG.")
+        }
+
+        println("Creating EduMIPS64-${version}.dmg.")
+        commandLine(
+            "jpackage",
+            "--main-jar", "edumips64-${version}.jar",
+            "--input", "${layout.buildDirectory.get().asFile.name}/libs/",
+            "--app-version", version,
+            "--name", "EduMIPS64",
+            "--description", "Educational MIPS64 CPU Simulator",
+            "--vendor", "EduMIPS64 Development Team",
+            "--copyright", "Copyright ${LocalDateTime.now().year}, EduMIPS64 Development Team",
+            "--license-file", "LICENSE",
+            "--type", "dmg",
+            "--icon", "src/main/resources/images/ico.png",
+            "--java-options", "-Dfile.encoding=utf-8"
+        )
+    }
+}
+
+tasks.register<Exec>("deb"){
+    group = "Distribution"
+    description = "Creates an installable DEB package for Linux"
+    workingDir = projectDir
+
+    doFirst{
+        val os = System.getProperty("os.name") as String
+        if (!os.contains("Linux", ignoreCase = true)){
+            throw GradleException("DEB creation must be executed on Linux")
+        }
+        val majorVersion = System.getProperty("java.version").split(".")[0].toInt()
+
+        if (majorVersion < 14) {
+            throw GradleException("JDK 14+ is required to create the DEB package.")
+        }
+        if (!layout.buildDirectory.file("libs/edumips64-${version}.jar").get().asFile.exists()) {
+            throw GradleException("Could not find build/libs/edumips64-${version}.jar. Please execute ./gradlew jar before trying to build the DEB.")
+        }
+
+        println("Creating edumips64-${version}.deb.")
+        commandLine(
+            "jpackage",
+            "--main-jar", "edumips64-${version}.jar",
+            "--input", "${layout.buildDirectory.get().asFile.name}/libs/",
+            "--app-version", version,
+            "--name", "EduMIPS64",
+            "--description", "Educational MIPS64 CPU Simulator",
+            "--vendor", "EduMIPS64 Development Team",
+            "--copyright", "Copyright ${LocalDateTime.now().year}, EduMIPS64 Development Team",
+            "--license-file", "LICENSE",
+            "--type", "deb",
+            "--icon", "src/main/resources/images/ico.png",
+            "--linux-shortcut",
+            "--java-options", "-Dfile.encoding=utf-8"
+        )
+    }
+}
+
+tasks.register<Exec>("rpm"){
+    group = "Distribution"
+    description = "Creates an installable RPM package for Linux"
+    workingDir = projectDir
+
+    doFirst{
+        val os = System.getProperty("os.name") as String
+        if (!os.contains("Linux", ignoreCase = true)){
+            throw GradleException("RPM creation must be executed on Linux")
+        }
+        val majorVersion = System.getProperty("java.version").split(".")[0].toInt()
+
+        if (majorVersion < 14) {
+            throw GradleException("JDK 14+ is required to create the RPM package.")
+        }
+        if (!layout.buildDirectory.file("libs/edumips64-${version}.jar").get().asFile.exists()) {
+            throw GradleException("Could not find build/libs/edumips64-${version}.jar. Please execute ./gradlew jar before trying to build the RPM.")
+        }
+
+        println("Creating edumips64-${version}.rpm.")
+        commandLine(
+            "jpackage",
+            "--main-jar", "edumips64-${version}.jar",
+            "--input", "${layout.buildDirectory.get().asFile.name}/libs/",
+            "--app-version", version,
+            "--name", "EduMIPS64",
+            "--description", "Educational MIPS64 CPU Simulator",
+            "--vendor", "EduMIPS64 Development Team",
+            "--copyright", "Copyright ${LocalDateTime.now().year}, EduMIPS64 Development Team",
+            "--license-file", "LICENSE",
+            "--type", "rpm",
+            "--icon", "src/main/resources/images/ico.png",
+            "--linux-shortcut",
+            "--java-options", "-Dfile.encoding=utf-8"
+        )
+    }
+}
+
 /*
  * GWT tasks
  */

@@ -51,7 +51,7 @@ There are two main workflows:
   Builds and tests the desktop application, builds the web application, deploys to
   staging/production, and builds/tests the Snap package.
 - **Release** (`release.yml`) — runs on every push to `master` to build all release artifacts
-  (JAR, MSI, Electron apps). Can also be triggered manually to create a tagged GitHub release
+  (JAR, MSI, DMG, DEB, RPM, Electron apps). Can also be triggered manually to create a tagged GitHub release
   with all artifacts attached.
 
 ### Main Gradle tasks
@@ -224,7 +224,7 @@ Most of the release process is automated via the `release.yml` GitHub Actions wo
 To create a release, trigger the workflow manually from the Actions tab with `create_release: true`.
 You can optionally provide a specific `commit_sha` to build and release from a particular commit
 (defaults to the latest commit on the selected branch if left empty).
-This will build all artifacts (JAR, PDF manuals, MSI, Electron apps), create a Git tag (`vX.Y.Z`),
+This will build all artifacts (JAR, PDF manuals, MSI, DMG, DEB, RPM, Electron apps), create a Git tag (`vX.Y.Z`),
 and publish a GitHub release with all assets attached. The release body comes from `RELEASE_NOTES.md`.
 
 Before triggering a release:
