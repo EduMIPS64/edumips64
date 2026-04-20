@@ -564,7 +564,7 @@ public class Converter {
   }
 
 /** Check if a string is a binary number, i.e. starts with the '0b' (or '0B')
- *  prefix followed by at least one binary digit (0 or 1).
+   *  prefix followed by at least one binary digit (0 or 1).
    *  @param num the string to validate
    *  @return true if num is a binary number in the specified format, otherwise false
    */
