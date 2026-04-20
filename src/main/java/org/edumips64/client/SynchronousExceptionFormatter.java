@@ -24,6 +24,7 @@
 package org.edumips64.client;
 
 import org.edumips64.core.SynchronousException;
+import org.edumips64.core.SynchronousExceptionCode;
 
 /**
  * Converts a {@link SynchronousException} into a user-friendly message for the
@@ -36,29 +37,6 @@ import org.edumips64.core.SynchronousException;
 public final class SynchronousExceptionFormatter {
   private SynchronousExceptionFormatter() {}
 
-  /** Returns a human-readable description of the given error code. */
-  static String descriptionForCode(String code) {
-    if (code == null) {
-      return "Synchronous exception";
-    }
-    switch (code) {
-      case "DIVZERO":
-        return "Division by zero";
-      case "INTOVERFLOW":
-        return "Integer overflow";
-      case "FPOVERFLOW":
-        return "FP overflow";
-      case "FPUNDERFLOW":
-        return "FP underflow";
-      case "FPINVALID":
-        return "FP invalid operation";
-      case "FPDIVBYZERO":
-        return "FP division by zero";
-      default:
-        return code;
-    }
-  }
-
   /**
    * Builds a user-friendly message for the given exception, of the form
    * {@code "<description> (<code>) caused by <instr> in stage <stage>"}.
@@ -69,11 +47,12 @@ public final class SynchronousExceptionFormatter {
     if (e == null) {
       return "";
     }
-    String code = e.getCode();
+    SynchronousExceptionCode code = e.getCode();
     StringBuilder sb = new StringBuilder();
-    sb.append(descriptionForCode(code));
-    if (code != null && !code.equals(descriptionForCode(code))) {
-      sb.append(" (").append(code).append(")");
+    if (code == null) {
+      sb.append("Synchronous exception");
+    } else {
+      sb.append(code.getDescription()).append(" (").append(code.name()).append(")");
     }
     if (e.getInstructionName() != null && e.getStage() != null) {
       sb.append(" caused by ")

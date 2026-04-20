@@ -543,7 +543,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       runMipsTest("div0.s");
       fail("Expected SynchronousException to be thrown");
     } catch (SynchronousException e) {
-      assertEquals("DIVZERO", e.getCode());
+      assertEquals(SynchronousExceptionCode.DIVZERO, e.getCode());
       assertNotNull("Instruction name should be set on the exception", e.getInstructionName());
       assertEquals("EX", e.getStage());
       // Sanity check: the enriched message should reference the stage.

@@ -23,6 +23,7 @@ package org.edumips64.client;
 
 import org.edumips64.BaseTest;
 import org.edumips64.core.SynchronousException;
+import org.edumips64.core.SynchronousExceptionCode;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -37,7 +38,7 @@ public class SynchronousExceptionFormatterTest extends BaseTest {
 
   @Test
   public void formatsIntegerOverflowWithInstructionAndStage() {
-    SynchronousException e = new SynchronousException("INTOVERFLOW");
+    SynchronousException e = new SynchronousException(SynchronousExceptionCode.INTOVERFLOW);
     e.setInstructionInfo("DADD R1,R2,R3", "EX");
 
     String message = SynchronousExceptionFormatter.format(e);
@@ -49,7 +50,7 @@ public class SynchronousExceptionFormatterTest extends BaseTest {
 
   @Test
   public void formatsDivisionByZeroWithInstructionAndStage() {
-    SynchronousException e = new SynchronousException("DIVZERO");
+    SynchronousException e = new SynchronousException(SynchronousExceptionCode.DIVZERO);
     e.setInstructionInfo("DIV R1,R0", "EX");
 
     String message = SynchronousExceptionFormatter.format(e);
@@ -62,46 +63,26 @@ public class SynchronousExceptionFormatterTest extends BaseTest {
   @Test
   public void formatsFpuExceptionsWithStructuredInfo() {
     assertTrue(SynchronousExceptionFormatter
-        .format(new SynchronousException("FPOVERFLOW"))
+        .format(new SynchronousException(SynchronousExceptionCode.FPOVERFLOW))
         .startsWith("FP overflow (FPOVERFLOW)"));
     assertTrue(SynchronousExceptionFormatter
-        .format(new SynchronousException("FPUNDERFLOW"))
+        .format(new SynchronousException(SynchronousExceptionCode.FPUNDERFLOW))
         .startsWith("FP underflow (FPUNDERFLOW)"));
     assertTrue(SynchronousExceptionFormatter
-        .format(new SynchronousException("FPINVALID"))
+        .format(new SynchronousException(SynchronousExceptionCode.FPINVALID))
         .startsWith("FP invalid operation (FPINVALID)"));
     assertTrue(SynchronousExceptionFormatter
-        .format(new SynchronousException("FPDIVBYZERO"))
+        .format(new SynchronousException(SynchronousExceptionCode.FPDIVBYZERO))
         .startsWith("FP division by zero (FPDIVBYZERO)"));
   }
 
   @Test
   public void omitsInstructionSuffixWhenInfoMissing() {
-    SynchronousException e = new SynchronousException("INTOVERFLOW");
+    SynchronousException e = new SynchronousException(SynchronousExceptionCode.INTOVERFLOW);
 
     String message = SynchronousExceptionFormatter.format(e);
 
     assertEquals("Integer overflow (INTOVERFLOW)", message);
-  }
-
-  @Test
-  public void unknownCodeIsReportedAsIs() {
-    SynchronousException e = new SynchronousException("SOMETHING_NEW");
-
-    String message = SynchronousExceptionFormatter.format(e);
-
-    // For an unknown code we should not duplicate it as both description and code.
-    assertEquals("SOMETHING_NEW", message);
-  }
-
-  @Test
-  public void unknownCodeStillAppendsInstructionInfo() {
-    SynchronousException e = new SynchronousException("SOMETHING_NEW");
-    e.setInstructionInfo("ADD R1,R2,R3", "EX");
-
-    String message = SynchronousExceptionFormatter.format(e);
-
-    assertEquals("SOMETHING_NEW caused by ADD R1,R2,R3 in stage EX", message);
   }
 
   @Test

@@ -182,7 +182,7 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
       } catch (SynchronousException ex) {
         logger.info("Caught a synchronous exception.");
         SwingUtilities.invokeLater(() -> {
-          String message = CurrentLocale.getString(ex.getCode() + ".Message");
+          String message = CurrentLocale.getString(ex.getCode().name() + ".Message");
           if (ex.getInstructionName() != null && ex.getStage() != null) {
             message += "\n\n" + CurrentLocale.getString("SYNCEX.CAUSE")
                 + " " + ex.getInstructionName()

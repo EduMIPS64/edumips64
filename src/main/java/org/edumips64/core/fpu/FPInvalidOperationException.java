@@ -22,6 +22,8 @@
  */
 package org.edumips64.core.fpu;
 
+import org.edumips64.core.SynchronousExceptionCode;
+
 /** Exception thrown in some arithmetic operations which are invalid operations and that
  * give as a result a QNaN string and that signal a QNaN exception:
  * 1) Any operation on a NaN
@@ -33,6 +35,6 @@ public class FPInvalidOperationException  extends org.edumips64.core.Synchronous
   private static final long serialVersionUID = 3276033034371478706L;
 
   public FPInvalidOperationException() {
-    super("FPINVALID");
+    super(SynchronousExceptionCode.FPINVALID);
   }
 }

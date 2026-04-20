@@ -33,12 +33,12 @@ package org.edumips64.core;
  */
 public class SynchronousException extends Exception {
   private static final long serialVersionUID = -5084570924398502491L;
-  private final String errcode;
+  private final SynchronousExceptionCode errcode;
   private String instructionName;
   private String stage;
 
   /** Gets the error code */
-  public String getCode() {
+  public SynchronousExceptionCode getCode() {
     return errcode;
   }
 
@@ -61,13 +61,13 @@ public class SynchronousException extends Exception {
   @Override
   public String getMessage() {
     if (instructionName != null && stage != null) {
-      return errcode + " (caused by " + instructionName + " in stage " + stage + ")";
+      return errcode.name() + " (caused by " + instructionName + " in stage " + stage + ")";
     }
-    return errcode;
+    return errcode.name();
   }
 
-  public SynchronousException(String errcode) {
-    super(errcode);
+  public SynchronousException(SynchronousExceptionCode errcode) {
+    super(errcode.name());
     this.errcode = errcode;
   }
 }

@@ -122,7 +122,7 @@ public class ResultFactory {
     public static Result AddRuntimeErrors(Result result, org.edumips64.core.SynchronousException e) {
         if (e == null) return result;
         if (e.getCode() != null) {
-            result.errorCode = e.getCode();
+            result.errorCode = e.getCode().name();
         }
         if (e.getInstructionName() != null) {
             result.errorInstruction = e.getInstructionName();
