@@ -35,31 +35,38 @@ const monacoPlugin = new MonacoWebpackPlugin({
   features: ['comment', 'foldng', 'hover'],
 });
 
-module.exports = {
-  mode: 'development',
-  entry: './src/webapp/index.js',
-  devtool: 'inline-source-map',
-  output: {
-    path: outputPath,
-    filename: 'ui.js',
-  },
-  module: {
-    rules: [
-      { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' },
-      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
-      { test: /\.ttf$/, use: ['file-loader'] },
-      { test: /\.png$/, use: ['file-loader'] },
+module.exports = (env, argv) => {
+  const isProduction = argv && argv.mode === 'production';
+  return {
+    mode: isProduction ? 'production' : 'development',
+    entry: './src/webapp/index.js',
+    // Inline source maps embed the full source into the bundle and bloat
+    // the production build by an order of magnitude (~30 MiB vs ~2 MiB).
+    // Use an external source map in production and keep fast inline maps
+    // only for development.
+    devtool: isProduction ? 'source-map' : 'inline-source-map',
+    output: {
+      path: outputPath,
+      filename: 'ui.js',
+    },
+    module: {
+      rules: [
+        { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' },
+        { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+        { test: /\.ttf$/, use: ['file-loader'] },
+        { test: /\.png$/, use: ['file-loader'] },
+      ],
+    },
+    devServer: {
+      static: outputPath,
+      open: true,
+    },
+    plugins: [
+      monacoPlugin,
+      copyPlugin,
+      grPlugin,
+      versionsPlugin,
+      //new BundleAnalyzerPlugin(),
     ],
-  },
-  devServer: {
-    static: outputPath,
-    open: true,
-  },
-  plugins: [
-    monacoPlugin,
-    copyPlugin,
-    grPlugin,
-    versionsPlugin,
-    //new BundleAnalyzerPlugin(),
-  ],
+  };
 };
