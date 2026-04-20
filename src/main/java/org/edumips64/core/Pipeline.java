@@ -30,7 +30,11 @@ public class Pipeline {
   }
 
   boolean isBubble(Stage stage) {
-    return !isEmpty(stage) && stageInstructionMap.get(stage).getName().equals(" ");
+    return !isEmpty(stage) && isBubble(stageInstructionMap.get(stage));
+  }
+
+  private static boolean isBubble(InstructionInterface instruction) {
+    return instruction != null && instruction.getName().equals(" ");
   }
 
   int size() {
@@ -72,24 +76,48 @@ public class Pipeline {
     return get(Stage.WB);
   }
 
+  /**
+   * Stores the given instruction in the given pipeline stage, enforcing the
+   * precondition that a real instruction already present in that stage cannot
+   * be silently overwritten by another real instruction. Clearing a stage
+   * (setting it to {@code null}) and inserting/replacing bubbles is always
+   * allowed, as is replacing an empty stage or a bubble with a real
+   * instruction. Attempting to overwrite a real instruction with another
+   * real instruction is almost certainly a bug in the CPU logic and results
+   * in an {@link IllegalStateException}.
+   */
+  private InstructionInterface put(Stage stage, InstructionInterface instruction) {
+    InstructionInterface current = stageInstructionMap.get(stage);
+    boolean currentIsReal = current != null && !isBubble(current);
+    boolean newIsReal = instruction != null && !isBubble(instruction);
+    if (currentIsReal && newIsReal) {
+      throw new IllegalStateException(
+          "Refusing to overwrite instruction " + current + " in pipeline stage "
+              + stage + " with " + instruction
+              + ". The stage must be cleared (set to null) or hold a bubble before "
+              + "writing a new instruction.");
+    }
+    return stageInstructionMap.put(stage, instruction);
+  }
+
   InstructionInterface setIF(InstructionInterface instruction) {
-    return stageInstructionMap.put(Stage.IF, instruction);
+    return put(Stage.IF, instruction);
   }
 
   InstructionInterface setID(InstructionInterface instruction) {
-    return stageInstructionMap.put(Stage.ID, instruction);
+    return put(Stage.ID, instruction);
   }
 
   InstructionInterface setEX(InstructionInterface instruction) {
-    return stageInstructionMap.put(Stage.EX, instruction);
+    return put(Stage.EX, instruction);
   }
 
   InstructionInterface setMEM(InstructionInterface instruction) {
-    return stageInstructionMap.put(Stage.MEM, instruction);
+    return put(Stage.MEM, instruction);
   }
 
   InstructionInterface setWB(InstructionInterface instruction) {
-    return stageInstructionMap.put(Stage.WB, instruction);
+    return put(Stage.WB, instruction);
   }
 
   void clear() {

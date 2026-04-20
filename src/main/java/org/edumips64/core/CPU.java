@@ -437,7 +437,11 @@ public class CPU {
       }
 
       // A J-Type instruction has just modified the Program Counter. We need to
-      // put in the IF stage the instruction the PC points to
+      // put in the IF stage the instruction the PC points to. The instruction
+      // previously in IF (fetched sequentially in the prior cycle) is discarded
+      // because of the jump: explicitly clear the stage so that the Pipeline's
+      // overwrite precondition is satisfied.
+      pipe.setIF(null);
       pipe.setIF(mem.getInstruction(pc));
       pipe.setEX(pipe.ID());
       pipe.setID(bubble);
@@ -683,6 +687,10 @@ public class CPU {
 
       logger.info("Moving " + pipe.IF() + " to ID");
       pipe.setID(pipe.IF());
+      // The instruction that used to be in IF is now also referenced by ID.
+      // Clear the IF stage so the upcoming fetch does not overwrite it,
+      // satisfying the Pipeline's overwrite precondition.
+      pipe.setIF(null);
 
       InstructionInterface next_if = mem.getInstruction(pc);
       logger.info("Fetched new instruction " + next_if);
