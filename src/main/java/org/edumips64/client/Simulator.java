@@ -136,11 +136,14 @@ public class Simulator {
     } catch (InputNeededException e) {
       return ResultFactory.AddParserErrors(resultFactory.InputRequested(e, steps), lastParsingErrors);
     } catch (SynchronousException e) {
-      // Synchronous exceptions (INTOVERFLOW, DIVZERO, FP traps, ...) get a
-      // dedicated failure Result so the Web UI can display a user-friendly
-      // message that includes the faulting instruction and pipeline stage.
+      // Synchronous exceptions (INTOVERFLOW, DIVZERO, FP traps, ...) are
+      // runtime errors. Build a Failure carrying a user-friendly message,
+      // then layer runtime-error info and any pending parser warnings on top.
       warning("Synchronous exception: " + e.getCode());
-      return ResultFactory.AddParserErrors(resultFactory.SynchronousExceptionFailure(e), lastParsingErrors);
+      Result r = resultFactory.Failure(SynchronousExceptionFormatter.format(e));
+      r = ResultFactory.AddRuntimeErrors(r, e);
+      r = ResultFactory.AddParserErrors(r, lastParsingErrors);
+      return r;
     } catch (Exception e) {
       warning("Error: " + e.toString());
       return ResultFactory.AddParserErrors(resultFactory.Failure(e.toString()), lastParsingErrors);

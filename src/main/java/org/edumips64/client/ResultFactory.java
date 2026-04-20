@@ -81,23 +81,6 @@ public class ResultFactory {
         return AddParsedInstructions(AddCpuInfo(r));
     }
 
-    /** Builds a failure result for a synchronous exception, embedding structured
-     *  information (code, instruction, stage) about the trap in addition to the
-     *  user-friendly error message. */
-    public Result SynchronousExceptionFailure(org.edumips64.core.SynchronousException e) {
-        Result r = Failure(SynchronousExceptionFormatter.format(e));
-        if (e.getCode() != null) {
-            r.errorCode = e.getCode();
-        }
-        if (e.getInstructionName() != null) {
-            r.errorInstruction = e.getInstructionName();
-        }
-        if (e.getStage() != null) {
-            r.errorStage = e.getStage();
-        }
-        return r;
-    }
-
     public Result InputRequested(InputNeededException inputNeeded, int resumeSteps) {
         Result r = Success();
         r.inputRequested = true;
@@ -113,6 +96,30 @@ public class ResultFactory {
         if (e == null) return result;
         result.parsingErrors = Js.cast(e.getExceptionList().stream()
             .map(exception -> ParserErrorFactory.FromParserException(exception)).toArray(ParserError[]::new));
+        return result;
+    }
+
+    /**
+     * Attaches structured information about a runtime (synchronous) exception
+     * to the given Result. This is the runtime-error counterpart of
+     * {@link #AddParserErrors}: the two concerns are orthogonal, so they live
+     * in separate helpers and can be composed independently.
+     *
+     * The error message itself is not overwritten here; callers are expected
+     * to pass a Result that already carries a user-friendly message (e.g.
+     * built via {@link SynchronousExceptionFormatter}).
+     */
+    public static Result AddRuntimeErrors(Result result, org.edumips64.core.SynchronousException e) {
+        if (e == null) return result;
+        if (e.getCode() != null) {
+            result.errorCode = e.getCode();
+        }
+        if (e.getInstructionName() != null) {
+            result.errorInstruction = e.getInstructionName();
+        }
+        if (e.getStage() != null) {
+            result.errorStage = e.getStage();
+        }
         return result;
     }
 
