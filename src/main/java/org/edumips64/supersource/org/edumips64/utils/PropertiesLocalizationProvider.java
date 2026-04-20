@@ -31,6 +31,9 @@ public class PropertiesLocalizationProvider implements LocalizationProvider {
   private static final Logger logger =
       Logger.getLogger(PropertiesLocalizationProvider.class.getName());
 
+  // Lazy, per-language parsed maps. Keys are internal language codes ("en"/"it"/"zhcn").
+  private final Map<String, Map<String, String>> cache = new HashMap<>();
+
   /** ClientBundle exposing the three property files as compile-time string resources. */
   public interface Messages extends ClientBundle {
     Messages INSTANCE = GWT.create(Messages.class);
@@ -44,9 +47,6 @@ public class PropertiesLocalizationProvider implements LocalizationProvider {
     @Source("CurrentLocaleMessages_zh.properties")
     TextResource simplifiedChinese();
   }
-
-  // Lazy, per-language parsed maps. Keys are internal language codes ("en"/"it"/"zhcn").
-  private final Map<String, Map<String, String>> cache = new HashMap<>();
 
   private Map<String, String> load(String lang) {
     Map<String, String> cached = cache.get(lang);

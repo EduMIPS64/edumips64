@@ -102,7 +102,10 @@ public class PropertiesParserTest {
       // Java 9+ reads .properties files as UTF-8 with Properties#load via an InputStream that
       // passes through the default ISO-8859-1 decoding. Use a UTF-8 reader explicitly to mirror
       // ResourceBundle's behaviour.
-      reference.load(new java.io.InputStreamReader(stream, StandardCharsets.UTF_8));
+      try (java.io.InputStreamReader reader =
+          new java.io.InputStreamReader(stream, StandardCharsets.UTF_8)) {
+        reference.load(reader);
+      }
     }
 
     assertEquals("Key count mismatch for " + resource,
