@@ -686,7 +686,7 @@ public class Parser {
                       try {
                         String trimmed = paramValue.trim();
 
-                        if (trimmed.equals("")) {
+                        if (trimmed.isEmpty()) {
                           tmpInst.getParams().add(0);
                         } else if (Converter.isInteger(trimmed)
                             || Converter.isHexNumber(trimmed)
