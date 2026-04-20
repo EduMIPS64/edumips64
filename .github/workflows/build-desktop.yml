@@ -74,16 +74,23 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: JAR
-          path: ./build/libs/edumips64-${{ steps.read_version.outputs.version }}.jar
+          path: ./out/edumips64-${{ steps.read_version.outputs.version }}.jar
 
       - name: Upload English Manual PDF
         uses: actions/upload-artifact@v7
         with:
           name: English manual (PDF)
-          path: ./build/docs/en/pdf/EduMIPS64.pdf
+          path: ./out/docs/en/pdf/EduMIPS64.pdf
 
       - name: Upload Italian Manual PDF
         uses: actions/upload-artifact@v7
         with:
           name: Italian manual (PDF)
-          path: ./build/docs/it/pdf/EduMIPS64.pdf
+          path: ./out/docs/it/pdf/EduMIPS64.pdf
+
+      - name: Upload Chinese Manual PDF
+        uses: actions/upload-artifact@v7
+        with:
+          name: Chinese manual (PDF)
+          path: ./out/docs/zh/pdf/EduMIPS64.pdf
+

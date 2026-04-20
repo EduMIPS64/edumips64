@@ -19,8 +19,9 @@ import sys, os
 sys.path.append(os.path.abspath("../.."))
 from common_conf import *
 
-pdf_stylesheets = ['sphinx', 'kerning', 'a4', 'zh_CN.json', 'chinese']
-pdf_font_path = [os.path.abspath(".\\docs\\zh\\src"),'C:\\Windows\\Fonts']
+pdf_stylesheets = ['sphinx', 'a4', 'zh_CN.json']
+# Look for the embedded CJK fonts (sarasa-gothic-sc-*.ttf) next to this conf.py.
+pdf_font_path = [os.path.abspath(os.path.dirname(__file__))]
 pdf_language = "zh_CN"
 source_encoding = "utf-8"
 language = "zh_CN"
