@@ -18,6 +18,8 @@
 - CLI: quiet mode is now the default, preventing simulator messages from mixing
   with program output; use `--verbose` to restore the previous behaviour.
   (Issue #1181)
+- "Reset to defaults" button in the Settings dialog of the desktop (Swing) UI
+  to restore all preferences to their default values. (Issue #803)
 
 ### Fixed
 - Parser now supports multiple adjacent labels pointing to the same address,

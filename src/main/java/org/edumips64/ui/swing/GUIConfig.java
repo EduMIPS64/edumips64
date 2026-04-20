@@ -415,12 +415,45 @@ public class GUIConfig extends JDialog {
     okButton.setFont(getFont());
     final JButton cancelButton = new JButton("Cancel");
     cancelButton.setFont(getFont());
+    final JButton resetButton = new JButton(CurrentLocale.getString("Config.RESET"));
+    resetButton.setFont(getFont());
 
     buttonPanel.add(okButton);
     buttonPanel.add(cancelButton);
+    buttonPanel.add(resetButton);
 
     //Setting Action for each buttons
     cancelButton.addActionListener(e -> setVisible(false));
+    resetButton.addActionListener(e -> {
+      int answer = JOptionPane.showConfirmDialog(this,
+              CurrentLocale.getString("Config.RESET_CONFIRM"),
+              CurrentLocale.getString("GUI_WARNING"),
+              JOptionPane.YES_NO_OPTION);
+      if (answer != JOptionPane.YES_OPTION) {
+        return;
+      }
+
+      // Determine changes that require special handling.
+      boolean fontChanged = config.getInt(ConfigKey.UI_FONT_SIZE) != (Integer) ConfigStore.defaults.get(ConfigKey.UI_FONT_SIZE);
+      boolean themeChanged = config.getBoolean(ConfigKey.UI_DARK_THEME) != (Boolean) ConfigStore.defaults.get(ConfigKey.UI_DARK_THEME);
+      boolean fwdChanged = config.getBoolean(ConfigKey.FORWARDING) != (Boolean) ConfigStore.defaults.get(ConfigKey.FORWARDING);
+
+      // Reset the configuration to defaults.
+      config.resetConfiguration();
+      logger.log(Level.INFO, "Configuration reset to defaults.");
+
+      // Run the update callback.
+      updateCallback.accept(fwdChanged);
+
+      // Warn the user that they need to restart the simulator if font size or theme changed.
+      if (fontChanged || themeChanged) {
+        JOptionPane.showMessageDialog(null,
+            CurrentLocale.getString("RESTART_APPEARANCE"), CurrentLocale.getString("GUI_WARNING"),
+            JOptionPane.WARNING_MESSAGE);
+      }
+
+      setVisible(false);
+    });
     okButton.addActionListener(e -> {
       logger.log(Level.INFO, "Pushing values: " + cache.toString());
 
