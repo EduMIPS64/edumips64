@@ -531,6 +531,25 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runMipsTest("div0.s");
   }
 
+  /* Verify that synchronous exceptions carry information about the
+   * instruction that caused them and the pipeline stage they were raised in. */
+  @Test(timeout=2000)
+  public void testSynchronousExceptionHasInstructionAndStageInfo() throws Exception {
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
+    try {
+      runMipsTest("div0.s");
+      org.junit.Assert.fail("Expected SynchronousException to be thrown");
+    } catch (SynchronousException e) {
+      assertEquals("DIVZERO", e.getCode());
+      org.junit.Assert.assertNotNull("Instruction name should be set on the exception", e.getInstructionName());
+      org.junit.Assert.assertEquals("EX", e.getStage());
+      // Sanity check: the enriched message should reference the stage.
+      org.junit.Assert.assertTrue(
+          "Exception message should mention the pipeline stage, got: " + e.getMessage(),
+          e.getMessage().contains("EX"));
+    }
+  }
+
   /* Test for Out Of Memory while loading a file with more data than the memory can fit. */
   @Test(expected = ParserMultiException.class, timeout=2000)
   public void testOom() throws Exception {
