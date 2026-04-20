@@ -327,14 +327,14 @@ const Code = (props) => {
   // Set the dark theme if necessary
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
-  // Detect touch-first (mobile / tablet) devices. Monaco Editor does not
-  // work reliably with soft keyboards and touch selection, so on these
-  // devices we fall back to a plain <textarea> which provides a native,
-  // reliable editing experience. Pipeline stages and parsing errors are
-  // still shown in the surrounding panels.
-  const isTouchDevice = useMediaQuery('(pointer: coarse)');
+  // Detect devices where the primary pointer is coarse (touch screens).
+  // Monaco Editor does not work reliably with soft keyboards and touch
+  // selection on such devices, so we fall back to a plain <textarea>
+  // which provides a native, reliable editing experience. Pipeline
+  // stages and parsing errors are still shown in the surrounding panels.
+  const useCoarsePointerFallback = useMediaQuery('(pointer: coarse)');
 
-  if (isTouchDevice) {
+  if (useCoarsePointerFallback) {
     return (
       <MobileCodeEditor
         code={props.code}
@@ -389,6 +389,13 @@ const MobileCodeEditor = ({
       },
       focus: () => el.focus(),
     };
+    return () => {
+      // Remove the global reference when the component unmounts or before
+      // the next effect run, to avoid leaving a stale closure behind.
+      if (window.editor && window.editor.getValue && window.editor.getValue() === el.value) {
+        delete window.editor;
+      }
+    };
   }, [onChange]);
 
   const style = {
@@ -401,7 +408,7 @@ const MobileCodeEditor = ({
     outline: 'none',
     resize: 'none',
     fontFamily: "Menlo, Monaco, 'Courier New', monospace",
-    fontSize: (fontSize || 14) + 'px',
+    fontSize: `${fontSize || 14}px`,
     lineHeight: 1.5,
     tabSize: 4,
     whiteSpace: 'pre',
