@@ -178,6 +178,17 @@ const Simulator = ({worker, initialState, appInsights}) => {
     }
   };
 
+  // Returns true if the given parsingErrors array contains at least one
+  // actual error (not just warnings). Used to decide whether it is safe
+  // to keep the parsed instructions around (e.g. to power the hover
+  // provider in the code editor): programs that only emit warnings are
+  // still successfully parsed and loadable, so we should not discard the
+  // parsed instructions in that case.
+  const hasRealErrors = (parsingErrors) => {
+    if (!parsingErrors) return false;
+    return parsingErrors.some((e) => !e.isWarning);
+  };
+
   worker.onmessage = (e) => {
     const result = worker.parseResult(e.data);
     console.log('Got message from worker.', result);
@@ -185,7 +196,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
     // For syntax check responses, only update parsing errors to avoid unnecessary re-renders
     if (result.method === 'checksyntax') {
       setParsingErrors(result.parsingErrors);
-      if (result.parsingErrors) {
+      if (hasRealErrors(result.parsingErrors)) {
         setParsedInstructions(null);
       } else {
         setParsedInstructions(result.parsedInstructions);
@@ -211,7 +222,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
     setPipeline(result.pipeline);
     setParsingErrors(result.parsingErrors);
 
-    if (result.parsingErrors) {
+    if (hasRealErrors(result.parsingErrors)) {
       setParsedInstructions(null);
     } else {
       setParsedInstructions(result.parsedInstructions);
@@ -357,6 +368,14 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   // A debounced version of syntaxCheck. Needed to not run props.onChange too often.
   const debouncedSyntaxCheck = debounce((code) => worker.checkSyntax(code), 500);
+
+  // Run a syntax check on the initial code once on mount so that warnings
+  // (e.g. deprecated instructions in the sample program) are surfaced
+  // immediately, without requiring the user to edit the code first.
+  React.useEffect(() => {
+    worker.checkSyntax(code);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onCodeChange = (code) => {
     setCode(code);
