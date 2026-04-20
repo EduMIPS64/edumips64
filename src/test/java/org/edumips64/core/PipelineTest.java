@@ -18,7 +18,7 @@ import static org.junit.Assert.fail;
 @RunWith(JUnit4.class)
 public class PipelineTest extends BaseWithInstructionBuilderTest {
   private Pipeline pipeline = new Pipeline();
-  
+
   @Before
   public void testSetup() {
     super.testSetup();
@@ -32,65 +32,61 @@ public class PipelineTest extends BaseWithInstructionBuilderTest {
     assertTrue(pipeline.isEmpty(Pipeline.Stage.EX));
     assertTrue(pipeline.isEmpty(Pipeline.Stage.MEM));
     assertTrue(pipeline.isEmpty(Pipeline.Stage.WB));
-    
+
     // Test that even with an empty pipeline the getters work.
-    assertEquals(null, pipeline.IF());
-    assertEquals(null, pipeline.ID());
-    assertEquals(null, pipeline.EX());
-    assertEquals(null, pipeline.MEM());
-    assertEquals(null, pipeline.WB());
+    assertNull(pipeline.IF());
+    assertNull(pipeline.ID());
+    assertNull(pipeline.EX());
+    assertNull(pipeline.MEM());
+    assertNull(pipeline.WB());
   }
-  
+
   @Test
   public void testNonEmptySize() {
     assertEquals(0, pipeline.size());
-    pipeline.setIF(instructionBuilder.buildInstruction("ADD"));
-    pipeline.setID(instructionBuilder.buildInstruction("ADD"));
+    pipeline.setStage(Pipeline.Stage.IF, instructionBuilder.buildInstruction("ADD"));
+    pipeline.setStage(Pipeline.Stage.ID, instructionBuilder.buildInstruction("ADD"));
     assertEquals(2, pipeline.size());
   }
 
   @Test
   public void testSizeIncreaseWithBubble() {
     assertEquals(0, pipeline.size());
-    pipeline.setIF(new BUBBLE());
+    pipeline.setStage(Pipeline.Stage.IF, new BUBBLE());
     assertEquals(1, pipeline.size());
   }
-  
+
   @Test
   public void testSizeIncreaseWithOtherInstructions() {
     assertEquals(0, pipeline.size());
-    pipeline.setIF(instructionBuilder.buildInstruction("ADD"));
+    pipeline.setStage(Pipeline.Stage.IF, instructionBuilder.buildInstruction("ADD"));
     assertEquals(1, pipeline.size());
   }
 
   @Test
   public void testIsBubble() {
-    pipeline.setIF(new BUBBLE());
+    pipeline.setStage(Pipeline.Stage.IF, new BUBBLE());
     assertTrue(pipeline.isBubble(Pipeline.Stage.IF));
     assertTrue(pipeline.isEmptyOrBubble(Pipeline.Stage.IF));
-    
-    pipeline.setIF(instructionBuilder.buildInstruction("ADD"));
+
+    pipeline.setStage(Pipeline.Stage.IF, instructionBuilder.buildInstruction("ADD"));
     assertFalse(pipeline.isBubble(Pipeline.Stage.IF));
     assertFalse(pipeline.isEmptyOrBubble(Pipeline.Stage.IF));
   }
-  
+
   @Test
   public void testClear() {
     assertEquals(0, pipeline.size());
-    pipeline.setIF(new BUBBLE());
-    pipeline.setID(new BUBBLE());
-    pipeline.setEX(new BUBBLE());
-    pipeline.setMEM(new BUBBLE());
-    pipeline.setWB(new BUBBLE());
+    for (Pipeline.Stage stage : Pipeline.Stage.values()) {
+      pipeline.setStage(stage, new BUBBLE());
+    }
     assertEquals(5, pipeline.size());
-    
+
     pipeline.clear();
     assertEquals(0, pipeline.size());
-    assertEquals(null, pipeline.IF());
-    assertEquals(null, pipeline.ID());
-    assertEquals(null, pipeline.EX());
-    assertEquals(null, pipeline.MEM());
-    assertEquals(null, pipeline.WB());
+    for (Pipeline.Stage stage : Pipeline.Stage.values()) {
+      assertNull(pipeline.get(stage));
+    }
   }
 
   // Overwriting a real instruction with another real instruction should fail,
@@ -102,9 +98,9 @@ public class PipelineTest extends BaseWithInstructionBuilderTest {
       Pipeline localPipeline = new Pipeline();
       InstructionInterface firstInstr = instructionBuilder.buildInstruction("ADD");
       InstructionInterface secondInstr = instructionBuilder.buildInstruction("DADD");
-      setStage(localPipeline, stage, firstInstr);
+      localPipeline.setStage(stage, firstInstr);
       try {
-        setStage(localPipeline, stage, secondInstr);
+        localPipeline.setStage(stage, secondInstr);
         fail("Expected IllegalStateException when overwriting stage " + stage
             + " containing a real instruction with another real instruction.");
       } catch (IllegalStateException expected) {
@@ -120,9 +116,9 @@ public class PipelineTest extends BaseWithInstructionBuilderTest {
   public void testSetAllowsClearingRealInstruction() {
     for (Pipeline.Stage stage : Pipeline.Stage.values()) {
       Pipeline localPipeline = new Pipeline();
-      setStage(localPipeline, stage, instructionBuilder.buildInstruction("ADD"));
+      localPipeline.setStage(stage, instructionBuilder.buildInstruction("ADD"));
       assertNotNull(localPipeline.get(stage));
-      setStage(localPipeline, stage, null);
+      localPipeline.setStage(stage, null);
       assertNull("Stage " + stage + " must be clearable via null.",
           localPipeline.get(stage));
     }
@@ -134,9 +130,8 @@ public class PipelineTest extends BaseWithInstructionBuilderTest {
   public void testSetAllowsReplacingRealInstructionWithBubble() {
     for (Pipeline.Stage stage : Pipeline.Stage.values()) {
       Pipeline localPipeline = new Pipeline();
-      setStage(localPipeline, stage, instructionBuilder.buildInstruction("ADD"));
-      InstructionInterface bubble = new BUBBLE();
-      setStage(localPipeline, stage, bubble);
+      localPipeline.setStage(stage, instructionBuilder.buildInstruction("ADD"));
+      localPipeline.setStage(stage, new BUBBLE());
       assertTrue("Stage " + stage + " must contain a bubble after flush.",
           localPipeline.isBubble(stage));
     }
@@ -149,13 +144,13 @@ public class PipelineTest extends BaseWithInstructionBuilderTest {
     for (Pipeline.Stage stage : Pipeline.Stage.values()) {
       Pipeline localPipeline = new Pipeline();
       // Empty -> real.
-      setStage(localPipeline, stage, instructionBuilder.buildInstruction("ADD"));
+      localPipeline.setStage(stage, instructionBuilder.buildInstruction("ADD"));
       assertFalse(localPipeline.isEmpty(stage));
 
       // Reset and test bubble -> real.
       localPipeline.clear();
-      setStage(localPipeline, stage, new BUBBLE());
-      setStage(localPipeline, stage, instructionBuilder.buildInstruction("ADD"));
+      localPipeline.setStage(stage, new BUBBLE());
+      localPipeline.setStage(stage, instructionBuilder.buildInstruction("ADD"));
       assertFalse(localPipeline.isEmpty(stage));
       assertFalse(localPipeline.isBubble(stage));
     }
@@ -166,18 +161,89 @@ public class PipelineTest extends BaseWithInstructionBuilderTest {
   public void testSetAllowsNullOnEmptyStage() {
     Pipeline localPipeline = new Pipeline();
     for (Pipeline.Stage stage : Pipeline.Stage.values()) {
-      setStage(localPipeline, stage, null);
+      localPipeline.setStage(stage, null);
       assertTrue(localPipeline.isEmpty(stage));
     }
   }
 
-  private void setStage(Pipeline p, Pipeline.Stage stage, InstructionInterface instr) {
-    switch (stage) {
-      case IF: p.setIF(instr); break;
-      case ID: p.setID(instr); break;
-      case EX: p.setEX(instr); break;
-      case MEM: p.setMEM(instr); break;
-      case WB: p.setWB(instr); break;
+  // advance() moves the instruction from one stage to the next, clearing the
+  // source stage. The destination must be empty or contain a bubble.
+  @Test
+  public void testAdvance() {
+    InstructionInterface instr = instructionBuilder.buildInstruction("ADD");
+    pipeline.setStage(Pipeline.Stage.IF, instr);
+    pipeline.advance(Pipeline.Stage.IF, Pipeline.Stage.ID);
+    assertNull("Source stage must be empty after advance.", pipeline.IF());
+    assertEquals("Destination stage must contain the advanced instruction.",
+        instr, pipeline.ID());
+  }
+
+  // advance() is allowed when the destination contains a bubble: the bubble
+  // is replaced by the advancing instruction.
+  @Test
+  public void testAdvanceOverBubble() {
+    InstructionInterface instr = instructionBuilder.buildInstruction("ADD");
+    pipeline.setStage(Pipeline.Stage.IF, instr);
+    pipeline.setStage(Pipeline.Stage.ID, new BUBBLE());
+    pipeline.advance(Pipeline.Stage.IF, Pipeline.Stage.ID);
+    assertNull(pipeline.IF());
+    assertEquals(instr, pipeline.ID());
+  }
+
+  // advance() refuses to overwrite a real instruction in the destination
+  // stage, preserving the overwrite invariant.
+  @Test
+  public void testAdvanceRefusesToOverwriteRealInstruction() {
+    InstructionInterface src = instructionBuilder.buildInstruction("ADD");
+    InstructionInterface dst = instructionBuilder.buildInstruction("DADD");
+    pipeline.setStage(Pipeline.Stage.IF, src);
+    pipeline.setStage(Pipeline.Stage.ID, dst);
+    try {
+      pipeline.advance(Pipeline.Stage.IF, Pipeline.Stage.ID);
+      fail("Expected IllegalStateException when advancing into a stage that "
+          + "already contains a real instruction.");
+    } catch (IllegalStateException expected) {
+      // Both stages must be unchanged.
+      assertEquals(src, pipeline.IF());
+      assertEquals(dst, pipeline.ID());
     }
+  }
+
+  // advance() from an empty stage is allowed and simply clears the
+  // destination (moving null into it).
+  @Test
+  public void testAdvanceFromEmptyStage() {
+    pipeline.advance(Pipeline.Stage.IF, Pipeline.Stage.ID);
+    assertNull(pipeline.IF());
+    assertNull(pipeline.ID());
+  }
+
+  // clear(Stage) empties a single stage regardless of its content.
+  @Test
+  public void testClearStage() {
+    InstructionInterface instr = instructionBuilder.buildInstruction("ADD");
+    pipeline.setStage(Pipeline.Stage.WB, instr);
+    assertEquals(instr, pipeline.clear(Pipeline.Stage.WB));
+    assertNull(pipeline.WB());
+    assertTrue(pipeline.isEmpty(Pipeline.Stage.WB));
+  }
+
+  // flushAndSet() explicitly discards the previous content (even if it is a
+  // real instruction) and writes the new one. This is the escape hatch for
+  // legitimate flushes such as the jump handler.
+  @Test
+  public void testFlushAndSetReplacesRealInstruction() {
+    InstructionInterface first = instructionBuilder.buildInstruction("ADD");
+    InstructionInterface second = instructionBuilder.buildInstruction("DADD");
+    pipeline.setStage(Pipeline.Stage.IF, first);
+    assertEquals(first, pipeline.flushAndSet(Pipeline.Stage.IF, second));
+    assertEquals(second, pipeline.IF());
+  }
+
+  @Test
+  public void testFlushAndSetOnEmptyStage() {
+    InstructionInterface instr = instructionBuilder.buildInstruction("ADD");
+    assertNull(pipeline.flushAndSet(Pipeline.Stage.IF, instr));
+    assertEquals(instr, pipeline.IF());
   }
 }
