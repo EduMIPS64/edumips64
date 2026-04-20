@@ -6,6 +6,12 @@ import MonacoEditor from 'react-monaco-editor';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import * as monacoEditor from 'monaco-editor';
 
+// Lightweight editor used as a mobile fallback: a <textarea> with a
+// syntax-highlighted overlay rendered by Prism. Works natively with
+// mobile soft keyboards and touch selection.
+import SimpleCodeEditor from 'react-simple-code-editor';
+import Prism from 'prismjs/components/prism-core';
+
 // Global MIPS language definition for the Monaco editor.
 monacoEditor.languages.register({ id: 'mips' });
 
@@ -342,6 +348,7 @@ const Code = (props) => {
         running={props.running}
         fontSize={props.fontSize}
         prefersDarkMode={prefersDarkMode}
+        validInstructions={props.validInstructions}
       />
     );
   }
@@ -358,82 +365,179 @@ const Code = (props) => {
   );
 };
 
-// MobileCodeEditor is a plain <textarea>-based editor rendered on touch
+// Build a Prism grammar for MIPS that mirrors the Monarch tokenizer used
+// by Monaco. Token names map to the `token.<name>` CSS classes we style
+// further down.
+const buildMipsGrammar = (validInstructions) => ({
+  comment: /;.*/,
+  string: /"(?:\\.|[^"\\])*"/,
+  label: {
+    pattern: /^[ \t]*[a-zA-Z_]\w*:/m,
+    alias: 'function',
+  },
+  directive: {
+    pattern: /\.[a-zA-Z_]\w*/,
+    alias: 'attr-name',
+  },
+  keyword: new RegExp(`\\b(?:${validInstructions})\\b`, 'i'),
+  register: {
+    pattern: /\br\d{1,2}\b/i,
+    alias: 'variable',
+  },
+  number: /\b\d+\b/,
+  punctuation: /[#,()]/,
+});
+
+// MobileCodeEditor is a lightweight code editor used on touch-first
 // devices, where Monaco Editor is known to have serious usability issues
-// (see https://github.com/microsoft/monaco-editor/issues/246). It retains
-// the core editing feature set (read-only mode during execution, font
-// size, dark theme) while letting the device's native soft keyboard and
-// selection gestures drive the editing experience. Syntax highlighting,
-// hover tooltips and inline error markers are intentionally omitted:
-// pipeline state and parsing errors are already displayed in the side
-// panels.
+// (see https://github.com/microsoft/monaco-editor/issues/246). It is
+// built on a native <textarea> with a Prism-highlighted overlay, so the
+// device's native soft keyboard, touch selection and accessibility all
+// Just Work while users still get syntax highlighting. Pipeline state,
+// parsing errors and instruction info are shown in the surrounding
+// panels (Pipeline, ErrorList, Registers, Memory).
 const MobileCodeEditor = ({
   code,
   onChange,
   running,
   fontSize,
   prefersDarkMode,
+  validInstructions,
 }) => {
-  const textareaRef = React.useRef(null);
+  const containerRef = React.useRef(null);
 
-  // Expose the textarea on window.editor (with a Monaco-compatible minimal
-  // API) so that existing test helpers and integrations continue to work.
+  const grammar = React.useMemo(
+    () => buildMipsGrammar(validInstructions || ''),
+    [validInstructions],
+  );
+
+  const highlight = React.useCallback(
+    (source) => Prism.highlight(source, grammar, 'mips'),
+    [grammar],
+  );
+
+  // Expose a minimal Monaco-compatible API on window.editor so existing
+  // test helpers and integrations continue to work.
   React.useEffect(() => {
-    const el = textareaRef.current;
-    if (!el) return;
-    window.editor = {
-      getValue: () => el.value,
+    const getTextarea = () =>
+      containerRef.current && containerRef.current.querySelector('textarea');
+    const api = {
+      getValue: () => {
+        const t = getTextarea();
+        return t ? t.value : code;
+      },
       setValue: (v) => {
-        el.value = v;
         onChange && onChange(v);
       },
-      focus: () => el.focus(),
+      focus: () => {
+        const t = getTextarea();
+        if (t) t.focus();
+      },
     };
+    window.editor = api;
     return () => {
-      // Remove the global reference when the component unmounts or before
-      // the next effect run, to avoid leaving a stale closure behind.
-      if (window.editor && window.editor.getValue && window.editor.getValue() === el.value) {
+      // Only clear the global if it still points at our API, to avoid
+      // clobbering another editor instance that may have mounted.
+      if (window.editor === api) {
         delete window.editor;
       }
     };
-  }, [onChange]);
+  }, [onChange, code]);
 
-  const style = {
+  const bg = prefersDarkMode ? '#1e1e1e' : '#ffffff';
+  const fg = prefersDarkMode ? '#d4d4d4' : '#000000';
+
+  // Prism token colors. Two palettes so light and dark themes both work.
+  const tokenColors = prefersDarkMode
+    ? {
+        comment: '#6a9955',
+        string: '#ce9178',
+        keyword: '#569cd6',
+        directive: '#c586c0',
+        label: '#dcdcaa',
+        register: '#9cdcfe',
+        number: '#b5cea8',
+        punctuation: '#d4d4d4',
+      }
+    : {
+        comment: '#008000',
+        string: '#a31515',
+        keyword: '#0000ff',
+        directive: '#af00db',
+        label: '#795e26',
+        register: '#267f99',
+        number: '#098658',
+        punctuation: '#000000',
+      };
+
+  const containerStyle = {
     width: '100%',
     height: '100%',
     boxSizing: 'border-box',
-    padding: '8px',
-    margin: 0,
-    border: 'none',
-    outline: 'none',
-    resize: 'none',
+    overflow: 'auto',
+    backgroundColor: bg,
+    color: fg,
     fontFamily: "Menlo, Monaco, 'Courier New', monospace",
     fontSize: `${fontSize || 14}px`,
     lineHeight: 1.5,
-    tabSize: 4,
-    whiteSpace: 'pre',
-    overflow: 'auto',
-    backgroundColor: prefersDarkMode ? '#1e1e1e' : '#ffffff',
-    color: prefersDarkMode ? '#d4d4d4' : '#000000',
-    // Disable mobile niceties that interfere with code editing.
-    WebkitTextSizeAdjust: '100%',
+    // Scoped Prism-like token colors — defined here rather than in the
+    // global stylesheet to keep the change self-contained.
+    ['--tok-comment']: tokenColors.comment,
+    ['--tok-string']: tokenColors.string,
+    ['--tok-keyword']: tokenColors.keyword,
+    ['--tok-directive']: tokenColors.directive,
+    ['--tok-label']: tokenColors.label,
+    ['--tok-register']: tokenColors.register,
+    ['--tok-number']: tokenColors.number,
+    ['--tok-punctuation']: tokenColors.punctuation,
   };
 
+  const editorStyle = {
+    fontFamily: "Menlo, Monaco, 'Courier New', monospace",
+    fontSize: `${fontSize || 14}px`,
+    minHeight: '100%',
+    outline: 'none',
+  };
+
+  const textareaClassName = 'mobile-code-editor-textarea';
+
   return (
-    <textarea
-      ref={textareaRef}
+    <div
+      ref={containerRef}
       className="mobile-code-editor"
-      aria-label="MIPS64 assembly code editor"
-      value={code}
-      readOnly={running}
-      onChange={(e) => onChange && onChange(e.target.value)}
-      style={style}
-      spellCheck={false}
-      autoCapitalize="off"
-      autoCorrect="off"
-      autoComplete="off"
-      wrap="off"
-    />
+      style={containerStyle}
+    >
+      <style>{`
+        .mobile-code-editor .token.comment     { color: var(--tok-comment); font-style: italic; }
+        .mobile-code-editor .token.string      { color: var(--tok-string); }
+        .mobile-code-editor .token.keyword     { color: var(--tok-keyword); font-weight: bold; }
+        .mobile-code-editor .token.directive   { color: var(--tok-directive); font-weight: bold; }
+        .mobile-code-editor .token.label       { color: var(--tok-label); font-weight: bold; }
+        .mobile-code-editor .token.register    { color: var(--tok-register); }
+        .mobile-code-editor .token.number      { color: var(--tok-number); }
+        .mobile-code-editor .token.punctuation { color: var(--tok-punctuation); }
+        .mobile-code-editor .${textareaClassName} {
+          outline: none !important;
+        }
+      `}</style>
+      <SimpleCodeEditor
+        value={code}
+        onValueChange={(v) => onChange && onChange(v)}
+        highlight={highlight}
+        padding={8}
+        tabSize={4}
+        insertSpaces={true}
+        disabled={running}
+        textareaClassName={textareaClassName}
+        textareaId="mobile-code-editor-textarea"
+        aria-label="MIPS64 assembly code editor"
+        spellCheck={false}
+        autoCapitalize="off"
+        autoCorrect="off"
+        autoComplete="off"
+        style={editorStyle}
+      />
+    </div>
   );
 };
 
