@@ -35,12 +35,14 @@ test('integer overflow produces a user-friendly synchronous-exception alert', as
   await page.goto(targetUri);
   await waitForPageReady(page);
 
-  // Capture the native alert() dialog that the simulator uses to report
-  // runtime errors.
-  let alertMessage = null;
+  // Capture all native alert() dialogs shown by the simulator. We collect
+  // every alert (not just the first) so we can also assert that the Run All
+  // flow does not surface a spurious follow-up "Cannot run in state READY"
+  // dialog after the real synchronous-exception alert.
+  const alertMessages = [];
   page.on('dialog', async (dialog) => {
     if (dialog.type() === 'alert') {
-      alertMessage = dialog.message();
+      alertMessages.push(dialog.message());
     }
     await dialog.dismiss();
   });
@@ -53,7 +55,9 @@ test('integer overflow produces a user-friendly synchronous-exception alert', as
   await page.click('#run-button');
 
   // Wait until the alert handler has been invoked.
-  await expect.poll(() => alertMessage, { timeout: 15000 }).not.toBeNull();
+  await expect.poll(() => alertMessages.length, { timeout: 15000 }).toBeGreaterThan(0);
+
+  const alertMessage = alertMessages[0];
 
   // The alert must describe the exception in plain English, and include the
   // faulting instruction and pipeline stage.
@@ -65,4 +69,12 @@ test('integer overflow produces a user-friendly synchronous-exception alert', as
 
   // It must NOT be the raw Java exception toString (which used to be the case).
   expect(alertMessage).not.toContain('org.edumips64.core');
+
+  // Give the UI a moment to (not) fire any follow-up alerts, then assert that
+  // no spurious second dialog (e.g. "Cannot run in state READY") was shown.
+  await page.waitForTimeout(1000);
+  expect(alertMessages).toHaveLength(1);
+  for (const msg of alertMessages) {
+    expect(msg).not.toContain('Cannot run in state');
+  }
 });
