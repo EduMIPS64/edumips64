@@ -229,7 +229,11 @@ apportate alla configurazione, mentre il tasto "Cancel" (o la semplice
 chiusura della finestra) comporta il mancato salvataggiu delle stesse.
 
 La sezione "Impostazioni generali" consente di configurare il forwarding ed il
-numero di passi da effettuare nella modalità Cicli multipli.
+numero di passi da effettuare nella modalità Cicli multipli. Quando il
+forwarding è abilitato, il risultato di un'istruzione viene inoltrato
+direttamente all'istruzione dipendente, riducendo o eliminando molti stalli
+RAW. Si veda :doc:`pipeline` per una descrizione dettagliata della pipeline
+e dei casi in cui il forwarding può (e non può) evitare gli stalli.
 
 La sezione "Comportamento" permette di abilitare o disabilitare gli avvisi
 durante la fase di parsing, l'opzione "sincronizza la GUI con la CPU
