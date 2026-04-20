@@ -366,27 +366,36 @@ const Code = (props) => {
 };
 
 // Build a Prism grammar for MIPS that mirrors the Monarch tokenizer used
-// by Monaco. Token names map to the `token.<name>` CSS classes we style
-// further down.
-const buildMipsGrammar = (validInstructions) => ({
-  comment: /;.*/,
-  string: /"(?:\\.|[^"\\])*"/,
-  label: {
-    pattern: /^[ \t]*[a-zA-Z_]\w*:/m,
-    alias: 'function',
-  },
-  directive: {
-    pattern: /\.[a-zA-Z_]\w*/,
-    alias: 'attr-name',
-  },
-  keyword: new RegExp(`\\b(?:${validInstructions})\\b`, 'i'),
-  register: {
-    pattern: /\br\d{1,2}\b/i,
-    alias: 'variable',
-  },
-  number: /\b\d+\b/,
-  punctuation: /[#,()]/,
-});
+// by Monaco. `validInstructions` is a pipe-delimited alternation list
+// (e.g. "ADD|SUB|LD|..."), the same format consumed by the Monarch
+// tokenizer above. Token names map to the `token.<name>` CSS classes
+// we style further down.
+const buildMipsGrammar = (validInstructions) => {
+  const grammar = {
+    comment: /;.*/,
+    string: /"(?:\\.|[^"\\])*"/,
+    label: {
+      pattern: /^[ \t]*[a-zA-Z_]\w*:/m,
+      alias: 'function',
+    },
+    directive: {
+      pattern: /\.[a-zA-Z_]\w*/,
+      alias: 'attr-name',
+    },
+    register: {
+      pattern: /\br\d{1,2}\b/i,
+      alias: 'variable',
+    },
+    number: /\b\d+\b/,
+    punctuation: /[#,()]/,
+  };
+  // Only add the keyword rule when we actually have instructions, to
+  // avoid creating a malformed/overly greedy `\b(?:)\b` pattern.
+  if (validInstructions) {
+    grammar.keyword = new RegExp(`\\b(?:${validInstructions})\\b`, 'i');
+  }
+  return grammar;
+};
 
 // MobileCodeEditor is a lightweight code editor used on touch-first
 // devices, where Monaco Editor is known to have serious usability issues
@@ -516,9 +525,7 @@ const MobileCodeEditor = ({
         .mobile-code-editor .token.register    { color: var(--tok-register); }
         .mobile-code-editor .token.number      { color: var(--tok-number); }
         .mobile-code-editor .token.punctuation { color: var(--tok-punctuation); }
-        .mobile-code-editor .${textareaClassName} {
-          outline: none !important;
-        }
+        .mobile-code-editor .mobile-code-editor-textarea { outline: none !important; }
       `}</style>
       <SimpleCodeEditor
         value={code}
