@@ -228,7 +228,7 @@ public class GUIAbout extends JDialog implements Runnable  {
       G.drawString("Built on " + buildDate + ", git rev " + gitRevision, 150, 112);
       head = logo.getHeight(this);
       G.setTransform(new AffineTransform(1, 0, 0, 1, 0, 0));
-      //inizio stringhe
+      //start of strings
       int alpha, line;
 
       for (int i = 0 ; i < members.length; i++) {
@@ -259,7 +259,7 @@ public class GUIAbout extends JDialog implements Runnable  {
         }
       }
 
-      //per evitare lo sfarfallio applico la grafica appena creata in quella del paint
+      // to avoid flickering, apply the newly created graphics to the paint graphics
 
       Graphics2D g2 = (Graphics2D) g;
       g2.drawImage(I, 0, 0, null);

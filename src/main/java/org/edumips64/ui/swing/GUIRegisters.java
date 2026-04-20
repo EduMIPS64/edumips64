@@ -157,7 +157,7 @@ class GUIRegisters extends GUIComponent {
       theTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
       theTable.setRowHeight(scale(theTable.getRowHeight()));
 
-      //ascoltatore della tabella
+      // table listener
       theTable.addFocusListener(new FocusAdapter() {
         public void focusGained(FocusEvent e) {
           int row = theTable.getSelectedRow();
@@ -185,7 +185,7 @@ class GUIRegisters extends GUIComponent {
       add(scrollTable, BorderLayout.CENTER);
       //setBackground(Color.RED);
 
-      //init dei vettori statici 1a e 3a colonna
+      // initialize the static arrays for the 1st and 3rd columns
       for (int i = 0; i < 32; i++) {
         numR[i] = fillFirstColumn(i);
         numRF[i] = "F" + i;
@@ -210,12 +210,12 @@ class GUIRegisters extends GUIComponent {
       }
     }
 
-    //classe interna che gestisce l'evento doppio click
+    // inner class that handles the double-click event
     class MyMouseListener implements MouseListener {
       public void mouseClicked(MouseEvent e) {
-        Object premuto = e.getSource();
+        Object source = e.getSource();
 
-        if ((premuto == theTable)) {
+        if ((source == theTable)) {
           try {
             //click on LO register
             if (theTable.getSelectedRow() == 32 && theTable.getSelectedColumn() == 1) {
@@ -261,7 +261,7 @@ class GUIRegisters extends GUIComponent {
           if (theTable.getSelectedColumn() == 1 &&  theTable.getSelectedRow() != 0 && e.getClickCount() == 2) {
             xprLastDoubleClick = 0;
             int row = theTable.getSelectedRow();
-            oldValue = value[row]; //estraggo il valore corrente dal registro
+            oldValue = value[row]; // get current value from the register
             JDialog IVD = new InsertValueDialog(row, oldValue, value);
             IVD.setVisible(true);
           }
@@ -284,7 +284,7 @@ class GUIRegisters extends GUIComponent {
 
     class FileTableModel extends AbstractTableModel {
       private static final long serialVersionUID = -215234323840818814L;
-      private String[] columnNames = { "Colonna1", "Colonna2", "Colonna3", "Colonna4" };
+      private String[] columnNames = { "Column1", "Column2", "Column3", "Column4" };
       private Class<?>[] columnClasses = {String.class, String.class, String.class, String.class};
       private String value[];
 
@@ -337,7 +337,7 @@ class GUIRegisters extends GUIComponent {
     }
   }
 
-  //classe per la JDialog
+  // class for the JDialog
   private class InsertValueDialog extends JDialog implements ActionListener {
     private static final long serialVersionUID = -2463021546228567288L;
     JButton OK;
@@ -484,7 +484,7 @@ class GUIRegisters extends GUIComponent {
 
     }
 
-    //classe interna per quando si PIGIA "INVIO"
+    // inner class for when the ENTER key is pressed
     class MyKeyListener implements KeyListener {
       public void keyPressed(KeyEvent e) {
         text.setEditable(true);

@@ -140,7 +140,7 @@ public class IOManager {
    *  @param flags combination of the flags O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_APPEND, O_TRUNC
    */
   public int open(String pathname, int flags) throws OpenException, IOManagerException {
-    // TODO: gestire combinazioni non valide tipo O_RDONLY || O_APPEND?
+    // TODO: handle invalid flag combinations like O_RDONLY || O_APPEND?
     if (((flags & O_RDONLY) != O_RDONLY) && (flags & O_WRONLY) != O_WRONLY) {
       throw new IOManagerException("NOOPENMODESPECIFIED");
     }

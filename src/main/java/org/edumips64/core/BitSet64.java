@@ -82,11 +82,11 @@ public class BitSet64 extends FixedBitSet {
       try {
 
         this.reset(false);
-        //dobbiamo scrivere solo negli ultimi 8 bit
-        //ma considerando la dimensione della nuova stringa di bit!!
+        //we must write only in the last 8 bits
+        //but considering the size of the new bit string!!
         this.setBits(bits, size - bits.length());
       } catch (IrregularStringOfBitsException e) {
-        System.err.println("stringa errata: " + bits);
+        System.err.println("invalid bit string: " + bits);
         e.printStackTrace();
         throw new IrregularWriteOperationException();
       }
@@ -110,20 +110,20 @@ public class BitSet64 extends FixedBitSet {
           this.reset(false);
           this.setBits(bits, size - bits.length());
         } catch (IrregularStringOfBitsException e) {
-          System.err.println("stringa errata: " + bits);
+          System.err.println("invalid bit string: " + bits);
           e.printStackTrace();
           throw new IrregularWriteOperationException();
         }
-      } else { //il numero Ãš negativo
+      } else { // the number is negative
         value = -value;
 
         try {
           bits = Converter.twoComplement(bits);
-          //estensione del segno
-          this.reset(true);  //il numero Ãš negativo, ci vogliono tutti '1'
+          // sign extension
+          this.reset(true);  // the number is negative, all bits must be '1'
           this.setBits(bits, size - bits.length());
         } catch (IrregularStringOfBitsException e) {
-          System.err.println("stringa errata: " + bits);
+          System.err.println("invalid bit string: " + bits);
           e.printStackTrace();
           throw new IrregularWriteOperationException();
         }
@@ -150,18 +150,18 @@ public class BitSet64 extends FixedBitSet {
         try {
           this.setBits(bits, offset);
         } catch (IrregularStringOfBitsException e) {
-          System.err.println("stringa errata: " + bits);
+          System.err.println("invalid bit string: " + bits);
           e.printStackTrace();
           throw new IrregularWriteOperationException();
         }
-      } else { //il numero Ãš negativo
+      } else { // the number is negative
         value = -value;
 
         try {
           bits = Converter.twoComplement(bits);
           this.setBits(bits, offset);
         } catch (IrregularStringOfBitsException e) {
-          System.err.println("stringa errata: " + bits);
+          System.err.println("invalid bit string: " + bits);
           e.printStackTrace();
           throw new IrregularWriteOperationException();
         }
@@ -183,10 +183,10 @@ public class BitSet64 extends FixedBitSet {
 
       try {
         this.reset(false);
-        //dobbiamo scrivere solo negli ultimi 16 bit
+        // we must write only in the last 16 bits
         this.setBits(bits, size - bits.length());
       } catch (IrregularStringOfBitsException e) {
-        System.err.println("stringa errata: " + bits);
+        System.err.println("invalid bit string: " + bits);
         e.printStackTrace();
         throw new IrregularWriteOperationException();
       }
@@ -211,20 +211,20 @@ public class BitSet64 extends FixedBitSet {
           this.reset(false);
           this.setBits(bits, size - bits.length());
         } catch (IrregularStringOfBitsException e) {
-          System.err.println("stringa errata: " + bits);
+          System.err.println("invalid bit string: " + bits);
           e.printStackTrace();
           throw new IrregularWriteOperationException();
         }
-      } else { //il numero Ãš negativo
+      } else { // the number is negative
         value = -value;
 
         try {
           bits = Converter.twoComplement(bits);
-          //estensione del segno
-          this.reset(true);  //il numero Ãš negativo, ci vogliono tutti '1'
+          // sign extension
+          this.reset(true);  // the number is negative, all bits must be '1'
           this.setBits(bits, size - bits.length());
         } catch (IrregularStringOfBitsException e) {
-          System.err.println("stringa errata: " + bits);
+          System.err.println("invalid bit string: " + bits);
           e.printStackTrace();
           throw new IrregularWriteOperationException();
         }
@@ -253,18 +253,18 @@ public class BitSet64 extends FixedBitSet {
         try {
           this.setBits(bits, offset);
         } catch (IrregularStringOfBitsException e) {
-          System.err.println("stringa errata: " + bits);
+          System.err.println("invalid bit string: " + bits);
           e.printStackTrace();
           throw new IrregularWriteOperationException();
         }
-      } else { //il numero Ãš negativo
+      } else { // the number is negative
         value = -value;
 
         try {
           bits = Converter.twoComplement(bits);
           this.setBits(bits, offset);
         } catch (IrregularStringOfBitsException e) {
-          System.err.println("stringa errata: " + bits);
+          System.err.println("invalid bit string: " + bits);
           e.printStackTrace();
           throw new IrregularWriteOperationException();
         }
@@ -285,10 +285,10 @@ public class BitSet64 extends FixedBitSet {
 
       try {
         this.reset(false);
-        //dobbiamo scrivere solo negli ultimi 32 bit
+        // we must write only in the last 32 bits
         this.setBits(bits, size - bits.length());
       } catch (IrregularStringOfBitsException e) {
-        System.err.println("stringa errata: " + bits);
+        System.err.println("invalid bit string: " + bits);
         e.printStackTrace();
         throw new IrregularWriteOperationException();
       }
@@ -311,20 +311,20 @@ public class BitSet64 extends FixedBitSet {
         this.reset(false);
         this.setBits(bits, size - bits.length());
       } catch (IrregularStringOfBitsException e) {
-        System.err.println("stringa errata: " + bits);
+        System.err.println("invalid bit string: " + bits);
         e.printStackTrace();
         throw new IrregularWriteOperationException();
       }
-    } else { //il numero Ãš negativo
+    } else { // the number is negative
       value = -value;
 
       try {
         bits = Converter.twoComplement(bits);
-        //estensione del segno
-        this.reset(true);  //il numero Ãš negativo, ci vogliono tutti '1'
+        // sign extension
+        this.reset(true);  // the number is negative, all bits must be '1'
         this.setBits(bits, size - bits.length());
       } catch (IrregularStringOfBitsException e) {
-        System.err.println("stringa errata: " + bits);
+        System.err.println("invalid bit string: " + bits);
         e.printStackTrace();
         throw new IrregularWriteOperationException();
       }
@@ -355,18 +355,18 @@ public class BitSet64 extends FixedBitSet {
       try {
         this.setBits(bits, offset);
       } catch (IrregularStringOfBitsException e) {
-        System.err.println("stringa errata: " + bits);
+        System.err.println("invalid bit string: " + bits);
         e.printStackTrace();
         throw new IrregularWriteOperationException();
       }
-    } else { //il numero Ãš negativo
+    } else { // the number is negative
       value = -value;
 
       try {
         bits = Converter.twoComplement(bits);
         this.setBits(bits, offset);
       } catch (IrregularStringOfBitsException e) {
-        System.err.println("stringa errata: " + bits);
+        System.err.println("invalid bit string: " + bits);
         e.printStackTrace();
         throw new IrregularWriteOperationException();
       }
@@ -388,20 +388,20 @@ public class BitSet64 extends FixedBitSet {
         this.reset(false);
         this.setBits(bits, size - bits.length());
       } catch (IrregularStringOfBitsException e) {
-        System.err.println("stringa errata: " + bits);
+        System.err.println("invalid bit string: " + bits);
         e.printStackTrace();
         throw new IrregularWriteOperationException();
       }
-    } else { //il numero Ãš negativo
+    } else { // the number is negative
       if (value == -9223372036854775808L) {
-        //questo numero non puÃ² essere convertito dalla positiveIntToBin
-        //occorre fare a mano
-        //e mettere il valore "1000000....0000" (tutti zero nel mezzo)
+        // this number cannot be converted by positiveIntToBin
+        // it must be done manually
+        // and set the value "1000000....0000" (all zeros in the middle)
         this.reset(false);
 
         try {
           this.setBits("1", 0);
-        } catch (IrregularStringOfBitsException e) {} //non puÃ² accadere :-)
+        } catch (IrregularStringOfBitsException e) {} // this cannot happen :-)
 
         return;
       }
@@ -411,11 +411,11 @@ public class BitSet64 extends FixedBitSet {
       try {
         bits = Converter.positiveIntToBin(value);
         bits = Converter.twoComplement(bits);
-        //estensione del segno
-        this.reset(true);  //il numero Ãš negativo, ci vogliono tutti '1'
+        // sign extension
+        this.reset(true);  // the number is negative, all bits must be '1'
         this.setBits(bits, size - bits.length());
       } catch (IrregularStringOfBitsException e) {
-        System.err.println("stringa errata: " + bits);
+        System.err.println("invalid bit string: " + bits);
         e.printStackTrace();
         throw new IrregularWriteOperationException();
       }

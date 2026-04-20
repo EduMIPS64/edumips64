@@ -50,12 +50,12 @@ public class Converter {
       throw new IrregularStringOfBitsException();
     }
 
-    //se la stringa di bits Ãš lunga 32 bit
-    //ed Ãš composta da uno 1 e 31 0
-    //allora la conversione si deve fare a mano
-    //perchÃš il numero da ritornare Ãš -(2^32)
-    //e non si puÃ² utilizzare il valore positivo (2^32)
-    //con il tipo int :-(
+    // if the bit string is 32 bits long
+    // and consists of a 1 followed by 31 zeros
+    // then the conversion must be done manually
+    // because the number to return is -(2^32)
+    // and the positive value (2^32) cannot be used
+    // with the int type :-(
     if (!unsignd && bits.length() == 32 && isOverflow(bits)) {
       return OVERFLOW_32;
     }
@@ -89,12 +89,12 @@ public class Converter {
       throw new IrregularStringOfBitsException();
     }
 
-    //se la stringa di bits Ãš lunga 64 bit
-    //ed Ãš composta da uno 1 e 63 0
-    //allora la conversione si deve fare a mano
-    //perchÃš il numero da ritornare Ãš -(2^63)
-    //e non si puÃ² utilizzare il valore positivo (2^63)
-    //con il tipo long :-(
+    // if the bit string is 64 bits long
+    // and consists of a 1 followed by 63 zeros
+    // then the conversion must be done manually
+    // because the number to return is -(2^63)
+    // and the positive value (2^63) cannot be used
+    // with the long type :-(
     if (!unsignd && bits.length() == 64 && isOverflow(bits)) {
         return OVERFLOW_64;
     }
