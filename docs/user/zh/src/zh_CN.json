@@ -1,0 +1,28 @@
+{
+  "embeddedFonts": [
+    [
+      "sarasa-gothic-sc-regular.ttf",
+      "sarasa-gothic-sc-bold.ttf",
+      "sarasa-gothic-sc-italic.ttf",
+      "sarasa-gothic-sc-bolditalic.ttf"
+    ]
+  ],
+  "fontsAlias": {
+    "fontSerif": "sarasa-gothic-sc-regular",
+    "fontSerifBold": "sarasa-gothic-sc-bold",
+    "fontSerifItalic": "sarasa-gothic-sc-italic",
+    "fontSerifBoldItalic": "sarasa-gothic-sc-bolditalic",
+    "fontSans": "sarasa-gothic-sc-regular",
+    "fontSansBold": "sarasa-gothic-sc-bold",
+    "fontSansItalic": "sarasa-gothic-sc-italic",
+    "fontSansBoldItalic": "sarasa-gothic-sc-bolditalic",
+    "fontMono": "sarasa-gothic-sc-regular",
+    "fontMonoBold": "sarasa-gothic-sc-bold",
+    "fontMonoItalic": "sarasa-gothic-sc-italic",
+    "fontMonoBoldItalic": "sarasa-gothic-sc-bolditalic"
+  },
+  "styles": [
+    ["base", {"wordWrap": "CJK"}],
+    ["literal", {"wordWrap": "None"}]
+  ]
+}
