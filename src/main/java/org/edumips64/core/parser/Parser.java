@@ -32,7 +32,6 @@ package org.edumips64.core.parser;
 import org.edumips64.core.Converter;
 import org.edumips64.core.FCSRRegister;
 import org.edumips64.core.IrregularStringOfBitsException;
-import org.edumips64.core.IrregularStringOfHexException;
 import org.edumips64.core.IrregularWriteOperationException;
 import org.edumips64.core.Memory;
 import org.edumips64.core.MemoryElement;
@@ -417,29 +416,23 @@ public class Parser {
                 memoryCount++;
 
                 try {
-                  if (Converter.isHexNumber(parameters)) {
-                    parameters = Converter.hexToLong(parameters);
-                  }
-
-                  if (Converter.isInteger(parameters)) {
-                    int num = Integer.parseInt(parameters);
-
-                    for (int tmpi = 0; tmpi < num; tmpi++) {
-                      if (tmpi % 8 == 0 && tmpi != 0) {
-                        tmpMem = mem.getCellByIndex(memoryCount);
-                        memoryCount++;
-                        posInWord = 0;
-                      }
-
-                      tmpMem.writeByte(0, posInWord++);
-                    }
-                  } else {
+                  // Accept decimal, hexadecimal (0x) and binary (0b) literals.
+                  long numLong = Converter.parseImmediate(parameters);
+                  if (numLong < 0 || numLong > Integer.MAX_VALUE) {
                     throw new NumberFormatException();
                   }
+                  int num = (int) numLong;
+
+                  for (int tmpi = 0; tmpi < num; tmpi++) {
+                    if (tmpi % 8 == 0 && tmpi != 0) {
+                      tmpMem = mem.getCellByIndex(memoryCount);
+                      memoryCount++;
+                      posInWord = 0;
+                    }
+
+                    tmpMem.writeByte(0, posInWord++);
+                  }
                 } catch (NumberFormatException ex) {
-                  errors.addError("INVALIDVALUE", row, column + 1, line);
-                  continue;
-                } catch (IrregularStringOfHexException ex) {
                   errors.addError("INVALIDVALUE", row, column + 1, line);
                   continue;
                 }
@@ -637,7 +630,7 @@ public class Parser {
                       }
                       // when hexadecimal, the range 32768 to 65536 is actually the signed value will be between -32738 and -1
                       // for example: 0xffff is not 65535, but -1
-                      if ( Converter.isHexNumber(paramValue) ) {
+                      if ( Converter.isHexNumber(paramValue) || Converter.isBinNumber(paramValue) ) {
                         if ( immediateValue >= 32768 && immediateValue<=65535) {
                           immediateValue -= 65536;
                         }
@@ -692,13 +685,25 @@ public class Parser {
                     } else if (type == 'L') {
                       try {
                         MemoryElement tmpMem;
+                        String trimmed = paramValue.trim();
 
                         if (paramValue.equals("")) {
                           tmpInst.getParams().add(0);
-                        } else if (Converter.isInteger(paramValue.trim())) {
-                          int tmp = Integer.parseInt(paramValue.trim());
+                        } else if (Converter.isInteger(trimmed)
+                            || Converter.isHexNumber(trimmed)
+                            || Converter.isBinNumber(trimmed)) {
+                          long tmpLong;
+                          try {
+                            tmpLong = Converter.parseImmediate(trimmed);
+                          } catch (NumberFormatException ex) {
+                            errors.addError("LABELADDRESSINVALID", row, line.indexOf(paramValue) + 1, line);
+                            column = line.length();
+                            paramStart = paramEnd + 1;
+                            tmpInst.getParams().add(0);
+                            continue;
+                          }
 
-                          if (tmp < Memory.MIN_OFFSET_BYTES || tmp > Memory.MAX_OFFSET_BYTES) {
+                          if (tmpLong < Memory.MIN_OFFSET_BYTES || tmpLong > Memory.MAX_OFFSET_BYTES) {
                             String er = "LABELADDRESSINVALID";
 
                             errors.addError(er, row, line.indexOf(paramValue) + 1, line);
@@ -708,9 +713,9 @@ public class Parser {
                             continue;
                           }
 
-                          tmpInst.getParams().add(tmp);
+                          tmpInst.getParams().add((int) tmpLong);
                         } else {
-                          tmpMem = symTab.getCell(paramValue.trim());
+                          tmpMem = symTab.getCell(trimmed);
                           tmpInst.getParams().add(tmpMem.getAddress());
 
                         }
@@ -1065,31 +1070,33 @@ public class Parser {
         continue;
       }
 
-      boolean is_hex = (Converter.isHexNumber(val));
-      if (is_hex) {
-        try {
-          // handle the corner case of unlimited hex strings
-          if (numBit ==64 && is_hex && val.length()>18) {
-            throw new IrregularStringOfHexException();
-          }
-          val = Converter.hexToLong(val);
-        } catch (IrregularStringOfHexException e) {
-          errors.addError("INVALIDVALUE", row, i + 1, line);
-          i = line.length();
-          continue;
+      boolean is_hex = Converter.isHexNumber(val);
+      boolean is_bin = Converter.isBinNumber(val);
+      boolean is_unsigned = is_hex || is_bin;
+      long num;
+      try {
+        // handle the corner case of unlimited hex/binary strings for 64-bit values.
+        if (numBit == 64 && is_hex && val.length() > 18) {
+          throw new NumberFormatException();
         }
+        if (numBit == 64 && is_bin && val.length() > 66) {
+          throw new NumberFormatException();
+        }
+        // Convert the literal (decimal, 0x hex or 0b binary) to a long, and then check for overflow.
+        num = Converter.parseImmediate(val);
+      } catch (NumberFormatException e) {
+        errors.addError("INVALIDVALUE", row, i + 1, line);
+        i = line.length();
+        continue;
       }
 
       try {
-        // Convert the integer to a long, and then check for overflow.
-        long num = Long.parseLong(val);
-
-        if (!is_hex && (num < - (Converter.powLong(2, numBit - 1)) || num > (Converter.powLong(2, numBit - 1) - 1)) &&  numBit != 64) {
+        if (!is_unsigned && (num < - (Converter.powLong(2, numBit - 1)) || num > (Converter.powLong(2, numBit - 1) - 1)) &&  numBit != 64) {
           throw new NumberFormatException();
         }
 
-        // hex string values should be allowed independently of signed/unsigned interpretation
-        if (is_hex && (num > (Converter.powLong(2, numBit) - 1)) && numBit!=64) {
+        // hex/binary string values should be allowed independently of signed/unsigned interpretation
+        if (is_unsigned && (num > (Converter.powLong(2, numBit) - 1)) && numBit!=64) {
           throw new NumberFormatException();
         }
 
