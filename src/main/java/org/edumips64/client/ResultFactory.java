@@ -81,21 +81,55 @@ public class ResultFactory {
         return AddParsedInstructions(AddCpuInfo(r));
     }
 
-    public Result InputRequested(InputNeededException inputNeeded, int resumeSteps) {
-        Result r = Success();
-        r.inputRequested = true;
-        r.inputMaxLength = inputNeeded.getMaxLength();
-        r.inputResumeSteps = resumeSteps;
-        r.inputDialogTitle = inputNeeded.getDialogTitle();
-        r.inputPromptMessage = inputNeeded.getPromptMessage();
-        r.inputTooLongMessage = inputNeeded.getTooLongMessage();
-        return r;
+    /**
+     * Attaches information about a pending synchronous input request to the
+     * given Result. Symmetric to {@link #AddParserErrors} and
+     * {@link #AddRuntimeErrors}: input-request, parser-error and runtime-error
+     * information are orthogonal concerns, each exposed as a composable helper.
+     *
+     * @param result       the Result to enrich (typically a {@code Success()})
+     * @param inputNeeded  the exception carrying the prompt/title/limit info
+     * @param resumeSteps  number of steps still pending when input was requested
+     */
+    public static Result AddInputNeeded(Result result, InputNeededException inputNeeded, int resumeSteps) {
+        if (inputNeeded == null) return result;
+        result.inputRequested = true;
+        result.inputMaxLength = inputNeeded.getMaxLength();
+        result.inputResumeSteps = resumeSteps;
+        result.inputDialogTitle = inputNeeded.getDialogTitle();
+        result.inputPromptMessage = inputNeeded.getPromptMessage();
+        result.inputTooLongMessage = inputNeeded.getTooLongMessage();
+        return result;
     }
 
     public static Result AddParserErrors(Result result, ParserMultiException e) {
         if (e == null) return result;
         result.parsingErrors = Js.cast(e.getExceptionList().stream()
             .map(exception -> ParserErrorFactory.FromParserException(exception)).toArray(ParserError[]::new));
+        return result;
+    }
+
+    /**
+     * Attaches structured information about a runtime (synchronous) exception
+     * to the given Result. This is the runtime-error counterpart of
+     * {@link #AddParserErrors}: the two concerns are orthogonal, so they live
+     * in separate helpers and can be composed independently.
+     *
+     * The error message itself is not overwritten here; callers are expected
+     * to pass a Result that already carries a user-friendly message (e.g.
+     * built via {@link SynchronousExceptionFormatter}).
+     */
+    public static Result AddRuntimeErrors(Result result, org.edumips64.core.SynchronousException e) {
+        if (e == null) return result;
+        if (e.getCode() != null) {
+            result.errorCode = e.getCode().name();
+        }
+        if (e.getInstructionName() != null) {
+            result.errorInstruction = e.getInstructionName();
+        }
+        if (e.getStage() != null) {
+            result.errorStage = e.getStage();
+        }
         return result;
     }
 
