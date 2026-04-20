@@ -107,6 +107,25 @@ public class IOManager {
     fileUtils = fu;
   }
 
+  /** File descriptor used for standard input. */
+  public static final int STDIN_FD = 0;
+
+  /** File descriptor used for standard output. */
+  public static final int STDOUT_FD = 1;
+
+  /** File descriptor used for standard error. */
+  public static final int STDERR_FD = 2;
+
+  /**
+   * Whether the underlying environment supports a real filesystem. Returns
+   * {@code false} for environments like the web UI that are backed by
+   * {@link org.edumips64.utils.io.NullFileUtils}, signalling to callers that
+   * file I/O syscalls cannot be served.
+   */
+  public boolean supportsFileSystem() {
+    return fileUtils.supportsFileSystem();
+  }
+
   /** Closes the specified file descriptor.
    *  @param fd the file descriptor to close
    */

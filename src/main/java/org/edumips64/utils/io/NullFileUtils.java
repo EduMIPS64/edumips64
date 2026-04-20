@@ -45,4 +45,12 @@ public class NullFileUtils extends FileUtils {
     // is in use, so we fail the open() call cleanly.
     throw new OpenException();
   }
+
+  @Override
+  public boolean supportsFileSystem() {
+    // NullFileUtils is used in environments (e.g. the web UI) that do not
+    // provide a filesystem. Signal that to callers so they can refuse
+    // unsupported syscalls with a clear error.
+    return false;
+  }
 }
