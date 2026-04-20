@@ -57,7 +57,7 @@ public class SymbolTable {
 
       mem_labels.put(label, address);
       MemoryElement temp = mem.getCellByAddress(address);
-      // TODO: attualmente la cella  si prende l'ultima etichetta
+      // TODO: currently the cell takes the last label
       temp.setLabel(label);
       logger.info("Added memory label " + label + " to address " + address);
     }
@@ -98,7 +98,7 @@ public class SymbolTable {
         // TODO: throw exception?
         logger.severe("No instruction at address " + address);
       } else {
-        // TODO: attualmente l'istruzione si prende l'ultima etichetta
+        // TODO: currently the instruction takes the last label
         temp.setLabel(label);
       }
       logger.info("Added instruction label " + label + " to address " + address);
@@ -120,8 +120,8 @@ public class SymbolTable {
   public void reset() {
     instr_labels.clear();
     mem_labels.clear();
-    // TODO: eliminare individualmente le label dalle celle e dalle
-    // istruzioni?
+    // TODO: individually remove labels from cells and
+    // instructions?
   }
 
   public String toString() {
