@@ -72,6 +72,18 @@ java {
     }
 }
 
+// Exclude the GWT super-source directory from the main Java compilation. It provides
+// alternative implementations of classes that aren't compatible with GWT's JRE emulation
+// (see webclient.gwt.xml <super-source> directive) and would otherwise clash with the
+// regular sources as duplicate classes.
+sourceSets {
+    main {
+        java {
+            exclude("org/edumips64/supersource/**")
+        }
+    }
+}
+
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
 }

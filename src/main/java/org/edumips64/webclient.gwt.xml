@@ -29,5 +29,12 @@
     <exclude name="io/Local*.java" />
     <exclude name="MetaInfo.java" />
     <exclude name="JavaPrefsConfigStore.java" />
+    <!-- CurrentLocale uses java.util.ResourceBundle, which is not emulated by GWT.
+         A HashMap-based replacement is provided via the super-source path below. -->
+    <exclude name="CurrentLocale.java" />
   </source>
+
+  <!-- Super-source providing GWT-only replacements for classes that rely on APIs not available
+       in GWT's JRE emulation (currently: utils.CurrentLocale, which uses ResourceBundle). -->
+  <super-source path="supersource" />
 </module>

@@ -37,6 +37,10 @@ import java.util.logging.Logger;
    (Italian) and {@code CurrentLocaleMessages_zh.properties} (Simplified Chinese). This consolidates the
    internationalization mechanism to be consistent with the CLI, which already used ResourceBundles
    (see PRs #264 and #199).
+
+   Note: {@code java.util.ResourceBundle} is not part of GWT's JRE emulation, so this file is excluded
+   from GWT compilation in {@code webclient.gwt.xml} and replaced by the {@code HashMap}-based version
+   located under {@code supersource/}. Keep both implementations in sync behaviourally.
  */
 public class CurrentLocale {
 
