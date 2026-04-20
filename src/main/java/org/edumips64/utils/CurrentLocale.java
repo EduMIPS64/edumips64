@@ -22,42 +22,24 @@
  */
 package org.edumips64.utils;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-/** This class has mostly static methods. If the 'config' attribute is set, then the current language is
-   fetched from it. Otherwise, "en" is considered the default and used.
-
-   Localized messages are loaded from {@link ResourceBundle} properties files named
-   {@code CurrentLocaleMessages.properties} (English, default), {@code CurrentLocaleMessages_it.properties}
-   (Italian) and {@code CurrentLocaleMessages_zh.properties} (Simplified Chinese). This consolidates the
-   internationalization mechanism to be consistent with the CLI, which already used ResourceBundles
-   (see PRs #264 and #199).
-
-   Note: {@code java.util.ResourceBundle} is not part of GWT's JRE emulation, so this file is excluded
-   from GWT compilation in {@code webclient.gwt.xml} and replaced by the {@code HashMap}-based version
-   located under {@code supersource/}. Keep both implementations in sync behaviourally.
+/**
+ * Static facade for localized UI message lookup.
+ *
+ * <p>If the {@link ConfigStore} attribute is set, the current language is fetched from it;
+ * otherwise English is used as the default. The actual lookup is delegated to a
+ * {@link LocalizationProvider}; the JVM build uses {@link ResourceBundleLocalizationProvider},
+ * which reads the {@code CurrentLocaleMessages*.properties} files under
+ * {@code org/edumips64/utils/}. Those property files are the single source of truth for the
+ * application's translations; the GWT web worker reads the very same files through a
+ * super-source override of this class (see {@code webclient.gwt.xml}).
  */
 public class CurrentLocale {
 
-  private static final String BUNDLE_BASE_NAME = "CurrentLocaleMessages";
+  private static final Logger logger = Logger.getLogger(CurrentLocale.class.getName());
 
-  // Maps an internal language code (as used in ConfigKey.LANGUAGE) to the Locale used to look up
-  // the matching ResourceBundle. The English bundle is the base bundle (no suffix).
-  private static final Map<String, Locale> SUPPORTED_LANGUAGES;
-  static {
-    Map<String, Locale> m = new HashMap<>();
-    // English is served by the base bundle (no suffix), so use Locale.ROOT to avoid an extra
-    // lookup for CurrentLocaleMessages_en.properties.
-    m.put("en", Locale.ROOT);
-    m.put("it", Locale.ITALIAN);
-    m.put("zhcn", Locale.SIMPLIFIED_CHINESE);
-    SUPPORTED_LANGUAGES = m;
-  }
+  private static final LocalizationProvider provider = new ResourceBundleLocalizationProvider();
 
   private static ConfigStore config;
 
@@ -65,44 +47,17 @@ public class CurrentLocale {
     CurrentLocale.config = config;
   }
 
-  private static final Logger logger = Logger.getLogger(CurrentLocale.class.getName());
-
-  private static ResourceBundle getBundle(Locale locale) {
-    // Use the no-fallback control so we never silently fall back to the JVM's default locale,
-    // ensuring deterministic behaviour across environments.
-    return ResourceBundle.getBundle(BUNDLE_BASE_NAME, locale,
-        ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT));
-  }
-
   public static String getString(String key) {
-    String lang_name = "en";
-    Locale locale = Locale.ROOT;
-
+    String lang = "en";
     if (config != null) {
-      lang_name = config.getString(ConfigKey.LANGUAGE);
-      Locale found = SUPPORTED_LANGUAGES.get(lang_name);
-      if (found != null) {
-        locale = found;
+      String configured = config.getString(ConfigKey.LANGUAGE);
+      if ("en".equals(configured) || "it".equals(configured) || "zhcn".equals(configured)) {
+        lang = configured;
       } else {
-        logger.severe("Could not find language " + lang_name + ", defaulting to English");
-        lang_name = "en";
+        logger.severe("Could not find language " + configured + ", defaulting to English");
       }
     }
-
-    try {
-      return getBundle(locale).getString(key);
-    } catch (MissingResourceException e) {
-      // Not found in the selected language: fall back to English.
-    }
-
-    logger.severe("Language " + lang_name + " does not contain message " + key + ", falling back to English.");
-    try {
-      return getBundle(Locale.ROOT).getString(key);
-    } catch (MissingResourceException e) {
-      logger.severe("Could not find message " + key + " neither in language " + lang_name + " nor in English.");
-      // Return the key to avoid the UI to show a blank, and also to make it very evident in the UI that something
-      // is very wrong.
-      return key;
-    }
+    return provider.getString(lang, key);
   }
 }
+

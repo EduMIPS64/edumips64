@@ -2,6 +2,7 @@
   <!-- Core GWT modules. -->
   <inherits name="com.google.gwt.core.Core" />
   <inherits name="com.google.gwt.json.JSON" />
+  <inherits name="com.google.gwt.resources.Resources" />
   <inherits name="elemental2.dom.Dom" />
 
   <!-- Web worker linker. -->
@@ -29,12 +30,16 @@
     <exclude name="io/Local*.java" />
     <exclude name="MetaInfo.java" />
     <exclude name="JavaPrefsConfigStore.java" />
-    <!-- CurrentLocale uses java.util.ResourceBundle, which is not emulated by GWT.
-         A HashMap-based replacement is provided via the super-source path below. -->
+    <!-- CurrentLocale and ResourceBundleLocalizationProvider use java.util.ResourceBundle, which
+         is not emulated by GWT. The supersource/ directory below provides GWT-only replacements
+         that read the same CurrentLocaleMessages*.properties files. -->
     <exclude name="CurrentLocale.java" />
+    <exclude name="ResourceBundleLocalizationProvider.java" />
   </source>
 
   <!-- Super-source providing GWT-only replacements for classes that rely on APIs not available
-       in GWT's JRE emulation (currently: utils.CurrentLocale, which uses ResourceBundle). -->
+       in GWT's JRE emulation. The alternative LocalizationProvider implementation used here
+       reads the same CurrentLocaleMessages*.properties files as the JVM build, so the property
+       files remain the single source of truth for translations. -->
   <super-source path="supersource" />
 </module>
