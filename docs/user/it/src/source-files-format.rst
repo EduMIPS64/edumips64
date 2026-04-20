@@ -167,11 +167,12 @@ Le istruzioni possono accettare tre tipi di parametri:
   di registro (tra 0 e 31). Ad esempio, le scritture "r4", "R4" e "\$4"
   identificano tutt'e tre il quarto registro;
 * *Valori immediati* un valore immediato può essere un numero o
-  un'etichetta; il numero può essere specificato in base 10 o in base 16. I
-  numeri in base 10 sono inseriti semplicemente scrivendo il numero
+  un'etichetta; il numero può essere specificato in base 10, in base 16 o in
+  base 2. I numeri in base 10 sono inseriti semplicemente scrivendo il numero
   utilizzando l'usuale notazione decimale; i numeri in base 16 si inseriscono
-  aggiungendo all'inizio del numero il prefisso "0x". I valori immediati
-  possono essere preceduti dal carattere #;
+  aggiungendo all'inizio del numero il prefisso "0x"; i numeri in base 2 si
+  inseriscono aggiungendo all'inizio del numero il prefisso "0b". I valori
+  immediati possono essere preceduti dal carattere #;
 * *Indirizzi* un indirizzo è composto da un valore immediato
   seguito dal nome di un registro tra parentesi. Il valore del registro sarà
   usato come base, quello dell'immediato come offset.
