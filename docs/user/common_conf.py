@@ -1,6 +1,6 @@
 # Common values for the Sphinx configuration for all languages.
 
-import sys, os
+import os
 
 # Get the version from build.gradle.kts
 import re
