@@ -83,6 +83,22 @@ For developers that don't want to recompile the help files when creating a JAR, 
 `noHelpJar` Gradle task will produce `edumips64-<version>-nohelp.jar`, which does
 not include the compiled help files.
 
+#### Build output directory
+
+All Gradle-produced artifacts are written under the `out/` directory at the
+root of the repository, rather than Gradle's default `build/`. The layout is:
+
+| Artifact | Location |
+| --- | --- |
+| JARs (main, nohelp) | `out/edumips64-<version>[-nohelp].jar` |
+| MSI installer | `out/EduMIPS64-<version>.msi` |
+| Electron packages | `out/WebEduMips64-<platform>-<arch>/` |
+| Web application (worker, ui, docs) | `out/web/` |
+| Documentation (HTML, PDF) | `out/docs/` |
+| Test reports, caches, intermediates | `out/reports/`, `out/tmp/`, ... |
+
+The `out/` directory is ignored by Git.
+
 ### Visual Studio Code
 
 If you want to work on EduMIPS64 with Visual Studio Code, you need to download the Java Extension Pack
@@ -106,11 +122,11 @@ The GWT code runs as a Web Worker to enable concurrency between UI interaction
 and the execution of the simulation steps.
 
 To compile it, run the `war` task, which will produce the file `worker.js` inside
-the directory `build/gwt/war/edumips64/`.
+the directory `out/web/`.
 
-**NOTE:** the `war` gradle task wipes the `build/gwt/war/edumips64` directory.
-So if you re-build the worker, you need to re-build the rest of the web UI as well
-to have a working local test environment (see next section).
+**NOTE:** the `assembleWebApp` gradle task copies the GWT compiler output into
+`out/web`. If you re-build the worker, you need to re-build the rest of the web
+UI as well to have a working local test environment (see next section).
 
 #### Web UI
 
@@ -130,7 +146,7 @@ Custom NPM scripts:
 - `build`: runs `webpack -p` (compile without debugging symbols, minified, etc)
 - `start`: starts the webpack-dev-server with live reloading
 
-Both `build` and `build-dbg` produce a `ui.js` file in the `build/gwt/war/edumips64` directory.
+Both `build` and `build-dbg` produce a `ui.js` file in the `out/web` directory.
 
 The code was tested with Node.JS 16. The CI environment uses this version.
 
