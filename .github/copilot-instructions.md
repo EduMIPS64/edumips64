@@ -124,11 +124,28 @@ The EduMIPS64 core is cross-compiled to JavaScript using GWT and runs as a Web W
 - Available online at http://edumips64.rtfd.io
 - Build with `./gradlew check` (includes documentation compilation)
 - Requirements in `docs/requirements.txt`
+- User documentation is localized in three languages, each under its own subdirectory:
+  - English: `docs/user/en/`
+  - Italian: `docs/user/it/`
+  - Chinese: `docs/user/zh/`
+- **Any user-facing change MUST be documented in all three languages.** When
+  updating a user-facing page (e.g. `source-files-format.rst`, `instructions.rst`,
+  `examples.rst`, `fpu.rst`, `user-interface.rst`, etc.), apply the equivalent
+  change to the matching file under `docs/user/en/`, `docs/user/it/` and
+  `docs/user/zh/`. If you cannot translate the change accurately, mirror the
+  structure and leave a clear English note in the non-English files so a native
+  speaker can refine the wording later, but do not skip any language.
 
 ### Developer Documentation
 - Developer guide: `docs/developer-guide.md`
 - README: `readme.md`
 - Code of Conduct: `CODE_OF_CONDUCT.md`
+- **Any developer-facing change MUST be documented in the developer docs.**
+  This includes changes to how developers interact with the EduMIPS64 source
+  code, such as: new or changed Gradle tasks, build/test/lint commands, project
+  structure, CI workflows, dev-container setup, coding conventions, release
+  process, or new developer tooling. Update `docs/developer-guide.md` (and
+  `readme.md` if it is affected) as part of the same change.
 
 ## Important Guidelines for Code Changes
 
