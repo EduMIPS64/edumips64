@@ -23,6 +23,8 @@
  */
 package org.edumips64.core.fpu;
 
+import org.edumips64.core.SynchronousExceptionCode;
+
 /** Exception thrown when a small double number cannot be represented on 64 bit according to IEEE754 standard
  * @author Trubia Massimo
  */
@@ -30,7 +32,7 @@ public class FPUnderflowException extends org.edumips64.core.SynchronousExceptio
   private static final long serialVersionUID = -3703049138797582033L;
 
   public FPUnderflowException() {
-    super("FPUNDERFLOW");
+    super(SynchronousExceptionCode.FPUNDERFLOW);
   }
 
 }

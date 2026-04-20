@@ -385,7 +385,7 @@ public class CPU {
   */
   public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException {
     configFPExceptionsAndRM();
-    Optional<String> syncex;
+    Optional<SynchronousException> syncex;
     if (status != CPUStatus.RUNNING && status != CPUStatus.STOPPING) {
       throw new StoppedCPUException();
     }
@@ -420,7 +420,7 @@ public class CPU {
       stepIF();
 
       if (syncex.isPresent()) {
-        throw new SynchronousException(syncex.get());
+        throw syncex.get();
       }
     } catch (JumpException ex) {
       logger.info("Executing a Jump.");
@@ -558,15 +558,15 @@ public class CPU {
     pipe.advance(Pipeline.Stage.MEM, Pipeline.Stage.WB);
   }
 
-  private Optional<String> stepEX() throws SynchronousException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
+  private Optional<SynchronousException> stepEX() throws SynchronousException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
     changeStage(Pipeline.Stage.EX);
 
     // Used for exception handling
     boolean masked = config.getBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED);
     boolean terminate = config.getBoolean(ConfigKey.SYNC_EXCEPTIONS_TERMINATE);
 
-    // Code of the synchronous exception that happens in EX.
-    Optional<String> syncex = Optional.empty();
+    // Synchronous exception that happens in EX, if any.
+    Optional<SynchronousException> syncex = Optional.empty();
 
     // If the FPU has one completed instruction, that one should be executed. Otherwise, the instruction in the EX
     // stage should be executed.
@@ -590,17 +590,20 @@ public class CPU {
         logger.info("Executing EX() for " + toExecute);
         toExecute.EX();
       } catch (SynchronousException e) {
+        // Annotate the exception with the instruction that caused it and the
+        // pipeline stage, so that the UI can display a more informative message.
+        e.setInstructionInfo(toExecute.getFullName(), Pipeline.Stage.EX.name());
         if (masked) {
           logger.info("[EXCEPTION] [MASKED] " + e.getCode());
         } else {
           if (terminate) {
             logger.info("Terminating due to an unmasked exception");
-            throw new SynchronousException(e.getCode());
+            throw e;
           } else {
             // We must complete this cycle, but we must notify the user.
-            // If the syncex contains a string, the CPU code will throw
+            // If syncex is present, the CPU code will throw
             // the exception at the end of the step
-            syncex = Optional.of(e.getCode());
+            syncex = Optional.of(e);
           }
         }
       }

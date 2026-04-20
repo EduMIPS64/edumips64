@@ -25,6 +25,8 @@
 
 package org.edumips64.core.is;
 
+import org.edumips64.core.SynchronousExceptionCode;
+
 /**
  *Exception thrown when there's an integer overflow
  * @author Trubia Massimo, Russo Daniele, Andrea Spadaccini
@@ -33,7 +35,7 @@ public class IntegerOverflowException extends org.edumips64.core.SynchronousExce
   private static final long serialVersionUID = 4883695065192685861L;
 
   IntegerOverflowException() {
-    super("INTOVERFLOW");
+    super(SynchronousExceptionCode.INTOVERFLOW);
   }
 }
 
