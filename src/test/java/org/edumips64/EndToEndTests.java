@@ -55,6 +55,9 @@ import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(JUnit4.class)
 public class EndToEndTests extends BaseWithInstructionBuilderTest {
@@ -538,13 +541,13 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
     try {
       runMipsTest("div0.s");
-      org.junit.Assert.fail("Expected SynchronousException to be thrown");
+      fail("Expected SynchronousException to be thrown");
     } catch (SynchronousException e) {
       assertEquals("DIVZERO", e.getCode());
-      org.junit.Assert.assertNotNull("Instruction name should be set on the exception", e.getInstructionName());
-      org.junit.Assert.assertEquals("EX", e.getStage());
+      assertNotNull("Instruction name should be set on the exception", e.getInstructionName());
+      assertEquals("EX", e.getStage());
       // Sanity check: the enriched message should reference the stage.
-      org.junit.Assert.assertTrue(
+      assertTrue(
           "Exception message should mention the pipeline stage, got: " + e.getMessage(),
           e.getMessage().contains("EX"));
     }
