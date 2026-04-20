@@ -985,49 +985,46 @@ public class Parser {
     int i = 0;
 
     // Optional leading sign (e.g. "-8+label").
-    if (expression.charAt(0) == '+') {
-      i = 1;
-    } else if (expression.charAt(0) == '-') {
-      sign = -1;
+    char first = expression.charAt(0);
+    if (first == '+' || first == '-') {
+      sign = (first == '-') ? -1 : 1;
       i = 1;
     }
 
     int tokenStart = i;
-    while (i <= expression.length()) {
-      char c = (i < expression.length()) ? expression.charAt(i) : '\0';
-      if (c == '+' || c == '-' || c == '\0') {
-        String token = expression.substring(tokenStart, i).trim();
-        if (token.isEmpty()) {
-          throw new NumberFormatException("Empty operand in label expression: " + expression);
-        }
-
-        long value;
-        if (Converter.isInteger(token)
-            || Converter.isHexNumber(token)
-            || Converter.isBinNumber(token)) {
-          value = Converter.parseImmediate(token);
-        } else {
-          // Not a numeric literal: look the operand up in the symbol table.
-          // Propagates MemoryElementNotFoundException on miss.
-          MemoryElement tmpMem = symTab.getCell(token);
-          value = tmpMem.getAddress();
-        }
-
-        sum += sign * value;
-
-        if (c == '+') {
-          sign = 1;
-        } else if (c == '-') {
-          sign = -1;
-        }
-        i++;
-        tokenStart = i;
-      } else {
-        i++;
+    int len = expression.length();
+    while (i <= len) {
+      char c = (i < len) ? expression.charAt(i) : '+';
+      boolean atEnd = (i == len);
+      if (atEnd || c == '+' || c == '-') {
+        sum += sign * evaluateOperand(expression.substring(tokenStart, i), expression);
+        sign = (c == '-') ? -1 : 1;
+        tokenStart = i + 1;
       }
+      i++;
     }
 
     return sum;
+  }
+
+  /** Evaluates a single operand of a label expression. The operand is either
+   *  a numeric literal (base 10, 16 or 2) or a memory label defined in the
+   *  {@code .data} section.
+   */
+  private long evaluateOperand(String rawToken, String expression)
+      throws MemoryElementNotFoundException {
+    String token = rawToken.trim();
+    if (token.isEmpty()) {
+      throw new NumberFormatException("Empty operand in label expression: " + expression);
+    }
+    if (Converter.isInteger(token)
+        || Converter.isHexNumber(token)
+        || Converter.isBinNumber(token)) {
+      return Converter.parseImmediate(token);
+    }
+    // Not a numeric literal: resolve the operand via the symbol table.
+    // Propagates MemoryElementNotFoundException on miss.
+    return symTab.getCell(token).getAddress();
   }
 
   /** Check if is a valid string for a register

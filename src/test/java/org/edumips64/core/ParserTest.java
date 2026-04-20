@@ -1,6 +1,7 @@
 package org.edumips64.core;
 
 import org.edumips64.BaseParsingTest;
+import org.edumips64.core.is.Instruction;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.is.ParsedInstructionMetadata;
 import org.edumips64.core.parser.ParserMultiException;
@@ -485,9 +486,9 @@ public class ParserTest extends BaseParsingTest {
         "lw r3, data2-data1(r0)\n" +
         "SYSCALL 0\n");
     int base = memory.getCellByIndex(0).getAddress();
-    org.edumips64.core.is.Instruction i0 = (org.edumips64.core.is.Instruction) memory.getInstruction(0);
-    org.edumips64.core.is.Instruction i1 = (org.edumips64.core.is.Instruction) memory.getInstruction(4);
-    org.edumips64.core.is.Instruction i2 = (org.edumips64.core.is.Instruction) memory.getInstruction(8);
+    Instruction i0 = (Instruction) memory.getInstruction(0);
+    Instruction i1 = (Instruction) memory.getInstruction(4);
+    Instruction i2 = (Instruction) memory.getInstruction(8);
     assertEquals(Integer.valueOf(base), i0.getParams().get(1));
     assertEquals(Integer.valueOf(base + 8), i1.getParams().get(1));
     // data2 is one word (8 bytes) after data1.
