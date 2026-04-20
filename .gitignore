@@ -33,6 +33,8 @@ syscall-testfile.txt
 # Miscellaneous output directories.
 build
 build/*
+out
+out/*
 docs/user/*/output/
 docs/user/*/output/**
 gwt-unitCache/
@@ -67,6 +69,7 @@ hs_err_pid*
 
 .gradle
 /build/
+/out/
 gradle-backup/
 
 # Ignore Gradle GUI config
