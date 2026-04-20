@@ -327,6 +327,25 @@ const Code = (props) => {
   // Set the dark theme if necessary
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
+  // Detect touch-first (mobile / tablet) devices. Monaco Editor does not
+  // work reliably with soft keyboards and touch selection, so on these
+  // devices we fall back to a plain <textarea> which provides a native,
+  // reliable editing experience. Pipeline stages and parsing errors are
+  // still shown in the surrounding panels.
+  const isTouchDevice = useMediaQuery('(pointer: coarse)');
+
+  if (isTouchDevice) {
+    return (
+      <MobileCodeEditor
+        code={props.code}
+        onChange={props.onChangeValue}
+        running={props.running}
+        fontSize={props.fontSize}
+        prefersDarkMode={prefersDarkMode}
+      />
+    );
+  }
+
   return (
         <MonacoEditor
             language="mips"
@@ -336,6 +355,78 @@ const Code = (props) => {
             theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
             editorDidMount={editorDidMount}
         />
+  );
+};
+
+// MobileCodeEditor is a plain <textarea>-based editor rendered on touch
+// devices, where Monaco Editor is known to have serious usability issues
+// (see https://github.com/microsoft/monaco-editor/issues/246). It retains
+// the core editing feature set (read-only mode during execution, font
+// size, dark theme) while letting the device's native soft keyboard and
+// selection gestures drive the editing experience. Syntax highlighting,
+// hover tooltips and inline error markers are intentionally omitted:
+// pipeline state and parsing errors are already displayed in the side
+// panels.
+const MobileCodeEditor = ({
+  code,
+  onChange,
+  running,
+  fontSize,
+  prefersDarkMode,
+}) => {
+  const textareaRef = React.useRef(null);
+
+  // Expose the textarea on window.editor (with a Monaco-compatible minimal
+  // API) so that existing test helpers and integrations continue to work.
+  React.useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    window.editor = {
+      getValue: () => el.value,
+      setValue: (v) => {
+        el.value = v;
+        onChange && onChange(v);
+      },
+      focus: () => el.focus(),
+    };
+  }, [onChange]);
+
+  const style = {
+    width: '100%',
+    height: '100%',
+    boxSizing: 'border-box',
+    padding: '8px',
+    margin: 0,
+    border: 'none',
+    outline: 'none',
+    resize: 'none',
+    fontFamily: "Menlo, Monaco, 'Courier New', monospace",
+    fontSize: (fontSize || 14) + 'px',
+    lineHeight: 1.5,
+    tabSize: 4,
+    whiteSpace: 'pre',
+    overflow: 'auto',
+    backgroundColor: prefersDarkMode ? '#1e1e1e' : '#ffffff',
+    color: prefersDarkMode ? '#d4d4d4' : '#000000',
+    // Disable mobile niceties that interfere with code editing.
+    WebkitTextSizeAdjust: '100%',
+  };
+
+  return (
+    <textarea
+      ref={textareaRef}
+      className="mobile-code-editor"
+      aria-label="MIPS64 assembly code editor"
+      value={code}
+      readOnly={running}
+      onChange={(e) => onChange && onChange(e.target.value)}
+      style={style}
+      spellCheck={false}
+      autoCapitalize="off"
+      autoCorrect="off"
+      autoComplete="off"
+      wrap="off"
+    />
   );
 };
 
