@@ -1,5 +1,7 @@
 # Common values for the Sphinx configuration for all languages.
 
+import sys, os
+
 # Get the version from build.gradle.kts
 import re
 
@@ -20,7 +22,10 @@ pdf_documents = [
 ]
 
 # Other variables
-templates_path = ['_templates']
+# Shared templates live in docs/user/_templates (one level above each
+# language's conf.py); use an absolute path so that all language builds
+# pick them up regardless of the working directory.
+templates_path = [os.path.join(os.path.dirname(os.path.abspath(__file__)), '_templates')]
 source_suffix = '.rst'
 master_doc = 'index'
 exclude_patterns = ['_build']
