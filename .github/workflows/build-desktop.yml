@@ -87,3 +87,9 @@ jobs:
         with:
           name: Italian manual (PDF)
           path: ./build/docs/it/pdf/EduMIPS64.pdf
+
+      - name: Upload Chinese Manual PDF
+        uses: actions/upload-artifact@v7
+        with:
+          name: Chinese manual (PDF)
+          path: ./build/docs/zh/pdf/EduMIPS64.pdf
