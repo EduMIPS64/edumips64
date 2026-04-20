@@ -128,7 +128,13 @@ public class SYSCALL extends Instruction {
       MemoryElement fd_cell = memory.getCellByAddress(address);
       int fd = (int) fd_cell.getValue();
       logger.info("Closing fd " + fd);
-      return_value = iom.close(fd);
+      return_value = -1;
+      try {
+        return_value = iom.close(fd);
+      } catch (Exception e) {
+        logger.info("Error in executing the close(), the syscall will fail.");
+        logger.info(e.toString());
+      }
     } else if ((syscall_n == 3) || (syscall_n == 4)) {
       // int read(int fd, void* buf, int count)
       // int write(int fd, void* buf, int count)
