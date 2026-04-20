@@ -673,16 +673,42 @@ public class Converter {
     }
 
     // For hex/binary we allow the full unsigned 64-bit range, which may not
-    // fit as a signed long (e.g. 0xffffffffffffffff). Fall back to
-    // parseUnsignedLong when signed parsing fails.
+    // fit as a signed long (e.g. 0xffffffffffffffff). Fall back to manual
+    // bitwise accumulation when signed parsing overflows. We avoid
+    // Long.parseUnsignedLong because it is not available in the GWT JRE
+    // emulation used to build the web worker.
     try {
       return Long.parseLong(immediate, base);
     } catch (NumberFormatException ex) {
       if (base == 16 || base == 2) {
-        return Long.parseUnsignedLong(immediate, base);
+        return parseUnsignedLongBits(immediate, base);
       }
       throw ex;
     }
+  }
+
+  /**
+   * Parses the given string as an unsigned long in the given base (must be 2
+   * or 16) and returns it as a signed long with the same bit pattern.
+   */
+  private static long parseUnsignedLongBits(String s, int base) {
+    if (s.length() == 0) {
+      throw new NumberFormatException("Invalid immediate: empty string.");
+    }
+    int maxDigits = (base == 16) ? 16 : 64;
+    if (s.length() > maxDigits) {
+      throw new NumberFormatException("Immediate value too large: " + s);
+    }
+    int shift = (base == 16) ? 4 : 1;
+    long result = 0;
+    for (int i = 0; i < s.length(); i++) {
+      int digit = Character.digit(s.charAt(i), base);
+      if (digit < 0) {
+        throw new NumberFormatException("Invalid digit '" + s.charAt(i) + "' for base " + base);
+      }
+      result = (result << shift) | digit;
+    }
+    return result;
   }
 }
 
