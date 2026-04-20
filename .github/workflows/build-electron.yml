@@ -41,7 +41,7 @@ jobs:
         uses: actions/download-artifact@v8.0.1
         with:
           name: web
-          path: build/gwt/war/edumips64
+          path: out/gwt/war/edumips64
 
       - name: Set up Node.JS
         uses: actions/setup-node@v6

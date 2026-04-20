@@ -17,6 +17,19 @@ plugins {
     id ("ru.vyarus.use-python") version "4.1.0"
 }
 
+// Consolidate all Gradle build outputs under a single "out/" directory in the
+// project root, instead of the Gradle default "build/". This keeps generated
+// artifacts (JARs, docs, GWT output, MSI, reports, ...) in one discoverable
+// location.
+layout.buildDirectory.set(layout.projectDirectory.dir("out"))
+
+// The us.ascendtech.gwt.classic plugin hard-codes the resources output to
+// "build/classes/java/main" (see GWTLibPlugin). Override it so resources are
+// emitted under the custom build directory too, keeping everything in one place.
+sourceSets.matching { it.name == "main" }.configureEach {
+    output.setResourcesDir(layout.buildDirectory.dir("classes/java/main"))
+}
+
 repositories {
     mavenCentral()
 }
@@ -276,7 +289,7 @@ tasks.register<Exec>("msi"){
             throw GradleException("JDK 14+ is required to create the MSI package.")
         }
         if (!layout.buildDirectory.file("libs/edumips64-${version}.jar").get().asFile.exists()) {
-            throw GradleException("Could not find build/libs/edumips64-${version}.jar. Please execute ./gradlew jar before trying to build the MSI.")
+            throw GradleException("Could not find out/libs/edumips64-${version}.jar. Please execute ./gradlew jar before trying to build the MSI.")
         }
         
         if (System.getenv("WIX") == null){

@@ -113,7 +113,7 @@ We use the [GitHub Flow](http://scottchacon.com/2011/08/31/github-flow.html) wor
 The EduMIPS64 core is cross-compiled to JavaScript using GWT and runs as a Web Worker:
 - Source: `org.edumips64.client` package
 - Configuration: `webclient.gwt.xml`
-- Build: `./gradlew war` produces `worker.js` in `build/gwt/war/edumips64/`
+- Build: `./gradlew war` produces `worker.js` in `out/gwt/war/edumips64/`
 - **Note**: The `war` task wipes the output directory, so rebuild the web UI after rebuilding the worker
 
 ## Documentation

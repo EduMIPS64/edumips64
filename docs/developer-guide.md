@@ -83,6 +83,14 @@ For developers that don't want to recompile the help files when creating a JAR, 
 `noHelpJar` Gradle task will produce `edumips64-<version>-nohelp.jar`, which does
 not include the compiled help files.
 
+#### Build output directory
+
+All Gradle-produced artifacts (JARs, documentation, GWT/web worker output, MSI
+installer, test reports, etc.) are written to the `out/` directory at the root
+of the repository, rather than Gradle's default `build/`. This keeps every
+generated artifact in a single, discoverable location. The `out/` directory is
+ignored by Git.
+
 ### Visual Studio Code
 
 If you want to work on EduMIPS64 with Visual Studio Code, you need to download the Java Extension Pack
@@ -106,9 +114,9 @@ The GWT code runs as a Web Worker to enable concurrency between UI interaction
 and the execution of the simulation steps.
 
 To compile it, run the `war` task, which will produce the file `worker.js` inside
-the directory `build/gwt/war/edumips64/`.
+the directory `out/gwt/war/edumips64/`.
 
-**NOTE:** the `war` gradle task wipes the `build/gwt/war/edumips64` directory.
+**NOTE:** the `war` gradle task wipes the `out/gwt/war/edumips64` directory.
 So if you re-build the worker, you need to re-build the rest of the web UI as well
 to have a working local test environment (see next section).
 
@@ -130,7 +138,7 @@ Custom NPM scripts:
 - `build`: runs `webpack -p` (compile without debugging symbols, minified, etc)
 - `start`: starts the webpack-dev-server with live reloading
 
-Both `build` and `build-dbg` produce a `ui.js` file in the `build/gwt/war/edumips64` directory.
+Both `build` and `build-dbg` produce a `ui.js` file in the `out/gwt/war/edumips64` directory.
 
 The code was tested with Node.JS 16. The CI environment uses this version.
 
