@@ -7,7 +7,7 @@ const { GitRevisionPlugin } = require('git-revision-webpack-plugin')
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-const outputPath = path.resolve(__dirname, 'out/gwt/war/edumips64');
+const outputPath = path.resolve(__dirname, 'out/web');
 const staticPath = path.resolve(__dirname, 'src/webapp/static');
 const docsPath = path.resolve(__dirname, 'out/docs');
 

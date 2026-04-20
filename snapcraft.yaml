@@ -39,8 +39,8 @@ parts:
       export ORG_GRADLE_PROJECT_pythonPath=/usr/local/bin
       mkdir -p "$CRAFT_PART_INSTALL"/jar
       bash gradlew --no-daemon "$@" jar && \
-        ls -ld out/libs/* && \
-        mv out/libs/edumips64-*.jar "$CRAFT_PART_INSTALL"/jar/edumips64.jar && \
+        ls -ld out/edumips64-*.jar && \
+        mv out/edumips64-*.jar "$CRAFT_PART_INSTALL"/jar/edumips64.jar && \
         ls $CRAFT_PART_INSTALL/jar/*.jar -ld
     source: .
     # Core24 (Ubuntu 24.04) only ships Python 3.12 in its default repos, so Python 3.14

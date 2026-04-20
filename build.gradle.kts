@@ -199,8 +199,10 @@ val sharedManifest = Action<Manifest> {
     attributes["Build-Qualifier"] = buildQualifier.get()
 }
 
-// Main JAR
+// Main JAR — write directly under the build directory (out/) rather than
+// the default out/libs/ subfolder, so JARs sit next to other top-level artifacts.
 tasks.jar {
+    destinationDirectory.set(layout.buildDirectory)
     from(sourceSets.main.get().output)
     from(docsDir) {
         into("docs")
@@ -216,8 +218,9 @@ tasks.jar {
     dependsOn("copyHelp")
 }
 
-// NoHelp JAR
+// NoHelp JAR — same destination as the main JAR (build directory root).
 tasks.register<Jar>("noHelpJar"){
+    destinationDirectory.set(layout.buildDirectory)
     archiveClassifier.set("nohelp")
     dependsOn(configurations.runtimeClasspath)
     from(sourceSets.main.get().output)
@@ -300,8 +303,8 @@ tasks.register<Exec>("msi"){
         if (majorVersion < 14) {
             throw GradleException("JDK 14+ is required to create the MSI package.")
         }
-        if (!layout.buildDirectory.file("libs/edumips64-${version}.jar").get().asFile.exists()) {
-            throw GradleException("Could not find out/libs/edumips64-${version}.jar. Please execute ./gradlew jar before trying to build the MSI.")
+        if (!layout.buildDirectory.file("edumips64-${version}.jar").get().asFile.exists()) {
+            throw GradleException("Could not find out/edumips64-${version}.jar. Please execute ./gradlew jar before trying to build the MSI.")
         }
         
         if (System.getenv("WIX") == null){
@@ -309,9 +312,17 @@ tasks.register<Exec>("msi"){
         }
 
         val buildDirName = layout.buildDirectory.get().asFile.name
-        val destDir = "./${buildDirName}/libs"
+        // jpackage's --input directory is copied in its entirety into the installer,
+        // so we stage just the main JAR in a dedicated folder to avoid shipping the
+        // nohelp JAR, WAR, etc. The MSI itself is written to the build directory root.
+        val inputStaging = layout.buildDirectory.dir("tmp/msi-input").get().asFile
+        inputStaging.deleteRecursively()
+        inputStaging.mkdirs()
+        layout.buildDirectory.file("edumips64-${version}.jar").get().asFile
+            .copyTo(inputStaging.resolve("edumips64-${version}.jar"), overwrite = true)
+        val destDir = "./${buildDirName}"
         println("Creating ${destDir}/EduMIPS64-${version}.msi.");
-        val cmd = "jpackage.exe --main-jar edumips64-${version}.jar --input ./${buildDirName}/libs/ --dest ${destDir} --app-version ${version} --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright ${LocalDateTime.now().year}, EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install --java-options -Dfile.encoding=utf-8"
+        val cmd = "jpackage.exe --main-jar edumips64-${version}.jar --input ./${buildDirName}/tmp/msi-input/ --dest ${destDir} --app-version ${version} --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright ${LocalDateTime.now().year}, EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install --java-options -Dfile.encoding=utf-8"
         commandLine(cmd.split(" "));
     }
 }
@@ -322,6 +333,31 @@ tasks.register<Exec>("msi"){
 gwt {
     modules.add("org.edumips64.webclient")
     sourceLevel = "1.11"
+}
+
+// Redirect GWT outputs from the plugin's hard-coded "gwt/war", "gwt/extras" and
+// "gwt/codeServer" subdirectories. GWT always writes its output into a
+// subfolder named after the module's `rename-to` value (we use "web"), so we
+// point it at a scratch staging directory and then copy the produced files
+// into out/web/ via the assembleWebApp task below.
+tasks.named("gwtCompile") {
+    setProperty("outputDir", layout.buildDirectory.dir("tmp/gwt-war").get().asFile)
+    setProperty("extraOutputDir", layout.buildDirectory.dir("tmp/gwt-extras").get().asFile)
+}
+tasks.withType<War>().configureEach {
+    destinationDirectory.set(layout.buildDirectory)
+}
+
+// Copy the files produced by gwtCompile (scripts, resources) into out/web/,
+// which is the canonical location for the assembled web application. Webpack
+// also writes its bundle here, and copyWebHelp copies the HTML docs into
+// out/web/docs/.
+val assembleWebApp by tasks.registering(Copy::class) {
+    group = "Web"
+    description = "Assembles GWT compiler output into out/web/"
+    dependsOn("gwtCompile")
+    from(layout.buildDirectory.dir("tmp/gwt-war/web"))
+    into(layout.buildDirectory.dir("web"))
 }
 
 val npmExecutable = if (System.getProperty("os.name").lowercase().contains("windows")) "npm.cmd" else "npm"
@@ -337,7 +373,7 @@ val npmBuild by tasks.registering(Exec::class) {
         "webpack.config.js"
     )
     inputs.dir("src/webapp")
-    outputs.dir(layout.buildDirectory.dir("gwt/war/edumips64"))
+    outputs.dir(layout.buildDirectory.dir("web"))
     mustRunAfter("war")
 }
 
@@ -348,12 +384,12 @@ val copyWebHelp by tasks.registering(Copy::class) {
     from(layout.buildDirectory.dir("docs")) {
         exclude("**/doctrees/**", "**/.buildinfo", "**/objects.inv", "**/_sources/**")
     }
-    into(layout.buildDirectory.dir("gwt/war/edumips64/docs"))
+    into(layout.buildDirectory.dir("web/docs"))
     mustRunAfter("war")
 }
 
 tasks.register("webapp") {
     group = "Web"
     description = "Builds the EduMIPS64 web application with bundled documentation"
-    dependsOn("war", "htmlDocs", npmBuild, copyWebHelp)
+    dependsOn("war", "htmlDocs", assembleWebApp, npmBuild, copyWebHelp)
 }
