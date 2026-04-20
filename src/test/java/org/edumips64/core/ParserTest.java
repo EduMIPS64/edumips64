@@ -394,4 +394,25 @@ public class ParserTest extends BaseParsingTest {
         "SYSCALL 0\n");
   }
 
+  /** Regression test for the issue about cryptic parser error messages: an instruction
+   * that is not part of the MIPS64 instruction set (e.g., the MIPS32-only ADDU) should
+   * produce an error whose description mentions that it is an unknown instruction,
+   * rather than the old cryptic "Invalid code" message.
+   */
+  @Test
+  public void unknownInstructionProducesDescriptiveError() {
+    try {
+      parseCode("notanop r1, r2, r3");
+      org.junit.Assert.fail("Expected a ParserMultiException for an unknown instruction.");
+    } catch (ParserMultiException e) {
+      String description = e.getExceptionList().get(0).getStringArray()[3];
+      org.junit.Assert.assertTrue(
+          "Unknown-instruction error should mention that the instruction is unknown; got: "
+              + description,
+          description.toLowerCase().contains("unknown instruction"));
+    } catch (Exception other) {
+      org.junit.Assert.fail("Unexpected exception type: " + other);
+    }
+  }
+
 }
