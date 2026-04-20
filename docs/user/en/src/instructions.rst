@@ -444,6 +444,13 @@ Those instructions effectively executes the jump in the ID stage, so often an
 useless fetch is executed. In this case, two instructions are removed from the
 pipeline, and the branch taken stalls counter is incremented by two units.
 
+Optionally, EduMIPS64 supports a classic MIPS **delay slot**. When the
+delay slot option is enabled (via the *Enable delay slot* setting in the
+configuration dialog), the instruction immediately following a branch or
+jump is not flushed: it is kept in the pipeline and executed as part of
+the normal program flow, before the branch target. This option is disabled
+by default to preserve backwards compatibility with existing programs.
+
 List of R-Type flow control instructions:
 
 * `JALR rs`

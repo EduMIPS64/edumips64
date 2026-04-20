@@ -423,27 +423,44 @@ public class CPU {
         throw new SynchronousException(syncex.get());
       }
     } catch (JumpException ex) {
-      logger.info("Executing a Jump.");
+      boolean delaySlot = isEnableDelaySlot();
+      logger.info("Executing a Jump." + (delaySlot ? " (delay slot enabled)" : ""));
       try {
         if (!pipe.isEmpty(Pipeline.Stage.IF)) {
           logger.info("Executing the IF() method of the instruction in IF.");
           pipe.IF().IF();
         }
       } catch (BreakException bex) {
+        if (delaySlot) {
+          // With delay slot enabled the instruction following the jump is a
+          // legitimate part of the program flow, so BREAK must not be
+          // swallowed. Re-throw to let the normal BREAK handling take over.
+          throw bex;
+        }
         // This needs to be ignored here because BREAK throws BreakException when it enters
         // the IF stage, but if BREAK enters IF after a jump instruction is about to modify
         // the program counter, then it must be discarded (like every other instruction).
         logger.info("Caught a BREAK after a Jump: ignoring it.");
       }
 
-      // A J-Type instruction has just modified the Program Counter. We need
-      // to put in the IF stage the instruction the PC points to, discarding
-      // the instruction that was fetched sequentially in the prior cycle.
-      // Then advance the jump instruction from ID to EX and put a bubble in
-      // ID, which represents the flushed slot in the cycle view.
-      pipe.flushAndSet(Pipeline.Stage.IF, mem.getInstruction(pc));
-      pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
-      pipe.setStage(Pipeline.Stage.ID, bubble);
+      if (delaySlot) {
+        // Delay slot: the instruction sequentially fetched into IF is the
+        // delay slot and must execute. Advance the jump from ID to EX,
+        // promote the delay slot from IF to ID, and fetch the jump target
+        // into IF.
+        pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
+        pipe.advance(Pipeline.Stage.IF, Pipeline.Stage.ID);
+        pipe.setStage(Pipeline.Stage.IF, mem.getInstruction(pc));
+      } else {
+        // A J-Type instruction has just modified the Program Counter. We need
+        // to put in the IF stage the instruction the PC points to, discarding
+        // the instruction that was fetched sequentially in the prior cycle.
+        // Then advance the jump instruction from ID to EX and put a bubble in
+        // ID, which represents the flushed slot in the cycle view.
+        pipe.flushAndSet(Pipeline.Stage.IF, mem.getInstruction(pc));
+        pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
+        pipe.setStage(Pipeline.Stage.ID, bubble);
+      }
       old_pc.writeDoubleWord((pc.getValue()));
       pc.writeDoubleWord((pc.getValue()) + 4);
 
@@ -807,6 +824,15 @@ public class CPU {
 
   public boolean isEnableForwarding() {
     return config.getBoolean(ConfigKey.FORWARDING);
+  }
+
+  /** Returns whether the delay slot is enabled. When enabled, the
+   *  instruction following a jump or branch is not flushed from the pipeline
+   *  and executes as part of the program flow. When disabled (default) the
+   *  simulator keeps the traditional branch-not-taken with flush behavior.
+   */
+  public boolean isEnableDelaySlot() {
+    return config.getBoolean(ConfigKey.DELAY_SLOT);
   }
 
   /** Test method that returns a string containing the values of every

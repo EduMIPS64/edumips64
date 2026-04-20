@@ -24,6 +24,7 @@ public enum ConfigKey {
     RAW_COLOR("RAWColor"),
     SAME_IF_COLOR("SAMEIFColor"),
     FORWARDING("forwarding"),
+    DELAY_SLOT("delay_slot"),
     WARNINGS("warnings"),
     VERBOSE("verbose"),
     SYNC_EXCEPTIONS_MASKED("syncexc-masked"),
