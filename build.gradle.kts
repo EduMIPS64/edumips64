@@ -392,4 +392,20 @@ tasks.register("webapp") {
     group = "Web"
     description = "Builds the EduMIPS64 web application with bundled documentation"
     dependsOn("war", "htmlDocs", assembleWebApp, npmBuild, copyWebHelp)
+
+    // Transitional CI compatibility: `pull_request_target` loads reusable
+    // workflows (including build-web.yml) from the base branch, so while this
+    // PR is open the master workflow is still uploading the web artifact from
+    // the legacy `build/gwt/war/edumips64/` path. Mirror the assembled
+    // out/web/ tree there so the artifact upload finds the files. Once this
+    // PR is merged and master's build-web.yml uploads from `out/web`, this
+    // shim can be removed.
+    doLast {
+        val legacyPath = projectDir.resolve("build/gwt/war/edumips64")
+        legacyPath.mkdirs()
+        copy {
+            from(layout.buildDirectory.dir("web"))
+            into(legacyPath)
+        }
+    }
 }
