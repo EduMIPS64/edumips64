@@ -47,99 +47,133 @@ final class PropertiesParser {
       return out;
     }
 
-    int i = 0;
+    int[] cursor = {0};
     int n = input.length();
-    StringBuilder logicalLine = new StringBuilder();
-
-    while (i < n) {
-      // Read one logical line (following backslash-continuations).
-      logicalLine.setLength(0);
-      boolean continued;
-      boolean firstSegment = true;
-
-      do {
-        // Skip leading whitespace (spaces and tabs) on each physical line.
-        while (i < n && (input.charAt(i) == ' ' || input.charAt(i) == '\t'
-            || input.charAt(i) == '\f')) {
-          i++;
-        }
-
-        // Find end of this physical line and detect whether it ends in an unescaped backslash.
-        int lineStart = i;
-        while (i < n && input.charAt(i) != '\n' && input.charAt(i) != '\r') {
-          i++;
-        }
-        int lineEnd = i;
-
-        // Consume the line terminator (handle \r, \n, and \r\n).
-        if (i < n && input.charAt(i) == '\r') {
-          i++;
-          if (i < n && input.charAt(i) == '\n') {
-            i++;
-          }
-        } else if (i < n && input.charAt(i) == '\n') {
-          i++;
-        }
-
-        String segment = input.substring(lineStart, lineEnd);
-
-        if (firstSegment) {
-          firstSegment = false;
-          // On the first physical line only: skip comments and blanks entirely.
-          if (segment.isEmpty()
-              || segment.charAt(0) == '#' || segment.charAt(0) == '!') {
-            continued = false;
-            continue;
-          }
-        }
-
-        // Determine whether the segment ends with an unescaped backslash (line continuation).
-        int trailingBackslashes = 0;
-        for (int k = segment.length() - 1; k >= 0 && segment.charAt(k) == '\\'; k--) {
-          trailingBackslashes++;
-        }
-        continued = (trailingBackslashes % 2) == 1;
-        if (continued) {
-          // Strip the trailing continuation backslash before appending.
-          logicalLine.append(segment, 0, segment.length() - 1);
-        } else {
-          logicalLine.append(segment);
-        }
-      } while (continued && i < n);
-
-      if (logicalLine.length() == 0) {
+    while (cursor[0] < n) {
+      String line = readLogicalLine(input, cursor);
+      if (line == null || line.isEmpty()) {
         continue;
       }
-
-      // Split the logical line into key and value.
-      String line = logicalLine.toString();
-      int keyEnd = findKeyEnd(line);
-      String rawKey = line.substring(0, keyEnd);
-      String rawValue;
-      if (keyEnd >= line.length()) {
-        rawValue = "";
-      } else {
-        int valueStart = keyEnd;
-        // Skip the separator character (= or :) if present, and surrounding whitespace.
-        while (valueStart < line.length() && (line.charAt(valueStart) == ' '
-            || line.charAt(valueStart) == '\t' || line.charAt(valueStart) == '\f')) {
-          valueStart++;
-        }
-        if (valueStart < line.length()
-            && (line.charAt(valueStart) == '=' || line.charAt(valueStart) == ':')) {
-          valueStart++;
-          while (valueStart < line.length() && (line.charAt(valueStart) == ' '
-              || line.charAt(valueStart) == '\t' || line.charAt(valueStart) == '\f')) {
-            valueStart++;
-          }
-        }
-        rawValue = line.substring(valueStart);
-      }
-
-      out.put(unescape(rawKey), unescape(rawValue));
+      addEntry(line, out);
     }
 
     return out;
+  }
+
+  /**
+   * Reads one logical line (honouring comments, blank lines, and trailing-backslash
+   * continuations) starting at {@code cursor[0]} and advances the cursor past the consumed
+   * characters. Returns {@code null} when the line was a comment or blank, and the empty string
+   * only when the logical line was itself empty.
+   */
+  private static String readLogicalLine(String input, int[] cursor) {
+    int n = input.length();
+    StringBuilder logicalLine = new StringBuilder();
+    boolean continued;
+    boolean firstSegment = true;
+    boolean skipped = false;
+
+    do {
+      cursor[0] = skipLeadingWhitespace(input, cursor[0]);
+      int lineStart = cursor[0];
+      while (cursor[0] < n && input.charAt(cursor[0]) != '\n' && input.charAt(cursor[0]) != '\r') {
+        cursor[0]++;
+      }
+      int lineEnd = cursor[0];
+      cursor[0] = consumeLineTerminator(input, cursor[0]);
+
+      String segment = input.substring(lineStart, lineEnd);
+
+      if (firstSegment) {
+        firstSegment = false;
+        if (segment.isEmpty() || segment.charAt(0) == '#' || segment.charAt(0) == '!') {
+          skipped = true;
+          continued = false;
+          continue;
+        }
+      }
+
+      continued = endsWithUnescapedBackslash(segment);
+      if (continued) {
+        logicalLine.append(segment, 0, segment.length() - 1);
+      } else {
+        logicalLine.append(segment);
+      }
+    } while (continued && cursor[0] < n);
+
+    if (skipped) {
+      return null;
+    }
+    return logicalLine.toString();
+  }
+
+  private static int skipLeadingWhitespace(String input, int i) {
+    int n = input.length();
+    while (i < n) {
+      char c = input.charAt(i);
+      if (c != ' ' && c != '\t' && c != '\f') {
+        break;
+      }
+      i++;
+    }
+    return i;
+  }
+
+  private static int consumeLineTerminator(String input, int i) {
+    int n = input.length();
+    if (i >= n) {
+      return i;
+    }
+    char c = input.charAt(i);
+    if (c == '\r') {
+      i++;
+      if (i < n && input.charAt(i) == '\n') {
+        i++;
+      }
+    } else if (c == '\n') {
+      i++;
+    }
+    return i;
+  }
+
+  private static boolean endsWithUnescapedBackslash(String segment) {
+    int trailing = 0;
+    for (int k = segment.length() - 1; k >= 0 && segment.charAt(k) == '\\'; k--) {
+      trailing++;
+    }
+    return (trailing % 2) == 1;
+  }
+
+  /** Splits a logical line into a key/value pair and stores the unescaped entry in {@code out}. */
+  private static void addEntry(String line, Map<String, String> out) {
+    int keyEnd = findKeyEnd(line);
+    String rawKey = line.substring(0, keyEnd);
+    String rawValue = extractRawValue(line, keyEnd);
+    out.put(unescape(rawKey), unescape(rawValue));
+  }
+
+  private static String extractRawValue(String line, int keyEnd) {
+    if (keyEnd >= line.length()) {
+      return "";
+    }
+    int valueStart = skipValueWhitespace(line, keyEnd);
+    if (valueStart < line.length()
+        && (line.charAt(valueStart) == '=' || line.charAt(valueStart) == ':')) {
+      valueStart = skipValueWhitespace(line, valueStart + 1);
+    }
+    return line.substring(valueStart);
+  }
+
+  private static int skipValueWhitespace(String line, int i) {
+    int n = line.length();
+    while (i < n) {
+      char c = line.charAt(i);
+      if (c != ' ' && c != '\t' && c != '\f') {
+        break;
+      }
+      i++;
+    }
+    return i;
   }
 
   /**

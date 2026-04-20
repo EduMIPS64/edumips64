@@ -78,7 +78,7 @@ public class ResourceBundleLocalizationProvider implements LocalizationProvider 
       // Fall back to English below.
     }
 
-    if (locale != Locale.ROOT) {
+    if (!Locale.ROOT.equals(locale)) {
       logger.severe("Language " + lang + " does not contain message " + key
           + ", falling back to English.");
       try {
