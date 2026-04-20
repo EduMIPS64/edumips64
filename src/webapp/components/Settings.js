@@ -5,8 +5,18 @@ import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import TextField from '@mui/material/TextField';
 
-const Settings = ({ viMode, setViMode, fontSize, setFontSize, accordionAlerts, setAccordionAlerts }) => {
+const Settings = ({
+  viMode,
+  setViMode,
+  fontSize,
+  setFontSize,
+  accordionAlerts,
+  setAccordionAlerts,
+  executionDelay,
+  setExecutionDelay,
+}) => {
   return (
     <Box
       sx={{
@@ -66,8 +76,30 @@ const Settings = ({ viMode, setViMode, fontSize, setFontSize, accordionAlerts, s
             />
           }
           label={
-            <Typography sx={{ fontSize: '0.85rem' }}>Accordion Change Alerts</Typography>
+            <Typography sx={{ fontSize: '0.85rem' }}>
+              Accordion Change Alerts
+            </Typography>
           }
+        />
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Typography sx={{ fontSize: '0.85rem' }}>
+          Execution Delay (ms)
+        </Typography>
+        <TextField
+          type="number"
+          size="small"
+          value={executionDelay}
+          onChange={(e) => {
+            const parsed = parseInt(e.target.value, 10);
+            setExecutionDelay(Number.isNaN(parsed) || parsed < 0 ? 0 : parsed);
+          }}
+          inputProps={{
+            min: 0,
+            step: 10,
+            'aria-label': 'Execution delay in milliseconds',
+          }}
+          sx={{ width: '90px' }}
         />
       </Box>
     </Box>

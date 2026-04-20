@@ -55,6 +55,14 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [viMode, setViMode] = React.useState(false);
   const [fontSize, setFontSize] = React.useState(14);
   const [accordionAlerts, setAccordionAlerts] = React.useState(true);
+  const [executionDelay, setExecutionDelay] = React.useState(0);
+
+  // Ref mirroring executionDelay so the worker message handler (which closes
+  // over state at render time) always reads the current value.
+  const executionDelayRef = React.useRef(executionDelay);
+  React.useEffect(() => {
+    executionDelayRef.current = executionDelay;
+  }, [executionDelay]);
 
   // Track expanded state for each accordion
   const [expandedAccordions, setExpandedAccordions] = React.useState({
@@ -252,9 +260,22 @@ const Simulator = ({worker, initialState, appInsights}) => {
       setRunAll(false);
     } else if (stepsToRun > 0) {
       console.log('Steps left: ' + stepsToRun);
-      stepCode(stepsToRun);
+      scheduleNextStep(stepsToRun);
     } else if (runAll) {
-      stepCode(INTERNAL_STEPS_STRIDE);
+      scheduleNextStep(INTERNAL_STEPS_STRIDE);
+    }
+  };
+
+  // Schedules the next batch of steps, honoring the user-configured execution
+  // delay. When a delay is set, the stride is forced to 1 instruction so that
+  // the delay is visible between every executed instruction.
+  const scheduleNextStep = (requestedSteps) => {
+    const delay = executionDelayRef.current;
+    const steps = delay > 0 ? 1 : requestedSteps;
+    if (delay > 0) {
+      setTimeout(() => stepCode(steps), delay);
+    } else {
+      stepCode(steps);
     }
   };
 
@@ -574,6 +595,8 @@ const Simulator = ({worker, initialState, appInsights}) => {
                   setFontSize={setFontSize}
                   accordionAlerts={accordionAlerts}
                   setAccordionAlerts={setAccordionAlerts}
+                  executionDelay={executionDelay}
+                  setExecutionDelay={setExecutionDelay}
                   showTitle={false}
                 />
               </AccordionDetails>
