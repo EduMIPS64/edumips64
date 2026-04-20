@@ -1,0 +1,13 @@
+{# Extend the default Sphinx theme layout and add an HTML4-style
+   Content-Type meta tag. This is required by Java Swing's HTMLEditorKit
+   (used by JavaHelp to render the in-app documentation), which only
+   detects the document encoding from a `<meta http-equiv="Content-Type" ...>`
+   tag and ignores the HTML5 `<meta charset="...">` shorthand. Without
+   this tag, the help viewer falls back to the platform default encoding
+   and non-ASCII content (e.g. the Chinese translation) is rendered as
+   mojibake on platforms where the default is not UTF-8 (see issue #778). #}
+{%- extends "!layout.html" %}
+{%- block extrahead %}
+    <meta http-equiv="Content-Type" content="text/html; charset={{ encoding }}" />
+{{ super() }}
+{%- endblock %}
