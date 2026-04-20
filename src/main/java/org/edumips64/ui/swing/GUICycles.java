@@ -78,7 +78,7 @@ public class GUICycles extends GUIComponent {
     cyclePanelSp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
     cyclePanelSp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-    // SplitPane che contiene entrambi i pannelli.
+    // SplitPane containing both panels.
     splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, instructionPanelSp, cyclePanelSp);
     splitPane.setOneTouchExpandable(true);
     splitPane.setDividerLocation(150);

@@ -678,7 +678,7 @@ public class CPU {
 
     boolean breaking = false;
     if (status == CPUStatus.RUNNING) {
-      if (!pipe.isEmpty(Pipeline.Stage.IF)) {  //rispetto a dinmips scambia le load con le IF
+      if (!pipe.isEmpty(Pipeline.Stage.IF)) {  // unlike dinmips, swaps loads with IF
         try {
           logger.info("Executing IF() for " + pipe.IF());
           pipe.IF().IF();

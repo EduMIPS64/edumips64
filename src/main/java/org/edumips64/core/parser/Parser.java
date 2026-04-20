@@ -478,7 +478,7 @@ public class Parser {
               try {
                 symTab.setCellLabel(memoryCount * 8, label);
               } catch (SameLabelsException e) {
-                // TODO: errore del parser
+                // TODO: parser error
                 logger.warning("Label " + label + " is already assigned");
               }
             } else if (section == FileSection.TEXT) {
@@ -828,8 +828,8 @@ public class Parser {
                 errors.addError("SAMELABEL", row, 1, line);
                 column = line.length();
               }
-              // Il finally e' totalmente inutile, ma è bello utilizzarlo per la
-              // prima volta in un programma ;)
+              // The finally block is completely useless here, but it's nice to use it
+              // for the first time in a program ;)
               finally {
                 pendingLabels.clear();
               }
@@ -949,7 +949,7 @@ public class Parser {
     try {
       int num;
 
-      if (reg.charAt(0) == 'r' || reg.charAt(0) == 'R' || reg.charAt(0) == '$')    //ci sono altri modi di scrivere un registro???
+      if (reg.charAt(0) == 'r' || reg.charAt(0) == 'R' || reg.charAt(0) == '$')    // are there other ways to write a register???
         if (Converter.isInteger(reg.substring(1))) {
           num = Integer.parseInt(reg.substring(1));
 
