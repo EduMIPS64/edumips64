@@ -72,6 +72,6 @@ class MOVN extends ALU_RType {
     }
 
     // We must unlock the register in both cases.
-    cpu.getRegister(params.get(RD_FIELD)).decrWriteSemaphore();
+    cpu.scheduleUnlock(cpu.getRegister(params.get(RD_FIELD)));
   }
 }

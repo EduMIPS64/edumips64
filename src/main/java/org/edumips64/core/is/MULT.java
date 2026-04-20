@@ -130,8 +130,8 @@ class MULT extends ALU_RType {
     lo.setBits(this.lo, 0);
     hi.setBits(this.hi, 0);
 
-    lo.decrWriteSemaphore();
-    hi.decrWriteSemaphore();
+    cpu.scheduleUnlock(lo);
+    cpu.scheduleUnlock(hi);
   }
   public void pack() throws IrregularStringOfBitsException {
     //conversion of instruction parameters of "params" list to the "repr" form (32 binary value)

@@ -78,7 +78,7 @@ public class JALR extends FlowControl_RType {
   }
   public void doWB() throws IrregularStringOfBitsException {
     cpu.getRegister(31).setBits(TR[PC_VALUE].getBinString(), 0);
-    cpu.getRegister(31).decrWriteSemaphore();  //deadlock!!!
+    cpu.scheduleUnlock(cpu.getRegister(31));  //deadlock!!!
   }
 
 }

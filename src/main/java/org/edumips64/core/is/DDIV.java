@@ -85,8 +85,8 @@ class DDIV extends ALU_RType {
       quozient = rs / rt;
     } catch (ArithmeticException e) {
       if (cpu.isEnableForwarding()) {
-        cpu.getLO().decrWriteSemaphore();
-        cpu.getHI().decrWriteSemaphore();
+        cpu.scheduleUnlock(cpu.getLO());
+        cpu.scheduleUnlock(cpu.getHI());
       }
 
       throw new DivisionByZeroException();
@@ -118,8 +118,8 @@ class DDIV extends ALU_RType {
     Register hi = cpu.getHI();
     lo.setBits(TR[LO_REG].getBinString(), 0);
     hi.setBits(TR[HI_REG].getBinString(), 0);
-    lo.decrWriteSemaphore();
-    hi.decrWriteSemaphore();
+    cpu.scheduleUnlock(lo);
+    cpu.scheduleUnlock(hi);
   }
   public void pack() throws IrregularStringOfBitsException {
     //conversion of instruction parameters of "params" list to the "repr" form (32 binary value)

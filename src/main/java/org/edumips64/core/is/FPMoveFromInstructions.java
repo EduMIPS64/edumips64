@@ -70,7 +70,7 @@ public abstract class FPMoveFromInstructions extends FPMoveToAndFromInstructions
   public void doWB() throws IrregularStringOfBitsException {
     //passing result from temporary register to destination register and unlocking it
     cpu.getRegister(params.get(RT_FIELD)).setBits(TR[RT_FIELD].getBinString(), 0);
-    cpu.getRegister(params.get(RT_FIELD)).decrWriteSemaphore();
+    cpu.scheduleUnlock(cpu.getRegister(params.get(RT_FIELD)));
   }
 }
 

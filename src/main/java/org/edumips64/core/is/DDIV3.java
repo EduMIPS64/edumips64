@@ -67,7 +67,7 @@ class DDIV3 extends ALU_RType {
       quotient = rs / rt;
     } catch (ArithmeticException e) {
       if (cpu.isEnableForwarding()) {
-        cpu.getRegister(params.get(RD_FIELD)).decrWriteSemaphore();
+        cpu.scheduleUnlock(cpu.getRegister(params.get(RD_FIELD)));
       }
       throw new DivisionByZeroException();
     }

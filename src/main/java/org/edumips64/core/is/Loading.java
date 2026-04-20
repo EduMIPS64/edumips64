@@ -92,7 +92,7 @@ public abstract class Loading extends LDSTInstructions {
   public void doWB() throws IrregularStringOfBitsException {
     //passing memory value from temporary LMD register to the destination register and unlocking it
     cpu.getRegister(params.get(RT_FIELD)).setBits(TR[LMD_REGISTER].getBinString(), 0);
-    cpu.getRegister(params.get(RT_FIELD)).decrWriteSemaphore();
+    cpu.scheduleUnlock(cpu.getRegister(params.get(RT_FIELD)));
   }
 }
 

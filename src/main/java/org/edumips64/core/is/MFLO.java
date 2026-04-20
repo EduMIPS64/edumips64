@@ -77,7 +77,7 @@ class MFLO extends ALU_RType {
   }
   public void doWB() throws IrregularStringOfBitsException {
     cpu.getRegister(params.get(RD_FIELD)).setBits(TR[LO_REG].getBinString(), 0);
-    cpu.getRegister(params.get(RD_FIELD)).decrWriteSemaphore();
+    cpu.scheduleUnlock(cpu.getRegister(params.get(RD_FIELD)));
   }
   public void pack() throws IrregularStringOfBitsException {
     //conversion of instruction parameters of "params" list to the "repr" form (32 binary value)

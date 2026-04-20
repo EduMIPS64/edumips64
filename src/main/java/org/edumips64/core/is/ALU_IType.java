@@ -104,7 +104,7 @@ public abstract class ALU_IType extends ComputationalInstructions {
     //passing result from temporary register to destination register and unlocking it
     logger.info("WB of the ALU I-Type instruction. Writing " + TR[RT_FIELD].getValue() + " to R" + params.get(RT_FIELD));
     cpu.getRegister(params.get(RT_FIELD)).setBits(TR[RT_FIELD].getBinString(), 0);
-    cpu.getRegister(params.get(RT_FIELD)).decrWriteSemaphore();
+    cpu.scheduleUnlock(cpu.getRegister(params.get(RT_FIELD)));
   }
 
   public void pack() throws IrregularStringOfBitsException {
