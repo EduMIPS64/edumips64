@@ -40,10 +40,39 @@ public class ParserTest extends BaseParsingTest {
   }
 
   @Test
+  public void ParseBin() throws Exception {
+    parseData(".word 0b10000");
+    MemoryElement el = memory.getCellByIndex(0);
+    assertEquals(el.readByte(0), 16);
+  }
+
+  @Test
+  public void ParseBinDifferentWidths() throws Exception {
+    parseData(".byte 0b11111111\n.word16 0b1111111111111111\n.word32 0b11111111111111111111111111111111");
+    // All three should parse without error (hex/binary literals are interpreted as bit patterns).
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void ParseInvalidBin() throws Exception {
+    parseData(".word 0b12");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void tooLargeByteBinDataTest() throws Exception {
+    parseData(".byte 0b100000000");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void tooLarge16BitsBinDataTest() throws Exception {
+    parseData(".word16 0b10000000000000000");
+  }
+
+  @Test
   public void Spaces() throws Exception {
     // The user should be able to reserve space in small and larger amounts, specifying the amount in hexadecimal
-    // if they so desire.
+    // or binary if they so desire.
     parseData(".space 0x10");
+    parseData(".space 0b10000");
     parseData(".space 16");
     parseData(".space 8");
     parseData(".space 1");
@@ -306,6 +335,31 @@ public class ParserTest extends BaseParsingTest {
   @Test(expected = ParserMultiException.class)
   public void tooLargeImmediate16BitsHexTest() throws Exception {
     parseCode("daddi r1,r0,0x10000");
+  }
+
+  @Test
+  public void immediateBinaryTest() throws Exception {
+    // Binary immediates should be accepted and treated like hex bit patterns.
+    parseCode("daddi r1,r0,0b1010");
+    parseCode("daddi r1,r0,0b1111111111111111");  // 16 ones -> -1 (bit-pattern)
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void tooLargeImmediate16BitsBinTest() throws Exception {
+    parseCode("daddi r1,r0,0b10000000000000000");
+  }
+
+  @Test
+  public void memoryLabelHexOffsetTest() throws Exception {
+    // Issue #1394: hex and binary offsets must be accepted as memory label offsets.
+    parser.doParsing(
+        ".data\n" +
+        "data1: .word 42\n" +
+        ".code\n" +
+        "lw r1, 0x0(r0)\n" +
+        "lw r2, 0b0(r0)\n" +
+        "lw r3, 0(r0)\n" +
+        "SYSCALL 0\n");
   }
 
   /** Tests for issue #1376: Support multiple labels for each given address */

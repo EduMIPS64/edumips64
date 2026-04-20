@@ -158,10 +158,11 @@ Instructions can take three types of parameters:
   or lowercase "r", or a $, followed by the number of the register (between
   0 and 31), as in "r4", "R4" or "\$4";
 * *Immediate values* an immediate value can be a number or a
-  label; the number can be specified in base 10 or in base 16: base 10 numbers
-  are simply inserted by writing the number, while base 16 number are inserted
-  by putting before the number the prefix "0x". Immediate values can be preceded
-  by the # character.
+  label; the number can be specified in base 10, base 16 or base 2: base 10
+  numbers are simply inserted by writing the number, base 16 numbers are
+  inserted by putting before the number the prefix "0x", and base 2 numbers
+  are inserted by putting before the number the prefix "0b". Immediate values
+  can be preceded by the # character.
 * *Address* an address is composed by an immediate value followed
   by a register name enclosed in brackets. The value of the register will be
   used as base, the value of the immediate will be the offset.
