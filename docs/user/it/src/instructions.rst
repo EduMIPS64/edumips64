@@ -455,6 +455,12 @@ qual volta viene effettuato un fetch inutile. In tal caso, due istruzioni
 vengono rimosse dalla pipeline, ed il contatore degli stalli dovuti ai salti
 effettuati viene incrementato di due unità.
 
+In alternativa, è possibile abilitare il **branch delay slot** dall'opzione
+corrispondente nel pannello di configurazione. Quando il delay slot è abilitato,
+l'istruzione immediatamente successiva ad un salto effettuato viene sempre
+eseguita (come previsto dall'ISA MIPS classico) invece di essere rimossa dalla
+pipeline.
+
 Ecco la lista delle istruzioni di controllo del flusso di tipo R:
 
 * `JALR rs`

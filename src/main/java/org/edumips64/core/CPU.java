@@ -438,9 +438,21 @@ public class CPU {
 
       // A J-Type instruction has just modified the Program Counter. We need to
       // put in the IF stage the instruction the PC points to
+      if (config.getBoolean(ConfigKey.BRANCH_DELAY_SLOT)) {
+        // Branch delay slot enabled: the instruction that was fetched right after
+        // the branch (currently sitting in IF) is the delay slot and must always
+        // execute, regardless of whether the branch is taken. It therefore
+        // continues into the ID stage instead of being discarded.
+        InstructionInterface delaySlot = pipe.IF();
+        pipe.setEX(pipe.ID());
+        pipe.setID(delaySlot != null ? delaySlot : bubble);
+      } else {
+        // Branch-not-taken prediction: the speculatively fetched instruction is
+        // flushed from the pipeline.
+        pipe.setEX(pipe.ID());
+        pipe.setID(bubble);
+      }
       pipe.setIF(mem.getInstruction(pc));
-      pipe.setEX(pipe.ID());
-      pipe.setID(bubble);
       old_pc.writeDoubleWord((pc.getValue()));
       pc.writeDoubleWord((pc.getValue()) + 4);
 

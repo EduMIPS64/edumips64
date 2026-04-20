@@ -675,6 +675,30 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runForwardingTest("issue51-syscall0.s", 11, 17, 6);
   }
 
+  /* Issue #4: Integrate delay slot. Verifies that the branch delay slot feature
+   * can be toggled at runtime, and that the pipeline honours the selected mode. */
+  @Test(timeout=2000)
+  public void testBranchDelaySlotDisabled() throws Exception {
+    boolean previous = config.getBoolean(ConfigKey.BRANCH_DELAY_SLOT);
+    try {
+      config.putBoolean(ConfigKey.BRANCH_DELAY_SLOT, false);
+      runMipsTest("branch-delay-slot-disabled.s");
+    } finally {
+      config.putBoolean(ConfigKey.BRANCH_DELAY_SLOT, previous);
+    }
+  }
+
+  @Test(timeout=2000)
+  public void testBranchDelaySlotEnabled() throws Exception {
+    boolean previous = config.getBoolean(ConfigKey.BRANCH_DELAY_SLOT);
+    try {
+      config.putBoolean(ConfigKey.BRANCH_DELAY_SLOT, true);
+      runMipsTest("branch-delay-slot-enabled.s");
+    } finally {
+      config.putBoolean(ConfigKey.BRANCH_DELAY_SLOT, previous);
+    }
+  }
+
   /* Issue #68: JR does not respect RAW stalls. */
   @Test(timeout=2000)
   public void testRAWForRTypeFlowControl() throws Exception {

@@ -444,6 +444,11 @@ Those instructions effectively executes the jump in the ID stage, so often an
 useless fetch is executed. In this case, two instructions are removed from the
 pipeline, and the branch taken stalls counter is incremented by two units.
 
+Alternatively, the **branch delay slot** can be enabled from the configuration
+panel. When the delay slot is enabled, the instruction immediately following a
+taken branch is always executed (as specified by the classic MIPS ISA) instead
+of being squashed from the pipeline.
+
 List of R-Type flow control instructions:
 
 * `JALR rs`

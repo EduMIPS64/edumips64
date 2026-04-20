@@ -127,6 +127,7 @@ public class GUIConfig extends JDialog {
     int row = 2;
 
     addRow(panel, row++, ConfigKey.FORWARDING, new JCheckBox());
+    addRow(panel, row++, ConfigKey.BRANCH_DELAY_SLOT, new JCheckBox());
     addRow(panel, row++, ConfigKey.N_STEPS, new JNumberField());
 
     // fill remaining vertical space
