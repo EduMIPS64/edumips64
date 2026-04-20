@@ -35,7 +35,7 @@ ifeven:
         div.d f8,f6,f30
         cvt.l.d f20,f8      ; f20=trunc(f8)
         cvt.d.l f21,f20      ;f21= trunc(f8)
-        sub.d f20,f8,f21    ;f20=resto(f6/2.0)
+        sub.d f20,f8,f21    ;f20=remainder(f6/2.0)
         c.eq.d 0,f29,f20  ; FCSR[0]=(f29==f20)
         nop
         bc1f 0,endifeven  
@@ -63,7 +63,7 @@ whilescanvett2: slt r9,r1,r3
 		ddiv r1,r14		;LO=i/8
 		mflo r15
 		andi r10,r15,1 ;andi r10,LO,1
-ifodd:	bnez r10,endifodd 	;if(i%2==0)  // i.e., if at odd position (1st, 3rd, etc.)		
+ifodd:	bnez r10,endifodd 	;if(r15%2==0), i.e., the element is at an even index (0, 2, 4...) meaning 1st, 3rd, 5th position		
 		ldc1 f11,vett2(r1)		;f11=vett2[i];
 		sdc1 f11,vett2_odd(r2)
 		daddi r2,r2,8
