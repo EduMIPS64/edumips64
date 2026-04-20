@@ -135,6 +135,12 @@ public class Simulator {
       return res;
     } catch (InputNeededException e) {
       return ResultFactory.AddParserErrors(resultFactory.InputRequested(e, steps), lastParsingErrors);
+    } catch (SynchronousException e) {
+      // Synchronous exceptions (INTOVERFLOW, DIVZERO, FP traps, ...) get a
+      // dedicated failure Result so the Web UI can display a user-friendly
+      // message that includes the faulting instruction and pipeline stage.
+      warning("Synchronous exception: " + e.getCode());
+      return ResultFactory.AddParserErrors(resultFactory.SynchronousExceptionFailure(e), lastParsingErrors);
     } catch (Exception e) {
       warning("Error: " + e.toString());
       return ResultFactory.AddParserErrors(resultFactory.Failure(e.toString()), lastParsingErrors);

@@ -81,6 +81,23 @@ public class ResultFactory {
         return AddParsedInstructions(AddCpuInfo(r));
     }
 
+    /** Builds a failure result for a synchronous exception, embedding structured
+     *  information (code, instruction, stage) about the trap in addition to the
+     *  user-friendly error message. */
+    public Result SynchronousExceptionFailure(org.edumips64.core.SynchronousException e) {
+        Result r = Failure(SynchronousExceptionFormatter.format(e));
+        if (e.getCode() != null) {
+            r.errorCode = e.getCode();
+        }
+        if (e.getInstructionName() != null) {
+            r.errorInstruction = e.getInstructionName();
+        }
+        if (e.getStage() != null) {
+            r.errorStage = e.getStage();
+        }
+        return r;
+    }
+
     public Result InputRequested(InputNeededException inputNeeded, int resumeSteps) {
         Result r = Success();
         r.inputRequested = true;

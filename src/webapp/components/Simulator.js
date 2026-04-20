@@ -242,7 +242,16 @@ const Simulator = ({worker, initialState, appInsights}) => {
     // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
     // Runtime errors should not cause multiple alert prompting to avoid webui getting stuck
     if (!result.success && result.errorMessage !== 'Parsing errors.') {
-      alert(result.errorMessage);
+      // Synchronous exceptions carry structured info (errorCode, errorInstruction, errorStage).
+      // When present, compose a clearer, multi-line alert message.
+      let message = result.errorMessage;
+      if (result.errorCode) {
+        message = `Synchronous exception: ${result.errorMessage}`;
+        if (result.errorInstruction && result.errorStage) {
+          message += `\n\nInstruction: ${result.errorInstruction}\nPipeline stage: ${result.errorStage}`;
+        }
+      }
+      alert(message);
       stopCode();
     }
 
