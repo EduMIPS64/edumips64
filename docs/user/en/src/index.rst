@@ -31,11 +31,12 @@ to command line parameters. In the second chapter there's an overview of the
 subset of the MIPS64 instruction set that is accepted by EduMIPS64, with all
 the needed parameters and indications to use them. The third chapter is a
 description of the Floating Point Unit and its instruction set.
-The fourth chapter is a description of the user interface of EduMIPS64, that
-explains the purpose of each frame and menu, along with a description of the
-configuration dialog, the L1 cache simulator, the Dinero frontend dialog, the 
-Manual dialog and command line options. The fifth chapter contains some useful 
-examples.
+The fourth chapter describes the CPU pipeline, data hazards, and the
+forwarding mechanism. The fifth chapter is a description of the user
+interface of EduMIPS64, that explains the purpose of each frame and menu,
+along with a description of the configuration dialog, the L1 cache
+simulator, the Dinero frontend dialog, the Manual dialog and command line
+options. The sixth chapter contains some useful examples.
 
 This manual describes EduMIPS64 version |version|.
 
@@ -45,6 +46,7 @@ This manual describes EduMIPS64 version |version|.
    source-files-format
    instructions
    fpu
+   pipeline
    user-interface
    examples
 
