@@ -684,14 +684,14 @@ public class Parser {
                     // %L: Memory Label.
                     } else if (type == 'L') {
                       try {
-                        MemoryElement tmpMem;
                         String trimmed = paramValue.trim();
 
-                        if (paramValue.equals("")) {
+                        if (trimmed.isEmpty()) {
                           tmpInst.getParams().add(0);
                         } else if (Converter.isInteger(trimmed)
                             || Converter.isHexNumber(trimmed)
                             || Converter.isBinNumber(trimmed)) {
+                          // Pure numeric literal: enforce the 16-bit signed offset bounds.
                           long tmpLong;
                           try {
                             tmpLong = Converter.parseImmediate(trimmed);
@@ -704,9 +704,7 @@ public class Parser {
                           }
 
                           if (tmpLong < Memory.MIN_OFFSET_BYTES || tmpLong > Memory.MAX_OFFSET_BYTES) {
-                            String er = "LABELADDRESSINVALID";
-
-                            errors.addError(er, row, line.indexOf(paramValue) + 1, line);
+                            errors.addError("LABELADDRESSINVALID", row, line.indexOf(paramValue) + 1, line);
                             column = line.length();
                             paramStart = paramEnd + 1;
                             tmpInst.getParams().add(0);
@@ -715,9 +713,20 @@ public class Parser {
 
                           tmpInst.getParams().add((int) tmpLong);
                         } else {
-                          tmpMem = symTab.getCell(trimmed);
-                          tmpInst.getParams().add(tmpMem.getAddress());
+                          // Expression containing at least one label, possibly combined
+                          // with numeric offsets using the + and - operators.
+                          long tmpLong;
+                          try {
+                            tmpLong = parseLabelExpression(trimmed);
+                          } catch (NumberFormatException ex) {
+                            errors.addError("LABELADDRESSINVALID", row, line.indexOf(paramValue) + 1, line);
+                            column = line.length();
+                            paramStart = paramEnd + 1;
+                            tmpInst.getParams().add(0);
+                            continue;
+                          }
 
+                          tmpInst.getParams().add((int) tmpLong);
                         }
 
                         paramStart = paramEnd + 1;
@@ -943,6 +952,79 @@ public class Parser {
     }
 
     return "";
+  }
+
+  /** Parses a memory label expression composed of one or more operands
+   *  separated by the {@code +} and {@code -} operators. Each operand can
+   *  be either a numeric literal (decimal, hexadecimal with {@code 0x} prefix
+   *  or binary with {@code 0b} prefix) or a memory label defined in the
+   *  {@code .data} section. Whitespace around operators and operands is
+   *  allowed. A leading {@code +} or {@code -} is also accepted.
+   *
+   *  Examples of accepted expressions: {@code label}, {@code label+4},
+   *  {@code label-4}, {@code label+label2}, {@code label-8+16},
+   *  {@code 0+label}, {@code -8+label}.
+   *
+   *  @param expression the expression to parse (must be non-empty)
+   *  @return the numeric value of the expression
+   *  @throws NumberFormatException if the expression is malformed (e.g.
+   *          an empty operand caused by consecutive operators or a trailing
+   *          operator) or contains an operand that is neither a valid
+   *          numeric literal nor a known memory label
+   *  @throws MemoryElementNotFoundException if an operand is a label that
+   *          does not exist in the symbol table
+   */
+  private long parseLabelExpression(String expression)
+      throws MemoryElementNotFoundException {
+    if (expression == null || expression.isEmpty()) {
+      throw new NumberFormatException("Empty label expression");
+    }
+
+    long sum = 0;
+    int sign = 1;
+    int i = 0;
+
+    // Optional leading sign (e.g. "-8+label").
+    char first = expression.charAt(0);
+    if (first == '+' || first == '-') {
+      sign = (first == '-') ? -1 : 1;
+      i = 1;
+    }
+
+    int tokenStart = i;
+    int len = expression.length();
+    while (i <= len) {
+      char c = (i < len) ? expression.charAt(i) : '+';
+      boolean atEnd = (i == len);
+      if (atEnd || c == '+' || c == '-') {
+        sum += sign * evaluateOperand(expression.substring(tokenStart, i), expression);
+        sign = (c == '-') ? -1 : 1;
+        tokenStart = i + 1;
+      }
+      i++;
+    }
+
+    return sum;
+  }
+
+  /** Evaluates a single operand of a label expression. The operand is either
+   *  a numeric literal (base 10, 16 or 2) or a memory label defined in the
+   *  {@code .data} section.
+   */
+  private long evaluateOperand(String rawToken, String expression)
+      throws MemoryElementNotFoundException {
+    String token = rawToken.trim();
+    if (token.isEmpty()) {
+      throw new NumberFormatException("Empty operand in label expression: " + expression);
+    }
+    if (Converter.isInteger(token)
+        || Converter.isHexNumber(token)
+        || Converter.isBinNumber(token)) {
+      return Converter.parseImmediate(token);
+    }
+    // Not a numeric literal: resolve the operand via the symbol table.
+    // Propagates MemoryElementNotFoundException on miss.
+    return symTab.getCell(token).getAddress();
   }
 
   /** Check if is a valid string for a register

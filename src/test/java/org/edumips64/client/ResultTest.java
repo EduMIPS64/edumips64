@@ -130,4 +130,26 @@ public class ResultTest extends BaseTest {
     
     assertEquals("Complex error message should be preserved", complexError, result.errorMessage);
   }
+
+  @Test
+  public void testResultSynchronousExceptionFieldsDefaultToEmpty() {
+    Result result = new Result(true, "", "");
+
+    assertEquals("Default errorCode should be empty", "", result.errorCode);
+    assertEquals("Default errorInstruction should be empty", "", result.errorInstruction);
+    assertEquals("Default errorStage should be empty", "", result.errorStage);
+  }
+
+  @Test
+  public void testResultSynchronousExceptionFieldsAreWritable() {
+    Result result = new Result(false, "Integer overflow", "");
+
+    result.errorCode = "INTOVERFLOW";
+    result.errorInstruction = "DADD R1,R2,R3";
+    result.errorStage = "EX";
+
+    assertEquals("INTOVERFLOW", result.errorCode);
+    assertEquals("DADD R1,R2,R3", result.errorInstruction);
+    assertEquals("EX", result.errorStage);
+  }
 }

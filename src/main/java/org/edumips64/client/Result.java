@@ -51,6 +51,12 @@ public class Result {
   public String inputTooLongMessage = "";
   // Indicates the operation that generated this result (e.g., "checksyntax", "step", "load", "reset")
   public String method = "";
+  // Structured information about synchronous exceptions. Only populated when
+  // the CPU raised a SynchronousException while stepping. Allows the Web UI to
+  // render a clearer error message than the raw exception.toString().
+  public String errorCode = "";
+  public String errorInstruction = "";
+  public String errorStage = "";
 
   public Result(boolean success, String errorMessage, String stdout) {
     this.success = success;

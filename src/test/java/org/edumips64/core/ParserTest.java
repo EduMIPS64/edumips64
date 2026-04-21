@@ -1,6 +1,7 @@
 package org.edumips64.core;
 
 import org.edumips64.BaseParsingTest;
+import org.edumips64.core.is.Instruction;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.is.ParsedInstructionMetadata;
 import org.edumips64.core.parser.ParserMultiException;
@@ -445,6 +446,85 @@ public class ParserTest extends BaseParsingTest {
         "dup_label:\n" +
         "daddi r1, r0, 1\n" +
         "dup_label:\n" +
+        "SYSCALL 0\n");
+  }
+
+  /** Tests for label offset arithmetic in memory label parameters (%L).
+   *  The parser accepts expressions built from memory labels and numeric
+   *  literals combined with the {@code +} and {@code -} operators. */
+  @Test
+  public void labelPlusOffsetTest() throws Exception {
+    parser.doParsing(
+        ".data\n" +
+        "data1: .word 42\n" +
+        "data2: .word 43\n" +
+        ".code\n" +
+        "lw r1, data1+0(r0)\n" +
+        "lw r2, data1-0(r0)\n" +
+        "lw r3, data1+8(r0)\n" +
+        "lw r4, data2-8(r0)\n" +
+        "lw r5, 0+data1(r0)\n" +
+        "lw r6, data1+data2(r0)\n" +
+        "lw r7, data2-data1(r0)\n" +
+        "lw r8, data1-8+16(r0)\n" +
+        "lw r9, data1+0x10(r0)\n" +
+        "lw r10, data1+0b10(r0)\n" +
+        "lw r11, data1 + 4(r0)\n" +
+        "SYSCALL 0\n");
+  }
+
+  @Test
+  public void labelPlusOffsetValuesTest() throws Exception {
+    // Verify that label+offset resolves to the correct address (label + offset).
+    parser.doParsing(
+        ".data\n" +
+        "data1: .word 42\n" +
+        "data2: .word 43\n" +
+        ".code\n" +
+        "lw r1, data1(r0)\n" +
+        "lw r2, data1+8(r0)\n" +
+        "lw r3, data2-data1(r0)\n" +
+        "SYSCALL 0\n");
+    int base = memory.getCellByIndex(0).getAddress();
+    Instruction i0 = (Instruction) memory.getInstruction(0);
+    Instruction i1 = (Instruction) memory.getInstruction(4);
+    Instruction i2 = (Instruction) memory.getInstruction(8);
+    assertEquals(Integer.valueOf(base), i0.getParams().get(1));
+    assertEquals(Integer.valueOf(base + 8), i1.getParams().get(1));
+    // data2 is one word (8 bytes) after data1.
+    assertEquals(Integer.valueOf(8), i2.getParams().get(1));
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void labelPlusEmptyOperandFailsTest() throws Exception {
+    // A trailing operator is a malformed expression.
+    parser.doParsing(
+        ".data\n" +
+        "data1: .word 42\n" +
+        ".code\n" +
+        "lw r1, data1+(r0)\n" +
+        "SYSCALL 0\n");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void labelDoubleOperatorFailsTest() throws Exception {
+    // Consecutive operators produce an empty operand and must fail.
+    parser.doParsing(
+        ".data\n" +
+        "data1: .word 42\n" +
+        ".code\n" +
+        "lw r1, data1+0+(r0)\n" +
+        "SYSCALL 0\n");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void labelUnknownInExpressionFailsTest() throws Exception {
+    // An unknown label in an expression still produces a LABELNOTFOUND error.
+    parser.doParsing(
+        ".data\n" +
+        "data1: .word 42\n" +
+        ".code\n" +
+        "lw r1, data1+nosuchlabel(r0)\n" +
         "SYSCALL 0\n");
   }
 
