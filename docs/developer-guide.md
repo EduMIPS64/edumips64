@@ -247,6 +247,28 @@ The Swing UI code is explicitly excluded from code coverage reports because
 writing tests for it is quite difficult and might not be worth it since we
 might be migrating to a new shiny web-based frontend.
 
+#### Instruction coverage check
+
+Every instruction implemented under `src/main/java/org/edumips64/core/is/`
+must be exercised by at least one `.s` program under `src/test/resources/`.
+The `utils/find-instructions.sh` script enforces this: it lists every
+non-abstract instruction class, collects every mnemonic referenced in the
+assembly test files, and exits non-zero if there is any instruction that
+is not used in at least one test.
+
+The script runs in CI as part of the desktop build, so a pull request that
+adds a new instruction without also adding a test that uses it will fail
+the build. When you add a new instruction, make sure to add (or extend) a
+`.s` test under `src/test/resources/` that uses it, and register the test
+in `EndToEndTests.java`.
+
+A small allow-list inside the script (`EXCLUDE_REGEX`) covers internal
+pseudo-instructions that are not user-addressable and therefore cannot
+appear in assembly source (for example `BUBBLE`, which the pipeline
+inserts to represent stalls, and `DDIV3`, which is the Java class name
+for the 3-operand form of the `DDIV` mnemonic). Only extend this list
+for entries that are genuinely not reachable from MIPS64 assembly.
+
 ### Windows
 
 EduMIPS64 compiles under Windows, both natively (e.g., using PowerShell) and in WSL.
