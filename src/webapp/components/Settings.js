@@ -6,6 +6,12 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField from '@mui/material/TextField';
+import {
+  MIN_STEP_STRIDE,
+  MAX_STEP_STRIDE,
+  MIN_EXECUTION_DELAY_MS,
+  MAX_EXECUTION_DELAY_MS,
+} from '../settings/schema';
 
 const Settings = ({
   viMode,
@@ -123,11 +129,17 @@ const Settings = ({
           value={stepStride}
           onChange={(e) => {
             const value = parseInt(e.target.value, 10);
-            if (Number.isInteger(value) && value >= 1 && value <= 100000) {
+            if (
+              Number.isInteger(value) &&
+              value >= MIN_STEP_STRIDE &&
+              value <= MAX_STEP_STRIDE
+            ) {
               setStepStride(value);
             }
           }}
-          slotProps={{ htmlInput: { min: 1, max: 100000 } }}
+          slotProps={{
+            htmlInput: { min: MIN_STEP_STRIDE, max: MAX_STEP_STRIDE },
+          }}
           sx={{ width: '140px' }}
         />
       </Box>
@@ -139,11 +151,21 @@ const Settings = ({
           value={executionDelayMs}
           onChange={(e) => {
             const value = parseInt(e.target.value, 10);
-            if (Number.isInteger(value) && value >= 0 && value <= 5000) {
+            if (
+              Number.isInteger(value) &&
+              value >= MIN_EXECUTION_DELAY_MS &&
+              value <= MAX_EXECUTION_DELAY_MS
+            ) {
               setExecutionDelayMs(value);
             }
           }}
-          slotProps={{ htmlInput: { min: 0, max: 5000, step: 10 } }}
+          slotProps={{
+            htmlInput: {
+              min: MIN_EXECUTION_DELAY_MS,
+              max: MAX_EXECUTION_DELAY_MS,
+              step: 10,
+            },
+          }}
           sx={{ width: '160px' }}
         />
       </Box>

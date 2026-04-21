@@ -26,15 +26,15 @@ const MAX_FONT_SIZE = 72;
 // button runs in one click). Mirrors the `<input min/max>` that used to live
 // in the Header, but enforced centrally here so the persisted value is
 // always in range.
-const MIN_STEP_STRIDE = 1;
-const MAX_STEP_STRIDE = 100000;
+export const MIN_STEP_STRIDE = 1;
+export const MAX_STEP_STRIDE = 100000;
 
 // Execution delay bounds, in milliseconds. `0` means "run as fast as
 // possible" (the previous behavior). The upper bound is generous enough to
 // demonstrate pipeline effects without being able to accidentally lock the
 // UI into a multi-minute sleep between tiny batches.
-const MIN_EXECUTION_DELAY_MS = 0;
-const MAX_EXECUTION_DELAY_MS = 5000;
+export const MIN_EXECUTION_DELAY_MS = 0;
+export const MAX_EXECUTION_DELAY_MS = 5000;
 
 // Shared validator for the L1D / L1I cache configuration objects.
 const isValidCacheConfig = (v) =>
