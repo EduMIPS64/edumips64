@@ -291,8 +291,8 @@ function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }) {
 
 export default function HelpDialog(props) {
   const [tabValue, setTabValue] = React.useState(0);
-  const [rawLanguage, setLanguage] = useLocalStorage('help.language', 'en');
-  const language = ALLOWED_LANGUAGES.includes(rawLanguage) ? rawLanguage : 'en';
+  const [storedLanguage, setLanguage] = useLocalStorage('help.language', 'en');
+  const language = ALLOWED_LANGUAGES.includes(storedLanguage) ? storedLanguage : 'en';
   const [currentPage, setCurrentPage] = React.useState('index.html');
   const iframeRef = React.useRef(null);
 
