@@ -1,3 +1,4 @@
+// test-utils.js does not define any tests, so only `expect` is needed here.
 const { expect } = require('./fixtures');
 
 const targetUri = process.env.PLAYWRIGHT_TARGET_URL || 'http://localhost:8080';
