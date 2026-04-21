@@ -32,6 +32,7 @@ import SampleProgram from '../data/SampleProgram';
 import { debounce, isEqual } from 'lodash';
 import Settings from './Settings';
 import CacheConfig from "./CacheConfig";
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const Simulator = ({worker, initialState, appInsights}) => {
   // The amount of steps to run in multi-step executions.
@@ -52,12 +53,12 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [stdout, setStdout] = React.useState('');
   const [inputRequest, setInputRequest] = React.useState(null);
 
-  const [viMode, setViMode] = React.useState(false);
-  const [fontSize, setFontSize] = React.useState(14);
-  const [accordionAlerts, setAccordionAlerts] = React.useState(true);
+  const [viMode, setViMode] = useLocalStorage('viMode', false);
+  const [fontSize, setFontSize] = useLocalStorage('fontSize', 14);
+  const [accordionAlerts, setAccordionAlerts] = useLocalStorage('accordionAlerts', true);
 
   // Track expanded state for each accordion
-  const [expandedAccordions, setExpandedAccordions] = React.useState({
+  const [expandedAccordions, setExpandedAccordions] = useLocalStorage('expandedAccordions', {
     stats: true,
     pipeline: false,
     registers: false,

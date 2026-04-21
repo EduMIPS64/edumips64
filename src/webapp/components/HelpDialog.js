@@ -22,6 +22,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Typography } from '@mui/material';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 // Define the set of allowed languages (should match what's shown in the language Select)
 const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
@@ -290,7 +291,8 @@ function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }) {
 
 export default function HelpDialog(props) {
   const [tabValue, setTabValue] = React.useState(0);
-  const [language, setLanguage] = React.useState('en');
+  const [rawLanguage, setLanguage] = useLocalStorage('help.language', 'en');
+  const language = ALLOWED_LANGUAGES.includes(rawLanguage) ? rawLanguage : 'en';
   const [currentPage, setCurrentPage] = React.useState('index.html');
   const iframeRef = React.useRef(null);
 
