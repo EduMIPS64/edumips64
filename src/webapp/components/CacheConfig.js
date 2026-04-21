@@ -2,19 +2,12 @@ import React, { useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useSetting } from '../settings/useSetting';
+import { SettingKey } from '../settings/SettingKey';
 
 const CacheConfig = ({ onChange, status }) => {
-  const [l1d, setL1D] = useLocalStorage('cache.l1d', {
-    size: 1024,
-    blockSize: 16,
-    associativity: 1,
-  });
-  const [l1i, setL1I] = useLocalStorage('cache.l1i', {
-    size: 1024,
-    blockSize: 16,
-    associativity: 1,
-  });
+  const [l1d, setL1D] = useSetting(SettingKey.CACHE_L1D);
+  const [l1i, setL1I] = useSetting(SettingKey.CACHE_L1I);
 
   const isDisabled = status === 'RUNNING';
 

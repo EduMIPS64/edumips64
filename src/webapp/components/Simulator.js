@@ -32,7 +32,8 @@ import SampleProgram from '../data/SampleProgram';
 import { debounce, isEqual } from 'lodash';
 import Settings from './Settings';
 import CacheConfig from "./CacheConfig";
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useSetting } from '../settings/useSetting';
+import { SettingKey } from '../settings/SettingKey';
 
 const Simulator = ({worker, initialState, appInsights}) => {
   // The amount of steps to run in multi-step executions.
@@ -53,20 +54,12 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [stdout, setStdout] = React.useState('');
   const [inputRequest, setInputRequest] = React.useState(null);
 
-  const [viMode, setViMode] = useLocalStorage('viMode', false);
-  const [fontSize, setFontSize] = useLocalStorage('fontSize', 14);
-  const [accordionAlerts, setAccordionAlerts] = useLocalStorage('accordionAlerts', true);
+  const [viMode, setViMode] = useSetting(SettingKey.VI_MODE);
+  const [fontSize, setFontSize] = useSetting(SettingKey.FONT_SIZE);
+  const [accordionAlerts, setAccordionAlerts] = useSetting(SettingKey.ACCORDION_ALERTS);
 
   // Track expanded state for each accordion
-  const [expandedAccordions, setExpandedAccordions] = useLocalStorage('expandedAccordions', {
-    stats: true,
-    pipeline: false,
-    registers: false,
-    memory: false,
-    stdout: false,
-    cache: true,
-    settings: true,
-  });
+  const [expandedAccordions, setExpandedAccordions] = useSetting(SettingKey.EXPANDED_ACCORDIONS);
 
   // Track if data has changed while accordion was collapsed
   const [accordionChanges, setAccordionChanges] = React.useState({
