@@ -26,6 +26,10 @@ export const SettingKey = Object.freeze({
   // CPU configuration.
   FORWARDING: 'forwarding',
 
+  // Execution parameters.
+  STEP_STRIDE: 'stepStride',
+  EXECUTION_DELAY_MS: 'executionDelayMs',
+
   // Help dialog.
   HELP_LANGUAGE: 'help.language',
 });
