@@ -22,6 +22,8 @@
  */
 package org.edumips64.core.fpu;
 
+import org.edumips64.core.SynchronousExceptionCode;
+
 /** The division of any number by zero other than zero itself gives infinity as a result.
  *  The addition or multiplication of two numbers may also give infinity as a result.
  *  So to differentiate between the two cases, a divide-by-zero exception was implemented.
@@ -30,6 +32,6 @@ public class FPDivideByZeroException extends org.edumips64.core.SynchronousExcep
   private static final long serialVersionUID = -4259655339736003176L;
 
   public FPDivideByZeroException() {
-    super("FPDIVBYZERO");
+    super(SynchronousExceptionCode.FPDIVBYZERO);
   }
 }

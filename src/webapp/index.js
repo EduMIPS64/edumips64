@@ -52,6 +52,10 @@ worker.setCacheConfig = (config) => {
   worker.postMessage({ method: 'setCacheConfig', config });
 };
 
+worker.setForwarding = (enabled) => {
+  worker.postMessage({ method: 'setForwarding', enabled });
+};
+
 worker.checkSyntax = (code) => {
   worker.postMessage({ method: 'checksyntax', code });
 

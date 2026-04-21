@@ -55,6 +55,9 @@ import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(JUnit4.class)
 public class EndToEndTests extends BaseWithInstructionBuilderTest {
@@ -637,6 +640,25 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testDivisionByZeroThrowException() throws Exception {
     config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
     runMipsTest("div0.s");
+  }
+
+  /* Verify that synchronous exceptions carry information about the
+   * instruction that caused them and the pipeline stage they were raised in. */
+  @Test(timeout=2000)
+  public void testSynchronousExceptionHasInstructionAndStageInfo() throws Exception {
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
+    try {
+      runMipsTest("div0.s");
+      fail("Expected SynchronousException to be thrown");
+    } catch (SynchronousException e) {
+      assertEquals(SynchronousExceptionCode.DIVZERO, e.getCode());
+      assertNotNull("Instruction name should be set on the exception", e.getInstructionName());
+      assertEquals("EX", e.getStage());
+      // Sanity check: the enriched message should reference the stage.
+      assertTrue(
+          "Exception message should mention the pipeline stage, got: " + e.getMessage(),
+          e.getMessage().contains("EX"));
+    }
   }
 
   /* Test for Out Of Memory while loading a file with more data than the memory can fit. */

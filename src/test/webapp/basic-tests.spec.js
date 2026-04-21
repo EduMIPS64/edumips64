@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+const { test } = require('./fixtures');
 const { targetUri, waitForPageReady } = require('./test-utils');
 
 test('single step works', async ({ page }) => {
@@ -13,6 +13,4 @@ test('single step works', async ({ page }) => {
 
   // Click text=Single Step
   await page.click('#step-button');
-
-  await page.close();
 });

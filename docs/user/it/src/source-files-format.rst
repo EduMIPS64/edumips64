@@ -185,6 +185,30 @@ istruzioni ALU I-Type, è possibile utilizzare come valore immediato un'etichett
 di memoria. L'assembler usera come valore immediato l'indirizzo della locazione
 di memoria a cui l'etichetta punta.
 
+Aritmetica di offset sulle etichette
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Nella forma "indirizzo" di un parametro (ad esempio l'offset di un'istruzione
+di load o store) il valore immediato può essere una semplice espressione
+costituita da etichette di memoria e valori numerici combinati con gli
+operatori ``+`` e ``-``. È ammesso anche un segno ``+`` o ``-`` iniziale ed è
+consentito utilizzare spazi bianchi tra operandi e operatori. Ogni operando è
+un valore numerico (in base 10, 16 o 2) oppure un'etichetta di memoria
+definita nella sezione ``.data``; le etichette vengono sostituite con il loro
+indirizzo prima che l'espressione venga valutata.
+
+Ad esempio, dati ``data1: .word 42`` e ``data2: .word 43``, le seguenti forme
+sono tutte accettate::
+
+  lw r1, data1+8(r0)       ; carica da data1 con offset di 8 byte
+  lw r1, data1-8(r0)       ; carica da data1 con offset di -8 byte
+  lw r1, 0+data1(r0)       ; equivalente a data1(r0)
+  lw r1, data2-data1(r0)   ; differenza tra gli indirizzi di due etichette
+  lw r1, data1-8+16(r0)    ; sono supportate sequenze di + e -
+
+Espressioni con un operando vuoto (ad esempio ``data1+`` oppure
+``data1++0``) sono rifiutate come malformate e un'etichetta non definita
+all'interno dell'espressione genera il consueto errore "label not found".
+
 è possibile utilizzare gli alias standard MIPS per i primi 32 registri,
 mettendo in coda ai prefissi standard per i registri ("r", "$", "R") uno
 degli alias indicati nella seguente tabella.
