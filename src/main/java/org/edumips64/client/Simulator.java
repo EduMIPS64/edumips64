@@ -90,12 +90,11 @@ public class Simulator {
   }
 
   public Result setForwarding(boolean enabled) {
-    // The CPU reads this flag dynamically on every step from the ConfigStore,
-    // so simply updating the stored value is enough for subsequent executions
-    // to respect the new setting. We still reset the CPU to make sure the
-    // change doesn't take effect mid-execution.
-    cpu.reset();
+    // The CPU reads this flag dynamically on every step from the ConfigStore.
+    // Update the config *before* resetting the CPU so any component that
+    // re-reads the setting during reset observes the new value.
     config.putBoolean(ConfigKey.FORWARDING, enabled);
+    cpu.reset();
     return resultFactory.Success();
   }
 

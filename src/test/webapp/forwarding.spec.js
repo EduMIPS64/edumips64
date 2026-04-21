@@ -299,9 +299,11 @@ test('forwarding switch is disabled while a program is running', async ({
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  // Load a program that will NOT finish on its own so we can observe the
-  // RUNNING state. The loop decrements r1 forever because r1 starts at 0
-  // and wraps around; we only single-step through it.
+  // Load a program that will not finish on its own in the short window we
+  // need to observe the RUNNING state. The loop counts r1 down from 100 to
+  // 0 and then exits through SYSCALL 0; between `load` and the first step,
+  // the simulator is in RUNNING (program loaded, not yet completed), which
+  // is exactly what we want to assert against.
   const longProgram = `.code
 DADDI r1, r0, 100
 loop:
