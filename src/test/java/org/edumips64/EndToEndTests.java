@@ -510,6 +510,15 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runMipsTest("movfd.s");
   }
 
+  /* Regression test for the MOVF.D/MOVT.D write-semaphore leak: with
+   * forwarding enabled, FPConditionalCC_DMoveInstructions used to skip
+   * doWB() in EX, so the destination register's write semaphore was
+   * never released and any later reader would stall forever. */
+  @Test(timeout=2000)
+  public void testMovfdSemaphoreLeak() throws Exception {
+    runMipsTest("movfd-semaphore-leak.s");
+  }
+
   /* Test for instruction MOVT.D */
   @Test(timeout=2000)
   public void testMovtd() throws Exception {
