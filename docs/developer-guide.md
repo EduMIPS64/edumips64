@@ -144,6 +144,7 @@ Custom NPM scripts:
 
 - `build-dbg`: runs `webpack -d` (compile with debugging symbols)
 - `build`: runs `webpack -p` (compile without debugging symbols, minified, etc)
+- `build:coverage`: runs `webpack` with `BABEL_ENV=coverage` to produce an Istanbul-instrumented bundle used for code-coverage collection
 - `start`: starts the webpack-dev-server with live reloading
 
 Both `build` and `build-dbg` produce a `ui.js` file in the `out/web` directory.
@@ -151,6 +152,26 @@ Both `build` and `build-dbg` produce a `ui.js` file in the `out/web` directory.
 The code was tested with Node.JS 16. The CI environment uses this version.
 
 There are some basic Playwright tests for the web UI, which can be run with `npx run playwright`.
+
+#### Web UI Code Coverage
+
+Code coverage for the web UI is collected via [Istanbul](https://istanbul.js.org/) and reported to [Codecov](https://codecov.io/) under the `webui` flag.
+
+The coverage pipeline:
+1. `npm run build:coverage` – rebuilds only the React/webpack bundle (`ui.js`) with Istanbul instrumentation (`babel-plugin-istanbul`).  The GWT worker (`worker.js`) does not need to be rebuilt.
+2. `npm run test:coverage` – starts a local static file server that serves `out/web/`, runs the Playwright tests with `COVERAGE=true`, and writes per-test coverage JSON files to `.nyc_output/`.
+3. `npm run report:coverage` – uses `nyc` to merge the per-test JSON files and produce an lcov report at `out/coverage/lcov.info`.
+
+To run coverage locally, first build the full web application (`./gradlew webapp`) so that `out/web/` is populated with the GWT worker and static assets, then run the three commands above in sequence:
+
+```sh
+./gradlew webapp      # produces out/web/ (GWT worker + static assets)
+npm run build:coverage
+npm run test:coverage
+npm run report:coverage
+```
+
+In CI the `web-coverage` job in `ci.yml` handles this automatically: it downloads the pre-built `web` artifact from the `build-web` job, rebuilds only the webpack bundle with instrumentation, runs the tests, generates the report, and uploads it to Codecov.
 
 ### Source code structure
 
