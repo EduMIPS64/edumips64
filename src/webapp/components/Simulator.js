@@ -57,6 +57,14 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [viMode, setViMode] = useSetting(SettingKey.VI_MODE);
   const [fontSize, setFontSize] = useSetting(SettingKey.FONT_SIZE);
   const [accordionAlerts, setAccordionAlerts] = useSetting(SettingKey.ACCORDION_ALERTS);
+  const [forwarding, setForwarding] = useSetting(SettingKey.FORWARDING);
+
+  // Keep the simulator worker's forwarding flag in sync with the persisted
+  // setting. Runs once on mount (so a value restored from localStorage is
+  // pushed to the worker) and whenever the user toggles the switch.
+  React.useEffect(() => {
+    worker.setForwarding(forwarding);
+  }, [forwarding]);
 
   // Track expanded state for each accordion
   const [expandedAccordions, setExpandedAccordions] = useSetting(SettingKey.EXPANDED_ACCORDIONS);
@@ -584,6 +592,9 @@ const Simulator = ({worker, initialState, appInsights}) => {
                   setFontSize={setFontSize}
                   accordionAlerts={accordionAlerts}
                   setAccordionAlerts={setAccordionAlerts}
+                  forwarding={forwarding}
+                  setForwarding={setForwarding}
+                  status={status}
                   showTitle={false}
                 />
               </AccordionDetails>

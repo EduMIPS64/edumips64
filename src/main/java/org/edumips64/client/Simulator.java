@@ -37,6 +37,7 @@ import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.core.cache.CacheConfig;
+import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.InputNeededException;
@@ -53,6 +54,10 @@ public class Simulator {
   private StringWriter stdout;
   private IOManager iom;
   private WebInputReader stdin;
+  // Config store used by the CPU and the instruction builder. Held as a field
+  // so that runtime-tweakable settings (e.g. forwarding) can be updated from
+  // the worker protocol without recreating the whole simulator.
+  private ConfigStore config;
 
   // TODO: handle these errors more elegantly.
   private ParserMultiException lastParsingErrors = null;
@@ -65,7 +70,7 @@ public class Simulator {
   public Simulator() {
     info("Initializing the simulator");
     // Simulator initialization.
-    ConfigStore config = new InMemoryConfigStore(ConfigStore.defaults);
+    config = new InMemoryConfigStore(ConfigStore.defaults);
     memory = new Memory();
     symTab = new SymbolTable(memory);
     stdout = new StringWriter();
@@ -82,6 +87,15 @@ public class Simulator {
     resultFactory = new ResultFactory(cpu, memory, cachesim, stdout);
     supportedInstructions = instructionBuilder.getSupportedInstructionString();
     info("initialization complete!");
+  }
+
+  public Result setForwarding(boolean enabled) {
+    // The CPU reads this flag dynamically on every step from the ConfigStore.
+    // Update the config *before* resetting the CPU so any component that
+    // re-reads the setting during reset observes the new value.
+    config.putBoolean(ConfigKey.FORWARDING, enabled);
+    cpu.reset();
+    return resultFactory.Success();
   }
 
   public Result setCacheConfig(CacheConfig l1d_config, CacheConfig l1i_config)  {

@@ -79,6 +79,10 @@ public class Worker implements EntryPoint {
             info("steps: " + steps);
             postSimulationResult(simulator.step(steps), method);
             break;
+          case "setforwarding":
+            boolean forwardingEnabled = data.getAsAny("enabled").asBoolean();
+            postMessage(withMethod(simulator.setForwarding(forwardingEnabled), method));
+            break;
           case "setcacheconfig":
             JsPropertyMap<Object> config = Js.cast(data.get("config"));
             JsPropertyMap<Object> l1d = Js.cast(config.get("l1d"));
