@@ -34,6 +34,7 @@ import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
 import org.edumips64.core.is.InstructionBuilder;
+import org.edumips64.core.is.UnsupportedSyscallException;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.core.cache.CacheConfig;
@@ -159,6 +160,16 @@ public class Simulator {
       warning("Synchronous exception: " + e.getCode());
       Result r = resultFactory.Failure(SynchronousExceptionFormatter.format(e));
       r = ResultFactory.AddRuntimeErrors(r, e);
+      r = ResultFactory.AddParserErrors(r, lastParsingErrors);
+      return r;
+    } catch (UnsupportedSyscallException e) {
+      // Unsupported SYSCALLs are runtime errors too. Route them through the
+      // same rich-error plumbing as SynchronousException so the Web UI can
+      // render errorCode / errorInstruction / errorStage.
+      warning("Unsupported syscall: " + e.getMessage());
+      SynchronousException sx = e.toSynchronousException();
+      Result r = resultFactory.Failure(e.getMessage());
+      r = ResultFactory.AddRuntimeErrors(r, sx);
       r = ResultFactory.AddParserErrors(r, lastParsingErrors);
       return r;
     } catch (Exception e) {

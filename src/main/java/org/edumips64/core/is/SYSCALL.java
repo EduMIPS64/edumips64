@@ -89,7 +89,8 @@ public class SYSCALL extends Instruction {
       // error rather than silently behaving as a no-op.
       logger.info("INVALID SYSCALL (" + this.hashCode() + "): number " + syscall_n);
       throw new UnsupportedSyscallException(
-          "SYSCALL " + syscall_n + " is not a supported system call number.");
+          "SYSCALL " + syscall_n + " is not a supported system call number.",
+          "SYSCALL " + syscall_n, "ID");
     }
     return false;
   }
@@ -109,7 +110,8 @@ public class SYSCALL extends Instruction {
       if (!iom.supportsFileSystem()) {
         throw new UnsupportedSyscallException(
             "SYSCALL 1 (open) is not supported in this environment: "
-                + "no filesystem is available.");
+                + "no filesystem is available.",
+            "SYSCALL 1", "MEM");
       }
       String filename = fetchString(address);
       int flags_address = (int) address + filename.length();
@@ -139,7 +141,8 @@ public class SYSCALL extends Instruction {
       if (!iom.supportsFileSystem()) {
         throw new UnsupportedSyscallException(
             "SYSCALL 2 (close) is not supported in this environment: "
-                + "no filesystem is available.");
+                + "no filesystem is available.",
+            "SYSCALL 2", "MEM");
       }
       MemoryElement fd_cell = memory.getCellByAddress(address);
       int fd = (int) fd_cell.getValue();
@@ -173,13 +176,15 @@ public class SYSCALL extends Instruction {
           throw new UnsupportedSyscallException(
               "SYSCALL 3 (read) on file descriptor " + fd
                   + " is not supported in this environment: "
-                  + "only reads from stdin (fd " + IOManager.STDIN_FD + ") are available.");
+                  + "only reads from stdin (fd " + IOManager.STDIN_FD + ") are available.",
+              "SYSCALL 3", "MEM");
         }
         if (syscall_n == 4 && fd != IOManager.STDOUT_FD) {
           throw new UnsupportedSyscallException(
               "SYSCALL 4 (write) on file descriptor " + fd
                   + " is not supported in this environment: "
-                  + "only writes to stdout (fd " + IOManager.STDOUT_FD + ") are available.");
+                  + "only writes to stdout (fd " + IOManager.STDOUT_FD + ") are available.",
+              "SYSCALL 4", "MEM");
         }
       }
 

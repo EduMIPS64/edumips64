@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
@@ -63,6 +64,9 @@ public class SYSCALLUnsupportedTest extends BaseTest {
         assertThrows(UnsupportedSyscallException.class, () -> runThroughMem(instruction));
     assertTrue("error message should mention SYSCALL 1",
         e.getMessage().contains("SYSCALL 1"));
+    assertEquals("SYSCALL 1", e.getInstructionName());
+    assertEquals("MEM", e.getStage());
+    assertEquals(org.edumips64.core.SynchronousExceptionCode.UNSUPPORTED_SYSCALL, e.getCode());
   }
 
   @Test
@@ -76,6 +80,8 @@ public class SYSCALLUnsupportedTest extends BaseTest {
         assertThrows(UnsupportedSyscallException.class, () -> runThroughMem(instruction));
     assertTrue("error message should mention SYSCALL 2",
         e.getMessage().contains("SYSCALL 2"));
+    assertEquals("SYSCALL 2", e.getInstructionName());
+    assertEquals("MEM", e.getStage());
   }
 
   @Test
@@ -96,6 +102,8 @@ public class SYSCALLUnsupportedTest extends BaseTest {
         e.getMessage().contains("SYSCALL 3"));
     assertTrue("error message should mention the offending fd",
         e.getMessage().contains("7"));
+    assertEquals("SYSCALL 3", e.getInstructionName());
+    assertEquals("MEM", e.getStage());
   }
 
   @Test
@@ -115,6 +123,8 @@ public class SYSCALLUnsupportedTest extends BaseTest {
         e.getMessage().contains("SYSCALL 4"));
     assertTrue("error message should mention the offending fd",
         e.getMessage().contains("7"));
+    assertEquals("SYSCALL 4", e.getInstructionName());
+    assertEquals("MEM", e.getStage());
   }
 
   @Test
@@ -143,6 +153,8 @@ public class SYSCALLUnsupportedTest extends BaseTest {
         });
     assertTrue("error message should mention the invalid number",
         e.getMessage().contains("42"));
+    assertEquals("SYSCALL 42", e.getInstructionName());
+    assertEquals("ID", e.getStage());
   }
 }
 
