@@ -98,6 +98,12 @@ public class Worker implements EntryPoint {
 
             postMessage(withMethod(simulator.resultFactory.Success(), method));
             break;
+          case "setforwarding":
+            clearPendingInput();
+            boolean enabled = data.getAsAny("enabled").asBoolean();
+            String codeToReload = data.get("code") == null ? null : data.getAsAny("code").asString();
+            postSimulationResult(simulator.setForwarding(enabled, codeToReload), method);
+            break;
           case "load":
             clearPendingInput();
             String code = data.getAsAny("code").asString();

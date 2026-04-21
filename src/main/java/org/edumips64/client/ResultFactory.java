@@ -110,6 +110,7 @@ public class ResultFactory {
 
     private Result AddCpuInfo(Result r) {
         r.status = FromCpuStatus(cpu.getStatus());
+        r.forwardingEnabled = cpu.isEnableForwarding();
         r.pipeline = getPipeline();
         r.memory = getMemory();
         r.registers = getRegisters();

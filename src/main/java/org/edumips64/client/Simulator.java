@@ -37,6 +37,7 @@ import org.edumips64.core.is.InstructionBuilder;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.core.cache.CacheConfig;
+import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.InputNeededException;
@@ -45,6 +46,7 @@ import org.edumips64.utils.io.NullFileUtils;
 import org.edumips64.utils.io.StringWriter;
 
 public class Simulator {
+  private ConfigStore config;
   private CPU cpu;
   private Parser parser;
   private SymbolTable symTab;
@@ -65,7 +67,7 @@ public class Simulator {
   public Simulator() {
     info("Initializing the simulator");
     // Simulator initialization.
-    ConfigStore config = new InMemoryConfigStore(ConfigStore.defaults);
+    config = new InMemoryConfigStore(ConfigStore.defaults);
     memory = new Memory();
     symTab = new SymbolTable(memory);
     stdout = new StringWriter();
@@ -90,6 +92,21 @@ public class Simulator {
     cachesim.getL1DataCache().setConfig(l1d_config);
     resultFactory = new ResultFactory(cpu, memory, cachesim,stdout);
     return resultFactory.Success();
+  }
+
+  public Result setForwarding(boolean enabled, String code) {
+    config.putBoolean(ConfigKey.FORWARDING, enabled);
+
+    if (code == null || code.isEmpty()) {
+      return reset();
+    }
+
+    Result loadResult = loadProgram(code);
+    if (!loadResult.success) {
+      return loadResult;
+    }
+
+    return step(1);
   }
 
   public Result reset() {

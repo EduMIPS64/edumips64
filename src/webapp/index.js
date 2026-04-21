@@ -52,6 +52,11 @@ worker.setCacheConfig = (config) => {
   worker.postMessage({ method: 'setCacheConfig', config });
 };
 
+worker.setForwarding = (enabled, code) => {
+  worker.postMessage({ method: 'setForwarding', enabled, code });
+  appInsights.trackEvent({name: 'setForwarding', properties: {enabled}});
+};
+
 worker.checkSyntax = (code) => {
   worker.postMessage({ method: 'checksyntax', code });
 

@@ -42,6 +42,7 @@ public class Result {
   public JsArray<Instruction> parsedInstructions;
   public String stdout;
   public String validInstructions;
+  public boolean forwardingEnabled = false;
   public boolean inputRequested = false;
   public int inputMaxLength = 0;
   public int inputResumeSteps = 0;

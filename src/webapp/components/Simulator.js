@@ -13,8 +13,6 @@ import Grid from '@mui/material/Grid';
 import ErrorList from './ErrorList';
 import StdOut from './StdOut';
 import InputDialog from './InputDialog';
-import Switch from '@mui/material/Switch';
-import Button from '@mui/material/Button';
 
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 
@@ -51,6 +49,9 @@ const Simulator = ({worker, initialState, appInsights}) => {
   );
   const [stdout, setStdout] = React.useState('');
   const [inputRequest, setInputRequest] = React.useState(null);
+  const [forwardingEnabled, setForwardingEnabled] = React.useState(
+    initialState.forwardingEnabled,
+  );
 
   const [viMode, setViMode] = React.useState(false);
   const [fontSize, setFontSize] = React.useState(14);
@@ -85,6 +86,8 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   // Ref to track if we are resetting the simulator (clearing code)
   const isResetting = React.useRef(false);
+  const loadedCodeRef = React.useRef(null);
+  const pendingLoadCodeRef = React.useRef(null);
 
   // Detect changes in accordion data when collapsed
   React.useEffect(() => {
@@ -192,6 +195,13 @@ const Simulator = ({worker, initialState, appInsights}) => {
   worker.onmessage = (e) => {
     const result = worker.parseResult(e.data);
     console.log('Got message from worker.', result);
+
+    if (result.method === 'load') {
+      if (result.success) {
+        loadedCodeRef.current = pendingLoadCodeRef.current;
+      }
+      pendingLoadCodeRef.current = null;
+    }
     
     // For syntax check responses, only update parsing errors to avoid unnecessary re-renders
     if (result.method === 'checksyntax') {
@@ -221,6 +231,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
     setStatus(result.status);
     setPipeline(result.pipeline);
     setParsingErrors(result.parsingErrors);
+    setForwardingEnabled(result.forwardingEnabled);
 
     if (hasRealErrors(result.parsingErrors)) {
       setParsedInstructions(null);
@@ -228,9 +239,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
       setParsedInstructions(result.parsedInstructions);
     }
 
-    if (result.stdout) {
-      setStdout(result.stdout);
-    }
+    setStdout(result.stdout || '');
   };
 
   const updateState = (result) => {
@@ -307,6 +316,8 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const clearCode = () => {
     setCode(".data\n\n.code\n  SYSCALL 0\n");
     isResetting.current = true;
+    loadedCodeRef.current = null;
+    pendingLoadCodeRef.current = null;
     setInputRequest(null);
     worker.reset();
     // Clear accordion change markers
@@ -322,6 +333,28 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   const setCacheConfig = (config) => {
     worker.setCacheConfig(config);
+  };
+
+  const handleForwardingChange = (enabled) => {
+    if (enabled === forwardingEnabled) {
+      return;
+    }
+
+    const shouldReset = window.confirm(
+      'Changing the forwarding setting will reset the simulation. Continue?',
+    );
+    if (!shouldReset) {
+      return;
+    }
+
+    isResetting.current = true;
+    setForwardingEnabled(enabled);
+    setExecuting(true);
+    setInputRequest(null);
+    setMustPause(false);
+    setRunAll(false);
+    setStepsToRun(0);
+    worker.setForwarding(enabled, loadedCodeRef.current);
   };
 
   const openCode = () => {
@@ -343,6 +376,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   const loadCode = () => {
     setStdout("");
+    pendingLoadCodeRef.current = code;
     worker.load(code);
   };
 
@@ -568,6 +602,9 @@ const Simulator = ({worker, initialState, appInsights}) => {
               </AccordionSummary>
               <AccordionDetails>
                 <Settings
+                  forwardingEnabled={forwardingEnabled}
+                  onForwardingChange={handleForwardingChange}
+                  forwardingDisabled={executing}
                   viMode={viMode}
                   setViMode={setViMode}
                   fontSize={fontSize}

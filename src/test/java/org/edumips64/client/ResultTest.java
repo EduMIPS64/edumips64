@@ -86,6 +86,7 @@ public class ResultTest extends BaseTest {
     assertEquals("Default registers should be empty", "", result.registers);
     assertEquals("Default statistics should be empty", "", result.statistics);
     assertEquals("Default cachestats should be empty", "", result.cachestats);
+    assertFalse("Default forwardingEnabled should be false", result.forwardingEnabled);
     assertFalse("Default encounteredBreak should be false", result.encounteredBreak);
     assertNull("Default pipeline should be null", result.pipeline);
     assertNull("Default validInstructions should be null", result.validInstructions);

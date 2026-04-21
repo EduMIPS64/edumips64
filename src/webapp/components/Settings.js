@@ -6,7 +6,17 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
-const Settings = ({ viMode, setViMode, fontSize, setFontSize, accordionAlerts, setAccordionAlerts }) => {
+const Settings = ({
+  forwardingEnabled,
+  onForwardingChange,
+  forwardingDisabled,
+  viMode,
+  setViMode,
+  fontSize,
+  setFontSize,
+  accordionAlerts,
+  setAccordionAlerts,
+}) => {
   return (
     <Box
       sx={{
@@ -16,6 +26,25 @@ const Settings = ({ viMode, setViMode, fontSize, setFontSize, accordionAlerts, s
         alignItems: 'center',
       }}
     >
+      <Box>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={forwardingEnabled}
+              onChange={(e) => onForwardingChange(e.target.checked)}
+              color="primary"
+              size="small"
+              disabled={forwardingDisabled}
+              slotProps={{
+                input: { id: 'forwarding-checkbox', 'aria-label': 'Enable Forwarding' },
+              }}
+            />
+          }
+          label={
+            <Typography sx={{ fontSize: '0.85rem' }}>Enable Forwarding</Typography>
+          }
+        />
+      </Box>
       <Box>
         <FormControlLabel
           control={
