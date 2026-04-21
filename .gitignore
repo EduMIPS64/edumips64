@@ -23,6 +23,8 @@
 # Coverage output and report.
 cov-int
 report/
+.nyc_output/
+coverage/
 
 # Zip archives.
 *.zip

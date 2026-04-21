@@ -1,4 +1,4 @@
-const { expect } = require('@playwright/test');
+const { expect } = require('./fixtures');
 
 const targetUri = process.env.PLAYWRIGHT_TARGET_URL || 'http://localhost:8080';
 

@@ -11,3 +11,12 @@ status:
 ignore:
   - "src/main/java/org/edumips64/ui/swing/**"
   - "src/main/java/org/edumips64/Main.java"
+
+flags:
+  java:
+    paths:
+      - src/main/java/
+  web:
+    paths:
+      - src/webapp/
+    carryforward: true

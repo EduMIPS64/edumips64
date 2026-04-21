@@ -1,0 +1,6 @@
+{
+  "include": ["src/webapp/**/*.js"],
+  "exclude": ["src/test/**", "node_modules/**"],
+  "temp-dir": ".nyc_output",
+  "report-dir": "coverage"
+}
