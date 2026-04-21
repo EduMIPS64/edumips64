@@ -102,8 +102,8 @@ public class MemoryElement extends BitSet64 {
     try {
       return Converter.binToLong(this.getBinString(), false);
     } catch (IrregularStringOfBitsException e) {
-      System.err.println("Errore in un registro");
-      this.reset(false);  //azzeriamo il registro
+      System.err.println("Error in a register");
+      this.reset(false);  // reset the register
       return 0;
     }
   }

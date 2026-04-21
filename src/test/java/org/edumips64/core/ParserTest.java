@@ -1,6 +1,7 @@
 package org.edumips64.core;
 
 import org.edumips64.BaseParsingTest;
+import org.edumips64.core.is.Instruction;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.is.ParsedInstructionMetadata;
 import org.edumips64.core.parser.ParserMultiException;
@@ -40,10 +41,39 @@ public class ParserTest extends BaseParsingTest {
   }
 
   @Test
+  public void ParseBin() throws Exception {
+    parseData(".word 0b10000");
+    MemoryElement el = memory.getCellByIndex(0);
+    assertEquals(el.readByte(0), 16);
+  }
+
+  @Test
+  public void ParseBinDifferentWidths() throws Exception {
+    parseData(".byte 0b11111111\n.word16 0b1111111111111111\n.word32 0b11111111111111111111111111111111");
+    // All three should parse without error (hex/binary literals are interpreted as bit patterns).
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void ParseInvalidBin() throws Exception {
+    parseData(".word 0b12");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void tooLargeByteBinDataTest() throws Exception {
+    parseData(".byte 0b100000000");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void tooLarge16BitsBinDataTest() throws Exception {
+    parseData(".word16 0b10000000000000000");
+  }
+
+  @Test
   public void Spaces() throws Exception {
     // The user should be able to reserve space in small and larger amounts, specifying the amount in hexadecimal
-    // if they so desire.
+    // or binary if they so desire.
     parseData(".space 0x10");
+    parseData(".space 0b10000");
     parseData(".space 16");
     parseData(".space 8");
     parseData(".space 1");
@@ -308,6 +338,31 @@ public class ParserTest extends BaseParsingTest {
     parseCode("daddi r1,r0,0x10000");
   }
 
+  @Test
+  public void immediateBinaryTest() throws Exception {
+    // Binary immediates should be accepted and treated like hex bit patterns.
+    parseCode("daddi r1,r0,0b1010");
+    parseCode("daddi r1,r0,0b1111111111111111");  // 16 ones -> -1 (bit-pattern)
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void tooLargeImmediate16BitsBinTest() throws Exception {
+    parseCode("daddi r1,r0,0b10000000000000000");
+  }
+
+  @Test
+  public void memoryLabelHexOffsetTest() throws Exception {
+    // Issue #1394: hex and binary offsets must be accepted as memory label offsets.
+    parser.doParsing(
+        ".data\n" +
+        "data1: .word 42\n" +
+        ".code\n" +
+        "lw r1, 0x0(r0)\n" +
+        "lw r2, 0b0(r0)\n" +
+        "lw r3, 0(r0)\n" +
+        "SYSCALL 0\n");
+  }
+
   /** Tests for issue #1376: Support multiple labels for each given address */
   @Test
   public void AdjacentLabelsForwardJumpTest() throws Exception {
@@ -391,6 +446,85 @@ public class ParserTest extends BaseParsingTest {
         "dup_label:\n" +
         "daddi r1, r0, 1\n" +
         "dup_label:\n" +
+        "SYSCALL 0\n");
+  }
+
+  /** Tests for label offset arithmetic in memory label parameters (%L).
+   *  The parser accepts expressions built from memory labels and numeric
+   *  literals combined with the {@code +} and {@code -} operators. */
+  @Test
+  public void labelPlusOffsetTest() throws Exception {
+    parser.doParsing(
+        ".data\n" +
+        "data1: .word 42\n" +
+        "data2: .word 43\n" +
+        ".code\n" +
+        "lw r1, data1+0(r0)\n" +
+        "lw r2, data1-0(r0)\n" +
+        "lw r3, data1+8(r0)\n" +
+        "lw r4, data2-8(r0)\n" +
+        "lw r5, 0+data1(r0)\n" +
+        "lw r6, data1+data2(r0)\n" +
+        "lw r7, data2-data1(r0)\n" +
+        "lw r8, data1-8+16(r0)\n" +
+        "lw r9, data1+0x10(r0)\n" +
+        "lw r10, data1+0b10(r0)\n" +
+        "lw r11, data1 + 4(r0)\n" +
+        "SYSCALL 0\n");
+  }
+
+  @Test
+  public void labelPlusOffsetValuesTest() throws Exception {
+    // Verify that label+offset resolves to the correct address (label + offset).
+    parser.doParsing(
+        ".data\n" +
+        "data1: .word 42\n" +
+        "data2: .word 43\n" +
+        ".code\n" +
+        "lw r1, data1(r0)\n" +
+        "lw r2, data1+8(r0)\n" +
+        "lw r3, data2-data1(r0)\n" +
+        "SYSCALL 0\n");
+    int base = memory.getCellByIndex(0).getAddress();
+    Instruction i0 = (Instruction) memory.getInstruction(0);
+    Instruction i1 = (Instruction) memory.getInstruction(4);
+    Instruction i2 = (Instruction) memory.getInstruction(8);
+    assertEquals(Integer.valueOf(base), i0.getParams().get(1));
+    assertEquals(Integer.valueOf(base + 8), i1.getParams().get(1));
+    // data2 is one word (8 bytes) after data1.
+    assertEquals(Integer.valueOf(8), i2.getParams().get(1));
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void labelPlusEmptyOperandFailsTest() throws Exception {
+    // A trailing operator is a malformed expression.
+    parser.doParsing(
+        ".data\n" +
+        "data1: .word 42\n" +
+        ".code\n" +
+        "lw r1, data1+(r0)\n" +
+        "SYSCALL 0\n");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void labelDoubleOperatorFailsTest() throws Exception {
+    // Consecutive operators produce an empty operand and must fail.
+    parser.doParsing(
+        ".data\n" +
+        "data1: .word 42\n" +
+        ".code\n" +
+        "lw r1, data1+0+(r0)\n" +
+        "SYSCALL 0\n");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void labelUnknownInExpressionFailsTest() throws Exception {
+    // An unknown label in an expression still produces a LABELNOTFOUND error.
+    parser.doParsing(
+        ".data\n" +
+        "data1: .word 42\n" +
+        ".code\n" +
+        "lw r1, data1+nosuchlabel(r0)\n" +
         "SYSCALL 0\n");
   }
 
