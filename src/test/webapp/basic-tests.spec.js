@@ -1,4 +1,4 @@
-const { test, expect } = require('./fixtures');
+const { test } = require('./fixtures');
 const { targetUri, waitForPageReady } = require('./test-utils');
 
 test('single step works', async ({ page }) => {
