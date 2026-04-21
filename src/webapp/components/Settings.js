@@ -5,6 +5,7 @@ import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import TextField from '@mui/material/TextField';
 
 const Settings = ({
   viMode,
@@ -15,6 +16,10 @@ const Settings = ({
   setAccordionAlerts,
   forwarding,
   setForwarding,
+  stepStride,
+  setStepStride,
+  executionDelayMs,
+  setExecutionDelayMs,
   status,
 }) => {
   // Forwarding affects the CPU pipeline behavior and resets the CPU when
@@ -108,6 +113,38 @@ const Settings = ({
               CPU Forwarding
             </Typography>
           }
+        />
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <TextField
+          label="Multi Step Size"
+          type="number"
+          size="small"
+          value={stepStride}
+          onChange={(e) => {
+            const value = parseInt(e.target.value, 10);
+            if (Number.isInteger(value) && value >= 1 && value <= 100000) {
+              setStepStride(value);
+            }
+          }}
+          slotProps={{ htmlInput: { min: 1, max: 100000 } }}
+          sx={{ width: '140px' }}
+        />
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <TextField
+          label="Execution Delay (ms)"
+          type="number"
+          size="small"
+          value={executionDelayMs}
+          onChange={(e) => {
+            const value = parseInt(e.target.value, 10);
+            if (Number.isInteger(value) && value >= 0 && value <= 5000) {
+              setExecutionDelayMs(value);
+            }
+          }}
+          slotProps={{ htmlInput: { min: 0, max: 5000, step: 10 } }}
+          sx={{ width: '160px' }}
         />
       </Box>
     </Box>

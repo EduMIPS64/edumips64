@@ -58,6 +58,20 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [fontSize, setFontSize] = useSetting(SettingKey.FONT_SIZE);
   const [accordionAlerts, setAccordionAlerts] = useSetting(SettingKey.ACCORDION_ALERTS);
   const [forwarding, setForwarding] = useSetting(SettingKey.FORWARDING);
+  const [stepStride, setStepStride] = useSetting(SettingKey.STEP_STRIDE);
+  const [executionDelayMs, setExecutionDelayMs] = useSetting(
+    SettingKey.EXECUTION_DELAY_MS,
+  );
+
+  // `executionDelayMs` is read inside async callbacks that were captured when
+  // a step batch started (potentially many batches ago). Mirror the latest
+  // value in a ref so the delay applied between batches always reflects the
+  // *current* setting, not the one that was active when "Run All" was
+  // pressed. This lets the user tweak the delay live, mid-run.
+  const executionDelayRef = React.useRef(executionDelayMs);
+  React.useEffect(() => {
+    executionDelayRef.current = executionDelayMs;
+  }, [executionDelayMs]);
 
   // Keep the simulator worker's forwarding flag in sync with the persisted
   // setting. Runs once on mount (so a value restored from localStorage is
@@ -270,10 +284,38 @@ const Simulator = ({worker, initialState, appInsights}) => {
       setRunAll(false);
     } else if (stepsToRun > 0) {
       console.log('Steps left: ' + stepsToRun);
-      stepCode(stepsToRun);
+      scheduleNextBatch(() => stepCode(stepsToRun));
     } else if (runAll) {
-      stepCode(INTERNAL_STEPS_STRIDE);
+      scheduleNextBatch(() => stepCode(INTERNAL_STEPS_STRIDE));
     }
+  };
+
+  // Pending timeout id for a delayed follow-up batch, so that stopping the
+  // simulation cancels any batch that was sleeping between strides instead
+  // of having it fire after `worker.reset()` and surface a spurious error.
+  const nextBatchTimeout = React.useRef(null);
+
+  const cancelPendingBatch = () => {
+    if (nextBatchTimeout.current !== null) {
+      clearTimeout(nextBatchTimeout.current);
+      nextBatchTimeout.current = null;
+    }
+  };
+
+  // Schedule the next internal step batch, inserting the user-configured
+  // execution delay so long runs are visually paced. A delay of 0 ms (the
+  // default) runs batches back-to-back, matching the pre-existing behavior.
+  const scheduleNextBatch = (fn) => {
+    cancelPendingBatch();
+    const delay = executionDelayRef.current;
+    if (delay <= 0) {
+      fn();
+      return;
+    }
+    nextBatchTimeout.current = setTimeout(() => {
+      nextBatchTimeout.current = null;
+      fn();
+    }, delay);
   };
 
   // Click handlers. Decoupled from business logic to place the telemetry hooks in the right place.
@@ -315,6 +357,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
   };
 
   const stopCode = () => {
+    cancelPendingBatch();
     setMustPause(true);
     setRunAll(false);
     setStepsToRun(0);
@@ -323,6 +366,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
   };
 
   const clearCode = () => {
+    cancelPendingBatch();
     setCode(".data\n\n.code\n  SYSCALL 0\n");
     isResetting.current = true;
     setInputRequest(null);
@@ -461,6 +505,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
           version={worker.version}
           status={status}
           prefersDarkMode={prefersDarkMode}
+          multiStepCount={stepStride}
         />
         <Grid container id="main-grid" disableEqualOverflow spacing={0}>
           <Grid id="left-panel" size={8}>
@@ -594,6 +639,10 @@ const Simulator = ({worker, initialState, appInsights}) => {
                   setAccordionAlerts={setAccordionAlerts}
                   forwarding={forwarding}
                   setForwarding={setForwarding}
+                  stepStride={stepStride}
+                  setStepStride={setStepStride}
+                  executionDelayMs={executionDelayMs}
+                  setExecutionDelayMs={setExecutionDelayMs}
                   status={status}
                   showTitle={false}
                 />

@@ -158,6 +158,55 @@ test('expandedAccordions persists across page reloads', async ({ page }) => {
 });
 
 /**
+ * Test: stepStride and executionDelayMs persist across page reloads.
+ */
+test('stepStride and executionDelayMs persist across page reloads', async ({ page }) => {
+  await waitForPageReady(page);
+  await removeOverlay(page);
+
+  await openSettingsAccordion(page);
+
+  // Change Multi Step Size from the default (500) to 250.
+  const strideInput = page.getByLabel('Multi Step Size');
+  await strideInput.fill('250');
+  await strideInput.blur();
+
+  // Change Execution Delay from the default (0) to 100 ms.
+  const delayInput = page.getByLabel('Execution Delay (ms)');
+  await delayInput.fill('100');
+  await delayInput.blur();
+
+  // Verify localStorage was updated.
+  const strideStored = await page.evaluate(
+    (key) => window.localStorage.getItem(key),
+    `${STORAGE_PREFIX}stepStride`
+  );
+  expect(strideStored).toBe('250');
+
+  const delayStored = await page.evaluate(
+    (key) => window.localStorage.getItem(key),
+    `${STORAGE_PREFIX}executionDelayMs`
+  );
+  expect(delayStored).toBe('100');
+
+  // Reload and assert the values survived.
+  await page.reload();
+  await waitForPageReady(page);
+  await removeOverlay(page);
+
+  await openSettingsAccordion(page);
+
+  await expect(page.getByLabel('Multi Step Size')).toHaveValue('250');
+  await expect(page.getByLabel('Execution Delay (ms)')).toHaveValue('100');
+
+  // The Multi Step button's tooltip reflects the configured stride, so the
+  // header really does read from the persisted setting.
+  await expect(
+    page.getByRole('button', { name: /Run 250 steps of simulation/ })
+  ).toBeVisible();
+});
+
+/**
  * Cleanup: clear edumips64 localStorage keys after each test.
  */
 test.afterEach(async ({ page }) => {

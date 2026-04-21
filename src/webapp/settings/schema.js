@@ -22,6 +22,20 @@ const ALLOWED_HELP_LANGUAGES = ['en', 'it', 'zh'];
 const MIN_FONT_SIZE = 1;
 const MAX_FONT_SIZE = 72;
 
+// Multi-step stride bounds (number of simulation steps the "Multi Step"
+// button runs in one click). Mirrors the `<input min/max>` that used to live
+// in the Header, but enforced centrally here so the persisted value is
+// always in range.
+const MIN_STEP_STRIDE = 1;
+const MAX_STEP_STRIDE = 100000;
+
+// Execution delay bounds, in milliseconds. `0` means "run as fast as
+// possible" (the previous behavior). The upper bound is generous enough to
+// demonstrate pipeline effects without being able to accidentally lock the
+// UI into a multi-minute sleep between tiny batches.
+const MIN_EXECUTION_DELAY_MS = 0;
+const MAX_EXECUTION_DELAY_MS = 5000;
+
 // Shared validator for the L1D / L1I cache configuration objects.
 const isValidCacheConfig = (v) =>
   Number.isFinite(v.size) &&
@@ -98,6 +112,24 @@ export const SETTINGS_SCHEMA = Object.freeze({
     type: SettingType.BOOLEAN,
     // Matches the Java `ConfigStore` default for `ConfigKey.FORWARDING`.
     default: false,
+  },
+  [SettingKey.STEP_STRIDE]: {
+    type: SettingType.NUMBER,
+    // Matches the legacy `multiStepCount` default that used to live in
+    // `Header.js` local state.
+    default: 500,
+    validate: (v) =>
+      Number.isInteger(v) && v >= MIN_STEP_STRIDE && v <= MAX_STEP_STRIDE,
+  },
+  [SettingKey.EXECUTION_DELAY_MS]: {
+    type: SettingType.NUMBER,
+    // 0 means "no artificial delay between batches", which is the pre-existing
+    // behavior.
+    default: 0,
+    validate: (v) =>
+      Number.isFinite(v) &&
+      v >= MIN_EXECUTION_DELAY_MS &&
+      v <= MAX_EXECUTION_DELAY_MS,
   },
 });
 
