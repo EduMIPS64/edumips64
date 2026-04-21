@@ -89,6 +89,10 @@ public abstract class FPConditionalCC_DMoveInstructions extends ComputationalIns
     if (cpu.getFCSRConditionCode(params.get(CC_FIELD).intValue()) == TF_FIELD_VALUE) {
       TRfp[FD_FIELD].setBits(fs, 0);
     }
+
+    if (cpu.isEnableForwarding()) {
+      doWB();
+    }
   }
   public void MEM() throws MemoryElementNotFoundException {
     cpu.getRegisterFP(params.get(FD_FIELD)).decrWAWSemaphore();
