@@ -18,6 +18,16 @@ export const SettingType = Object.freeze({
 
 const ALLOWED_HELP_LANGUAGES = ['en', 'it', 'zh'];
 
+// Font size bounds for the code editor, in pt.
+const MIN_FONT_SIZE = 1;
+const MAX_FONT_SIZE = 72;
+
+// Shared validator for the L1D / L1I cache configuration objects.
+const isValidCacheConfig = (v) =>
+  Number.isFinite(v.size) &&
+  Number.isFinite(v.blockSize) &&
+  Number.isFinite(v.associativity);
+
 /**
  * The single, canonical registry of all locally-persisted settings.
  *
@@ -42,7 +52,8 @@ export const SETTINGS_SCHEMA = Object.freeze({
   [SettingKey.FONT_SIZE]: {
     type: SettingType.NUMBER,
     default: 14,
-    validate: (v) => Number.isFinite(v) && v >= 1 && v <= 72,
+    validate: (v) =>
+      Number.isFinite(v) && v >= MIN_FONT_SIZE && v <= MAX_FONT_SIZE,
   },
   [SettingKey.ACCORDION_ALERTS]: {
     type: SettingType.BOOLEAN,
@@ -67,10 +78,7 @@ export const SETTINGS_SCHEMA = Object.freeze({
       blockSize: 16,
       associativity: 1,
     },
-    validate: (v) =>
-      Number.isFinite(v.size) &&
-      Number.isFinite(v.blockSize) &&
-      Number.isFinite(v.associativity),
+    validate: isValidCacheConfig,
   },
   [SettingKey.CACHE_L1I]: {
     type: SettingType.OBJECT,
@@ -79,10 +87,7 @@ export const SETTINGS_SCHEMA = Object.freeze({
       blockSize: 16,
       associativity: 1,
     },
-    validate: (v) =>
-      Number.isFinite(v.size) &&
-      Number.isFinite(v.blockSize) &&
-      Number.isFinite(v.associativity),
+    validate: isValidCacheConfig,
   },
   [SettingKey.HELP_LANGUAGE]: {
     type: SettingType.STRING,
