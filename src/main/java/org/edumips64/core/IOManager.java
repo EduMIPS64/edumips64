@@ -113,9 +113,6 @@ public class IOManager {
   /** File descriptor used for standard output. */
   public static final int STDOUT_FD = 1;
 
-  /** File descriptor used for standard error. */
-  public static final int STDERR_FD = 2;
-
   /**
    * Whether the underlying environment supports a real filesystem. Returns
    * {@code false} for environments like the web UI that are backed by

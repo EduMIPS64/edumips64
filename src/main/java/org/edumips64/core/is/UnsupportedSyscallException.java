@@ -62,9 +62,7 @@ public class UnsupportedSyscallException extends RuntimeException {
    */
   public SynchronousException toSynchronousException() {
     SynchronousException sx = new SynchronousException(code);
-    if (instructionName != null && stage != null) {
-      sx.setInstructionInfo(instructionName, stage);
-    }
+    sx.setInstructionInfo(instructionName, stage);
     return sx;
   }
 }
