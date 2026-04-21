@@ -1,4 +1,4 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require('./fixtures');
 const { targetUri, waitForPageReady, removeOverlay } = require('./test-utils');
 
 const STORAGE_PREFIX = 'edumips64:v1:';
