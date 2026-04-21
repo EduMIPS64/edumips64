@@ -252,7 +252,6 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const updateState = (result) => {
     console.log('Updating state.');
 
-    setExecuting(false);
     applyResultState(result);
 
     // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
@@ -269,6 +268,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
       }
       alert(message);
       stopCode();
+      setExecuting(false);
       // stopCode() queues state updates (setRunAll(false), setMustPause(true))
       // and a worker.reset(), but those don't take effect within this closure.
       // Return early to avoid falling through to the "schedule more steps"
@@ -278,15 +278,27 @@ const Simulator = ({worker, initialState, appInsights}) => {
       return;
     }
 
+    // Note: we intentionally keep `executing === true` across inter-batch
+    // delays when more steps are queued. Clearing `executing` between
+    // batches would toggle the toolbar buttons (Run/Step/Stop becoming
+    // enabled, Pause becoming disabled) every stride, which looks like a
+    // flash during long runs with a non-zero execution delay. The user
+    // should see the same "running" controls whether the worker is busy
+    // stepping or we're simply waiting out the inter-batch delay.
     if (result.status !== 'RUNNING' || mustPause || result.encounteredBreak) {
       setStepsToRun(0);
       setMustPause(false);
       setRunAll(false);
+      setExecuting(false);
     } else if (stepsToRun > 0) {
       console.log('Steps left: ' + stepsToRun);
       scheduleNextBatch(() => stepCode(stepsToRun));
     } else if (runAll) {
       scheduleNextBatch(() => stepCode(INTERNAL_STEPS_STRIDE));
+    } else {
+      // No further batches scheduled (e.g. a plain Single Step finishing):
+      // we're done executing for now.
+      setExecuting(false);
     }
   };
 
@@ -357,19 +369,30 @@ const Simulator = ({worker, initialState, appInsights}) => {
   };
 
   const stopCode = () => {
+    // If a batch was sleeping between strides, cancel it. In that case no
+    // worker result is in flight to flip `executing` back off via
+    // `updateState`, so clear it here too.
+    const hadPendingBatch = nextBatchTimeout.current !== null;
     cancelPendingBatch();
     setMustPause(true);
     setRunAll(false);
     setStepsToRun(0);
     setInputRequest(null);
+    if (hadPendingBatch) {
+      setExecuting(false);
+    }
     worker.reset();  // Assuming simulator has a reset method
   };
 
   const clearCode = () => {
+    const hadPendingBatch = nextBatchTimeout.current !== null;
     cancelPendingBatch();
     setCode(".data\n\n.code\n  SYSCALL 0\n");
     isResetting.current = true;
     setInputRequest(null);
+    if (hadPendingBatch) {
+      setExecuting(false);
+    }
     worker.reset();
     // Clear accordion change markers
     setAccordionChanges({
