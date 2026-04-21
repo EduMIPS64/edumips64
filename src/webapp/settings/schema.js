@@ -94,6 +94,11 @@ export const SETTINGS_SCHEMA = Object.freeze({
     default: 'en',
     validate: (v) => ALLOWED_HELP_LANGUAGES.includes(v),
   },
+  [SettingKey.FORWARDING]: {
+    type: SettingType.BOOLEAN,
+    // Matches the Java `ConfigStore` default for `ConfigKey.FORWARDING`.
+    default: false,
+  },
 });
 
 /**

@@ -6,7 +6,21 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
-const Settings = ({ viMode, setViMode, fontSize, setFontSize, accordionAlerts, setAccordionAlerts }) => {
+const Settings = ({
+  viMode,
+  setViMode,
+  fontSize,
+  setFontSize,
+  accordionAlerts,
+  setAccordionAlerts,
+  forwarding,
+  setForwarding,
+  status,
+}) => {
+  // Forwarding affects the CPU pipeline behavior and resets the CPU when
+  // changed, so we only allow toggling it when the simulator is not running
+  // a program. This mirrors the way `CacheConfig` grays out its inputs.
+  const forwardingDisabled = status === 'RUNNING';
   return (
     <Box
       sx={{
@@ -66,7 +80,33 @@ const Settings = ({ viMode, setViMode, fontSize, setFontSize, accordionAlerts, s
             />
           }
           label={
-            <Typography sx={{ fontSize: '0.85rem' }}>Accordion Change Alerts</Typography>
+            <Typography sx={{ fontSize: '0.85rem' }}>
+              Accordion Change Alerts
+            </Typography>
+          }
+        />
+      </Box>
+      <Box>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={forwarding}
+              onChange={(e) => setForwarding(e.target.checked)}
+              color="primary"
+              size="small"
+              disabled={forwardingDisabled}
+              inputProps={{ 'data-testid': 'forwarding-switch' }}
+            />
+          }
+          label={
+            <Typography
+              sx={{
+                fontSize: '0.85rem',
+                color: forwardingDisabled ? 'text.disabled' : 'text.primary',
+              }}
+            >
+              CPU Forwarding
+            </Typography>
           }
         />
       </Box>

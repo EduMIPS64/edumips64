@@ -23,6 +23,9 @@ export const SettingKey = Object.freeze({
   CACHE_L1D: 'cache.l1d',
   CACHE_L1I: 'cache.l1i',
 
+  // CPU configuration.
+  FORWARDING: 'forwarding',
+
   // Help dialog.
   HELP_LANGUAGE: 'help.language',
 });
