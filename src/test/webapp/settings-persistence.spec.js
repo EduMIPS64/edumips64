@@ -21,17 +21,25 @@ test.beforeEach(async ({ page }) => {
 });
 
 /**
- * Helper: open the General Settings accordion if it is collapsed.
+ * Helper: ensure the General Settings accordion is expanded.
+ *
+ * The MUI `AccordionSummary` renders as a button whose accessible name is the
+ * text it contains ("General Settings"). We target it by role so that
+ * `aria-expanded` is read from the correct element — an earlier version of
+ * this helper took `text=... >> ..` which landed on the Typography's parent,
+ * not on the button, so `aria-expanded` was always `null` and the helper
+ * ended up *toggling* (collapsing) the accordion instead of ensuring it was
+ * open, which made the switches invisible and timed the tests out.
  */
 async function openSettingsAccordion(page) {
-  // The settings accordion summary contains "General Settings"
-  const summary = page.locator('text=General Settings').locator('..');
-  // Check if the accordion content is hidden by looking for the expanded attribute
-  const expanded = await summary.getAttribute('aria-expanded').catch(() => null);
-  if (expanded === 'false' || expanded === null) {
+  const summary = page.getByRole('button', { name: /General Settings/ });
+  await summary.waitFor({ state: 'visible' });
+  if ((await summary.getAttribute('aria-expanded')) !== 'true') {
     await summary.click();
-    await page.waitForTimeout(300);
   }
+  // Wait until the accordion reports as expanded before returning, so the
+  // switches inside have had a chance to become visible.
+  await expect(summary).toHaveAttribute('aria-expanded', 'true');
 }
 
 /**
