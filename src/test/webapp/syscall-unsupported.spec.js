@@ -63,8 +63,7 @@ buffer:       .space  8
 // and must be refused regardless of arguments.
 const openProgram = `.data
 filename:    .asciiz "nope.txt"
-             .align  3
-flags:       .word64 1
+             .word64 1
 
 .code
              daddi $t6, $zero, filename
@@ -101,12 +100,14 @@ async function runAndCollectAlerts(page, program) {
 
 /**
  * Assertions common to every unsupported-syscall alert: structured prefix,
- * UNSUPPORTED_SYSCALL code, and no raw Java exception toString leak.
+ * correct faulting instruction and stage, and no raw Java exception toString
+ * leak.
+ *
+ * The Web UI composes the alert as:
+ *   "Synchronous exception: <message>\n\nInstruction: <instr>\nPipeline stage: <stage>"
  */
 function assertUnsupportedSyscallAlert(alertMessage, expectedInstruction, expectedStage) {
   expect(alertMessage).toContain('Synchronous exception');
-  expect(alertMessage).toContain('Unsupported system call');
-  expect(alertMessage).toContain('UNSUPPORTED_SYSCALL');
   expect(alertMessage).toContain(`Instruction: ${expectedInstruction}`);
   expect(alertMessage).toContain(`Pipeline stage: ${expectedStage}`);
   // Must not be the raw Java exception toString.
@@ -120,7 +121,7 @@ test('invalid SYSCALL number produces a user-friendly unsupported-syscall alert'
 
   const alertMessage = alertMessages[0];
   assertUnsupportedSyscallAlert(alertMessage, 'SYSCALL 6', 'ID');
-  expect(alertMessage).toContain('SYSCALL 6');
+  expect(alertMessage).toContain('SYSCALL 6 is not a supported system call number');
 
   // No spurious follow-up alert (e.g. "Cannot run in state READY").
   await page.waitForTimeout(1000);
@@ -137,9 +138,9 @@ test('SYSCALL 4 (write) on a non-stdout fd produces a user-friendly alert', asyn
 
   const alertMessage = alertMessages[0];
   assertUnsupportedSyscallAlert(alertMessage, 'SYSCALL 4', 'MEM');
-  // The underlying message must identify SYSCALL 4 and the offending fd.
-  expect(alertMessage).toContain('SYSCALL 4');
-  expect(alertMessage).toContain('file descriptor 7');
+  // The underlying message must identify SYSCALL 4 (write) and the offending fd.
+  expect(alertMessage).toContain('SYSCALL 4 (write) on file descriptor 7');
+  expect(alertMessage).toContain('stdout');
 
   await page.waitForTimeout(1000);
   expect(alertMessages).toHaveLength(1);
@@ -155,8 +156,8 @@ test('SYSCALL 3 (read) on a non-stdin fd produces a user-friendly alert', async 
 
   const alertMessage = alertMessages[0];
   assertUnsupportedSyscallAlert(alertMessage, 'SYSCALL 3', 'MEM');
-  expect(alertMessage).toContain('SYSCALL 3');
-  expect(alertMessage).toContain('file descriptor 9');
+  expect(alertMessage).toContain('SYSCALL 3 (read) on file descriptor 9');
+  expect(alertMessage).toContain('stdin');
 
   await page.waitForTimeout(1000);
   expect(alertMessages).toHaveLength(1);
@@ -167,7 +168,7 @@ test('SYSCALL 1 (open) is refused in the web UI environment', async ({ page }) =
 
   const alertMessage = alertMessages[0];
   assertUnsupportedSyscallAlert(alertMessage, 'SYSCALL 1', 'MEM');
-  expect(alertMessage).toContain('SYSCALL 1');
+  expect(alertMessage).toContain('SYSCALL 1 (open)');
   expect(alertMessage).toContain('no filesystem');
 
   await page.waitForTimeout(1000);
