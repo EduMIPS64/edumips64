@@ -40,7 +40,8 @@ public enum SynchronousExceptionCode {
   FPOVERFLOW("FP overflow"),
   FPUNDERFLOW("FP underflow"),
   FPINVALID("FP invalid operation"),
-  FPDIVBYZERO("FP division by zero");
+  FPDIVBYZERO("FP division by zero"),
+  UNSUPPORTED_SYSCALL("Unsupported system call");
 
   private final String description;
 

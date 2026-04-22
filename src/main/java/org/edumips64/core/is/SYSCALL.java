@@ -85,8 +85,12 @@ public class SYSCALL extends Instruction {
       address = r14.getValue();
       logger.info("SYSCALL (" + this.hashCode() + "): locked register R14. Value = " + address);
     } else {
-      // TODO: invalid syscall
-      logger.info("INVALID SYSCALL (" + this.hashCode() + ")");
+      // Unknown syscall number: refuse to continue execution with a clear
+      // error rather than silently behaving as a no-op.
+      logger.info("INVALID SYSCALL (" + this.hashCode() + "): number " + syscall_n);
+      throw new UnsupportedSyscallException(
+          "SYSCALL " + syscall_n + " is not a supported system call number.",
+          "SYSCALL " + syscall_n, "ID");
     }
     return false;
   }
@@ -100,6 +104,15 @@ public class SYSCALL extends Instruction {
 
     if (syscall_n == 1) {
       // int open(const char* filename, int flags)
+      // Refuse the call cleanly if the environment has no filesystem
+      // (e.g. the web UI). Otherwise SYSCALL 1 cannot succeed and would
+      // leave the simulator in an inconsistent state.
+      if (!iom.supportsFileSystem()) {
+        throw new UnsupportedSyscallException(
+            "SYSCALL 1 (open) is not supported in this environment: "
+                + "no filesystem is available.",
+            "SYSCALL 1", "MEM");
+      }
       String filename = fetchString(address);
       int flags_address = (int) address + filename.length();
       flags_address += 8 - (flags_address % 8);
@@ -125,6 +138,12 @@ public class SYSCALL extends Instruction {
 
     } else if (syscall_n == 2) {
       // int close(int fd)
+      if (!iom.supportsFileSystem()) {
+        throw new UnsupportedSyscallException(
+            "SYSCALL 2 (close) is not supported in this environment: "
+                + "no filesystem is available.",
+            "SYSCALL 2", "MEM");
+      }
       MemoryElement fd_cell = memory.getCellByAddress(address);
       int fd = (int) fd_cell.getValue();
       logger.info("Closing fd " + fd);
@@ -146,6 +165,28 @@ public class SYSCALL extends Instruction {
 
       temp = memory.getCellByAddress(paramsAddress);
       count = (int) temp.getValue();
+
+      // In environments without a filesystem (e.g. the web UI), only
+      // read() from stdin and write() to stdout can be served. Any other
+      // fd would require a file that was never (and could never be)
+      // opened, so refuse the call with a clear error instead of silently
+      // returning -1.
+      if (!iom.supportsFileSystem()) {
+        if (syscall_n == 3 && fd != IOManager.STDIN_FD) {
+          throw new UnsupportedSyscallException(
+              "SYSCALL 3 (read) on file descriptor " + fd
+                  + " is not supported in this environment: "
+                  + "only reads from stdin (fd " + IOManager.STDIN_FD + ") are available.",
+              "SYSCALL 3", "MEM");
+        }
+        if (syscall_n == 4 && fd != IOManager.STDOUT_FD) {
+          throw new UnsupportedSyscallException(
+              "SYSCALL 4 (write) on file descriptor " + fd
+                  + " is not supported in this environment: "
+                  + "only writes to stdout (fd " + IOManager.STDOUT_FD + ") are available.",
+              "SYSCALL 4", "MEM");
+        }
+      }
 
       return_value = -1;
 

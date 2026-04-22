@@ -31,11 +31,26 @@ public class NullFileUtils extends FileUtils {
 
   @Override
   public Reader openReadOnly(String pathname) throws OpenException {
-    return null;
+    // File I/O is not supported in environments that use NullFileUtils
+    // (e.g. the web UI). Throw OpenException so that callers such as
+    // SYSCALL handle the failure gracefully (return value -1) instead
+    // of receiving a null Reader that causes unhandled exceptions on
+    // later read/close operations.
+    throw new OpenException();
   }
 
   @Override
   public Writer openWriteOnly(String pathname, boolean append) throws OpenException {
-    return null;
+    // See openReadOnly(): file I/O is not supported when NullFileUtils
+    // is in use, so we fail the open() call cleanly.
+    throw new OpenException();
+  }
+
+  @Override
+  public boolean supportsFileSystem() {
+    // NullFileUtils is used in environments (e.g. the web UI) that do not
+    // provide a filesystem. Signal that to callers so they can refuse
+    // unsupported syscalls with a clear error.
+    return false;
   }
 }
