@@ -27,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 public class SYSCALLUnsupportedTest extends BaseTest {
   private Memory memory;
   private CPU cpu;
-  private IOManager ioManager;
   private InstructionBuilder builder;
 
   @Before
@@ -35,7 +34,7 @@ public class SYSCALLUnsupportedTest extends BaseTest {
     memory = new Memory();
     CacheSimulator cacheSimulator = new CacheSimulator();
     cpu = new CPU(memory, config, new BUBBLE());
-    ioManager = new IOManager(new NullFileUtils(), memory);
+    IOManager ioManager = new IOManager(new NullFileUtils(), memory);
     ioManager.setStdInput(new WebInputReader());
     ioManager.setStdOutput(new StringWriter());
     builder = new InstructionBuilder(memory, ioManager, cpu, cacheSimulator, config);

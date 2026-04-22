@@ -72,6 +72,12 @@ public class IOManager {
   /** Truncate the file if it exists */
   public final int O_TRUNC = 0x10;  // 10000
 
+  /** File descriptor used for standard input. */
+  public static final int STDIN_FD = 0;
+
+  /** File descriptor used for standard output. */
+  public static final int STDOUT_FD = 1;
+
   private Map<Integer, Reader> ins;
   private Map<Integer, Writer> outs;
 
@@ -106,12 +112,6 @@ public class IOManager {
 
     fileUtils = fu;
   }
-
-  /** File descriptor used for standard input. */
-  public static final int STDIN_FD = 0;
-
-  /** File descriptor used for standard output. */
-  public static final int STDOUT_FD = 1;
 
   /**
    * Whether the underlying environment supports a real filesystem. Returns
