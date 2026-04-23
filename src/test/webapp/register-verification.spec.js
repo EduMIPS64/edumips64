@@ -1,7 +1,6 @@
 const { test, expect } = require('./fixtures');
 const {
   targetUri,
-  removeOverlay,
   waitForPageReady,
   loadProgram,
   runToCompletion,
