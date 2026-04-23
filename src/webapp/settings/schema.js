@@ -113,6 +113,11 @@ export const SETTINGS_SCHEMA = Object.freeze({
     // Matches the Java `ConfigStore` default for `ConfigKey.FORWARDING`.
     default: false,
   },
+  [SettingKey.DELAY_SLOT]: {
+    type: SettingType.BOOLEAN,
+    // Matches the Java `ConfigStore` default for `ConfigKey.DELAY_SLOT`.
+    default: false,
+  },
   [SettingKey.STEP_STRIDE]: {
     type: SettingType.NUMBER,
     // Matches the legacy `multiStepCount` default that used to live in

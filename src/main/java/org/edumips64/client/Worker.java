@@ -83,6 +83,10 @@ public class Worker implements EntryPoint {
             boolean forwardingEnabled = data.getAsAny("enabled").asBoolean();
             postMessage(withMethod(simulator.setForwarding(forwardingEnabled), method));
             break;
+          case "setdelayslot":
+            boolean delaySlotEnabled = data.getAsAny("enabled").asBoolean();
+            postMessage(withMethod(simulator.setDelaySlot(delaySlotEnabled), method));
+            break;
           case "setcacheconfig":
             JsPropertyMap<Object> config = Js.cast(data.get("config"));
             JsPropertyMap<Object> l1d = Js.cast(config.get("l1d"));

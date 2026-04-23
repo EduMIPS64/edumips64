@@ -22,16 +22,19 @@ const Settings = ({
   setAccordionAlerts,
   forwarding,
   setForwarding,
+  delaySlot,
+  setDelaySlot,
   stepStride,
   setStepStride,
   executionDelayMs,
   setExecutionDelayMs,
   status,
 }) => {
-  // Forwarding affects the CPU pipeline behavior and resets the CPU when
-  // changed, so we only allow toggling it when the simulator is not running
-  // a program. This mirrors the way `CacheConfig` grays out its inputs.
-  const forwardingDisabled = status === 'RUNNING';
+  // Forwarding and delay slot affect the CPU pipeline behavior and reset the
+  // CPU when changed, so we only allow toggling them when the simulator is
+  // not running a program. This mirrors the way `CacheConfig` grays out its
+  // inputs.
+  const pipelineDisabled = status === 'RUNNING';
   return (
     <Box
       sx={{
@@ -105,7 +108,7 @@ const Settings = ({
               onChange={(e) => setForwarding(e.target.checked)}
               color="primary"
               size="small"
-              disabled={forwardingDisabled}
+              disabled={pipelineDisabled}
               inputProps={{ 'data-testid': 'forwarding-switch' }}
             />
           }
@@ -113,10 +116,34 @@ const Settings = ({
             <Typography
               sx={{
                 fontSize: '0.85rem',
-                color: forwardingDisabled ? 'text.disabled' : 'text.primary',
+                color: pipelineDisabled ? 'text.disabled' : 'text.primary',
               }}
             >
               CPU Forwarding
+            </Typography>
+          }
+        />
+      </Box>
+      <Box>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={delaySlot}
+              onChange={(e) => setDelaySlot(e.target.checked)}
+              color="primary"
+              size="small"
+              disabled={pipelineDisabled}
+              inputProps={{ 'data-testid': 'delay-slot-switch' }}
+            />
+          }
+          label={
+            <Typography
+              sx={{
+                fontSize: '0.85rem',
+                color: pipelineDisabled ? 'text.disabled' : 'text.primary',
+              }}
+            >
+              Delay Slot
             </Typography>
           }
         />

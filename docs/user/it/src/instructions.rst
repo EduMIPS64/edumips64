@@ -455,6 +455,14 @@ qual volta viene effettuato un fetch inutile. In tal caso, due istruzioni
 vengono rimosse dalla pipeline, ed il contatore degli stalli dovuti ai salti
 effettuati viene incrementato di due unità.
 
+In alternativa, EduMIPS64 supporta il classico **delay slot** dei MIPS.
+Quando l'opzione delay slot è abilitata (tramite la voce *Abilita delay slot*
+nella finestra di configurazione), l'istruzione immediatamente successiva a
+un salto o a un branch non viene rimossa dalla pipeline: viene mantenuta ed
+eseguita come parte del normale flusso del programma, prima dell'istruzione
+di destinazione del salto. L'opzione è disabilitata per default, per
+mantenere la compatibilità con i programmi esistenti.
+
 Ecco la lista delle istruzioni di controllo del flusso di tipo R:
 
 * `JALR rs`

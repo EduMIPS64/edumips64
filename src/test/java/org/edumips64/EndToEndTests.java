@@ -78,6 +78,7 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     int rawStalls, wawStalls, memStalls, divStalls;
     String traceFile;
     RegisterFP[] fpRegisters;
+    long[] registerValues;
 
     CpuTestStatus(CPU cpu, String dineroTrace) {
       cycles = cpu.getCycles();
@@ -87,6 +88,13 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
       memStalls = cpu.getStructuralStallsMemory();
       divStalls = cpu.getStructuralStallsDivider();
       traceFile = dineroTrace;
+
+      // Snapshot GPR values so they can be inspected after the CPU is reset.
+      Register[] cpuRegisters = cpu.getRegisters();
+      registerValues = new long[cpuRegisters.length];
+      for (int i = 0; i < cpuRegisters.length; ++i) {
+        registerValues[i] = cpuRegisters[i].getValue();
+      }
 
       // Deep copy the FP Registers.
       RegisterFP cpuFPRegisters[] = cpu.getRegistersFP();
@@ -595,6 +603,39 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   @Test(timeout=2000)
   public void storeAfterLoad() throws Exception {
     runMipsTest("store-after-load.s");
+  }
+
+  /** Delay slot tests: run the same program with the delay-slot option off
+   *  and on, and verify that the instruction following the jump only runs
+   *  when the option is enabled. */
+  @Test(timeout=2000)
+  public void testDelaySlotDisabled() throws Exception {
+    boolean previous = config.getBoolean(ConfigKey.DELAY_SLOT);
+    try {
+      config.putBoolean(ConfigKey.DELAY_SLOT, false);
+      CpuTestStatus status = runMipsTest("delay-slot.s");
+      // Without delay slot, the instruction after J is flushed and r2 stays 0,
+      // so r1 also stays 0.
+      assertEquals(0, status.registerValues[1]);
+      assertEquals(0, status.registerValues[2]);
+    } finally {
+      config.putBoolean(ConfigKey.DELAY_SLOT, previous);
+    }
+  }
+
+  @Test(timeout=2000)
+  public void testDelaySlotEnabled() throws Exception {
+    boolean previous = config.getBoolean(ConfigKey.DELAY_SLOT);
+    try {
+      config.putBoolean(ConfigKey.DELAY_SLOT, true);
+      CpuTestStatus status = runMipsTest("delay-slot.s");
+      // With delay slot enabled, the instruction following J runs and sets
+      // r2 to 1; the target then copies r2 into r1.
+      assertEquals(1, status.registerValues[1]);
+      assertEquals(1, status.registerValues[2]);
+    } finally {
+      config.putBoolean(ConfigKey.DELAY_SLOT, previous);
+    }
   }
 
   /* ------- FPU TESTS -------- */
