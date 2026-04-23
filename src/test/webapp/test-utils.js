@@ -68,18 +68,16 @@ async function loadProgram(page, program) {
   // Remove the overlay if present before interacting
   await removeOverlay(page);
 
-  const inputArea = page.locator('.monaco-editor textarea.inputarea');
-
-  // Focus Monaco's hidden textarea (the real input target)
-  // Use force: true because Monaco's text layer intercepts pointer events
-  await inputArea.click({ force: true });
-
-  // Clear existing text
-  await page.keyboard.press('ControlOrMeta+a');
-  await page.keyboard.press('Backspace');
-
-  // Insert text in one go (more reliable than typing, preserves newlines)
-  await page.keyboard.insertText(program);
+  // Set the editor content via Monaco's API. This is more reliable than
+  // clicking the hidden textarea + keyboard shortcuts, which can fail on
+  // Firefox ("Element is outside of the viewport") and WebKit due to how
+  // Monaco positions its internal <textarea>.
+  await page.evaluate((code) => {
+    const model = window.monaco.editor.getModels()[0];
+    if (model) {
+      model.setValue(code);
+    }
+  }, program);
 
   // Remove overlay again before clicking Load
   await removeOverlay(page);

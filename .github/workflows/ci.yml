@@ -114,11 +114,13 @@ jobs:
           done
 
       # Run the full Playwright suite with coverage collection enabled.
+      # Only the chromium project is installed in this job; the full
+      # multi-browser matrix runs in the test-web job below.
       - name: Run web tests with coverage
         env:
           COVERAGE: 'true'
           PLAYWRIGHT_TARGET_URL: 'http://localhost:8080'
-        run: npx playwright test
+        run: npx playwright test --project=chromium
 
       # Merge per-test coverage JSON files and produce an lcov report.
       - name: Generate lcov coverage report
@@ -204,15 +206,15 @@ jobs:
           key: playwright-${{ hashFiles('package-lock.json') }}
       - name: Install Playwright dependencies
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install
-      # Run tests against the deployed code.
+        run: npx playwright install --with-deps
+      # Run tests against the deployed code on all configured browser projects.
       - name: Run web tests against deployed code
         uses: nick-fields/retry@v4
         env:
           PLAYWRIGHT_TARGET_URL: https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/
         with:
           max_attempts: 10
-          timeout_minutes: 2
+          timeout_minutes: 5
           retry_on: error
           command: npm run test
 

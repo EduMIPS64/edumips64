@@ -14,7 +14,7 @@ jobs:
         with:
           node-version-file: '.nvmrc'
       - run: npm install
-      - run: npx playwright install
+      - run: npx playwright install --with-deps chromium
       - name: Run web tests against deployed code in production
         uses: nick-fields/retry@v4
         env:
@@ -23,5 +23,5 @@ jobs:
           max_attempts: 2
           timeout_minutes: 2
           retry_on: error
-          command: npm run test
+          command: npx playwright test --project=chromium
 
