@@ -99,6 +99,15 @@ public class Simulator {
     return resultFactory.Success();
   }
 
+  public Result setDelaySlot(boolean enabled) {
+    // The CPU reads this flag dynamically on every step from the ConfigStore.
+    // Update the config *before* resetting the CPU so any component that
+    // re-reads the setting during reset observes the new value.
+    config.putBoolean(ConfigKey.DELAY_SLOT, enabled);
+    cpu.reset();
+    return resultFactory.Success();
+  }
+
   public Result setCacheConfig(CacheConfig l1d_config, CacheConfig l1i_config)  {
     cpu.reset();
     cachesim.getL1InstructionCache().setConfig(l1i_config);
