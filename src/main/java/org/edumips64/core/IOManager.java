@@ -72,6 +72,12 @@ public class IOManager {
   /** Truncate the file if it exists */
   public final int O_TRUNC = 0x10;  // 10000
 
+  /** File descriptor used for standard input. */
+  public static final int STDIN_FD = 0;
+
+  /** File descriptor used for standard output. */
+  public static final int STDOUT_FD = 1;
+
   private Map<Integer, Reader> ins;
   private Map<Integer, Writer> outs;
 
@@ -107,6 +113,16 @@ public class IOManager {
     fileUtils = fu;
   }
 
+  /**
+   * Whether the underlying environment supports a real filesystem. Returns
+   * {@code false} for environments like the web UI that are backed by
+   * {@link org.edumips64.utils.io.NullFileUtils}, signalling to callers that
+   * file I/O syscalls cannot be served.
+   */
+  public boolean supportsFileSystem() {
+    return fileUtils.supportsFileSystem();
+  }
+
   /** Closes the specified file descriptor.
    *  @param fd the file descriptor to close
    */
@@ -140,7 +156,7 @@ public class IOManager {
    *  @param flags combination of the flags O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_APPEND, O_TRUNC
    */
   public int open(String pathname, int flags) throws OpenException, IOManagerException {
-    // TODO: gestire combinazioni non valide tipo O_RDONLY || O_APPEND?
+    // TODO: handle invalid flag combinations like O_RDONLY || O_APPEND?
     if (((flags & O_RDONLY) != O_RDONLY) && (flags & O_WRONLY) != O_WRONLY) {
       throw new IOManagerException("NOOPENMODESPECIFIED");
     }

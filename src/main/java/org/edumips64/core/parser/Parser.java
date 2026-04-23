@@ -32,7 +32,6 @@ package org.edumips64.core.parser;
 import org.edumips64.core.Converter;
 import org.edumips64.core.FCSRRegister;
 import org.edumips64.core.IrregularStringOfBitsException;
-import org.edumips64.core.IrregularStringOfHexException;
 import org.edumips64.core.IrregularWriteOperationException;
 import org.edumips64.core.Memory;
 import org.edumips64.core.MemoryElement;
@@ -417,29 +416,23 @@ public class Parser {
                 memoryCount++;
 
                 try {
-                  if (Converter.isHexNumber(parameters)) {
-                    parameters = Converter.hexToLong(parameters);
-                  }
-
-                  if (Converter.isInteger(parameters)) {
-                    int num = Integer.parseInt(parameters);
-
-                    for (int tmpi = 0; tmpi < num; tmpi++) {
-                      if (tmpi % 8 == 0 && tmpi != 0) {
-                        tmpMem = mem.getCellByIndex(memoryCount);
-                        memoryCount++;
-                        posInWord = 0;
-                      }
-
-                      tmpMem.writeByte(0, posInWord++);
-                    }
-                  } else {
+                  // Accept decimal, hexadecimal (0x) and binary (0b) literals.
+                  long numLong = Converter.parseImmediate(parameters);
+                  if (numLong < 0 || numLong > Integer.MAX_VALUE) {
                     throw new NumberFormatException();
                   }
+                  int num = (int) numLong;
+
+                  for (int tmpi = 0; tmpi < num; tmpi++) {
+                    if (tmpi % 8 == 0 && tmpi != 0) {
+                      tmpMem = mem.getCellByIndex(memoryCount);
+                      memoryCount++;
+                      posInWord = 0;
+                    }
+
+                    tmpMem.writeByte(0, posInWord++);
+                  }
                 } catch (NumberFormatException ex) {
-                  errors.addError("INVALIDVALUE", row, column + 1, line);
-                  continue;
-                } catch (IrregularStringOfHexException ex) {
                   errors.addError("INVALIDVALUE", row, column + 1, line);
                   continue;
                 }
@@ -478,7 +471,7 @@ public class Parser {
               try {
                 symTab.setCellLabel(memoryCount * 8, label);
               } catch (SameLabelsException e) {
-                // TODO: errore del parser
+                // TODO: parser error
                 logger.warning("Label " + label + " is already assigned");
               }
             } else if (section == FileSection.TEXT) {
@@ -637,7 +630,7 @@ public class Parser {
                       }
                       // when hexadecimal, the range 32768 to 65536 is actually the signed value will be between -32738 and -1
                       // for example: 0xffff is not 65535, but -1
-                      if ( Converter.isHexNumber(paramValue) ) {
+                      if ( Converter.isHexNumber(paramValue) || Converter.isBinNumber(paramValue) ) {
                         if ( immediateValue >= 32768 && immediateValue<=65535) {
                           immediateValue -= 65536;
                         }
@@ -691,28 +684,49 @@ public class Parser {
                     // %L: Memory Label.
                     } else if (type == 'L') {
                       try {
-                        MemoryElement tmpMem;
+                        String trimmed = paramValue.trim();
 
-                        if (paramValue.equals("")) {
+                        if (trimmed.isEmpty()) {
                           tmpInst.getParams().add(0);
-                        } else if (Converter.isInteger(paramValue.trim())) {
-                          int tmp = Integer.parseInt(paramValue.trim());
-
-                          if (tmp < Memory.MIN_OFFSET_BYTES || tmp > Memory.MAX_OFFSET_BYTES) {
-                            String er = "LABELADDRESSINVALID";
-
-                            errors.addError(er, row, line.indexOf(paramValue) + 1, line);
+                        } else if (Converter.isInteger(trimmed)
+                            || Converter.isHexNumber(trimmed)
+                            || Converter.isBinNumber(trimmed)) {
+                          // Pure numeric literal: enforce the 16-bit signed offset bounds.
+                          long tmpLong;
+                          try {
+                            tmpLong = Converter.parseImmediate(trimmed);
+                          } catch (NumberFormatException ex) {
+                            errors.addError("LABELADDRESSINVALID", row, line.indexOf(paramValue) + 1, line);
                             column = line.length();
                             paramStart = paramEnd + 1;
                             tmpInst.getParams().add(0);
                             continue;
                           }
 
-                          tmpInst.getParams().add(tmp);
-                        } else {
-                          tmpMem = symTab.getCell(paramValue.trim());
-                          tmpInst.getParams().add(tmpMem.getAddress());
+                          if (tmpLong < Memory.MIN_OFFSET_BYTES || tmpLong > Memory.MAX_OFFSET_BYTES) {
+                            errors.addError("LABELADDRESSINVALID", row, line.indexOf(paramValue) + 1, line);
+                            column = line.length();
+                            paramStart = paramEnd + 1;
+                            tmpInst.getParams().add(0);
+                            continue;
+                          }
 
+                          tmpInst.getParams().add((int) tmpLong);
+                        } else {
+                          // Expression containing at least one label, possibly combined
+                          // with numeric offsets using the + and - operators.
+                          long tmpLong;
+                          try {
+                            tmpLong = parseLabelExpression(trimmed);
+                          } catch (NumberFormatException ex) {
+                            errors.addError("LABELADDRESSINVALID", row, line.indexOf(paramValue) + 1, line);
+                            column = line.length();
+                            paramStart = paramEnd + 1;
+                            tmpInst.getParams().add(0);
+                            continue;
+                          }
+
+                          tmpInst.getParams().add((int) tmpLong);
                         }
 
                         paramStart = paramEnd + 1;
@@ -828,8 +842,8 @@ public class Parser {
                 errors.addError("SAMELABEL", row, 1, line);
                 column = line.length();
               }
-              // Il finally e' totalmente inutile, ma è bello utilizzarlo per la
-              // prima volta in un programma ;)
+              // The finally block is completely useless here, but it's nice to use it
+              // for the first time in a program ;)
               finally {
                 pendingLabels.clear();
               }
@@ -940,6 +954,79 @@ public class Parser {
     return "";
   }
 
+  /** Parses a memory label expression composed of one or more operands
+   *  separated by the {@code +} and {@code -} operators. Each operand can
+   *  be either a numeric literal (decimal, hexadecimal with {@code 0x} prefix
+   *  or binary with {@code 0b} prefix) or a memory label defined in the
+   *  {@code .data} section. Whitespace around operators and operands is
+   *  allowed. A leading {@code +} or {@code -} is also accepted.
+   *
+   *  Examples of accepted expressions: {@code label}, {@code label+4},
+   *  {@code label-4}, {@code label+label2}, {@code label-8+16},
+   *  {@code 0+label}, {@code -8+label}.
+   *
+   *  @param expression the expression to parse (must be non-empty)
+   *  @return the numeric value of the expression
+   *  @throws NumberFormatException if the expression is malformed (e.g.
+   *          an empty operand caused by consecutive operators or a trailing
+   *          operator) or contains an operand that is neither a valid
+   *          numeric literal nor a known memory label
+   *  @throws MemoryElementNotFoundException if an operand is a label that
+   *          does not exist in the symbol table
+   */
+  private long parseLabelExpression(String expression)
+      throws MemoryElementNotFoundException {
+    if (expression == null || expression.isEmpty()) {
+      throw new NumberFormatException("Empty label expression");
+    }
+
+    long sum = 0;
+    int sign = 1;
+    int i = 0;
+
+    // Optional leading sign (e.g. "-8+label").
+    char first = expression.charAt(0);
+    if (first == '+' || first == '-') {
+      sign = (first == '-') ? -1 : 1;
+      i = 1;
+    }
+
+    int tokenStart = i;
+    int len = expression.length();
+    while (i <= len) {
+      char c = (i < len) ? expression.charAt(i) : '+';
+      boolean atEnd = (i == len);
+      if (atEnd || c == '+' || c == '-') {
+        sum += sign * evaluateOperand(expression.substring(tokenStart, i), expression);
+        sign = (c == '-') ? -1 : 1;
+        tokenStart = i + 1;
+      }
+      i++;
+    }
+
+    return sum;
+  }
+
+  /** Evaluates a single operand of a label expression. The operand is either
+   *  a numeric literal (base 10, 16 or 2) or a memory label defined in the
+   *  {@code .data} section.
+   */
+  private long evaluateOperand(String rawToken, String expression)
+      throws MemoryElementNotFoundException {
+    String token = rawToken.trim();
+    if (token.isEmpty()) {
+      throw new NumberFormatException("Empty operand in label expression: " + expression);
+    }
+    if (Converter.isInteger(token)
+        || Converter.isHexNumber(token)
+        || Converter.isBinNumber(token)) {
+      return Converter.parseImmediate(token);
+    }
+    // Not a numeric literal: resolve the operand via the symbol table.
+    // Propagates MemoryElementNotFoundException on miss.
+    return symTab.getCell(token).getAddress();
+  }
+
   /** Check if is a valid string for a register
    *  @param reg the string to validate
    *  @return -1 if reg isn't a valid register, else a number of register
@@ -949,7 +1036,7 @@ public class Parser {
     try {
       int num;
 
-      if (reg.charAt(0) == 'r' || reg.charAt(0) == 'R' || reg.charAt(0) == '$')    //ci sono altri modi di scrivere un registro???
+      if (reg.charAt(0) == 'r' || reg.charAt(0) == 'R' || reg.charAt(0) == '$')    // are there other ways to write a register???
         if (Converter.isInteger(reg.substring(1))) {
           num = Integer.parseInt(reg.substring(1));
 
@@ -1065,31 +1152,33 @@ public class Parser {
         continue;
       }
 
-      boolean is_hex = (Converter.isHexNumber(val));
-      if (is_hex) {
-        try {
-          // handle the corner case of unlimited hex strings
-          if (numBit ==64 && is_hex && val.length()>18) {
-            throw new IrregularStringOfHexException();
-          }
-          val = Converter.hexToLong(val);
-        } catch (IrregularStringOfHexException e) {
-          errors.addError("INVALIDVALUE", row, i + 1, line);
-          i = line.length();
-          continue;
+      boolean is_hex = Converter.isHexNumber(val);
+      boolean is_bin = Converter.isBinNumber(val);
+      boolean is_unsigned = is_hex || is_bin;
+      long num;
+      try {
+        // handle the corner case of unlimited hex/binary strings for 64-bit values.
+        if (numBit == 64 && is_hex && val.length() > 18) {
+          throw new NumberFormatException();
         }
+        if (numBit == 64 && is_bin && val.length() > 66) {
+          throw new NumberFormatException();
+        }
+        // Convert the literal (decimal, 0x hex or 0b binary) to a long, and then check for overflow.
+        num = Converter.parseImmediate(val);
+      } catch (NumberFormatException e) {
+        errors.addError("INVALIDVALUE", row, i + 1, line);
+        i = line.length();
+        continue;
       }
 
       try {
-        // Convert the integer to a long, and then check for overflow.
-        long num = Long.parseLong(val);
-
-        if (!is_hex && (num < - (Converter.powLong(2, numBit - 1)) || num > (Converter.powLong(2, numBit - 1) - 1)) &&  numBit != 64) {
+        if (!is_unsigned && (num < - (Converter.powLong(2, numBit - 1)) || num > (Converter.powLong(2, numBit - 1) - 1)) &&  numBit != 64) {
           throw new NumberFormatException();
         }
 
-        // hex string values should be allowed independently of signed/unsigned interpretation
-        if (is_hex && (num > (Converter.powLong(2, numBit) - 1)) && numBit!=64) {
+        // hex/binary string values should be allowed independently of signed/unsigned interpretation
+        if (is_unsigned && (num > (Converter.powLong(2, numBit) - 1)) && numBit!=64) {
           throw new NumberFormatException();
         }
 

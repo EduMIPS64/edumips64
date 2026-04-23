@@ -22,6 +22,8 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Typography } from '@mui/material';
+import { useSetting } from '../settings/useSetting';
+import { SettingKey } from '../settings/SettingKey';
 
 // Define the set of allowed languages (should match what's shown in the language Select)
 const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
@@ -290,7 +292,10 @@ function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }) {
 
 export default function HelpDialog(props) {
   const [tabValue, setTabValue] = React.useState(0);
-  const [language, setLanguage] = React.useState('en');
+  // The `useSetting` hook sanitizes the persisted value against the
+  // ALLOWED_LANGUAGES validator declared in the settings schema, so an
+  // unexpected value (e.g. from an older schema version) falls back to 'en'.
+  const [language, setLanguage] = useSetting(SettingKey.HELP_LANGUAGE);
   const [currentPage, setCurrentPage] = React.useState('index.html');
   const iframeRef = React.useRef(null);
 

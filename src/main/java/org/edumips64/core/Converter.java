@@ -50,12 +50,12 @@ public class Converter {
       throw new IrregularStringOfBitsException();
     }
 
-    //se la stringa di bits Ãš lunga 32 bit
-    //ed Ãš composta da uno 1 e 31 0
-    //allora la conversione si deve fare a mano
-    //perchÃš il numero da ritornare Ãš -(2^32)
-    //e non si puÃ² utilizzare il valore positivo (2^32)
-    //con il tipo int :-(
+    // if the bit string is 32 bits long
+    // and consists of a 1 followed by 31 zeros
+    // then the conversion must be done manually
+    // because the number to return is -(2^32)
+    // and the positive value (2^32) cannot be used
+    // with the int type :-(
     if (!unsignd && bits.length() == 32 && isOverflow(bits)) {
       return OVERFLOW_32;
     }
@@ -89,12 +89,12 @@ public class Converter {
       throw new IrregularStringOfBitsException();
     }
 
-    //se la stringa di bits Ãš lunga 64 bit
-    //ed Ãš composta da uno 1 e 63 0
-    //allora la conversione si deve fare a mano
-    //perchÃš il numero da ritornare Ãš -(2^63)
-    //e non si puÃ² utilizzare il valore positivo (2^63)
-    //con il tipo long :-(
+    // if the bit string is 64 bits long
+    // and consists of a 1 followed by 63 zeros
+    // then the conversion must be done manually
+    // because the number to return is -(2^63)
+    // and the positive value (2^63) cannot be used
+    // with the long type :-(
     if (!unsignd && bits.length() == 64 && isOverflow(bits)) {
         return OVERFLOW_64;
     }
@@ -563,6 +563,42 @@ public class Converter {
     return true;
   }
 
+/** Check if a string is a binary number, i.e. starts with the '0b' (or '0B')
+   *  prefix followed by at least one binary digit (0 or 1).
+   *  @param num the string to validate
+   *  @return true if num is a binary number in the specified format, otherwise false
+   */
+  public static boolean isBinNumber(String num) {
+    // Need at least 3 characters: 0, b (or B) and a digit.
+    int len = num.length();
+    if (len < 3) {
+      return false;
+    }
+
+    // The first must be a 0, the second a b or B.
+    int cur = 0;
+    if (num.charAt(cur) != '0') {
+      return false;
+    }
+    cur++;
+    char b = num.charAt(cur);
+    if (b != 'b' && b != 'B') {
+      return false;
+    }
+
+    // Skip the 'b'/'B' prefix.
+    cur++;
+
+    // Check the rest of the number.
+    for (; cur < num.length(); cur++) {
+      char c = num.charAt(cur);
+      if (c != '0' && c != '1') {
+        return false;
+      }
+    }
+    return true;
+  }
+
 /** Check if a string is a Hex number
    *  @param num the string to validate
    *  @return true if num is a number, else false
@@ -605,10 +641,12 @@ public class Converter {
    * Parses an immediate value without any overflow/underflow check.
    * 
    * The immediate value may be preceded by the # character (which is ignored).
-   * The immediate value may be encoded in base 10 or in base 16. In the latter
-   * case, it must be preceded by the '0x' or '0X' prefix.
+   * The immediate value may be encoded in base 10, base 16 or base 2. For a
+   * base-16 value it must be preceded by the '0x' or '0X' prefix, and for a
+   * base-2 value it must be preceded by the '0b' or '0B' prefix.
    * 
-   * If the # character is used in a base-16 immediate, it must precede the 0x prefix.
+   * If the # character is used with a base-16 or base-2 immediate, it must
+   * precede the base prefix.
    * 
    * @param immediate a string representing an immediate value.
    * @throws NumberFormatException if the number is not well-formatted.
@@ -624,14 +662,53 @@ public class Converter {
       immediate = immediate.substring(1);
     }
 
-    // Check if it's a hexadecimal.
+    // Check the base (hexadecimal, binary or decimal).
     int base = 10;
     if (immediate.length() >= 3 && immediate.substring(0, 2).compareToIgnoreCase("0x") == 0) {
       immediate = immediate.substring(2);
       base = 16;
+    } else if (immediate.length() >= 3 && immediate.substring(0, 2).compareToIgnoreCase("0b") == 0) {
+      immediate = immediate.substring(2);
+      base = 2;
     }
 
-    return Long.parseLong(immediate, base);
+    // For hex/binary we allow the full unsigned 64-bit range, which may not
+    // fit as a signed long (e.g. 0xffffffffffffffff). Fall back to manual
+    // bitwise accumulation when signed parsing overflows. We avoid
+    // Long.parseUnsignedLong because it is not available in the GWT JRE
+    // emulation used to build the web worker.
+    try {
+      return Long.parseLong(immediate, base);
+    } catch (NumberFormatException ex) {
+      if (base == 16 || base == 2) {
+        return parseUnsignedLongBits(immediate, base);
+      }
+      throw ex;
+    }
+  }
+
+  /**
+   * Parses the given string as an unsigned long in the given base (must be 2
+   * or 16) and returns it as a signed long with the same bit pattern.
+   */
+  private static long parseUnsignedLongBits(String s, int base) {
+    if (s.length() == 0) {
+      throw new NumberFormatException("Invalid immediate: empty string.");
+    }
+    int maxDigits = (base == 16) ? 16 : 64;
+    if (s.length() > maxDigits) {
+      throw new NumberFormatException("Immediate value too large: " + s);
+    }
+    int shift = (base == 16) ? 4 : 1;
+    long result = 0;
+    for (int i = 0; i < s.length(); i++) {
+      int digit = Character.digit(s.charAt(i), base);
+      if (digit < 0) {
+        throw new NumberFormatException("Invalid digit '" + s.charAt(i) + "' for base " + base);
+      }
+      result = (result << shift) | digit;
+    }
+    return result;
   }
 }
 

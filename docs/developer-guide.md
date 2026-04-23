@@ -150,7 +150,34 @@ Both `build` and `build-dbg` produce a `ui.js` file in the `out/web` directory.
 
 The code was tested with Node.JS 16. The CI environment uses this version.
 
-There are some basic Playwright tests for the web UI, which can be run with `npx run playwright`.
+There are Playwright tests for the web UI, which can be run with `npm test`.
+
+#### Web UI code coverage
+
+The web UI tests can generate Istanbul code coverage data. This is used to upload
+coverage metrics to [codecov.io](https://codecov.io) under the `web` flag.
+
+To run tests with coverage locally:
+
+1. Build the web application with coverage instrumentation:
+   ```
+   BABEL_ENV=coverage npm run build-dbg
+   ```
+2. Start a local server serving `out/web` on port 8080 (e.g. `python3 -m http.server 8080 --directory out/web`).
+3. Run the tests with coverage collection enabled:
+   ```
+   COVERAGE=true npm test
+   ```
+4. Generate the HTML/lcov report:
+   ```
+   npm run report:coverage
+   ```
+
+The coverage report is written to `coverage/lcov.info` (and `coverage/index.html` for the
+HTML report). Both `.nyc_output/` and `coverage/` are excluded from version control.
+
+In CI, the `test-web-coverage` job in `ci.yml` performs these steps automatically and
+uploads the result to Codecov using the `CODECOV_TOKEN` secret.
 
 ### Source code structure
 
@@ -219,6 +246,28 @@ sure your new class behaves as required.
 The Swing UI code is explicitly excluded from code coverage reports because
 writing tests for it is quite difficult and might not be worth it since we
 might be migrating to a new shiny web-based frontend.
+
+#### Instruction coverage check
+
+Every instruction implemented under `src/main/java/org/edumips64/core/is/`
+must be exercised by at least one `.s` program under `src/test/resources/`.
+The `utils/find-instructions.sh` script enforces this: it lists every
+non-abstract instruction class, collects every mnemonic referenced in the
+assembly test files, and exits non-zero if there is any instruction that
+is not used in at least one test.
+
+The script runs in CI as part of the desktop build, so a pull request that
+adds a new instruction without also adding a test that uses it will fail
+the build. When you add a new instruction, make sure to add (or extend) a
+`.s` test under `src/test/resources/` that uses it, and register the test
+in `EndToEndTests.java`.
+
+A small allow-list inside the script (`EXCLUDE_REGEX`) covers internal
+pseudo-instructions that are not user-addressable and therefore cannot
+appear in assembly source (for example `BUBBLE`, which the pipeline
+inserts to represent stalls, and `DDIV3`, which is the Java class name
+for the 3-operand form of the `DDIV` mnemonic). Only extend this list
+for entries that are genuinely not reachable from MIPS64 assembly.
 
 ### Windows
 

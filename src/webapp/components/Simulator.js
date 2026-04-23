@@ -32,6 +32,8 @@ import SampleProgram from '../data/SampleProgram';
 import { debounce, isEqual } from 'lodash';
 import Settings from './Settings';
 import CacheConfig from "./CacheConfig";
+import { useSetting } from '../settings/useSetting';
+import { SettingKey } from '../settings/SettingKey';
 
 const Simulator = ({worker, initialState, appInsights}) => {
   // The amount of steps to run in multi-step executions.
@@ -52,20 +54,34 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [stdout, setStdout] = React.useState('');
   const [inputRequest, setInputRequest] = React.useState(null);
 
-  const [viMode, setViMode] = React.useState(false);
-  const [fontSize, setFontSize] = React.useState(14);
-  const [accordionAlerts, setAccordionAlerts] = React.useState(true);
+  const [viMode, setViMode] = useSetting(SettingKey.VI_MODE);
+  const [fontSize, setFontSize] = useSetting(SettingKey.FONT_SIZE);
+  const [accordionAlerts, setAccordionAlerts] = useSetting(SettingKey.ACCORDION_ALERTS);
+  const [forwarding, setForwarding] = useSetting(SettingKey.FORWARDING);
+  const [stepStride, setStepStride] = useSetting(SettingKey.STEP_STRIDE);
+  const [executionDelayMs, setExecutionDelayMs] = useSetting(
+    SettingKey.EXECUTION_DELAY_MS,
+  );
+
+  // `executionDelayMs` is read inside async callbacks that were captured when
+  // a step batch started (potentially many batches ago). Mirror the latest
+  // value in a ref so the delay applied between batches always reflects the
+  // *current* setting, not the one that was active when "Run All" was
+  // pressed. This lets the user tweak the delay live, mid-run.
+  const executionDelayRef = React.useRef(executionDelayMs);
+  React.useEffect(() => {
+    executionDelayRef.current = executionDelayMs;
+  }, [executionDelayMs]);
+
+  // Keep the simulator worker's forwarding flag in sync with the persisted
+  // setting. Runs once on mount (so a value restored from localStorage is
+  // pushed to the worker) and whenever the user toggles the switch.
+  React.useEffect(() => {
+    worker.setForwarding(forwarding);
+  }, [forwarding]);
 
   // Track expanded state for each accordion
-  const [expandedAccordions, setExpandedAccordions] = React.useState({
-    stats: true,
-    pipeline: false,
-    registers: false,
-    memory: false,
-    stdout: false,
-    cache: true,
-    settings: true,
-  });
+  const [expandedAccordions, setExpandedAccordions] = useSetting(SettingKey.EXPANDED_ACCORDIONS);
 
   // Track if data has changed while accordion was collapsed
   const [accordionChanges, setAccordionChanges] = React.useState({
@@ -236,26 +252,82 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const updateState = (result) => {
     console.log('Updating state.');
 
-    setExecuting(false);
     applyResultState(result);
 
     // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
     // Runtime errors should not cause multiple alert prompting to avoid webui getting stuck
     if (!result.success && result.errorMessage !== 'Parsing errors.') {
-      alert(result.errorMessage);
+      // Synchronous exceptions carry structured info (errorCode, errorInstruction, errorStage).
+      // When present, compose a clearer, multi-line alert message.
+      let message = result.errorMessage;
+      if (result.errorCode) {
+        message = `Synchronous exception: ${result.errorMessage}`;
+        if (result.errorInstruction && result.errorStage) {
+          message += `\n\nInstruction: ${result.errorInstruction}\nPipeline stage: ${result.errorStage}`;
+        }
+      }
+      alert(message);
       stopCode();
+      setExecuting(false);
+      // stopCode() queues state updates (setRunAll(false), setMustPause(true))
+      // and a worker.reset(), but those don't take effect within this closure.
+      // Return early to avoid falling through to the "schedule more steps"
+      // branch below, which would otherwise race worker.reset() with a new
+      // step() call against an already-reset (READY) CPU and surface a
+      // spurious "Cannot run in state READY" alert.
+      return;
     }
 
+    // Note: we intentionally keep `executing === true` across inter-batch
+    // delays when more steps are queued. Clearing `executing` between
+    // batches would toggle the toolbar buttons (Run/Step/Stop becoming
+    // enabled, Pause becoming disabled) every stride, which looks like a
+    // flash during long runs with a non-zero execution delay. The user
+    // should see the same "running" controls whether the worker is busy
+    // stepping or we're simply waiting out the inter-batch delay.
     if (result.status !== 'RUNNING' || mustPause || result.encounteredBreak) {
       setStepsToRun(0);
       setMustPause(false);
       setRunAll(false);
+      setExecuting(false);
     } else if (stepsToRun > 0) {
       console.log('Steps left: ' + stepsToRun);
-      stepCode(stepsToRun);
+      scheduleNextBatch(() => stepCode(stepsToRun));
     } else if (runAll) {
-      stepCode(INTERNAL_STEPS_STRIDE);
+      scheduleNextBatch(() => stepCode(INTERNAL_STEPS_STRIDE));
+    } else {
+      // No further batches scheduled (e.g. a plain Single Step finishing):
+      // we're done executing for now.
+      setExecuting(false);
     }
+  };
+
+  // Pending timeout id for a delayed follow-up batch, so that stopping the
+  // simulation cancels any batch that was sleeping between strides instead
+  // of having it fire after `worker.reset()` and surface a spurious error.
+  const nextBatchTimeout = React.useRef(null);
+
+  const cancelPendingBatch = () => {
+    if (nextBatchTimeout.current !== null) {
+      clearTimeout(nextBatchTimeout.current);
+      nextBatchTimeout.current = null;
+    }
+  };
+
+  // Schedule the next internal step batch, inserting the user-configured
+  // execution delay so long runs are visually paced. A delay of 0 ms (the
+  // default) runs batches back-to-back, matching the pre-existing behavior.
+  const scheduleNextBatch = (fn) => {
+    cancelPendingBatch();
+    const delay = executionDelayRef.current;
+    if (delay <= 0) {
+      fn();
+      return;
+    }
+    nextBatchTimeout.current = setTimeout(() => {
+      nextBatchTimeout.current = null;
+      fn();
+    }, delay);
   };
 
   // Click handlers. Decoupled from business logic to place the telemetry hooks in the right place.
@@ -297,17 +369,30 @@ const Simulator = ({worker, initialState, appInsights}) => {
   };
 
   const stopCode = () => {
+    // If a batch was sleeping between strides, cancel it. In that case no
+    // worker result is in flight to flip `executing` back off via
+    // `updateState`, so clear it here too.
+    const hadPendingBatch = nextBatchTimeout.current !== null;
+    cancelPendingBatch();
     setMustPause(true);
     setRunAll(false);
     setStepsToRun(0);
     setInputRequest(null);
+    if (hadPendingBatch) {
+      setExecuting(false);
+    }
     worker.reset();  // Assuming simulator has a reset method
   };
 
   const clearCode = () => {
+    const hadPendingBatch = nextBatchTimeout.current !== null;
+    cancelPendingBatch();
     setCode(".data\n\n.code\n  SYSCALL 0\n");
     isResetting.current = true;
     setInputRequest(null);
+    if (hadPendingBatch) {
+      setExecuting(false);
+    }
     worker.reset();
     // Clear accordion change markers
     setAccordionChanges({
@@ -443,6 +528,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
           version={worker.version}
           status={status}
           prefersDarkMode={prefersDarkMode}
+          multiStepCount={stepStride}
         />
         <Grid container id="main-grid" disableEqualOverflow spacing={0}>
           <Grid id="left-panel" size={8}>
@@ -574,6 +660,13 @@ const Simulator = ({worker, initialState, appInsights}) => {
                   setFontSize={setFontSize}
                   accordionAlerts={accordionAlerts}
                   setAccordionAlerts={setAccordionAlerts}
+                  forwarding={forwarding}
+                  setForwarding={setForwarding}
+                  stepStride={stepStride}
+                  setStepStride={setStepStride}
+                  executionDelayMs={executionDelayMs}
+                  setExecutionDelayMs={setExecutionDelayMs}
+                  status={status}
                   showTitle={false}
                 />
               </AccordionDetails>
