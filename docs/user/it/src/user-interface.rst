@@ -227,6 +227,9 @@ Nella finestra di configurazione possono essere configurati vari aspetti del
 simulatore. La selezione del tasto "OK" causa il salvataggio delle modifiche
 apportate alla configurazione, mentre il tasto "Cancel" (o la semplice
 chiusura della finestra) comporta il mancato salvataggiu delle stesse.
+Il tasto "Ripristina predefiniti" riporta tutte le impostazioni ai valori
+predefiniti, previa conferma da parte dell'utente; è utile per recuperare
+una configurazione errata senza dover modificare manualmente ogni opzione.
 
 La sezione "Impostazioni generali" consente di configurare il forwarding ed il
 numero di passi da effettuare nella modalità Cicli multipli. Quando il

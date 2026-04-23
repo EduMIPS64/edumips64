@@ -122,7 +122,7 @@ public class Register extends BitSet64 {
       return Converter.binToLong(this.getBinString(), false);
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
-      this.reset(false);  //azzeriamo il registro
+      this.reset(false);  // reset the register
       return 0;
     }
   }
@@ -143,7 +143,7 @@ public class Register extends BitSet64 {
       s = getHexString();
     } catch (IrregularStringOfBitsException e) {
       e.printStackTrace();
-    } //Impossibile che si verifichi
+    } // this cannot happen
 
     return s;
   }

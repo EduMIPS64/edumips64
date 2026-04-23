@@ -34,9 +34,11 @@ import org.edumips64.core.is.BUBBLE;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
 import org.edumips64.core.is.InstructionBuilder;
+import org.edumips64.core.is.UnsupportedSyscallException;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.core.cache.CacheConfig;
+import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.InputNeededException;
@@ -53,6 +55,10 @@ public class Simulator {
   private StringWriter stdout;
   private IOManager iom;
   private WebInputReader stdin;
+  // Config store used by the CPU and the instruction builder. Held as a field
+  // so that runtime-tweakable settings (e.g. forwarding) can be updated from
+  // the worker protocol without recreating the whole simulator.
+  private ConfigStore config;
 
   // TODO: handle these errors more elegantly.
   private ParserMultiException lastParsingErrors = null;
@@ -65,7 +71,7 @@ public class Simulator {
   public Simulator() {
     info("Initializing the simulator");
     // Simulator initialization.
-    ConfigStore config = new InMemoryConfigStore(ConfigStore.defaults);
+    config = new InMemoryConfigStore(ConfigStore.defaults);
     memory = new Memory();
     symTab = new SymbolTable(memory);
     stdout = new StringWriter();
@@ -82,6 +88,15 @@ public class Simulator {
     resultFactory = new ResultFactory(cpu, memory, cachesim, stdout);
     supportedInstructions = instructionBuilder.getSupportedInstructionString();
     info("initialization complete!");
+  }
+
+  public Result setForwarding(boolean enabled) {
+    // The CPU reads this flag dynamically on every step from the ConfigStore.
+    // Update the config *before* resetting the CPU so any component that
+    // re-reads the setting during reset observes the new value.
+    config.putBoolean(ConfigKey.FORWARDING, enabled);
+    cpu.reset();
+    return resultFactory.Success();
   }
 
   public Result setCacheConfig(CacheConfig l1d_config, CacheConfig l1i_config)  {
@@ -134,7 +149,29 @@ public class Simulator {
       res.encounteredBreak = true;
       return res;
     } catch (InputNeededException e) {
-      return ResultFactory.AddParserErrors(resultFactory.InputRequested(e, steps), lastParsingErrors);
+      Result r = resultFactory.Success();
+      r = ResultFactory.AddInputNeeded(r, e, steps);
+      r = ResultFactory.AddParserErrors(r, lastParsingErrors);
+      return r;
+    } catch (SynchronousException e) {
+      // Synchronous exceptions (INTOVERFLOW, DIVZERO, FP traps, ...) are
+      // runtime errors. Build a Failure carrying a user-friendly message,
+      // then layer runtime-error info and any pending parser warnings on top.
+      warning("Synchronous exception: " + e.getCode());
+      Result r = resultFactory.Failure(SynchronousExceptionFormatter.format(e));
+      r = ResultFactory.AddRuntimeErrors(r, e);
+      r = ResultFactory.AddParserErrors(r, lastParsingErrors);
+      return r;
+    } catch (UnsupportedSyscallException e) {
+      // Unsupported SYSCALLs are runtime errors too. Route them through the
+      // same rich-error plumbing as SynchronousException so the Web UI can
+      // render errorCode / errorInstruction / errorStage.
+      warning("Unsupported syscall: " + e.getMessage());
+      SynchronousException sx = e.toSynchronousException();
+      Result r = resultFactory.Failure(e.getMessage());
+      r = ResultFactory.AddRuntimeErrors(r, sx);
+      r = ResultFactory.AddParserErrors(r, lastParsingErrors);
+      return r;
     } catch (Exception e) {
       warning("Error: " + e.toString());
       return ResultFactory.AddParserErrors(resultFactory.Failure(e.toString()), lastParsingErrors);

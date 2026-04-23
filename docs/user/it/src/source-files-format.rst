@@ -167,11 +167,12 @@ Le istruzioni possono accettare tre tipi di parametri:
   di registro (tra 0 e 31). Ad esempio, le scritture "r4", "R4" e "\$4"
   identificano tutt'e tre il quarto registro;
 * *Valori immediati* un valore immediato può essere un numero o
-  un'etichetta; il numero può essere specificato in base 10 o in base 16. I
-  numeri in base 10 sono inseriti semplicemente scrivendo il numero
+  un'etichetta; il numero può essere specificato in base 10, in base 16 o in
+  base 2. I numeri in base 10 sono inseriti semplicemente scrivendo il numero
   utilizzando l'usuale notazione decimale; i numeri in base 16 si inseriscono
-  aggiungendo all'inizio del numero il prefisso "0x". I valori immediati
-  possono essere preceduti dal carattere #;
+  aggiungendo all'inizio del numero il prefisso "0x"; i numeri in base 2 si
+  inseriscono aggiungendo all'inizio del numero il prefisso "0b". I valori
+  immediati possono essere preceduti dal carattere #;
 * *Indirizzi* un indirizzo è composto da un valore immediato
   seguito dal nome di un registro tra parentesi. Il valore del registro sarà
   usato come base, quello dell'immediato come offset.
@@ -183,6 +184,30 @@ Nel caso di immediati a 16 bit, come ad esempio i valori immediati delle
 istruzioni ALU I-Type, è possibile utilizzare come valore immediato un'etichetta
 di memoria. L'assembler usera come valore immediato l'indirizzo della locazione
 di memoria a cui l'etichetta punta.
+
+Aritmetica di offset sulle etichette
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Nella forma "indirizzo" di un parametro (ad esempio l'offset di un'istruzione
+di load o store) il valore immediato può essere una semplice espressione
+costituita da etichette di memoria e valori numerici combinati con gli
+operatori ``+`` e ``-``. È ammesso anche un segno ``+`` o ``-`` iniziale ed è
+consentito utilizzare spazi bianchi tra operandi e operatori. Ogni operando è
+un valore numerico (in base 10, 16 o 2) oppure un'etichetta di memoria
+definita nella sezione ``.data``; le etichette vengono sostituite con il loro
+indirizzo prima che l'espressione venga valutata.
+
+Ad esempio, dati ``data1: .word 42`` e ``data2: .word 43``, le seguenti forme
+sono tutte accettate::
+
+  lw r1, data1+8(r0)       ; carica da data1 con offset di 8 byte
+  lw r1, data1-8(r0)       ; carica da data1 con offset di -8 byte
+  lw r1, 0+data1(r0)       ; equivalente a data1(r0)
+  lw r1, data2-data1(r0)   ; differenza tra gli indirizzi di due etichette
+  lw r1, data1-8+16(r0)    ; sono supportate sequenze di + e -
+
+Espressioni con un operando vuoto (ad esempio ``data1+`` oppure
+``data1++0``) sono rifiutate come malformate e un'etichetta non definita
+all'interno dell'espressione genera il consueto errore "label not found".
 
 è possibile utilizzare gli alias standard MIPS per i primi 32 registri,
 mettendo in coda ai prefissi standard per i registri ("r", "$", "R") uno

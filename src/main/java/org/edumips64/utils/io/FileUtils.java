@@ -21,6 +21,17 @@ public abstract class FileUtils {
   public abstract Reader openReadOnly(String pathname) throws OpenException;
   public abstract Writer openWriteOnly(String pathname, boolean append) throws OpenException;
 
+  /**
+   * Whether this FileUtils implementation can actually interact with a
+   * filesystem. Environments without a usable filesystem (e.g. the Web UI
+   * backed by {@code NullFileUtils}) should return {@code false} so that
+   * callers such as SYSCALL can refuse unsupported operations with a clear
+   * error instead of pretending the call succeeded or silently failing.
+   */
+  public boolean supportsFileSystem() {
+    return true;
+  }
+
   /** Clean multiple tab or spaces in a bad format String //and converts  this String to upper case
    *  @param s the bad format String
    *  @return the cleaned String

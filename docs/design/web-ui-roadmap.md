@@ -88,9 +88,9 @@ implementation of the remaining features.
 2. ~~executing a MIPS64 assembly program~~
    1. ~~all at once~~
    1. ~~showing progress as time goes by~~
-      1. setting a customizable processor frequency (to show updates slowly)
+      1. ~~setting a customizable processor frequency (to show updates slowly)~~
    1. ~~step-by-step~~
-      1. with a customizable stride
+      1. ~~with a customizable stride~~
   1. ~~reset execution state while paused~~
 4. graceful handling of all errors, including parser errors
 5. SYSCALL support

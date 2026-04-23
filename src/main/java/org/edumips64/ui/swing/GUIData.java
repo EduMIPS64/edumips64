@@ -91,7 +91,7 @@ public class GUIData extends GUIComponent {
       theTable.getColumnModel().getColumn(4).setPreferredWidth(scale(200));
       theTable.setRowHeight(scale(theTable.getRowHeight()));
 
-      //theTable.setTableHeader(null); //cosÃ¬ visualizzo le intestazioni
+      //theTable.setTableHeader(null); // this would show the headers
       Font headerFont = theTable.getTableHeader().getFont();
       theTable.getTableHeader().setFont(new Font(headerFont.getName(), headerFont.getStyle(), font.getSize()));
       theTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -117,19 +117,19 @@ public class GUIData extends GUIComponent {
           }
         }
       });
-      //ascoltatore della tabella
+      // table listener
       theTable.addMouseListener(new MyMouseListener());
 
-      //aggiungo la tabella ad uno SCROLLER
+      // add the table to a scroll pane
       scrollTable = new JScrollPane(theTable);
       add(scrollTable, BorderLayout.CENTER);
     }
 
     class MyMouseListener implements MouseListener {
       public void mouseClicked(MouseEvent e) {
-        Object premuto = e.getSource();
+        Object source = e.getSource();
 
-        if ((premuto == theTable) && (theTable.getSelectedColumn() == 1)) {
+        if ((source == theTable) && (theTable.getSelectedColumn() == 1)) {
           try {
             String value = CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
                            CurrentLocale.getString("StatusBar.MEMORYCELL") +
@@ -347,8 +347,8 @@ public class GUIData extends GUIComponent {
         }
       }
 
-      //classe interna che ascolta gli eventu sulla tastiera quando appare la
-      //Jdialog per la modifica manuale delle celle di memoria
+      // inner class that listens to keyboard events when the dialog
+      // for manual editing of memory cells appears
       class MyKeyListener implements KeyListener {
         public void keyPressed(KeyEvent e) {
           text.setEditable(true);

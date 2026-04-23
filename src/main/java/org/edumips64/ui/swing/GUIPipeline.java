@@ -83,33 +83,33 @@ class GUIPipeline extends GUIComponent {
     public void paintComponent(Graphics graphicsOriginal) {
       Graphics2D g = (Graphics2D) graphicsOriginal;
       g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
-      super.paintComponent(g); // va fatto sempre
+      super.paintComponent(g); // must always be called
 
-      setBackground(theme.getBackgroundColor()); // fondo bianco
+      setBackground(theme.getBackgroundColor()); // white background
       g.setColor(theme.getTextColor());
 
       largh = this.getWidth();
       alt = this.getHeight();
-      riempiBlocchi(g);
+      fillBlocks(g);
       g.setColor(theme.getTextColor());
-      // Blocco IF
+      // IF block
       g.drawRect(largh / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
 
       g.drawLine(largh * 3 / 20, alt / 2, largh * 4 / 20, alt / 2);
-      // Blocco ID
+      // ID block
       g.drawRect(largh * 4 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
 
-      // Blocco MEM
+      // MEM block
       g.drawRect(largh * 14 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
 
       g.drawLine(largh * 16 / 20, alt / 2, largh * 17 / 20, alt / 2);
-      // Blocco WB
+      // WB block
       g.drawRect(largh * 17 / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
 
-      // Blocco EX
+      // EX block
       g.drawRect(largh * 9 / 20, (alt / 2) - (alt * 5 / 12), largh / 10, alt / 6);
 
-      // Blocco FP-DIV 0
+      // FP-DIV 0 block
       g.drawRect(largh * 8 / 20, (alt / 2) + (alt * 3 / 12), largh * 2 / 10, alt / 6);
 
       // IF---FPDIV0
@@ -176,7 +176,7 @@ class GUIPipeline extends GUIComponent {
       g.getFontMetrics(f1);
       g.setFont(f1);
       g.setColor(theme.getTextColor());
-      // Stringhe all'interno dei blocchi
+      // Strings inside the blocks
       g.drawString("IF", largh * 17 / 200, (alt / 2));
       g.drawString("ID", largh * 47 / 200, (alt / 2));
       g.drawString("MEM", largh * 142 / 200, (alt / 2));
@@ -188,17 +188,16 @@ class GUIPipeline extends GUIComponent {
       g.drawString("FP Multiplier", largh * 85 / 200, (alt / 2) - (alt * 15 / 120));
       g.drawString("FP Adder", largh * 85 / 200, (alt / 2) + (alt * 23 / 120));
 
-      riempiStringhe(g);
+      fillStrings(g);
 
     }
 
     /*
-     * Per ogni blocco della pipeline, all'interno di questa funzione dovrÃ²
-     * controllare se c'Ãš
-     * qualche istruzione, e in tal caso colorare il blocco e scrivere il nome
-     * dell'istruzione
+     * For each pipeline block, this function checks if there is
+     * an instruction in it, and if so, colors the block and writes the name
+     * of the instruction.
      */
-    void riempiBlocchi(Graphics g) {
+    void fillBlocks(Graphics g) {
       g.setColor(theme.getBackgroundColor());
 
       g.fillRect(largh / 20, (alt / 2) - (alt / 12), largh / 10, alt / 6);
@@ -346,10 +345,10 @@ class GUIPipeline extends GUIComponent {
     }
 
     /**
-     * Questo metodo stampa all'interno di ogni blocco della pipeline il nome
-     * dell'istruzione che viÃš all'interno.
+     * This method prints inside each pipeline block the name
+     * of the instruction that is in it.
      */
-    void riempiStringhe(Graphics g) {
+    void fillStrings(Graphics g) {
       Font f1 = new Font("SansSerif", Font.PLAIN, dimCar - 3);
       g.getFontMetrics(f1);
       g.setFont(f1);

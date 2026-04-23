@@ -55,6 +55,9 @@ import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @RunWith(JUnit4.class)
 public class EndToEndTests extends BaseWithInstructionBuilderTest {
@@ -435,6 +438,123 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runMipsTest("sllv.s");
   }
 
+  /* Test for instruction ADDIU */
+  @Test(timeout=2000)
+  public void testAddiu() throws Exception {
+    runMipsTest("addiu.s");
+  }
+
+  /* Test for instruction ADDU */
+  @Test(timeout=2000)
+  public void testAddu() throws Exception {
+    runMipsTest("addu.s");
+  }
+
+  /* Test for instruction SUBU */
+  @Test(timeout=2000)
+  public void testSubu() throws Exception {
+    runMipsTest("subu.s");
+  }
+
+  /* Test for instruction SLTI */
+  @Test(timeout=2000)
+  public void testSlti() throws Exception {
+    runMipsTest("slti.s");
+  }
+
+  /* Test for instruction SLTIU */
+  @Test(timeout=2000)
+  public void testSltiu() throws Exception {
+    runMipsTest("sltiu.s");
+  }
+
+  /* Test for instruction SLTU */
+  @Test(timeout=2000)
+  public void testSltu() throws Exception {
+    runMipsTest("sltu.s");
+  }
+
+  /* Test for instruction DADDIU */
+  @Test(timeout=2000)
+  public void testDaddiu() throws Exception {
+    runMipsTest("daddiu.s");
+  }
+
+  /* Test for instruction DADDUI (alias of DADDIU) */
+  @Test(timeout=2000)
+  public void testDaddui() throws Exception {
+    runMipsTest("daddui.s");
+  }
+
+  /* Test for instruction CVT.W.D */
+  @Test(timeout=2000)
+  public void testCvtwd() throws Exception {
+    runMipsTest("cvtwd.s");
+  }
+
+  /* Test for instruction MFC1 */
+  @Test(timeout=2000)
+  public void testMfc1() throws Exception {
+    runMipsTest("mfc1.s");
+  }
+
+  /* Test for instruction MOV.D */
+  @Test(timeout=2000)
+  public void testMovd() throws Exception {
+    runMipsTest("movd.s");
+  }
+
+  /* Test for instruction MOVF.D */
+  @Test(timeout=2000)
+  public void testMovfd() throws Exception {
+    runMipsTest("movfd.s");
+  }
+
+  /* Regression test for the MOVF.D/MOVT.D write-semaphore leak: with
+   * forwarding enabled, FPConditionalCC_DMoveInstructions used to skip
+   * doWB() in EX, so the destination register's write semaphore was
+   * never released and any later reader would stall forever. */
+  @Test(timeout=2000)
+  public void testMovfdSemaphoreLeak() throws Exception {
+    runMipsTest("movfd-semaphore-leak.s");
+  }
+
+  /* Test for instruction MOVT.D */
+  @Test(timeout=2000)
+  public void testMovtd() throws Exception {
+    runMipsTest("movtd.s");
+  }
+
+  /* Test for instruction MOVN.D */
+  @Test(timeout=2000)
+  public void testMovnd() throws Exception {
+    runMipsTest("movnd.s");
+  }
+
+  /* Test for instruction MOVZ.D */
+  @Test(timeout=2000)
+  public void testMovzd() throws Exception {
+    runMipsTest("movzd.s");
+  }
+
+  /* Test for instruction S.D */
+  @Test(timeout=2000)
+  public void testSdFp() throws Exception {
+    runMipsTest("sd-fp.s");
+  }
+
+  /* Test for instructions LWC1 and SWC1 */
+  @Test(timeout=2000)
+  public void testLwc1Swc1() throws Exception {
+    runMipsTest("lwc1-swc1.s");
+  }
+
+  /* Test for instruction TRAP (alias for SYSCALL) */
+  @Test(timeout=2000)
+  public void testTrap() throws Exception {
+    runMipsTest("trap.s");
+  }
+
 
   /* Test for utils/strlen.s */
   @Test(timeout=2000)
@@ -547,6 +667,25 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testDivisionByZeroThrowException() throws Exception {
     config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
     runMipsTest("div0.s");
+  }
+
+  /* Verify that synchronous exceptions carry information about the
+   * instruction that caused them and the pipeline stage they were raised in. */
+  @Test(timeout=2000)
+  public void testSynchronousExceptionHasInstructionAndStageInfo() throws Exception {
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
+    try {
+      runMipsTest("div0.s");
+      fail("Expected SynchronousException to be thrown");
+    } catch (SynchronousException e) {
+      assertEquals(SynchronousExceptionCode.DIVZERO, e.getCode());
+      assertNotNull("Instruction name should be set on the exception", e.getInstructionName());
+      assertEquals("EX", e.getStage());
+      // Sanity check: the enriched message should reference the stage.
+      assertTrue(
+          "Exception message should mention the pipeline stage, got: " + e.getMessage(),
+          e.getMessage().contains("EX"));
+    }
   }
 
   /* Test for Out Of Memory while loading a file with more data than the memory can fit. */

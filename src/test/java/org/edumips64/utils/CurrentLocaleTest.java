@@ -13,7 +13,7 @@ public class CurrentLocaleTest extends BaseTest {
         CurrentLocale.setConfig(null);
         var val = CurrentLocale.getString("INVALIDVALUE");
         assertNotNull(val);
-        assertEquals(val, "Invalid value");
+        assertEquals(val, "Invalid value: could not parse the value for this data directive");
     }
 
     @Test()
@@ -22,7 +22,7 @@ public class CurrentLocaleTest extends BaseTest {
         CurrentLocale.setConfig(config);
         var val = CurrentLocale.getString("INVALIDVALUE");
         assertNotNull(val);
-        assertEquals(val, "Invalid value");
+        assertEquals(val, "Invalid value: could not parse the value for this data directive");
     }
      
     @Test()
@@ -49,7 +49,7 @@ public class CurrentLocaleTest extends BaseTest {
         CurrentLocale.setConfig(config);
         var val = CurrentLocale.getString("INVALIDVALUE");
         assertNotNull(val);
-        assertEquals(val, "Invalid value");
+        assertEquals(val, "Invalid value: could not parse the value for this data directive");
     }
 
     @Test()
@@ -58,7 +58,7 @@ public class CurrentLocaleTest extends BaseTest {
         CurrentLocale.setConfig(config);
         var val = CurrentLocale.getString("INVALIDVALUE");
         assertTrue(val != null);
-        assertTrue(val.compareTo("Valore non valido") == 0);
+        assertTrue(val.compareTo("Valore non valido: impossibile interpretare il valore di questa direttiva dati") == 0);
     }
 
     @Test()
@@ -67,6 +67,6 @@ public class CurrentLocaleTest extends BaseTest {
         CurrentLocale.setConfig(config);
         var val = CurrentLocale.getString("INVALIDVALUE");
         assertTrue(val != null);
-        assertTrue(val.compareTo("无效值") == 0);
+        assertTrue(val.compareTo("无效值：无法解析此数据指令的值") == 0);
     }
 }

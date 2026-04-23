@@ -5,7 +5,6 @@ import ToolBar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 
 import HelpDialog from './HelpDialog';
@@ -25,8 +24,13 @@ import DownloadIcon from '@mui/icons-material/Download';
 
 export default function Header(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [multiStepCount, setMultiStepCount] = React.useState(500);
   const [fileContent, setFileContent] = React.useState('');
+
+  // The multi-step size used to be a piece of local state managed by an
+  // inline `<TextField>` in this toolbar. It is now driven by the persisted
+  // `stepStride` setting, so it lives alongside the other execution
+  // parameters in the Settings panel and survives page reloads.
+  const multiStepCount = props.multiStepCount;
 
 
   const handleFileLoad = (event) => {
@@ -92,38 +96,7 @@ export default function Header(props) {
             Single Step
           </Button>
         </Tooltip>
-        <Tooltip title="Number of steps that the 'Multi step' button will execute" arrow placement="top">
-          <TextField
-            type="number"
-            size="small"
-            value={multiStepCount}
-            onChange={(e) => {
-              const value = parseInt(e.target.value, 10);
-              if (value > 0 && value <= 10000) {
-                setMultiStepCount(value);
-              }
-            }}
-            disabled={props.pauseEnabled}
-            sx={{
-              width: '100px',
-              mx: 1,
-              input: {
-                color: 'inherit'
-              },
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  borderColor: 'rgba(255, 255, 255, 0.23)',
-                },
-              },
-            }}
-            inputProps={{
-              min: 1,
-              max: 100000,
-              'aria-label': 'Steps count'
-            }}
-          />
-        </Tooltip>
-        <Tooltip title="Run multiple steps of simulation" arrow placement="top">
+        <Tooltip title={`Run ${multiStepCount} steps of simulation (configurable in Settings)`} arrow placement="top">
           <Button
             color="inherit"
             className="multi-step-button"

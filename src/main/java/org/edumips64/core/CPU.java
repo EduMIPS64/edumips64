@@ -426,7 +426,7 @@ public class CPU {
   */
   public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException {
     configFPExceptionsAndRM();
-    Optional<String> syncex;
+    Optional<SynchronousException> syncex;
     if (status != CPUStatus.RUNNING && status != CPUStatus.STOPPING) {
       throw new StoppedCPUException();
     }
@@ -461,7 +461,7 @@ public class CPU {
       stepIF();
 
       if (syncex.isPresent()) {
-        throw new SynchronousException(syncex.get());
+        throw syncex.get();
       }
     } catch (JumpException ex) {
       logger.info("Executing a Jump.");
@@ -477,11 +477,14 @@ public class CPU {
         logger.info("Caught a BREAK after a Jump: ignoring it.");
       }
 
-      // A J-Type instruction has just modified the Program Counter. We need to
-      // put in the IF stage the instruction the PC points to
-      pipe.setIF(mem.getInstruction(pc));
-      pipe.setEX(pipe.ID());
-      pipe.setID(bubble);
+      // A J-Type instruction has just modified the Program Counter. We need
+      // to put in the IF stage the instruction the PC points to, discarding
+      // the instruction that was fetched sequentially in the prior cycle.
+      // Then advance the jump instruction from ID to EX and put a bubble in
+      // ID, which represents the flushed slot in the cycle view.
+      pipe.flushAndSet(Pipeline.Stage.IF, mem.getInstruction(pc));
+      pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
+      pipe.setStage(Pipeline.Stage.ID, bubble);
       old_pc.writeDoubleWord((pc.getValue()));
       pc.writeDoubleWord((pc.getValue()) + 4);
 
@@ -489,7 +492,7 @@ public class CPU {
       logger.info("RAW - Read-After-Write");
       if (currentPipeStage == Pipeline.Stage.ID && pipe.EX() == null) {
         logger.info("Adding a BUBBLE instruction into EX.");
-        pipe.setEX(bubble);
+        pipe.setStage(Pipeline.Stage.EX, bubble);
       }
       RAWStalls++;
 
@@ -499,7 +502,7 @@ public class CPU {
 
       if (currentPipeStage == Pipeline.Stage.ID && pipe.EX() == null) {
         logger.info("Adding a BUBBLE instruction into EX.");
-        pipe.setEX(bubble);
+        pipe.setStage(Pipeline.Stage.EX, bubble);
       }
       WAWStalls++;
 
@@ -507,7 +510,7 @@ public class CPU {
       logger.info("Structural Stall - FP Divider Unavailable");
       if (currentPipeStage == Pipeline.Stage.ID) {
         logger.info("Adding a BUBBLE instruction into EX.");
-        pipe.setEX(bubble);
+        pipe.setStage(Pipeline.Stage.EX, bubble);
       }
       dividerStalls++;
 
@@ -515,7 +518,7 @@ public class CPU {
       logger.info("Structural Stall - FP Unavailable");
       if (currentPipeStage == Pipeline.Stage.ID) {
         logger.info("Adding a BUBBLE instruction into EX.");
-        pipe.setEX(bubble);
+        pipe.setStage(Pipeline.Stage.EX, bubble);
       }
       funcUnitStalls++;
 
@@ -529,7 +532,7 @@ public class CPU {
 
     } catch (HaltException ex) {
       setStatus(CPU.CPUStatus.HALTED);
-      pipe.setWB(null);
+      pipe.clear(Pipeline.Stage.WB);
       // The last tick does not execute a full CPU cycle, it just removes the last instruction from the pipeline.
       // Decrementing the cycles counter by one.
       cycles--;
@@ -576,7 +579,7 @@ public class CPU {
 
     // Move the instruction in WB out of the pipeline.
     logger.info("Instruction " + pipe.WB() + " has been completed. Removing it.");
-    pipe.setWB(null);
+    pipe.clear(Pipeline.Stage.WB);
 
     //if the pipeline is empty and it is into the stopping state (because a long latency instruction was executed) we can halt the cpu when computations finished
     if (isPipelinesEmpty() && getStatus() == CPUStatus.STOPPING) {
@@ -594,19 +597,18 @@ public class CPU {
     }
 
     logger.info("Moving " + pipe.MEM() + " to WB");
-    pipe.setWB(pipe.MEM());
-    pipe.setMEM(null);
+    pipe.advance(Pipeline.Stage.MEM, Pipeline.Stage.WB);
   }
 
-  private Optional<String> stepEX() throws SynchronousException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
+  private Optional<SynchronousException> stepEX() throws SynchronousException, NotAlignException, TwosComplementSumException, IrregularWriteOperationException, AddressErrorException, IrregularStringOfBitsException {
     changeStage(Pipeline.Stage.EX);
 
     // Used for exception handling
     boolean masked = config.getBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED);
     boolean terminate = config.getBoolean(ConfigKey.SYNC_EXCEPTIONS_TERMINATE);
 
-    // Code of the synchronous exception that happens in EX.
-    Optional<String> syncex = Optional.empty();
+    // Synchronous exception that happens in EX, if any.
+    Optional<SynchronousException> syncex = Optional.empty();
 
     // If the FPU has one completed instruction, that one should be executed. Otherwise, the instruction in the EX
     // stage should be executed.
@@ -630,26 +632,34 @@ public class CPU {
         logger.info("Executing EX() for " + toExecute);
         toExecute.EX();
       } catch (SynchronousException e) {
+        // Annotate the exception with the instruction that caused it and the
+        // pipeline stage, so that the UI can display a more informative message.
+        e.setInstructionInfo(toExecute.getFullName(), Pipeline.Stage.EX.name());
         if (masked) {
           logger.info("[EXCEPTION] [MASKED] " + e.getCode());
         } else {
           if (terminate) {
             logger.info("Terminating due to an unmasked exception");
-            throw new SynchronousException(e.getCode());
+            throw e;
           } else {
             // We must complete this cycle, but we must notify the user.
-            // If the syncex contains a string, the CPU code will throw
+            // If syncex is present, the CPU code will throw
             // the exception at the end of the step
-            syncex = Optional.of(e.getCode());
+            syncex = Optional.of(e);
           }
         }
       }
     }
 
     logger.info("Moving " + toExecute + " to MEM");
-    pipe.setMEM(toExecute);
     if (completedFpInstruction == null) {
-      pipe.setEX(null);
+      // Normal case: advance the EX-stage instruction to MEM.
+      pipe.advance(Pipeline.Stage.EX, Pipeline.Stage.MEM);
+    } else {
+      // The FP pipeline produced the instruction to be executed this cycle;
+      // whatever was in EX stays there (and will cause a structural stall on
+      // subsequent cycles as counted above).
+      pipe.setStage(Pipeline.Stage.MEM, completedFpInstruction);
     }
     // Shift instructions in the fpPipe.
     fpPipe.step();
@@ -696,12 +706,11 @@ public class CPU {
     if (isFP) {
       logger.info("Moving " + pipe.ID() + " to the FP pipeline.");
       fpPipe.putInstruction(pipe.ID(), false);
+      pipe.clear(Pipeline.Stage.ID);
     } else {
       logger.info("Moving " + pipe.ID() + " to EX");
-      pipe.setEX(pipe.ID());
+      pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
     }
-
-    pipe.setID(null);
     return false;
   }
 
@@ -714,7 +723,7 @@ public class CPU {
 
     boolean breaking = false;
     if (status == CPUStatus.RUNNING) {
-      if (!pipe.isEmpty(Pipeline.Stage.IF)) {  //rispetto a dinmips scambia le load con le IF
+      if (!pipe.isEmpty(Pipeline.Stage.IF)) {  // unlike dinmips, swaps loads with IF
         try {
           logger.info("Executing IF() for " + pipe.IF());
           pipe.IF().IF();
@@ -724,7 +733,7 @@ public class CPU {
       }
 
       logger.info("Moving " + pipe.IF() + " to ID");
-      pipe.setID(pipe.IF());
+      pipe.advance(Pipeline.Stage.IF, Pipeline.Stage.ID);
 
       InstructionInterface next_if = mem.getInstruction(pc);
       logger.info("Fetched new instruction " + next_if);
@@ -733,9 +742,9 @@ public class CPU {
       pc.writeDoubleWord((pc.getValue()) + 4);
       logger.info("New Program Counter value: " + pc.toString());
       logger.info("Putting " + next_if + "in IF.");
-      pipe.setIF(next_if);
+      pipe.setStage(Pipeline.Stage.IF, next_if);
     } else {
-      pipe.setID(bubble);
+      pipe.setStage(Pipeline.Stage.ID, bubble);
     }
 
     if (breaking) {

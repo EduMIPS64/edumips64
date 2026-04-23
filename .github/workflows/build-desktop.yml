@@ -48,6 +48,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Check that every instruction is covered by a test
+        run: sh utils/find-instructions.sh
+
       - name: Read version from gradle.properties
         id: read_version
         uses: christian-draeger/read-properties@1.1.1

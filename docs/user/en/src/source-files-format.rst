@@ -158,10 +158,11 @@ Instructions can take three types of parameters:
   or lowercase "r", or a $, followed by the number of the register (between
   0 and 31), as in "r4", "R4" or "\$4";
 * *Immediate values* an immediate value can be a number or a
-  label; the number can be specified in base 10 or in base 16: base 10 numbers
-  are simply inserted by writing the number, while base 16 number are inserted
-  by putting before the number the prefix "0x". Immediate values can be preceded
-  by the # character.
+  label; the number can be specified in base 10, base 16 or base 2: base 10
+  numbers are simply inserted by writing the number, base 16 numbers are
+  inserted by putting before the number the prefix "0x", and base 2 numbers
+  are inserted by putting before the number the prefix "0b". Immediate values
+  can be preceded by the # character.
 * *Address* an address is composed by an immediate value followed
   by a register name enclosed in brackets. The value of the register will be
   used as base, the value of the immediate will be the offset.
@@ -172,6 +173,29 @@ available in the bit encoding of the instruction.
 When 16-bit immediates can be used, for example in ALU I-Type instructions,
 it's also possible to use as an immediate value a memory label. The assembler
 will put as immediate value the memory address the label points to.
+
+Label offset arithmetic
+^^^^^^^^^^^^^^^^^^^^^^^
+In the address form of a parameter (e.g. the offset of a load or store
+instruction) the immediate value can be a simple expression built from memory
+labels and numeric literals combined with the ``+`` and ``-`` operators. A
+leading ``+`` or ``-`` is also accepted and whitespace is allowed between the
+operands and the operators. Each operand is either a numeric literal (in base
+10, 16 or 2) or a memory label defined in the ``.data`` section; labels are
+replaced by their address before the expression is evaluated.
+
+For example, given the data definitions ``data1: .word 42`` and
+``data2: .word 43``, the following forms are all accepted::
+
+  lw r1, data1+8(r0)       ; load from data1 offset by 8 bytes
+  lw r1, data1-8(r0)       ; load from data1 offset by -8 bytes
+  lw r1, 0+data1(r0)       ; equivalent to data1(r0)
+  lw r1, data2-data1(r0)   ; difference between two label addresses
+  lw r1, data1-8+16(r0)    ; chains of + and - are supported
+
+Expressions with an empty operand (for example ``data1+`` or ``data1++0``) are
+rejected as malformed, and an unknown label anywhere in the expression
+produces the usual "label not found" error.
 
 You can use standard MIPS assembly aliases to address the first 32 registers,
 appending the alias to one of the standard register prefixes like "r", "\$"

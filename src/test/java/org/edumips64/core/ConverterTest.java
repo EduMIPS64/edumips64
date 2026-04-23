@@ -323,6 +323,23 @@ public class ConverterTest {
         assertEquals(Converter.parseImmediate("0x+A"), 10L);
         assertEquals(Converter.parseImmediate("#0x+A"), 10L);
         assertEquals(Converter.parseImmediate("#0x+A1"), 161L);
+        // Binary literals.
+        assertEquals(Converter.parseImmediate("0b1010"), 10L);
+        assertEquals(Converter.parseImmediate("0B1010"), 10L);
+        assertEquals(Converter.parseImmediate("#0b1010"), 10L);
+        assertEquals(Converter.parseImmediate("0b0"), 0L);
+        assertEquals(Converter.parseImmediate("0b-1"), -1L);
+        assertEquals(Converter.parseImmediate("0b+1"), 1L);
+
+        // Full 64-bit unsigned hex/binary (bit pattern interpretation).
+        assertEquals(Converter.parseImmediate("0xffffffffffffffff"), -1L);
+        assertEquals(Converter.parseImmediate(
+                "0b1111111111111111111111111111111111111111111111111111111111111111"), -1L);
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void ParseImmediateInvalidBin() throws Exception {
+        Converter.parseImmediate("0b2");
     }
 
     @Test(expected = NumberFormatException.class)
