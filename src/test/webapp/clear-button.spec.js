@@ -103,20 +103,16 @@ INVALID_INSTRUCTION r1, r2
 SYSCALL 0
 `;
 
-  // Remove overlay before interacting
-  await removeOverlay(page);
+  // Set the editor content via Monaco's API (more reliable across browsers
+  // than clicking the hidden textarea)
+  await page.evaluate((code) => {
+    const model = window.monaco.editor.getModels()[0];
+    if (model) {
+      model.setValue(code);
+    }
+  }, invalidProgram);
 
-  const inputArea = page.locator('.monaco-editor textarea.inputarea');
-  await inputArea.click({ force: true });
-
-  // Clear existing text
-  await page.keyboard.press('ControlOrMeta+a');
-  await page.keyboard.press('Backspace');
-
-  // Insert invalid program
-  await page.keyboard.insertText(invalidProgram);
-
-  // Remove overlay again
+  // Remove overlay
   await removeOverlay(page);
 
   // Wait a bit for syntax checking to complete

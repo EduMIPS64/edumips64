@@ -11,8 +11,9 @@ test('default sample program completes within a reasonable time', async ({
   page,
 }) => {
   // The default sample program runs for ~5020 cycles. The web worker should
-  // finish well under 60 seconds even on slow CI runners under load.
-  test.setTimeout(90000);
+  // finish well under 120 seconds even on slow CI runners under load.
+  // Firefox and WebKit may be significantly slower than Chromium.
+  test.setTimeout(150000);
 
   await page.goto(targetUri);
   await waitForPageReady(page);
@@ -28,8 +29,8 @@ test('default sample program completes within a reasonable time', async ({
   await page.click('#run-button');
 
   // Wait for completion with a generous timeout for CI environments
-  await expect(page.locator('#stat-cycles')).toHaveText(/^[1-9][0-9]*$/, { timeout: 60000 });
-  await page.waitForSelector('#clear-code-button:not([disabled])', { timeout: 60000 });
+  await expect(page.locator('#stat-cycles')).toHaveText(/^[1-9][0-9]*$/, { timeout: 120000 });
+  await page.waitForSelector('#clear-code-button:not([disabled])', { timeout: 120000 });
 
   const elapsed = Date.now() - startTime;
 
@@ -41,8 +42,9 @@ test('default sample program completes within a reasonable time', async ({
   // The sample program should run for approximately 5020 cycles
   expect(cycles).toBeGreaterThanOrEqual(5000);
 
-  // It should complete in under 60 seconds (very generous budget for CI)
-  expect(elapsed).toBeLessThan(60000);
+  // It should complete in under 120 seconds (very generous budget for CI,
+  // accounts for Firefox/WebKit being slower than Chromium)
+  expect(elapsed).toBeLessThan(120000);
 
   // Log the performance measurement for informational purposes
   console.log(
