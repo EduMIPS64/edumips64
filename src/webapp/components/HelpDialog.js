@@ -150,7 +150,7 @@ function useToc(language) {
       }
     }
 
-    fetchToc();
+    await fetchToc();
 
     return () => {
       abortController.abort();
