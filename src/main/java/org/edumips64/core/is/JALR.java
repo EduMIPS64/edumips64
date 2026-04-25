@@ -52,6 +52,15 @@ public class JALR extends FlowControl_RType {
     if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0) {
       return true;
     }
+
+    // With forwarding enabled, a value produced by EX in this cycle cannot be
+    // forwarded to ID (no EX→ID path). The jump must stall 1 cycle.
+    if (cpu.isEnableForwarding()) {
+      if (cpu.wasRegisterForwardedFromEX(cpu.getRegister(params.get(RS_FIELD)))) {
+        return true;
+      }
+    }
+
     //saving PC value into a temporary register
     cpu.getRegister(31).incrWriteSemaphore();  //deadlock !!!
     TR[PC_VALUE].writeDoubleWord(cpu.getPC().getValue() - 4);
