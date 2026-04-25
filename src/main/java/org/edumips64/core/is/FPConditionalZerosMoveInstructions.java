@@ -94,7 +94,7 @@ public abstract class FPConditionalZerosMoveInstructions extends ComputationalIn
   public void doWB() throws IrregularStringOfBitsException {
     //passing result from temporary register to destination register and unlocking it
     cpu.getRegisterFP(params.get(FD_FIELD)).setBits(TRfp[FD_FIELD].getBinString(), 0);
-    cpu.getRegisterFP(params.get(FD_FIELD)).decrWriteSemaphore();
+    cpu.scheduleUnlock(cpu.getRegisterFP(params.get(FD_FIELD)));
   }
 
   public void pack() throws IrregularStringOfBitsException {

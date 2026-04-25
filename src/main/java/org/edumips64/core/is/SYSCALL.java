@@ -343,7 +343,7 @@ public class SYSCALL extends Instruction {
       logger.info("SYSCALL (" + this.hashCode() + "): got R1");
       r1.setBits(Converter.intToBin(64, return_value), 0);
       logger.info("SYSCALL (" + this.hashCode() + "): set R1 to " + return_value);
-      r1.decrWriteSemaphore();
+      cpu.scheduleUnlock(r1);
       logger.info("SYSCALL (" + this.hashCode() + "): decremented write semaphore");
     }
 

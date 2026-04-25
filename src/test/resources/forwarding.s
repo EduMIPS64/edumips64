@@ -4,8 +4,8 @@
 ; shortened through forwarding.
 ;
 ; The expected number of execution cycles are:
-; * without forwarding: 19
-; * with forwarding: 16
+; * without forwarding: 20
+; * with forwarding: 17
 ;
 ; (c) 2018 Andrea Spadaccini and the EduMIPS64 team
 ;

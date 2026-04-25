@@ -86,7 +86,7 @@ public class JAL extends FlowControl_JType {
   }
   public void doWB() throws IrregularStringOfBitsException {
     cpu.getRegister(31).setBits(TR[PC_VALUE].getBinString(), 0);
-    cpu.getRegister(31).decrWriteSemaphore();
+    cpu.scheduleUnlock(cpu.getRegister(31));
   }
 
 

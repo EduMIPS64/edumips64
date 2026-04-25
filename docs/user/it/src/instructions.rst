@@ -450,10 +450,18 @@ sequenziali successive. Se il salto viene effettivamente eseguito, le
 istruzioni prelevate speculativamente vengono rimosse dalla pipeline e
 l'esecuzione riprende dall'indirizzo di destinazione del salto.
 
-Tali istruzioni eseguono il salto alla fase di Instruction Decode (ID), ogni
-qual volta viene effettuato un fetch inutile. In tal caso, due istruzioni
-vengono rimosse dalla pipeline, ed il contatore degli stalli dovuti ai salti
+I salti condizionali vengono risolti nello stadio **ID**: i registri sorgente
+vengono letti e la condizione viene valutata non appena il salto raggiunge
+la decodifica, come descritto in Hennessy e Patterson, Appendice C, Sezione
+C.2 ("Branch Hazards"). Di conseguenza, quando un salto viene effettivamente
+eseguito, due istruzioni sono già state prelevate speculativamente e devono
+essere rimosse dalla pipeline; il contatore degli stalli dovuti ai salti
 effettuati viene incrementato di due unità.
+
+La risoluzione dei salti in ID implica anche che un'istruzione ALU o di load
+che produce un registro letto dal salto successivo genera un conflitto sui
+dati che il forwarding non riesce ad eliminare completamente. Si veda
+:doc:`pipeline` per i dettagli e alcuni esempi.
 
 Ecco la lista delle istruzioni di controllo del flusso di tipo R:
 

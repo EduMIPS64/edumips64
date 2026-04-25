@@ -107,7 +107,7 @@ public abstract class ALU_RType extends ComputationalInstructions {
   public void doWB() throws IrregularStringOfBitsException {
     //passing result from temporary register to destination register and unlocking it
     cpu.getRegister(params.get(RD_FIELD)).setBits(TR[RD_FIELD].getBinString(), 0);
-    cpu.getRegister(params.get(RD_FIELD)).decrWriteSemaphore();
+    cpu.scheduleUnlock(cpu.getRegister(params.get(RD_FIELD)));
 
   }
 

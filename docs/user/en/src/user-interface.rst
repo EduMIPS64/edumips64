@@ -218,7 +218,11 @@ after asking for confirmation; this is useful to recover from a misconfigured
 simulator without having to change each option manually.
 
 The Main Settings tab allow to configure forwarding and the number of steps
-in the Multi Cycle mode.
+in the Multi Cycle mode. When forwarding is enabled, the result of an
+instruction is bypassed directly to the dependent instruction, reducing
+or eliminating many RAW stalls. See :doc:`pipeline` for a detailed
+description of the pipeline and of the cases in which forwarding can
+(and cannot) avoid stalls.
 
 The Behavior tab allow to enable or disable warnings during the parsing phase,
 the "Sync graphics with CPU in multi-step execution" option, when checked,

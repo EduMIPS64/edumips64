@@ -15,8 +15,8 @@ const STORAGE_PREFIX = 'edumips64:v1:';
  * end-to-end tests. The expected cycle / instruction / stall counts below are
  * the same ones asserted by `EndToEndTests.testForwarding()` in
  * `src/test/java/org/edumips64/EndToEndTests.java`:
- *   - with forwarding    : 15 cycles, 10 instructions
- *   - without forwarding : 18 cycles, 10 instructions
+ *   - with forwarding    : 17 cycles, 10 instructions
+ *   - without forwarding : 20 cycles, 10 instructions
  */
 const FORWARDING_PROGRAM = `    .code
     dadd    r1, r2, r3
@@ -31,12 +31,12 @@ const FORWARDING_PROGRAM = `    .code
     syscall 0
 `;
 
-const EXPECTED_WITH_FORWARDING = { cycles: 15, instructions: 10 };
-const EXPECTED_WITHOUT_FORWARDING = { cycles: 18, instructions: 10 };
+const EXPECTED_WITH_FORWARDING = { cycles: 17, instructions: 10 };
+const EXPECTED_WITHOUT_FORWARDING = { cycles: 20, instructions: 10 };
 
 /**
  * Equivalent to the "issue51-halt.s" resource; the expectations below match
- * `runForwardingTest("issue51-halt.s", 11, 17, 6)` in EndToEndTests.
+ * `runForwardingTest("issue51-halt.s", 14, 20, 6)` in EndToEndTests.
  */
 const ISSUE51_HALT_PROGRAM = `.code
           daddi   r2, r0, 2
@@ -45,8 +45,8 @@ start:    daddi   r2, r2, -1
           halt
 `;
 
-const EXPECTED_ISSUE51_WITH_FORWARDING = { cycles: 11, instructions: 6 };
-const EXPECTED_ISSUE51_WITHOUT_FORWARDING = { cycles: 17, instructions: 6 };
+const EXPECTED_ISSUE51_WITH_FORWARDING = { cycles: 14, instructions: 6 };
+const EXPECTED_ISSUE51_WITHOUT_FORWARDING = { cycles: 20, instructions: 6 };
 
 /**
  * Clear all edumips64 localStorage keys before each test to ensure hermeticity.
@@ -132,7 +132,7 @@ async function getExecutionStats(page) {
  * Test: Running `forwarding.s` without forwarding (the default) produces the
  * same cycle / instruction counts as the Java EndToEndTests.
  */
-test('forwarding.s runs with 18 cycles when forwarding is disabled', async ({
+test('forwarding.s runs with 20 cycles when forwarding is disabled', async ({
   page,
 }) => {
   await waitForPageReady(page);
@@ -149,10 +149,10 @@ test('forwarding.s runs with 18 cycles when forwarding is disabled', async ({
 });
 
 /**
- * Test: Running `forwarding.s` with forwarding enabled produces the same 15
+ * Test: Running `forwarding.s` with forwarding enabled produces the same 17
  * cycles / 10 instructions asserted by EndToEndTests.
  */
-test('forwarding.s runs with 15 cycles when forwarding is enabled', async ({
+test('forwarding.s runs with 17 cycles when forwarding is enabled', async ({
   page,
 }) => {
   await waitForPageReady(page);

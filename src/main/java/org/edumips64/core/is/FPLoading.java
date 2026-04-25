@@ -85,7 +85,7 @@ public abstract class FPLoading extends FPLDSTInstructions {
   public void doWB() throws IrregularStringOfBitsException {
     //passing memory value from temporary LMD register to the destination register and unlocking it
     cpu.getRegisterFP(params.get(FT_FIELD)).setBits(TR[LMD_REGISTER].getBinString(), 0);
-    cpu.getRegisterFP(params.get(FT_FIELD)).decrWriteSemaphore();
+    cpu.scheduleUnlock(cpu.getRegisterFP(params.get(FT_FIELD)));
   }
 }
 

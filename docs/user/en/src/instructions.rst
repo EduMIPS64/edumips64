@@ -440,9 +440,17 @@ be taken and continues fetching the next sequential instructions. If the
 branch is actually taken, the speculatively fetched instructions are squashed
 from the pipeline and execution resumes from the branch target.
 
-Those instructions effectively executes the jump in the ID stage, so often an
-useless fetch is executed. In this case, two instructions are removed from the
-pipeline, and the branch taken stalls counter is incremented by two units.
+Conditional branches resolve in the **ID** stage: the source registers are
+read and the condition is evaluated as soon as the branch reaches decode, as
+described in Hennessy & Patterson, Appendix C, Section C.2 ("Branch
+Hazards"). As a consequence, when a branch is taken two instructions have
+already been speculatively fetched and must be removed from the pipeline;
+the branch-taken stalls counter is incremented by two units.
+
+Resolving branches in ID also implies that an ALU or load instruction
+producing a register read by the following branch creates a data hazard that
+cannot be fully eliminated by forwarding. See :doc:`pipeline` for details
+and examples.
 
 List of R-Type flow control instructions:
 

@@ -580,16 +580,34 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runMipsTestWithAndWithoutForwarding("raw.s");
   }
 
+  /* Regression test for the "Missing RAW for some branches" issue:
+   * a branch that reads a register written by the immediately preceding
+   * ALU instruction must stall in ID also when forwarding is enabled,
+   * because the branch resolves the condition in ID. */
+  @Test(timeout=2000)
+  public void testBranchRAW() throws Exception {
+    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("branch-raw.s");
+
+    // With forwarding: the branch's ID reads r1, which is being written by
+    // the preceding SLT. One RAW stall is expected.
+    collector.checkThat("branch-raw.s: RAW stalls with forwarding.",
+        statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(1));
+    // Without forwarding: the branch has to wait until WB of SLT is done,
+    // yielding more RAW stalls.
+    collector.checkThat("branch-raw.s: RAW stalls without forwarding (must be > 0).",
+        statuses.get(ForwardingStatus.DISABLED).rawStalls > 0, equalTo(true));
+  }
+
   /* Forwarding test. The number of cycles is hardcoded and depends on the
    * contents of forwarding.s */
   @Test(timeout=2000)
   public void testForwarding() throws Exception {
     // Simple test.
-    runForwardingTest("forwarding.s", 15, 18, 10);
+    runForwardingTest("forwarding.s", 17, 20, 10);
 
     // Tests taken from Hennessy & Patterson, Appendix A
-    runForwardingTest("forwarding-hp-pA16.s", 10, 12, 6);
-    runForwardingTest("forwarding-hp-pA18.s", 8, 12, 4);
+    runForwardingTest("forwarding-hp-pA16.s", 11, 13, 6);
+    runForwardingTest("forwarding-hp-pA18.s", 9, 14, 4);
   }
 
   @Test(timeout=2000)
@@ -604,16 +622,16 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding(filename);
 
     // With forwarding
-    collector.checkThat(filename + ": cycles with forwarding.", statuses.get(ForwardingStatus.ENABLED).cycles, equalTo(19));
+    collector.checkThat(filename + ": cycles with forwarding.", statuses.get(ForwardingStatus.ENABLED).cycles, equalTo(20));
     collector.checkThat(filename + ": instructions with forwarding.", statuses.get(ForwardingStatus.ENABLED).instructions, equalTo(5));
     collector.checkThat(filename + ": WAW stalls with forwarding." ,statuses.get(ForwardingStatus.ENABLED).wawStalls, equalTo(7));
-    collector.checkThat(filename + ": RAW stalls with forwarding.", statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(1));
+    collector.checkThat(filename + ": RAW stalls with forwarding.", statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(2));
 
     // Without forwarding
-    collector.checkThat(filename + ": cycles without forwarding.", statuses.get(ForwardingStatus.DISABLED).cycles, equalTo(20));
+    collector.checkThat(filename + ": cycles without forwarding.", statuses.get(ForwardingStatus.DISABLED).cycles, equalTo(21));
     collector.checkThat(filename + ": instructions without forwarding.", statuses.get(ForwardingStatus.DISABLED).instructions, equalTo(5));
     collector.checkThat(filename + ": WAW stalls without forwarding." ,statuses.get(ForwardingStatus.DISABLED).wawStalls, equalTo(7));
-    collector.checkThat(filename + ": RAW stalls without forwarding.", statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(2));
+    collector.checkThat(filename + ": RAW stalls without forwarding.", statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(3));
   }
 
 
@@ -810,8 +828,8 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   /* Issue #51: Problem with SYSCALL 0 after branch. */
   @Test(timeout=2000)
   public void testTerminationInID() throws Exception {
-    runForwardingTest("issue51-halt.s", 11, 17, 6);
-    runForwardingTest("issue51-syscall0.s", 11, 17, 6);
+    runForwardingTest("issue51-halt.s", 14, 20, 6);
+    runForwardingTest("issue51-syscall0.s", 14, 20, 6);
   }
 
   /* Issue #68: JR does not respect RAW stalls. */

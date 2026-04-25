@@ -99,6 +99,15 @@ public class CPU {
   /** BUBBLE */
   private InstructionInterface bubble;
 
+  /** Registers scheduled to be unlocked (write semaphore decremented) at the
+   * end of the current CPU cycle. This defers register unlocking so that a
+   * branch instruction whose ID stage runs in the same cycle as the EX
+   * (forwarding) or WB stage of a previous instruction writing to that
+   * register still observes the write semaphore as set and correctly
+   * detects the RAW hazard. See issue "Missing RAW for some branches".
+   */
+  private List<Register> pendingUnlocks = new LinkedList<>();
+
   /** Terminating instructions */
   private static ArrayList<String> terminating = new ArrayList<>(
       Arrays.asList("0000000C",     // SYSCALL 0
@@ -215,6 +224,38 @@ public class CPU {
 
   public RegisterFP getRegisterFP(int index) {
     return fpr[index];
+  }
+
+  /** Schedules a register's write semaphore to be decremented at the end of
+   * the current CPU cycle, instead of being decremented immediately.
+   *
+   * Instructions must call this method (rather than calling
+   * {@code decrWriteSemaphore()} directly on the register) to unlock a
+   * destination register. This ensures that, within the same cycle, the ID
+   * stage (which reads registers, executes earlier than WB/MEM/EX for the
+   * following instruction in pipeline order but runs <em>after</em> WB/MEM/EX
+   * within a single call to {@link #step()}) still observes the register as
+   * locked, so that RAW hazards are correctly detected. This is especially
+   * important for branches, whose ID stage reads register values.
+   *
+   * @param r the register to unlock at the end of the current cycle.
+   */
+  public void scheduleUnlock(Register r) {
+    pendingUnlocks.add(r);
+  }
+
+  /** Applies all pending register unlocks scheduled via
+   * {@link #scheduleUnlock(Register)} during the current cycle and clears the
+   * pending list.
+   */
+  private void applyPendingUnlocks() {
+    if (pendingUnlocks.isEmpty()) {
+      return;
+    }
+    for (Register r : pendingUnlocks) {
+      r.decrWriteSemaphore();
+    }
+    pendingUnlocks.clear();
   }
 
   /** Returns true if the specified functional unit is filled by an instruction, false when the contrary happens.
@@ -498,6 +539,7 @@ public class CPU {
       throw ex;
 
     } finally {
+      applyPendingUnlocks();
       logger.info("End of cycle " + cycles + "\n---------------------------------------------\n" + pipeLineString() + "\n");
     }
   }
@@ -774,6 +816,9 @@ public class CPU {
     pipe.clear();
     // Reset FP pipeline
     fpPipe.reset();
+
+    // Discard any registers that were scheduled to be unlocked.
+    pendingUnlocks.clear();
 
     logger.info("CPU Resetted");
   }
