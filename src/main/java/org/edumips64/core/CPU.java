@@ -442,7 +442,7 @@ public class CPU {
       // After EX, detect which GPR registers were forwarded (write semaphore
       // decreased during EX) and record them for branch hazard detection.
       registersForwardedFromEX.clear();
-      if (isEnableForwarding() && preSemaphores != null) {
+      if (isEnableForwarding()) {
         for (int i = 0; i < 32; i++) {
           if (gpr[i].getWriteSemaphore() < preSemaphores[i]) {
             registersForwardedFromEX.add(gpr[i]);
