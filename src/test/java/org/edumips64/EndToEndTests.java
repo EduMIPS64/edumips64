@@ -592,6 +592,43 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runForwardingTest("forwarding-hp-pA18.s", 8, 12, 4);
   }
 
+  /* Patti forwarding analysis test.
+   * Tests all major forwarding scenarios based on Prof. Patti's analysis.
+   * Expected RAW stalls:
+   *   With forwarding:    TEST1: 10 (1 per loop × 10) + TEST2: 0 + TEST3: 0 + TEST4: 1 = 11
+   *   Without forwarding: TEST1: 20 (2 per loop × 10) + TEST2: 2 + TEST3: 2 + TEST4: 2 = 26
+   */
+  @Test(timeout=2000)
+  public void testPattiForwarding() throws Exception {
+    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("patti-forwarding.s");
+
+    // Log the results for debugging
+    log.warning("patti-forwarding.s with forwarding: cycles=" + statuses.get(ForwardingStatus.ENABLED).cycles +
+        " instructions=" + statuses.get(ForwardingStatus.ENABLED).instructions +
+        " RAW=" + statuses.get(ForwardingStatus.ENABLED).rawStalls);
+    log.warning("patti-forwarding.s without forwarding: cycles=" + statuses.get(ForwardingStatus.DISABLED).cycles +
+        " instructions=" + statuses.get(ForwardingStatus.DISABLED).instructions +
+        " RAW=" + statuses.get(ForwardingStatus.DISABLED).rawStalls);
+
+    // With forwarding:
+    // TEST1 (ALU→Branch): 1 RAW stall per iteration × 10 iterations = 10
+    // TEST2 (ALU→Store):  0 stalls (store defers RT read to MEM)
+    // TEST3 (ALU→ALU):    0 stalls (EX→EX forwarding)
+    // TEST4 (Load→ALU):   1 stall (load-use hazard)
+    // Total: 11 RAW stalls
+    collector.checkThat("patti-forwarding.s: RAW stalls with forwarding.",
+        statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(11));
+
+    // Without forwarding:
+    // TEST1 (ALU→Branch): 2 RAW stalls per iteration × 10 iterations = 20
+    // TEST2 (ALU→Store):  2 stalls
+    // TEST3 (ALU→ALU):    2 stalls
+    // TEST4 (Load→ALU):   2 stalls
+    // Total: 26 RAW stalls
+    collector.checkThat("patti-forwarding.s: RAW stalls without forwarding.",
+        statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(26));
+  }
+
   @Test(timeout=2000)
   public void storeAfterLoad() throws Exception {
     runMipsTest("store-after-load.s");
@@ -810,8 +847,8 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   /* Issue #51: Problem with SYSCALL 0 after branch. */
   @Test(timeout=2000)
   public void testTerminationInID() throws Exception {
-    runForwardingTest("issue51-halt.s", 11, 17, 6);
-    runForwardingTest("issue51-syscall0.s", 11, 17, 6);
+    runForwardingTest("issue51-halt.s", 13, 17, 6);
+    runForwardingTest("issue51-syscall0.s", 13, 17, 6);
   }
 
   /* Issue #68: JR does not respect RAW stalls. */

@@ -55,6 +55,14 @@ public class BEQZ extends FlowControl_IType {
       return true;
     }
 
+    // With forwarding enabled, a value produced by EX in this cycle cannot be
+    // forwarded to ID (no EX→ID path). The branch must stall 1 cycle.
+    if (cpu.isEnableForwarding()) {
+      if (cpu.wasRegisterForwardedFromEX(cpu.getRegister(params.get(RS_FIELD)))) {
+        return true;
+      }
+    }
+
     String rs = cpu.getRegister(params.get(RS_FIELD)).getBinString();
     String zero = Converter.positiveIntToBin(64, 0);
     boolean condition = rs.equals(zero);

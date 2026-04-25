@@ -99,6 +99,23 @@ public class CPU {
   /** BUBBLE */
   private InstructionInterface bubble;
 
+  /**
+   * Tracks which GPR registers were forwarded (had their write semaphore
+   * decremented) during the current cycle's EX stage.
+   *
+   * In a real MIPS pipeline with forwarding, the EX/MEM forwarding path
+   * can forward data to the EX stage input of the next instruction, but
+   * NOT to the ID stage. Branch instructions evaluate their conditions in
+   * the ID stage, so they cannot use values forwarded from EX in the same
+   * cycle. They must stall one cycle and wait for the value to be available
+   * via the MEM/WB forwarding path (or directly from the register file).
+   *
+   * This set is populated between the EX and ID stage execution by comparing
+   * GPR write semaphores before and after stepEX(). Branch instructions
+   * check this set in their ID() method to detect and handle this case.
+   */
+  private Set<Register> registersForwardedFromEX = new HashSet<>();
+
   /** Terminating instructions */
   private static ArrayList<String> terminating = new ArrayList<>(
       Arrays.asList("0000000C",     // SYSCALL 0
@@ -406,7 +423,32 @@ public class CPU {
       // Returns the code of the synchronous exception that can happen at this
       // stage, so the rest of the step can continue and, at the end, the
       // exception can be thrown.
+
+      // Before EX, snapshot GPR write semaphores so we can detect which
+      // registers are forwarded (semaphore decremented) during EX.
+      // This is needed so that branch instructions in ID can tell that a
+      // value was just produced by EX and is not yet available for ID
+      // (no EX→ID forwarding path).
+      int[] preSemaphores = null;
+      if (isEnableForwarding()) {
+        preSemaphores = new int[32];
+        for (int i = 0; i < 32; i++) {
+          preSemaphores[i] = gpr[i].getWriteSemaphore();
+        }
+      }
+
       syncex = stepEX();
+
+      // After EX, detect which GPR registers were forwarded (write semaphore
+      // decreased during EX) and record them for branch hazard detection.
+      registersForwardedFromEX.clear();
+      if (isEnableForwarding() && preSemaphores != null) {
+        for (int i = 0; i < 32; i++) {
+          if (gpr[i].getWriteSemaphore() < preSemaphores[i]) {
+            registersForwardedFromEX.add(gpr[i]);
+          }
+        }
+      }
 
       // ID: instruction decode / register fetch stage. The RAW exception is handled
       // via a return value instead of an exception because throwing exceptions proved
@@ -727,6 +769,7 @@ public class CPU {
     funcUnitStalls = 0;
     exStalls = 0;
     memoryStalls = 0;
+    registersForwardedFromEX.clear();
 
     // Reset registers.
     for (int i = 0; i < 32; i++) {
@@ -810,6 +853,16 @@ public class CPU {
 
   public boolean isEnableForwarding() {
     return config.getBoolean(ConfigKey.FORWARDING);
+  }
+
+  /**
+   * Returns true if the given register had its value forwarded from the EX
+   * stage during the current cycle. Branch instructions use this to detect
+   * that the forwarded value is not yet available for use in the ID stage
+   * (no EX→ID forwarding path exists in the pipeline).
+   */
+  public boolean wasRegisterForwardedFromEX(Register reg) {
+    return registersForwardedFromEX.contains(reg);
   }
 
   /** Test method that returns a string containing the values of every
