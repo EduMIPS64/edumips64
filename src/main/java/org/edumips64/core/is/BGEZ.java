@@ -54,12 +54,8 @@ public class BGEZ extends FlowControl_IType {
       return true;
     }
 
-    // With forwarding enabled, a value produced by EX in this cycle cannot be
-    // forwarded to ID (no EX→ID path). The branch must stall 1 cycle.
-    if (cpu.isEnableForwarding()) {
-      if (cpu.wasRegisterForwardedFromEX(cpu.getRegister(params.get(RS_FIELD)))) {
-        return true;
-      }
+    if (cpu.isGPRForwardedFromEX(cpu.getRegister(params.get(RS_FIELD)))) {
+      return true;
     }
 
     //getting register rs

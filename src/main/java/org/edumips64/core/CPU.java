@@ -429,10 +429,11 @@ public class CPU {
       // This is needed so that branch instructions in ID can tell that a
       // value was just produced by EX and is not yet available for ID
       // (no EX→ID forwarding path).
+      // Skip R0 (index 0) since it is architecturally immutable.
       final boolean forwardingEnabled = isEnableForwarding();
       int[] preSemaphores = new int[32];
       if (forwardingEnabled) {
-        for (int i = 0; i < 32; i++) {
+        for (int i = 1; i < 32; i++) {
           preSemaphores[i] = gpr[i].getWriteSemaphore();
         }
       }
@@ -441,9 +442,10 @@ public class CPU {
 
       // After EX, detect which GPR registers were forwarded (write semaphore
       // decreased during EX) and record them for branch hazard detection.
+      // Skip R0 (index 0) since it is architecturally immutable.
       registersForwardedFromEX.clear();
       if (forwardingEnabled) {
-        for (int i = 0; i < 32; i++) {
+        for (int i = 1; i < 32; i++) {
           if (gpr[i].getWriteSemaphore() < preSemaphores[i]) {
             registersForwardedFromEX.add(gpr[i]);
           }
@@ -856,13 +858,28 @@ public class CPU {
   }
 
   /**
-   * Returns true if the given register had its value forwarded from the EX
-   * stage during the current cycle. Branch instructions use this to detect
-   * that the forwarded value is not yet available for use in the ID stage
-   * (no EX→ID forwarding path exists in the pipeline).
+   * Checks whether any of the given registers were forwarded from the EX
+   * stage during the current cycle, which means the value is not yet
+   * available for use in the ID stage (no EX→ID forwarding path exists).
+   *
+   * <p>This should be called by branch/jump instructions in their ID()
+   * method to detect ALU→branch hazards that require a 1-cycle stall even
+   * with forwarding enabled.
+   *
+   * @param regs the source registers to check
+   * @return true if forwarding is enabled and at least one of the given
+   *         registers was forwarded from EX this cycle, false otherwise
    */
-  public boolean wasRegisterForwardedFromEX(Register reg) {
-    return registersForwardedFromEX.contains(reg);
+  public boolean isGPRForwardedFromEX(Register... regs) {
+    if (!isEnableForwarding() || registersForwardedFromEX.isEmpty()) {
+      return false;
+    }
+    for (Register r : regs) {
+      if (registersForwardedFromEX.contains(r)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /** Test method that returns a string containing the values of every
