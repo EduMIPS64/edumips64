@@ -429,9 +429,9 @@ public class CPU {
       // This is needed so that branch instructions in ID can tell that a
       // value was just produced by EX and is not yet available for ID
       // (no EX→ID forwarding path).
-      int[] preSemaphores = null;
-      if (isEnableForwarding()) {
-        preSemaphores = new int[32];
+      final boolean forwardingEnabled = isEnableForwarding();
+      int[] preSemaphores = new int[32];
+      if (forwardingEnabled) {
         for (int i = 0; i < 32; i++) {
           preSemaphores[i] = gpr[i].getWriteSemaphore();
         }
@@ -442,7 +442,7 @@ public class CPU {
       // After EX, detect which GPR registers were forwarded (write semaphore
       // decreased during EX) and record them for branch hazard detection.
       registersForwardedFromEX.clear();
-      if (isEnableForwarding()) {
+      if (forwardingEnabled) {
         for (int i = 0; i < 32; i++) {
           if (gpr[i].getWriteSemaphore() < preSemaphores[i]) {
             registersForwardedFromEX.add(gpr[i]);
