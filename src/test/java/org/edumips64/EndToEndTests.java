@@ -602,14 +602,6 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   public void testPattiForwarding() throws Exception {
     Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("patti-forwarding.s");
 
-    // Log the results for debugging
-    log.warning("patti-forwarding.s with forwarding: cycles=" + statuses.get(ForwardingStatus.ENABLED).cycles +
-        " instructions=" + statuses.get(ForwardingStatus.ENABLED).instructions +
-        " RAW=" + statuses.get(ForwardingStatus.ENABLED).rawStalls);
-    log.warning("patti-forwarding.s without forwarding: cycles=" + statuses.get(ForwardingStatus.DISABLED).cycles +
-        " instructions=" + statuses.get(ForwardingStatus.DISABLED).instructions +
-        " RAW=" + statuses.get(ForwardingStatus.DISABLED).rawStalls);
-
     // With forwarding:
     // TEST1 (ALU→Branch): 1 RAW stall per iteration × 10 iterations = 10
     // TEST2 (ALU→Store):  0 stalls (store defers RT read to MEM)
@@ -632,6 +624,24 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   @Test(timeout=2000)
   public void storeAfterLoad() throws Exception {
     runMipsTest("store-after-load.s");
+  }
+
+  /* Issue #702 regression test: an ALU instruction immediately followed by a
+   * branch that reads its result must produce a 1-cycle stall even when
+   * forwarding is enabled, because branches resolve in the ID stage and
+   * there is no EX -> ID forwarding path. */
+  @Test(timeout=2000)
+  public void testIssue702SltBeqz() throws Exception {
+    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("issue-702-slt-beqz.s");
+
+    // With forwarding: `slt` writes r1 in EX, `beqz` reads r1 in ID.
+    // No EX -> ID forwarding path -> 1 RAW stall.
+    collector.checkThat("issue-702-slt-beqz.s: RAW stalls with forwarding.",
+        statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(1));
+
+    // Without forwarding: branch waits for `slt` to reach WB -> 2 RAW stalls.
+    collector.checkThat("issue-702-slt-beqz.s: RAW stalls without forwarding.",
+        statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(2));
   }
 
   /* ------- FPU TESTS -------- */

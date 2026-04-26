@@ -20,7 +20,7 @@
 ;   - No fwd: 'dadd' (ID) waits for 'ld' (WB) -> 2 stalls
 ;   - Fwd:    'ld' gets data in MEM, 'dadd' needs it in EX -> 1 stall
 ;
-; (c) 2024 EduMIPS64 project
+; (c) 2026 EduMIPS64 project
 ;
 ; This file is part of the EduMIPS64 project, and is released under the GNU
 ; General Public License.
