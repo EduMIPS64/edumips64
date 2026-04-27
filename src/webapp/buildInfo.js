@@ -17,8 +17,9 @@ const PR_REPO_URL = 'https://github.com/EduMIPS64/edumips64/pull';
 /**
  * Classify a `window.location`-like object.
  *
- * @param {{hostname?: string, pathname?: string}} [loc]
- * @returns {{kind: 'production'|'pr'|'dev', prNumber: ?number, prUrl: ?string}}
+ * @param {{hostname?: string, pathname?: string}} [loc] Optional location
+ *   object. Defaults to `window.location` when running in a browser.
+ * @returns {{kind: 'production'|'pr'|'dev', prNumber: number|null, prUrl: string|null}}
  */
 export function getBuildInfo(loc) {
   const location =
