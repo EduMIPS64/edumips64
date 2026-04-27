@@ -152,6 +152,24 @@ The code was tested with Node.JS 16. The CI environment uses this version.
 
 There are Playwright tests for the web UI, which can be run with `npm test`.
 
+#### Build environment indicator
+
+The header of the web UI shows a label that identifies which deployment of
+the application is currently running:
+
+- "Web Version" — production deployment at `web.edumips.org`.
+- "Web Version" + a clickable "PR #N" chip — a per-PR preview build deployed
+  to `https://edumips64ci.z16.web.core.windows.net/<PR_NUMBER>/` by the
+  `deploy-staging` job in `.github/workflows/ci.yml`. The chip links back to
+  the originating pull request on GitHub.
+- "Web Version (dev)" + a "dev" chip — any other host (local development,
+  forks, ad-hoc deployments, etc.).
+
+The same information is also surfaced in the "About" tab of the help dialog.
+The classification logic lives in `src/webapp/buildInfo.js` and is driven
+purely by `window.location`, so it does not require any build-time
+configuration.
+
 #### Web UI code coverage
 
 The web UI tests can generate Istanbul code coverage data. This is used to upload
