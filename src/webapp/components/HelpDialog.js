@@ -24,6 +24,36 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { Typography } from '@mui/material';
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
+import { getBuildInfo } from '../buildInfo';
+
+// Render a localized description of the running build (production/PR/dev),
+// shown in the "About" tab so users can clearly tell which version of the
+// web UI they are running and link back to the PR for preview builds.
+function BuildInfoLine() {
+  const buildInfo = getBuildInfo();
+  if (buildInfo.kind === 'pr') {
+    return (
+      <Typography id="about-build-info">
+        Build: preview for{' '}
+        <Link href={buildInfo.prUrl} target="_blank" rel="noreferrer">
+          pull request #{buildInfo.prNumber}
+        </Link>
+      </Typography>
+    );
+  }
+  if (buildInfo.kind === 'production') {
+    return (
+      <Typography id="about-build-info">
+        Build: production (
+        <Link href="https://web.edumips.org" target="_blank" rel="noreferrer">
+          web.edumips.org
+        </Link>
+        )
+      </Typography>
+    );
+  }
+  return <Typography id="about-build-info">Build: development</Typography>;
+}
 
 // Define the set of allowed languages (should match what's shown in the language Select)
 const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
@@ -498,6 +528,7 @@ export default function HelpDialog(props) {
         <TabPanel value={tabValue} index={1}>
           <Box sx={{ p: 3 }}>
             <Typography>Version: {props.ver}</Typography>
+            <BuildInfoLine />
             <Typography gutterBottom variant="h6" sx={{ mt: 2 }}>
               Quick Start
             </Typography>
