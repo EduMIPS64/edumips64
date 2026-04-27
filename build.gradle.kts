@@ -103,10 +103,21 @@ tasks.withType<JavaCompile>().configureEach {
 
 /* 
  * Documentation tasks. To avoid dependency on GNU Make, these tasks duplicate the commands run by the Sphinx makefiles.
+ *
+ * The user manual is split (via Sphinx `.. only::` directives) in three
+ * flavors, all built from the same sources:
+ *  - "full"  (no Sphinx tag): includes both UI chapters. Used for the PDF
+ *            and matches what Read the Docs publishes.
+ *  - "swing" (-t swing): only the desktop (Swing) UI chapter. Used by the
+ *            in-application help of the desktop JAR.
+ *  - "web"   (-t web): only the web UI chapter. Used by the in-application
+ *            help of the web frontend.
  */
-fun buildDocsCmd(language: String, type: String) : String {
+fun buildDocsCmd(language: String, type: String, flavor: String = "full") : String {
+    val outputSubdir = if (type == "html" && flavor != "full") "${type}-${flavor}" else type
     val baseDir = "${layout.buildDirectory.get()}/docs/${language}"
-    return "-m sphinx -N -a -E . ${baseDir}/${type} -b ${type} -d ${baseDir}/doctrees"
+    val tagFlag = if (flavor == "full") "" else "-t ${flavor} "
+    return "-m sphinx -N -a -E ${tagFlag}. ${baseDir}/${outputSubdir} -b ${type} -d ${baseDir}/doctrees-${flavor}"
 }
 
 /*
@@ -117,36 +128,74 @@ val docsDir = layout.buildDirectory.dir("resources/main/docs")
 // Generate documentation tasks for all languages
 val languages = listOf("en", "it", "zh")
 val docTypes = listOf("html", "pdf")
+// HTML flavors that filter the user-interface chapter via Sphinx `.. only::`
+// directives. The "full" flavor (no tag) includes both UI chapters and
+// matches the PDF and Read the Docs build.
+val htmlFlavors = listOf("full", "swing", "web")
 val allDocsTaskNames = mutableListOf<String>()
 val copyHelpTaskNames = mutableListOf<String>()
+val copyWebHelpTaskNames = mutableListOf<String>()
 val htmlTaskNames = mutableListOf<String>()
 
+fun langCap(l: String) = l.replaceFirstChar { it.uppercase() }
+fun flavorCap(f: String) = f.replaceFirstChar { it.uppercase() }
+
 for (language in languages) {
-    for (type in docTypes) {
-        val taskName = "${type}Docs${language.replaceFirstChar { it.uppercase() }}"
+    // PDF tasks (single flavor: "full"; the PDF always contains everything).
+    val pdfTaskName = "pdfDocs${langCap(language)}"
+    tasks.register<PythonTask>(pdfTaskName) {
+        workDir = "${projectDir}/docs/user/${language}/src"
+        command = buildDocsCmd(language, "pdf")
+    }
+    allDocsTaskNames.add(pdfTaskName)
+
+    // HTML tasks, one per flavor. The "full" flavor keeps the historical
+    // task name `htmlDocs<Lang>` so existing dependencies (e.g. on Read the
+    // Docs and CI) keep working unchanged.
+    for (flavor in htmlFlavors) {
+        val taskName = if (flavor == "full") "htmlDocs${langCap(language)}"
+                       else "htmlDocs${flavorCap(flavor)}${langCap(language)}"
         tasks.register<PythonTask>(taskName) {
             workDir = "${projectDir}/docs/user/${language}/src"
-            command = buildDocsCmd(language, type)
+            command = buildDocsCmd(language, "html", flavor)
         }
         allDocsTaskNames.add(taskName)
-
-        if (type == "html") {
+        if (flavor == "full") {
             htmlTaskNames.add(taskName)
         }
     }
-    
-    // Generate copy tasks for each language
-    val copyTaskName = "copyHelp${language.replaceFirstChar { it.uppercase() }}"
+
+    // copyHelp<Lang>: copies the Swing-flavored HTML into the JAR resources.
+    val copyTaskName = "copyHelp${langCap(language)}"
     tasks.register<Copy>(copyTaskName) {
         from("${layout.buildDirectory.get()}/docs/${language}") {
-            include("html/**")
+            // Map the Swing-flavored HTML output to the standard "html/"
+            // path used at runtime (Map.jhm + HelpDialog.js both look for
+            // docs/<lang>/html/).
+            include("html-swing/**")
             exclude("**/_sources/**")
+            eachFile { path = path.replaceFirst("html-swing", "html") }
+            includeEmptyDirs = false
         }
         into(docsDir.map { it.dir("user/$language") })
-        dependsOn("htmlDocs${language.replaceFirstChar { it.uppercase() }}")
+        dependsOn("htmlDocsSwing${langCap(language)}")
         mustRunAfter("compileJava")
     }
     copyHelpTaskNames.add(copyTaskName)
+
+    // copyWebHelp<Lang>: copies the Web-flavored HTML into the web bundle.
+    val copyWebTaskName = "copyWebHelp${langCap(language)}"
+    tasks.register<Copy>(copyWebTaskName) {
+        from("${layout.buildDirectory.get()}/docs/${language}") {
+            include("html-web/**")
+            exclude("**/.buildinfo", "**/objects.inv", "**/_sources/**")
+            eachFile { path = path.replaceFirst("html-web", "html") }
+            includeEmptyDirs = false
+        }
+        into(layout.buildDirectory.dir("web/docs/${language}"))
+        dependsOn("htmlDocsWeb${langCap(language)}")
+    }
+    copyWebHelpTaskNames.add(copyWebTaskName)
 }
 
 // Catch-all tasks for documentation
@@ -377,21 +426,19 @@ val npmBuild by tasks.registering(Exec::class) {
     mustRunAfter("war")
 }
 
-val copyWebHelp by tasks.registering(Copy::class) {
+val copyWebHelp by tasks.registering {
     group = "Web"
-    description = "Copies generated HTML help into the web UI bundle"
-    dependsOn("htmlDocs")
-    from(layout.buildDirectory.dir("docs")) {
-        exclude("**/doctrees/**", "**/.buildinfo", "**/objects.inv", "**/_sources/**")
-    }
-    into(layout.buildDirectory.dir("web/docs"))
+    description = "Copies the Web-flavored HTML help into the web UI bundle"
+    // Aggregate per-language copyWebHelp<Lang> tasks; each of them copies the
+    // `html-web/` Sphinx build output for one language into out/web/docs/.
+    copyWebHelpTaskNames.forEach { dependsOn(it) }
     mustRunAfter("war")
 }
 
 tasks.register("webapp") {
     group = "Web"
     description = "Builds the EduMIPS64 web application with bundled documentation"
-    dependsOn("war", "htmlDocs", assembleWebApp, npmBuild, copyWebHelp)
+    dependsOn("war", assembleWebApp, npmBuild, copyWebHelp)
 
     // Transitional CI compatibility: `pull_request_target` loads reusable
     // workflows (including build-web.yml) from the base branch, so while this

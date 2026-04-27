@@ -24,25 +24,21 @@ differenze importanti con quest'ultimo.
 
 Questo manuale vi introdurrà ad EduMIPS64, e spiegherà come utilizzarlo.
 
-Il primo capitolo del manuale riguarda il formato dei file sorgente accettato
-dal simulatore, descrivendo i tipi di dato e le direttive, oltre ai parametri
-da linea di comando.
-
-Nel secondo capitolo è presentata una panoramica del set di istruzioni MIPS64
-utilizzato da EduMIPS64, con tutti i parametri richiesti e le indicazioni per
-il loro utilizzo.
-
-Il terzo capitolo descrive la Floating Point Unit ed il suo insieme di
-istruzioni.
-
-Il quarto capitolo è una descrizione dell'interfaccia utente di EduMIPS64,
-che espone lo scopo di ciascuna finestra e di ciascun menù, insieme ad una
-descrizione delle finestre di configurazione, del simulatore di cache L1, del 
-Dinero frontend, del manuale e delle opzioni da linea di comando.
-
-Il quinto capitolo contiene alcune esempi pratici di utilizzo del simulatore.
-
 Questo manuale si riferisce ad EduMIPS64 versione |version|.
+
+Il manuale è suddiviso in due parti. La prima parte è indipendente
+dall'interfaccia utente in uso e copre il formato dei file sorgente,
+l'insieme di istruzioni supportato, la Floating Point Unit e una serie
+di programmi di esempio. La seconda parte documenta le interfacce
+utente: un capitolo dedicato all'applicazione desktop (Swing), che
+include anche le opzioni da linea di comando del JAR, ed un capitolo
+dedicato al frontend web.
+
+Quando il manuale viene aperto dall'interno dell'applicazione, viene
+mostrato solo il capitolo relativo all'interfaccia utente attiva. Il
+manuale completo (con entrambi i capitoli sulle interfacce utente) è
+disponibile su `Read the Docs <https://edumips64.readthedocs.io/>`_ ed
+in formato PDF.
 
 .. toctree::
    :maxdepth: 2
@@ -50,5 +46,18 @@ Questo manuale si riferisce ad EduMIPS64 versione |version|.
    source-files-format
    instructions
    fpu
-   user-interface
    examples
+
+.. only:: not web
+
+   .. toctree::
+      :maxdepth: 2
+
+      user-interface-swing
+
+.. only:: not swing
+
+   .. toctree::
+      :maxdepth: 2
+
+      user-interface-web

@@ -10,7 +10,7 @@
 
  <tocitem text="Floating Point Unit" target="fpu"/>
 
- <tocitem text="L'interfaccia utente " target="user-interface"/>
+ <tocitem text="L'interfaccia utente " target="user-interface-swing"/>
 
  <tocitem text="Esempi " target="examples"/>
 

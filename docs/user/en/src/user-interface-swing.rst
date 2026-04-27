@@ -1,7 +1,12 @@
-The user interface
-==================
-The GUI of EduMIPS64 is inspired to WinMIPS64 user interface. In fact, the
-main window is identical, except for some menus.
+The desktop user interface
+==========================
+EduMIPS64 ships as a Java desktop application based on Swing. This chapter
+describes the desktop GUI, which is inspired by the WinMIPS64 user interface.
+In fact, the main window is identical, except for some menus.
+
+This chapter also documents the command line options that are supported by
+the desktop JAR. The same JAR can be run as a graphical application or in
+headless / CLI mode (see :ref:`command-line-options`).
 
 .. Please refer to chapter~\ref{mips-simulators} for an overview of some MIPS
    and DLX simulators (including WinMIPS64), and to \cite{winmips-web} for more
@@ -313,6 +318,8 @@ Help
 ~~~~
 The Help dialog brings up the on-line manual, which is an HTML copy of this
 document.
+
+.. _command-line-options:
 
 Command line options
 --------------------
