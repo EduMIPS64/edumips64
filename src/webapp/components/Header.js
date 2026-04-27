@@ -6,11 +6,14 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
+import Chip from '@mui/material/Chip';
+import Link from '@mui/material/Link';
 
 import HelpDialog from './HelpDialog';
 import CpuStatusDisplay from './CpuStatusDisplay';
 import logoDark from '../static/logo-dark.png';
 import logoBright from '../static/logo.png';
+import { getBuildInfo } from '../buildInfo';
 
 import HelpIcon from '@mui/icons-material/Help';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -31,6 +34,11 @@ export default function Header(props) {
   // `stepStride` setting, so it lives alongside the other execution
   // parameters in the Settings panel and survives page reloads.
   const multiStepCount = props.multiStepCount;
+
+  // Classify the current deployment so that users can tell at a glance
+  // whether they are using the production version or a PR/dev build, and
+  // jump back to the originating pull request when applicable.
+  const buildInfo = React.useMemo(() => getBuildInfo(), []);
 
 
   const handleFileLoad = (event) => {
@@ -58,9 +66,43 @@ export default function Header(props) {
           variant="h6"
           noWrap
           component="div"
-          sx={{ flexGrow: 1, display: { xs: 'none', lg: 'block' } }}
+          sx={{
+            flexGrow: 1,
+            display: { xs: 'none', lg: 'flex' },
+            alignItems: 'center',
+            gap: 1,
+          }}
         >
-          Web Version
+          {buildInfo.kind === 'dev' ? 'Web Version (dev)' : 'Web Version'}
+          {buildInfo.kind === 'pr' && (
+            <Tooltip
+              title="This is a preview build for a pull request. Click to open the PR on GitHub."
+              arrow
+              placement="bottom"
+            >
+              <Chip
+                id="pr-build-chip"
+                component={Link}
+                href={buildInfo.prUrl}
+                target="_blank"
+                rel="noreferrer"
+                clickable
+                color="warning"
+                size="small"
+                label={`PR #${buildInfo.prNumber}`}
+                sx={{ fontWeight: 'bold' }}
+              />
+            </Tooltip>
+          )}
+          {buildInfo.kind === 'dev' && (
+            <Chip
+              id="dev-build-chip"
+              color="info"
+              size="small"
+              label="dev"
+              sx={{ fontWeight: 'bold' }}
+            />
+          )}
         </Typography>
         <Tooltip title="The current status of the CPU" arrow placement="top">
           <div>
