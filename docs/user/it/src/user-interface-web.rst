@@ -260,16 +260,39 @@ ad essi sono distribuite le unità funzionali della FPU — l'Adder
 
 * si colora con il colore associato al proprio stadio quando contiene
   un'istruzione, e mostra il nome dell'istruzione all'interno;
-* viene riempito con un tratteggio e l'etichetta *stall* quando lo
-  stadio contiene una bolla della pipeline (per esempio mentre lo
-  stadio ID attende la risoluzione di un hazard RAW con il forwarding
-  disattivato), così da distinguere visivamente gli stalli dagli
-  stadi attivi;
-* resta vuoto quando l'unità funzionale corrispondente non è in uso.
+* resta come un riquadro vuoto quando lo stadio è inattivo o contiene
+  una bolla della pipeline (per esempio gli slot scartati da un salto
+  oppure le bolle di drain a fine programma): come nel widget Swing,
+  le bolle vengono mostrate come stadi vuoti;
+* viene riempito con un tratteggio, il colore dedicato *Stall* e una
+  breve etichetta del tipo di stallo quando in quel ciclo si è
+  effettivamente verificato uno stallo. Le etichette riprendono la
+  classificazione del widget Cycles del front-end Swing:
 
-I colori dei singoli stadi possono essere personalizzati dalla sezione
-*General Settings → Pipeline Colors* (vedi sotto) e vengono salvati nel
-local storage del browser.
+  - **RAW** — Read-After-Write (tipicamente sullo stadio ID quando
+    il forwarding è disabilitato);
+  - **WAW** — Write-After-Write fra due istruzioni FP che
+    competono per lo stesso registro destinazione;
+  - **Struct: Div / EX / FU** — stallo strutturale sul divisore
+    FP, sullo stadio EX intero o su un'altra unità funzionale FP;
+  - **Struct: Mem / Add / Mul** — stallo strutturale causato da
+    un'istruzione bloccata in MEM, nell'ultimo stadio dell'Adder
+    FP (A4) o nell'ultimo stadio del Multiplier FP (M7).
+
+  Gli hazard WAR (Write-After-Read) *non* sono possibili in questa
+  implementazione MIPS: l'emissione in-order in ID e il writeback
+  tardivo in WB ordinano sempre le letture prima delle scritture
+  successive, quindi il simulatore non li genera mai.
+
+La classificazione degli stalli riusa il ``CycleBuilder`` del
+front-end Swing — uno stallo viene identificato dal contatore della
+CPU che è incrementato nell'ultimo ciclo — quindi il widget Pipeline
+sul web è sempre coerente con i totali mostrati nel pannello
+*Statistics*.
+
+I colori dei singoli stadi (incluso quello *Stall*) possono essere
+personalizzati dalla sezione *General Settings → Pipeline Colors*
+(vedi sotto) e vengono salvati nel local storage del browser.
 
 Registers
 ~~~~~~~~~

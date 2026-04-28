@@ -39,6 +39,17 @@ public class Instruction {
     public int Line;
     public String BinaryRepresentation;
     public String OpCode;
+    /**
+     * Last state recorded for this instruction by {@code CycleBuilder} (one of
+     * {@code "IF"}, {@code "ID"}, {@code "EX"}, {@code "MEM"}, {@code "WB"},
+     * {@code "RAW"}, {@code "WAW"}, {@code "StDiv"}, {@code "StEx"},
+     * {@code "StFun"}, {@code "Str"}, {@code "A1"}..{@code "A4"}, {@code "M1"}..
+     * {@code "M7"}, {@code "StAdd"}, {@code "StMul"}, {@code "DIV"} or
+     * {@code "Dxx"} for divider counters). May be {@code null} for instructions
+     * that haven't been seen by the CycleBuilder yet (e.g. when CycleBuilder
+     * has not been wired in).
+     */
+    public String Stage;
 
     private Instruction() {}
 

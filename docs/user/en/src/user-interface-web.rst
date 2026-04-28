@@ -251,15 +251,38 @@ Divider — laid out around them. Each block:
 
 * lights up with the stage's colour while it holds an instruction, and
   shows the instruction's mnemonic inside the block;
-* renders with a hatched fill and the label *stall* when the stage
-  contains a pipeline bubble (for example, while ID waits for an
-  unresolved RAW hazard with forwarding disabled), so stalls are
-  visually distinct from active stages;
-* stays empty when the corresponding functional unit is idle.
+* stays as an empty outline when the corresponding stage is idle or
+  holds a pipeline bubble (e.g. branch-flush slots, end-of-program
+  drain bubbles): just like Swing's pipeline widget, bubbles are
+  rendered as empty stages;
+* renders with a hatched fill, the dedicated *Stall* colour and a
+  short stall-type label whenever a stall actually occurred in the
+  current cycle. The labels match the Swing cycle widget's
+  classification:
 
-The per-stage colours can be customised from *General Settings →
-Pipeline Colors* (see below) and are persisted in browser local
-storage.
+  - **RAW** — Read-After-Write data hazard (typically on the ID
+    stage when forwarding is disabled);
+  - **WAW** — Write-After-Write hazard between two FP instructions
+    competing for the same destination register;
+  - **Struct: Div / EX / FU** — structural hazard at the FP Divider,
+    the integer EX stage or another FP functional unit;
+  - **Struct: Mem / Add / Mul** — structural hazard caused by an
+    instruction stuck in MEM, in the FP Adder's last stage (A4) or
+    the FP Multiplier's last stage (M7).
+
+  WAR (Write-After-Read) hazards are *not* possible in this MIPS
+  implementation: the in-order issue at ID combined with the late
+  writeback at WB orders all reads before later writes, so the
+  simulator never raises one.
+
+Stall classification reuses the Swing UI's ``CycleBuilder`` —
+identifying a stall by detecting which CPU stall counter incremented
+in the most recent cycle — so the Web pipeline widget always agrees
+with the totals shown in the *Statistics* panel.
+
+The per-stage colours (including the *Stall* colour) can be
+customised from *General Settings → Pipeline Colors* (see below) and
+are persisted in browser local storage.
 
 Registers
 ~~~~~~~~~

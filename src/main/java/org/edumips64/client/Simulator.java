@@ -40,6 +40,7 @@ import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.core.cache.CacheConfig;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.InputNeededException;
 import org.edumips64.utils.io.FileUtils;
@@ -59,6 +60,13 @@ public class Simulator {
   // so that runtime-tweakable settings (e.g. forwarding) can be updated from
   // the worker protocol without recreating the whole simulator.
   private ConfigStore config;
+
+  // Per-cycle builder of the pipeline-state diagram. Reused from the Swing UI
+  // (`org.edumips64.utils.CycleBuilder`); we step it alongside `cpu.step()`
+  // and read the latest state of each in-flight instruction from it so the
+  // Web UI can label active stalls (RAW / WAW / StDiv / StEx / StFun / Str /
+  // StAdd / StMul) the same way the Swing cycle widget does.
+  private CycleBuilder cycleBuilder;
 
   // TODO: handle these errors more elegantly.
   private ParserMultiException lastParsingErrors = null;
@@ -82,10 +90,11 @@ public class Simulator {
     iom.setStdInput(stdin);
     cpu = new CPU(memory, config, new BUBBLE());
     cachesim = new CacheSimulator();
+    cycleBuilder = new CycleBuilder(cpu);
 
     InstructionBuilder instructionBuilder = new InstructionBuilder(memory, iom, cpu, cachesim, config);
     parser = new Parser(fu, symTab, memory, instructionBuilder);
-    resultFactory = new ResultFactory(cpu, memory, cachesim, stdout);
+    resultFactory = new ResultFactory(cpu, memory, cachesim, stdout, cycleBuilder);
     supportedInstructions = instructionBuilder.getSupportedInstructionString();
     info("initialization complete!");
   }
@@ -96,6 +105,7 @@ public class Simulator {
     // re-reads the setting during reset observes the new value.
     config.putBoolean(ConfigKey.FORWARDING, enabled);
     cpu.reset();
+    cycleBuilder = new CycleBuilder(cpu);
     return resultFactory.Success();
   }
 
@@ -103,7 +113,8 @@ public class Simulator {
     cpu.reset();
     cachesim.getL1InstructionCache().setConfig(l1i_config);
     cachesim.getL1DataCache().setConfig(l1d_config);
-    resultFactory = new ResultFactory(cpu, memory, cachesim,stdout);
+    cycleBuilder = new CycleBuilder(cpu);
+    resultFactory = new ResultFactory(cpu, memory, cachesim, stdout, cycleBuilder);
     return resultFactory.Success();
   }
 
@@ -117,7 +128,8 @@ public class Simulator {
       iom.setStdOutput(stdout);
       iom.setStdInput(stdin);
 
-      resultFactory = new ResultFactory(cpu, memory, cachesim, stdout);
+      cycleBuilder = new CycleBuilder(cpu);
+      resultFactory = new ResultFactory(cpu, memory, cachesim, stdout, cycleBuilder);
       var result = resultFactory.Success();
 
       // reset() provides the JS simulator's initial state. Therefore, we pass the
@@ -140,6 +152,13 @@ public class Simulator {
     try {
       do {
         cpu.step();
+        // Step the cycle builder alongside the CPU so the per-cycle stall
+        // classification surfaced via Pipeline.getStage() stays in sync. We
+        // ignore HaltException-driven step updates: when HaltException is
+        // thrown the CPU decrements its `cycles` counter and we end up in
+        // the catch block below, where stepping CycleBuilder would be a
+        // no-op anyway (oldTime == cycles).
+        cycleBuilder.step();
       } while (--steps > 0);
     } catch (HaltException e) {
       info("Program terminated successfully.");

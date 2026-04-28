@@ -202,13 +202,32 @@ Pipeline
 以及 FP Divider——围绕在它们周围。每个方块：
 
 * 当其中持有指令时，会以该阶段的颜色高亮，并在方块中显示指令名；
-* 当阶段中是流水线气泡（例如关闭 forwarding 时 ID 因 RAW
-  hazard 等待）时，会以斜线填充并显示 *stall* 标签，从而与
-  正常占用的阶段在视觉上明确区分；
-* 对应功能单元空闲时保持为空。
+* 当阶段空闲或仅持有流水线气泡时（例如分支冲刷的槽位、程序结束时
+  的排空气泡），保持为空白方框：与 Swing 流水线视图的做法一致，
+  气泡渲染为空阶段；
+* 当本周期内确实发生了停顿时，方块会以斜线填充、使用专用的
+  *Stall* 颜色，并标注简短的停顿类型标签。标签沿用 Swing 周期
+  视图的分类：
 
-各阶段的颜色可在 *General Settings → Pipeline Colors* 中自定义
-（见下文），并保存在浏览器的本地存储中。
+  - **RAW** —— Read-After-Write 数据相关（关闭 forwarding 时
+    通常出现在 ID 阶段）；
+  - **WAW** —— 两条 FP 指令竞争同一目的寄存器引发的
+    Write-After-Write 相关；
+  - **Struct: Div / EX / FU** —— FP 除法器、整数 EX 阶段或其他
+    FP 功能单元上的结构相关；
+  - **Struct: Mem / Add / Mul** —— 由 MEM 阶段被占用、FP Adder
+    末级（A4）或 FP Multiplier 末级（M7）被占用引起的结构相关。
+
+  本 MIPS 实现中**不会**出现 WAR（Write-After-Read）相关：ID 阶段
+  按序发射加上 WB 阶段的延迟写回，使得任意先发射的读操作总在后续
+  写操作之前完成，因此模拟器从不产生此类相关。
+
+停顿分类复用了 Swing 前端的 ``CycleBuilder`` —— 通过检测最近一个
+周期内 CPU 哪个停顿计数器递增来识别停顿，因此 Web 流水线视图所
+显示的停顿与 *Statistics* 面板中的总数始终一致。
+
+各阶段的颜色（包括 *Stall* 颜色）可在 *General Settings → Pipeline
+Colors* 中自定义（见下文），并保存在浏览器的本地存储中。
 
 Registers
 ~~~~~~~~~

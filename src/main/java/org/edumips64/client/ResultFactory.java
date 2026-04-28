@@ -39,6 +39,8 @@ import org.edumips64.core.CacheSimulator;
 import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.parser.ParserMultiException;
+import org.edumips64.utils.CycleBuilder;
+import org.edumips64.utils.CycleElement;
 import org.edumips64.utils.io.InputNeededException;
 import org.edumips64.utils.io.StringWriter;
 
@@ -51,6 +53,11 @@ public class ResultFactory {
     private CacheSimulator cachesim;
     private Logger logger = Logger.getLogger("ResultFactory");
     private StringWriter stdout;
+    // The CycleBuilder mirrors the Swing UI's pipeline-state diagram and is
+    // used to classify the *current* cycle's stalls (RAW, WAW, structural)
+    // so the Web UI can label the stalled stage. Optional — when null, the
+    // factory simply omits stall classification.
+    private CycleBuilder cycleBuilder;
 
     static String FromCpuStatus(CPUStatus s) {
         switch (s) {
@@ -65,10 +72,16 @@ public class ResultFactory {
     }
 
     public ResultFactory(CPU cpu, Memory memory, CacheSimulator cachesim, StringWriter stdout) {
+        this(cpu, memory, cachesim, stdout, null);
+    }
+
+    public ResultFactory(CPU cpu, Memory memory, CacheSimulator cachesim, StringWriter stdout,
+                         CycleBuilder cycleBuilder) {
         this.cpu = cpu;
         this.memory = memory;
         this.stdout = stdout;
         this.cachesim = cachesim;
+        this.cycleBuilder = cycleBuilder;
     }
 
     public Result Success() {
@@ -304,25 +317,58 @@ public class ResultFactory {
         Map<Stage, InstructionInterface> cpuPipeline = cpu.getPipeline();
 
         Pipeline p = new Pipeline();
-        p.IF = Instruction.FromInstruction(cpuPipeline.get(Stage.IF));
-        p.ID = Instruction.FromInstruction(cpuPipeline.get(Stage.ID));
-        p.EX = Instruction.FromInstruction(cpuPipeline.get(Stage.EX));
-        p.MEM = Instruction.FromInstruction(cpuPipeline.get(Stage.MEM));
-        p.WB = Instruction.FromInstruction(cpuPipeline.get(Stage.WB));
-        
-        p.FPAdder1 = Instruction.FromInstruction(cpu.getFpuInstruction("ADDER", 1));
-        p.FPAdder2 = Instruction.FromInstruction(cpu.getFpuInstruction("ADDER", 2));
-        p.FPAdder3 = Instruction.FromInstruction(cpu.getFpuInstruction("ADDER", 3));
-        p.FPAdder4 = Instruction.FromInstruction(cpu.getFpuInstruction("ADDER", 4));
-        p.FPMultiplier1 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 1));
-        p.FPMultiplier2 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 2));
-        p.FPMultiplier3 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 3));
-        p.FPMultiplier4 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 4));
-        p.FPMultiplier5 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 5));
-        p.FPMultiplier6 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 6));
-        p.FPMultiplier7 = Instruction.FromInstruction(cpu.getFpuInstruction("MULTIPLIER", 7));
-        p.FPDivider = Instruction.FromInstruction(cpu.getFpuInstruction("DIVIDER", 0));
+        p.IF = wrap(cpuPipeline.get(Stage.IF));
+        p.ID = wrap(cpuPipeline.get(Stage.ID));
+        p.EX = wrap(cpuPipeline.get(Stage.EX));
+        p.MEM = wrap(cpuPipeline.get(Stage.MEM));
+        p.WB = wrap(cpuPipeline.get(Stage.WB));
+
+        p.FPAdder1 = wrap(cpu.getFpuInstruction("ADDER", 1));
+        p.FPAdder2 = wrap(cpu.getFpuInstruction("ADDER", 2));
+        p.FPAdder3 = wrap(cpu.getFpuInstruction("ADDER", 3));
+        p.FPAdder4 = wrap(cpu.getFpuInstruction("ADDER", 4));
+        p.FPMultiplier1 = wrap(cpu.getFpuInstruction("MULTIPLIER", 1));
+        p.FPMultiplier2 = wrap(cpu.getFpuInstruction("MULTIPLIER", 2));
+        p.FPMultiplier3 = wrap(cpu.getFpuInstruction("MULTIPLIER", 3));
+        p.FPMultiplier4 = wrap(cpu.getFpuInstruction("MULTIPLIER", 4));
+        p.FPMultiplier5 = wrap(cpu.getFpuInstruction("MULTIPLIER", 5));
+        p.FPMultiplier6 = wrap(cpu.getFpuInstruction("MULTIPLIER", 6));
+        p.FPMultiplier7 = wrap(cpu.getFpuInstruction("MULTIPLIER", 7));
+        p.FPDivider = wrap(cpu.getFpuInstruction("DIVIDER", 0));
 
         return p;
+    }
+
+    /**
+     * Wraps the given internal Instruction for JS consumption and, when a
+     * {@link CycleBuilder} is wired in, attaches the instruction's current
+     * pipeline-state tag (e.g. {@code "RAW"}, {@code "WAW"}, {@code "StDiv"})
+     * so the Web UI can render stall information without having to mirror the
+     * core's stall-detection state machine.
+     */
+    private Instruction wrap(InstructionInterface i) {
+        Instruction instruction = Instruction.FromInstruction(i);
+        if (instruction == null || cycleBuilder == null || i == null || i.isBubble()) {
+            return instruction;
+        }
+        // Walk the CycleBuilder's element list in reverse to find the most
+        // recent CycleElement matching this instruction's serial number — the
+        // "live" cycle for this in-flight instruction. Reading the *last*
+        // tagged state from it gives us the state that was assigned in the
+        // most recently completed CPU cycle (e.g. "ID" when ID succeeded,
+        // "RAW" when ID stalled due to a Read-After-Write hazard, etc.).
+        java.util.List<CycleElement> elements = cycleBuilder.getElementsList();
+        int serial = i.getSerialNumber();
+        for (int idx = elements.size() - 1; idx >= 0; idx--) {
+            CycleElement el = elements.get(idx);
+            if (el.getSerialNumber() == serial) {
+                java.util.LinkedList<String> states = el.getStates();
+                if (!states.isEmpty()) {
+                    instruction.Stage = states.getLast();
+                }
+                break;
+            }
+        }
+        return instruction;
     }
 }
