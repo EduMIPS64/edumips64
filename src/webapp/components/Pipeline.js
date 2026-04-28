@@ -93,7 +93,7 @@ const STALL_LABELS = {
 };
 
 const stallLabel = (instr) =>
-  instr && instr.Stage ? STALL_LABELS[instr.Stage] || null : null;
+  (instr?.Stage && STALL_LABELS[instr.Stage]) || null;
 
 /**
  * Render a single rectangular pipeline stage.

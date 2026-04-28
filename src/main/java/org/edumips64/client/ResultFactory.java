@@ -348,7 +348,7 @@ public class ResultFactory {
      */
     private Instruction wrap(InstructionInterface i) {
         Instruction instruction = Instruction.FromInstruction(i);
-        if (instruction == null || cycleBuilder == null || i == null || i.isBubble()) {
+        if (instruction == null || i == null || i.isBubble() || cycleBuilder == null) {
             return instruction;
         }
         // Walk the CycleBuilder's element list in reverse to find the most
