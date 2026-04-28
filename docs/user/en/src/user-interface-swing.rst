@@ -301,6 +301,62 @@ for programs with poor memory locality. Use the cache simulator to:
 The cache configuration can be changed through the Settings dialog (Cache tab)
 and takes effect when the simulation is reset.
 
+Forwarding
+~~~~~~~~~~
+EduMIPS64 models a 5-stage MIPS64 pipeline (IF, ID, EX, MEM, WB) and supports
+optional data forwarding to reduce the number of stalls caused by Read After
+Write (RAW) hazards. Forwarding can be toggled from the Main Settings tab of
+the Settings dialog.
+
+When forwarding is **disabled**, source registers are read from the register
+file in the ID stage. An instruction that reads a register written by one of
+the two previous instructions must wait until the producer reaches WB, which
+results in two RAW stalls.
+
+When forwarding is **enabled**, the simulator implements two forwarding paths
+that match the canonical Hennessy & Patterson MIPS pipeline:
+
+* **EX → EX**: an ALU result produced at the end of EX can be forwarded to
+  the EX input of the immediately following instruction (no stall).
+* **MEM → EX**: a value produced at the end of MEM (typically a load
+  result, or an ALU result one cycle later) can be forwarded to the EX
+  input of an instruction in EX (no stall).
+
+There is **no EX → ID forwarding path** and, by symmetry, no MEM → ID
+forwarding path. This has two visible consequences for branch and
+register-based jump instructions (``BEQ``, ``BNE``, ``BEQZ``, ``BNEZ``,
+``BGEZ``, ``JR``, ``JALR``), which evaluate their condition or target in
+the ID stage:
+
+* **ALU → branch**: if the source register of the branch is being
+  produced by the immediately preceding ALU instruction, the value is not
+  yet available at the start of ID, and the simulator inserts one RAW
+  stall.
+* **Load → branch**: if the source register of the branch is being
+  produced by the immediately preceding load, the value is only available
+  at the end of MEM, while the branch needs it at the start of ID. The
+  simulator inserts two RAW stalls: this is the union of the load-use
+  hazard (one stall) and the branch-in-ID hazard (one extra stall).
+
+Both behaviors match the description in Hennessy & Patterson.
+
+The following table summarises the typical RAW stalls for the most common
+producer/consumer pairs:
+
++------------------------------+----------------+-------------------+
+| Producer → consumer          | No forwarding  | With forwarding   |
++==============================+================+===================+
+| ALU → ALU                    | 2              | 0                 |
++------------------------------+----------------+-------------------+
+| ALU → store (data operand)   | 2              | 0                 |
++------------------------------+----------------+-------------------+
+| Load → ALU (load-use)        | 2              | 1                 |
++------------------------------+----------------+-------------------+
+| ALU → branch / register jump | 2              | 1                 |
++------------------------------+----------------+-------------------+
+| Load → branch / register jump| 2              | 2                 |
++------------------------------+----------------+-------------------+
+
 Dinero Frontend
 ~~~~~~~~~~~~~~~
 The Dinero Frontend dialog allows to feed a DineroIV process with the trace

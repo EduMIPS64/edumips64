@@ -52,6 +52,11 @@ public class JALR extends FlowControl_RType {
     if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0) {
       return true;
     }
+
+    if (cpu.isGPRForwardedThisCycle(cpu.getRegister(params.get(RS_FIELD)))) {
+      return true;
+    }
+
     //saving PC value into a temporary register
     cpu.getRegister(31).incrWriteSemaphore();  //deadlock !!!
     TR[PC_VALUE].writeDoubleWord(cpu.getPC().getValue() - 4);

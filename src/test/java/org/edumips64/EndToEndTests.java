@@ -592,9 +592,75 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runForwardingTest("forwarding-hp-pA18.s", 8, 12, 4);
   }
 
+  /* Patti forwarding analysis test.
+   * Tests all major forwarding scenarios based on Prof. Patti's analysis.
+   * Expected RAW stalls:
+   *   With forwarding:    TEST1: 10 + TEST2: 0 + TEST3: 0 + TEST4: 1 + TEST5: 2 = 13
+   *   Without forwarding: TEST1: 20 + TEST2: 2 + TEST3: 2 + TEST4: 2 + TEST5: 2 = 28
+   */
+  @Test(timeout=2000)
+  public void testPattiForwarding() throws Exception {
+    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("patti-forwarding.s");
+
+    // With forwarding:
+    // TEST1 (ALU→Branch): 1 RAW stall per iteration × 10 iterations = 10
+    // TEST2 (ALU→Store):  0 stalls (store defers RT read to MEM)
+    // TEST3 (ALU→ALU):    0 stalls (EX→EX forwarding)
+    // TEST4 (Load→ALU):   1 stall (load-use hazard)
+    // TEST5 (Load→Branch): 2 stalls (load-use + branch-in-ID combined)
+    // Total: 13 RAW stalls
+    collector.checkThat("patti-forwarding.s: RAW stalls with forwarding.",
+        statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(13));
+
+    // Without forwarding:
+    // TEST1 (ALU→Branch): 2 RAW stalls per iteration × 10 iterations = 20
+    // TEST2 (ALU→Store):  2 stalls
+    // TEST3 (ALU→ALU):    2 stalls
+    // TEST4 (Load→ALU):   2 stalls
+    // TEST5 (Load→Branch): 2 stalls
+    // Total: 28 RAW stalls
+    collector.checkThat("patti-forwarding.s: RAW stalls without forwarding.",
+        statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(28));
+  }
+
   @Test(timeout=2000)
   public void storeAfterLoad() throws Exception {
     runMipsTest("store-after-load.s");
+  }
+
+  /* Issue #702 regression test: an ALU instruction immediately followed by a
+   * branch that reads its result must produce a 1-cycle stall even when
+   * forwarding is enabled, because branches resolve in the ID stage and
+   * there is no EX -> ID forwarding path. */
+  @Test(timeout=2000)
+  public void testIssue702SltBeqz() throws Exception {
+    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("issue-702-slt-beqz.s");
+
+    // With forwarding: `slt` writes r1 in EX, `beqz` reads r1 in ID.
+    // No EX -> ID forwarding path -> 1 RAW stall.
+    collector.checkThat("issue-702-slt-beqz.s: RAW stalls with forwarding.",
+        statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(1));
+
+    // Without forwarding: branch waits for `slt` to reach WB -> 2 RAW stalls.
+    collector.checkThat("issue-702-slt-beqz.s: RAW stalls without forwarding.",
+        statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(2));
+  }
+
+  /* Issue #702 regression test (load-use + branch-in-ID combined): a load
+   * immediately followed by a branch that reads its result must produce
+   * 2 RAW stalls both with and without forwarding. With forwarding, the
+   * load produces the value in MEM, but the branch needs it in ID and
+   * there is no MEM -> ID forwarding path: the branch must wait for the
+   * value to become available via WB -> ID one cycle later. */
+  @Test(timeout=2000)
+  public void testIssue702LdBeq() throws Exception {
+    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("issue-702-ld-beq.s");
+
+    collector.checkThat("issue-702-ld-beq.s: RAW stalls with forwarding.",
+        statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(2));
+
+    collector.checkThat("issue-702-ld-beq.s: RAW stalls without forwarding.",
+        statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(2));
   }
 
   /* ------- FPU TESTS -------- */
@@ -810,8 +876,8 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   /* Issue #51: Problem with SYSCALL 0 after branch. */
   @Test(timeout=2000)
   public void testTerminationInID() throws Exception {
-    runForwardingTest("issue51-halt.s", 11, 17, 6);
-    runForwardingTest("issue51-syscall0.s", 11, 17, 6);
+    runForwardingTest("issue51-halt.s", 13, 17, 6);
+    runForwardingTest("issue51-syscall0.s", 13, 17, 6);
   }
 
   /* Issue #68: JR does not respect RAW stalls. */

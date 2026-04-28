@@ -321,6 +321,67 @@ La configurazione della cache può essere modificata tramite la finestra di
 dialogo Impostazioni (scheda Cache) e ha effetto quando la simulazione viene 
 resettata.
 
+Forwarding
+~~~~~~~~~~
+EduMIPS64 simula una pipeline MIPS64 a 5 stadi (IF, ID, EX, MEM, WB) e
+supporta opzionalmente il forwarding dei dati per ridurre il numero di stalli
+causati da hazard Read After Write (RAW). Il forwarding può essere abilitato
+o disabilitato dalla scheda "Impostazioni generali" della finestra di
+configurazione.
+
+Quando il forwarding è **disabilitato**, i registri sorgente vengono letti
+dal register file nello stadio ID. Un'istruzione che legge un registro
+scritto da una delle due istruzioni precedenti deve attendere che il
+produttore raggiunga lo stadio WB, e ciò provoca due stalli RAW.
+
+Quando il forwarding è **abilitato**, il simulatore implementa due cammini
+di forwarding analoghi a quelli descritti nella pipeline MIPS canonica di
+Hennessy & Patterson:
+
+* **EX → EX**: il risultato di un'operazione ALU prodotto alla fine dello
+  stadio EX può essere inoltrato all'ingresso EX dell'istruzione immediatamente
+  successiva (nessuno stallo).
+* **MEM → EX**: un valore prodotto alla fine dello stadio MEM (tipicamente
+  il risultato di una load, o un risultato ALU disponibile un ciclo dopo)
+  può essere inoltrato all'ingresso EX di un'istruzione nello stadio EX
+  (nessuno stallo).
+
+Non esistono invece cammini di forwarding **EX → ID** né **MEM → ID**.
+Questo ha due effetti visibili sulle istruzioni di salto condizionato e sui
+salti basati su registro (``BEQ``, ``BNE``, ``BEQZ``, ``BNEZ``, ``BGEZ``,
+``JR``, ``JALR``), che valutano la condizione o l'indirizzo di destinazione
+nello stadio ID:
+
+* **ALU → branch**: se il registro sorgente del salto viene prodotto
+  dall'istruzione ALU immediatamente precedente, il valore non è ancora
+  disponibile all'inizio dell'ID e il simulatore inserisce uno stallo RAW.
+* **Load → branch**: se il registro sorgente del salto viene prodotto
+  dalla load immediatamente precedente, il valore è disponibile solo al
+  termine dello stadio MEM, mentre il salto lo richiede all'inizio
+  dell'ID. Il simulatore inserisce due stalli RAW: è l'unione del
+  load-use hazard (uno stallo) e del branch-in-ID hazard (uno stallo
+  aggiuntivo).
+
+Entrambi i comportamenti sono coerenti con la descrizione presente in
+Hennessy & Patterson.
+
+La tabella seguente riassume gli stalli RAW tipici per le coppie
+produttore/consumatore più comuni:
+
++--------------------------------+-----------------+--------------------+
+| Produttore → consumatore       | Senza fwd       | Con forwarding     |
++================================+=================+====================+
+| ALU → ALU                      | 2               | 0                  |
++--------------------------------+-----------------+--------------------+
+| ALU → store (dato)             | 2               | 0                  |
++--------------------------------+-----------------+--------------------+
+| Load → ALU (load-use)          | 2               | 1                  |
++--------------------------------+-----------------+--------------------+
+| ALU → branch / jump da reg.    | 2               | 1                  |
++--------------------------------+-----------------+--------------------+
+| Load → branch / jump da reg.   | 2               | 2                  |
++--------------------------------+-----------------+--------------------+
+
 Dinero Frontend
 ~~~~~~~~~~~~~~~
 La finestra di dialogo Dinero Frontend consente di avviare un processo
