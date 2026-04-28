@@ -20,6 +20,11 @@
 ;   - No fwd: 'dadd' (ID) waits for 'ld' (WB) -> 2 stalls
 ;   - Fwd:    'ld' gets data in MEM, 'dadd' needs it in EX -> 1 stall
 ;
+; TEST5: RAW LD/branch (Load + branch-on-register)
+;   - No fwd: 'beq' (ID) waits for 'ld' (WB) -> 2 stalls
+;   - Fwd:    'ld' produces data after MEM, 'beq' needs it in ID -> 2 stalls
+;     (combination of TEST4 load-use and TEST1 branch-uses-ID)
+;
 ; (c) 2026 EduMIPS64 project
 ;
 ; This file is part of the EduMIPS64 project, and is released under the GNU
@@ -71,6 +76,13 @@ loop:
    ; TEST4: RAW LD/ALU (Load-Use Hazard)
    ld      r15, somewhere(r0)
    dadd    r13, r15, r0
+
+
+   ; TEST5: RAW LD/branch (load result consumed by branch in ID)
+   ; Always 2 stalls, both with and without forwarding.
+   ld      r16, somewhere(r0)
+   beq     r16, r0, finish
+finish:
 
 
    ; Exit the program.

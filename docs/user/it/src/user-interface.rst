@@ -339,15 +339,24 @@ Hennessy & Patterson:
   può essere inoltrato all'ingresso EX di un'istruzione nello stadio EX
   (nessuno stallo).
 
-Non esiste invece un cammino di forwarding **EX → ID**. Questo ha un effetto
-visibile sulle istruzioni di salto condizionato e sui salti basati su
-registro (``BEQ``, ``BNE``, ``BEQZ``, ``BNEZ``, ``BGEZ``, ``JR``, ``JALR``),
-che valutano la condizione o l'indirizzo di destinazione nello stadio ID.
-Se il registro sorgente di una di queste istruzioni viene prodotto
-dall'istruzione ALU immediatamente precedente, il valore non è ancora
-disponibile all'inizio dell'ID e il simulatore inserisce uno stallo RAW.
-Questo comportamento è coerente con la descrizione presente in Hennessy &
-Patterson.
+Non esistono invece cammini di forwarding **EX → ID** né **MEM → ID**.
+Questo ha due effetti visibili sulle istruzioni di salto condizionato e sui
+salti basati su registro (``BEQ``, ``BNE``, ``BEQZ``, ``BNEZ``, ``BGEZ``,
+``JR``, ``JALR``), che valutano la condizione o l'indirizzo di destinazione
+nello stadio ID:
+
+* **ALU → branch**: se il registro sorgente del salto viene prodotto
+  dall'istruzione ALU immediatamente precedente, il valore non è ancora
+  disponibile all'inizio dell'ID e il simulatore inserisce uno stallo RAW.
+* **Load → branch**: se il registro sorgente del salto viene prodotto
+  dalla load immediatamente precedente, il valore è disponibile solo al
+  termine dello stadio MEM, mentre il salto lo richiede all'inizio
+  dell'ID. Il simulatore inserisce due stalli RAW: è l'unione del
+  load-use hazard (uno stallo) e del branch-in-ID hazard (uno stallo
+  aggiuntivo).
+
+Entrambi i comportamenti sono coerenti con la descrizione presente in
+Hennessy & Patterson.
 
 La tabella seguente riassume gli stalli RAW tipici per le coppie
 produttore/consumatore più comuni:
@@ -362,6 +371,8 @@ produttore/consumatore più comuni:
 | Load → ALU (load-use)          | 2               | 1                  |
 +--------------------------------+-----------------+--------------------+
 | ALU → branch / jump da reg.    | 2               | 1                  |
++--------------------------------+-----------------+--------------------+
+| Load → branch / jump da reg.   | 2               | 2                  |
 +--------------------------------+-----------------+--------------------+
 
 Dinero Frontend

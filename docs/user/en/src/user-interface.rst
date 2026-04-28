@@ -317,13 +317,23 @@ that match the canonical Hennessy & Patterson MIPS pipeline:
   result, or an ALU result one cycle later) can be forwarded to the EX
   input of an instruction in EX (no stall).
 
-There is **no EX → ID forwarding path**. This has a visible effect on
-branch and register-based jump instructions (``BEQ``, ``BNE``, ``BEQZ``,
-``BNEZ``, ``BGEZ``, ``JR``, ``JALR``), which evaluate their condition or
-target in the ID stage. If the source register of one of these instructions
-is being produced by the immediately preceding ALU instruction, the value
-is not yet available at the start of ID, and the simulator inserts one RAW
-stall. This matches the behavior described in Hennessy & Patterson.
+There is **no EX → ID forwarding path** and, by symmetry, no MEM → ID
+forwarding path. This has two visible consequences for branch and
+register-based jump instructions (``BEQ``, ``BNE``, ``BEQZ``, ``BNEZ``,
+``BGEZ``, ``JR``, ``JALR``), which evaluate their condition or target in
+the ID stage:
+
+* **ALU → branch**: if the source register of the branch is being
+  produced by the immediately preceding ALU instruction, the value is not
+  yet available at the start of ID, and the simulator inserts one RAW
+  stall.
+* **Load → branch**: if the source register of the branch is being
+  produced by the immediately preceding load, the value is only available
+  at the end of MEM, while the branch needs it at the start of ID. The
+  simulator inserts two RAW stalls: this is the union of the load-use
+  hazard (one stall) and the branch-in-ID hazard (one extra stall).
+
+Both behaviors match the description in Hennessy & Patterson.
 
 The following table summarises the typical RAW stalls for the most common
 producer/consumer pairs:
@@ -338,6 +348,8 @@ producer/consumer pairs:
 | Load → ALU (load-use)        | 2              | 1                 |
 +------------------------------+----------------+-------------------+
 | ALU → branch / register jump | 2              | 1                 |
++------------------------------+----------------+-------------------+
+| Load → branch / register jump| 2              | 2                 |
 +------------------------------+----------------+-------------------+
 
 Dinero Frontend

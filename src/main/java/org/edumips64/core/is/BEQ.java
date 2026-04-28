@@ -52,7 +52,7 @@ public class BEQ extends FlowControl_IType {
       return true;
     }
 
-    if (cpu.isGPRForwardedFromEX(cpu.getRegister(params.get(RS_FIELD)), cpu.getRegister(params.get(RT_FIELD)))) {
+    if (cpu.isGPRForwardedThisCycle(cpu.getRegister(params.get(RS_FIELD)), cpu.getRegister(params.get(RT_FIELD)))) {
       return true;
     }
 

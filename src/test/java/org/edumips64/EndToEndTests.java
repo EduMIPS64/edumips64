@@ -595,8 +595,8 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   /* Patti forwarding analysis test.
    * Tests all major forwarding scenarios based on Prof. Patti's analysis.
    * Expected RAW stalls:
-   *   With forwarding:    TEST1: 10 (1 per loop × 10) + TEST2: 0 + TEST3: 0 + TEST4: 1 = 11
-   *   Without forwarding: TEST1: 20 (2 per loop × 10) + TEST2: 2 + TEST3: 2 + TEST4: 2 = 26
+   *   With forwarding:    TEST1: 10 + TEST2: 0 + TEST3: 0 + TEST4: 1 + TEST5: 2 = 13
+   *   Without forwarding: TEST1: 20 + TEST2: 2 + TEST3: 2 + TEST4: 2 + TEST5: 2 = 28
    */
   @Test(timeout=2000)
   public void testPattiForwarding() throws Exception {
@@ -607,18 +607,20 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     // TEST2 (ALU→Store):  0 stalls (store defers RT read to MEM)
     // TEST3 (ALU→ALU):    0 stalls (EX→EX forwarding)
     // TEST4 (Load→ALU):   1 stall (load-use hazard)
-    // Total: 11 RAW stalls
+    // TEST5 (Load→Branch): 2 stalls (load-use + branch-in-ID combined)
+    // Total: 13 RAW stalls
     collector.checkThat("patti-forwarding.s: RAW stalls with forwarding.",
-        statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(11));
+        statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(13));
 
     // Without forwarding:
     // TEST1 (ALU→Branch): 2 RAW stalls per iteration × 10 iterations = 20
     // TEST2 (ALU→Store):  2 stalls
     // TEST3 (ALU→ALU):    2 stalls
     // TEST4 (Load→ALU):   2 stalls
-    // Total: 26 RAW stalls
+    // TEST5 (Load→Branch): 2 stalls
+    // Total: 28 RAW stalls
     collector.checkThat("patti-forwarding.s: RAW stalls without forwarding.",
-        statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(26));
+        statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(28));
   }
 
   @Test(timeout=2000)
@@ -641,6 +643,23 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
 
     // Without forwarding: branch waits for `slt` to reach WB -> 2 RAW stalls.
     collector.checkThat("issue-702-slt-beqz.s: RAW stalls without forwarding.",
+        statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(2));
+  }
+
+  /* Issue #702 regression test (load-use + branch-in-ID combined): a load
+   * immediately followed by a branch that reads its result must produce
+   * 2 RAW stalls both with and without forwarding. With forwarding, the
+   * load produces the value in MEM, but the branch needs it in ID and
+   * there is no MEM -> ID forwarding path: the branch must wait for the
+   * value to become available via WB -> ID one cycle later. */
+  @Test(timeout=2000)
+  public void testIssue702LdBeq() throws Exception {
+    Map<ForwardingStatus, CpuTestStatus> statuses = runMipsTestWithAndWithoutForwarding("issue-702-ld-beq.s");
+
+    collector.checkThat("issue-702-ld-beq.s: RAW stalls with forwarding.",
+        statuses.get(ForwardingStatus.ENABLED).rawStalls, equalTo(2));
+
+    collector.checkThat("issue-702-ld-beq.s: RAW stalls without forwarding.",
         statuses.get(ForwardingStatus.DISABLED).rawStalls, equalTo(2));
   }
 

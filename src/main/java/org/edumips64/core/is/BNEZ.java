@@ -54,7 +54,7 @@ public class BNEZ extends FlowControl_IType {
       return true;
     }
 
-    if (cpu.isGPRForwardedFromEX(cpu.getRegister(params.get(RS_FIELD)))) {
+    if (cpu.isGPRForwardedThisCycle(cpu.getRegister(params.get(RS_FIELD)))) {
       return true;
     }
 

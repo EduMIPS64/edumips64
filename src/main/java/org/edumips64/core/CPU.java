@@ -99,22 +99,20 @@ public class CPU {
   /** BUBBLE */
   private InstructionInterface bubble;
 
-  /**
-   * Tracks which GPR registers were forwarded (had their write semaphore
-   * decremented) during the current cycle's EX stage.
+  /** Set of GPR registers whose value was forwarded *during the current
+   *  cycle* (either by the MEM or by the EX stage). The values are produced
+   *  in time for the EX/MEM forwarding paths but are not yet available at
+   *  the start of the ID stage in the same cycle: branch and register-based
+   *  jump instructions, which read their source operands in ID, must stall
+   *  one extra cycle and wait for the value to become available via
+   *  MEM→ID/WB→ID in a later cycle.
    *
-   * In a real MIPS pipeline with forwarding, the EX/MEM forwarding path
-   * can forward data to the EX stage input of the next instruction, but
-   * NOT to the ID stage. Branch instructions evaluate their conditions in
-   * the ID stage, so they cannot use values forwarded from EX in the same
-   * cycle. They must stall one cycle and wait for the value to be available
-   * via the MEM/WB forwarding path (or directly from the register file).
-   *
-   * This set is populated between the EX and ID stage execution by comparing
-   * GPR write semaphores before and after stepEX(). Branch instructions
-   * check this set in their ID() method to detect and handle this case.
+   *  This set is populated between the EX and ID stage execution by
+   *  comparing GPR write semaphores before stepMEM() and after stepEX().
+   *  Branch and jump instructions check this set in their ID() method to
+   *  detect and handle this case.
    */
-  private Set<Register> registersForwardedFromEX = new HashSet<>();
+  private Set<Register> registersForwardedThisCycle = new HashSet<>();
 
   /** Terminating instructions */
   private static ArrayList<String> terminating = new ArrayList<>(
@@ -416,19 +414,13 @@ public class CPU {
       // WB: Write-back stage.
       stepWB();
 
-      // MEM: Memory access stage.
-      stepMEM();
-
-      // EX: Execution/effective address stage.
-      // Returns the code of the synchronous exception that can happen at this
-      // stage, so the rest of the step can continue and, at the end, the
-      // exception can be thrown.
-
-      // Before EX, snapshot GPR write semaphores so we can detect which
-      // registers are forwarded (semaphore decremented) during EX.
-      // This is needed so that branch instructions in ID can tell that a
-      // value was just produced by EX and is not yet available for ID
-      // (no EX→ID forwarding path).
+      // Before MEM, snapshot GPR write semaphores so that, after EX, we can
+      // detect which registers were forwarded during MEM or EX in this
+      // cycle. Such values are available for the EX/MEM forwarding paths,
+      // but they are NOT available at the start of ID in the same cycle
+      // (no EX→ID nor MEM→ID forwarding path). Branch and register-based
+      // jump instructions, which read their operands in ID, must stall one
+      // extra cycle when their source register is in this set.
       // Skip R0 (index 0) since it is architecturally immutable.
       final boolean forwardingEnabled = isEnableForwarding();
       int[] preSemaphores = new int[32];
@@ -438,16 +430,23 @@ public class CPU {
         }
       }
 
+      // MEM: Memory access stage.
+      stepMEM();
+
+      // EX: Execution/effective address stage.
+      // Returns the code of the synchronous exception that can happen at this
+      // stage, so the rest of the step can continue and, at the end, the
+      // exception can be thrown.
       syncex = stepEX();
 
-      // After EX, detect which GPR registers were forwarded (write semaphore
-      // decreased during EX) and record them for branch hazard detection.
-      // Skip R0 (index 0) since it is architecturally immutable.
-      registersForwardedFromEX.clear();
+      // After MEM+EX, detect which GPR registers were forwarded during this
+      // cycle (write semaphore decreased) and record them for branch/jump
+      // hazard detection in ID. Skip R0 (index 0).
+      registersForwardedThisCycle.clear();
       if (forwardingEnabled) {
         for (int i = 1; i < 32; i++) {
           if (gpr[i].getWriteSemaphore() < preSemaphores[i]) {
-            registersForwardedFromEX.add(gpr[i]);
+            registersForwardedThisCycle.add(gpr[i]);
           }
         }
       }
@@ -771,7 +770,7 @@ public class CPU {
     funcUnitStalls = 0;
     exStalls = 0;
     memoryStalls = 0;
-    registersForwardedFromEX.clear();
+    registersForwardedThisCycle.clear();
 
     // Reset registers.
     for (int i = 0; i < 32; i++) {
@@ -858,24 +857,26 @@ public class CPU {
   }
 
   /**
-   * Checks whether any of the given registers were forwarded from the EX
-   * stage during the current cycle, which means the value is not yet
-   * available for use in the ID stage (no EX→ID forwarding path exists).
+   * Checks whether any of the given registers were forwarded during the
+   * current cycle (either by the MEM or by the EX stage). Such values are
+   * available for the EX/MEM forwarding paths but are NOT yet available
+   * at the start of the ID stage in the same cycle (no MEM→ID nor EX→ID
+   * forwarding path exists).
    *
-   * <p>This should be called by branch/jump instructions in their ID()
-   * method to detect ALU→branch hazards that require a 1-cycle stall even
-   * with forwarding enabled.
+   * <p>This should be called by branch and register-based jump
+   * instructions in their ID() method to detect ALU→branch and load→branch
+   * hazards that require an extra stall even with forwarding enabled.
    *
    * @param regs the source registers to check
    * @return true if forwarding is enabled and at least one of the given
-   *         registers was forwarded from EX this cycle, false otherwise
+   *         registers was forwarded during this cycle, false otherwise
    */
-  public boolean isGPRForwardedFromEX(Register... regs) {
-    if (!isEnableForwarding() || registersForwardedFromEX.isEmpty()) {
+  public boolean isGPRForwardedThisCycle(Register... regs) {
+    if (!isEnableForwarding() || registersForwardedThisCycle.isEmpty()) {
       return false;
     }
     for (Register r : regs) {
-      if (registersForwardedFromEX.contains(r)) {
+      if (registersForwardedThisCycle.contains(r)) {
         return true;
       }
     }
