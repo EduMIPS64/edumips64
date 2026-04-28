@@ -420,8 +420,10 @@ tra parentesi quadre è presente solo in certe circostanze.
   Carica una doubleword (64 bit) dalla memoria all'FPR ft. Questa istruzione
   non appartiene all'ISA MIPS64; si consiglia l'utilizzo di ``LDC1``.
 
-.. note:: `L.D` è un'istruzione non presente nell'ISA MIPS64, inclusa in
-          EduMIPS64, solo per compabitibilità con WinMIPS64
+.. warning:: ``L.D`` non è presente nell'ISA MIPS64; è un alias di
+             ``LDC1`` accettato da EduMIPS64 per compatibilità con
+             WinMIPS64. Il parser segnala un avviso quando viene utilizzata;
+             preferire ``LDC1``.
 
 * `LDC1 ft, offset(base)`
 
@@ -519,8 +521,10 @@ tra parentesi quadre è presente solo in certe circostanze.
 
   Copia la doubleword (64 bit) dell'FPR ft in memoria.
 
-.. note:: `S.D` è un'istruzione non presente nell'ISA MIPS64, inclusa in
-          EduMIPS64, solo per compabitibilità con WinMIPS64
+.. warning:: ``S.D`` non è presente nell'ISA MIPS64; è un alias di
+             ``SDC1`` accettato da EduMIPS64 per compatibilità con
+             WinMIPS64. Il parser segnala un avviso quando viene utilizzata;
+             preferire ``SDC1``.
 
 
 * `SDC1 ft, offset(base)`

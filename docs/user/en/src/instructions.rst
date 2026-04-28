@@ -29,6 +29,16 @@ Four of those instructions make use of two special registers: LO and HI. They
 are internal CPU registers, whose value can be accessed through the
 `MFLO` and `MFHI` instructions.
 
+.. note::
+
+   Several MIPS instructions have a name ending in ``U`` (for example
+   ``ADDU``, ``ADDIU``, ``DADDU``, ``DADDIU``, ``DSUBU``, ``SUBU``). Despite
+   the suggestive suffix, these instructions **do not** treat their operands
+   as unsigned: the result is sign-extended exactly like in the non-``U``
+   variant. The only difference is that no Integer Overflow exception is
+   raised. This naming is a well-known historical misnomer in the MIPS
+   architecture.
+
 Here's the list of R-Type ALU Instructions.
 
 * `AND rd, rs, rt`
@@ -304,6 +314,13 @@ Here's the list of I-Type ALU Instructions.
   putting the result in rt. No integer overflow occurs under any
   circumstances.
 
+  .. warning::
+
+     ``DADDUI`` is not a standard MIPS64 instruction (it is part of the
+     WinMIPS64 instruction set, accepted by EduMIPS64 for backward
+     compatibility). The parser emits a warning when it is used; prefer
+     ``DADDIU`` instead.
+
 * `LUI rt, immediate`
 
   Loads the constant defined in the immediate value in the upper half (16
@@ -449,6 +466,13 @@ List of I-Type flow control instructions:
 
   Jumps to offset if rs is equal to zero.
 
+  .. warning::
+
+     ``BEQZ`` is not a standard MIPS64 instruction (it is part of the
+     WinMIPS64 instruction set, accepted by EduMIPS64 for backward
+     compatibility). The parser emits a warning when it is used; prefer
+     ``BEQ rs, r0, offset`` instead.
+
 * `BGEZ rs, offset`
 
   If rs is greater than or equal to zero, does a PC-relative jump to offset.
@@ -460,6 +484,13 @@ List of I-Type flow control instructions:
 * `BNEZ rs, offset`
 
   Jumps to offset if rs is not equal to zero.
+
+  .. warning::
+
+     ``BNEZ`` is not a standard MIPS64 instruction (it is part of the
+     WinMIPS64 instruction set, accepted by EduMIPS64 for backward
+     compatibility). The parser emits a warning when it is used; prefer
+     ``BNE rs, r0, offset`` instead.
 
 List of J-Type flow control instructions:
 
@@ -607,3 +638,10 @@ The TRAP instruction is a deprecated alias for the SYSCALL instruction.
 ~~~~~~
 The HALT instruction is a deprecated alias for the SYSCALL 0 instruction, that
 halts the simulator.
+
+.. warning::
+
+   ``HALT`` is not a standard MIPS64 instruction (it is part of the
+   WinMIPS64 instruction set, accepted by EduMIPS64 for backward
+   compatibility). The parser emits a warning when it is used; prefer
+   ``SYSCALL 0`` instead.

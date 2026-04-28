@@ -30,6 +30,16 @@ Quattro di esse utilizzano due registri speciali: LO e HI. Tali registri sono
 interni alla CPU ed è possibile accedere al loro valore mediante le
 istruzioni `MFLO` e `MFHI`.
 
+.. note::
+
+   Diverse istruzioni MIPS hanno un nome che termina con ``U`` (ad esempio
+   ``ADDU``, ``ADDIU``, ``DADDU``, ``DADDIU``, ``DSUBU``, ``SUBU``).
+   Nonostante il suffisso, queste istruzioni **non** trattano gli operandi
+   come valori senza segno: il risultato viene esteso in segno esattamente
+   come nella variante senza ``U``. L'unica differenza è che non viene
+   sollevata l'eccezione di Integer Overflow. È un noto refuso storico
+   (misnomer) dell'architettura MIPS.
+
 Ecco la lista delle istruzioni ALU di tipo R.
 
 * `AND rd, rs, rt`
@@ -307,6 +317,13 @@ Ecco la lista delle istruzioni ALU di tipo I.
   Effettua la somma tra il registro a 64 bit rs ed il valore immediato,
   ponendo il risultato in rt.  Non si verificano eccezioni di overflow.
 
+  .. warning::
+
+     ``DADDUI`` non è un'istruzione MIPS64 standard (fa parte
+     dell'instruction set di WinMIPS64, accettata da EduMIPS64 per
+     retrocompatibilità). Il parser segnala un avviso quando viene
+     utilizzata; preferire ``DADDIU``.
+
 * `LUI rt, immediate`
 
   Carica la costante definita dal valore immediato nella metà superiore dei 32
@@ -460,6 +477,13 @@ Ed ecco le istruzioni di controllo del flusso di tipo I:
 
   Salta ad offset se rs è uguale a zero.
 
+  .. warning::
+
+     ``BEQZ`` non è un'istruzione MIPS64 standard (fa parte
+     dell'instruction set di WinMIPS64, accettata da EduMIPS64 per
+     retrocompatibilità). Il parser segnala un avviso quando viene
+     utilizzata; preferire ``BEQ rs, r0, offset``.
+
 * `BGEZ rs, offset`
 
   Effettua un salto relativo al PC ad offset se rs è maggiore o uguale a zero.
@@ -471,6 +495,13 @@ Ed ecco le istruzioni di controllo del flusso di tipo I:
 * `BNEZ rs, offset`
 
   Salta ad offset se rs non è uguale a zero.
+
+  .. warning::
+
+     ``BNEZ`` non è un'istruzione MIPS64 standard (fa parte
+     dell'instruction set di WinMIPS64, accettata da EduMIPS64 per
+     retrocompatibilità). Il parser segnala un avviso quando viene
+     utilizzata; preferire ``BNE rs, r0, offset``.
 
 Ecco la lista delle istruzioni di controllo del flusso di tipo J:
 
@@ -628,3 +659,10 @@ SYSCALL.
 ~~~~~~
 L'istruzione HALT è deprecated, rappresenta un'alternativa all'istruzione
 SYSCALL 0, che ferma il simulatore.
+
+.. warning::
+
+   ``HALT`` non è un'istruzione MIPS64 standard (fa parte dell'instruction
+   set di WinMIPS64, accettata da EduMIPS64 per retrocompatibilità). Il
+   parser segnala un avviso quando viene utilizzata; preferire
+   ``SYSCALL 0``.

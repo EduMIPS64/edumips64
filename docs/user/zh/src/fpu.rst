@@ -274,7 +274,9 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
   从内存中加载一个双字，并将其存储在 ft 中。
 
-注： `L.D` 不存在于 MIPS64 ISA 中，它是 `LDC1` 的别名，存在于 EduMIPS64 中，以便与 WinMIPS64 兼容。
+.. warning:: ``L.D`` 不存在于 MIPS64 ISA 中；它是 ``LDC1`` 的别名，
+             EduMIPS64 出于与 WinMIPS64 兼容的目的而接受它。解析器在使用时
+             会发出警告；请改用 ``LDC1``。
 
 * LDC1 ft, offset(base)`
 
@@ -355,7 +357,9 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
   将 ft 复制到内存中。
 
-注意：MIPS64 ISA 中没有`S.D`，它是`SDC1`的别名，EduMIPS64 中有`SDC1`，以便与 WinMIPS64 兼容。
+.. warning:: ``S.D`` 不存在于 MIPS64 ISA 中；它是 ``SDC1`` 的别名，
+             EduMIPS64 出于与 WinMIPS64 兼容的目的而接受它。解析器在使用时
+             会发出警告；请改用 ``SDC1``。
 
 * `SDC1 ft, offset(base)`
 

@@ -375,8 +375,10 @@ where the ``rounding_type`` parameter is optional.
 
   Loads from memory a doubleword and stores it in ft.
 
-.. note:: `L.D` is not present in the MIPS64 ISA, it is an alias for ``LDC1``
-          that is present in EduMIPS64 for compatibility with WinMIPS64.
+.. warning:: ``L.D`` is not present in the MIPS64 ISA; it is an alias for
+             ``LDC1`` that EduMIPS64 accepts for compatibility with
+             WinMIPS64. The parser emits a warning when it is used; prefer
+             ``LDC1`` instead.
 
 * `LDC1 ft, offset(base)`
 
@@ -466,8 +468,10 @@ where the ``rounding_type`` parameter is optional.
 
   Copies ft to memory.
 
-.. note:: `S.D` is not present in the MIPS64 ISA, it is an alias for ``SDC1``
-          that is present in EduMIPS64 for compatibility with WinMIPS64.
+.. warning:: ``S.D`` is not present in the MIPS64 ISA; it is an alias for
+             ``SDC1`` that EduMIPS64 accepts for compatibility with
+             WinMIPS64. The parser emits a warning when it is used; prefer
+             ``SDC1`` instead.
 
 * `SDC1 ft, offset(base)`
 
