@@ -62,6 +62,9 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [executionDelayMs, setExecutionDelayMs] = useSetting(
     SettingKey.EXECUTION_DELAY_MS,
   );
+  const [pipelineColors, setPipelineColors] = useSetting(
+    SettingKey.PIPELINE_COLORS,
+  );
 
   // `executionDelayMs` is read inside async callbacks that were captured when
   // a step batch started (potentially many batches ago). Mirror the latest
@@ -576,7 +579,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Pipeline pipeline={pipeline} />
+                <Pipeline pipeline={pipeline} colors={pipelineColors} />
               </AccordionDetails>
             </Accordion>
             <Accordion 
@@ -666,6 +669,8 @@ const Simulator = ({worker, initialState, appInsights}) => {
                   setStepStride={setStepStride}
                   executionDelayMs={executionDelayMs}
                   setExecutionDelayMs={setExecutionDelayMs}
+                  pipelineColors={pipelineColors}
+                  setPipelineColors={setPipelineColors}
                   status={status}
                   showTitle={false}
                 />

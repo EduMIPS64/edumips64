@@ -243,11 +243,23 @@ Counters about the program execution:
 
 Pipeline
 ~~~~~~~~
-Shows which instruction is currently in each stage of the CPU
-pipeline. The five integer stages (IF, ID, EX, MEM, WB) are always
-displayed; the FPU stages (Adder, Multiplier, Divider) appear when
-they are populated. Stages use the same colour code as the editor's
-in-line highlight.
+Shows a graphical representation of the CPU pipeline that resembles the
+classic Swing UI's pipeline diagram. The five integer stages (IF, ID,
+EX, MEM, WB) are drawn as connected blocks, with the FPU functional
+units — the FP Adder (4 stages), FP Multiplier (7 stages) and FP
+Divider — laid out around them. Each block:
+
+* lights up with the stage's colour while it holds an instruction, and
+  shows the instruction's mnemonic inside the block;
+* renders with a hatched fill and the label *stall* when the stage
+  contains a pipeline bubble (for example, while ID waits for an
+  unresolved RAW hazard with forwarding disabled), so stalls are
+  visually distinct from active stages;
+* stays empty when the corresponding functional unit is idle.
+
+The per-stage colours can be customised from *General Settings →
+Pipeline Colors* (see below) and are persisted in browser local
+storage.
 
 Registers
 ~~~~~~~~~
@@ -307,6 +319,12 @@ reloads.
   down long runs so that the visual feedback (line highlighting,
   panel updates) can be followed in real time. The change is applied
   live, even mid-execution.
+* **Pipeline Colors** — per-stage colours used by the *Pipeline*
+  diagram. Each entry (``IF``, ``ID``, ``EX``, ``MEM``, ``WB``,
+  ``FP Adder``, ``FP Multiplier``, ``FP Divider``, ``Stall``) can be
+  edited with a colour picker, and the *Reset to defaults* button
+  restores the original palette (the same RGB values the Swing UI
+  uses by default).
 
 Running EduMIPS64 as a desktop or CLI application
 -------------------------------------------------

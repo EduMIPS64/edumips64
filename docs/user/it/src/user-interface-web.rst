@@ -252,11 +252,24 @@ Contatori sull'esecuzione del programma:
 
 Pipeline
 ~~~~~~~~
-Mostra quale istruzione si trova in ciascuno stadio della pipeline
-della CPU. I cinque stadi interi (IF, ID, EX, MEM, WB) sono sempre
-visibili; gli stadi della FPU (Adder, Multiplier, Divider) compaiono
-solo quando contengono un'istruzione. Gli stadi usano lo stesso
-codice colore dell'evidenziazione nell'editor.
+Mostra una rappresentazione grafica della pipeline della CPU che ricalca
+il diagramma del classico front-end Swing. I cinque stadi interi
+(IF, ID, EX, MEM, WB) sono disegnati come blocchi collegati, e attorno
+ad essi sono distribuite le unità funzionali della FPU — l'Adder
+(4 stadi), il Multiplier (7 stadi) e il Divider. Ogni blocco:
+
+* si colora con il colore associato al proprio stadio quando contiene
+  un'istruzione, e mostra il nome dell'istruzione all'interno;
+* viene riempito con un tratteggio e l'etichetta *stall* quando lo
+  stadio contiene una bolla della pipeline (per esempio mentre lo
+  stadio ID attende la risoluzione di un hazard RAW con il forwarding
+  disattivato), così da distinguere visivamente gli stalli dagli
+  stadi attivi;
+* resta vuoto quando l'unità funzionale corrispondente non è in uso.
+
+I colori dei singoli stadi possono essere personalizzati dalla sezione
+*General Settings → Pipeline Colors* (vedi sotto) e vengono salvati nel
+local storage del browser.
 
 Registers
 ~~~~~~~~~
@@ -320,6 +333,12 @@ ai reload della pagina.
   l'evidenziazione delle righe e l'aggiornamento dei pannelli. La
   modifica si applica in tempo reale, anche durante un'esecuzione in
   corso.
+* **Pipeline Colors** — colori usati dal diagramma *Pipeline* per
+  ciascuno stadio. Ogni voce (``IF``, ``ID``, ``EX``, ``MEM``, ``WB``,
+  ``FP Adder``, ``FP Multiplier``, ``FP Divider``, ``Stall``) può
+  essere modificata con un selettore di colore; il pulsante
+  *Reset to defaults* ripristina la palette originale (gli stessi
+  valori RGB usati dal front-end Swing).
 
 Eseguire EduMIPS64 come applicazione desktop o da CLI
 -----------------------------------------------------

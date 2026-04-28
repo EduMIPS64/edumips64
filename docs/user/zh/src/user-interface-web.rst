@@ -196,10 +196,19 @@ Statistics
 
 Pipeline
 ~~~~~~~~
-显示当前 CPU 流水线各阶段中正在执行的指令。整数流水线的五个阶段
-（IF、ID、EX、MEM、WB）始终显示；FPU 阶段（Adder、Multiplier、
-Divider）只有在被占用时才显示。各阶段使用与编辑器内联高亮相同的
-颜色编码。
+以图形化方式展示 CPU 流水线，外观参考经典的 Swing 前端的流水线
+示意图。整数流水线的五个阶段（IF、ID、EX、MEM、WB）以相互连接的
+方块绘制，FPU 功能单元——FP Adder（4 级）、FP Multiplier（7 级）
+以及 FP Divider——围绕在它们周围。每个方块：
+
+* 当其中持有指令时，会以该阶段的颜色高亮，并在方块中显示指令名；
+* 当阶段中是流水线气泡（例如关闭 forwarding 时 ID 因 RAW
+  hazard 等待）时，会以斜线填充并显示 *stall* 标签，从而与
+  正常占用的阶段在视觉上明确区分；
+* 对应功能单元空闲时保持为空。
+
+各阶段的颜色可在 *General Settings → Pipeline Colors* 中自定义
+（见下文），并保存在浏览器的本地存储中。
 
 Registers
 ~~~~~~~~~
@@ -248,6 +257,11 @@ General Settings
 * **Execution Delay (ms)** — 在 *Run All* 中两个连续内部批次之间插入
   的延迟。增大该值可以减慢长时间运行，使行高亮和面板更新等视觉反馈
   得以实时跟踪。该更改会立即生效，即使在执行中途也是如此。
+* **Pipeline Colors** — *Pipeline* 示意图为各阶段使用的颜色。每一项
+  （``IF``、``ID``、``EX``、``MEM``、``WB``、``FP Adder``、
+  ``FP Multiplier``、``FP Divider``、``Stall``）都可以通过取色器
+  修改；*Reset to defaults* 按钮可恢复原始配色（与 Swing 前端
+  默认使用的 RGB 值相同）。
 
 将 EduMIPS64 作为桌面或命令行应用程序运行
 -----------------------------------------

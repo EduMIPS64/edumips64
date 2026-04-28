@@ -32,4 +32,8 @@ export const SettingKey = Object.freeze({
 
   // Help dialog.
   HELP_LANGUAGE: 'help.language',
+
+  // Per-stage colors for the Pipeline widget. Mirrors the Swing UI's
+  // `IF_COLOR` / `ID_COLOR` / ... `ConfigKey`s.
+  PIPELINE_COLORS: 'pipelineColors',
 });

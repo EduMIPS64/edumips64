@@ -42,6 +42,35 @@ const isValidCacheConfig = (v) =>
   Number.isFinite(v.blockSize) &&
   Number.isFinite(v.associativity);
 
+// Hex color (`#RRGGBB`) validator used by the pipeline color settings.
+const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
+const isHexColor = (v) => typeof v === 'string' && HEX_COLOR_RE.test(v);
+
+/**
+ * Default colors for the Pipeline widget, mirroring the Swing UI's
+ * `IF_COLOR` / `ID_COLOR` / ... `ConfigKey` defaults from `ConfigStore`.
+ *
+ * The keys here mirror the stage groups drawn by the Pipeline widget; the
+ * `Stall` entry is used to highlight pipeline bubbles, which the Swing UI
+ * does not render but the Web UI does.
+ */
+export const DEFAULT_PIPELINE_COLORS = Object.freeze({
+  IF: '#ebeb3b', // Swing default rgb(235, 235, 59)
+  ID: '#2196f3', // Swing default rgb( 33, 150, 243)
+  EX: '#f44336', // Swing default rgb(244,  67,  54)
+  MEM: '#4caf50', // Swing default rgb( 76, 175,  80)
+  WB: '#ab47bc', // Swing default rgb(171,  71, 188)
+  FPAdder: '#008000', // Swing default rgb(  0, 128,   0)
+  FPMultiplier: '#008080', // Swing default rgb(  0, 128, 128)
+  FPDivider: '#808000', // Swing default rgb(128, 128,   0)
+  Stall: '#9e9e9e', // Material grey 500 — Swing has no equivalent.
+});
+
+const isValidPipelineColors = (v) =>
+  Object.keys(DEFAULT_PIPELINE_COLORS).every(
+    (k) => v[k] === undefined || isHexColor(v[k]),
+  );
+
 /**
  * The single, canonical registry of all locally-persisted settings.
  *
@@ -130,6 +159,11 @@ export const SETTINGS_SCHEMA = Object.freeze({
       Number.isFinite(v) &&
       v >= MIN_EXECUTION_DELAY_MS &&
       v <= MAX_EXECUTION_DELAY_MS,
+  },
+  [SettingKey.PIPELINE_COLORS]: {
+    type: SettingType.OBJECT,
+    default: { ...DEFAULT_PIPELINE_COLORS },
+    validate: isValidPipelineColors,
   },
 });
 

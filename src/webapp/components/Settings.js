@@ -11,7 +11,21 @@ import {
   MAX_STEP_STRIDE,
   MIN_EXECUTION_DELAY_MS,
   MAX_EXECUTION_DELAY_MS,
+  DEFAULT_PIPELINE_COLORS,
 } from '../settings/schema';
+
+// Human-readable labels for each pipeline color knob, in display order.
+const PIPELINE_COLOR_FIELDS = [
+  { key: 'IF', label: 'IF' },
+  { key: 'ID', label: 'ID' },
+  { key: 'EX', label: 'EX' },
+  { key: 'MEM', label: 'MEM' },
+  { key: 'WB', label: 'WB' },
+  { key: 'FPAdder', label: 'FP Adder' },
+  { key: 'FPMultiplier', label: 'FP Multiplier' },
+  { key: 'FPDivider', label: 'FP Divider' },
+  { key: 'Stall', label: 'Stall' },
+];
 
 const Settings = ({
   viMode,
@@ -26,148 +40,230 @@ const Settings = ({
   setStepStride,
   executionDelayMs,
   setExecutionDelayMs,
+  pipelineColors,
+  setPipelineColors,
   status,
 }) => {
   // Forwarding affects the CPU pipeline behavior and resets the CPU when
   // changed, so we only allow toggling it when the simulator is not running
   // a program. This mirrors the way `CacheConfig` grays out its inputs.
   const forwardingDisabled = status === 'RUNNING';
+  const handleColorChange = (key) => (e) => {
+    // `pipelineColors` may be undefined when the parent doesn't wire the
+    // setting (e.g. older callers); guard so we always start from a complete
+    // object before merging the user's edit.
+    const base = { ...DEFAULT_PIPELINE_COLORS, ...(pipelineColors || {}) };
+    setPipelineColors({ ...base, [key]: e.target.value });
+  };
+  const resetPipelineColors = () =>
+    setPipelineColors({ ...DEFAULT_PIPELINE_COLORS });
   return (
-    <Box
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: 2,
-        alignItems: 'center',
-      }}
-    >
-      <Box>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={viMode}
-              onChange={(e) => setViMode(e.target.checked)}
-              color="primary"
-              size="small"
-            />
-          }
-          label={
-            <Typography sx={{ fontSize: '0.85rem' }}>Editor Vi Mode</Typography>
-          }
-        />
-      </Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Typography sx={{ fontSize: '0.85rem' }}>Font Size</Typography>
-        <ButtonGroup size="small" variant="contained">
-          <Button
-            onClick={() => setFontSize(Math.max(fontSize - 1, 1))}
-            aria-label="Decrease font size"
-          >
-            -
-          </Button>
-          <Button
-            disabled
-            sx={{ minWidth: '40px' }}
-            aria-label={`Current font size: ${fontSize}`}
-          >
-            {fontSize}
-          </Button>
-          <Button
-            onClick={() => setFontSize(fontSize + 1)}
-            aria-label="Increase font size"
-          >
-            +
-          </Button>
-        </ButtonGroup>
-      </Box>
-      <Box>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={accordionAlerts}
-              onChange={(e) => setAccordionAlerts(e.target.checked)}
-              color="primary"
-              size="small"
-            />
-          }
-          label={
-            <Typography sx={{ fontSize: '0.85rem' }}>
-              Accordion Change Alerts
-            </Typography>
-          }
-        />
-      </Box>
-      <Box>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={forwarding}
-              onChange={(e) => setForwarding(e.target.checked)}
-              color="primary"
-              size="small"
-              disabled={forwardingDisabled}
-              inputProps={{ 'data-testid': 'forwarding-switch' }}
-            />
-          }
-          label={
-            <Typography
-              sx={{
-                fontSize: '0.85rem',
-                color: forwardingDisabled ? 'text.disabled' : 'text.primary',
-              }}
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: 2,
+          alignItems: 'center',
+        }}
+      >
+        <Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={viMode}
+                onChange={(e) => setViMode(e.target.checked)}
+                color="primary"
+                size="small"
+              />
+            }
+            label={
+              <Typography sx={{ fontSize: '0.85rem' }}>
+                Editor Vi Mode
+              </Typography>
+            }
+          />
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography sx={{ fontSize: '0.85rem' }}>Font Size</Typography>
+          <ButtonGroup size="small" variant="contained">
+            <Button
+              onClick={() => setFontSize(Math.max(fontSize - 1, 1))}
+              aria-label="Decrease font size"
             >
-              CPU Forwarding
-            </Typography>
-          }
-        />
-      </Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <TextField
-          label="Multi Step Size"
-          type="number"
-          size="small"
-          value={stepStride}
-          onChange={(e) => {
-            const value = parseInt(e.target.value, 10);
-            if (
-              Number.isInteger(value) &&
-              value >= MIN_STEP_STRIDE &&
-              value <= MAX_STEP_STRIDE
-            ) {
-              setStepStride(value);
+              -
+            </Button>
+            <Button
+              disabled
+              sx={{ minWidth: '40px' }}
+              aria-label={`Current font size: ${fontSize}`}
+            >
+              {fontSize}
+            </Button>
+            <Button
+              onClick={() => setFontSize(fontSize + 1)}
+              aria-label="Increase font size"
+            >
+              +
+            </Button>
+          </ButtonGroup>
+        </Box>
+        <Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={accordionAlerts}
+                onChange={(e) => setAccordionAlerts(e.target.checked)}
+                color="primary"
+                size="small"
+              />
             }
-          }}
-          slotProps={{
-            htmlInput: { min: MIN_STEP_STRIDE, max: MAX_STEP_STRIDE },
-          }}
-          sx={{ width: '140px' }}
-        />
-      </Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <TextField
-          label="Execution Delay (ms)"
-          type="number"
-          size="small"
-          value={executionDelayMs}
-          onChange={(e) => {
-            const value = parseInt(e.target.value, 10);
-            if (
-              Number.isInteger(value) &&
-              value >= MIN_EXECUTION_DELAY_MS &&
-              value <= MAX_EXECUTION_DELAY_MS
-            ) {
-              setExecutionDelayMs(value);
+            label={
+              <Typography sx={{ fontSize: '0.85rem' }}>
+                Accordion Change Alerts
+              </Typography>
             }
+          />
+        </Box>
+        <Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={forwarding}
+                onChange={(e) => setForwarding(e.target.checked)}
+                color="primary"
+                size="small"
+                disabled={forwardingDisabled}
+                inputProps={{ 'data-testid': 'forwarding-switch' }}
+              />
+            }
+            label={
+              <Typography
+                sx={{
+                  fontSize: '0.85rem',
+                  color: forwardingDisabled ? 'text.disabled' : 'text.primary',
+                }}
+              >
+                CPU Forwarding
+              </Typography>
+            }
+          />
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <TextField
+            label="Multi Step Size"
+            type="number"
+            size="small"
+            value={stepStride}
+            onChange={(e) => {
+              const value = parseInt(e.target.value, 10);
+              if (
+                Number.isInteger(value) &&
+                value >= MIN_STEP_STRIDE &&
+                value <= MAX_STEP_STRIDE
+              ) {
+                setStepStride(value);
+              }
+            }}
+            slotProps={{
+              htmlInput: { min: MIN_STEP_STRIDE, max: MAX_STEP_STRIDE },
+            }}
+            sx={{ width: '140px' }}
+          />
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <TextField
+            label="Execution Delay (ms)"
+            type="number"
+            size="small"
+            value={executionDelayMs}
+            onChange={(e) => {
+              const value = parseInt(e.target.value, 10);
+              if (
+                Number.isInteger(value) &&
+                value >= MIN_EXECUTION_DELAY_MS &&
+                value <= MAX_EXECUTION_DELAY_MS
+              ) {
+                setExecutionDelayMs(value);
+              }
+            }}
+            slotProps={{
+              htmlInput: {
+                min: MIN_EXECUTION_DELAY_MS,
+                max: MAX_EXECUTION_DELAY_MS,
+                step: 10,
+              },
+            }}
+            sx={{ width: '160px' }}
+          />
+        </Box>
+      </Box>
+      <Box>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: 1,
           }}
-          slotProps={{
-            htmlInput: {
-              min: MIN_EXECUTION_DELAY_MS,
-              max: MAX_EXECUTION_DELAY_MS,
-              step: 10,
-            },
+        >
+          <Typography sx={{ fontSize: '0.85rem', fontWeight: 'bold' }}>
+            Pipeline Colors
+          </Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={resetPipelineColors}
+            data-testid="pipeline-colors-reset"
+          >
+            Reset to defaults
+          </Button>
+        </Box>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: 1.5,
           }}
-          sx={{ width: '160px' }}
-        />
+        >
+          {PIPELINE_COLOR_FIELDS.map(({ key, label }) => {
+            const value =
+              (pipelineColors && pipelineColors[key]) ||
+              DEFAULT_PIPELINE_COLORS[key];
+            const inputId = `pipeline-color-${key}`;
+            return (
+              <Box
+                key={key}
+                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+              >
+                <Box
+                  component="input"
+                  type="color"
+                  id={inputId}
+                  data-testid={`pipeline-color-${key}`}
+                  value={value}
+                  onChange={handleColorChange(key)}
+                  sx={{
+                    width: 36,
+                    height: 28,
+                    border: '1px solid #ccc',
+                    borderRadius: 1,
+                    padding: 0,
+                    background: 'none',
+                    cursor: 'pointer',
+                  }}
+                />
+                <Typography
+                  component="label"
+                  htmlFor={inputId}
+                  sx={{ fontSize: '0.8rem' }}
+                >
+                  {label}
+                </Typography>
+              </Box>
+            );
+          })}
+        </Box>
       </Box>
     </Box>
   );
