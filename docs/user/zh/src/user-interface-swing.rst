@@ -1,6 +1,10 @@
-用户界面
+桌面用户界面
 ==================
-EduMIPS64 的图形用户界面借鉴了 WinMIPS64 的用户界面。事实上，除了一些菜单外，主窗口是完全相同的。
+EduMIPS64 以基于 Swing 的 Java 桌面应用程序形式发布。本章介绍桌面图形用户界面，
+该界面借鉴了 WinMIPS64 的用户界面。事实上，除了一些菜单外，主窗口是完全相同的。
+
+本章还介绍了桌面 JAR 支持的命令行选项。同一个 JAR 可以作为图形应用程序运行，
+也可以在 headless / CLI 模式下运行（请参见 :ref:`command-line-options-zh`）。
 
 .. 关于一些 MIPS 和 DLX 仿真器（包括 WinMIPS64）的概述，请参阅 ~\ref{mips-simulators} 一章；关于 WinMIPS64 的更多信息，请参阅 \cite{winmips-web}。%在图~ref{fig:edumips-main}中，你可以看到 EduMIPS64 的主窗口，由以下部分组成
 
@@ -263,6 +267,8 @@ Dinero 前端
 帮助
 ~~~~
 通过帮助（Help）对话框可以查看在线手册，该手册是本文档的 HTML 副本。
+
+.. _command-line-options-zh:
 
 命令行选项
 --------------------

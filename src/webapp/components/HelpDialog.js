@@ -79,9 +79,13 @@ const SPHINX_SELECTORS = {
 function parseTocFromHtml(htmlString, language) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlString, 'text/html');
-  const toctreeWrapper = doc.querySelector(SPHINX_SELECTORS.tocWrapper);
+  // The user manual is built with two top-level `.. toctree::` directives:
+  // one for the UI-independent chapters and one for the UI-specific chapter
+  // (selected at build time via Sphinx tags). Merge entries from every
+  // toctree-wrapper found on the page so all chapters show up in the drawer.
+  const toctreeWrappers = doc.querySelectorAll(SPHINX_SELECTORS.tocWrapper);
 
-  if (!toctreeWrapper) {
+  if (toctreeWrappers.length === 0) {
     console.warn(
       'Could not find toctree-wrapper in documentation HTML. The documentation structure may have changed.',
     );
@@ -96,42 +100,44 @@ function parseTocFromHtml(htmlString, language) {
     url: 'index.html',
   });
 
-  // Parse the top-level list items (toctree-l1)
-  const topLevelItems = toctreeWrapper.querySelectorAll(
-    SPHINX_SELECTORS.topLevelItem,
-  );
+  toctreeWrappers.forEach((toctreeWrapper) => {
+    // Parse the top-level list items (toctree-l1)
+    const topLevelItems = toctreeWrapper.querySelectorAll(
+      SPHINX_SELECTORS.topLevelItem,
+    );
 
-  topLevelItems.forEach((li) => {
-    const link = li.querySelector(':scope > a');
-    if (!link) return;
+    topLevelItems.forEach((li) => {
+      const link = li.querySelector(':scope > a');
+      if (!link) return;
 
-    const item = {
-      title: link.textContent.trim(),
-      url: link.getAttribute('href'),
-    };
+      const item = {
+        title: link.textContent.trim(),
+        url: link.getAttribute('href'),
+      };
 
-    // Check for nested items (toctree-l2)
-    const nestedList = li.querySelector(':scope > ul');
-    if (nestedList) {
-      const children = [];
-      const nestedItems = nestedList.querySelectorAll(
-        SPHINX_SELECTORS.nestedItem,
-      );
-      nestedItems.forEach((nestedLi) => {
-        const nestedLink = nestedLi.querySelector(':scope > a');
-        if (nestedLink) {
-          children.push({
-            title: nestedLink.textContent.trim(),
-            url: nestedLink.getAttribute('href'),
-          });
+      // Check for nested items (toctree-l2)
+      const nestedList = li.querySelector(':scope > ul');
+      if (nestedList) {
+        const children = [];
+        const nestedItems = nestedList.querySelectorAll(
+          SPHINX_SELECTORS.nestedItem,
+        );
+        nestedItems.forEach((nestedLi) => {
+          const nestedLink = nestedLi.querySelector(':scope > a');
+          if (nestedLink) {
+            children.push({
+              title: nestedLink.textContent.trim(),
+              url: nestedLink.getAttribute('href'),
+            });
+          }
+        });
+        if (children.length > 0) {
+          item.children = children;
         }
-      });
-      if (children.length > 0) {
-        item.children = children;
       }
-    }
 
-    toc.push(item);
+      toc.push(item);
+    });
   });
 
   return toc;

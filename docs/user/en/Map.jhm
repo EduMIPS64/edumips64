@@ -4,7 +4,9 @@
 <map version="1.0" xml:lang="it">
     <mapID target="top" url="html/index.html "/>
     <mapID target="index" url="html/index.html"/>
-    <mapID target="user-interface" url="html/user-interface.html"/>
+    <mapID target="user-interface" url="html/user-interface-swing.html"/>
+    <mapID target="user-interface-swing" url="html/user-interface-swing.html"/>
+    <mapID target="cli-interface" url="html/cli-interface.html"/>
     <mapID target="instructions" url="html/instructions.html"/>
     <mapID target="fpu" url="html/fpu.html"/>
     <mapID target="search" url="html/search.html"/>

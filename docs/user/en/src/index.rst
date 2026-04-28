@@ -25,19 +25,20 @@ differences between the two simulators.
 This manual will introduce you to EduMIPS64, and will cover some details on
 how to use it.
 
-The first chapter of this manual covers the format of source files accepted
-by the simulator, describing the data types and the directives, in addition
-to command line parameters. In the second chapter there's an overview of the
-subset of the MIPS64 instruction set that is accepted by EduMIPS64, with all
-the needed parameters and indications to use them. The third chapter is a
-description of the Floating Point Unit and its instruction set.
-The fourth chapter is a description of the user interface of EduMIPS64, that
-explains the purpose of each frame and menu, along with a description of the
-configuration dialog, the L1 cache simulator, the Dinero frontend dialog, the 
-Manual dialog and command line options. The fifth chapter contains some useful 
-examples.
-
 This manual describes EduMIPS64 version |version|.
+
+This manual is split into two parts. The first part is independent from the
+user interface in use and covers the source file format, the supported
+instruction set, the Floating Point Unit and a set of example programs.
+The second part documents the user interfaces: a chapter for the desktop
+(Swing) application, which also includes the command line options of the
+JAR, a chapter for the interactive command line shell that the JAR
+exposes in headless mode, and a chapter for the web frontend.
+
+When this manual is opened from inside the running application, only the
+chapter that is relevant for the active user interface is shown. The full
+manual (with both UI chapters) is available on
+`Read the Docs <https://edumips64.readthedocs.io/>`_ and as a PDF.
 
 .. toctree::
    :maxdepth: 2
@@ -45,8 +46,22 @@ This manual describes EduMIPS64 version |version|.
    source-files-format
    instructions
    fpu
-   user-interface
    examples
+
+.. only:: not web
+
+   .. toctree::
+      :maxdepth: 2
+
+      user-interface-swing
+      cli-interface
+
+.. only:: not swing
+
+   .. toctree::
+      :maxdepth: 2
+
+      user-interface-web
 
 .. Indices and tables
    ==================
