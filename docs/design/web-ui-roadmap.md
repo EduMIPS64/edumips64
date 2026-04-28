@@ -39,13 +39,13 @@ User stories and features:
 ### Beta (EduMIPS64 2.0-beta)
 Status: **In Progress**
 
-This milestone will improve the UI and split it out in its own repository
-and enable settings support.
+This milestone will improve the UI and enable settings support. The web UI
+is intentionally kept in the same repository as the Java core (see `D.2`
+below).
 
 User stories and features:
 
-* `D.1-3` (Separate repo, proper toolchain, Material UI) — `D.1` and `D.3`
-  are done; the web UI still lives in this repository (`D.2`).
+* ~~`D.1, D.3` (Proper toolchain, Material UI)~~
 * `U.6-8` (Improved UI, including settings) — `U.8` (Settings UI) is done,
   including persisting preferences to local storage (see also `S.2`); `U.6`
   (full pipeline widget) and `U.7` (full cycles widget) are still pending.
@@ -136,7 +136,11 @@ implementation of the remaining features.
 
 ### Development features
 1. ~~Move to a proper JS toolchain.~~
-2. Build and deploy the frontend JS from a separate GitHub repository to web.edumips.org. (#87)
+2. ~~Build and deploy the frontend JS from a separate GitHub repository to web.edumips.org. (#87)~~
+   **Dropped.** The web UI will keep living in the same repository as the
+   Java core: it shares the GWT-compiled worker with the core, and the
+   single-repo setup has worked well in practice. Issue #87 should be
+   closed as "won't fix".
 3. ~~Move to React Material UI~~
 4. ~~Find a good (dashboard) Material UI template to use as a starting point (e.g. https://github.com/devias-io/react-material-dashboard)~~
 5. ~~Instrument web UI (Google Analytics + some metrics)~~ (Azure
