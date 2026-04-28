@@ -25,28 +25,31 @@ EduMIPS64 and, by extension, refine the Java -> JS API created with GWT.
 
 ## Milestones
 ### Alpha (EduMIPS64 2.0-alpha)
-Status: **In Progress**
-Tracked on https://github.com/EduMIPS64/edumips64/issues/852
+Status: **Completed**
+Tracked on https://github.com/EduMIPS64/edumips64/issues/852 (closed)
 
 This milestone is a basic working simulator, with a pretty rough UI and just enough
 basic features to run most programs and verify its working.
 
 User stories and features:
 
-* `E.1-6` (Full IS support, even with primitive UI and partial support for SYSCALL)
-* `U.1-5` (Basic functional UI, no settings)
+* ~~`E.1-6` (Full IS support, even with primitive UI and partial support for SYSCALL)~~
+* ~~`U.1-5` (Basic functional UI, no settings)~~
 
 ### Beta (EduMIPS64 2.0-beta)
-Status: **Not started**
+Status: **In Progress**
 
 This milestone will improve the UI and split it out in its own repository
 and enable settings support.
 
 User stories and features:
 
-* `D.1-3` (Separate repo, proper toolchain, Material UI)
-* `U.6-8` (Improved UI, including settings)
-* `S.1-2` (Forwarding setting)
+* `D.1-3` (Separate repo, proper toolchain, Material UI) — `D.1` and `D.3`
+  are done; the web UI still lives in this repository (`D.2`).
+* `U.6-8` (Improved UI, including settings) — `U.8` (Settings UI) is done,
+  including persisting preferences to local storage (see also `S.2`); `U.6`
+  (full pipeline widget) and `U.7` (full cycles widget) are still pending.
+* ~~`S.1-2` (Forwarding setting, persisted via HTML5 storage)~~
 
 ### GA (EduMIPS64 2.0)
 Status: **Not started**
@@ -54,7 +57,10 @@ Status: **Not started**
 Fully working web simulator, suitable as a replacement for the current simulator.
 
 * `E.7-8` (Dinero Tracefile Download, file-based SYSCALL)
-* `U.9-10` (Better code editor, localization)
+* `U.9-10` (Better code editor, localization) — `U.9` (Monaco-based editor
+  with MIPS syntax highlighting and inline error markers) is done; `U.10`
+  (localization of the simulator UI) is still pending. The Help dialog
+  already supports English/Italian/Chinese.
 * `S.3-5` (Most runtime settings)
 * ~~`D.4` (Instrumentation)~~
 
@@ -74,7 +80,7 @@ of future features might be:
 
 ## User Stories / Features
 
-Anything that is done (as of 26/10/2023) is marked with strike-through.
+Anything that is done (as of 28/04/2026) is marked with strike-through.
 
 ### Prerequisites
 This section contains the preliminary work necessary to move forward with the
@@ -92,9 +98,10 @@ implementation of the remaining features.
    1. ~~step-by-step~~
       1. ~~with a customizable stride~~
   1. ~~reset execution state while paused~~
-4. graceful handling of all errors, including parser errors
+4. ~~graceful handling of all errors, including parser errors~~
 5. SYSCALL support
-   1. console I/O (via Web UI)
+   1. ~~console I/O (via Web UI)~~ (output via the StdOut accordion, input
+      via a modal dialog)
 6. ~~BREAK support~~
 7. downloading a Dinero Tracefile at the end of the execution
 8. SYSCALL File I/O (not sure it's possible, needs to be investigated)
@@ -104,18 +111,25 @@ implementation of the remaining features.
 2. ~~Execution controls (start/stop/etc.)~~
 3. ~~Basic registers, memory and code widgets.~~
 4. ~~Basic pipeline widget (no graphics, just text)~~
-5. I/O widgets (necessary for `E.5.1`)
+5. ~~I/O widgets (necessary for `E.5.1`)~~
 6. Full Pipeline widget (state of which instructions are in which stage)
 7. Full Cycles widget (temporal instruction diagram)
-8. Settings UI (necessary for `S.*`)
-9. ~~Code editor with syntax highlighting (e.g., ACE or Monaco)~~
-10. Localization
-11. Show binary/decimal/hex values of all numbers in the UI.
-12. Show program counter
+8. ~~Settings UI (necessary for `S.*`)~~
+9. ~~Code editor with syntax highlighting (e.g., ACE or Monaco)~~ (Monaco,
+   with a custom MIPS language definition, inline parser-error markers and
+   optional Vim keybindings)
+10. Localization (the Help dialog already supports en/it/zh; the rest of
+    the UI is still English-only)
+11. Show binary/decimal/hex values of all numbers in the UI. (partially:
+    registers and memory cells show hex with the decimal value in a
+    tooltip; binary is not yet shown)
+12. ~~Show program counter~~ (rendered with the other special registers)
 
 ### Settings
-1. Enabling / disabling forwarding
-2. Storing preferences locally (probably with HTML5 storage)
+1. ~~Enabling / disabling forwarding~~
+2. ~~Storing preferences locally (probably with HTML5 storage)~~ (a
+   schema-driven `useSetting` hook persists every preference to
+   `localStorage`)
 3. Setting options related to exceptions
 4. Setting options related to the FPU
 5. Setting parser warning/errors options
@@ -125,4 +139,16 @@ implementation of the remaining features.
 2. Build and deploy the frontend JS from a separate GitHub repository to web.edumips.org. (#87)
 3. ~~Move to React Material UI~~
 4. ~~Find a good (dashboard) Material UI template to use as a starting point (e.g. https://github.com/devias-io/react-material-dashboard)~~
-5. ~~Instrument web UI (Google Analytics + some metrics)~~
+5. ~~Instrument web UI (Google Analytics + some metrics)~~ (Azure
+   Application Insights)
+
+### Extras (not originally planned)
+These features are not in the original roadmap but have been implemented
+as part of the web UI work:
+
+* Configurable L1 data and instruction caches (size, block size,
+  associativity), with a dedicated `CacheConfig` widget.
+* Configurable execution delay between step batches, to make it easier to
+  observe pipeline behavior in real time.
+* Persisted multi-step stride, font size, accordion expansion state and
+  Help language, all driven by the same settings schema.
