@@ -32,7 +32,8 @@ user interface in use and covers the source file format, the supported
 instruction set, the Floating Point Unit and a set of example programs.
 The second part documents the user interfaces: a chapter for the desktop
 (Swing) application, which also includes the command line options of the
-JAR, and a chapter for the web frontend.
+JAR, a chapter for the interactive command line shell that the JAR
+exposes in headless mode, and a chapter for the web frontend.
 
 When this manual is opened from inside the running application, only the
 chapter that is relevant for the active user interface is shown. The full
@@ -53,6 +54,7 @@ manual (with both UI chapters) is available on
       :maxdepth: 2
 
       user-interface-swing
+      cli-interface
 
 .. only:: not swing
 

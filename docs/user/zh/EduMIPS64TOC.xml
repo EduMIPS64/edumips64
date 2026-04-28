@@ -12,6 +12,8 @@
 
  <tocitem text="用户界面" target="user-interface-swing"/>
 
+ <tocitem text="交互式命令行界面" target="cli-interface"/>
+
  <tocitem text="代码示例" target="examples"/>
 
 </toc>

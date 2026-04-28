@@ -12,6 +12,8 @@
 
  <tocitem text="The user interface " target="user-interface-swing"/>
 
+ <tocitem text="The interactive command line interface " target="cli-interface"/>
+
  <tocitem text="Code Examples " target="examples"/>
 
 </toc>

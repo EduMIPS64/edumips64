@@ -12,6 +12,8 @@
 
  <tocitem text="L'interfaccia utente " target="user-interface-swing"/>
 
+ <tocitem text="L'interfaccia a linea di comando interattiva " target="cli-interface"/>
+
  <tocitem text="Esempi " target="examples"/>
 
 </toc>

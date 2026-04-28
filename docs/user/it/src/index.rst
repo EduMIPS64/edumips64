@@ -31,8 +31,9 @@ dall'interfaccia utente in uso e copre il formato dei file sorgente,
 l'insieme di istruzioni supportato, la Floating Point Unit e una serie
 di programmi di esempio. La seconda parte documenta le interfacce
 utente: un capitolo dedicato all'applicazione desktop (Swing), che
-include anche le opzioni da linea di comando del JAR, ed un capitolo
-dedicato al frontend web.
+include anche le opzioni da linea di comando del JAR, un capitolo
+dedicato alla shell interattiva a linea di comando esposta dal JAR in
+modalità headless, ed un capitolo dedicato al frontend web.
 
 Quando il manuale viene aperto dall'interno dell'applicazione, viene
 mostrato solo il capitolo relativo all'interfaccia utente attiva. Il
@@ -54,6 +55,7 @@ in formato PDF.
       :maxdepth: 2
 
       user-interface-swing
+      cli-interface
 
 .. only:: not swing
 
