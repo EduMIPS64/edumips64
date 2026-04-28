@@ -115,7 +115,7 @@ ciascuna linea.
 +----+-+-+-+-+-+-+-+-+
 |*24*|0|0|0|0|0|0|0|3|
 +----+-+-+-+-+-+-+-+-+
-|*36*|0|0|0|0|0|0|0|4|
+|*32*|0|0|0|0|0|0|0|4|
 +----+-+-+-+-+-+-+-+-+
 
 Ci sono alcune direttive speciali che devono essere discusse: `.space`,
@@ -156,9 +156,6 @@ simulatore a run-time. La forma generale di un comando `.code` è::
 Essa può essere indicata anche con la direttiva `.text`.
 
 Il numero e il tipo di parametri dipendono dall'istruzione stessa.
-
-.. %TODO: questa va sicuramente inserita.
-   %Please see table~\ref{table:segm-type} for the list of possible parameters.
 
 Le istruzioni possono accettare tre tipi di parametri:
 
@@ -249,13 +246,6 @@ degli alias indicati nella seguente tabella.
             30       `fp`
             31       `ra`
             ======== ======
-
-.. % TODO: anche questa, ma nell'indice
-   %Please see~\cite{mips-2} for more details about how instruction are
-   actually encoded.
-
-.. The instructions that can be used in this section will be discussed in
-   section~\ref{instructions}
 
 Il comando `\#include`
 ----------------------

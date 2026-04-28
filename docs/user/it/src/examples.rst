@@ -58,8 +58,6 @@ il percorso del file da aprire (che deve esistere se si apre il file in
 modalità sola lettura o lettura/scrittura) e, nella cella successiva, un
 intero che definisce la modalità di apertura.
 
-.. For more info about the opening mode of a file, please refer to \ref{sys1}.
-
 In questo esempio, il file è stato aerto utilizzando la seguente modalità:
 `O_RDWR` | `O_CREAT` | `O_APPEND`. Il numero 15 (0xF in base 16) deriva dalla
 somma dei valori di queste tre modalità modes (3 + 4 + 8).
@@ -215,7 +213,6 @@ successivamente la SYSCALL 5 viene chiamata, stampando quindi la stringa.
 L'ultima istruzione varia il program counter, impostandolo al valore di r31 -
 che secondo le convenzioni di chiamata di funzione MIPS contiene l'indirizzo
 dell'istruzione successiva alla chiamata di funzione.
-
 
 Un esempio di utilizzo della SYSCALL 5 più complesso
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

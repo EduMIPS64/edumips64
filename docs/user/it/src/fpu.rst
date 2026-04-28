@@ -199,10 +199,6 @@ conversione vengono indicati con la notazione
 ``convert_tipoconversione(registro[,tipo arrotondamento])``, dove il parametro
 tra parentesi quadre è presente solo in certe circostanze.
 
-Per prendere confidenza con le istruzioni floating point, alcuni file sorgenti
-possono essere scaricati dal link
-``http://www.edumips.org/attachment/wiki/Upload/FPUMaxSamples.rar``.
-
 * `ADD.D fd, fs, ft`
 
   *Descrizione*: ``fd = fs + ft``
@@ -396,13 +392,13 @@ possono essere scaricati dal link
 
 * `DIV.D fd, fs, ft`
 
-  *Descrizione:* ``fd = fs \div ft``
+  *Descrizione:* ``fd = fs / ft``
 
   *Eccezioni:* Le trap di Overflow e Underflow vengono generate se il
   risultato non può essere rappresentato secondo lo standard IEEE 754. Invalid
   Operation è generata se fs o ft contengono QNaN o SNaN, o se viene eseguita
-  un'operazione non valida (0\div0,∞ \div ∞). Divide by zero è generata se è
-  eseguita una divisione per zero che non ha per dividendo un XNaN (5\div0).
+  un'operazione non valida (0/0, ∞/∞). Divide by zero è generata se è
+  eseguita una divisione per zero che non ha per dividendo un XNaN (5/0).
 
 * `DMFC1 rt,fs`
 
@@ -491,8 +487,6 @@ possono essere scaricati dal link
 
   Copia fs su fd, senza alcun controllo del formato di fs, se il il GPR rt è
   uguale a zero
-
-.. TODO: find a way to do subscript with fixed-width font.
 
 * `MTC1 rt, fs`
 

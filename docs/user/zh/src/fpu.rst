@@ -79,7 +79,6 @@ exceptional condition is encountered (Figure
 
    Trap notification window
 
-
 .. _double-directive:
 
 .double 指令
@@ -99,12 +98,11 @@ FCSR 寄存器
 -----------------
 FCSR（浮点控制状态寄存器）是控制 FPU 多个功能方面的寄存器。它的长度为 32 位，在统计窗口中表示。
 
-
 **FCC** 字段宽 8 位，从 0 到 7。条件指令（``C.EQ.D,C.LT.D``）使用它来保存两个寄存器之间比较的布尔结果。
 
 Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 IEEE 异常动态。每个字段由 5 个位组成，分别是 V（无效操作）、Z（除以零）、O（溢出）、U（下溢）和 I（不精确）；后者尚未使用。
 
-如果在程序执行过程中出现相应的 IEEE 异常，**Clause** 字段位将被置位。
+如果在程序执行过程中出现相应的 IEEE 异常，**Cause** 字段位将被置位。
 
 启用**字段位通过配置窗口设置，显示启用陷阱的 IEEE 异常。
 
@@ -118,8 +116,6 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
 在某些指令中，为了避免歧义，寄存器被表示为 ``GPR[i]`` 和 ``FPR[i]``, ``i`` ∈ [0,31]，但在大多数情况下，我们只使用 ``rx`` 或 ``fx`` 符号，其中 ``x``∈ {d,s,t}。三个字母用来表示每个寄存器的用途（目的寄存器、源寄存器、第三寄存器）。最后，转换操作返回的值用以下符号表示：``convert_conversiontype(register[,rounding_type])``、
 其中 ``rounding_type`` 参数是可选的。
-
-有关 FPU 指令的一些示例，请访问 ``http://www.edumips.org/attachment/wiki/Upload/FPUMaxSamples.rar``。
 
 * `ADD.D fd, fs, ft`
 
@@ -232,7 +228,7 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 .. table:: 四舍五入示例
 
    =============== ========== ============= =============
-    Tipo            RM field   f5 register   r6 register
+    类型            RM field   f5 register   r6 register
    =============== ========== ============= =============
     To nearest      0          6.4           6
     To nearest      0          6.8           7
@@ -252,13 +248,13 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
   使用当前舍入模式将 double 转换为 int。
 
-  *异常：* 如果 fs 包含一个无限值、任何 NaN 或结果超出有符号 int 域 [-2 :sup:`63`, 2 :sup:`63` -1] 则会抛出无效操作。
+  *异常：* 如果 fs 包含一个无限值、任何 NaN 或结果超出有符号 int 域 [-2 :sup:`31`, 2 :sup:`31` -1] 则会抛出无效操作。
 
 * `DIV.D fd, fs, ft`
 
-  *描述：* `fd = fs\div ft`
+  *描述：* ``fd = fs / ft``
 
-  *异常：* 如果结果不能用 IEEE 754 标准表示，则会出现溢出或下溢。如果fs或ft包含QNaN或SNan，或者执行了无效操作（0\div0,∞ \div ∞），则会出现无效操作。如果试图用非 QNaN 或 SNaN 的红利除以零，则会出现除以零的提示。
+  *异常：* 如果结果不能用 IEEE 754 标准表示，则会出现溢出或下溢。如果fs或ft包含QNaN或SNan，或者执行了无效操作（0/0, ∞/∞），则会出现无效操作。如果试图用非 QNaN 或 SNaN 的红利除以零，则会出现除以零的提示。
 
 * `DMFC1 rt,fs`.
 
@@ -335,8 +331,6 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
   如果 rt 等于零，则将 fs 复制到 fd。
 
-.. TODO: 找到使用固定宽度字体的下标方法。
-
 * MTC1 rt, fs
 
   *描述：* fs = rt :sub:`0..31`
@@ -373,7 +367,7 @@ Cause、Enables 和 Flag 字段用于处理 :ref:`special-values` 中描述的 I
 
   *描述：* ``fd = fs-ft``
 
-  *异常*： 如果结果无法根据 IEEE 753 表示，则会产生溢出和下溢陷阱。如果fs或ft包含QNaN或SNan，或者执行了无效操作（+∞ - ∞），则会产生无效操作。
+  *异常*： 如果结果无法根据 IEEE 754 表示，则会产生溢出和下溢陷阱。如果fs或ft包含QNaN或SNan，或者执行了无效操作（+∞ - ∞），则会产生无效操作。
 
 * `SWC1 ft, offset(base)`
 

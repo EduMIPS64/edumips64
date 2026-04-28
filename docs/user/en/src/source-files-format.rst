@@ -109,7 +109,7 @@ eight cells in each line.
 +----+-+-+-+-+-+-+-+-+
 |*24*|0|0|0|0|0|0|0|3|
 +----+-+-+-+-+-+-+-+-+
-|*36*|0|0|0|0|0|0|0|4|
+|*32*|0|0|0|0|0|0|0|4|
 +----+-+-+-+-+-+-+-+-+
 
 There are some special directives that need to be discussed: `.space`,
@@ -148,9 +148,6 @@ is::
 The *code* section can be specified with the `.text` alias.
 
 The number and the type of parameters depends on the instruction itself.
-
-.. %TODO: questa va sicuramente inserita.
-   %Please see table~\ref{table:segm-type} for the list of possible parameters.
 
 Instructions can take three types of parameters:
 
@@ -237,13 +234,6 @@ and "R". See the next table.
             30       `fp`
             31       `ra`
             ======== ======
-
-.. % TODO: anche questa, ma nell'indice
-   %Please see~\cite{mips-2} for more details about how instruction are
-   actually encoded.
-
-.. The instructions that can be used in this section will be discussed in
-   section~\ref{instructions}
 
 The `\#include` command
 -----------------------
