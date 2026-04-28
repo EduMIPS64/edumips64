@@ -58,9 +58,12 @@ public class GUIHelp {
    * @return true if the help window was displayed, false otherwise.
    */
   public static boolean showHelp(Window parent, URL helpSetUrl, ConfigStore cfg) {
-    // Clean up the URL from spaces.
+    // Encode raw spaces in the URL so it is a valid URI. This is needed when the JAR
+    // (or any directory along the path) contains spaces, e.g. "C:/Users/foo/JAR (1)/...",
+    // which would otherwise produce "Illegal character in opaque part" when constructing
+    // a URI.
     log.info("Got helpSetUrl: <"+helpSetUrl+">");
-    String clean = helpSetUrl.getProtocol() + ":" + helpSetUrl.getPath().replace("%20", " ");
+    String clean = helpSetUrl.toString().replace(" ", "%20");
     URL cleanUrl;
 
     try {
