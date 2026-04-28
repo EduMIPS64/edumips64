@@ -134,25 +134,13 @@ implementation of the remaining features.
 4. Setting options related to the FPU
 5. Setting parser warning/errors options
 
-### Development features
+### Development features - DONE
 1. ~~Move to a proper JS toolchain.~~
 2. ~~Build and deploy the frontend JS from a separate GitHub repository to web.edumips.org. (#87)~~
    **Dropped.** The web UI will keep living in the same repository as the
    Java core: it shares the GWT-compiled worker with the core, and the
-   single-repo setup has worked well in practice. Issue #87 should be
-   closed as "won't fix".
+   single-repo setup has worked well in practice.
 3. ~~Move to React Material UI~~
 4. ~~Find a good (dashboard) Material UI template to use as a starting point (e.g. https://github.com/devias-io/react-material-dashboard)~~
 5. ~~Instrument web UI (Google Analytics + some metrics)~~ (Azure
    Application Insights)
-
-### Extras (not originally planned)
-These features are not in the original roadmap but have been implemented
-as part of the web UI work:
-
-* Configurable L1 data and instruction caches (size, block size,
-  associativity), with a dedicated `CacheConfig` widget.
-* Configurable execution delay between step batches, to make it easier to
-  observe pipeline behavior in real time.
-* Persisted multi-step stride, font size, accordion expansion state and
-  Help language, all driven by the same settings schema.
