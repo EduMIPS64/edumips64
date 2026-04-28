@@ -10,11 +10,6 @@ dal JAR desktop. Lo stesso JAR può essere eseguito come applicazione
 grafica oppure in modalità headless / CLI (vedi
 :ref:`command-line-options-it`).
 
-.. Please refer to chapter~\ref{mips-simulators} for an overview of some MIPS
-  and DLX simulators (including WinMIPS64), and to \cite{winmips-web} for more
-  information about WinMIPS64. %In figure~\ref{fig:edumips-main} you can see
-  the main window of EduMIPS64, composed by
-
 La finestra principale di EduMIPS64 è caratterizzata da sei frame, che
 mostrano i differenti aspetti della simulazione.  è inoltre presente una
 barra di stato, che ha il duplice scopo di mostrare il contenuto delle celle
@@ -84,8 +79,6 @@ simulazione.
 * *Cicli multipli* Esegue un certo numero di passi di simulazione, tale
   valore può essere configurato attraverso la finestra di configurazione.
 
-.. Vedere la sezione~\ref{dialog-settings} per ulteriori dettagli.
-
 * *Ferma* Ferma l'esecuzione quando il simulatore è in modalità
   "Completa" o "Cicli multipli", come descritto precedentemente.
 
@@ -103,8 +96,8 @@ funzionamento di EduMIPS64.
   prossima sezione di questo capitolo;
 
 * *Selezione lingua* Consente di modificare la lingua usata
-  dall'interfaccia utente. Attualmente sono supportate solo inglese ed
-  italiano. Questa modifica riguarda ogni aspetto dell'interfaccia grafica,
+  dall'interfaccia utente. Sono supportati inglese, italiano e cinese
+  semplificato. Questa modifica riguarda ogni aspetto dell'interfaccia grafica,
   dal titolo delle finestre al manuale in linea ed i messaggi di errore o le
   notifiche.
 
@@ -388,9 +381,6 @@ La finestra di dialogo Dinero Frontend consente di avviare un processo
 DineroIV con il trace file generato internamente mediante l'esecuzione del
 programma. Nella prima casella di testo c'è il percorso dell'eseguibile
 DineroIV, e nella seconda devono essere inseriti i parametri opportuni.
-
-.. % Please see~\cite{dinero-web} for further informations about the DineroIV
-   cache simulator.
 
 La sezione più in basso contiene l'output del processo DineroIV, dal quale
 è possibile prelevare i dati di cui si necessita.

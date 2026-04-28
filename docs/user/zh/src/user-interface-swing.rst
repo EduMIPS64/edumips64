@@ -6,8 +6,6 @@ EduMIPS64 以基于 Swing 的 Java 桌面应用程序形式发布。本章介绍
 本章还介绍了桌面 JAR 支持的命令行选项。同一个 JAR 可以作为图形应用程序运行，
 也可以在 headless / CLI 模式下运行（请参见 :ref:`command-line-options-zh`）。
 
-.. 关于一些 MIPS 和 DLX 仿真器（包括 WinMIPS64）的概述，请参阅 ~\ref{mips-simulators} 一章；关于 WinMIPS64 的更多信息，请参阅 \cite{winmips-web}。%在图~ref{fig:edumips-main}中，你可以看到 EduMIPS64 的主窗口，由以下部分组成
-
 EduMIPS64 主窗口由一个菜单栏和六个框架组成，显示仿真的不同方面。此外，还有一个状态栏，它有双重作用，一是在点击内存单元和寄存器时显示它们的内容，二是在模拟已启动但未选择verbose（详细）模式时通知用户模拟器正在运行。
 
 状态栏还显示 CPU 状态。它可以显示以下四种状态之一：
@@ -53,8 +51,6 @@ Write Dinero Tracefile...*（写入 Dinero Tracefile...*）菜单项只有在执
 * *运行* 开始执行，当模拟器执行到SYSCALL 0（或类似指令），或BREAK指令，或用户点击停止菜单项（或按 F9 键）时停止。
 
 * *多周期* 执行一些仿真步骤。执行的步数可通过设置对话框进行配置。
-
-.. 更多详情请参见~ref{dialog-settings}。
 
 * *停止* 当模拟器处于运行或多循环模式时停止执行，如前所述。
 
@@ -259,8 +255,6 @@ MIPS 流水线相一致的两条前推路径：
 Dinero 前端
 ~~~~~~~~~~~~~~~
 通过 Dinero Frontend 对话框，可以向 DineroIV 进程提供程序执行时内部生成的跟踪文件。第一个文本框中是 DineroIV 可执行文件的路径，第二个文本框中必须是 DineroIV 的参数。
-
-关于 DineroIV 缓存模拟器的更多信息，请参阅 ~\cite{dinero-web}。
 
 下部包含 DineroIV 进程的输出，你可以从中获取所需的数据。
 

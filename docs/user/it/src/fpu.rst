@@ -199,10 +199,6 @@ conversione vengono indicati con la notazione
 ``convert_tipoconversione(registro[,tipo arrotondamento])``, dove il parametro
 tra parentesi quadre è presente solo in certe circostanze.
 
-Per prendere confidenza con le istruzioni floating point, alcuni file sorgenti
-possono essere scaricati dal link
-``http://www.edumips.org/attachment/wiki/Upload/FPUMaxSamples.rar``.
-
 * `ADD.D fd, fs, ft`
 
   *Descrizione*: ``fd = fs + ft``
@@ -396,13 +392,13 @@ possono essere scaricati dal link
 
 * `DIV.D fd, fs, ft`
 
-  *Descrizione:* ``fd = fs \div ft``
+  *Descrizione:* ``fd = fs / ft``
 
   *Eccezioni:* Le trap di Overflow e Underflow vengono generate se il
   risultato non può essere rappresentato secondo lo standard IEEE 754. Invalid
   Operation è generata se fs o ft contengono QNaN o SNaN, o se viene eseguita
-  un'operazione non valida (0\div0,∞ \div ∞). Divide by zero è generata se è
-  eseguita una divisione per zero che non ha per dividendo un XNaN (5\div0).
+  un'operazione non valida (0/0, ∞/∞). Divide by zero è generata se è
+  eseguita una divisione per zero che non ha per dividendo un XNaN (5/0).
 
 * `DMFC1 rt,fs`
 
@@ -424,8 +420,10 @@ possono essere scaricati dal link
   Carica una doubleword (64 bit) dalla memoria all'FPR ft. Questa istruzione
   non appartiene all'ISA MIPS64; si consiglia l'utilizzo di ``LDC1``.
 
-.. note:: `L.D` è un'istruzione non presente nell'ISA MIPS64, inclusa in
-          EduMIPS64, solo per compabitibilità con WinMIPS64
+.. warning:: ``L.D`` non è presente nell'ISA MIPS64; è un alias di
+             ``LDC1`` accettato da EduMIPS64 per compatibilità con
+             WinMIPS64. Il parser segnala un avviso quando viene utilizzata;
+             preferire ``LDC1``.
 
 * `LDC1 ft, offset(base)`
 
@@ -492,8 +490,6 @@ possono essere scaricati dal link
   Copia fs su fd, senza alcun controllo del formato di fs, se il il GPR rt è
   uguale a zero
 
-.. TODO: find a way to do subscript with fixed-width font.
-
 * `MTC1 rt, fs`
 
   *Descrizione:* fs = rt :sub:`0..31`
@@ -525,8 +521,10 @@ possono essere scaricati dal link
 
   Copia la doubleword (64 bit) dell'FPR ft in memoria.
 
-.. note:: `S.D` è un'istruzione non presente nell'ISA MIPS64, inclusa in
-          EduMIPS64, solo per compabitibilità con WinMIPS64
+.. warning:: ``S.D`` non è presente nell'ISA MIPS64; è un alias di
+             ``SDC1`` accettato da EduMIPS64 per compatibilità con
+             WinMIPS64. Il parser segnala un avviso quando viene utilizzata;
+             preferire ``SDC1``.
 
 
 * `SDC1 ft, offset(base)`

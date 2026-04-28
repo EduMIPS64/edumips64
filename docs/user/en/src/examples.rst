@@ -58,8 +58,6 @@ path of the file to be opened (that must exist if we work in read or
 read/write mode) and, in the next memory cell, an integer that defines the
 opening mode.
 
-.. For more info about the opening mode of a file, please refer to \ref{sys1}.
-
 In this example, the file was opened using the following modes:
 `O_RDWR` | `O_CREAT` | `O_APPEND`. The
 number 15 (0xF in base 16) comes from the sum of the values of these three
@@ -146,8 +144,9 @@ Example program that reads 16 bytes from a file and saves them to memory::
                   #include    print.s
 
 The first 4 rows of the .data section contain the arguments of SYSCALL 3, the
-file descriptor of the from which we must read, the memory address where the
-SYSCALL must save the read data, the number of bytes to read. We give labels
+file descriptor of the file from which we must read, the memory address where
+the SYSCALL must save the read data, the number of bytes to read. We give
+labels
 to those parameters that must be accessed later. Next we put, as usual, the
 strings containing the error message and the success message.
 
@@ -190,8 +189,9 @@ Example program that writes to a file a string::
                   #include    print.s
 
 The first 4 rows of the .data section contain the arguments of SYSCALL 4, the
-file descriptor of the from which we must read, the memory address from where
-the SYSCALL must read the bytes to write, the number of bytes to write. We
+file descriptor of the file to which we must write, the memory address from
+where the SYSCALL must read the bytes to write, the number of bytes to
+write. We
 give labels to those parameters that must be accessed later. Next we put, as
 usual, the strings containing the error message and the success message.
 
@@ -200,8 +200,8 @@ in the memory cells for the SYSCALL parameters the file descriptor (that we
 suppose to have in $s2) and the address from where we must take the bytes to
 write.
 
-Next we can call SYSCALL 3, and then we call the print_string function
-passing as argument error_3 or ok_message, according to the success of the
+Next we can call SYSCALL 4, and then we call the print_string function
+passing as argument error_4 or ok_message, according to the success of the
 operation.
 
 SYSCALL 5

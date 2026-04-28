@@ -38,7 +38,7 @@ Floating point arithmetics allows the programmer to choose whether to stop the
 computation or not, if invalid operations are carried on. In this scenario,
 operations like the division between zeroes or square roots of negative
 numbers must produce a result that, not being a number (NaN) is treated as
-somehting different.
+something different.
 
 .. _nan:
 
@@ -48,7 +48,7 @@ The IEEE Standard for Floating-Point Arithmetic (IEEE 754) defined that
 invalid arithmetic operations can either signal the error while the program is
 running (using a trap for the IEEE exception **Invalid Operation**) or return
 as a result the special value QNan (Quit Not a Number). Another NaN value,
-that inconditionally raises the same trap once it is detected as being one of
+that unconditionally raises the same trap once it is detected as being one of
 the operands, is SNan (Signalling Not a Number). This value is seldom used in
 applications, and historically it has been used to initialize variables.
 
@@ -127,7 +127,7 @@ The directive can be used in 2 ways::
 where ``double_number`` can be represented either in extended notation
 (``1.0,0.003``), or in scientific notation(``3.7E-12,0.5E32``).
 ``keyword`` can be ``POSITIVEINFINITY``, ``NEGATIVEINFINITY``,
-``POSITIVEZERO``, ``NEGATIVEZERO``, ``SNAN`` e ``QNAN``,
+``POSITIVEZERO``, ``NEGATIVEZERO``, ``SNAN`` and ``QNAN``,
 thus allowing to directly insert in memory the special values.
 
 The FCSR register
@@ -150,7 +150,7 @@ described in :ref:`special-values`. Each of them is composed of 5 bits, V
 (Invalid Operation), Z (Divide by Zero), O (Overflow), U (Underflow) and I
 (Inexact); the latter is not yet used.
 
-The **Clause** field bits are set if the corresponding IEEE exceptions occur
+The **Cause** field bits are set if the corresponding IEEE exceptions occur
 during the execution of a program.
 
 The **Enable** field bits are set through the configuration window and show
@@ -180,9 +180,6 @@ indicate the purpose of each register (destination, source, third). Lastly,
 the values returned by conversion operations are represented with the
 following notation: ``convert_conversiontype(register[,rounding_type])``,
 where the ``rounding_type`` parameter is optional.
-
-Some examples for the FPU instructions are available at
-``http://www.edumips.org/attachment/wiki/Upload/FPUMaxSamples.rar``.
 
 * `ADD.D fd, fs, ft`
 
@@ -222,8 +219,8 @@ Some examples for the FPU instructions are available at
 
   In this example, ``C.EQ.D`` checks if ``f1`` and ``f2`` are equal, writing
   the results of the comparison in the 7th bit of the FCC field of the FCSR
-  register. After that, ``BC1F`` jumps to ``label`` if the result of the
-  comparison is 1 (false).
+  register. After that, ``BC1T`` jumps to ``label`` if the result of the
+  comparison is 1 (true).
 
 * `C.EQ.D cc, fs, ft`
 
@@ -233,7 +230,7 @@ Some examples for the FPU instructions are available at
   in ``FCSR_FCC[cc]``. See examples for ``BC1T``, ``BC1F``.
 
   *Exceptions*: Invalid Operation can be thrown if ``fs`` or ``ft`` contain
-  QNaN (trap is triggered if it is enabled) o SNaN (trap is always triggered).
+  QNaN (trap is triggered if it is enabled) or SNaN (trap is always triggered).
 
 * `C.LT.D cc, fs, ft`
 
@@ -253,7 +250,7 @@ Some examples for the FPU instructions are available at
   to 1.
 
   *Exceptions*: Invalid Operation can be thrown if ``fs`` or ``ft`` contain
-  QNaN (trap is triggered if it is enabled) o SNaN (trap is always triggered).
+  QNaN (trap is triggered if it is enabled) or SNaN (trap is always triggered).
 
 * `CVT.D.L fd, fs`
 
@@ -309,14 +306,13 @@ Some examples for the FPU instructions are available at
     CVT.L.D f5,f5
     DMFC1 r6,f5
 
-  ``CVT.L.D`` the double value in f5 to a long; then ``DMFC1`` copies f5 to
+  ``CVT.L.D`` converts the double value in f5 to a long; then ``DMFC1`` copies f5 to
   r6; the result of this operation depends on the current rounding modality,
   that can be set in the *FPU Rounding* tab of the *Configure* →  *Settings*
   window, as depicted in Figure :ref:`fig-fpu_rounding`.
 
   *Exceptions:* Invalid Operation is thrown if fs contains an infinite value,
-  any NaN or the results is outside the long domain [-2 :sup:`63`, 2 :sup:`63`
-  -1]
+  any NaN or the result is outside the long domain [-2 :sup:`63`, 2 :sup:`63` -1].
 
 
 .. _fig-fpu_rounding:
@@ -328,7 +324,7 @@ Some examples for the FPU instructions are available at
 .. table:: Rounding examples
 
    =============== ========== ============= =============
-    Tipo            RM field   f5 register   r6 register
+    Type            RM field   f5 register   r6 register
    =============== ========== ============= =============
     To nearest      0          6.4           6
     To nearest      0          6.8           7
@@ -349,18 +345,17 @@ Some examples for the FPU instructions are available at
   Converts a double to an int, using the current rounding modality.
 
   *Exceptions:* Invalid Operation is thrown if fs contains an infinite value,
-  any NaN or the results is outside the signed int domain [-2 :sup:`63`, 2
-  :sup:`63` -1]
+  any NaN or the result is outside the signed int domain [-2 :sup:`31`, 2 :sup:`31` -1].
 
 * `DIV.D fd, fs, ft`
 
-  *Description:* ``fd = fs \div ft``
+  *Description:* ``fd = fs / ft``
 
   *Exceptions:* Overflow or Underflow are raised if the results cannot be
   represented using the IEEE 754 standard. Invalid Operation is raised if fs
-  or ft contain QNaN or SNan, or if an invalid operation is executed (0\div0,∞
-  \div ∞). Divide by zero is raised if a division by zero is attempted with a
-  dividend that is not QNaN or SNaN.
+  or ft contain QNaN or SNan, or if an invalid operation is executed
+  (0/0, ∞/∞). Divide by zero is raised if a division by zero is attempted
+  with a dividend that is not QNaN or SNaN.
 
 * `DMFC1 rt,fs`
 
@@ -380,12 +375,14 @@ Some examples for the FPU instructions are available at
 
   Loads from memory a doubleword and stores it in ft.
 
-.. note:: `L.D` is not present in the MIPS64 ISA, it is an alias for ``LDC1``
-          that is present in EduMIPS64 for compatibility with WinMIPS64.
+.. warning:: ``L.D`` is not present in the MIPS64 ISA; it is an alias for
+             ``LDC1`` that EduMIPS64 accepts for compatibility with
+             WinMIPS64. The parser emits a warning when it is used; prefer
+             ``LDC1`` instead.
 
 * `LDC1 ft, offset(base)`
 
-  *Description:* ``memory[GPR[base] + offset]``
+  *Description:* ``ft = memory[GPR[base] + offset]``
 
   Loads from memory a doubleword and stores it in ft.
 
@@ -416,13 +413,13 @@ Some examples for the FPU instructions are available at
 
   *Description:* ``if FCSR_FCC[cc] == 0 then fd=fs``
 
-  If FCSR_FCC[cc] is false, the copies fs to fd.
+  If FCSR_FCC[cc] is false, copies fs to fd.
 
 * `MOVT.D fd, fs, cc`
 
   *Description:* ``if FCSR_FCC[cc] == 1 then fd=fs``
 
-  If FCSR_FCC[cc] is true, the copies fs to fd.
+  If FCSR_FCC[cc] is true, copies fs to fd.
 
 * `MOV.D fd, fs`
 
@@ -441,8 +438,6 @@ Some examples for the FPU instructions are available at
   *Description:* ``if rt == 0 then fd=fs``
 
   If rt is equal to zero, copies fs to fd.
-
-.. TODO: find a way to do subscript with fixed-width font.
 
 * `MTC1 rt, fs`
 
@@ -473,8 +468,10 @@ Some examples for the FPU instructions are available at
 
   Copies ft to memory.
 
-.. note:: `S.D` is not present in the MIPS64 ISA, it is an alias for ``SDC1``
-          that is present in EduMIPS64 for compatibility with WinMIPS64.
+.. warning:: ``S.D`` is not present in the MIPS64 ISA; it is an alias for
+             ``SDC1`` that EduMIPS64 accepts for compatibility with
+             WinMIPS64. The parser emits a warning when it is used; prefer
+             ``SDC1`` instead.
 
 * `SDC1 ft, offset(base)`
 
@@ -487,7 +484,7 @@ Some examples for the FPU instructions are available at
   *Description:* ``fd = fs-ft``
 
   *Exceptions*: Overflow and underflow traps are generated if the result
-  cannot be represented according to IEEE 753. Invalid operation is raised if
+  cannot be represented according to IEEE 754. Invalid operation is raised if
   fs or ft contain QNaN or SNan, or if an invalid operation (+∞ - ∞) is
   executed.
 
