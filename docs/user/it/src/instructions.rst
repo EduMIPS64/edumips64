@@ -6,9 +6,6 @@ riconosciute da EduMIPS64. è possibile effettuare due differenti
 classificazioni: una basata sulla funzionalità delle istruzioni e l'altra
 basata sul tipo di parametri.
 
-.. Please refer to Section~\ref{mipsis} for more informations about those
-   classifications.
-
 La prima classificazione suddivide le istruzioni in tre categorie: istruzioni
 ALU, istruzioni Load/Store, istruzioni di controllo del flusso. I prossimi tre
 paragrafi descriveranno ciascuna categoria e le istruzioni che vi
@@ -18,8 +15,6 @@ Il quarto paragrafo descriverà le istruzioni che non rientrano in nessuna
 delle tre categorie sopraelencate.
 
 .. For a more complete MIPS64 instruction set reference, please refer
-   to~\cite{mips-2}.
-
 
 Le istruzioni ALU
 -----------------
@@ -35,6 +30,16 @@ Quattro di esse utilizzano due registri speciali: LO e HI. Tali registri sono
 interni alla CPU ed è possibile accedere al loro valore mediante le
 istruzioni `MFLO` e `MFHI`.
 
+.. note::
+
+   Diverse istruzioni MIPS hanno un nome che termina con ``U`` (ad esempio
+   ``ADDU``, ``ADDIU``, ``DADDU``, ``DADDIU``, ``DSUBU``, ``SUBU``).
+   Nonostante il suffisso, queste istruzioni **non** trattano gli operandi
+   come valori senza segno: il risultato viene esteso in segno esattamente
+   come nella variante senza ``U``. L'unica differenza è che non viene
+   sollevata l'eccezione di Integer Overflow. È un noto refuso storico
+   (misnomer) dell'architettura MIPS.
+
 Ecco la lista delle istruzioni ALU di tipo R.
 
 * `AND rd, rs, rt`
@@ -47,13 +52,10 @@ Ecco la lista delle istruzioni ALU di tipo R.
   valori con segno, e pone il risultato in rd.  Lancia un'eccezione in caso di
   overflow.
 
-
 * `ADDU rd, rs, rt`
 
   Somma il contenuto dei registri a 32-bit rs ed rt, e pone il risultato in
   rd. Non si verificano eccezioni di overflow.
-
-.. \MISN{}
 
 * `DADD rd, rs, rt`
 
@@ -65,8 +67,6 @@ Ecco la lista delle istruzioni ALU di tipo R.
 
   Somma il contenuto dei registri a 64-bit rs ed rt, e pone il risultato in rd.
   Non si verificano eccezioni di overflow.
-
-.. \MISN{}
 
 * `DDIV rs, rt` O `DDIV rd, rs, rt`
 
@@ -170,16 +170,14 @@ Ecco la lista delle istruzioni ALU di tipo R.
 
 * `DSUB rd, rs, rt`
 
-  Sottrae il valore del registro a 64-bit rt al valore del registro a 64-bit
+  Sottrae il valore del registro a 64-bit rt dal valore del registro a 64-bit
   rs, considerandoli come valori con segno, e pone il risultato in rd. Lancia
   un'eccezione in caso di overflow.
 
 * `DSUBU rd, rs, rt`
 
-  Sottrae il valore del registro a 64-bit rt al valore del registro a 64-bit
+  Sottrae il valore del registro a 64-bit rt dal valore del registro a 64-bit
   rs, e pone il risultato in rd.  Non si verificano eccezioni di overflow.
-
-.. \MISN{}
 
 * `MFLO rd`
 
@@ -258,17 +256,15 @@ Ecco la lista delle istruzioni ALU di tipo R.
 
 * `SUB rd, rs, rt`
 
-  Sottrae il valore del registro a 32-bit rt al valore del registro a 32-bit
+  Sottrae il valore del registro a 32-bit rt dal valore del registro a 32-bit
   rs, considerandoli come valori con segno, e pone il risultato in rd. Lancia
   un'eccezione in caso di overflow.
 
 * `SUBU rd, rs, rt`
 
-  Sottrae il valore del registro a 32-bit rt al valore del registro a 32-bit
+  Sottrae il valore del registro a 32-bit rt dal valore del registro a 32-bit
   rs, e pone il risultato in rd.
   Non si verificano eccezioni di overflow.
-
-.. \MISN{}
 
 * `SLT rd, rs, rt`
 
@@ -300,8 +296,6 @@ Ecco la lista delle istruzioni ALU di tipo I.
   Effettua la somma tra il registro a 32 bit rs ed il valore immediato,
   ponendo il risultato in rt.  Non si verificano eccezioni di overflow.
 
-.. \MISN{}
-
 * `ANDI rt, rs, immediate`
 
   Esegue un AND bit a bit tra rs ed il valore immediato, ponendo il risultato
@@ -318,15 +312,17 @@ Ecco la lista delle istruzioni ALU di tipo I.
   Effettua la somma tra il registro a 64 bit rs ed il valore immediato,
   ponendo il risultato in rt.  Non si verificano eccezioni di overflow.
 
-.. \MISN{}
-
 * `DADDUI rt, rs, immediate`
 
   Effettua la somma tra il registro a 64 bit rs ed il valore immediato,
   ponendo il risultato in rt.  Non si verificano eccezioni di overflow.
 
-.. \MISN{}
-.. \WARN{}
+  .. warning::
+
+     ``DADDUI`` non è un'istruzione MIPS64 standard (fa parte
+     dell'instruction set di WinMIPS64, accettata da EduMIPS64 per
+     retrocompatibilità). Il parser segnala un avviso quando viene
+     utilizzata; preferire ``DADDIU``.
 
 * `LUI rt, immediate`
 
@@ -481,7 +477,12 @@ Ed ecco le istruzioni di controllo del flusso di tipo I:
 
   Salta ad offset se rs è uguale a zero.
 
-..  \WARN
+  .. warning::
+
+     ``BEQZ`` non è un'istruzione MIPS64 standard (fa parte
+     dell'instruction set di WinMIPS64, accettata da EduMIPS64 per
+     retrocompatibilità). Il parser segnala un avviso quando viene
+     utilizzata; preferire ``BEQ rs, r0, offset``.
 
 * `BGEZ rs, offset`
 
@@ -495,7 +496,12 @@ Ed ecco le istruzioni di controllo del flusso di tipo I:
 
   Salta ad offset se rs non è uguale a zero.
 
-..  \WARN
+  .. warning::
+
+     ``BNEZ`` non è un'istruzione MIPS64 standard (fa parte
+     dell'instruction set di WinMIPS64, accettata da EduMIPS64 per
+     retrocompatibilità). Il parser segnala un avviso quando viene
+     utilizzata; preferire ``BNE rs, r0, offset``.
 
 Ecco la lista delle istruzioni di controllo del flusso di tipo J:
 
@@ -544,7 +550,7 @@ utilizzare, scelti dalla seguente lista:
 * `O_CREAT (0x04)` Crea il file se non esiste;
 * `O_APPEND (0x08)` In modalità di scrittura, aggiunge il testo alla fine del
   file;
-* `O_TRUNC (0x08)` In modalità di scrittura, cancella il contenuto del file al
+* `O_TRUNC (0x10)` In modalità di scrittura, cancella il contenuto del file al
   momento della sua apertura.
 
 È obbligatorio specificare una delle prime tre modalità. La quinta e
@@ -596,8 +602,8 @@ SYSCALL 4 richiede tre parametri: il file descriptor su cui scrivere,
 l'indirizzo dal quale i dati dovranno essere letti, il numero di byte da
 scrivere.
 
-Se il primo parametro è 2 o 3, il simulatore mostrerà la finestra di
-input/output dove scriverà i dati letti.
+Se il primo parametro è 1 o 2 (cioè ``stdout`` o ``stderr``), il simulatore
+mostrerà la finestra di input/output dove scriverà i dati.
 
 Questa chiamata di sistema ritorna il numero di byte che sono stati scritti, o
 -1 se l'operazione di scrittura fallisce.  Possibili cause di errore sono il
@@ -653,3 +659,10 @@ SYSCALL.
 ~~~~~~
 L'istruzione HALT è deprecated, rappresenta un'alternativa all'istruzione
 SYSCALL 0, che ferma il simulatore.
+
+.. warning::
+
+   ``HALT`` non è un'istruzione MIPS64 standard (fa parte dell'instruction
+   set di WinMIPS64, accettata da EduMIPS64 per retrocompatibilità). Il
+   parser segnala un avviso quando viene utilizzata; preferire
+   ``SYSCALL 0``.

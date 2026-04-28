@@ -1,13 +1,10 @@
 The instruction set
 ===================
 
-In this section we will the subset of the MIPS64 instruction set that EduMIPS64
+In this section we will describe the subset of the MIPS64 instruction set that EduMIPS64
 recognizes. We can operate two different taxonomic classification: one based on
 the functionality of the instructions and one based on the type of the
 parameters of the instructions.
-
-.. Please refer to Section~\ref{mipsis} for more informations about those
-   classifications.
 
 The first classification divides instruction into three categories: ALU
 instructions, Load/Store instructions, Flow control instructions. The next
@@ -18,8 +15,6 @@ The fourth subsection will describe instructions that do not fit in any of the
 three categories.
 
 .. For a more complete MIPS64 instruction set reference, please refer
-   to~\cite{mips-2}.
-
 
 ALU Instructions
 ----------------
@@ -33,6 +28,16 @@ ALU Instructions can be divided in two groups: *R-Type* and *I-Type*.
 Four of those instructions make use of two special registers: LO and HI. They
 are internal CPU registers, whose value can be accessed through the
 `MFLO` and `MFHI` instructions.
+
+.. note::
+
+   Several MIPS instructions have a name ending in ``U`` (for example
+   ``ADDU``, ``ADDIU``, ``DADDU``, ``DADDIU``, ``DSUBU``, ``SUBU``). Despite
+   the suggestive suffix, these instructions **do not** treat their operands
+   as unsigned: the result is sign-extended exactly like in the non-``U``
+   variant. The only difference is that no Integer Overflow exception is
+   raised. This naming is a well-known historical misnomer in the MIPS
+   architecture.
 
 Here's the list of R-Type ALU Instructions.
 
@@ -50,8 +55,6 @@ Here's the list of R-Type ALU Instructions.
   Sums the content of 32-bits registers rs and rt, and puts the result into rd.
   No integer overflow occurs under any circumstances.
 
-.. \MISN{}
-
 * `DADD rd, rs, rt`
 
   Sums the content of 64-bits registers rs and rt, considering them as signed
@@ -61,8 +64,6 @@ Here's the list of R-Type ALU Instructions.
 
   Sums the content of 64-bits registers rs and rt, and puts the result into rd.
   No integer overflow occurs under any circumstances.
-
-.. \MISN{}
 
 * `DDIV rs, rt` OR `DDIV rd, rs, rt`
 
@@ -139,7 +140,7 @@ Here's the list of R-Type ALU Instructions.
 * `DSLLV rd, rt, rs`
 
   Does a left shift of 64-bits register rt, by the amount specified in
-  low-order 6-bits of rs threatd as unsigned value, and puts the result into
+  low-order 6-bits of rs treated as unsigned value, and puts the result into
   64-bits register rd. Empty bits are padded with zeros.
 
 * `DSRA rd, rt, sa`
@@ -152,7 +153,7 @@ Here's the list of R-Type ALU Instructions.
 * `DSRAV rd, rt, rs`
 
   Does a right shift of 64-bits register rt, by the amount specified in
-  low-order 6-bits of rs threatd as unsigned value, and puts the result into
+  low-order 6-bits of rs treated as unsigned value, and puts the result into
   64-bits register rd. Empty bits are padded with zeros if the leftmost bit
   of rt is zero, otherwise they are padded with ones.
 
@@ -165,21 +166,19 @@ Here's the list of R-Type ALU Instructions.
 * `DSRLV rd, rt, rs`
 
   Does a right shift of 64-bits register rt, by the amount specified in
-  low-order 6-bits of rs threatd as unsigned value, and puts the result into
+  low-order 6-bits of rs treated as unsigned value, and puts the result into
   64-bits register rd. Empty bits are padded with zeros.
 
 * `DSUB rd, rs, rt`
 
-  Subtracts the value of 64-bits register rt to 64-bits register rs,
+  Subtracts the value of 64-bits register rt from 64-bits register rs,
   considering them as signed values, and puts the result in rd. If an
   overflow occurs then trap.
 
 * `DSUBU rd, rs, rt`
 
-  Subtracts the value of 64-bits register rt to 64-bits register rs, and puts
+  Subtracts the value of 64-bits register rt from 64-bits register rs, and puts
   the result in rd. No integer overflow occurs under any circumstances.
-
-.. \MISN{}
 
 * `MFLO rd`
 
@@ -223,7 +222,7 @@ Here's the list of R-Type ALU Instructions.
 * `SLLV rd, rt, rs`
 
   Does a left shift of 32-bits register rt, by the amount specified in
-  low-order 5-bits of rs threatd as unsigned value, and puts the result into
+  low-order 5-bits of rs treated as unsigned value, and puts the result into
   32-bits register rd. Empty bits are padded with zeros.
 
 * `SRA rd, rt, sa`
@@ -236,7 +235,7 @@ Here's the list of R-Type ALU Instructions.
 * `SRAV rd, rt, rs`
 
   Does a right shift of 32-bits register rt, by the amount specified in
-  low-order 5-bits of rs threatd as unsigned value, and puts the result into
+  low-order 5-bits of rs treated as unsigned value, and puts the result into
   32-bits register rd. Empty bits are padded with zeros if the leftmost bit
   of rt is zero, otherwise they are padded with ones.
 
@@ -249,21 +248,19 @@ Here's the list of R-Type ALU Instructions.
 * `SRLV rd, rt, rs`
 
   Does a right shift of 32-bits register rt, by the amount specified in
-  low-order 5-bits of rs threatd as unsigned value, and puts the result into
+  low-order 5-bits of rs treated as unsigned value, and puts the result into
   32-bits register rd. Empty bits are padded with zeros.
 
 * `SUB rd, rs, rt`
 
-  Subtracts the value of 32-bits register rt to 32-bits register rs,
+  Subtracts the value of 32-bits register rt from 32-bits register rs,
   considering them as signed values, and puts the result in rd. If an
   overflow occurs then trap.
 
 * `SUBU rd, rs, rt`
 
-  Subtracts the value of 32-bits register rt to 32-bits register rs, and puts
+  Subtracts the value of 32-bits register rt from 32-bits register rs, and puts
   the result in rd. No integer overflow occurs under any circumstances.
-
-.. \MISN{}
 
 * `SLT rd, rs, rt`
 
@@ -294,8 +291,6 @@ Here's the list of I-Type ALU Instructions.
   putting the result in rt. No integer overflow occurs under any
   circumstances.
 
-.. \MISN{}
-
 * `ANDI rt, rs, immediate`
 
   Executes the bitwise AND between rs and the immediate value, putting the
@@ -313,16 +308,18 @@ Here's the list of I-Type ALU Instructions.
   putting the result in rt. No integer overflow occurs under any
   circumstances.
 
-.. \MISN{}
-
 * `DADDUI rt, rs, immediate`
 
   Executes the sum between 64-bits register rs and the immediate value,
   putting the result in rt. No integer overflow occurs under any
   circumstances.
 
-.. \MISN{}
-.. \WARN{}
+  .. warning::
+
+     ``DADDUI`` is not a standard MIPS64 instruction (it is part of the
+     WinMIPS64 instruction set, accepted by EduMIPS64 for backward
+     compatibility). The parser emits a warning when it is used; prefer
+     ``DADDIU`` instead.
 
 * `LUI rt, immediate`
 
@@ -351,7 +348,6 @@ Here's the list of I-Type ALU Instructions.
 
   Executes a bitwise exclusive OR (XOR) between rs and the immediate value,
   and puts the result into rt.
-
 
 Load/Store instructions
 -----------------------
@@ -470,11 +466,16 @@ List of I-Type flow control instructions:
 
   Jumps to offset if rs is equal to zero.
 
-..	\WARN
+  .. warning::
+
+     ``BEQZ`` is not a standard MIPS64 instruction (it is part of the
+     WinMIPS64 instruction set, accepted by EduMIPS64 for backward
+     compatibility). The parser emits a warning when it is used; prefer
+     ``BEQ rs, r0, offset`` instead.
 
 * `BGEZ rs, offset`
 
-  If rs is greather than or equal to zero, does a PC-relative jump to offset.
+  If rs is greater than or equal to zero, does a PC-relative jump to offset.
 
 * `BNE rs, rt, offset`
 
@@ -484,7 +485,12 @@ List of I-Type flow control instructions:
 
   Jumps to offset if rs is not equal to zero.
 
-..	\WARN
+  .. warning::
+
+     ``BNEZ`` is not a standard MIPS64 instruction (it is part of the
+     WinMIPS64 instruction set, accepted by EduMIPS64 for backward
+     compatibility). The parser emits a warning when it is used; prefer
+     ``BNE rs, r0, offset`` instead.
 
 List of J-Type flow control instructions:
 
@@ -532,12 +538,12 @@ them from the following list:
 * `O_RDWR (0x03)` Opens the file in read/write mode;
 * `O_CREAT (0x04)` Creates the file if it does not exist;
 * `O_APPEND (0x08)` In write mode, appends written text at the end of the file;
-* `O_TRUNC (0x08)` In write mode, deletes the content of the file as soon as it
+* `O_TRUNC (0x10)` In write mode, deletes the content of the file as soon as it
   is opened.
 
-It is mandatory to specify one of the first three modes. The fourth and the
-fifth modes are exclusive, you can not specify O_APPEND if you specify O_TRUNC
-(and vice versa).
+It is mandatory to specify one of the first three modes. The fifth and the
+sixth modes are mutually exclusive: you cannot specify O_APPEND if you specify
+O_TRUNC (and vice versa).
 
 You can specify a combination of modes by simply adding the integer values of
 those flags. For instance, if you want to open a file in write only mode and
@@ -578,8 +584,8 @@ write-only file descriptor.
 SYSCALL 4 expects three parameters: the file descriptor to write to, the
 address where the data must be read from, the number of bytes to write.
 
-If the first parameter is two or three, the simulator will pop the input/output
-frame, and write there the read data.
+If the first parameter is one or two (i.e. ``stdout`` or ``stderr``), the
+simulator pops up the input/output frame and writes the data there.
 
 It returns the number of bytes that have been written, or -1 if the write
 operation fails. Possible causes of failure are the attempt to write to a
@@ -632,3 +638,10 @@ The TRAP instruction is a deprecated alias for the SYSCALL instruction.
 ~~~~~~
 The HALT instruction is a deprecated alias for the SYSCALL 0 instruction, that
 halts the simulator.
+
+.. warning::
+
+   ``HALT`` is not a standard MIPS64 instruction (it is part of the
+   WinMIPS64 instruction set, accepted by EduMIPS64 for backward
+   compatibility). The parser emits a warning when it is used; prefer
+   ``SYSCALL 0`` instead.

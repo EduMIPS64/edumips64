@@ -84,7 +84,7 @@ EduMIPS64 支持不同的数据类型，详见下表。
 +----+-+-+-+-+-+-+-+-+
 |*24*|0|0|0|0|0|0|0|3|
 +----+-+-+-+-+-+-+-+-+
-|*36*|0|0|0|0|0|0|0|4|
+|*32*|0|0|0|0|0|0|0|4|
 +----+-+-+-+-+-+-+-+-+
 
 有一些特殊指令需要讨论： `.space`、`.ascii` 和 `.asciiz`。
@@ -185,13 +185,6 @@ EduMIPS64 支持不同的数据类型，详见下表。
             30       `fp`
             31       `ra`
             ======== ======
-
-.. % TODO: anche questa, ma nell'indice
-   %Please see~\cite{mips-2} for more details about how instruction are
-   actually encoded.
-
-.. The instructions that can be used in this section will be discussed in
-   section~\ref{instructions}
 
 `\#include` 命令
 -----------------------
