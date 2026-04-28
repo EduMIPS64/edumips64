@@ -50,6 +50,11 @@ public class JR extends FlowControl_RType {
     if (cpu.getRegister(params.get(RS_FIELD)).getWriteSemaphore() > 0) {
       return true;
     }
+
+    if (cpu.isGPRForwardedThisCycle(cpu.getRegister(params.get(RS_FIELD)))) {
+      return true;
+    }
+
     cpu.getPC().setBits(cpu.getRegister(params.get(RS_FIELD)).getBinString(), 0);
     throw new JumpException();
   }

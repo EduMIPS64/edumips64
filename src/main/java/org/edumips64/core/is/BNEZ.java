@@ -54,6 +54,10 @@ public class BNEZ extends FlowControl_IType {
       return true;
     }
 
+    if (cpu.isGPRForwardedThisCycle(cpu.getRegister(params.get(RS_FIELD)))) {
+      return true;
+    }
+
     String rs = cpu.getRegister(params.get(RS_FIELD)).getBinString();
     String zero = Converter.positiveIntToBin(64, 0);
     //converting offset into a signed binary value of 64 bits in length

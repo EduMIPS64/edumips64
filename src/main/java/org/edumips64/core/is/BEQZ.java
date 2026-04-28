@@ -55,6 +55,10 @@ public class BEQZ extends FlowControl_IType {
       return true;
     }
 
+    if (cpu.isGPRForwardedThisCycle(cpu.getRegister(params.get(RS_FIELD)))) {
+      return true;
+    }
+
     String rs = cpu.getRegister(params.get(RS_FIELD)).getBinString();
     String zero = Converter.positiveIntToBin(64, 0);
     boolean condition = rs.equals(zero);

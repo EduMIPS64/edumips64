@@ -54,6 +54,10 @@ public class BGEZ extends FlowControl_IType {
       return true;
     }
 
+    if (cpu.isGPRForwardedThisCycle(cpu.getRegister(params.get(RS_FIELD)))) {
+      return true;
+    }
+
     //getting register rs
     String rs = cpu.getRegister(params.get(RS_FIELD)).getBinString();
     //converting offset into a signed binary value of 64 bits in length

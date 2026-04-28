@@ -99,6 +99,21 @@ public class CPU {
   /** BUBBLE */
   private InstructionInterface bubble;
 
+  /** Set of GPR registers whose value was forwarded *during the current
+   *  cycle* (either by the MEM or by the EX stage). The values are produced
+   *  in time for the EX/MEM forwarding paths but are not yet available at
+   *  the start of the ID stage in the same cycle: branch and register-based
+   *  jump instructions, which read their source operands in ID, must stall
+   *  one extra cycle and wait for the value to become available via
+   *  MEM→ID/WB→ID in a later cycle.
+   *
+   *  This set is populated between the EX and ID stage execution by
+   *  comparing GPR write semaphores before stepMEM() and after stepEX().
+   *  Branch and jump instructions check this set in their ID() method to
+   *  detect and handle this case.
+   */
+  private Set<Register> registersForwardedThisCycle = new HashSet<>();
+
   /** Terminating instructions */
   private static ArrayList<String> terminating = new ArrayList<>(
       Arrays.asList("0000000C",     // SYSCALL 0
@@ -399,6 +414,22 @@ public class CPU {
       // WB: Write-back stage.
       stepWB();
 
+      // Before MEM, snapshot GPR write semaphores so that, after EX, we can
+      // detect which registers were forwarded during MEM or EX in this
+      // cycle. Such values are available for the EX/MEM forwarding paths,
+      // but they are NOT available at the start of ID in the same cycle
+      // (no EX→ID nor MEM→ID forwarding path). Branch and register-based
+      // jump instructions, which read their operands in ID, must stall one
+      // extra cycle when their source register is in this set.
+      // Skip R0 (index 0) since it is architecturally immutable.
+      final boolean forwardingEnabled = isEnableForwarding();
+      int[] preSemaphores = new int[32];
+      if (forwardingEnabled) {
+        for (int i = 1; i < 32; i++) {
+          preSemaphores[i] = gpr[i].getWriteSemaphore();
+        }
+      }
+
       // MEM: Memory access stage.
       stepMEM();
 
@@ -407,6 +438,18 @@ public class CPU {
       // stage, so the rest of the step can continue and, at the end, the
       // exception can be thrown.
       syncex = stepEX();
+
+      // After MEM+EX, detect which GPR registers were forwarded during this
+      // cycle (write semaphore decreased) and record them for branch/jump
+      // hazard detection in ID. Skip R0 (index 0).
+      registersForwardedThisCycle.clear();
+      if (forwardingEnabled) {
+        for (int i = 1; i < 32; i++) {
+          if (gpr[i].getWriteSemaphore() < preSemaphores[i]) {
+            registersForwardedThisCycle.add(gpr[i]);
+          }
+        }
+      }
 
       // ID: instruction decode / register fetch stage. The RAW exception is handled
       // via a return value instead of an exception because throwing exceptions proved
@@ -727,6 +770,7 @@ public class CPU {
     funcUnitStalls = 0;
     exStalls = 0;
     memoryStalls = 0;
+    registersForwardedThisCycle.clear();
 
     // Reset registers.
     for (int i = 0; i < 32; i++) {
@@ -810,6 +854,33 @@ public class CPU {
 
   public boolean isEnableForwarding() {
     return config.getBoolean(ConfigKey.FORWARDING);
+  }
+
+  /**
+   * Checks whether any of the given registers were forwarded during the
+   * current cycle (either by the MEM or by the EX stage). Such values are
+   * available for the EX/MEM forwarding paths but are NOT yet available
+   * at the start of the ID stage in the same cycle (no MEM→ID nor EX→ID
+   * forwarding path exists).
+   *
+   * <p>This should be called by branch and register-based jump
+   * instructions in their ID() method to detect ALU→branch and load→branch
+   * hazards that require an extra stall even with forwarding enabled.
+   *
+   * @param regs the source registers to check
+   * @return true if forwarding is enabled and at least one of the given
+   *         registers was forwarded during this cycle, false otherwise
+   */
+  public boolean isGPRForwardedThisCycle(Register... regs) {
+    if (!isEnableForwarding() || registersForwardedThisCycle.isEmpty()) {
+      return false;
+    }
+    for (Register r : regs) {
+      if (registersForwardedThisCycle.contains(r)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /** Test method that returns a string containing the values of every

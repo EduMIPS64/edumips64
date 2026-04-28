@@ -36,7 +36,7 @@ const EXPECTED_WITHOUT_FORWARDING = { cycles: 18, instructions: 10 };
 
 /**
  * Equivalent to the "issue51-halt.s" resource; the expectations below match
- * `runForwardingTest("issue51-halt.s", 11, 17, 6)` in EndToEndTests.
+ * `runForwardingTest("issue51-halt.s", 13, 17, 6)` in EndToEndTests.
  */
 const ISSUE51_HALT_PROGRAM = `.code
           daddi   r2, r0, 2
@@ -45,7 +45,7 @@ start:    daddi   r2, r2, -1
           halt
 `;
 
-const EXPECTED_ISSUE51_WITH_FORWARDING = { cycles: 11, instructions: 6 };
+const EXPECTED_ISSUE51_WITH_FORWARDING = { cycles: 13, instructions: 6 };
 const EXPECTED_ISSUE51_WITHOUT_FORWARDING = { cycles: 17, instructions: 6 };
 
 /**
@@ -175,7 +175,7 @@ test('forwarding.s runs with 15 cycles when forwarding is enabled', async ({
 /**
  * Test: issue51-halt.s produces the expected cycle / instruction counts under
  * both forwarding settings, matching `runForwardingTest("issue51-halt.s",
- * 11, 17, 6)` in EndToEndTests.
+ * 13, 17, 6)` in EndToEndTests.
  */
 test('issue51-halt.s cycle counts match EndToEndTests under both forwarding settings', async ({
   page,
