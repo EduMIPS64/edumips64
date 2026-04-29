@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <title>EduMIPS64 Experimental Web Frontend</title>
@@ -11,12 +12,19 @@
     />
   </head>
   <body>
+    <!-- Skip link for keyboard / screen-reader users (WCAG 2.4.1). -->
+    <a class="skip-link" href="#simulator">Skip to simulator</a>
+
     <noscript>
       <div id="nojs">
         Your web browser must have JavaScript enabled in order for this
         application to display correctly.
       </div>
     </noscript>
+
+    <!-- Visually hidden top-level heading so the page has a single H1
+         (WCAG 1.3.1, 2.4.6). The visible app uses H3 panel headings. -->
+    <h1 class="visually-hidden">EduMIPS64 web simulator</h1>
 
     <!-- React mount node. -->
     <div id="simulator"></div>

@@ -242,6 +242,7 @@ export default function Header(props) {
           color="inherit"
           className="help-button"
           id="help-button"
+          aria-label="Open help"
           onClick={() => {
             setDialogOpen(true);
           }}
