@@ -17,7 +17,7 @@
 
 import sys, os
 sys.path.append(os.path.abspath("../.."))
-from common_conf import *
+from common_conf import *  # noqa: F401, F403  -- re-export Sphinx config defaults
 
 language = "en"
 copyright = u'2011, Andrea Spadaccini (and the EduMIPS64 development team)'

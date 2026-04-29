@@ -43,13 +43,19 @@ import javax.swing.*;
 public class DineroFrontend extends JDialog {
   private static final long serialVersionUID = -3679388156127239041L;
 
-  // Attributes are static in order to make them accessible from
-  // the nested anonymous classes. They can be static, because at most
-  // one instance of DineroFrame will be created in EduMIPS64
+  // The dialog's interactive widgets. These were historically `static` to
+  // expose them to the inner anonymous listener classes; lambdas (and inner
+  // classes) capture the enclosing `this`, so they can be plain instance
+  // fields. Keeping them as instance state also lets multiple Dinero dialogs
+  // coexist (e.g. in tests) without tearing each other's UI apart.
+  // They are not `final` because the lambdas defined earlier in the
+  // constructor reference them before they get initialized below; making
+  // them `final` would require reordering the entire constructor.
   private static final Logger logger = Logger.getLogger(DineroFrontend.class.getName());
-  private static JTextField path, params;
-  private static JButton execute;
-  private static JTextArea result;
+  private JTextField path;
+  private JTextField params;
+  private JButton execute;
+  private JTextArea result;
 
   private class StreamReader extends Thread {
     private InputStream stream;
