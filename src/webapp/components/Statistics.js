@@ -22,7 +22,7 @@ const Row = ({ label, value, valueId }) => {
 // the given value is != 1. Of course this is not proper
 // pluralization, just me playing around with React.
 const PluralRow = ({ label, value, valueId }) => {
-  const pluralSuffix = value != 1 ? 's' : '';
+  const pluralSuffix = value !== 1 ? 's' : '';
   return <Row label={`${label}${pluralSuffix}`} value={value} valueId={valueId} />;
 };
 
@@ -54,7 +54,7 @@ const tableStyle = {
             </tr>
               <PluralRow value={cycles} label="Cycle" valueId="stat-cycles"/>
               <PluralRow value={instructions} label="Instruction" valueId="stat-instructions"/>
-            <Row value={instructions == 0 ? 0 : (cycles / instructions).toFixed(2)}
+            <Row value={instructions === 0 ? 0 : (cycles / instructions).toFixed(2)}
                  label="Cycles per Instructions (CPI)"/>
             </tbody>
         </table>
