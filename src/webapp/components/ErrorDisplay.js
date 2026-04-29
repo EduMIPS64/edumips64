@@ -4,7 +4,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import Chip from '@mui/material/Chip';
 
 const ErrorCount = ({ count }) => {
-  if (count == 0) {
+  if (count === 0) {
     return <React.Fragment />;
   }
   return (
@@ -18,7 +18,7 @@ const ErrorCount = ({ count }) => {
   );
 };
 const WarningCount = ({ count }) => {
-  if (count == 0) {
+  if (count === 0) {
     return <React.Fragment />;
   }
   return (

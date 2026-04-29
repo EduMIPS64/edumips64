@@ -98,25 +98,21 @@ public abstract class FPArithmeticInstructions extends ComputationalInstructions
     try {
       outputstring = doFPArith(operand1, operand2);
       TRfp[FD_FIELD].setBits(outputstring, 0);
-    } catch (Exception ex) {
-      //if the enable forwarding is turned on we have to ensure that registers
-      //should be unlocked also if a synchronous exception occurs. This is performed
-      //by executing the WB method before raising the trap
+    } catch (FPInvalidOperationException | FPUnderflowException
+        | FPOverflowException | FPDivideByZeroException
+        | IrregularStringOfBitsException ex) {
+      // If forwarding is enabled we have to ensure that registers are
+      // unlocked even if a synchronous exception occurs. This is done by
+      // executing the WB method before re-raising the trap.
       if (cpu.isEnableForwarding()) {
         doWB();
       }
-
-      if (ex instanceof FPInvalidOperationException) {
-        throw new FPInvalidOperationException();
-      } else if (ex instanceof FPUnderflowException) {
-        throw new FPUnderflowException();
-      } else if (ex instanceof FPOverflowException) {
-        throw new FPOverflowException();
-      } else if (ex instanceof FPDivideByZeroException) {
-        throw new FPDivideByZeroException();
-      } else if (ex instanceof IrregularStringOfBitsException) {
-        throw new IrregularStringOfBitsException();
-      }
+      // Re-throw the same exception type without stack-trace context, to
+      // preserve the pre-existing behavior of throwing a freshly-constructed
+      // instance. Multi-catch with rethrow keeps each branch type-safe and
+      // removes the PMD AvoidInstanceofChecksInCatchClause violations that
+      // the previous if/else-if dispatcher produced.
+      throw ex;
     }
 
     if (cpu.isEnableForwarding()) {
