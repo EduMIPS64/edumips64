@@ -107,10 +107,14 @@ public abstract class FPC_cond_DInstructions extends ComputationalInstructions {
         throw new FPInvalidOperationException();
       }
     } else {
-      BigDecimal fsbd = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(fs.getBinString(), false)));
-      BigDecimal ftbd = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(ft.getBinString(), false)));
+      // Compare the operand values directly as `double` — going through a
+      // BigDecimal that is never used for arithmetic, only converted back
+      // via `doubleValue()`, adds no precision and trips
+      // PMD's AvoidDecimalLiteralsInBigDecimalConstructor rule.
+      double fsd = Double.longBitsToDouble(Converter.binToLong(fs.getBinString(), false));
+      double ftd = Double.longBitsToDouble(Converter.binToLong(ft.getBinString(), false));
 
-      less = fsbd.doubleValue() < ftbd.doubleValue();
+      less = fsd < ftd;
       equal = (fs.getBinString().compareTo(ft.getBinString()) == 0);
       unordered = false;
     }
