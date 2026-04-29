@@ -75,14 +75,26 @@ export const SETTINGS_SCHEMA = Object.freeze({
   },
   [SettingKey.EXPANDED_ACCORDIONS]: {
     type: SettingType.OBJECT,
+    // Defaults follow the simulator's primary purpose: a first-time visitor
+    // should see the pipeline, registers, and stats — the headline features
+    // of a CPU simulator — without having to scroll-and-click. Cache config
+    // and general settings are collapsed by default so students don't stumble
+    // into configuration before they've seen the simulator run. Memory and
+    // standard output stay collapsed by default to keep the right rail
+    // compact on small screens; the change-indicator dot still draws
+    // attention to them when something changes.
+    //
+    // This is only the *default* — every user-driven expand/collapse is
+    // persisted to localStorage via `useSetting`, so a returning user always
+    // sees the layout they last left.
     default: {
       stats: true,
-      pipeline: false,
-      registers: false,
+      pipeline: true,
+      registers: true,
       memory: false,
       stdout: false,
-      cache: true,
-      settings: true,
+      cache: false,
+      settings: false,
     },
   },
   [SettingKey.CACHE_L1D]: {
