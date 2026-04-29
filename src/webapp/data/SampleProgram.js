@@ -20,8 +20,10 @@ loop:
 	
 	daddi 	r10, r10, -1
 
-	; deprecated instruction, added on purpose to show how deprecated instructions are flagged as warnings.
-	bnez	r10, loop
+	; Loop back to the start until r10 reaches zero. We use 'bne … r0'
+	; (canonical MIPS64) instead of the WinMIPS64-only 'bnez' alias so
+	; that the default sample loads with zero warnings.
+	bne	r10, r0, loop
 
 	; Call SYSCALL 5 (printf())
 	daddi     r5, r0, format_str
