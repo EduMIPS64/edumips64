@@ -10,7 +10,6 @@ import * as monacoEditor from 'monaco-editor';
 monacoEditor.languages.register({ id: 'mips' });
 
 const Code = (props) => {
-
   const [monaco, setMonaco] = useState(null);
   const [editor, setEditor] = useState(null);
   const [vimInstance, setVimInstance] = useState(null); // new state for Vim instance
@@ -18,13 +17,16 @@ const Code = (props) => {
   const [hoverDisposable, setHoverCleanup] = useState(null);
 
   // Decorations (used for CPU stage indication).
+  // We only need the setter (functional updates everywhere); keep state local
+  // so the editor's previous decoration IDs survive across renders.
+  // eslint-disable-next-line no-unused-vars
   const [decorations, setDecorations] = useState([]);
 
   // Maps line of code to CPU stage.
   const [stageMap, setStageMap] = useState(new Map());
 
   // Dynamically build the syntax highlighting regex for instructions.
-  var instructionRegex = new RegExp(`\\b(${props.validInstructions})\\b`)
+  var instructionRegex = new RegExp(`\\b(${props.validInstructions})\\b`);
   monacoEditor.languages.setMonarchTokensProvider('mips', {
     tokenizer: {
       root: [
@@ -37,17 +39,19 @@ const Code = (props) => {
         [/".*?"/, 'regexp'],
         [/;.*/, 'comment'],
         [/[a-zA-Z_][\w]*/, 'identifier'],
-      ]
-    }
+      ],
+    },
   });
 
   useEffect(() => {
     if (!monaco) {
       return;
     }
-    if (!props.running && decorations) {
-      const newDecorations = editor.deltaDecorations(decorations, []);
-      setDecorations(decorations);
+    if (!props.running) {
+      // Functional update keeps `decorations` out of the deps array.
+      setDecorations((prev) =>
+        prev ? editor.deltaDecorations(prev, []) : prev,
+      );
       return;
     }
 
@@ -154,12 +158,10 @@ const Code = (props) => {
     setStageMap(newStageMap);
     console.log('decorations');
     console.log(newDecorations);
-    const appliedDecorations = editor.deltaDecorations(
-      decorations,
-      newDecorations,
-    );
-    setDecorations(appliedDecorations);
-  }, [props.pipeline, props.running, monaco]);
+    // Functional update so we don't need `decorations` in the deps array
+    // (which would loop: this very effect calls setDecorations).
+    setDecorations((prev) => editor.deltaDecorations(prev, newDecorations));
+  }, [props.pipeline, props.running, monaco, editor]);
 
   // Hook to update the map of source line to instruction.
   useEffect(() => {
@@ -238,7 +240,7 @@ const Code = (props) => {
     // Expose monaco and editor to window for testing purposes
     window.monaco = monaco;
     window.editor = editor;
-    
+
     setMonaco(monaco);
     setEditor(editor);
 
@@ -250,26 +252,36 @@ const Code = (props) => {
 
     // Ensure the required command is registered
     editor.addAction({
-      id: "editor.action.insertLineAfter",
-      label: "Insert Line After",
+      id: 'editor.action.insertLineAfter',
+      label: 'Insert Line After',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
       run: function (ed) {
-        ed.trigger("keyboard", "type", { text: "\n" });
+        ed.trigger('keyboard', 'type', { text: '\n' });
       },
     });
   };
 
-  // Hook to dynamically toggle Vi mode when viMode prop changes
+  // Hook to dynamically toggle Vi mode when viMode prop changes.
+  // We deliberately depend ONLY on [editor, props.viMode]: re-running this
+  // every time `vimInstance` changes would trigger a feedback loop because
+  // the effect itself calls setVimInstance. We read the current vimInstance
+  // via a ref so the dispose/recreate logic still sees fresh state.
+  // Note: editorDidMount already initializes Vim if props.viMode is true on
+  // first mount, so we guard against double-init by checking the ref.
+  const vimInstanceRef = React.useRef(vimInstance);
+  useEffect(() => {
+    vimInstanceRef.current = vimInstance;
+  }, [vimInstance]);
   useEffect(() => {
     if (!editor) return;
-    if (props.viMode) {
+    if (props.viMode && !vimInstanceRef.current) {
       const vim = initVimMode(editor);
       setVimInstance(vim);
-    } else if (vimInstance) {
-      vimInstance.dispose();
+    } else if (!props.viMode && vimInstanceRef.current) {
+      vimInstanceRef.current.dispose();
       setVimInstance(null);
     }
-  }, [props.viMode]);
+  }, [editor, props.viMode]);
 
   const options = {
     selectOnLineNumbers: true,
@@ -281,7 +293,7 @@ const Code = (props) => {
     tabsize: 4,
     lineNumbersMinChars: 3,
     automaticLayout: true,
-    fontSize: props.fontSize,  // Set font size from props
+    fontSize: props.fontSize, // Set font size from props
   };
 
   // Hook to compute and set markers for warnings and errors.
@@ -328,14 +340,14 @@ const Code = (props) => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   return (
-        <MonacoEditor
-            language="mips"
-            value={props.code}
-            options={options}
-            onChange={props.onChangeValue}
-            theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
-            editorDidMount={editorDidMount}
-        />
+    <MonacoEditor
+      language="mips"
+      value={props.code}
+      options={options}
+      onChange={props.onChangeValue}
+      theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
+      editorDidMount={editorDidMount}
+    />
   );
 };
 

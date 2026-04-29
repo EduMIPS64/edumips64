@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -11,9 +11,21 @@ const CacheConfig = ({ onChange, status }) => {
 
   const isDisabled = status === 'RUNNING';
 
+  // Keep the latest `onChange` in a ref so the effect below depends only on
+  // [l1d, l1i] (the actual cache state). Adding `onChange` to the deps array
+  // would refire whenever the parent re-renders — the parent here is
+  // `Simulator`, which redefines `setCacheConfig` every render — and would
+  // spam `worker.setCacheConfig(...)` on every Simulator render. The ref
+  // gives us a stable identity for the effect while still invoking the
+  // latest callback.
+  const onChangeRef = useRef(onChange);
   useEffect(() => {
-    if (onChange) {
-      onChange({ l1d, l1i });
+    onChangeRef.current = onChange;
+  }, [onChange]);
+
+  useEffect(() => {
+    if (onChangeRef.current) {
+      onChangeRef.current({ l1d, l1i });
     }
   }, [l1d, l1i]);
 
