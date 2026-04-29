@@ -27,11 +27,14 @@ const VIEW_W = 600;
 const VIEW_H = 320;
 
 // Geometry of the five integer stages. `x`/`y` is the top-left corner and
-// `w`/`h` are the box dimensions, in viewBox units.
+// `w`/`h` are the box dimensions, in viewBox units. The EX block mirrors the
+// FP Divider block geometry (same width and horizontal position) so the
+// integer-pipeline diagram is vertically symmetric: ID/MEM connect to EX
+// with the same diagonal pattern they use for the FP Divider.
 const STAGE_BOXES = {
   IF: { x: 20, y: 140, w: 60, h: 50 },
   ID: { x: 110, y: 140, w: 60, h: 50 },
-  EX: { x: 270, y: 30, w: 60, h: 50 },
+  EX: { x: 205, y: 30, w: 190, h: 40 },
   MEM: { x: 430, y: 140, w: 60, h: 50 },
   WB: { x: 520, y: 140, w: 60, h: 50 },
 };
@@ -201,19 +204,10 @@ const Wire = ({ x1, y1, x2, y2, color }) => (
 );
 
 /**
- * Render an L-/Z-shaped connector along a list of (x, y) waypoints. Used
- * for the integer ID↔EX↔MEM connectors so they don't cut diagonally
- * through the FP-Multiplier row.
+ * Render a thin connector line between two stages — see {@link Wire}. The
+ * pipeline diagram is now drawn entirely with straight diagonal/horizontal
+ * `Wire`s, so no polyline helper is needed.
  */
-const PolyWire = ({ points, color }) => (
-  <polyline
-    points={points.map(([x, y]) => `${x},${y}`).join(' ')}
-    fill="none"
-    stroke={color}
-    strokeWidth={1}
-    strokeLinejoin="miter"
-  />
-);
 
 const Pipeline = ({ pipeline, colors }) => {
   // `colors` is the persisted setting; fall back to the schema defaults so
@@ -243,13 +237,6 @@ const Pipeline = ({ pipeline, colors }) => {
   // Section labels.
   const fpuLabelXMult = (FPU_LEFT + FPU_RIGHT) / 2;
   const fpuLabelXAdd = (FPU_LEFT + FPU_RIGHT) / 2;
-
-  // Y coordinate of the horizontal segment that carries the ID→EX and
-  // EX→MEM connectors above the FP Multiplier row. Sitting at y=20 keeps
-  // the segment well above both the EX block (y=30..80) and the FP
-  // Multiplier row (y=95..125), so the connectors no longer cross the
-  // multiplier boxes.
-  const TOP_BUS_Y = 20;
 
   return (
     <div id="pipeline" data-testid="pipeline-widget">
@@ -282,26 +269,23 @@ const Pipeline = ({ pipeline, colors }) => {
         {/* Connectors (drawn first so the boxes paint on top) */}
         {/* IF -> ID */}
         <Wire x1={80} y1={165} x2={110} y2={165} color={outline} />
-        {/* ID -> EX: vertical stub up the right edge of ID, horizontal
-            segment along the top bus, then down into the EX block. Routes
-            the connector cleanly above the FP Multiplier row. */}
-        <PolyWire
-          points={[
-            [170, 150],
-            [170, TOP_BUS_Y],
-            [STAGE_BOXES.EX.x + STAGE_BOXES.EX.w / 2, TOP_BUS_Y],
-            [STAGE_BOXES.EX.x + STAGE_BOXES.EX.w / 2, STAGE_BOXES.EX.y],
-          ]}
+        {/* ID -> EX: diagonal from the top edge of ID up to the left edge
+            of EX. Mirrors the ID -> FP Divider connector below for vertical
+            symmetry. */}
+        <Wire
+          x1={170}
+          y1={145}
+          x2={STAGE_BOXES.EX.x}
+          y2={STAGE_BOXES.EX.y + STAGE_BOXES.EX.h / 2}
           color={outline}
         />
-        {/* EX -> MEM: symmetric to ID -> EX. */}
-        <PolyWire
-          points={[
-            [STAGE_BOXES.EX.x + STAGE_BOXES.EX.w / 2, STAGE_BOXES.EX.y],
-            [STAGE_BOXES.EX.x + STAGE_BOXES.EX.w / 2, TOP_BUS_Y],
-            [STAGE_BOXES.MEM.x, TOP_BUS_Y],
-            [STAGE_BOXES.MEM.x, 150],
-          ]}
+        {/* EX -> MEM: symmetric diagonal from the right edge of EX down to
+            the top edge of MEM. */}
+        <Wire
+          x1={STAGE_BOXES.EX.x + STAGE_BOXES.EX.w}
+          y1={STAGE_BOXES.EX.y + STAGE_BOXES.EX.h / 2}
+          x2={430}
+          y2={145}
           color={outline}
         />
         {/* MEM -> WB */}
