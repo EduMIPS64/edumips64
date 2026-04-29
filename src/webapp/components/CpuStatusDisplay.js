@@ -24,6 +24,12 @@ const CpuStatusDisplay = ({ status }) => {
       color={color}
       size="small"
       style={{ textAlign: 'center', marginRight: "5px" }}
+      // Make the chip a polite live region so screen readers announce
+      // CPU state transitions (READY → RUNNING → STOPPED/HALTED).
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      aria-label={`CPU status: ${status}`}
     />
     </>
   );

@@ -431,6 +431,13 @@ export default function HelpDialog(props) {
             .related, .sphinxsidebar, div.clearer {
               display: none !important;
             }
+            /* Hide Sphinx's per-heading "¶" permalink anchors. They are
+               useful in the standalone Sphinx site (right-click → copy
+               link), but inside our embedded help iframe they don't
+               navigate anywhere useful and just clutter every heading. */
+            a.headerlink {
+              display: none !important;
+            }
             .documentwrapper, .bodywrapper, .body {
               margin: 0 !important;
               width: 100% !important;
