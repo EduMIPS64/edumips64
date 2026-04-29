@@ -95,4 +95,29 @@ public class RegisterTest extends BaseTest {
     register.reset();
     assertEquals(0L, register.getValue());
   }
+
+  /**
+   * Regression test for the MIPS ABI register alias table.
+   *
+   * Prior to this test, R2 was incorrectly aliased to "v1" (a duplicate of R3),
+   * instead of "v0" as defined by the MIPS O32/N32/N64 ABIs. The Web UI
+   * (and Swing UI) display these aliases next to each register, so the bug
+   * was user-visible.
+   *
+   * The expected mapping mirrors the MIPS register convention used elsewhere
+   * in the codebase (see GUIRegisters.java and Parser.java).
+   */
+  @Test
+  public void testRegisterAliases() {
+    String[] expectedAliases = {
+        "zero", "at", "v0", "v1", "a0", "a1", "a2", "a3",
+        "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7",
+        "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7",
+        "t8", "t9", "k0", "k1", "gp", "sp", "fp", "ra"
+    };
+    for (int i = 0; i < expectedAliases.length; i++) {
+      Register r = new Register("R" + i);
+      assertEquals("Wrong alias for R" + i, expectedAliases[i], r.getAlias());
+    }
+  }
 }
