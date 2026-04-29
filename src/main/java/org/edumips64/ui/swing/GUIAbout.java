@@ -41,9 +41,9 @@ public class GUIAbout extends JDialog implements Runnable  {
   private Display lavagna;
   private boolean running;
 
-  private static Image logo;
+  private Image logo;
 
-  private static String members[] = {
+  private static final String[] members = {
     "EduMIPS64 Project",
     "http://www.edumips.org",
     "MIPS64 Instruction set simulator",
