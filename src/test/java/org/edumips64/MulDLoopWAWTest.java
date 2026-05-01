@@ -125,7 +125,7 @@ public class MulDLoopWAWTest extends BaseWithInstructionBuilderTest {
     int safetyCap = 200;
 
     try {
-      while (safetyCap-- > 0) {
+      while (!reproduced && safetyCap-- > 0) {
         cpu.step();
         builder.step();
 
@@ -178,7 +178,6 @@ public class MulDLoopWAWTest extends BaseWithInstructionBuilderTest {
             parsed.isValidForSlot(matchingSlot));
 
         reproduced = true;
-        break;
       }
     } catch (HaltException e) {
       // Program completed before we caught the dual-slot configuration.
