@@ -151,14 +151,18 @@ public class Simulator {
 
     try {
       do {
-        cpu.step();
-        // Step the cycle builder alongside the CPU so the per-cycle stall
-        // classification surfaced via Pipeline.getStage() stays in sync. We
-        // ignore HaltException-driven step updates: when HaltException is
-        // thrown the CPU decrements its `cycles` counter and we end up in
-        // the catch block below, where stepping CycleBuilder would be a
-        // no-op anyway (oldTime == cycles).
-        cycleBuilder.step();
+        try {
+          cpu.step();
+        } finally {
+          // Always advance the CycleBuilder so its per-cycle stall
+          // classification stays in sync with the CPU, even if cpu.step()
+          // threw mid-cycle (Break / InputNeeded / Synchronous exceptions
+          // can all occur after the CPU has already advanced its cycle
+          // counter). HaltException is the one case where cpu.step() rolls
+          // its `cycles` back, so cycleBuilder.step() is a no-op here
+          // (oldTime == curTime), as documented in CycleBuilder.step().
+          cycleBuilder.step();
+        }
       } while (--steps > 0);
     } catch (HaltException e) {
       info("Program terminated successfully.");
