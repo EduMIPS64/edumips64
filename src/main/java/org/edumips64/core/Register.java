@@ -154,7 +154,7 @@ public class Register extends BitSet64 {
     registerAliases = new HashMap<>();
     registerAliases.put("R0", "zero");
     registerAliases.put("R1", "at");
-    registerAliases.put("R2", "v1");
+    registerAliases.put("R2", "v0");
     registerAliases.put("R3", "v1");
     registerAliases.put("R4", "a0");
     registerAliases.put("R5", "a1");

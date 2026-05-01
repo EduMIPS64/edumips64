@@ -194,7 +194,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const isValidProgram = () => {
     if (!parsingErrors) { return true; }
     else {
-      return (parsingErrors.filter((e) => !e.isWarning).length == 0);
+      return (parsingErrors.filter((e) => !e.isWarning).length === 0);
     }
   };
 

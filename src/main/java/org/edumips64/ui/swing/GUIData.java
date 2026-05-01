@@ -129,7 +129,9 @@ public class GUIData extends GUIComponent {
       public void mouseClicked(MouseEvent e) {
         Object source = e.getSource();
 
-        if ((source == theTable) && (theTable.getSelectedColumn() == 1)) {
+        // NOPMD - reference identity intentional: `source` is the event's
+        // source object, which IS theTable when this listener fires on theTable.
+        if ((source == theTable) && (theTable.getSelectedColumn() == 1)) { // NOPMD CompareObjectsWithEquals
           try {
             String value = CurrentLocale.getString("StatusBar.DECIMALVALUE") + " " +
                            CurrentLocale.getString("StatusBar.MEMORYCELL") +
