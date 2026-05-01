@@ -72,6 +72,26 @@ public class CycleBuilder {
   public List<CycleElement> getElementsList() {
     return elementsList;
   }
+
+  /**
+   * Returns the most recently assigned state tag for the in-flight instruction
+   * identified by {@code serialNumber}, or {@code null} if no element for that
+   * instruction is found or the matching element has no recorded state.
+   *
+   * <p>The list is walked in reverse so that, when the same instruction appears
+   * more than once (e.g. in branch-misprediction corner cases), the "live"
+   * cycle for it — the one most recently updated — is returned.
+   */
+  public String getLastStateForSerial(int serialNumber) {
+    for (int idx = elementsList.size() - 1; idx >= 0; idx--) {
+      CycleElement el = elementsList.get(idx);
+      if (el.getSerialNumber() == serialNumber) {
+        LinkedList<String> states = el.getStates();
+        return states.isEmpty() ? null : states.getLast();
+      }
+    }
+    return null;
+  }
   public int getInstructionsCount() {
     return instructionsCount;
   }

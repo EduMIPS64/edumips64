@@ -40,7 +40,6 @@ import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.utils.CycleBuilder;
-import org.edumips64.utils.CycleElement;
 import org.edumips64.utils.io.InputNeededException;
 import org.edumips64.utils.io.StringWriter;
 
@@ -351,31 +350,15 @@ public class ResultFactory {
         if (instruction == null || i == null || i.isBubble() || cycleBuilder == null) {
             return instruction;
         }
-        // Walk the CycleBuilder's element list in reverse to find the most
-        // recent CycleElement matching this instruction's serial number — the
-        // "live" cycle for this in-flight instruction. Reading the *last*
-        // tagged state from it gives us the state that was assigned in the
-        // most recently completed CPU cycle (e.g. "ID" when ID succeeded,
-        // "RAW" when ID stalled due to a Read-After-Write hazard, etc.).
-        java.util.List<CycleElement> elements = cycleBuilder.getElementsList();
-        int serial = i.getSerialNumber();
-        for (int idx = elements.size() - 1; idx >= 0; idx--) {
-            CycleElement el = elements.get(idx);
-            if (el.getSerialNumber() == serial) {
-                java.util.LinkedList<String> states = el.getStates();
-                if (!states.isEmpty()) {
-                    // The CycleBuilder/CycleElement internals still use raw
-                    // String tags; convert at this boundary into the typed
-                    // CycleState exposed on the public client API. Unknown
-                    // tags (e.g. the bubble placeholder " ") parse to null,
-                    // which we treat as "no stage info" — same as if the
-                    // CycleBuilder hadn't seen this instruction yet.
-                    String lastTag = states.getLast();
-                    instruction.Stage = CycleState.fromTag(lastTag);
-                    instruction.DivCount = CycleState.parseDivCount(lastTag);
-                }
-                break;
-            }
+        // The CycleBuilder/CycleElement internals still use raw String tags;
+        // convert at this boundary into the typed CycleState exposed on the
+        // public client API. Unknown tags (e.g. the bubble placeholder " ")
+        // parse to null, which we treat as "no stage info" — same as if the
+        // CycleBuilder hadn't seen this instruction yet.
+        String lastTag = cycleBuilder.getLastStateForSerial(i.getSerialNumber());
+        if (lastTag != null) {
+            instruction.Stage = CycleState.fromTag(lastTag);
+            instruction.DivCount = CycleState.parseDivCount(lastTag);
         }
         return instruction;
     }
