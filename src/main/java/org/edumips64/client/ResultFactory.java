@@ -357,8 +357,17 @@ public class ResultFactory {
         // CycleBuilder hadn't seen this instruction yet.
         String lastTag = cycleBuilder.getLastStateForSerial(i.getSerialNumber());
         if (lastTag != null) {
-            instruction.Stage = CycleState.fromTag(lastTag);
-            instruction.DivCount = CycleState.parseDivCount(lastTag);
+            // Convert at this boundary into the typed CycleState — this keeps
+            // the wire vocabulary in lock-step with the enum and rejects the
+            // bubble placeholder " " — then surface it across the JS boundary
+            // as the CycleState's name() string. (GWT-compiled @JsType enums
+            // are exposed as objects with mangled field names, so a typed
+            // CycleState reference is not reliably readable from JS.)
+            CycleState cs = CycleState.fromTag(lastTag);
+            if (cs != null) {
+                instruction.Stage = cs.name();
+                instruction.DivCount = CycleState.parseDivCount(lastTag);
+            }
         }
         return instruction;
     }

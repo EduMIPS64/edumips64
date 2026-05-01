@@ -44,17 +44,20 @@ public class Instruction {
      * most recently completed CPU cycle, or {@code null} if the instruction
      * hasn't been seen by the {@code CycleBuilder} yet (e.g. when
      * {@code CycleBuilder} has not been wired in). When {@code Stage} is
-     * {@link CycleState#DIV_COUNT}, the actual counter value (0..24) is
-     * exposed separately via {@link #DivCount}; for any other stage,
+     * {@code "DIV_COUNT"}, the actual counter value (0..24) is exposed
+     * separately via {@link #DivCount}; for any other stage,
      * {@link #DivCount} is {@code -1}.
      *
-     * <p>This used to be a free-form {@code String} matching the historical
-     * {@code CycleBuilder} tag vocabulary; it is now strongly typed via
-     * {@link CycleState}. The {@code CycleBuilder}/{@code CycleElement}
-     * internals still work with strings — conversion happens once, at the
-     * {@code ResultFactory} boundary.
+     * <p>Wire format: a {@code String} matching {@link CycleState#name()}
+     * (e.g. {@code "ID"}, {@code "RAW"}, {@code "StDiv"}). We deliberately
+     * use the string form across the JS boundary because GWT-compiled
+     * {@code @JsType} enums are exposed as objects with mangled internal
+     * field names — {@code .name()} is not reliably reachable from JS.
+     * On the Java side, conversion goes through the typed {@link CycleState}
+     * enum (see {@code ResultFactory.wrap()}), so type safety is preserved
+     * at construction.
      */
-    public CycleState Stage;
+    public String Stage;
 
     /**
      * Companion to {@link #Stage}: the FP divider's per-cycle counter when

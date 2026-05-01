@@ -135,8 +135,16 @@ const StageBox = ({
   const stageLabelY = occupied ? box.y + box.h * 0.32 : box.y + box.h / 2 + 4;
   const instrNameY = stall ? box.y + box.h * 0.6 : box.y + box.h * 0.78;
   const stallTagY = box.y + box.h * 0.85;
+  // Expose the per-stage state via `data-*` attributes so the Playwright
+  // tests can read pipeline contents and stall classifications without
+  // having to parse rendered SVG text.
   return (
-    <g>
+    <g
+      data-stage={label}
+      data-instruction={occupied ? instr.Name : ''}
+      data-stall={stall || ''}
+      data-fill={fill}
+    >
       <rect
         x={box.x}
         y={box.y}
