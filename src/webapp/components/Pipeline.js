@@ -81,9 +81,9 @@ const isOccupied = (instr) => !!instr && instr.Name && instr.Name !== ' ';
 // Stage-tag set produced by `CycleBuilder` when an instruction was *stalled*
 // in the most recent CPU cycle. Each tag maps to a short user-friendly
 // label rendered inside the stage block. The two-character `Dxx` divider
-// counter states (`D00`..`D24`) and the integer/normal stage tags (`IF`,
-// `ID`, `EX`, `MEM`, `WB`, `A1`..`A4`, `M1`..`M7`, `DIV`, `" "`) are *not*
-// stalls and intentionally absent here.
+// counter states (`DIV_COUNT` + numeric `DivCount`) and the integer/normal
+// stage tags (`IF`, `ID`, `EX`, `MEM`, `WB`, `A1`..`A4`, `M1`..`M7`, `DIV`)
+// are *not* stalls and intentionally absent here.
 const STALL_LABELS = {
   RAW: 'RAW',
   WAW: 'WAW',
@@ -95,8 +95,18 @@ const STALL_LABELS = {
   StMul: 'Struct: Mul',
 };
 
-const stallLabel = (instr) =>
-  (instr?.Stage && STALL_LABELS[instr.Stage]) || null;
+// `instr.Stage` is sourced from a Java `@JsType` enum (`CycleState`) on the
+// worker side. Across the worker `postMessage` boundary the enum may surface
+// as either a plain string (its `name()`) or as an object that string-coerces
+// to its name; coerce defensively here so the lookup works either way and
+// `null`/`undefined` (no stage info yet) cleanly returns no label.
+const stageName = (stage) =>
+  stage == null ? null : typeof stage === 'string' ? stage : String(stage);
+
+const stallLabel = (instr) => {
+  const name = stageName(instr?.Stage);
+  return (name && STALL_LABELS[name]) || null;
+};
 
 /**
  * Render a single rectangular pipeline stage.

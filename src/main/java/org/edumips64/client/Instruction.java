@@ -40,16 +40,30 @@ public class Instruction {
     public String BinaryRepresentation;
     public String OpCode;
     /**
-     * Last state recorded for this instruction by {@code CycleBuilder} (one of
-     * {@code "IF"}, {@code "ID"}, {@code "EX"}, {@code "MEM"}, {@code "WB"},
-     * {@code "RAW"}, {@code "WAW"}, {@code "StDiv"}, {@code "StEx"},
-     * {@code "StFun"}, {@code "Str"}, {@code "A1"}..{@code "A4"}, {@code "M1"}..
-     * {@code "M7"}, {@code "StAdd"}, {@code "StMul"}, {@code "DIV"} or
-     * {@code "Dxx"} for divider counters). May be {@code null} for instructions
-     * that haven't been seen by the CycleBuilder yet (e.g. when CycleBuilder
-     * has not been wired in).
+     * Last state recorded for this instruction by {@code CycleBuilder} for the
+     * most recently completed CPU cycle, or {@code null} if the instruction
+     * hasn't been seen by the {@code CycleBuilder} yet (e.g. when
+     * {@code CycleBuilder} has not been wired in). When {@code Stage} is
+     * {@link CycleState#DIV_COUNT}, the actual counter value (0..24) is
+     * exposed separately via {@link #DivCount}; for any other stage,
+     * {@link #DivCount} is {@code -1}.
+     *
+     * <p>This used to be a free-form {@code String} matching the historical
+     * {@code CycleBuilder} tag vocabulary; it is now strongly typed via
+     * {@link CycleState}. The {@code CycleBuilder}/{@code CycleElement}
+     * internals still work with strings — conversion happens once, at the
+     * {@code ResultFactory} boundary.
      */
-    public String Stage;
+    public CycleState Stage;
+
+    /**
+     * Companion to {@link #Stage}: the FP divider's per-cycle counter when
+     * {@code Stage == CycleState.DIV_COUNT} (in the range {@code [0, 24]}),
+     * or {@code -1} otherwise. Kept as a separate field so {@link CycleState}
+     * does not need 25 enum constants for what is just a parameterised tag;
+     * see the class-level Javadoc on {@link CycleState}.
+     */
+    public int DivCount = -1;
 
     private Instruction() {}
 

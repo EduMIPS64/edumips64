@@ -364,7 +364,15 @@ public class ResultFactory {
             if (el.getSerialNumber() == serial) {
                 java.util.LinkedList<String> states = el.getStates();
                 if (!states.isEmpty()) {
-                    instruction.Stage = states.getLast();
+                    // The CycleBuilder/CycleElement internals still use raw
+                    // String tags; convert at this boundary into the typed
+                    // CycleState exposed on the public client API. Unknown
+                    // tags (e.g. the bubble placeholder " ") parse to null,
+                    // which we treat as "no stage info" — same as if the
+                    // CycleBuilder hadn't seen this instruction yet.
+                    String lastTag = states.getLast();
+                    instruction.Stage = CycleState.fromTag(lastTag);
+                    instruction.DivCount = CycleState.parseDivCount(lastTag);
                 }
                 break;
             }
