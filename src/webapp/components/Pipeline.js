@@ -118,7 +118,7 @@ const StageBox = ({
 }) => {
   const occupied = isOccupied(instr);
   const stall = occupied ? stallLabel(instr) : null;
-  const fill = stall ? stallColor : occupied ? fillColor : 'transparent';
+  const fill = stall ? stallColor : occupied ? fillColor : 'white';
   const cx = box.x + box.w / 2;
   // Vertical layout depends on whether we render only the stage label, the
   // stage label + instruction name, or label + name + stall tag.
