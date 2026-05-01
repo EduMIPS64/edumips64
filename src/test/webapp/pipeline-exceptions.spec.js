@@ -76,16 +76,6 @@ async function readPipeline(page) {
 }
 
 /**
- * Wait until the simulator's run loop has stopped scheduling more batches —
- * detected by the Run-All button becoming enabled again. (Either the run
- * finished, hit a BREAK, or surfaced a synchronous-exception alert that has
- * already been dismissed.)
- */
-async function waitForRunDone(page) {
-  await page.waitForSelector('#run-button:not([disabled])', { timeout: 15000 });
-}
-
-/**
  * Returns the list of (stage label, cycleStage) pairs for *occupied*
  * pipeline boxes (i.e. boxes that are showing an instruction). An occupied
  * stage with no recorded `cycleStage` would be a hard signal that
