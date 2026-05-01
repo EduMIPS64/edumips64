@@ -128,6 +128,12 @@ const StageBox = ({
 }) => {
   const occupied = isOccupied(instr);
   const stall = occupied ? stallLabel(instr) : null;
+  // The CycleBuilder's per-instruction stage tag (e.g. "IF"/"ID"/"EX"/.../
+  // "RAW"/"WAW"/"StDiv"/...) for the most recently completed cycle. Used by
+  // tests to verify `CycleBuilder` advances even when `cpu.step()` throws
+  // (`BreakException`, `InputNeededException`, `SynchronousException`); see
+  // `src/main/java/org/edumips64/client/Simulator.java`.
+  const cycleStage = occupied ? stageName(instr.Stage) || '' : '';
   const fill = stall ? stallColor : occupied ? fillColor : 'white';
   const cx = box.x + box.w / 2;
   // Vertical layout depends on whether we render only the stage label, the
@@ -143,6 +149,7 @@ const StageBox = ({
       data-stage={label}
       data-instruction={occupied ? instr.Name : ''}
       data-stall={stall || ''}
+      data-cycle-stage={cycleStage}
       data-fill={fill}
     >
       <rect

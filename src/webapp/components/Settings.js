@@ -45,6 +45,8 @@ const Settings = ({
   setExecutionDelayMs,
   pipelineColors,
   setPipelineColors,
+  themeMode,
+  setThemeMode,
   status,
 }) => {
   // Forwarding affects the CPU pipeline behavior and resets the CPU when
@@ -199,6 +201,36 @@ const Settings = ({
             }}
             sx={{ width: '160px' }}
           />
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography sx={{ fontSize: '0.85rem' }}>Theme</Typography>
+          <ToggleButtonGroup
+            size="small"
+            exclusive
+            value={themeMode || 'auto'}
+            onChange={(_, value) => {
+              // ToggleButtonGroup emits `null` when the user clicks the
+              // currently-selected button; treat that as "no change" so the
+              // theme mode never gets cleared from settings.
+              if (value && ALLOWED_THEME_MODES.includes(value)) {
+                setThemeMode(value);
+              }
+            }}
+            aria-label="Theme mode"
+            data-testid="theme-mode-toggle"
+          >
+            {ALLOWED_THEME_MODES.map((mode) => (
+              <ToggleButton
+                key={mode}
+                value={mode}
+                aria-label={`Theme mode: ${mode}`}
+                data-testid={`theme-mode-${mode}`}
+                sx={{ fontSize: '0.75rem', textTransform: 'capitalize' }}
+              >
+                {mode}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
         </Box>
       </Box>
       <Box>
