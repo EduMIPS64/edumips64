@@ -1,10 +1,24 @@
 coverage:
   range: "30...100"
-  
-status:
-  project:
-    default:
-      threshold: 1
+
+  status:
+    project:
+      default:
+        # Tolerate small fluctuations in total coverage.
+        threshold: 1
+        # A failed CI run (e.g. an unrelated Playwright timeout) should not also
+        # paint the Codecov check red on top — that produces two failures from
+        # one root cause. Keep Codecov out of the gating decision when CI is
+        # already failing or no upload arrived.
+        if_ci_failed: success
+        if_not_found: success
+    patch:
+      default:
+        # Patch coverage is informational: missing patch coverage often reflects
+        # tests living in a different language/flag (e.g. Playwright covers
+        # JS that unit tests do not), and a missing upload should not block.
+        if_ci_failed: success
+        if_not_found: success
 
 # The Swing UI is explicitly excluded from code coverage reports (see
 # docs/developer-guide.md). Main.java is the Swing entry point.
@@ -16,6 +30,7 @@ flags:
   java:
     paths:
       - src/main/java/
+    carryforward: true
   web:
     paths:
       - src/webapp/
