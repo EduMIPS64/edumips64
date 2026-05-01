@@ -10,7 +10,6 @@ import * as monacoEditor from 'monaco-editor';
 monacoEditor.languages.register({ id: 'mips' });
 
 const Code = (props) => {
-
   const [monaco, setMonaco] = useState(null);
   const [editor, setEditor] = useState(null);
   const [vimInstance, setVimInstance] = useState(null); // new state for Vim instance
@@ -23,23 +22,81 @@ const Code = (props) => {
   // Maps line of code to CPU stage.
   const [stageMap, setStageMap] = useState(new Map());
 
-  // Dynamically build the syntax highlighting regex for instructions.
-  var instructionRegex = new RegExp(`\\b(${props.validInstructions})\\b`)
-  monacoEditor.languages.setMonarchTokensProvider('mips', {
-    tokenizer: {
-      root: [
-        [/^[ \t]*[a-zA-Z_][\w]*:/, 'type.identifier'], // label
-        [instructionRegex, 'keyword'],
-        [/\.[a-zA-Z_][\w]*/, 'strong'], // directives
-        [/[#,]/, 'delimiter'],
-        [/\br(?:\d{1,2})\b/, 'string'],
-        [/\d+/, 'number'],
-        [/".*?"/, 'regexp'],
-        [/;.*/, 'comment'],
-        [/[a-zA-Z_][\w]*/, 'identifier'],
-      ]
-    }
-  });
+  // Install our MIPS syntax highlighting provider.
+  //
+  // Background and pitfalls
+  // -----------------------
+  //
+  // monaco-editor ships its own stock `mips` Monarch grammar via
+  // `basic-languages/mips/mips.contribution.js`. That contribution registers
+  // a `TokensProviderFactory` whose `create()` is async — Monaco only awaits
+  // it the first time a `mips` model needs tokens, and on resolution it
+  // calls `TokenizationRegistry.register('mips', stockSupport)`, which
+  // overwrites whatever was installed synchronously by
+  // `setMonarchTokensProvider`. So a plain `setMonarchTokensProvider` call
+  // loses a race to the stock grammar a few hundred ms after the editor
+  // mounts.
+  //
+  // The previous version of this file masked the race by reinstalling our
+  // provider in the component render body, which fires many times per
+  // second while a program runs (each pipeline state update re-renders the
+  // Simulator). That kept our provider on top, but every reinstall
+  // invalidates Monaco's tokenization state and triggers an async retoken-
+  // ization pass during which lines render with the default `mtk1` token
+  // class — i.e. plain black text. That was the run-time "flicker" bug
+  // reported in #1723.
+  //
+  // The robust fix is to *replace* the stock factory rather than fight it.
+  // `monaco.languages.registerTokensProviderFactory` disposes any previous
+  // factory for the language and installs ours, so the basic-languages
+  // grammar can never reach the editor. We additionally call
+  // `setMonarchTokensProvider` synchronously so the very first paint uses
+  // our tokenizer (before the factory's `create()` is awaited).
+  //
+  // The effect re-runs whenever `validInstructions` changes so newly added
+  // instruction mnemonics are picked up by the keyword regex.
+  useEffect(() => {
+    if (!monaco) return undefined;
+    const instructionRegex = new RegExp(`\\b(${props.validInstructions})\\b`);
+    const tokenizer = {
+      tokenizer: {
+        root: [
+          [/^[ \t]*[a-zA-Z_][\w]*:/, 'type.identifier'], // label
+          [instructionRegex, 'keyword'],
+          [/\.[a-zA-Z_][\w]*/, 'strong'], // directives
+          [/[#,]/, 'delimiter'],
+          [/\br(?:\d{1,2})\b/, 'string'],
+          [/\d+/, 'number'],
+          [/".*?"/, 'regexp'],
+          [/;.*/, 'comment'],
+          [/[a-zA-Z_][\w]*/, 'identifier'],
+        ],
+      },
+    };
+    // Replace any previously-registered tokens-provider factory for `mips`.
+    // monaco-editor ships its own `mips` Monarch grammar via
+    // `basic-languages/mips/mips.contribution.js`, registered as an *async*
+    // factory. If we only call `setMonarchTokensProvider` (which performs
+    // a synchronous `register`), the stock factory's later async resolution
+    // overwrites our provider. `registerTokensProviderFactory` disposes any
+    // existing factory and installs ours, so the stock grammar can never
+    // reach the editor.
+    const factoryDisposable = monaco.languages.registerTokensProviderFactory(
+      'mips',
+      { create: () => tokenizer },
+    );
+    // Also install synchronously so the very first paint already uses our
+    // tokenizer before the factory's `create()` is awaited.
+    monaco.languages.setMonarchTokensProvider('mips', tokenizer);
+    return () => {
+      if (
+        factoryDisposable &&
+        typeof factoryDisposable.dispose === 'function'
+      ) {
+        factoryDisposable.dispose();
+      }
+    };
+  }, [monaco, props.validInstructions]);
 
   useEffect(() => {
     if (!monaco) {
@@ -238,7 +295,7 @@ const Code = (props) => {
     // Expose monaco and editor to window for testing purposes
     window.monaco = monaco;
     window.editor = editor;
-    
+
     setMonaco(monaco);
     setEditor(editor);
 
@@ -250,11 +307,11 @@ const Code = (props) => {
 
     // Ensure the required command is registered
     editor.addAction({
-      id: "editor.action.insertLineAfter",
-      label: "Insert Line After",
+      id: 'editor.action.insertLineAfter',
+      label: 'Insert Line After',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
       run: function (ed) {
-        ed.trigger("keyboard", "type", { text: "\n" });
+        ed.trigger('keyboard', 'type', { text: '\n' });
       },
     });
   };
@@ -281,7 +338,7 @@ const Code = (props) => {
     tabsize: 4,
     lineNumbersMinChars: 3,
     automaticLayout: true,
-    fontSize: props.fontSize,  // Set font size from props
+    fontSize: props.fontSize, // Set font size from props
   };
 
   // Hook to compute and set markers for warnings and errors.
@@ -328,14 +385,14 @@ const Code = (props) => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   return (
-        <MonacoEditor
-            language="mips"
-            value={props.code}
-            options={options}
-            onChange={props.onChangeValue}
-            theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
-            editorDidMount={editorDidMount}
-        />
+    <MonacoEditor
+      language="mips"
+      value={props.code}
+      options={options}
+      onChange={props.onChangeValue}
+      theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
+      editorDidMount={editorDidMount}
+    />
   );
 };
 
