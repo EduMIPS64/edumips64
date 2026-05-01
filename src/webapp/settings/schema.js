@@ -18,6 +18,11 @@ export const SettingType = Object.freeze({
 
 const ALLOWED_HELP_LANGUAGES = ['en', 'it', 'zh'];
 
+// Allowed values for the theme mode setting. 'auto' follows the OS
+// `prefers-color-scheme` media query; the other two force a specific
+// palette mode.
+export const ALLOWED_THEME_MODES = ['auto', 'light', 'dark'];
+
 // Font size bounds for the code editor, in pt.
 const MIN_FONT_SIZE = 1;
 const MAX_FONT_SIZE = 72;
@@ -164,6 +169,14 @@ export const SETTINGS_SCHEMA = Object.freeze({
     type: SettingType.OBJECT,
     default: { ...DEFAULT_PIPELINE_COLORS },
     validate: isValidPipelineColors,
+  },
+  [SettingKey.THEME_MODE]: {
+    type: SettingType.STRING,
+    // 'auto' follows the OS-level `prefers-color-scheme` media query, which
+    // matches the pre-existing behavior. 'light' and 'dark' force the
+    // corresponding MUI palette mode regardless of the OS setting.
+    default: 'auto',
+    validate: (v) => ALLOWED_THEME_MODES.includes(v),
   },
 });
 

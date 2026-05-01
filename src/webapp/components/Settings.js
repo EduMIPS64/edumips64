@@ -4,6 +4,8 @@ import Typography from '@mui/material/Typography';
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField from '@mui/material/TextField';
 import {
@@ -12,6 +14,7 @@ import {
   MIN_EXECUTION_DELAY_MS,
   MAX_EXECUTION_DELAY_MS,
   DEFAULT_PIPELINE_COLORS,
+  ALLOWED_THEME_MODES,
 } from '../settings/schema';
 
 // Human-readable labels for each pipeline color knob, in display order.

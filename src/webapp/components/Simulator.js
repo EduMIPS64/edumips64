@@ -65,6 +65,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [pipelineColors, setPipelineColors] = useSetting(
     SettingKey.PIPELINE_COLORS,
   );
+  const [themeMode, setThemeMode] = useSetting(SettingKey.THEME_MODE);
 
   // `executionDelayMs` is read inside async callbacks that were captured when
   // a step batch started (potentially many batches ago). Mirror the latest
@@ -491,14 +492,26 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
+  // Resolve the user-selected theme mode: 'auto' defers to the OS media
+  // query, while 'light' / 'dark' force the corresponding palette so the
+  // dark theme can be exercised regardless of the OS preference.
+  const paletteMode =
+    themeMode === 'light'
+      ? 'light'
+      : themeMode === 'dark'
+        ? 'dark'
+        : prefersDarkMode
+          ? 'dark'
+          : 'light';
+
   const theme = React.useMemo(
     () =>
       createTheme({
         palette: {
-          mode: prefersDarkMode ? 'dark' : 'light',
+          mode: paletteMode,
         },
       }),
-    [prefersDarkMode],
+    [paletteMode],
   );
 
   return (
@@ -671,6 +684,8 @@ const Simulator = ({worker, initialState, appInsights}) => {
                   setExecutionDelayMs={setExecutionDelayMs}
                   pipelineColors={pipelineColors}
                   setPipelineColors={setPipelineColors}
+                  themeMode={themeMode}
+                  setThemeMode={setThemeMode}
                   status={status}
                   showTitle={false}
                 />
