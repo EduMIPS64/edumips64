@@ -6,6 +6,17 @@ import MonacoEditor from 'react-monaco-editor';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import * as monacoEditor from 'monaco-editor';
 
+// Resolve the Monaco editor theme name from the MUI palette mode passed in
+// by the parent (which already accounts for the user's THEME_MODE setting).
+// When the parent does not provide a palette mode (e.g. older callers or
+// tests), fall back to the OS-level `prefers-color-scheme` preference so
+// that behaviour does not regress.
+const resolveMonacoTheme = (paletteMode, prefersDarkMode) => {
+  if (paletteMode === 'dark') return 'vs-dark';
+  if (paletteMode === 'light') return 'vs-light';
+  return prefersDarkMode ? 'vs-dark' : 'vs-light';
+};
+
 // Global MIPS language definition for the Monaco editor.
 monacoEditor.languages.register({ id: 'mips' });
 
@@ -324,8 +335,11 @@ const Code = (props) => {
     monaco.editor.setModelMarkers(model, 'EduMIPS64', markers);
   }, [props.parsingErrors, editor, monaco]);
 
-  // Set the dark theme if necessary
+  // Resolve the editor theme: prefer the user-selected palette mode passed
+  // in from the parent (driven by the THEME_MODE setting), and fall back to
+  // the OS preference when the parent leaves the choice on `auto`.
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const editorTheme = resolveMonacoTheme(props.paletteMode, prefersDarkMode);
 
   return (
         <MonacoEditor
@@ -333,7 +347,7 @@ const Code = (props) => {
             value={props.code}
             options={options}
             onChange={props.onChangeValue}
-            theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
+            theme={editorTheme}
             editorDidMount={editorDidMount}
         />
   );

@@ -558,6 +558,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               viMode={viMode}
               fontSize={fontSize}
               validInstructions={initialState.validInstructions}
+              paletteMode={paletteMode}
             />
           </Grid>
           <Grid size={4} id="right-panel" disableEqualOverflow>
