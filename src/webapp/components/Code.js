@@ -399,25 +399,14 @@ const Code = (props) => {
   const editorTheme = resolveMonacoTheme(props.paletteMode, prefersDarkMode);
 
   return (
-<<<<<<< copilot/improve-web-ui-pipeline-widget
-        <MonacoEditor
-            language="mips"
-            value={props.code}
-            options={options}
-            onChange={props.onChangeValue}
-            theme={editorTheme}
-            editorDidMount={editorDidMount}
-        />
-=======
     <MonacoEditor
       language="mips"
       value={props.code}
       options={options}
       onChange={props.onChangeValue}
-      theme={prefersDarkMode ? 'vs-dark' : 'vs-light'}
+      theme={editorTheme}
       editorDidMount={editorDidMount}
     />
->>>>>>> master
   );
 };
 
