@@ -163,7 +163,6 @@ public class ResultFactory {
         r.cachestats = getCacheStats();
         return r;
     }
-
     private String getCacheStats() {
         var cachestatsJson = new FluentJsonObject();
 
@@ -316,24 +315,24 @@ public class ResultFactory {
         Map<Stage, InstructionInterface> cpuPipeline = cpu.getPipeline();
 
         Pipeline p = new Pipeline();
-        p.IF = wrap(cpuPipeline.get(Stage.IF));
-        p.ID = wrap(cpuPipeline.get(Stage.ID));
-        p.EX = wrap(cpuPipeline.get(Stage.EX));
-        p.MEM = wrap(cpuPipeline.get(Stage.MEM));
-        p.WB = wrap(cpuPipeline.get(Stage.WB));
+        p.IF = wrap(cpuPipeline.get(Stage.IF), CycleState.IF);
+        p.ID = wrap(cpuPipeline.get(Stage.ID), CycleState.ID);
+        p.EX = wrap(cpuPipeline.get(Stage.EX), CycleState.EX);
+        p.MEM = wrap(cpuPipeline.get(Stage.MEM), CycleState.MEM);
+        p.WB = wrap(cpuPipeline.get(Stage.WB), CycleState.WB);
 
-        p.FPAdder1 = wrap(cpu.getFpuInstruction("ADDER", 1));
-        p.FPAdder2 = wrap(cpu.getFpuInstruction("ADDER", 2));
-        p.FPAdder3 = wrap(cpu.getFpuInstruction("ADDER", 3));
-        p.FPAdder4 = wrap(cpu.getFpuInstruction("ADDER", 4));
-        p.FPMultiplier1 = wrap(cpu.getFpuInstruction("MULTIPLIER", 1));
-        p.FPMultiplier2 = wrap(cpu.getFpuInstruction("MULTIPLIER", 2));
-        p.FPMultiplier3 = wrap(cpu.getFpuInstruction("MULTIPLIER", 3));
-        p.FPMultiplier4 = wrap(cpu.getFpuInstruction("MULTIPLIER", 4));
-        p.FPMultiplier5 = wrap(cpu.getFpuInstruction("MULTIPLIER", 5));
-        p.FPMultiplier6 = wrap(cpu.getFpuInstruction("MULTIPLIER", 6));
-        p.FPMultiplier7 = wrap(cpu.getFpuInstruction("MULTIPLIER", 7));
-        p.FPDivider = wrap(cpu.getFpuInstruction("DIVIDER", 0));
+        p.FPAdder1 = wrap(cpu.getFpuInstruction("ADDER", 1), CycleState.A1);
+        p.FPAdder2 = wrap(cpu.getFpuInstruction("ADDER", 2), CycleState.A2);
+        p.FPAdder3 = wrap(cpu.getFpuInstruction("ADDER", 3), CycleState.A3);
+        p.FPAdder4 = wrap(cpu.getFpuInstruction("ADDER", 4), CycleState.A4);
+        p.FPMultiplier1 = wrap(cpu.getFpuInstruction("MULTIPLIER", 1), CycleState.M1);
+        p.FPMultiplier2 = wrap(cpu.getFpuInstruction("MULTIPLIER", 2), CycleState.M2);
+        p.FPMultiplier3 = wrap(cpu.getFpuInstruction("MULTIPLIER", 3), CycleState.M3);
+        p.FPMultiplier4 = wrap(cpu.getFpuInstruction("MULTIPLIER", 4), CycleState.M4);
+        p.FPMultiplier5 = wrap(cpu.getFpuInstruction("MULTIPLIER", 5), CycleState.M5);
+        p.FPMultiplier6 = wrap(cpu.getFpuInstruction("MULTIPLIER", 6), CycleState.M6);
+        p.FPMultiplier7 = wrap(cpu.getFpuInstruction("MULTIPLIER", 7), CycleState.M7);
+        p.FPDivider = wrap(cpu.getFpuInstruction("DIVIDER", 0), CycleState.DIV);
 
         return p;
     }
@@ -344,8 +343,21 @@ public class ResultFactory {
      * pipeline-state tag (e.g. {@code "RAW"}, {@code "WAW"}, {@code "StDiv"})
      * so the Web UI can render stall information without having to mirror the
      * core's stall-detection state machine.
+     *
+     * <p>The {@code slot} parameter identifies the physical pipeline slot
+     * being rendered. The cycle-builder tag is only attached when it is
+     * physically consistent with that slot (see
+     * {@link CycleState#isValidForSlot(CycleState)}). This matters because
+     * the parser produces a single {@code InstructionInterface} per source
+     * line, so the same Java object is reused on every loop iteration; when
+     * iteration <i>n</i>'s {@code mul.d} is progressing through {@code M5}
+     * while iteration <i>n+1</i>'s {@code mul.d} is {@code WAW}-stalled in
+     * {@code ID}, they share a serial number and
+     * {@code CycleBuilder.getLastStateForSerial} returns the most recent tag
+     * ({@code WAW}) for both. Without the slot check, the {@code M5} slot
+     * would inherit that spurious {@code WAW} tag and be painted as stalled.
      */
-    private Instruction wrap(InstructionInterface i) {
+    private Instruction wrap(InstructionInterface i, CycleState slot) {
         Instruction instruction = Instruction.FromInstruction(i);
         if (instruction == null || i == null || i.isBubble() || cycleBuilder == null) {
             return instruction;
@@ -364,7 +376,11 @@ public class ResultFactory {
             // are exposed as objects with mangled field names, so a typed
             // CycleState reference is not reliably readable from JS.)
             CycleState cs = CycleState.fromTag(lastTag);
-            if (cs != null) {
+            // Drop tags that don't physically belong to this slot; this is
+            // what protects FP functional-unit slots from inheriting the
+            // ID-slot stall tag of a later fetch of the same source-line
+            // instruction (see method-level Javadoc).
+            if (cs != null && cs.isValidForSlot(slot)) {
                 instruction.Stage = cs.name();
                 instruction.DivCount = CycleState.parseDivCount(lastTag);
             }
