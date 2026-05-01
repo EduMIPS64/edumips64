@@ -132,6 +132,51 @@ td.instructionName {
   background-color: rgba(128, 128, 0, 0.5);
 }
 
+/*
+ * When the same stage classes are applied as full-line decorations inside the
+ * Monaco code editor, the 0.5-alpha backgrounds above tint the row strongly
+ * enough to collide with Monaco's default token foreground colors (e.g. blue
+ * keywords on .stageId, green comments on .stageMem, dark-red registers on
+ * .stageEx). The result is that, while the program is executing, syntax
+ * highlighting on the rows currently in the pipeline appears to "disappear".
+ *
+ * Use a much lower alpha for the in-editor decorations only, so the row is
+ * still clearly tinted with the same hue as the matching Pipeline panel cell
+ * but the token text remains readable. The Pipeline panel cells outside the
+ * editor are not affected by these overrides.
+ */
+.monaco-editor .stageIf {
+  background-color: rgba(255, 255, 0, 0.18);
+}
+
+.monaco-editor .stageId {
+  background-color: rgba(0, 0, 255, 0.18);
+}
+
+.monaco-editor .stageEx {
+  background-color: rgba(255, 0, 0, 0.18);
+}
+
+.monaco-editor .stageMem {
+  background-color: rgba(0, 255, 0, 0.18);
+}
+
+.monaco-editor .stageWb {
+  background-color: rgba(255, 0, 255, 0.18);
+}
+
+.monaco-editor .stageFPAdder {
+  background-color: rgba(0, 128, 0, 0.18);
+}
+
+.monaco-editor .stageFPMultiplier {
+  background-color: rgba(0, 128, 128, 0.18);
+}
+
+.monaco-editor .stageFPDivider {
+  background-color: rgba(128, 128, 0, 0.18);
+}
+
 #errorCount {
   color: #cc6054;
 }
