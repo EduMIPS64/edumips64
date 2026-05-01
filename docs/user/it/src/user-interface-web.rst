@@ -284,11 +284,9 @@ ad essi sono distribuite le unità funzionali della FPU — l'Adder
   tardivo in WB ordinano sempre le letture prima delle scritture
   successive, quindi il simulatore non li genera mai.
 
-La classificazione degli stalli riusa il ``CycleBuilder`` del
-front-end Swing — uno stallo viene identificato dal contatore della
-CPU che è incrementato nell'ultimo ciclo — quindi il widget Pipeline
-sul web è sempre coerente con i totali mostrati nel pannello
-*Statistics*.
+Gli stalli vengono identificati dalla stessa logica che aggiorna i
+contatori di stallo della CPU, quindi il widget Pipeline sul web è
+sempre coerente con i totali mostrati nel pannello *Statistics*.
 
 I colori dei singoli stadi (incluso quello *Stall*) possono essere
 personalizzati dalla sezione *General Settings → Pipeline Colors*

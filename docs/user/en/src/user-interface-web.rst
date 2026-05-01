@@ -275,10 +275,9 @@ Divider — laid out around them. Each block:
   writeback at WB orders all reads before later writes, so the
   simulator never raises one.
 
-Stall classification reuses the Swing UI's ``CycleBuilder`` —
-identifying a stall by detecting which CPU stall counter incremented
-in the most recent cycle — so the Web pipeline widget always agrees
-with the totals shown in the *Statistics* panel.
+Stalls are identified by the same logic that updates the CPU's
+stall counters, so the Web pipeline widget always agrees with the
+totals shown in the *Statistics* panel.
 
 The per-stage colours (including the *Stall* colour) can be
 customised from *General Settings → Pipeline Colors* (see below) and
