@@ -163,7 +163,11 @@ public enum CycleState {
 
   /**
    * Returns whether this cycle-builder tag is physically consistent with the
-   * given pipeline {@code slot}.
+   * given pipeline {@code slot}. Thin wrapper over
+   * {@link org.edumips64.utils.CycleElement#isStateValidForSlot(String,String)}
+   * (which keeps the per-slot membership data co-located with
+   * {@code CycleElement.allowedTransitions} — they encode the same
+   * pipeline-state vocabulary).
    *
    * <p><b>Why this exists.</b> The parser produces a single
    * {@code InstructionInterface} per source line, and that same Java object
@@ -178,28 +182,10 @@ public enum CycleState {
    * inherit that {@code WAW} tag and be painted as a stall in the Web UI,
    * even though that functional unit is progressing normally.
    *
-   * <p>The valid tags per slot are:
-   * <ul>
-   *   <li>{@code IF}, {@code MEM}, {@code WB}: only their own stage.</li>
-   *   <li>{@code ID}: {@code ID}, {@code RAW}, {@code WAW}, {@code StDiv},
-   *       {@code StEx}, {@code StFun} (all input/data hazards are detected
-   *       in ID).</li>
-   *   <li>{@code EX}: {@code EX} or {@code Str} (memory structural stall in
-   *       EX).</li>
-   *   <li>FP Adder non-terminal stages {@code A1}..{@code A3}: only their own
-   *       stage.</li>
-   *   <li>FP Adder terminal stage {@code A4}: {@code A4} or {@code StAdd}.</li>
-   *   <li>FP Multiplier non-terminal stages {@code M1}..{@code M6}: only
-   *       their own stage.</li>
-   *   <li>FP Multiplier terminal stage {@code M7}: {@code M7} or
-   *       {@code StMul}.</li>
-   *   <li>FP Divider {@code DIV}: {@code DIV} or {@code DIV_COUNT}.</li>
-   * </ul>
-   *
    * <p>{@code DIV_COUNT} as a slot value is undefined — the divider's
    * physical slot is identified by {@code DIV}, with the per-cycle counter
    * carried separately on {@code Instruction.DivCount}. Passing
-   * {@code DIV_COUNT} as the slot returns {@code false}.
+   * {@code DIV_COUNT} or {@code null} as the slot returns {@code false}.
    *
    * @param slot the physical pipeline slot the instruction is being rendered
    *     in (must itself be a "stage" state — IF/ID/EX/MEM/WB, A1..A4,
@@ -209,23 +195,6 @@ public enum CycleState {
     if (slot == null) {
       return false;
     }
-    if (this == slot) {
-      return true;
-    }
-    switch (slot) {
-      case ID:
-        return this == RAW || this == WAW
-            || this == StDiv || this == StEx || this == StFun;
-      case EX:
-        return this == Str;
-      case A4:
-        return this == StAdd;
-      case M7:
-        return this == StMul;
-      case DIV:
-        return this == DIV_COUNT;
-      default:
-        return false;
-    }
+    return org.edumips64.utils.CycleElement.isStateValidForSlot(this.name(), slot.name());
   }
 }
