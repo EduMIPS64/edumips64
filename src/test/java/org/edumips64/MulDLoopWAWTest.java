@@ -85,6 +85,7 @@ public class MulDLoopWAWTest extends BaseWithInstructionBuilderTest {
   private CycleBuilder builder;
 
   @Before
+  @Override
   public void testSetup() {
     super.testSetup();
     parser = new Parser(lfu, symTab, memory, instructionBuilder);
