@@ -126,7 +126,7 @@ jobs:
       # otherwise indistinguishable from a flake in raw logs.
       - name: Upload Playwright artifacts on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-traces-${{ github.run_id }}
           path: |
