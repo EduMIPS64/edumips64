@@ -120,17 +120,40 @@ jobs:
           PLAYWRIGHT_TARGET_URL: 'http://localhost:8080'
         run: npx playwright test
 
+      # Upload Playwright traces, screenshots, and HTML report whenever the
+      # test step fails so the failure is diagnosable without rerunning. The
+      # most common failure mode (every test timing out on waitForSelector) is
+      # otherwise indistinguishable from a flake in raw logs.
+      - name: Upload Playwright artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-${{ github.run_id }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore
+
       # Merge per-test coverage JSON files and produce an lcov report.
+      # Run regardless of test outcome: even with some failing tests we want to
+      # publish whatever coverage was collected, so the Codecov check reflects
+      # reality instead of "no upload" → "coverage dropped to 0".
       - name: Generate lcov coverage report
-        run: npx nyc report --reporter=lcov --reporter=text
+        if: always()
+        run: npx nyc report --reporter=lcov --reporter=text || true
 
       - name: Upload web UI coverage to Codecov
+        if: always()
         uses: codecov/codecov-action@v6.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage/lcov.info
           flags: web
           name: web-ui-coverage
+          # A transient Codecov upload error must not turn this job red on top
+          # of whatever the actual test outcome was.
+          fail_ci_if_error: false
 
   deploy-staging:
     name: Deploy web application to staging environment
