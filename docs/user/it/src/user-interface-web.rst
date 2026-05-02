@@ -217,7 +217,11 @@ l'editor mostra inline:
   errore (cerchio rosso) marca gli errori;
 * l'intestazione del pannello mostra due piccoli contatori, uno per
   gli avvisi ed uno per gli errori. I contatori sono nascosti quando
-  non c'è nulla da segnalare.
+  non c'è nulla da segnalare;
+* ogni voce è cliccabile: selezionando un problema l'editor scorre in
+  modo da centrare la riga interessata, posiziona il cursore sulla
+  colonna segnalata e ne assume il focus, così è possibile correggere
+  l'errore immediatamente.
 
 Il pannello Issues è espanso di default, in modo che i problemi siano
 sempre visibili.

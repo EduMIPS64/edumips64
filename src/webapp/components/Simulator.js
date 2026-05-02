@@ -73,6 +73,27 @@ const Simulator = ({worker, initialState, appInsights}) => {
     executionDelayRef.current = executionDelayMs;
   }, [executionDelayMs]);
 
+  // Reference to the Monaco editor instance, populated by `<Code />` once
+  // the editor has mounted. Used by the Issues panel to jump the editor to
+  // the line/column of a parsing error or warning when the user clicks it.
+  const editorRef = React.useRef(null);
+  const handleEditorReady = React.useCallback((editor) => {
+    editorRef.current = editor;
+  }, []);
+  const handleIssueClick = React.useCallback((row, column) => {
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
+    }
+    // Reveal the offending line in the centre of the viewport, place the
+    // cursor at the reported column and focus the editor so the user can
+    // start fixing the problem immediately.
+    editor.revealLineInCenter(row);
+    const safeColumn = Math.max(1, column || 1);
+    editor.setPosition({ lineNumber: row, column: safeColumn });
+    editor.focus();
+  }, []);
+
   // Keep the simulator worker's forwarding flag in sync with the persisted
   // setting. Runs once on mount (so a value restored from localStorage is
   // pushed to the worker) and whenever the user toggles the switch.
@@ -542,12 +563,14 @@ const Simulator = ({worker, initialState, appInsights}) => {
               viMode={viMode}
               fontSize={fontSize}
               validInstructions={initialState.validInstructions}
+              onEditorReady={handleEditorReady}
             />
           </Grid>
           <Grid size={4} id="right-panel" disableEqualOverflow>
             <ErrorList
               parsingErrors={parsingErrors}
               AccordionSummary={AccordionSummary}
+              onIssueClick={handleIssueClick}
             />
             <Accordion 
               expanded={expandedAccordions.stats} 
