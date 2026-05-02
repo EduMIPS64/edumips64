@@ -299,6 +299,12 @@ const Code = (props) => {
     setMonaco(monaco);
     setEditor(editor);
 
+    // Allow parents to receive the editor instance (e.g. so the Issues
+    // panel can jump the cursor to a specific line/column on click).
+    if (typeof props.onEditorReady === 'function') {
+      props.onEditorReady(editor);
+    }
+
     // Enable Vi mode if viMode prop is true
     if (props.viMode) {
       const vim = initVimMode(editor);

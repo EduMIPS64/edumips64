@@ -209,7 +209,11 @@ diagnostics that the editor surfaces inline:
 * a warning icon (yellow triangle) marks warnings, an error icon (red
   circle) marks errors;
 * the panel header shows two count chips, one for warnings and one
-  for errors. The chips are hidden when there is nothing to report.
+  for errors. The chips are hidden when there is nothing to report;
+* every entry is clickable: selecting an issue scrolls the editor so
+  the offending line is centred in the viewport, places the cursor at
+  the reported column and focuses the editor so you can start fixing
+  the problem right away.
 
 The Issues panel is expanded by default so problems are visible at a
 glance.
