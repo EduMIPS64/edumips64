@@ -1,0 +1,155 @@
+/* Dashboard Grid experimental UI — every panel always visible. */
+
+.dg-root {
+  --dg-bg: #f7f8fb;
+  --dg-card: #ffffff;
+  --dg-border: #e3e6ee;
+  --dg-text: #1f2533;
+  --dg-text-dim: #6b7280;
+  --dg-accent: #4f46e5;
+  --dg-accent-soft: #eef2ff;
+  --dg-good: #16a34a;
+  --dg-warn: #f59e0b;
+  --dg-danger: #dc2626;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  grid-template-rows: auto 1fr 1fr;
+  grid-template-areas:
+    "topbar    topbar"
+    "editor    side"
+    "bottom    side";
+  gap: 12px;
+  padding: 12px;
+  height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  background: var(--dg-bg);
+  color: var(--dg-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dg-root {
+    --dg-bg: #0f1117;
+    --dg-card: #181b24;
+    --dg-border: #262a36;
+    --dg-text: #e5e7eb;
+    --dg-text-dim: #9ca3af;
+    --dg-accent: #818cf8;
+    --dg-accent-soft: #1e1b4b;
+  }
+}
+
+.dg-card {
+  background: var(--dg-card);
+  border: 1px solid var(--dg-border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+
+.dg-card-head {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--dg-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--dg-text-dim);
+}
+
+.dg-card-head .dg-tabs {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+.dg-card-head .dg-tabs button {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font: inherit;
+  text-transform: none;
+  letter-spacing: 0;
+  padding: 3px 10px;
+  color: var(--dg-text-dim);
+  cursor: pointer;
+}
+.dg-card-head .dg-tabs button.active {
+  background: var(--dg-accent-soft);
+  color: var(--dg-accent);
+  border-color: var(--dg-accent);
+}
+
+.dg-card-body {
+  padding: 8px 12px;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.dg-card-body table { width: 100%; }
+
+/* ----- top bar ----- */
+.dg-topbar {
+  grid-area: topbar;
+  background: var(--dg-card);
+  border: 1px solid var(--dg-border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.dg-topbar .dg-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 16px;
+}
+.dg-topbar .dg-brand img { height: 22px; }
+.dg-topbar .dg-runs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 14px;
+}
+.dg-topbar .dg-tail {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dg-topbar .MuiButton-root { text-transform: none; }
+.dg-topbar .dg-load-btn { background: var(--dg-accent); color: #fff; }
+.dg-topbar .dg-load-btn:hover { background: #3730a3; }
+
+.dg-status-chip {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--dg-accent-soft);
+  color: var(--dg-accent);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ----- main areas ----- */
+.dg-editor { grid-area: editor; }
+.dg-editor .dg-card-body { padding: 0; }
+.dg-editor .dg-card-body > * { height: 100%; }
+
+.dg-side { grid-area: side; }
+.dg-bottom { grid-area: bottom; }
+
+/* drawer */
+.dg-drawer-content { padding: 16px 24px; min-width: 360px; }
+.dg-drawer-content h4 { margin: 0 0 8px; font-size: 13px; color: var(--dg-text-dim); text-transform: uppercase; letter-spacing: .8px; }
+.dg-drawer-section { padding: 14px 0; border-bottom: 1px solid var(--dg-border); }
+.dg-drawer-section:last-child { border-bottom: none; }
