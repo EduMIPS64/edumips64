@@ -78,6 +78,14 @@ simulatore. Ogni pulsante ha un tooltip che ne descrive l'effetto.
   assembly (direttive ``.data`` e ``.code`` ed una ``SYSCALL 0``
   finale). È disabilitato mentre la CPU sta eseguendo.
 
+* **Restore default sample** — sostituisce il contenuto dell'editor
+  con il programma di esempio incluso in EduMIPS64 (lo stesso
+  visualizzato in un'installazione nuova). È utile per tornare ad un
+  punto di partenza noto dopo aver fatto esperimenti, o per
+  scartare il contenuto dell'editor salvato in locale (si veda
+  *Salvataggio e caricamento* qui sotto). Il pulsante è disabilitato
+  mentre la CPU sta eseguendo.
+
 * **Open Code** — apre un file locale (tipicamente un file ``.s``) e
   ne carica il contenuto nell'editor.
 
@@ -192,6 +200,15 @@ pulsanti **Save Code** e **Open Code** della barra degli strumenti.
 *Save Code* avvia il download del sorgente come ``code.s``; *Open
 Code* permette di selezionare un file locale, sostituendo il
 contenuto dell'editor.
+
+Inoltre, l'editor salva automaticamente il proprio contenuto nel
+local storage del browser mentre si digita, in modo che un
+ricaricamento accidentale della pagina non cancelli un programma
+non banale riportandolo al sorgente di esempio. L'ultima versione
+modificata viene ripristinata alla successiva apertura della pagina
+nello stesso browser. Per scartare il contenuto persistito e
+tornare al programma di esempio originale si può usare il pulsante
+**Restore default sample** della barra degli strumenti.
 
 Modalità Vi opzionale
 ~~~~~~~~~~~~~~~~~~~~~

@@ -1,4 +1,5 @@
 import { SettingKey } from './SettingKey';
+import SampleProgram from '../data/SampleProgram';
 
 /**
  * Supported setting types.
@@ -130,6 +131,13 @@ export const SETTINGS_SCHEMA = Object.freeze({
       Number.isFinite(v) &&
       v >= MIN_EXECUTION_DELAY_MS &&
       v <= MAX_EXECUTION_DELAY_MS,
+  },
+  [SettingKey.EDITOR_CODE]: {
+    type: SettingType.STRING,
+    // The bundled sample program is shown on first load and restored by the
+    // "Restore default sample" button. Any subsequent edit is persisted, so
+    // an accidental page reload no longer wipes a user's in-progress code.
+    default: SampleProgram,
   },
 });
 

@@ -32,4 +32,8 @@ export const SettingKey = Object.freeze({
 
   // Help dialog.
   HELP_LANGUAGE: 'help.language',
+
+  // Editor content. Persisted so that an accidental page reload does not wipe
+  // a user's in-progress program back to the bundled sample.
+  EDITOR_CODE: 'editorCode',
 });

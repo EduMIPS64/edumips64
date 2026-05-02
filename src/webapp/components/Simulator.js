@@ -27,7 +27,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Typography from '@mui/material/Typography';
 
-import SampleProgram from '../data/SampleProgram';
 
 import { debounce, isEqual } from 'lodash';
 import Settings from './Settings';
@@ -42,7 +41,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [registers, setRegisters] = React.useState(initialState.registers);
   const [memory, setMemory] = React.useState(initialState.memory);
   const [stats, setStats] = React.useState(initialState.statistics);
-  const [code, setCode] = React.useState(SampleProgram);
+  const [code, setCode, resetCode] = useSetting(SettingKey.EDITOR_CODE);
   const [status, setStatus] = React.useState(initialState.status);
   const [pipeline, setPipeline] = React.useState(initialState.pipeline);
   const [parsingErrors, setParsingErrors] = React.useState(
@@ -425,6 +424,30 @@ const Simulator = ({worker, initialState, appInsights}) => {
     });
   }
 
+  // Replace the editor contents with the bundled sample program and reset
+  // the simulator. Mirrors `clearCode` but restores the default sample
+  // instead of an empty stub. Exposed via the "Restore default sample"
+  // button in the Header so users who persist their own code in
+  // localStorage can still get back to a known-good starting point.
+  const restoreDefaultSample = () => {
+    const hadPendingBatch = nextBatchTimeout.current !== null;
+    cancelPendingBatch();
+    resetCode();
+    isResetting.current = true;
+    setInputRequest(null);
+    if (hadPendingBatch) {
+      setExecuting(false);
+    }
+    worker.reset();
+    setAccordionChanges({
+      stats: false,
+      pipeline: false,
+      registers: false,
+      memory: false,
+      stdout: false,
+    });
+  }
+
 
   const setCacheConfig = (config) => {
     worker.setCacheConfig(config);
@@ -541,6 +564,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
           }}
           pauseEnabled={executing}
           onClearClick={clearCode}
+          onRestoreSampleClick={restoreDefaultSample}
           onOpenClick={openCode}
           onSaveClick={saveCode}
           onStopClick={clickStop}
