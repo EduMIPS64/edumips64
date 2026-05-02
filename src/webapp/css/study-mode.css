@@ -1,0 +1,230 @@
+/* Study Mode experimental UI — calmer, classroom-friendly layout. */
+
+.sm-root {
+  --sm-bg: #fbf9f5;
+  --sm-card: #ffffff;
+  --sm-border: #e7e2d7;
+  --sm-text: #2a2520;
+  --sm-text-dim: #7a7268;
+  --sm-accent: #b8540f;
+  --sm-accent-soft: #fbe9d6;
+  --sm-stage: #f3ede1;
+  --sm-stage-active: #fdd9b0;
+  --sm-stage-active-border: #b8540f;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: var(--sm-bg);
+  color: var(--sm-text);
+  font-family: "Charter", "Iowan Old Style", Georgia, serif;
+  font-size: 15px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sm-root {
+    --sm-bg: #1c1a17;
+    --sm-card: #25221e;
+    --sm-border: #3a352e;
+    --sm-text: #f1ebde;
+    --sm-text-dim: #b3a99b;
+    --sm-accent: #f0a060;
+    --sm-accent-soft: #4a2f1a;
+    --sm-stage: #2f2a23;
+    --sm-stage-active: #4a2f1a;
+    --sm-stage-active-border: #f0a060;
+  }
+}
+
+/* ---------------------------------------------------- top bar */
+.sm-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--sm-border);
+  background: var(--sm-card);
+}
+.sm-topbar .sm-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+.sm-topbar .sm-brand img { height: 24px; }
+.sm-topbar .sm-tagline {
+  font-size: 13px;
+  color: var(--sm-text-dim);
+  font-style: italic;
+}
+.sm-topbar .sm-runs { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.sm-topbar .MuiButton-root { text-transform: none; font-family: inherit; }
+.sm-topbar .sm-load-btn { background: var(--sm-accent); color: #fff; }
+.sm-topbar .sm-load-btn:hover { background: #8e3f0c; }
+
+.sm-status-pill {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--sm-accent-soft);
+  color: var(--sm-accent);
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------- pipeline ribbon */
+.sm-ribbon {
+  padding: 16px 24px;
+  background: var(--sm-card);
+  border-bottom: 1px solid var(--sm-border);
+}
+.sm-ribbon h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--sm-text-dim);
+  font-weight: 600;
+}
+.sm-ribbon .sm-stages {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.sm-stage {
+  background: var(--sm-stage);
+  border: 1px solid var(--sm-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  position: relative;
+  min-height: 78px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.sm-stage.active {
+  background: var(--sm-stage-active);
+  border-color: var(--sm-stage-active-border);
+}
+.sm-stage .sm-stage-name {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--sm-text-dim);
+}
+.sm-stage .sm-stage-instr {
+  margin-top: 6px;
+  font-family: "JetBrains Mono", "Menlo", monospace;
+  font-size: 13px;
+  color: var(--sm-text);
+  word-break: break-word;
+}
+.sm-stage .sm-stage-empty {
+  margin-top: 10px;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--sm-text-dim);
+}
+.sm-stage::after {
+  content: "→";
+  position: absolute;
+  right: -10px; top: 50%;
+  transform: translate(50%, -50%);
+  color: var(--sm-text-dim);
+  font-size: 16px;
+  z-index: 1;
+}
+.sm-stage:last-child::after { content: ""; }
+
+.sm-fpu-toggle {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--sm-accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+.sm-fpu-detail { margin-top: 10px; }
+.sm-fpu-detail table { width: 100%; font-size: 12px; }
+
+/* ---------------------------------------------------- main split */
+.sm-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 14px;
+  padding: 14px 24px 24px;
+  min-height: 0;
+}
+
+.sm-card {
+  background: var(--sm-card);
+  border: 1px solid var(--sm-border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+.sm-card-head {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--sm-border);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--sm-text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sm-card-body {
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+  min-height: 0;
+}
+.sm-card.sm-editor .sm-card-body { padding: 0; }
+.sm-card.sm-editor .sm-card-body > * { height: 100%; }
+
+.sm-side-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 8px 12px 0;
+  border-bottom: 1px solid var(--sm-border);
+}
+.sm-side-tabs button {
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--sm-text-dim);
+  cursor: pointer;
+}
+.sm-side-tabs button.active {
+  background: var(--sm-bg);
+  border-color: var(--sm-border);
+  color: var(--sm-accent);
+  font-weight: 600;
+  margin-bottom: -1px;
+}
+
+/* settings menu */
+.sm-menu-section {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--sm-border);
+}
+.sm-menu-section:last-child { border-bottom: none; }
+.sm-menu-section h4 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--sm-text-dim);
+  font-weight: 600;
+}
