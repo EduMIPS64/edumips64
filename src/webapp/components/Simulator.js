@@ -5,27 +5,40 @@ import Memory from './Memory';
 import Pipeline from './Pipeline';
 import Registers from './Registers';
 import Statistics from './Statistics';
-import Header from './Header';
-import Accordion from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import MuiAccordionSummary from '@mui/material/AccordionSummary';
-import Grid from '@mui/material/Grid';
 import ErrorList from './ErrorList';
 import StdOut from './StdOut';
 import InputDialog from './InputDialog';
-import Switch from '@mui/material/Switch';
+import HelpDialog from './HelpDialog';
+import CpuStatusDisplay from './CpuStatusDisplay';
+
 import Button from '@mui/material/Button';
-
-import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
-
-import { styled } from '@mui/material/styles';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Typography from '@mui/material/Typography';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import FastForwardIcon from '@mui/icons-material/FastForward';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+import PauseCircleIcon from '@mui/icons-material/PauseCircle';
+import StopCircleIcon from '@mui/icons-material/StopCircle';
+import UploadIcon from '@mui/icons-material/Upload';
+import DownloadIcon from '@mui/icons-material/Download';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import HelpIcon from '@mui/icons-material/Help';
+import SettingsIcon from '@mui/icons-material/Settings';
+import StorageIcon from '@mui/icons-material/Storage';
+import MemoryIcon from '@mui/icons-material/Memory';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import BarChartIcon from '@mui/icons-material/BarChart';
+
+import logoBright from '../static/logo.png';
+import logoDark from '../static/logo-dark.png';
 
 import SampleProgram from '../data/SampleProgram';
 
@@ -34,6 +47,8 @@ import Settings from './Settings';
 import CacheConfig from "./CacheConfig";
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
+
+import '../css/focus-mode.css';
 
 const Simulator = ({worker, initialState, appInsights}) => {
   // The amount of steps to run in multi-step executions.
@@ -467,24 +482,13 @@ const Simulator = ({worker, initialState, appInsights}) => {
     debouncedSyntaxCheck(code);
   };
 
-  const AccordionSummary = styled((props) => (
-    <MuiAccordionSummary
-      expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.8rem' }} />}
-      {...props}
-    />
-  ))(({ theme }) => ({
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, .05)'
-        : 'rgba(227, 245, 254, 1)',
-    flexDirection: 'row-reverse',
-    '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
-      transform: 'rotate(180deg)',
-    },
-    '& .MuiAccordionSummary-content': {
-      marginLeft: theme.spacing(1),
-    },
-  }));
+  // ---------------------------------------------------------------------------
+  // Focus Mode UI shell
+  // ---------------------------------------------------------------------------
+  // The editor is the main attraction. A slim activity rail on the left toggles
+  // an inspector drawer on the right (Pipeline / Registers / Memory). A bottom
+  // strip carries Stats and StdOut as tabs. Everything settings-related is
+  // tucked into a Preferences modal — out of the way until you ask for it.
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
@@ -493,188 +497,287 @@ const Simulator = ({worker, initialState, appInsights}) => {
       createTheme({
         palette: {
           mode: prefersDarkMode ? 'dark' : 'light',
+          primary: { main: '#007acc' },
         },
       }),
     [prefersDarkMode],
   );
 
+  // Active inspector panel (right drawer). null = collapsed.
+  const [inspector, setInspector] = React.useState('pipeline');
+  // Active bottom tab.
+  const [bottomTab, setBottomTab] = React.useState('stdout');
+  // Preferences dialog open state.
+  const [prefsOpen, setPrefsOpen] = React.useState(false);
+  // Help dialog open state.
+  const [helpOpen, setHelpOpen] = React.useState(false);
+
+  // Hidden file input for "Open code".
+  const fileInputRef = React.useRef(null);
+  const onPickFile = (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setCode(ev.target.result);
+    reader.readAsText(f);
+    e.target.value = '';
+  };
+
+  const inspectorPanels = {
+    pipeline: { label: 'Pipeline', body: <Pipeline pipeline={pipeline} /> },
+    registers: { label: 'Registers', body: <Registers {...registers} /> },
+    memory: { label: 'Memory', body: <Memory memory={memory} /> },
+  };
+
+  const RailBtn = ({ id, title, icon, alert }) => (
+    <Tooltip title={title} placement="right" arrow>
+      <button
+        className={inspector === id ? 'active' : ''}
+        onClick={() => setInspector((cur) => (cur === id ? null : id))}
+        aria-label={title}
+      >
+        {icon}
+        {alert && <span className="dot" />}
+      </button>
+    </Tooltip>
+  );
+
   return (
-    <>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <InputDialog
-          request={inputRequest}
-          onSubmit={submitInput}
-          onCancel={cancelInput}
-        />
-        <Header
-          onRunClick={clickRun}
-          runEnabled={simulatorRunning && !executing}
-          onStepClick={clickStep}
-          stepEnabled={simulatorRunning && !executing}
-          onLoadClick={loadCode}
-          loadEnabled={isValidProgram()}
-          onPauseClick={() => {
-            appInsights.trackEvent({name: "pause"})
-            setMustPause(true);
-          }}
-          pauseEnabled={executing}
-          onClearClick={clearCode}
-          onOpenClick={openCode}
-          onSaveClick={saveCode}
-          onStopClick={clickStop}
-          stopEnabled={simulatorRunning && !executing}
-          parsingErrors={parsingErrors}
-          version={worker.version}
-          status={status}
-          prefersDarkMode={prefersDarkMode}
-          multiStepCount={stepStride}
-        />
-        <Grid container id="main-grid" disableEqualOverflow spacing={0}>
-          <Grid id="left-panel" size={8}>
-            <Code
-              onChangeValue={onCodeChange}
-              code={code}
-              parsingErrors={parsingErrors}
-              parsedInstructions={parsedInstructions}
-              pipeline={pipeline}
-              running={simulatorRunning}
-              viMode={viMode}
-              fontSize={fontSize}
-              validInstructions={initialState.validInstructions}
-            />
-          </Grid>
-          <Grid size={4} id="right-panel" disableEqualOverflow>
-            <ErrorList
-              parsingErrors={parsingErrors}
-              AccordionSummary={AccordionSummary}
-            />
-            <Accordion 
-              expanded={expandedAccordions.stats} 
-              onChange={handleAccordionChange('stats')} 
-              disableGutters
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <InputDialog request={inputRequest} onSubmit={submitInput} onCancel={cancelInput} />
+      <HelpDialog open={helpOpen} handleClose={() => setHelpOpen(false)} ver={worker.version} />
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".asm,.txt,.s"
+        style={{ display: 'none' }}
+        onChange={onPickFile}
+      />
+
+      <div className="fm-root">
+        {/* ---------------------------------------------------------- title bar */}
+        <div className="fm-titlebar">
+          <span className="fm-brand">
+            <img src={prefersDarkMode ? logoDark : logoBright} alt="EduMIPS64" />
+            EduMIPS64 <span style={{ opacity: 0.6 }}>· Focus Mode</span>
+          </span>
+
+          <div className="fm-runbar">
+            <Tooltip title="Load the current code into the simulator" arrow>
+              <span>
+                <Button
+                  size="small"
+                  className="fm-primary"
+                  startIcon={<UploadIcon />}
+                  disabled={!isValidProgram() || status === 'RUNNING'}
+                  onClick={clickLoad}
+                >
+                  Load
+                </Button>
+              </span>
+            </Tooltip>
+            <Tooltip title="Single step" arrow>
+              <span>
+                <Button
+                  size="small"
+                  startIcon={<PlayArrowIcon />}
+                  disabled={!simulatorRunning || executing}
+                  onClick={() => clickStep(1)}
+                >
+                  Step
+                </Button>
+              </span>
+            </Tooltip>
+            <Tooltip title={`Run ${stepStride} steps`} arrow>
+              <span>
+                <Button
+                  size="small"
+                  startIcon={<FastForwardIcon />}
+                  disabled={!simulatorRunning || executing}
+                  onClick={() => clickStep(stepStride)}
+                >
+                  Multi
+                </Button>
+              </span>
+            </Tooltip>
+            <Tooltip title="Run until finished" arrow>
+              <span>
+                <Button
+                  size="small"
+                  startIcon={<PlayCircleIcon />}
+                  disabled={!simulatorRunning || executing}
+                  onClick={clickRun}
+                >
+                  Run
+                </Button>
+              </span>
+            </Tooltip>
+            <Tooltip title="Pause" arrow>
+              <span>
+                <IconButton size="small" disabled={!executing} onClick={() => {
+                  appInsights.trackEvent({ name: 'pause' });
+                  setMustPause(true);
+                }}>
+                  <PauseCircleIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title="Stop and reset CPU" arrow>
+              <span>
+                <IconButton size="small" disabled={!simulatorRunning || executing} onClick={clickStop}>
+                  <StopCircleIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+
+            <span style={{ width: 8 }} />
+
+            <Tooltip title="Open code from file" arrow>
+              <IconButton size="small" disabled={status === 'RUNNING'} onClick={() => fileInputRef.current?.click()}>
+                <UploadIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Save code to file" arrow>
+              <IconButton size="small" disabled={status === 'RUNNING'} onClick={saveCode}>
+                <DownloadIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Clear editor" arrow>
+              <IconButton size="small" disabled={status === 'RUNNING'} onClick={clearCode}>
+                <DeleteForeverIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+
+            <span style={{ width: 8 }} />
+
+            <Tooltip title="Preferences (cache, settings)" arrow>
+              <IconButton size="small" onClick={() => setPrefsOpen(true)}>
+                <SettingsIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Help" arrow>
+              <IconButton size="small" onClick={() => setHelpOpen(true)}>
+                <HelpIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </div>
+
+        {/* --------------------------------------------------- left activity rail */}
+        <div className="fm-rail">
+          <RailBtn
+            id="pipeline"
+            title="Pipeline"
+            icon={<TimelineIcon fontSize="small" />}
+            alert={accordionAlerts && accordionChanges.pipeline}
+          />
+          <RailBtn
+            id="registers"
+            title="Registers"
+            icon={<MemoryIcon fontSize="small" />}
+            alert={accordionAlerts && accordionChanges.registers}
+          />
+          <RailBtn
+            id="memory"
+            title="Memory"
+            icon={<StorageIcon fontSize="small" />}
+            alert={accordionAlerts && accordionChanges.memory}
+          />
+          <div className="fm-rail-spacer" />
+        </div>
+
+        {/* ------------------------------------------------------------- editor */}
+        <div className="fm-editor">
+          <ErrorList parsingErrors={parsingErrors} />
+          <Code
+            onChangeValue={onCodeChange}
+            code={code}
+            parsingErrors={parsingErrors}
+            parsedInstructions={parsedInstructions}
+            pipeline={pipeline}
+            running={simulatorRunning}
+            viMode={viMode}
+            fontSize={fontSize}
+            validInstructions={initialState.validInstructions}
+          />
+        </div>
+
+        {/* ---------------------------------------- bottom strip: stdout + stats */}
+        <div className="fm-bottom">
+          <div className="fm-bottom-tabs">
+            <button
+              className={bottomTab === 'stdout' ? 'active' : ''}
+              onClick={() => setBottomTab('stdout')}
             >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  Stats
-                  {accordionAlerts && accordionChanges.stats && <span className="accordion-change-indicator" />}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Statistics {...stats} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.pipeline} 
-              onChange={handleAccordionChange('pipeline')} 
-              disableGutters
+              Output {accordionAlerts && accordionChanges.stdout && '•'}
+            </button>
+            <button
+              className={bottomTab === 'stats' ? 'active' : ''}
+              onClick={() => setBottomTab('stats')}
             >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  Pipeline
-                  {accordionAlerts && accordionChanges.pipeline && <span className="accordion-change-indicator" />}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Pipeline pipeline={pipeline} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.registers} 
-              onChange={handleAccordionChange('registers')} 
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  Registers
-                  {accordionAlerts && accordionChanges.registers && <span className="accordion-change-indicator" />}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Registers {...registers} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.memory} 
-              onChange={handleAccordionChange('memory')} 
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />} id="memory-accordion-summary">
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  Memory
-                  {accordionAlerts && accordionChanges.memory && <span className="accordion-change-indicator" />}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Memory memory={memory} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.stdout} 
-              onChange={handleAccordionChange('stdout')} 
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  Standard Output
-                  {accordionAlerts && accordionChanges.stdout && <span className="accordion-change-indicator" />}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <StdOut stdout={stdout} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.cache} 
-              onChange={handleAccordionChange('cache')} 
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: status === 'RUNNING' ? 'gray' : '#1976d2' }}>
-                  Cache Configuration
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <CacheConfig
-                  showTitle={false}
-                  onChange={setCacheConfig}
-                  status={status}
-                />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.settings} 
-              onChange={handleAccordionChange('settings')} 
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  General Settings
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Settings
-                  viMode={viMode}
-                  setViMode={setViMode}
-                  fontSize={fontSize}
-                  setFontSize={setFontSize}
-                  accordionAlerts={accordionAlerts}
-                  setAccordionAlerts={setAccordionAlerts}
-                  forwarding={forwarding}
-                  setForwarding={setForwarding}
-                  stepStride={stepStride}
-                  setStepStride={setStepStride}
-                  executionDelayMs={executionDelayMs}
-                  setExecutionDelayMs={setExecutionDelayMs}
-                  status={status}
-                  showTitle={false}
-                />
-              </AccordionDetails>
-            </Accordion>
-          </Grid>
-        </Grid>
-      </ThemeProvider>
-    </>
+              <BarChartIcon style={{ fontSize: 12, verticalAlign: -2, marginRight: 4 }} />
+              Stats {accordionAlerts && accordionChanges.stats && '•'}
+            </button>
+            <span className="fm-spacer" />
+          </div>
+          <div className="fm-bottom-content">
+            {bottomTab === 'stdout' && <StdOut stdout={stdout} />}
+            {bottomTab === 'stats' && <Statistics {...stats} />}
+          </div>
+        </div>
+
+        {/* ----------------------------------------------------- right inspector */}
+        <div className={`fm-inspector ${inspector ? '' : 'collapsed'}`}>
+          {inspector && (
+            <>
+              <div className="fm-inspector-header">
+                {inspectorPanels[inspector].label}
+                <button className="fm-close" onClick={() => setInspector(null)} aria-label="Close panel">×</button>
+              </div>
+              <div className="fm-inspector-body">{inspectorPanels[inspector].body}</div>
+            </>
+          )}
+        </div>
+
+        {/* ------------------------------------------------------------ status bar */}
+        <div className="fm-statusbar">
+          <span className="fm-pill"><CpuStatusDisplay status={status} /></span>
+          <span>cycles: {stats.cycles ?? 0}</span>
+          <span>instr: {stats.instructions ?? 0}</span>
+          <span style={{ marginLeft: 'auto', opacity: 0.85 }}>
+            {worker.version}
+          </span>
+        </div>
+      </div>
+
+      {/* -------------------------------------------------- preferences dialog */}
+      <Dialog open={prefsOpen} onClose={() => setPrefsOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Preferences</DialogTitle>
+        <DialogContent dividers>
+          <h4 style={{ marginTop: 0 }}>Cache configuration</h4>
+          <CacheConfig showTitle={false} onChange={setCacheConfig} status={status} />
+          <h4 style={{ marginTop: 24 }}>General settings</h4>
+          <Settings
+            viMode={viMode}
+            setViMode={setViMode}
+            fontSize={fontSize}
+            setFontSize={setFontSize}
+            accordionAlerts={accordionAlerts}
+            setAccordionAlerts={setAccordionAlerts}
+            forwarding={forwarding}
+            setForwarding={setForwarding}
+            stepStride={stepStride}
+            setStepStride={setStepStride}
+            executionDelayMs={executionDelayMs}
+            setExecutionDelayMs={setExecutionDelayMs}
+            status={status}
+            showTitle={false}
+          />
+        </DialogContent>
+      </Dialog>
+    </ThemeProvider>
   );
 };
 

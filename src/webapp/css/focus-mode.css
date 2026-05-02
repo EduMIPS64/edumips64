@@ -1,0 +1,229 @@
+/* Focus Mode experimental UI — VS Code-style chrome around the editor. */
+
+.fm-root {
+  --fm-bg: #1e1e1e;
+  --fm-bg-2: #252526;
+  --fm-bg-3: #2d2d30;
+  --fm-border: #3c3c3c;
+  --fm-text: #cccccc;
+  --fm-text-dim: #858585;
+  --fm-accent: #007acc;
+  --fm-accent-2: #4ec9b0;
+  --fm-warn: #d7ba7d;
+  --fm-error: #f48771;
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  grid-template-rows: 36px 1fr auto 22px;
+  grid-template-areas:
+    "title title title"
+    "rail  editor  inspector"
+    "rail  bottom  inspector"
+    "status status status";
+  height: 100vh;
+  width: 100vw;
+  background: var(--fm-bg);
+  color: var(--fm-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: light) {
+  .fm-root {
+    --fm-bg: #ffffff;
+    --fm-bg-2: #f3f3f3;
+    --fm-bg-3: #ececec;
+    --fm-border: #e0e0e0;
+    --fm-text: #1f1f1f;
+    --fm-text-dim: #6a6a6a;
+  }
+}
+
+.fm-titlebar {
+  grid-area: title;
+  background: var(--fm-bg-2);
+  border-bottom: 1px solid var(--fm-border);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.fm-titlebar .fm-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.fm-titlebar .fm-brand img { height: 18px; }
+
+.fm-titlebar .fm-runbar {
+  margin-left: auto;
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.fm-titlebar .fm-runbar .MuiButton-root,
+.fm-titlebar .fm-runbar .MuiIconButton-root {
+  color: var(--fm-text);
+  text-transform: none;
+  font-size: 12px;
+  min-width: 0;
+  padding: 4px 8px;
+}
+
+.fm-titlebar .fm-runbar .MuiButton-root.fm-primary {
+  background: var(--fm-accent);
+  color: #fff;
+}
+
+.fm-rail {
+  grid-area: rail;
+  background: var(--fm-bg-2);
+  border-right: 1px solid var(--fm-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 6px;
+  gap: 2px;
+}
+
+.fm-rail button {
+  background: transparent;
+  border: none;
+  color: var(--fm-text-dim);
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: color 0.15s;
+}
+.fm-rail button:hover { color: var(--fm-text); }
+.fm-rail button.active {
+  color: var(--fm-text);
+  border-left-color: var(--fm-accent);
+}
+.fm-rail .dot {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--fm-accent);
+}
+
+.fm-rail .fm-rail-spacer { flex: 1; }
+
+.fm-editor {
+  grid-area: editor;
+  min-width: 0;
+  min-height: 0;
+  background: var(--fm-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.fm-editor > * { flex: 1; min-height: 0; }
+
+.fm-bottom {
+  grid-area: bottom;
+  background: var(--fm-bg-2);
+  border-top: 1px solid var(--fm-border);
+  max-height: 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.fm-bottom-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--fm-border);
+  background: var(--fm-bg-3);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.fm-bottom-tabs button {
+  background: transparent;
+  border: none;
+  color: var(--fm-text-dim);
+  padding: 6px 12px;
+  cursor: pointer;
+  font: inherit;
+}
+.fm-bottom-tabs button.active {
+  color: var(--fm-text);
+  border-bottom: 2px solid var(--fm-accent);
+}
+.fm-bottom-tabs .fm-spacer { flex: 1; }
+
+.fm-bottom-content {
+  overflow: auto;
+  padding: 8px 12px;
+}
+
+.fm-inspector {
+  grid-area: inspector;
+  width: 380px;
+  background: var(--fm-bg-2);
+  border-left: 1px solid var(--fm-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.fm-inspector.collapsed { display: none; }
+
+.fm-inspector-header {
+  padding: 10px 12px;
+  font-size: 11px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--fm-text-dim);
+  border-bottom: 1px solid var(--fm-border);
+  display: flex;
+  align-items: center;
+}
+
+.fm-inspector-header .fm-close {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: var(--fm-text-dim);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.fm-inspector-body {
+  overflow: auto;
+  padding: 8px 12px;
+  flex: 1;
+}
+
+.fm-inspector-body table { width: 100%; }
+.fm-inspector-body td { padding: 2px 4px; }
+
+.fm-statusbar {
+  grid-area: status;
+  background: var(--fm-accent);
+  color: #fff;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 14px;
+}
+
+.fm-statusbar .fm-pill {
+  background: rgba(255,255,255,0.15);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+/* Tone down stock MUI accordions used inside the inspector. */
+.fm-inspector .MuiAccordion-root { background: transparent; box-shadow: none; }
+.fm-inspector .MuiAccordionSummary-root { min-height: 36px; padding: 0; }
