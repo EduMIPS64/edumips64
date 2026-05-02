@@ -41,17 +41,31 @@ test('clicking an Issues entry jumps the editor to that line', async ({ page }) 
 
   await typeProgram(page, BROKEN_PROGRAM);
 
-  // Wait for the parsing error to show up in the Issues panel.
-  const issueButton = page.locator('.error-list-item-button').first();
-  await expect(issueButton).toBeVisible({ timeout: 10000 });
+  // Wait for the parsing error to show up in the Issues panel, and for the
+  // debounced syntax check (500 ms) to settle so the list of issues is
+  // stable before we read its data attributes.
+  const issueButtons = page.locator('.error-list-item-button');
+  await expect(issueButtons.first()).toBeVisible({ timeout: 10000 });
+  await page.waitForTimeout(800);
 
-  // Read the row reported in the issue label so the assertion is robust to
-  // small changes in the parser's diagnostics.
-  const label = await issueButton.innerText();
-  const match = label.match(/Line\s+(\d+)\s+Position\s+(\d+)/i);
-  expect(match, `Issue label "${label}" should expose Line/Position`).not.toBeNull();
-  const expectedLine = Number(match[1]);
-  const expectedColumn = Number(match[2]);
+  // Pick the first issue button and read the (row, column) directly from
+  // the data-* attributes that the component sets from the same `value`
+  // that its onClick handler closes over. This guarantees our expectation
+  // matches the values the click handler will receive, regardless of how
+  // the parser formats the description in the visible label.
+  const buttonCount = await issueButtons.count();
+  expect(buttonCount).toBeGreaterThan(0);
+  const targetButton = issueButtons.first();
+  const issueRow = Number(await targetButton.getAttribute('data-issue-row'));
+  const issueColumn = Number(await targetButton.getAttribute('data-issue-column'));
+  expect(Number.isFinite(issueRow)).toBe(true);
+  expect(Number.isFinite(issueColumn)).toBe(true);
+
+  // The handler clamps the column to 1 when the parser reports column 0
+  // (which happens for diagnostics that are not tied to a specific
+  // character within a line). Mirror that here.
+  const expectedLine = issueRow;
+  const expectedColumn = Math.max(1, issueColumn || 1);
 
   // Move the cursor far away from the offending line so we can detect the
   // jump unambiguously.
@@ -59,9 +73,11 @@ test('clicking an Issues entry jumps the editor to that line', async ({ page }) 
     window.editor.setPosition({ lineNumber: 1, column: 1 });
   });
 
-  await issueButton.click();
+  await targetButton.click();
 
-  // After the click the editor's cursor must be at (expectedLine, expectedColumn).
+  // After the click the editor's cursor must be on the line reported by
+  // the issue, at the expected (clamped) column. Poll because the click's
+  // effect on the Monaco view propagates asynchronously.
   await expect.poll(async () => {
     return page.evaluate(() => {
       const pos = window.editor.getPosition();

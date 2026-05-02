@@ -49,6 +49,8 @@ const ErrorList = ({ parsingErrors, AccordionSummary, onIssueClick }) => {
                                     }
                                     className='error-list-item-button'
                                     aria-label={`Jump to line ${value.row}, position ${value.column}: ${value.description}`}
+                                    data-issue-row={value.row}
+                                    data-issue-column={value.column}
                                 >
                                     <ListItemIcon className='error-list-item'>
                                         <DecideIconType errorType={value.isWarning} />
