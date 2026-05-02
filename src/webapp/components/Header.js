@@ -24,6 +24,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 export default function Header(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -206,6 +207,20 @@ export default function Header(props) {
             disabled={props.status === 'RUNNING'}
           >
             clear
+          </Button>
+        </Tooltip>
+        <Tooltip title="Replace the editor contents with the bundled sample program" arrow placement="top">
+          <Button
+            color="inherit"
+            className="restore-sample-button"
+            id="restore-sample-button"
+            startIcon={<RestartAltIcon />}
+            onClick={() => {
+              props.onRestoreSampleClick();
+            }}
+            disabled={props.status === 'RUNNING'}
+          >
+            Restore default sample
           </Button>
         </Tooltip>
         <Tooltip title="Open code from file" arrow placement="top">
