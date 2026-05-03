@@ -66,6 +66,10 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [executionDelayMs, setExecutionDelayMs] = useSetting(
     SettingKey.EXECUTION_DELAY_MS,
   );
+  const [pipelineColors, setPipelineColors] = useSetting(
+    SettingKey.PIPELINE_COLORS,
+  );
+  const [themeMode, setThemeMode] = useSetting(SettingKey.THEME_MODE);
 
   // `executionDelayMs` is read inside async callbacks that were captured when
   // a step batch started (potentially many batches ago). Mirror the latest
@@ -76,6 +80,27 @@ const Simulator = ({worker, initialState, appInsights}) => {
   React.useEffect(() => {
     executionDelayRef.current = executionDelayMs;
   }, [executionDelayMs]);
+
+  // Reference to the Monaco editor instance, populated by `<Code />` once
+  // the editor has mounted. Used by the Issues panel to jump the editor to
+  // the line/column of a parsing error or warning when the user clicks it.
+  const editorRef = React.useRef(null);
+  const handleEditorReady = React.useCallback((editor) => {
+    editorRef.current = editor;
+  }, []);
+  const handleIssueClick = React.useCallback((row, column) => {
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
+    }
+    // Reveal the offending line in the centre of the viewport, place the
+    // cursor at the reported column and focus the editor so the user can
+    // start fixing the problem immediately.
+    editor.revealLineInCenter(row);
+    const safeColumn = Math.max(1, column || 1);
+    editor.setPosition({ lineNumber: row, column: safeColumn });
+    editor.focus();
+  }, []);
 
   // Keep the simulator worker's forwarding flag in sync with the persisted
   // setting. Runs once on mount (so a value restored from localStorage is
@@ -492,6 +517,17 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
+  // Resolve the user-selected theme mode: 'auto' defers to the OS media
+  // query, while 'light' / 'dark' force the corresponding palette so the
+  // dark theme can be exercised regardless of the OS preference.
+  const paletteMode =
+    themeMode === 'light'
+      ? 'light'
+      : themeMode === 'dark'
+        ? 'dark'
+        : prefersDarkMode
+          ? 'dark'
+          : 'light';
   // `responsiveFontSizes` rescales the MUI typography variants
   // (h1..h6, body etc.) so that text shrinks gracefully on phones
   // and tablets. Without it MUI sticks to its desktop-tuned sizes,
@@ -499,11 +535,11 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const theme = React.useMemo(() => {
     const base = createTheme({
       palette: {
-        mode: prefersDarkMode ? 'dark' : 'light',
+        mode: paletteMode,
       },
     });
     return responsiveFontSizes(base);
-  }, [prefersDarkMode]);
+  }, [paletteMode]);
 
   return (
     <>
@@ -549,12 +585,15 @@ const Simulator = ({worker, initialState, appInsights}) => {
               viMode={viMode}
               fontSize={fontSize}
               validInstructions={initialState.validInstructions}
+              paletteMode={paletteMode}
+              onEditorReady={handleEditorReady}
             />
           </Grid>
           <Grid size={{ xs: 12, md: 4 }} id="right-panel" disableEqualOverflow>
             <ErrorList
               parsingErrors={parsingErrors}
               AccordionSummary={AccordionSummary}
+              onIssueClick={handleIssueClick}
             />
             <Accordion 
               expanded={expandedAccordions.stats} 
@@ -583,7 +622,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Pipeline pipeline={pipeline} />
+                <Pipeline pipeline={pipeline} colors={pipelineColors} />
               </AccordionDetails>
             </Accordion>
             <Accordion 
@@ -673,6 +712,10 @@ const Simulator = ({worker, initialState, appInsights}) => {
                   setStepStride={setStepStride}
                   executionDelayMs={executionDelayMs}
                   setExecutionDelayMs={setExecutionDelayMs}
+                  pipelineColors={pipelineColors}
+                  setPipelineColors={setPipelineColors}
+                  themeMode={themeMode}
+                  setThemeMode={setThemeMode}
                   status={status}
                   showTitle={false}
                 />

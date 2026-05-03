@@ -217,7 +217,11 @@ l'editor mostra inline:
   errore (cerchio rosso) marca gli errori;
 * l'intestazione del pannello mostra due piccoli contatori, uno per
   gli avvisi ed uno per gli errori. I contatori sono nascosti quando
-  non c'è nulla da segnalare.
+  non c'è nulla da segnalare;
+* ogni voce è cliccabile: selezionando un problema l'editor scorre in
+  modo da centrare la riga interessata, posiziona il cursore sulla
+  colonna segnalata e ne assume il focus, così è possibile correggere
+  l'errore immediatamente.
 
 Il pannello Issues è espanso di default, in modo che i problemi siano
 sempre visibili.
@@ -252,11 +256,45 @@ Contatori sull'esecuzione del programma:
 
 Pipeline
 ~~~~~~~~
-Mostra quale istruzione si trova in ciascuno stadio della pipeline
-della CPU. I cinque stadi interi (IF, ID, EX, MEM, WB) sono sempre
-visibili; gli stadi della FPU (Adder, Multiplier, Divider) compaiono
-solo quando contengono un'istruzione. Gli stadi usano lo stesso
-codice colore dell'evidenziazione nell'editor.
+Mostra una rappresentazione grafica della pipeline della CPU che ricalca
+il diagramma del classico front-end Swing. I cinque stadi interi
+(IF, ID, EX, MEM, WB) sono disegnati come blocchi collegati, e attorno
+ad essi sono distribuite le unità funzionali della FPU — l'Adder
+(4 stadi), il Multiplier (7 stadi) e il Divider. Ogni blocco:
+
+* si colora con il colore associato al proprio stadio quando contiene
+  un'istruzione, e mostra il nome dell'istruzione all'interno;
+* resta come un riquadro vuoto quando lo stadio è inattivo o contiene
+  una bolla della pipeline (per esempio gli slot scartati da un salto
+  oppure le bolle di drain a fine programma): come nel widget Swing,
+  le bolle vengono mostrate come stadi vuoti;
+* viene riempito con un tratteggio, il colore dedicato *Stall* e una
+  breve etichetta del tipo di stallo quando in quel ciclo si è
+  effettivamente verificato uno stallo. Le etichette riprendono la
+  classificazione del widget Cycles del front-end Swing:
+
+  - **RAW** — Read-After-Write (tipicamente sullo stadio ID quando
+    il forwarding è disabilitato);
+  - **WAW** — Write-After-Write fra due istruzioni FP che
+    competono per lo stesso registro destinazione;
+  - **Struct: Div / EX / FU** — stallo strutturale sul divisore
+    FP, sullo stadio EX intero o su un'altra unità funzionale FP;
+  - **Struct: Mem / Add / Mul** — stallo strutturale causato da
+    un'istruzione bloccata in MEM, nell'ultimo stadio dell'Adder
+    FP (A4) o nell'ultimo stadio del Multiplier FP (M7).
+
+  Gli hazard WAR (Write-After-Read) *non* sono possibili in questa
+  implementazione MIPS: l'emissione in-order in ID e il writeback
+  tardivo in WB ordinano sempre le letture prima delle scritture
+  successive, quindi il simulatore non li genera mai.
+
+Gli stalli vengono identificati dalla stessa logica che aggiorna i
+contatori di stallo della CPU, quindi il widget Pipeline sul web è
+sempre coerente con i totali mostrati nel pannello *Statistics*.
+
+I colori dei singoli stadi (incluso quello *Stall*) possono essere
+personalizzati dalla sezione *General Settings → Pipeline Colors*
+(vedi sotto) e vengono salvati nel local storage del browser.
 
 Registers
 ~~~~~~~~~
@@ -320,6 +358,12 @@ ai reload della pagina.
   l'evidenziazione delle righe e l'aggiornamento dei pannelli. La
   modifica si applica in tempo reale, anche durante un'esecuzione in
   corso.
+* **Pipeline Colors** — colori usati dal diagramma *Pipeline* per
+  ciascuno stadio. Ogni voce (``IF``, ``ID``, ``EX``, ``MEM``, ``WB``,
+  ``FP Adder``, ``FP Multiplier``, ``FP Divider``, ``Stall``) può
+  essere modificata con un selettore di colore; il pulsante
+  *Reset to defaults* ripristina la palette originale (gli stessi
+  valori RGB usati dal front-end Swing).
 
 Eseguire EduMIPS64 come applicazione desktop o da CLI
 -----------------------------------------------------

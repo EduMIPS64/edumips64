@@ -137,6 +137,25 @@ public class CycleElement {
   // The states that are not added in the list are not checked.
   // TODO: complete the map (it does not contain all possible transitions).
   private static Map<String, Set<String>> allowedTransitions;
+  // Map that associates each physical pipeline slot to the set of state tags
+  // that can legitimately describe an instruction sitting in that slot.
+  //
+  // <p>This lives next to {@link #allowedTransitions} because both encode the
+  // same pipeline-state vocabulary; keeping them co-located avoids drift.
+  // Whereas {@code allowedTransitions} answers "from state X, which Y states
+  // are reachable?", this map answers "for physical slot S, which state tags
+  // can describe it?".
+  //
+  // <p>It is needed because the parser produces a single
+  // {@code InstructionInterface} per source line: in a tight loop the same
+  // Java object can sit in two pipeline slots simultaneously (e.g. iteration
+  // <i>n</i>'s {@code mul.d} progressing through {@code M5} while iteration
+  // <i>n+1</i>'s {@code mul.d} is {@code WAW}-stalled in {@code ID}), so
+  // {@link CycleBuilder#getLastStateForSerial(int)} returns the most recent
+  // tag ({@code WAW}) for both slots. Consumers (e.g. the Web UI's
+  // {@code ResultFactory.wrap()}) use {@link #isStateValidForSlot(String,
+  // String)} to drop the tag for the slot that does not own it.
+  private static Map<String, Set<String>> slotMembership;
   static {
     allowedTransitions = new HashMap<>();
     allowedTransitions.put("IF", new HashSet<>(Arrays.asList("ID", " ")));
@@ -147,11 +166,55 @@ public class CycleElement {
     allowedTransitions.put("EX", new HashSet<>(Arrays.asList("MEM", "Str")));
     allowedTransitions.put("MEM", new HashSet<>(Arrays.asList("WB")));
     allowedTransitions.put("WB", new HashSet<>(Arrays.asList(" ")));
+
+    slotMembership = new HashMap<>();
+    slotMembership.put("IF", new HashSet<>(Arrays.asList("IF")));
+    // Data hazards (RAW, WAW) and input structural stalls (StDiv, StEx,
+    // StFun) are all detected and tagged at the ID slot.
+    slotMembership.put("ID", new HashSet<>(Arrays.asList("ID", "RAW", "WAW", "StDiv", "StEx", "StFun")));
+    // EX can stall waiting for MEM (Str).
+    slotMembership.put("EX", new HashSet<>(Arrays.asList("EX", "Str")));
+    slotMembership.put("MEM", new HashSet<>(Arrays.asList("MEM")));
+    slotMembership.put("WB", new HashSet<>(Arrays.asList("WB")));
+    // FP Adder non-terminal stages only host their own tag; the terminal
+    // stage A4 can additionally carry the StAdd structural-stall tag.
+    slotMembership.put("A1", new HashSet<>(Arrays.asList("A1")));
+    slotMembership.put("A2", new HashSet<>(Arrays.asList("A2")));
+    slotMembership.put("A3", new HashSet<>(Arrays.asList("A3")));
+    slotMembership.put("A4", new HashSet<>(Arrays.asList("A4", "StAdd")));
+    // FP Multiplier — same story as the Adder, with seven stages.
+    slotMembership.put("M1", new HashSet<>(Arrays.asList("M1")));
+    slotMembership.put("M2", new HashSet<>(Arrays.asList("M2")));
+    slotMembership.put("M3", new HashSet<>(Arrays.asList("M3")));
+    slotMembership.put("M4", new HashSet<>(Arrays.asList("M4")));
+    slotMembership.put("M5", new HashSet<>(Arrays.asList("M5")));
+    slotMembership.put("M6", new HashSet<>(Arrays.asList("M6")));
+    slotMembership.put("M7", new HashSet<>(Arrays.asList("M7", "StMul")));
+    // The FP Divider's DIV slot owns both the DIV entry tag and the
+    // per-cycle DIV_COUNT counter (rendered as D00..D24).
+    slotMembership.put("DIV", new HashSet<>(Arrays.asList("DIV", "DIV_COUNT")));
   }
 
   private static boolean validateStateTransition(String curState, String nextState) {
     // Don't check states that are not in the map.
     return !allowedTransitions.containsKey(curState) || allowedTransitions.get(curState).contains(nextState);
 
+  }
+
+  /**
+   * Returns whether {@code state} is a valid state tag for an instruction
+   * physically located in pipeline slot {@code slot}. Used by consumers that
+   * need to filter cycle-builder tags by the slot they are rendering — see
+   * the {@link #slotMembership} field comment for the motivating bug.
+   *
+   * <p>Returns {@code false} for unknown slots, which is the conservative
+   * choice (an unknown slot has no known valid tags).
+   */
+  public static boolean isStateValidForSlot(String state, String slot) {
+    if (state == null || slot == null) {
+      return false;
+    }
+    Set<String> valid = slotMembership.get(slot);
+    return valid != null && valid.contains(state);
   }
 }
