@@ -31,8 +31,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Typography from '@mui/material/Typography';
 
-import SampleProgram from '../data/SampleProgram';
-
 import { debounce, isEqual } from 'lodash';
 import Settings from './Settings';
 import CacheConfig from "./CacheConfig";
@@ -46,7 +44,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [registers, setRegisters] = React.useState(initialState.registers);
   const [memory, setMemory] = React.useState(initialState.memory);
   const [stats, setStats] = React.useState(initialState.statistics);
-  const [code, setCode] = React.useState(SampleProgram);
+  const [code, setCode, resetCode] = useSetting(SettingKey.EDITOR_CODE);
   const [status, setStatus] = React.useState(initialState.status);
   const [pipeline, setPipeline] = React.useState(initialState.pipeline);
   const [parsingErrors, setParsingErrors] = React.useState(
@@ -433,6 +431,26 @@ const Simulator = ({worker, initialState, appInsights}) => {
     });
   }
 
+  const restoreDefaultSample = () => {
+    const hadPendingBatch = nextBatchTimeout.current !== null;
+    cancelPendingBatch();
+    resetCode();
+    isResetting.current = true;
+    setInputRequest(null);
+    if (hadPendingBatch) {
+      setExecuting(false);
+    }
+    worker.reset();
+    // Clear accordion change markers
+    setAccordionChanges({
+      stats: false,
+      pipeline: false,
+      registers: false,
+      memory: false,
+      stdout: false,
+    });
+  };
+
 
   const setCacheConfig = (config) => {
     worker.setCacheConfig(config);
@@ -565,6 +583,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
           onClearClick={clearCode}
           onOpenClick={openCode}
           onSaveClick={saveCode}
+          onRestoreClick={restoreDefaultSample}
           onStopClick={clickStop}
           stopEnabled={simulatorRunning && !executing}
           parsingErrors={parsingErrors}
