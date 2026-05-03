@@ -217,7 +217,7 @@ public final class Banner {
      * narrow terminal, no UTF-8 stdout).
      */
     public static void print(PrintStream out) {
-        if (shouldRenderFull(out)) {
+        if (shouldRenderFull()) {
             out.print(Ansi.AUTO.string(asMarkup()));
         } else {
             printCompact(out);
@@ -242,7 +242,7 @@ public final class Banner {
      * the terminal width (from {@code COLUMNS}) is below
      * {@link #MIN_WIDTH}, or when stdout's charset is not Unicode-capable.
      */
-    static boolean shouldRenderFull(PrintStream out) {
+    static boolean shouldRenderFull() {
         if (System.console() == null) {
             return false;
         }
