@@ -21,12 +21,17 @@ import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import { styled } from '@mui/material/styles';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import {
+  createTheme,
+  responsiveFontSizes,
+  ThemeProvider,
+} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Typography from '@mui/material/Typography';
 
+import SampleProgram from '../data/SampleProgram';
 
 import { debounce, isEqual } from 'lodash';
 import Settings from './Settings';
@@ -41,7 +46,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [registers, setRegisters] = React.useState(initialState.registers);
   const [memory, setMemory] = React.useState(initialState.memory);
   const [stats, setStats] = React.useState(initialState.statistics);
-  const [code, setCode, resetCode] = useSetting(SettingKey.EDITOR_CODE);
+  const [code, setCode] = React.useState(SampleProgram);
   const [status, setStatus] = React.useState(initialState.status);
   const [pipeline, setPipeline] = React.useState(initialState.pipeline);
   const [parsingErrors, setParsingErrors] = React.useState(
@@ -61,6 +66,10 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [executionDelayMs, setExecutionDelayMs] = useSetting(
     SettingKey.EXECUTION_DELAY_MS,
   );
+  const [pipelineColors, setPipelineColors] = useSetting(
+    SettingKey.PIPELINE_COLORS,
+  );
+  const [themeMode, setThemeMode] = useSetting(SettingKey.THEME_MODE);
 
   // `executionDelayMs` is read inside async callbacks that were captured when
   // a step batch started (potentially many batches ago). Mirror the latest
@@ -424,30 +433,6 @@ const Simulator = ({worker, initialState, appInsights}) => {
     });
   }
 
-  // Replace the editor contents with the bundled sample program and reset
-  // the simulator. Mirrors `clearCode` but restores the default sample
-  // instead of an empty stub. Exposed via the "Restore default sample"
-  // button in the Header so users who persist their own code in
-  // localStorage can still get back to a known-good starting point.
-  const restoreDefaultSample = () => {
-    const hadPendingBatch = nextBatchTimeout.current !== null;
-    cancelPendingBatch();
-    resetCode();
-    isResetting.current = true;
-    setInputRequest(null);
-    if (hadPendingBatch) {
-      setExecuting(false);
-    }
-    worker.reset();
-    setAccordionChanges({
-      stats: false,
-      pipeline: false,
-      registers: false,
-      memory: false,
-      stdout: false,
-    });
-  }
-
 
   const setCacheConfig = (config) => {
     worker.setCacheConfig(config);
@@ -532,15 +517,29 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
-  const theme = React.useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode: prefersDarkMode ? 'dark' : 'light',
-        },
-      }),
-    [prefersDarkMode],
-  );
+  // Resolve the user-selected theme mode: 'auto' defers to the OS media
+  // query, while 'light' / 'dark' force the corresponding palette so the
+  // dark theme can be exercised regardless of the OS preference.
+  const paletteMode =
+    themeMode === 'light'
+      ? 'light'
+      : themeMode === 'dark'
+        ? 'dark'
+        : prefersDarkMode
+          ? 'dark'
+          : 'light';
+  // `responsiveFontSizes` rescales the MUI typography variants
+  // (h1..h6, body etc.) so that text shrinks gracefully on phones
+  // and tablets. Without it MUI sticks to its desktop-tuned sizes,
+  // which look excessively large on devices like the iPad Pro.
+  const theme = React.useMemo(() => {
+    const base = createTheme({
+      palette: {
+        mode: paletteMode,
+      },
+    });
+    return responsiveFontSizes(base);
+  }, [paletteMode]);
 
   return (
     <>
@@ -564,7 +563,6 @@ const Simulator = ({worker, initialState, appInsights}) => {
           }}
           pauseEnabled={executing}
           onClearClick={clearCode}
-          onRestoreSampleClick={restoreDefaultSample}
           onOpenClick={openCode}
           onSaveClick={saveCode}
           onStopClick={clickStop}
@@ -576,7 +574,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
           multiStepCount={stepStride}
         />
         <Grid container id="main-grid" disableEqualOverflow spacing={0}>
-          <Grid id="left-panel" size={8}>
+          <Grid id="left-panel" size={{ xs: 12, md: 8 }}>
             <Code
               onChangeValue={onCodeChange}
               code={code}
@@ -587,10 +585,11 @@ const Simulator = ({worker, initialState, appInsights}) => {
               viMode={viMode}
               fontSize={fontSize}
               validInstructions={initialState.validInstructions}
+              paletteMode={paletteMode}
               onEditorReady={handleEditorReady}
             />
           </Grid>
-          <Grid size={4} id="right-panel" disableEqualOverflow>
+          <Grid size={{ xs: 12, md: 4 }} id="right-panel" disableEqualOverflow>
             <ErrorList
               parsingErrors={parsingErrors}
               AccordionSummary={AccordionSummary}
@@ -623,7 +622,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Pipeline pipeline={pipeline} />
+                <Pipeline pipeline={pipeline} colors={pipelineColors} />
               </AccordionDetails>
             </Accordion>
             <Accordion 
@@ -713,6 +712,10 @@ const Simulator = ({worker, initialState, appInsights}) => {
                   setStepStride={setStepStride}
                   executionDelayMs={executionDelayMs}
                   setExecutionDelayMs={setExecutionDelayMs}
+                  pipelineColors={pipelineColors}
+                  setPipelineColors={setPipelineColors}
+                  themeMode={themeMode}
+                  setThemeMode={setThemeMode}
                   status={status}
                   showTitle={false}
                 />

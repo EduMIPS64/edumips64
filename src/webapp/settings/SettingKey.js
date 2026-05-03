@@ -36,4 +36,13 @@ export const SettingKey = Object.freeze({
   // Editor content. Persisted so that an accidental page reload does not wipe
   // a user's in-progress program back to the bundled sample.
   EDITOR_CODE: 'editorCode',
+
+  // Per-stage colors for the Pipeline widget. Mirrors the Swing UI's
+  // `IF_COLOR` / `ID_COLOR` / ... `ConfigKey`s.
+  PIPELINE_COLORS: 'pipelineColors',
+
+  // UI theme mode. One of `'auto'` (follow OS preference, the default),
+  // `'light'`, or `'dark'`. Exposed as a toggle in the General Settings
+  // panel so the dark theme can be exercised regardless of the OS setting.
+  THEME_MODE: 'themeMode',
 });

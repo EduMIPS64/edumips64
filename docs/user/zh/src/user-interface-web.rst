@@ -210,10 +210,37 @@ Statistics
 
 Pipeline
 ~~~~~~~~
-显示当前 CPU 流水线各阶段中正在执行的指令。整数流水线的五个阶段
-（IF、ID、EX、MEM、WB）始终显示；FPU 阶段（Adder、Multiplier、
-Divider）只有在被占用时才显示。各阶段使用与编辑器内联高亮相同的
-颜色编码。
+以图形化方式展示 CPU 流水线，外观参考经典的 Swing 前端的流水线
+示意图。整数流水线的五个阶段（IF、ID、EX、MEM、WB）以相互连接的
+方块绘制，FPU 功能单元——FP Adder（4 级）、FP Multiplier（7 级）
+以及 FP Divider——围绕在它们周围。每个方块：
+
+* 当其中持有指令时，会以该阶段的颜色高亮，并在方块中显示指令名；
+* 当阶段空闲或仅持有流水线气泡时（例如分支冲刷的槽位、程序结束时
+  的排空气泡），保持为空白方框：与 Swing 流水线视图的做法一致，
+  气泡渲染为空阶段；
+* 当本周期内确实发生了停顿时，方块会以斜线填充、使用专用的
+  *Stall* 颜色，并标注简短的停顿类型标签。标签沿用 Swing 周期
+  视图的分类：
+
+  - **RAW** —— Read-After-Write 数据相关（关闭 forwarding 时
+    通常出现在 ID 阶段）；
+  - **WAW** —— 两条 FP 指令竞争同一目的寄存器引发的
+    Write-After-Write 相关；
+  - **Struct: Div / EX / FU** —— FP 除法器、整数 EX 阶段或其他
+    FP 功能单元上的结构相关；
+  - **Struct: Mem / Add / Mul** —— 由 MEM 阶段被占用、FP Adder
+    末级（A4）或 FP Multiplier 末级（M7）被占用引起的结构相关。
+
+  本 MIPS 实现中**不会**出现 WAR（Write-After-Read）相关：ID 阶段
+  按序发射加上 WB 阶段的延迟写回，使得任意先发射的读操作总在后续
+  写操作之前完成，因此模拟器从不产生此类相关。
+
+停顿由更新 CPU 停顿计数器的同一套逻辑识别，因此 Web 流水线视图所
+显示的停顿与 *Statistics* 面板中的总数始终一致。
+
+各阶段的颜色（包括 *Stall* 颜色）可在 *General Settings → Pipeline
+Colors* 中自定义（见下文），并保存在浏览器的本地存储中。
 
 Registers
 ~~~~~~~~~
@@ -262,6 +289,11 @@ General Settings
 * **Execution Delay (ms)** — 在 *Run All* 中两个连续内部批次之间插入
   的延迟。增大该值可以减慢长时间运行，使行高亮和面板更新等视觉反馈
   得以实时跟踪。该更改会立即生效，即使在执行中途也是如此。
+* **Pipeline Colors** — *Pipeline* 示意图为各阶段使用的颜色。每一项
+  （``IF``、``ID``、``EX``、``MEM``、``WB``、``FP Adder``、
+  ``FP Multiplier``、``FP Divider``、``Stall``）都可以通过取色器
+  修改；*Reset to defaults* 按钮可恢复原始配色（与 Swing 前端
+  默认使用的 RGB 值相同）。
 
 将 EduMIPS64 作为桌面或命令行应用程序运行
 -----------------------------------------
