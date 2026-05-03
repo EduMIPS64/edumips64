@@ -131,8 +131,10 @@ test('expandedAccordions persists across page reloads', async ({ page }) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  // The Pipeline accordion is collapsed by default; expand it
-  const pipelineSummary = page.locator('text=Pipeline').locator('..');
+  // The Pipeline accordion is collapsed by default; expand it. Use the
+  // accordion's button role (its accessible name is exactly "Pipeline") so
+  // we don't accidentally match the "Pipeline Colors" section in Settings.
+  const pipelineSummary = page.getByRole('button', { name: 'Pipeline' });
   await pipelineSummary.click();
   await page.waitForTimeout(300);
 
@@ -204,6 +206,99 @@ test('stepStride and executionDelayMs persist across page reloads', async ({ pag
   await expect(
     page.getByRole('button', { name: /Run 250 steps of simulation/ })
   ).toBeVisible();
+});
+
+/**
+ * Test: pipelineColors persist across page reloads, and the in-page Pipeline
+ * widget actually picks up the customized values.
+ */
+test('pipelineColors persist across page reloads', async ({ page }) => {
+  await waitForPageReady(page);
+  await removeOverlay(page);
+
+  await openSettingsAccordion(page);
+
+  // Set IF and Stall colors via the native color inputs. React tracks
+  // input values via a hidden internal property, so we have to use the
+  // native setter to make sure the synthetic onChange fires.
+  const setColor = async (key, value) => {
+    const input = page.getByTestId(`pipeline-color-${key}`);
+    await input.evaluate((el, v) => {
+      const setter = Object.getOwnPropertyDescriptor(
+        window.HTMLInputElement.prototype,
+        'value'
+      ).set;
+      setter.call(el, v);
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    }, value);
+  };
+  await setColor('IF', '#123456');
+  await setColor('Stall', '#abcdef');
+
+  // The persisted value is written by `useLocalStorage`'s effect, which
+  // fires asynchronously after the render — wait for the storage write to
+  // land before asserting on it.
+  await expect
+    .poll(() =>
+      page.evaluate(
+        (key) => JSON.parse(window.localStorage.getItem(key) || 'null'),
+        `${STORAGE_PREFIX}pipelineColors`
+      )
+    )
+    .toMatchObject({ IF: '#123456', Stall: '#abcdef' });
+
+  // Verify localStorage was updated with our overrides on top of the defaults.
+  const stored = await page.evaluate(
+    (key) => JSON.parse(window.localStorage.getItem(key) || 'null'),
+    `${STORAGE_PREFIX}pipelineColors`
+  );
+  expect(stored).not.toBeNull();
+  expect(stored.IF).toBe('#123456');
+  expect(stored.Stall).toBe('#abcdef');
+  // Untouched stages must keep their defaults.
+  expect(stored.MEM).toBe('#4caf50');
+
+  // Reload and assert the inputs come back with the persisted values.
+  await page.reload();
+  await waitForPageReady(page);
+  await removeOverlay(page);
+
+  await openSettingsAccordion(page);
+
+  const ifInput = page.getByTestId('pipeline-color-IF');
+  await expect(ifInput).toHaveValue('#123456');
+  const stallInput = page.getByTestId('pipeline-color-Stall');
+  await expect(stallInput).toHaveValue('#abcdef');
+});
+
+/**
+ * Test: the Pipeline Colors "Reset to defaults" button restores every entry
+ * to the schema defaults.
+ */
+test('pipelineColors reset restores schema defaults', async ({ page }) => {
+  await waitForPageReady(page);
+  await removeOverlay(page);
+
+  await openSettingsAccordion(page);
+
+  // Pick a non-default value for IF to make sure reset really overwrites.
+  const ifInput = page.getByTestId('pipeline-color-IF');
+  await ifInput.evaluate((el) => {
+    const setter = Object.getOwnPropertyDescriptor(
+      window.HTMLInputElement.prototype,
+      'value'
+    ).set;
+    setter.call(el, '#000000');
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await expect(ifInput).toHaveValue('#000000');
+
+  await page.getByTestId('pipeline-colors-reset').click();
+
+  // Schema default for IF (mirrors Swing UI's `IF_COLOR`).
+  await expect(ifInput).toHaveValue('#ebeb3b');
 });
 
 /**

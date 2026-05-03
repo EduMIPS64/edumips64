@@ -247,11 +247,45 @@ Counters about the program execution:
 
 Pipeline
 ~~~~~~~~
-Shows which instruction is currently in each stage of the CPU
-pipeline. The five integer stages (IF, ID, EX, MEM, WB) are always
-displayed; the FPU stages (Adder, Multiplier, Divider) appear when
-they are populated. Stages use the same colour code as the editor's
-in-line highlight.
+Shows a graphical representation of the CPU pipeline that resembles the
+classic Swing UI's pipeline diagram. The five integer stages (IF, ID,
+EX, MEM, WB) are drawn as connected blocks, with the FPU functional
+units — the FP Adder (4 stages), FP Multiplier (7 stages) and FP
+Divider — laid out around them. Each block:
+
+* lights up with the stage's colour while it holds an instruction, and
+  shows the instruction's mnemonic inside the block;
+* stays as an empty outline when the corresponding stage is idle or
+  holds a pipeline bubble (e.g. branch-flush slots, end-of-program
+  drain bubbles): just like Swing's pipeline widget, bubbles are
+  rendered as empty stages;
+* renders with a hatched fill, the dedicated *Stall* colour and a
+  short stall-type label whenever a stall actually occurred in the
+  current cycle. The labels match the Swing cycle widget's
+  classification:
+
+  - **RAW** — Read-After-Write data hazard (typically on the ID
+    stage when forwarding is disabled);
+  - **WAW** — Write-After-Write hazard between two FP instructions
+    competing for the same destination register;
+  - **Struct: Div / EX / FU** — structural hazard at the FP Divider,
+    the integer EX stage or another FP functional unit;
+  - **Struct: Mem / Add / Mul** — structural hazard caused by an
+    instruction stuck in MEM, in the FP Adder's last stage (A4) or
+    the FP Multiplier's last stage (M7).
+
+  WAR (Write-After-Read) hazards are *not* possible in this MIPS
+  implementation: the in-order issue at ID combined with the late
+  writeback at WB orders all reads before later writes, so the
+  simulator never raises one.
+
+Stalls are identified by the same logic that updates the CPU's
+stall counters, so the Web pipeline widget always agrees with the
+totals shown in the *Statistics* panel.
+
+The per-stage colours (including the *Stall* colour) can be
+customised from *General Settings → Pipeline Colors* (see below) and
+are persisted in browser local storage.
 
 Registers
 ~~~~~~~~~
@@ -311,6 +345,12 @@ reloads.
   down long runs so that the visual feedback (line highlighting,
   panel updates) can be followed in real time. The change is applied
   live, even mid-execution.
+* **Pipeline Colors** — per-stage colours used by the *Pipeline*
+  diagram. Each entry (``IF``, ``ID``, ``EX``, ``MEM``, ``WB``,
+  ``FP Adder``, ``FP Multiplier``, ``FP Divider``, ``Stall``) can be
+  edited with a colour picker, and the *Reset to defaults* button
+  restores the original palette (the same RGB values the Swing UI
+  uses by default).
 
 Running EduMIPS64 as a desktop or CLI application
 -------------------------------------------------
