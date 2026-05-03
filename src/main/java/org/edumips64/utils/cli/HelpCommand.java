@@ -122,12 +122,11 @@ public class HelpCommand implements Runnable {
                 id, t.resource)));
             return;
         }
-        BufferedReader reader = new BufferedReader(
-            new InputStreamReader(in, StandardCharsets.UTF_8));
         BufferedReader stdin = new BufferedReader(
             new InputStreamReader(System.in, StandardCharsets.UTF_8));
         Pager pager = new Pager(System.out, stdin);
-        try {
+        try (BufferedReader reader = new BufferedReader(
+            new InputStreamReader(in, StandardCharsets.UTF_8))) {
             pager.page(reader);
         } catch (IOException e) {
             Cli.printErrorMessage(e);
