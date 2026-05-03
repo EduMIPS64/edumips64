@@ -21,17 +21,17 @@ jobs:
             platform: linux
             arch: x64
             artifact-name: Electron Linux x64
-            artifact-path: out/WebEduMips64-linux-x64
+            artifact-path: electron/dist/WebEduMips64-linux-x64
           - os: macos-latest
             platform: darwin
             arch: arm64
             artifact-name: Electron macOS ARM64
-            artifact-path: out/WebEduMips64-darwin-arm64
+            artifact-path: electron/dist/WebEduMips64-darwin-arm64
           - os: windows-latest
             platform: win32
             arch: x64
             artifact-name: Electron Windows x64
-            artifact-path: out/WebEduMips64-win32-x64
+            artifact-path: electron/dist/WebEduMips64-win32-x64
     steps:
       - uses: actions/checkout@v6
         with:
@@ -56,16 +56,21 @@ jobs:
         working-directory: electron
         shell: bash
         run: |
-          rm -rf ../out/WebEduMips64-${{ matrix.platform }}-${{ matrix.arch }}
+          # Note: @electron/packager auto-ignores its own --out directory
+          # within the source tree, so we MUST NOT use ../out here — that
+          # would strip the out/web/ web bundle from the packaged app and
+          # leave the express server with nothing to serve. Use a sibling
+          # output directory (electron/dist) instead.
+          rm -rf dist/WebEduMips64-${{ matrix.platform }}-${{ matrix.arch }}
 
           # Copy index.js to root directory (required by @electron/packager)
           cp index.js ..
 
           # Build the Electron app
           if [ "${{ matrix.platform }}" = "linux" ]; then
-            npx @electron/packager ../ WebEduMips64 --platform=${{ matrix.platform }} --arch=${{ matrix.arch }} --out ../out
+            npx @electron/packager ../ WebEduMips64 --platform=${{ matrix.platform }} --arch=${{ matrix.arch }} --out dist
           else
-            npx @electron/packager ../ WebEduMips64 --asar --platform=${{ matrix.platform }} --arch=${{ matrix.arch }} --out ../out
+            npx @electron/packager ../ WebEduMips64 --asar --platform=${{ matrix.platform }} --arch=${{ matrix.arch }} --out dist
           fi
 
           rm ../index.js
