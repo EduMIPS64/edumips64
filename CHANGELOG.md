@@ -1,6 +1,6 @@
 # EduMIPS64 ChangeLog
 
-## Unreleased
+## 1.4.0 (03/05/2026) - WalkOfLife
 
 ### Added
 - Electron desktop application for Windows, macOS, and Linux, allowing the
