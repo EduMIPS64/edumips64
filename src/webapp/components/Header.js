@@ -54,12 +54,27 @@ export default function Header(props) {
     }
   };
 
-  // On small viewports the buttons collapse to icon-only (label hidden,
-  // tooltip preserves the text for accessibility). This avoids the
-  // toolbar overflowing on phones / tablets where 9+ full-text buttons
-  // plus status chips can't possibly fit on one row.
+  // On small viewports the buttons collapse to icon-only. Keep the text
+  // visually hidden on `xs` so it still provides an accessible name,
+  // while showing it inline on larger screens. This avoids the toolbar
+  // overflowing on phones / tablets where 9+ full-text buttons plus
+  // status chips can't possibly fit on one row.
   const responsiveLabel = (text) => (
-    <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>
+    <Box
+      component="span"
+      sx={{
+        position: { xs: 'absolute', md: 'static' },
+        width: { xs: 1, md: 'auto' },
+        height: { xs: 1, md: 'auto' },
+        p: 0,
+        m: { xs: -1, md: 0 },
+        overflow: { xs: 'hidden', md: 'visible' },
+        clip: { xs: 'rect(0 0 0 0)', md: 'auto' },
+        whiteSpace: { xs: 'nowrap', md: 'normal' },
+        border: 0,
+        display: 'inline',
+      }}
+    >
       {text}
     </Box>
   );
