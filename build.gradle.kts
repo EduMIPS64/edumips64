@@ -224,8 +224,12 @@ tasks.register("htmlDocs") {
 
 tasks.register<Copy>("copyHelp") {
     from("docs/") {
-        exclude("**/src/**", "**/design/**", "**/*.py",  "**/*.pyc", 
-            "**/*.md", "**/.buildinfo", "**/objects.inv", "**/*.txt", "**/__pycache__/**")
+        exclude("**/src/**", "**/design/**", "**/*.py",  "**/*.pyc",
+            "**/*.md", "**/.buildinfo", "**/objects.inv", "**/*.txt", "**/__pycache__/**",
+            // The MIPS64 ISA reference PDF is large (~5.6 MB) and is not referenced
+            // by JavaHelp or any in-app component; ship it via the project website
+            // instead of embedding it in every JAR.
+            "**/*.pdf")
     }
     into(docsDir)
     copyHelpTaskNames.forEach { dependsOn(it) }
