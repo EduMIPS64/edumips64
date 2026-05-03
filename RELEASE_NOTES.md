@@ -21,6 +21,9 @@ always under the supervision of maintainers.
 Most of the efforts went into making the web UI usable, but some improvements - especially
 in the core - are trickling down to the Swing UI (and CLI!).
 
+For this release, we want to thank Prof. Davide Patti (@davidepatti) from UniCT for his efforts
+to improve the simulator. Thanks, Davide!
+
 ## Highlights
 
 ### More ways to run EduMIPS64
