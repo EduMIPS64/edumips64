@@ -255,6 +255,59 @@ Any user-facing change must be reflected in all three languages
 interface, it should go into the matching `user-interface-<flavor>.rst`
 file only.
 
+### CLI banner and in-shell help browser
+
+The interactive CLI shell (`--headless`) shows a stylised startup
+banner and offers an in-shell user-manual browser. The implementation
+lives in `src/main/java/org/edumips64/utils/cli/`:
+
+- `Banner.java` renders the EduMIPS64 ASCII-art banner (figlet "ANSI
+  Shadow" font, heavy Unicode block characters) with three
+  logo-matching colours — gold "Edu", bright/white "MIPS", red "64" —
+  via picocli's `Help.Ansi.AUTO` markup. The "Edu" segment combines
+  the font's uppercase E with a hand-crafted lowercase d (whose right
+  wall doubles as a tall ascender) and a lowercase u in the same
+  heavy block style, so the rendering matches the mixed-case product
+  name. Each segment is painted with a top-to-bottom three-shade
+  gradient (bold light at the top, mid tone in the middle, deep tone
+  at the bottom), which gives the heavy blocks a soft drop-shadow /
+  3-D effect — the same trick used by the Hermes Agent CLI banner.
+  The banner auto-degrades to a one-line version string when stdout
+  is not a TTY, when `COLUMNS` is below the banner width, when the
+  encoding is not UTF-8, or when the user passes `--no-banner`. The
+  same `Banner.print(...)` is invoked by `Main` for both the Swing
+  and CLI entry points, so launching `java -jar edumips64.jar` from a
+  terminal also shows the banner.
+- `Pager.java` is a tiny dependency-free "more"-style pager used by
+  the help browser. It bypasses paging when `System.console()` is
+  null, so piped/redirected runs stay clean.
+- `HelpCommand.java` is the picocli subcommand backing
+  `help` / `help topics` / `help <topic>`. The list of available
+  topics is read from a hand-maintained index file
+  (`src/main/resources/org/edumips64/help/topics/topics.index`) with
+  three tab-separated columns: `<id> <TAB> <rst-filename> <TAB> <human title>`.
+  The chapter content itself is **not** hand-curated: the Gradle
+  `processResources` task copies `docs/user/en/src/*.rst` verbatim
+  into the JAR under `org/edumips64/help/topics/`, so the chapters
+  served by the shell are always exactly the ones that Sphinx renders
+  for the website and PDF (the build is hermetic; the docs cannot
+  drift apart).
+
+To add a new help topic:
+
+1. Make sure the chapter exists at `docs/user/en/src/<filename>.rst`
+   (it does already if it is part of the manual).
+2. Add a row to `topics.index`:
+   `<id><TAB><filename>.rst<TAB><human title>`.
+3. (Optional) Mention the new topic in the user manual under
+   `cli-interface.rst`.
+
+`BannerTest` verifies that the banner mentions `EduMIPS64` and the
+current `MetaInfo.VERSION`. `HelpTopicsTest` verifies that every entry
+in `topics.index` resolves to a non-empty resource bundled in the JAR
+— if a row references a missing file, this test fails and protects
+the hermetic-build contract.
+
 
 
 We use the [GitHub Flow](http://scottchacon.com/2011/08/31/github-flow.html)

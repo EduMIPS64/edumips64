@@ -19,13 +19,52 @@ shell 仅产生程序输出（例如 ``SYSCALL 5`` 打印的字符串）以及
 
 提示符
 ------
-启动后，shell 会打印一个 ``>`` 提示符并等待命令。命令按行读取，并按空格
-分割成 token。在空行上按回车会重新打印 help。shell 的循环会一直运行，
-直到执行 ``exit`` 命令（或在标准输入上发送 ``Ctrl+D`` / EOF）。
+启动后，shell 会先打印一个风格化的横幅，使用粗重的块状字符显示
+**EduMIPS64** 名称：其中 "Edu" 为金色、"MIPS" 为亮白色、"64" 为红色，
+与项目 logo 的配色一致。每个分段从顶部明亮的色调渐变到底部更深的色调，
+为粗块字符带来柔和的阴影 / 立体感。紧接着显示版本号、代号和构建日期。
+横幅使用 ANSI 颜色和 Unicode 块字符，因此在任何现代终端
+（Linux/macOS、Windows Terminal、Codespaces 等）上都能良好显示。
+当标准输出不是 TTY、 ``COLUMNS`` 太小或编码不是 UTF-8 时，横幅会
+自动回退为纯文本的单行版本字符串，以便脚本和管道保持整洁。如果完全
+不想看到横幅，可在命令行上传入 ``--no-banner`` 选项。
+
+随后 shell 会打印一个彩色提示符，形式如下::
+
+    edumips64 [READY] >
+
+方括号中的文字反映 CPU 的当前状态（ ``READY`` 、 ``RUNNING`` 、
+``HALTED`` 或 ``STOPPING`` ），并相应地变换颜色，可以一眼看出
+模拟器正在做什么。
+
+命令按行读取，并按空格分割成 token。在空行上按回车会重新打印
+help。shell 的循环会一直运行，直到执行 ``exit`` 命令（或在标准
+输入上发送 ``Ctrl+D`` / EOF）。
 
 每个命令都接受 ``-h`` / ``--help``\ ，以打印其专属的用法说明。顶层命令
 ``help`` 列出所有可用命令以及简短描述；这是发现 shell 功能的最简单
 方式。
+
+在 shell 中浏览用户手册
+------------------------
+shell 将本用户手册的章节内置在 JAR 中，因此可以直接在终端里阅读
+它们，而无需离开 EduMIPS64。输入 ``help topics`` 查看主题列表，
+然后用 ``help <主题>`` 阅读具体章节，例如::
+
+    edumips64 [READY] > help topics
+    edumips64 [READY] > help cli
+    edumips64 [READY] > help instructions
+
+``help`` 命令所提供的章节，正是用于构建网站和 PDF 的同一组
+reStructuredText 源文件（ ``cli-interface.rst`` 、
+``source-files-format.rst`` 、 ``instructions.rst`` 、
+``examples.rst`` 、 ``fpu.rst`` 等等），构建过程会原样地把它们
+复制进 JAR。较长的章节会通过一个内置的 "more" 风格分页器展示：
+按 ``Enter`` / ``空格`` 翻页，按 ``q`` 退出。当标准输入不是 TTY
+时，分页器会被跳过，整章一次性全部输出。
+
+.. note::
+   ``help`` 所服务的章节源文件目前只有英文版。
 
 可用命令
 --------

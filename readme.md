@@ -8,9 +8,14 @@
 [![Join the chat at https://gitter.im/lupino3/edumips64](https://badges.gitter.im/lupino3/edumips64.svg)](https://gitter.im/lupino3/edumips64?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Stack Exchange questions](https://img.shields.io/stackexchange/stackoverflow/t/edumips64)](https://stackoverflow.com/questions/tagged/edumips64)
 
-EduMIPS64 is a free cross-platform visual MIPS64 CPU simulator written in Java.
+EduMIPS64 is a free cross-platform visual MIPS64 CPU simulator written in Java. 
 
-![Screenshot](http://www.edumips.org/edumips64-1.2.2-screenshot.png)
+It runs both as a stand-alone Java Swing application and as a React-based web Single-Page Application (deployed at https://web.edumips.org). 
+
+![Swing UI Screenshot](http://www.edumips.org/edumips64-1.3.0.png)
+![Web UI Screenshot](http://www.edumips.org/screenshot-web.png)
+
+⚡ The web UI is also bundled as an Electron package for all major platforms.
 
 🌐The EduMIPS64 web site is http://www.edumips.org. There is also a
 developers' blog at http://edumips64.blogspot.com.
@@ -30,10 +35,6 @@ For the italian version, click the selector at the bottom-right corner and choos
 By participating, you are expected to uphold this code. Please report unacceptable behavior to andrea.spadaccini@gmail.com.
 
 ⌨️ To contribute to EduMIPS64, please start by reading the [developer guide](docs/developer-guide.md).
-
-🧪 The proof-of-concept JS web application (GWT compilation + JS UI) is available at https://web.edumips.org.
-
-💬 Find us on IRC @ Libera.chat - #edumips64. Web client: https://web.libera.chat/
 
 ## Known distribution packages
 

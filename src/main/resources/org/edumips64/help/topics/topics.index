@@ -1,0 +1,19 @@
+# EduMIPS64 help topics index.
+#
+# This file is the single hand-maintained metadata for the in-shell help
+# browser (`help topics`, `help <topic>`). The topic content itself is
+# the actual reStructuredText source of the user manual, copied into
+# the JAR by the Gradle `processResources` task; the build is hermetic
+# and the docs never drift from the chapters they ship.
+#
+# Format: <topic-id><TAB><rst-filename><TAB><human title>
+# Lines starting with '#' or empty lines are ignored.
+overview	index.rst	EduMIPS64 user manual - landing page
+cli	cli-interface.rst	The interactive command-line shell
+syntax	source-files-format.rst	Source-file format and assembler syntax
+instructions	instructions.rst	The supported MIPS64 instruction set
+fpu	fpu.rst	Floating-point unit support
+examples	examples.rst	Code examples
+swing	user-interface-swing.rst	The Swing desktop user interface
+web	user-interface-web.rst	The web user interface
+

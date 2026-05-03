@@ -27,6 +27,9 @@ public class Args implements Runnable {
     @Option(names = {"-v", "--verbose"}, descriptionKey = "verbose", defaultValue = "false")
     private boolean verbose;
 
+    @Option(names = {"--no-banner"}, descriptionKey = "noBanner", defaultValue = "false")
+    private boolean noBanner;
+
     public String getFileName() {
         return this.fileName;
     }
@@ -42,6 +45,8 @@ public class Args implements Runnable {
     public boolean isHeadless() { return headless; }
 
     public boolean isVerbose() { return verbose; }
+
+    public boolean isNoBanner() { return noBanner; }
 
     @Override
     public void run() {
