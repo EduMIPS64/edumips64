@@ -232,7 +232,7 @@ function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }) {
     return (
       <Box
         sx={{
-          width: 280,
+          width: { xs: '100%', sm: 280 },
           height: '100%',
           display: 'flex',
           alignItems: 'center',
@@ -246,7 +246,7 @@ function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }) {
 
   if (error) {
     return (
-      <Box sx={{ width: 280, height: '100%', p: 2 }}>
+      <Box sx={{ width: { xs: '100%', sm: 280 }, height: '100%', p: 2 }}>
         <Typography color="error" variant="body2">
           Failed to load navigation: {error}
         </Typography>
@@ -257,7 +257,7 @@ function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }) {
   return (
     <Box
       sx={{
-        width: 280,
+        width: { xs: '100%', sm: 280 },
         height: '100%',
         overflowY: 'auto',
         overflowX: 'hidden',
@@ -460,7 +460,15 @@ export default function HelpDialog(props) {
       fullWidth
       PaperProps={{
         sx: {
-          height: '90vh',
+          // On phones / small tablets give the dialog the whole screen
+          // (margins waste already-scarce space); on larger screens
+          // keep the previous "almost full height" appearance.
+          height: { xs: '100vh', sm: '90vh' },
+          m: { xs: 0, sm: 4 },
+          maxHeight: { xs: '100vh', sm: 'calc(100% - 64px)' },
+          width: { xs: '100vw', sm: 'auto' },
+          maxWidth: { xs: '100vw', sm: 'calc(100% - 64px)' },
+          borderRadius: { xs: 0, sm: 1 },
         },
       }}
     >
@@ -480,15 +488,30 @@ export default function HelpDialog(props) {
         sx={{ p: 0, display: 'flex', flexGrow: 1, overflow: 'hidden' }}
       >
         <TabPanel value={tabValue} index={0}>
-          <Box sx={{ display: 'flex', height: '100%', width: '100%' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              // On narrow viewports stack the navigation drawer above
+              // the iframe instead of side-by-side, so the manual
+              // content gets the full width of the dialog.
+              flexDirection: { xs: 'column', sm: 'row' },
+              height: '100%',
+              width: '100%',
+            }}
+          >
             {/* Navigation Drawer */}
             <Box
               sx={{
-                width: 280,
-                minWidth: 280,
-                maxWidth: 280,
+                width: { xs: '100%', sm: 280 },
+                minWidth: { xs: '100%', sm: 280 },
+                maxWidth: { xs: '100%', sm: 280 },
+                // Constrain the drawer height when stacked on top of
+                // the iframe so the manual content stays visible.
+                height: { xs: 'auto', sm: '100%' },
+                maxHeight: { xs: '40%', sm: 'none' },
                 flexShrink: 0,
-                borderRight: 1,
+                borderRight: { xs: 0, sm: 1 },
+                borderBottom: { xs: 1, sm: 0 },
                 borderColor: 'divider',
                 bgcolor: 'background.paper',
                 overflow: 'hidden',
@@ -496,7 +519,13 @@ export default function HelpDialog(props) {
                 flexDirection: 'column',
               }}
             >
-              <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+              <Box
+                sx={{
+                  p: { xs: 1, sm: 2 },
+                  borderBottom: 1,
+                  borderColor: 'divider',
+                }}
+              >
                 <FormControl size="small" fullWidth>
                   <InputLabel id="language-select-label">Language</InputLabel>
                   <Select
@@ -522,7 +551,7 @@ export default function HelpDialog(props) {
             </Box>
 
             {/* Content Area */}
-            <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
+            <Box sx={{ flexGrow: 1, overflow: 'hidden', minHeight: 0 }}>
               <iframe
                 ref={iframeRef}
                 src={`docs/${language}/html/${currentPage}`}

@@ -21,7 +21,11 @@ import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import { styled } from '@mui/material/styles';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import {
+  createTheme,
+  responsiveFontSizes,
+  ThemeProvider,
+} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -524,16 +528,18 @@ const Simulator = ({worker, initialState, appInsights}) => {
         : prefersDarkMode
           ? 'dark'
           : 'light';
-
-  const theme = React.useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode: paletteMode,
-        },
-      }),
-    [paletteMode],
-  );
+  // `responsiveFontSizes` rescales the MUI typography variants
+  // (h1..h6, body etc.) so that text shrinks gracefully on phones
+  // and tablets. Without it MUI sticks to its desktop-tuned sizes,
+  // which look excessively large on devices like the iPad Pro.
+  const theme = React.useMemo(() => {
+    const base = createTheme({
+      palette: {
+        mode: paletteMode,
+      },
+    });
+    return responsiveFontSizes(base);
+  }, [paletteMode]);
 
   return (
     <>
@@ -568,7 +574,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
           multiStepCount={stepStride}
         />
         <Grid container id="main-grid" disableEqualOverflow spacing={0}>
-          <Grid id="left-panel" size={8}>
+          <Grid id="left-panel" size={{ xs: 12, md: 8 }}>
             <Code
               onChangeValue={onCodeChange}
               code={code}
@@ -583,7 +589,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               onEditorReady={handleEditorReady}
             />
           </Grid>
-          <Grid size={4} id="right-panel" disableEqualOverflow>
+          <Grid size={{ xs: 12, md: 4 }} id="right-panel" disableEqualOverflow>
             <ErrorList
               parsingErrors={parsingErrors}
               AccordionSummary={AccordionSummary}

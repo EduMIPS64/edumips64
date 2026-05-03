@@ -170,8 +170,51 @@ div.error-list-item {
 div.error-accordion {
   position: sticky;
   top: 0;
-  z-index: 10000;
+  /* Keep the sticky Issues accordion above sibling accordions in the
+     right panel, but well below MUI overlays such as the Help dialog
+     (default modal z-index = 1300) and tooltips/popovers. The previous
+     value (10000) leaked through every overlay because sticky + z-index
+     creates a stacking context that outranks MUI portals. */
+  z-index: 2;
   border-bottom: 1px solid rgb(33, 150, 243);
+}
+
+/* ---------- Responsive layout (tablets and phones) ----------
+   Below ~900px the desktop-style two-column layout is too cramped:
+   the right-panel widgets (Registers/Memory) have no horizontal room
+   and the editor becomes unreadable. Stack the panels vertically and
+   let the page scroll naturally. */
+@media (max-width: 900px) {
+  body {
+    /* The desktop layout pins the page to the viewport (no scroll) so
+       Monaco can fill the left pane. On small viewports the panels are
+       stacked, so allow the document to scroll. */
+    max-height: none;
+    overflow: auto;
+  }
+
+  #main-grid {
+    /* Let the natural document flow govern the height; don't try to
+       fit the whole simulator in a single viewport. */
+    height: auto;
+    overflow: visible;
+  }
+
+  #left-panel {
+    /* Give the editor a usable, but bounded, height so the right
+       panel is reachable by scrolling. */
+    height: 60vh;
+    min-height: 320px;
+    resize: none;
+  }
+
+  #right-panel {
+    height: auto;
+    overflow: visible;
+    /* The right panel now sits *under* the editor, not next to it. */
+    border-left: none;
+    border-top: 1px solid rgb(33, 150, 243);
+  }
 }
 
 /* Dark Mode Specific Styles */
@@ -183,7 +226,13 @@ div.error-accordion {
   div.error-accordion{
     border-bottom-color: rgba(255, 255, 255, 0.188);
   }
-  
+
+  @media (max-width: 900px) {
+    #right-panel {
+      border-top-color: rgba(255, 255, 255, 0.188);
+    }
+  }
+
   textarea {
     background: transparent;
     color: white;
