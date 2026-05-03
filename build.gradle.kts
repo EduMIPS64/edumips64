@@ -101,6 +101,18 @@ tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
 }
 
+// Bundle the English user-manual reStructuredText sources as JAR resources
+// so the in-shell `help <topic>` browser can display them. Shipping the rst
+// files verbatim (rather than hand-curated summaries) keeps the build
+// hermetic: the chapters the CLI shows are exactly the chapters that
+// Sphinx renders for the website / PDF, and they cannot drift apart.
+tasks.processResources {
+    from("docs/user/en/src") {
+        include("*.rst")
+        into("org/edumips64/help/topics")
+    }
+}
+
 /* 
  * Documentation tasks. To avoid dependency on GNU Make, these tasks duplicate the commands run by the Sphinx makefiles.
  *

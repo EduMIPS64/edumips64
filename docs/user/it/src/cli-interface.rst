@@ -25,8 +25,31 @@ inserito in pipeline con altri strumenti.
 
 Il prompt
 ---------
-All'avvio la shell stampa un prompt ``>`` ed attende un comando. I
-comandi sono letti una riga per volta e suddivisi in token in
+All'avvio la shell stampa un banner stilizzato con il nome
+**EduMIPS64** disegnato in caratteri a blocchi pesanti: "Edu" è in
+oro, "MIPS" in bianco brillante e "64" in rosso, riprendendo i colori
+del logo del progetto. Ciascun segmento sfuma da un tono brillante in
+alto a un tono più scuro in basso, ottenendo un effetto di ombra /
+tridimensionalità sui caratteri. Subito sotto compaiono la versione,
+il codename e la data di build. Il banner usa colori ANSI e caratteri
+Unicode di tipo "block", e si vede al meglio su un terminale moderno
+(Linux/macOS, Windows Terminal, Codespaces, …). Quando lo standard
+output non è un TTY, quando ``COLUMNS`` è troppo piccolo o la
+codifica non è UTF-8, il banner ricade automaticamente su una
+semplice riga con la versione, così che script e pipeline restino
+puliti. Per disabilitare del tutto il banner si può passare l'opzione
+``--no-banner`` sulla riga di comando.
+
+Dopo il banner, la shell stampa un prompt colorato della forma::
+
+    edumips64 [READY] >
+
+Il testo tra parentesi quadre riflette lo stato corrente della CPU
+(``READY``, ``RUNNING``, ``HALTED`` o ``STOPPING``) e cambia colore di
+conseguenza, dando un'indicazione a colpo d'occhio di cosa sta facendo
+il simulatore.
+
+I comandi sono letti una riga per volta e suddivisi in token in
 corrispondenza degli spazi. Premendo Invio su una riga vuota viene
 ristampato l'help. Il loop della shell continua fino al comando
 ``exit`` (o fino a ``Ctrl+D`` / EOF su standard input).
@@ -35,6 +58,30 @@ Ogni comando accetta ``-h`` / ``--help``, che ne stampa l'uso
 specifico. Il comando di livello superiore ``help`` elenca tutti i
 comandi disponibili con una breve descrizione; è il modo più semplice
 per scoprire cosa la shell può fare.
+
+Sfogliare il manuale utente dalla shell
+---------------------------------------
+La shell include i capitoli di questo manuale utente direttamente nel
+JAR, in modo che li si possa leggere dal terminale senza uscire da
+EduMIPS64. Si digiti ``help topics`` per vederne la lista, e poi
+``help <argomento>`` per leggere un capitolo, per esempio::
+
+    edumips64 [READY] > help topics
+    edumips64 [READY] > help cli
+    edumips64 [READY] > help instructions
+
+I capitoli serviti da ``help`` sono gli stessi sorgenti
+reStructuredText usati per generare il sito web e il PDF
+(``cli-interface.rst``, ``source-files-format.rst``,
+``instructions.rst``, ``examples.rst``, ``fpu.rst``, …), copiati
+letteralmente nel JAR dalla build. I capitoli lunghi vengono mostrati
+attraverso un semplice pager in stile "more": ``Invio`` / ``spazio``
+per avanzare, ``q`` per uscire. Quando lo standard input non è un TTY
+il pager viene bypassato e il capitolo viene stampato per intero.
+
+.. note::
+   I sorgenti dei capitoli serviti da ``help`` sono al momento
+   disponibili solo in inglese.
 
 Comandi disponibili
 -------------------

@@ -12,17 +12,14 @@ import org.edumips64.utils.io.StdOutWriter;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-
 @Command(name="", resourceBundle = "CliMessages", subcommands = {
         StepCommand.class,
         RunCommand.class,
         LoadCommand.class,
         ShowCommand.class,
         DineroCommand.class,
-        ConfigCommand.class
+        ConfigCommand.class,
+        HelpCommand.class
 })
 public class Cli implements Runnable {
 
@@ -44,14 +41,6 @@ public class Cli implements Runnable {
         this.configStore = cfg;
         this.verbose = verbose;
         reset();
-    }
-
-    @Command(name = "help")
-    void help() {
-        // Use an explicit UTF-8 PrintWriter so localized (e.g. Chinese) usage
-        // text isn't mangled on systems where Charset.defaultCharset() isn't UTF-8.
-        PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8), true);
-        new CommandLine(this).usage(pw);
     }
 
     @Command(name = "reset")
