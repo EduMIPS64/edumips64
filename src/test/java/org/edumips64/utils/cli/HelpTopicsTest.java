@@ -31,10 +31,11 @@ public class HelpTopicsTest {
       String path = HelpCommand.TOPIC_RESOURCE_PREFIX + t.resource;
       try (InputStream in = HelpCommand.class.getResourceAsStream(path)) {
         assertNotNull("missing resource for topic '" + t.id + "': " + path, in);
-        BufferedReader br = new BufferedReader(
-            new InputStreamReader(in, StandardCharsets.UTF_8));
-        String first = br.readLine();
-        assertNotNull("empty resource for topic '" + t.id + "'", first);
+        try (BufferedReader br = new BufferedReader(
+            new InputStreamReader(in, StandardCharsets.UTF_8))) {
+          String first = br.readLine();
+          assertNotNull("empty resource for topic '" + t.id + "'", first);
+        }
       }
     }
   }
