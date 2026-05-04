@@ -44,12 +44,10 @@ jobs:
   build-desktop:
     permissions:
       contents: read
+      pull-requests: write
     uses: ./.github/workflows/build-desktop.yml
     with:
       ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      upload_codecov: true
-    secrets:
-      codecov_token: ${{ secrets.CODECOV_TOKEN }}
 
   build-web:
     permissions:
@@ -59,13 +57,15 @@ jobs:
       ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
   # Run web UI Playwright tests locally with Istanbul coverage instrumentation
-  # and upload the lcov report to Codecov.
+  # and publish the lcov report directly to the PR (comment + step summary).
+  # No third-party SaaS is involved; everything stays on github.com.
   test-web-coverage:
-    name: Web UI coverage (Playwright + Codecov)
+    name: Web UI coverage (Playwright)
     runs-on: ubuntu-latest
     needs: build-web
     permissions:
       contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v6
         with:
@@ -136,24 +136,40 @@ jobs:
           if-no-files-found: ignore
 
       # Merge per-test coverage JSON files and produce an lcov report.
-      # Run regardless of test outcome: even with some failing tests we want to
-      # publish whatever coverage was collected, so the Codecov check reflects
-      # reality instead of "no upload" → "coverage dropped to 0".
+      # Run regardless of test outcome: even with some failing tests we want
+      # to publish whatever coverage was collected, so the in-PR report
+      # reflects reality instead of vanishing on a flaky test.
       - name: Generate lcov coverage report
         if: always()
-        run: npx nyc report --reporter=lcov --reporter=text || true
+        run: |
+          mkdir -p coverage
+          npx nyc report --reporter=lcov --reporter=text-summary > coverage/summary.txt || true
 
-      - name: Upload web UI coverage to Codecov
-        if: always()
-        uses: codecov/codecov-action@v6.0.0
+      # Append the textual nyc summary to the GitHub Actions run summary so
+      # totals are visible directly on the run page, with no external service.
+      - name: Publish coverage summary to job summary
+        if: always() && hashFiles('coverage/summary.txt') != ''
+        run: |
+          {
+            echo "## Web UI code coverage"
+            echo
+            echo '```'
+            cat coverage/summary.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Post (or update) a sticky comment on the pull request with a per-file
+      # breakdown of the lcov report. A transient failure here must not turn
+      # the job red on top of whatever the test outcome was.
+      - name: Report web UI coverage on PR
+        if: always() && github.event_name == 'pull_request_target' && hashFiles('coverage/lcov.info') != ''
+        continue-on-error: true
+        uses: romeovs/lcov-reporter-action@v0.4.0
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage/lcov.info
-          flags: web
-          name: web-ui-coverage
-          # A transient Codecov upload error must not turn this job red on top
-          # of whatever the actual test outcome was.
-          fail_ci_if_error: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: coverage/lcov.info
+          title: Web UI code coverage
+          delete-old-comments: true
 
   deploy-staging:
     name: Deploy web application to staging environment

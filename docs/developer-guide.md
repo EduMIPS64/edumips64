@@ -178,8 +178,9 @@ configuration.
 
 #### Web UI code coverage
 
-The web UI tests can generate Istanbul code coverage data. This is used to upload
-coverage metrics to [codecov.io](https://codecov.io) under the `web` flag.
+The web UI tests can generate Istanbul code coverage data. CI publishes this
+report directly on each pull request (as a sticky comment and on the GitHub
+Actions run summary) — no third-party coverage service is involved.
 
 To run tests with coverage locally:
 
@@ -200,8 +201,13 @@ To run tests with coverage locally:
 The coverage report is written to `coverage/lcov.info` (and `coverage/index.html` for the
 HTML report). Both `.nyc_output/` and `coverage/` are excluded from version control.
 
-In CI, the `test-web-coverage` job in `ci.yml` performs these steps automatically and
-uploads the result to Codecov using the `CODECOV_TOKEN` secret.
+In CI, the `test-web-coverage` job in `ci.yml` performs these steps automatically.
+It then writes a textual `nyc` summary to the Actions run summary and posts a
+per-file lcov report as a comment on the originating pull request using
+[`romeovs/lcov-reporter-action`](https://github.com/romeovs/lcov-reporter-action).
+The Java side is reported the same way: the `build-desktop` job uses
+[`madrapps/jacoco-report`](https://github.com/madrapps/jacoco-report) to publish
+the JaCoCo XML produced by `./gradlew check` as a PR comment.
 
 ### Source code structure
 
