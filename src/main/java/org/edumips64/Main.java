@@ -72,6 +72,9 @@ import javax.swing.*;
 import javax.swing.event.*;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import com.formdev.flatlaf.util.SystemInfo;
 
 /** Entry point of EduMIPS64
  * @author Andrea Spadaccini, Antonella Scandura, Vanni Rizzo
@@ -148,6 +151,21 @@ public class Main {
     System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8));
     System.setErr(new PrintStream(System.err, true, StandardCharsets.UTF_8));
 
+    // macOS-specific system properties. These must be set before any AWT/Swing
+    // class is loaded so that the native macOS integration is properly enabled.
+    // See: https://www.formdev.com/flatlaf/macos/
+    if (SystemInfo.isMacOS) {
+      // Use the screen menu bar (the global menu bar at the top of the screen)
+      // instead of placing the menu inside the window.
+      System.setProperty("apple.laf.useScreenMenuBar", "true");
+      // Application name shown in the screen menu bar.
+      System.setProperty("apple.awt.application.name", "EduMIPS64");
+      // Make the system appearance (light/dark) match the OS, so that native
+      // window decorations (title bar, traffic-light buttons) follow the user
+      // preferences.
+      System.setProperty("apple.awt.application.appearance", "system");
+    }
+
     Main mm = new Main();
     Args cliArgs = new Args();
     CommandLine commandLine = new CommandLine(cliArgs);
@@ -187,11 +205,14 @@ public class Main {
     // Use a more modern look and feel.
     // Note that if the JAR is not available to the class loader then the whole application will not start,
     // we won't be able to recover.
+    // On macOS, use the macOS-flavored FlatLaf themes so that controls match
+    // the platform conventions (see https://www.formdev.com/flatlaf/macos/).
     try {
-      if(mm.configStore.getBoolean(ConfigKey.UI_DARK_THEME)){
-        UIManager.setLookAndFeel( new FlatDarkLaf() );
-      } else{
-        UIManager.setLookAndFeel( new FlatLightLaf() );
+      boolean dark = mm.configStore.getBoolean(ConfigKey.UI_DARK_THEME);
+      if (SystemInfo.isMacOS) {
+        UIManager.setLookAndFeel(dark ? new FlatMacDarkLaf() : new FlatMacLightLaf());
+      } else {
+        UIManager.setLookAndFeel(dark ? new FlatDarkLaf() : new FlatLightLaf());
       }
     } catch( Exception ex ) {
       log.log(Level.SEVERE, "Could not initialize FlatLaF Swing look & feel. Reverting to Swing default.");
@@ -202,9 +223,14 @@ public class Main {
     SplashScreen s = new SplashScreen();
     s.showSplash();
 
-    // Creating the main JFrame
-    JFrame.setDefaultLookAndFeelDecorated(true);
-    JDialog.setDefaultLookAndFeelDecorated(true);
+    // Creating the main JFrame.
+    // On macOS, keep the standard native window decorations (with the
+    // traffic-light buttons in the proper position). On other platforms, use
+    // the FlatLaf-decorated window for a more modern look.
+    if (!SystemInfo.isMacOS) {
+      JFrame.setDefaultLookAndFeelDecorated(true);
+      JDialog.setDefaultLookAndFeelDecorated(true);
+    }
     mm.mainFrame = new JFrame();
     mm.mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     // Maximizing the application
@@ -295,8 +321,10 @@ public class Main {
   }
 
   public void init() {
-    JFrame.setDefaultLookAndFeelDecorated(true);
-    JDialog.setDefaultLookAndFeelDecorated(true);
+    if (!SystemInfo.isMacOS) {
+      JFrame.setDefaultLookAndFeelDecorated(true);
+      JDialog.setDefaultLookAndFeelDecorated(true);
+    }
     LocalFileUtils lfu = new LocalFileUtils();
 
     jfc = new JFileChooser(new File(configStore.getString(ConfigKey.LAST_DIR)));
