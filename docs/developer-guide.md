@@ -413,8 +413,17 @@ Before triggering a release:
 - Update `RELEASE_NOTES.md` with notes for the new version
 - Update the version in `snapcraft.yaml`
 - Merge all changes to `master`
+- **Smoke-test the release artifacts produced by the automatic `release.yml`
+  run for the merge commit to `master` _before_ triggering the manual run.**
+  The same workflow runs on every push to `master` (without `create_release`),
+  so the JAR, MSI, Electron apps and PDF manuals for the exact commit you are
+  about to release are already available as workflow-run artifacts. Download
+  them from the most recent automatic `Release` run on `master`, run through
+  the verification checklist below, and only kick off the manual release once
+  the artifacts pass. This avoids cutting a tag for a broken build.
 
-After the automated release completes, manually verify:
+After the automated release completes (or against the artifacts of the
+automatic pre-release run on `master`, see above), manually verify:
 
 - JAR and MSI:
   - verify that the splash screen works
@@ -424,9 +433,12 @@ After the automated release completes, manually verify:
   - open the help
   - close the application
 - JAR-only: verify the JAR size (should be < 3 MB)
+- Electron apps (Linux / macOS / Windows): launch each one, confirm the web UI
+  loads (no `Cannot GET /` from the embedded express server) and run a sample program
 - PDF:
   - open the English manual and check the version
   - open the Italian manual and check the version
+  - open the Chinese manual and check the version
 
 Trigger builds on snapcraft.
 
