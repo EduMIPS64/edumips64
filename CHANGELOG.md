@@ -1,6 +1,6 @@
 # EduMIPS64 ChangeLog
 
-## Unreleased
+## 1.4.0 (03/05/2026) - WalkOfLife
 
 ### Added
 - Electron desktop application for Windows, macOS, and Linux, allowing the
@@ -18,8 +18,25 @@
 - CLI: quiet mode is now the default, preventing simulator messages from mixing
   with program output; use `--verbose` to restore the previous behaviour.
   (Issue #1181)
+- CLI: stylised ANSI-art banner (also shown when launching the Swing UI from a
+  terminal), a colorised prompt that surfaces the CPU status, friendlier error
+  messages, and a new in-shell `help` / `help topics` / `help <topic>` browser
+  that pages through user-manual chapters bundled in the JAR. The banner can be
+  suppressed with `--no-banner`. (PR #1737)
 - "Reset to defaults" button in the Settings dialog of the desktop (Swing) UI
   to restore all preferences to their default values. (Issue #803)
+- Parser: hexadecimal (`0x...`) and binary (`0b...`) literals are now accepted
+  consistently across the assembly language, in addition to decimal. (PR #1670)
+- Parser: label arithmetic offsets (e.g. `LD R1, label+8(R0)`, `label-N`) on
+  memory-access instructions. (PR #1673)
+- Synchronous exceptions (division by zero, integer overflow, FP
+  overflow/underflow/invalid-operation/divide-by-zero) now report the faulting
+  instruction and the pipeline stage where the fault occurred. (PR #1671)
+- End-to-end test coverage for every remaining MIPS64 instruction; CI now
+  enforces that no supported instruction lacks a regression test. (PR #1660)
+- Documentation: user manual is now split into UI-independent (core /
+  architecture) and UI-specific (Swing / Web) chapters, so each flavour ships
+  only the pages that apply to it. (PR #1688)
 
 ### Fixed
 - Parser now supports multiple adjacent labels pointing to the same address,
@@ -28,6 +45,7 @@
   include loops instead of crashing. (Issue #610)
 - Parser now provides a proper error message when instructions have missing
   parameters instead of throwing an exception. (Issue #1048)
+- Parser: more descriptive error messages in common failure cases. (PR #1662)
 - CLI: loading a program that has parser warnings (e.g., deprecated
   instructions) no longer fails.
 - Hexadecimal values in `.data` section are now properly validated according to
@@ -35,11 +53,41 @@
   (@davidepatti)
 - Hexadecimal immediates now support the full 16-bit range in instructions.
   (@davidepatti)
+- CPU forwarding: branches now correctly stall 1 cycle on an ALU→branch hazard
+  and 2 cycles on an LD→branch hazard when forwarding is enabled. The
+  EX→ID and MEM→ID forwarding paths, which do not exist in the MIPS pipeline,
+  are no longer falsely modelled. (Issue #702)
+- `MOVF.D` / `MOVT.D` no longer leak the destination register's write
+  semaphore, which previously caused any later reader to stall forever with
+  forwarding enabled. (PR #1660)
+- Pipeline: stage setters now enforce a no-overwrite precondition, catching
+  inconsistencies in instruction movement across the pipeline at simulation
+  time instead of producing silently wrong results. (PR #1661)
+- Core: R2's ABI alias is now correctly `v0` (it was previously `v1`,
+  duplicating R3's alias). The fix is visible in the Swing register panel.
+  (Issue #1693)
 - Desktop UI: Cycles window now always shows the first instruction correctly.
   (Issue #875)
+- Desktop UI: in-app help can now be loaded when the JAR path contains spaces
+  (e.g. `C:\Users\foo\JAR (1)\edumips64-1.3.0.jar`). (PR #1689)
+- Documentation: corrected a number of errors in the user help across English,
+  Italian and Chinese (`O_TRUNC` value, `CVT.W.D` integer domain, `BC1T`
+  narrative, `IEEE 753` → `754`, `LDC1` missing `ft`, byte layout, SYSCALL 4
+  file-descriptor range, etc.); restored the deprecation / misnomer warnings
+  that had been stripped, and added a note clarifying that the `U` suffix on
+  ALU instructions does not mean "unsigned". (PR #1690)
+- Documentation: fixed broken image references in the FPU chapter. (PR #1672)
 - Documentation: fixed typo in `LWU` instruction description. (@AptInit)
 
 ### Changed
+- Removed leftover Italian text (comments, identifiers, example assembly
+  programs) from the Java source code and `contrib/examples/`. (PR #1666)
+- Code-quality cleanups in the Swing UI: intentional reference-identity
+  comparisons are now explicitly annotated, and static-mutable fields are
+  scoped to instances or proper constants. As a side effect, building a second
+  `GUITheme` no longer silently flips dark mode on the already-existing
+  instance. (Issues #1715, #1716; PRs #1718, #1719)
+- Build: updated to Gradle 9.5.0. (PR #1721)
 - Updated various dependencies for security and compatibility improvements.
 
 ## 1.3.0 (16/10/2023) - Lourdes

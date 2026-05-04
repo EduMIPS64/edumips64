@@ -133,8 +133,12 @@ public class Main {
     CurrentLocale.setConfig(this.configStore);
   }
 
-  private static void showVersion() {
-    System.out.println(Version.versionInfo);
+  private static void showVersion(Args cliArgs) {
+    if (cliArgs != null && cliArgs.isNoBanner()) {
+      org.edumips64.utils.cli.Banner.printCompact(System.out);
+    } else {
+      org.edumips64.utils.cli.Banner.print(System.out);
+    }
   }
 
   public static void main(String args[]) {
@@ -163,13 +167,13 @@ public class Main {
     System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tm%1$td %1$tH:%1$tM:%1$tS %4$s %2$s %5$s%6$s%n");
 
     if (cliArgs.isHeadless()) {
-      // Only show version in verbose mode for CLI
-      if (cliArgs.isVerbose()) {
-        Main.showVersion();
+      // Always print the banner unless explicitly suppressed for scripting.
+      if (!cliArgs.isNoBanner()) {
+        Main.showVersion(cliArgs);
       }
       startCli(mm.configStore, cliArgs);
     } else {
-      Main.showVersion();
+      Main.showVersion(cliArgs);
       checkAndStartGui(mm, cliArgs);
     }
   }

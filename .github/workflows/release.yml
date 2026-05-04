@@ -246,6 +246,7 @@ jobs:
           # PDF manuals
           cp "release-artifacts/English manual (PDF)/EduMIPS64.pdf" staged/EduMIPS64-manual-en.pdf
           cp "release-artifacts/Italian manual (PDF)/EduMIPS64.pdf" staged/EduMIPS64-manual-it.pdf
+          cp "release-artifacts/Chinese manual (PDF)/EduMIPS64.pdf" staged/EduMIPS64-manual-zh.pdf
 
           # MSI
           cp release-artifacts/MSI/EduMIPS64-*.msi staged/

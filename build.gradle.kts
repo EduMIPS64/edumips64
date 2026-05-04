@@ -69,7 +69,7 @@ python {
     }
     scope = VIRTUALENV
     requirements.file = "docs/requirements.txt"
-    minPythonVersion = "3.14"
+    minPythonVersion = "3.12"
 }
 
 application {
@@ -99,6 +99,18 @@ sourceSets {
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
+}
+
+// Bundle the English user-manual reStructuredText sources as JAR resources
+// so the in-shell `help <topic>` browser can display them. Shipping the rst
+// files verbatim (rather than hand-curated summaries) keeps the build
+// hermetic: the chapters the CLI shows are exactly the chapters that
+// Sphinx renders for the website / PDF, and they cannot drift apart.
+tasks.processResources {
+    from("docs/user/en/src") {
+        include("*.rst")
+        into("org/edumips64/help/topics")
+    }
 }
 
 /* 
@@ -212,8 +224,12 @@ tasks.register("htmlDocs") {
 
 tasks.register<Copy>("copyHelp") {
     from("docs/") {
-        exclude("**/src/**", "**/design/**", "**/*.py",  "**/*.pyc", 
-            "**/*.md", "**/.buildinfo", "**/objects.inv", "**/*.txt", "**/__pycache__/**")
+        exclude("**/src/**", "**/design/**", "**/*.py",  "**/*.pyc",
+            "**/*.md", "**/.buildinfo", "**/objects.inv", "**/*.txt", "**/__pycache__/**",
+            // The MIPS64 ISA reference PDF is large (~5.6 MB) and is not referenced
+            // by JavaHelp or any in-app component; ship it via the project website
+            // instead of embedding it in every JAR.
+            "**/*.pdf")
     }
     into(docsDir)
     copyHelpTaskNames.forEach { dependsOn(it) }

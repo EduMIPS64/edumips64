@@ -34,11 +34,11 @@ jobs:
           distribution: 'microsoft'
           cache: 'gradle'
 
-      - name: Set up Python 3.14
+      - name: Set up Python 3.12
         id: setup-python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.12'
 
       - name: Configure Python path for Gradle
         run: |

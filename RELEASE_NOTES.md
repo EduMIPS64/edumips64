@@ -1,78 +1,82 @@
-# EduMIPS64 version 1.3.0
+# EduMIPS64 version 1.4.0
 
-*16th of October, 2023*
+*3rd of May, 2026*
 
 EduMIPS64 is a GPL MIPS64 Instruction Set Architecture (ISA) simulator and graphical debugger.
 
 ## Notes for this release
 
-This is version 1.3.0 of EduMIPS64. Its codename is **Lourdes**, as the release is being
-published from the french city of Lourdes, home to the Sanctuaire Notre-Dame de Lourdes.
+This is version 1.4.0 of EduMIPS64. Its codename is **WalkOfLife**, as the release is being
+published on the same day as the 2026 Telethon Walk of Life in Catania, Italy.
 
-Many complex conflicts are currently plaguing our world. We wish for reason and human
-kindness to prevail over reasoning that can only lead to destruction and death, and for
-those conflicts to end peacefully as soon as possible. 
+Scientific research is the only hope for millions of people affected by rare genetic diseases.
+Fondazione telethon (www.telethon.it) is a beacon of hope for them, as they raise funds
+for targeted research projects.
 
-This release contains some small improvements, a whole new translation for the simulator
-and its documentation and a breaking change.
+Since 1.3.0 was released, the programming world was shaken by the advent of generative AI,
+LLMs, coding agents and so on. The EduMIPS64 dev team embraced those technologies, and 
+many of the improvements between 1.3.0 and 1.4.0 have been AI-assisted or entirely AI-authored,
+always under the supervision of maintainers.
 
-Let's start from the last one.
+Most of the efforts went into making the web UI usable, but some improvements - especially
+in the core - are trickling down to the Swing UI (and CLI!).
 
-### Fixing DMULU
+For this release, we want to thank Prof. Davide Patti (@davidepatti) from UniCT for his efforts
+to improve the simulator. Thanks, Davide!
 
-`DMULU` was historically implemented using a syntax that was made incorrect by Release 6
-of the MIPS64 ISA in 2014. This version of EduMIPS64 changes `DMULU` to use the new,
-correct syntax, and therefore it will break all code using the old `DMULU` syntax.
+## Highlights
 
-Porting old code to the new code is pretty simple, as the old version store the results
-of the multiplication in the `LO` register, requiring an `MFLO` instruction to fetch it,
-while the new version allows users to directly specify the target register.
+### More ways to run EduMIPS64
 
-While the old code may have looked like the following:
+This release adds a packaged Electron desktop application for Linux, macOS and Windows,
+so EduMIPS64 can now run as a standalone offline app without asking users to install Java
+or open the hosted web version.
 
-```
-    [...]
-    DMULU r1, r2
-    MFLO r3
-    [...]
-```
+### Stronger MIPS64 Release 6 support
 
-The new code should instead be:
+Release 1.4.0 expands the simulator's ISA coverage with the three-operand `DMUL`, `DMOD`
+and `DDIV` instructions from MIPS64 Release 6, and also finishes the transition of `DMULU`
+to the modern syntax. This is an important compatibility improvement, but it is also the main
+breaking change in the release: older code using the legacy `DMULU rs, rt` form must be updated
+to the new `DMULU rd, rs, rt` syntax.
 
-```
-    [...]
-    DMULU r3, r1, r1
-```
+### Better core diagnostics and parser support
 
-This is exactly how our internal tests changed, see [code](https://github.com/EduMIPS64/edumips64/commit/897f559ebda971760aae0bcad949b3cf38847b02#diff-24af5fcdf7f63916c891371766a8dc7875e89634fb6dfd5dad34d5b1969846e7).
+Several core improvements make assembly programs easier to write and debug. The parser now
+accepts hexadecimal and binary literals consistently, understands label arithmetic in memory
+operands, supports multiple labels on the same address, and reports missing parameters and other
+common mistakes more clearly. On the execution side, synchronous exceptions now report both the
+faulting instruction and the pipeline stage where the error occurred.
 
+### Cache simulation without external tools
 
-### Simplified Chinese Translation
+EduMIPS64 now ships with an embedded cache simulator that can be used instead of DineroIV.
+Users can configure L1 instruction and data cache parameters directly inside EduMIPS64, which
+makes cache-related experiments much easier to run in teaching environments.
 
-Thanks to the effort of @smallg0at, EduMIPS64 now is fully translated to Simplified Chinese,
-including the in-app documentation and the HTML/PDF docs.
+### CLI and desktop improvements
 
-This change had us find and fix several smaller bugs related to rendering non-ASCII (and non-Italian)
-characters, as well as trying to get Sphinx to properly emit Simplified Chinese docs. We haven't
-fully succeeded, so the PDF has to be rendered through readthedocs.io, but it is usable and
-we have all the needed artifacts.
+The CLI received a substantial quality-of-life pass: quiet mode is now the default, `SYSCALL 5`
+supports printf-like output, the shell shows clearer CPU status and help topics, and error
+messages are friendlier. On the desktop side, 1.4.0 adds a dark mode toggle, a "Reset to defaults"
+button in Settings, and fixes a few long-standing UI issues.
 
-Huge thanks to @smallg0at for this contribution!
+### More accurate simulation
 
-## Special mention: new Web UI
+This release also fixes a number of correctness issues in the simulator core, including branch
+hazard handling with forwarding enabled, a stalled-register bug in `MOVF.D` / `MOVT.D`, stricter
+pipeline consistency checks, and the incorrect ABI alias previously shown for register `R2`.
 
-@smallg0at also implemented a brand new, IDE-like layout for the Web UI, which is already deployed
-to https://web.edumips.org. This is a major step forward in having a fully-functional version
-of EduMIPS64 on the web. Thanks agains, @smallg0at!
+## Web UI
 
-Also thanks to @pviotti for doing the foundational work of migrating to more recent major versions
-of React and Material UI, which made this work possible.
+The web UI saw the largest amount of work in this cycle, but those changes are documented elsewhere.
+Here we wanted to focus on the improvements that also matter to Swing, CLI and offline users.
 
 ## Other changes
 
-We also added the `DMUHU` instruction (pretty similar to `DMULU` in terms of implementation), fixed
-a few documentation issues (thanks @galloj and @winstonpurnomo) and also changed the look and feel to
-be more modern (goodbye, Metal!).
+We also added end-to-end regression coverage for every supported MIPS64 instruction, split the user
+manual into UI-independent and UI-specific chapters, updated Gradle to 9.5.0, and refreshed several
+dependencies for security and compatibility.
 
 ## The usual conclusion
 
