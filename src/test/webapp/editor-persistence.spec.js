@@ -107,11 +107,14 @@ test('restore default sample button restores the bundled sample', async ({
   await page.keyboard.press('Backspace');
   await page.keyboard.insertText('.code\nSYSCALL 0\n');
 
-  await page.waitForFunction(() => {
-    const model = window.monaco.editor.getModels()[0];
-    return model && model.getValue().includes('SYSCALL 0') &&
-      !model.getValue().includes('EduMIPS64 Web test program');
-  }, null, { timeout: 5000 });
+  await page.waitForFunction(
+    (expected) => {
+      const model = window.monaco.editor.getModels()[0];
+      return model && model.getValue() !== expected;
+    },
+    defaultSample,
+    { timeout: 5000 },
+  );
 
   // Click "Restore default sample".
   await removeOverlay(page);
@@ -130,8 +133,30 @@ test('restore default sample button restores the bundled sample', async ({
   const afterRestore = await getEditorContent(page);
   expect(afterRestore).toBe(defaultSample);
 
-  // localStorage should also be reset to the default (i.e. either removed or
-  // holding the default sample) so a subsequent reload picks up the sample.
+  // localStorage should also be reset (to the empty-string sentinel, which
+  // Simulator.js maps back to the current SampleProgram) before we reload, so
+  // the subsequent reload picks up the bundled sample instead of the code we
+  // had just typed.  Wait for the useEffect write to commit to storage before
+  // triggering the reload — without this, the reload can race the async effect
+  // and load the stale typed code instead of the sample.
+  await page.waitForFunction(
+    (key) => {
+      const raw = window.localStorage.getItem(key);
+      // null  → key was never written (will show sample on reload)
+      // '""'  → empty-string sentinel written by resetStoredCode() (will show
+      //          sample on reload)
+      if (raw === null) return true;
+      try {
+        return JSON.parse(raw) === '';
+      } catch {
+        return false;
+      }
+    },
+    EDITOR_CODE_KEY,
+    { timeout: 5000 },
+  );
+
+  // Reload and verify the editor restores the bundled sample.
   await page.reload();
   await waitForPageReady(page);
   const afterReload = await getEditorContent(page);

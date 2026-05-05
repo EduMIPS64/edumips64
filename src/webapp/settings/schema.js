@@ -1,5 +1,4 @@
 import { SettingKey } from './SettingKey';
-import SampleProgram from '../data/SampleProgram';
 
 /**
  * Supported setting types.
@@ -168,10 +167,12 @@ export const SETTINGS_SCHEMA = Object.freeze({
   },
   [SettingKey.EDITOR_CODE]: {
     type: SettingType.STRING,
-    // The bundled sample program is shown on first load and restored by the
-    // "Restore default sample" button. Any subsequent edit is persisted, so
-    // an accidental page reload no longer wipes a user's in-progress code.
-    default: SampleProgram,
+    // Use an empty string as the sentinel for "user hasn't customized the editor
+    // yet". This avoids baking today's SampleProgram into localStorage on the
+    // very first visit, which would prevent a future sample update from being
+    // visible to users who never edited the editor.  Simulator.js maps '' back
+    // to the current SampleProgram when rendering.
+    default: '',
   },
   [SettingKey.PIPELINE_COLORS]: {
     type: SettingType.OBJECT,

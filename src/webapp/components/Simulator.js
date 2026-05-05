@@ -36,6 +36,7 @@ import Settings from './Settings';
 import CacheConfig from "./CacheConfig";
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
+import SampleProgram from '../data/SampleProgram';
 
 const Simulator = ({worker, initialState, appInsights}) => {
   // The amount of steps to run in multi-step executions.
@@ -44,7 +45,33 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [registers, setRegisters] = React.useState(initialState.registers);
   const [memory, setMemory] = React.useState(initialState.memory);
   const [stats, setStats] = React.useState(initialState.statistics);
-  const [code, setCode, resetCode] = useSetting(SettingKey.EDITOR_CODE);
+
+  // Editor code persistence:
+  // - `storedCode` is what useLocalStorage actually holds ('' = "never edited by user").
+  // - `code` is the live value the Monaco editor shows ('' maps to SampleProgram).
+  // - Writes to localStorage are debounced so individual keystrokes don't block.
+  const [storedCode, setStoredCode, resetStoredCode] = useSetting(SettingKey.EDITOR_CODE);
+  const [code, _setCode] = React.useState(() => storedCode || SampleProgram);
+
+  // Debounce localStorage writes to 500 ms so each keystroke doesn't trigger a
+  // synchronous `setItem` call.  The useMemo ensures a single stable debounced
+  // function instance exists across re-renders (the instance carries the timer
+  // state; recreating it on every render would orphan pending timers).
+  const debouncedPersistCode = React.useMemo(
+    () => debounce((v) => setStoredCode(v), 500),
+    // setStoredCode comes from useLocalStorage and is stable across renders.
+    [setStoredCode],
+  );
+
+  // Public setter: updates the editor display immediately while deferring the
+  // localStorage write.
+  const setCode = React.useCallback(
+    (newCode) => {
+      _setCode(newCode);
+      debouncedPersistCode(newCode);
+    },
+    [debouncedPersistCode],
+  );
   const [status, setStatus] = React.useState(initialState.status);
   const [pipeline, setPipeline] = React.useState(initialState.pipeline);
   const [parsingErrors, setParsingErrors] = React.useState(
@@ -434,13 +461,28 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const restoreDefaultSample = () => {
     const hadPendingBatch = nextBatchTimeout.current !== null;
     cancelPendingBatch();
-    resetCode();
+    // Cancel any pending debounced writes / syntax checks so stale results
+    // from the previous code don't arrive after the restore.
+    debouncedPersistCode.cancel();
+    debouncedSyntaxCheck.cancel();
+    // Update local state immediately so the editor switches to the sample at
+    // once, without waiting for the debounced write round-trip.
+    _setCode(SampleProgram);
+    // Reset the persisted value to the sentinel so future reloads also show
+    // the sample (and benefit from any future sample update).
+    resetStoredCode();
+    // Clear stale parsing errors so the issues panel doesn't show diagnostics
+    // for the code that was just replaced.
+    setParsingErrors([]);
     isResetting.current = true;
     setInputRequest(null);
     if (hadPendingBatch) {
       setExecuting(false);
     }
     worker.reset();
+    // Run a fresh syntax check on the restored sample so any warnings in the
+    // sample are surfaced immediately.
+    worker.checkSyntax(SampleProgram);
     // Clear accordion change markers
     setAccordionChanges({
       stats: false,
@@ -498,8 +540,16 @@ const Simulator = ({worker, initialState, appInsights}) => {
     URL.revokeObjectURL(fileURL);
   };
 
-  // A debounced version of syntaxCheck. Needed to not run props.onChange too often.
-  const debouncedSyntaxCheck = debounce((code) => worker.checkSyntax(code), 500);
+  // A stable debounced wrapper around worker.checkSyntax.  Creating this with
+  // useMemo ensures the same debounced instance (with its internal timer state)
+  // is reused across re-renders.  A plain `const debouncedSyntaxCheck = debounce(...)`
+  // at the top of the function body would create a fresh function on every
+  // render, orphaning any pending timer from the previous render.
+  const debouncedSyntaxCheck = React.useMemo(
+    () => debounce((c) => worker.checkSyntax(c), 500),
+    // worker is stable across renders (passed as a prop reference).
+    [worker],
+  );
 
   // Run a syntax check on the initial code once on mount so that warnings
   // (e.g. deprecated instructions in the sample program) are surfaced
