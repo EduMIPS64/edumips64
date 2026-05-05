@@ -51,7 +51,9 @@ const Simulator = ({worker, initialState, appInsights}) => {
   // - `code` is the live value the Monaco editor shows ('' maps to SampleProgram).
   // - Writes to localStorage are debounced so individual keystrokes don't block.
   const [storedCode, setStoredCode, resetStoredCode] = useSetting(SettingKey.EDITOR_CODE);
-  const [code, _setCode] = React.useState(() => storedCode || SampleProgram);
+  const [code, _setCode] = React.useState(() =>
+    storedCode === '' ? SampleProgram : storedCode,
+  );
 
   // Debounce localStorage writes to 500 ms so each keystroke doesn't trigger a
   // synchronous `setItem` call.  The useMemo ensures a single stable debounced
