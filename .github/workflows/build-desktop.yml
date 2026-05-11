@@ -7,14 +7,6 @@ on:
         description: 'Git ref to checkout'
         required: true
         type: string
-      upload_codecov:
-        description: 'Upload code coverage to Codecov'
-        required: false
-        type: boolean
-        default: false
-    secrets:
-      codecov_token:
-        required: false
 
 jobs:
   build:
@@ -22,6 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # Required so the JaCoCo coverage step below can post / update a sticky
+      # comment on the originating pull request when the workflow is invoked
+      # from a pull_request_target event.
+      pull-requests: write
     steps:
       - uses: actions/checkout@v6
         with:
@@ -34,11 +30,11 @@ jobs:
           distribution: 'microsoft'
           cache: 'gradle'
 
-      - name: Set up Python 3.14
+      - name: Set up Python 3.12
         id: setup-python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: '3.12'
 
       - name: Configure Python path for Gradle
         run: |
@@ -61,11 +57,23 @@ jobs:
       - name: Compile and run tests
         run: ./gradlew check
 
-      - name: Upload code coverage
-        if: inputs.upload_codecov
-        uses: codecov/codecov-action@v6.0.0
+      # Publish the JaCoCo report directly to the pull request and to the
+      # Actions run summary, with no third-party service involved. The XML
+      # report is produced by `./gradlew check` (jacocoTestReport runs as part
+      # of `check`). Gated on pull_request_target because release.yml also
+      # calls this reusable workflow and there is no PR to comment on there.
+      - name: Report Java coverage on PR
+        if: github.event_name == 'pull_request_target' && hashFiles('build/reports/jacoco/test/jacocoTestReport.xml') != ''
+        uses: madrapps/jacoco-report@v1.7.2
         with:
-          token: ${{ secrets.codecov_token }}
+          paths: build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: Java code coverage
+          update-comment: true
+          # The Swing UI is excluded from coverage (see developer-guide.md);
+          # keep the thresholds informational rather than gating.
+          min-coverage-overall: 0
+          min-coverage-changed-files: 0
 
       - name: Build all docs
         run: ./gradlew allDocs

@@ -63,7 +63,9 @@ public class GUIHelpTest extends BaseTest {
     }
 
     for (LogRecord r : handler.records) {
-      if (r.getLevel() == Level.SEVERE && r.getMessage() != null
+      // NOPMD - reference identity intentional: java.util.logging.Level
+      // values are singleton constants; `==` is the standard idiom.
+      if (r.getLevel() == Level.SEVERE && r.getMessage() != null // NOPMD CompareObjectsWithEquals
           && r.getMessage().startsWith("Could not parse Help URL")) {
         fail("URI parsing should succeed for URLs with raw spaces, "
             + "but got SEVERE log: " + r.getMessage());

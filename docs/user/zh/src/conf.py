@@ -17,7 +17,7 @@
 
 import sys, os
 sys.path.append(os.path.abspath("../.."))
-from common_conf import *
+from common_conf import *  # noqa: F401, F403  -- re-export Sphinx config defaults
 
 pdf_stylesheets = ['sphinx', 'a4', 'zh_CN.json']
 # Look for the embedded CJK fonts (sarasa-gothic-sc-*.ttf) next to this conf.py.

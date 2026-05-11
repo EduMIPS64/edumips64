@@ -7,17 +7,17 @@ import org.edumips64.utils.ConfigStore;
 import java.awt.*;
 
 public class GUITheme {
-    private static Color lightText = Color.black;
-    private static Color lightBackground = Color.white;
-    private static Color darkText = new Color(187, 187, 187);
-    private static Color darkBackground = new Color(70, 73, 75);
-    
-    private static boolean usingDarkTheme;
+    private static final Color lightText = Color.black;
+    private static final Color lightBackground = Color.white;
+    private static final Color darkText = new Color(187, 187, 187);
+    private static final Color darkBackground = new Color(70, 73, 75);
 
-    private ConfigStore config;
+    private final boolean usingDarkTheme;
+
+    private final ConfigStore config;
 
     public GUITheme(ConfigStore config){
-        usingDarkTheme = config.getBoolean(ConfigKey.UI_DARK_THEME);
+        this.usingDarkTheme = config.getBoolean(ConfigKey.UI_DARK_THEME);
         this.config = config;
         
         // For Current Setting Exporting

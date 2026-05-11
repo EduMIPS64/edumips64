@@ -178,8 +178,9 @@ configuration.
 
 #### Web UI code coverage
 
-The web UI tests can generate Istanbul code coverage data. This is used to upload
-coverage metrics to [codecov.io](https://codecov.io) under the `web` flag.
+The web UI tests can generate Istanbul code coverage data. CI publishes this
+report directly on each pull request (as a sticky comment and on the GitHub
+Actions run summary) — no third-party coverage service is involved.
 
 To run tests with coverage locally:
 
@@ -200,8 +201,13 @@ To run tests with coverage locally:
 The coverage report is written to `coverage/lcov.info` (and `coverage/index.html` for the
 HTML report). Both `.nyc_output/` and `coverage/` are excluded from version control.
 
-In CI, the `test-web-coverage` job in `ci.yml` performs these steps automatically and
-uploads the result to Codecov using the `CODECOV_TOKEN` secret.
+In CI, the `test-web-coverage` job in `ci.yml` performs these steps automatically.
+It then writes a textual `nyc` summary to the Actions run summary and posts a
+per-file lcov report as a comment on the originating pull request using
+[`romeovs/lcov-reporter-action`](https://github.com/romeovs/lcov-reporter-action).
+The Java side is reported the same way: the `build-desktop` job uses
+[`madrapps/jacoco-report`](https://github.com/madrapps/jacoco-report) to publish
+the JaCoCo XML produced by `./gradlew check` as a PR comment.
 
 ### Source code structure
 
@@ -254,6 +260,59 @@ Any user-facing change must be reflected in all three languages
 (English, Italian, Chinese). When a change is specific to one user
 interface, it should go into the matching `user-interface-<flavor>.rst`
 file only.
+
+### CLI banner and in-shell help browser
+
+The interactive CLI shell (`--headless`) shows a stylised startup
+banner and offers an in-shell user-manual browser. The implementation
+lives in `src/main/java/org/edumips64/utils/cli/`:
+
+- `Banner.java` renders the EduMIPS64 ASCII-art banner (figlet "ANSI
+  Shadow" font, heavy Unicode block characters) with three
+  logo-matching colours — gold "Edu", bright/white "MIPS", red "64" —
+  via picocli's `Help.Ansi.AUTO` markup. The "Edu" segment combines
+  the font's uppercase E with a hand-crafted lowercase d (whose right
+  wall doubles as a tall ascender) and a lowercase u in the same
+  heavy block style, so the rendering matches the mixed-case product
+  name. Each segment is painted with a top-to-bottom three-shade
+  gradient (bold light at the top, mid tone in the middle, deep tone
+  at the bottom), which gives the heavy blocks a soft drop-shadow /
+  3-D effect — the same trick used by the Hermes Agent CLI banner.
+  The banner auto-degrades to a one-line version string when stdout
+  is not a TTY, when `COLUMNS` is below the banner width, when the
+  encoding is not UTF-8, or when the user passes `--no-banner`. The
+  same `Banner.print(...)` is invoked by `Main` for both the Swing
+  and CLI entry points, so launching `java -jar edumips64.jar` from a
+  terminal also shows the banner.
+- `Pager.java` is a tiny dependency-free "more"-style pager used by
+  the help browser. It bypasses paging when `System.console()` is
+  null, so piped/redirected runs stay clean.
+- `HelpCommand.java` is the picocli subcommand backing
+  `help` / `help topics` / `help <topic>`. The list of available
+  topics is read from a hand-maintained index file
+  (`src/main/resources/org/edumips64/help/topics/topics.index`) with
+  three tab-separated columns: `<id> <TAB> <rst-filename> <TAB> <human title>`.
+  The chapter content itself is **not** hand-curated: the Gradle
+  `processResources` task copies `docs/user/en/src/*.rst` verbatim
+  into the JAR under `org/edumips64/help/topics/`, so the chapters
+  served by the shell are always exactly the ones that Sphinx renders
+  for the website and PDF (the build is hermetic; the docs cannot
+  drift apart).
+
+To add a new help topic:
+
+1. Make sure the chapter exists at `docs/user/en/src/<filename>.rst`
+   (it does already if it is part of the manual).
+2. Add a row to `topics.index`:
+   `<id><TAB><filename>.rst<TAB><human title>`.
+3. (Optional) Mention the new topic in the user manual under
+   `cli-interface.rst`.
+
+`BannerTest` verifies that the banner mentions `EduMIPS64` and the
+current `MetaInfo.VERSION`. `HelpTopicsTest` verifies that every entry
+in `topics.index` resolves to a non-empty resource bundled in the JAR
+— if a row references a missing file, this test fails and protects
+the hermetic-build contract.
 
 
 
@@ -354,8 +413,17 @@ Before triggering a release:
 - Update `RELEASE_NOTES.md` with notes for the new version
 - Update the version in `snapcraft.yaml`
 - Merge all changes to `master`
+- **Smoke-test the release artifacts produced by the automatic `release.yml`
+  run for the merge commit to `master` _before_ triggering the manual run.**
+  The same workflow runs on every push to `master` (without `create_release`),
+  so the JAR, MSI, Electron apps and PDF manuals for the exact commit you are
+  about to release are already available as workflow-run artifacts. Download
+  them from the most recent automatic `Release` run on `master`, run through
+  the verification checklist below, and only kick off the manual release once
+  the artifacts pass. This avoids cutting a tag for a broken build.
 
-After the automated release completes, manually verify:
+After the automated release completes (or against the artifacts of the
+automatic pre-release run on `master`, see above), manually verify:
 
 - JAR and MSI:
   - verify that the splash screen works
@@ -365,9 +433,12 @@ After the automated release completes, manually verify:
   - open the help
   - close the application
 - JAR-only: verify the JAR size (should be < 3 MB)
+- Electron apps (Linux / macOS / Windows): launch each one, confirm the web UI
+  loads (no `Cannot GET /` from the embedded express server) and run a sample program
 - PDF:
   - open the English manual and check the version
   - open the Italian manual and check the version
+  - open the Chinese manual and check the version
 
 Trigger builds on snapcraft.
 

@@ -95,8 +95,13 @@ public class FPInstructionUtils {
     final BigDecimal theSmallest = new BigDecimal(SMALLEST);
     final BigDecimal theZeroMinus = new BigDecimal(MINUSZERO_DEC);
     final BigDecimal theZeroPlus = new BigDecimal(PLUSZERO_DEC);
-    final BigDecimal zero = new BigDecimal(0.0);
-    final BigDecimal minuszero = new BigDecimal(-0.0);
+    // Note: the other `new BigDecimal(double)` calls below (operating on
+    // `Double.longBitsToDouble(...)`) intentionally preserve the exact
+    // bit-pattern of the IEEE-754 double for high-precision FP emulation,
+    // so they are NOT replaced with `BigDecimal.valueOf(double)` (which
+    // would round to the canonical decimal representation).
+    final BigDecimal zero = BigDecimal.ZERO;
+    final BigDecimal minuszero = BigDecimal.ZERO;
 
     try { //Check if the exponent is not in signed 32 bit, in this case the NumberFormatException occurs
       BigDecimal value_bd = new BigDecimal(value);

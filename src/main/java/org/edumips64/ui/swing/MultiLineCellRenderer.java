@@ -35,7 +35,9 @@ import java.awt.Color;
 public class MultiLineCellRenderer extends JTextArea implements TableCellRenderer {
   private static final long serialVersionUID = -4281001238359343652L;
 
-  protected static Border noFocusBorder;
+  // Shared default border. EmptyBorder is immutable, so a single constant
+  // can be reused across all renderer instances.
+  protected static final Border noFocusBorder = new EmptyBorder(1, 2, 1, 2);
 
   boolean[] lineIsError;
   private Color errorBackground ;
@@ -43,7 +45,6 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
 
   public MultiLineCellRenderer() {
     super();
-    noFocusBorder = new EmptyBorder(1, 2, 1, 2);
     setLineWrap(true);
     setWrapStyleWord(true);
     setOpaque(true);
@@ -53,7 +54,6 @@ public class MultiLineCellRenderer extends JTextArea implements TableCellRendere
 
   public MultiLineCellRenderer(boolean[] lineIsError, GUITheme theme) {
     super();
-    noFocusBorder = new EmptyBorder(1, 2, 1, 2);
     setLineWrap(true);
     setWrapStyleWord(true);
     setOpaque(true);

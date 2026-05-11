@@ -1,6 +1,7 @@
 import React from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ErrorDisplay from './ErrorDisplay';
@@ -20,7 +21,7 @@ const DecideIconType = ({ errorType }) => {
     }
 }
 
-const ErrorList = ({ parsingErrors, AccordionSummary }) => {
+const ErrorList = ({ parsingErrors, AccordionSummary, onIssueClick }) => {
 
     if (parsingErrors == undefined) {
         return <React.Fragment />;
@@ -38,13 +39,26 @@ const ErrorList = ({ parsingErrors, AccordionSummary }) => {
                             <ListItem
                                 key={JSON.stringify(value)}
                                 disableGutters
+                                disablePadding
                             >
-                                <ListItemIcon className='error-list-item'>
-                                    <DecideIconType errorType={value.isWarning} />
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary={`Line ${value.row} Position ${value.column}: ${value.description}`}
-                                />
+                                <ListItemButton
+                                    onClick={
+                                        onIssueClick
+                                            ? () => onIssueClick(value.row, value.column)
+                                            : undefined
+                                    }
+                                    className='error-list-item-button'
+                                    aria-label={`Jump to line ${value.row}, position ${value.column}: ${value.description}`}
+                                    data-issue-row={value.row}
+                                    data-issue-column={value.column}
+                                >
+                                    <ListItemIcon className='error-list-item'>
+                                        <DecideIconType errorType={value.isWarning} />
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        primary={`Line ${value.row} Position ${value.column}: ${value.description}`}
+                                    />
+                                </ListItemButton>
                             </ListItem>
                         ))}
                     </List>

@@ -17,6 +17,18 @@
      padding: 30px !important;
 }
 
+/* On phones / small tablets the 30px gutters of the help dialog eat up
+   precious horizontal space and make the manual unreadable. Tighten
+   them up below ~900px. */
+@media (max-width: 900px) {
+    .help-title {
+        padding: 16px !important;
+    }
+    .help-content {
+        padding: 12px !important;
+    }
+}
+
 .accordion-change-indicator {
     display: inline-block;
     width: 8px;

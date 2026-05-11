@@ -254,7 +254,9 @@ public class MultiLineBasicTableUI extends javax.swing.plaf.basic.BasicTableUI {
       if (cellRect.intersects(rect)) {
         drawn = true;
 
-        if ((header == null) || (aColumn != header.getDraggedColumn())) {
+        // NOPMD - reference identity intentional: getDraggedColumn() returns
+        // the same TableColumn instance the header is tracking; no equals().
+        if ((header == null) || (aColumn != header.getDraggedColumn())) { // NOPMD CompareObjectsWithEquals
           paintCell(g, cellRect, row, column);
         } else {
           // Paint a gray well in place of the moving column

@@ -215,7 +215,9 @@ class GUIRegisters extends GUIComponent {
       public void mouseClicked(MouseEvent e) {
         Object source = e.getSource();
 
-        if ((source == theTable)) {
+        // NOPMD - reference identity intentional: `source` is the event's
+        // source object, which IS theTable when this listener fires on theTable.
+        if ((source == theTable)) { // NOPMD CompareObjectsWithEquals
           try {
             //click on LO register
             if (theTable.getSelectedRow() == 32 && theTable.getSelectedColumn() == 1) {
