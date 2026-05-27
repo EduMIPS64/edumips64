@@ -1278,6 +1278,31 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runMipsTestWithoutDelaySlot("delay-slot-syscall-in-slot.s");
   }
 
+  /** Non-terminating SYSCALL (here SYSCALL 5, printf) in the delay slot.
+   *  Unlike SYSCALL 0 / HALT, this kind of syscall has no termination
+   *  side-effect, so the slot must run to completion and execution must
+   *  continue at the branch target. With delay slot OFF the SYSCALL is
+   *  squashed and the branch target executes anyway; the difference is
+   *  in R1, which SYSCALL 5 sets to the number of bytes "printed" (2 for
+   *  "ok") only when the slot actually runs. */
+  @Test(timeout=5000)
+  public void testDelaySlotSyscallNontermInSlotEnabled() throws Exception {
+    CpuTestStatus s = runMipsTestWithDelaySlot("delay-slot-syscall-nonterm-in-slot.s");
+    collector.checkThat("target executed after non-terminating SYSCALL ran in the slot",
+        s.gprValues[2], equalTo(42L));
+    collector.checkThat("R1 holds the SYSCALL 5 return value (length of \"ok\")",
+        s.gprValues[1], equalTo(2L));
+  }
+
+  @Test(timeout=5000)
+  public void testDelaySlotSyscallNontermInSlotDisabled() throws Exception {
+    CpuTestStatus s = runMipsTestWithoutDelaySlot("delay-slot-syscall-nonterm-in-slot.s");
+    collector.checkThat("target executed after non-terminating SYSCALL was squashed",
+        s.gprValues[2], equalTo(42L));
+    collector.checkThat("R1 untouched (SYSCALL was squashed in the slot)",
+        s.gprValues[1], equalTo(1L));
+  }
+
   /** HALT in the delay slot. Same semantics as SYSCALL 0 in the slot. */
   @Test(timeout=5000)
   public void testDelaySlotHaltInSlotEnabled() throws Exception {
