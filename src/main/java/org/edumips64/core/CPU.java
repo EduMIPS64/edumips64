@@ -486,11 +486,7 @@ public class CPU {
           // Advance the pipeline before re-throwing so the delay slot
           // (which is the BREAK) lands in ID and the jump in EX, mirroring
           // what happens on the regular delay-slot path below.
-          pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
-          pipe.advance(Pipeline.Stage.IF, Pipeline.Stage.ID);
-          pipe.setStage(Pipeline.Stage.IF, mem.getInstruction(pc));
-          old_pc.writeDoubleWord((pc.getValue()));
-          pc.writeDoubleWord((pc.getValue()) + 4);
+          advanceDelaySlotPipeline();
           throw bex;
         }
         logger.info("Caught a BREAK after a Jump: ignoring it.");
@@ -501,11 +497,7 @@ public class CPU {
         // sequentially right after the branch/jump and is the architectural
         // "delay slot". It is *not* squashed; we advance it into ID and
         // fetch the branch target into IF.
-        pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
-        pipe.advance(Pipeline.Stage.IF, Pipeline.Stage.ID);
-        pipe.setStage(Pipeline.Stage.IF, mem.getInstruction(pc));
-        old_pc.writeDoubleWord((pc.getValue()));
-        pc.writeDoubleWord((pc.getValue()) + 4);
+        advanceDelaySlotPipeline();
       } else {
         // A J-Type instruction has just modified the Program Counter. We need
         // to put in the IF stage the instruction the PC points to, discarding
@@ -896,6 +888,20 @@ public class CPU {
    */
   public boolean isDelaySlotEnabled() {
     return config.getBoolean(ConfigKey.DELAY_SLOT);
+  }
+
+  /**
+   * Advances the pipeline by one stage in delay-slot mode after a
+   * JumpException: the instruction previously in IF (the architectural
+   * delay slot) moves into ID, the branch/jump moves from ID to EX, and a
+   * fresh instruction is fetched from the (already updated) PC into IF.
+   */
+  private void advanceDelaySlotPipeline() throws IrregularStringOfBitsException, IrregularWriteOperationException {
+    pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
+    pipe.advance(Pipeline.Stage.IF, Pipeline.Stage.ID);
+    pipe.setStage(Pipeline.Stage.IF, mem.getInstruction(pc));
+    old_pc.writeDoubleWord((pc.getValue()));
+    pc.writeDoubleWord((pc.getValue()) + 4);
   }
 
   /**

@@ -474,7 +474,14 @@ public class GUIConfig extends JDialog {
 
         // Alert the user that the simulation will be restarted if the forwarding or delay slot setting is changed.
         if (fwdChanged || delaySlotChanged) {
-            String warningKey = fwdChanged ? "FWD_RESET_WARNING" : "DELAY_SLOT_RESET_WARNING";
+            String warningKey;
+            if (fwdChanged && delaySlotChanged) {
+              warningKey = "PIPELINE_RESET_WARNING";
+            } else if (fwdChanged) {
+              warningKey = "FWD_RESET_WARNING";
+            } else {
+              warningKey = "DELAY_SLOT_RESET_WARNING";
+            }
             boolean shouldReset = JOptionPane.showConfirmDialog(null,
                     CurrentLocale.getString(warningKey), CurrentLocale.getString("GUI_WARNING"),
                     JOptionPane.YES_NO_OPTION) == 0;
