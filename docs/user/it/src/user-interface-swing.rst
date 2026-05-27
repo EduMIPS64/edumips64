@@ -231,8 +231,9 @@ Il tasto "Ripristina predefiniti" riporta tutte le impostazioni ai valori
 predefiniti, previa conferma da parte dell'utente; è utile per recuperare
 una configurazione errata senza dover modificare manualmente ogni opzione.
 
-La sezione "Impostazioni generali" consente di configurare il forwarding ed il
-numero di passi da effettuare nella modalità Cicli multipli.
+La sezione "Impostazioni generali" consente di configurare il forwarding, il
+branch delay slot ed il numero di passi da effettuare nella modalità Cicli
+multipli.
 
 La sezione "Comportamento" permette di abilitare o disabilitare gli avvisi
 durante la fase di parsing, l'opzione "sincronizza la GUI con la CPU
@@ -374,6 +375,42 @@ produttore/consumatore più comuni:
 +--------------------------------+-----------------+--------------------+
 | Load → branch / jump da reg.   | 2               | 2                  |
 +--------------------------------+-----------------+--------------------+
+
+Branch Delay Slot
+~~~~~~~~~~~~~~~~~
+EduMIPS64 può opzionalmente simulare il classico **delay slot** del
+branch del MIPS, come descritto in Hennessy & Patterson. Il delay slot
+può essere attivato dalla scheda Impostazioni Generali della finestra
+delle impostazioni.
+
+Quando il delay slot è **disabilitato** (impostazione predefinita),
+l'istruzione recuperata sequenzialmente dopo un branch o un jump viene
+*scartata* quando il salto viene risolto in fase ID: non raggiunge mai
+EX, MEM o WB, e la vista a cicli mostra una bolla nello slot successivo
+al branch. Questo è il comportamento storico del simulatore.
+
+Quando il delay slot è **abilitato**, l'istruzione recuperata
+immediatamente dopo un branch o un jump (il *delay slot*) viene
+**eseguita sempre**, indipendentemente dal fatto che il branch sia
+preso o meno. Il bersaglio del salto viene quindi recuperato in IF nel
+ciclo successivo al delay slot. Ciò corrisponde al comportamento
+architetturale dell'instruction set MIPS64.
+
+Alcune note:
+
+* L'impostazione interessa tutte le istruzioni di controllo del flusso
+  che aggiornano il PC dallo stadio ID: branch incondizionati (``B``,
+  ``J``, ``JAL``), branch condizionati (``BEQ``, ``BNE``, ``BEQZ``,
+  ``BNEZ``, ``BGEZ``, ``BC1T``, ``BC1F``) e jump basati su registro
+  (``JR``, ``JALR``).
+* La modifica del delay slot causa il reset della simulazione, perché
+  altrimenti lo stato della pipeline sarebbe inconsistente con la
+  nuova semantica. Il simulatore chiede conferma prima di applicare la
+  modifica quando un programma è in esecuzione.
+* I programmi scritti assumendo la semantica del delay slot
+  tipicamente inseriscono un ``NOP`` (o un'istruzione utile il cui
+  risultato non dipende dal branch) immediatamente dopo ogni branch o
+  jump.
 
 Dinero Frontend
 ~~~~~~~~~~~~~~~

@@ -109,6 +109,19 @@ public class Simulator {
     return resultFactory.Success();
   }
 
+  /**
+   * Toggle the branch delay slot mode. Like {@link #setForwarding}, the
+   * flag is consulted by the CPU on every step, so we just need to update
+   * the {@link ConfigStore} and reset so the cycle builder sees a fresh
+   * pipeline.
+   */
+  public Result setDelaySlot(boolean enabled) {
+    config.putBoolean(ConfigKey.DELAY_SLOT, enabled);
+    cpu.reset();
+    cycleBuilder = new CycleBuilder(cpu);
+    return resultFactory.Success();
+  }
+
   public Result setCacheConfig(CacheConfig l1d_config, CacheConfig l1i_config)  {
     cpu.reset();
     cachesim.getL1InstructionCache().setConfig(l1i_config);

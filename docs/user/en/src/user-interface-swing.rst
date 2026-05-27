@@ -215,8 +215,8 @@ ignored. Don't forget to click "OK" if you want to save your changes. The
 after asking for confirmation; this is useful to recover from a misconfigured
 simulator without having to change each option manually.
 
-The Main Settings tab allow to configure forwarding and the number of steps
-in the Multi Cycle mode.
+The Main Settings tab allow to configure forwarding, the branch delay slot,
+and the number of steps in the Multi Cycle mode.
 
 The Behavior tab allow to enable or disable warnings during the parsing phase,
 the "Sync graphics with CPU in multi-step execution" option, when checked,
@@ -349,6 +349,39 @@ producer/consumer pairs:
 +------------------------------+----------------+-------------------+
 | Load → branch / register jump| 2              | 2                 |
 +------------------------------+----------------+-------------------+
+
+Branch Delay Slot
+~~~~~~~~~~~~~~~~~
+EduMIPS64 can optionally model the classical MIPS **branch delay slot**, as
+described in Hennessy & Patterson. The delay slot can be toggled from the
+Main Settings tab of the Settings dialog.
+
+When the delay slot is **disabled** (the default), the instruction
+sequentially fetched after a branch or jump is *squashed* when the jump
+resolves in the ID stage: it never reaches EX, MEM or WB, and the cycle
+view shows a bubble in the slot following the branch. This is the
+behavior the simulator has always had.
+
+When the delay slot is **enabled**, the instruction fetched immediately
+after a branch or jump (the *delay slot*) is **always executed**,
+regardless of whether the branch is taken. The branch target is then
+fetched into IF on the cycle after the delay slot. This matches the
+architectural behavior of the MIPS64 instruction set.
+
+A few notes:
+
+* The setting affects every flow-control instruction that updates the
+  program counter from the ID stage: unconditional branches (``B``,
+  ``J``, ``JAL``), conditional branches (``BEQ``, ``BNE``, ``BEQZ``,
+  ``BNEZ``, ``BGEZ``, ``BC1T``, ``BC1F``), and register-based jumps
+  (``JR``, ``JALR``).
+* Toggling the delay slot resets the simulation, because the pipeline
+  state would otherwise be inconsistent with the new semantics. The
+  simulator asks for confirmation before applying the change while a
+  program is in progress.
+* Programs written assuming the delay-slot semantics typically place a
+  ``NOP`` (or a useful instruction whose result is independent of the
+  branch) immediately after every branch or jump.
 
 Dinero Frontend
 ~~~~~~~~~~~~~~~

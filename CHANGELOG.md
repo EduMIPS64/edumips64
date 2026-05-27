@@ -3,6 +3,10 @@
 ## 1.4.0 (03/05/2026) - WalkOfLife
 
 ### Added
+- Optional branch delay slot mode, as described in Hennessy & Patterson. When
+  enabled, the instruction immediately following a branch or jump is always
+  executed; otherwise it is squashed (the existing behavior). Exposed in both
+  the Swing UI (Main Settings tab) and the Web UI (General Settings).
 - Electron desktop application for Windows, macOS, and Linux, allowing the
   simulator to run offline without requiring a browser or internet connection.
   (@davidepatti)

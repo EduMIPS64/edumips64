@@ -127,6 +127,7 @@ public class GUIConfig extends JDialog {
     int row = 2;
 
     addRow(panel, row++, ConfigKey.FORWARDING, new JCheckBox());
+    addRow(panel, row++, ConfigKey.DELAY_SLOT, new JCheckBox());
     addRow(panel, row++, ConfigKey.N_STEPS, new JNumberField());
 
     // fill remaining vertical space
@@ -437,13 +438,14 @@ public class GUIConfig extends JDialog {
       boolean fontChanged = config.getInt(ConfigKey.UI_FONT_SIZE) != (Integer) ConfigStore.defaults.get(ConfigKey.UI_FONT_SIZE);
       boolean themeChanged = config.getBoolean(ConfigKey.UI_DARK_THEME) != (Boolean) ConfigStore.defaults.get(ConfigKey.UI_DARK_THEME);
       boolean fwdChanged = config.getBoolean(ConfigKey.FORWARDING) != (Boolean) ConfigStore.defaults.get(ConfigKey.FORWARDING);
+      boolean delaySlotChanged = config.getBoolean(ConfigKey.DELAY_SLOT) != (Boolean) ConfigStore.defaults.get(ConfigKey.DELAY_SLOT);
 
       // Reset the configuration to defaults.
       config.resetConfiguration();
       logger.log(Level.INFO, "Configuration reset to defaults.");
 
       // Run the update callback.
-      updateCallback.accept(fwdChanged);
+      updateCallback.accept(fwdChanged || delaySlotChanged);
 
       // Warn the user that they need to restart the simulator if font size or theme changed.
       if (fontChanged || themeChanged) {
@@ -468,11 +470,13 @@ public class GUIConfig extends JDialog {
         boolean fontChanged = config.getInt(ConfigKey.UI_FONT_SIZE) != (Integer) cache.get(ConfigKey.UI_FONT_SIZE);
         boolean themeChanged = config.getBoolean(ConfigKey.UI_DARK_THEME) != (Boolean) cache.get(ConfigKey.UI_DARK_THEME);
         boolean fwdChanged = config.getBoolean(ConfigKey.FORWARDING) != (Boolean) cache.get(ConfigKey.FORWARDING);
+        boolean delaySlotChanged = config.getBoolean(ConfigKey.DELAY_SLOT) != (Boolean) cache.get(ConfigKey.DELAY_SLOT);
 
-        // Alert the user that the simulation will be restarted if the forwarding setting is changed.
-        if (fwdChanged) {
+        // Alert the user that the simulation will be restarted if the forwarding or delay slot setting is changed.
+        if (fwdChanged || delaySlotChanged) {
+            String warningKey = fwdChanged ? "FWD_RESET_WARNING" : "DELAY_SLOT_RESET_WARNING";
             boolean shouldReset = JOptionPane.showConfirmDialog(null,
-                    CurrentLocale.getString("FWD_RESET_WARNING"), CurrentLocale.getString("GUI_WARNING"),
+                    CurrentLocale.getString(warningKey), CurrentLocale.getString("GUI_WARNING"),
                     JOptionPane.YES_NO_OPTION) == 0;
             if (!shouldReset) {
               return;
@@ -483,7 +487,7 @@ public class GUIConfig extends JDialog {
         config.mergeFromGenericMap(cache);
 
         // Run the update callback.
-        updateCallback.accept(fwdChanged);
+        updateCallback.accept(fwdChanged || delaySlotChanged);
 
         // Warn the user that they need to restart the simulator if they changed the font size.
         if (fontChanged || themeChanged) {

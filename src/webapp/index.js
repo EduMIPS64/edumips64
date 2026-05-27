@@ -56,6 +56,10 @@ worker.setForwarding = (enabled) => {
   worker.postMessage({ method: 'setForwarding', enabled });
 };
 
+worker.setDelaySlot = (enabled) => {
+  worker.postMessage({ method: 'setDelaySlot', enabled });
+};
+
 worker.checkSyntax = (code) => {
   worker.postMessage({ method: 'checksyntax', code });
 
