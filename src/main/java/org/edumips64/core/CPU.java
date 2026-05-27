@@ -467,28 +467,57 @@ public class CPU {
       }
     } catch (JumpException ex) {
       logger.info("Executing a Jump.");
+      final boolean delaySlot = isDelaySlotEnabled();
       try {
         if (!pipe.isEmpty(Pipeline.Stage.IF)) {
           logger.info("Executing the IF() method of the instruction in IF.");
           pipe.IF().IF();
         }
       } catch (BreakException bex) {
-        // This needs to be ignored here because BREAK throws BreakException when it enters
-        // the IF stage, but if BREAK enters IF after a jump instruction is about to modify
-        // the program counter, then it must be discarded (like every other instruction).
+        // When the delay slot is disabled the IF instruction is discarded,
+        // so a BREAK fetched right after the branch must be swallowed: the
+        // BREAK never actually entered the pipeline from the program's
+        // perspective. When the delay slot is enabled the instruction *is*
+        // executed, so the BreakException is a real one and must be
+        // re-thrown after the pipeline has been advanced so the cycle ends
+        // in a consistent state.
+        if (delaySlot) {
+          logger.info("BREAK in delay slot: propagating.");
+          // Advance the pipeline before re-throwing so the delay slot
+          // (which is the BREAK) lands in ID and the jump in EX, mirroring
+          // what happens on the regular delay-slot path below.
+          pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
+          pipe.advance(Pipeline.Stage.IF, Pipeline.Stage.ID);
+          pipe.setStage(Pipeline.Stage.IF, mem.getInstruction(pc));
+          old_pc.writeDoubleWord((pc.getValue()));
+          pc.writeDoubleWord((pc.getValue()) + 4);
+          throw bex;
+        }
         logger.info("Caught a BREAK after a Jump: ignoring it.");
       }
 
-      // A J-Type instruction has just modified the Program Counter. We need
-      // to put in the IF stage the instruction the PC points to, discarding
-      // the instruction that was fetched sequentially in the prior cycle.
-      // Then advance the jump instruction from ID to EX and put a bubble in
-      // ID, which represents the flushed slot in the cycle view.
-      pipe.flushAndSet(Pipeline.Stage.IF, mem.getInstruction(pc));
-      pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
-      pipe.setStage(Pipeline.Stage.ID, bubble);
-      old_pc.writeDoubleWord((pc.getValue()));
-      pc.writeDoubleWord((pc.getValue()) + 4);
+      if (delaySlot) {
+        // Delay-slot semantics: the instruction in IF was fetched
+        // sequentially right after the branch/jump and is the architectural
+        // "delay slot". It is *not* squashed; we advance it into ID and
+        // fetch the branch target into IF.
+        pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
+        pipe.advance(Pipeline.Stage.IF, Pipeline.Stage.ID);
+        pipe.setStage(Pipeline.Stage.IF, mem.getInstruction(pc));
+        old_pc.writeDoubleWord((pc.getValue()));
+        pc.writeDoubleWord((pc.getValue()) + 4);
+      } else {
+        // A J-Type instruction has just modified the Program Counter. We need
+        // to put in the IF stage the instruction the PC points to, discarding
+        // the instruction that was fetched sequentially in the prior cycle.
+        // Then advance the jump instruction from ID to EX and put a bubble in
+        // ID, which represents the flushed slot in the cycle view.
+        pipe.flushAndSet(Pipeline.Stage.IF, mem.getInstruction(pc));
+        pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
+        pipe.setStage(Pipeline.Stage.ID, bubble);
+        old_pc.writeDoubleWord((pc.getValue()));
+        pc.writeDoubleWord((pc.getValue()) + 4);
+      }
 
     } catch (RAWException ex) {
       logger.info("RAW - Read-After-Write");
@@ -854,6 +883,19 @@ public class CPU {
 
   public boolean isEnableForwarding() {
     return config.getBoolean(ConfigKey.FORWARDING);
+  }
+
+  /**
+   * @return true if the branch delay slot is enabled, in which case the
+   *         instruction sequentially fetched after a branch/jump is
+   *         executed regardless of whether the branch is taken (the
+   *         classical MIPS "delay slot" semantics described in Hennessy
+   *         &amp; Patterson). When this is false, the instruction in IF
+   *         at the time the jump resolves is squashed and replaced with
+   *         a bubble, which is the default EduMIPS64 behavior.
+   */
+  public boolean isDelaySlotEnabled() {
+    return config.getBoolean(ConfigKey.DELAY_SLOT);
   }
 
   /**
