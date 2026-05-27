@@ -32,8 +32,10 @@ import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.AddressErrorException;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.FlowControlInstructions;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.is.IntegerOverflowException;
+import org.edumips64.core.is.InvalidDelaySlotException;
 import org.edumips64.core.is.JumpException;
 import org.edumips64.core.is.RAWException;
 import org.edumips64.core.is.StoppingException;
@@ -398,7 +400,7 @@ public class CPU {
 
   /** This method performs a single pipeline step
   */
-  public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException {
+  public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, InvalidDelaySlotException {
     configFPExceptionsAndRM();
     Optional<SynchronousException> syncex;
     if (status != CPUStatus.RUNNING && status != CPUStatus.STOPPING) {
@@ -468,6 +470,28 @@ public class CPU {
     } catch (JumpException ex) {
       logger.info("Executing a Jump.");
       final boolean delaySlot = isDelaySlotEnabled();
+
+      // Corner case: when the delay slot is enabled, the instruction that
+      // was fetched sequentially after the branch is about to be
+      // architecturally executed. If that instruction is itself a
+      // control-transfer (any subclass of FlowControlInstructions) the
+      // MIPS architecture says the behavior is UNPREDICTABLE (MIPS R4000
+      // User's Manual §3.1.2, MIPS64 Vol. II). Production assemblers
+      // either reject the pattern or warn; EduMIPS64 raises a clearly
+      // labelled, deterministic exception so the offending program is
+      // diagnosed instead of silently producing implementation-defined
+      // state. The check is intentionally skipped when delay slot is
+      // disabled, because the slot is squashed and never executes.
+      if (delaySlot && !pipe.isEmpty(Pipeline.Stage.IF)
+              && pipe.IF() instanceof FlowControlInstructions) {
+        String slotName = pipe.IF().getName();
+        long branchPC = old_pc.getValue();
+        logger.info("Control-transfer '" + slotName
+                + "' detected in the delay slot of the branch/jump at PC 0x"
+                + Long.toHexString(branchPC) + ": raising InvalidDelaySlotException.");
+        throw new InvalidDelaySlotException(slotName, branchPC);
+      }
+
       try {
         if (!pipe.isEmpty(Pipeline.Stage.IF)) {
           logger.info("Executing the IF() method of the instruction in IF.");
@@ -885,6 +909,48 @@ public class CPU {
    *         &amp; Patterson). When this is false, the instruction in IF
    *         at the time the jump resolves is squashed and replaced with
    *         a bubble, which is the default EduMIPS64 behavior.
+   *
+   *         <p><b>Corner cases.</b> The MIPS R4000 User's Manual §3.1.2
+   *         and the MIPS64 Architecture for Programmers Vol. II classify
+   *         a number of patterns as UNPREDICTABLE. EduMIPS64 picks a
+   *         deterministic, documented behavior for each so students see
+   *         a clear diagnostic instead of silent corruption:
+   *         <ul>
+   *           <li><b>Control-transfer in delay slot</b> (a branch or
+   *               jump fetched as the slot of another branch or jump):
+   *               raises an {@link org.edumips64.core.is.InvalidDelaySlotException}.
+   *               On real MIPS this is UNPREDICTABLE.</li>
+   *           <li><b>BREAK in delay slot</b>: with the delay slot
+   *               disabled the BREAK is squashed and silently ignored
+   *               (the BREAK never enters the pipeline architecturally);
+   *               with the delay slot enabled the BREAK propagates as a
+   *               regular {@link org.edumips64.core.is.BreakException}.</li>
+   *           <li><b>SYSCALL / HALT in delay slot</b>: with the delay
+   *               slot disabled the instruction is squashed; with the
+   *               delay slot enabled it executes and the program
+   *               terminates after the slot has retired, mirroring the
+   *               BREAK behavior. The branch target never runs.</li>
+   *           <li><b>Synchronous exception in delay slot</b> (integer
+   *               overflow, division by zero, address error, …): the
+   *               slot is advanced into ID before the exception is
+   *               re-thrown, so the pipeline ends the cycle in a
+   *               consistent state. The branch has already retired by
+   *               the time the EX-stage exception fires. Real MIPS
+   *               sets EPC = branch PC and Cause.BD = 1; EduMIPS64 has
+   *               no CP0 so it just reports the exception against the
+   *               slot's PC.</li>
+   *           <li><b>JAL / JALR link register</b>: R31 holds the
+   *               address of the instruction <em>after</em> the
+   *               architectural delay slot, per MIPS R4000 §3.2 — i.e.
+   *               JAL_PC + 8 when the delay slot is enabled, and
+   *               JAL_PC + 4 (the slot's own address, which is the
+   *               first instruction executed after JAL when the slot
+   *               is squashed) when it is disabled.</li>
+   *           <li><b>Not-taken branch</b>: the slot is the architectural
+   *               fall-through; it executes regardless of the setting.</li>
+   *         </ul>
+   *         The end-to-end suite pins down each of these in
+   *         {@code EndToEndTests#testDelaySlot*}.
    */
   public boolean isDelaySlotEnabled() {
     return config.getBoolean(ConfigKey.DELAY_SLOT);
@@ -895,6 +961,12 @@ public class CPU {
    * JumpException: the instruction previously in IF (the architectural
    * delay slot) moves into ID, the branch/jump moves from ID to EX, and a
    * fresh instruction is fetched from the (already updated) PC into IF.
+   *
+   * <p>Callers must have already validated that the IF instruction is
+   * <em>not</em> a control-transfer (see
+   * {@link org.edumips64.core.is.InvalidDelaySlotException}) — that
+   * pattern is UNPREDICTABLE on MIPS and is rejected by the
+   * JumpException handler before this method runs.
    */
   private void advanceDelaySlotPipeline() throws IrregularStringOfBitsException, IrregularWriteOperationException {
     pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);

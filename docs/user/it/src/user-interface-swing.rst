@@ -412,6 +412,46 @@ Alcune note:
   risultato non dipende dal branch) immediatamente dopo ogni branch o
   jump.
 
+Casi particolari
+^^^^^^^^^^^^^^^^
+
+Alcuni schemi all'interno di un delay slot sono classificati come
+**UNPREDICTABLE** dal MIPS R4000 User's Manual (§3.1.2) e dal MIPS64
+Architecture for Programmers, Vol. II. EduMIPS64 sceglie per ciascuno
+un comportamento deterministico e documentato, in modo che lo
+studente veda una diagnostica chiara invece di stati corrotti
+silenziosamente:
+
+* **Istruzione di salto in un delay slot** — inserire un branch o un
+  jump come delay slot di un altro branch o jump solleva a runtime
+  un'eccezione ``InvalidDelaySlotException``, con un messaggio che
+  identifica l'istruzione problematica. Sui MIPS reali questo caso è
+  UNPREDICTABLE; un simulatore didattico segnala l'errore invece di
+  produrre stati arbitrari.
+* **SYSCALL, HALT o BREAK in un delay slot** — quando il delay slot è
+  abilitato, l'istruzione dello slot viene eseguita fino in fondo
+  prima che l'eccezione o la terminazione abbiano effetto: le syscall
+  con effetti collaterali vengono eseguite esattamente una volta e il
+  bersaglio del salto non viene mai fetched. Quando il delay slot è
+  disabilitato, lo slot viene scartato come una normale bolla.
+* **Eccezione sincrona in un delay slot** — overflow su intero,
+  divisione per zero e simili eccezioni dello stadio EX generate dallo
+  slot si propagano correttamente dopo che lo slot è stato avanzato in
+  ID, lasciando la pipeline in uno stato coerente. Sui MIPS reali
+  ``EPC`` punta al branch e ``Cause.BD`` vale ``1``; EduMIPS64 non
+  modella CP0 e riporta semplicemente l'eccezione contro lo slot.
+* **Registro di link di JAL / JALR** — ``R31`` viene impostato
+  all'indirizzo dell'istruzione *successiva* al delay slot
+  architetturale (``JAL_PC + 8``) quando il delay slot è abilitato, e
+  all'indirizzo dello slot stesso (``JAL_PC + 4``) quando è
+  disabilitato. In entrambi i casi il comportamento corrisponde alla
+  definizione architetturale del MIPS R4000.
+* **Branch non preso** — lo slot è il fall-through architetturale e
+  viene comunque eseguito, indipendentemente dall'esito del branch.
+
+I test end-to-end in ``EndToEndTests`` (cercare ``testDelaySlot``)
+verificano ciascuno di questi casi.
+
 Dinero Frontend
 ~~~~~~~~~~~~~~~
 La finestra di dialogo Dinero Frontend consente di avviare un processo

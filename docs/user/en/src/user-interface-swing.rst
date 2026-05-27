@@ -383,6 +383,44 @@ A few notes:
   ``NOP`` (or a useful instruction whose result is independent of the
   branch) immediately after every branch or jump.
 
+Corner cases
+^^^^^^^^^^^^
+
+A number of patterns in a delay slot are classified as
+**UNPREDICTABLE** by the MIPS R4000 User's Manual (§3.1.2) and the
+MIPS64 Architecture for Programmers, Vol. II. EduMIPS64 picks a
+deterministic, documented behavior for each so that students see a
+clear diagnostic instead of silent corruption:
+
+* **Control transfer in a delay slot** — placing a branch or jump as
+  the delay slot of another branch or jump raises an
+  ``InvalidDelaySlotException`` at runtime, with a message that names
+  the offending instruction. On real MIPS this is UNPREDICTABLE; an
+  educational simulator surfaces the mistake instead of producing
+  arbitrary state.
+* **SYSCALL, HALT or BREAK in a delay slot** — when the delay slot is
+  enabled the slot instruction executes to completion before the
+  exception or program termination fires, so any side effects of the
+  syscall commit exactly once and the branch target is not fetched.
+  When the delay slot is disabled the slot is squashed, matching the
+  bubble semantics used everywhere else.
+* **Synchronous exception in a delay slot** — integer overflow,
+  division by zero and similar EX-stage exceptions raised by the slot
+  propagate cleanly after the slot has been advanced into ID, so the
+  pipeline ends the cycle in a self-consistent state. Real MIPS sets
+  ``EPC`` to the branch PC and ``Cause.BD`` to ``1``; EduMIPS64 does
+  not model CP0, so it simply reports the exception against the slot.
+* **JAL / JALR link register** — ``R31`` is set to the address of the
+  instruction *after* the architectural delay slot
+  (``JAL_PC + 8``) when the delay slot is enabled, and to the slot's
+  own address (``JAL_PC + 4``) when it is disabled. This matches the
+  MIPS R4000 architectural definition in both modes.
+* **Not-taken branch** — the slot is the architectural fall-through and
+  executes regardless of whether the branch is taken.
+
+End-to-end tests in ``EndToEndTests`` (search for ``testDelaySlot``)
+pin down each of these cases.
+
 Dinero Frontend
 ~~~~~~~~~~~~~~~
 The Dinero Frontend dialog allows to feed a DineroIV process with the trace

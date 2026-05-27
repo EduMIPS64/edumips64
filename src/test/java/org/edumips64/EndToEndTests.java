@@ -32,6 +32,7 @@ import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.AddressErrorException;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.InvalidDelaySlotException;
 import org.edumips64.core.parser.Parser;
 import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.utils.CycleBuilder;
@@ -1143,5 +1144,241 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     } finally {
       config.putBoolean(ConfigKey.DELAY_SLOT, previous);
     }
+  }
+
+  // ------------------------------------------------------------------
+  // Branch delay slot — edge cases.
+  //
+  // These tests pin down EduMIPS64's behavior for the corner cases of
+  // the branch delay slot, based on the rules in the MIPS R4000 User's
+  // Manual §3.1.2 and §5.4 (taxonomy of control-transfer in slot,
+  // exceptions in slot) and on the MIPS64 Architecture for Programmers
+  // Vol. II. Each test runs the same program with the delay slot
+  // disabled and enabled and asserts the resulting architectural state.
+  // ------------------------------------------------------------------
+
+  /** Convenience helper: enable the delay slot, run the test program,
+   *  and restore the previous setting on exit. */
+  private CpuTestStatus runMipsTestWithDelaySlot(String testPath) throws Exception {
+    boolean previous = config.getBoolean(ConfigKey.DELAY_SLOT);
+    try {
+      config.putBoolean(ConfigKey.DELAY_SLOT, true);
+      return runMipsTest(testPath);
+    } finally {
+      config.putBoolean(ConfigKey.DELAY_SLOT, previous);
+    }
+  }
+
+  /** Convenience helper: disable the delay slot, run the test program,
+   *  and restore the previous setting on exit. */
+  private CpuTestStatus runMipsTestWithoutDelaySlot(String testPath) throws Exception {
+    boolean previous = config.getBoolean(ConfigKey.DELAY_SLOT);
+    try {
+      config.putBoolean(ConfigKey.DELAY_SLOT, false);
+      return runMipsTest(testPath);
+    } finally {
+      config.putBoolean(ConfigKey.DELAY_SLOT, previous);
+    }
+  }
+
+  /** Branch in the delay slot of another branch. MIPS classifies this as
+   *  UNPREDICTABLE. With the delay slot disabled the slot is squashed so
+   *  the program completes normally; with the delay slot enabled
+   *  EduMIPS64 must raise an InvalidDelaySlotException so the offending
+   *  program is diagnosed instead of producing implementation-defined
+   *  state. */
+  @Test(timeout=5000)
+  public void testDelaySlotBranchInSlotDisabled() throws Exception {
+    // With delay slot disabled, the inner BEQ in the slot is squashed.
+    // Control reaches target1 → syscall 0 → clean termination.
+    runMipsTestWithoutDelaySlot("delay-slot-branch-in-slot.s");
+  }
+
+  @Test(expected = InvalidDelaySlotException.class, timeout=5000)
+  public void testDelaySlotBranchInSlotEnabled() throws Exception {
+    runMipsTestWithDelaySlot("delay-slot-branch-in-slot.s");
+  }
+
+  /** Unconditional jump in the delay slot of another unconditional jump.
+   *  Same classification as the branch-in-branch case. */
+  @Test(timeout=5000)
+  public void testDelaySlotJumpInSlotDisabled() throws Exception {
+    runMipsTestWithoutDelaySlot("delay-slot-jump-in-slot.s");
+  }
+
+  @Test(expected = InvalidDelaySlotException.class, timeout=5000)
+  public void testDelaySlotJumpInSlotEnabled() throws Exception {
+    runMipsTestWithDelaySlot("delay-slot-jump-in-slot.s");
+  }
+
+  /** JR in the delay slot of a JAL — the classic "tail call via jr in
+   *  delay slot" pattern. UNPREDICTABLE on real MIPS. */
+  @Test(timeout=5000)
+  public void testDelaySlotJrInJalSlotDisabled() throws Exception {
+    runMipsTestWithoutDelaySlot("delay-slot-jr-in-jal-slot.s");
+  }
+
+  @Test(expected = InvalidDelaySlotException.class, timeout=5000)
+  public void testDelaySlotJrInJalSlotEnabled() throws Exception {
+    runMipsTestWithDelaySlot("delay-slot-jr-in-jal-slot.s");
+  }
+
+  /** JAL followed by an unconditional branch as the slot. UNPREDICTABLE
+   *  on real MIPS; same expected outcome as the cases above. With the
+   *  delay slot disabled the slot branch is squashed and the program
+   *  completes via the subroutine's syscall. */
+  @Test(timeout=5000)
+  public void testDelaySlotJalThenBranchDisabled() throws Exception {
+    runMipsTestWithoutDelaySlot("delay-slot-jal-then-branch.s");
+  }
+
+  @Test(expected = InvalidDelaySlotException.class, timeout=5000)
+  public void testDelaySlotJalThenBranchEnabled() throws Exception {
+    runMipsTestWithDelaySlot("delay-slot-jal-then-branch.s");
+  }
+
+  /** Not-taken loop. With delay slot OFF, the slot (`daddi r3, r3, 7`)
+   *  is squashed every iteration in which the branch is taken, and
+   *  executes once at the loop exit (when the branch falls through).
+   *  With delay slot ON, the slot executes on every iteration including
+   *  the loop exit, so r3 ends up taken-count + 1 times larger. */
+  @Test(timeout=5000)
+  public void testDelaySlotNotTakenLoop() throws Exception {
+    Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutDelaySlot("delay-slot-not-taken-loop.s");
+    // Loop body always runs 3 times in both modes (r1 starts at 3).
+    collector.checkThat("r2 (loop body counter) without delay slot",
+        statuses.get(false).gprValues[2], equalTo(3L));
+    collector.checkThat("r2 (loop body counter) with delay slot",
+        statuses.get(true).gprValues[2], equalTo(3L));
+    // r3: with delay slot OFF, slot only runs at loop exit → +7.
+    collector.checkThat("r3 (slot increment) without delay slot",
+        statuses.get(false).gprValues[3], equalTo(7L));
+    // r3: with delay slot ON, slot runs once per BNEZ (3 iterations: 2
+    // taken + 1 not taken) → 3 × 7 = 21.
+    collector.checkThat("r3 (slot increment) with delay slot",
+        statuses.get(true).gprValues[3], equalTo(21L));
+  }
+
+  /** SYSCALL 0 (terminating) in the delay slot. The slot's side
+   *  effect — terminate — must take effect; the branch target must not
+   *  execute. Behavior diverges depending on whether the slot is
+   *  squashed: with delay slot OFF the SYSCALL is squashed, the program
+   *  falls through to the branch target which contains a BREAK, so a
+   *  BreakException is observed; with delay slot ON the SYSCALL fires
+   *  and the program terminates cleanly. */
+  @Test(timeout=5000)
+  public void testDelaySlotSyscallInSlotEnabled() throws Exception {
+    CpuTestStatus s = runMipsTestWithDelaySlot("delay-slot-syscall-in-slot.s");
+    collector.checkThat("r2 must be 0 (target not reached)",
+        s.gprValues[2], equalTo(0L));
+  }
+
+  @Test(expected = BreakException.class, timeout=5000)
+  public void testDelaySlotSyscallInSlotDisabled() throws Exception {
+    runMipsTestWithoutDelaySlot("delay-slot-syscall-in-slot.s");
+  }
+
+  /** HALT in the delay slot. Same semantics as SYSCALL 0 in the slot. */
+  @Test(timeout=5000)
+  public void testDelaySlotHaltInSlotEnabled() throws Exception {
+    CpuTestStatus s = runMipsTestWithDelaySlot("delay-slot-halt-in-slot.s");
+    collector.checkThat("r2 must be 0 (target not reached)",
+        s.gprValues[2], equalTo(0L));
+  }
+
+  @Test(expected = BreakException.class, timeout=5000)
+  public void testDelaySlotHaltInSlotDisabled() throws Exception {
+    runMipsTestWithoutDelaySlot("delay-slot-halt-in-slot.s");
+  }
+
+  /** BREAK in the delay slot. With delay slot OFF the BREAK is silently
+   *  squashed (existing behavior); with delay slot ON the BREAK is
+   *  propagated as a BreakException (handled in CPU.java's JumpException
+   *  handler). */
+  @Test(timeout=5000)
+  public void testDelaySlotBreakInSlotDisabled() throws Exception {
+    CpuTestStatus s = runMipsTestWithoutDelaySlot("delay-slot-break-in-slot.s");
+    collector.checkThat("target executed after BREAK was squashed",
+        s.gprValues[2], equalTo(7L));
+  }
+
+  @Test(expected = BreakException.class, timeout=5000)
+  public void testDelaySlotBreakInSlotEnabled() throws Exception {
+    runMipsTestWithDelaySlot("delay-slot-break-in-slot.s");
+  }
+
+  /** Synchronous arithmetic overflow exception raised by the EX stage of
+   *  the delay slot instruction. With delay slot OFF the offending
+   *  instruction is squashed and the program terminates cleanly via
+   *  the SYSCALL in the branch target; with delay slot ON the overflow
+   *  fires and propagates as a SynchronousException. */
+  @Test(expected = SynchronousException.class, timeout=5000)
+  public void testDelaySlotOverflowInSlotEnabled() throws Exception {
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
+    runMipsTestWithDelaySlot("delay-slot-overflow-in-slot.s");
+  }
+
+  @Test(timeout=5000)
+  public void testDelaySlotOverflowInSlotDisabled() throws Exception {
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
+    runMipsTestWithoutDelaySlot("delay-slot-overflow-in-slot.s");
+  }
+
+  /** Divide-by-zero in the delay slot. With delay slot OFF the DDIV is
+   *  squashed and the program terminates cleanly via the syscall in
+   *  the branch target; with delay slot ON the DDIV runs and raises a
+   *  DivisionByZeroException (a SynchronousException). */
+  @Test(timeout=5000)
+  public void testDelaySlotDiv0InSlotDisabled() throws Exception {
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
+    runMipsTestWithoutDelaySlot("delay-slot-div0-in-slot.s");
+  }
+
+  @Test(expected = SynchronousException.class, timeout=5000)
+  public void testDelaySlotDiv0InSlotEnabled() throws Exception {
+    config.putBoolean(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);
+    runMipsTestWithDelaySlot("delay-slot-div0-in-slot.s");
+  }
+
+  /** Sanity test: a NOP in the delay slot is the canonical, well-defined
+   *  pattern; observable register state must be identical with and
+   *  without delay slot support. */
+  @Test(timeout=5000)
+  public void testDelaySlotBubbleSlot() throws Exception {
+    Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutDelaySlot("delay-slot-bubble-slot.s");
+    collector.checkThat("r2 without delay slot",
+        statuses.get(false).gprValues[2], equalTo(11L));
+    collector.checkThat("r2 with delay slot",
+        statuses.get(true).gprValues[2], equalTo(11L));
+  }
+
+  /** JAL link register. EduMIPS64 stores PC-4 at JAL.ID() time; at that
+   *  point the slot has already been fetched so PC = JAL_PC + 8 and the
+   *  stored value is JAL_PC + 4 = address of the slot. This is
+   *  architecturally correct for the case where the slot is squashed
+   *  (delay slot OFF: the "return point" is the first instruction after
+   *  the JAL, i.e. the slot's address). When the delay slot is enabled
+   *  the MIPS spec requires R31 = JAL_PC + 8 (after-slot); this test
+   *  pins down the value EduMIPS64 produces so a future fix that
+   *  changes the semantics has to update the assertion explicitly. */
+  @Test(timeout=5000)
+  public void testDelaySlotJalLink() throws Exception {
+    Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutDelaySlot("delay-slot-jal-link.s");
+    // JAL is at PC = 0; slot at PC = 4; after-slot at PC = 8.
+    collector.checkThat("JAL link value without delay slot (slot address)",
+        statuses.get(false).gprValues[5], equalTo(4L));
+    collector.checkThat("JAL link value with delay slot (after slot)",
+        statuses.get(true).gprValues[5], equalTo(8L));
+  }
+
+  /** JALR link register, same semantics as JAL. */
+  @Test(timeout=5000)
+  public void testDelaySlotJalrLink() throws Exception {
+    Map<Boolean, CpuTestStatus> statuses = runMipsTestWithAndWithoutDelaySlot("delay-slot-jalr-link.s");
+    // JALR is at PC = 8; slot at PC = 12; after-slot at PC = 16.
+    collector.checkThat("JALR link value without delay slot (slot address)",
+        statuses.get(false).gprValues[5], equalTo(12L));
+    collector.checkThat("JALR link value with delay slot (after slot)",
+        statuses.get(true).gprValues[5], equalTo(16L));
   }
 }

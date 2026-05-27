@@ -55,7 +55,16 @@ public class JAL extends FlowControl_JType {
   public boolean ID() throws IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
     //saving PC value into a temporary register
     cpu.getRegister(31).incrWriteSemaphore();  //deadlock !!!
-    TR[PC_VALUE].writeDoubleWord(cpu.getPC().getValue() - 4);
+    // When the delay slot is enabled, MIPS R4000 §3.1 specifies that the
+    // link register holds the address of the instruction *after* the
+    // delay slot, i.e. JAL_PC + 8. At this point in the pipeline the IF
+    // stage has already incremented PC twice (once for JAL, once for the
+    // slot), so getPC() returns JAL_PC + 8 and getPC() - 4 is the slot
+    // address. With the delay slot disabled there is no slot, so the
+    // first instruction after the JAL lives at JAL_PC + 4 (the slot
+    // address from above), which is therefore the correct return point.
+    long linkAddress = cpu.isDelaySlotEnabled() ? cpu.getPC().getValue() : cpu.getPC().getValue() - 4;
+    TR[PC_VALUE].writeDoubleWord(linkAddress);
     //converting INSTR_INDEX into a bynary value of 26 bits in length
     String instr_index = Converter.positiveIntToBin(28, params.get(INSTR_INDEX));
     //appending the 35 most significant bits of the program counter on the left of "instr_index"
