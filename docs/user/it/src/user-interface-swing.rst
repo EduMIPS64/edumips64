@@ -416,8 +416,8 @@ Casi particolari
 ^^^^^^^^^^^^^^^^
 
 Alcuni schemi all'interno di un delay slot sono classificati come
-**UNPREDICTABLE** dal MIPS R4000 User's Manual (§3.1.2) e dal MIPS64
-Architecture for Programmers, Vol. II. EduMIPS64 sceglie per ciascuno
+**UNPREDICTABLE** dal MIPS64 Architecture For Programmers,
+Volume II-A. EduMIPS64 sceglie per ciascuno
 un comportamento deterministico e documentato, in modo che lo
 studente veda una diagnostica chiara invece di stati corrotti
 silenziosamente:
@@ -445,7 +445,7 @@ silenziosamente:
   architetturale (``JAL_PC + 8``) quando il delay slot è abilitato, e
   all'indirizzo dello slot stesso (``JAL_PC + 4``) quando è
   disabilitato. In entrambi i casi il comportamento corrisponde alla
-  definizione architetturale del MIPS R4000.
+  definizione MIPS64 di JAL/JALR.
 * **Branch non preso** — lo slot è il fall-through architetturale e
   viene comunque eseguito, indipendentemente dall'esito del branch.
 

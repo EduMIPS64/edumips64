@@ -1150,10 +1150,9 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
   // Branch delay slot — edge cases.
   //
   // These tests pin down EduMIPS64's behavior for the corner cases of
-  // the branch delay slot, based on the rules in the MIPS R4000 User's
-  // Manual §3.1.2 and §5.4 (taxonomy of control-transfer in slot,
-  // exceptions in slot) and on the MIPS64 Architecture for Programmers
-  // Vol. II. Each test runs the same program with the delay slot
+  // the branch delay slot, based on the rules in the MIPS64
+  // Architecture For Programmers Volume II-A (control-transfer in slot,
+  // exceptions in slot). Each test runs the same program with the delay slot
   // disabled and enabled and asserts the resulting architectural state.
   // ------------------------------------------------------------------
 

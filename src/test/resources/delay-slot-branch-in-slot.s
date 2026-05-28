@@ -2,9 +2,9 @@
 ;
 ; Edge case: a conditional branch placed in the delay slot of another
 ; conditional branch. The MIPS architecture defines this situation as
-; UNPREDICTABLE (MIPS R4000 User's Manual §3.1.2, MIPS64 Vol. II "Control
-; Transfer Instructions in a Branch Delay Slot result in UNPREDICTABLE
-; behavior").
+; UNPREDICTABLE (MIPS64 Architecture For Programmers Volume II-A:
+; "Control Transfer Instructions in a Branch Delay Slot result in
+; UNPREDICTABLE behavior").
 ;
 ; This program contains one such pattern. EduMIPS64 must either reject it
 ; or behave deterministically rather than silently corrupting state. With

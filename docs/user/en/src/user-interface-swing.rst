@@ -387,8 +387,8 @@ Corner cases
 ^^^^^^^^^^^^
 
 A number of patterns in a delay slot are classified as
-**UNPREDICTABLE** by the MIPS R4000 User's Manual (§3.1.2) and the
-MIPS64 Architecture for Programmers, Vol. II. EduMIPS64 picks a
+**UNPREDICTABLE** by the MIPS64 Architecture For Programmers,
+Volume II-A. EduMIPS64 picks a
 deterministic, documented behavior for each so that students see a
 clear diagnostic instead of silent corruption:
 
@@ -414,7 +414,7 @@ clear diagnostic instead of silent corruption:
   instruction *after* the architectural delay slot
   (``JAL_PC + 8``) when the delay slot is enabled, and to the slot's
   own address (``JAL_PC + 4``) when it is disabled. This matches the
-  MIPS R4000 architectural definition in both modes.
+  MIPS64 ISA definition of JAL/JALR in both modes.
 * **Not-taken branch** — the slot is the architectural fall-through and
   executes regardless of whether the branch is taken.
 

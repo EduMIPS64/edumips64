@@ -475,8 +475,8 @@ public class CPU {
       // was fetched sequentially after the branch is about to be
       // architecturally executed. If that instruction is itself a
       // control-transfer (any subclass of FlowControlInstructions) the
-      // MIPS architecture says the behavior is UNPREDICTABLE (MIPS R4000
-      // User's Manual §3.1.2, MIPS64 Vol. II). Production assemblers
+      // MIPS architecture says the behavior is UNPREDICTABLE (MIPS64
+      // Architecture For Programmers Volume II-A). Production assemblers
       // either reject the pattern or warn; EduMIPS64 raises a clearly
       // labelled, deterministic exception so the offending program is
       // diagnosed instead of silently producing implementation-defined
@@ -910,9 +910,9 @@ public class CPU {
    *         at the time the jump resolves is squashed and replaced with
    *         a bubble, which is the default EduMIPS64 behavior.
    *
-   *         <p><b>Corner cases.</b> The MIPS R4000 User's Manual §3.1.2
-   *         and the MIPS64 Architecture for Programmers Vol. II classify
-   *         a number of patterns as UNPREDICTABLE. EduMIPS64 picks a
+   *         <p><b>Corner cases.</b> The MIPS64 Architecture For
+   *         Programmers Volume II-A classifies a number of patterns as
+   *         UNPREDICTABLE. EduMIPS64 picks a
    *         deterministic, documented behavior for each so students see
    *         a clear diagnostic instead of silent corruption:
    *         <ul>
@@ -941,7 +941,8 @@ public class CPU {
    *               slot's PC.</li>
    *           <li><b>JAL / JALR link register</b>: R31 holds the
    *               address of the instruction <em>after</em> the
-   *               architectural delay slot, per MIPS R4000 §3.2 — i.e.
+   *               architectural delay slot, per the MIPS64 ISA
+   *               definition of JAL/JALR — i.e.
    *               JAL_PC + 8 when the delay slot is enabled, and
    *               JAL_PC + 4 (the slot's own address, which is the
    *               first instruction executed after JAL when the slot
