@@ -6,7 +6,7 @@
 ; observed, but when the delay slot is enabled the increment must take
 ; effect regardless of whether the branch is taken.
 ;
-; (c) 2024 EduMIPS64 project
+; (c) 2026 EduMIPS64 project
 ;
 ; This file is part of the EduMIPS64 project, and is released under the GNU
 ; General Public License.

@@ -6,7 +6,7 @@
 ; test is to make sure the delay-slot pipeline rewiring does not break
 ; not-taken branches.
 ;
-; (c) 2024 EduMIPS64 project
+; (c) 2026 EduMIPS64 project
                 .code
                 daddi   r1, r0, 1
                 daddi   r2, r0, 0

@@ -4,7 +4,7 @@
 ; instruction after the J is the delay slot and must execute only when
 ; the delay slot is enabled.
 ;
-; (c) 2024 EduMIPS64 project
+; (c) 2026 EduMIPS64 project
 ;
 ; This file is part of the EduMIPS64 project, and is released under the GNU
 ; General Public License.
