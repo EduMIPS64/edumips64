@@ -57,8 +57,9 @@ jobs:
       # controllable from PR content.
       #
       #   staging-dependabot : no manual approval required. Used for trusted
-      #                        maintainers and automation bots so their PRs get
-      #                        a preview without a human gate.
+      #                        maintainers and automation bots (Dependabot,
+      #                        Renovate, the Copilot coding agent) so their PRs
+      #                        get a preview without a human gate.
       #   Staging            : approval-gated environment. Used for everyone
       #                        else, including PRs from forks, so a maintainer
       #                        must approve before secrets are used to deploy.
@@ -71,8 +72,18 @@ jobs:
         env:
           ACTOR: ${{ github.event.workflow_run.triggering_actor.login }}
         run: |
+          # Actor logins are matched case-insensitively because GitHub may
+          # report e.g. the Copilot coding agent as "Copilot" rather than
+          # "copilot". Quote the "[bot]" entries so the brackets are treated
+          # literally and not as a glob character class.
+          shopt -s nocasematch
           maintainers=(lupino3)
-          bots=(dependabot dependabot[bot] renovate renovate[bot] copilot copilot[bot])
+          bots=(
+            dependabot "dependabot[bot]"
+            renovate "renovate[bot]"
+            copilot "copilot[bot]"
+            copilot-swe-agent "copilot-swe-agent[bot]"
+          )
 
           environment=Staging
           for actor in "${maintainers[@]}" "${bots[@]}"; do
