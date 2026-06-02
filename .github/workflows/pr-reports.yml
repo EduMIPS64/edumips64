@@ -27,6 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # Required so the GITHUB_TOKEN can download artifacts from the separate
+      # CI Build workflow run via the Actions artifacts API.
+      actions: read
     outputs:
       pr: ${{ steps.read.outputs.pr }}
       environment: ${{ steps.env.outputs.environment }}
@@ -91,6 +94,9 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      # Required so the GITHUB_TOKEN can download the web artifact from the
+      # separate CI Build workflow run via the Actions artifacts API.
+      actions: read
     environment:
       name: ${{ needs.metadata.outputs.environment }}
       url: https://edumips64ci.z16.web.core.windows.net/${{ needs.metadata.outputs.pr }}/

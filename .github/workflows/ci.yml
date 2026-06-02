@@ -2,13 +2,14 @@ name: CI Build
 
 # This is the "untrusted" stage of the CI pipeline. It runs on pull requests
 # (including those from forks) with a read-only token and NO access to secrets.
-# It builds and tests the proposed code and uploads the results as artifacts.
+# It builds and tests the proposed code, publishes coverage to the run's job
+# summaries, and uploads the build outputs as artifacts.
 #
-# All privileged actions (posting coverage comments, deploying preview builds)
-# are handled by the separate `pr-reports.yml` workflow, which runs base-branch
-# code only and never checks out pull request code. This separation means that
-# code from a fork can be built and tested safely without ever being able to
-# reach repository secrets or a write-enabled token.
+# The only privileged action (deploying a preview build) is handled by the
+# separate `pr-reports.yml` workflow, which runs base-branch code only and
+# never checks out pull request code. This separation means that code from a
+# fork can be built and tested safely without ever being able to reach
+# repository secrets or a write-enabled token.
 on:
   pull_request:
     branches:
@@ -66,8 +67,8 @@ jobs:
       ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
   # Run web UI Playwright tests locally with Istanbul coverage instrumentation.
-  # The lcov report is uploaded as an artifact; the actual PR comment is posted
-  # by the privileged pr-reports.yml workflow. No secrets are used here.
+  # The coverage report is rendered as a Markdown table and published to this
+  # run's job summary. No secrets are used here.
   test-web-coverage:
     name: Web UI coverage (Playwright)
     runs-on: ubuntu-latest
@@ -163,7 +164,7 @@ jobs:
 
   # Persist the pull request number as an artifact so the privileged workflow
   # (which is triggered by workflow_run and therefore has no PR context) knows
-  # which pull request to comment on and deploy a preview for.
+  # which pull request to deploy a preview for.
   save-pr-metadata:
     name: Save pull request metadata
     if: github.event_name == 'pull_request'
