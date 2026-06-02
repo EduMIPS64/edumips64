@@ -14,10 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      # Required so the JaCoCo coverage step below can post / update a sticky
-      # comment on the originating pull request when the workflow is invoked
-      # from a pull_request_target event.
-      pull-requests: write
     steps:
       - uses: actions/checkout@v6
         with:
@@ -57,23 +53,15 @@ jobs:
       - name: Compile and run tests
         run: ./gradlew check
 
-      # Publish the JaCoCo report directly to the pull request and to the
-      # Actions run summary, with no third-party service involved. The XML
-      # report is produced by `./gradlew check` (jacocoTestReport runs as part
-      # of `check`). Gated on pull_request_target because release.yml also
-      # calls this reusable workflow and there is no PR to comment on there.
-      - name: Report Java coverage on PR
-        if: github.event_name == 'pull_request_target' && hashFiles('build/reports/jacoco/test/jacocoTestReport.xml') != ''
-        uses: madrapps/jacoco-report@v1.7.2
-        with:
-          paths: build/reports/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: Java code coverage
-          update-comment: true
-          # The Swing UI is excluded from coverage (see developer-guide.md);
-          # keep the thresholds informational rather than gating.
-          min-coverage-overall: 0
-          min-coverage-changed-files: 0
+      # Summarise the JaCoCo report (produced by `./gradlew check`) into a
+      # small Markdown table and publish it to the run's job summary.
+      - name: Summarise Java coverage
+        if: hashFiles('build/reports/jacoco/test/jacocoTestReport.xml') != ''
+        run: python utils/jacoco-summary.py build/reports/jacoco/test/jacocoTestReport.xml java-coverage.md
+
+      - name: Publish Java coverage to job summary
+        if: hashFiles('java-coverage.md') != ''
+        run: cat java-coverage.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build all docs
         run: ./gradlew allDocs
