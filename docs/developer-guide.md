@@ -47,13 +47,18 @@ To generate an installable Windows MSI package (using the Gradle `msi` task), yo
 This project uses GitHub Actions for continuous integration
 (https://github.com/EduMIPS64/edumips64/actions).
 
-There are two main workflows:
+There are three main workflows:
 
-- **CI** (`ci.yml`) — runs on every pull request, push to `master`, and on a daily schedule.
-  Builds and tests the desktop application, builds the web application, deploys to
-  staging/production, and builds/tests the Snap package.
-- **Release** (`release.yml`) — runs on every push to `master` to build all release artifacts
-  (JAR, MSI, Electron apps). Can also be triggered manually to create a tagged GitHub release
+- **CI Build** (`ci.yml`) — runs on every pull request and on a daily schedule.
+  Builds and tests the desktop application, builds the web application, runs the
+  web UI tests, and builds/tests the Snap package. It runs with a read-only
+  token and no access to secrets, so it can safely build code from forks.
+- **PR preview deploy** (`pr-reports.yml`) — triggered when a CI Build run
+  completes. It runs from the base branch (never checking out pull request
+  code) and deploys the pre-built web application to the staging environment.
+- **Release** (`release.yml`) — runs on every push to `master` to build all
+  release artifacts (JAR, MSI, Electron apps) and deploy the web application to
+  production. Can also be triggered manually to create a tagged GitHub release
   with all artifacts attached.
 
 ### Main Gradle tasks
@@ -166,8 +171,8 @@ the application is currently running:
 - "Web Version" — production deployment at `web.edumips.org`.
 - "Web Version" + a clickable "PR #N" chip — a per-PR preview build deployed
   to `https://edumips64ci.z16.web.core.windows.net/<PR_NUMBER>/` by the
-  `deploy-staging` job in `.github/workflows/ci.yml`. The chip links back to
-  the originating pull request on GitHub.
+  `deploy-staging` job in `.github/workflows/pr-reports.yml`. The chip links
+  back to the originating pull request on GitHub.
 - "Web Version (dev)" + a "dev" chip — any other host (local development,
   forks, ad-hoc deployments, etc.).
 
@@ -179,8 +184,8 @@ configuration.
 #### Web UI code coverage
 
 The web UI tests can generate Istanbul code coverage data. CI publishes this
-report directly on each pull request (as a sticky comment and on the GitHub
-Actions run summary) — no third-party coverage service is involved.
+report on the GitHub Actions run summary — no third-party coverage service is
+involved.
 
 To run tests with coverage locally:
 
@@ -201,13 +206,13 @@ To run tests with coverage locally:
 The coverage report is written to `coverage/lcov.info` (and `coverage/index.html` for the
 HTML report). Both `.nyc_output/` and `coverage/` are excluded from version control.
 
-In CI, the `test-web-coverage` job in `ci.yml` performs these steps automatically.
-It then writes a textual `nyc` summary to the Actions run summary and posts a
-per-file lcov report as a comment on the originating pull request using
-[`romeovs/lcov-reporter-action`](https://github.com/romeovs/lcov-reporter-action).
-The Java side is reported the same way: the `build-desktop` job uses
-[`madrapps/jacoco-report`](https://github.com/madrapps/jacoco-report) to publish
-the JaCoCo XML produced by `./gradlew check` as a PR comment.
+In CI, the `test-web-coverage` job in `ci.yml` performs these steps
+automatically. It renders the lcov report as a Markdown table using
+`utils/lcov-summary.py` and appends it to the Actions run summary. The Java
+side is reported the same way: the `build-desktop` job uses
+`utils/jacoco-summary.py` to turn the JaCoCo XML produced by `./gradlew check`
+into a Markdown table on the run summary. Both summaries are published with a
+read-only token and require no repository secrets.
 
 ### Source code structure
 
