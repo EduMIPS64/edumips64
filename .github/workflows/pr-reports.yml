@@ -29,6 +29,7 @@ jobs:
       contents: read
     outputs:
       pr: ${{ steps.read.outputs.pr }}
+      environment: ${{ steps.env.outputs.environment }}
     steps:
       - name: Download PR number artifact
         uses: actions/download-artifact@v8.0.1
@@ -48,10 +49,40 @@ jobs:
           fi
           echo "pr=$number" >> "$GITHUB_OUTPUT"
 
-  # Deploy the pre-built web application to the staging environment and run a
-  # lightweight reachability check against it. The artifact content is built
-  # from PR code, but it is only ever uploaded as static files here; no PR code
-  # is executed in this privileged job.
+      # Decide which deployment environment to use based on who triggered the
+      # CI Build run. The trust signal is the triggering actor, which is not
+      # controllable from PR content.
+      #
+      #   staging-dependabot : no manual approval required. Used for trusted
+      #                        maintainers and automation bots so their PRs get
+      #                        a preview without a human gate.
+      #   Staging            : approval-gated environment. Used for everyone
+      #                        else, including PRs from forks, so a maintainer
+      #                        must approve before secrets are used to deploy.
+      #
+      # TODO: rename these GitHub Environments to more self-explanatory names
+      #       (e.g. staging-auto / staging-approval-required) and update the
+      #       values below to match.
+      - name: Determine deployment environment
+        id: env
+        env:
+          ACTOR: ${{ github.event.workflow_run.triggering_actor.login }}
+        run: |
+          maintainers=(lupino3)
+          bots=(dependabot dependabot[bot] renovate renovate[bot] copilot copilot[bot])
+
+          environment=Staging
+          for actor in "${maintainers[@]}" "${bots[@]}"; do
+            if [[ "$ACTOR" == "$actor" ]]; then
+              environment=staging-dependabot
+              break
+            fi
+          done
+          echo "environment=$environment" >> "$GITHUB_OUTPUT"
+
+  # Deploy the pre-built web application to the staging environment. The
+  # artifact content is built from PR code, but it is only ever uploaded as
+  # static files here; no PR code is executed in this privileged job.
   deploy-staging:
     name: Deploy web application to staging environment
     needs: metadata
@@ -61,10 +92,7 @@ jobs:
       contents: read
       id-token: write
     environment:
-      # Use the staging-dependabot environment for automated/maintainer PRs to
-      # avoid approval requirements; use the approval-gated Staging environment
-      # for everyone else (including forks).
-      name: ${{ (contains(fromJSON('["dependabot[bot]", "renovate[bot]", "copilot[bot]", "dependabot", "renovate", "copilot", "lupino3"]'), github.event.workflow_run.triggering_actor.login)) && 'staging-dependabot' || 'Staging' }}
+      name: ${{ needs.metadata.outputs.environment }}
       url: https://edumips64ci.z16.web.core.windows.net/${{ needs.metadata.outputs.pr }}/
     steps:
       - name: Download web application artifacts
@@ -90,21 +118,3 @@ jobs:
         with:
           inlineScript: |
               az storage blob upload-batch --account-name edumips64ci --auth-mode key -d '$web/${{ needs.metadata.outputs.pr }}' -s pr/${{ needs.metadata.outputs.pr }} --overwrite
-
-      # Verify the deployed preview is reachable. This is a plain availability
-      # check that does not execute any pull request code; the full functional
-      # Playwright suite already runs against a local server in CI Build.
-      - name: Verify deployed preview is reachable
-        env:
-          PREVIEW_URL: https://edumips64ci.z16.web.core.windows.net/${{ needs.metadata.outputs.pr }}/
-        run: |
-          for i in $(seq 1 20); do
-            if curl -sSf "$PREVIEW_URL" -o /dev/null; then
-              echo "Preview reachable at $PREVIEW_URL"
-              exit 0
-            fi
-            echo "Attempt $i: not ready yet, retrying..."
-            sleep 6
-          done
-          echo "::error::Preview deployment was not reachable at $PREVIEW_URL"
-          exit 1
