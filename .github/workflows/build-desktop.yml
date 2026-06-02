@@ -55,13 +55,11 @@ jobs:
 
       # Summarise the JaCoCo report (produced by `./gradlew check`) into a
       # small Markdown table and publish it to the run's job summary.
-      - name: Summarise Java coverage
-        if: hashFiles('build/reports/jacoco/test/jacocoTestReport.xml') != ''
-        run: python utils/jacoco-summary.py build/reports/jacoco/test/jacocoTestReport.xml java-coverage.md
-
       - name: Publish Java coverage to job summary
-        if: hashFiles('java-coverage.md') != ''
-        run: cat java-coverage.md >> "$GITHUB_STEP_SUMMARY"
+        if: hashFiles('build/reports/jacoco/test/jacocoTestReport.xml') != ''
+        run: |
+          python utils/jacoco-summary.py build/reports/jacoco/test/jacocoTestReport.xml java-coverage.md
+          cat java-coverage.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build all docs
         run: ./gradlew allDocs
