@@ -1124,22 +1124,20 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
         statuses.get(true).gprValues[2], equalTo(5L));
   }
 
-  /** JAL test program: ensures register-based jumps and links continue to
-   *  produce the same architectural outcome with the delay slot enabled
-   *  (R31 still holds the address of the instruction after the JAL, which
-   *  becomes the delay slot). The test program already terminates cleanly
-   *  via SYSCALL, so a clean run with delay slot on is the assertion. */
+  /** Smoke test for the unconditional-jump (J) family with the delay slot
+   *  enabled: ensures a jump and its delay slot continue to produce a clean
+   *  run with the delay slot on. JAL register-linking is covered separately by
+   *  {@link #testDelaySlotJalLink()}. The test program terminates cleanly via
+   *  SYSCALL, so a clean run with the delay slot on is the assertion. */
   @Test(timeout=5000)
-  public void testJalWithDelaySlot() throws Exception {
+  public void testJumpWithDelaySlotSmoke() throws Exception {
     boolean previous = config.getBoolean(ConfigKey.DELAY_SLOT);
     try {
       config.putBoolean(ConfigKey.DELAY_SLOT, true);
-      // jal.s has `b error` right after `jal continue`; with delay slot on
-      // this `b error` becomes the delay slot, executes, and jumps to
-      // `error: break`, which is the wrong outcome. We therefore use the
-      // simpler delay-slot-jump test program to assert the JAL/J family
-      // does not crash with delay slot enabled. Running the suite for
-      // jal.s with delay slot enabled is out of scope.
+      // delay-slot-jump.s uses an unconditional J whose delay slot executes
+      // cleanly with the delay slot enabled. (jal.s is unsuitable here because
+      // it has `b error` right after `jal continue`; with the delay slot on
+      // that `b error` would become the delay slot and jump to `error: break`.)
       runMipsTest("delay-slot-jump.s");
     } finally {
       config.putBoolean(ConfigKey.DELAY_SLOT, previous);

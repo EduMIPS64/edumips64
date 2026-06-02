@@ -8,7 +8,7 @@
 ; This file is part of the EduMIPS64 project, and is released under the GNU
 ; General Public License.
                 .code
-                daddi   r5, r0, 24          ; address of `target2` (computed by hand: instr 6 * 4)
+                daddi   r5, r0, 24          ; address of `target1` (instruction index 6 × 4 = 24)
                 nop
                 nop
                 jal     target1
