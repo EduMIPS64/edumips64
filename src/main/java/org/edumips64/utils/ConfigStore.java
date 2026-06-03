@@ -59,6 +59,7 @@ public abstract class ConfigStore {
 
     // Simulation parameters.
     ConfigStore.defaults.put(ConfigKey.FORWARDING, false);
+    ConfigStore.defaults.put(ConfigKey.DELAY_SLOT, false);
     ConfigStore.defaults.put(ConfigKey.WARNINGS, false);
     ConfigStore.defaults.put(ConfigKey.VERBOSE, true);
     ConfigStore.defaults.put(ConfigKey.SYNC_EXCEPTIONS_MASKED, false);

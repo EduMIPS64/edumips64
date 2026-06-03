@@ -1,5 +1,13 @@
 # EduMIPS64 ChangeLog
 
+## Unreleased
+
+### Added
+- Optional branch delay slot mode, as described in Hennessy & Patterson. When
+  enabled, the instruction immediately following a branch or jump is always
+  executed; otherwise it is squashed (the existing behavior). Exposed in both
+  the Swing UI (Main Settings tab) and the Web UI (General Settings).
+
 ## 1.4.0 (03/05/2026) - WalkOfLife
 
 ### Added

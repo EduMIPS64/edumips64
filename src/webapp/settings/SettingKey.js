@@ -25,6 +25,7 @@ export const SettingKey = Object.freeze({
 
   // CPU configuration.
   FORWARDING: 'forwarding',
+  DELAY_SLOT: 'delaySlot',
 
   // Execution parameters.
   STEP_STRIDE: 'stepStride',

@@ -9,6 +9,7 @@ import org.edumips64.core.SynchronousException;
 import org.edumips64.core.is.AddressErrorException;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.InvalidDelaySlotException;
 import org.edumips64.core.is.TwosComplementSumException;
 import org.edumips64.utils.CurrentLocale;
 import picocli.CommandLine.Command;
@@ -46,7 +47,7 @@ public class StepCommand implements Runnable {
         }
     }
 
-    private void runSteps() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException {
+    private void runSteps() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, InvalidDelaySlotException {
         for (int i = 0; i < steps; ++i) {
             cli.getCPU().step();
             System.out.println(cli.getCPU().pipeLineString());

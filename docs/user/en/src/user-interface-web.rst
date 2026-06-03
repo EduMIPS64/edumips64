@@ -338,6 +338,13 @@ reloads.
 * **CPU Forwarding** — enables or disables operand forwarding in the
   pipeline. Disabled while the simulator is running because changing
   it requires a reset.
+* **Branch Delay Slot** — enables or disables the classical MIPS
+  branch delay slot, as described in Hennessy & Patterson. When
+  enabled, the instruction immediately following any branch or jump
+  is **always executed**, regardless of whether the branch is taken;
+  when disabled (the default), that instruction is squashed and the
+  pipeline shows a bubble. Disabled while the simulator is running
+  because changing it requires a reset.
 * **Multi Step Size** — number of cycles executed by a single click of
   the *Multi Step* toolbar button.
 * **Execution Delay (ms)** — delay inserted between successive
