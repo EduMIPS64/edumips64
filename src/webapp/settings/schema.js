@@ -42,10 +42,11 @@ export const MIN_EXECUTION_DELAY_MS = 0;
 export const MAX_EXECUTION_DELAY_MS = 5000;
 
 // Shared validator for the L1D / L1I cache configuration objects.
+const isPositiveInteger = (v) => Number.isInteger(v) && v > 0;
 const isValidCacheConfig = (v) =>
-  Number.isFinite(v.size) &&
-  Number.isFinite(v.blockSize) &&
-  Number.isFinite(v.associativity);
+  isPositiveInteger(v.size) &&
+  isPositiveInteger(v.blockSize) &&
+  isPositiveInteger(v.associativity);
 
 // Hex color (`#RRGGBB`) validator used by the pipeline color settings.
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
