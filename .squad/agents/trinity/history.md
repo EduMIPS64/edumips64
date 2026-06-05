@@ -8,4 +8,3 @@
 ## Learnings
 
 <!-- Append new learnings below. Each entry is something lasting about the project. -->
-- 2026-06-05T16:05:59+02:00: React hook effects in Code.js use refs for Monaco/Vim disposables so exhaustive-deps stays truthful without eslint-disable comments.
