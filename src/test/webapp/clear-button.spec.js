@@ -60,10 +60,6 @@ SYSCALL 0
 
   const rawStallsAfterClear = await page.locator('#stat-raw-stalls').textContent();
   expect(rawStallsAfterClear).toBe('0');
-  const wawStallsAfterClear = await page.locator('#stat-waw-stalls').textContent();
-  expect(wawStallsAfterClear).toBe('0');
-  const structuralStallsAfterClear = await page.locator('#stat-structural-stalls').textContent();
-  expect(structuralStallsAfterClear).toBe('0');
 
   // 2) Verify that the code is the trivial "syscall 0" program
   // Get the editor content by reading from Monaco's model

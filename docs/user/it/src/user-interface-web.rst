@@ -265,7 +265,7 @@ Contatori sull'esecuzione del programma:
 * numero di cicli eseguiti;
 * numero di istruzioni eseguite;
 * CPI — cicli per istruzione (``cicli / istruzioni``);
-* stalli RAW, WAW e strutturali;
+* stalli RAW;
 * letture e miss della L1 istruzioni;
 * letture, miss in lettura, scritture e miss in scrittura della L1
   dati (significativi solo se la cache è opportunamente configurata —
