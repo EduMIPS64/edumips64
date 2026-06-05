@@ -434,9 +434,9 @@ const Simulator = ({worker, initialState, appInsights}) => {
   }
 
 
-  const setCacheConfig = (config) => {
+  const setCacheConfig = React.useCallback((config) => {
     worker.setCacheConfig(config);
-  };
+  }, [worker]);
 
   const openCode = () => {
     const fileInput = document.createElement('input');

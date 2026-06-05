@@ -6,7 +6,7 @@ const {
   waitForRunningState,
   waitForSimulationComplete,
   loadProgram,
-  runToCompletion
+  runToCompletion,
 } = require('./test-utils');
 
 /**
@@ -22,17 +22,7 @@ async function setCacheConfig(page, cacheType, config) {
   // by default (issue #1697). Make sure it's expanded before trying to fill
   // any field, otherwise the inputs aren't visible/editable and Playwright
   // will hang until the test times out.
-  const cacheAccordionSummary = page.getByRole('button', {
-    name: /Cache Configuration/,
-  });
-  await cacheAccordionSummary.waitFor({ state: 'visible' });
-  if ((await cacheAccordionSummary.getAttribute('aria-expanded')) !== 'true') {
-    await cacheAccordionSummary.click();
-    await expect(cacheAccordionSummary).toHaveAttribute(
-      'aria-expanded',
-      'true'
-    );
-  }
+  await expandCacheConfig(page);
 
   // Find the cache configuration section by its label
   const cacheSection = page.locator(`text=${cacheType}`).locator('..');
@@ -50,6 +40,20 @@ async function setCacheConfig(page, cacheType, config) {
   if (config.associativity !== undefined) {
     const assocInput = cacheSection.locator('input[type="number"]').nth(2);
     await assocInput.fill(String(config.associativity));
+  }
+}
+
+async function expandCacheConfig(page) {
+  const cacheAccordionSummary = page.getByRole('button', {
+    name: /Cache Configuration/,
+  });
+  await cacheAccordionSummary.waitFor({ state: 'visible' });
+  if ((await cacheAccordionSummary.getAttribute('aria-expanded')) !== 'true') {
+    await cacheAccordionSummary.click();
+    await expect(cacheAccordionSummary).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
   }
 }
 
@@ -74,12 +78,12 @@ async function getCacheStats(page) {
   const l1dReads = parseInt((await l1dReadsCell.textContent()) || '0', 10);
   const l1dReadMisses = parseInt(
     (await l1dReadMissesCell.textContent()) || '0',
-    10
+    10,
   );
   const l1dWrites = parseInt((await l1dWritesCell.textContent()) || '0', 10);
   const l1dWriteMisses = parseInt(
     (await l1dWriteMissesCell.textContent()) || '0',
-    10
+    10,
   );
 
   return {
@@ -92,7 +96,79 @@ async function getCacheStats(page) {
   };
 }
 
+test('cache configuration textboxes can be cleared and keep focus while typing', async ({
+  page,
+}) => {
+  await page.goto(targetUri);
+  await waitForPageReady(page);
+  await expandCacheConfig(page);
 
+  const cacheSection = page.locator('text=L1 Data Cache').locator('..');
+  const sizeInput = cacheSection.locator('input[type="number"]').nth(0);
+
+  await sizeInput.click();
+  await expect(sizeInput).toBeFocused();
+  await page.keyboard.press('ControlOrMeta+a');
+  await page.keyboard.press('Backspace');
+  await expect(sizeInput).toBeFocused();
+  await expect(sizeInput).toHaveValue('');
+
+  for (const digit of ['2', '0', '4', '8']) {
+    await page.keyboard.type(digit);
+    await expect(sizeInput).toBeFocused();
+  }
+
+  await expect(sizeInput).toHaveValue('2048');
+  await page.close();
+});
+
+test('cache configuration falls back to defaults when persisted values are invalid', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const invalidCacheConfig = {
+      size: 0,
+      blockSize: 0,
+      associativity: 0,
+    };
+    window.localStorage.setItem(
+      'edumips64:v1:cache.l1d',
+      JSON.stringify(invalidCacheConfig),
+    );
+    window.localStorage.setItem(
+      'edumips64:v1:cache.l1i',
+      JSON.stringify(invalidCacheConfig),
+    );
+  });
+
+  await page.goto(targetUri);
+  await waitForPageReady(page);
+  await expandCacheConfig(page);
+
+  const l1iLabel = page.locator('text=L1 Instruction Cache');
+  const l1dLabel = page.locator('text=L1 Data Cache');
+  const [l1iBox, l1dBox] = await Promise.all([
+    l1iLabel.boundingBox(),
+    l1dLabel.boundingBox(),
+  ]);
+  expect(l1iBox).not.toBeNull();
+  expect(l1dBox).not.toBeNull();
+  expect(l1iBox.y).toBeLessThan(l1dBox.y);
+
+  for (const cacheType of ['L1 Data Cache', 'L1 Instruction Cache']) {
+    const cacheSection = page.locator(`text=${cacheType}`).locator('..');
+    const inputs = cacheSection.locator('input[type="number"]');
+
+    await expect(inputs.nth(0)).toHaveValue('1024');
+    await expect(inputs.nth(1)).toHaveValue('16');
+    await expect(inputs.nth(2)).toHaveValue('1');
+    await expect(inputs.nth(0)).toHaveAttribute('min', '1');
+    await expect(inputs.nth(1)).toHaveAttribute('min', '1');
+    await expect(inputs.nth(2)).toHaveAttribute('min', '1');
+  }
+
+  await page.close();
+});
 
 /**
  * Test: Verify cache statistics are displayed and updated after running a simple program
@@ -290,7 +366,7 @@ SYSCALL 0
   // should fit in 1-2 cache blocks, resulting in fewer misses
   // than with 8-byte blocks where each write is a miss
   expect(statsLargeBlock.l1dWriteMisses).toBeLessThanOrEqual(
-    statsSmallBlock.l1dWriteMisses
+    statsSmallBlock.l1dWriteMisses,
   );
 
   await page.close();
