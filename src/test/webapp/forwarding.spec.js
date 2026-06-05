@@ -117,7 +117,15 @@ async function getExecutionStats(page) {
     (await page.locator('#stat-raw-stalls').textContent()) || '0',
     10
   );
-  return { cycles, instructions, rawStalls };
+  const wawStalls = parseInt(
+    (await page.locator('#stat-waw-stalls').textContent()) || '0',
+    10
+  );
+  const structuralStalls = parseInt(
+    (await page.locator('#stat-structural-stalls').textContent()) || '0',
+    10
+  );
+  return { cycles, instructions, rawStalls, wawStalls, structuralStalls };
 }
 
 /**
@@ -271,6 +279,8 @@ test('forwarding is applied on a fresh session and yields identical cycle/stall 
   expect(session2Stats.cycles).toBe(session1Stats.cycles);
   expect(session2Stats.instructions).toBe(session1Stats.instructions);
   expect(session2Stats.rawStalls).toBe(session1Stats.rawStalls);
+  expect(session2Stats.wawStalls).toBe(session1Stats.wawStalls);
+  expect(session2Stats.structuralStalls).toBe(session1Stats.structuralStalls);
 
   // And specifically the forwarding-enabled value, not the default one.
   expect(session2Stats.cycles).toBe(EXPECTED_WITH_FORWARDING.cycles);

@@ -254,7 +254,7 @@ Counters about the program execution:
 * number of executed cycles;
 * number of executed instructions;
 * CPI — cycles per instruction (``cycles / instructions``);
-* RAW stalls;
+* RAW, WAW and structural stalls;
 * L1 instruction-cache reads and misses;
 * L1 data-cache reads, read misses, writes and write misses (only
   meaningful when the cache simulator is configured — see *Cache

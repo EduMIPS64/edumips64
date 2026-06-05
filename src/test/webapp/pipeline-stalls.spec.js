@@ -232,6 +232,7 @@ SYSCALL 0
   expect(snap.ID.stall).toBe('WAW');
   expect(snap.ID.fill).toBe(STALL_COLOR);
 
+  expect(await readStat(page, 'stat-waw-stalls')).toBeGreaterThanOrEqual(1);
 });
 
 /**

@@ -43,7 +43,7 @@ public class GUIStatistics extends GUIComponent {
 
   StatPanel statPanel;
   JScrollPane jsp;
-  private int nCycles, nInstructions, rawStalls, codeSize;
+  private int nCycles, nInstructions, rawStalls, codeSize, WAWStalls, dividerStalls, memoryStalls;
 
   private int L1I_reads, L1I_reads_misses, L1D_reads, L1D_reads_misses, L1D_writes, L1D_writes_misses;
 
@@ -65,7 +65,8 @@ public class GUIStatistics extends GUIComponent {
   class StatPanel extends JPanel {
     private static final long serialVersionUID = 81105844698513914L;
     JList<? extends String> statList;
-    String [] statistics = {" Execution", " 0 Cycles", " 0 Instructions", " ", " Stalls", " 0 RAW Stalls",
+    String [] statistics = {" Execution", " 0 Cycles", " 0 Instructions", " ", " Stalls", " 0 RAW Stalls", " 0 WAW Stalls",
+                            " 0 Structural Stalls(Divider not available)", "0 Structural Stalls (Memory not available)",
                             " Code Size", " 0 Bytes", "FPU info", "FCSR", "FCSRGroups", "FCSRMnemonics", "FCSRValues",
                             " L1 Cache Stats", " 0 L1I Reads", " 0 L1I Read Misses",
                             " 0 L1D Reads", " 0 L1D Read Misses", " 0 L1D Writes", " 0 L1D Write Misses"
@@ -96,6 +97,9 @@ public class GUIStatistics extends GUIComponent {
 
     rawStalls = cpu.getRAWStalls();
     codeSize = (memory.getInstructionsNumber()) * 4;
+    WAWStalls = cpu.getWAWStalls();
+    dividerStalls = cpu.getStructuralStallsDivider();
+    memoryStalls = cpu.getStructuralStallsMemory();
     L1I_reads = (int) cachesim.getL1InstructionCache().getStats().getReadAccesses();
     L1I_reads_misses = (int) cachesim.getL1InstructionCache().getStats().getReadMisses();
     L1D_reads = (int) cachesim.getL1DataCache().getStats().getReadAccesses();
@@ -168,48 +172,57 @@ public class GUIStatistics extends GUIComponent {
         }
         return label;
       case 6:
+        label.setText(" " + WAWStalls + " " + CurrentLocale.getString("WAWS"));
+        return label;
+      case 7:
+        label.setText(" " + dividerStalls + " " + CurrentLocale.getString("STRUCTS_DIVNOTAVAILABLE"));
+        return label;
+      case 8:
+        label.setText(" " + memoryStalls  + " " + CurrentLocale.getString("STRUCTS_MEMNOTAVAILABLE"));
+        return label;
+      case 9:
         label.setText(" " + CurrentLocale.getString("CSIZE"));
         label.setForeground(Color.red);
         return label;
-      case 7:
+      case 10:
         label.setText(" " + codeSize + " " + CurrentLocale.getString("BYTES"));
         return label;
-      case 8:
+      case 11:
         label.setText(" " + CurrentLocale.getString("FPUINFO"));
         label.setForeground(Color.red);
         return label;
-      case 9:
+      case 12:
         label.setText(" " + CurrentLocale.getString("FPUFCSR"));
         return label;
-      case 10:
+      case 13:
         label.setText(" " + "    FCC       Cause EnablFlag RM");
         return label;
-      case 11:
+      case 14:
         label.setText(" " + "7654321 0      VZOUIVZOUIVZOUI");
         return label;
-      case 12:
+      case 15:
         label.setText(" " + cpu.getFCSR().getBinString());
         return label;
-      case 13:
+      case 16:
         label.setText(" " + CurrentLocale.getString("L1CACHESTATS"));
         label.setForeground(Color.red);
         return label;
-      case 14:
+      case 17:
         label.setText(" " + L1I_reads + " " + CurrentLocale.getString("L1I READS"));
         return label;
-      case 15:
+      case 18:
         label.setText(" " + L1I_reads_misses + " " + CurrentLocale.getString("L1I READ MISSES"));
         return label;
-      case 16:
+      case 19:
         label.setText(" " + L1D_reads + " " + CurrentLocale.getString("L1D READS"));
         return label;
-      case 17:
+      case 20:
         label.setText(" " + L1D_reads_misses + " " + CurrentLocale.getString("L1D READ MISSES"));
         return label;
-      case 18:
+      case 21:
         label.setText(" " + L1D_writes + " " + CurrentLocale.getString("L1D WRITES"));
         return label;
-      case 19:
+      case 22:
         label.setText(" " + L1D_writes_misses + " " + CurrentLocale.getString("L1D WRITE MISSES"));
         return label;
       }
