@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { initVimMode } from 'monaco-vim';
 
 // new
@@ -23,15 +23,14 @@ monacoEditor.languages.register({ id: 'mips' });
 const Code = (props) => {
   const [monaco, setMonaco] = useState(null);
   const [editor, setEditor] = useState(null);
-  const [vimInstance, setVimInstance] = useState(null); // new state for Vim instance
-  // IDisposable to clean up the hover provider.
-  const [hoverDisposable, setHoverCleanup] = useState(null);
+  const vimInstanceRef = useRef(null);
+  const hoverDisposableRef = useRef(null);
 
   // Decorations (used for CPU stage indication).
-  const [decorations, setDecorations] = useState([]);
+  const decorationsRef = useRef([]);
 
   // Maps line of code to CPU stage.
-  const [stageMap, setStageMap] = useState(new Map());
+  const [stageMap, setStageMap] = useState(() => new Map());
 
   // Install our MIPS syntax highlighting provider.
   //
@@ -110,12 +109,15 @@ const Code = (props) => {
   }, [monaco, props.validInstructions]);
 
   useEffect(() => {
-    if (!monaco) {
+    if (!monaco || !editor) {
       return;
     }
-    if (!props.running && decorations) {
-      const newDecorations = editor.deltaDecorations(decorations, []);
-      setDecorations(decorations);
+    if (!props.running) {
+      decorationsRef.current = editor.deltaDecorations(
+        decorationsRef.current,
+        [],
+      );
+      setStageMap(new Map());
       return;
     }
 
@@ -222,12 +224,11 @@ const Code = (props) => {
     setStageMap(newStageMap);
     console.log('decorations');
     console.log(newDecorations);
-    const appliedDecorations = editor.deltaDecorations(
-      decorations,
+    decorationsRef.current = editor.deltaDecorations(
+      decorationsRef.current,
       newDecorations,
     );
-    setDecorations(appliedDecorations);
-  }, [props.pipeline, props.running, monaco]);
+  }, [props.pipeline, props.running, monaco, editor]);
 
   // Hook to update the map of source line to instruction.
   useEffect(() => {
@@ -242,8 +243,8 @@ const Code = (props) => {
         .map((instruction) => map.set(instruction.Line, instruction));
     }
 
-    if (hoverDisposable) {
-      hoverDisposable.dispose();
+    if (hoverDisposableRef.current) {
+      hoverDisposableRef.current.dispose();
     }
 
     const disposable = monaco.languages.registerHoverProvider('mips', {
@@ -278,29 +279,14 @@ const Code = (props) => {
         };
       },
     });
-    setHoverCleanup(disposable);
-  }, [props.parsedInstructions, stageMap, monaco]); // eslint-disable-line @eslint-react/exhaustive-deps
-
-  const saveCodeToFile = () => {
-    const blob = new Blob([props.code], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'code.s';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
-  const loadCodeFromFile = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      props.onChangeValue(e.target.result);
+    hoverDisposableRef.current = disposable;
+    return () => {
+      if (hoverDisposableRef.current === disposable) {
+        hoverDisposableRef.current.dispose();
+        hoverDisposableRef.current = null;
+      }
     };
-    reader.readAsText(file);
-  };
+  }, [props.parsedInstructions, stageMap, monaco]);
 
   const editorDidMount = (editor, monaco) => {
     // Expose monaco and editor to window for testing purposes
@@ -318,8 +304,7 @@ const Code = (props) => {
 
     // Enable Vi mode if viMode prop is true
     if (props.viMode) {
-      const vim = initVimMode(editor);
-      setVimInstance(vim);
+      vimInstanceRef.current = initVimMode(editor);
     }
 
     // Ensure the required command is registered
@@ -336,14 +321,19 @@ const Code = (props) => {
   // Hook to dynamically toggle Vi mode when viMode prop changes
   useEffect(() => {
     if (!editor) return;
-    if (props.viMode) {
-      const vim = initVimMode(editor);
-      setVimInstance(vim);
-    } else if (vimInstance) {
-      vimInstance.dispose();
-      setVimInstance(null);
+    if (props.viMode && !vimInstanceRef.current) {
+      vimInstanceRef.current = initVimMode(editor);
+    } else if (!props.viMode && vimInstanceRef.current) {
+      vimInstanceRef.current.dispose();
+      vimInstanceRef.current = null;
     }
-  }, [props.viMode]);
+    return () => {
+      if (vimInstanceRef.current) {
+        vimInstanceRef.current.dispose();
+        vimInstanceRef.current = null;
+      }
+    };
+  }, [editor, props.viMode]);
 
   const options = {
     selectOnLineNumbers: true,
