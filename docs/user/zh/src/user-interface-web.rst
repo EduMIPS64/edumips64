@@ -203,7 +203,7 @@ Statistics
 * 已执行的周期数；
 * 已执行的指令数；
 * CPI —— 每条指令的平均周期数（``cycles / instructions``）；
-* RAW 停顿数；
+* RAW、WAW 和结构性停顿数；
 * L1 指令缓存的读次数和未命中次数；
 * L1 数据缓存的读次数、读未命中、写次数和写未命中（仅在配置缓存
   模拟器时才有意义 —— 见 *Cache Configuration*）。
