@@ -1,5 +1,11 @@
 # EduMIPS64 ChangeLog
 
+## 1.4.1 (TBD)
+
+### Fixed
+
+### Changed
+
 ## 1.4.0 (03/05/2026) - WalkOfLife
 
 ### Added
