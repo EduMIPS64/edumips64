@@ -74,6 +74,13 @@ the simulator. Each button has a tooltip that describes its effect.
   ``SYSCALL 0``). The Clear button is disabled while the CPU is
   running.
 
+* **Restore default sample** — replaces the editor contents with the
+  bundled sample program shipped with EduMIPS64 (the same one shown
+  on a fresh installation). This is useful to recover a known-good
+  starting point after experimenting, or to discard the persisted
+  editor contents (see *Saving and loading* below). The button is
+  disabled while the CPU is running.
+
 * **Open Code** — opens a local file (typically a ``.s`` file) and
   loads its contents into the editor.
 
@@ -185,6 +192,14 @@ The editor's contents can be persisted using the **Save Code** and
 **Open Code** toolbar buttons. ``Save Code`` triggers a download of
 the current source as ``code.s``; ``Open Code`` lets you pick a local
 file and replaces the editor's contents with it.
+
+In addition, the editor automatically persists its contents in the
+browser's local storage as you type, so an accidental page reload
+does not wipe a non-trivial program back to the bundled sample. The
+last edited source is restored the next time the page is opened in
+the same browser. Use the **Restore default sample** toolbar button
+to discard the persisted contents and bring back the original
+example program.
 
 Optional Vi mode
 ~~~~~~~~~~~~~~~~

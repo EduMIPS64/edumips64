@@ -178,6 +178,15 @@ export const SETTINGS_SCHEMA = Object.freeze({
       v >= MIN_EXECUTION_DELAY_MS &&
       v <= MAX_EXECUTION_DELAY_MS,
   },
+  [SettingKey.EDITOR_CODE]: {
+    type: SettingType.STRING,
+    // Use an empty string as the sentinel for "user hasn't customized the editor
+    // yet". This avoids baking today's SampleProgram into localStorage on the
+    // very first visit, which would prevent a future sample update from being
+    // visible to users who never edited the editor.  Simulator.js maps '' back
+    // to the current SampleProgram when rendering.
+    default: '',
+  },
   [SettingKey.PIPELINE_COLORS]: {
     type: SettingType.OBJECT,
     default: { ...DEFAULT_PIPELINE_COLORS },
