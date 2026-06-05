@@ -82,6 +82,13 @@ jobs:
           # Check that the tag does not already exist
           if git rev-parse "refs/tags/${TAG}" >/dev/null 2>&1; then
             echo "::error::Tag ${TAG} already exists. Please bump the version in gradle.properties before releasing."
+            {
+              echo "## ❌ Release validation failed: tag already exists"
+              echo ""
+              echo "Tag \`${TAG}\` already exists in this repository."
+              echo ""
+              echo "**Action required:** bump \`version\` in \`gradle.properties\` to the next version before triggering a release."
+            } >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
@@ -96,11 +103,33 @@ jobs:
             HIGHEST=$(printf '%s\n%s' "${LATEST_VERSION}" "${VERSION}" | sort -V | tail -n1)
             if [ "${HIGHEST}" = "${LATEST_VERSION}" ]; then
               echo "::error::Version ${VERSION} is not greater than the latest release ${LATEST_VERSION}. Please bump the version in gradle.properties."
+              {
+                echo "## ❌ Release validation failed: version not incremented"
+                echo ""
+                echo "Version \`${VERSION}\` is not strictly greater than the latest release \`${LATEST_VERSION}\`."
+                echo ""
+                echo "**Action required:** bump \`version\` in \`gradle.properties\` to a version greater than \`${LATEST_VERSION}\`."
+              } >> "$GITHUB_STEP_SUMMARY"
               exit 1
             fi
             echo "✅ Version ${VERSION} is greater than ${LATEST_VERSION}"
           else
             echo "No previous release tags found – this will be the first release."
+          fi
+
+      - name: Warn if version already has a tag (non-release run)
+        if: steps.set_mode.outputs.is_release != 'true'
+        run: |
+          VERSION="${{ steps.read_version.outputs.version }}"
+          TAG="v${VERSION}"
+          if git rev-parse "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "::warning::Version ${VERSION} (tag ${TAG}) is already released. Remember to bump the version in gradle.properties before the next release."
+            {
+              echo "## ⚠️ Version ${VERSION} is already released"
+              echo ""
+              echo "The current version \`${VERSION}\` already has a git tag (\`${TAG}\`)."
+              echo "Please update \`version\` in \`gradle.properties\` before triggering a new release."
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
   # ---------------------------------------------------------------------------
