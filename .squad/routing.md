@@ -22,7 +22,7 @@ How to decide who handles what.
 | `squad` | Triage: analyze issue, assign `squad:{member}` label | Morpheus (Lead) |
 | `squad:{name}` | Pick up issue and complete the work | Named member |
 | `squad:copilot` | Assign issue to @copilot (manual only — async draft PR) | @copilot |
-| `squad:andrea` | Present to Andrea for review/decision; wait for input | Andrea (human) |
+| `squad:andrea-spadaccini` | Present to Andrea for review/decision; wait for input | Andrea (human) |
 
 ### Triage Routing Guide (for Morpheus)
 
@@ -32,7 +32,7 @@ How to decide who handles what.
 - Docs (EN/IT/ZH), README, dev guide → `squad:link`
 - Testing / coverage / flaky tests → `squad:smith`
 - Architecture, scope, ambiguous direction → `squad:morpheus` (or escalate to Andrea)
-- Product/UX opinion, prioritization, "should we do this?" → `squad:andrea`
+- Product/UX opinion, prioritization, "should we do this?" → `squad:andrea-spadaccini`
 - Well-scoped fix/cleanup suitable for autonomy (e.g. lint/Codacy, small self-contained) → `squad:copilot` (assign explicitly; auto-assign is OFF)
 
 ### How Issue Assignment Works
