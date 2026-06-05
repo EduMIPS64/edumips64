@@ -101,11 +101,12 @@ test('restore default sample button restores the bundled sample', async ({
   expect(defaultSample.length).toBeGreaterThan(0);
 
   // Replace the editor with a different program.
+  const typedProgram = '.code\nSYSCALL 0\n';
   const inputArea = page.locator('.monaco-editor textarea.inputarea');
   await inputArea.click({ force: true });
   await page.keyboard.press('ControlOrMeta+a');
   await page.keyboard.press('Backspace');
-  await page.keyboard.insertText('.code\nSYSCALL 0\n');
+  await page.keyboard.insertText(typedProgram);
 
   await page.waitForFunction(
     (expected) => {
@@ -113,6 +114,27 @@ test('restore default sample button restores the bundled sample', async ({
       return model && model.getValue() !== expected;
     },
     defaultSample,
+    { timeout: 5000 },
+  );
+
+  // Wait until the typed program has actually been persisted to localStorage
+  // (the write is debounced ~500 ms). Without this, the debounced write may
+  // still be pending when Restore is clicked; restoreDefaultSample() cancels
+  // that pending write, so storage would still hold the mount-time '""'
+  // sentinel and the later `=== ''` assertion could pass even if
+  // resetStoredCode() never ran (false green). Polluting storage with the
+  // typed program first guarantees the subsequent reset is genuinely tested.
+  await page.waitForFunction(
+    ({ key, expected }) => {
+      const raw = window.localStorage.getItem(key);
+      if (raw === null) return false;
+      try {
+        return JSON.parse(raw) === expected;
+      } catch {
+        return false;
+      }
+    },
+    { key: EDITOR_CODE_KEY, expected: typedProgram },
     { timeout: 5000 },
   );
 
