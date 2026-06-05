@@ -1,0 +1,13 @@
+---
+# Codacy configuration.
+# Exclude vendored AI-team (Squad) tooling and scaffolding from static analysis.
+# These files are generated tooling, not part of the EduMIPS64 application code,
+# and are not maintained to the project's source quality standards.
+exclude_paths:
+  - '.squad/**'
+  - '.copilot/**'
+  - '.github/agents/**'
+  - '.github/workflows/squad-heartbeat.yml'
+  - '.github/workflows/squad-issue-assign.yml'
+  - '.github/workflows/squad-triage.yml'
+  - '.github/workflows/sync-squad-labels.yml'
