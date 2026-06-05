@@ -33,10 +33,10 @@
     "react-redux": "^9.0.0"
   },
   "devDependencies": {
-    "@babel/core": "7.29.0",
-    "@babel/preset-env": "7.29.5",
-    "@babel/preset-react": "7.28.5",
-    "@babel/runtime": "7.29.2",
+    "@babel/core": "7.29.7",
+    "@babel/preset-env": "7.29.7",
+    "@babel/preset-react": "7.29.7",
+    "@babel/runtime": "7.29.7",
     "@electron/packager": "^20.0.0",
     "@eslint-react/eslint-plugin": "^5.0.0",
     "@eslint/js": "^10.0.0",
@@ -48,7 +48,7 @@
     "electron": "^42.0.0",
     "eslint": "^10.0.0",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-prettier": "5.5.5",
+    "eslint-plugin-prettier": "5.5.6",
     "file-loader": "6.2.0",
     "git-revision-webpack-plugin": "5.0.0",
     "globals": "^17.0.0",
@@ -56,9 +56,9 @@
     "playwright": "1.60.0",
     "prettier": "3.8.3",
     "style-loader": "4.0.0",
-    "webpack": "5.106.2",
+    "webpack": "5.107.2",
     "webpack-bundle-analyzer": "5.3.0",
-    "webpack-cli": "7.0.2",
+    "webpack-cli": "7.0.3",
     "webpack-dev-server": "5.2.4"
   }
 }

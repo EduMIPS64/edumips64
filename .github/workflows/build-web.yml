@@ -30,7 +30,7 @@ jobs:
         id: setup-python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version: '3.14'
 
       - name: Configure Python path for Gradle
         run: |
