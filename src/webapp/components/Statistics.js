@@ -31,7 +31,7 @@ const Statistics = ({
   instructions,
   rawStalls,
   wawStalls,
-  memoryStalls, L1I_reads, L1I_misses,L1D_reads,L1D_reads_misses,L1D_writes,L1D_writes_misses,
+  memoryStalls, dividerStalls, exStalls, funcUnitStalls, L1I_reads, L1I_misses,L1D_reads,L1D_reads_misses,L1D_writes,L1D_writes_misses,
   codeSizeBytes,
   fcsr,
 }) => {
@@ -70,7 +70,7 @@ const tableStyle = {
                 </tr>
                 <PluralRow value={rawStalls} label="RAW Stall" valueId="stat-raw-stalls"/>
                 <PluralRow value={wawStalls} label="WAW Stall" valueId="stat-waw-stalls"/>
-                <PluralRow value={memoryStalls} label="Structural Stall" valueId="stat-structural-stalls"/>
+                <PluralRow value={(dividerStalls || 0) + (memoryStalls || 0) + (exStalls || 0) + (funcUnitStalls || 0)} label="Structural Stall" valueId="stat-structural-stalls"/>
                 <tr>
                     <th colSpan="2" style={{textAlign: 'left', fontSize: '1rem', padding: '0.5rem 0'}}>
                         Cache Memory Statistics
