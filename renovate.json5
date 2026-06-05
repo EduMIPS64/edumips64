@@ -29,6 +29,12 @@
       matchUpdateTypes: ["minor"],
       automerge: true,
     },
+    // Automerge GitHub Actions updates (all update types) once CI is green.
+    // Renovate enables merge only after required status checks pass.
+    {
+      matchManagers: ["github-actions"],
+      automerge: true,
+    },
     // Group React-related dependencies together
     {
       groupName: "React packages",
