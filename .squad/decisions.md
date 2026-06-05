@@ -85,6 +85,31 @@ Prioritized backlog recommendation for the squad based on 18 open issues.
 
 ---
 
+## 2026-06-05: Tank decision — Web UI Structural Stall counter sums all four structural-stall counters
+
+**Date:** 2026-06-05T21:42:39+02:00  
+**Author:** Tank  
+**Related PR:** #1819 (fixes issue #1818)
+
+**Context:** Web UI "Structural Stall" counter displayed only `memoryStalls`, making divider/EX/funcUnit structural stalls invisible to web UI users. Issue #1818 reported divider stalls were completely ignored (showed 0 for div.d.divider-stalls despite 23 divider stalls).
+
+**Decision:** The web UI "Structural Stall" counter (`stat-structural-stalls` in `Statistics.js`) now displays the **sum of all four structural-stall CPU counters**:
+- `getStructuralStallsDivider()` → `dividerStalls`
+- `getStructuralStallsMemory()` → `memoryStalls`
+- `getStructuralStallsEX()` → `exStalls`
+- `getStructuralStallsFuncUnit()` → `funcUnitStalls`
+
+**Rationale:** The web UI has a single "Structural Stall" row (matching educational intent of showing total pipeline stalls due to structural hazards). Summing all four counters gives users an accurate picture without requiring four separate rows (Swing UI already has separate rows; web UI keeps simplified aggregate view).
+
+**Implementation:**
+- `ResultFactory.java`: exports all four fields.
+- `Statistics.js`: sums them inline before rendering.
+- Any future structural-stall counters added to `CPU.java` must also be exported in `ResultFactory.java` and included in the sum in `Statistics.js`.
+
+**Verification:** PR #1819 passed all CI checks including Playwright tests; merged (squash); issue #1818 auto-closed.
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus
