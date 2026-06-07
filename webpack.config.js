@@ -24,9 +24,11 @@ const copyPlugin = new CopyPlugin({
     }
   ],
 });
-const grPlugin = new GitRevisionPlugin();
+const grPlugin = new GitRevisionPlugin({
+  versionCommand: 'describe --tags --match v* --always --dirty',
+});
 const versionsPlugin = new webpack.DefinePlugin({
-  VERSION: JSON.stringify(grPlugin.version()),
+  VERSION: JSON.stringify(grPlugin.version().replace(/^v/, '')),
   COMMITHASH: JSON.stringify(grPlugin.commithash()),
   BRANCH: JSON.stringify(grPlugin.branch()),
 });
