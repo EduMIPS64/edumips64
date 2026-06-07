@@ -110,6 +110,73 @@ Prioritized backlog recommendation for the squad based on 18 open issues.
 
 ---
 
+## 2026-06-07: Web Promotion & Versioning — Eight Decisions Locked
+
+**Date:** 2026-06-07  
+**Author:** Morpheus (Lead/Architect)  
+**Approved by:** Andrea (lupino3)  
+**Related Document:** `docs/design/web-promotion-and-versioning.md` (local, untracked)
+
+### Locked Decisions
+
+| # | Question | Decision |
+|---|----------|----------|
+| 1 | **Who can promote?** | Andrea (lupino3) only. `workflow_dispatch` admin-only trigger is sufficient access control. |
+| 2 | **Phase 0 now?** | YES — no pending releases. Safe to disable `deploy-prod` auto-deploy in `release.yml` immediately. |
+| 3 | **Artifact retention** | Accept 90-day limit. Rebuild from SHA if artifact expired. No durability backstop needed. |
+| 4 | **GitHub Pages vs Azure** | Stay on GitHub Pages. Azure remains optional Phase 4. |
+| 5 | **Versions in `/v/`** | Retain **50** (not 10). |
+| 6 | **Build identity everywhere** | YES — git-describe identity in desktop, CLI, and web UI. |
+| 7 | **package.json version** | Leave stale at `1.0.0`; add comment noting it is unused for versioning. |
+| 8 | **Workflow naming** | `promote-web.yml` |
+
+### New: Nightly Channel (Part 4 discussion)
+
+**Recommendation: YES — implement as Phase 3.5**
+
+- Separate `/nightly/` directory auto-deployed on every green master push.
+- Distinct from gated prod at root `/` — they coexist without interference.
+- Uses git-describe build identity (no promotion number).
+- Visible "NIGHTLY BUILD" banner so users know they're not on prod.
+- Rationale: Gives agents/contributors a continuously-deployed preview target without touching stable prod. Reduces promotion pressure. Early integration issue detection.
+
+### Implementation Phases
+
+| Phase | Status | Summary |
+|-------|--------|---------|
+| **0** | GO ✅ | Disable `deploy-prod` — agents-on-master safe |
+| **1** | Ready | `promote-web.yml` basic deployment |
+| **2** | Ready | Versioned layout `/prev/`, `/v/N/`, manifest, 50 versions |
+| **3** | Ready | `rollback-web.yml`, git-describe build identity everywhere |
+| **3.5** | Optional | Nightly channel `/nightly/` |
+| **4** | Optional | Azure migration |
+
+---
+
+## 2026-06-07: Versioning — Release label vs build identity
+
+**Date:** 2026-06-07  
+**Author:** Morpheus  
+**Approved by:** Andrea (lupino3)
+
+### Decision
+
+Keep `gradle.properties version=` as the **release/target label** (used only for tagging and release naming). Derive the **build identity** from `git describe --tags` — e.g. `1.4.0-2-gabc1234` — for every shipped artifact (desktop JAR, Electron, web build).
+
+### Rationale
+
+`gradle.properties version=` is not point-in-time between releases. Latest tag is `v1.4.0`; master is deep into `1.4.1` (untagged); every commit since PR #1803 reports `1.4.1`. The git SHA is the only true point-in-time identifier. `git describe --tags` derives a unique, monotonic, human-readable string (`1.4.0-2-gabc1234`) for free, with no manual bookkeeping. At a tagged commit it collapses to the clean label (e.g. `1.4.1`).
+
+### Implementation Details
+
+- Gradle task to invoke `git describe --tags` at build time and inject result into GWT worker + React UI (generated Java class + webpack `DefinePlugin`).
+- Desktop About box to display the same string.
+- Desktop+CLI: One `build.gradle.kts` `sharedManifest` change flowing through `MetaInfo` (manifest) → Swing title (`Main.java`) / `StatusBar.java` / crash `ReportDialog` + CLI `Version.java`. Removes the `alpha` `Build-Qualifier` hack.
+- Web (GWT): Separate injected build-time constant (webpack `DefinePlugin` or generated GWT constant) — GWT JS can't read JAR manifest at runtime.
+- CI workflows must use **`fetch-depth: 0`** in `actions/checkout` — shallow clones break `git describe`.
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus
