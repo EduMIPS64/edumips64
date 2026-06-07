@@ -44,3 +44,23 @@ All 8 open questions in `docs/design/web-promotion-and-versioning.md` resolved b
 | Workflow name | `promote-web.yml` |
 
 **Nightly channel recommendation (new Part 4):** YES — add optional `/nightly/` channel auto-deployed on every green master push. Separate from gated prod; uses git-describe identity (no promotion number); visible "NIGHTLY" banner; implement as Phase 3.5 after gated promotion works.
+
+### 2026-06-07: Single-PR feasibility — verdict NO (cross-repo boundary)
+
+**Question:** Can the entire web-promotion + rollback + versioning + nightly design ship in one PR?
+
+**Answer: NO** — the design spans two independent GitHub repositories:
+1. **`EduMIPS64/edumips64`** (this repo): workflow files, `build.gradle.kts` versioning changes, web UI badge code, `fetch-depth: 0` updates.
+2. **`EduMIPS64/web.edumips.org`** (separate Pages repo): directory layout (`/prev/`, `/v/N/`, `/nightly/`), `manifest.json`.
+
+A single GitHub PR cannot span two repositories. The Pages-repo directory structure must be bootstrapped by the *first run* of `promote-web.yml`, not by a PR.
+
+**Recommended minimal PR breakdown (2 PRs):**
+1. **PR-A (edumips64 repo):** All workflow changes + versioning + UI badge. Contains: disable `deploy-prod` (Phase 0), add `promote-web.yml` + `rollback-web.yml` + `nightly-web.yml`, `build.gradle.kts` git-describe, webpack `DefinePlugin`, `fetch-depth: 0` across workflows, nightly banner component. Self-contained and testable except for actual deployment.
+2. **Manual first promotion:** After PR-A merges, Andrea runs `promote-web.yml` once. This *creates* the `/v/1/`, `/prev/`, `manifest.json` structure in the Pages repo automatically. No separate PR needed.
+
+**Nightly:** Can be included in PR-A (same repo, additive workflow). Optionally defer to PR-B if Andrea wants to validate gated promotion first.
+
+**Ordering/safety:** Disabling `deploy-prod` + adding `promote-web.yml` in the same PR is safe — there is no race because both are admin-only triggers and Andrea controls when to run the new workflow. The artifact already exists from CI.
+
+**Testing:** Versioning changes are testable in-repo (unit tests for git-describe output). Workflows are only fully testable on first real run.
