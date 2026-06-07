@@ -31,7 +31,9 @@ if not _version:
         ).decode().strip()
         if _out:
             _version = _out.lstrip('v')
-    except Exception:
+    except (OSError, subprocess.SubprocessError):
+        # git may be absent or this may not be a git checkout (e.g. a source
+        # tarball); intentionally fall through to the next fallback.
         pass
 
 # 3. Read the Docs git commit hash (shortened to 8 chars).
@@ -54,7 +56,9 @@ if not _version:
                 if _m:
                     _version = _m.group(1).strip().strip('"').strip("'")
                     break
-    except Exception:
+    except (OSError, UnicodeDecodeError):
+        # gradle.properties may be missing or unreadable in some build
+        # environments; intentionally fall through to the "unknown" fallback.
         pass
 
 # 5. Last resort.
