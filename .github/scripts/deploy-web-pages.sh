@@ -53,7 +53,7 @@ delete_root_prod_files() {
   shopt -s extglob dotglob nullglob
   local pattern
   pattern=$(reserved_extglob)
-  # shellcheck disable=SC2086
+  # shellcheck disable=SC2086,SC2206
   local files=( $pattern )
   for f in "${files[@]}"; do
     rm -rf -- "$f"
@@ -65,7 +65,7 @@ delete_root_prod_files() {
 # dest_dir is a subdirectory of the Pages repo (safe: not root).
 replace_subdir() {
   local src="$1" dest="$2"
-  rm -rf -- "$dest"
+  rm -rf -- "${dest:?}"
   mkdir -p "$dest"
   cp -a "$src/." "$dest/"
 }
@@ -88,13 +88,12 @@ prune_versions() {
 
   local count="${#dirs[@]}"
   if (( count > MAX_VERSIONS )); then
-    local to_delete=$(( count - MAX_VERSIONS ))
     local i=0
     # Lowest-numbered dirs are at the end after descending sort.
     for d in "${dirs[@]}"; do
       if (( i >= MAX_VERSIONS )); then
         echo "Pruning v/$d"
-        rm -rf -- "$v_dir/$d"
+        rm -rf -- "${v_dir:?}/${d:?}"
       fi
       (( i++ ))
     done
@@ -134,7 +133,7 @@ cmd_promote() {
     shopt -s extglob dotglob nullglob
     local pattern
     pattern=$(reserved_extglob)
-    # shellcheck disable=SC2086
+    # shellcheck disable=SC2086,SC2206
     local existing_root=( $pattern )
     if [[ ${#existing_root[@]} -gt 0 ]]; then
       rm -rf prev
@@ -161,7 +160,7 @@ cmd_promote() {
     shopt -s extglob dotglob nullglob
     local pattern
     pattern=$(reserved_extglob)
-    # shellcheck disable=SC2086
+    # shellcheck disable=SC2086,SC2206
     local root_files=( $pattern )
     rm -rf prev
     mkdir -p prev
