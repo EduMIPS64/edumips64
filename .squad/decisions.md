@@ -177,6 +177,157 @@ Keep `gradle.properties version=` as the **release/target label** (used only for
 
 ---
 
+# Decision: Design doc restructured; nightly trigger decision updated
+
+**Date:** 2026-06-07  
+**Author:** Morpheus (Lead/Architect)  
+**PR:** #1826
+
+## Changes
+
+### 1. Nightly trigger decision changed
+
+The nightly channel trigger is now a **daily 01:00 UTC cron** (`0 1 * * *`) plus
+`workflow_dispatch` for manual use. The previous recommendation ("deploy on
+every green master push" via `workflow_run`) is moved to the Alternatives
+Considered section as a rejected option.
+
+**Rationale:** A daily cadence keeps the preview fresh enough while avoiding a
+Pages deploy on every single merge. Manual `workflow_dispatch` covers the "I
+want it now" case.
+
+### 2. Design doc restructured
+
+`docs/design/web-promotion-and-versioning.md` rewritten from a debate-style
+options document to an authoritative implementation reference:
+
+- **Chosen Implementation** is now the primary narrative (present-tense, concrete
+  file/workflow references).
+- **Alternatives Considered** consolidated into a single section organized by
+  decision point, preserving all substantive rationale.
+- Removed per-Part "Recommendation" framing and open-question debate tone.
+- Phased Rollout and Resolved Decisions retained as a decision record near the end.
+
+## Team impact
+
+No code changes. Documentation only. The design doc now matches the implemented
+system and is the authoritative reference for how web promotion works.
+
+---
+
+# Decision: Nightly deploy switches from workflow_run to cron schedule
+
+**Date:** 2026-06-07  
+**Author:** Tank (Core Dev)  
+**PR:** #1826
+
+## Decision
+
+The nightly web deploy (`nightly-web.yml`) is changed from triggering on every
+successful `CI` workflow_run on master to a fixed daily schedule at 01:00 UTC
+(`cron: '0 1 * * *'`) plus a `workflow_dispatch` for manual testing.
+
+## Rationale
+
+Triggering on every green master push means multiple deploys per day on active
+days, which wastes resources and makes the nightly channel less predictable.
+A daily cron gives a stable, once-per-night snapshot and is easier to reason
+about for users checking `web.edumips.org/nightly/`.
+
+## Implementation notes
+
+- No triggering-run context at schedule time → the job now calls
+  `gh run list --workflow ci.yml --branch master --status success --limit 1`
+  to find the latest green run and downloads its `web` artifact.
+- Step id `find_run` exposes `run_id` and `head_sha` outputs consumed by the
+  download and commit steps.
+- The job-level `if:` guard (branch/event/conclusion check) was removed; it
+  was only meaningful for `workflow_run` events.
+- Both nightly-description sections in `docs/developer-guide.md` updated.
+
+## Team impact
+
+No change to `deploy-web-pages.sh` or any other workflow. The `concurrency`
+group (`web-pages-deploy`) is unchanged, so nightly still serialises with
+promote and rollback writes.
+
+---
+
+# Decision: Reversible SWAP rollback for deploy-web-pages.sh
+
+**Date:** 2026-06-07T19:09Z  
+**Author:** Tank  
+**Related PR:** #1826  
+
+## Problem
+
+The original `cmd_rollback` in `.github/scripts/deploy-web-pages.sh` was a
+destructive one-way operation:
+
+1. It copied `prev/` contents to root (good).
+2. It set `manifest.json` `prev` to `0` (bad — discards the promotion number
+   that was at root, making "rollback the rollback" impossible).
+3. It did **not** update `prev/` with the former root build (bad — next
+   rollback has nothing in prev/).
+
+This made rollback non-reversible and inconsistent with the documented
+"swap root ↔ prev" behaviour.
+
+## Decision
+
+Replace the one-way copy with a true in-place SWAP:
+
+```
+root_prod_files  ──▶  .rollback-swap/   (stage)
+prev/*           ──▶  root/             (restore)
+.rollback-swap/* ──▶  prev/             (preserve former root as new prev)
+```
+
+And in `manifest.json`: `current` ↔ `prev` are swapped, not zeroed.
+
+### Key implementation details
+
+1. **Array collection before staging dir creation.** Root prod files are
+   collected into a bash array using the existing `reserved_extglob` +
+   `dotglob`/`nullglob` pattern *before* the `.rollback-swap` directory is
+   created. This prevents the staging dir from being included in the move set.
+
+2. **Empty-prev guard precedes all destructive ops.** `prev/*` is checked for
+   non-empty before any `mv` or `rm` runs. If `prev/` is empty, `die` is
+   called immediately.
+
+3. **Staging dir name.** `.rollback-swap` is used as the temporary staging
+   directory at the Pages-repo root. It is not a valid web-artifact filename,
+   so it cannot appear in `prev/` from a prior promote, avoiding accidental
+   collision.
+
+4. **Manifest swap.** After the filesystem swap:
+   - `manifest.current` = old `manifest.prev`
+   - `manifest.prev`    = old `manifest.current`
+   - `rolledBackFrom`, `note`, `promotedAt`, `promotedBy` updated as before.
+
+   This means a second rollback restores the state before the first rollback
+   ("rollback the rollback" works).
+
+5. **CNAME / .nojekyll.** `ensure_static_files` is called at the end (same as
+   before) so reserved static files are always present.
+
+6. **Shellcheck-clean.** No new warnings introduced (verified with
+   shellcheck v0.10.0).
+
+## Alternatives considered
+
+- **Copy instead of move:** Safer mid-operation but leaves prev/ unchanged
+  until step 4; requires explicit cleanup. Move is simpler and consistent with
+  the destructive-op style of the rest of the script.
+- **Use `replace_subdir` helper:** `replace_subdir` deletes dest then copies
+  src; it cannot swap two directories without a staging area, so a custom
+  approach is needed regardless.
+- **Temp dir outside Pages repo:** Fragile (depends on cwd path assumptions).
+  In-repo staging dir is simpler.
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus
