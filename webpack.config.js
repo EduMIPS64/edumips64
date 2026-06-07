@@ -29,8 +29,6 @@ const grPlugin = new GitRevisionPlugin({
 });
 const versionsPlugin = new webpack.DefinePlugin({
   VERSION: JSON.stringify(grPlugin.version().replace(/^v/, '')),
-  COMMITHASH: JSON.stringify(grPlugin.commithash()),
-  BRANCH: JSON.stringify(grPlugin.branch()),
 });
 const monacoPlugin = new MonacoWebpackPlugin({
   languages: ['mips'],

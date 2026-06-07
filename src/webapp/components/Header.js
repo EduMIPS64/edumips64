@@ -44,8 +44,10 @@ export default function Header(props) {
 
   // Runtime nightly detection: the same artifact may be served from multiple
   // paths; detect via the URL rather than a compile-time flag.
-  const isNightly = typeof window !== 'undefined' &&
-    window.location.pathname.includes('/nightly/');
+  // Match exactly `/nightly` OR any path under `/nightly/` to avoid false
+  // positives (e.g. `/nightlybuild`). Access pathname only when window exists.
+  const path = typeof window !== 'undefined' ? window.location.pathname : '';
+  const isNightly = path === '/nightly' || path.startsWith('/nightly/');
 
   const handleFileLoad = (event) => {
     const file = event.target.files[0];

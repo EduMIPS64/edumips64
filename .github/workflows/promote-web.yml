@@ -7,10 +7,6 @@ on:
         description: 'CI run ID whose "web" artifact to promote'
         required: true
         type: string
-      sha:
-        description: 'Commit SHA (optional — derived from run if omitted)'
-        required: false
-        type: string
 
 # Serialise all Pages writes; never cancel an in-flight promotion.
 concurrency:
@@ -26,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # Required to call gh api / gh run download against the Actions API.
+      actions: read
 
     steps:
       # ------------------------------------------------------------------

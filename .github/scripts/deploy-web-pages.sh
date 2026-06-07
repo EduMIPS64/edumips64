@@ -122,6 +122,20 @@ cmd_promote() {
 
   [[ -d "$artifact_dir" ]] || die "Artifact dir not found: $artifact_dir"
 
+  # Guard: die if the artifact's top-level entries contain any reserved name.
+  # This prevents an artifact from clobbering the Pages layout (v/, prev/, etc.).
+  echo "Checking artifact for reserved top-level names..."
+  shopt -s dotglob nullglob
+  local entry_name reserved
+  for entry in "$artifact_dir"/*; do
+    entry_name="$(basename -- "$entry")"
+    for reserved in "${RESERVED_NAMES[@]}"; do
+      [[ "$entry_name" == "$reserved" ]] \
+        && die "Artifact contains reserved top-level name '${entry_name}' — cannot promote."
+    done
+  done
+  shopt -u dotglob nullglob
+
   local is_first_run=false
   local current_n
   if [[ ! -f manifest.json ]]; then
@@ -220,24 +234,57 @@ cmd_rollback() {
   [[ -f manifest.json ]] || die "manifest.json not found — nothing to roll back to."
   [[ -d prev ]] || die "prev/ directory not found — no previous build to roll back to."
 
+  # Verify prev/ is non-empty before any destructive operation.
+  shopt -s dotglob nullglob
+  local prev_check=( prev/* )
+  shopt -u dotglob nullglob
+  [[ ${#prev_check[@]} -gt 0 ]] || die "prev/ is empty — cannot roll back."
+
   local current_n prev_n
   current_n=$(python3 -c "import json; d=json.load(open('manifest.json')); print(d['current'])")
   prev_n=$(python3 -c "import json; d=json.load(open('manifest.json')); print(d.get('prev', 0))")
 
-  echo "Rolling back: current=${current_n}, prev=${prev_n}, actor=${actor}"
+  echo "Rolling back: swapping root (v${current_n}) <-> prev (v${prev_n}), actor=${actor}"
 
-  # Replace root prod files with prev/ contents.
-  echo "Replacing root prod files with prev/..."
-  delete_root_prod_files
+  # ---- STEP 1: Collect current root prod files BEFORE creating any staging dir.
+  shopt -s extglob dotglob nullglob
+  local pattern
+  pattern=$(reserved_extglob)
+  # shellcheck disable=SC2086,SC2206
+  local root_files=( $pattern )
+  shopt -u extglob dotglob nullglob
+
+  # ---- STEP 2: Stage root prod files in a temporary directory.
+  local swap_dir=".rollback-swap"
+  rm -rf -- "$swap_dir"
+  mkdir -p "$swap_dir"
+  for f in "${root_files[@]}"; do
+    mv -- "$f" "$swap_dir/"
+  done
+
+  # ---- STEP 3: Move prev/ contents into root.
+  echo "Moving prev/ into root..."
   shopt -s dotglob nullglob
   local prev_files=( prev/* )
   shopt -u dotglob nullglob
-  [[ ${#prev_files[@]} -gt 0 ]] || die "prev/ is empty — cannot roll back."
   for f in "${prev_files[@]}"; do
-    cp -a -- "$f" ./
+    mv -- "$f" ./
   done
 
-  # Update manifest.json to reflect rollback.
+  # ---- STEP 4: Move former root (from swap_dir) into prev/, replacing it.
+  echo "Moving former root into prev/..."
+  rm -rf -- prev
+  mkdir -p prev
+  shopt -s dotglob nullglob
+  local swap_files=( "$swap_dir"/* )
+  shopt -u dotglob nullglob
+  for f in "${swap_files[@]}"; do
+    mv -- "$f" prev/
+  done
+
+  rm -rf -- "$swap_dir"
+
+  # ---- STEP 5: Swap manifest current <-> prev so a second rollback re-applies this one.
   local rolled_back_at
   rolled_back_at=$(utc_now)
   python3 - <<PYEOF
@@ -246,9 +293,8 @@ with open("manifest.json") as f:
     manifest = json.load(f)
 old_current = manifest["current"]
 old_prev = manifest.get("prev", 0)
-# After rollback: current becomes what was prev; mark prev as unknown (0).
 manifest["current"] = old_prev
-manifest["prev"] = 0
+manifest["prev"] = old_current
 manifest["promotedAt"] = "${rolled_back_at}"
 manifest["promotedBy"] = "${actor}"
 manifest["rolledBackFrom"] = old_current
@@ -257,11 +303,11 @@ with open("manifest.json", "w") as f:
     json.dump(manifest, f, indent=2)
     f.write("\n")
 PYEOF
-  echo "manifest.json updated (rollback)."
+  echo "manifest.json updated (swap: current=v${prev_n}, prev=v${current_n})."
 
   ensure_static_files
 
-  echo "Rollback complete: reverted to prev (was v${current_n}) by ${actor}"
+  echo "Rollback complete: root ↔ prev swap (v${current_n} ↔ v${prev_n}) by ${actor}"
 }
 
 # ---------------------------------------------------------------------------

@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # Required to call gh run list / gh run download against the Actions API.
+      actions: read
 
     steps:
       - name: Checkout edumips64 (for script)
