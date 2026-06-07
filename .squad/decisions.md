@@ -115,7 +115,7 @@ Prioritized backlog recommendation for the squad based on 18 open issues.
 **Date:** 2026-06-07  
 **Author:** Morpheus (Lead/Architect)  
 **Approved by:** Andrea (lupino3)  
-**Related Document:** `docs/design/web-promotion-and-versioning.md` (local, untracked)
+**Related Document:** `docs/design/web-promotion-and-versioning.md` (tracked in repo via PR #1826)
 
 ### Locked Decisions
 
