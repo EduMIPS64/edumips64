@@ -182,3 +182,84 @@ Keep `gradle.properties version=` as the **release/target label** (used only for
 - All meaningful changes require team consensus
 - Document architectural decisions here
 - Keep history focused on work, decisions focused on direction
+
+---
+
+## 2026-06-07: PR-A Implementation — Workflows slice (Tank)
+
+**Date:** 2026-06-07  
+**Author:** Tank  
+**Branch:** `squad/web-promotion-system`  
+**Commit:** `4b5f67d3`
+
+### Implementation Details
+
+1. **`deploy-prod` disabled with `if: false`** — job body intact for emergency re-enable.
+2. **`fetch-depth: 0` added to three checkouts** — `build-web.yml`, `build-desktop.yml`, `ci.yml` test-web-coverage. Required for `git describe --tags` fidelity.
+3. **Pages-layout logic in `deploy-web-pages.sh`** — complex bash is testable; workflows invoke it.
+4. **First-run bootstrap** — seed `prev/` from current root if `manifest.json` absent.
+5. **Reserved-names guard** — bash extglob pattern `(v|prev|nightly|manifest.json|CNAME|.nojekyll|.git)` protects core files.
+6. **Shared concurrency group `web-pages-deploy`** — all three workflows use same group; `cancel-in-progress: false`.
+7. **Source-run validation in `promote-web.yml`** — checks repo, workflow path, conclusion, branch, artifact presence.
+8. **Actor guard `if: github.actor == 'lupino3'`** — on promote/rollback jobs (belt-and-suspenders).
+9. **`/v/` pruned to 50 dirs** — oldest dirs removed on promotion when count exceeds 50.
+10. **`CNAME` and `.nojekyll` re-ensured** — `ensure_static_files()` called on all subcommands.
+
+---
+
+## 2026-06-07: PR-A Implementation — Web UI version identity + NIGHTLY badge (Trinity)
+
+**Date:** 2026-06-07  
+**Author:** Trinity  
+**Branch:** squad/web-promotion-system  
+**Commit:** 4149d54e
+
+### Implementation Details
+
+1. **Version alignment:** `GitRevisionPlugin` configured with `versionCommand: 'describe --tags --match v* --always --dirty'`. Web UI now displays same git-describe string as desktop (e.g. `1.4.0-75-geec17684-dirty`).
+2. **NIGHTLY badge:** Runtime detection via `window.location.pathname.includes('/nightly/')`. Purple MUI Chip in `Header.js` + CSS in `main.css`. Appears only for nightly, not prod/versioned/PR paths.
+3. **Artifact immutability:** Same built artifact may be served from `/` or `/nightly/` — runtime detection ensures correct badge display.
+
+---
+
+## 2026-06-07: PR-A Implementation — Build identity in docs (Link)
+
+**Date:** 2026-06-07  
+**Author:** Link (Docs/DevRel)  
+**Branch:** squad/web-promotion-system
+
+### Implementation Details
+
+**`docs/user/common_conf.py` fallback chain:**
+1. `EDUMIPS64_BUILD_VERSION` environment variable
+2. `git describe` via `__file__`-relative repo root
+3. `READTHEDOCS_GIT_COMMIT_HASH` environment variable
+4. `gradle.properties version=` via `__file__`-relative path
+5. `"unknown"` fallback
+
+**Rationale:** Cwd-relative paths broke when Sphinx invoked from non-standard directories. Git-describe is unique per commit; release label is shared across commits between releases. Fallback ensures RTD, shallow-clone CI, and tag-less builds never error.
+
+**Files changed:**
+- `docs/user/common_conf.py`
+- `docs/user/en/src/index.rst`, `docs/user/it/src/index.rst`, `docs/user/zh/src/index.rst`
+- `docs/developer-guide.md` (Versioning model + Web promotion sections)
+
+---
+
+## 2026-06-07: PR-A QA Finding — build-desktop.yml YAML corruption fix (Smith)
+
+**Date:** 2026-06-07  
+**Author:** Smith (QA)
+
+### Finding
+
+Addition of `fetch-depth: 0` to `.github/workflows/build-desktop.yml` corrupted YAML structure: `- name: Set up JDK 17` was deleted and `uses: actions/setup-java@v5` was merged into the `actions/checkout@v6` step mapping, creating a duplicate-`uses`-key error (GitHub Actions parse failure).
+
+### Fix
+
+Restored `- name: Set up JDK 17` as a proper separate sequence item with its own `name`, `uses`, `with` keys. Committed in QA pass.
+
+### Recommendation
+
+Validate YAML workflow patches with `actionlint`, `js-yaml`, or `python-yaml` before commit. Consider adding `actionlint` to CI.
+
