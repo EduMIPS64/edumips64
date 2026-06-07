@@ -2,7 +2,8 @@
 
 import os
 import re
-import subprocess
+import shutil
+import subprocess  # nosec B404 - used only for a fixed `git describe`, no user input
 
 # ---------------------------------------------------------------------------
 # Build identity — layered fallback so any build environment works:
@@ -24,13 +25,17 @@ if not _version:
     try:
         _conf_dir = os.path.dirname(os.path.abspath(__file__))       # docs/user/
         _repo_root = os.path.normpath(os.path.join(_conf_dir, '..', '..'))
-        _out = subprocess.check_output(
-            ['git', '-C', _repo_root, 'describe', '--tags',
-             '--match', 'v*', '--always', '--dirty'],
-            stderr=subprocess.DEVNULL,
-        ).decode().strip()
-        if _out:
-            _version = _out.lstrip('v')
+        # Resolve the absolute git path so we never start a process with a
+        # partial executable path; the command is fixed and takes no user input.
+        _git = shutil.which('git')
+        if _git:
+            _out = subprocess.check_output(  # nosec B603 - fixed argument list, no shell, no user input
+                [_git, '-C', _repo_root, 'describe', '--tags',
+                 '--match', 'v*', '--always', '--dirty'],
+                stderr=subprocess.DEVNULL,
+            ).decode().strip()
+            if _out:
+                _version = _out.lstrip('v')
     except (OSError, subprocess.SubprocessError):
         # git may be absent or this may not be a git checkout (e.g. a source
         # tarball); intentionally fall through to the next fallback.
