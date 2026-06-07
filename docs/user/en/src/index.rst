@@ -25,7 +25,7 @@ differences between the two simulators.
 This manual will introduce you to EduMIPS64, and will cover some details on
 how to use it.
 
-This manual describes EduMIPS64 version |version|.
+This manual was generated for EduMIPS64 build |version|.
 
 This manual is split into two parts. The first part is independent from the
 user interface in use and covers the source file format, the supported

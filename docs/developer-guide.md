@@ -18,6 +18,10 @@
 
 [Compiling under Mac OSX](#mac-os-x)
 
+[Versioning model](#versioning-model)
+
+[Web production promotion](#web-production-promotion)
+
 ### Requirements
 
 #### Dev Container
@@ -47,19 +51,25 @@ To generate an installable Windows MSI package (using the Gradle `msi` task), yo
 This project uses GitHub Actions for continuous integration
 (https://github.com/EduMIPS64/edumips64/actions).
 
-There are three main workflows:
+There are four main CI/CD workflows:
 
 - **CI Build** (`ci.yml`) — runs on every pull request and on a daily schedule.
   Builds and tests the desktop application, builds the web application, runs the
   web UI tests, and builds/tests the Snap package. It runs with a read-only
   token and no access to secrets, so it can safely build code from forks.
+  All CI checkouts use `fetch-depth: 0` so `git describe` works correctly.
 - **PR preview deploy** (`pr-reports.yml`) — triggered when a CI Build run
   completes. It runs from the base branch (never checking out pull request
   code) and deploys the pre-built web application to the staging environment.
 - **Release** (`release.yml`) — runs on every push to `master` to build all
-  release artifacts (JAR, MSI, Electron apps) and deploy the web application to
-  production. Can also be triggered manually to create a tagged GitHub release
-  with all artifacts attached.
+  release artifacts (JAR, MSI, Electron apps). The `deploy-prod` job is
+  disabled (`if: false`); production web deploys are now gated (see below).
+  Can also be triggered manually to create a tagged GitHub release with all
+  artifacts attached.
+- **Nightly web deploy** (`nightly-web.yml`) — triggered automatically after
+  every successful CI run on `master`. Deploys the built web artifact to
+  `web.edumips.org/nightly/` (an ungated preview channel; shows a NIGHTLY
+  badge). Does not touch the production root.
 
 ### Main Gradle tasks
 
@@ -402,6 +412,73 @@ plugins, as the Maven repo uses Let's Encrypt as a certificate issuer, which
 is not trusted by default by the JDK.
 
 Follow instructions [here](https://dev.cloudburo.net/2018/06/03/install-letsencrypt-certificate-in-the-java-jdk-keystore-on-osx.html) to import the Let's Encrypt root certificates in the JDK keystore.
+
+### Versioning model
+
+EduMIPS64 uses **two distinct version concepts**:
+
+- **Release label** — `version` in `gradle.properties` (e.g. `1.4.1`). This is
+  the human-visible release name. It is constant between releases and is used for
+  git tags (`v1.4.1`), JAR filenames, and the MSI installer version. Bumped
+  manually before each release.
+
+- **Build identity** — `git describe --tags --match v* --always --dirty` with
+  the leading `v` stripped. This uniquely identifies every commit:
+  - At a release tag: identical to the release label (e.g. `1.4.1`).
+  - Between releases: includes the commit distance and short SHA
+    (e.g. `1.4.0-74-geec1768`).
+  - With local uncommitted changes: appended `-dirty`.
+
+The build identity is what appears in the Swing window title/status bar, the
+CLI `--version` output, the web UI header, and the user manual `|version|`
+substitution. It is derived automatically from git at build time — no manual
+bookkeeping is required.
+
+The Gradle provider is defined in `build.gradle.kts` (the `gitDescribe` val).
+All CI checkouts must use `fetch-depth: 0` so the full tag history is
+available for `git describe` to produce meaningful output.
+
+### Web production promotion
+
+Production (`web.edumips.org`) is **not auto-deployed**. The `deploy-prod` job
+in `release.yml` is disabled (`if: false`). Promotion is manual and gated.
+
+#### Promoting a build to production
+
+1. Open **Actions → Promote Web to Production** (`promote-web.yml`).
+2. Click **Run workflow** and enter the **CI run ID** whose `web` artifact to ship.
+   (Find the run ID in the URL of any successful CI run on `master`.)
+3. The workflow validates the run (must be a successful `ci.yml` run on `master`
+   with a `web` artifact), then deploys it to the Pages repo
+   (`EduMIPS64/web.edumips.org`) with the following layout:
+
+   ```
+   web.edumips.org/
+   ├── index.html + [all files]   ← current promoted version (root)
+   ├── prev/                      ← previous promoted version
+   ├── v/
+   │   ├── 1/  2/  3/ …          ← immutable snapshots (up to 50 kept)
+   └── manifest.json              ← {current, prev, sha, build, promotedAt, …}
+   ```
+
+Only `lupino3` (Andrea) can trigger `promote-web.yml` (actor check enforced in
+the workflow, in addition to the collaborator gate on `workflow_dispatch`).
+
+The Pages-layout logic lives in `.github/scripts/deploy-web-pages.sh`.
+
+#### Rolling back
+
+If the current production version is broken, open **Actions → Rollback Web
+Production** (`rollback-web.yml`) and click **Run workflow** (no inputs needed).
+This promotes `prev/` back to root and updates `manifest.json`. Gated to
+`lupino3` only.
+
+#### Nightly channel
+
+Every successful CI run on `master` automatically deploys to
+`web.edumips.org/nightly/` via `nightly-web.yml`. This is an ungated
+preview; the build shows a **NIGHTLY** badge so users know it may be unstable.
+Nightly never touches the production root, `prev/`, or any `v/N/` snapshot.
 
 ### Manual release checklist
 
