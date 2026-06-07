@@ -251,17 +251,17 @@ val gitCommitHash: Provider<String> = providers.environmentVariable("GITHUB_SHA"
         commandLine("git", "rev-parse", "--verify", "--short", "HEAD")
     }.standardOutput.asText.map { it.trim() })
 
-val buildQualifier: Provider<String> = providers.environmentVariable("GITHUB_ACTIONS")
-    .map { "alpha" }
-    .orElse("")
+val gitDescribe: Provider<String> = providers.exec {
+    commandLine("git", "describe", "--tags", "--match", "v*", "--always", "--dirty")
+}.standardOutput.asText.map { it.trim().removePrefix("v") }
+    .orElse(version as String)
 
 val sharedManifest = Action<Manifest> {
-    attributes["Signature-Version"] = version
+    attributes["Signature-Version"] = gitDescribe.get()
     attributes["Codename"] = codename
     attributes["Build-Date"] = LocalDateTime.now()
     attributes["Full-Buildstring"] = "${gitBranch.get()}@${gitCommitHash.get()}"
     attributes["Git-Revision"] = gitCommitHash.get()
-    attributes["Build-Qualifier"] = buildQualifier.get()
 }
 
 // Main JAR — write directly under the build directory (out/) rather than

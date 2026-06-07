@@ -52,11 +52,6 @@ public class MetaInfo {
           BUILD_DATE = attributes.getValue("Build-Date");
           GIT_REVISION = attributes.getValue("Git-Revision");
           FULL_BUILDSTRING = attributes.getValue("Full-BuildString");
-
-          // Build-Qualifier is set during CI, augment the version number in that case.
-          if (!attributes.getValue("Build-Qualifier").isEmpty()) {
-            VERSION += "-" + attributes.getValue("Build-Qualifier") + "-" + GIT_REVISION;
-          }
         } else
           System.err.println("Error while getting the manifest from the JAR file.");
       } finally {
