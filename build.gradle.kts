@@ -302,7 +302,7 @@ tasks.register<Jar>("noHelpJar"){
  * Code coverage report tasks
  */
 jacoco {
-    toolVersion = "0.8.14"
+    toolVersion = "0.8.15"
 }
 tasks.jacocoTestReport {
     reports {
