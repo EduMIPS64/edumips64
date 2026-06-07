@@ -66,8 +66,9 @@ There are four main CI/CD workflows:
   disabled (`if: false`); production web deploys are now gated (see below).
   Can also be triggered manually to create a tagged GitHub release with all
   artifacts attached.
-- **Nightly web deploy** (`nightly-web.yml`) — triggered automatically after
-  every successful CI run on `master`. Deploys the built web artifact to
+- **Nightly web deploy** (`nightly-web.yml`) — runs on a daily schedule at
+  01:00 UTC (and can be triggered manually via `workflow_dispatch`). Finds the
+  latest green `master` CI build and deploys its web artifact to
   `web.edumips.org/nightly/` (an ungated preview channel; shows a NIGHTLY
   badge). Does not touch the production root.
 
@@ -475,10 +476,12 @@ This promotes `prev/` back to root and updates `manifest.json`. Gated to
 
 #### Nightly channel
 
-Every successful CI run on `master` automatically deploys to
-`web.edumips.org/nightly/` via `nightly-web.yml`. This is an ungated
-preview; the build shows a **NIGHTLY** badge so users know it may be unstable.
-Nightly never touches the production root, `prev/`, or any `v/N/` snapshot.
+`nightly-web.yml` runs on a daily schedule at 01:00 UTC (and can be triggered
+manually via `workflow_dispatch`). It finds the latest successful CI run on
+`master` and deploys that build to `web.edumips.org/nightly/`. This is an
+ungated preview; the build shows a **NIGHTLY** badge so users know it may be
+unstable. Nightly never touches the production root, `prev/`, or any `v/N/`
+snapshot.
 
 ### Manual release checklist
 

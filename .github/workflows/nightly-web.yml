@@ -1,9 +1,9 @@
 name: Nightly Web Deploy
 
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types: [completed]
+  schedule:
+    - cron: '0 1 * * *'   # 01:00 UTC daily
+  workflow_dispatch:       # manual trigger for testing
 
 # Serialise all Pages writes; never cancel an in-flight nightly deploy.
 concurrency:
@@ -13,11 +13,6 @@ concurrency:
 jobs:
   deploy-nightly:
     name: Deploy nightly web to /nightly/
-    # Only run when CI completed successfully on a master push.
-    if: |
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.head_branch == 'master' &&
-      github.event.workflow_run.event == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -28,14 +23,41 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Download web artifact from triggering run
+      - name: Find latest successful CI run on master
+        id: find_run
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TRIGGERING_RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          RUN_JSON=$(gh run list \
+            --workflow ci.yml \
+            --branch master \
+            --status success \
+            --limit 1 \
+            --json databaseId,headSha \
+            --jq '.[0]' \
+            --repo "${{ github.repository }}")
+
+          if [[ -z "$RUN_JSON" || "$RUN_JSON" == "null" ]]; then
+            echo "ERROR: No successful CI run found on master"
+            exit 1
+          fi
+
+          RUN_ID=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['databaseId'])")
+          HEAD_SHA=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['headSha'])")
+
+          echo "Found run ${RUN_ID} @ ${HEAD_SHA}"
+          echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
+          echo "head_sha=${HEAD_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Download web artifact from latest master CI run
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ steps.find_run.outputs.run_id }}
         run: |
           set -euo pipefail
           mkdir -p artifact/web
-          gh run download "${TRIGGERING_RUN_ID}" --name web --dir artifact/web \
+          gh run download "${RUN_ID}" --name web --dir artifact/web \
             --repo "${{ github.repository }}"
           echo "Artifact contents:"
           ls artifact/web/
@@ -60,7 +82,7 @@ jobs:
 
       - name: Commit and push to Pages repo
         env:
-          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_SHA: ${{ steps.find_run.outputs.head_sha }}
         run: |
           set -euo pipefail
           cd pages-repo
