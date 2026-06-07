@@ -195,6 +195,9 @@ jobs:
   # 5. Deploy web application to production.
   # ---------------------------------------------------------------------------
   deploy-prod:
+    # Phase 0: production is now gated via promote-web.yml (manual).
+    # Keep this job intact for emergency re-enable; set if:false to disable.
+    if: false
     name: Deploy web application to production
     permissions: write-all
     runs-on: ubuntu-latest
