@@ -484,7 +484,52 @@ in `release.yml` is disabled (`if: false`). Promotion is manual and gated.
 - Must be dispatched from the `master` branch in both modes.
 - The Pages-layout logic lives in `.github/scripts/deploy-web-pages.py`.
 
-#### Rolling back
+#### Manifest and version history
+
+The **`manifest.json`** file on the Pages repo root carries metadata about all
+promoted web versions:
+
+```json
+{
+  "current": 44,
+  "prev": 43,
+  "sha": "abc1234",
+  "build": "1.4.0-2-gabc1234",
+  "targetRelease": "1.4.1",
+  "promotedAt": "2026-06-07T18:49:37Z",
+  "promotedBy": "lupino3",
+  "history": [
+    { "n": 44, "build": "1.4.0-2-gabc1234", "sha": "abc1234", "targetRelease": "1.4.1", "promotedAt": "2026-06-07T18:49:37Z", "promotedBy": "lupino3" },
+    { "n": 43, "build": "1.4.0-1-gabc1233", "sha": "abc1233", "targetRelease": "1.4.1", "promotedAt": "2026-06-06T10:15:22Z", "promotedBy": "lupino3" }
+  ]
+}
+```
+
+The **`history`** array lists all retained versions (newest-first), with each entry
+containing the promotion number `n`, build identity string, git SHA, target release
+label, timestamp, and promoting actor. The array is backfilled with the live
+version on the first promotion after this feature is added, then grows with each
+subsequent promotion. Entries are pruned in lockstep with the `/v/<N>/` snapshots
+(MAX_VERSIONS=50 retained).
+
+**In-app version navigator:** The web UI's About tab fetches `/manifest.json` with
+`cache:'no-cache'` (absolute path, not relative). If the fetch succeeds and the
+manifest is valid, **and** the build is not a PR preview (detected by absence of
+`window.GIT_DESCRIBE.match(/^PR #/)`), the About tab renders a "Previous Versions"
+list linking to each archived version at `/v/<N>/` (opens in a new tab). The
+current version is marked. When viewing an archived snapshot at `/v/<N>/`, the
+About tab displays a "Return to latest" link instead.
+
+This gating ensures the navigator only appears for stable and nightly builds, not
+temporary PR previews.
+
+#### Monotonic version numbering
+
+Promotion numbers are **monotonically increasing** — the next version is always
+`max(ever used) + 1`, never re-used. This fixes a latent bug where a promote
+after a rollback could re-use and mutate an existing immutable snapshot. The
+`deploy-web-pages.py` script maintains a `next_version` counter to enforce this
+invariant.
 
 If the current production version is broken, open **Actions → Rollback Web
 Production** (`rollback-web.yml`) and click **Run workflow** (no inputs needed).
