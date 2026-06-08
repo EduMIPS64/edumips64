@@ -100,3 +100,15 @@
 **`workflow_run` / base-branch reason this cannot be tested pre-merge:** `workflow_run` workflows only fire from the workflow definition on the repository's **default branch** (master). A version of `pr-reports.yml` on a feature branch is never executed by GitHub Actions. Correctness must be verified by construction (actionlint + node --check) before merging; the first real end-to-end test only happens after the PR is merged.
 
 **GHA expression injection guard:** Only pass `${{ needs.metadata.outputs.pr }}` (already validated numeric upstream) into the script via a `const pr = '...'` assignment. Read `head_sha` and `html_url` through `context.payload.workflow_run.*` inside JS — never via `${{ }}` — to avoid injection and quoting issues with arbitrary SHA strings.
+
+## Learnings
+
+### 2026-06-08 — ci.yml now supports workflow_dispatch for on-demand master builds
+
+**Added `workflow_dispatch:` trigger** to `ci.yml` so a maintainer can run the full validating CI on master on demand without waiting for the nightly cron.
+
+**Key insight — why a dispatch run qualifies for web promotion:** `promote-web.yml` validates that the triggering `ci.yml` run (a) targeted the `master` branch, (b) completed with `success`, and (c) produced a `web` artifact. A `workflow_dispatch` run on master satisfies all three conditions unchanged — no edits to `promote-web.yml` were needed.
+
+**Force-all-builds on dispatch:** The `detect-changes` outputs used `github.event_name == 'schedule' && 'true'` to force snap/electron builds. Extended to `(github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && 'true'` so manual runs also build every artifact, making the dispatch button a true "build current master" action.
+
+**PR-only steps remain untouched and correctly skip on dispatch:** `save-pr-metadata` is gated by `if: github.event_name == 'pull_request'`; the `paths-filter` checkout step is also guarded; `ref:` expressions use `github.event.pull_request.head.sha || github.sha` (falls back to master HEAD); `build-and-test-snap`'s bot-login guards evaluate true on dispatch (null login is not 'dependabot[bot]'). No changes required for any of these.

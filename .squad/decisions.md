@@ -563,6 +563,12 @@ GitHub Actions before merge. Correctness was verified by:
 - `actionlint .github/workflows/pr-reports.yml` → exit 0, no warnings
 - `node --check` on the extracted JS → no syntax errors
 
+### 2026-06-08: Add workflow_dispatch trigger to ci.yml
+
+**By:** Tank (CI/workflow owner), requested by Andrea (lupino3)
+**What:** Added a `workflow_dispatch:` trigger to `.github/workflows/ci.yml` so maintainers can run the full validating CI on master on demand. Manual runs force snap+electron builds (mirroring scheduled runs), producing a fresh `web` artifact from current master.
+**Why:** `promote-web.yml` promotes the `web` artifact from a successful `ci.yml` run on master. Previously the only such artifact came from the daily 00:00 UTC cron, so promoting current master meant waiting up to 24h. A `workflow_dispatch` run on master satisfies promote-web's validation (ci.yml + master + success + web artifact) with no change to promote-web.yml. Shipped as PR #1829.
+
 ## Governance
 
 - All meaningful changes require team consensus
