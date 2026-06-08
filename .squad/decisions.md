@@ -328,6 +328,241 @@ And in `manifest.json`: `current` ↔ `prev` are swapped, not zeroed.
 
 ---
 
+# Decision: Port deploy-web-pages.sh to Python
+
+**Date:** 2026-06-08  
+**Author:** Tank (Core/Backend Developer)  
+**Status:** Implemented
+
+## Context
+
+`.github/scripts/deploy-web-pages.sh` was a 342-line bash script managing the
+Pages-repo layout (promote/rollback/nightly). Bash's `extglob`/`dotglob` and
+heredoc-Python made it hard to read and reason about.
+
+## Decision
+
+Rewrite as `.github/scripts/deploy-web-pages.py` (Python 3, standard library
+only). Identical CLI, behavior, manifest schema, and destructive-op safety.
+
+## Rationale
+
+- Python is significantly more readable for complex file-system logic.
+- Standard-library-only (`os`, `sys`, `json`, `shutil`, `pathlib`, `datetime`,
+  `argparse`) — no `subprocess` use, so Codacy/Bandit are clean.
+- Argparse subparsers replace bash `case` dispatch; typed helpers replace
+  shell functions.
+- `dotglob` semantics (include hidden files) are matched naturally by
+  `Path(".").iterdir()`.
+- `cp -a "$src/." "$dest/"` (copy contents, not dir) is wrapped in
+  `copy_contents_into()` using `shutil.copytree(dirs_exist_ok=True)` with
+  symlink preservation.
+
+## Changes
+
+| File | Action |
+|------|--------|
+| `.github/scripts/deploy-web-pages.py` | Created (faithful Python port) |
+| `.github/scripts/deploy-web-pages.sh` | Deleted |
+| `.github/workflows/promote-web.yml` | Updated cp/run/rm to `.py` |
+| `.github/workflows/rollback-web.yml` | Updated cp/run/rm to `.py` |
+| `.github/workflows/nightly-web.yml` | Updated cp/run/rm to `.py` |
+| `docs/developer-guide.md` | `.sh` → `.py` reference at line 468 |
+| `docs/design/web-promotion-and-versioning.md` | `.sh` → `.py` at lines 37, 57, 73, 86 |
+
+## Verification
+
+Self-tested under /tmp with a fake Pages repo:
+1. **First-run promote** — manifest created, v/1 snapshot, prev/ empty (no pre-existing root files).
+2. **Second promote** — prev/ seeded from v1 root files, v/2 snapshot created, root replaced with v2.
+3. **Rollback (v2→v1)** — root/prev swapped correctly, manifest updated with `rolledBackFrom` + `note:"rollback"`.
+4. **Double rollback (v1→v2)** — reversible swap confirmed.
+5. **Nightly** — nightly/ replaced with artifact contents.
+6. **Error guards** — bad artifact dir, reserved name in artifact, empty prev/ all exit 1 with `ERROR:` messages.
+7. **Prune versions** — 57 snapshot dirs pruned to exactly 50 (highest kept).
+
+# Decision: JAR filenames carry git-describe build version
+
+**Date:** 2026-06-08  
+**Author:** Tank (Core/Backend Developer)  
+**PR:** #1826 (web-promotion + git-describe versioning)
+
+## Context
+
+JARs were named `edumips64-1.4.1.jar` (Gradle's default `archiveVersion` = static
+`version` from `gradle.properties`). The full build identity (e.g.
+`1.4.1-5-gabc1234`) only appeared in the manifest `Signature-Version` attribute via
+the existing `gitDescribe` provider. This made the filename misleading for dev builds.
+
+## Decision
+
+Set `archiveVersion.set(gitDescribe)` on both `tasks.jar` and `tasks.register("noHelpJar")`
+so produced filenames become `edumips64-<git-describe>.jar` and
+`edumips64-<git-describe>-nohelp.jar`.
+
+The MSI task (`--app-version`) stays strictly numeric (`${version}`) because
+jpackage/Windows MSI versions require `major.minor.patch` format.
+
+## Changes Made
+
+### `build.gradle.kts`
+- Added `archiveVersion.set(gitDescribe)` to `tasks.jar` and `noHelpJar`.
+- Rewrote the MSI task JAR-finding logic: instead of reconstructing the filename
+  from `${version}`, it now globs the build directory for `edumips64-*.jar`
+  (excluding `nohelp` variants). This is robust across any git-describe suffix.
+- `--main-jar` in jpackage uses the dynamically found `jarFile.name`.
+
+### `.github/workflows/build-desktop.yml`
+- Added a `Get produced JAR path` step that runs
+  `ls ./out/edumips64-*.jar | grep -v '\-nohelp\.jar' | head -1` to discover
+  the actual filename.
+- Upload step uses `${{ steps.get_jar.outputs.path }}` instead of the hardcoded
+  static-version name.
+
+### `.github/workflows/release.yml`
+- JAR staging step now discovers the actual filename with a glob and renames it to
+  the canonical `edumips64-${VERSION}.jar` for the GitHub release.
+- **Why this was necessary:** The release workflow validates that the tag does NOT
+  exist yet, then builds the JAR, then creates the tag. So during the JAR build,
+  git-describe returns the previous tag + commit distance (e.g.
+  `1.4.0-101-gabc1234`), NOT the new version. The static-version `cp` would fail.
+  Globbing for the actual file and renaming it to the release name is correct.
+
+### `docs/developer-guide.md`
+- Updated JAR naming description to use `<build-version>` and explain the
+  git-describe format for dev builds vs. release tags.
+
+## Rationale
+
+- **Transparency:** The filename now unambiguously identifies which commit a JAR
+  was built from.
+- **No static-version fallbacks needed for the WAR task:** The WAR task is not a
+  JAR and is consumed by GWT/webpack machinery, not by end users — no change needed.
+- **Lazy evaluation:** `gitDescribe` is a `Provider<String>` from `providers.exec`;
+  `archiveVersion.set(gitDescribe)` wires it lazily. No `.get()` at configuration
+  time in the MSI task (all file operations happen inside `doFirst`).
+
+## Verified
+
+- `./gradlew jar noHelpJar` → `out/edumips64-1.4.0-101-g6ee73e92-dirty.jar` and
+  `out/edumips64-1.4.0-101-g6ee73e92-dirty-nohelp.jar` produced.
+- `./gradlew assemble` → BUILD SUCCESSFUL.
+- `./gradlew msi --dry-run` → SKIPPED (no error at configuration time).
+- Glob `ls ./out/edumips64-*.jar | grep -v '\-nohelp\.jar' | head -1` correctly
+  returns the main JAR only.
+
+# Decision: Add user-facing versioning page to the manual
+
+**Date:** 2026-06-08  
+**Agent:** Link (Docs/DevRel)  
+**Branch:** `squad/web-promotion-system` (PR #1826)
+
+## Context
+
+With the introduction of the web promotion system (nightly builds, PR preview
+builds, production promotion), users needed a simple, user-facing explanation
+of:
+- what the version string they see actually means;
+- where to find the version in each flavour of the app;
+- what the coloured badges next to "Web Version" in the web toolbar mean.
+
+## Decision
+
+Created a new page `versioning.rst` in all three language trees
+(`docs/user/en/src/`, `docs/user/it/src/`, `docs/user/zh/src/`) and added it
+as the fifth entry (`versioning`) in the first, UI-independent toctree block
+of each `index.rst` (after `examples`).
+
+## Rationale
+
+- The page is UI-independent (the badges are web-specific, but knowing which
+  build you're on is equally useful for desktop/CLI users), so it belongs in
+  the shared toctree, not inside the `.. only:: not web` or `.. only:: not
+  swing` blocks.
+- Placing it after `examples` (the last existing entry) keeps the logical flow:
+  format → instructions → FPU → examples → versioning.
+- Language: deliberately avoids all developer jargon (no "git describe",
+  "Gradle", "CI", "archiveVersion"). The between-release format is explained
+  purely in plain terms (release + count + unique ID).
+
+## Files created / modified
+
+| File | Action |
+|------|--------|
+| `docs/user/en/src/versioning.rst` | Created (EN prose) |
+| `docs/user/it/src/versioning.rst` | Created (IT translation) |
+| `docs/user/zh/src/versioning.rst` | Created (ZH translation) |
+| `docs/user/en/src/index.rst` | Added `versioning` to first toctree |
+| `docs/user/it/src/index.rst` | Added `versioning` to first toctree |
+| `docs/user/zh/src/index.rst` | Added `versioning` to first toctree |
+
+## Translation notes
+
+- **IT**: Full Italian translation. High confidence — consistent with the tone
+  and vocabulary of the existing Italian documentation.
+- **ZH**: Full Simplified Chinese translation. Underline lengths verified with
+  `unicodedata.east_asian_width` (all passed). Moderate confidence — technically
+  accurate but may benefit from review by a native Mandarin speaker.
+
+# Decision: PR preview sticky comment in pr-reports.yml
+
+**Author:** Tank (Core/Backend)
+**Date:** 2026-06-08
+**PR:** #1826
+**Status:** Implemented
+
+## Context
+
+The `pr-reports.yml` workflow deploys a per-PR Azure web preview to
+`https://edumips64ci.z16.web.core.windows.net/<PR>/` but did not surface
+that URL anywhere on the pull request. Developers had to know to look at
+the `deploy-staging` job's environment URL in the Actions tab.
+
+## Decision
+
+Add a `comment-preview` job to `pr-reports.yml` that posts (and keeps
+updated) a single sticky comment on the PR containing the preview URL,
+the short commit SHA it reflects, and a link to the CI run.
+
+## Design choices
+
+### Separate job, not additional step in deploy-staging
+
+`deploy-staging` already has `id-token: write` (for Azure OIDC login) and
+Azure secrets. Adding `pull-requests: write` to that job would broaden its
+privilege surface unnecessarily. A separate job with **only**
+`pull-requests: write` keeps each job at the minimum required permissions.
+
+### Inheritance of approval gate
+
+`comment-preview` declares `needs: [metadata, deploy-staging]`. Because
+`deploy-staging` uses an environment-based approval gate for untrusted
+actors (`Staging` environment), `comment-preview` cannot run until that
+approval is granted and the deploy succeeds. No additional gating needed.
+
+### Sticky via hidden HTML marker + user.type Bot filter
+
+The comment body embeds `<!-- web-preview-link -->` as a unique marker.
+On each run, the job paginates all PR comments, finds the first one
+containing the marker authored by a Bot, and updates it in-place. This
+avoids comment spam across multiple CI runs on the same PR.
+
+### GHA expression injection
+
+Only the already-validated PR number is passed via `${{ }}` interpolation
+(as a `const pr = '...'` assignment, re-validated with `/^\d+$/` inside
+the script). The commit SHA and run URL are read from
+`context.payload.workflow_run.*` inside the JS to avoid injection risk
+with arbitrary string values.
+
+### No pre-merge testability
+
+`workflow_run` workflows execute from the **base branch** definition only.
+The feature-branch version of `pr-reports.yml` is never exercised by
+GitHub Actions before merge. Correctness was verified by:
+- `actionlint .github/workflows/pr-reports.yml` → exit 0, no warnings
+- `node --check` on the extracted JS → no syntax errors
+
 ## Governance
 
 - All meaningful changes require team consensus
