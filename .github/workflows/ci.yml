@@ -16,6 +16,7 @@ on:
       - master
   schedule:
     - cron: '0 0 * * *'
+  workflow_dispatch:
 
 # Read-only by default. No job in this workflow needs more.
 permissions:
@@ -23,7 +24,7 @@ permissions:
 
 jobs:
   # Detect which files changed in the PR to conditionally run expensive builds.
-  # On schedule runs, all outputs are set to 'true' so every build runs.
+  # On schedule and manual (workflow_dispatch) runs, all outputs are set to 'true' so every build runs.
   detect-changes:
     name: Detect file changes
     runs-on: ubuntu-latest
@@ -31,8 +32,8 @@ jobs:
       contents: read
       pull-requests: read
     outputs:
-      snap: ${{ github.event_name == 'schedule' && 'true' || steps.changes.outputs.snap }}
-      electron: ${{ github.event_name == 'schedule' && 'true' || steps.changes.outputs.electron }}
+      snap: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && 'true' || steps.changes.outputs.snap }}
+      electron: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && 'true' || steps.changes.outputs.electron }}
     steps:
       - uses: actions/checkout@v6
         if: github.event_name == 'pull_request'
