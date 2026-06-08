@@ -465,7 +465,7 @@ in `release.yml` is disabled (`if: false`). Promotion is manual and gated.
 Only `lupino3` (Andrea) can trigger `promote-web.yml` (actor check enforced in
 the workflow, in addition to the collaborator gate on `workflow_dispatch`).
 
-The Pages-layout logic lives in `.github/scripts/deploy-web-pages.sh`.
+The Pages-layout logic lives in `.github/scripts/deploy-web-pages.py`.
 
 #### Rolling back
 

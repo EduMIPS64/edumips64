@@ -131,15 +131,15 @@ jobs:
         run: |
           set -euo pipefail
           # Copy the script into the Pages-repo checkout.
-          cp .github/scripts/deploy-web-pages.sh pages-repo/
+          cp .github/scripts/deploy-web-pages.py pages-repo/
           cd pages-repo
-          bash deploy-web-pages.sh promote \
+          python3 deploy-web-pages.py promote \
             "../artifact/web" \
             "${BUILD}" \
             "${HEAD_SHA}" \
             "${TARGET_RELEASE}" \
             "${{ github.actor }}"
-          rm -f deploy-web-pages.sh
+          rm -f deploy-web-pages.py
 
       - name: Commit and push to Pages repo
         env:

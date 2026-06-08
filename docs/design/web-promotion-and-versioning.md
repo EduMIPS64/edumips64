@@ -34,7 +34,7 @@ Three sub-problems solved:
 
 ## Chosen Implementation
 
-This section describes the system as built. All workflows live in `.github/workflows/`; the shared deploy script is `.github/scripts/deploy-web-pages.sh`.
+This section describes the system as built. All workflows live in `.github/workflows/`; the shared deploy script is `.github/scripts/deploy-web-pages.py`.
 
 ### Phase 0 — Disable Auto-Deploy
 
@@ -54,7 +54,7 @@ This section describes the system as built. All workflows live in `.github/workf
 3. **Compute build identity:** `git describe --tags --match 'v*' --always <SHA> | sed 's/^v//'` → e.g. `1.4.0-2-gabc1234`. Also reads `targetRelease` from `gradle.properties`.
 4. **Download** the immutable `web` artifact from the validated run.
 5. **Clone** the Pages repo (`EduMIPS64/web.edumips.org`).
-6. **Run** `deploy-web-pages.sh promote <artifact_dir> <build> <sha> <targetRelease> <actor>`:
+6. **Run** `deploy-web-pages.py promote <artifact_dir> <build> <sha> <targetRelease> <actor>`:
    - Archives current root files → `/prev/` (on first run, seeds `/prev/` from existing root).
    - Copies artifact → `/v/<N+1>/` (immutable snapshot) and to repo root (current).
    - Writes `manifest.json` with promotion number, SHA, build string, timestamp, actor.
@@ -70,7 +70,7 @@ This section describes the system as built. All workflows live in `.github/workf
 
 **Access control:** `if: github.actor == 'lupino3'`
 
-**Mechanism:** `deploy-web-pages.sh rollback <actor>` swaps `/prev/` contents into the repo root and updates `manifest.json` (sets `current` to what was `prev`, marks `rolledBackFrom`). No artifact download needed — instant emergency recovery.
+**Mechanism:** `deploy-web-pages.py rollback <actor>` swaps `/prev/` contents into the repo root and updates `manifest.json` (sets `current` to what was `prev`, marks `rolledBackFrom`). No artifact download needed — instant emergency recovery.
 
 **Normal rollback** (non-emergency): re-run `promote-web.yml` with the `run_id` of the previous good build; the system treats it as a new promotion.
 
@@ -83,7 +83,7 @@ This section describes the system as built. All workflows live in `.github/workf
 **Mechanism:**
 1. Finds the latest successful `ci.yml` run on `master` via `gh run list`.
 2. Downloads its `web` artifact.
-3. Runs `deploy-web-pages.sh nightly <artifact_dir>` — replaces the `/nightly/` directory with the artifact contents.
+3. Runs `deploy-web-pages.py nightly <artifact_dir>` — replaces the `/nightly/` directory with the artifact contents.
 4. Commits and pushes to Pages repo.
 
 **Ungated** — no actor restriction. Nightly is a preview channel for contributors and agents.

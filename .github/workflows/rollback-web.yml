@@ -36,10 +36,10 @@ jobs:
       - name: Run rollback script
         run: |
           set -euo pipefail
-          cp .github/scripts/deploy-web-pages.sh pages-repo/
+          cp .github/scripts/deploy-web-pages.py pages-repo/
           cd pages-repo
-          bash deploy-web-pages.sh rollback "${{ github.actor }}"
-          rm -f deploy-web-pages.sh
+          python3 deploy-web-pages.py rollback "${{ github.actor }}"
+          rm -f deploy-web-pages.py
 
       - name: Commit and push to Pages repo
         run: |
