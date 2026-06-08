@@ -450,12 +450,14 @@ in `release.yml` is disabled (`if: false`). Promotion is manual and gated.
 
 #### Promoting a build to production
 
+**`promote-web.yml` serves two modes:**
+
+**Mode 1: Build and promote current master (one-click ship)**
 1. Open **Actions → Promote Web to Production** (`promote-web.yml`).
-2. Click **Run workflow** and enter the **CI run ID** whose `web` artifact to ship.
-   (Find the run ID in the URL of any successful CI run on `master`.)
-3. The workflow validates the run (must be a successful `ci.yml` run on `master`
-   with a `web` artifact), then deploys it to the Pages repo
-   (`EduMIPS64/web.edumips.org`) with the following layout:
+2. Click **Run workflow**. Leave the **CI run ID** field **empty**.
+3. The workflow builds and tests the current `master` (via reusable `build-web.yml`, 
+   no secrets), then deploys the artifact to production.
+4. The Pages repo (`EduMIPS64/web.edumips.org`) receives the update with the following layout:
 
    ```
    web.edumips.org/
@@ -466,10 +468,21 @@ in `release.yml` is disabled (`if: false`). Promotion is manual and gated.
    └── manifest.json              ← {current, prev, sha, build, promotedAt, …}
    ```
 
-Only `lupino3` (Andrea) can trigger `promote-web.yml` (actor check enforced in
-the workflow, in addition to the collaborator gate on `workflow_dispatch`).
+**Mode 2: Promote a specific past CI run (rollback / re-promote)**
+1. Open **Actions → Promote Web to Production** (`promote-web.yml`).
+2. Click **Run workflow** and enter the **CI run ID** whose `web` artifact to ship.
+   (Find the run ID in the URL of any successful CI run on `master`.)
+3. The workflow validates the run (must be a successful `ci.yml` run on `master`
+   with a `web` artifact), then deploys it to production using the same layout as Mode 1.
+   This mode is useful for: rolling back to a previous good build (find its run ID and
+   re-promote), re-promoting the current production version by id, or auditing which
+   runs have shipped.
 
-The Pages-layout logic lives in `.github/scripts/deploy-web-pages.py`.
+**Details:**
+- Only `lupino3` (Andrea) can trigger `promote-web.yml` (actor check enforced in
+  the workflow, in addition to the collaborator gate on `workflow_dispatch`).
+- Must be dispatched from the `master` branch in both modes.
+- The Pages-layout logic lives in `.github/scripts/deploy-web-pages.py`.
 
 #### Rolling back
 
@@ -477,6 +490,8 @@ If the current production version is broken, open **Actions → Rollback Web
 Production** (`rollback-web.yml`) and click **Run workflow** (no inputs needed).
 This promotes `prev/` back to root and updates `manifest.json`. Gated to
 `lupino3` only.
+
+Alternatively, use Mode 2 of `promote-web.yml` to re-promote a previous good build by its run ID.
 
 #### Nightly channel
 
