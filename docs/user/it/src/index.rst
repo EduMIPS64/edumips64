@@ -48,6 +48,7 @@ in formato PDF.
    instructions
    fpu
    examples
+   versioning
 
 .. only:: not web
 

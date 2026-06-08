@@ -47,6 +47,7 @@ manual (with both UI chapters) is available on
    instructions
    fpu
    examples
+   versioning
 
 .. only:: not web
 
