@@ -451,6 +451,59 @@ jpackage/Windows MSI versions require `major.minor.patch` format.
 - Glob `ls ./out/edumips64-*.jar | grep -v '\-nohelp\.jar' | head -1` correctly
   returns the main JAR only.
 
+# Decision: Add user-facing versioning page to the manual
+
+**Date:** 2026-06-08  
+**Agent:** Link (Docs/DevRel)  
+**Branch:** `squad/web-promotion-system` (PR #1826)
+
+## Context
+
+With the introduction of the web promotion system (nightly builds, PR preview
+builds, production promotion), users needed a simple, user-facing explanation
+of:
+- what the version string they see actually means;
+- where to find the version in each flavour of the app;
+- what the coloured badges next to "Web Version" in the web toolbar mean.
+
+## Decision
+
+Created a new page `versioning.rst` in all three language trees
+(`docs/user/en/src/`, `docs/user/it/src/`, `docs/user/zh/src/`) and added it
+as the fifth entry (`versioning`) in the first, UI-independent toctree block
+of each `index.rst` (after `examples`).
+
+## Rationale
+
+- The page is UI-independent (the badges are web-specific, but knowing which
+  build you're on is equally useful for desktop/CLI users), so it belongs in
+  the shared toctree, not inside the `.. only:: not web` or `.. only:: not
+  swing` blocks.
+- Placing it after `examples` (the last existing entry) keeps the logical flow:
+  format → instructions → FPU → examples → versioning.
+- Language: deliberately avoids all developer jargon (no "git describe",
+  "Gradle", "CI", "archiveVersion"). The between-release format is explained
+  purely in plain terms (release + count + unique ID).
+
+## Files created / modified
+
+| File | Action |
+|------|--------|
+| `docs/user/en/src/versioning.rst` | Created (EN prose) |
+| `docs/user/it/src/versioning.rst` | Created (IT translation) |
+| `docs/user/zh/src/versioning.rst` | Created (ZH translation) |
+| `docs/user/en/src/index.rst` | Added `versioning` to first toctree |
+| `docs/user/it/src/index.rst` | Added `versioning` to first toctree |
+| `docs/user/zh/src/index.rst` | Added `versioning` to first toctree |
+
+## Translation notes
+
+- **IT**: Full Italian translation. High confidence — consistent with the tone
+  and vocabulary of the existing Italian documentation.
+- **ZH**: Full Simplified Chinese translation. Underline lengths verified with
+  `unicodedata.east_asian_width` (all passed). Moderate confidence — technically
+  accurate but may benefit from review by a native Mandarin speaker.
+
 ## Governance
 
 - All meaningful changes require team consensus

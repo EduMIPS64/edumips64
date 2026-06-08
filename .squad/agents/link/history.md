@@ -36,3 +36,30 @@ Developer guide: `docs/developer-guide.md`. New sections inserted before "Manual
 
 ### Pre-existing note
 The `latex_preamble` in `common_conf.py` uses `\D` in a non-raw string (produces a `SyntaxWarning` in Python 3.12+). This is pre-existing and unrelated to this change — left untouched per minimal-change policy.
+
+
+### New page: `versioning.rst`
+Created `docs/user/{en,it,zh}/src/versioning.rst` and added `versioning` as
+the fifth entry in the first (UI-independent) toctree block of each
+`docs/user/{en,it,zh}/src/index.rst` (after `examples`).
+
+### Content summary (for future reference)
+The page covers three topics:
+1. **Version string format** — plain release number (e.g. `1.4.1`) vs.
+   between-release build (e.g. `1.4.0-74-geec1768`: release + number of
+   changes + short unique identifier). No dev jargon.
+2. **Where to find the version** — desktop: window title / Help→About;
+   CLI: `--version` flag; web: About tab + toolbar "Web Version" label.
+3. **Web build badges** — the key user-facing rule:
+   - No badge → stable production (https://web.edumips.org).
+   - `NIGHTLY` (orange) → rebuilt every night, newest features, may be unstable.
+   - `PR #N` (yellow) → temporary preview for a pull request.
+   - `dev` (blue) → local development build.
+
+### Translation confidence
+- IT: full Italian translation, high confidence — matches tone of existing IT pages.
+- ZH: full Simplified Chinese translation using `unicodedata`-verified underlines;
+  moderate confidence — technically accurate, may benefit from native-speaker review.
+
+### CJK / full-width punctuation rST inline-markup rule
+In reStructuredText, inline markup (`**bold**`, `` ``literal`` ``) must be bounded by whitespace or ASCII punctuation. CJK characters and full-width punctuation (e.g. `（`, `）`, `。`, `；`) do NOT satisfy this boundary rule, so adjacent markup is silently dropped (renders as literal `**`/backticks). Fix: insert `\ ` (backslash-space, produces no visible output) between the inline markup delimiter and the adjacent CJK/full-width character. For nested or spanning bold+literal, split into separate non-nested markup runs joined with `\ ` — e.g. `**text；**\ ``NIGHTLY``\ **→ more text。**`.
