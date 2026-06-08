@@ -577,6 +577,20 @@ GitHub Actions before merge. Correctness was verified by:
 **Supersedes:** PR #1829 (standalone ci.yml workflow_dispatch) — CLOSED. Scheduled ci.yml unchanged (still feeds nightly).
 **Docs:** design doc "Manual Gated Promotion" + Alternatives (rejected D hard-build-always-promote, E separate orchestrator); developer-guide two-mode procedure.
 
+### 2026-06-08: Windows CI Colon-in-Filenames Fix — Mandatory Filename Convention (Coordinator maintenance)
+
+**By:** lupino3 (Coordinator)
+**Issue:** Earlier Scribe runs wrote `.squad/log/` and `.squad/orchestration-log/` files with ISO-8601 timestamps containing colons (e.g., `2026-06-08T13:55:00Z-tank.md`). Colons are illegal in Windows filenames → `actions/checkout` failed with exit 128 on Build Windows MSI + build-electron win32-x64 jobs → master Release workflow red.
+**Fix Deployed:**
+- Renamed all 6 offending timestamp files to colon-free form: `2026-06-08T13-55-00Z-...` (hyphens, not colons).
+- Added mandatory Windows-safe filename convention to Scribe charter (`.squad/agents/scribe/charter.md`).
+- Activated windows-compatibility skill into `.squad/skills/`.
+- Updated orchestration-log template to enforce colon-free timestamps.
+
+**Verification:** Release run 27144326413 on commit ed03753b completed SUCCESS; both Windows jobs passed the checkout step (was the previous failure point). CodeQL + Code Quality also green.
+
+**Convention (now mandatory):** All timestamped files in `.squad/log/` and `.squad/orchestration-log/` MUST use format `YYYY-MM-DDTHH-MM-SSZ` (e.g., `2026-06-08T14-35-00Z-task.md`), never ISO-8601 with colons. This prevents Windows CI failures on every master run.
+
 ## Governance
 
 - All meaningful changes require team consensus
