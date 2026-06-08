@@ -5,10 +5,7 @@ Run with:  cd .github/scripts && python -m pytest test_deploy_web_pages.py -q
 
 import importlib.util
 import json
-import sys
 from pathlib import Path
-
-import pytest
 
 # ---------------------------------------------------------------------------
 # Load the hyphenated module
