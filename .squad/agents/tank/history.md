@@ -84,3 +84,19 @@
 
 **MSI JAR-finding pattern:**
 - The MSI task downloads a pre-built JAR (from CI artifact), then needs to find it. Since git-describe on the MSI Windows runner may differ from the Linux build runner (different fetch-depth/tags), never recompute the archive name from gitDescribe in the MSI task. Instead, glob the build directory: `layout.buildDirectory.get().asFile.listFiles()?.filter { it.name.startsWith("edumips64-") && it.name.endsWith(".jar") && !it.name.contains("nohelp") }?.firstOrNull()`.
+
+
+### 2026-06-08 — PR preview sticky comment via separate minimal-privilege job (#1826)
+
+**Sticky comment pattern:** To post a single updating comment on a PR from a `workflow_run` workflow:
+1. Use a hidden HTML marker constant (`<!-- web-preview-link -->`) embedded in the comment body.
+2. Paginate all issue comments with `github.paginate(github.rest.issues.listComments, { owner, repo, issue_number, per_page: 100 })`.
+3. Find the first comment whose `body.includes(MARKER)` AND `user.type === 'Bot'` (identifies comments by github-actions[bot]).
+4. If found → `updateComment({ comment_id: existing.id, body })`; else → `createComment({ issue_number, body })`.
+5. Wrap in try/catch with `core.warning` on error — never hard-fail the pipeline over a comment.
+
+**Least-privilege separate-job approach:** `pull-requests: write` must NOT be added to the deploy job (which already has `id-token: write` + Azure secrets). Instead, add a dedicated `comment-preview` job with `permissions: pull-requests: write` only. Dependency on `deploy-staging` (via `needs: [metadata, deploy-staging]`) ensures it only runs after a successful deploy and inherits the environment-based approval gate for untrusted actors.
+
+**`workflow_run` / base-branch reason this cannot be tested pre-merge:** `workflow_run` workflows only fire from the workflow definition on the repository's **default branch** (master). A version of `pr-reports.yml` on a feature branch is never executed by GitHub Actions. Correctness must be verified by construction (actionlint + node --check) before merging; the first real end-to-end test only happens after the PR is merged.
+
+**GHA expression injection guard:** Only pass `${{ needs.metadata.outputs.pr }}` (already validated numeric upstream) into the script via a `const pr = '...'` assignment. Read `head_sha` and `html_url` through `context.payload.workflow_run.*` inside JS — never via `${{ }}` — to avoid injection and quoting issues with arbitrary SHA strings.

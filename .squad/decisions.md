@@ -504,6 +504,65 @@ of each `index.rst` (after `examples`).
   `unicodedata.east_asian_width` (all passed). Moderate confidence — technically
   accurate but may benefit from review by a native Mandarin speaker.
 
+# Decision: PR preview sticky comment in pr-reports.yml
+
+**Author:** Tank (Core/Backend)
+**Date:** 2026-06-08
+**PR:** #1826
+**Status:** Implemented
+
+## Context
+
+The `pr-reports.yml` workflow deploys a per-PR Azure web preview to
+`https://edumips64ci.z16.web.core.windows.net/<PR>/` but did not surface
+that URL anywhere on the pull request. Developers had to know to look at
+the `deploy-staging` job's environment URL in the Actions tab.
+
+## Decision
+
+Add a `comment-preview` job to `pr-reports.yml` that posts (and keeps
+updated) a single sticky comment on the PR containing the preview URL,
+the short commit SHA it reflects, and a link to the CI run.
+
+## Design choices
+
+### Separate job, not additional step in deploy-staging
+
+`deploy-staging` already has `id-token: write` (for Azure OIDC login) and
+Azure secrets. Adding `pull-requests: write` to that job would broaden its
+privilege surface unnecessarily. A separate job with **only**
+`pull-requests: write` keeps each job at the minimum required permissions.
+
+### Inheritance of approval gate
+
+`comment-preview` declares `needs: [metadata, deploy-staging]`. Because
+`deploy-staging` uses an environment-based approval gate for untrusted
+actors (`Staging` environment), `comment-preview` cannot run until that
+approval is granted and the deploy succeeds. No additional gating needed.
+
+### Sticky via hidden HTML marker + user.type Bot filter
+
+The comment body embeds `<!-- web-preview-link -->` as a unique marker.
+On each run, the job paginates all PR comments, finds the first one
+containing the marker authored by a Bot, and updates it in-place. This
+avoids comment spam across multiple CI runs on the same PR.
+
+### GHA expression injection
+
+Only the already-validated PR number is passed via `${{ }}` interpolation
+(as a `const pr = '...'` assignment, re-validated with `/^\d+$/` inside
+the script). The commit SHA and run URL are read from
+`context.payload.workflow_run.*` inside the JS to avoid injection risk
+with arbitrary string values.
+
+### No pre-merge testability
+
+`workflow_run` workflows execute from the **base branch** definition only.
+The feature-branch version of `pr-reports.yml` is never exercised by
+GitHub Actions before merge. Correctness was verified by:
+- `actionlint .github/workflows/pr-reports.yml` → exit 0, no warnings
+- `node --check` on the extracted JS → no syntax errors
+
 ## Governance
 
 - All meaningful changes require team consensus
