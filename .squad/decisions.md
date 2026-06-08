@@ -328,6 +328,59 @@ And in `manifest.json`: `current` ↔ `prev` are swapped, not zeroed.
 
 ---
 
+# Decision: Port deploy-web-pages.sh to Python
+
+**Date:** 2026-06-08  
+**Author:** Tank (Core/Backend Developer)  
+**Status:** Implemented
+
+## Context
+
+`.github/scripts/deploy-web-pages.sh` was a 342-line bash script managing the
+Pages-repo layout (promote/rollback/nightly). Bash's `extglob`/`dotglob` and
+heredoc-Python made it hard to read and reason about.
+
+## Decision
+
+Rewrite as `.github/scripts/deploy-web-pages.py` (Python 3, standard library
+only). Identical CLI, behavior, manifest schema, and destructive-op safety.
+
+## Rationale
+
+- Python is significantly more readable for complex file-system logic.
+- Standard-library-only (`os`, `sys`, `json`, `shutil`, `pathlib`, `datetime`,
+  `argparse`) — no `subprocess` use, so Codacy/Bandit are clean.
+- Argparse subparsers replace bash `case` dispatch; typed helpers replace
+  shell functions.
+- `dotglob` semantics (include hidden files) are matched naturally by
+  `Path(".").iterdir()`.
+- `cp -a "$src/." "$dest/"` (copy contents, not dir) is wrapped in
+  `copy_contents_into()` using `shutil.copytree(dirs_exist_ok=True)` with
+  symlink preservation.
+
+## Changes
+
+| File | Action |
+|------|--------|
+| `.github/scripts/deploy-web-pages.py` | Created (faithful Python port) |
+| `.github/scripts/deploy-web-pages.sh` | Deleted |
+| `.github/workflows/promote-web.yml` | Updated cp/run/rm to `.py` |
+| `.github/workflows/rollback-web.yml` | Updated cp/run/rm to `.py` |
+| `.github/workflows/nightly-web.yml` | Updated cp/run/rm to `.py` |
+| `docs/developer-guide.md` | `.sh` → `.py` reference at line 468 |
+| `docs/design/web-promotion-and-versioning.md` | `.sh` → `.py` at lines 37, 57, 73, 86 |
+
+## Verification
+
+Self-tested under /tmp with a fake Pages repo:
+1. **First-run promote** — manifest created, v/1 snapshot, prev/ empty (no pre-existing root files).
+2. **Second promote** — prev/ seeded from v1 root files, v/2 snapshot created, root replaced with v2.
+3. **Rollback (v2→v1)** — root/prev swapped correctly, manifest updated with `rolledBackFrom` + `note:"rollback"`.
+4. **Double rollback (v1→v2)** — reversible swap confirmed.
+5. **Nightly** — nightly/ replaced with artifact contents.
+6. **Error guards** — bad artifact dir, reserved name in artifact, empty prev/ all exit 1 with `ERROR:` messages.
+7. **Prune versions** — 57 snapshot dirs pruned to exactly 50 (highest kept).
+
 ## Governance
 
 - All meaningful changes require team consensus

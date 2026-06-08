@@ -45,3 +45,15 @@
 **Reserved-name guard placement:** The guard scanning artifact top-level entries for reserved names belongs _before_ any destructive operation in `cmd_promote`, immediately after the `artifact_dir` existence check. Use the existing `RESERVED_NAMES` array and `die` helper; keep `dotglob`+`nullglob` consistent with the rest of the script.
 
 **Reversible rollback via SWAP:** The old rollback was one-way (set `manifest.prev = 0`, losing the current root). The correct design is a true in-place SWAP: (1) collect root prod files into a `.rollback-swap` staging dir _before_ touching prev/, (2) move prev/* to root, (3) move staging dir contents to prev/, (4) in manifest.json swap `current` ↔ `prev`. Key: collect root_files into an array _before_ creating the staging dir so the dir itself is never included in the move set. The `.rollback-swap` name is safe because it's not a valid web-artifact filename, but must be created after the array is collected.
+
+### 2026-06-08 — deploy-web-pages.sh → .py port
+
+**Python port of the 342-line bash deploy script:**
+- Standard-library only (os, sys, json, shutil, pathlib, datetime, argparse) — no subprocess; Bandit/Codacy clean.
+- `dotglob` in bash → `Path(".").iterdir()` in Python (both include hidden files); filter with `RESERVED_NAMES` list.
+- `cp -a "$src/." "$dest/"` (contents, not the dir) → custom `copy_contents_into()` using `shutil.copytree(dirs_exist_ok=True)` + `shutil.copy2` + symlink handling; preserves metadata like `cp -a`.
+- `shutil.move` for rollback staging: collect root file list BEFORE creating `.rollback-swap` dir so the staging dir never appears in the move set.
+- Prune logic: collect numeric dir names, sort descending, delete anything beyond index `MAX_VERSIONS-1`.
+- All 3 workflows updated to `cp deploy-web-pages.py`, `python3 deploy-web-pages.py`, `rm -f deploy-web-pages.py`.
+- `_ArgumentParser` subclass overrides `error()` → `sys.exit(1)` (argparse defaults to 2) to match bash `die` exit-code contract.
+- Tested: first-run promote, second promote, rollback, double-rollback (restores), nightly, error guards, prune-versions (50-cap verified). Cross-validated byte-identical against the old bash through a full operation sequence.
