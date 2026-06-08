@@ -93,12 +93,16 @@ Individual tasks for building single documentation (PDF and HTML) and jar target
 are available too: please read `build.gradle` for the complete list.  
 Gradle builds the following jar artifacts:
 
-- `edumips64-<version>.jar`: GUI executable jar (includes JavaHelp and picocli)
+- `edumips64-<build-version>.jar`: GUI executable jar (includes JavaHelp and picocli)
+
+The `<build-version>` is the full git-describe build identity. At a release tag it
+collapses to the plain version (e.g. `edumips64-1.4.1.jar`); on development builds
+it includes the commit distance and hash (e.g. `edumips64-1.4.1-5-gabc1234.jar`).
 
 Gradle is supported by all the main Java IDEs (e.g. IDEA, Eclipse, NetBeans).
 
 For developers that don't want to recompile the help files when creating a JAR, the
-`noHelpJar` Gradle task will produce `edumips64-<version>-nohelp.jar`, which does
+`noHelpJar` Gradle task will produce `edumips64-<build-version>-nohelp.jar`, which does
 not include the compiled help files.
 
 #### Build output directory
@@ -108,7 +112,7 @@ root of the repository, rather than Gradle's default `build/`. The layout is:
 
 | Artifact | Location |
 | --- | --- |
-| JARs (main, nohelp) | `out/edumips64-<version>[-nohelp].jar` |
+| JARs (main, nohelp) | `out/edumips64-<build-version>[-nohelp].jar` |
 | MSI installer | `out/EduMIPS64-<version>.msi` |
 | Electron packages | `out/WebEduMips64-<platform>-<arch>/` |
 | Web application (worker, ui, docs) | `out/web/` |
