@@ -44,15 +44,23 @@ This section describes the system as built. All workflows live in `.github/workf
 
 **Workflow:** `.github/workflows/promote-web.yml` (`workflow_dispatch`)
 
-**Inputs:** `run_id` (required) — the CI run whose `web` artifact to promote. Optional `sha` (derived from run if omitted).
+**Inputs:** `run_id` (optional) — the CI run whose `web` artifact to promote. Behavior depends on whether it is provided:
+- **Empty `run_id`** → **Build+promote current master:** a `build` job (using reusable `build-web.yml`) builds and tests the current master, then the `promote` job deploys that fresh artifact. One-click "ship current master" mode. Security preserved: `build-web.yml` has `contents: read` only and never sees `PAT_WEBUI`; the credential lives only in the `promote` job.
+- **`run_id` provided** → **Promote a specific validated run:** skip the build; validate that the given run is from this repo, ran `ci.yml`, concluded `success`, on `master` branch, and has a `web` artifact. Deploy that immutable artifact. This preserves rollback (re-promote a previously-validated run by id), re-promote (run the same id again), and audit (promote an arbitrary run by explicit id).
+
+**Dispatch requirement:** Must be dispatched from the `master` branch in both modes.
 
 **Access control:** `if: github.actor == 'lupino3'` — only Andrea can trigger.
 
-**Steps:**
-1. **Validate** the source CI run: confirms it belongs to this repo, ran `ci.yml`, concluded `success`, on `master` branch, and has a `web` artifact.
+**Steps (build+promote mode, no `run_id`):**
+1. **Build** (via reusable `build-web.yml` on current `master`): GWT worker + React/webpack bundle to `out/web/`, no secrets required.
+2. **Promote** (same flow as below, using current run id as `SOURCE_RUN_ID`).
+
+**Steps (promote-specific-run mode, `run_id` provided):**
+1. **Validate** the source CI run: confirms it belongs to this repo, ran `ci.yml`, concluded `success`, on `master` branch, and has a `web` artifact. Use the validated SHA and `run_id` as `SOURCE_RUN_ID`.
 2. **Checkout** this repo at the validated SHA with `fetch-depth: 0`.
 3. **Compute build identity:** `git describe --tags --match 'v*' --always <SHA> | sed 's/^v//'` → e.g. `1.4.0-2-gabc1234`. Also reads `targetRelease` from `gradle.properties`.
-4. **Download** the immutable `web` artifact from the validated run.
+4. **Download** the immutable `web` artifact from the source run (current run if build mode, or validated external run if promote-specific mode).
 5. **Clone** the Pages repo (`EduMIPS64/web.edumips.org`).
 6. **Run** `deploy-web-pages.py promote <artifact_dir> <build> <sha> <targetRelease> <actor>`:
    - Archives current root files → `/prev/` (on first run, seeds `/prev/` from existing root).
@@ -62,7 +70,7 @@ This section describes the system as built. All workflows live in `.github/workf
    - Ensures `CNAME` and `.nojekyll` are preserved.
 7. **Commit and push** to Pages repo.
 
-**Concurrency:** All Pages writes (promote, rollback, nightly) share a single `concurrency: group: web-pages-deploy` with `cancel-in-progress: false` to serialise safely.
+**Concurrency:** The `promote` job uses `concurrency: group: web-pages-deploy` with `cancel-in-progress: false` to serialise Pages writes safely across promote, rollback, and nightly operations. The `build` job (in fresh mode) is not serialised — parallel builds of different master snapshots do not conflict.
 
 ### Rollback
 
@@ -177,6 +185,8 @@ Organized by decision point. Each lists the option(s) we evaluated and rejected,
 |-----------------|-----------|
 | **(A) Environment approval gate** — add a `Production` GitHub Environment with required reviewers to the existing `deploy-prod` job; every master push creates a pending deployment awaiting approval. | Creates notification noise on every merge. No way to skip/batch. Artifact is rebuilt per push (not immutable promotion of an already-tested build). |
 | **(C) Git tag triggers deploy** — pushing a tag like `web-v<N>` triggers prod deploy by rebuilding from tag. | Rebuilding from tag means what you tested ≠ what you deploy (non-immutable). Agents could accidentally push tags. Extra manual step. |
+| **(D) Hard build+promote, dropping run_id** — a single workflow that ALWAYS rebuilds master and promotes, with no `run_id` input. | Removes the ability to re-promote / roll back by promoting a previously-validated run by id. Wastes CI resources by always rebuilding when an identical green artifact already exists. Loses audit trail of which runs have been shipped. |
+| **(E) Separate build→promote orchestrator** — keep two workflows but add a third that chains "trigger build, wait for green, then promote". | Cross-workflow orchestration is awkward in Actions (dispatch-then-wait has no native support). No capability gain over making `run_id` optional within a single workflow. Adds UI complexity (three workflows instead of one). |
 | **Auto-promote on green CI + time delay** — automatically promote the latest green build after N hours if no issues are raised. | Defeats the purpose of human gating. Andrea specifically wants an explicit manual action for production. |
 
 ### Rollback Hosting
@@ -248,6 +258,6 @@ Organized by decision point. Each lists the option(s) we evaluated and rejected,
 | 5 | Versions to retain in `/v/`? | 50. |
 | 6 | Build identity surfaces? | git-describe everywhere (desktop, CLI, web, docs). |
 | 7 | `package.json` version? | Leave stale at `1.0.0`; add comment noting it is unused. |
-| 8 | Workflow naming? | `promote-web.yml`, `rollback-web.yml`, `nightly-web.yml`. |
+| 8 | Workflow naming? | `promote-web.yml` (unifies build+promote with optional `run_id`), `rollback-web.yml`, `nightly-web.yml`. `promote-web.yml` serves both "build+promote current master" (empty `run_id`) and "promote a specific validated run" (with `run_id`). |
 | 9 | Nightly trigger? | Daily 01:00 UTC cron + `workflow_dispatch`. (Changed from initial "on-every-green-master-push" recommendation.) |
 | 10 | PR grouping? | Single PR (PR #1826) for all `edumips64` repo changes. Pages-repo layout bootstraps on first promotion run. |
