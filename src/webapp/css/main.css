@@ -48,3 +48,9 @@
     }
 }
 
+
+/* Nightly channel badge — shown only when served from /nightly/ path */
+.nightly-chip {
+    background-color: #7b1fa2 !important;
+    color: #fff !important;
+}

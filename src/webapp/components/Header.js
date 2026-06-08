@@ -42,6 +42,12 @@ export default function Header(props) {
   // jump back to the originating pull request when applicable.
   const buildInfo = React.useMemo(() => getBuildInfo(), []);
 
+  // Runtime nightly detection: the same artifact may be served from multiple
+  // paths; detect via the URL rather than a compile-time flag.
+  // Match exactly `/nightly` OR any path under `/nightly/` to avoid false
+  // positives (e.g. `/nightlybuild`). Access pathname only when window exists.
+  const path = typeof window !== 'undefined' ? window.location.pathname : '';
+  const isNightly = path === '/nightly' || path.startsWith('/nightly/');
 
   const handleFileLoad = (event) => {
     const file = event.target.files[0];
@@ -152,6 +158,22 @@ export default function Header(props) {
               label="dev"
               sx={{ fontWeight: 'bold' }}
             />
+          )}
+          {isNightly && (
+            <Tooltip
+              title="This is a nightly build, automatically deployed from the latest master commit. It may be unstable."
+              arrow
+              placement="bottom"
+            >
+              <Chip
+                id="nightly-build-chip"
+                size="small"
+                label="NIGHTLY"
+                className="nightly-chip"
+                aria-label="Nightly build"
+                sx={{ fontWeight: 'bold' }}
+              />
+            </Tooltip>
           )}
         </Typography>
         <Tooltip title="The current status of the CPU" arrow placement="top">

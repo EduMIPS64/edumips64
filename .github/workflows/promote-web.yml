@@ -1,0 +1,160 @@
+name: Promote Web to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'CI run ID whose "web" artifact to promote'
+        required: true
+        type: string
+
+# Serialise all Pages writes; never cancel an in-flight promotion.
+concurrency:
+  group: web-pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    name: Promote web artifact to production
+    # Only the maintainer (lupino3) may trigger this; workflow_dispatch is
+    # already collaborator-gated, but belt-and-suspenders actor check here.
+    if: github.actor == 'lupino3'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Required to call gh api / gh run download against the Actions API.
+      actions: read
+
+    steps:
+      # ------------------------------------------------------------------
+      # 1. Validate the source CI run before touching anything.
+      # ------------------------------------------------------------------
+      - name: Validate CI run
+        id: validate
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+
+          echo "Fetching run ${RUN_ID}..."
+          RUN_JSON=$(gh api "repos/${{ github.repository }}/actions/runs/${RUN_ID}" 2>&1) \
+            || { echo "ERROR: Could not fetch run ${RUN_ID}"; exit 1; }
+
+          REPO=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['repository']['full_name'])")
+          WORKFLOW=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['path'])")
+          CONCLUSION=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['conclusion'] or '')")
+          HEAD_BRANCH=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['head_branch'])")
+          HEAD_SHA=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['head_sha'])")
+
+          echo "  repo=${REPO} workflow=${WORKFLOW} conclusion=${CONCLUSION} branch=${HEAD_BRANCH} sha=${HEAD_SHA}"
+
+          [[ "$REPO" == "${{ github.repository }}" ]] \
+            || { echo "ERROR: Run belongs to ${REPO}, not ${{ github.repository }}"; exit 1; }
+          [[ "$WORKFLOW" == *"ci.yml"* ]] \
+            || { echo "ERROR: Run workflow is '${WORKFLOW}', expected ci.yml"; exit 1; }
+          [[ "$CONCLUSION" == "success" ]] \
+            || { echo "ERROR: Run conclusion is '${CONCLUSION}', must be 'success'"; exit 1; }
+          [[ "$HEAD_BRANCH" == "master" ]] \
+            || { echo "ERROR: Run head_branch is '${HEAD_BRANCH}', must be 'master'"; exit 1; }
+
+          # Confirm the 'web' artifact exists on that run.
+          ARTIFACTS=$(gh api "repos/${{ github.repository }}/actions/runs/${RUN_ID}/artifacts")
+          HAS_WEB=$(echo "$ARTIFACTS" | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)
+          names = [a['name'] for a in d.get('artifacts', [])]
+          print('yes' if 'web' in names else 'no')
+          ")
+          [[ "$HAS_WEB" == "yes" ]] \
+            || { echo "ERROR: No artifact named 'web' found on run ${RUN_ID}"; exit 1; }
+
+          echo "Validation passed."
+          echo "head_sha=${HEAD_SHA}" >> "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------------------
+      # 2. Checkout THIS repo at the validated SHA (for git describe).
+      # ------------------------------------------------------------------
+      - name: Checkout edumips64 at promoted SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.validate.outputs.head_sha }}
+          fetch-depth: 0
+
+      - name: Compute build identity
+        id: build_id
+        env:
+          HEAD_SHA: ${{ steps.validate.outputs.head_sha }}
+        run: |
+          set -euo pipefail
+          # git describe relative to the promoted commit; strip leading 'v'.
+          BUILD=$(git describe --tags --match 'v*' --always "$HEAD_SHA" | sed 's/^v//')
+          # targetRelease = gradle.properties version (the release label).
+          TARGET_RELEASE=$(grep '^version=' gradle.properties | cut -d= -f2 | tr -d '"' | tr -d "'")
+          echo "build=${BUILD}"
+          echo "targetRelease=${TARGET_RELEASE}"
+          echo "build=${BUILD}" >> "$GITHUB_OUTPUT"
+          echo "targetRelease=${TARGET_RELEASE}" >> "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------------------
+      # 3. Download the web artifact from the validated CI run.
+      # ------------------------------------------------------------------
+      - name: Download web artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifact/web
+          gh run download "${RUN_ID}" --name web --dir artifact/web
+          echo "Artifact contents:"
+          ls artifact/web/
+
+      # ------------------------------------------------------------------
+      # 4. Clone Pages repo, run script, commit, push.
+      # ------------------------------------------------------------------
+      - name: Clone Pages repo
+        env:
+          PAT_WEBUI: ${{ secrets.PAT_WEBUI }}
+        run: |
+          set -euo pipefail
+          git clone "https://x-access-token:${PAT_WEBUI}@github.com/EduMIPS64/web.edumips.org.git" \
+            pages-repo --branch master --depth 1
+          git -C pages-repo config user.name "github-actions[bot]"
+          git -C pages-repo config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run promote script
+        env:
+          BUILD: ${{ steps.build_id.outputs.build }}
+          TARGET_RELEASE: ${{ steps.build_id.outputs.targetRelease }}
+          HEAD_SHA: ${{ steps.validate.outputs.head_sha }}
+        run: |
+          set -euo pipefail
+          # Copy the script into the Pages-repo checkout.
+          cp .github/scripts/deploy-web-pages.py pages-repo/
+          cd pages-repo
+          python3 deploy-web-pages.py promote \
+            "../artifact/web" \
+            "${BUILD}" \
+            "${HEAD_SHA}" \
+            "${TARGET_RELEASE}" \
+            "${{ github.actor }}"
+          rm -f deploy-web-pages.py
+
+      - name: Commit and push to Pages repo
+        env:
+          HEAD_SHA: ${{ steps.validate.outputs.head_sha }}
+          BUILD: ${{ steps.build_id.outputs.build }}
+        run: |
+          set -euo pipefail
+          cd pages-repo
+
+          # Read the new promotion number from the manifest.
+          NEW_N=$(python3 -c "import json; d=json.load(open('manifest.json')); print(d['current'])")
+
+          git add -A
+          git diff --cached --quiet && { echo "Nothing to commit."; exit 0; }
+          git commit -m "Promote web to v${NEW_N} @ ${HEAD_SHA:0:8} (${BUILD})"
+          git push origin master
+
+          echo "Promoted v${NEW_N} @ ${HEAD_SHA} to web.edumips.org"

@@ -24,7 +24,7 @@ differenze importanti con quest'ultimo.
 
 Questo manuale vi introdurrà ad EduMIPS64, e spiegherà come utilizzarlo.
 
-Questo manuale si riferisce ad EduMIPS64 versione |version|.
+Questo manuale è stato generato per la build |version| di EduMIPS64.
 
 Il manuale è suddiviso in due parti. La prima parte è indipendente
 dall'interfaccia utente in uso e copre il formato dei file sorgente,
@@ -48,6 +48,7 @@ in formato PDF.
    instructions
    fpu
    examples
+   versioning
 
 .. only:: not web
 

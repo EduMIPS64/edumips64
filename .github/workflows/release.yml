@@ -195,6 +195,9 @@ jobs:
   # 5. Deploy web application to production.
   # ---------------------------------------------------------------------------
   deploy-prod:
+    # Phase 0: production is now gated via promote-web.yml (manual).
+    # Keep this job intact for emergency re-enable; set if:false to disable.
+    if: false
     name: Deploy web application to production
     permissions: write-all
     runs-on: ubuntu-latest
@@ -269,8 +272,10 @@ jobs:
         run: |
           mkdir -p staged
 
-          # JAR
-          cp release-artifacts/JAR/edumips64-${VERSION}.jar staged/
+          # JAR — discover actual filename (git-describe at build time may include
+          # a pre-tag suffix; rename to the canonical release name for the GitHub release).
+          JAR_SRC=$(ls release-artifacts/JAR/edumips64-*.jar | grep -v '\-nohelp\.jar' | head -1)
+          cp "$JAR_SRC" "staged/edumips64-${VERSION}.jar"
 
           # PDF manuals
           cp "release-artifacts/English manual (PDF)/EduMIPS64.pdf" staged/EduMIPS64-manual-en.pdf

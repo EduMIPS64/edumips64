@@ -5,10 +5,17 @@ name: PR preview deploy
 # out or executes pull request code. Its only inputs are the artifacts produced
 # by CI Build, which are treated as inert data.
 #
-# Coverage statistics are published directly in the CI Build job summaries, so
-# this workflow needs no pull-request write access. The only privileged action
-# here is deploying a static preview build, which uses repository secrets but
-# never runs pull request code.
+# Coverage statistics are published directly in the CI Build job summaries.
+#
+# The deploy-staging job deploys a static preview build using repository
+# secrets but never runs pull request code.
+#
+# The comment-preview job posts (and keeps updated) a sticky comment on the
+# pull request with the preview URL. It is a separate, minimal-privilege job
+# (pull-requests: write only) that never runs PR code and only writes a comment
+# containing the validated PR number and the known Azure preview URL. It
+# inherits the approval gate for untrusted actors via its dependency on
+# deploy-staging, which uses the environment-based approval mechanism.
 on:
   workflow_run:
     workflows: ["CI Build"]
@@ -135,3 +142,72 @@ jobs:
         with:
           inlineScript: |
               az storage blob upload-batch --account-name edumips64ci --auth-mode key -d '$web/${{ needs.metadata.outputs.pr }}' -s pr/${{ needs.metadata.outputs.pr }} --overwrite
+
+  # Post (or update) a sticky comment on the PR with the preview URL.
+  # This is a separate minimal-privilege job; it never checks out or runs PR
+  # code. The dependency on deploy-staging means it only runs after a
+  # successful deploy and inherits the same environment-based approval gate.
+  comment-preview:
+    name: Post preview link comment
+    needs: [metadata, deploy-staging]
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Post or update sticky preview comment
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const pr = '${{ needs.metadata.outputs.pr }}';
+            if (!/^\d+$/.test(pr)) {
+              core.setFailed(`Invalid PR number: ${pr}`);
+              return;
+            }
+
+            const { owner, repo } = context.repo;
+            const issue_number = parseInt(pr, 10);
+            const url = `https://edumips64ci.z16.web.core.windows.net/${pr}/`;
+            const sha = context.payload.workflow_run.head_sha;
+            const runUrl = context.payload.workflow_run.html_url;
+            const MARKER = '<!-- web-preview-link -->';
+
+            const body = [
+              MARKER,
+              `🌐 **Web preview for this PR:** ${url}`,
+              '',
+              `> Reflects commit \`${sha.slice(0, 8)}\`. Updated automatically on each successful build. ([CI run](${runUrl}))`
+            ].join('\n');
+
+            try {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner,
+                repo,
+                issue_number,
+                per_page: 100
+              });
+
+              const existing = comments.find(
+                c => c.body.includes(MARKER) && c.user.type === 'Bot'
+              );
+
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner,
+                  repo,
+                  comment_id: existing.id,
+                  body
+                });
+                core.info(`Updated preview comment ${existing.id} on PR #${pr}`);
+              } else {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number,
+                  body
+                });
+                core.info(`Created preview comment on PR #${pr}`);
+              }
+            } catch (e) {
+              core.warning(`Failed to post preview comment on PR #${pr}: ${e.message}`);
+            }

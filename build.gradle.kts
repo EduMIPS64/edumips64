@@ -251,22 +251,23 @@ val gitCommitHash: Provider<String> = providers.environmentVariable("GITHUB_SHA"
         commandLine("git", "rev-parse", "--verify", "--short", "HEAD")
     }.standardOutput.asText.map { it.trim() })
 
-val buildQualifier: Provider<String> = providers.environmentVariable("GITHUB_ACTIONS")
-    .map { "alpha" }
-    .orElse("")
+val gitDescribe: Provider<String> = providers.exec {
+    commandLine("git", "describe", "--tags", "--match", "v*", "--always", "--dirty")
+}.standardOutput.asText.map { it.trim().removePrefix("v") }
+    .orElse(version as String)
 
 val sharedManifest = Action<Manifest> {
-    attributes["Signature-Version"] = version
+    attributes["Signature-Version"] = gitDescribe.get()
     attributes["Codename"] = codename
     attributes["Build-Date"] = LocalDateTime.now()
     attributes["Full-Buildstring"] = "${gitBranch.get()}@${gitCommitHash.get()}"
     attributes["Git-Revision"] = gitCommitHash.get()
-    attributes["Build-Qualifier"] = buildQualifier.get()
 }
 
 // Main JAR — write directly under the build directory (out/) rather than
 // the default out/libs/ subfolder, so JARs sit next to other top-level artifacts.
 tasks.jar {
+    archiveVersion.set(gitDescribe)
     destinationDirectory.set(layout.buildDirectory)
     from(sourceSets.main.get().output)
     from(docsDir) {
@@ -285,6 +286,7 @@ tasks.jar {
 
 // NoHelp JAR — same destination as the main JAR (build directory root).
 tasks.register<Jar>("noHelpJar"){
+    archiveVersion.set(gitDescribe)
     destinationDirectory.set(layout.buildDirectory)
     archiveClassifier.set("nohelp")
     dependsOn(configurations.runtimeClasspath)
@@ -368,10 +370,13 @@ tasks.register<Exec>("msi"){
         if (majorVersion < 14) {
             throw GradleException("JDK 14+ is required to create the MSI package.")
         }
-        if (!layout.buildDirectory.file("edumips64-${version}.jar").get().asFile.exists()) {
-            throw GradleException("Could not find out/edumips64-${version}.jar. Please execute ./gradlew jar before trying to build the MSI.")
-        }
-        
+        // Find the actual main JAR (excludes nohelp variant) so the filename
+        // always matches regardless of the git-describe build suffix.
+        val jarFile = layout.buildDirectory.get().asFile.listFiles()
+            ?.filter { it.name.startsWith("edumips64-") && it.name.endsWith(".jar") && !it.name.contains("nohelp") }
+            ?.firstOrNull()
+            ?: throw GradleException("Could not find edumips64-*.jar in ${layout.buildDirectory.get().asFile}. Please execute ./gradlew jar before trying to build the MSI.")
+
         if (System.getenv("WIX") == null){
             throw GradleException("Wix is required to create the MSI package.")
         }
@@ -383,11 +388,10 @@ tasks.register<Exec>("msi"){
         val inputStaging = layout.buildDirectory.dir("tmp/msi-input").get().asFile
         inputStaging.deleteRecursively()
         inputStaging.mkdirs()
-        layout.buildDirectory.file("edumips64-${version}.jar").get().asFile
-            .copyTo(inputStaging.resolve("edumips64-${version}.jar"), overwrite = true)
+        jarFile.copyTo(inputStaging.resolve(jarFile.name), overwrite = true)
         val destDir = "./${buildDirName}"
         println("Creating ${destDir}/EduMIPS64-${version}.msi.");
-        val cmd = "jpackage.exe --main-jar edumips64-${version}.jar --input ./${buildDirName}/tmp/msi-input/ --dest ${destDir} --app-version ${version} --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright ${LocalDateTime.now().year}, EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install --java-options -Dfile.encoding=utf-8"
+        val cmd = "jpackage.exe --main-jar ${jarFile.name} --input ./${buildDirName}/tmp/msi-input/ --dest ${destDir} --app-version ${version} --name EduMIPS64 --description \"Educational MIPS64 CPU Simulator\" --vendor \"EduMIPS64 Development Team\" --copyright \"Copyright ${LocalDateTime.now().year}, EduMIPS64 development Team\" --license-file ./LICENSE --win-shortcut --win-dir-chooser --win-menu --type msi --icon ./src/main/resources/images/ico.ico --win-per-user-install --java-options -Dfile.encoding=utf-8"
         commandLine(cmd.split(" "));
     }
 }
