@@ -1,6 +1,10 @@
 # Orchestration Log Entry
 
 > One file per agent spawn. Saved to `.squad/orchestration-log/{timestamp}-{agent-name}.md`
+>
+> ⚠️ `{timestamp}` MUST be the Windows-safe, colon-free form `YYYY-MM-DDTHH-MM-SSZ`
+> (e.g. `2026-06-08T13-55-00Z`). NEVER use colons — they are illegal in Windows
+> filenames and break `actions/checkout` (exit 128) on Windows CI jobs.
 
 ---
 
