@@ -63,3 +63,34 @@ The page covers three topics:
 
 ### CJK / full-width punctuation rST inline-markup rule
 In reStructuredText, inline markup (`**bold**`, `` ``literal`` ``) must be bounded by whitespace or ASCII punctuation. CJK characters and full-width punctuation (e.g. `（`, `）`, `。`, `；`) do NOT satisfy this boundary rule, so adjacent markup is silently dropped (renders as literal `**`/backticks). Fix: insert `\ ` (backslash-space, produces no visible output) between the inline markup delimiter and the adjacent CJK/full-width character. For nested or spanning bold+literal, split into separate non-nested markup runs joined with `\ ` — e.g. `**text；**\ ``NIGHTLY``\ **→ more text。**`.
+
+## Learnings — 2026-06-08: Unified build+promote workflow with optional run_id
+
+### Design change: `promote-web.yml` now unified
+
+The `promote-web.yml` workflow has been refactored to consolidate "manual build" + "manual promote" into ONE workflow with an optional `run_id` input:
+- **No `run_id`** (empty): Build current master from scratch (via reusable `build-web.yml`, no secrets) and promote it. One-click "ship current master" mode.
+- **`run_id` provided**: Skip build; validate and promote that specific CI run. Enables rollback, re-promote, and promoting an arbitrary validated run.
+
+Both modes:
+- Dispatch from `master` only.
+- Gated to `lupino3` (Andrea).
+- Promote job serialised via concurrency `web-pages-deploy` (cancel-in-progress false).
+- Build job (fresh mode) is not serialised.
+
+### Files updated
+
+- **`docs/design/web-promotion-and-versioning.md`**:
+  - Section "Manual Gated Promotion" (lines 43–65): Expanded to describe both modes, inputs, dispatch requirement, and concurrency.
+  - Section "Alternatives Considered" → "Promotion Trigger" (lines 174–181): Added rows (D) "Hard build+promote, dropping run_id" and (E) "Separate build→promote orchestrator" with rationales for rejection.
+  - Section "Resolved Decisions" (line 251): Updated row 8 (workflow naming) to clarify that `promote-web.yml` unifies both modes.
+
+- **`docs/developer-guide.md`**:
+  - Section "Web production promotion" (lines 446–489): Restructured to clearly present two modes (Mode 1: empty `run_id` for build+promote current master; Mode 2: provided `run_id` for rollback/re-promote/audit). Simplified the normal-case procedure (just leave `run_id` empty) while preserving documented rollback capability.
+
+### Key design points preserved
+
+- Security: `build-web.yml` has `contents: read` only; `PAT_WEBUI` credential lives only in promote job.
+- Immutability: Build+promote of current master is immutable once dispatched; re-promoting with external `run_id` validates artifact exists before deploy.
+- Audit trail: manifest.json records all deployments; promotion numbers are monotonic.
+

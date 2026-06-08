@@ -569,6 +569,14 @@ GitHub Actions before merge. Correctness was verified by:
 **What:** Added a `workflow_dispatch:` trigger to `.github/workflows/ci.yml` so maintainers can run the full validating CI on master on demand. Manual runs force snap+electron builds (mirroring scheduled runs), producing a fresh `web` artifact from current master.
 **Why:** `promote-web.yml` promotes the `web` artifact from a successful `ci.yml` run on master. Previously the only such artifact came from the daily 00:00 UTC cron, so promoting current master meant waiting up to 24h. A `workflow_dispatch` run on master satisfies promote-web's validation (ci.yml + master + success + web artifact) with no change to promote-web.yml. Shipped as PR #1829.
 
+### 2026-06-08: Unify build+promote — optional run_id on promote-web.yml (PR #1830)
+
+**By:** Tank (workflow) + Link (docs), requested by Andrea (lupino3); rubber-duck reviewed.
+**What:** Made `run_id` OPTIONAL on `promote-web.yml`. Empty run_id → a `build` job (reusable `build-web.yml`, no secrets) builds current master, then `promote` ships it (one-click). run_id set → validate that external ci.yml/master/success run and promote it (rollback / re-promote / promote-arbitrary preserved). Single `SOURCE_RUN_ID` unifies download (current run vs external), retries + fails closed on empty artifact.
+**Security:** build job has `contents: read` only, never sees PAT_WEBUI; both jobs gated on actor==lupino3 AND ref_name==master (blocks tampered-workflow-on-feature-branch from reaching creds). Concurrency `web-pages-deploy` moved to promote job so builds aren't serialised.
+**Supersedes:** PR #1829 (standalone ci.yml workflow_dispatch) — CLOSED. Scheduled ci.yml unchanged (still feeds nightly).
+**Docs:** design doc "Manual Gated Promotion" + Alternatives (rejected D hard-build-always-promote, E separate orchestrator); developer-guide two-mode procedure.
+
 ## Governance
 
 - All meaningful changes require team consensus

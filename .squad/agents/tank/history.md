@@ -103,6 +103,35 @@
 
 ## Learnings
 
+### 2026-06-08 — Unified promote-web: optional run_id, build job, master-only gate
+
+**Design:** `promote-web.yml` now supports two modes via an optional `run_id` input:
+- **Fresh mode** (`run_id` empty): a new `build` job runs `.github/workflows/build-web.yml`
+  (the shared reusable CI build) against `github.sha`, then the `promote` job downloads
+  the artifact via `github.run_id` (the current workflow run's own ID).
+- **External mode** (`run_id` given): `build` job is skipped; `promote` validates the
+  external ci.yml run and promotes that artifact (rollback/re-promote/arbitrary-run preserved).
+
+**Key structural decisions (from rubber-duck review):**
+1. `concurrency: group: web-pages-deploy` moved from workflow-level to the `promote` job only —
+   so a fresh-mode build is not serialised by the Pages-deploy lock.
+2. `promote` job `if:` uses `always()` + mode-specific `needs.build.result` check:
+   `'success'` in fresh mode, `'skipped'` in external mode. This gives better failure locality.
+3. Both jobs gated on `github.actor == 'lupino3' && github.ref_name == 'master'`.
+
+**Security rationale for master-only gate:** `workflow_dispatch` runs use the workflow file
+at the branch the dispatch targets. Without `github.ref_name == 'master'`, a maintainer could
+dispatch from a feature branch carrying a tampered workflow file, reaching the PAT_WEBUI secrets.
+The `ref_name == 'master'` check ensures only the audited master copy can execute the PAT steps.
+The `build` job has only `contents: read` and never sees PAT_WEBUI regardless.
+
+**SOURCE_RUN_ID unifies artifact download:** A three-step "determine source" sequence:
+(1) `validate` (external mode only) validates the external run, emits `head_sha` + `source_run_id`;
+(2) `fresh_source` (fresh mode only) emits `head_sha = github.sha` + `source_run_id = github.run_id`;
+(3) `source` (always) concatenates the two pairs — exactly one is non-empty — and re-emits them.
+All downstream steps reference `steps.source.outputs.{head_sha,source_run_id}` uniformly.
+The download step retries up to 3×(sleep 5) to tolerate same-run artifact API propagation lag.
+
 ### 2026-06-08 — ci.yml now supports workflow_dispatch for on-demand master builds
 
 **Added `workflow_dispatch:` trigger** to `ci.yml` so a maintainer can run the full validating CI on master on demand without waiting for the nightly cron.
