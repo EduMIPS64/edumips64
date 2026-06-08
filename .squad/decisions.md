@@ -381,6 +381,76 @@ Self-tested under /tmp with a fake Pages repo:
 6. **Error guards** — bad artifact dir, reserved name in artifact, empty prev/ all exit 1 with `ERROR:` messages.
 7. **Prune versions** — 57 snapshot dirs pruned to exactly 50 (highest kept).
 
+# Decision: JAR filenames carry git-describe build version
+
+**Date:** 2026-06-08  
+**Author:** Tank (Core/Backend Developer)  
+**PR:** #1826 (web-promotion + git-describe versioning)
+
+## Context
+
+JARs were named `edumips64-1.4.1.jar` (Gradle's default `archiveVersion` = static
+`version` from `gradle.properties`). The full build identity (e.g.
+`1.4.1-5-gabc1234`) only appeared in the manifest `Signature-Version` attribute via
+the existing `gitDescribe` provider. This made the filename misleading for dev builds.
+
+## Decision
+
+Set `archiveVersion.set(gitDescribe)` on both `tasks.jar` and `tasks.register("noHelpJar")`
+so produced filenames become `edumips64-<git-describe>.jar` and
+`edumips64-<git-describe>-nohelp.jar`.
+
+The MSI task (`--app-version`) stays strictly numeric (`${version}`) because
+jpackage/Windows MSI versions require `major.minor.patch` format.
+
+## Changes Made
+
+### `build.gradle.kts`
+- Added `archiveVersion.set(gitDescribe)` to `tasks.jar` and `noHelpJar`.
+- Rewrote the MSI task JAR-finding logic: instead of reconstructing the filename
+  from `${version}`, it now globs the build directory for `edumips64-*.jar`
+  (excluding `nohelp` variants). This is robust across any git-describe suffix.
+- `--main-jar` in jpackage uses the dynamically found `jarFile.name`.
+
+### `.github/workflows/build-desktop.yml`
+- Added a `Get produced JAR path` step that runs
+  `ls ./out/edumips64-*.jar | grep -v '\-nohelp\.jar' | head -1` to discover
+  the actual filename.
+- Upload step uses `${{ steps.get_jar.outputs.path }}` instead of the hardcoded
+  static-version name.
+
+### `.github/workflows/release.yml`
+- JAR staging step now discovers the actual filename with a glob and renames it to
+  the canonical `edumips64-${VERSION}.jar` for the GitHub release.
+- **Why this was necessary:** The release workflow validates that the tag does NOT
+  exist yet, then builds the JAR, then creates the tag. So during the JAR build,
+  git-describe returns the previous tag + commit distance (e.g.
+  `1.4.0-101-gabc1234`), NOT the new version. The static-version `cp` would fail.
+  Globbing for the actual file and renaming it to the release name is correct.
+
+### `docs/developer-guide.md`
+- Updated JAR naming description to use `<build-version>` and explain the
+  git-describe format for dev builds vs. release tags.
+
+## Rationale
+
+- **Transparency:** The filename now unambiguously identifies which commit a JAR
+  was built from.
+- **No static-version fallbacks needed for the WAR task:** The WAR task is not a
+  JAR and is consumed by GWT/webpack machinery, not by end users — no change needed.
+- **Lazy evaluation:** `gitDescribe` is a `Provider<String>` from `providers.exec`;
+  `archiveVersion.set(gitDescribe)` wires it lazily. No `.get()` at configuration
+  time in the MSI task (all file operations happen inside `doFirst`).
+
+## Verified
+
+- `./gradlew jar noHelpJar` → `out/edumips64-1.4.0-101-g6ee73e92-dirty.jar` and
+  `out/edumips64-1.4.0-101-g6ee73e92-dirty-nohelp.jar` produced.
+- `./gradlew assemble` → BUILD SUCCESSFUL.
+- `./gradlew msi --dry-run` → SKIPPED (no error at configuration time).
+- Glob `ls ./out/edumips64-*.jar | grep -v '\-nohelp\.jar' | head -1` correctly
+  returns the main JAR only.
+
 ## Governance
 
 - All meaningful changes require team consensus

@@ -57,3 +57,30 @@
 - All 3 workflows updated to `cp deploy-web-pages.py`, `python3 deploy-web-pages.py`, `rm -f deploy-web-pages.py`.
 - `_ArgumentParser` subclass overrides `error()` → `sys.exit(1)` (argparse defaults to 2) to match bash `die` exit-code contract.
 - Tested: first-run promote, second promote, rollback, double-rollback (restores), nightly, error guards, prune-versions (50-cap verified). Cross-validated byte-identical against the old bash through a full operation sequence.
+
+
+### 2026-06-08 — JAR filename carries git-describe build version (#1826)
+
+**Key file paths:**
+- `build.gradle.kts` ~line 269: `tasks.jar` — add `archiveVersion.set(gitDescribe)` here.
+- `build.gradle.kts` ~line 287: `tasks.register<Jar>("noHelpJar")` — same pattern.
+- `build.gradle.kts` ~line 356: `tasks.register<Exec>("msi")` — find JAR by glob, not by reconstructed `${version}` filename.
+- `.github/workflows/build-desktop.yml` ~line 71: JAR upload — discover actual filename with shell glob before uploading.
+- `.github/workflows/release.yml` ~line 276: JAR staging — glob and rename to canonical release name.
+- `docs/developer-guide.md` ~line 96/101/111: Updated to use `<build-version>` terminology.
+
+**git-describe-in-filename pattern:**
+- `val gitDescribe: Provider<String>` is already defined in build.gradle.kts (~line 254) using `providers.exec { commandLine("git", "describe", ...) }`.
+- Wire it lazily: `archiveVersion.set(gitDescribe)`. Do NOT call `.get()` at configuration time.
+- Produced filename: `edumips64-<git-describe>.jar` (e.g. `edumips64-1.4.1-5-gabc1234.jar` for dev, `edumips64-1.4.1.jar` at a clean tag).
+
+**Release-at-tag collapses-to-tag insight:**
+- The release workflow VALIDATES that the tag does NOT exist before building, then creates the tag at the very end. So during `./gradlew jar` in `build-desktop`, the new tag is absent → git-describe returns `<prev-tag>-<N>-g<sha>`, NOT the new version string.
+- Therefore the `create-release` staging step cannot `cp edumips64-${VERSION}.jar`; it must glob for the actual file and rename it. Pattern: `JAR_SRC=$(ls release-artifacts/JAR/edumips64-*.jar | grep -v '\-nohelp\.jar' | head -1); cp "$JAR_SRC" "staged/edumips64-${VERSION}.jar"`.
+
+**Provider-laziness gotcha:**
+- `providers.exec { ... }` is lazy by nature. `archiveVersion.set(gitDescribe)` wires the provider without forcing evaluation. Safe.
+- Calls to `.get()` inside a `doFirst { }` block are fine (execution time). Calls to `.get()` at the top level of `build.gradle.kts` or inside `val x = ...` ARE configuration-time and will run git on every `./gradlew tasks`. The existing `sharedManifest` block already does `.get()` inside a Manifest Action lambda, which runs at configuration time — this is the existing pattern and is acceptable.
+
+**MSI JAR-finding pattern:**
+- The MSI task downloads a pre-built JAR (from CI artifact), then needs to find it. Since git-describe on the MSI Windows runner may differ from the Linux build runner (different fetch-depth/tags), never recompute the archive name from gitDescribe in the MSI task. Instead, glob the build directory: `layout.buildDirectory.get().asFile.listFiles()?.filter { it.name.startsWith("edumips64-") && it.name.endsWith(".jar") && !it.name.contains("nohelp") }?.firstOrNull()`.
