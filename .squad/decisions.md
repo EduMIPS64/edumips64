@@ -110,8 +110,307 @@ Prioritized backlog recommendation for the squad based on 18 open issues.
 
 ---
 
+## 2026-06-07: Web Promotion & Versioning — Eight Decisions Locked
+
+**Date:** 2026-06-07  
+**Author:** Morpheus (Lead/Architect)  
+**Approved by:** Andrea (lupino3)  
+**Related Document:** `docs/design/web-promotion-and-versioning.md` (tracked in repo via PR #1826)
+
+### Locked Decisions
+
+| # | Question | Decision |
+|---|----------|----------|
+| 1 | **Who can promote?** | Andrea (lupino3) only. `workflow_dispatch` admin-only trigger is sufficient access control. |
+| 2 | **Phase 0 now?** | YES — no pending releases. Safe to disable `deploy-prod` auto-deploy in `release.yml` immediately. |
+| 3 | **Artifact retention** | Accept 90-day limit. Rebuild from SHA if artifact expired. No durability backstop needed. |
+| 4 | **GitHub Pages vs Azure** | Stay on GitHub Pages. Azure remains optional Phase 4. |
+| 5 | **Versions in `/v/`** | Retain **50** (not 10). |
+| 6 | **Build identity everywhere** | YES — git-describe identity in desktop, CLI, and web UI. |
+| 7 | **package.json version** | Leave stale at `1.0.0`; add comment noting it is unused for versioning. |
+| 8 | **Workflow naming** | `promote-web.yml` |
+
+### New: Nightly Channel (Part 4 discussion)
+
+**Recommendation: YES — implement as Phase 3.5**
+
+- Separate `/nightly/` directory auto-deployed on every green master push.
+- Distinct from gated prod at root `/` — they coexist without interference.
+- Uses git-describe build identity (no promotion number).
+- Visible "NIGHTLY BUILD" banner so users know they're not on prod.
+- Rationale: Gives agents/contributors a continuously-deployed preview target without touching stable prod. Reduces promotion pressure. Early integration issue detection.
+
+### Implementation Phases
+
+| Phase | Status | Summary |
+|-------|--------|---------|
+| **0** | GO ✅ | Disable `deploy-prod` — agents-on-master safe |
+| **1** | Ready | `promote-web.yml` basic deployment |
+| **2** | Ready | Versioned layout `/prev/`, `/v/N/`, manifest, 50 versions |
+| **3** | Ready | `rollback-web.yml`, git-describe build identity everywhere |
+| **3.5** | Optional | Nightly channel `/nightly/` |
+| **4** | Optional | Azure migration |
+
+---
+
+## 2026-06-07: Versioning — Release label vs build identity
+
+**Date:** 2026-06-07  
+**Author:** Morpheus  
+**Approved by:** Andrea (lupino3)
+
+### Decision
+
+Keep `gradle.properties version=` as the **release/target label** (used only for tagging and release naming). Derive the **build identity** from `git describe --tags` — e.g. `1.4.0-2-gabc1234` — for every shipped artifact (desktop JAR, Electron, web build).
+
+### Rationale
+
+`gradle.properties version=` is not point-in-time between releases. Latest tag is `v1.4.0`; master is deep into `1.4.1` (untagged); every commit since PR #1803 reports `1.4.1`. The git SHA is the only true point-in-time identifier. `git describe --tags` derives a unique, monotonic, human-readable string (`1.4.0-2-gabc1234`) for free, with no manual bookkeeping. At a tagged commit it collapses to the clean label (e.g. `1.4.1`).
+
+### Implementation Details
+
+- Gradle task to invoke `git describe --tags` at build time and inject result into GWT worker + React UI (generated Java class + webpack `DefinePlugin`).
+- Desktop About box to display the same string.
+- Desktop+CLI: One `build.gradle.kts` `sharedManifest` change flowing through `MetaInfo` (manifest) → Swing title (`Main.java`) / `StatusBar.java` / crash `ReportDialog` + CLI `Version.java`. Removes the `alpha` `Build-Qualifier` hack.
+- Web (GWT): Separate injected build-time constant (webpack `DefinePlugin` or generated GWT constant) — GWT JS can't read JAR manifest at runtime.
+- CI workflows must use **`fetch-depth: 0`** in `actions/checkout` — shallow clones break `git describe`.
+
+---
+
+# Decision: Design doc restructured; nightly trigger decision updated
+
+**Date:** 2026-06-07  
+**Author:** Morpheus (Lead/Architect)  
+**PR:** #1826
+
+## Changes
+
+### 1. Nightly trigger decision changed
+
+The nightly channel trigger is now a **daily 01:00 UTC cron** (`0 1 * * *`) plus
+`workflow_dispatch` for manual use. The previous recommendation ("deploy on
+every green master push" via `workflow_run`) is moved to the Alternatives
+Considered section as a rejected option.
+
+**Rationale:** A daily cadence keeps the preview fresh enough while avoiding a
+Pages deploy on every single merge. Manual `workflow_dispatch` covers the "I
+want it now" case.
+
+### 2. Design doc restructured
+
+`docs/design/web-promotion-and-versioning.md` rewritten from a debate-style
+options document to an authoritative implementation reference:
+
+- **Chosen Implementation** is now the primary narrative (present-tense, concrete
+  file/workflow references).
+- **Alternatives Considered** consolidated into a single section organized by
+  decision point, preserving all substantive rationale.
+- Removed per-Part "Recommendation" framing and open-question debate tone.
+- Phased Rollout and Resolved Decisions retained as a decision record near the end.
+
+## Team impact
+
+No code changes. Documentation only. The design doc now matches the implemented
+system and is the authoritative reference for how web promotion works.
+
+---
+
+# Decision: Nightly deploy switches from workflow_run to cron schedule
+
+**Date:** 2026-06-07  
+**Author:** Tank (Core Dev)  
+**PR:** #1826
+
+## Decision
+
+The nightly web deploy (`nightly-web.yml`) is changed from triggering on every
+successful `CI` workflow_run on master to a fixed daily schedule at 01:00 UTC
+(`cron: '0 1 * * *'`) plus a `workflow_dispatch` for manual testing.
+
+## Rationale
+
+Triggering on every green master push means multiple deploys per day on active
+days, which wastes resources and makes the nightly channel less predictable.
+A daily cron gives a stable, once-per-night snapshot and is easier to reason
+about for users checking `web.edumips.org/nightly/`.
+
+## Implementation notes
+
+- No triggering-run context at schedule time → the job now calls
+  `gh run list --workflow ci.yml --branch master --status success --limit 1`
+  to find the latest green run and downloads its `web` artifact.
+- Step id `find_run` exposes `run_id` and `head_sha` outputs consumed by the
+  download and commit steps.
+- The job-level `if:` guard (branch/event/conclusion check) was removed; it
+  was only meaningful for `workflow_run` events.
+- Both nightly-description sections in `docs/developer-guide.md` updated.
+
+## Team impact
+
+No change to `deploy-web-pages.sh` or any other workflow. The `concurrency`
+group (`web-pages-deploy`) is unchanged, so nightly still serialises with
+promote and rollback writes.
+
+---
+
+# Decision: Reversible SWAP rollback for deploy-web-pages.sh
+
+**Date:** 2026-06-07T19:09Z  
+**Author:** Tank  
+**Related PR:** #1826  
+
+## Problem
+
+The original `cmd_rollback` in `.github/scripts/deploy-web-pages.sh` was a
+destructive one-way operation:
+
+1. It copied `prev/` contents to root (good).
+2. It set `manifest.json` `prev` to `0` (bad — discards the promotion number
+   that was at root, making "rollback the rollback" impossible).
+3. It did **not** update `prev/` with the former root build (bad — next
+   rollback has nothing in prev/).
+
+This made rollback non-reversible and inconsistent with the documented
+"swap root ↔ prev" behaviour.
+
+## Decision
+
+Replace the one-way copy with a true in-place SWAP:
+
+```
+root_prod_files  ──▶  .rollback-swap/   (stage)
+prev/*           ──▶  root/             (restore)
+.rollback-swap/* ──▶  prev/             (preserve former root as new prev)
+```
+
+And in `manifest.json`: `current` ↔ `prev` are swapped, not zeroed.
+
+### Key implementation details
+
+1. **Array collection before staging dir creation.** Root prod files are
+   collected into a bash array using the existing `reserved_extglob` +
+   `dotglob`/`nullglob` pattern *before* the `.rollback-swap` directory is
+   created. This prevents the staging dir from being included in the move set.
+
+2. **Empty-prev guard precedes all destructive ops.** `prev/*` is checked for
+   non-empty before any `mv` or `rm` runs. If `prev/` is empty, `die` is
+   called immediately.
+
+3. **Staging dir name.** `.rollback-swap` is used as the temporary staging
+   directory at the Pages-repo root. It is not a valid web-artifact filename,
+   so it cannot appear in `prev/` from a prior promote, avoiding accidental
+   collision.
+
+4. **Manifest swap.** After the filesystem swap:
+   - `manifest.current` = old `manifest.prev`
+   - `manifest.prev`    = old `manifest.current`
+   - `rolledBackFrom`, `note`, `promotedAt`, `promotedBy` updated as before.
+
+   This means a second rollback restores the state before the first rollback
+   ("rollback the rollback" works).
+
+5. **CNAME / .nojekyll.** `ensure_static_files` is called at the end (same as
+   before) so reserved static files are always present.
+
+6. **Shellcheck-clean.** No new warnings introduced (verified with
+   shellcheck v0.10.0).
+
+## Alternatives considered
+
+- **Copy instead of move:** Safer mid-operation but leaves prev/ unchanged
+  until step 4; requires explicit cleanup. Move is simpler and consistent with
+  the destructive-op style of the rest of the script.
+- **Use `replace_subdir` helper:** `replace_subdir` deletes dest then copies
+  src; it cannot swap two directories without a staging area, so a custom
+  approach is needed regardless.
+- **Temp dir outside Pages repo:** Fragile (depends on cwd path assumptions).
+  In-repo staging dir is simpler.
+
+---
+
 ## Governance
 
 - All meaningful changes require team consensus
 - Document architectural decisions here
 - Keep history focused on work, decisions focused on direction
+
+---
+
+## 2026-06-07: PR-A Implementation — Workflows slice (Tank)
+
+**Date:** 2026-06-07  
+**Author:** Tank  
+**Branch:** `squad/web-promotion-system`  
+**Commit:** `4b5f67d3`
+
+### Implementation Details
+
+1. **`deploy-prod` disabled with `if: false`** — job body intact for emergency re-enable.
+2. **`fetch-depth: 0` added to three checkouts** — `build-web.yml`, `build-desktop.yml`, `ci.yml` test-web-coverage. Required for `git describe --tags` fidelity.
+3. **Pages-layout logic in `deploy-web-pages.sh`** — complex bash is testable; workflows invoke it.
+4. **First-run bootstrap** — seed `prev/` from current root if `manifest.json` absent.
+5. **Reserved-names guard** — bash extglob pattern `(v|prev|nightly|manifest.json|CNAME|.nojekyll|.git)` protects core files.
+6. **Shared concurrency group `web-pages-deploy`** — all three workflows use same group; `cancel-in-progress: false`.
+7. **Source-run validation in `promote-web.yml`** — checks repo, workflow path, conclusion, branch, artifact presence.
+8. **Actor guard `if: github.actor == 'lupino3'`** — on promote/rollback jobs (belt-and-suspenders).
+9. **`/v/` pruned to 50 dirs** — oldest dirs removed on promotion when count exceeds 50.
+10. **`CNAME` and `.nojekyll` re-ensured** — `ensure_static_files()` called on all subcommands.
+
+---
+
+## 2026-06-07: PR-A Implementation — Web UI version identity + NIGHTLY badge (Trinity)
+
+**Date:** 2026-06-07  
+**Author:** Trinity  
+**Branch:** squad/web-promotion-system  
+**Commit:** 4149d54e
+
+### Implementation Details
+
+1. **Version alignment:** `GitRevisionPlugin` configured with `versionCommand: 'describe --tags --match v* --always --dirty'`. Web UI now displays same git-describe string as desktop (e.g. `1.4.0-75-geec17684-dirty`).
+2. **NIGHTLY badge:** Runtime detection via `window.location.pathname.includes('/nightly/')`. Purple MUI Chip in `Header.js` + CSS in `main.css`. Appears only for nightly, not prod/versioned/PR paths.
+3. **Artifact immutability:** Same built artifact may be served from `/` or `/nightly/` — runtime detection ensures correct badge display.
+
+---
+
+## 2026-06-07: PR-A Implementation — Build identity in docs (Link)
+
+**Date:** 2026-06-07  
+**Author:** Link (Docs/DevRel)  
+**Branch:** squad/web-promotion-system
+
+### Implementation Details
+
+**`docs/user/common_conf.py` fallback chain:**
+1. `EDUMIPS64_BUILD_VERSION` environment variable
+2. `git describe` via `__file__`-relative repo root
+3. `READTHEDOCS_GIT_COMMIT_HASH` environment variable
+4. `gradle.properties version=` via `__file__`-relative path
+5. `"unknown"` fallback
+
+**Rationale:** Cwd-relative paths broke when Sphinx invoked from non-standard directories. Git-describe is unique per commit; release label is shared across commits between releases. Fallback ensures RTD, shallow-clone CI, and tag-less builds never error.
+
+**Files changed:**
+- `docs/user/common_conf.py`
+- `docs/user/en/src/index.rst`, `docs/user/it/src/index.rst`, `docs/user/zh/src/index.rst`
+- `docs/developer-guide.md` (Versioning model + Web promotion sections)
+
+---
+
+## 2026-06-07: PR-A QA Finding — build-desktop.yml YAML corruption fix (Smith)
+
+**Date:** 2026-06-07  
+**Author:** Smith (QA)
+
+### Finding
+
+Addition of `fetch-depth: 0` to `.github/workflows/build-desktop.yml` corrupted YAML structure: `- name: Set up JDK 17` was deleted and `uses: actions/setup-java@v5` was merged into the `actions/checkout@v6` step mapping, creating a duplicate-`uses`-key error (GitHub Actions parse failure).
+
+### Fix
+
+Restored `- name: Set up JDK 17` as a proper separate sequence item with its own `name`, `uses`, `with` keys. Committed in QA pass.
+
+### Recommendation
+
+Validate YAML workflow patches with `actionlint`, `js-yaml`, or `python-yaml` before commit. Consider adding `actionlint` to CI.
+
