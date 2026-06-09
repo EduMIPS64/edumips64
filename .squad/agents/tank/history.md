@@ -155,3 +155,10 @@ The download step retries up to 3×(sleep 5) to tolerate same-run artifact API p
 **Rollback** — `cmd_rollback()` swaps current ↔ prev and does not modify `history`. No history entry is added on rollback (rollback is not a promotion).
 
 **pytest location** — `.github/scripts/test_deploy_web_pages.py` (5 tests). Run: `cd .github/scripts && python3 -m pytest test_deploy_web_pages.py -q`. No existing Python/pytest CI job found in `.github/workflows/`; recommend adding a `scripts-lint` step to `ci.yml` as a follow-up.
+### 2026-06-09 — pytest CI job for deploy-web-pages.py (#1831)
+
+**New `test-deploy-script` job in `ci.yml`:** Added a lightweight pytest job (job id `test-deploy-script`, name "Deploy script tests (pytest)") that runs the 5-test suite at `.github/scripts/test_deploy_web_pages.py` on every PR and nightly schedule. No paths-filter gate — the suite finishes in <1 s and must always be green.
+
+**`working-directory` is mandatory:** `test_deploy_web_pages.py` loads the hyphenated module `deploy-web-pages.py` via `importlib.util.spec_from_file_location` using `Path(__file__).parent`. The test file's `__file__` must resolve inside `.github/scripts/`, so the step sets `working-directory: .github/scripts`. Without it, `importlib` fails to find the script.
+
+**Python setup:** Uses `actions/setup-python@v5` pinned to `python-version: '3.12'` (matches the repo's documented Python 3.12+ requirement), then `pip install pytest`. No `requirements.txt` exists for the scripts directory — only stdlib + pytest are needed.
