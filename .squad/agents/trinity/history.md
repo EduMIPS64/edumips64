@@ -83,3 +83,36 @@ Successfully implemented contextual run controls in `Header.js` and `Simulator.j
 - Props cleanup: removed 4 enable-state bools, added `executing` + `inputRequest`
 - Full test suite: 68/70 PASS (2 pre-existing GPU crashes); contextual-controls spec: 8/8 PASS
 - No implementation bugs found; design fully realized
+
+## 2026-06-09 — Floating Draggable Debug Toolbar (PR #1835, second iteration)
+
+Andrea requested replacement of the inline execution controls with a VSCode-style floating debug toolbar.
+
+### Floating Toolbar Component (RunControlsToolbar.js)
+
+**New file:** `src/webapp/components/RunControlsToolbar.js`
+- MUI `Paper` with `position: fixed`, `elevation: 8`, rounded pill shape (`borderRadius: '24px'`), `zIndex: 1200`
+- Icon-only `IconButton` buttons (no text labels) with MUI `Tooltip`s for all action names
+- Drag handle (`DragIndicatorIcon`) at the left; uses `setPointerCapture` on the handle element so drag remains smooth even when pointer moves outside the handle
+- Position stored in `useState` (lazy initial value: center of viewport, y=80); constrained to stay on-screen via viewport bounds check in `handlePointerMove`
+- Refs renamed to `isDraggingRef` / `dragOffsetRef` to satisfy `@eslint-react/naming-convention-ref-name`
+- Returns `null` (not rendered) in EMPTY / ENDED / WAITING_FOR_INPUT states; same visibility logic as the previous inline controls
+- Mounted unconditionally from `Simulator.js` so position state persists across logical-state changes
+
+### Shared State Helper (simulatorState.js)
+
+**New file:** `src/webapp/simulatorState.js`
+Exports `deriveLogicalState(status, executing, inputRequest)` as a named export, consumed by both `Header.js` and `RunControlsToolbar.js`. Previously this function was inlined in `Header.js`.
+
+### Header.js Changes
+
+- Removed execution controls `Box` (contained Step / Multi Step / Run / Pause / Stop)
+- `Load` button is now **always visible** (no `showLoad` condition) — it is always present in the header AppBar regardless of logical state
+- Removed now-unused imports: `PlayArrowIcon`, `FastForwardIcon`, `PlayCircleIcon`, `PauseCircleIcon`, `StopCircleIcon`
+- Removed now-unused variables: `multiStepCount`, `showLoad`, `showStep`, `showMultiStep`, `showRun`, `showPause`, `showStop`, `stopDisabled`
+- Props removed from Header interface: `onRunClick`, `onStepClick`, `onPauseClick`, `onStopClick`, `multiStepCount`
+- `deriveLogicalState` imported from `../simulatorState` (no longer defined inline)
+
+### Simulator.js Mounting
+
+`RunControlsToolbar` is mounted immediately after `<Header>` in the ThemeProvider tree, receiving: `onStepClick`, `onRunClick`, `onPauseClick`, `onStopClick`, `status`, `executing`, `inputRequest`, `multiStepCount`.
