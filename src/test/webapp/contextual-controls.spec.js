@@ -12,9 +12,15 @@
  *
  * Matrix summary (execution controls):
  *   EMPTY      : Load ✅  #run-controls-toolbar 🚫  Step 🚫  MultiStep 🚫  Run 🚫  Pause 🚫  Stop 🚫
- *   READY      : Load ✅  #run-controls-toolbar ✅  Step ✅  MultiStep ✅  Run ✅  Pause 🚫  Stop ✅
- *   EXECUTING  : Load ✅  #run-controls-toolbar ✅  Step 🚫  MultiStep 🚫  Run 🚫  Pause ✅  Stop 🔒 (disabled)
+ *   READY      : Load ✅  #run-controls-toolbar ✅  Step ✅  MultiStep ✅  Run ✅  Pause 🔒(disabled)  Stop ✅
+ *   EXECUTING  : Load ✅  #run-controls-toolbar ✅  Step 🔒  MultiStep 🔒  Run 🔒  Pause ✅  Stop 🔒 (disabled)
  *   ENDED      : Load ✅  #run-controls-toolbar 🚫  Step 🚫  MultiStep 🚫  Run 🚫  Pause 🚫  Stop 🚫
+ *
+ * When the toolbar IS visible (READY or EXECUTING), ALL FIVE buttons are
+ * always present in the DOM — they are greyed-out (disabled) rather than
+ * removed when not actionable.  Use toBeDisabled() / toBeEnabled() rather
+ * than toBeHidden() / toBeVisible() to check actionability within a
+ * visible toolbar.
  *
  * Editor controls (clear, restore-sample, open-code, save-code, help) are
  * always visible in every state (may be disabled during EXECUTING, but the
@@ -89,7 +95,7 @@ test('EMPTY: editor controls (clear, restore-sample, open-code, save-code, help)
 
 // ─── READY state ─────────────────────────────────────────────────────────────
 
-test('READY: run-controls-toolbar visible; step/multi-step/run/stop visible & enabled; pause hidden; load still visible', async ({
+test('READY: run-controls-toolbar visible; step/multi-step/run/stop visible & enabled; pause visible but disabled; load still visible', async ({
   page,
 }) => {
   await page.goto(targetUri);
@@ -116,8 +122,9 @@ test('READY: run-controls-toolbar visible; step/multi-step/run/stop visible & en
   // Load button remains visible in READY (it's always in the header).
   await expect(page.locator('#load-button')).toBeVisible();
 
-  // Pause has no meaning in READY — must be hidden.
-  await expect(page.locator('#pause-button')).toBeHidden();
+  // Pause has no meaning in READY — present in the toolbar but disabled.
+  await expect(page.locator('#pause-button')).toBeVisible();
+  await expect(page.locator('#pause-button')).toBeDisabled();
 });
 
 test('READY: editor controls remain visible after loading a program', async ({ page }) => {
@@ -137,8 +144,10 @@ test('READY: editor controls remain visible after loading a program', async ({ p
 // Catching EXECUTING reliably is challenging because a short program
 // completes before Playwright can observe the transient state.  We use a
 // 10 000-iteration loop to give ourselves a comfortable window, then wait
-// for #pause-button to become visible as the definitive signal that the
-// simulator is in EXECUTING.
+// for #pause-button to become ENABLED as the definitive signal that the
+// simulator is in EXECUTING.  (In the always-present model, pause is
+// visible in READY too — just disabled — so `state:'visible'` is not a
+// sufficient signal; we must check `:not([disabled])` instead.)
 //
 // If the host machine is so fast that even 10 000 iterations complete before
 // the assertion runs, this test will time out on `waitForSelector` (not
@@ -147,10 +156,11 @@ test('READY: editor controls remain visible after loading a program', async ({ p
 // stable "executing" signal — see note in decisions/inbox/.
 //
 // Stop is DISABLED (not hidden) in EXECUTING per §3.2 footnote ¹ —
-// tooltip "Pause before stopping".  This avoids rewriting cancellation logic
-// while still communicating intent.
+// tooltip "Pause before stopping".  Pause is enabled.  All other buttons
+// (step, multi-step, run) remain in the DOM but are disabled — the toolbar
+// always renders all five when visible.
 
-test('EXECUTING: pause visible & enabled; stop visible but disabled; step/multi-step/run hidden; load-button still visible in header', async ({
+test('EXECUTING: pause visible & enabled; stop visible but disabled; step/multi-step/run visible but disabled; load-button still visible in header', async ({
   page,
 }) => {
   await page.goto(targetUri);
@@ -164,8 +174,10 @@ test('EXECUTING: pause visible & enabled; stop visible but disabled; step/multi-
   // Start execution.
   await page.click('#run-button');
 
-  // Wait until the UI enters EXECUTING: #pause-button is rendered and visible.
-  await page.waitForSelector('#pause-button', { state: 'visible', timeout: 10000 });
+  // Wait until the UI enters EXECUTING: #pause-button becomes enabled.
+  // (In the always-present model, pause is visible even in READY but disabled;
+  // we must wait for it to be enabled as the definitive EXECUTING signal.)
+  await page.waitForSelector('#pause-button:not([disabled])', { timeout: 10000 });
 
   // ── assertions while EXECUTING ──
   await expect(page.locator('#pause-button')).toBeVisible();
@@ -175,10 +187,13 @@ test('EXECUTING: pause visible & enabled; stop visible but disabled; step/multi-
   await expect(page.locator('#stop-button')).toBeVisible();
   await expect(page.locator('#stop-button')).toBeDisabled();
 
-  // Controls inapplicable during EXECUTING must be hidden (absent from toolbar).
-  await expect(page.locator('#step-button')).toBeHidden();
-  await expect(page.locator('#multi-step-button')).toBeHidden();
-  await expect(page.locator('#run-button')).toBeHidden();
+  // Controls inapplicable during EXECUTING are present in the toolbar but disabled.
+  await expect(page.locator('#step-button')).toBeVisible();
+  await expect(page.locator('#step-button')).toBeDisabled();
+  await expect(page.locator('#multi-step-button')).toBeVisible();
+  await expect(page.locator('#multi-step-button')).toBeDisabled();
+  await expect(page.locator('#run-button')).toBeVisible();
+  await expect(page.locator('#run-button')).toBeDisabled();
 
   // Load button lives in the header — always visible regardless of state.
   await expect(page.locator('#load-button')).toBeVisible();
@@ -188,8 +203,9 @@ test('EXECUTING: pause visible & enabled; stop visible but disabled; step/multi-
   // transitions the simulator back to READY (pause/run buttons swap), making
   // the stop button enabled so we can reset cleanly.
   await page.click('#pause-button');
-  // Wait for READY state: step button re-appears, pause button disappears.
-  await page.waitForSelector('#step-button', { state: 'visible', timeout: 10000 });
+  // Wait for READY state: step button becomes enabled (it's always present, just
+  // disabled during EXECUTING), then reset cleanly.
+  await page.waitForSelector('#step-button:not([disabled])', { timeout: 10000 });
   // Reset the simulator so subsequent tests start from a clean EMPTY state.
   await page.click('#stop-button');
 });
@@ -256,7 +272,8 @@ test('lifecycle: EMPTY → READY → ENDED control transitions', async ({ page }
   await expect(page.locator('#run-button')).toBeEnabled();
   await expect(page.locator('#stop-button')).toBeVisible();
   await expect(page.locator('#stop-button')).toBeEnabled();
-  await expect(page.locator('#pause-button')).toBeHidden();
+  await expect(page.locator('#pause-button')).toBeVisible();
+  await expect(page.locator('#pause-button')).toBeDisabled();
   await expect(page.locator('#load-button')).toBeVisible();
 
   // ── ENDED (after runToCompletion) ──

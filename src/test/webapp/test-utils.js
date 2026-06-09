@@ -35,17 +35,16 @@ async function waitForPageReady(page) {
 /**
  * Helper function to wait for simulator to enter RUNNING state (logical READY).
  *
- * With contextual run controls, #step-button is only rendered when the
- * simulator is in the logical READY state (CPU status === 'RUNNING',
- * executing === false). waitForSelector therefore acts as a compound check:
- * the element must be in the DOM (rendered) AND not disabled, which is only
- * true in READY. No change to the selector is required.
+ * With the always-present toolbar model, #step-button is rendered whenever the
+ * toolbar is visible (READY or EXECUTING), but is DISABLED during EXECUTING.
+ * The `:not([disabled])` filter ensures we only match READY state, where step
+ * is enabled.  No change to the selector is required from the previous model.
  *
  * @param {import('@playwright/test').Page} page - Playwright page object
  */
 async function waitForRunningState(page) {
-  // #step-button is conditionally rendered: absent in EMPTY/EXECUTING/ENDED,
-  // present and enabled only in READY. waitForSelector polls until it appears.
+  // #step-button is always rendered when the toolbar is visible, but disabled
+  // in EXECUTING.  `:not([disabled])` ensures this only matches READY.
   await page.waitForSelector('#step-button:not([disabled])', {
     timeout: 10000,
   });
