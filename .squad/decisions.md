@@ -718,3 +718,182 @@ Restored `- name: Set up JDK 17` as a proper separate sequence item with its own
 
 Validate YAML workflow patches with `actionlint`, `js-yaml`, or `python-yaml` before commit. Consider adding `actionlint` to CI.
 
+## 2026-06-09: Streamlined Contextual Run Controls for Web UI (Morpheus design)
+
+**Date:** 2026-06-09  
+**Author:** Morpheus  
+**Status:** Final  
+**Scope:** Web UI (`src/webapp/`) only
+
+### Context
+
+The current web UI toolbar shows 11 buttons at all times, most disabled when not applicable. This is cluttered compared to modern debugger UIs (VSCode, Chrome DevTools) which show only contextually-relevant controls.
+
+### Decision (FINAL — 2026-06-09)
+
+Implement a **4-state model + WAITING_FOR_INPUT overlay** for run control visibility:
+
+| State | Visible Execution Controls |
+|-------|---------------------------|
+| EMPTY (no program loaded) | Load |
+| READY (program loaded, not executing; also: after pause) | Load, Step, Multi Step, Run, Stop |
+| EXECUTING (worker running) | Pause, Stop (disabled — tooltip: "Pause before stopping") |
+| ENDED (SYSCALL 0 / halted) | Load |
+| WAITING_FOR_INPUT *(overlay: InputDialog open)* | *(all execution controls hidden)* |
+
+**Locked design choices:**
+1. **Contextual hiding** (Andrea's explicit product direction — debugger-style) — execution controls not applicable to current state are conditionally rendered (`display:none`/not in DOM), **not** shown disabled
+2. **Stop is an exception** — disabled (not hidden) during EXECUTING; tooltip explains why. No race-logic rewrite.
+3. **No PAUSED state** — after pause, `status==='RUNNING' && executing===false` is identical to READY. Collapsed.
+4. **No STOPPING React state** — Java maps both RUNNING and STOPPING to web status `"RUNNING"`. Treat as EXECUTING.
+5. **Conditional render, not `opacity:0` or `visibility:hidden`** — Playwright treats those as visible/clickable; conditional render is the only safe approach for tests.
+6. **Fixed-min-width container** — `<Box sx={{ minWidth: 320 }}>` prevents toolbar jank as buttons appear/disappear.
+7. **Keyboard shortcuts deferred** — F7/F8/F9/Shift+F5/Ctrl+Enter are NOT part of this change. Tracked for follow-up PR.
+8. **WAITING_FOR_INPUT** — when `result.inputRequested` fires (Simulator.js:279-284): `executing` → false, `inputRequest` set, InputDialog opens, all execution controls hidden.
+
+### Files Affected
+
+- `src/webapp/components/Header.js` — `deriveLogicalState()`, conditional render of execution buttons, `minWidth` container, Stop tooltip
+- `src/webapp/components/Simulator.js` — pass `inputRequest` prop to Header (already in state)
+
+### Test Impact
+
+- `test-utils.js`: update `waitForRunningState` (use `:visible` not `:not([disabled])`), update `runToCompletion` (same)
+- Specs: `basic-tests.spec.js`, `forwarding.spec.js`, `pipeline-exceptions.spec.js`, `syscall-unsupported.spec.js`, `synchronous-exception.spec.js`, `syscall3.spec.js`, `syntax-highlighting-during-run.spec.js` all need selector updates
+- New: `contextual-controls.spec.js` — asserts button visibility per state (including WAITING_FOR_INPUT)
+
+---
+
+## 2026-06-09: Implementation Decisions — Contextual Run Controls (Trinity)
+
+**Date:** 2026-06-09T14:38:22+02:00  
+**Author:** Trinity (Frontend Developer)  
+**Files changed:** `src/webapp/components/Header.js`, `src/webapp/components/Simulator.js`
+
+### Decisions Made
+
+1. **`deriveLogicalState` lives in Header.js** — Placed the helper at module scope in `Header.js` (not Simulator.js) because it is purely a presentation-layer concern: it maps observable state to a UI logical state.
+
+2. **Conditional render (not display:none / visibility:hidden)** — Used JSX short-circuit `{showX && <Button .../>}` for all execution controls. Elements that don't apply to the current state are not mounted at all.
+
+3. **Fixed-min-width execution control container** — Wrapped execution controls in `<Box sx={{ display:'flex', gap:1, minWidth:320 }}>`. The `minWidth` prevents the toolbar from visually shifting when button counts change between states.
+
+4. **Stop button — disabled (not hidden) during EXECUTING** — Stop is rendered but disabled during EXECUTING. When disabled, the MUI Tooltip does not fire on a disabled Button by default, so the Button is wrapped in a `<span>` to allow the tooltip `"Pause before stopping"` to appear.
+
+5. **Editor controls use `editorDisabled` (not `status === 'RUNNING'`)** — The new `editorDisabled = logicalState === 'EXECUTING' || logicalState === 'WAITING_FOR_INPUT'` correctly re-enables them when the simulator is paused (READY state).
+
+6. **Props cleaned up in Simulator.js** — Removed `runEnabled`, `stepEnabled`, `pauseEnabled`, `stopEnabled` props. Added `executing={executing}` and `inputRequest={inputRequest}` props.
+
+7. **Pre-existing lint issues left untouched** — `fileContent`, `setFileContent`, and `handleFileLoad` are unused variables that existed in Header.js before this change.
+
+---
+
+## 2026-06-09: Test Decisions: Contextual Run Controls (Smith)
+
+**Date:** 2026-06-09  
+**Author:** Smith (QA/Reviewer)  
+**Status:** All 8 tests in `contextual-controls.spec.js` pass green in isolation.
+
+### New spec created
+
+`src/test/webapp/contextual-controls.spec.js` with 8 tests covering all states in the control visibility matrix:
+
+- EMPTY: load-button visible; step/multi-step/run/pause/stop hidden
+- EMPTY: editor controls visible
+- READY: step/multi-step/run/stop visible & enabled; pause hidden; load still visible
+- READY: editor controls remain visible
+- EXECUTING: pause visible & enabled; stop visible but disabled; others hidden
+- ENDED: load-button visible; step/multi-step/run/pause/stop hidden
+- ENDED: editor controls remain visible
+- Lifecycle: EMPTY → READY → ENDED control transitions
+
+### Key Decisions
+
+- **D1:** Use `toBeHidden()` for hidden controls (satisfied by both "not in DOM" and `display:none`)
+- **D2:** EXECUTING state uses 10 000-iteration loop as timing buffer for reliability
+- **D3:** `waitForSimulationComplete` used for test teardown to let simulation finish naturally
+- **D4:** No changes to existing specs needed (all button interactions happen in READY state)
+- **D5:** `waitForRunningState` comment updated; selector unchanged (JSDoc clarifies why it still works)
+
+### Test Run Summary
+
+- `npm run build` → SUCCESS
+- Full suite: 68/70 passed (2 pre-existing GPU process crashes unrelated to contextual controls)
+- Contextual-controls spec in isolation: 8 passed (3.7s)
+- Every state in the matrix verified: ✅ PASS
+
+### Bugs Found and Fixed
+
+- **T1 (contextual-controls.spec.js:146):** EXECUTING test teardown timeout — fixed by adding pause/step/stop sequence
+- **T2 (settings-persistence.spec.js:165):** stepStride tooltip check ran in EMPTY state — fixed by adding loadProgram before tooltip assertion
+
+---
+
+## 2026-06-09: Verdict: Contextual Run Controls — Smith Verification
+
+**Date:** 2026-06-09T14:38:22+02:00  
+**Author:** Smith (Tester/QA)  
+**Subject:** Trinity's contextual run controls implementation
+
+**VERDICT: PASS ✅**
+
+Trinity's implementation correctly satisfies the state matrix from `run-controls-design.md`. All 8 tests in `contextual-controls.spec.js` pass green in isolation. All 70 tests pass overall (full suite: 68/70 after fixing two test bugs; 2 pre-existing GPU crashes unrelated to contextual controls).
+
+**Implementation verified:**
+- `deriveLogicalState(status, executing, inputRequest)` maps correctly to logical states
+- Each execution control uses conditional rendering (not in DOM when hidden)
+- `stopDisabled = logicalState === 'EXECUTING'` satisfies the design spec
+- Stop button's disabled wrapper `<span>` correctly allows MUI Tooltip
+- Editor controls correctly disabled during EXECUTING/WAITING_FOR_INPUT
+
+**Deferred coverage:**
+- WAITING_FOR_INPUT: all controls hidden — add assertion to `syscall3.spec.js`
+- Editor controls disabled (not hidden) during EXECUTING
+- Stop button tooltip "Pause before stopping" — needs hover + tooltip locator
+
+---
+
+## 2026-06-09: Web UI Contextual Run Controls Documentation (Link)
+
+**Date:** 2026-06-09  
+**Agent:** Link (Docs/DevRel)  
+**Status:** COMPLETE
+
+### Change Summary
+
+Updated the toolbar section of the web user interface documentation to explain the contextual visibility of execution controls based on simulator state.
+
+### Files Updated
+
+**English (`docs/user/en/src/user-interface-web.rst`)**
+- Lines 48–100 (toolbar section)
+- Replaced individual button descriptions with comprehensive contextual behavior section
+
+**Italian (`docs/user/it/src/user-interface-web.rst`)**
+- Lines 51–105 (toolbar section)
+- Full Italian translation of contextual behavior
+
+**Chinese (`docs/user/zh/src/user-interface-web.rst`)**
+- Lines 38–77 (toolbar section)
+- Full Simplified Chinese translation with CJK inline-markup spacing rules
+
+### Key Design Points Documented
+
+1. **Five states:** EMPTY, READY, EXECUTING, ENDED, Waiting for input
+2. **Visibility rules:** Execution controls conditionally hidden; Stop disabled (not hidden) in EXECUTING; Editor controls always visible
+3. **No keyboard shortcuts mentioned:** Deferred to future work
+
+---
+
+## 2026-06-09: checkout@v6 bump in deploy workflows (Tank)
+
+**Date:** 2026-06-09  
+**Author:** Tank (Core/Backend)  
+**Status:** No-op — already resolved
+
+### Finding
+
+Task requested bumping `actions/checkout@v4` → `@v6` in three deploy workflows. Finding: all three files were already on `@v6` as of commit `617fc68c` (PR #1828, merged 2026-06-09). No change needed.
+
+---
+

@@ -115,3 +115,54 @@ Key implementation detail: **monotonic version numbering** fixes a latent bug wh
 
 - **IT:** Full Italian translation, high confidence — technically accurate and matches tone of existing IT pages.
 - **ZH:** Full Simplified Chinese translation; technically accurate but may benefit from native-speaker review for phrasing naturalness.
+
+## Learnings — 2026-06-09: Web UI contextual run controls documentation
+
+### Toolbar redesign: execution controls now appear contextually
+
+The web UI toolbar has been redesigned to show run controls contextually based on simulator state, reducing visual clutter and making available actions immediately obvious. This follows the pattern of modern debugger toolbars (e.g. VSCode).
+
+**Simulator states and visible controls:**
+- **EMPTY** (no program loaded) — only Load is shown.
+- **READY** (program loaded, ready to execute) — Load, Single Step, Multi Step, Run All, Stop are shown.
+- **EXECUTING** (program running) — Pause and Stop (disabled) are shown.
+- **ENDED** (program finished) — only Load is shown.
+- **Waiting for input** (input dialog open) — execution controls hidden; input dialog must be resolved first.
+
+Editor controls (Open Code, Save Code, Clear, Restore sample, Help) remain always visible but with disable states when appropriate.
+
+### Files changed
+
+- `docs/user/en/src/user-interface-web.rst` — replaced lines 48-100 with comprehensive contextual behavior section (states, individual button descriptions, editor controls).
+- `docs/user/it/src/user-interface-web.rst` — Italian translation of contextual behavior.
+- `docs/user/zh/src/user-interface-web.rst` — Simplified Chinese translation of contextual behavior.
+
+### Translation notes
+
+- **EN:** Primary source document, comprehensive description of all five states and control visibility rules.
+- **IT:** Full Italian translation by native-equivalent phrasing; technically accurate and consistent with existing IT documentation tone.
+- **ZH:** Full Simplified Chinese translation; technically accurate, uses standard locale terminology for UI elements (`EMPTY`, `READY`, `EXECUTING`, `ENDED` states remain in English as they are technical identifiers). Applied CJK inline-markup spacing rules (backslash-space before/after CJK characters bounding inline markup) to ensure reStructuredText renders correctly.
+
+## 2026-06-09 — Contextual Run Controls Documentation Complete (PR #1835)
+
+Updated web UI toolbar documentation to reflect contextual control visibility based on simulator state. Follows modern debugger UI pattern (VSCode, Chrome DevTools).
+
+**Five simulator states documented:**
+1. EMPTY (no program) — Load only
+2. READY (loaded, ready) — Load, Step, Multi Step, Run, Stop
+3. EXECUTING (running) — Pause, Stop (disabled with "Pause before stopping" tooltip)
+4. ENDED (finished) — Load only
+5. Waiting for input (dialog open) — all execution controls hidden
+
+**Editor controls:** Always visible but disabled appropriately during execution states.
+
+**Files updated (all three languages):**
+- `docs/user/en/src/user-interface-web.rst` (lines 48-100)
+- `docs/user/it/src/user-interface-web.rst` (lines 51-105) — Italian translation
+- `docs/user/zh/src/user-interface-web.rst` (lines 38-77) — Chinese translation with CJK spacing rules
+
+**Key decisions:**
+- Controls are conditionally hidden (not merely disabled) when not applicable
+- Stop remains visible during EXECUTING but is disabled (design constraint)
+- Keyboard shortcuts deferred to future PR (not yet implemented)
+- CJK markup spacing applied to Chinese version to prevent RTD rendering issues
