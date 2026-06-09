@@ -1018,3 +1018,33 @@ Trinity's floating RunControlsToolbar implementation is correct. All tests GREEN
 
 ---
 
+
+---
+
+## 2026-06-09: Always-Visible Run Control Buttons in Floating Toolbar (Trinity)
+
+**Date:** 2026-06-09T15:41:52+02:00  
+**Author:** Trinity (Frontend Developer)  
+**PR:** #1835 (`squad/streamline-run-controls`)  
+**Commit:** 1facbfd2  
+
+**Decision:** All five execution buttons are always rendered (always in the DOM) whenever the toolbar itself is visible (in READY or EXECUTING logical state). Buttons that cannot be used in a given state are disabled (`disabled` prop) rather than removed.
+
+**Consequences:**
+- No layout shift when transitioning between READY and EXECUTING
+- Toolbar-hidden logic unchanged: toolbar returns `null` in EMPTY, ENDED, WAITING_FOR_INPUT
+- Test impact: assertions on buttons must switch from presence/absence checks to enabled/disabled checks
+
+---
+
+## 2026-06-09: Smith QA Verdict — Always-Visible Toolbar Buttons (PR #1835)
+
+**Date:** 2026-06-09T15:41:52+02:00  
+**Branch:** squad/streamline-run-controls  
+**Commit:** 207827ba  
+
+**VERDICT: PASS ✅**
+
+Trinity's `RunControlsToolbar.js` architecture is correctly implemented and verified. Test suite: 69/71 pass, 1 skipped (drag test, intentional), 1 pre-existing GPU crash. All implementation checks pass — no bugs found.
+
+**Test changes required:** Fixed 5 test patterns (presence/absence → enabled/disabled), all passing now.
