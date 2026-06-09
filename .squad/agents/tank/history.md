@@ -162,3 +162,12 @@ The download step retries up to 3×(sleep 5) to tolerate same-run artifact API p
 **`working-directory` is mandatory:** `test_deploy_web_pages.py` loads the hyphenated module `deploy-web-pages.py` via `importlib.util.spec_from_file_location` using `Path(__file__).parent`. The test file's `__file__` must resolve inside `.github/scripts/`, so the step sets `working-directory: .github/scripts`. Without it, `importlib` fails to find the script.
 
 **Python setup:** Uses `actions/setup-python@v5` pinned to `python-version: '3.12'` (matches the repo's documented Python 3.12+ requirement), then `pip install pytest`. No `requirements.txt` exists for the scripts directory — only stdlib + pytest are needed.
+## Learnings
+
+### 2026-06-09 — checkout@v6 bump in deploy workflows already covered by #1828
+
+**Task:** Bump `actions/checkout@v4` → `@v6` in `promote-web.yml`, `nightly-web.yml`, `rollback-web.yml` (three deploy workflows that were noted as missed by Dependabot PR #1828).
+
+**Finding:** When the task was actioned, all three files already contained `actions/checkout@v6`. Commit `617fc68c` (PR #1828, merged 2026-06-09 by Renovate + lupino3) **did** include these three files — despite the task brief stating they were missed. No additional PR was opened; the task was a no-op.
+
+**Lesson:** Always grep/view the files on the latest master before creating a branch — the situation may have changed between when a task is written and when it is executed. A clean `git fetch origin` + grep for the target pattern is the definitive check before doing any work.
