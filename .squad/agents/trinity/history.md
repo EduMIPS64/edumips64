@@ -120,3 +120,35 @@ Exports `deriveLogicalState(status, executing, inputRequest)` as a named export,
 ## 2026-06-09 — Floating Run Toolbar Iteration 2: Complete ✅
 
 PR #1835 floating toolbar implementation committed (609d66af). Inbox decisions merged into squad/decisions.md, orchestration log written, cross-team validation complete (Smith: 69/71 tests pass; Link: docs updated en/it/zh). Ready for merge.
+
+## 2026-06-09 — Always-Visible Toolbar Buttons (PR #1835, third iteration)
+
+Andrea requested that all five execution buttons always remain in the DOM when the toolbar is visible (READY or EXECUTING), and are greyed out/disabled instead of removed.
+
+### Change: RunControlsToolbar.js
+
+Replaced the `showStep` / `showMultiStep` / `showRun` / `showPause` boolean guards (JSX short-circuit `{showX && <Button/>}`) with always-rendered buttons using `disabled` prop:
+
+| Button | READY | EXECUTING |
+|--------|-------|-----------|
+| #step-button | enabled | disabled |
+| #multi-step-button | enabled | disabled |
+| #run-button | enabled | disabled |
+| #pause-button | disabled | enabled |
+| #stop-button | enabled | disabled ("Pause before stopping") |
+
+Derived as: `stepDisabled = logicalState !== 'READY'`, `pauseDisabled = logicalState !== 'EXECUTING'`, `stopDisabled = logicalState === 'EXECUTING'`.
+
+Every button is now wrapped in a `<span>` (not just Stop) so MUI Tooltip fires even when the child IconButton is disabled.
+
+The toolbar-hidden logic (`return null` in EMPTY/ENDED/WAITING_FOR_INPUT) is unchanged.
+
+Committed: 1facbfd2. ESLint clean, `npm run build-dbg` successful.
+
+### Note for Smith (test changes required)
+
+All 5 execution buttons are now always present in `#run-controls-toolbar` when it is visible. Tests must assert ENABLED/DISABLED state rather than presence/absence:
+
+- **In READY state:** `#step-button`, `#multi-step-button`, `#run-button`, `#stop-button` are present and **enabled**; `#pause-button` is present but **disabled**.
+- **In EXECUTING state:** `#pause-button` is present and **enabled**; `#step-button`, `#multi-step-button`, `#run-button`, `#stop-button` are present but **disabled**.
+- Any test that asserted a button was absent (not in DOM) in a given state should be rewritten to assert `disabled` attribute instead.
