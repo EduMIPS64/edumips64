@@ -190,3 +190,10 @@ The Program menu is **disabled while the CPU is executing** (during RUNNING/EXEC
 - **Commit:** 30f0fa7e on squad/program-menu (pushed to origin)
 - Git message: "docs: Update web UI user docs for new Program dropdown menu"
 
+
+## 2026-06-09: Trilingual Program Menu Docs — Completed
+
+**Status:** All three languages updated, verified
+
+Updated docs/user/{en,it,zh}/src/user-interface-web.rst for Program dropdown menu. PR #1836 ready.
+

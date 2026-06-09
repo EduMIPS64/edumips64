@@ -177,3 +177,10 @@ All 5 execution buttons are now always present in `#run-controls-toolbar` when i
 **Tooltip gotcha (disabled buttons):** MUI Tooltip does not fire on disabled `<Button>` elements. The trigger is wrapped in `<span>` inside the `<Tooltip>` to ensure the tooltip still appears when the button is disabled.
 
 **Removed (vestigial):** `handleFileLoad`, `fileContent`, `setFileContent` state and handler — these were unused since `onOpenClick` was extracted to `Simulator.js`.
+
+## 2026-06-09: Program Menu PR #1836 — Completed
+
+**Status:** Merged to squad/program-menu (commit b79f8029)
+
+Implemented Alternative A (Program ▾ dropdown). Build + lint green. Tests reworked by Smith (16 passed, APPROVE verdict). Docs updated by Link (trilingual). PR ready for review.
+

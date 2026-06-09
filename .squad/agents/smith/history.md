@@ -72,3 +72,10 @@ Changed from `#clear-code-button:not([disabled])` to `#program-menu-button:not([
 - `toBeDisabled()` in Playwright correctly targets the `disabled` attribute on `<button>` elements — MUI IconButton's `disabled={true}` prop sets the HTML attribute on the rendered `<button>`.
 - `toBeHidden()` remains correct for toolbar-level assertions (toolbar not rendered → null → element absent from DOM).
 
+
+## 2026-06-09: Program Menu Tests + Toolbar Verification — Completed
+
+**Status:** Tests reworked, verdicts rendered
+
+Program menu test rework (16 passed, APPROVE). Always-visible toolbar verification (69/71 pass, PASS verdict). PR #1836 ready.
+
