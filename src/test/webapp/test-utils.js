@@ -123,6 +123,12 @@ async function loadProgram(page, program) {
   // Click Load button using the id selector for precision
   await page.click('#load-button');
 
+  // Move the mouse off the Load button so its hover tooltip dismisses.
+  // Otherwise the tooltip stays open for the rest of the test and, because it
+  // can flip to the `bottom` placement, its popper overlaps the accordions
+  // just below the header and intercepts pointer events on them.
+  await page.mouse.move(0, 0);
+
   // Wait for the simulator to enter RUNNING state
   await waitForRunningState(page);
 }
