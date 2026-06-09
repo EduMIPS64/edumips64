@@ -612,6 +612,25 @@ GitHub Actions before merge. Correctness was verified by:
   `version-history.spec.js`. No Python/pytest CI job exists yet -> recommended follow-up.
 - **Docs:** versioning.rst (en/it/zh), developer-guide.md, design doc (with rejected
   alternatives: per-snapshot manifest; UI-only blind enumeration).
+## 2026-06-09: No paths-filter gate for deploy-script pytest job
+
+**Date:** 2026-06-09  
+**Author:** Tank  
+**PR:** #1831 (`squad/web-version-navigator`)
+
+### Decision
+
+The `test-deploy-script` CI job (pytest suite for `deploy-web-pages.py`) runs on **every PR and nightly schedule** without a `paths-filter` gate, even though the suite only guards files under `.github/scripts/`.
+
+### Rationale
+
+1. **Suite is fast:** 5 tests complete in under 0.1 s — no meaningful CI cost.  
+2. **Always-green contract:** The deploy script is load-bearing for web promotion and rollback. A filter gate (e.g., only when `.github/scripts/**` changes) would allow unrelated PRs to land while the suite is broken, which defeats the safety net.  
+3. **Consistency with task brief:** The requirement explicitly stated "do NOT gate it behind a paths-filter".
+
+### Implications
+
+All future changes — including dependency bumps, refactors, and unrelated PRs — will run this suite. If the suite ever grows expensive, revisit the gate decision then.
 
 ## Governance
 
