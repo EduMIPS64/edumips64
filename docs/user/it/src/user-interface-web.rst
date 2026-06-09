@@ -48,31 +48,62 @@ simulatore. Ogni pulsante ha un tooltip che ne descrive l'effetto.
     di terminazione e la pipeline si sta svuotando, oppure il
     programma è terminato.
 
-* **Load** — analizza il contenuto dell'editor e carica il programma
-  risultante nel simulatore. È disabilitato mentre la simulazione è
-  in corso e viene nascosto una volta che il caricamento è andato a
-  buon fine.
+Controlli di esecuzione e layout della barra degli strumenti
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I controlli di esecuzione appaiono come una **barra degli strumenti
+fluttuante e trascinabile con solo icone** che si sovrappone al
+contenuto, come la barra di debug in VS Code. La barra appare in modo
+contestuale in base allo stato attuale del simulatore, riducendo il
+disordine visivo e rendendo chiare le azioni disponibili:
 
-* **Single Step** — esegue un singolo ciclo di CPU.
+* **EMPTY** (nessun programma caricato) — la barra è nascosta; solo il
+  pulsante ``Load`` nella barra superiore è disponibile.
+* **READY** (programma caricato, pronto per l'esecuzione) — la barra
+  fluttuante appare con ``Single Step``, ``Multi Step``, ``Run All`` e
+  ``Stop`` come pulsanti con icone. La barra può essere trascinata per
+  riposizionarla ovunque sullo schermo.
+* **EXECUTING** (programma in esecuzione) — la barra mostra ``Pause``
+  e ``Stop`` (disabilitato con il messaggio "Pause before stopping").
+  La barra rimane trascinabile.
+* **ENDED** (programma terminato) — la barra è nascosta.
+* **In attesa di input** (finestra di dialogo per l'input aperta) —
+  la barra è nascosta; la finestra di dialogo deve essere completata
+  prima di proseguire.
+
+Il pulsante **Load** e i controlli dell'editor (Open, Save, Clear,
+Restore sample, Help) rimangono sempre visibili nella barra
+superiore.
+
+Descrizione dei singoli pulsanti:
+
+* **Single Step** — esegue un singolo ciclo di CPU. Appare nella barra
+  fluttuante quando un programma è caricato e pronto per l'esecuzione.
 
 * **Multi Step** — esegue un numero configurabile di cicli di CPU con
   un singolo click. Il numero corrente è mostrato nel tooltip del
   pulsante e può essere modificato nel pannello *General Settings*
-  ("Multi Step Size").
+  ("Multi Step Size"). Appare nella barra fluttuante quando un
+  programma è caricato e pronto per l'esecuzione.
 
 * **Run All** — esegue il programma fino al termine, ovvero fino ad
   una ``SYSCALL 0`` (o equivalente) o ad una istruzione ``BREAK``,
   oppure fino a quando l'utente preme *Pause* o *Stop*. Tra un blocco
   interno di cicli e l'altro il simulatore può attendere un ritardo
   configurabile (``Execution Delay``), così da rendere visivamente
-  osservabili anche esecuzioni lunghe.
+  osservabili anche esecuzioni lunghe. Appare nella barra fluttuante
+  quando un programma è caricato e pronto per l'esecuzione.
 
 * **Pause** — interrompe l'esecuzione in corso al ciclo corrente. È
   poi possibile proseguire con *Single Step*, *Multi Step* o *Run
-  All*.
+  All*. Appare nella barra fluttuante solamente mentre il programma
+  è in esecuzione.
 
 * **Stop** — interrompe l'esecuzione e riporta la CPU allo stato
-  ``READY``, azzerando registri, memoria e pipeline.
+  ``READY``, azzerando registri, memoria e pipeline. Appare nella
+  barra fluttuante negli stati READY e EXECUTING (disabilitato in
+  EXECUTING con il messaggio "Pause before stopping").
+
+I controlli dell'editor rimangono sempre visibili:
 
 * **Clear** — svuota l'editor lasciando solo uno scheletro di file
   assembly (direttive ``.data`` e ``.code`` ed una ``SYSCALL 0``
@@ -83,11 +114,12 @@ simulatore. Ogni pulsante ha un tooltip che ne descrive l'effetto.
   visualizzato in un'installazione nuova). È utile per tornare ad un
   punto di partenza noto dopo aver fatto esperimenti, o per
   scartare il contenuto dell'editor salvato in locale (si veda
-  *Salvataggio e caricamento* qui sotto). Il pulsante è disabilitato
-  mentre la CPU sta eseguendo.
+  *Salvataggio e caricamento* qui sotto). È disabilitato mentre la
+  CPU sta eseguendo.
 
 * **Open Code** — apre un file locale (tipicamente un file ``.s``) e
-  ne carica il contenuto nell'editor.
+  ne carica il contenuto nell'editor. È disabilitato mentre la CPU
+  sta eseguendo.
 
 * **Save Code** — salva il contenuto corrente dell'editor in un file
   locale chiamato ``code.s``.
@@ -97,12 +129,6 @@ simulatore. Ogni pulsante ha un tooltip che ne descrive l'effetto.
   lingua. La finestra di Help include anche una scheda *About* che
   mostra la versione del simulatore ed una descrizione della build in
   esecuzione.
-
-I pulsanti che non avrebbero alcun effetto nello stato corrente sono
-disabilitati automaticamente. Ad esempio, *Single Step*, *Multi Step*
-e *Run All* sono disabilitati finché un programma non è stato
-caricato con *Load*, e *Pause* è disponibile solo durante una
-esecuzione lunga.
 
 L'editor di codice
 ------------------

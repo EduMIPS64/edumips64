@@ -33,11 +33,18 @@ async function waitForPageReady(page) {
 }
 
 /**
- * Helper function to wait for simulator to enter RUNNING state
+ * Helper function to wait for simulator to enter RUNNING state (logical READY).
+ *
+ * With the always-present toolbar model, #step-button is rendered whenever the
+ * toolbar is visible (READY or EXECUTING), but is DISABLED during EXECUTING.
+ * The `:not([disabled])` filter ensures we only match READY state, where step
+ * is enabled.  No change to the selector is required from the previous model.
+ *
  * @param {import('@playwright/test').Page} page - Playwright page object
  */
 async function waitForRunningState(page) {
-  // Wait for the Single Step button to become enabled (indicates RUNNING state)
+  // #step-button is always rendered when the toolbar is visible, but disabled
+  // in EXECUTING.  `:not([disabled])` ensures this only matches READY.
   await page.waitForSelector('#step-button:not([disabled])', {
     timeout: 10000,
   });

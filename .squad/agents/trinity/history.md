@@ -46,3 +46,109 @@ The web UI `Statistics.js` component now sums all four structural-stall CPU coun
 
 **Changed files:**
 - `src/webapp/components/HelpDialog.js` — added `PreviousVersions` component rendered below `<BuildInfoLine />` in the About TabPanel; added `Chip` import and `versionHistory` imports.
+
+### Contextual Run Controls — state model and component wiring (2026-06-09)
+
+**State derivation:** `deriveLogicalState(status, executing, inputRequest)` is a plain function defined at the top of `Header.js` (not in Simulator.js). It maps the three observable values to one of: `'EMPTY'`, `'READY'`, `'EXECUTING'`, `'ENDED'`, `'WAITING_FOR_INPUT'`.
+
+**Simulator state location:** `status` (READY/RUNNING/STOPPED), `executing` (boolean), and `inputRequest` (object|null) all live in `Simulator.js` state. `status` was already passed to `<Header>`; `executing` and `inputRequest` were added as new props in this change.
+
+**Contextual rendering wiring:** Execution controls (`showLoad`, `showStep`, `showMultiStep`, `showRun`, `showPause`, `showStop`) are computed as booleans from `logicalState` and used to conditionally mount buttons via JSX short-circuit (`{showX && <Button .../>}`). All execution controls are wrapped in `<Box sx={{ display:'flex', gap:1, minWidth:320 }}>` to prevent layout jank.
+
+**Stop special case:** Stop is shown in both READY and EXECUTING; rendered disabled (`stopDisabled = logicalState === 'EXECUTING'`) with tooltip `'Pause before stopping'` when disabled. The MUI Tooltip requires a non-disabled DOM child to show, so the disabled Button is wrapped in a `<span>`.
+
+**Editor controls:** Clear, Restore, and Open Code are disabled when `logicalState` is `'EXECUTING'` or `'WAITING_FOR_INPUT'` (replacing the old `status === 'RUNNING'` check, which incorrectly disabled them in READY/paused state). Save Code is now always enabled (design matrix: ✅ in all states).
+
+**Props removed from Simulator.js → Header.js:** `runEnabled`, `stepEnabled`, `pauseEnabled`, `stopEnabled` (all derivable from logical state now). `loadEnabled` kept because it reflects parsing-error validity.
+
+**Build verified:** `npm run build-dbg` compiled successfully. ESLint (post-prettier) shows only the 3 pre-existing unused-var errors (`fileContent`, `setFileContent`, `handleFileLoad`) that existed before this change.
+
+## 2026-06-09 — Contextual Run Controls Implementation Complete (PR #1835)
+
+Successfully implemented contextual run controls in `Header.js` and `Simulator.js`. Design locked with 8 constraints:
+1. Contextual hiding (conditional render, not display:none/visibility:hidden)
+2. Stop disabled (not hidden) during EXECUTING
+3. No PAUSED state (collapsed to READY)
+4. No STOPPING React state
+5. Conditional render for Playwright compat
+6. Fixed-min-width container prevents toolbar jank
+7. Keyboard shortcuts deferred
+8. WAITING_FOR_INPUT hides all execution controls
+
+**Implementation verified:**
+- `deriveLogicalState()` correctly maps 3 observable props to 5 logical states
+- All execution controls use `{showX && <Button>}` pattern (not in DOM when hidden)
+- Stop button wrapped in `<span>` for MUI Tooltip support when disabled
+- Editor controls properly re-enabled when paused (READY state, not EXECUTING)
+- Props cleanup: removed 4 enable-state bools, added `executing` + `inputRequest`
+- Full test suite: 68/70 PASS (2 pre-existing GPU crashes); contextual-controls spec: 8/8 PASS
+- No implementation bugs found; design fully realized
+
+## 2026-06-09 — Floating Draggable Debug Toolbar (PR #1835, second iteration)
+
+Andrea requested replacement of the inline execution controls with a VSCode-style floating debug toolbar.
+
+### Floating Toolbar Component (RunControlsToolbar.js)
+
+**New file:** `src/webapp/components/RunControlsToolbar.js`
+- MUI `Paper` with `position: fixed`, `elevation: 8`, rounded pill shape (`borderRadius: '24px'`), `zIndex: 1200`
+- Icon-only `IconButton` buttons (no text labels) with MUI `Tooltip`s for all action names
+- Drag handle (`DragIndicatorIcon`) at the left; uses `setPointerCapture` on the handle element so drag remains smooth even when pointer moves outside the handle
+- Position stored in `useState` (lazy initial value: center of viewport, y=80); constrained to stay on-screen via viewport bounds check in `handlePointerMove`
+- Refs renamed to `isDraggingRef` / `dragOffsetRef` to satisfy `@eslint-react/naming-convention-ref-name`
+- Returns `null` (not rendered) in EMPTY / ENDED / WAITING_FOR_INPUT states; same visibility logic as the previous inline controls
+- Mounted unconditionally from `Simulator.js` so position state persists across logical-state changes
+
+### Shared State Helper (simulatorState.js)
+
+**New file:** `src/webapp/simulatorState.js`
+Exports `deriveLogicalState(status, executing, inputRequest)` as a named export, consumed by both `Header.js` and `RunControlsToolbar.js`. Previously this function was inlined in `Header.js`.
+
+### Header.js Changes
+
+- Removed execution controls `Box` (contained Step / Multi Step / Run / Pause / Stop)
+- `Load` button is now **always visible** (no `showLoad` condition) — it is always present in the header AppBar regardless of logical state
+- Removed now-unused imports: `PlayArrowIcon`, `FastForwardIcon`, `PlayCircleIcon`, `PauseCircleIcon`, `StopCircleIcon`
+- Removed now-unused variables: `multiStepCount`, `showLoad`, `showStep`, `showMultiStep`, `showRun`, `showPause`, `showStop`, `stopDisabled`
+- Props removed from Header interface: `onRunClick`, `onStepClick`, `onPauseClick`, `onStopClick`, `multiStepCount`
+- `deriveLogicalState` imported from `../simulatorState` (no longer defined inline)
+
+### Simulator.js Mounting
+
+`RunControlsToolbar` is mounted immediately after `<Header>` in the ThemeProvider tree, receiving: `onStepClick`, `onRunClick`, `onPauseClick`, `onStopClick`, `status`, `executing`, `inputRequest`, `multiStepCount`.
+
+## 2026-06-09 — Floating Run Toolbar Iteration 2: Complete ✅
+
+PR #1835 floating toolbar implementation committed (609d66af). Inbox decisions merged into squad/decisions.md, orchestration log written, cross-team validation complete (Smith: 69/71 tests pass; Link: docs updated en/it/zh). Ready for merge.
+
+## 2026-06-09 — Always-Visible Toolbar Buttons (PR #1835, third iteration)
+
+Andrea requested that all five execution buttons always remain in the DOM when the toolbar is visible (READY or EXECUTING), and are greyed out/disabled instead of removed.
+
+### Change: RunControlsToolbar.js
+
+Replaced the `showStep` / `showMultiStep` / `showRun` / `showPause` boolean guards (JSX short-circuit `{showX && <Button/>}`) with always-rendered buttons using `disabled` prop:
+
+| Button | READY | EXECUTING |
+|--------|-------|-----------|
+| #step-button | enabled | disabled |
+| #multi-step-button | enabled | disabled |
+| #run-button | enabled | disabled |
+| #pause-button | disabled | enabled |
+| #stop-button | enabled | disabled ("Pause before stopping") |
+
+Derived as: `stepDisabled = logicalState !== 'READY'`, `pauseDisabled = logicalState !== 'EXECUTING'`, `stopDisabled = logicalState === 'EXECUTING'`.
+
+Every button is now wrapped in a `<span>` (not just Stop) so MUI Tooltip fires even when the child IconButton is disabled.
+
+The toolbar-hidden logic (`return null` in EMPTY/ENDED/WAITING_FOR_INPUT) is unchanged.
+
+Committed: 1facbfd2. ESLint clean, `npm run build-dbg` successful.
+
+### Note for Smith (test changes required)
+
+All 5 execution buttons are now always present in `#run-controls-toolbar` when it is visible. Tests must assert ENABLED/DISABLED state rather than presence/absence:
+
+- **In READY state:** `#step-button`, `#multi-step-button`, `#run-button`, `#stop-button` are present and **enabled**; `#pause-button` is present but **disabled**.
+- **In EXECUTING state:** `#pause-button` is present and **enabled**; `#step-button`, `#multi-step-button`, `#run-button`, `#stop-button` are present but **disabled**.
+- Any test that asserted a button was absent (not in DOM) in a given state should be rewritten to assert `disabled` attribute instead.

@@ -1,5 +1,5 @@
 const { test, expect } = require('./fixtures');
-const { targetUri, waitForPageReady, removeOverlay } = require('./test-utils');
+const { targetUri, waitForPageReady, removeOverlay, loadProgram } = require('./test-utils');
 
 const STORAGE_PREFIX = 'edumips64:v1:';
 
@@ -201,11 +201,19 @@ test('stepStride and executionDelayMs persist across page reloads', async ({ pag
   await expect(page.getByLabel('Multi Step Size')).toHaveValue('250');
   await expect(page.getByLabel('Execution Delay (ms)')).toHaveValue('100');
 
-  // The Multi Step button's tooltip reflects the configured stride, so the
-  // header really does read from the persisted setting.
-  await expect(
-    page.getByRole('button', { name: /Run 250 steps of simulation/ })
-  ).toBeVisible();
+  // The Multi Step button is only rendered in READY state (contextual run
+  // controls).  Load a minimal program so the toolbar transitions from EMPTY
+  // to READY and the button becomes visible for the tooltip assertion.
+  const simpleProgram = `.code\nDADDI r1, r0, 1\nSYSCALL 0\n`;
+  await loadProgram(page, simpleProgram);
+
+  // The Multi Step button is now icon-only (aria-label="Multi Step"); the
+  // stride is surfaced via the MUI Tooltip.  Hover to trigger the tooltip and
+  // assert it contains the configured count, confirming the component reads
+  // from the persisted setting.
+  await page.waitForSelector('#multi-step-button');
+  await page.hover('#multi-step-button');
+  await expect(page.locator('.MuiTooltip-tooltip').filter({ hasText: 'Run 250 steps of simulation' })).toBeVisible();
 });
 
 /**

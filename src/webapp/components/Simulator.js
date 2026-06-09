@@ -6,6 +6,7 @@ import Pipeline from './Pipeline';
 import Registers from './Registers';
 import Statistics from './Statistics';
 import Header from './Header';
+import RunControlsToolbar from './RunControlsToolbar';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
@@ -621,27 +622,30 @@ const Simulator = ({worker, initialState, appInsights}) => {
           onCancel={cancelInput}
         />
         <Header
-          onRunClick={clickRun}
-          runEnabled={simulatorRunning && !executing}
-          onStepClick={clickStep}
-          stepEnabled={simulatorRunning && !executing}
           onLoadClick={loadCode}
           loadEnabled={isValidProgram()}
-          onPauseClick={() => {
-            appInsights.trackEvent({name: "pause"})
-            setMustPause(true);
-          }}
-          pauseEnabled={executing}
           onClearClick={clearCode}
           onOpenClick={openCode}
           onSaveClick={saveCode}
           onRestoreClick={restoreDefaultSample}
-          onStopClick={clickStop}
-          stopEnabled={simulatorRunning && !executing}
           parsingErrors={parsingErrors}
           version={worker.version}
           status={status}
+          executing={executing}
+          inputRequest={inputRequest}
           prefersDarkMode={prefersDarkMode}
+        />
+        <RunControlsToolbar
+          onStepClick={clickStep}
+          onRunClick={clickRun}
+          onPauseClick={() => {
+            appInsights.trackEvent({ name: 'pause' });
+            setMustPause(true);
+          }}
+          onStopClick={clickStop}
+          status={status}
+          executing={executing}
+          inputRequest={inputRequest}
           multiStepCount={stepStride}
         />
         <Grid container id="main-grid" disableEqualOverflow spacing={0}>

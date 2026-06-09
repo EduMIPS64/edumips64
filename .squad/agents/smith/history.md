@@ -9,28 +9,43 @@
 
 <!-- Append new learnings below. Each entry is something lasting about the project. -->
 
-## 2026-06-07 — PR-A: Web promotion/versioning test & review pass
+## 2026-06-09 — Always-visible toolbar buttons (PR #1835, iteration 3)
 
-### Java tests (./gradlew test)
-All Java tests GREEN (BUILD SUCCESSFUL in ~25s). No test asserted a fixed version format — `BannerTest` already used `MetaInfo.VERSION` directly (accepts null/empty as "dev"), and `ArgsTest.properly_displays_version` uses `new Version().getVersion()[0]` (not a hardcoded string). No format assertions needed fixing.
+### What changed (Trinity's latest architecture)
+- `RunControlsToolbar.js`: All five execution buttons (step, multi-step, run, pause, stop) are now **always rendered** when the toolbar is visible, greyed out (disabled) rather than absent from the DOM.
+- Previous model: READY → pause absent; EXECUTING → step/multi-step/run absent.
+- New model: READY → pause present but disabled; EXECUTING → step/multi-step/run/stop present but disabled.
+- Toolbar visibility rule unchanged: not rendered in EMPTY / ENDED / WAITING_FOR_INPUT.
 
-### Playwright tests
-Ran `help-dialog.spec.js` and the new `version-and-nightly-badge.spec.js` against the locally served production build (with `worker.js` copied from `out/tmp/gwt-war/web/worker.js`). All version-touching tests GREEN. Full suite: 59/60 passed; the 1 failure (`cache-simulator.spec.js:99`) is a pre-existing GPU crash in the snap Chromium under 32-way parallelism — passes in isolation.
+### Test fixes applied (contextual-controls.spec.js)
 
-**Environment note**: Ubuntu 26.04 is not yet officially supported by Playwright 1.60.0. The bundled Chromium headless shell does not install. Workaround: pass `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium-browser` and configure `launchOptions: { executablePath, args: ['--no-sandbox', '--disable-dev-shm-usage'] }` in `playwright.config.js`. Extended the config to read that env var. CI (ubuntu-latest) is unaffected.
+**READY test:**
+- `#pause-button toBeHidden()` → `toBeVisible() + toBeDisabled()`
 
-**GWT worker.js**: `npm run build` does NOT build `worker.js` — that requires `./gradlew webapp` (slow GWT compilation). For local Playwright runs, copy `out/tmp/gwt-war/web/worker.js` → `out/web/worker.js` after a webpack build. Without it the app mounts Monaco but never renders `#load-button`.
+**EXECUTING test:**
+- `#step-button toBeHidden()` → `toBeVisible() + toBeDisabled()`
+- `#multi-step-button toBeHidden()` → `toBeVisible() + toBeDisabled()`
+- `#run-button toBeHidden()` → `toBeVisible() + toBeDisabled()`
+- EXECUTING entry signal: `waitForSelector('#pause-button', {state:'visible'})` →
+  `waitForSelector('#pause-button:not([disabled])')` — pause is visible (just disabled) in READY too, so visibility alone was no longer a sufficient EXECUTING signal.
+- EXECUTING teardown: `waitForSelector('#step-button', {state:'visible'})` →
+  `waitForSelector('#step-button:not([disabled])')` — step is now always visible; enabled state is the READY discriminator.
 
-### NIGHTLY badge coverage added
-New spec `src/test/webapp/version-and-nightly-badge.spec.js` covers:
-1. About tab shows a non-empty version matching git-describe regex `^\d+\.\d+\.\d+(-\d+-g[0-9a-f]+)?(-dirty)?|g?[0-9a-f]{7,}$`
-2. NIGHTLY badge (`#nightly-build-chip`) is absent on a root-path load
-3. Path-based detection logic is correct (unit-level `page.evaluate`)
-Deferred: badge PRESENCE requires serving under `/nightly/` which the local harness doesn't do.
+**Lifecycle test:**
+- READY section: `#pause-button toBeHidden()` → `toBeVisible() + toBeDisabled()`
 
-### Bug found and fixed
-**BLOCKING BUG in `build-desktop.yml`**: The `fetch-depth: 0` patch that was applied to add deep clone support corrupted the YAML — the `- name: Set up JDK 17` step was deleted and `uses: actions/setup-java@v5` was merged into the same YAML mapping as `actions/checkout@v6` (duplicate `uses` key in one step). This would have made the desktop build fail at workflow parse time. Fixed by restoring the step as a proper separate sequence item.
+**test-utils.js:**
+- Updated `waitForRunningState()` JSDoc: selector `#step-button:not([disabled])` is still correct; step is always present when toolbar visible but disabled in EXECUTING, so `:not([disabled])` correctly discriminates READY.
 
-### Reviewer verdict
-**APPROVE WITH FIX** — the build-desktop.yml YAML corruption (fixed in this commit) was the only blocking issue. All other changes are correct: git-describe versioning flows cleanly from build.gradle.kts through MetaInfo.java; webpack VERSION is properly derived; NIGHTLY badge detection is path-based (correct approach); workflow gating/promote/rollback/nightly logic is sound; `promote-web.yml` uses `actions/checkout@v4` (vs `@v6` elsewhere) — minor inconsistency, not blocking.
+### Full suite results (commit 207827ba)
+| # | Result | Root cause |
+|---|--------|------------|
+| 1 | `cache-simulator.spec.js:125` FAIL | GPU crash — pre-existing env issue (snap Chromium, Ubuntu 26.04) |
+
+**69 passed, 1 skipped (drag test), 1 pre-existing GPU crash. VERDICT: PASS ✅**
+
+### Key learnings
+- When buttons are always-present (just disabled), `state:'visible'` is not a sufficient discriminator for state transitions. Must use `:not([disabled])` selectors.
+- `toBeDisabled()` in Playwright correctly targets the `disabled` attribute on `<button>` elements — MUI IconButton's `disabled={true}` prop sets the HTML attribute on the rendered `<button>`.
+- `toBeHidden()` remains correct for toolbar-level assertions (toolbar not rendered → null → element absent from DOM).
 
