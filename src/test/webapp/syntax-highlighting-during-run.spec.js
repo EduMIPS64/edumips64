@@ -86,9 +86,9 @@ test.describe('Syntax highlighting during execution (#1723)', () => {
           lastBad = samples;
         }
       }
-      // #program-menu-button is disabled while EXECUTING and re-enables when
-      // execution ends (ENDED / READY).  The menu items themselves live in a
-      // MUI portal and are absent from the DOM when the menu is closed.
+      // #program-menu-button is disabled while a program is loaded into the
+      // simulator (READY/EXECUTING/WAITING_FOR_INPUT) and re-enables only when
+      // the simulation ends (ENDED) or the simulator is reset (EMPTY).
       const finished = await page
         .locator('#program-menu-button')
         .isEnabled()

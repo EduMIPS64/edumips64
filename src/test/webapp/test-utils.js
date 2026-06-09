@@ -83,12 +83,35 @@ async function waitForSimulationComplete(page) {
   // We use a regex to ensure it's a positive number (not 0, not empty)
   await expect(page.locator('#stat-cycles')).toHaveText(/^[1-9][0-9]*$/, { timeout: 30000 });
 
-  // Wait for the Program menu button to become enabled — it is disabled while
-  // the CPU is EXECUTING or WAITING_FOR_INPUT and re-enables in READY/ENDED.
+  // Wait for the Program menu button to become enabled — it is disabled whenever
+  // a program is loaded into the simulator (READY/EXECUTING/WAITING_FOR_INPUT)
+  // and re-enables only in EMPTY and ENDED.
   // (The individual menu items live in a MUI portal and are absent from the DOM
   // when the menu is closed, so we cannot use #clear-code-button here.)
   await page.waitForSelector('#program-menu-button:not([disabled])', {
     timeout: 30000,
+  });
+}
+
+/**
+ * Helper function to reset the simulator back to EMPTY state.
+ * Clicks #stop-button (if visible and enabled) and waits for the Program menu
+ * button to become enabled, which is the definitive signal that the simulator
+ * has returned to EMPTY.
+ * @param {import('@playwright/test').Page} page - Playwright page object
+ */
+async function resetSimulator(page) {
+  const stopBtn = page.locator('#stop-button');
+  const isVisible = await stopBtn.isVisible().catch(() => false);
+  if (isVisible) {
+    const isEnabled = await stopBtn.isEnabled().catch(() => false);
+    if (isEnabled) {
+      await stopBtn.click();
+    }
+  }
+  // After stop (or if already EMPTY/ENDED), wait for the menu button to be enabled.
+  await page.waitForSelector('#program-menu-button:not([disabled])', {
+    timeout: 10000,
   });
 }
 
@@ -166,6 +189,7 @@ module.exports = {
   waitForPageReady,
   waitForRunningState,
   waitForSimulationComplete,
+  resetSimulator,
   openProgramMenu,
   clickProgramMenuItem,
   loadProgram,

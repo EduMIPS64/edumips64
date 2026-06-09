@@ -6,8 +6,10 @@
  * #program-menu-button.  Key contract:
  *
  *   - #program-menu-button is always visible in the header.
- *   - It is ENABLED in EMPTY, READY, and ENDED states.
- *   - It is DISABLED while the CPU is EXECUTING or WAITING_FOR_INPUT.
+ *   - It is ENABLED only in EMPTY (no program loaded) and ENDED (program
+ *     finished) states.
+ *   - It is DISABLED whenever a program is loaded into the simulator:
+ *     READY (loaded, paused), EXECUTING (running), and WAITING_FOR_INPUT.
  *   - The four menu items (#clear-code-button, #load-code-button,
  *     #save-code-button, #restore-sample-button) live in a MUI portal and
  *     are only present in the DOM when the menu is open.
@@ -24,6 +26,7 @@ const {
   removeOverlay,
   waitForSimulationComplete,
   openProgramMenu,
+  resetSimulator,
 } = require('./test-utils');
 
 // A simple program that completes quickly.
@@ -44,12 +47,12 @@ SYSCALL 0
 
 // ─── Menu items visible when open ────────────────────────────────────────────
 
-test('program-menu: all four items visible when menu opened in READY state', async ({
+test('program-menu: all four items visible when menu opened in EMPTY state', async ({
   page,
 }) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
-  await loadProgram(page, simpleProgram);
+  // Do NOT load a program — the page stays in EMPTY state (button enabled).
 
   // Items must NOT be in the DOM before the menu is opened.
   await expect(page.locator('#clear-code-button')).toHaveCount(0);
@@ -80,7 +83,7 @@ test('program-menu: all four items visible when menu opened in READY state', asy
 
 // ─── Disabled during EXECUTING, re-enabled after ─────────────────────────────
 
-test('program-menu: button disabled during EXECUTING, re-enabled after completion', async ({
+test('program-menu: button disabled during READY and EXECUTING, re-enabled after stop (→ EMPTY)', async ({
   page,
 }) => {
   await page.goto(targetUri);
@@ -88,8 +91,8 @@ test('program-menu: button disabled during EXECUTING, re-enabled after completio
   await loadProgram(page, longProgram);
   await removeOverlay(page);
 
-  // In READY state the button must be enabled.
-  await expect(page.locator('#program-menu-button')).toBeEnabled();
+  // In READY state the button must be DISABLED (program is loaded into simulator).
+  await expect(page.locator('#program-menu-button')).toBeDisabled();
 
   // Start execution.
   await page.waitForSelector('#run-button:not([disabled])');
@@ -105,15 +108,20 @@ test('program-menu: button disabled during EXECUTING, re-enabled after completio
   await page.click('#pause-button');
   await page.waitForSelector('#step-button:not([disabled])', { timeout: 10000 });
 
-  // Button must be enabled again in READY.
+  // Back in READY — still disabled (program is still loaded).
+  await expect(page.locator('#program-menu-button')).toBeDisabled();
+
+  // Click stop to reset the simulator back to EMPTY.
+  await page.click('#stop-button');
+
+  // In EMPTY state the button must be ENABLED again.
+  await page.waitForSelector('#program-menu-button:not([disabled])', { timeout: 10000 });
   await expect(page.locator('#program-menu-button')).toBeEnabled();
 
-  // Clean up.
-  await page.click('#stop-button');
   await page.close();
 });
 
-test('program-menu: button disabled during EXECUTING, re-enabled after simulation ends', async ({
+test('program-menu: button disabled during READY and EXECUTING, re-enabled after simulation ends (ENDED)', async ({
   page,
 }) => {
   await page.goto(targetUri);
@@ -121,8 +129,12 @@ test('program-menu: button disabled during EXECUTING, re-enabled after simulatio
   await loadProgram(page, simpleProgram);
   await removeOverlay(page);
 
-  // Run to completion and verify the button re-enables (waitForSimulationComplete
-  // already gates on #program-menu-button:not([disabled])).
+  // In READY state the button must be DISABLED (program is loaded into simulator).
+  await expect(page.locator('#program-menu-button')).toBeDisabled();
+
+  // Run to completion — ENDED state re-enables the button.
+  // waitForSimulationComplete gates on #program-menu-button:not([disabled]),
+  // which is valid because ENDED is one of the two enabled states.
   await page.waitForSelector('#run-button:not([disabled])');
   await page.click('#run-button');
   await waitForSimulationComplete(page);

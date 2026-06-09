@@ -136,22 +136,17 @@ test('READY: run-controls-toolbar visible; step/multi-step/run/stop visible & en
   await expect(page.locator('#pause-button')).toBeDisabled();
 });
 
-test('READY: program-menu-button visible and enabled; menu items visible when open', async ({ page }) => {
+test('READY: program-menu-button visible but DISABLED; help-button visible', async ({ page }) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await loadProgram(page, simpleProgram);
 
-  // Program menu button must be visible and enabled in READY.
+  // Program menu button must be visible but DISABLED in READY — the user
+  // cannot load/save a new program while one is already loaded into the
+  // simulator.  To access the menu again the user must either run to
+  // completion (ENDED) or click #stop-button to reset to EMPTY.
   await expect(page.locator('#program-menu-button')).toBeVisible();
-  await expect(page.locator('#program-menu-button')).toBeEnabled();
-
-  // Open the menu and verify all four items are present, then close.
-  await openProgramMenu(page);
-  await expect(page.locator('#clear-code-button')).toBeVisible();
-  await expect(page.locator('#load-code-button')).toBeVisible();
-  await expect(page.locator('#save-code-button')).toBeVisible();
-  await expect(page.locator('#restore-sample-button')).toBeVisible();
-  await page.keyboard.press('Escape');
+  await expect(page.locator('#program-menu-button')).toBeDisabled();
 
   await expect(page.locator('#help-button')).toBeVisible();
 });
@@ -305,6 +300,9 @@ test('lifecycle: EMPTY → READY → ENDED control transitions', async ({ page }
   await expect(page.locator('#pause-button')).toBeVisible();
   await expect(page.locator('#pause-button')).toBeDisabled();
   await expect(page.locator('#load-button')).toBeVisible();
+  // Program menu is DISABLED in READY — a program is loaded into the simulator.
+  await expect(page.locator('#program-menu-button')).toBeVisible();
+  await expect(page.locator('#program-menu-button')).toBeDisabled();
 
   // ── ENDED (after runToCompletion) ──
   await runToCompletion(page);
@@ -315,8 +313,9 @@ test('lifecycle: EMPTY → READY → ENDED control transitions', async ({ page }
   await expect(page.locator('#pause-button')).toBeHidden();
   await expect(page.locator('#load-button')).toBeVisible();
 
-  // Program menu button and help survive all transitions; items only visible when menu is open.
+  // Program menu button and help survive all transitions; enabled in EMPTY and ENDED.
   await expect(page.locator('#program-menu-button')).toBeVisible();
+  await expect(page.locator('#program-menu-button')).toBeEnabled();
   await expect(page.locator('#help-button')).toBeVisible();
 });
 
