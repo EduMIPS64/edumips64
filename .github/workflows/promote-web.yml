@@ -140,7 +140,7 @@ jobs:
       # 2. Checkout THIS repo at the promoted SHA (for git describe).
       # ------------------------------------------------------------------
       - name: Checkout edumips64 at promoted SHA
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ steps.source.outputs.head_sha }}
           fetch-depth: 0
