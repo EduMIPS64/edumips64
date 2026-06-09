@@ -170,3 +170,43 @@ Trinity's implementation correct. All 8 contextual-controls tests pass in isolat
 
 Test validation for PR #1835 floating toolbar committed (e6ab64a6). Final results: 69/71 pass, 1 skipped (synthetic pointer events unreliable in snap Chromium), 1 pre-existing GPU flake. No implementation bugs. Inbox decision merged, orchestration log written. Ready for merge.
 
+## 2026-06-09 — Always-present toolbar buttons verification (PR #1835, Trinity re-architecture)
+
+### What changed (Trinity's latest architecture)
+- `RunControlsToolbar.js`: All five execution buttons (step, multi-step, run, pause, stop) are now **always rendered** when the toolbar is visible, greyed out (disabled) rather than absent from the DOM.
+- Previous model: READY → pause absent; EXECUTING → step/multi-step/run absent.
+- New model: READY → pause present but disabled; EXECUTING → step/multi-step/run/stop present but disabled.
+- Toolbar visibility rule unchanged: not rendered in EMPTY / ENDED / WAITING_FOR_INPUT.
+
+### Test fixes applied (contextual-controls.spec.js)
+
+**READY test:**
+- `#pause-button toBeHidden()` → `toBeVisible() + toBeDisabled()`
+
+**EXECUTING test:**
+- `#step-button toBeHidden()` → `toBeVisible() + toBeDisabled()`
+- `#multi-step-button toBeHidden()` → `toBeVisible() + toBeDisabled()`
+- `#run-button toBeHidden()` → `toBeVisible() + toBeDisabled()`
+- EXECUTING entry signal: `waitForSelector('#pause-button', {state:'visible'})` →
+  `waitForSelector('#pause-button:not([disabled])')` — pause is visible (just disabled) in READY too, so visibility alone was no longer a sufficient EXECUTING signal.
+- EXECUTING teardown: `waitForSelector('#step-button', {state:'visible'})` →
+  `waitForSelector('#step-button:not([disabled])')` — step is now always visible; enabled state is the READY discriminator.
+
+**Lifecycle test:**
+- READY section: `#pause-button toBeHidden()` → `toBeVisible() + toBeDisabled()`
+
+**test-utils.js:**
+- Updated `waitForRunningState()` JSDoc: selector `#step-button:not([disabled])` is still correct; step is always present when toolbar visible but disabled in EXECUTING, so `:not([disabled])` correctly discriminates READY.
+
+### Full suite results (commit 207827ba)
+| # | Result | Root cause |
+|---|--------|------------|
+| 1 | `cache-simulator.spec.js:125` FAIL | GPU crash — pre-existing env issue (snap Chromium, Ubuntu 26.04) |
+
+**69 passed, 1 skipped (drag test), 1 pre-existing GPU crash. VERDICT: PASS ✅**
+
+### Key learnings
+- When buttons are always-present (just disabled), `state:'visible'` is not a sufficient discriminator for state transitions. Must use `:not([disabled])` selectors.
+- `toBeDisabled()` in Playwright correctly targets the `disabled` attribute on `<button>` elements — MUI IconButton's `disabled={true}` prop sets the HTML attribute on the rendered `<button>`.
+- `toBeHidden()` remains correct for toolbar-level assertions (toolbar not rendered → null → element absent from DOM).
+
