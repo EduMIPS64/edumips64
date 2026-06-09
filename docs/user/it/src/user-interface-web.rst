@@ -107,8 +107,11 @@ Menu Program
 Il menu **Program** (icona di cartella con freccia a discesa)
 consolida la gestione dei programmi in un singolo pulsante nella
 barra superiore. Apre un menu a discesa con i seguenti elementi.
-**Il menu è disabilitato mentre la CPU sta eseguendo**, per evitare
-modifiche accidentali al programma durante la simulazione.
+**Il menu non è disponibile quando un programma è caricato nel
+simulatore** (ovvero mentre il simulatore è in esecuzione), per evitare
+modifiche accidentali al programma durante la simulazione. Diventa disponibile
+di nuovo una volta che il programma caricato ha terminato l'esecuzione o dopo
+il reset del simulatore (nessun programma caricato).
 
 * **New** — svuota l'editor lasciando solo uno scheletro di file
   assembly (direttive ``.data`` e ``.code`` ed una ``SYSCALL 0``

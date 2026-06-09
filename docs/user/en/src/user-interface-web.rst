@@ -101,9 +101,11 @@ Program menu
 ~~~~~~~~~~~~
 The **Program** menu (folder icon with a dropdown caret) consolidates
 program management into a single header button. It opens a dropdown menu
-with the following items. **The menu is disabled while the CPU is
-executing**, preventing accidental changes to the program during
-simulation.
+with the following items. **The menu is unavailable while a program is
+loaded in the simulator** (i.e. while the simulator is running), preventing
+accidental changes to the program during simulation. It becomes available
+again once the loaded program has finished running or after the simulator
+is reset (no program loaded).
 
 * **New** — empties the code editor, leaving only an empty assembly
   skeleton (``.data`` and ``.code`` directives plus a final
