@@ -143,26 +143,23 @@ Editor controls (Open Code, Save Code, Clear, Restore sample, Help) remain alway
 - **IT:** Full Italian translation by native-equivalent phrasing; technically accurate and consistent with existing IT documentation tone.
 - **ZH:** Full Simplified Chinese translation; technically accurate, uses standard locale terminology for UI elements (`EMPTY`, `READY`, `EXECUTING`, `ENDED` states remain in English as they are technical identifiers). Applied CJK inline-markup spacing rules (backslash-space before/after CJK characters bounding inline markup) to ensure reStructuredText renders correctly.
 
-## 2026-06-09 — Contextual Run Controls Documentation Complete (PR #1835)
+## 2026-06-09 — Floating toolbar documentation update (PR #1835)
 
-Updated web UI toolbar documentation to reflect contextual control visibility based on simulator state. Follows modern debugger UI pattern (VSCode, Chrome DevTools).
+Updated web UI toolbar documentation to reflect implementation change: execution controls now appear as a **floating, draggable, icon-only toolbar** that overlays the content (like VS Code debug toolbar), instead of inline labeled buttons in the header.
 
-**Five simulator states documented:**
-1. EMPTY (no program) — Load only
-2. READY (loaded, ready) — Load, Step, Multi Step, Run, Stop
-3. EXECUTING (running) — Pause, Stop (disabled with "Pause before stopping" tooltip)
-4. ENDED (finished) — Load only
-5. Waiting for input (dialog open) — all execution controls hidden
-
-**Editor controls:** Always visible but disabled appropriately during execution states.
+**Key changes to documentation:**
+- Execution controls are in a floating toolbar, not inline
+- Toolbar is draggable to any position on screen
+- Load button and editor controls (Open, Save, Clear, Restore sample, Help) remain in top header bar
+- Toolbar visibility tied to simulator state (EMPTY/READY/EXECUTING/ENDED/Waiting for input)
 
 **Files updated (all three languages):**
-- `docs/user/en/src/user-interface-web.rst` (lines 48-100)
-- `docs/user/it/src/user-interface-web.rst` (lines 51-105) — Italian translation
-- `docs/user/zh/src/user-interface-web.rst` (lines 38-77) — Chinese translation with CJK spacing rules
+- `docs/user/en/src/user-interface-web.rst` — primary source with comprehensive description
+- `docs/user/it/src/user-interface-web.rst` — Italian translation
+- `docs/user/zh/src/user-interface-web.rst` — Chinese translation with CJK spacing rules
 
-**Key decisions:**
-- Controls are conditionally hidden (not merely disabled) when not applicable
-- Stop remains visible during EXECUTING but is disabled (design constraint)
-- Keyboard shortcuts deferred to future PR (not yet implemented)
-- CJK markup spacing applied to Chinese version to prevent RTD rendering issues
+**Commit:** caa78112 on squad/streamline-run-controls (pushed to origin)
+
+## 2026-06-09 — Floating Toolbar Documentation Iteration 2: Complete ✅
+
+PR #1835 documentation committed (caa78112). All three languages (en/it/zh) updated with floating toolbar behavior, context-aware visibility, and header-resident controls. Inbox decision merged, orchestration log written. Ready for merge.

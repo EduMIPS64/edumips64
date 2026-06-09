@@ -116,3 +116,7 @@ Exports `deriveLogicalState(status, executing, inputRequest)` as a named export,
 ### Simulator.js Mounting
 
 `RunControlsToolbar` is mounted immediately after `<Header>` in the ThemeProvider tree, receiving: `onStepClick`, `onRunClick`, `onPauseClick`, `onStopClick`, `status`, `executing`, `inputRequest`, `multiStepCount`.
+
+## 2026-06-09 — Floating Run Toolbar Iteration 2: Complete ✅
+
+PR #1835 floating toolbar implementation committed (609d66af). Inbox decisions merged into squad/decisions.md, orchestration log written, cross-team validation complete (Smith: 69/71 tests pass; Link: docs updated en/it/zh). Ready for merge.
