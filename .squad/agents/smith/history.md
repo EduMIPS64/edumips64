@@ -79,3 +79,45 @@ Changed from `#clear-code-button:not([disabled])` to `#program-menu-button:not([
 
 Program menu test rework (16 passed, APPROVE). Always-visible toolbar verification (69/71 pass, PASS verdict). PR #1836 ready.
 
+
+
+## 2026-06-09: Program Menu Gating Contract Update — Completed
+
+**Status:** Contract tightened by Andrea; tests updated and all green.
+
+### New gating contract for #program-menu-button
+
+| Logical state | CPU status | Button |
+|---|---|---|
+| EMPTY | READY (no program) | **ENABLED** |
+| READY | RUNNING + !executing | **DISABLED** |
+| EXECUTING | RUNNING + executing | **DISABLED** |
+| WAITING_FOR_INPUT | inputRequest active | **DISABLED** |
+| ENDED | STOPPED | **ENABLED** |
+
+The button is enabled **only** in EMPTY and ENDED. It is disabled whenever
+a program is loaded into the simulator — even when paused (READY) — not
+just during active execution.
+
+### Reset-via-#stop-button workflow
+
+To reuse the Program menu after loading a program (READY state), the user
+(or test) must click `#stop-button` in the floating run toolbar to reset
+the simulator back to EMPTY. The button is then re-enabled.
+
+**Test pattern:**
+```js
+await loadProgram(page, prog);
+await expect(page.locator('#program-menu-button')).toBeDisabled(); // READY
+// ... run / pause ...
+await page.click('#stop-button');  // → EMPTY
+await page.waitForSelector('#program-menu-button:not([disabled])');
+await expect(page.locator('#program-menu-button')).toBeEnabled();
+```
+
+`resetSimulator(page)` helper added to test-utils.js encapsulates this
+pattern.
+
+### Suite results (commit cacbf90e)
+
+73 passed, 1 skipped (known drag test). Zero failures. VERDICT: PASS ✅
