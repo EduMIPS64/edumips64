@@ -94,3 +94,24 @@ Both modes:
 - Immutability: Build+promote of current master is immutable once dispatched; re-promoting with external `run_id` validates artifact exists before deploy.
 - Audit trail: manifest.json records all deployments; promotion numbers are monotonic.
 
+
+## Learnings — 2026-06-08: In-app version navigator documentation
+
+### Version navigator feature (in-app browsing of previous versions)
+
+Users can now browse and open previous released versions of the web UI from the Help → About tab. The navigator reads `/manifest.json` and displays a list of retained versions (up to 50) with dates, build identifiers, and promotion metadata. Clicking an older version opens it at `/v/<N>/` in a new tab. The feature is gated on a successfully-fetched valid manifest and a non-PR build (PR previews don't show the navigator).
+
+Key implementation detail: **monotonic version numbering** fixes a latent bug where a promote after a rollback could re-use and mutate an existing immutable snapshot. The deploy script maintains a `next_version` counter to ensure `n` is always `max(ever used) + 1`.
+
+### Files changed
+
+- `docs/user/en/src/versioning.rst` — Added "Viewing previous versions" subsection explaining the feature in simple user terms.
+- `docs/user/it/src/versioning.rst` — Italian translation.
+- `docs/user/zh/src/versioning.rst` — Simplified Chinese translation.
+- `docs/developer-guide.md` — Added "Manifest and version history" and "Monotonic version numbering" subsections under "Web production promotion" section, documenting the `manifest.json` `history` array schema, the About-tab navigator behavior, gating conditions, backfill logic, prune-in-lockstep behavior, and the monotonic-numbering fix.
+- `docs/design/web-promotion-and-versioning.md` — Added new "In-app Previous-Version Navigator" decision section describing the implementation, rejected alternatives (per-snapshot manifest.json and UI-only blind enumeration), and the monotonic-numbering fix. Added row 11 to "Resolved Decisions" table.
+
+### Translation notes
+
+- **IT:** Full Italian translation, high confidence — technically accurate and matches tone of existing IT pages.
+- **ZH:** Full Simplified Chinese translation; technically accurate but may benefit from native-speaker review for phrasing naturalness.

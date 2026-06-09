@@ -591,6 +591,28 @@ GitHub Actions before merge. Correctness was verified by:
 
 **Convention (now mandatory):** All timestamped files in `.squad/log/` and `.squad/orchestration-log/` MUST use format `YYYY-MM-DDTHH-MM-SSZ` (e.g., `2026-06-08T14-35-00Z-task.md`), never ISO-8601 with colons. This prevents Windows CI failures on every master run.
 
+### 2026-06-08: In-app previous-version navigator (PR #1831)
+
+**By:** lupino3 (via Coordinator); implemented by Tank, Trinity, Link.
+**What:** Users can browse/open previous web-UI versions from Help -> About.
+- **manifest.json** gains a newest-first `history` array of EXACTLY
+  `{n, build, sha, targetRelease, promotedAt, promotedBy}` (hard contract between
+  `deploy-web-pages.py` and `src/webapp/versionHistory.js`). Backfills the live
+  version on first post-change promotion; pruned in lockstep with `/v/<n>/`
+  snapshots so the UI never links to a removed snapshot.
+- **Monotonic version numbering** (`max ever used + 1`, with a `v/<new_n>` guard)
+  replaces `current+1`, fixing a latent bug where a promote after a rollback could
+  re-use and mutate an immutable snapshot. Rollback leaves `history` untouched.
+- **UI** (`versionHistory.js` + About-tab `PreviousVersions`): gated on a valid
+  manifest AND a non-PR build (production-only, mockable in Playwright); absolute
+  `/v/<n>/` links open in a new tab (`rel=noreferrer`); current version chipped;
+  archived snapshots show a "return to latest" notice. Absolute `/manifest.json`
+  fetch with `cache:no-cache`.
+- **Tests:** `.github/scripts/test_deploy_web_pages.py` (5 pytest cases) + Playwright
+  `version-history.spec.js`. No Python/pytest CI job exists yet -> recommended follow-up.
+- **Docs:** versioning.rst (en/it/zh), developer-guide.md, design doc (with rejected
+  alternatives: per-snapshot manifest; UI-only blind enumeration).
+
 ## Governance
 
 - All meaningful changes require team consensus

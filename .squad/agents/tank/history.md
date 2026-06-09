@@ -141,3 +141,17 @@ The download step retries up to 3×(sleep 5) to tolerate same-run artifact API p
 **Force-all-builds on dispatch:** The `detect-changes` outputs used `github.event_name == 'schedule' && 'true'` to force snap/electron builds. Extended to `(github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && 'true'` so manual runs also build every artifact, making the dispatch button a true "build current master" action.
 
 **PR-only steps remain untouched and correctly skip on dispatch:** `save-pr-metadata` is gated by `if: github.event_name == 'pull_request'`; the `paths-filter` checkout step is also guarded; `ref:` expressions use `github.event.pull_request.head.sha || github.sha` (falls back to master HEAD); `build-and-test-snap`'s bot-login guards evaluate true on dispatch (null login is not 'dependabot[bot]'). No changes required for any of these.
+
+### 2026-06-08 — manifest.json `history` array, monotonic numbering, prune lockstep
+
+**manifest history schema** — `manifest.json` now carries a `"history"` key (newest-first array). Each entry has exactly: `n` (int), `build`, `sha`, `targetRelease`, `promotedAt`, `promotedBy` (all strings). This is the hard contract with the frontend; do not rename or add keys without a coordinated frontend change.
+
+**Backfill logic** — when promoting against an old history-less manifest with `current >= 1`, a single entry is synthesized from the manifest's top-level fields. When the manifest is absent (first-ever promote) or `current == 0`, history starts empty.
+
+**Monotonic version numbering** — `new_n = max(current, prev, max(n in history), max(existing v/ numeric subdirs)) + 1`. This fixes the rollback collision bug where the old `new_n = current + 1` would reuse an existing `/v/<n>/` after a rollback. A defensive assertion (`die()`) fires if `v/<new_n>/` somehow already exists.
+
+**Prune lockstep** — `prune_versions()` is called BEFORE writing `manifest.json`. After pruning, `history` is filtered to only entries whose `v/<n>/` dir still exists (`filter_history_to_existing()`). Manifest is always written last.
+
+**Rollback** — `cmd_rollback()` swaps current ↔ prev and does not modify `history`. No history entry is added on rollback (rollback is not a promotion).
+
+**pytest location** — `.github/scripts/test_deploy_web_pages.py` (5 tests). Run: `cd .github/scripts && python3 -m pytest test_deploy_web_pages.py -q`. No existing Python/pytest CI job found in `.github/workflows/`; recommend adding a `scripts-lint` step to `ci.yml` as a follow-up.
