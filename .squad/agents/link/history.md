@@ -163,3 +163,30 @@ Updated web UI toolbar documentation to reflect implementation change: execution
 ## 2026-06-09 — Floating Toolbar Documentation Iteration 2: Complete ✅
 
 PR #1835 documentation committed (caa78112). All three languages (en/it/zh) updated with floating toolbar behavior, context-aware visibility, and header-resident controls. Inbox decision merged, orchestration log written. Ready for merge.
+
+## 2026-06-09 — Program Dropdown Menu Documentation Update
+
+### Program menu consolidation (Alternative A)
+
+The web UI toolbar header has been redesigned to consolidate four separate program-management buttons into a **single "Program" dropdown menu**. Trinity implemented the UI change on branch `squad/program-menu`.
+
+**Button mapping:**
+- **Clear** → **New** (empty editor, leaving assembly skeleton)
+- **Open Code** → **Open…** (open local file)
+- **Save Code** → **Save…** (save to code.s)
+- **Restore default sample** → **Load Example** (restore bundled sample)
+
+The Program menu is **disabled while the CPU is executing** (during RUNNING/EXECUTING states) to prevent accidental program changes mid-simulation.
+
+### Files changed
+
+- `docs/user/en/src/user-interface-web.rst` — lines 69–130: Replaced four separate "Editor controls" with new "Program menu" subsection describing the dropdown and its four items; moved Help into its own "Help button" subsection for clarity.
+- `docs/user/it/src/user-interface-web.rst` — Italian translation of Program menu (Menu Program) with equivalent subsection structure.
+- `docs/user/zh/src/user-interface-web.rst` — Simplified Chinese translation of Program menu (Program 菜单) with CJK inline-markup spacing rules applied.
+
+### Validation & commit
+
+- Verified reStructuredText syntax: all heading underlines match heading lengths (EN, IT, ZH).
+- **Commit:** 30f0fa7e on squad/program-menu (pushed to origin)
+- Git message: "docs: Update web UI user docs for new Program dropdown menu"
+
