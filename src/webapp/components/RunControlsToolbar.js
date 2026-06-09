@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
 import FastForwardIcon from '@mui/icons-material/FastForward';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
@@ -155,7 +155,7 @@ export default function RunControlsToolbar(props) {
             onClick={() => onStepClick(1)}
             disabled={stepDisabled}
           >
-            <PlayArrowIcon />
+            <SkipNextIcon />
           </IconButton>
         </span>
       </Tooltip>
