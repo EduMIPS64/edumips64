@@ -117,7 +117,8 @@ simulation.
 
 * **Load Example** — replaces the editor contents with the
   bundled sample program shipped with EduMIPS64 (the same one shown
-  on a fresh installation). This is useful to recover a known-good
+  the first time you open the web simulator). This is useful to
+  recover a known-good
   starting point after experimenting, or to discard the persisted
   editor contents (see *Saving and loading* below).
 

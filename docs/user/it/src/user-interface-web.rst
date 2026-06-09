@@ -122,7 +122,7 @@ modifiche accidentali al programma durante la simulazione.
 
 * **Load Example** — sostituisce il contenuto dell'editor con il
   programma di esempio incluso in EduMIPS64 (lo stesso visualizzato
-  in un'installazione nuova). È utile per tornare ad un punto di
+  la prima volta che si apre il simulatore web). È utile per tornare ad un punto di
   partenza noto dopo aver fatto esperimenti, o per scartare il
   contenuto dell'editor salvato in locale (si veda *Salvataggio e
   caricamento* qui sotto).
