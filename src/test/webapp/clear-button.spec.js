@@ -4,7 +4,8 @@ const {
   removeOverlay,
   waitForPageReady,
   loadProgram,
-  runToCompletion
+  runToCompletion,
+  clickProgramMenuItem,
 } = require('./test-utils');
 
 /**
@@ -45,8 +46,8 @@ SYSCALL 0
   // Remove overlay before clicking clear button
   await removeOverlay(page);
 
-  // Click the Clear button
-  await page.click('#clear-code-button');
+  // Open the Program menu and click "New" (Clear)
+  await clickProgramMenuItem(page, '#clear-code-button');
 
   // Wait a bit for the state to update
   await page.waitForTimeout(500);

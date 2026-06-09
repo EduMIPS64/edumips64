@@ -51,6 +51,29 @@ async function waitForRunningState(page) {
 }
 
 /**
+ * Helper function to open the Program ▾ dropdown menu.
+ * MUI <Menu> renders its items in a portal only when open, so callers must
+ * invoke this before interacting with any of the four program-menu items.
+ * @param {import('@playwright/test').Page} page - Playwright page object
+ */
+async function openProgramMenu(page) {
+  await page.click('#program-menu-button');
+  await page.waitForSelector('#program-menu', { state: 'visible' });
+}
+
+/**
+ * Helper function to click a Program-menu item by id.
+ * Opens the menu (if closed) then clicks the item.  Clicking the item closes
+ * the menu automatically (MUI default behaviour).
+ * @param {import('@playwright/test').Page} page - Playwright page object
+ * @param {string} id - CSS id selector of the menu item, e.g. '#clear-code-button'
+ */
+async function clickProgramMenuItem(page, id) {
+  await openProgramMenu(page);
+  await page.click(id);
+}
+
+/**
  * Helper function to wait for simulator to finish execution
  * @param {import('@playwright/test').Page} page - Playwright page object
  */
@@ -60,8 +83,11 @@ async function waitForSimulationComplete(page) {
   // We use a regex to ensure it's a positive number (not 0, not empty)
   await expect(page.locator('#stat-cycles')).toHaveText(/^[1-9][0-9]*$/, { timeout: 30000 });
 
-  // Wait for the Clear Code button to become enabled (indicates simulation ended)
-  await page.waitForSelector('#clear-code-button:not([disabled])', {
+  // Wait for the Program menu button to become enabled — it is disabled while
+  // the CPU is EXECUTING or WAITING_FOR_INPUT and re-enables in READY/ENDED.
+  // (The individual menu items live in a MUI portal and are absent from the DOM
+  // when the menu is closed, so we cannot use #clear-code-button here.)
+  await page.waitForSelector('#program-menu-button:not([disabled])', {
     timeout: 30000,
   });
 }
@@ -134,6 +160,8 @@ module.exports = {
   waitForPageReady,
   waitForRunningState,
   waitForSimulationComplete,
+  openProgramMenu,
+  clickProgramMenuItem,
   loadProgram,
   runToCompletion
 };

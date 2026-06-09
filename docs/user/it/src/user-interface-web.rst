@@ -70,9 +70,8 @@ disordine visivo e rendendo chiare le azioni disponibili:
   la barra è nascosta; la finestra di dialogo deve essere completata
   prima di proseguire.
 
-Il pulsante **Load** e i controlli dell'editor (Open, Save, Clear,
-Restore sample, Help) rimangono sempre visibili nella barra
-superiore.
+Il pulsante **Load**, il menu **Program** e il pulsante **Help (?)**
+rimangono sempre visibili nella barra superiore.
 
 Descrizione dei singoli pulsanti:
 
@@ -103,27 +102,33 @@ Descrizione dei singoli pulsanti:
   barra fluttuante negli stati READY e EXECUTING (disabilitato in
   EXECUTING con il messaggio "Pause before stopping").
 
-I controlli dell'editor rimangono sempre visibili:
+Menu Program
+~~~~~~~~~~~~
+Il menu **Program** (icona di cartella con freccia a discesa)
+consolida la gestione dei programmi in un singolo pulsante nella
+barra superiore. Apre un menu a discesa con i seguenti elementi.
+**Il menu è disabilitato mentre la CPU sta eseguendo**, per evitare
+modifiche accidentali al programma durante la simulazione.
 
-* **Clear** — svuota l'editor lasciando solo uno scheletro di file
+* **New** — svuota l'editor lasciando solo uno scheletro di file
   assembly (direttive ``.data`` e ``.code`` ed una ``SYSCALL 0``
-  finale). È disabilitato mentre la CPU sta eseguendo.
+  finale).
 
-* **Restore default sample** — sostituisce il contenuto dell'editor
-  con il programma di esempio incluso in EduMIPS64 (lo stesso
-  visualizzato in un'installazione nuova). È utile per tornare ad un
-  punto di partenza noto dopo aver fatto esperimenti, o per
-  scartare il contenuto dell'editor salvato in locale (si veda
-  *Salvataggio e caricamento* qui sotto). È disabilitato mentre la
-  CPU sta eseguendo.
+* **Open…** — apre un file locale (tipicamente un file ``.s``) e
+  ne carica il contenuto nell'editor.
 
-* **Open Code** — apre un file locale (tipicamente un file ``.s``) e
-  ne carica il contenuto nell'editor. È disabilitato mentre la CPU
-  sta eseguendo.
-
-* **Save Code** — salva il contenuto corrente dell'editor in un file
+* **Save…** — salva il contenuto corrente dell'editor in un file
   locale chiamato ``code.s``.
 
+* **Load Example** — sostituisce il contenuto dell'editor con il
+  programma di esempio incluso in EduMIPS64 (lo stesso visualizzato
+  in un'installazione nuova). È utile per tornare ad un punto di
+  partenza noto dopo aver fatto esperimenti, o per scartare il
+  contenuto dell'editor salvato in locale (si veda *Salvataggio e
+  caricamento* qui sotto).
+
+Pulsante Help
+~~~~~~~~~~~~~
 * **Help (?)** — apre questo manuale all'interno dell'applicazione,
   con un pannello di navigazione sulla sinistra ed un selettore della
   lingua. La finestra di Help include anche una scheda *About* che
