@@ -1,5 +1,5 @@
 const { test, expect } = require('./fixtures');
-const { targetUri, removeOverlay, waitForPageReady } = require('./test-utils');
+const { targetUri, removeOverlay, waitForPageReady, clickProgramMenuItem } = require('./test-utils');
 
 const STORAGE_PREFIX = 'edumips64:v1:';
 const EDITOR_CODE_KEY = `${STORAGE_PREFIX}editorCode`;
@@ -138,9 +138,9 @@ test('restore default sample button restores the bundled sample', async ({
     { timeout: 5000 },
   );
 
-  // Click "Restore default sample".
+  // Click "Load Example" via the Program menu.
   await removeOverlay(page);
-  await page.click('#restore-sample-button');
+  await clickProgramMenuItem(page, '#restore-sample-button');
 
   // The editor should now match the original bundled sample again.
   await page.waitForFunction(

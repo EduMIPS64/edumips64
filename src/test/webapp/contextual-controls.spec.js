@@ -41,6 +41,7 @@ const {
   runToCompletion,
   removeOverlay,
   waitForSimulationComplete,
+  openProgramMenu,
 } = require('./test-utils');
 
 // Minimal valid program — completes quickly (SYSCALL 0).
@@ -79,17 +80,25 @@ test('EMPTY: load-button visible; run-controls-toolbar absent; step/multi-step/r
   await expect(page.locator('#stop-button')).toBeHidden();
 });
 
-test('EMPTY: editor controls (clear, restore-sample, open-code, save-code, help) are visible', async ({
+test('EMPTY: program-menu-button visible and enabled; help-button visible', async ({
   page,
 }) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
 
-  // §3.3 — editor controls are always visible.
+  // §3.3 — Program menu button is always visible; items live in a portal and
+  // are only present in the DOM while the menu is open.
+  await expect(page.locator('#program-menu-button')).toBeVisible();
+  await expect(page.locator('#program-menu-button')).toBeEnabled();
+
+  // Open the menu and verify all four items are present, then close.
+  await openProgramMenu(page);
   await expect(page.locator('#clear-code-button')).toBeVisible();
-  await expect(page.locator('#restore-sample-button')).toBeVisible();
   await expect(page.locator('#load-code-button')).toBeVisible();
   await expect(page.locator('#save-code-button')).toBeVisible();
+  await expect(page.locator('#restore-sample-button')).toBeVisible();
+  await page.keyboard.press('Escape');
+
   await expect(page.locator('#help-button')).toBeVisible();
 });
 
@@ -127,15 +136,23 @@ test('READY: run-controls-toolbar visible; step/multi-step/run/stop visible & en
   await expect(page.locator('#pause-button')).toBeDisabled();
 });
 
-test('READY: editor controls remain visible after loading a program', async ({ page }) => {
+test('READY: program-menu-button visible and enabled; menu items visible when open', async ({ page }) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await loadProgram(page, simpleProgram);
 
+  // Program menu button must be visible and enabled in READY.
+  await expect(page.locator('#program-menu-button')).toBeVisible();
+  await expect(page.locator('#program-menu-button')).toBeEnabled();
+
+  // Open the menu and verify all four items are present, then close.
+  await openProgramMenu(page);
   await expect(page.locator('#clear-code-button')).toBeVisible();
-  await expect(page.locator('#restore-sample-button')).toBeVisible();
   await expect(page.locator('#load-code-button')).toBeVisible();
   await expect(page.locator('#save-code-button')).toBeVisible();
+  await expect(page.locator('#restore-sample-button')).toBeVisible();
+  await page.keyboard.press('Escape');
+
   await expect(page.locator('#help-button')).toBeVisible();
 });
 
@@ -198,6 +215,11 @@ test('EXECUTING: pause visible & enabled; stop visible but disabled; step/multi-
   // Load button lives in the header — always visible regardless of state.
   await expect(page.locator('#load-button')).toBeVisible();
 
+  // Program menu button is visible but DISABLED during EXECUTING — the user
+  // cannot modify the program while the CPU is running.
+  await expect(page.locator('#program-menu-button')).toBeVisible();
+  await expect(page.locator('#program-menu-button')).toBeDisabled();
+
   // Pause the simulation — avoids waiting for natural completion, which would
   // time out for a 10 000-iteration loop on the test machine.  Clicking pause
   // transitions the simulator back to READY (pause/run buttons swap), making
@@ -232,16 +254,24 @@ test('ENDED: load-button visible; run-controls-toolbar absent; step/multi-step/r
   await expect(page.locator('#load-button')).toBeVisible();
 });
 
-test('ENDED: editor controls remain visible after simulation completes', async ({ page }) => {
+test('ENDED: program-menu-button visible and enabled; help-button visible', async ({ page }) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await loadProgram(page, simpleProgram);
   await runToCompletion(page);
 
+  // Program menu button must be visible and enabled after simulation ends.
+  await expect(page.locator('#program-menu-button')).toBeVisible();
+  await expect(page.locator('#program-menu-button')).toBeEnabled();
+
+  // Open the menu and verify all four items, then close.
+  await openProgramMenu(page);
   await expect(page.locator('#clear-code-button')).toBeVisible();
-  await expect(page.locator('#restore-sample-button')).toBeVisible();
   await expect(page.locator('#load-code-button')).toBeVisible();
   await expect(page.locator('#save-code-button')).toBeVisible();
+  await expect(page.locator('#restore-sample-button')).toBeVisible();
+  await page.keyboard.press('Escape');
+
   await expect(page.locator('#help-button')).toBeVisible();
 });
 
@@ -285,8 +315,8 @@ test('lifecycle: EMPTY → READY → ENDED control transitions', async ({ page }
   await expect(page.locator('#pause-button')).toBeHidden();
   await expect(page.locator('#load-button')).toBeVisible();
 
-  // Editor controls survive all transitions.
-  await expect(page.locator('#clear-code-button')).toBeVisible();
+  // Program menu button and help survive all transitions; items only visible when menu is open.
+  await expect(page.locator('#program-menu-button')).toBeVisible();
   await expect(page.locator('#help-button')).toBeVisible();
 });
 
