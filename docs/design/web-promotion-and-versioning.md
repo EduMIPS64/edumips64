@@ -247,6 +247,40 @@ Organized by decision point. Each lists the option(s) we evaluated and rejected,
 
 ---
 
+## In-app Previous-Version Navigator
+
+**Date:** 2026-06-08  
+**Status:** IMPLEMENTED  
+**Feature:** Users can browse and open previous web versions from the About tab in the Help dialog.
+
+### Implementation
+
+The web UI's About tab now fetches the root `/manifest.json` (with `cache:'no-cache'` to bypass browser cache) and, if successful and the build is not a PR preview, displays a **"Previous Versions"** list. Each retained version (up to 50) is listed with its promotion number, build identity, SHA, and promotion date/actor. The current version is marked. Clicking an older version opens it at `https://web.edumips.org/v/<N>/` in a new tab, preserving the user's current work.
+
+When viewing an archived snapshot at `/v/<N>/`, the About tab displays a "Return to latest" link instead, making navigation back to the current version obvious.
+
+The `manifest.json` `history` array entry schema:
+```json
+{ "n": 44, "build": "1.4.0-2-gabc1234", "sha": "abc1234", "targetRelease": "1.4.1", "promotedAt": "2026-06-07T18:49:37Z", "promotedBy": "lupino3" }
+```
+
+**Gating:** The navigator only appears if:
+1. `/manifest.json` fetch succeeds and parses.
+2. The build is NOT a PR preview (detected via `window.GIT_DESCRIBE`).
+
+This ensures the navigator is available on stable production and nightly builds but hidden for temporary PR preview builds.
+
+**Related fix:** Promotion numbers now use **monotonic numbering** — the next version is always `max(ever used) + 1`, never re-used. This fixes a latent bug where a promote after a rollback could re-use and mutate an existing immutable snapshot.
+
+### Rejected Alternatives
+
+| Option | Rationale |
+|--------|-----------|
+| **(A) Per-snapshot `/v/<N>/manifest.json`** — Each archived snapshot carries its own metadata file; the UI probes `/v/1/manifest.json`, `/v/2/manifest.json`, etc. in a loop to discover versions. | Inefficient (many 404s on missing versions), no centralized source-of-truth, harder to back-fill history on the first post-feature promotion. |
+| **(B) UI-only blind enumeration** — UI enumerates `/v/1/`, `/v/2/`, etc. by trying to fetch `index.html` from each and uses the HTTP status code to detect existence. Labels are number-only (no dates, no build identity). | Relies on HTTP probe pattern-matching (brittle), no date/build metadata, poor UX (just "Version 44" with no context). |
+
+---
+
 ## Resolved Decisions (2026-06-07)
 
 | # | Question | Decision |
@@ -261,3 +295,4 @@ Organized by decision point. Each lists the option(s) we evaluated and rejected,
 | 8 | Workflow naming? | `promote-web.yml` (unifies build+promote with optional `run_id`), `rollback-web.yml`, `nightly-web.yml`. `promote-web.yml` serves both "build+promote current master" (empty `run_id`) and "promote a specific validated run" (with `run_id`). |
 | 9 | Nightly trigger? | Daily 01:00 UTC cron + `workflow_dispatch`. (Changed from initial "on-every-green-master-push" recommendation.) |
 | 10 | PR grouping? | Single PR (PR #1826) for all `edumips64` repo changes. Pages-repo layout bootstraps on first promotion run. |
+| 11 | Version navigator? | Fetch root `/manifest.json` with `cache:'no-cache'`, render history list in About tab (gated on valid manifest + non-PR build). Monotonic numbering (next n = max ever used + 1) fixes post-rollback collision bug. |

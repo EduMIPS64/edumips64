@@ -55,3 +55,22 @@ mostrato accanto all'etichetta **"Web Version"** nella barra degli strumenti:
 In sintesi: **nessun badge → produzione stabile; ``NIGHTLY`` → funzionalità
 più recenti ma possibilmente instabile; ``PR #N`` / ``dev`` → build
 temporanee o di anteprima.**
+
+Visualizzazione di versioni precedenti
+---------------------------------------
+Ogni versione web rilasciata viene conservata come snapshot immutabile e
+rimane disponibile per l'uso. Puoi visualizzare un elenco di tutte le versioni
+conservate e aprire una versione precedente direttamente dalla finestra di
+dialogo **Help**:
+
+1. Fai clic su **Help** → **About** (nella barra degli strumenti dell'app web).
+2. Cerca la sezione **Previous Versions** nella scheda About.
+3. Vedrai un elenco delle versioni rilasciate con le rispettive date.
+4. La versione corrente è contrassegnata con un'etichetta in modo da sapere
+   quale è quella attiva.
+5. Fai clic su qualsiasi versione precedente per aprirla in una nuova scheda — il
+   tuo lavoro attuale viene preservato nella scheda originale.
+
+Questo è utile se hai bisogno di confrontare versioni, verificare un bug in una
+release precedente o lavorare con una versione che si adatta meglio alle tue
+esigenze.

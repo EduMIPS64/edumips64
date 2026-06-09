@@ -22,9 +22,15 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Typography } from '@mui/material';
+import Chip from '@mui/material/Chip';
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
 import { getBuildInfo } from '../buildInfo';
+import {
+  fetchManifest,
+  buildVersionList,
+  getViewedVersion,
+} from '../versionHistory';
 
 // Render a localized description of the running build (production/PR/dev),
 // shown in the "About" tab so users can clearly tell which version of the
@@ -55,7 +61,75 @@ function BuildInfoLine() {
   return <Typography id="about-build-info">Build: development</Typography>;
 }
 
-// Define the set of allowed languages (should match what's shown in the language Select)
+// Renders the list of previous retained versions fetched from /manifest.json.
+// Gated on: valid manifest AND build kind !== 'pr'.
+function PreviousVersions() {
+  const [manifest, setManifest] = React.useState(null);
+  const viewedN = React.useMemo(() => getViewedVersion(), []);
+
+  React.useEffect(() => {
+    fetchManifest().then((m) => setManifest(m));
+  }, []);
+
+  const buildInfo = getBuildInfo();
+  if (!manifest || buildInfo.kind === 'pr') {
+    return null;
+  }
+
+  const versions = buildVersionList(manifest, viewedN);
+
+  return (
+    <Box id="about-previous-versions" sx={{ mt: 2 }}>
+      {viewedN != null && viewedN !== manifest.current && (
+        <Typography gutterBottom color="warning.main">
+          You are viewing an archived version (v{viewedN}).{' '}
+          <Link href="/">Open the latest.</Link>
+        </Typography>
+      )}
+      <Typography variant="h6" gutterBottom>
+        Previous versions
+      </Typography>
+      <List dense disablePadding>
+        {versions.map((item) => (
+          <ListItem key={item.n} disablePadding data-version={item.n}>
+            <ListItemText
+              primary={
+                item.isCurrent ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography component="span">
+                      {item.dateLabel
+                        ? `${item.dateLabel} (targets ${item.targetRelease})`
+                        : `v${item.n}`}
+                    </Typography>
+                    <Chip label="current" size="small" color="success" />
+                  </Box>
+                ) : (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Link
+                      href={item.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      title={item.build}
+                    >
+                      {item.dateLabel
+                        ? `${item.dateLabel} (targets ${item.targetRelease})`
+                        : `v${item.n}`}
+                    </Link>
+                    {item.isViewed && (
+                      <Typography component="span" variant="caption">
+                        (viewing)
+                      </Typography>
+                    )}
+                  </Box>
+                )
+              }
+            />
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
+}
 const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
 
 // Localized "Introduction" labels for each language
@@ -571,6 +645,7 @@ export default function HelpDialog(props) {
           <Box sx={{ p: 3 }}>
             <Typography>Version: {props.ver}</Typography>
             <BuildInfoLine />
+            <PreviousVersions />
             <Typography gutterBottom variant="h6" sx={{ mt: 2 }}>
               Quick Start
             </Typography>
@@ -625,7 +700,11 @@ export default function HelpDialog(props) {
         </TabPanel>
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.handleClose} variant="outlined" id="help-close-button">
+        <Button
+          onClick={props.handleClose}
+          variant="outlined"
+          id="help-close-button"
+        >
           Close
         </Button>
       </DialogActions>

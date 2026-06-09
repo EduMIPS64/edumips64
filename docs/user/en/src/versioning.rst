@@ -51,3 +51,19 @@ next to the **"Web Version"** label in the toolbar:
 
 In short: **no badge → stable production; ``NIGHTLY`` → newest features but
 possibly unstable; ``PR #N`` / ``dev`` → temporary or preview builds.**
+
+Viewing previous versions
+--------------------------
+Every released web version is kept as an immutable snapshot and remains
+available for you to use. You can see a list of all retained versions and open
+an older one directly from the **Help** dialog:
+
+1. Click **Help** → **About** (in the web app toolbar).
+2. Look for the **Previous Versions** section in the About tab.
+3. You will see a list of released versions with their dates.
+4. The current version is marked with a label so you know which one is live.
+5. Click any older version to open it in a new tab — your current work is
+   preserved in the original tab.
+
+This is useful if you need to compare versions, verify a bug in an older release,
+or work with a version that suits your needs better.
