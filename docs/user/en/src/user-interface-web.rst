@@ -45,47 +45,57 @@ the simulator. Each button has a tooltip that describes its effect.
     been fetched and the pipeline is draining, or the program has
     ended.
 
-The execution controls in the web UI appear contextually based on the
-current simulator state, similar to debugger toolbars in modern IDEs.
-This reduces visual clutter and makes the available actions clear at
-a glance:
+Execution controls and toolbar layout
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The execution controls appear as a **floating, draggable, icon-only
+toolbar** that overlays the content, much like the debug toolbar in
+VS Code. The toolbar is contextually shown based on the current
+simulator state, reducing visual clutter and making available actions
+immediately obvious:
 
-* **EMPTY** (no program loaded) — only ``Load`` is shown.
-* **READY** (program loaded, ready to run) — ``Load``, ``Single Step``,
-  ``Multi Step``, ``Run All``, and ``Stop`` are shown.
-* **EXECUTING** (program running) — ``Pause`` and ``Stop`` are shown;
-  ``Stop`` is disabled with the tooltip "Pause before stopping".
-* **ENDED** (program finished) — only ``Load`` is shown.
-* **Waiting for input** (input dialog open) — execution controls are
-  hidden; the input dialog must be resolved first.
+* **EMPTY** (no program loaded) — the toolbar is hidden; only the
+  ``Load`` button in the top header is available.
+* **READY** (program loaded, ready to run) — the floating toolbar
+  appears with ``Single Step``, ``Multi Step``, ``Run All``, and
+  ``Stop`` as icon buttons. The toolbar can be dragged to reposition
+  it anywhere on the screen.
+* **EXECUTING** (program running) — the toolbar shows ``Pause`` and
+  ``Stop`` (disabled with the tooltip "Pause before stopping"). The
+  toolbar remains draggable.
+* **ENDED** (program finished) — the toolbar is hidden.
+* **Waiting for input** (input dialog open) — the toolbar is hidden;
+  the input dialog must be resolved first.
+
+The **Load** button and editor controls (Open, Save, Clear, Restore
+sample, Help) remain always visible in the top header bar.
 
 Individual button descriptions:
 
-* **Load** — parses the contents of the editor and loads the resulting
-  program into the simulator. Appears in EMPTY and READY states.
-
-* **Single Step** — executes one CPU cycle. Appears when a program is
-  loaded and ready to execute.
+* **Single Step** — executes one CPU cycle. Shown in the floating
+  toolbar when a program is loaded and ready to execute.
 
 * **Multi Step** — executes a configurable number of CPU cycles in a
   single click. The number of steps is shown in the button's tooltip
   and can be changed in the *General Settings* panel ("Multi Step
-  Size"). Appears when a program is loaded and ready to execute.
+  Size"). Shown in the floating toolbar when a program is loaded and
+  ready to execute.
 
 * **Run All** — executes the program until it terminates with a
   ``SYSCALL 0`` (or equivalent) or a ``BREAK`` instruction, or until
   it is paused or stopped manually. Between batches of cycles the
   simulator can wait a configurable delay (``Execution Delay``) so
-  that long runs remain visually observable. Appears when a program
-  is loaded and ready to execute.
+  that long runs remain visually observable. Shown in the floating
+  toolbar when a program is loaded and ready to execute.
 
 * **Pause** — interrupts a running execution at the current cycle.
   Single Step / Multi Step / Run All can then be used to continue.
-  Appears only while the program is actively executing.
+  Shown in the floating toolbar only while the program is actively
+  executing.
 
 * **Stop** — halts the running execution and resets the CPU to the
-  ``READY`` state, clearing registers, memory and pipeline. Appears
-  in READY and EXECUTING states.
+  ``READY`` state, clearing registers, memory and pipeline. Shown in
+  the floating toolbar in READY and EXECUTING states (disabled in
+  EXECUTING with tooltip "Pause before stopping").
 
 Editor controls remain always visible:
 

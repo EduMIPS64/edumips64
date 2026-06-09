@@ -48,52 +48,60 @@ simulatore. Ogni pulsante ha un tooltip che ne descrive l'effetto.
     di terminazione e la pipeline si sta svuotando, oppure il
     programma è terminato.
 
-I controlli di esecuzione nell'interfaccia web appaiono in modo
-contestuale a seconda dello stato corrente del simulatore, in modo
-simile alle barre di debug degli ambienti di sviluppo moderni. Questo
-riduce il disordine visivo e rende chiare le azioni disponibili a colpo
-d'occhio:
+Controlli di esecuzione e layout della barra degli strumenti
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I controlli di esecuzione appaiono come una **barra degli strumenti
+fluttuante e trascinabile con solo icone** che si sovrappone al
+contenuto, come la barra di debug in VS Code. La barra appare in modo
+contestuale in base allo stato attuale del simulatore, riducendo il
+disordine visivo e rendendo chiare le azioni disponibili:
 
-* **EMPTY** (nessun programma caricato) — solamente ``Load`` è visibile.
-* **READY** (programma caricato, pronto per l'esecuzione) — ``Load``,
-  ``Single Step``, ``Multi Step``, ``Run All`` e ``Stop`` sono visibili.
-* **EXECUTING** (programma in esecuzione) — ``Pause`` e ``Stop`` sono
-  visibili; ``Stop`` è disabilitato con il messaggio "Pause before
-  stopping".
-* **ENDED** (programma terminato) — solamente ``Load`` è visibile.
+* **EMPTY** (nessun programma caricato) — la barra è nascosta; solo il
+  pulsante ``Load`` nella barra superiore è disponibile.
+* **READY** (programma caricato, pronto per l'esecuzione) — la barra
+  fluttuante appare con ``Single Step``, ``Multi Step``, ``Run All`` e
+  ``Stop`` come pulsanti con icone. La barra può essere trascinata per
+  riposizionarla ovunque sullo schermo.
+* **EXECUTING** (programma in esecuzione) — la barra mostra ``Pause``
+  e ``Stop`` (disabilitato con il messaggio "Pause before stopping").
+  La barra rimane trascinabile.
+* **ENDED** (programma terminato) — la barra è nascosta.
 * **In attesa di input** (finestra di dialogo per l'input aperta) —
-  i controlli di esecuzione sono nascosti; la finestra di dialogo deve
-  essere completata prima di proseguire.
+  la barra è nascosta; la finestra di dialogo deve essere completata
+  prima di proseguire.
+
+Il pulsante **Load** e i controlli dell'editor (Open, Save, Clear,
+Restore sample, Help) rimangono sempre visibili nella barra
+superiore.
 
 Descrizione dei singoli pulsanti:
 
-* **Load** — analizza il contenuto dell'editor e carica il programma
-  risultante nel simulatore. Appare negli stati EMPTY e READY.
-
-* **Single Step** — esegue un singolo ciclo di CPU. Appare quando un
-  programma è caricato e pronto per l'esecuzione.
+* **Single Step** — esegue un singolo ciclo di CPU. Appare nella barra
+  fluttuante quando un programma è caricato e pronto per l'esecuzione.
 
 * **Multi Step** — esegue un numero configurabile di cicli di CPU con
   un singolo click. Il numero corrente è mostrato nel tooltip del
   pulsante e può essere modificato nel pannello *General Settings*
-  ("Multi Step Size"). Appare quando un programma è caricato e pronto
-  per l'esecuzione.
+  ("Multi Step Size"). Appare nella barra fluttuante quando un
+  programma è caricato e pronto per l'esecuzione.
 
 * **Run All** — esegue il programma fino al termine, ovvero fino ad
   una ``SYSCALL 0`` (o equivalente) o ad una istruzione ``BREAK``,
   oppure fino a quando l'utente preme *Pause* o *Stop*. Tra un blocco
   interno di cicli e l'altro il simulatore può attendere un ritardo
   configurabile (``Execution Delay``), così da rendere visivamente
-  osservabili anche esecuzioni lunghe. Appare quando un programma è
-  caricato e pronto per l'esecuzione.
+  osservabili anche esecuzioni lunghe. Appare nella barra fluttuante
+  quando un programma è caricato e pronto per l'esecuzione.
 
 * **Pause** — interrompe l'esecuzione in corso al ciclo corrente. È
   poi possibile proseguire con *Single Step*, *Multi Step* o *Run
-  All*. Appare solamente mentre il programma è in esecuzione.
+  All*. Appare nella barra fluttuante solamente mentre il programma
+  è in esecuzione.
 
 * **Stop** — interrompe l'esecuzione e riporta la CPU allo stato
-  ``READY``, azzerando registri, memoria e pipeline. Appare negli
-  stati READY e EXECUTING.
+  ``READY``, azzerando registri, memoria e pipeline. Appare nella
+  barra fluttuante negli stati READY e EXECUTING (disabilitato in
+  EXECUTING con il messaggio "Pause before stopping").
 
 I controlli dell'editor rimangono sempre visibili:
 
