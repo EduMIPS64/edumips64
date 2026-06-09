@@ -184,3 +184,19 @@ All 5 execution buttons are now always present in `#run-controls-toolbar` when i
 
 Implemented Alternative A (Program ▾ dropdown). Build + lint green. Tests reworked by Smith (16 passed, APPROVE verdict). Docs updated by Link (trilingual). PR ready for review.
 
+
+## Learnings
+
+### Program menu gating contract (refined 2026-06-09)
+
+**New condition (programMenuDisabled):**
+```
+programMenuDisabled = logicalState === 'READY' || logicalState === 'EXECUTING' || logicalState === 'WAITING_FOR_INPUT'
+```
+
+- **DISABLED** whenever a program is loaded into the simulator (status `'RUNNING'`), which covers `READY` (loaded, paused), `EXECUTING` (actively running), and `WAITING_FOR_INPUT`.
+- **ENABLED** in `EMPTY` (no program loaded) and `ENDED` (execution finished).
+
+**Why ENDED stays enabled:** There is no Stop/Reset toolbar button available in the `ENDED` state. The Program menu (New / Open… / Load Example) is the *only* mechanism the user has to start a fresh program after one finishes. Disabling it in `ENDED` would leave the user stuck with no way to proceed without a full page reload.
+
+**Old (wrong) condition:** `editorDisabled = EXECUTING || WAITING_FOR_INPUT` — this incorrectly kept the menu enabled while a program was loaded but paused (`READY`), allowing the user to load a different program mid-simulation.
