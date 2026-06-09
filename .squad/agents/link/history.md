@@ -197,3 +197,7 @@ The Program menu is **disabled while the CPU is executing** (during RUNNING/EXEC
 
 Updated docs/user/{en,it,zh}/src/user-interface-web.rst for Program dropdown menu. PR #1836 ready.
 
+## 2026-06-09: Refined Program Menu Availability Description
+
+Program menu now described as unavailable when a program is **loaded** in the simulator (not just executing), with clarification that it becomes available again once the program finishes or simulator is reset. Updated EN, IT, ZH; commit f8e72894.
+
