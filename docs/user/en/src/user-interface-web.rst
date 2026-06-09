@@ -45,44 +45,64 @@ the simulator. Each button has a tooltip that describes its effect.
     been fetched and the pipeline is draining, or the program has
     ended.
 
-* **Load** — parses the contents of the editor and loads the resulting
-  program into the simulator. The button is disabled while the
-  simulator is running, and is hidden once a program has been loaded
-  successfully.
+The execution controls in the web UI appear contextually based on the
+current simulator state, similar to debugger toolbars in modern IDEs.
+This reduces visual clutter and makes the available actions clear at
+a glance:
 
-* **Single Step** — executes one CPU cycle.
+* **EMPTY** (no program loaded) — only ``Load`` is shown.
+* **READY** (program loaded, ready to run) — ``Load``, ``Single Step``,
+  ``Multi Step``, ``Run All``, and ``Stop`` are shown.
+* **EXECUTING** (program running) — ``Pause`` and ``Stop`` are shown;
+  ``Stop`` is disabled with the tooltip "Pause before stopping".
+* **ENDED** (program finished) — only ``Load`` is shown.
+* **Waiting for input** (input dialog open) — execution controls are
+  hidden; the input dialog must be resolved first.
+
+Individual button descriptions:
+
+* **Load** — parses the contents of the editor and loads the resulting
+  program into the simulator. Appears in EMPTY and READY states.
+
+* **Single Step** — executes one CPU cycle. Appears when a program is
+  loaded and ready to execute.
 
 * **Multi Step** — executes a configurable number of CPU cycles in a
   single click. The number of steps is shown in the button's tooltip
   and can be changed in the *General Settings* panel ("Multi Step
-  Size").
+  Size"). Appears when a program is loaded and ready to execute.
 
 * **Run All** — executes the program until it terminates with a
   ``SYSCALL 0`` (or equivalent) or a ``BREAK`` instruction, or until
   it is paused or stopped manually. Between batches of cycles the
   simulator can wait a configurable delay (``Execution Delay``) so
-  that long runs remain visually observable.
+  that long runs remain visually observable. Appears when a program
+  is loaded and ready to execute.
 
 * **Pause** — interrupts a running execution at the current cycle.
   Single Step / Multi Step / Run All can then be used to continue.
+  Appears only while the program is actively executing.
 
 * **Stop** — halts the running execution and resets the CPU to the
-  ``READY`` state, clearing registers, memory and pipeline.
+  ``READY`` state, clearing registers, memory and pipeline. Appears
+  in READY and EXECUTING states.
+
+Editor controls remain always visible:
 
 * **Clear** — empties the code editor, leaving only an empty assembly
   skeleton (``.data`` and ``.code`` directives plus a final
-  ``SYSCALL 0``). The Clear button is disabled while the CPU is
-  running.
+  ``SYSCALL 0``). Disabled while the CPU is executing.
 
 * **Restore default sample** — replaces the editor contents with the
   bundled sample program shipped with EduMIPS64 (the same one shown
   on a fresh installation). This is useful to recover a known-good
   starting point after experimenting, or to discard the persisted
-  editor contents (see *Saving and loading* below). The button is
-  disabled while the CPU is running.
+  editor contents (see *Saving and loading* below). Disabled while
+  the CPU is executing.
 
 * **Open Code** — opens a local file (typically a ``.s`` file) and
-  loads its contents into the editor.
+  loads its contents into the editor. Disabled while the CPU is
+  executing.
 
 * **Save Code** — saves the current contents of the editor to a local
   file named ``code.s``.
@@ -92,12 +112,6 @@ the simulator. Each button has a tooltip that describes its effect.
   switch between English, Italian and Chinese. The Help dialog also
   includes an *About* tab that shows the version of the simulator and
   a description of the running build.
-
-Buttons that would have no effect in the current state are
-automatically disabled. For example, ``Single Step``, ``Multi Step``
-and ``Run All`` are disabled until a program has been loaded with
-``Load``, and ``Pause`` is only available while a long execution is
-in progress.
 
 The code editor
 ---------------

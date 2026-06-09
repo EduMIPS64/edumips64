@@ -48,31 +48,54 @@ simulatore. Ogni pulsante ha un tooltip che ne descrive l'effetto.
     di terminazione e la pipeline si sta svuotando, oppure il
     programma è terminato.
 
-* **Load** — analizza il contenuto dell'editor e carica il programma
-  risultante nel simulatore. È disabilitato mentre la simulazione è
-  in corso e viene nascosto una volta che il caricamento è andato a
-  buon fine.
+I controlli di esecuzione nell'interfaccia web appaiono in modo
+contestuale a seconda dello stato corrente del simulatore, in modo
+simile alle barre di debug degli ambienti di sviluppo moderni. Questo
+riduce il disordine visivo e rende chiare le azioni disponibili a colpo
+d'occhio:
 
-* **Single Step** — esegue un singolo ciclo di CPU.
+* **EMPTY** (nessun programma caricato) — solamente ``Load`` è visibile.
+* **READY** (programma caricato, pronto per l'esecuzione) — ``Load``,
+  ``Single Step``, ``Multi Step``, ``Run All`` e ``Stop`` sono visibili.
+* **EXECUTING** (programma in esecuzione) — ``Pause`` e ``Stop`` sono
+  visibili; ``Stop`` è disabilitato con il messaggio "Pause before
+  stopping".
+* **ENDED** (programma terminato) — solamente ``Load`` è visibile.
+* **In attesa di input** (finestra di dialogo per l'input aperta) —
+  i controlli di esecuzione sono nascosti; la finestra di dialogo deve
+  essere completata prima di proseguire.
+
+Descrizione dei singoli pulsanti:
+
+* **Load** — analizza il contenuto dell'editor e carica il programma
+  risultante nel simulatore. Appare negli stati EMPTY e READY.
+
+* **Single Step** — esegue un singolo ciclo di CPU. Appare quando un
+  programma è caricato e pronto per l'esecuzione.
 
 * **Multi Step** — esegue un numero configurabile di cicli di CPU con
   un singolo click. Il numero corrente è mostrato nel tooltip del
   pulsante e può essere modificato nel pannello *General Settings*
-  ("Multi Step Size").
+  ("Multi Step Size"). Appare quando un programma è caricato e pronto
+  per l'esecuzione.
 
 * **Run All** — esegue il programma fino al termine, ovvero fino ad
   una ``SYSCALL 0`` (o equivalente) o ad una istruzione ``BREAK``,
   oppure fino a quando l'utente preme *Pause* o *Stop*. Tra un blocco
   interno di cicli e l'altro il simulatore può attendere un ritardo
   configurabile (``Execution Delay``), così da rendere visivamente
-  osservabili anche esecuzioni lunghe.
+  osservabili anche esecuzioni lunghe. Appare quando un programma è
+  caricato e pronto per l'esecuzione.
 
 * **Pause** — interrompe l'esecuzione in corso al ciclo corrente. È
   poi possibile proseguire con *Single Step*, *Multi Step* o *Run
-  All*.
+  All*. Appare solamente mentre il programma è in esecuzione.
 
 * **Stop** — interrompe l'esecuzione e riporta la CPU allo stato
-  ``READY``, azzerando registri, memoria e pipeline.
+  ``READY``, azzerando registri, memoria e pipeline. Appare negli
+  stati READY e EXECUTING.
+
+I controlli dell'editor rimangono sempre visibili:
 
 * **Clear** — svuota l'editor lasciando solo uno scheletro di file
   assembly (direttive ``.data`` e ``.code`` ed una ``SYSCALL 0``
@@ -83,11 +106,12 @@ simulatore. Ogni pulsante ha un tooltip che ne descrive l'effetto.
   visualizzato in un'installazione nuova). È utile per tornare ad un
   punto di partenza noto dopo aver fatto esperimenti, o per
   scartare il contenuto dell'editor salvato in locale (si veda
-  *Salvataggio e caricamento* qui sotto). Il pulsante è disabilitato
-  mentre la CPU sta eseguendo.
+  *Salvataggio e caricamento* qui sotto). È disabilitato mentre la
+  CPU sta eseguendo.
 
 * **Open Code** — apre un file locale (tipicamente un file ``.s``) e
-  ne carica il contenuto nell'editor.
+  ne carica il contenuto nell'editor. È disabilitato mentre la CPU
+  sta eseguendo.
 
 * **Save Code** — salva il contenuto corrente dell'editor in un file
   locale chiamato ``code.s``.
@@ -97,12 +121,6 @@ simulatore. Ogni pulsante ha un tooltip che ne descrive l'effetto.
   lingua. La finestra di Help include anche una scheda *About* che
   mostra la versione del simulatore ed una descrizione della build in
   esecuzione.
-
-I pulsanti che non avrebbero alcun effetto nello stato corrente sono
-disabilitati automaticamente. Ad esempio, *Single Step*, *Multi Step*
-e *Run All* sono disabilitati finché un programma non è stato
-caricato con *Load*, e *Pause* è disponibile solo durante una
-esecuzione lunga.
 
 L'editor di codice
 ------------------

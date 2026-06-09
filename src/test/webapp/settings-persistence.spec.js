@@ -1,5 +1,5 @@
 const { test, expect } = require('./fixtures');
-const { targetUri, waitForPageReady, removeOverlay } = require('./test-utils');
+const { targetUri, waitForPageReady, removeOverlay, loadProgram } = require('./test-utils');
 
 const STORAGE_PREFIX = 'edumips64:v1:';
 
@@ -200,6 +200,12 @@ test('stepStride and executionDelayMs persist across page reloads', async ({ pag
 
   await expect(page.getByLabel('Multi Step Size')).toHaveValue('250');
   await expect(page.getByLabel('Execution Delay (ms)')).toHaveValue('100');
+
+  // The Multi Step button is only rendered in READY state (contextual run
+  // controls).  Load a minimal program so the header transitions from EMPTY
+  // to READY and the button becomes visible for the tooltip assertion.
+  const simpleProgram = `.code\nDADDI r1, r0, 1\nSYSCALL 0\n`;
+  await loadProgram(page, simpleProgram);
 
   // The Multi Step button's tooltip reflects the configured stride, so the
   // header really does read from the persisted setting.

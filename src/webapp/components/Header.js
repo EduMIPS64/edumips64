@@ -27,6 +27,15 @@ import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
+function deriveLogicalState(status, executing, inputRequest) {
+  if (inputRequest !== null) return 'WAITING_FOR_INPUT';
+  if (status === 'READY') return 'EMPTY';
+  if (status === 'STOPPED') return 'ENDED';
+  // status === 'RUNNING'
+  if (executing) return 'EXECUTING';
+  return 'READY';
+}
+
 export default function Header(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [fileContent, setFileContent] = React.useState('');
@@ -36,6 +45,30 @@ export default function Header(props) {
   // `stepStride` setting, so it lives alongside the other execution
   // parameters in the Settings panel and survives page reloads.
   const multiStepCount = props.multiStepCount;
+
+  // Derive the logical UI state from observable simulator state.
+  const logicalState = deriveLogicalState(
+    props.status,
+    props.executing,
+    props.inputRequest,
+  );
+
+  // Execution controls — which to show per state.
+  const showLoad =
+    logicalState === 'EMPTY' ||
+    logicalState === 'READY' ||
+    logicalState === 'ENDED';
+  const showStep = logicalState === 'READY';
+  const showMultiStep = logicalState === 'READY';
+  const showRun = logicalState === 'READY';
+  const showPause = logicalState === 'EXECUTING';
+  const showStop = logicalState === 'READY' || logicalState === 'EXECUTING';
+  const stopDisabled = logicalState === 'EXECUTING';
+
+  // Editor controls are always visible; disabled only while the worker is
+  // actively executing steps or waiting for user input.
+  const editorDisabled =
+    logicalState === 'EXECUTING' || logicalState === 'WAITING_FOR_INPUT';
 
   // Classify the current deployment so that users can tell at a glance
   // whether they are using the production version or a PR/dev build, and
@@ -181,98 +214,139 @@ export default function Header(props) {
             <CpuStatusDisplay status={props.status} />
           </div>
         </Tooltip>
-        <Tooltip title="Load the current code into the simulator" arrow placement="top">
-          <Button
-            color="inherit"
-            className="load-button"
-            id="load-button"
-            onClick={() => props.onLoadClick()}
-            startIcon={<UploadIcon />}
-            disabled={!props.loadEnabled}
-            sx={{
-              ...responsiveButtonSx,
-              display: props.status === 'RUNNING' ? 'none' : 'inline-flex'
-            }}
-          >
-            {responsiveLabel('Load')}
-          </Button>
-        </Tooltip>
-        <Tooltip title="Runs a single step of simulation" arrow placement="top">
-          <Button
-            color="inherit"
-            className="step-button"
-            id="step-button"
-            onClick={() => {
-              props.onStepClick(1);
-            }}
-            startIcon={<PlayArrowIcon />}
-            disabled={!props.stepEnabled}
-            sx={responsiveButtonSx}
-          >
-            {responsiveLabel('Single Step')}
-          </Button>
-        </Tooltip>
-        <Tooltip title={`Run ${multiStepCount} steps of simulation (configurable in Settings)`} arrow placement="top">
-          <Button
-            color="inherit"
-            className="multi-step-button"
-            id="multi-step-button"
-            onClick={() => {
-              props.onStepClick(multiStepCount);
-            }}
-            startIcon={<FastForwardIcon />}
-            disabled={!props.stepEnabled}
-            sx={responsiveButtonSx}
-          >
-            {responsiveLabel('Multi Step')}
-          </Button>
-        </Tooltip>
-        <Tooltip title="Run until the simulation ends" arrow placement="top">
-          <Button
-            color="inherit"
-            className="run-button"
-            id="run-button"
-            onClick={() => {
-              props.onRunClick();
-            }}
-            startIcon={<PlayCircleIcon />}
-            disabled={!props.runEnabled}
-            sx={responsiveButtonSx}
-          >
-            {responsiveLabel('Run All')}
-          </Button>
-        </Tooltip>
-        <Tooltip title="Pause the simulation" arrow placement="top">
-          <Button
-            color="inherit"
-            className="pause-button"
-            id="pause-button"
-            onClick={() => {
-              props.onPauseClick();
-            }}
-            startIcon={<PauseCircleIcon />}
-            disabled={!props.pauseEnabled}
-            sx={responsiveButtonSx}
-          >
-            {responsiveLabel('Pause')}
-          </Button>
-        </Tooltip>
-        <Tooltip title="Stop the simulation and reset the CPU" arrow placement="top">
-          <Button
-            color="inherit"
-            className="stop-button"
-            id="stop-button"
-            onClick={() => {
-              props.onStopClick();
-            }}
-            startIcon={<StopCircleIcon />}
-            disabled={!props.stopEnabled}
-            sx={responsiveButtonSx}
-          >
-            {responsiveLabel('Stop')}
-          </Button>
-        </Tooltip>
-        <Tooltip title="Remove all the code from the editor, leaving only an empty assembly file" arrow placement="top">
+        {/* Execution controls — rendered contextually per logical state. Wrapped in
+            a fixed-min-width container so the toolbar doesn't shift when the set
+            of visible buttons changes between states. */}
+        <Box sx={{ display: 'flex', gap: 1, minWidth: 320 }}>
+          {showLoad && (
+            <Tooltip
+              title="Load the current code into the simulator"
+              arrow
+              placement="top"
+            >
+              <Button
+                color="inherit"
+                className="load-button"
+                id="load-button"
+                onClick={() => props.onLoadClick()}
+                startIcon={<UploadIcon />}
+                disabled={!props.loadEnabled}
+                sx={responsiveButtonSx}
+              >
+                {responsiveLabel('Load')}
+              </Button>
+            </Tooltip>
+          )}
+          {showStep && (
+            <Tooltip
+              title="Runs a single step of simulation"
+              arrow
+              placement="top"
+            >
+              <Button
+                color="inherit"
+                className="step-button"
+                id="step-button"
+                onClick={() => {
+                  props.onStepClick(1);
+                }}
+                startIcon={<PlayArrowIcon />}
+                sx={responsiveButtonSx}
+              >
+                {responsiveLabel('Single Step')}
+              </Button>
+            </Tooltip>
+          )}
+          {showMultiStep && (
+            <Tooltip
+              title={`Run ${multiStepCount} steps of simulation (configurable in Settings)`}
+              arrow
+              placement="top"
+            >
+              <Button
+                color="inherit"
+                className="multi-step-button"
+                id="multi-step-button"
+                onClick={() => {
+                  props.onStepClick(multiStepCount);
+                }}
+                startIcon={<FastForwardIcon />}
+                sx={responsiveButtonSx}
+              >
+                {responsiveLabel('Multi Step')}
+              </Button>
+            </Tooltip>
+          )}
+          {showRun && (
+            <Tooltip
+              title="Run until the simulation ends"
+              arrow
+              placement="top"
+            >
+              <Button
+                color="inherit"
+                className="run-button"
+                id="run-button"
+                onClick={() => {
+                  props.onRunClick();
+                }}
+                startIcon={<PlayCircleIcon />}
+                sx={responsiveButtonSx}
+              >
+                {responsiveLabel('Run All')}
+              </Button>
+            </Tooltip>
+          )}
+          {showPause && (
+            <Tooltip title="Pause the simulation" arrow placement="top">
+              <Button
+                color="inherit"
+                className="pause-button"
+                id="pause-button"
+                onClick={() => {
+                  props.onPauseClick();
+                }}
+                startIcon={<PauseCircleIcon />}
+                sx={responsiveButtonSx}
+              >
+                {responsiveLabel('Pause')}
+              </Button>
+            </Tooltip>
+          )}
+          {showStop && (
+            <Tooltip
+              title={
+                stopDisabled
+                  ? 'Pause before stopping'
+                  : 'Stop the simulation and reset the CPU'
+              }
+              arrow
+              placement="top"
+            >
+              {/* Tooltip requires a non-disabled child to function; wrap in span. */}
+              <span>
+                <Button
+                  color="inherit"
+                  className="stop-button"
+                  id="stop-button"
+                  onClick={() => {
+                    props.onStopClick();
+                  }}
+                  startIcon={<StopCircleIcon />}
+                  disabled={stopDisabled}
+                  sx={responsiveButtonSx}
+                >
+                  {responsiveLabel('Stop')}
+                </Button>
+              </span>
+            </Tooltip>
+          )}
+        </Box>
+        <Tooltip
+          title="Remove all the code from the editor, leaving only an empty assembly file"
+          arrow
+          placement="top"
+        >
           <Button
             color="inherit"
             className="clear-code-button"
@@ -281,13 +355,17 @@ export default function Header(props) {
             onClick={() => {
               props.onClearClick();
             }}
-            disabled={props.status === 'RUNNING'}
+            disabled={editorDisabled}
             sx={responsiveButtonSx}
           >
             {responsiveLabel('clear')}
           </Button>
         </Tooltip>
-        <Tooltip title="Restore the bundled sample program in the editor" arrow placement="top">
+        <Tooltip
+          title="Restore the bundled sample program in the editor"
+          arrow
+          placement="top"
+        >
           <Button
             color="inherit"
             className="restore-sample-button"
@@ -296,7 +374,7 @@ export default function Header(props) {
             onClick={() => {
               props.onRestoreClick();
             }}
-            disabled={props.status === 'RUNNING'}
+            disabled={editorDisabled}
             sx={responsiveButtonSx}
           >
             {responsiveLabel('Restore default sample')}
@@ -311,7 +389,7 @@ export default function Header(props) {
             onClick={() => {
               props.onOpenClick();
             }}
-            disabled={props.status === 'RUNNING'}
+            disabled={editorDisabled}
             component="label"
             sx={responsiveButtonSx}
           >
@@ -320,16 +398,15 @@ export default function Header(props) {
         </Tooltip>
         <Tooltip title="Save code to file" arrow placement="top">
           <Button
-              color="inherit"
-              className="save-code-button"
-              id="save-code-button"
-              startIcon={<DownloadIcon />}
-              onClick={() => {
-                props.onSaveClick();
-              }}
-              disabled={props.status === 'RUNNING'}
-              component="label"
-              sx={responsiveButtonSx}
+            color="inherit"
+            className="save-code-button"
+            id="save-code-button"
+            startIcon={<DownloadIcon />}
+            onClick={() => {
+              props.onSaveClick();
+            }}
+            component="label"
+            sx={responsiveButtonSx}
           >
             {responsiveLabel('Save Code')}
           </Button>

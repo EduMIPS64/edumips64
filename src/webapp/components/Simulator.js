@@ -622,25 +622,23 @@ const Simulator = ({worker, initialState, appInsights}) => {
         />
         <Header
           onRunClick={clickRun}
-          runEnabled={simulatorRunning && !executing}
           onStepClick={clickStep}
-          stepEnabled={simulatorRunning && !executing}
           onLoadClick={loadCode}
           loadEnabled={isValidProgram()}
           onPauseClick={() => {
             appInsights.trackEvent({name: "pause"})
             setMustPause(true);
           }}
-          pauseEnabled={executing}
           onClearClick={clearCode}
           onOpenClick={openCode}
           onSaveClick={saveCode}
           onRestoreClick={restoreDefaultSample}
           onStopClick={clickStop}
-          stopEnabled={simulatorRunning && !executing}
           parsingErrors={parsingErrors}
           version={worker.version}
           status={status}
+          executing={executing}
+          inputRequest={inputRequest}
           prefersDarkMode={prefersDarkMode}
           multiStepCount={stepStride}
         />
