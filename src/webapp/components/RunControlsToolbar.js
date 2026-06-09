@@ -23,8 +23,9 @@ import { deriveLogicalState } from '../simulatorState';
  *
  * Visibility rules (mirrors the logical-state matrix in the design doc):
  *   EMPTY / ENDED / WAITING_FOR_INPUT → toolbar not rendered at all.
- *   READY     → Step, Multi Step, Run All, Stop (enabled).
- *   EXECUTING → Pause (enabled), Stop (disabled — tooltip: "Pause before stopping").
+ *   READY     → Step, Multi Step, Run All, Stop enabled; Pause disabled.
+ *   EXECUTING → Pause enabled; Step, Multi Step, Run All, Stop disabled.
+ *               Stop tooltip changes to "Pause before stopping" when disabled.
  */
 export default function RunControlsToolbar(props) {
   const {
@@ -85,12 +86,12 @@ export default function RunControlsToolbar(props) {
     isDraggingRef.current = false;
   };
 
-  // Button visibility per logical state.
-  const showStep = logicalState === 'READY';
-  const showMultiStep = logicalState === 'READY';
-  const showRun = logicalState === 'READY';
-  const showPause = logicalState === 'EXECUTING';
-  const showStop = logicalState === 'READY' || logicalState === 'EXECUTING';
+  // Disabled state per logical state — all five buttons are always rendered
+  // when the toolbar is visible; they are greyed out when not actionable.
+  const stepDisabled = logicalState !== 'READY';
+  const multiStepDisabled = logicalState !== 'READY';
+  const runDisabled = logicalState !== 'READY';
+  const pauseDisabled = logicalState !== 'EXECUTING';
   const stopDisabled = logicalState === 'EXECUTING';
 
   // Toolbar is not shown outside of an active simulation session.
@@ -140,90 +141,93 @@ export default function RunControlsToolbar(props) {
         <DragIndicatorIcon fontSize="small" />
       </Box>
 
-      {showStep && (
-        <Tooltip
-          title="Runs a single step of simulation"
-          arrow
-          placement="bottom"
-        >
+      {/* Tooltip wraps a <span> so it still fires while the button is disabled. */}
+      <Tooltip
+        title="Runs a single step of simulation"
+        arrow
+        placement="bottom"
+      >
+        <span>
           <IconButton
             id="step-button"
             aria-label="Single Step"
             size="small"
             onClick={() => onStepClick(1)}
+            disabled={stepDisabled}
           >
             <PlayArrowIcon />
           </IconButton>
-        </Tooltip>
-      )}
+        </span>
+      </Tooltip>
 
-      {showMultiStep && (
-        <Tooltip
-          title={`Run ${multiStepCount} steps of simulation (configurable in Settings)`}
-          arrow
-          placement="bottom"
-        >
+      <Tooltip
+        title={`Run ${multiStepCount} steps of simulation (configurable in Settings)`}
+        arrow
+        placement="bottom"
+      >
+        <span>
           <IconButton
             id="multi-step-button"
             aria-label="Multi Step"
             size="small"
             onClick={() => onStepClick(multiStepCount)}
+            disabled={multiStepDisabled}
           >
             <FastForwardIcon />
           </IconButton>
-        </Tooltip>
-      )}
+        </span>
+      </Tooltip>
 
-      {showRun && (
-        <Tooltip title="Run until the simulation ends" arrow placement="bottom">
+      <Tooltip title="Run until the simulation ends" arrow placement="bottom">
+        <span>
           <IconButton
             id="run-button"
             aria-label="Run All"
             size="small"
             onClick={onRunClick}
+            disabled={runDisabled}
           >
             <PlayCircleIcon />
           </IconButton>
-        </Tooltip>
-      )}
+        </span>
+      </Tooltip>
 
-      {showPause && (
-        <Tooltip title="Pause the simulation" arrow placement="bottom">
+      <Tooltip title="Pause the simulation" arrow placement="bottom">
+        <span>
           <IconButton
             id="pause-button"
             aria-label="Pause"
             size="small"
             onClick={onPauseClick}
+            disabled={pauseDisabled}
           >
             <PauseCircleIcon />
           </IconButton>
-        </Tooltip>
-      )}
+        </span>
+      </Tooltip>
 
-      {showStop && (
-        <Tooltip
-          title={
-            stopDisabled
-              ? 'Pause before stopping'
-              : 'Stop the simulation and reset the CPU'
-          }
-          arrow
-          placement="bottom"
-        >
-          {/* Tooltip requires a non-disabled child to function; wrap in span. */}
-          <span>
-            <IconButton
-              id="stop-button"
-              aria-label="Stop"
-              size="small"
-              onClick={onStopClick}
-              disabled={stopDisabled}
-            >
-              <StopCircleIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
-      )}
+      <Tooltip
+        title={
+          stopDisabled
+            ? 'Pause before stopping'
+            : 'Stop the simulation and reset the CPU'
+        }
+        arrow
+        placement="bottom"
+      >
+        {/* Tooltip requires a non-disabled child to function; wrap in span. */}
+        <span>
+          <IconButton
+            id="stop-button"
+            aria-label="Stop"
+            size="small"
+            onClick={onStopClick}
+            disabled={stopDisabled}
+          >
+            <StopCircleIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
     </Paper>
   );
 }
