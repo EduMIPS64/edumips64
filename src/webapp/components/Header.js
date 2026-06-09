@@ -43,10 +43,15 @@ export default function Header(props) {
     props.inputRequest,
   );
 
-  // Editor controls are always visible; disabled only while the worker is
-  // actively executing steps or waiting for user input.
-  const editorDisabled =
-    logicalState === 'EXECUTING' || logicalState === 'WAITING_FOR_INPUT';
+  // The Program menu manages the editor's program (New / Open… / Save… / Load
+  // Example). It must be unavailable whenever a program is loaded in the
+  // simulator (i.e. the simulator is running). It stays available in EMPTY
+  // (nothing loaded yet) and ENDED (program finished — the user needs these
+  // controls to start a new program, and there is no Stop button in ENDED).
+  const programMenuDisabled =
+    logicalState === 'READY' ||
+    logicalState === 'EXECUTING' ||
+    logicalState === 'WAITING_FOR_INPUT';
 
   // Classify the current deployment so that users can tell at a glance
   // whether they are using the production version or a PR/dev build, and
@@ -217,7 +222,7 @@ export default function Header(props) {
               className="program-menu-button"
               startIcon={<FolderOpenIcon />}
               endIcon={<ArrowDropDownIcon />}
-              disabled={editorDisabled}
+              disabled={programMenuDisabled}
               onClick={(e) => setProgramAnchor(e.currentTarget)}
               aria-haspopup="true"
               aria-controls={menuOpen ? 'program-menu' : undefined}
