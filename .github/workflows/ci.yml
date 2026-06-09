@@ -163,6 +163,32 @@ jobs:
         if: always() && hashFiles('coverage/web-coverage.md') != ''
         run: cat coverage/web-coverage.md >> "$GITHUB_STEP_SUMMARY"
 
+  # Run the pytest suite that guards the Python deploy-web-pages script.
+  # No paths-filter gate: the suite is fast and must always be green.
+  test-deploy-script:
+    name: Deploy script tests (pytest)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pytest
+        run: pip install pytest
+
+      # The test file loads deploy-web-pages.py via importlib relative to the
+      # scripts directory, so the working-directory must be .github/scripts.
+      - name: Run deploy-script tests
+        working-directory: .github/scripts
+        run: python -m pytest test_deploy_web_pages.py -q
+
   # Persist the pull request number as an artifact so the privileged workflow
   # (which is triggered by workflow_run and therefore has no PR context) knows
   # which pull request to deploy a preview for.

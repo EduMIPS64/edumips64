@@ -119,11 +119,18 @@ def prune_versions() -> None:
             shutil.rmtree(target)
 
 
-def read_current_from_manifest() -> int:
-    """Return manifest.json's `current` value, or 0 if the file is absent."""
+def read_manifest() -> dict | None:
+    """Return the parsed manifest.json dict, or None if the file is absent."""
     p = Path("manifest.json")
     if p.is_file():
-        data = json.loads(p.read_text())
+        return json.loads(p.read_text())
+    return None
+
+
+def read_current_from_manifest() -> int:
+    """Return manifest.json's `current` value, or 0 if the file is absent."""
+    data = read_manifest()
+    if data is not None:
         return int(data.get("current", 0))
     return 0
 
@@ -131,6 +138,20 @@ def read_current_from_manifest() -> int:
 def write_manifest(data: dict) -> None:
     """Write manifest.json with 2-space indent and a trailing newline."""
     Path("manifest.json").write_text(json.dumps(data, indent=2) + "\n")
+
+
+def _max_v_subdir() -> int:
+    """Return the highest numeric subdir name under v/, or 0 if none exist."""
+    v_dir = Path("v")
+    if not v_dir.is_dir():
+        return 0
+    nums = [int(d.name) for d in v_dir.iterdir() if d.is_dir() and d.name.isdigit()]
+    return max(nums) if nums else 0
+
+
+def filter_history_to_existing(history: list[dict]) -> list[dict]:
+    """Remove history entries whose v/<n>/ directory no longer exists."""
+    return [e for e in history if (Path("v") / str(e["n"])).is_dir()]
 
 
 # ---------------------------------------------------------------------------
@@ -151,10 +172,14 @@ def cmd_promote(artifact_dir: str, build_string: str, sha: str,
         if child.name in RESERVED_NAMES:
             die(f"Artifact contains reserved top-level name '{child.name}' — cannot promote.")
 
-    is_first_run = not Path("manifest.json").is_file()
+    # Read full manifest (may be None on first run).
+    existing_manifest = read_manifest()
+    is_first_run = existing_manifest is None
 
     if is_first_run:
         current_n = 0
+        prev_n = 0
+        prior_history: list[dict] = []
         print("First run detected: manifest.json absent.")
         print("Seeding prev/ from current root prod files (first-run bootstrap)...")
         existing_root = root_prod_entries()
@@ -176,10 +201,36 @@ def cmd_promote(artifact_dir: str, build_string: str, sha: str,
             print("Root has no prod files yet; prev/ will be empty on first promotion.")
             Path("prev").mkdir(exist_ok=True)
     else:
-        current_n = read_current_from_manifest()
+        current_n = int(existing_manifest.get("current", 0))
+        prev_n = int(existing_manifest.get("prev", 0))
 
-    new_n = current_n + 1
-    print(f"Promoting: N={current_n} -> newN={new_n}, build={build_string}, sha={sha}")
+        # Build prior history: use existing list, or backfill from top-level manifest fields.
+        if "history" in existing_manifest and isinstance(existing_manifest["history"], list):
+            prior_history = existing_manifest["history"]
+        elif current_n >= 1:
+            # History-less manifest: synthesize a single backfill entry.
+            backfill: dict = {
+                "n": current_n,
+                "build": existing_manifest.get("build", ""),
+                "sha": existing_manifest.get("sha", ""),
+                "targetRelease": existing_manifest.get("targetRelease", ""),
+                "promotedAt": existing_manifest.get("promotedAt", ""),
+                "promotedBy": existing_manifest.get("promotedBy", ""),
+            }
+            prior_history = [backfill]
+        else:
+            prior_history = []
+
+    # Monotonic version number: strictly greater than any number ever used.
+    max_history_n = max((e["n"] for e in prior_history), default=0)
+    new_n = max(current_n, prev_n, max_history_n, _max_v_subdir()) + 1
+
+    # Defensive guard: the target snapshot must not already exist.
+    target_snapshot = Path("v") / str(new_n)
+    if target_snapshot.exists():
+        die(f"v/{new_n}/ already exists — aborting to protect immutable snapshot.")
+
+    print(f"Promoting: current={current_n} -> new_n={new_n}, build={build_string}, sha={sha}")
 
     if not is_first_run:
         # Archive current root prod files into prev/.
@@ -201,29 +252,44 @@ def cmd_promote(artifact_dir: str, build_string: str, sha: str,
 
     # Copy artifact into v/<new_n>/ (immutable snapshot).
     print(f"Creating immutable snapshot at v/{new_n}/...")
-    snapshot = Path("v") / str(new_n)
-    snapshot.mkdir(parents=True, exist_ok=True)
-    copy_contents_into(artifact, snapshot)
+    target_snapshot.mkdir(parents=True, exist_ok=True)
+    copy_contents_into(artifact, target_snapshot)
 
     # Replace root production files with artifact contents.
     print("Replacing root prod files...")
     delete_root_prod_files()
     copy_contents_into(artifact, Path("."))
 
-    # Write manifest.json (keys in defined order).
+    # Prune old snapshots BEFORE writing the manifest.
+    prune_versions()
+
+    # Build new history entry and filter to dirs that still exist after pruning.
+    promoted_at = utc_now()
+    new_entry: dict = {
+        "n": new_n,
+        "build": build_string,
+        "sha": sha,
+        "targetRelease": target_release,
+        "promotedAt": promoted_at,
+        "promotedBy": actor,
+    }
+    combined = [new_entry] + [e for e in prior_history if e["n"] != new_n]
+    history = filter_history_to_existing(combined)
+
+    # Write manifest.json LAST (snapshot + prune already done).
     manifest = {
         "current": new_n,
         "prev": current_n,
         "sha": sha,
         "build": build_string,
         "targetRelease": target_release,
-        "promotedAt": utc_now(),
+        "promotedAt": promoted_at,
         "promotedBy": actor,
+        "history": history,
     }
     write_manifest(manifest)
     print("manifest.json written.")
 
-    prune_versions()
     ensure_static_files()
 
     print(f"Promote complete: v{new_n} @ {sha} by {actor}")
