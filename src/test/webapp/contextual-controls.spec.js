@@ -221,6 +221,8 @@ test('ENDED: load-button visible; run-controls-toolbar absent; execution buttons
 
   // Execution controls must not be actionable after the simulation ends:
   // either absent from the DOM or present but disabled.
+  // Note: #stop-button is intentionally excluded — in some UI designs it
+  // remains enabled in ENDED state to allow resetting the simulator.
   await expect(page.locator('#step-button:not([disabled])')).toHaveCount(0);
   await expect(page.locator('#multi-step-button:not([disabled])')).toHaveCount(0);
   await expect(page.locator('#run-button:not([disabled])')).toHaveCount(0);
@@ -278,6 +280,8 @@ test('lifecycle: EMPTY → READY → ENDED control transitions', async ({ page }
   await runToCompletion(page);
   await expect(page.locator('#run-controls-toolbar')).toBeHidden();
   // Execution buttons must not be actionable (absent or disabled).
+  // Note: #stop-button is intentionally excluded — it may remain enabled in
+  // ENDED state in some UI designs to allow resetting the simulator.
   await expect(page.locator('#step-button:not([disabled])')).toHaveCount(0);
   await expect(page.locator('#run-button:not([disabled])')).toHaveCount(0);
   await expect(page.locator('#pause-button:not([disabled])')).toHaveCount(0);
