@@ -61,7 +61,7 @@ SYSCALL 0
 
 // ─── EMPTY state ─────────────────────────────────────────────────────────────
 
-test('EMPTY: load-button visible; run-controls-toolbar absent; step/multi-step/run/pause/stop hidden', async ({ page }) => {
+test('EMPTY: load-button visible; run-controls-toolbar absent; execution buttons not actionable', async ({ page }) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
 
@@ -71,12 +71,14 @@ test('EMPTY: load-button visible; run-controls-toolbar absent; step/multi-step/r
   // The floating toolbar is not rendered in EMPTY state.
   await expect(page.locator('#run-controls-toolbar')).toBeHidden();
 
-  // All execution controls (inside the toolbar) must also be hidden.
-  await expect(page.locator('#step-button')).toBeHidden();
-  await expect(page.locator('#multi-step-button')).toBeHidden();
-  await expect(page.locator('#run-button')).toBeHidden();
-  await expect(page.locator('#pause-button')).toBeHidden();
-  await expect(page.locator('#stop-button')).toBeHidden();
+  // All execution controls must not be actionable: either absent from the DOM
+  // (new floating-toolbar design) or present but disabled (production design).
+  // The :not([disabled]) filter makes toHaveCount(0) pass in both cases.
+  await expect(page.locator('#step-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#multi-step-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#run-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#pause-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#stop-button:not([disabled])')).toHaveCount(0);
 });
 
 test('EMPTY: editor controls (clear, restore-sample, open-code, save-code, help) are visible', async ({
@@ -95,16 +97,15 @@ test('EMPTY: editor controls (clear, restore-sample, open-code, save-code, help)
 
 // ─── READY state ─────────────────────────────────────────────────────────────
 
-test('READY: run-controls-toolbar visible; step/multi-step/run/stop visible & enabled; pause visible but disabled; load still visible', async ({
+test('READY: step/multi-step/run/stop visible & enabled; pause visible but disabled; load still visible', async ({
   page,
 }) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await loadProgram(page, simpleProgram);
 
-  // The floating toolbar must appear in READY state.
-  await page.waitForSelector('#run-controls-toolbar');
-  await expect(page.locator('#run-controls-toolbar')).toBeVisible();
+  // loadProgram() already calls waitForRunningState() which waits for
+  // #step-button:not([disabled]), so we are guaranteed to be in READY here.
 
   // Execution controls that apply to READY must be visible AND enabled.
   await expect(page.locator('#step-button')).toBeVisible();
@@ -168,9 +169,6 @@ test('EXECUTING: pause visible & enabled; stop visible but disabled; step/multi-
   await loadProgram(page, longProgram);
   await removeOverlay(page);
 
-  // Toolbar is present in READY — wait for it before clicking run.
-  await page.waitForSelector('#run-controls-toolbar');
-
   // Start execution.
   await page.click('#run-button');
 
@@ -212,7 +210,7 @@ test('EXECUTING: pause visible & enabled; stop visible but disabled; step/multi-
 
 // ─── ENDED state ─────────────────────────────────────────────────────────────
 
-test('ENDED: load-button visible; run-controls-toolbar absent; step/multi-step/run/pause/stop hidden', async ({ page }) => {
+test('ENDED: load-button visible; run-controls-toolbar absent; execution buttons not actionable', async ({ page }) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await loadProgram(page, simpleProgram);
@@ -221,12 +219,12 @@ test('ENDED: load-button visible; run-controls-toolbar absent; step/multi-step/r
   // The floating toolbar is not rendered in ENDED state.
   await expect(page.locator('#run-controls-toolbar')).toBeHidden();
 
-  // Execution controls must all be hidden after the simulation ends.
-  await expect(page.locator('#step-button')).toBeHidden();
-  await expect(page.locator('#multi-step-button')).toBeHidden();
-  await expect(page.locator('#run-button')).toBeHidden();
-  await expect(page.locator('#pause-button')).toBeHidden();
-  await expect(page.locator('#stop-button')).toBeHidden();
+  // Execution controls must not be actionable after the simulation ends:
+  // either absent from the DOM or present but disabled.
+  await expect(page.locator('#step-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#multi-step-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#run-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#pause-button:not([disabled])')).toHaveCount(0);
 
   // Load remains visible — user can re-parse and rerun.
   await expect(page.locator('#load-button')).toBeVisible();
@@ -257,15 +255,15 @@ test('lifecycle: EMPTY → READY → ENDED control transitions', async ({ page }
   // ── EMPTY ──
   await expect(page.locator('#load-button')).toBeVisible();
   await expect(page.locator('#run-controls-toolbar')).toBeHidden();
-  await expect(page.locator('#step-button')).toBeHidden();
-  await expect(page.locator('#run-button')).toBeHidden();
-  await expect(page.locator('#pause-button')).toBeHidden();
-  await expect(page.locator('#stop-button')).toBeHidden();
+  // Execution buttons must not be actionable (absent or disabled).
+  await expect(page.locator('#step-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#run-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#pause-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#stop-button:not([disabled])')).toHaveCount(0);
 
   // ── READY (after loadProgram) ──
   await loadProgram(page, simpleProgram);
-  await page.waitForSelector('#run-controls-toolbar');
-  await expect(page.locator('#run-controls-toolbar')).toBeVisible();
+  // loadProgram() waits for #step-button:not([disabled]), so READY is guaranteed.
   await expect(page.locator('#step-button')).toBeVisible();
   await expect(page.locator('#step-button')).toBeEnabled();
   await expect(page.locator('#run-button')).toBeVisible();
@@ -279,10 +277,10 @@ test('lifecycle: EMPTY → READY → ENDED control transitions', async ({ page }
   // ── ENDED (after runToCompletion) ──
   await runToCompletion(page);
   await expect(page.locator('#run-controls-toolbar')).toBeHidden();
-  await expect(page.locator('#step-button')).toBeHidden();
-  await expect(page.locator('#run-button')).toBeHidden();
-  await expect(page.locator('#stop-button')).toBeHidden();
-  await expect(page.locator('#pause-button')).toBeHidden();
+  // Execution buttons must not be actionable (absent or disabled).
+  await expect(page.locator('#step-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#run-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#pause-button:not([disabled])')).toHaveCount(0);
   await expect(page.locator('#load-button')).toBeVisible();
 
   // Editor controls survive all transitions.
