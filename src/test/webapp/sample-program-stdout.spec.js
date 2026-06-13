@@ -97,3 +97,63 @@ test('stdout text is visible in light theme with dark OS', async ({ page }) => {
   expect(textBrightness).toBeLessThan(150);
 });
 
+/**
+ * Regression test for the BROADER root cause: raw-element CSS was gated on
+ * the OS `prefers-color-scheme` media query, desyncing from the user-selected
+ * app theme.  The fix publishes the resolved MUI palette mode to
+ * `html[data-theme]` (via useLayoutEffect in Simulator.js) and gates all
+ * raw-element rules on that attribute instead.
+ *
+ * This test validates the OPPOSITE direction:
+ *   OS = light, app theme forced to 'dark' via localStorage.
+ * Before the fix, the OS-light media query would NOT apply the dark textarea
+ * rule, so the textarea text would default to the base dark colour
+ * (rgba(0,0,0,0.87)) — nearly invisible on the dark-theme background.
+ * After the fix, `html[data-theme='dark']` fires regardless of OS and the
+ * textarea text is white (luminance ≈ 255).
+ */
+test('stdout text is visible in dark theme with light OS', async ({ page }) => {
+  // Emulate OS light preference while the app is forced to dark theme.
+  await page.emulateMedia({ colorScheme: 'light' });
+
+  await page.addInitScript(() => {
+    window.localStorage.setItem('edumips64:v1:themeMode', '"dark"');
+  });
+
+  await page.goto(targetUri);
+  await waitForPageReady(page);
+  await removeOverlay(page);
+
+  await loadProgram(page, STDOUT_PROGRAM);
+  await runToCompletion(page);
+
+  await page.locator('text=Standard Output').click();
+
+  await expect(page.locator('#stdout-view')).toContainText('being tested!');
+
+  // Assert the app published the resolved palette to the DOM.
+  const dataTheme = await page.evaluate(() =>
+    document.documentElement.getAttribute('data-theme')
+  );
+  expect(dataTheme).toBe('dark');
+
+  const styles = await page.locator('#stdout-view').evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { color: s.color, background: s.backgroundColor };
+  });
+
+  function parseBrightness(cssColor) {
+    const m = cssColor.match(/\d+/g);
+    if (!m || m.length < 3) return null;
+    const [r, g, b] = m.map(Number);
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+
+  const textBrightness = parseBrightness(styles.color);
+
+  // The text must be near-white (luminance > 150) — visible on the dark background.
+  // MUI dark palette text is white (rgb(255,255,255)) → luminance = 255.
+  // The StdOut.js theme-aware inline style guarantees this.
+  expect(textBrightness).toBeGreaterThan(150);
+});
+

@@ -599,6 +599,15 @@ const Simulator = ({worker, initialState, appInsights}) => {
         : prefersDarkMode
           ? 'dark'
           : 'light';
+
+  // Mirror the resolved palette mode onto the root <html> element so that
+  // static CSS rules can target `html[data-theme='dark']` instead of the OS
+  // `prefers-color-scheme` media query, which desyncs when the user forces
+  // a theme override in Settings.
+  React.useLayoutEffect(() => {
+    document.documentElement.setAttribute('data-theme', paletteMode);
+  }, [paletteMode]);
+
   // `responsiveFontSizes` rescales the MUI typography variants
   // (h1..h6, body etc.) so that text shrinks gracefully on phones
   // and tablets. Without it MUI sticks to its desktop-tuned sizes,
