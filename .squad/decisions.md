@@ -1967,4 +1967,91 @@ Playwright test cases recommended (per §6.3):
 3. **Share link correctness** — for each `data-candidate="<date>-<n>"` element, assert the inner `<a>` href matches `/<date>/<n>-<shortsha>/`.
 4. **Graceful 404** — mock `GET /candidates.json` → 404 → assert `#about-candidate-builds` is absent from DOM.
 5. **"(viewing)" caption** — serve from candidate URL matching an entry in `candidates.json` → assert that `[data-candidate="${date}-${n}"] :text("(viewing)")` is visible.
+---
+
+## 2026-06-09: Decision — Alt A Program ▾ Dropdown Menu (Trinity implementation)
+
+**Date:** 2026-06-09T16:49:43+02:00  
+**Author:** Trinity (Frontend Dev)  
+**Requested by:** Andrea Spadaccini (@lupino3)  
+**Status:** Implemented, merged to squad/program-menu (commit b79f8029)  
+**Related:** PR #1836
+
+### Decision
+
+Replace four individual program-management header buttons (Clear, Restore default sample, Open Code, Save Code) with a single **"Program ▾"** dropdown menu.
+
+### Requirements (from Andrea)
+
+1. **Integrated style** — trigger button matches other AppBar buttons (Load, Help): `color="inherit"`, `responsiveButtonSx`, `responsiveLabel`
+2. **Disabled during execution** — menu unavailable while `logicalState` is `EXECUTING` or `WAITING_FOR_INPUT`
+
+### Implementation (src/webapp/components/Header.js)
+
+**Trigger button:** `id="program-menu-button"`, `color="inherit"`, disabled={editorDisabled}
+
+**Menu items (IDs preserved):**
+- `#clear-code-button` — "New" (DeleteForeverIcon)
+- `#load-code-button` — "Open…" (UploadIcon)
+- `#save-code-button` — "Save…" (DownloadIcon)
+- `#restore-sample-button` — "Load Example" (RestartAltIcon)
+
+**Consequence:** Behavioral tests must open menu first; menu items rendered in MUI portal (absent when closed).
+
+---
+
+## 2026-06-09: Test Rework — Program Menu Tests (Smith verification)
+
+**Date:** 2026-06-09T16:49:43+02:00  
+**Agent:** Smith (QA)  
+**Status:** APPROVE ✅  
+**Related:** PR #1836, squad/program-menu (commit f6e54235)
+
+### Changes
+
+| File | Change |
+|------|--------|
+| `test-utils.js` | Added `openProgramMenu()`, `clickProgramMenuItem()`; fixed `waitForSimulationComplete()` |
+| `clear-button.spec.js` | 3 tests reworked to open menu first |
+| `editor-persistence.spec.js` | Restore button access updated |
+| `syntax-highlighting-during-run.spec.js` | Button enable detection → menu button |
+| `contextual-controls.spec.js` | Menu button assertions added |
+| `program-menu.spec.js` (new) | Focused coverage: absent when closed, disabled during EXECUTING |
+
+### Result
+
+**16 passed, 1 skipped, 1 pre-existing flake.** Implementation is correct, preserves button IDs, and correctly gates during execution.
+
+---
+
+## 2026-06-09: User Documentation — Trilingual Program Menu Update (Link)
+
+**Date:** 2026-06-09T16:56:13+02:00  
+**Scope:** User-facing documentation (trilingual)  
+**Status:** Complete  
+**Related:** PR #1836, squad/program-menu
+
+### Files Updated
+
+1. `docs/user/en/src/user-interface-web.rst` — English (primary)
+2. `docs/user/it/src/user-interface-web.rst` — Italian
+3. `docs/user/zh/src/user-interface-web.rst` — Simplified Chinese
+
+### Changes
+
+Replaced four separate button descriptions (Clear, Open Code, Save Code, Restore) with:
+- "Program menu" subsection listing dropdown items
+- "Help button" subsection
+
+Verified reStructuredText syntax and translation accuracy.
+
+---
+
+## 2026-06-09: QA Verdict — Always-Visible Run Controls (Smith, PR #1835)
+
+**Date:** 2026-06-09T15:41:52+02:00  
+**Status:** PASS ✅  
+**Branch:** squad/streamline-run-controls (commit 207827ba)
+
+Trinity's `RunControlsToolbar.js` architecture is correct: all execution buttons always in DOM, enabled/disabled per state (not rendered/absent). Test suite: 69/71 pass, 1 skipped, 1 pre-existing GPU crash. No implementation bugs.
 

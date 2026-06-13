@@ -9,7 +9,30 @@
 
 <!-- Append new learnings below. Each entry is something lasting about the project. -->
 
-## 2026-06-09 — Always-visible toolbar buttons (PR #1835, iteration 3)
+## 2026-06-09 — Program ▾ dropdown menu tests (squad/program-menu)
+
+### MUI Menu portal gotcha
+MUI `<Menu>` renders its items in a React portal **only while the menu is open**. When the menu is closed, `#clear-code-button`, `#load-code-button`, `#save-code-button`, and `#restore-sample-button` are **not in the DOM**. Any test that clicks or asserts these must first open the menu. `toHaveCount(0)` is the correct assertion for "item absent" when the menu is closed.
+
+### New test helpers (test-utils.js)
+- `openProgramMenu(page)` — clicks `#program-menu-button` and waits for `#program-menu` to be visible (portal renders).
+- `clickProgramMenuItem(page, id)` — opens the menu then clicks the item (clicking an item auto-closes the menu).
+
+### Readiness signal change (waitForSimulationComplete)
+Changed from `#clear-code-button:not([disabled])` to `#program-menu-button:not([disabled])`. The Program menu button is always in the DOM and is disabled during EXECUTING/WAITING_FOR_INPUT, so it is the correct readiness discriminator now that the individual items live in a portal.
+
+### Specs updated
+- `test-utils.js` — two new helpers + waitForSimulationComplete fix
+- `clear-button.spec.js` — all three `page.click('#clear-code-button')` calls wrapped with `clickProgramMenuItem`
+- `editor-persistence.spec.js` — `#restore-sample-button` click wrapped with `clickProgramMenuItem`
+- `syntax-highlighting-during-run.spec.js` — isEnabled() polling switched to `#program-menu-button`
+- `contextual-controls.spec.js` — "editor controls" tests reworked; EXECUTING test asserts button disabled; lifecycle test updated
+- `program-menu.spec.js` (new) — focused coverage: items absent when closed, button disabled in EXECUTING, re-enables after
+
+### Local run result (commit f6e54235)
+16 passed, 1 skipped, 1 pre-existing tooltip-intercept flake (`clear button removes accordion change markers` — Stats accordion click intercepted by MUI Tooltip, unrelated to Program menu changes; was failing on the branch before my edits too).
+
+
 
 ### What changed (Trinity's latest architecture)
 - `RunControlsToolbar.js`: All five execution buttons (step, multi-step, run, pause, stop) are now **always rendered** when the toolbar is visible, greyed out (disabled) rather than absent from the DOM.
@@ -97,3 +120,51 @@ Added `candidate()` and `read_candidates()` helpers plus 10 new test cases:
 - `git mv` correctly renames Playwright specs while preserving git history.
 
 - **2026-06-13:** Candidate builds QA session: wrote 10 Python tests for deploy-web-pages.py candidate subcommand (pruning, JSON index, per-day counter); wrote Playwright specs for UI candidate selection + badge display. All tests APPROVED and passing in PR #1845. Removed dead replace_subdir function. Feature validated.
+## 2026-06-09: Program Menu Tests + Toolbar Verification — Completed
+
+**Status:** Tests reworked, verdicts rendered
+
+Program menu test rework (16 passed, APPROVE). Always-visible toolbar verification (69/71 pass, PASS verdict). PR #1836 ready.
+
+
+
+## 2026-06-09: Program Menu Gating Contract Update — Completed
+
+**Status:** Contract tightened by Andrea; tests updated and all green.
+
+### New gating contract for #program-menu-button
+
+| Logical state | CPU status | Button |
+|---|---|---|
+| EMPTY | READY (no program) | **ENABLED** |
+| READY | RUNNING + !executing | **DISABLED** |
+| EXECUTING | RUNNING + executing | **DISABLED** |
+| WAITING_FOR_INPUT | inputRequest active | **DISABLED** |
+| ENDED | STOPPED | **ENABLED** |
+
+The button is enabled **only** in EMPTY and ENDED. It is disabled whenever
+a program is loaded into the simulator — even when paused (READY) — not
+just during active execution.
+
+### Reset-via-#stop-button workflow
+
+To reuse the Program menu after loading a program (READY state), the user
+(or test) must click `#stop-button` in the floating run toolbar to reset
+the simulator back to EMPTY. The button is then re-enabled.
+
+**Test pattern:**
+```js
+await loadProgram(page, prog);
+await expect(page.locator('#program-menu-button')).toBeDisabled(); // READY
+// ... run / pause ...
+await page.click('#stop-button');  // → EMPTY
+await page.waitForSelector('#program-menu-button:not([disabled])');
+await expect(page.locator('#program-menu-button')).toBeEnabled();
+```
+
+`resetSimulator(page)` helper added to test-utils.js encapsulates this
+pattern.
+
+### Suite results (commit cacbf90e)
+
+73 passed, 1 skipped (known drag test). Zero failures. VERDICT: PASS ✅
