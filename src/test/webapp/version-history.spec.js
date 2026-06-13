@@ -85,8 +85,12 @@ test.describe('version history in About tab', () => {
   test('B: section is absent when no valid manifest is available', async ({
     page,
   }) => {
-    // No route mock — localhost returns no manifest.json (or a non-JSON page),
-    // so fetchManifest() returns null and the section must not render.
+    // Intercept manifest.json so it always returns 404, ensuring fetchManifest()
+    // returns null regardless of whether production serves a real manifest.
+    await page.route('**/manifest.json', (route) =>
+      route.fulfill({ status: 404 }),
+    );
+
     await page.goto(targetUri);
     await waitForPageReady(page);
     await openAboutTab(page);
