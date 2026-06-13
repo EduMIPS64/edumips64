@@ -3,7 +3,8 @@ const {
   targetUri,
   removeOverlay,
   waitForPageReady,
-  waitForSimulationComplete,
+  loadProgram,
+  runToCompletion,
 } = require('./test-utils');
 
 /**
@@ -22,8 +23,28 @@ const {
  * It asserts both that the textarea VALUE contains "being tested!" AND that
  * the rendered text colour contrasts with the background (i.e. is not
  * white-on-light / invisible).
+ *
+ * A short SYSCALL 5 program (a handful of cycles) is used instead of the
+ * default 5020-cycle sample to keep CI fast under the Playwright coverage
+ * instrumentation, which slows JS execution enough that a long program
+ * exceeds the 30 s waitForSimulationComplete timeout.
  */
-test('default sample stdout text is visible in light theme with dark OS', async ({ page }) => {
+
+// Short MIPS64 program that prints "being tested!" via SYSCALL 5 (printf).
+// Mirrors the default sample's mechanism: store the format-string address at
+// fs_addr, point r14 at fs_addr, then syscall 5.  Runs in ~10 cycles.
+const STDOUT_PROGRAM = `.data
+format_str: .asciiz "being tested!"
+fs_addr:    .space 4
+.code
+  daddi r5, r0, format_str
+  sw    r5, fs_addr(r0)
+  daddi r14, r0, fs_addr
+  syscall 5
+  syscall 0
+`;
+
+test('stdout text is visible in light theme with dark OS', async ({ page }) => {
   // Emulate OS dark preference while the app is forced to light theme.
   await page.emulateMedia({ colorScheme: 'dark' });
 
@@ -36,19 +57,11 @@ test('default sample stdout text is visible in light theme with dark OS', async 
 
   await page.goto(targetUri);
   await waitForPageReady(page);
-
   await removeOverlay(page);
 
-  // Load the default sample (preloaded in the editor).
-  await page.waitForSelector('#load-button:not([disabled])', { timeout: 10000 });
-  await page.click('#load-button');
-  await page.mouse.move(0, 0);
-
-  // Wait for READY state, then Run All.
-  await page.waitForSelector('#run-button:not([disabled])', { timeout: 10000 });
-  await page.click('#run-button');
-  await page.mouse.move(0, 0);
-  await waitForSimulationComplete(page);
+  // Load the short program and run it to completion using the CI-proven helpers.
+  await loadProgram(page, STDOUT_PROGRAM);
+  await runToCompletion(page);
 
   // Open the Standard Output accordion.
   await page.locator('text=Standard Output').click();
