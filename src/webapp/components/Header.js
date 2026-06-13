@@ -4,7 +4,12 @@ import AppBar from '@mui/material/AppBar';
 import ToolBar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
@@ -16,17 +21,20 @@ import logoDark from '../static/logo-dark.png';
 import logoBright from '../static/logo.png';
 import { getBuildInfo } from '../buildInfo';
 
-import HelpIcon from '@mui/icons-material/Help';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import HelpIcon from '@mui/icons-material/Help';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import UploadIcon from '@mui/icons-material/Upload';
 
 import { deriveLogicalState } from '../simulatorState';
 
 export default function Header(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [fileContent, setFileContent] = React.useState('');
+  const [programAnchor, setProgramAnchor] = React.useState(null);
+  const menuOpen = Boolean(programAnchor);
 
   // Derive the logical UI state for editor-control gating.
   const logicalState = deriveLogicalState(
@@ -35,10 +43,15 @@ export default function Header(props) {
     props.inputRequest,
   );
 
-  // Editor controls are always visible; disabled only while the worker is
-  // actively executing steps or waiting for user input.
-  const editorDisabled =
-    logicalState === 'EXECUTING' || logicalState === 'WAITING_FOR_INPUT';
+  // The Program menu manages the editor's program (New / Open… / Save… / Load
+  // Example). It must be unavailable whenever a program is loaded in the
+  // simulator (i.e. the simulator is running). It stays available in EMPTY
+  // (nothing loaded yet) and ENDED (program finished — the user needs these
+  // controls to start a new program, and there is no Stop button in ENDED).
+  const programMenuDisabled =
+    logicalState === 'READY' ||
+    logicalState === 'EXECUTING' ||
+    logicalState === 'WAITING_FOR_INPUT';
 
   // Classify the current deployment so that users can tell at a glance
   // whether they are using the production version or a PR/dev build, and
@@ -52,17 +65,7 @@ export default function Header(props) {
   const path = typeof window !== 'undefined' ? window.location.pathname : '';
   const isNightly = path === '/nightly' || path.startsWith('/nightly/');
 
-  const handleFileLoad = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        props.onChangeValue(e.target.result);
-      };
-
-      reader.readAsText(file);
-    }
-  };
+  const handleProgramMenuClose = () => setProgramAnchor(null);
 
   // On small viewports the buttons collapse to icon-only. Keep the text
   // visually hidden on `xs` so it still provides an accessible name,
@@ -208,74 +211,86 @@ export default function Header(props) {
           </Button>
         </Tooltip>
         <Tooltip
-          title="Remove all the code from the editor, leaving only an empty assembly file"
+          title="Manage the program: new, open, save, or load the example"
           arrow
           placement="top"
         >
-          <Button
-            color="inherit"
-            className="clear-code-button"
+          <span>
+            <Button
+              id="program-menu-button"
+              color="inherit"
+              className="program-menu-button"
+              startIcon={<FolderOpenIcon />}
+              endIcon={<ArrowDropDownIcon />}
+              disabled={programMenuDisabled}
+              onClick={(e) => setProgramAnchor(e.currentTarget)}
+              aria-haspopup="true"
+              aria-controls={menuOpen ? 'program-menu' : undefined}
+              aria-expanded={menuOpen ? 'true' : undefined}
+              sx={responsiveButtonSx}
+            >
+              {responsiveLabel('Program')}
+            </Button>
+          </span>
+        </Tooltip>
+        <Menu
+          id="program-menu"
+          anchorEl={programAnchor}
+          open={menuOpen}
+          onClose={handleProgramMenuClose}
+          MenuListProps={{ 'aria-labelledby': 'program-menu-button' }}
+        >
+          <MenuItem
             id="clear-code-button"
-            startIcon={<DeleteForeverIcon />}
             onClick={() => {
               props.onClearClick();
+              handleProgramMenuClose();
             }}
-            disabled={editorDisabled}
-            sx={responsiveButtonSx}
           >
-            {responsiveLabel('clear')}
-          </Button>
-        </Tooltip>
-        <Tooltip
-          title="Restore the bundled sample program in the editor"
-          arrow
-          placement="top"
-        >
-          <Button
-            color="inherit"
-            className="restore-sample-button"
-            id="restore-sample-button"
-            startIcon={<RestartAltIcon />}
-            onClick={() => {
-              props.onRestoreClick();
-            }}
-            disabled={editorDisabled}
-            sx={responsiveButtonSx}
-          >
-            {responsiveLabel('Restore default sample')}
-          </Button>
-        </Tooltip>
-        <Tooltip title="Open code from file" arrow placement="top">
-          <Button
-            color="inherit"
-            className="load-code-button"
+            <ListItemIcon>
+              <DeleteForeverIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>New</ListItemText>
+          </MenuItem>
+          <Divider />
+          <MenuItem
             id="load-code-button"
-            startIcon={<UploadIcon />}
             onClick={() => {
               props.onOpenClick();
+              handleProgramMenuClose();
             }}
-            disabled={editorDisabled}
-            component="label"
-            sx={responsiveButtonSx}
           >
-            {responsiveLabel('Open Code')}
-          </Button>
-        </Tooltip>
-        <Tooltip title="Save code to file" arrow placement="top">
-          <Button
-            color="inherit"
-            className="save-code-button"
+            <ListItemIcon>
+              <UploadIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Open…</ListItemText>
+          </MenuItem>
+          <MenuItem
             id="save-code-button"
-            startIcon={<DownloadIcon />}
             onClick={() => {
               props.onSaveClick();
+              handleProgramMenuClose();
             }}
-            component="label"
-            sx={responsiveButtonSx}
           >
-            {responsiveLabel('Save Code')}
-          </Button>
-        </Tooltip>
+            <ListItemIcon>
+              <DownloadIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Save…</ListItemText>
+          </MenuItem>
+          <Divider />
+          <MenuItem
+            id="restore-sample-button"
+            onClick={() => {
+              props.onRestoreClick();
+              handleProgramMenuClose();
+            }}
+          >
+            <ListItemIcon>
+              <RestartAltIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Load Example</ListItemText>
+          </MenuItem>
+        </Menu>
         <IconButton
           color="inherit"
           className="help-button"

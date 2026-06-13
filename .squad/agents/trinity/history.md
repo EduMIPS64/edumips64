@@ -152,3 +152,51 @@ All 5 execution buttons are now always present in `#run-controls-toolbar` when i
 - **In READY state:** `#step-button`, `#multi-step-button`, `#run-button`, `#stop-button` are present and **enabled**; `#pause-button` is present but **disabled**.
 - **In EXECUTING state:** `#pause-button` is present and **enabled**; `#step-button`, `#multi-step-button`, `#run-button`, `#stop-button` are present but **disabled**.
 - Any test that asserted a button was absent (not in DOM) in a given state should be rewritten to assert `disabled` attribute instead.
+2026-06-09 — Replaced PlayArrowIcon with SkipNextIcon on #step-button in RunControlsToolbar.js to visually distinguish Single Step (▶|) from Multi Step (>>) and Run All.
+
+2026-06-09 — Produced design exploration mockups for program-management controls (Open Code, Save Code, Clear, Restore default sample): 4 alternatives (Alt A: Program▾ dropdown, Alt B: grouped segmented bar, Alt C: split button, Alt D: icon-only group with micro-labels), 6 PNGs rendered via Playwright setContent() + Chromium headless. Recipe: NODE_PATH=/path/to/node_modules node script.js; read HTML via fs.readFileSync + page.setContent(); screenshot with page.screenshot({ clip }). Output: ~/.copilot/session-state/359dc6eb.../files/mock-alt*.png + program-controls-options.md.
+- 2026-06-09: Regenerated program-management-controls mockups (v2) against post-merge master header (run controls now in floating RunControlsToolbar, not AppBar); 6 PNGs overwritten, gallery HTML cache-busted (?v=2), intro note updated to reflect accurate baseline.
+- 2026-06-09: Fixed icon rendering in all 6 program-controls mockup PNGs — replaced every Material Icons font ligature span with inline <svg fill="currentColor"><path d="…"/></svg> using MUI path data from node_modules/@mui/icons-material/*.js; re-rendered all PNGs (15–25 KB each), bumped gallery HTML to ?v=3. Lesson: inline SVG icons are 100% reliable in headless Chromium; font ligatures are not.
+
+### Program ▾ Dropdown Menu (2026-06-09)
+
+**New element IDs:**
+- `#program-menu-button` — the trigger `<Button>` in the AppBar that opens the Program menu; styled identically to other AppBar buttons (`color="inherit"`, `responsiveButtonSx`, `responsiveLabel`); uses `FolderOpenIcon` + `ArrowDropDownIcon`.
+- `#program-menu` — the `<Menu>` portal element (MUI default: rendered in a portal, NOT a child of the AppBar).
+
+**Preserved menu-item IDs (behavioral tests target these):**
+- `#clear-code-button` → "New"
+- `#load-code-button` → "Open…"
+- `#save-code-button` → "Save…"
+- `#restore-sample-button` → "Load Example"
+
+**Disable-on-execution behavior:** The trigger button has `disabled={editorDisabled}` where `editorDisabled = logicalState === 'EXECUTING' || logicalState === 'WAITING_FOR_INPUT'`. While disabled the whole menu is inaccessible (Andrea's explicit requirement #2).
+
+**MUI Portal / DOM presence caveat:** Menu items live in an MUI `<Menu>` which renders in a portal (outside the AppBar DOM subtree). When the menu is closed the `<MenuItem>` elements are NOT in the DOM — they only appear when the menu is open. Tests that need to interact with `#clear-code-button`, `#load-code-button`, etc. must first click `#program-menu-button` to open the menu.
+
+**Tooltip gotcha (disabled buttons):** MUI Tooltip does not fire on disabled `<Button>` elements. The trigger is wrapped in `<span>` inside the `<Tooltip>` to ensure the tooltip still appears when the button is disabled.
+
+**Removed (vestigial):** `handleFileLoad`, `fileContent`, `setFileContent` state and handler — these were unused since `onOpenClick` was extracted to `Simulator.js`.
+
+## 2026-06-09: Program Menu PR #1836 — Completed
+
+**Status:** Merged to squad/program-menu (commit b79f8029)
+
+Implemented Alternative A (Program ▾ dropdown). Build + lint green. Tests reworked by Smith (16 passed, APPROVE verdict). Docs updated by Link (trilingual). PR ready for review.
+
+
+## Learnings
+
+### Program menu gating contract (refined 2026-06-09)
+
+**New condition (programMenuDisabled):**
+```
+programMenuDisabled = logicalState === 'READY' || logicalState === 'EXECUTING' || logicalState === 'WAITING_FOR_INPUT'
+```
+
+- **DISABLED** whenever a program is loaded into the simulator (status `'RUNNING'`), which covers `READY` (loaded, paused), `EXECUTING` (actively running), and `WAITING_FOR_INPUT`.
+- **ENABLED** in `EMPTY` (no program loaded) and `ENDED` (execution finished).
+
+**Why ENDED stays enabled:** There is no Stop/Reset toolbar button available in the `ENDED` state. The Program menu (New / Open… / Load Example) is the *only* mechanism the user has to start a fresh program after one finishes. Disabling it in `ENDED` would leave the user stuck with no way to proceed without a full page reload.
+
+**Old (wrong) condition:** `editorDisabled = EXECUTING || WAITING_FOR_INPUT` — this incorrectly kept the menu enabled while a program was loaded but paused (`READY`), allowing the user to load a different program mid-simulation.

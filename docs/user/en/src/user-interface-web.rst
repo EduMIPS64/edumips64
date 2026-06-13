@@ -66,8 +66,8 @@ immediately obvious:
 * **Waiting for input** (input dialog open) — the toolbar is hidden;
   the input dialog must be resolved first.
 
-The **Load** button and editor controls (Open, Save, Clear, Restore
-sample, Help) remain always visible in the top header bar.
+The **Load** button, the **Program** menu, and the **Help (?)** button
+remain always visible in the top header bar.
 
 Individual button descriptions:
 
@@ -97,26 +97,35 @@ Individual button descriptions:
   the floating toolbar in READY and EXECUTING states (disabled in
   EXECUTING with tooltip "Pause before stopping").
 
-Editor controls remain always visible:
+Program menu
+~~~~~~~~~~~~
+The **Program** menu (folder icon with a dropdown caret) consolidates
+program management into a single header button. It opens a dropdown menu
+with the following items. **The menu is unavailable while a program is
+loaded in the simulator** (i.e. while the simulator is running), preventing
+accidental changes to the program during simulation. It becomes available
+again once the loaded program has finished running or after the simulator
+is reset (no program loaded).
 
-* **Clear** — empties the code editor, leaving only an empty assembly
+* **New** — empties the code editor, leaving only an empty assembly
   skeleton (``.data`` and ``.code`` directives plus a final
-  ``SYSCALL 0``). Disabled while the CPU is executing.
+  ``SYSCALL 0``).
 
-* **Restore default sample** — replaces the editor contents with the
-  bundled sample program shipped with EduMIPS64 (the same one shown
-  on a fresh installation). This is useful to recover a known-good
-  starting point after experimenting, or to discard the persisted
-  editor contents (see *Saving and loading* below). Disabled while
-  the CPU is executing.
+* **Open…** — opens a local file (typically a ``.s`` file) and
+  loads its contents into the editor.
 
-* **Open Code** — opens a local file (typically a ``.s`` file) and
-  loads its contents into the editor. Disabled while the CPU is
-  executing.
-
-* **Save Code** — saves the current contents of the editor to a local
+* **Save…** — saves the current contents of the editor to a local
   file named ``code.s``.
 
+* **Load Example** — replaces the editor contents with the
+  bundled sample program shipped with EduMIPS64 (the same one shown
+  the first time you open the web simulator). This is useful to
+  recover a known-good
+  starting point after experimenting, or to discard the persisted
+  editor contents (see *Saving and loading* below).
+
+Help button
+~~~~~~~~~~~
 * **Help (?)** — opens this manual inside the application, with a
   navigation drawer on the left and a language selector that lets you
   switch between English, Italian and Chinese. The Help dialog also
