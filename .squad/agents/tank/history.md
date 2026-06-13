@@ -43,6 +43,30 @@ Fixed web UI to sum all four structural-stall CPU counters. Pattern: `ResultFact
 6. **Least privilege:** Separate jobs for different permission scopes (deploy vs. comment)
 7. **Pre-merge validation:** actionlint + node --check for workflow_run files before merge
 
+## 2026-06-13: Candidate Builds Implementation
+
+**Task:** Implement §2 and §3 of Morpheus's candidate design (`morpheus-candidate-design.md`).
+
+**deploy-web-pages.py changes:**
+- Updated `RESERVED_NAMES`: added `"candidates.json"`, removed `"nightly"`.
+- Added `import re` and `timedelta`; added `_DATE_DIR_RE` regex constant and `DEFAULT_RETENTION_DAYS = 14`.
+- Added `is_candidate_date_dir(name)`: matches YYYY-MM-DD pattern AND is a directory.
+- Modified `root_prod_entries()` to skip candidate date-dirs — prevents promote/rollback from clobbering them.
+- Added `prune_candidates(candidates_data)`: date-based pruning using `retentionDays`, removes old dirs and empty date dirs.
+- Added `cmd_candidate(artifact_dir, sha, build_string, target_release)`: full implementation per design §2.2.
+- Removed `cmd_nightly`; replaced nightly subparser with `candidate` subparser.
+- Updated module docstring to "Subcommands: promote | rollback | candidate".
+- All 5 existing tests pass.
+
+**Workflows:**
+- Deleted `.github/workflows/nightly-web.yml`.
+- Created `.github/workflows/candidate-web.yml` with `workflow_run` trigger on "CI Build" (NOT "CI" — the actual name in ci.yml is "CI Build") and `workflow_dispatch`.
+
+**Key deviation from design:**
+- Design spec assumed CI workflow name is "CI" — actual name is "CI Build". Used "CI Build" in `workflows: [...]`.
+
 ## Archive
 
 Detailed session learnings from 2026-06-05 through 2026-06-09 are available in git history of `.squad/agents/tank/history.md` (pre-2026-06-09 versions).
+
+- **2026-06-13:** Candidate builds implementation session: deployed `deploy-web-pages.py candidate` subcommand (per-commit deployment, per-day counter `N`, 14-day pruning by date). Deleted nightly-web.yml, added candidate-web.yml triggered on master CI success. Workflow validated in PR #1845 (candidate URLs verified, index generated correctly). Feature shipped.

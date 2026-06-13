@@ -30,6 +30,9 @@ import {
   fetchManifest,
   buildVersionList,
   getViewedVersion,
+  fetchCandidates,
+  buildCandidateList,
+  getViewedCandidate,
 } from '../versionHistory';
 
 // Render a localized description of the running build (production/PR/dev),
@@ -44,6 +47,17 @@ function BuildInfoLine() {
         <Link href={buildInfo.prUrl} target="_blank" rel="noreferrer">
           pull request #{buildInfo.prNumber}
         </Link>
+      </Typography>
+    );
+  }
+  if (buildInfo.kind === 'candidate') {
+    return (
+      <Typography id="about-build-info">
+        Build: candidate {buildInfo.candidateDate} #{buildInfo.candidateN} (
+        <Link href={buildInfo.candidateUrl} target="_blank" rel="noreferrer">
+          {buildInfo.candidateSha}
+        </Link>
+        )
       </Typography>
     );
   }
@@ -130,9 +144,72 @@ function PreviousVersions() {
     </Box>
   );
 }
-const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
+// Renders the list of per-commit candidate builds fetched from /candidates.json.
+// Gated on: non-empty candidate list AND build kind !== 'pr'.
+function CandidateBuilds() {
+  const [candidates, setCandidates] = React.useState(null);
+  const viewedCandidate = React.useMemo(() => getViewedCandidate(), []);
 
-// Localized "Introduction" labels for each language
+  React.useEffect(() => {
+    fetchCandidates().then((c) => setCandidates(c));
+  }, []);
+
+  const buildInfo = getBuildInfo();
+  if (!candidates || buildInfo.kind === 'pr') {
+    return null;
+  }
+
+  const items = buildCandidateList(candidates, viewedCandidate);
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <Box id="about-candidate-builds" sx={{ mt: 2 }}>
+      {buildInfo.kind === 'candidate' && (
+        <Typography gutterBottom color="info.main">
+          You are viewing candidate build {buildInfo.candidateDate} #
+          {buildInfo.candidateN} ({buildInfo.candidateSha}).{' '}
+          <Link href="/">Open production.</Link>
+        </Typography>
+      )}
+      <Typography variant="h6" gutterBottom>
+        Candidate builds
+      </Typography>
+      <List dense disablePadding>
+        {items.map((item) => (
+          <ListItem
+            key={item.href}
+            disablePadding
+            data-candidate={`${item.date}-${item.n}`}
+          >
+            <ListItemText
+              primary={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Link
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    title={item.build}
+                  >
+                    {item.label}
+                  </Link>
+                  {item.isViewed && (
+                    <Typography component="span" variant="caption">
+                      (viewing)
+                    </Typography>
+                  )}
+                </Box>
+              }
+            />
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
+}
+
+const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
 const INTRODUCTION_LABELS = {
   en: 'Introduction',
   it: 'Introduzione',
@@ -646,6 +723,7 @@ export default function HelpDialog(props) {
             <Typography>Version: {props.ver}</Typography>
             <BuildInfoLine />
             <PreviousVersions />
+            <CandidateBuilds />
             <Typography gutterBottom variant="h6" sx={{ mt: 2 }}>
               Quick Start
             </Typography>

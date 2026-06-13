@@ -3,7 +3,7 @@
 **Author:** Morpheus (Lead/Architect)  
 **Date:** 2026-06-05 (decisions locked 2026-06-07)  
 **Status:** IMPLEMENTED (PR #1826)  
-**Scope:** Gated production deploys to web.edumips.org, rollback via /prev, versioning split, nightly channel
+**Scope:** Gated production deploys to web.edumips.org, rollback via /prev, versioning split, per-commit candidate channel
 
 ---
 
@@ -70,7 +70,7 @@ This section describes the system as built. All workflows live in `.github/workf
    - Ensures `CNAME` and `.nojekyll` are preserved.
 7. **Commit and push** to Pages repo.
 
-**Concurrency:** The `promote` job uses `concurrency: group: web-pages-deploy` with `cancel-in-progress: false` to serialise Pages writes safely across promote, rollback, and nightly operations. The `build` job (in fresh mode) is not serialised — parallel builds of different master snapshots do not conflict.
+**Concurrency:** The `promote` job uses `concurrency: group: web-pages-deploy` with `cancel-in-progress: false` to serialise Pages writes safely across promote, rollback, and candidate operations. The `build` job (in fresh mode) is not serialised — parallel builds of different master snapshots do not conflict.
 
 ### Rollback
 
@@ -82,23 +82,45 @@ This section describes the system as built. All workflows live in `.github/workf
 
 **Normal rollback** (non-emergency): re-run `promote-web.yml` with the `run_id` of the previous good build; the system treats it as a new promotion.
 
-### Nightly Channel
+### Candidate Channel
 
-**Workflow:** `.github/workflows/nightly-web.yml`
+**Workflow:** `.github/workflows/candidate-web.yml`
 
-**Trigger:** Scheduled cron `0 1 * * *` (daily at 01:00 UTC) + `workflow_dispatch` for on-demand use.
+**Trigger:** 
+- `workflow_run` event after a successful **CI Build** (`ci.yml`) on `master` branch (per-commit, replacing the old daily nightly cron).
+- `workflow_dispatch` for on-demand manual deployment.
 
 **Mechanism:**
-1. Finds the latest successful `ci.yml` run on `master` via `gh run list`.
+1. Finds the successful `ci.yml` run that triggered the workflow_run event (or the latest green run if manual dispatch).
 2. Downloads its `web` artifact.
-3. Runs `deploy-web-pages.py nightly <artifact_dir>` — replaces the `/nightly/` directory with the artifact contents.
-4. Commits and pushes to Pages repo.
+3. Computes the date-based candidate directory path: `<YYYY-MM-DD>/<N>-<shortsha>/` where:
+   - `<YYYY-MM-DD>` is the current date.
+   - `<N>` is an incrementing counter (1-based) for that day (resets daily).
+   - `<shortsha>` is the abbreviated commit SHA.
+4. Runs `deploy-web-pages.py candidate <artifact_dir> <date> <N> <sha> <shortsha> <build> <targetRelease>` to:
+   - Deploy the artifact to `/<YYYY-MM-DD>/<N>-<shortsha>/`.
+   - Update `/candidates.json` (root index file) with metadata for the new candidate.
+   - Prune candidates older than 14 days, sorted by date.
+   - Ensure `candidates.json` is in `RESERVED_NAMES` (protected from promotion/rollback).
+5. Commits and pushes to Pages repo.
 
-**Ungated** — no actor restriction. Nightly is a preview channel for contributors and agents.
+**Ungated** — no actor restriction. Candidate builds provide a preview channel for contributors and agents.
 
-**UI indication:** The web UI's `Header.js` component detects the `/nightly/` path prefix at runtime and displays a "NIGHTLY" badge so users clearly see they are not on the stable production channel.
+**UI indication:** The web UI's `Header.js` component detects the candidate path prefix (`/<YYYY-MM-DD>/<N>-<shortsha>/`) at runtime and displays a **"CANDIDATE"** badge (purple) so users clearly see they are not on the stable production channel.
 
-**Build identity:** Nightly is identified only by its git-describe string and SHA (no promotion number — those are reserved for gated production promotions).
+**Build identity & metadata:** Each candidate build includes git-describe string, SHA, and the candidate date/N identifier (no promotion number — those are reserved for gated production promotions).
+
+**Root index file (`/candidates.json`):**
+```json
+{
+  "candidates": [
+    { "date": "2026-06-13", "n": 3, "sha": "abc1234567890123", "shortsha": "abc1234", "path": "2026-06-13/3-abc1234", "build": "1.4.0-7-gabc1234", "targetRelease": "1.4.1", "deployedAt": "2026-06-13T15:30:45Z" },
+    { "date": "2026-06-13", "n": 2, "sha": "def5678901234567", "shortsha": "def5678", "path": "2026-06-13/2-def5678", "build": "1.4.0-6-gdef5678", "targetRelease": "1.4.1", "deployedAt": "2026-06-13T14:22:10Z" }
+  ],
+  "retentionDays": 14
+}
+```
+Candidates are sorted newest-first for easy discovery of the latest build.
 
 ### Versioning Model (Unified Build Identity, Split Release Label)
 
@@ -135,7 +157,14 @@ EduMIPS64/web.edumips.org repo:
 │   ├── 42/                 ← immutable snapshot (prod promotion 42)
 │   ├── 43/                 ← immutable snapshot (= prev)
 │   └── 44/                 ← immutable snapshot (= current)
-├── nightly/                ← overwritten daily by nightly-web.yml
+├── 2026-06-13/             ← candidate builds for date (per-commit)
+│   ├── 1-abc1234/
+│   ├── 2-def5678/
+│   └── 3-ghi9012/
+├── 2026-06-12/
+│   ├── 1-jkl3456/
+│   └── 2-mno7890/
+├── candidates.json         ← candidate metadata (sorted newest-first, 14-day retention)
 ├── manifest.json           ← prod metadata (see below)
 ├── CNAME                   ← preserved (web.edumips.org)
 └── .nojekyll               ← preserved
@@ -163,8 +192,9 @@ The structure is bootstrapped automatically on the first `promote-web.yml` run �
 | `https://web.edumips.org/` | Current promoted version (stable) |
 | `https://web.edumips.org/prev/` | Previous promoted version (rollback target) |
 | `https://web.edumips.org/v/44/` | Immutable snapshot by promotion number |
-| `https://web.edumips.org/nightly/` | Latest green master (daily, ungated) |
-| `https://web.edumips.org/manifest.json` | Machine-readable version metadata |
+| `https://web.edumips.org/<YYYY-MM-DD>/<N>-<shortsha>/` | Candidate build (per-commit, ungated) |
+| `https://web.edumips.org/candidates.json` | Machine-readable candidate metadata |
+| `https://web.edumips.org/manifest.json` | Machine-readable promotion metadata |
 
 ### What Stays the Same
 
@@ -213,12 +243,12 @@ Organized by decision point. Each lists the option(s) we evaluated and rejected,
 | **GITHUB_RUN_NUMBER** — auto-incrementing CI counter. | Not portable outside CI. Not meaningful to users. Doesn't collapse to a clean label at tagged releases. |
 | **Hand-maintained Build-Qualifier** — the old `alpha`+SHA mechanism. | Inconsistent (`1.4.1-alpha-abc1234` in CI vs `1.4.1` at release). Redundant once git-describe is adopted. Potential NPE if attribute absent. |
 
-### Nightly Trigger
+### Candidate Trigger
 
 | Rejected option | Rationale |
 |-----------------|-----------|
-| **(B) Deploy on every green master push** — `workflow_run` triggered after each successful CI on master. | Multiple deploys per day on active days wastes resources and makes the nightly channel less predictable. A daily cadence keeps the preview fresh enough while avoiding a Pages deploy on every single merge. Manual `workflow_dispatch` covers the "I want it now" case. |
-| **Longer fixed interval** (e.g. weekly cron) | Stale for too long; defeats the purpose of giving contributors a fast feedback loop on merged work. |
+| **(B) Deploy on every green master push** (original nightly design) — `workflow_run` triggered after each successful CI on master, deployed to `/nightly/` with a daily cron. | Replaced by per-commit candidate builds triggered on `workflow_run` after successful CI, deployed to `/<YYYY-MM-DD>/<N>-<shortsha>/` with automatic pruning (14-day retention). The new design provides fresher feedback on every green commit, indexed by date for discoverability, without a stale daily schedule. |
+| **Longer fixed interval** (e.g. weekly cron, previous alternative) | Stale for too long; defeats the purpose of giving contributors a fast feedback loop on merged work. Per-commit deployment solves this. |
 
 ### PR Grouping
 
@@ -242,7 +272,7 @@ Organized by decision point. Each lists the option(s) we evaluated and rejected,
 | **Phase 0** ✅ | Disable auto-deploy: `if: false` on `deploy-prod` in `release.yml`. | 5 min | Agents can merge without shipping to prod. |
 | **Phase 1–2** ✅ | `promote-web.yml` with full versioned layout (`/v/N/`, `/prev/`, `manifest.json`, prune at 50). | 2-3 hours | Manual promotion + rollback history. |
 | **Phase 3** ✅ | `rollback-web.yml` for emergency swap. Git-describe build identity in desktop+CLI (`build.gradle.kts` `sharedManifest` → `MetaInfo`), web (`webpack.config.js` `GitRevisionPlugin`), docs (`common_conf.py`). `fetch-depth: 0` across workflows. | 2-3 hours | Complete versioning + rollback. |
-| **Phase 3.5** ✅ | `nightly-web.yml` (daily 01:00 UTC cron + manual dispatch) + `/nightly/` + UI NIGHTLY badge (`Header.js`). | 1-2 hours | Continuous preview for contributors. |
+| **Phase 3.5** ✅ | `candidate-web.yml` (per-commit `workflow_run` after green master CI + manual dispatch) + `/<YYYY-MM-DD>/<N>-<shortsha>/` + `/candidates.json` + UI CANDIDATE badge (purple, `Header.js`). Replaces nightly (daily cron removed). | 2-3 hours | Per-commit preview for contributors, indexed by date, 14-day retention. |
 | **Phase 4** (future, optional) | Migrate prod hosting to Azure Blob + CDN. | 4-8 hours | Eliminates file duplication, enables pointer-based routing. |
 
 ---
@@ -268,7 +298,7 @@ The `manifest.json` `history` array entry schema:
 1. `/manifest.json` fetch succeeds and parses.
 2. The build is NOT a PR preview (detected via `window.GIT_DESCRIBE`).
 
-This ensures the navigator is available on stable production and nightly builds but hidden for temporary PR preview builds.
+This ensures the navigator is available on stable production and candidate builds but hidden for temporary PR preview builds.
 
 **Related fix:** Promotion numbers now use **monotonic numbering** — the next version is always `max(ever used) + 1`, never re-used. This fixes a latent bug where a promote after a rollback could re-use and mutate an existing immutable snapshot.
 
@@ -292,7 +322,7 @@ This ensures the navigator is available on stable production and nightly builds 
 | 5 | Versions to retain in `/v/`? | 50. |
 | 6 | Build identity surfaces? | git-describe everywhere (desktop, CLI, web, docs). |
 | 7 | `package.json` version? | Leave stale at `1.0.0`; add comment noting it is unused. |
-| 8 | Workflow naming? | `promote-web.yml` (unifies build+promote with optional `run_id`), `rollback-web.yml`, `nightly-web.yml`. `promote-web.yml` serves both "build+promote current master" (empty `run_id`) and "promote a specific validated run" (with `run_id`). |
-| 9 | Nightly trigger? | Daily 01:00 UTC cron + `workflow_dispatch`. (Changed from initial "on-every-green-master-push" recommendation.) |
+| 8 | Workflow naming? | `promote-web.yml` (unifies build+promote with optional `run_id`), `rollback-web.yml`, `candidate-web.yml`. `promote-web.yml` serves both "build+promote current master" (empty `run_id`) and "promote a specific validated run" (with `run_id`). |
+| 9 | Candidate trigger? | Per-commit `workflow_run` on green master CI + `workflow_dispatch`. (Per-commit replaces the original daily 01:00 UTC cron design, providing fresher feedback on every merge.) |
 | 10 | PR grouping? | Single PR (PR #1826) for all `edumips64` repo changes. Pages-repo layout bootstraps on first promotion run. |
 | 11 | Version navigator? | Fetch root `/manifest.json` with `cache:'no-cache'`, render history list in About tab (gated on valid manifest + non-PR build). Monotonic numbering (next n = max ever used + 1) fixes post-rollback collision bug. |

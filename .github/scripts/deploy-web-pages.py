@@ -1,24 +1,28 @@
 #!/usr/bin/env python3
 """deploy-web-pages.py — Pages-repo layout manager for web.edumips.org.
 
-Subcommands: promote | rollback | nightly
+Subcommands: promote | rollback | candidate
 Must be run with cwd = checkout of the Pages repo (EduMIPS64/web.edumips.org).
 """
 
 import argparse
 import json
 import os
+import re
 import shutil
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
-RESERVED_NAMES = ["v", "prev", "nightly", "manifest.json", "CNAME", ".nojekyll", ".git"]
+RESERVED_NAMES = ["v", "prev", "candidates.json", "manifest.json", "CNAME", ".nojekyll", ".git"]
 MAX_VERSIONS = 50
+DEFAULT_RETENTION_DAYS = 14
+
+_DATE_DIR_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -46,15 +50,25 @@ def ensure_static_files() -> None:
         print("Created missing .nojekyll")
 
 
+def is_candidate_date_dir(name: str) -> bool:
+    """Return True if name matches YYYY-MM-DD and is a directory."""
+    return bool(_DATE_DIR_RE.match(name)) and Path(name).is_dir()
+
+
 def root_prod_entries() -> list[str]:
     """Return all top-level cwd entries (including dotfiles) not in RESERVED_NAMES.
 
     Mirrors bash `dotglob` + extglob negation — hidden files ARE included.
+    Candidate date-dirs (YYYY-MM-DD) are also excluded to prevent promote/rollback
+    from clobbering them.
     """
     entries = []
     for entry in Path(".").iterdir():
-        if entry.name not in RESERVED_NAMES:
-            entries.append(entry.name)
+        if entry.name in RESERVED_NAMES:
+            continue
+        if is_candidate_date_dir(entry.name):
+            continue
+        entries.append(entry.name)
     return entries
 
 
@@ -92,14 +106,6 @@ def copy_contents_into(src: str | Path, dest: str | Path) -> None:
         else:
             shutil.copy2(child, dest_child)
 
-
-def replace_subdir(src: str | Path, dest: str | Path) -> None:
-    """Replace dest with a fresh copy of src's contents (mirrors `cp -a "$src/." "$dest/"`)."""
-    dest = Path(dest)
-    if dest.exists() or dest.is_symlink():
-        shutil.rmtree(dest)
-    dest.mkdir(parents=True)
-    copy_contents_into(src, dest)
 
 
 def prune_versions() -> None:
@@ -357,23 +363,85 @@ def cmd_rollback(actor: str) -> None:
     print(f"Rollback complete: root ↔ prev swap (v{current_n} ↔ v{prev_n}) by {actor}")
 
 
+def prune_candidates(candidates_data: dict) -> dict:
+    """Remove candidate entries older than retentionDays and their directories."""
+    retention = candidates_data.get("retentionDays", DEFAULT_RETENTION_DAYS)
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=retention)).strftime("%Y-%m-%d")
+
+    kept = []
+    removed_dates: set[str] = set()
+    for entry in candidates_data["candidates"]:
+        if entry["date"] < cutoff:
+            candidate_dir = Path(entry["date"]) / f"{entry['n']}-{entry['shortsha']}"
+            if candidate_dir.exists():
+                shutil.rmtree(candidate_dir)
+            removed_dates.add(entry["date"])
+        else:
+            kept.append(entry)
+
+    candidates_data["candidates"] = kept
+
+    for date_str in removed_dates:
+        date_path = Path(date_str)
+        if date_path.is_dir() and not any(date_path.iterdir()):
+            date_path.rmdir()
+
+    return candidates_data
+
+
 # ---------------------------------------------------------------------------
-# Subcommand: nightly
+# Subcommand: candidate
 # ---------------------------------------------------------------------------
 
 
-def cmd_nightly(artifact_dir: str) -> None:
-    """Replace /nightly/ with the contents of artifact_dir."""
+def cmd_candidate(artifact_dir: str, sha: str, build_string: str,
+                  target_release: str) -> None:
+    """Deploy a candidate build to /<date>/<n>-<shortsha>/ and update candidates.json."""
     artifact = Path(artifact_dir)
     if not artifact.is_dir():
         die(f"Artifact dir not found: {artifact_dir}")
 
-    print(f"Deploying nightly from {artifact_dir}...")
-    replace_subdir(artifact, "nightly")
+    date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    shortsha = sha[:7]
+
+    candidates_file = Path("candidates.json")
+    if candidates_file.is_file():
+        candidates_data = json.loads(candidates_file.read_text())
+    else:
+        candidates_data = {"candidates": [], "retentionDays": DEFAULT_RETENTION_DAYS}
+
+    today_ns = [e["n"] for e in candidates_data["candidates"] if e["date"] == date]
+    new_n = max(today_ns) + 1 if today_ns else 1
+
+    candidate_dir = Path(date) / f"{new_n}-{shortsha}"
+    print(f"Creating candidate at {candidate_dir}...")
+    candidate_dir.mkdir(parents=True, exist_ok=True)
+    copy_contents_into(artifact, candidate_dir)
+
+    new_entry: dict = {
+        "date": date,
+        "n": new_n,
+        "sha": sha,
+        "shortsha": shortsha,
+        "path": f"/{date}/{new_n}-{shortsha}/",
+        "build": build_string,
+        "targetRelease": target_release,
+        "deployedAt": utc_now(),
+    }
+    candidates_data["candidates"] = [new_entry] + candidates_data["candidates"]
+    candidates_data["candidates"].sort(key=lambda e: (e["date"], e["n"]), reverse=True)
+
+    candidates_data = prune_candidates(candidates_data)
+    candidates_file.write_text(json.dumps(candidates_data, indent=2) + "\n")
+    print("candidates.json written.")
 
     ensure_static_files()
 
-    print("nightly/ updated.")
+    if Path("nightly").is_dir():
+        shutil.rmtree("nightly")
+        print("Removed legacy /nightly/ directory.")
+
+    print(f"Candidate deploy complete: {candidate_dir} @ {sha}")
 
 
 # ---------------------------------------------------------------------------
@@ -411,8 +479,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_rollback = sub.add_parser("rollback", help="Roll back to the previous production build")
     p_rollback.add_argument("actor")
 
-    p_nightly = sub.add_parser("nightly", help="Deploy artifact to /nightly/")
-    p_nightly.add_argument("artifact_dir")
+    p_candidate = sub.add_parser("candidate", help="Deploy artifact as a candidate build")
+    p_candidate.add_argument("artifact_dir")
+    p_candidate.add_argument("sha")
+    p_candidate.add_argument("build_string")
+    p_candidate.add_argument("target_release")
 
     return parser
 
@@ -430,8 +501,8 @@ def main() -> None:
                     args.target_release, args.actor)
     elif args.subcmd == "rollback":
         cmd_rollback(args.actor)
-    elif args.subcmd == "nightly":
-        cmd_nightly(args.artifact_dir)
+    elif args.subcmd == "candidate":
+        cmd_candidate(args.artifact_dir, args.sha, args.build_string, args.target_release)
     else:
         parser.print_usage()
         sys.exit(1)

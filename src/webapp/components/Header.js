@@ -35,7 +35,6 @@ export default function Header(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [programAnchor, setProgramAnchor] = React.useState(null);
   const menuOpen = Boolean(programAnchor);
-
   // Derive the logical UI state for editor-control gating.
   const logicalState = deriveLogicalState(
     props.status,
@@ -57,13 +56,6 @@ export default function Header(props) {
   // whether they are using the production version or a PR/dev build, and
   // jump back to the originating pull request when applicable.
   const buildInfo = React.useMemo(() => getBuildInfo(), []);
-
-  // Runtime nightly detection: the same artifact may be served from multiple
-  // paths; detect via the URL rather than a compile-time flag.
-  // Match exactly `/nightly` OR any path under `/nightly/` to avoid false
-  // positives (e.g. `/nightlybuild`). Access pathname only when window exists.
-  const path = typeof window !== 'undefined' ? window.location.pathname : '';
-  const isNightly = path === '/nightly' || path.startsWith('/nightly/');
 
   const handleProgramMenuClose = () => setProgramAnchor(null);
 
@@ -165,18 +157,18 @@ export default function Header(props) {
               sx={{ fontWeight: 'bold' }}
             />
           )}
-          {isNightly && (
+          {buildInfo.kind === 'candidate' && (
             <Tooltip
-              title="This is a nightly build, automatically deployed from the latest master commit. It may be unstable."
+              title="This is a candidate build, automatically deployed from a master commit. It may be unstable."
               arrow
               placement="bottom"
             >
               <Chip
-                id="nightly-build-chip"
+                id="candidate-build-chip"
                 size="small"
-                label="NIGHTLY"
-                className="nightly-chip"
-                aria-label="Nightly build"
+                label="CANDIDATE"
+                className="candidate-chip"
+                aria-label="Candidate build"
                 sx={{ fontWeight: 'bold' }}
               />
             </Tooltip>

@@ -2,114 +2,6 @@
 
 ## Active Decisions
 
-## 2026-06-05: Issue Triage — Session Morpheus
-
-Prioritized backlog recommendation for the squad based on 18 open issues.
-
-### A. Top Picks (tackle now)
-
-| # | Issue | Why | Effort | Risk | Route to |
-|---|-------|-----|--------|------|----------|
-| 1808 | Bump transitive `uuid` (CVE-2026-41907) | Security hygiene — moderate CVE, transitive via sockjs/istanbul-lib-processinfo. Likely just an npm override or bumping parent deps. | S | Low | Trinity / @copilot |
-| 1717 | Codacy react-hooks/exhaustive-deps (3 sites) | Good-first-issue, improves code quality, low risk. | S | Low | @copilot |
-| 1643 | Label references in .word64/.word32 directives | Real parser feature gap — common MIPS pattern (storing addresses in data). Scoped to Parser.java. | M | Med | Tank + Cypher (ISA validation) |
-| 1799 | Make stats coherent with architecture | Removes misleading WAW stats; educational correctness matters. Needs audit of what stats exist vs. what's architecturally possible. | M | Low | Tank |
-| 588 | Add more web UI tests | Priority:1, up-for-grabs. Playwright infra already exists (editor-persistence tests just landed). Incremental. | M | Low | Smith + Trinity |
-
-### B. Quick Wins
-
-- **#1717** — exhaustive-deps lint fix, 3 sites. Perfect for @copilot one-shot.
-- **#1808** — npm override in package.json (`"overrides": {"uuid": ">=11.1.1"}`), verify build passes. @copilot or Trinity.
-- **#222** — Codacy items (broad, but individual items can be cherry-picked as good-first-issues).
-
-### C. Bigger Bets
-
-| # | Issue | Effort | Notes |
-|---|-------|--------|-------|
-| 4 | Delay slot | L-XL | Touches pipeline core + UI cycle display. Fresh demand: 300-400 student/year course wants EduMIPS64 as WinDLX replacement specifically for pipelining study. High pedagogical value but architecturally invasive. **Next step:** Cypher + Tank produce a design spike (2-3 days) scoping pipeline changes, then decide go/no-go. |
-| 692 | Branch Taken / Misprediction stalls | L | Related to #4 — both improve pipeline fidelity. Could be sequenced after delay slot or done independently. Needs design doc. |
-| 703 | Non-aligned memory accesses | M-L | Core memory subsystem change. Needs decision: raise exception (MIPS64 spec) or silently handle? Cypher to clarify ISA semantics first. |
-| 709 | Customizable FPU latency | M | Core + UI. Useful for teaching, moderate scope. Lower urgency than pipeline items. |
-
-### D. Close / No-Action
-
-| # | Action | Reason |
-|---|--------|--------|
-| 1709 | **CLOSE** | Fully resolved by PR #1736 (merged 2026-06-05). localStorage persistence + Restore default sample button implemented, tested, documented. |
-| 619 | Leave as-is | Renovate's auto-managed Dependency Dashboard. Not actionable work. |
-
-### E. Recommended Next Step
-
-**Immediate sprint (1-2 weeks):** Close #1709 as done. Assign #1808 and #1717 to @copilot for same-day resolution (both are S-sized, mechanical fixes). Start Tank on #1643 (label references in data directives) with Cypher reviewing the ISA semantics. In parallel, kick off a time-boxed design spike on #4 (delay slot) — Cypher + Tank, 3 days max — to produce a concrete scope/effort estimate given the university adoption signal. That spike will tell us whether to commit to #4 this quarter or defer. Everything else stays in backlog ordered as above.
-
----
-
-## 2026-06-05: Trinity decision — uuid CVE override
-
-**Date:** 2026-06-05T16:05:59+02:00
-
-**Context:** GitHub issue #1808 reports CVE-2026-41907 in transitive npm `uuid@8.3.2`, pulled by dev/build-time tooling (`sockjs` via `webpack-dev-server`, `istanbul-lib-processinfo` via coverage tooling).
-
-**Decision:** Add a top-level npm `overrides` entry pinning `uuid` to `^11.1.1` instead of upgrading parent tooling, because this is the least invasive fix and keeps the existing web build pipeline stable.
-
-**Verification:** `npm ls uuid` resolves both transitive paths to `uuid@11.1.1 overridden`; `npm run build` succeeds.
-
----
-
-## 2026-06-05: Learning — Classic JSX runtime requirement
-
-**Context:** EduMIPS64 web UI (src/webapp) uses the classic JSX runtime via @babel/preset-react WITHOUT `runtime:automatic`.
-
-**Finding:** In PR #1814 (react-hooks/exhaustive-deps fix), Trinity removed the `import React` statement from Code.js to clean up unused imports per ESLint. This compiled/built successfully but crashed at runtime with "React is not defined", causing all 57 Playwright tests to fail.
-
-**Learning:** Every src/webapp component MUST keep `import React` in scope, even if no JSX appears to use it directly. The classic JSX runtime requires React in scope for JSX compilation. Removing it breaks the application at runtime despite clean compilation.
-
-**Action:** All developers must be aware that classic JSX runtime is in use. ESLint rules that suggest removing unused imports must be reviewed manually before committing React component files.
-
----
-
-## 2026-06-05: Trinity decision — react-hooks/exhaustive-deps fix
-
-**Date:** 2026-06-05T16:05:59+02:00
-
-**Context:** Codacy reported 3 react-hooks/exhaustive-deps violations: Code.js (missing dependencies in useEffect), plus 2 other sites.
-
-**Decision:** Fix violations by:
-1. Adding missing useEffect dependencies (refs validated for correctness).
-2. Creating Playwright regression test `src/test/webapp/exhaustive-deps-regressions.spec.js` to catch future regressions.
-3. Ensuring `import React` remains in scope (classic JSX runtime requirement).
-
-**Verification:** All 57 Playwright tests pass after applying `import React` fix.
-
-**Merged:** PR #1814 (squash merge).
-
----
-
-## 2026-06-05: Tank decision — Web UI Structural Stall counter sums all four structural-stall counters
-
-**Date:** 2026-06-05T21:42:39+02:00  
-**Author:** Tank  
-**Related PR:** #1819 (fixes issue #1818)
-
-**Context:** Web UI "Structural Stall" counter displayed only `memoryStalls`, making divider/EX/funcUnit structural stalls invisible to web UI users. Issue #1818 reported divider stalls were completely ignored (showed 0 for div.d.divider-stalls despite 23 divider stalls).
-
-**Decision:** The web UI "Structural Stall" counter (`stat-structural-stalls` in `Statistics.js`) now displays the **sum of all four structural-stall CPU counters**:
-- `getStructuralStallsDivider()` → `dividerStalls`
-- `getStructuralStallsMemory()` → `memoryStalls`
-- `getStructuralStallsEX()` → `exStalls`
-- `getStructuralStallsFuncUnit()` → `funcUnitStalls`
-
-**Rationale:** The web UI has a single "Structural Stall" row (matching educational intent of showing total pipeline stalls due to structural hazards). Summing all four counters gives users an accurate picture without requiring four separate rows (Swing UI already has separate rows; web UI keeps simplified aggregate view).
-
-**Implementation:**
-- `ResultFactory.java`: exports all four fields.
-- `Statistics.js`: sums them inline before rendering.
-- Any future structural-stall counters added to `CPU.java` must also be exported in `ResultFactory.java` and included in the sum in `Statistics.js`.
-
-**Verification:** PR #1819 passed all CI checks including Playwright tests; merged (squash); issue #1818 auto-closed.
-
----
-
 ## 2026-06-07: Web Promotion & Versioning — Eight Decisions Locked
 
 **Date:** 2026-06-07  
@@ -1049,6 +941,1032 @@ Trinity's `RunControlsToolbar.js` architecture is correctly implemented and veri
 
 **Test changes required:** Fixed 5 test patterns (presence/absence → enabled/disabled), all passing now.
 
+## 2026-06-13: Candidate Builds Session — Agent Records Merged
+
+--- copilot-candidate-builds.md ---
+### 2026-06-13T17:13Z: Promotable candidate builds for web.edumips.org
+**By:** Andrea Spadaccini (via Copilot)
+**What:** Every commit to master deploys a "promotable candidate" build to
+web.edumips.org under `/<YYYY-MM-DD>/<N>-<shortsha>/` (N increments per day),
+listed/selectable/shareable from the About page. Promotion (/v/<n>/) and rollback
+are unchanged.
+**Decisions:**
+- Replace the nightly lane entirely with the per-commit candidate lane.
+- Retention: keep last N days of candidates (default 14), prune by date.
+**Why:** Product owner wants to preview & share specific master builds before promoting.
+
+--- link-candidate-docs.md ---
+# Link: Candidate Builds Documentation
+
+**Author:** Link (Documentation / DevRel)  
+**Date:** 2026-06-13  
+**Branch:** feat/promotable-candidate-builds  
+**Based on:** Morpheus design spec (`.squad/decisions/inbox/morpheus-candidate-design.md`)
+
+---
+
+## Summary
+
+Updated developer and user-facing documentation to replace the "nightly" lane with the new "candidate builds" feature. The candidate builds system auto-deploys every CI-passing master commit to a per-commit URL with 14-day retention. Users can browse and share candidates from the web UI's About tab.
+
+## Files Changed
+
+### Developer Documentation
+
+**File:** `docs/developer-guide.md`
+
+**Multiple sections updated:**
+
+1. **CI/CD Workflows List** (lines 54–74)
+   - Updated count from "four" to "five" main workflows.
+   - Replaced "Nightly web deploy" entry with "Candidate web deploy" entry.
+   - New entry references `candidate-web.yml`, per-commit URL scheme, 14-day retention, and links to detailed "Candidate builds" section below.
+
+2. **"Candidate builds" section** (replaces "Nightly channel" lines 541–548)
+   - Explains that every CI-passing master commit is deployed as a candidate at `/<YYYY-MM-DD>/<N>-<shortsha>/`.
+   - Documents `/candidates.json` index, per-day counter `N`, 14-day retention.
+   - Mentions `candidate-web.yml` workflow (replaces `nightly-web.yml`) and `candidate` subcommand.
+   - Clarifies that candidates are protected during promotion/rollback operations.
+   - Notes **CANDIDATE** badge shown in UI.
+
+3. **"Manifest and version history" section** (line 524)
+   - Updated "stable and nightly builds" to "stable and candidate builds" (for navigator gating logic).
+
+---
+
+### User Documentation
+
+**All three languages (en / it / zh) updated in parallel for structural and translational consistency.**
+
+#### English
+
+**File:** `docs/user/en/src/versioning.rst`
+
+**Section:** "Which web build am I running?" (lines 40–53)
+
+**Change:** Replaced **``NIGHTLY``** badge description with **``CANDIDATE``** badge description.
+
+**What was updated:**
+- Removed: "Rebuilt every night" (orange badge).
+- Added: "Deployed from every commit" (blue badge), labeled with date + sequence number (e.g., `2026-06-13 #2`).
+- Added: "Retained for 14 days; browse and share from About tab."
+- Changed "dev" badge color from blue to green (to avoid collision with CANDIDATE).
+- Updated final summary line to reference `CANDIDATE` instead of `NIGHTLY`.
+
+**Fully translated** — original English text.
+
+---
+
+#### Italian
+
+**File:** `docs/user/it/src/versioning.rst`
+
+**Section:** "Quale build web sto eseguendo?" (lines 40–57)
+
+**Change:** Replaced **``NIGHTLY``** badge description with **``CANDIDATE``** badge description.
+
+**What was updated:**
+- Removed: "Ricostruita automaticamente ogni notte" (orange badge).
+- Added: Full Italian translation of "Deployed from every commit" (blue badge), date + sequence labeling, 14-day retention, About-tab browsing/sharing.
+- Changed "dev" badge color from blue (blu) to green (verde).
+- Updated summary to reference `CANDIDATE` instead of `NIGHTLY`.
+
+**Translation confidence:** High. Phrasing is natural, consistent with existing IT documentation, and technically accurate.
+
+---
+
+#### Simplified Chinese
+
+**File:** `docs/user/zh/src/versioning.rst`
+
+**Section:** "我正在使用哪个网页构建版本?" (lines 35–42)
+
+**Change:** Replaced **``NIGHTLY``** badge description with **``CANDIDATE``** badge description.
+
+**What was updated:**
+- Removed: "每晚从最新开发代码自动重新构建" (orange badge).
+- Added: Full Simplified Chinese translation of "Deployed from every commit" (blue badge), date + sequence labeling, 14-day retention, About-tab browsing/sharing.
+- Applied **CJK inline-markup spacing rule**: inserted `\ ` (backslash-space) between inline markup delimiters (`**`, `` `` ``) and adjacent CJK characters to ensure reStructuredText renders correctly (CJK and full-width punctuation do not satisfy rST boundary rules).
+- Changed "dev" badge color from blue (蓝色) to green (绿色).
+- Updated summary to reference `CANDIDATE` instead of `NIGHTLY`.
+
+**Translation confidence:** Technically accurate; applied consistent CJK spacing conventions. May benefit from native-speaker review for natural phrasing.
+
+---
+
+## Notes for Coordinator
+
+1. **No mirrored passages**: All user-doc changes were fully translated into IT and ZH with natural phrasing (not mirrored English).
+
+2. **CJK markup rule applied**: Chinese version applies the backslash-space spacing rule to ensure reStructuredText renders `CANDIDATE` literal and surrounding Chinese text without silent markup loss.
+
+3. **readme.md not updated**: The readme only mentions "deployed at https://web.edumips.org" without detailing the deployment process, so no update was needed (per the charter).
+
+4. **Learnings appended**: See `.squad/agents/link/history.md` for a full record of what was changed, translation decisions, and design reference.
+
+---
+
+## Color Correction (2026-06-13 — Andrea review)
+
+**Issue:** Badge color descriptions did not match the actual UI implementation.
+
+**Fixes applied to all three language versions:**
+- **CANDIDATE badge:** Changed from "blue" → "purple" (actual CSS: `#7b1fa2`).
+  - English: "blue badge" → "purple badge"
+  - Italian: "badge blu" → "badge viola"
+  - Chinese: "蓝色徽章" → "紫色徽章"
+- **dev badge:** Reverted from "green" → "blue" (unchanged MUI `color="info"`).
+  - English: "green badge" → "blue badge"
+  - Italian: "badge verde" → "badge blu"
+  - Chinese: "绿色徽章" → "蓝色徽章"
+
+**Files updated:**
+- `docs/user/en/src/versioning.rst`
+- `docs/user/it/src/versioning.rst`
+- `docs/user/zh/src/versioning.rst`
+
+---
+
+## Ready for Merge
+
+- ✅ Developer docs (single source, comprehensive).
+- ✅ User docs (three languages, consistent structure, full translations).
+- ✅ Badge colors corrected to match UI implementation.
+- ✅ Sphinx/rST syntax valid (CJK rules applied).
+- ✅ No secrets or sensitive data.
+
+---
+
+## Design Document Updated
+
+**File:** `docs/design/web-promotion-and-versioning.md`
+
+**Changes (2026-06-13):**
+- Updated scope line to reference "per-commit candidate channel" instead of "nightly channel".
+- Replaced "Nightly Channel" section with "Candidate Channel" section:
+  - New trigger: `workflow_run` on green master CI + `workflow_dispatch` (per-commit, replaces daily 01:00 UTC cron).
+  - New path scheme: `/<YYYY-MM-DD>/<N>-<shortsha>/` with per-day counter.
+  - New root index: `/candidates.json` (replaces `/nightly/`), with 14-day retention.
+  - UI badge: **CANDIDATE** (purple) replaces NIGHTLY.
+  - Build identity includes date/N metadata.
+- Updated Pages Layout tree: removed `nightly/` entry, added date-based candidate directories and `candidates.json`.
+- Updated URL Scheme table: replaced `/nightly/` row with candidate URL rows.
+- Renamed "Nightly Trigger" decision to "Candidate Trigger" and updated rationale to reflect per-commit design.
+- Updated Phased Rollout table: Phase 3.5 now describes per-commit `workflow_run`, new URL scheme, `candidates.json`, purple CANDIDATE badge, and 14-day retention.
+- Updated Resolved Decisions: decision #9 changed from "Nightly trigger?" to "Candidate trigger?" with per-commit rationale.
+- Updated In-app Previous-Version Navigator section: "stable and nightly builds" → "stable and candidate builds".
+
+Design doc now accurately reflects the implemented candidate-build architecture and no longer presents nightly/daily-cron as current.
+
+--- morpheus-candidate-design.md ---
+# Design: Promotable Candidate Builds
+
+**Author:** Morpheus (Lead/Architect)  
+**Date:** 2026-06-13  
+**Status:** Ready for implementation  
+**Assignees:** Tank (backend/infra), Trinity (frontend), Smith (tests)
+
+---
+
+## 1. Candidate Index File: `candidates.json`
+
+**Location:** Pages repo root (`/candidates.json`)  
+**Add to RESERVED_NAMES.**
+
+### Schema
+
+```json
+{
+  "candidates": [
+    {
+      "date": "2026-06-13",
+      "n": 2,
+      "sha": "abc1234def5678...",
+      "shortsha": "abc1234",
+      "path": "/2026-06-13/2-abc1234/",
+      "build": "v2.0.1-14-gabc1234",
+      "targetRelease": "2.0.2",
+      "deployedAt": "2026-06-13T14:32:01Z"
+    }
+  ],
+  "retentionDays": 14
+}
+```
+
+**Sort order:** Array sorted descending by `(date, n)` — newest first.  
+**Latest candidate:** Always `candidates[0]`.
+
+Field notes:
+- `date`: ISO date string `YYYY-MM-DD` (UTC date at deploy time).
+- `n`: 1-based per-day counter.
+- `sha`: Full 40-char commit SHA.
+- `shortsha`: First 7 characters of SHA.
+- `path`: Canonical relative URL path for this candidate.
+- `build`: Output of `git describe --tags` from CI.
+- `targetRelease`: Next planned release version.
+- `deployedAt`: ISO-8601 UTC timestamp.
+
+---
+
+## 2. `deploy-web-pages.py` Changes
+
+### 2.1 New subcommand: `candidate`
+
+```
+deploy-web-pages.py candidate <artifact_dir> <sha> <build_string> <target_release>
+```
+
+Arguments:
+- `artifact_dir` — path to extracted web artifact.
+- `sha` — full 40-char commit SHA.
+- `build_string` — git describe output.
+- `target_release` — next release version string.
+
+**Date is derived from `datetime.now(timezone.utc).strftime("%Y-%m-%d")`** — not passed in. This is simpler and avoids clock-skew arguments between caller and script.
+
+### 2.2 Algorithm for `cmd_candidate`
+
+```python
+def cmd_candidate(artifact_dir, sha, build_string, target_release):
+    # 1. Validate artifact_dir exists.
+    # 2. Compute date = UTC today as YYYY-MM-DD.
+    # 3. Compute shortsha = sha[:7].
+    # 4. Load candidates.json (or default to {"candidates":[], "retentionDays":14}).
+    # 5. Find max n for today's date among existing entries; new_n = max_n + 1.
+    # 6. candidate_path = f"/{date}/{new_n}-{shortsha}/"
+    #    candidate_dir  = f"{date}/{new_n}-{shortsha}"
+    # 7. Create directory, copy artifact contents into it.
+    # 8. Prepend new entry to candidates array.
+    # 9. Run date-based pruning (see §2.4).
+    # 10. Write candidates.json.
+    # 11. ensure_static_files().
+    # 12. If /nightly/ exists, remove it (one-time migration cleanup).
+```
+
+### 2.3 RESERVED_NAMES update
+
+```python
+RESERVED_NAMES = [
+    "v", "prev", "candidates.json", "manifest.json",
+    "CNAME", ".nojekyll", ".git"
+]
+```
+
+Changes:
+- **Add** `"candidates.json"`.
+- **Remove** `"nightly"` (the lane is dead).
+
+### 2.4 Protecting candidate date-dirs from promote/rollback
+
+**Critical issue:** `root_prod_entries()` returns every top-level entry not in RESERVED_NAMES. Candidate date-dirs (e.g. `2026-06-13/`) would be treated as production files and deleted on promote or swapped on rollback.
+
+**Solution — minimal and safe:** Add a helper `is_candidate_date_dir(name)` that returns `True` if `name` matches `^\d{4}-\d{2}-\d{2}$` AND is a directory. Modify `root_prod_entries()`:
+
+```python
+import re
+
+_DATE_DIR_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+def is_candidate_date_dir(name: str) -> bool:
+    return bool(_DATE_DIR_RE.match(name)) and Path(name).is_dir()
+
+def root_prod_entries() -> list[str]:
+    entries = []
+    for entry in Path(".").iterdir():
+        if entry.name in RESERVED_NAMES:
+            continue
+        if is_candidate_date_dir(entry.name):
+            continue
+        entries.append(entry.name)
+    return entries
+```
+
+This ensures `delete_root_prod_files()` (promote) and the rollback swap logic never touch candidate date-dirs or `candidates.json`. No changes needed to `cmd_promote` or `cmd_rollback` beyond the RESERVED_NAMES update.
+
+### 2.5 Date-based pruning
+
+```python
+DEFAULT_RETENTION_DAYS = 14
+
+def prune_candidates(candidates_data: dict) -> dict:
+    retention = candidates_data.get("retentionDays", DEFAULT_RETENTION_DAYS)
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=retention)).strftime("%Y-%m-%d")
+    
+    kept = []
+    removed_dates = set()
+    for entry in candidates_data["candidates"]:
+        if entry["date"] < cutoff:
+            # Remove the directory
+            candidate_dir = Path(entry["date"]) / f"{entry['n']}-{entry['shortsha']}"
+            if candidate_dir.exists():
+                shutil.rmtree(candidate_dir)
+            removed_dates.add(entry["date"])
+        else:
+            kept.append(entry)
+    
+    candidates_data["candidates"] = kept
+    
+    # Remove empty date dirs
+    for date_str in removed_dates:
+        date_path = Path(date_str)
+        if date_path.is_dir() and not any(date_path.iterdir()):
+            date_path.rmdir()
+    
+    return candidates_data
+```
+
+### 2.6 Remove `cmd_nightly`
+
+- Delete the `cmd_nightly` function.
+- Remove the `nightly` subparser from `build_parser()`.
+- Remove the `nightly` dispatch branch from `main()`.
+
+### 2.7 One-time `/nightly/` cleanup
+
+In `cmd_candidate`, after deploying:
+```python
+if Path("nightly").is_dir():
+    shutil.rmtree("nightly")
+    print("Removed legacy /nightly/ directory.")
+```
+
+---
+
+## 3. Workflow: `candidate-web.yml` (replaces `nightly-web.yml`)
+
+**Delete** `.github/workflows/nightly-web.yml`.  
+**Create** `.github/workflows/candidate-web.yml`:
+
+```yaml
+name: Candidate Web Deploy
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: web-pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy-candidate:
+    name: Deploy candidate build
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'master')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+
+    steps:
+      - name: Checkout edumips64 (for script)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Resolve run and SHA
+        id: resolve
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            # Manual: find latest successful CI on master
+            RUN_JSON=$(gh run list \
+              --workflow ci.yml \
+              --branch master \
+              --status success \
+              --limit 1 \
+              --json databaseId,headSha \
+              --jq '.[0]' \
+              --repo "${{ github.repository }}")
+            RUN_ID=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['databaseId'])")
+            HEAD_SHA=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['headSha'])")
+          else
+            # workflow_run trigger
+            RUN_ID="${{ github.event.workflow_run.id }}"
+            HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
+          fi
+          echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
+          echo "head_sha=${HEAD_SHA}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${HEAD_SHA:0:7}" >> "$GITHUB_OUTPUT"
+
+      - name: Download web artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ steps.resolve.outputs.run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifact/web
+          gh run download "${RUN_ID}" --name web --dir artifact/web \
+            --repo "${{ github.repository }}"
+
+      - name: Get build string
+        id: build_info
+        run: |
+          echo "build=$(git describe --tags --always)" >> "$GITHUB_OUTPUT"
+
+      - name: Clone Pages repo
+        env:
+          PAT_WEBUI: ${{ secrets.PAT_WEBUI }}
+        run: |
+          set -euo pipefail
+          git clone "https://x-access-token:${PAT_WEBUI}@github.com/EduMIPS64/web.edumips.org.git" \
+            pages-repo --branch master --depth 1
+          git -C pages-repo config user.name "github-actions[bot]"
+          git -C pages-repo config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy candidate
+        env:
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
+          BUILD: ${{ steps.build_info.outputs.build }}
+        run: |
+          set -euo pipefail
+          cp .github/scripts/deploy-web-pages.py pages-repo/
+          cd pages-repo
+          python3 deploy-web-pages.py candidate "../artifact/web" "$HEAD_SHA" "$BUILD" ""
+          rm -f deploy-web-pages.py
+
+      - name: Commit and push
+        env:
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
+          SHORT_SHA: ${{ steps.resolve.outputs.short_sha }}
+        run: |
+          set -euo pipefail
+          cd pages-repo
+          git add -A
+          git diff --cached --quiet && { echo "Nothing to commit."; exit 0; }
+          git commit -m "Candidate @ ${SHORT_SHA} (${HEAD_SHA})"
+          git push origin master
+```
+
+Key points:
+- **`workflow_run` trigger** fires only when CI completes on `master` — PR CI runs do NOT match because `branches: [master]` filters on the *triggering workflow's* branch.
+- `workflow_dispatch` for manual re-runs.
+- `target_release` passed as empty string `""` — can be parameterized later via workflow input or extracted from a file.
+
+---
+
+## 4. Frontend Changes
+
+### 4.1 `buildInfo.js` — new `'candidate'` kind
+
+```javascript
+const CANDIDATE_PATH_RE = /^\/(\d{4}-\d{2}-\d{2})\/(\d+)-([a-f0-9]{7,8})\//;
+
+export function getBuildInfo(loc) {
+  // ... existing logic ...
+  if (hostname === PROD_HOSTNAME) {
+    const candidateMatch = pathname.match(CANDIDATE_PATH_RE);
+    if (candidateMatch) {
+      return {
+        kind: 'candidate',
+        prNumber: null,
+        prUrl: null,
+        candidateDate: candidateMatch[1],
+        candidateN: parseInt(candidateMatch[2], 10),
+        candidateSha: candidateMatch[3],
+        candidateUrl: `https://web.edumips.org${candidateMatch[0]}`,
+      };
+    }
+    return { kind: 'production', prNumber: null, prUrl: null };
+  }
+  // ... rest unchanged ...
+}
+```
+
+The candidate check must come **before** the plain `production` return, inside the `hostname === PROD_HOSTNAME` branch.
+
+### 4.2 `versionHistory.js` — new helpers
+
+```javascript
+const CANDIDATE_PATH_RE = /^\/(\d{4}-\d{2}-\d{2})\/(\d+)-([a-f0-9]{7,8})\//;
+
+/**
+ * Parse candidate info from a location, or return null.
+ */
+export function getViewedCandidate(loc) {
+  const location = loc || (typeof window !== 'undefined' ? window.location : null);
+  if (!location) return null;
+  const match = (location.pathname || '').match(CANDIDATE_PATH_RE);
+  if (!match) return null;
+  return { date: match[1], n: parseInt(match[2], 10), shortsha: match[3] };
+}
+
+/**
+ * Fetch /candidates.json — returns parsed object or null.
+ */
+export async function fetchCandidates() {
+  try {
+    const resp = await fetch('/candidates.json', { cache: 'no-cache' });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    if (!data || !Array.isArray(data.candidates)) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Build display list from candidates data.
+ * Returns array sorted newest-first with display labels and hrefs.
+ */
+export function buildCandidateList(candidatesData, viewedCandidate) {
+  if (!candidatesData || !Array.isArray(candidatesData.candidates)) return [];
+  return candidatesData.candidates.map((c) => ({
+    date: c.date,
+    n: c.n,
+    shortsha: c.shortsha,
+    build: c.build,
+    href: c.path,
+    deployedAt: c.deployedAt,
+    label: `${c.date} #${c.n} (${c.shortsha})`,
+    isViewed:
+      viewedCandidate &&
+      viewedCandidate.date === c.date &&
+      viewedCandidate.n === c.n,
+  }));
+}
+```
+
+### 4.3 `HelpDialog.js` — About tab additions
+
+Add a new component `CandidateBuilds` rendered **after** `<PreviousVersions />`:
+
+```jsx
+function CandidateBuilds() {
+  const [candidates, setCandidates] = React.useState(null);
+  const viewedCandidate = React.useMemo(() => getViewedCandidate(), []);
+
+  React.useEffect(() => {
+    fetchCandidates().then((c) => setCandidates(c));
+  }, []);
+
+  const buildInfo = getBuildInfo();
+  if (!candidates || buildInfo.kind === 'pr') return null;
+
+  const items = buildCandidateList(candidates, viewedCandidate);
+  if (items.length === 0) return null;
+
+  return (
+    <Box id="about-candidate-builds" sx={{ mt: 2 }}>
+      {buildInfo.kind === 'candidate' && (
+        <Typography gutterBottom color="info.main">
+          You are viewing candidate build {buildInfo.candidateDate} #{buildInfo.candidateN} ({buildInfo.candidateSha}).{' '}
+          <Link href="/">Open production.</Link>
+        </Typography>
+      )}
+      <Typography variant="h6" gutterBottom>
+        Candidate builds
+      </Typography>
+      <List dense disablePadding>
+        {items.map((item) => (
+          <ListItem key={item.href} disablePadding>
+            <ListItemText
+              primary={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Link href={item.href} target="_blank" rel="noreferrer" title={item.build}>
+                    {item.label}
+                  </Link>
+                  {item.isViewed && (
+                    <Typography component="span" variant="caption">(viewing)</Typography>
+                  )}
+                </Box>
+              }
+            />
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
+}
+```
+
+Also update `BuildInfoLine` to handle `kind === 'candidate'`:
+
+```jsx
+if (buildInfo.kind === 'candidate') {
+  return (
+    <Typography id="about-build-info">
+      Build: candidate {buildInfo.candidateDate} #{buildInfo.candidateN} (
+      <Link href={buildInfo.candidateUrl} target="_blank" rel="noreferrer">
+        {buildInfo.candidateSha}
+      </Link>
+      )
+    </Typography>
+  );
+}
+```
+
+---
+
+## 5. Edge Cases
+
+| Scenario | Handling |
+|----------|----------|
+| **First run, `candidates.json` absent** | Script creates it with `{"candidates": [], "retentionDays": 14}` before computing `n=1`. |
+| **Multiple commits same day** | Each increments `n` within that day. The `concurrency` lock serializes deploys, so no race. |
+| **Pruning removes currently-viewed candidate** | The UI gracefully shows "this candidate is no longer available" if the path 404s. The share URL is best-effort — retention is documented. |
+| **Candidate dir collides with `/v/`, `/prev/`, reserved** | Impossible: date dirs match `YYYY-MM-DD` pattern which never equals `v`, `prev`, `manifest.json`, etc. |
+| **`monitor-webui.yml`** | Unaffected — it reads root `/manifest.json` `.sha` which is only written by `promote`. |
+| **Promote during candidate deploy** | Both are in `concurrency: web-pages-deploy` — serialized, no conflict. Promote's `delete_root_prod_files` skips date-dirs thanks to `is_candidate_date_dir`. |
+| **Legacy `/nightly/` exists** | First candidate run removes it. After that, it's gone. |
+| **`target_release` empty** | Acceptable — field is informational. Script stores whatever is passed. |
+
+---
+
+## 6. Test Plan (for Smith)
+
+### 6.1 Python unit tests (`test_deploy_web_pages.py`)
+
+| # | Test case |
+|---|-----------|
+| 1 | `cmd_candidate` first run: creates `candidates.json`, date dir, candidate subdir with correct contents. |
+| 2 | `cmd_candidate` second run same day: `n` increments to 2, both entries present. |
+| 3 | `cmd_candidate` different day: `n` resets to 1 for the new date. |
+| 4 | Date-based pruning: entries older than N days are removed from JSON and their dirs deleted; empty date dirs removed. |
+| 5 | `root_prod_entries` excludes date-pattern dirs and `candidates.json`. |
+| 6 | `cmd_promote` does not delete candidate date-dirs or `candidates.json`. |
+| 7 | `cmd_rollback` does not disturb candidate date-dirs or `candidates.json`. |
+| 8 | Legacy `/nightly/` removal on first candidate deploy. |
+| 9 | `candidates.json` entries are sorted descending by `(date, n)`. |
+| 10 | Invalid/missing `artifact_dir` triggers `die()`. |
+
+### 6.2 JavaScript unit tests
+
+| # | Test case |
+|---|-----------|
+| 1 | `getBuildInfo` returns `kind: 'candidate'` for `/2026-06-13/2-abc1234/index.html`. |
+| 2 | `getBuildInfo` returns `kind: 'production'` for root path on prod host. |
+| 3 | `getViewedCandidate` parses valid candidate paths correctly. |
+| 4 | `getViewedCandidate` returns null for non-candidate paths. |
+| 5 | `buildCandidateList` marks the correct item as `isViewed`. |
+| 6 | `buildCandidateList` returns empty array for null/invalid input. |
+| 7 | `fetchCandidates` returns null on 404 / invalid JSON. |
+
+### 6.3 Playwright e2e tests
+
+| # | Test case |
+|---|-----------|
+| 1 | About tab shows "Candidate builds" section when `candidates.json` is served. |
+| 2 | Candidate banner appears when viewing a candidate URL. |
+| 3 | Share links in candidate list are correct `/<date>/<n>-<sha>/` URLs. |
+| 4 | About tab hides candidate section gracefully when `candidates.json` 404s. |
+
+---
+
+## Summary of file changes
+
+| File | Action | Owner |
+|------|--------|-------|
+| `.github/scripts/deploy-web-pages.py` | Add `candidate` subcommand, update RESERVED_NAMES, add `is_candidate_date_dir`, modify `root_prod_entries`, remove `cmd_nightly`, add pruning | Tank |
+| `.github/scripts/test_deploy_web_pages.py` | Add tests per §6.1 | Smith |
+| `.github/workflows/nightly-web.yml` | **Delete** | Tank |
+| `.github/workflows/candidate-web.yml` | **Create** per §3 | Tank |
+| `src/webapp/buildInfo.js` | Add candidate kind detection | Trinity |
+| `src/webapp/versionHistory.js` | Add `getViewedCandidate`, `fetchCandidates`, `buildCandidateList` | Trinity |
+| `src/webapp/components/HelpDialog.js` | Add `CandidateBuilds` component, update `BuildInfoLine` | Trinity |
+| JS test files | Add tests per §6.2, §6.3 | Smith |
+
+--- smith-always-visible-toolbar-verification.md ---
+# Smith QA Verdict: Always-Present Toolbar Buttons (PR #1835)
+
+**Date:** 2026-06-09T15:41:52+02:00  
+**Branch:** squad/streamline-run-controls  
+**Commit:** 207827ba  
+**Spec:** src/test/webapp/contextual-controls.spec.js  
+
+---
+
+## VERDICT: PASS ✅
+
+Trinity's new `RunControlsToolbar.js` architecture — all five execution buttons
+always present in the DOM when the toolbar is visible, enabled/disabled rather
+than rendered/absent — is correctly implemented and verified by the test suite.
+
+---
+
+## Implementation correctness
+
+| Check | Result |
+|-------|--------|
+| Toolbar absent in EMPTY | ✅ |
+| Toolbar absent in ENDED | ✅ |
+| READY: step/multi-step/run/stop **enabled** | ✅ |
+| READY: pause **visible + disabled** | ✅ |
+| EXECUTING: pause **enabled** | ✅ |
+| EXECUTING: step/multi-step/run **visible + disabled** | ✅ |
+| EXECUTING: stop **visible + disabled** ("Pause before stopping") | ✅ |
+| Load button always in header | ✅ |
+
+---
+
+## Test changes required (test bugs, not impl bugs)
+
+All fixes were in the test code. No implementation bugs found.
+
+### 1. READY pause: `toBeHidden()` → `toBeVisible() + toBeDisabled()`
+Old model had pause absent in READY; new model has it present but disabled.
+
+### 2. EXECUTING step/multi-step/run: `toBeHidden()` → `toBeVisible() + toBeDisabled()`
+Old model had these absent in EXECUTING; new model has them present but disabled.
+
+### 3. EXECUTING entry signal
+`waitForSelector('#pause-button', {state:'visible'})` was insufficient — pause
+is now visible even in READY (just disabled). Fixed to:
+`waitForSelector('#pause-button:not([disabled])')`.
+
+### 4. EXECUTING teardown
+`waitForSelector('#step-button', {state:'visible'})` was insufficient — step is
+now always visible. Fixed to: `waitForSelector('#step-button:not([disabled])')`.
+
+### 5. test-utils.js JSDoc
+Updated `waitForRunningState()` comment to explain the always-present model.
+The selector `#step-button:not([disabled])` remains valid — it correctly
+discriminates READY (enabled) from EXECUTING (disabled).
+
+---
+
+## Full suite results
+
+| Spec | Result |
+|------|--------|
+| contextual-controls.spec.js (8 tests) | ✅ All pass |
+| settings-persistence.spec.js (6 tests) | ✅ All pass (no changes needed) |
+| All other specs (55 tests) | ✅ Pass |
+| cache-simulator.spec.js:125 | ❌ GPU crash (pre-existing env flake) |
+| contextual-controls.spec.js drag test | ⏭ Skipped (intentional, deferred) |
+
+**Total: 69/71 pass, 1 skipped, 1 pre-existing GPU crash.**
+
+---
+
+## No implementation bugs to report
+
+Trinity's implementation in `RunControlsToolbar.js` is correct:
+- `deriveLogicalState()` mapping correct
+- `stepDisabled = logicalState !== 'READY'` — correct
+- `pauseDisabled = logicalState !== 'EXECUTING'` — correct
+- `stopDisabled = logicalState === 'EXECUTING'` — correct ("Pause before stopping" tooltip)
+- Early return `null` for EMPTY/ENDED/WAITING_FOR_INPUT — correct
+
+--- smith-candidate-tests.md ---
+# Smith: Candidate Build Tests — Summary
+
+**Author:** Smith (Tester / QA)  
+**Date:** 2026-06-13  
+**Branch:** `feat/promotable-candidate-builds`  
+**Task:** Tests per §6.1 and §6.3 of `morpheus-candidate-design.md`
+
+---
+
+## Files Changed
+
+| File | Action |
+|------|--------|
+| `.github/scripts/deploy-web-pages.py` | Removed orphaned `replace_subdir` function |
+| `.github/scripts/test_deploy_web_pages.py` | Added `candidate()` / `read_candidates()` helpers + 10 new tests |
+| `src/test/webapp/version-and-nightly-badge.spec.js` | **Renamed** to `version-and-candidate-badge.spec.js` (via `git mv`) |
+| `src/test/webapp/version-and-candidate-badge.spec.js` | Rewritten to target `#candidate-build-chip` and candidate path regex |
+| `src/test/webapp/candidate-builds.spec.js` | **Created** — 4 new Playwright specs for `#about-candidate-builds` |
+
+---
+
+## 1. Dead-code Cleanup
+
+`replace_subdir` in `.github/scripts/deploy-web-pages.py` had **no callers** after the removal of the nightly subcommand. Confirmed via grep (only definition line appeared). Function removed.
+
+---
+
+## 2. Python Unit Tests
+
+### New helpers
+- `candidate(pages, artifact, sha, build_string, target_release)` — runs `cmd_candidate` inside the pages dir (mirrors existing `promote` / `rollback` helpers).
+- `read_candidates(pages)` — reads and parses `candidates.json`.
+
+### New tests (§6.1)
+
+| # | Test | Description |
+|---|------|-------------|
+| 1 | `test_candidate_first_run` | Creates `candidates.json` + `<date>/1-<shortsha>/` with correct entry fields |
+| 2 | `test_candidate_second_run_same_day` | `n` increments to 2; both entries present; sorted newest-first |
+| 3 | `test_candidate_different_day_resets_n` | `n` resets to 1 for new date |
+| 4 | `test_candidate_pruning` | Entry older than retentionDays removed; dir deleted; empty date dir removed; fresh entry kept |
+| 5 | `test_root_prod_entries_excludes_candidate_dirs` | Date-pattern dirs and `candidates.json` excluded |
+| 6 | `test_promote_preserves_candidate_dirs` | `cmd_promote` does NOT delete candidate dir or `candidates.json` |
+| 7 | `test_rollback_preserves_candidate_dirs` | `cmd_rollback` does NOT disturb candidate dir / `candidates.json` |
+| 8 | `test_candidate_removes_nightly_dir` | Legacy `/nightly/` removed on first candidate deploy |
+| 9 | `test_candidates_sorted_newest_first` | `candidates.json` array sorted descending by `(date, n)` |
+| 10 | `test_candidate_die_on_missing_artifact` | `die()` → `SystemExit(1)` on missing artifact dir |
+
+### Python test results
+
+```
+15 passed in 0.07s   ✅
+```
+(5 pre-existing + 10 new — all green)
+
+---
+
+## 3. Playwright Specs
+
+### `version-and-candidate-badge.spec.js` (renamed from `version-and-nightly-badge.spec.js`)
+
+Tests:
+- **About tab shows a non-empty version string** — unchanged from original.
+- **CANDIDATE chip is absent on a normal (non-candidate) load** — asserts `#candidate-build-chip` has count 0 at root `/`.
+- **CANDIDATE chip detection is path-based (unit-level check)** — injects candidate paths into `CANDIDATE_PATH_RE` regex; verifies root `/` → false, valid candidate paths → true, old `/nightly/` path → false.
+
+### `candidate-builds.spec.js` (new file)
+
+Mocks `GET /candidates.json` via `page.route()` before `page.goto()` (same pattern as `version-history.spec.js`).
+
+| Test | Description |
+|------|-------------|
+| A | Section `#about-candidate-builds` present with 3 `[data-candidate]` items when mock returns 3 candidates |
+| B | Section absent when `candidates.json` returns 404 |
+| C | Each `[data-candidate="<date>-<n>"]` item's `<a>` href matches `/<date>/<n>-<shortsha>/` |
+| D | Section absent when `candidates.json` returns empty `candidates` array |
+
+### Playwright runtime status
+
+`npx playwright test --list` confirms **all 7 new/updated specs parse without syntax errors**. ✅
+
+Full e2e runtime: **deferred to CI** — the GWT `worker.js` artifact is absent in the dev environment, causing `waitForPageReady` to time out. This is the **same failure mode as existing specs** (confirmed by running `version-history.spec.js` — also fails). Not a test-code defect.
+
+---
+
+## 4. Reviewer Verdict
+
+### APPROVE ✅
+
+The candidate feature implementation is clean and follows the design spec. No production bugs found.
+
+### Observations (non-blocking)
+
+- **`deploy-web-pages.py`**: `replace_subdir` was orphaned — now removed. All other functions are properly used. Logic for `cmd_candidate`, `prune_candidates`, `is_candidate_date_dir`, and `root_prod_entries` is correct and verified by tests.
+
+- **`buildInfo.js` / `versionHistory.js` / `HelpDialog.js` / `Header.js`**: Trinity's implementation follows the design spec. DOM hooks (`#candidate-build-chip`, `#about-candidate-builds`, `[data-candidate]`) match what the test specs assert. CSS class renamed correctly (`.nightly-chip` → `.candidate-chip`).
+
+- **`candidate-web.yml`**: Tank correctly noted the workflow name deviation (`"CI Build"` vs `"CI"`) — this is the right call and would have caused a silent CI trigger failure if left as `"CI"`.
+
+### No blocking issues found.
+
+---
+
+## 5. Bugs Found
+
+None. The implementation is correct and consistent with the design spec.
+
+--- tank-candidate-impl.md ---
+# Tank Implementation Notes: Candidate Build Backend
+
+**Author:** Tank (Core/Backend Developer)  
+**Date:** 2026-06-13  
+**Task:** Implementation of §2 and §3 from `morpheus-candidate-design.md`
+
+---
+
+## Deviations from Design
+
+### CI Workflow Name (CRITICAL)
+
+**Design assumed:** `workflows: ["CI"]`  
+**Actual name in `.github/workflows/ci.yml`:** `"CI Build"`
+
+The `candidate-web.yml` workflow uses:
+```yaml
+workflows: ["CI Build"]
+```
+
+This is the exact string that must match for `workflow_run` to fire. Using "CI" would cause the trigger to silently never activate.
+
+---
+
+## Files Modified / Created / Deleted
+
+| File | Action |
+|------|--------|
+| `.github/scripts/deploy-web-pages.py` | Modified |
+| `.github/workflows/nightly-web.yml` | **Deleted** |
+| `.github/workflows/candidate-web.yml` | **Created** |
+| `.squad/agents/tank/history.md` | Updated with learnings |
+
+---
+
+## Verification Results
+
+- **Syntax check:** `python3 -c "import ast; ast.parse(...)"` → OK
+- **Existing tests:** `python3 -m pytest test_deploy_web_pages.py -q` → 5 passed, 0 failed
+- **Sanity run:** Two back-to-back `cmd_candidate` calls on same day confirmed `n` increments (1→2) and `candidates[0]` is newest
+- **YAML lint:** `yaml.safe_load(...)` → OK
+
+---
+
+## Notes for Smith (Test Author)
+
+The `cmd_candidate` function is ready for the test cases in §6.1. Key things to note:
+- `candidates_data["candidates"]` is sorted descending by `(date, n)` — newest first.
+- `prune_candidates` is called inside `cmd_candidate` after prepending the new entry.
+- The `candidate` subparser argument order is: `artifact_dir sha build_string target_release`.
+
+--- trinity-candidate-badge.md ---
+# Decision: Candidate Build Badge — DOM Hooks
+
+**Author:** Trinity (Frontend Developer)  
+**Date:** 2026-06-13  
+**For:** Smith (Test Engineer) and anyone writing Playwright / E2E specs against the Header
+
+## Summary
+
+The nightly badge has been fully removed and replaced with a candidate badge in
+`src/webapp/components/Header.js`. The CSS rule in `src/webapp/css/main.css` has
+been renamed to match.
+
+## New DOM Hooks
+
+| Attribute | Value |
+|-----------|-------|
+| `id` | `candidate-build-chip` |
+| `class` | `candidate-chip` |
+| `aria-label` | `Candidate build` |
+| `label` (visible text) | `CANDIDATE` |
+
+The chip is rendered only when `buildInfo.kind === 'candidate'`, i.e. when the
+app is served from a `/<YYYY-MM-DD>/<N>-<shortsha>/` path on `web.edumips.org`.
+
+## Removed DOM Hooks (no longer exist)
+
+- `id="nightly-build-chip"`
+- `class="nightly-chip"`
+- `aria-label="Nightly build"`
+
+Any existing tests that target these selectors must be updated.
+
+## CSS Change
+
+`.nightly-chip` → `.candidate-chip` in `src/webapp/css/main.css`.  
+Comment updated to reference `/<date>/<n>-<sha>/` candidate paths.  
+Visual treatment (purple background `#7b1fa2`, white text) is unchanged.
+
+--- trinity-candidate-ui.md ---
+# Trinity: Candidate UI Implementation Notes
+
+**Author:** Trinity (Frontend Developer)
+**Date:** 2026-06-13
+**Feature:** Promotable Candidate Builds — frontend (§4 of morpheus-candidate-design.md)
+**Branch:** feat/promotable-candidate-builds
+
+---
+
+## Files Changed
+
+| File | Change |
+|------|--------|
+| `src/webapp/buildInfo.js` | Added `'candidate'` kind detection |
+| `src/webapp/versionHistory.js` | Added `getViewedCandidate`, `fetchCandidates`, `buildCandidateList` |
+| `src/webapp/components/HelpDialog.js` | Updated `BuildInfoLine`, added `CandidateBuilds` component |
+
+---
+
+## Deviations from Design
+
+None. The implementation follows §4 of the design spec exactly.
+
+---
+
+## DOM Hooks (ids / data-attrs) for Playwright
+
+### Existing (unchanged)
+- `id="about-build-info"` — `<Typography>` rendered by `BuildInfoLine()`. Now also covers `kind === 'candidate'`.
+
+### New
+- `id="about-candidate-builds"` — Outer `<Box>` wrapping the entire `CandidateBuilds` section. Present in DOM only when: `candidates.json` returns ≥1 entry AND `buildInfo.kind !== 'pr'`.
+- `data-candidate="${date}-${n}"` — on each `<ListItem>` inside the candidate list (e.g. `data-candidate="2026-06-13-2"`). Allows Playwright to assert specific candidates are listed.
+
+### Candidate info banner
+The banner (`<Typography color="info.main">`) inside `#about-candidate-builds` is rendered only when `buildInfo.kind === 'candidate'` (i.e. the page is being served from a candidate URL). It contains the text "You are viewing candidate build …" and an `<a href="/">Open production.</a>` link.
+
+### "(viewing)" caption
+Each `<ListItem>` with `isViewed === true` renders a `<Typography component="span" variant="caption">(viewing)</Typography>` adjacent to the link. Playwright can assert this by combining the `data-candidate` attribute with `:has-text("(viewing)")`.
+
+---
+
+## Test Notes for Smith
+
+Playwright test cases recommended (per §6.3):
+
+1. **Candidates section present** — mock `GET /candidates.json` → valid payload with ≥1 entry → assert `#about-candidate-builds` is visible in About tab.
+2. **Candidate banner** — serve app at a URL matching `/<date>/<n>-<sha>/` on `web.edumips.org` (mock hostname) → assert banner text contains "You are viewing candidate build".
+3. **Share link correctness** — for each `data-candidate="<date>-<n>"` element, assert the inner `<a>` href matches `/<date>/<n>-<shortsha>/`.
+4. **Graceful 404** — mock `GET /candidates.json` → 404 → assert `#about-candidate-builds` is absent from DOM.
+5. **"(viewing)" caption** — serve from candidate URL matching an entry in `candidates.json` → assert that `[data-candidate="${date}-${n}"] :text("(viewing)")` is visible.
 ---
 
 ## 2026-06-09: Decision — Alt A Program ▾ Dropdown Menu (Trinity implementation)

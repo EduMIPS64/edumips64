@@ -51,7 +51,7 @@ To generate an installable Windows MSI package (using the Gradle `msi` task), yo
 This project uses GitHub Actions for continuous integration
 (https://github.com/EduMIPS64/edumips64/actions).
 
-There are four main CI/CD workflows:
+There are five main CI/CD workflows:
 
 - **CI Build** (`ci.yml`) — runs on every pull request and on a daily schedule.
   Builds and tests the desktop application, builds the web application, runs the
@@ -61,16 +61,17 @@ There are four main CI/CD workflows:
 - **PR preview deploy** (`pr-reports.yml`) — triggered when a CI Build run
   completes. It runs from the base branch (never checking out pull request
   code) and deploys the pre-built web application to the staging environment.
+- **Candidate web deploy** (`candidate-web.yml`) — triggered when a CI Build run
+  completes successfully on `master`. Deploys the build as a candidate build to
+  `web.edumips.org` at a per-commit URL path `/<YYYY-MM-DD>/<N>-<shortsha>/`.
+  Users can browse and share candidates from the web UI's **About** tab. The
+  `/candidates.json` index maintains a 14-day retention policy. See
+  [Candidate builds](#candidate-builds) section below for details.
 - **Release** (`release.yml`) — runs on every push to `master` to build all
   release artifacts (JAR, MSI, Electron apps). The `deploy-prod` job is
   disabled (`if: false`); production web deploys are now gated (see below).
   Can also be triggered manually to create a tagged GitHub release with all
   artifacts attached.
-- **Nightly web deploy** (`nightly-web.yml`) — runs on a daily schedule at
-  01:00 UTC (and can be triggered manually via `workflow_dispatch`). Finds the
-  latest green `master` CI build and deploys its web artifact to
-  `web.edumips.org/nightly/` (an ungated preview channel; shows a NIGHTLY
-  badge). Does not touch the production root.
 
 ### Main Gradle tasks
 
@@ -520,7 +521,7 @@ list linking to each archived version at `/v/<N>/` (opens in a new tab). The
 current version is marked. When viewing an archived snapshot at `/v/<N>/`, the
 About tab displays a "Return to latest" link instead.
 
-This gating ensures the navigator only appears for stable and nightly builds, not
+This gating ensures the navigator only appears for stable and candidate builds, not
 temporary PR previews.
 
 #### Monotonic version numbering
@@ -538,14 +539,33 @@ This promotes `prev/` back to root and updates `manifest.json`. Gated to
 
 Alternatively, use Mode 2 of `promote-web.yml` to re-promote a previous good build by its run ID.
 
-#### Nightly channel
+#### Candidate builds
 
-`nightly-web.yml` runs on a daily schedule at 01:00 UTC (and can be triggered
-manually via `workflow_dispatch`). It finds the latest successful CI run on
-`master` and deploys that build to `web.edumips.org/nightly/`. This is an
-ungated preview; the build shows a **NIGHTLY** badge so users know it may be
-unstable. Nightly never touches the production root, `prev/`, or any `v/N/`
-snapshot.
+Every commit to `master` that passes CI is automatically deployed as a **candidate
+build** at a per-commit URL following the pattern `/<YYYY-MM-DD>/<N>-<shortsha>/`,
+where `<N>` is a 1-based per-day counter and `<shortsha>` is the 7-character commit
+SHA. Multiple commits on the same day receive incrementing numbers.
+
+The `candidate-web.yml` workflow handles candidate deploys, triggered when a CI
+run completes successfully on `master`. The `.github/scripts/deploy-web-pages.py`
+script gains a `candidate` subcommand that:
+
+- Computes the UTC date and per-day counter `N`.
+- Creates the candidate directory structure.
+- Updates a root-level `/candidates.json` index file listing all candidates sorted
+  newest-first (same format as `/manifest.json`, but with date-based entries and
+  retention metadata).
+- Automatically prunes candidates older than 14 days (configured in the JSON file).
+- Removes any legacy `/nightly/` directory on first run (one-time migration).
+
+The `/candidates.json` index file is excluded from promotion and rollback operations,
+which ensures candidate builds remain immutable and independent of production
+version management.
+
+Users can browse and share specific candidate builds from the web UI's **About** tab,
+which fetches and displays the candidate list. This replaces the previous `/nightly/`
+ungated preview channel. Candidate builds show a **CANDIDATE** badge so users know
+they may be unstable.
 
 ### Manual release checklist
 

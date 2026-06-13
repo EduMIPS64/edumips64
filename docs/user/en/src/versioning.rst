@@ -39,17 +39,19 @@ next to the **"Web Version"** label in the toolbar:
 
 * **No badge** — you are on the normal production build. This is the stable
   version at https://web.edumips.org.
-* **``NIGHTLY``** (orange badge) — a build that is **rebuilt automatically
-  every night** from the latest development code. It always has the newest
-  features, but it **may be unstable**. Hovering over the badge shows a
-  tooltip confirming this.
+* **``CANDIDATE``** (purple badge) — a build automatically deployed from every
+  commit to the latest development code. Each candidate build is labeled with
+  its date and sequence number (e.g., `2026-06-13 #2`). You can browse all
+  available candidates and share their URLs from the **About** tab. Candidates
+  may be unstable and are retained for 14 days. Hovering over the badge shows
+  a tooltip confirming this.
 * **``PR #N``** (yellow badge) — a temporary preview built for a specific
   proposed change (pull request) on GitHub. Clicking the badge opens the
   corresponding pull request page.
 * **``dev``** (blue badge) — someone is running a local development build
   directly on their machine.
 
-In short: **no badge → stable production; ``NIGHTLY`` → newest features but
+In short: **no badge → stable production; ``CANDIDATE`` → newest features but
 possibly unstable; ``PR #N`` / ``dev`` → temporary or preview builds.**
 
 Viewing previous versions

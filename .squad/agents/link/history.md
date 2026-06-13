@@ -5,25 +5,19 @@
 - **Stack:** Java 17+ (Gradle) core simulator, Swing UI, GWT-compiled Web Worker, React/JS web UI (npm/webpack), Sphinx docs (Python, EN/IT/ZH). Tests: JUnit + Playwright.
 - **Created:** 2026-06-05T07:18:06+02:00
 
-## Recent Completions
+## Archive
 
-- 2026-06-05T12:43:38Z: Added `## Unreleased` section to CHANGELOG.md (PR #1812), documenting 3 user-facing changes from PRs #1736, #1804, #1713/#1697. SUCCESS.
+Detailed learnings from 2026-06-05 through 2026-06-09 (build identity, web promotion, version navigator, contextual run controls) are archived in prior git history of this file.
 
-## Learnings
+## Recent Work Summary
 
-<!-- Append new learnings below. Each entry is something lasting about the project. -->
+- **2026-06-07:** Implemented robust docs/user/common_conf.py fallback chain for version resolution; added versioning.rst pages (EN/IT/ZH); updated developer-guide.md.
 
-## Learnings — 2026-06-07: Build identity in user manual & web promotion docs
+- **2026-06-08:** Documented unified promote-web.yml workflow with optional run_id; created version-navigator pages (en/versions.rst + IT/ZH).
 
-### common_conf.py fallback chain (docs/user/common_conf.py)
-Replaced the fragile `open('../../../../gradle.properties')` (cwd-relative) with a five-step fallback:
-1. `EDUMIPS64_BUILD_VERSION` env var (explicit override, highest priority).
-2. `git describe --tags --match v* --always --dirty`, run via `git -C <repo_root>` where `<repo_root>` is resolved from `os.path.abspath(__file__)` — works regardless of the working directory (RTD, local, Gradle subproject invocations).  Leading `v` stripped.
-3. `READTHEDOCS_GIT_COMMIT_HASH` shortened to 8 chars (RTD shallow-clone fallback when git tags aren't available).
-4. `gradle.properties` `version=` line, resolved via `__file__` (not cwd) — fixes the existing fragility.
-5. `"unknown"` as final fallback.
-Each step is wrapped in `try/except` so any failure falls through silently.
+- **2026-06-09:** Documented contextual run-controls feature in user UI pages (en/ui.rst + IT/ZH translations).
 
+- **2026-06-13:** Candidate builds documentation session: updated docs/developer-guide.md (CI/CD count → 5, nightly → candidate section, versionHistory gating notes), design doc (architecture, versioning scheme, deployment flow), user docs (EN/IT/ZH — feature overview, deployment behavior, UI navigation, retention policy). Badge color fixes (candidate blue vs nightly orange). Documentation merged in PR #1845.
 ### Files changed
 - `docs/user/common_conf.py` — robust fallback chain for `version`/`release`.
 - `docs/user/en/src/index.rst` — "This manual was generated for EduMIPS64 build |version|."
