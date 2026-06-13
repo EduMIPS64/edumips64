@@ -1,5 +1,5 @@
 const { test, expect } = require('./fixtures');
-const { targetUri, waitForPageReady, removeOverlay } = require('./test-utils');
+const { targetUri, waitForPageReady, removeOverlay, loadProgram } = require('./test-utils');
 
 const STORAGE_PREFIX = 'edumips64:v1:';
 
@@ -131,22 +131,22 @@ test('expandedAccordions persists across page reloads', async ({ page }) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  // The Pipeline accordion is collapsed by default; expand it. Use the
-  // accordion's button role (its accessible name is exactly "Pipeline") so
-  // we don't accidentally match the "Pipeline Colors" section in Settings.
-  const pipelineSummary = page.getByRole('button', { name: 'Pipeline' });
-  await pipelineSummary.click();
+  // The Memory accordion is collapsed by default (see issue #1697 defaults);
+  // expand it. Target the accordion's button by role so we don't accidentally
+  // match other elements that contain the word "Memory".
+  const memorySummary = page.getByRole('button', { name: 'Memory' });
+  await memorySummary.click();
   await page.waitForTimeout(300);
 
-  // Verify localStorage contains the updated accordions object with pipeline: true
+  // Verify localStorage contains the updated accordions object with memory: true
   const stored = await page.evaluate(
     (key) => JSON.parse(window.localStorage.getItem(key) || 'null'),
     `${STORAGE_PREFIX}expandedAccordions`
   );
   expect(stored).not.toBeNull();
-  expect(stored.pipeline).toBe(true);
+  expect(stored.memory).toBe(true);
 
-  // Reload and verify Pipeline accordion is still expanded
+  // Reload and verify Memory accordion is still expanded
   await page.reload();
   await waitForPageReady(page);
   await removeOverlay(page);
@@ -156,7 +156,7 @@ test('expandedAccordions persists across page reloads', async ({ page }) => {
     `${STORAGE_PREFIX}expandedAccordions`
   );
   expect(storedAfterReload).not.toBeNull();
-  expect(storedAfterReload.pipeline).toBe(true);
+  expect(storedAfterReload.memory).toBe(true);
 });
 
 /**
@@ -201,11 +201,19 @@ test('stepStride and executionDelayMs persist across page reloads', async ({ pag
   await expect(page.getByLabel('Multi Step Size')).toHaveValue('250');
   await expect(page.getByLabel('Execution Delay (ms)')).toHaveValue('100');
 
-  // The Multi Step button's tooltip reflects the configured stride, so the
-  // header really does read from the persisted setting.
-  await expect(
-    page.getByRole('button', { name: /Run 250 steps of simulation/ })
-  ).toBeVisible();
+  // The Multi Step button is only rendered in READY state (contextual run
+  // controls).  Load a minimal program so the toolbar transitions from EMPTY
+  // to READY and the button becomes visible for the tooltip assertion.
+  const simpleProgram = `.code\nDADDI r1, r0, 1\nSYSCALL 0\n`;
+  await loadProgram(page, simpleProgram);
+
+  // The Multi Step button is now icon-only (aria-label="Multi Step"); the
+  // stride is surfaced via the MUI Tooltip.  Hover to trigger the tooltip and
+  // assert it contains the configured count, confirming the component reads
+  // from the persisted setting.
+  await page.waitForSelector('#multi-step-button');
+  await page.hover('#multi-step-button');
+  await expect(page.locator('.MuiTooltip-tooltip').filter({ hasText: 'Run 250 steps of simulation' })).toBeVisible();
 });
 
 /**

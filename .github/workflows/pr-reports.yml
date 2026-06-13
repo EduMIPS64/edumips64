@@ -1,0 +1,213 @@
+name: PR preview deploy
+
+# Privileged stage of the CI pipeline. It is triggered when the CI Build
+# workflow completes and runs entirely from the base branch: it never checks
+# out or executes pull request code. Its only inputs are the artifacts produced
+# by CI Build, which are treated as inert data.
+#
+# Coverage statistics are published directly in the CI Build job summaries.
+#
+# The deploy-staging job deploys a static preview build using repository
+# secrets but never runs pull request code.
+#
+# The comment-preview job posts (and keeps updated) a sticky comment on the
+# pull request with the preview URL. It is a separate, minimal-privilege job
+# (pull-requests: write only) that never runs PR code and only writes a comment
+# containing the validated PR number and the known Azure preview URL. It
+# inherits the approval gate for untrusted actors via its dependency on
+# deploy-staging, which uses the environment-based approval mechanism.
+on:
+  workflow_run:
+    workflows: ["CI Build"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+jobs:
+  # Recover the pull request number from the artifact uploaded by CI Build and
+  # validate it strictly, since it is untrusted input.
+  metadata:
+    name: Resolve pull request metadata
+    if: github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Required so the GITHUB_TOKEN can download artifacts from the separate
+      # CI Build workflow run via the Actions artifacts API.
+      actions: read
+    outputs:
+      pr: ${{ steps.read.outputs.pr }}
+      environment: ${{ steps.env.outputs.environment }}
+    steps:
+      - name: Download PR number artifact
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: pr-number
+          path: pr
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read and validate PR number
+        id: read
+        run: |
+          number="$(cat pr/pr-number.txt)"
+          if [[ ! "$number" =~ ^[0-9]+$ ]]; then
+            echo "::error::Unexpected pull request number: '$number'"
+            exit 1
+          fi
+          echo "pr=$number" >> "$GITHUB_OUTPUT"
+
+      # Decide which deployment environment to use based on who triggered the
+      # CI Build run. The trust signal is the triggering actor, which is not
+      # controllable from PR content.
+      #
+      #   staging-dependabot : no manual approval required. Used for trusted
+      #                        maintainers and automation bots (Dependabot,
+      #                        Renovate, the Copilot coding agent) so their PRs
+      #                        get a preview without a human gate.
+      #   Staging            : approval-gated environment. Used for everyone
+      #                        else, including PRs from forks, so a maintainer
+      #                        must approve before secrets are used to deploy.
+      #
+      # TODO: rename these GitHub Environments to more self-explanatory names
+      #       (e.g. staging-auto / staging-approval-required) and update the
+      #       values below to match.
+      - name: Determine deployment environment
+        id: env
+        env:
+          ACTOR: ${{ github.event.workflow_run.triggering_actor.login }}
+        run: |
+          # Actor logins are matched case-insensitively because GitHub may
+          # report e.g. the Copilot coding agent as "Copilot" rather than
+          # "copilot". Quote the "[bot]" entries so the brackets are treated
+          # literally and not as a glob character class.
+          shopt -s nocasematch
+          maintainers=(lupino3)
+          bots=(
+            dependabot "dependabot[bot]"
+            renovate "renovate[bot]"
+            copilot "copilot[bot]"
+            copilot-swe-agent "copilot-swe-agent[bot]"
+          )
+
+          environment=Staging
+          for actor in "${maintainers[@]}" "${bots[@]}"; do
+            if [[ "$ACTOR" == "$actor" ]]; then
+              environment=staging-dependabot
+              break
+            fi
+          done
+          echo "environment=$environment" >> "$GITHUB_OUTPUT"
+
+  # Deploy the pre-built web application to the staging environment. The
+  # artifact content is built from PR code, but it is only ever uploaded as
+  # static files here; no PR code is executed in this privileged job.
+  deploy-staging:
+    name: Deploy web application to staging environment
+    needs: metadata
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      # Required so the GITHUB_TOKEN can download the web artifact from the
+      # separate CI Build workflow run via the Actions artifacts API.
+      actions: read
+    environment:
+      name: ${{ needs.metadata.outputs.environment }}
+      url: https://edumips64ci.z16.web.core.windows.net/${{ needs.metadata.outputs.pr }}/
+    steps:
+      - name: Download web application artifacts
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: web
+          path: out/web
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Copy files to run directory
+        run: mkdir -p pr/${{ needs.metadata.outputs.pr }} && cp -r out/web/* pr/${{ needs.metadata.outputs.pr }}
+
+      - name: Login to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Upload to Azure blob storage (https://edumips64ci.z16.web.core.windows.net/${{ needs.metadata.outputs.pr }}/)
+        uses: azure/CLI@v3
+        with:
+          inlineScript: |
+              az storage blob upload-batch --account-name edumips64ci --auth-mode key -d '$web/${{ needs.metadata.outputs.pr }}' -s pr/${{ needs.metadata.outputs.pr }} --overwrite
+
+  # Post (or update) a sticky comment on the PR with the preview URL.
+  # This is a separate minimal-privilege job; it never checks out or runs PR
+  # code. The dependency on deploy-staging means it only runs after a
+  # successful deploy and inherits the same environment-based approval gate.
+  comment-preview:
+    name: Post preview link comment
+    needs: [metadata, deploy-staging]
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Post or update sticky preview comment
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const pr = '${{ needs.metadata.outputs.pr }}';
+            if (!/^\d+$/.test(pr)) {
+              core.setFailed(`Invalid PR number: ${pr}`);
+              return;
+            }
+
+            const { owner, repo } = context.repo;
+            const issue_number = parseInt(pr, 10);
+            const url = `https://edumips64ci.z16.web.core.windows.net/${pr}/`;
+            const sha = context.payload.workflow_run.head_sha;
+            const runUrl = context.payload.workflow_run.html_url;
+            const MARKER = '<!-- web-preview-link -->';
+
+            const body = [
+              MARKER,
+              `🌐 **Web preview for this PR:** ${url}`,
+              '',
+              `> Reflects commit \`${sha.slice(0, 8)}\`. Updated automatically on each successful build. ([CI run](${runUrl}))`
+            ].join('\n');
+
+            try {
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner,
+                repo,
+                issue_number,
+                per_page: 100
+              });
+
+              const existing = comments.find(
+                c => c.body.includes(MARKER) && c.user.type === 'Bot'
+              );
+
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner,
+                  repo,
+                  comment_id: existing.id,
+                  body
+                });
+                core.info(`Updated preview comment ${existing.id} on PR #${pr}`);
+              } else {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number,
+                  body
+                });
+                core.info(`Created preview comment on PR #${pr}`);
+              }
+            } catch (e) {
+              core.warning(`Failed to post preview comment on PR #${pr}: ${e.message}`);
+            }

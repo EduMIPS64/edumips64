@@ -1,12 +1,25 @@
-name: CI
+name: CI Build
 
+# This is the "untrusted" stage of the CI pipeline. It runs on pull requests
+# (including those from forks) with a read-only token and NO access to secrets.
+# It builds and tests the proposed code, publishes coverage to the run's job
+# summaries, and uploads the build outputs as artifacts.
+#
+# The only privileged action (deploying a preview build) is handled by the
+# separate `pr-reports.yml` workflow, which runs base-branch code only and
+# never checks out pull request code. This separation means that code from a
+# fork can be built and tested safely without ever being able to reach
+# repository secrets or a write-enabled token.
 on:
-  pull_request_target:
+  pull_request:
     branches:
       - master
   schedule:
     - cron: '0 0 * * *'
 
+# Read-only by default. No job in this workflow needs more.
+permissions:
+  contents: read
 
 jobs:
   # Detect which files changed in the PR to conditionally run expensive builds.
@@ -22,12 +35,10 @@ jobs:
       electron: ${{ github.event_name == 'schedule' && 'true' || steps.changes.outputs.electron }}
     steps:
       - uses: actions/checkout@v6
-        if: github.event_name == 'pull_request_target'
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
+        if: github.event_name == 'pull_request'
 
       - name: Check changed paths
-        if: github.event_name == 'pull_request_target'
+        if: github.event_name == 'pull_request'
         uses: dorny/paths-filter@v4
         id: changes
         with:
@@ -47,9 +58,6 @@ jobs:
     uses: ./.github/workflows/build-desktop.yml
     with:
       ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      upload_codecov: true
-    secrets:
-      codecov_token: ${{ secrets.CODECOV_TOKEN }}
 
   build-web:
     permissions:
@@ -58,10 +66,11 @@ jobs:
     with:
       ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-  # Run web UI Playwright tests locally with Istanbul coverage instrumentation
-  # and upload the lcov report to Codecov.
+  # Run web UI Playwright tests locally with Istanbul coverage instrumentation.
+  # The coverage report is rendered as a Markdown table and published to this
+  # run's job summary. No secrets are used here.
   test-web-coverage:
-    name: Web UI coverage (Playwright + Codecov)
+    name: Web UI coverage (Playwright)
     runs-on: ubuntu-latest
     needs: build-web
     permissions:
@@ -70,6 +79,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
 
       - name: Set up Node.JS
         uses: actions/setup-node@v6
@@ -121,9 +131,7 @@ jobs:
         run: npx playwright test
 
       # Upload Playwright traces, screenshots, and HTML report whenever the
-      # test step fails so the failure is diagnosable without rerunning. The
-      # most common failure mode (every test timing out on waitForSelector) is
-      # otherwise indistinguishable from a flake in raw logs.
+      # test step fails so the failure is diagnosable without rerunning.
       - name: Upload Playwright artifacts on failure
         if: failure()
         uses: actions/upload-artifact@v7
@@ -136,108 +144,69 @@ jobs:
           if-no-files-found: ignore
 
       # Merge per-test coverage JSON files and produce an lcov report.
-      # Run regardless of test outcome: even with some failing tests we want to
-      # publish whatever coverage was collected, so the Codecov check reflects
-      # reality instead of "no upload" → "coverage dropped to 0".
+      # Run regardless of test outcome: even with some failing tests we want
+      # to publish whatever coverage was collected.
       - name: Generate lcov coverage report
         if: always()
-        run: npx nyc report --reporter=lcov --reporter=text || true
+        run: |
+          mkdir -p coverage
+          npx nyc report --reporter=lcov > /dev/null || true
 
-      - name: Upload web UI coverage to Codecov
-        if: always()
-        uses: codecov/codecov-action@v6.0.0
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage/lcov.info
-          flags: web
-          name: web-ui-coverage
-          # A transient Codecov upload error must not turn this job red on top
-          # of whatever the actual test outcome was.
-          fail_ci_if_error: false
+      # Render the lcov report as a Markdown table (matching the Java coverage
+      # summary style) and publish it to the run's job summary.
+      - name: Summarise web coverage
+        if: always() && hashFiles('coverage/lcov.info') != ''
+        run: python utils/lcov-summary.py coverage/lcov.info coverage/web-coverage.md
 
-  deploy-staging:
-    name: Deploy web application to staging environment
-    permissions: write-all
+      # Append the Markdown summary to the GitHub Actions run summary.
+      - name: Publish coverage summary to job summary
+        if: always() && hashFiles('coverage/web-coverage.md') != ''
+        run: cat coverage/web-coverage.md >> "$GITHUB_STEP_SUMMARY"
+
+  # Run the pytest suite that guards the Python deploy-web-pages script.
+  # No paths-filter gate: the suite is fast and must always be green.
+  test-deploy-script:
+    name: Deploy script tests (pytest)
     runs-on: ubuntu-latest
-    needs: build-web
-    if: ${{ github.event_name == 'pull_request_target' }}
-    environment:
-      # Use staging-dependabot environment for dependabot, renovate, copilot, and lupino3 PRs to avoid approval requirements
-      # Use Staging environment for regular PRs
-      name: ${{ (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'renovate[bot]' || github.event.pull_request.user.login == 'copilot[bot]' || github.event.pull_request.user.login == 'dependabot' || github.event.pull_request.user.login == 'renovate' || github.event.pull_request.user.login == 'copilot' || github.event.pull_request.user.login == 'lupino3') && 'staging-dependabot' || 'Staging' }}
-      url: https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/
-    steps:
-      # Download web application built in 'build-web'
-      - uses: actions/download-artifact@v8.0.1
-        name: Download web application artifacts
-        with:
-          name: web
-          path: out/web
-
-      # Deploy the code on Github Pages.
-      # Copy files to a directory to allow pushing to a subdir in the web.edumips.org repo.
-      - name: Copy files to run directory
-        run: mkdir -p pr/${{ github.event.pull_request.number }} && cp -r out/web/* pr/${{ github.event.pull_request.number }}
-        
-      # Upload to Azure blob if this is a PR.
-      - name: Login to Azure
-        uses: azure/login@v3
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          
-      - name: Upload to Azure blob storage (https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/)
-        uses: azure/CLI@v3
-        with:
-          inlineScript: |
-              az storage blob upload-batch --account-name edumips64ci --auth-mode key -d '$web/${{ github.event.pull_request.number }}' -s pr/${{ github.event.pull_request.number }} --overwrite
-
-  # Test the deployed web application.
-  # This is only ran on pull request because runs triggered by push and schedule
-  # will deploy to web.edumips.org. Given that the deployment has some latency,
-  # the test will most likely run against the previously-deployed version,
-  # potentially giving a false sense of security if a developer sees the test being
-  # run immediately after the deployment.
-  #
-  # There is a separate job that periodically monitors web.edumips.org, which will
-  # catch regressions.
-  test-web:
-    name: Test web application
-    runs-on: ubuntu-latest
-    needs: deploy-staging
-    if: ${{ github.event_name == 'pull_request_target' }}
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - run: git log -1
-      - name: Set up Node.JS
-        uses: actions/setup-node@v6
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-      - name: Install JS dependencies
-        run: npm install
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v5
+          python-version: '3.14'
+
+      - name: Install pytest
+        run: pip install pytest
+
+      # The test file loads deploy-web-pages.py via importlib relative to the
+      # scripts directory, so the working-directory must be .github/scripts.
+      - name: Run deploy-script tests
+        working-directory: .github/scripts
+        run: python -m pytest test_deploy_web_pages.py -q
+
+  # Persist the pull request number as an artifact so the privileged workflow
+  # (which is triggered by workflow_run and therefore has no PR context) knows
+  # which pull request to deploy a preview for.
+  save-pr-metadata:
+    name: Save pull request metadata
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Write PR number
+        run: |
+          mkdir -p pr
+          echo "${{ github.event.pull_request.number }}" > pr/pr-number.txt
+      - uses: actions/upload-artifact@v7
         with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ hashFiles('package-lock.json') }}
-      - name: Install Playwright dependencies
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install
-      # Run tests against the deployed code.
-      - name: Run web tests against deployed code
-        uses: nick-fields/retry@v4
-        env:
-          PLAYWRIGHT_TARGET_URL: https://edumips64ci.z16.web.core.windows.net/${{github.event.pull_request.number}}/
-        with:
-          max_attempts: 10
-          timeout_minutes: 2
-          retry_on: error
-          command: npm run test
+          name: pr-number
+          path: pr/pr-number.txt
 
   # Build and test Snapcraft package when relevant files change.
   build-and-test-snap:

@@ -4,7 +4,12 @@ import AppBar from '@mui/material/AppBar';
 import ToolBar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
@@ -16,43 +21,43 @@ import logoDark from '../static/logo-dark.png';
 import logoBright from '../static/logo.png';
 import { getBuildInfo } from '../buildInfo';
 
-import HelpIcon from '@mui/icons-material/Help';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import FastForwardIcon from '@mui/icons-material/FastForward';
-import PlayCircleIcon from '@mui/icons-material/PlayCircle';
-import PauseCircleIcon from '@mui/icons-material/PauseCircle';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import StopCircleIcon from '@mui/icons-material/StopCircle';
-import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import HelpIcon from '@mui/icons-material/Help';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import UploadIcon from '@mui/icons-material/Upload';
+
+import { deriveLogicalState } from '../simulatorState';
 
 export default function Header(props) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [fileContent, setFileContent] = React.useState('');
+  const [programAnchor, setProgramAnchor] = React.useState(null);
+  const menuOpen = Boolean(programAnchor);
+  // Derive the logical UI state for editor-control gating.
+  const logicalState = deriveLogicalState(
+    props.status,
+    props.executing,
+    props.inputRequest,
+  );
 
-  // The multi-step size used to be a piece of local state managed by an
-  // inline `<TextField>` in this toolbar. It is now driven by the persisted
-  // `stepStride` setting, so it lives alongside the other execution
-  // parameters in the Settings panel and survives page reloads.
-  const multiStepCount = props.multiStepCount;
+  // The Program menu manages the editor's program (New / Open… / Save… / Load
+  // Example). It must be unavailable whenever a program is loaded in the
+  // simulator (i.e. the simulator is running). It stays available in EMPTY
+  // (nothing loaded yet) and ENDED (program finished — the user needs these
+  // controls to start a new program, and there is no Stop button in ENDED).
+  const programMenuDisabled =
+    logicalState === 'READY' ||
+    logicalState === 'EXECUTING' ||
+    logicalState === 'WAITING_FOR_INPUT';
 
   // Classify the current deployment so that users can tell at a glance
   // whether they are using the production version or a PR/dev build, and
   // jump back to the originating pull request when applicable.
   const buildInfo = React.useMemo(() => getBuildInfo(), []);
 
-
-  const handleFileLoad = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        props.onChangeValue(e.target.result);
-      };
-
-      reader.readAsText(file);
-    }
-  };
+  const handleProgramMenuClose = () => setProgramAnchor(null);
 
   // On small viewports the buttons collapse to icon-only. Keep the text
   // visually hidden on `xs` so it still provides an accessible name,
@@ -152,13 +157,39 @@ export default function Header(props) {
               sx={{ fontWeight: 'bold' }}
             />
           )}
+          {buildInfo.kind === 'candidate' && (
+            <Tooltip
+              title="This is a candidate build, automatically deployed from a master commit. It may be unstable."
+              arrow
+              placement="bottom"
+            >
+              <Chip
+                id="candidate-build-chip"
+                size="small"
+                label="CANDIDATE"
+                className="candidate-chip"
+                aria-label="Candidate build"
+                sx={{ fontWeight: 'bold' }}
+              />
+            </Tooltip>
+          )}
         </Typography>
         <Tooltip title="The current status of the CPU" arrow placement="top">
           <div>
             <CpuStatusDisplay status={props.status} />
           </div>
         </Tooltip>
-        <Tooltip title="Load the current code into the simulator" arrow placement="top">
+        {/* Execution controls — rendered contextually per logical state. Wrapped in
+            a fixed-min-width container so the toolbar doesn't shift when the set
+            of visible buttons changes between states. */}
+        {/* Load button — always visible in the header. Execution controls
+            (Step / Multi Step / Run / Pause / Stop) live in the floating
+            RunControlsToolbar overlay mounted from Simulator.js. */}
+        <Tooltip
+          title="Load the current code into the simulator"
+          arrow
+          placement="top"
+        >
           <Button
             color="inherit"
             className="load-button"
@@ -166,136 +197,92 @@ export default function Header(props) {
             onClick={() => props.onLoadClick()}
             startIcon={<UploadIcon />}
             disabled={!props.loadEnabled}
-            sx={{
-              ...responsiveButtonSx,
-              display: props.status === 'RUNNING' ? 'none' : 'inline-flex'
-            }}
+            sx={responsiveButtonSx}
           >
             {responsiveLabel('Load')}
           </Button>
         </Tooltip>
-        <Tooltip title="Runs a single step of simulation" arrow placement="top">
-          <Button
-            color="inherit"
-            className="step-button"
-            id="step-button"
-            onClick={() => {
-              props.onStepClick(1);
-            }}
-            startIcon={<PlayArrowIcon />}
-            disabled={!props.stepEnabled}
-            sx={responsiveButtonSx}
-          >
-            {responsiveLabel('Single Step')}
-          </Button>
+        <Tooltip
+          title="Manage the program: new, open, save, or load the example"
+          arrow
+          placement="top"
+        >
+          <span>
+            <Button
+              id="program-menu-button"
+              color="inherit"
+              className="program-menu-button"
+              startIcon={<FolderOpenIcon />}
+              endIcon={<ArrowDropDownIcon />}
+              disabled={programMenuDisabled}
+              onClick={(e) => setProgramAnchor(e.currentTarget)}
+              aria-haspopup="true"
+              aria-controls={menuOpen ? 'program-menu' : undefined}
+              aria-expanded={menuOpen ? 'true' : undefined}
+              sx={responsiveButtonSx}
+            >
+              {responsiveLabel('Program')}
+            </Button>
+          </span>
         </Tooltip>
-        <Tooltip title={`Run ${multiStepCount} steps of simulation (configurable in Settings)`} arrow placement="top">
-          <Button
-            color="inherit"
-            className="multi-step-button"
-            id="multi-step-button"
-            onClick={() => {
-              props.onStepClick(multiStepCount);
-            }}
-            startIcon={<FastForwardIcon />}
-            disabled={!props.stepEnabled}
-            sx={responsiveButtonSx}
-          >
-            {responsiveLabel('Multi Step')}
-          </Button>
-        </Tooltip>
-        <Tooltip title="Run until the simulation ends" arrow placement="top">
-          <Button
-            color="inherit"
-            className="run-button"
-            id="run-button"
-            onClick={() => {
-              props.onRunClick();
-            }}
-            startIcon={<PlayCircleIcon />}
-            disabled={!props.runEnabled}
-            sx={responsiveButtonSx}
-          >
-            {responsiveLabel('Run All')}
-          </Button>
-        </Tooltip>
-        <Tooltip title="Pause the simulation" arrow placement="top">
-          <Button
-            color="inherit"
-            className="pause-button"
-            id="pause-button"
-            onClick={() => {
-              props.onPauseClick();
-            }}
-            startIcon={<PauseCircleIcon />}
-            disabled={!props.pauseEnabled}
-            sx={responsiveButtonSx}
-          >
-            {responsiveLabel('Pause')}
-          </Button>
-        </Tooltip>
-        <Tooltip title="Stop the simulation and reset the CPU" arrow placement="top">
-          <Button
-            color="inherit"
-            className="stop-button"
-            id="stop-button"
-            onClick={() => {
-              props.onStopClick();
-            }}
-            startIcon={<StopCircleIcon />}
-            disabled={!props.stopEnabled}
-            sx={responsiveButtonSx}
-          >
-            {responsiveLabel('Stop')}
-          </Button>
-        </Tooltip>
-        <Tooltip title="Remove all the code from the editor, leaving only an empty assembly file" arrow placement="top">
-          <Button
-            color="inherit"
-            className="clear-code-button"
+        <Menu
+          id="program-menu"
+          anchorEl={programAnchor}
+          open={menuOpen}
+          onClose={handleProgramMenuClose}
+          MenuListProps={{ 'aria-labelledby': 'program-menu-button' }}
+        >
+          <MenuItem
             id="clear-code-button"
-            startIcon={<DeleteForeverIcon />}
             onClick={() => {
               props.onClearClick();
+              handleProgramMenuClose();
             }}
-            disabled={props.status === 'RUNNING'}
-            sx={responsiveButtonSx}
           >
-            {responsiveLabel('clear')}
-          </Button>
-        </Tooltip>
-        <Tooltip title="Open code from file" arrow placement="top">
-          <Button
-            color="inherit"
-            className="load-code-button"
+            <ListItemIcon>
+              <DeleteForeverIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>New</ListItemText>
+          </MenuItem>
+          <Divider />
+          <MenuItem
             id="load-code-button"
-            startIcon={<UploadIcon />}
             onClick={() => {
               props.onOpenClick();
+              handleProgramMenuClose();
             }}
-            disabled={props.status === 'RUNNING'}
-            component="label"
-            sx={responsiveButtonSx}
           >
-            {responsiveLabel('Open Code')}
-          </Button>
-        </Tooltip>
-        <Tooltip title="Save code to file" arrow placement="top">
-          <Button
-              color="inherit"
-              className="save-code-button"
-              id="save-code-button"
-              startIcon={<DownloadIcon />}
-              onClick={() => {
-                props.onSaveClick();
-              }}
-              disabled={props.status === 'RUNNING'}
-              component="label"
-              sx={responsiveButtonSx}
+            <ListItemIcon>
+              <UploadIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Open…</ListItemText>
+          </MenuItem>
+          <MenuItem
+            id="save-code-button"
+            onClick={() => {
+              props.onSaveClick();
+              handleProgramMenuClose();
+            }}
           >
-            {responsiveLabel('Save Code')}
-          </Button>
-        </Tooltip>
+            <ListItemIcon>
+              <DownloadIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Save…</ListItemText>
+          </MenuItem>
+          <Divider />
+          <MenuItem
+            id="restore-sample-button"
+            onClick={() => {
+              props.onRestoreClick();
+              handleProgramMenuClose();
+            }}
+          >
+            <ListItemIcon>
+              <RestartAltIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Load Example</ListItemText>
+          </MenuItem>
+        </Menu>
         <IconButton
           color="inherit"
           className="help-button"

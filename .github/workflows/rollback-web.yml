@@ -1,0 +1,52 @@
+name: Rollback Web Production
+
+on:
+  workflow_dispatch:
+
+# Serialise all Pages writes; never cancel an in-flight rollback.
+concurrency:
+  group: web-pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    name: Roll back web production to last known good
+    # Only the maintainer (lupino3) may trigger this.
+    if: github.actor == 'lupino3'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout edumips64 (for script)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Clone Pages repo
+        env:
+          PAT_WEBUI: ${{ secrets.PAT_WEBUI }}
+        run: |
+          set -euo pipefail
+          git clone "https://x-access-token:${PAT_WEBUI}@github.com/EduMIPS64/web.edumips.org.git" \
+            pages-repo --branch master --depth 1
+          git -C pages-repo config user.name "github-actions[bot]"
+          git -C pages-repo config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run rollback script
+        run: |
+          set -euo pipefail
+          cp .github/scripts/deploy-web-pages.py pages-repo/
+          cd pages-repo
+          python3 deploy-web-pages.py rollback "${{ github.actor }}"
+          rm -f deploy-web-pages.py
+
+      - name: Commit and push to Pages repo
+        run: |
+          set -euo pipefail
+          cd pages-repo
+          git add -A
+          git diff --cached --quiet && { echo "Nothing to commit."; exit 0; }
+          git commit -m "Rollback web to last known good (triggered by ${{ github.actor }})"
+          git push origin master
+          echo "Rollback complete."

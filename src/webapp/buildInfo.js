@@ -13,13 +13,14 @@
 const PROD_HOSTNAME = 'web.edumips.org';
 const CI_HOSTNAME = 'edumips64ci.z16.web.core.windows.net';
 const PR_REPO_URL = 'https://github.com/EduMIPS64/edumips64/pull';
+const CANDIDATE_PATH_RE = /^\/(\d{4}-\d{2}-\d{2})\/(\d+)-([a-f0-9]{7,8})\//;
 
 /**
  * Classify a `window.location`-like object.
  *
  * @param {{hostname?: string, pathname?: string}} [loc] Optional location
  *   object. Defaults to `window.location` when running in a browser.
- * @returns {{kind: 'production'|'pr'|'dev', prNumber: number|null, prUrl: string|null}}
+ * @returns {{kind: 'production'|'candidate'|'pr'|'dev', prNumber: number|null, prUrl: string|null, candidateDate?: string, candidateN?: number, candidateSha?: string, candidateUrl?: string}}
  */
 export function getBuildInfo(loc) {
   const location =
@@ -32,6 +33,18 @@ export function getBuildInfo(loc) {
   const pathname = location.pathname || '';
 
   if (hostname === PROD_HOSTNAME) {
+    const candidateMatch = pathname.match(CANDIDATE_PATH_RE);
+    if (candidateMatch) {
+      return {
+        kind: 'candidate',
+        prNumber: null,
+        prUrl: null,
+        candidateDate: candidateMatch[1],
+        candidateN: parseInt(candidateMatch[2], 10),
+        candidateSha: candidateMatch[3],
+        candidateUrl: `https://web.edumips.org${candidateMatch[0]}`,
+      };
+    }
     return { kind: 'production', prNumber: null, prUrl: null };
   }
 

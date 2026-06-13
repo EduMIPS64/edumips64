@@ -22,9 +22,18 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Typography } from '@mui/material';
+import Chip from '@mui/material/Chip';
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
 import { getBuildInfo } from '../buildInfo';
+import {
+  fetchManifest,
+  buildVersionList,
+  getViewedVersion,
+  fetchCandidates,
+  buildCandidateList,
+  getViewedCandidate,
+} from '../versionHistory';
 
 // Render a localized description of the running build (production/PR/dev),
 // shown in the "About" tab so users can clearly tell which version of the
@@ -38,6 +47,17 @@ function BuildInfoLine() {
         <Link href={buildInfo.prUrl} target="_blank" rel="noreferrer">
           pull request #{buildInfo.prNumber}
         </Link>
+      </Typography>
+    );
+  }
+  if (buildInfo.kind === 'candidate') {
+    return (
+      <Typography id="about-build-info">
+        Build: candidate {buildInfo.candidateDate} #{buildInfo.candidateN} (
+        <Link href={buildInfo.candidateUrl} target="_blank" rel="noreferrer">
+          {buildInfo.candidateSha}
+        </Link>
+        )
       </Typography>
     );
   }
@@ -55,10 +75,141 @@ function BuildInfoLine() {
   return <Typography id="about-build-info">Build: development</Typography>;
 }
 
-// Define the set of allowed languages (should match what's shown in the language Select)
-const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
+// Renders the list of previous retained versions fetched from /manifest.json.
+// Gated on: valid manifest AND build kind !== 'pr'.
+function PreviousVersions() {
+  const [manifest, setManifest] = React.useState(null);
+  const viewedN = React.useMemo(() => getViewedVersion(), []);
 
-// Localized "Introduction" labels for each language
+  React.useEffect(() => {
+    fetchManifest().then((m) => setManifest(m));
+  }, []);
+
+  const buildInfo = getBuildInfo();
+  if (!manifest || buildInfo.kind === 'pr') {
+    return null;
+  }
+
+  const versions = buildVersionList(manifest, viewedN);
+
+  return (
+    <Box id="about-previous-versions" sx={{ mt: 2 }}>
+      {viewedN != null && viewedN !== manifest.current && (
+        <Typography gutterBottom color="warning.main">
+          You are viewing an archived version (v{viewedN}).{' '}
+          <Link href="/">Open the latest.</Link>
+        </Typography>
+      )}
+      <Typography variant="h6" gutterBottom>
+        Previous versions
+      </Typography>
+      <List dense disablePadding>
+        {versions.map((item) => (
+          <ListItem key={item.n} disablePadding data-version={item.n}>
+            <ListItemText
+              primary={
+                item.isCurrent ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography component="span">
+                      {item.dateLabel
+                        ? `${item.dateLabel} (targets ${item.targetRelease})`
+                        : `v${item.n}`}
+                    </Typography>
+                    <Chip label="current" size="small" color="success" />
+                  </Box>
+                ) : (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Link
+                      href={item.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      title={item.build}
+                    >
+                      {item.dateLabel
+                        ? `${item.dateLabel} (targets ${item.targetRelease})`
+                        : `v${item.n}`}
+                    </Link>
+                    {item.isViewed && (
+                      <Typography component="span" variant="caption">
+                        (viewing)
+                      </Typography>
+                    )}
+                  </Box>
+                )
+              }
+            />
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
+}
+// Renders the list of per-commit candidate builds fetched from /candidates.json.
+// Gated on: non-empty candidate list AND build kind !== 'pr'.
+function CandidateBuilds() {
+  const [candidates, setCandidates] = React.useState(null);
+  const viewedCandidate = React.useMemo(() => getViewedCandidate(), []);
+
+  React.useEffect(() => {
+    fetchCandidates().then((c) => setCandidates(c));
+  }, []);
+
+  const buildInfo = getBuildInfo();
+  if (!candidates || buildInfo.kind === 'pr') {
+    return null;
+  }
+
+  const items = buildCandidateList(candidates, viewedCandidate);
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <Box id="about-candidate-builds" sx={{ mt: 2 }}>
+      {buildInfo.kind === 'candidate' && (
+        <Typography gutterBottom color="info.main">
+          You are viewing candidate build {buildInfo.candidateDate} #
+          {buildInfo.candidateN} ({buildInfo.candidateSha}).{' '}
+          <Link href="/">Open production.</Link>
+        </Typography>
+      )}
+      <Typography variant="h6" gutterBottom>
+        Candidate builds
+      </Typography>
+      <List dense disablePadding>
+        {items.map((item) => (
+          <ListItem
+            key={item.href}
+            disablePadding
+            data-candidate={`${item.date}-${item.n}`}
+          >
+            <ListItemText
+              primary={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Link
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    title={item.build}
+                  >
+                    {item.label}
+                  </Link>
+                  {item.isViewed && (
+                    <Typography component="span" variant="caption">
+                      (viewing)
+                    </Typography>
+                  )}
+                </Box>
+              }
+            />
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  );
+}
+
+const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
 const INTRODUCTION_LABELS = {
   en: 'Introduction',
   it: 'Introduzione',
@@ -571,6 +722,8 @@ export default function HelpDialog(props) {
           <Box sx={{ p: 3 }}>
             <Typography>Version: {props.ver}</Typography>
             <BuildInfoLine />
+            <PreviousVersions />
+            <CandidateBuilds />
             <Typography gutterBottom variant="h6" sx={{ mt: 2 }}>
               Quick Start
             </Typography>
@@ -625,7 +778,11 @@ export default function HelpDialog(props) {
         </TabPanel>
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.handleClose} variant="outlined" id="help-close-button">
+        <Button
+          onClick={props.handleClose}
+          variant="outlined"
+          id="help-close-button"
+        >
           Close
         </Button>
       </DialogActions>

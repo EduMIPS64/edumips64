@@ -1,5 +1,22 @@
 # EduMIPS64 ChangeLog
 
+## 1.4.1 (TBD)
+
+### Added
+- Web UI now persists the editor's program contents in the browser's local
+  storage, so your code survives page reloads. Also added a new "Restore default
+  sample" button to reset the editor back to the bundled sample program.
+  (@Copilot, PR #1736)
+
+### Fixed
+- Web UI Cache Configuration panel no longer loses focus after each keystroke,
+  making input fields much easier to edit. (@davidepatti, PR #1804)
+
+### Changed
+- Web UI now shows the Stats, Pipeline and Registers panels expanded by default
+  on a first visit, so the simulator's core views are visible immediately.
+  Returning users keep their last layout preference. (@Copilot, Issue #1697)
+
 ## 1.4.0 (03/05/2026) - WalkOfLife
 
 ### Added

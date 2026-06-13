@@ -42,10 +42,11 @@ export const MIN_EXECUTION_DELAY_MS = 0;
 export const MAX_EXECUTION_DELAY_MS = 5000;
 
 // Shared validator for the L1D / L1I cache configuration objects.
+const isPositiveInteger = (v) => Number.isInteger(v) && v > 0;
 const isValidCacheConfig = (v) =>
-  Number.isFinite(v.size) &&
-  Number.isFinite(v.blockSize) &&
-  Number.isFinite(v.associativity);
+  isPositiveInteger(v.size) &&
+  isPositiveInteger(v.blockSize) &&
+  isPositiveInteger(v.associativity);
 
 // Hex color (`#RRGGBB`) validator used by the pipeline color settings.
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
@@ -109,14 +110,26 @@ export const SETTINGS_SCHEMA = Object.freeze({
   },
   [SettingKey.EXPANDED_ACCORDIONS]: {
     type: SettingType.OBJECT,
+    // Defaults follow the simulator's primary purpose: a first-time visitor
+    // should see the pipeline, registers, and stats — the headline features
+    // of a CPU simulator — without having to scroll-and-click. Cache config
+    // and general settings are collapsed by default so students don't stumble
+    // into configuration before they've seen the simulator run. Memory and
+    // standard output stay collapsed by default to keep the right rail
+    // compact on small screens; the change-indicator dot still draws
+    // attention to them when something changes.
+    //
+    // This is only the *default* — every user-driven expand/collapse is
+    // persisted to localStorage via `useSetting`, so a returning user always
+    // sees the layout they last left.
     default: {
       stats: true,
-      pipeline: false,
-      registers: false,
+      pipeline: true,
+      registers: true,
       memory: false,
       stdout: false,
-      cache: true,
-      settings: true,
+      cache: false,
+      settings: false,
     },
   },
   [SettingKey.CACHE_L1D]: {
@@ -164,6 +177,15 @@ export const SETTINGS_SCHEMA = Object.freeze({
       Number.isFinite(v) &&
       v >= MIN_EXECUTION_DELAY_MS &&
       v <= MAX_EXECUTION_DELAY_MS,
+  },
+  [SettingKey.EDITOR_CODE]: {
+    type: SettingType.STRING,
+    // Use an empty string as the sentinel for "user hasn't customized the editor
+    // yet". This avoids baking today's SampleProgram into localStorage on the
+    // very first visit, which would prevent a future sample update from being
+    // visible to users who never edited the editor.  Simulator.js maps '' back
+    // to the current SampleProgram when rendering.
+    default: '',
   },
   [SettingKey.PIPELINE_COLORS]: {
     type: SettingType.OBJECT,

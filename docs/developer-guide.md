@@ -18,6 +18,10 @@
 
 [Compiling under Mac OSX](#mac-os-x)
 
+[Versioning model](#versioning-model)
+
+[Web production promotion](#web-production-promotion)
+
 ### Requirements
 
 #### Dev Container
@@ -47,14 +51,27 @@ To generate an installable Windows MSI package (using the Gradle `msi` task), yo
 This project uses GitHub Actions for continuous integration
 (https://github.com/EduMIPS64/edumips64/actions).
 
-There are two main workflows:
+There are five main CI/CD workflows:
 
-- **CI** (`ci.yml`) — runs on every pull request, push to `master`, and on a daily schedule.
-  Builds and tests the desktop application, builds the web application, deploys to
-  staging/production, and builds/tests the Snap package.
-- **Release** (`release.yml`) — runs on every push to `master` to build all release artifacts
-  (JAR, MSI, Electron apps). Can also be triggered manually to create a tagged GitHub release
-  with all artifacts attached.
+- **CI Build** (`ci.yml`) — runs on every pull request and on a daily schedule.
+  Builds and tests the desktop application, builds the web application, runs the
+  web UI tests, and builds/tests the Snap package. It runs with a read-only
+  token and no access to secrets, so it can safely build code from forks.
+  All CI checkouts use `fetch-depth: 0` so `git describe` works correctly.
+- **PR preview deploy** (`pr-reports.yml`) — triggered when a CI Build run
+  completes. It runs from the base branch (never checking out pull request
+  code) and deploys the pre-built web application to the staging environment.
+- **Candidate web deploy** (`candidate-web.yml`) — triggered when a CI Build run
+  completes successfully on `master`. Deploys the build as a candidate build to
+  `web.edumips.org` at a per-commit URL path `/<YYYY-MM-DD>/<N>-<shortsha>/`.
+  Users can browse and share candidates from the web UI's **About** tab. The
+  `/candidates.json` index maintains a 14-day retention policy. See
+  [Candidate builds](#candidate-builds) section below for details.
+- **Release** (`release.yml`) — runs on every push to `master` to build all
+  release artifacts (JAR, MSI, Electron apps). The `deploy-prod` job is
+  disabled (`if: false`); production web deploys are now gated (see below).
+  Can also be triggered manually to create a tagged GitHub release with all
+  artifacts attached.
 
 ### Main Gradle tasks
 
@@ -77,12 +94,16 @@ Individual tasks for building single documentation (PDF and HTML) and jar target
 are available too: please read `build.gradle` for the complete list.  
 Gradle builds the following jar artifacts:
 
-- `edumips64-<version>.jar`: GUI executable jar (includes JavaHelp and picocli)
+- `edumips64-<build-version>.jar`: GUI executable jar (includes JavaHelp and picocli)
+
+The `<build-version>` is the full git-describe build identity. At a release tag it
+collapses to the plain version (e.g. `edumips64-1.4.1.jar`); on development builds
+it includes the commit distance and hash (e.g. `edumips64-1.4.1-5-gabc1234.jar`).
 
 Gradle is supported by all the main Java IDEs (e.g. IDEA, Eclipse, NetBeans).
 
 For developers that don't want to recompile the help files when creating a JAR, the
-`noHelpJar` Gradle task will produce `edumips64-<version>-nohelp.jar`, which does
+`noHelpJar` Gradle task will produce `edumips64-<build-version>-nohelp.jar`, which does
 not include the compiled help files.
 
 #### Build output directory
@@ -92,7 +113,7 @@ root of the repository, rather than Gradle's default `build/`. The layout is:
 
 | Artifact | Location |
 | --- | --- |
-| JARs (main, nohelp) | `out/edumips64-<version>[-nohelp].jar` |
+| JARs (main, nohelp) | `out/edumips64-<build-version>[-nohelp].jar` |
 | MSI installer | `out/EduMIPS64-<version>.msi` |
 | Electron packages | `out/WebEduMips64-<platform>-<arch>/` |
 | Web application (worker, ui, docs) | `out/web/` |
@@ -166,8 +187,8 @@ the application is currently running:
 - "Web Version" — production deployment at `web.edumips.org`.
 - "Web Version" + a clickable "PR #N" chip — a per-PR preview build deployed
   to `https://edumips64ci.z16.web.core.windows.net/<PR_NUMBER>/` by the
-  `deploy-staging` job in `.github/workflows/ci.yml`. The chip links back to
-  the originating pull request on GitHub.
+  `deploy-staging` job in `.github/workflows/pr-reports.yml`. The chip links
+  back to the originating pull request on GitHub.
 - "Web Version (dev)" + a "dev" chip — any other host (local development,
   forks, ad-hoc deployments, etc.).
 
@@ -178,8 +199,9 @@ configuration.
 
 #### Web UI code coverage
 
-The web UI tests can generate Istanbul code coverage data. This is used to upload
-coverage metrics to [codecov.io](https://codecov.io) under the `web` flag.
+The web UI tests can generate Istanbul code coverage data. CI publishes this
+report on the GitHub Actions run summary — no third-party coverage service is
+involved.
 
 To run tests with coverage locally:
 
@@ -200,8 +222,13 @@ To run tests with coverage locally:
 The coverage report is written to `coverage/lcov.info` (and `coverage/index.html` for the
 HTML report). Both `.nyc_output/` and `coverage/` are excluded from version control.
 
-In CI, the `test-web-coverage` job in `ci.yml` performs these steps automatically and
-uploads the result to Codecov using the `CODECOV_TOKEN` secret.
+In CI, the `test-web-coverage` job in `ci.yml` performs these steps
+automatically. It renders the lcov report as a Markdown table using
+`utils/lcov-summary.py` and appends it to the Actions run summary. The Java
+side is reported the same way: the `build-desktop` job uses
+`utils/jacoco-summary.py` to turn the JaCoCo XML produced by `./gradlew check`
+into a Markdown table on the run summary. Both summaries are published with a
+read-only token and require no repository secrets.
 
 ### Source code structure
 
@@ -391,6 +418,154 @@ plugins, as the Maven repo uses Let's Encrypt as a certificate issuer, which
 is not trusted by default by the JDK.
 
 Follow instructions [here](https://dev.cloudburo.net/2018/06/03/install-letsencrypt-certificate-in-the-java-jdk-keystore-on-osx.html) to import the Let's Encrypt root certificates in the JDK keystore.
+
+### Versioning model
+
+EduMIPS64 uses **two distinct version concepts**:
+
+- **Release label** — `version` in `gradle.properties` (e.g. `1.4.1`). This is
+  the human-visible release name. It is constant between releases and is used for
+  git tags (`v1.4.1`), JAR filenames, and the MSI installer version. Bumped
+  manually before each release.
+
+- **Build identity** — `git describe --tags --match v* --always --dirty` with
+  the leading `v` stripped. This uniquely identifies every commit:
+  - At a release tag: identical to the release label (e.g. `1.4.1`).
+  - Between releases: includes the commit distance and short SHA
+    (e.g. `1.4.0-74-geec1768`).
+  - With local uncommitted changes: appended `-dirty`.
+
+The build identity is what appears in the Swing window title/status bar, the
+CLI `--version` output, the web UI header, and the user manual `|version|`
+substitution. It is derived automatically from git at build time — no manual
+bookkeeping is required.
+
+The Gradle provider is defined in `build.gradle.kts` (the `gitDescribe` val).
+All CI checkouts must use `fetch-depth: 0` so the full tag history is
+available for `git describe` to produce meaningful output.
+
+### Web production promotion
+
+Production (`web.edumips.org`) is **not auto-deployed**. The `deploy-prod` job
+in `release.yml` is disabled (`if: false`). Promotion is manual and gated.
+
+#### Promoting a build to production
+
+**`promote-web.yml` serves two modes:**
+
+**Mode 1: Build and promote current master (one-click ship)**
+1. Open **Actions → Promote Web to Production** (`promote-web.yml`).
+2. Click **Run workflow**. Leave the **CI run ID** field **empty**.
+3. The workflow builds and tests the current `master` (via reusable `build-web.yml`, 
+   no secrets), then deploys the artifact to production.
+4. The Pages repo (`EduMIPS64/web.edumips.org`) receives the update with the following layout:
+
+   ```
+   web.edumips.org/
+   ├── index.html + [all files]   ← current promoted version (root)
+   ├── prev/                      ← previous promoted version
+   ├── v/
+   │   ├── 1/  2/  3/ …          ← immutable snapshots (up to 50 kept)
+   └── manifest.json              ← {current, prev, sha, build, promotedAt, …}
+   ```
+
+**Mode 2: Promote a specific past CI run (rollback / re-promote)**
+1. Open **Actions → Promote Web to Production** (`promote-web.yml`).
+2. Click **Run workflow** and enter the **CI run ID** whose `web` artifact to ship.
+   (Find the run ID in the URL of any successful CI run on `master`.)
+3. The workflow validates the run (must be a successful `ci.yml` run on `master`
+   with a `web` artifact), then deploys it to production using the same layout as Mode 1.
+   This mode is useful for: rolling back to a previous good build (find its run ID and
+   re-promote), re-promoting the current production version by id, or auditing which
+   runs have shipped.
+
+**Details:**
+- Only `lupino3` (Andrea) can trigger `promote-web.yml` (actor check enforced in
+  the workflow, in addition to the collaborator gate on `workflow_dispatch`).
+- Must be dispatched from the `master` branch in both modes.
+- The Pages-layout logic lives in `.github/scripts/deploy-web-pages.py`.
+
+#### Manifest and version history
+
+The **`manifest.json`** file on the Pages repo root carries metadata about all
+promoted web versions:
+
+```json
+{
+  "current": 44,
+  "prev": 43,
+  "sha": "abc1234",
+  "build": "1.4.0-2-gabc1234",
+  "targetRelease": "1.4.1",
+  "promotedAt": "2026-06-07T18:49:37Z",
+  "promotedBy": "lupino3",
+  "history": [
+    { "n": 44, "build": "1.4.0-2-gabc1234", "sha": "abc1234", "targetRelease": "1.4.1", "promotedAt": "2026-06-07T18:49:37Z", "promotedBy": "lupino3" },
+    { "n": 43, "build": "1.4.0-1-gabc1233", "sha": "abc1233", "targetRelease": "1.4.1", "promotedAt": "2026-06-06T10:15:22Z", "promotedBy": "lupino3" }
+  ]
+}
+```
+
+The **`history`** array lists all retained versions (newest-first), with each entry
+containing the promotion number `n`, build identity string, git SHA, target release
+label, timestamp, and promoting actor. The array is backfilled with the live
+version on the first promotion after this feature is added, then grows with each
+subsequent promotion. Entries are pruned in lockstep with the `/v/<N>/` snapshots
+(MAX_VERSIONS=50 retained).
+
+**In-app version navigator:** The web UI's About tab fetches `/manifest.json` with
+`cache:'no-cache'` (absolute path, not relative). If the fetch succeeds and the
+manifest is valid, **and** the build is not a PR preview (detected by absence of
+`window.GIT_DESCRIBE.match(/^PR #/)`), the About tab renders a "Previous Versions"
+list linking to each archived version at `/v/<N>/` (opens in a new tab). The
+current version is marked. When viewing an archived snapshot at `/v/<N>/`, the
+About tab displays a "Return to latest" link instead.
+
+This gating ensures the navigator only appears for stable and candidate builds, not
+temporary PR previews.
+
+#### Monotonic version numbering
+
+Promotion numbers are **monotonically increasing** — the next version is always
+`max(ever used) + 1`, never re-used. This fixes a latent bug where a promote
+after a rollback could re-use and mutate an existing immutable snapshot. The
+`deploy-web-pages.py` script maintains a `next_version` counter to enforce this
+invariant.
+
+If the current production version is broken, open **Actions → Rollback Web
+Production** (`rollback-web.yml`) and click **Run workflow** (no inputs needed).
+This promotes `prev/` back to root and updates `manifest.json`. Gated to
+`lupino3` only.
+
+Alternatively, use Mode 2 of `promote-web.yml` to re-promote a previous good build by its run ID.
+
+#### Candidate builds
+
+Every commit to `master` that passes CI is automatically deployed as a **candidate
+build** at a per-commit URL following the pattern `/<YYYY-MM-DD>/<N>-<shortsha>/`,
+where `<N>` is a 1-based per-day counter and `<shortsha>` is the 7-character commit
+SHA. Multiple commits on the same day receive incrementing numbers.
+
+The `candidate-web.yml` workflow handles candidate deploys, triggered when a CI
+run completes successfully on `master`. The `.github/scripts/deploy-web-pages.py`
+script gains a `candidate` subcommand that:
+
+- Computes the UTC date and per-day counter `N`.
+- Creates the candidate directory structure.
+- Updates a root-level `/candidates.json` index file listing all candidates sorted
+  newest-first (same format as `/manifest.json`, but with date-based entries and
+  retention metadata).
+- Automatically prunes candidates older than 14 days (configured in the JSON file).
+- Removes any legacy `/nightly/` directory on first run (one-time migration).
+
+The `/candidates.json` index file is excluded from promotion and rollback operations,
+which ensures candidate builds remain immutable and independent of production
+version management.
+
+Users can browse and share specific candidate builds from the web UI's **About** tab,
+which fetches and displays the candidate list. This replaces the previous `/nightly/`
+ungated preview channel. Candidate builds show a **CANDIDATE** badge so users know
+they may be unstable.
 
 ### Manual release checklist
 

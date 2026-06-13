@@ -8,7 +8,21 @@ jobs:
   monitor-ui:
     runs-on: ubuntu-latest
     steps:
+      - name: Get deployed commit SHA from production manifest
+        id: deployed
+        run: |
+          SHA=$(curl -sf https://web.edumips.org/manifest.json | jq -r '.sha')
+          if [ -z "$SHA" ] || [ "$SHA" = "null" ]; then
+            echo "Failed to fetch deployed SHA from manifest.json" >&2
+            exit 1
+          fi
+          echo "sha=${SHA}" >> "$GITHUB_OUTPUT"
+          echo "Monitoring production at commit ${SHA}"
+
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.deployed.outputs.sha }}
+
       - name: Set up Node.JS
         uses: actions/setup-node@v6
         with:
@@ -24,4 +38,3 @@ jobs:
           timeout_minutes: 2
           retry_on: error
           command: npm run test
-

@@ -1,0 +1,20 @@
+{
+  "universe_usage_history": [
+    { "universe": "The Matrix", "assigned_at": "2026-06-05T07:18:06+02:00", "agent_count": 6 }
+  ],
+  "assignment_cast_snapshots": {
+    "edumips64-initial-cast": {
+      "assignment_id": "edumips64-initial-cast",
+      "universe": "The Matrix",
+      "created_at": "2026-06-05T07:18:06+02:00",
+      "cast": {
+        "Morpheus": "Lead",
+        "Tank": "Core Dev",
+        "Trinity": "Frontend Dev",
+        "Smith": "Tester",
+        "Link": "Docs/DevRel",
+        "Cypher": "MIPS64 ISA Expert"
+      }
+    }
+  }
+}

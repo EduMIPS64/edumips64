@@ -297,6 +297,8 @@ public class ResultFactory {
             .put("wawStalls", cpu.getWAWStalls())
             .put("dividerStalls", cpu.getStructuralStallsDivider())
             .put("memoryStalls", cpu.getStructuralStallsMemory())
+            .put("exStalls", cpu.getStructuralStallsEX())
+            .put("funcUnitStalls", cpu.getStructuralStallsFuncUnit())
                 .put("L1I_reads", cachesim.getL1InstructionCache().getStats().getReadAccesses())
                 .put("L1I_misses", cachesim.getL1InstructionCache().getStats().getReadMisses())
                 .put("L1D_reads", cachesim.getL1DataCache().getStats().getReadAccesses())
