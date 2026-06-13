@@ -1,0 +1,109 @@
+name: Candidate Web Deploy
+
+on:
+  workflow_run:
+    workflows: ["CI Build"]
+    types: [completed]
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: web-pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy-candidate:
+    name: Deploy candidate build
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'master')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+
+    steps:
+      - name: Checkout edumips64 (for script)
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Resolve run and SHA
+        id: resolve
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            # Manual: find latest successful CI Build on master
+            RUN_JSON=$(gh run list \
+              --workflow ci.yml \
+              --branch master \
+              --status success \
+              --limit 1 \
+              --json databaseId,headSha \
+              --jq '.[0]' \
+              --repo "${{ github.repository }}")
+            if [[ -z "$RUN_JSON" || "$RUN_JSON" == "null" ]]; then
+              echo "ERROR: No successful CI run found on master"
+              exit 1
+            fi
+            RUN_ID=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['databaseId'])")
+            HEAD_SHA=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['headSha'])")
+          else
+            # workflow_run trigger
+            RUN_ID="${{ github.event.workflow_run.id }}"
+            HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
+          fi
+          echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
+          echo "head_sha=${HEAD_SHA}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${HEAD_SHA:0:7}" >> "$GITHUB_OUTPUT"
+
+      - name: Download web artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ steps.resolve.outputs.run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifact/web
+          gh run download "${RUN_ID}" --name web --dir artifact/web \
+            --repo "${{ github.repository }}"
+
+      - name: Get build string
+        id: build_info
+        run: |
+          echo "build=$(git describe --tags --always)" >> "$GITHUB_OUTPUT"
+
+      - name: Clone Pages repo
+        env:
+          PAT_WEBUI: ${{ secrets.PAT_WEBUI }}
+        run: |
+          set -euo pipefail
+          git clone "https://x-access-token:${PAT_WEBUI}@github.com/EduMIPS64/web.edumips.org.git" \
+            pages-repo --branch master --depth 1
+          git -C pages-repo config user.name "github-actions[bot]"
+          git -C pages-repo config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy candidate
+        env:
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
+          BUILD: ${{ steps.build_info.outputs.build }}
+        run: |
+          set -euo pipefail
+          cp .github/scripts/deploy-web-pages.py pages-repo/
+          cd pages-repo
+          python3 deploy-web-pages.py candidate "../artifact/web" "$HEAD_SHA" "$BUILD" ""
+          rm -f deploy-web-pages.py
+
+      - name: Commit and push
+        env:
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
+          SHORT_SHA: ${{ steps.resolve.outputs.short_sha }}
+        run: |
+          set -euo pipefail
+          cd pages-repo
+          git add -A
+          git diff --cached --quiet && { echo "Nothing to commit."; exit 0; }
+          git commit -m "Candidate @ ${SHORT_SHA} (${HEAD_SHA})"
+          git push origin master

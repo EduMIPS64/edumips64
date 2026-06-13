@@ -49,8 +49,8 @@
 }
 
 
-/* Nightly channel badge — shown only when served from /nightly/ path */
-.nightly-chip {
+/* Candidate channel badge — shown when served from /<date>/<n>-<sha>/ path */
+.candidate-chip {
     background-color: #7b1fa2 !important;
     color: #fff !important;
 }

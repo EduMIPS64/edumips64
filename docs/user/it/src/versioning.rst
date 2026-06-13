@@ -42,17 +42,19 @@ mostrato accanto all'etichetta **"Web Version"** nella barra degli strumenti:
 
 * **Nessun badge** — ti trovi sulla normale build di produzione. È la versione
   stabile di https://web.edumips.org.
-* **``NIGHTLY``** (badge arancione) — una build che viene **ricostruita
-  automaticamente ogni notte** dall'ultimo codice in sviluppo. Contiene sempre
-  le funzionalità più recenti, ma **potrebbe essere instabile**. Passando con
-  il mouse sul badge viene mostrato un tooltip che lo conferma.
+* **``CANDIDATE``** (badge viola) — una build distribuita automaticamente da ogni
+  commit al codice di sviluppo più recente. Ogni build candidate è etichettata
+  con la sua data e numero di sequenza (es., `2026-06-13 #2`). Puoi sfogliare
+  tutti i candidati disponibili e condividere i loro URL dalla scheda **About**.
+  I candidati possono essere instabili e vengono conservati per 14 giorni.
+  Passando con il mouse sul badge viene mostrato un tooltip che lo conferma.
 * **``PR #N``** (badge giallo) — un'anteprima temporanea creata per una
   specifica modifica proposta (pull request) su GitHub. Cliccando sul badge si
   apre la pagina della pull request corrispondente.
 * **``dev``** (badge blu) — qualcuno sta eseguendo una build di sviluppo
   locale direttamente sul proprio computer.
 
-In sintesi: **nessun badge → produzione stabile; ``NIGHTLY`` → funzionalità
+In sintesi: **nessun badge → produzione stabile; ``CANDIDATE`` → funzionalità
 più recenti ma possibilmente instabile; ``PR #N`` / ``dev`` → build
 temporanee o di anteprima.**
 

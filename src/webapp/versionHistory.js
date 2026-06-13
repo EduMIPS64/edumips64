@@ -2,6 +2,10 @@
 //
 // The production deployment accumulates immutable snapshots at /v/<n>/.
 // A root /manifest.json describes all retained versions.
+// Per-commit candidate builds are deployed to /<YYYY-MM-DD>/<n>-<sha>/ and
+// indexed by a root /candidates.json.
+
+const CANDIDATE_PATH_RE = /^\/(\d{4}-\d{2}-\d{2})\/(\d+)-([a-f0-9]{7,8})\//;
 
 /**
  * Given a window.location-like object, return the integer version number <n>
@@ -100,4 +104,61 @@ export async function fetchManifest() {
   } catch {
     return null;
   }
+}
+
+/**
+ * Parse candidate info from a location, or return null.
+ *
+ * @param {{pathname?: string}} [loc] - Optional location object.
+ *   Defaults to window.location when running in a browser.
+ * @returns {{date: string, n: number, shortsha: string}|null}
+ */
+export function getViewedCandidate(loc) {
+  const location =
+    loc || (typeof window !== 'undefined' ? window.location : null);
+  if (!location) return null;
+  const match = (location.pathname || '').match(CANDIDATE_PATH_RE);
+  if (!match) return null;
+  return { date: match[1], n: parseInt(match[2], 10), shortsha: match[3] };
+}
+
+/**
+ * Fetch /candidates.json — returns parsed object or null.
+ *
+ * @returns {Promise<object|null>} Parsed candidates object or null on error.
+ */
+export async function fetchCandidates() {
+  try {
+    const resp = await fetch('/candidates.json', { cache: 'no-cache' });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    if (!data || !Array.isArray(data.candidates)) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Build display list from candidates data, sorted newest-first.
+ *
+ * @param {object|null} candidatesData - Parsed candidates.json object.
+ * @param {{date: string, n: number, shortsha: string}|null} viewedCandidate
+ * @returns {Array<{date: string, n: number, shortsha: string, build: string, href: string, deployedAt: string, label: string, isViewed: boolean}>}
+ */
+export function buildCandidateList(candidatesData, viewedCandidate) {
+  if (!candidatesData || !Array.isArray(candidatesData.candidates)) return [];
+  return candidatesData.candidates.map((c) => ({
+    date: c.date,
+    n: c.n,
+    shortsha: c.shortsha,
+    build: c.build,
+    href: c.path,
+    deployedAt: c.deployedAt,
+    label: `${c.date} #${c.n} (${c.shortsha})`,
+    isViewed:
+      viewedCandidate != null &&
+      viewedCandidate.date === c.date &&
+      viewedCandidate.n === c.n,
+  }));
 }
