@@ -217,32 +217,33 @@ div.error-accordion {
   }
 }
 
-/* Dark Mode Specific Styles */
-@media screen and (prefers-color-scheme: dark) {
-  #right-panel {
-    border-left-color: rgba(255, 255, 255, 0.188);
-  }
+/* Dark Mode Specific Styles
+   Driven by the app's resolved theme (the data-theme attribute set on <html>
+   from the MUI palette mode), NOT the OS `prefers-color-scheme` media query,
+   so these stay in sync when the user overrides the theme in Settings. */
+html[data-theme='dark'] #right-panel {
+  border-left-color: rgba(255, 255, 255, 0.188);
+}
 
-  div.error-accordion{
-    border-bottom-color: rgba(255, 255, 255, 0.188);
-  }
+html[data-theme='dark'] div.error-accordion {
+  border-bottom-color: rgba(255, 255, 255, 0.188);
+}
 
-  @media (max-width: 900px) {
-    #right-panel {
-      border-top-color: rgba(255, 255, 255, 0.188);
-    }
+@media (max-width: 900px) {
+  html[data-theme='dark'] #right-panel {
+    border-top-color: rgba(255, 255, 255, 0.188);
   }
+}
 
-  textarea {
-    background: transparent;
-    color: white;
-  }
+html[data-theme='dark'] textarea {
+  background: transparent;
+  color: white;
+}
 
-  ::-webkit-scrollbar {
-    background-color: #1e1e1e;
-  }
+html[data-theme='dark'] ::-webkit-scrollbar {
+  background-color: #1e1e1e;
+}
 
-  ::-webkit-scrollbar-thumb {
-    background-color: rgb(97, 97, 97);
-  }
+html[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background-color: rgb(97, 97, 97);
 }
