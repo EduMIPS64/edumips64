@@ -152,3 +152,30 @@ All 5 execution buttons are now always present in `#run-controls-toolbar` when i
 - **In READY state:** `#step-button`, `#multi-step-button`, `#run-button`, `#stop-button` are present and **enabled**; `#pause-button` is present but **disabled**.
 - **In EXECUTING state:** `#pause-button` is present and **enabled**; `#step-button`, `#multi-step-button`, `#run-button`, `#stop-button` are present but **disabled**.
 - Any test that asserted a button was absent (not in DOM) in a given state should be rewritten to assert `disabled` attribute instead.
+
+### Candidate Build UI (2026-06-13)
+
+Implemented the frontend portion of the promotable candidate builds feature (§4 of morpheus-candidate-design.md):
+
+- **`buildInfo.js`**: Added `CANDIDATE_PATH_RE` regex and candidate detection inside the `PROD_HOSTNAME` branch, returning `kind:'candidate'` with `candidateDate`, `candidateN`, `candidateSha`, `candidateUrl`. The check runs before the plain `production` return so a candidate URL is correctly classified even though it's served from `web.edumips.org`.
+
+- **`versionHistory.js`**: Added `CANDIDATE_PATH_RE` at module top, then three new exported helpers: `getViewedCandidate(loc)`, `fetchCandidates()`, `buildCandidateList(candidatesData, viewedCandidate)`. Mirrors the style of existing `getViewedVersion`/`fetchManifest`/`buildVersionList`.
+
+- **`HelpDialog.js`**: Updated `BuildInfoLine` to handle `kind === 'candidate'`, added `CandidateBuilds` component (mirrors `PreviousVersions` structure), rendered it after `<PreviousVersions />` in the About tab. Each ListItem carries `data-candidate="${date}-${n}"` for Playwright targeting. The outer Box has `id="about-candidate-builds"`. The info banner appears only when `buildInfo.kind === 'candidate'`.
+
+ESLint: 0 errors (2 pre-existing array-index-key warnings in unrelated NavigationDrawer code). Prettier: clean. `npm run build-dbg`: succeeded.
+
+### Nightly → Candidate Badge Migration (2026-06-13)
+
+Removed the nightly lane entirely from the Header and CSS. Key changes:
+
+- **`Header.js`**: Removed `path`/`isNightly` runtime path-detection constants and their comment block. Replaced `{isNightly && <Tooltip>/<Chip id="nightly-build-chip" className="nightly-chip">}` with `{buildInfo.kind === 'candidate' && <Tooltip>/<Chip id="candidate-build-chip" className="candidate-chip">}`. Also removed pre-existing dead code: `fileContent` state, `setFileContent`, and `handleFileLoad` (these were never wired into JSX and caused ESLint `no-unused-vars` errors). The existing `buildInfo` useMemo is reused — no second `getBuildInfo` call.
+
+- **`main.css`**: Renamed `.nightly-chip` selector to `.candidate-chip`; updated the comment to reference `/<date>/<n>-<sha>/` paths. Kept the same purple visual treatment.
+
+- **Verify results:** ESLint 0 errors, Prettier clean, `npm run build-dbg` succeeded, `grep -rn nightly src/webapp/` returns nothing.
+
+- **DOM hooks for Smith:** chip id `candidate-build-chip`, class `candidate-chip`, aria-label `"Candidate build"`.
+
+
+- **2026-06-13:** Candidate builds UI session: implemented versionHistory candidate selection (lists from candidates.json), buildInfo display, HelpDialog docs, Header CANDIDATE badge (blue color). Playwright tests passing; UI integrated with Tank's CI/CD layer. Feature deployed in PR #1845.
