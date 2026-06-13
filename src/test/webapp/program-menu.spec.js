@@ -22,11 +22,9 @@ const {
   targetUri,
   waitForPageReady,
   loadProgram,
-  runToCompletion,
   removeOverlay,
   waitForSimulationComplete,
   openProgramMenu,
-  resetSimulator,
 } = require('./test-utils');
 
 // A simple program that completes quickly.
