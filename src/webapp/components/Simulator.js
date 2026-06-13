@@ -301,19 +301,9 @@ const Simulator = ({worker, initialState, appInsights}) => {
       setParsedInstructions(result.parsedInstructions);
     }
 
-    // Always mirror the worker's stdout field, including the empty string.
-    // The previous truthiness guard (`if (result.stdout)`) silently dropped
-    // empty-string updates, which left the displayed stdout stuck on the
-    // previous run's content after a reset/load and made the stdout state
-    // diverge from the worker's view of the world. A real long run (e.g.
-    // the default sample's 1000-iteration loop before its SYSCALL 5) goes
-    // through many batches where `result.stdout === ""`; under the old
-    // guard, if any later state-clearing event raced with the final batch
-    // that carried the printf output, the user would see nothing in the
-    // Standard Output panel. Reflecting the worker's value unconditionally
-    // keeps the two in lock-step. `?? ''` is purely defensive against an
-    // unexpectedly null/undefined field.
-    setStdout(result.stdout ?? '');
+    if (result.stdout) {
+      setStdout(result.stdout);
+    }
   };
 
   const updateState = (result) => {
