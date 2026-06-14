@@ -273,9 +273,8 @@ SYSCALL 0
   expect(snap.ID.stall).toBe('Struct: Div');
   expect(snap.ID.fill).toBe(STALL_COLOR);
 
-  // Note: the Statistics panel's "Structural Stall" counter only counts
-  // memory-structural stalls (`getStructuralStallsMemory()`), not divider
-  // stalls, so we don't assert anything about it here. The SVG check above
-  // is the authoritative verification that the Web UI surfaced the StDiv
-  // tag for the second DIV.D.
+  // Note: the Statistics panel's "Structural Stall" counter now sums all four
+  // structural-stall counters (divider, memory, EX, funcUnit), so we assert
+  // that it reflects at least the divider stalls seen above.
+  expect(await readStat(page, 'stat-structural-stalls')).toBeGreaterThanOrEqual(1);
 });

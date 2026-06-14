@@ -18,6 +18,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v5
@@ -30,7 +31,7 @@ jobs:
         id: setup-python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version: '3.14'
 
       - name: Configure Python path for Gradle
         run: |
@@ -42,13 +43,6 @@ jobs:
 
       - name: Check that every instruction is covered by a test
         run: sh utils/find-instructions.sh
-
-      - name: Read version from gradle.properties
-        id: read_version
-        uses: christian-draeger/read-properties@1.1.1
-        with:
-          path: 'gradle.properties'
-          properties: 'version'
 
       - name: Compile and run tests
         run: ./gradlew check
@@ -67,11 +61,17 @@ jobs:
       - name: Build JAR
         run: ./gradlew jar
 
+      - name: Get produced JAR path
+        id: get_jar
+        run: |
+          JAR_FILE=$(ls ./out/edumips64-*.jar | grep -v '\-nohelp\.jar' | head -1)
+          echo "path=${JAR_FILE}" >> "$GITHUB_OUTPUT"
+
       - name: Upload JAR
         uses: actions/upload-artifact@v7
         with:
           name: JAR
-          path: ./out/edumips64-${{ steps.read_version.outputs.version }}.jar
+          path: ${{ steps.get_jar.outputs.path }}
 
       - name: Upload English Manual PDF
         uses: actions/upload-artifact@v7

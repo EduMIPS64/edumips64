@@ -45,6 +45,7 @@ public abstract class ALU_IType extends ComputationalInstructions {
   protected final static int RS_FIELD_LENGTH = 5;
   protected final static int IMM_FIELD_LENGTH = 16;
   protected final static int IMM_FIELD_MAX = 32767; // 2^15-1
+  protected final static int IMM_FIELD_UNSIGNED_MAX = 65535; // 2^16-1
   protected String OPCODE_VALUE = "";
 
   // Needs to be mutable because LUI's syntax is %R,%I, and IMM_FIELD will be 1 in that case.
@@ -65,6 +66,18 @@ public abstract class ALU_IType extends ComputationalInstructions {
    */
   protected void checkImmediateForOverflow() throws IntegerOverflowException {
     if (params.get(IMM_FIELD) > IMM_FIELD_MAX) {
+      throw new IntegerOverflowException();
+    }
+  }
+
+  /**
+   * Throws an IntegerOverflowException if the immediate value does not fit in the unsigned 16-bit
+   * range [0, 65535]. Used by the zero-extended logical-immediate instructions (ANDI/ORI/XORI).
+   * @throws IntegerOverflowException
+   */
+  protected void checkUnsignedImmediateForOverflow() throws IntegerOverflowException {
+    int immediate = params.get(IMM_FIELD);
+    if (immediate < 0 || immediate > IMM_FIELD_UNSIGNED_MAX) {
       throw new IntegerOverflowException();
     }
   }

@@ -1,0 +1,106 @@
+# Promote Web to Production
+#
+# Promotion is a pure metadata + file-copy operation against a build that was
+# ALREADY built and pushed to /c/<sha>/ by push-web.yml. It NEVER builds a new
+# web artifact (see docs/design/unified-web-versioning.md).
+#
+# Input:
+#   sha — full or short commit SHA of the candidate to promote. Leave empty to
+#         promote the NEWEST candidate currently in versions.json.
+#
+# Security model:
+#   - Gated on `github.actor == 'lupino3'` AND `github.ref_name == 'master'`.
+#     The master-only gate ensures the workflow file itself is the audited
+#     version; a tampered copy on a feature branch can never reach PAT_WEBUI.
+#   - The `concurrency` lock (web-pages-deploy) serialises all Pages writes.
+
+name: Promote Web to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: 'Commit SHA (full or short) of the pushed candidate to promote. Leave empty to promote the newest candidate.'
+        required: false
+        type: string
+
+concurrency:
+  group: web-pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    name: Promote a pushed candidate to production
+    if: github.actor == 'lupino3' && github.ref_name == 'master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout edumips64 (for script)
+        uses: actions/checkout@v6
+        with:
+          # Full history so the one-shot legacy migration can compute
+          # seq = `git rev-list --count <sha>` for past promoted builds.
+          fetch-depth: 0
+
+      - name: Clone Pages repo
+        env:
+          PAT_WEBUI: ${{ secrets.PAT_WEBUI }}
+        run: |
+          set -euo pipefail
+          git clone "https://x-access-token:${PAT_WEBUI}@github.com/EduMIPS64/web.edumips.org.git" \
+            pages-repo --branch master --depth 1
+          git -C pages-repo config user.name "github-actions[bot]"
+          git -C pages-repo config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Migrate legacy Pages layout if needed
+        run: .github/scripts/migrate-pages-if-needed.sh pages-repo "${{ github.workspace }}"
+
+      - name: Resolve SHA to promote
+        id: resolve
+        env:
+          INPUT_SHA: ${{ inputs.sha }}
+        run: |
+          set -euo pipefail
+          cd pages-repo
+          if [[ -n "${INPUT_SHA}" ]]; then
+            SHA="${INPUT_SHA}"
+          else
+            # Default: newest candidate (highest seq that is not promoted).
+            SHA=$(python3 <<'PY'
+          import json
+          d = json.load(open('versions.json'))
+          cands = [v for v in d['versions'] if not v['promoted']]
+          if not cands:
+              raise SystemExit('ERROR: no pending candidates to promote')
+          print(max(cands, key=lambda v: v['seq'])['sha'])
+          PY
+          )
+          fi
+          echo "Promoting SHA: ${SHA}"
+          echo "sha=${SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Run promote script (never builds)
+        env:
+          SHA: ${{ steps.resolve.outputs.sha }}
+        run: |
+          set -euo pipefail
+          cp .github/scripts/deploy-web-pages.py pages-repo/
+          cd pages-repo
+          python3 deploy-web-pages.py promote "${SHA}" "${{ github.actor }}"
+          rm -f deploy-web-pages.py
+
+      - name: Commit and push to Pages repo
+        env:
+          SHA: ${{ steps.resolve.outputs.sha }}
+        run: |
+          set -euo pipefail
+          cd pages-repo
+          # Read the resolved current SHA and its build string for the message.
+          BUILD=$(python3 -c "import json; d=json.load(open('versions.json')); cur=d['current']; e=[v for v in d['versions'] if v['sha']==cur][0]; print(e['build'])")
+          git add -A
+          git diff --cached --quiet && { echo "Nothing to commit."; exit 0; }
+          git commit -m "Promote web to ${SHA:0:8} (${BUILD})"
+          git push origin master
+          echo "Promoted ${SHA} (${BUILD}) to web.edumips.org"

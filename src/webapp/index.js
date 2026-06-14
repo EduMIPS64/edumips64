@@ -11,8 +11,9 @@ import './css/main.css'
 
 
 // Set version from the webpack variables. Uses globals defined by webpack.
-/* global BRANCH, COMMITHASH */
-const version = `${BRANCH}-${COMMITHASH.substring(0, 7)}`;
+// VERSION is git-describe (e.g. "1.4.0-74-ge1b45a15"), matching desktop identity.
+/* global VERSION */
+const version = VERSION;
 
 // Initialize AppInsights.
 const appInsights = new ApplicationInsights({

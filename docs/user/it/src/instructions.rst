@@ -299,7 +299,8 @@ Ecco la lista delle istruzioni ALU di tipo I.
 * `ANDI rt, rs, immediate`
 
   Esegue un AND bit a bit tra rs ed il valore immediato, ponendo il risultato
-  in rt.
+  in rt. L'immediato a 16 bit è esteso con zeri, quindi accetta l'intervallo
+  senza segno ``0``–``65535``.
 
 * `DADDI rt, rs, immediate`
 
@@ -333,7 +334,8 @@ Ecco la lista delle istruzioni ALU di tipo I.
 * `ORI rt, rs, immediate`
 
   Effettua l'OR bit a bit tra rs ed il valore immediato, ponendo il risultato
-  in rt.
+  in rt. L'immediato a 16 bit è esteso con zeri, quindi accetta l'intervallo
+  senza segno ``0``–``65535``.
 
 * `SLTI rt, rs, immediate`
 
@@ -350,7 +352,8 @@ Ecco la lista delle istruzioni ALU di tipo I.
 * `XORI rt, rs, immediate`
 
   Effettua l'OR esclusivo bit a bit tra rs ed il valore immediato, ponendo il
-  risultato in rt.
+  risultato in rt. L'immediato a 16 bit è esteso con zeri, quindi accetta
+  l'intervallo senza segno ``0``–``65535``.
 
 Istruzioni load/store
 ---------------------

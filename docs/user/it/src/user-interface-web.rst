@@ -48,53 +48,95 @@ simulatore. Ogni pulsante ha un tooltip che ne descrive l'effetto.
     di terminazione e la pipeline si sta svuotando, oppure il
     programma è terminato.
 
-* **Load** — analizza il contenuto dell'editor e carica il programma
-  risultante nel simulatore. È disabilitato mentre la simulazione è
-  in corso e viene nascosto una volta che il caricamento è andato a
-  buon fine.
+Controlli di esecuzione e layout della barra degli strumenti
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I controlli di esecuzione appaiono come una **barra degli strumenti
+fluttuante e trascinabile con solo icone** che si sovrappone al
+contenuto, come la barra di debug in VS Code. La barra appare in modo
+contestuale in base allo stato attuale del simulatore, riducendo il
+disordine visivo e rendendo chiare le azioni disponibili:
 
-* **Single Step** — esegue un singolo ciclo di CPU.
+* **EMPTY** (nessun programma caricato) — la barra è nascosta; solo il
+  pulsante ``Load`` nella barra superiore è disponibile.
+* **READY** (programma caricato, pronto per l'esecuzione) — la barra
+  fluttuante appare con ``Single Step``, ``Multi Step``, ``Run All`` e
+  ``Stop`` come pulsanti con icone. La barra può essere trascinata per
+  riposizionarla ovunque sullo schermo.
+* **EXECUTING** (programma in esecuzione) — la barra mostra ``Pause``
+  e ``Stop`` (disabilitato con il messaggio "Pause before stopping").
+  La barra rimane trascinabile.
+* **ENDED** (programma terminato) — la barra è nascosta.
+* **In attesa di input** (finestra di dialogo per l'input aperta) —
+  la barra è nascosta; la finestra di dialogo deve essere completata
+  prima di proseguire.
+
+Il pulsante **Load**, il menu **Program** e il pulsante **Help (?)**
+rimangono sempre visibili nella barra superiore.
+
+Descrizione dei singoli pulsanti:
+
+* **Single Step** — esegue un singolo ciclo di CPU. Appare nella barra
+  fluttuante quando un programma è caricato e pronto per l'esecuzione.
 
 * **Multi Step** — esegue un numero configurabile di cicli di CPU con
   un singolo click. Il numero corrente è mostrato nel tooltip del
   pulsante e può essere modificato nel pannello *General Settings*
-  ("Multi Step Size").
+  ("Multi Step Size"). Appare nella barra fluttuante quando un
+  programma è caricato e pronto per l'esecuzione.
 
 * **Run All** — esegue il programma fino al termine, ovvero fino ad
   una ``SYSCALL 0`` (o equivalente) o ad una istruzione ``BREAK``,
   oppure fino a quando l'utente preme *Pause* o *Stop*. Tra un blocco
   interno di cicli e l'altro il simulatore può attendere un ritardo
   configurabile (``Execution Delay``), così da rendere visivamente
-  osservabili anche esecuzioni lunghe.
+  osservabili anche esecuzioni lunghe. Appare nella barra fluttuante
+  quando un programma è caricato e pronto per l'esecuzione.
 
 * **Pause** — interrompe l'esecuzione in corso al ciclo corrente. È
   poi possibile proseguire con *Single Step*, *Multi Step* o *Run
-  All*.
+  All*. Appare nella barra fluttuante solamente mentre il programma
+  è in esecuzione.
 
 * **Stop** — interrompe l'esecuzione e riporta la CPU allo stato
-  ``READY``, azzerando registri, memoria e pipeline.
+  ``READY``, azzerando registri, memoria e pipeline. Appare nella
+  barra fluttuante negli stati READY e EXECUTING (disabilitato in
+  EXECUTING con il messaggio "Pause before stopping").
 
-* **Clear** — svuota l'editor lasciando solo uno scheletro di file
+Menu Program
+~~~~~~~~~~~~
+Il menu **Program** (icona di cartella con freccia a discesa)
+consolida la gestione dei programmi in un singolo pulsante nella
+barra superiore. Apre un menu a discesa con i seguenti elementi.
+**Il menu non è disponibile quando un programma è caricato nel
+simulatore** (ovvero mentre il simulatore è in esecuzione), per evitare
+modifiche accidentali al programma durante la simulazione. Diventa disponibile
+di nuovo una volta che il programma caricato ha terminato l'esecuzione o dopo
+il reset del simulatore (nessun programma caricato).
+
+* **New** — svuota l'editor lasciando solo uno scheletro di file
   assembly (direttive ``.data`` e ``.code`` ed una ``SYSCALL 0``
-  finale). È disabilitato mentre la CPU sta eseguendo.
+  finale).
 
-* **Open Code** — apre un file locale (tipicamente un file ``.s``) e
+* **Open…** — apre un file locale (tipicamente un file ``.s``) e
   ne carica il contenuto nell'editor.
 
-* **Save Code** — salva il contenuto corrente dell'editor in un file
+* **Save…** — salva il contenuto corrente dell'editor in un file
   locale chiamato ``code.s``.
 
+* **Load Example** — sostituisce il contenuto dell'editor con il
+  programma di esempio incluso in EduMIPS64 (lo stesso visualizzato
+  la prima volta che si apre il simulatore web). È utile per tornare ad un punto di
+  partenza noto dopo aver fatto esperimenti, o per scartare il
+  contenuto dell'editor salvato in locale (si veda *Salvataggio e
+  caricamento* qui sotto).
+
+Pulsante Help
+~~~~~~~~~~~~~
 * **Help (?)** — apre questo manuale all'interno dell'applicazione,
   con un pannello di navigazione sulla sinistra ed un selettore della
   lingua. La finestra di Help include anche una scheda *About* che
   mostra la versione del simulatore ed una descrizione della build in
   esecuzione.
-
-I pulsanti che non avrebbero alcun effetto nello stato corrente sono
-disabilitati automaticamente. Ad esempio, *Single Step*, *Multi Step*
-e *Run All* sono disabilitati finché un programma non è stato
-caricato con *Load*, e *Pause* è disponibile solo durante una
-esecuzione lunga.
 
 L'editor di codice
 ------------------
@@ -192,6 +234,15 @@ pulsanti **Save Code** e **Open Code** della barra degli strumenti.
 *Save Code* avvia il download del sorgente come ``code.s``; *Open
 Code* permette di selezionare un file locale, sostituendo il
 contenuto dell'editor.
+
+Inoltre, l'editor salva automaticamente il proprio contenuto nel
+local storage del browser mentre si digita, in modo che un
+ricaricamento accidentale della pagina non cancelli un programma
+non banale riportandolo al sorgente di esempio. L'ultima versione
+modificata viene ripristinata alla successiva apertura della pagina
+nello stesso browser. Per scartare il contenuto persistito e
+tornare al programma di esempio originale si può usare il pulsante
+**Restore default sample** della barra degli strumenti.
 
 Modalità Vi opzionale
 ~~~~~~~~~~~~~~~~~~~~~
@@ -372,6 +423,37 @@ ai reload della pagina.
   essere modificata con un selettore di colore; il pulsante
   *Reset to defaults* ripristina la palette originale (gli stessi
   valori RGB usati dal front-end Swing).
+
+Scorciatoie da tastiera
+-----------------------
+Le seguenti scorciatoie da tastiera sono disponibili in ogni momento,
+salvo quando un dialogo (Aiuto, Impostazioni, Input) è aperto.
+Tutti i tasti elencati invocano ``preventDefault()``, così le azioni
+predefinite del browser (es. F10 barra dei menu, Esc) non si
+attivano.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 35 50
+
+   * - Tasto
+     - Azione
+     - Attivo quando
+   * - **F2**
+     - Carica il programma
+     - Il programma non ha errori di sintassi
+   * - **F8**
+     - Esegui tutto / Pausa (toggle)
+     - Esegui tutto: programma caricato (READY); Pausa: in esecuzione
+   * - **F9**
+     - Passo singolo
+     - Programma caricato (READY)
+   * - **F10**
+     - Passo multiplo
+     - Programma caricato (READY)
+   * - **Esc**
+     - Ferma e reimposta CPU
+     - Programma caricato (READY)
 
 Eseguire EduMIPS64 come applicazione desktop o da CLI
 -----------------------------------------------------

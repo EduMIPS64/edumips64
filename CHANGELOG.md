@@ -1,12 +1,38 @@
 # EduMIPS64 ChangeLog
 
-## Unreleased
+## 1.4.1 (TBD)
 
 ### Added
 - Optional branch delay slot mode, as described in Hennessy & Patterson. When
   enabled, the instruction immediately following a branch or jump is always
   executed; otherwise it is squashed (the existing behavior). Exposed in both
   the Swing UI (Main Settings tab) and the Web UI (General Settings).
+- Web UI now has keyboard shortcuts for run-control actions: F2 (Load), F8
+  (Run All / Pause), F9 (Single Step), F10 (Multi Step), Esc (Stop). Shortcuts
+  are shown in button tooltips and documented in a new "Shortcuts" tab in the
+  Help dialog. (Issue #1706)
+- Integer data directives (`.byte`, `.word16`, `.word32`, `.word` and
+  `.word64`) now accept a label as their value. The assembler stores the memory
+  address the label points to, resolving both data labels and forward code
+  labels (e.g. for jump tables). (Issue #1643)
+- Web UI now persists the editor's program contents in the browser's local
+  storage, so your code survives page reloads. Also added a new "Restore default
+  sample" button to reset the editor back to the bundled sample program.
+  (@Copilot, PR #1736)
+
+### Fixed
+- `ANDI`, `ORI` and `XORI` now accept the full unsigned 16-bit immediate range
+  (`0`–`65535`), matching the MIPS64 zero-extended immediate semantics.
+  Previously, decimal immediates in `32768`–`65535` (e.g. the mask `65280` /
+  `0xFF00`) were wrongly rejected with an `IMMEDIATE_TOO_LARGE` error.
+  (Issue #1822)
+- Web UI Cache Configuration panel no longer loses focus after each keystroke,
+  making input fields much easier to edit. (@davidepatti, PR #1804)
+
+### Changed
+- Web UI now shows the Stats, Pipeline and Registers panels expanded by default
+  on a first visit, so the simulator's core views are visible immediately.
+  Returning users keep their last layout preference. (@Copilot, Issue #1697)
 
 ## 1.4.0 (03/05/2026) - WalkOfLife
 

@@ -68,6 +68,21 @@ class VoidJump {
   boolean isBranch = false;
 }
 
+// Wrapper class used to handle label references used as values in data
+// directives (.word64/.word32/.word16/.byte). The referenced label may be
+// defined later in the source (e.g. a code label used to build a jump table),
+// so the actual address is written only after the full symbol table is built.
+class VoidData {
+  MemoryElement target;
+  int posInWord;
+  int numBit;
+  String name;
+  String label;
+  int row;
+  int column;
+  String line;
+}
+
 public class Parser {
   /** Instance variables */
   private static final Logger logger = Logger.getLogger(Parser.class.getName());
@@ -87,6 +102,8 @@ public class Parser {
   /** File to be parsed
   */
   private int memoryCount;
+  // Label references used as values in data directives, resolved after STAGE 1.
+  private List<VoidData> voidDatas;
   private String filename;
   private SymbolTable symTab;
   private FileUtils fileUtils;
@@ -234,6 +251,10 @@ public class Parser {
     // Keep track of jumps that couldn't be handled at parsing time,
     // to resolve them after the symbol table is full.
     LinkedList<VoidJump> voidJumps = new LinkedList<>();
+
+    // Keep track of label references used as values in data directives,
+    // to resolve them after the symbol table is full (STAGE 2).
+    voidDatas = new LinkedList<>();
 
     memoryCount = 0;
     List<String> pendingLabels = new LinkedList<>();
@@ -652,6 +673,45 @@ public class Parser {
                         column = line.length();
                         continue;
                       }
+                    // %Z: 16-bit unsigned (zero-extended) immediate.
+                    // Used by the logical-immediate instructions (ANDI/ORI/XORI), whose immediate is
+                    // zero-extended, so the full unsigned range [0, 65535] is legal. Unlike %I, a hex
+                    // literal such as 0xFFFF keeps its face value (65535), it is not reinterpreted as -1.
+                    // Also allows a memory label as a parameter -- the address will be used as immediate value.
+                    } else if (type == 'Z') {
+                      long immediateValue = 0;
+                      String errorMessage = "";
+
+                      try {
+                        immediateValue = Converter.parseImmediate(paramValue);
+                      } catch (NumberFormatException e) {
+                        // Invalid number, try to parse it as a memory label.
+                        MemoryElement tmpMem;
+                        try {
+                          tmpMem = symTab.getCell(paramValue.trim());
+                          immediateValue = tmpMem.getAddress();
+                        } catch (MemoryElementNotFoundException ex) {
+                          errorMessage = "INVALIDIMMEDIATE";
+                        }
+                      }
+
+                      if (errorMessage.isEmpty()) {
+                        if (immediateValue < 0) {
+                          errorMessage = "VALUEISNOTUNSIGNED";
+                          immediateValue = 0;
+                        } else if (immediateValue > 65535) {
+                          errorMessage = "16BIT_IMMEDIATE_TOO_LARGE";
+                          immediateValue = 0;
+                        }
+                      }
+
+                      // Casting to int is safe because we know the value is between 0 and 65535.
+                      tmpInst.getParams().add((int)immediateValue);
+                      if (!errorMessage.isEmpty()) {
+                        errors.addError(errorMessage, row, line.indexOf(paramValue) + 1, line);
+                        column = line.length();
+                        continue;
+                      }
                     // %U: 5-bit unsigned immediate.
                     // %C: 3-bit unsigned immediate.
                     } else if (type == 'U' || type == 'C') {
@@ -892,6 +952,11 @@ public class Parser {
         continue;
       }
     }
+
+    // ----------------------------------------------------
+    // STAGE 2b: RESOLVE LABEL REFERENCES IN DATA DIRECTIVES
+    // ----------------------------------------------------
+    resolveDataLabels();
 
     if (!halt) { //if Halt is not present in code
       errors.addWarning("HALT_NOT_PRESENT", row, 0, "");
@@ -1167,8 +1232,20 @@ public class Parser {
         // Convert the literal (decimal, 0x hex or 0b binary) to a long, and then check for overflow.
         num = Converter.parseImmediate(val);
       } catch (NumberFormatException e) {
-        errors.addError("INVALIDVALUE", row, i + 1, line);
-        i = line.length();
+        // Not a numeric literal: treat it as a label reference. The label may be
+        // defined later in the source (e.g. a code label for a jump table), so the
+        // address is resolved and written in STAGE 2, once the symbol table is full.
+        VoidData voidData = new VoidData();
+        voidData.target = tmpMem;
+        voidData.posInWord = posInWord;
+        voidData.numBit = numBit;
+        voidData.name = name;
+        voidData.label = val;
+        voidData.row = row;
+        voidData.column = i;
+        voidData.line = line;
+        voidDatas.add(voidData);
+        posInWord += numBit / 8;
         continue;
       }
 
@@ -1204,6 +1281,51 @@ public class Parser {
       }
 
       posInWord += numBit / 8;
+    }
+  }
+
+  /** Resolves label references used as values in data directives (collected in
+   * {@link VoidData} entries during STAGE 1) and writes the corresponding
+   * addresses into memory. Must be called after the full symbol table is built.
+   * A label may resolve to either a data label or a code (instruction) label.
+   */
+  private void resolveDataLabels() {
+    for (VoidData voidData : voidDatas) {
+      Integer address = null;
+
+      // First look the label up among data labels, then among instruction labels.
+      try {
+        address = symTab.getCell(voidData.label).getAddress();
+      } catch (MemoryElementNotFoundException e) {
+        address = symTab.getInstructionAddress(voidData.label.trim());
+      }
+
+      if (address == null) {
+        errors.addError("LABELNOTFOUND", voidData.row, voidData.column + 1, voidData.line);
+        continue;
+      }
+
+      long num = address;
+
+      // Addresses are non-negative; make sure the address fits in the directive's width.
+      if (voidData.numBit != 64 && num > (Converter.powLong(2, voidData.numBit) - 1)) {
+        errors.addError(voidData.name.toUpperCase() + "_TOO_LARGE", voidData.row, voidData.column + 1, voidData.line);
+        continue;
+      }
+
+      try {
+        if (voidData.numBit == 8) {
+          voidData.target.writeByte((int) num, voidData.posInWord);
+        } else if (voidData.numBit == 16) {
+          voidData.target.writeHalf((int) num, voidData.posInWord);
+        } else if (voidData.numBit == 32) {
+          voidData.target.writeWord(num, voidData.posInWord);
+        } else if (voidData.numBit == 64) {
+          voidData.target.writeDoubleWord(num);
+        }
+      } catch (IrregularWriteOperationException | NotAlignException e) {
+        errors.addError("INVALIDVALUE", voidData.row, voidData.column + 1, voidData.line);
+      }
     }
   }
 

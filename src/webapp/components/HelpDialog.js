@@ -22,9 +22,22 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Typography } from '@mui/material';
+import Chip from '@mui/material/Chip';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
 import { getBuildInfo } from '../buildInfo';
+import {
+  fetchVersions,
+  buildVersionList,
+  getViewedSha,
+} from '../versionHistory';
 
 // Render a localized description of the running build (production/PR/dev),
 // shown in the "About" tab so users can clearly tell which version of the
@@ -38,6 +51,17 @@ function BuildInfoLine() {
         <Link href={buildInfo.prUrl} target="_blank" rel="noreferrer">
           pull request #{buildInfo.prNumber}
         </Link>
+      </Typography>
+    );
+  }
+  if (buildInfo.kind === 'archive-build') {
+    return (
+      <Typography id="about-build-info">
+        Build: archived (
+        <Link href={buildInfo.buildUrl} target="_blank" rel="noreferrer">
+          {buildInfo.sha.slice(0, 7)}
+        </Link>
+        )
       </Typography>
     );
   }
@@ -55,10 +79,117 @@ function BuildInfoLine() {
   return <Typography id="about-build-info">Build: development</Typography>;
 }
 
-// Define the set of allowed languages (should match what's shown in the language Select)
-const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
+// Renders the unified version list from /versions.json. Promoted versions are
+// shown prominently; pending candidates (builds newer than the live one that
+// have not been promoted) are listed below in a lighter style. All retained
+// candidates are shown (they are expected to be few between promotions).
+// Gated on: valid versions index AND build kind !== 'pr'.
+function Versions() {
+  const [versionsData, setVersionsData] = React.useState(null);
+  const viewedSha = React.useMemo(() => getViewedSha(), []);
 
-// Localized "Introduction" labels for each language
+  React.useEffect(() => {
+    fetchVersions().then((v) => setVersionsData(v));
+  }, []);
+
+  const buildInfo = getBuildInfo();
+  if (!versionsData || buildInfo.kind === 'pr') {
+    return null;
+  }
+
+  const items = buildVersionList(versionsData, viewedSha);
+  if (items.length === 0) {
+    return null;
+  }
+
+  const promoted = items.filter((it) => it.promoted);
+  const candidates = items.filter((it) => !it.promoted);
+  const viewedItem = viewedSha
+    ? items.find((it) => it.sha === viewedSha)
+    : null;
+
+  const renderEntry = (item) => (
+    <ListItem key={item.sha} disablePadding data-version={item.sha}>
+      <ListItemText
+        primary={
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {item.isCurrent ? (
+              <Typography
+                component="span"
+                sx={{ fontWeight: item.promoted ? 'bold' : 'normal' }}
+              >
+                {item.dateLabel
+                  ? `${item.dateLabel} (${item.shortsha}` +
+                    (item.targetRelease ? `, targets ${item.targetRelease})` : ')')
+                  : item.shortsha}
+              </Typography>
+            ) : (
+              <Link
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                title={item.build}
+                sx={{ fontWeight: item.promoted ? 'bold' : 'normal' }}
+              >
+                {item.dateLabel
+                  ? `${item.dateLabel} (${item.shortsha}` +
+                    (item.targetRelease ? `, targets ${item.targetRelease})` : ')')
+                  : item.shortsha}
+              </Link>
+            )}
+            {item.isCurrent && (
+              <Chip label="current" size="small" color="success" />
+            )}
+            {!item.promoted && (
+              <Chip label="candidate" size="small" color="info" variant="outlined" />
+            )}
+            {item.isViewed && !item.isCurrent && (
+              <Typography component="span" variant="caption">
+                (viewing)
+              </Typography>
+            )}
+          </Box>
+        }
+      />
+    </ListItem>
+  );
+
+  return (
+    <Box id="about-versions" sx={{ mt: 2 }}>
+      {viewedItem != null && !viewedItem.isCurrent && (
+        <Typography
+          gutterBottom
+          color={viewedItem.promoted ? 'warning.main' : 'info.main'}
+        >
+          You are viewing {viewedItem.promoted ? 'an archived' : 'a candidate'}{' '}
+          build ({viewedItem.shortsha}). <Link href="/">Open the latest.</Link>
+        </Typography>
+      )}
+      {promoted.length > 0 && (
+        <>
+          <Typography variant="h6" gutterBottom>
+            Promoted versions
+          </Typography>
+          <List dense disablePadding id="about-promoted-versions">
+            {promoted.map(renderEntry)}
+          </List>
+        </>
+      )}
+      {candidates.length > 0 && (
+        <>
+          <Typography variant="h6" gutterBottom sx={{ mt: promoted.length ? 2 : 0 }}>
+            Candidate builds
+          </Typography>
+          <List dense disablePadding id="about-candidate-versions">
+            {candidates.map(renderEntry)}
+          </List>
+        </>
+      )}
+    </Box>
+  );
+}
+
+const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
 const INTRODUCTION_LABELS = {
   en: 'Introduction',
   it: 'Introduzione',
@@ -458,17 +589,22 @@ export default function HelpDialog(props) {
       open={props.open}
       maxWidth="xl"
       fullWidth
-      PaperProps={{
-        sx: {
-          // On phones / small tablets give the dialog the whole screen
-          // (margins waste already-scarce space); on larger screens
-          // keep the previous "almost full height" appearance.
-          height: { xs: '100vh', sm: '90vh' },
-          m: { xs: 0, sm: 4 },
-          maxHeight: { xs: '100vh', sm: 'calc(100% - 64px)' },
-          width: { xs: '100vw', sm: 'auto' },
-          maxWidth: { xs: '100vw', sm: 'calc(100% - 64px)' },
-          borderRadius: { xs: 0, sm: 1 },
+      slotProps={{
+        // MUI v9 removed `PaperProps`; the Paper slot is now styled via
+        // `slotProps.paper`. Without this the dialog collapses to its content
+        // height (~2/5 of the viewport) instead of the intended tall layout.
+        paper: {
+          sx: {
+            // On phones / small tablets give the dialog the whole screen
+            // (margins waste already-scarce space); on larger screens
+            // keep the previous "almost full height" appearance.
+            height: { xs: '100vh', sm: '90vh' },
+            m: { xs: 0, sm: 4 },
+            maxHeight: { xs: '100vh', sm: 'calc(100% - 64px)' },
+            width: { xs: '100vw', sm: '100%' },
+            maxWidth: { xs: '100vw', sm: 'calc(100% - 64px)' },
+            borderRadius: { xs: 0, sm: 1 },
+          },
         },
       }}
     >
@@ -480,7 +616,8 @@ export default function HelpDialog(props) {
           aria-label="help tabs"
         >
           <Tab label="User Manual" id="help-tab-0" />
-          <Tab label="About" id="help-tab-1" />
+          <Tab label="Shortcuts" id="help-tab-1" />
+          <Tab label="About" id="help-tab-2" />
         </Tabs>
       </Box>
       <DialogContent
@@ -568,9 +705,76 @@ export default function HelpDialog(props) {
           </Box>
         </TabPanel>
         <TabPanel value={tabValue} index={1}>
+          <Box id="help-shortcuts" sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Keyboard Shortcuts
+            </Typography>
+            <Typography gutterBottom sx={{ mb: 2 }}>
+              These keyboard shortcuts are active whenever no dialog is open.
+            </Typography>
+            <TableContainer component={Paper} variant="outlined">
+              <Table size="small" aria-label="keyboard shortcuts">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <strong>Key</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Action</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Active when</strong>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>
+                      <code>F2</code>
+                    </TableCell>
+                    <TableCell>Load program</TableCell>
+                    <TableCell>Program is valid (no errors)</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <code>F8</code>
+                    </TableCell>
+                    <TableCell>Run All / Pause (toggle)</TableCell>
+                    <TableCell>
+                      Run All: program loaded (READY); Pause: executing
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <code>F9</code>
+                    </TableCell>
+                    <TableCell>Single Step</TableCell>
+                    <TableCell>Program loaded (READY)</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <code>F10</code>
+                    </TableCell>
+                    <TableCell>Multi Step</TableCell>
+                    <TableCell>Program loaded (READY)</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <code>Esc</code>
+                    </TableCell>
+                    <TableCell>Stop &amp; reset CPU</TableCell>
+                    <TableCell>Program loaded (READY)</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </TabPanel>
+        <TabPanel value={tabValue} index={2}>
           <Box sx={{ p: 3 }}>
             <Typography>Version: {props.ver}</Typography>
             <BuildInfoLine />
+            <Versions />
             <Typography gutterBottom variant="h6" sx={{ mt: 2 }}>
               Quick Start
             </Typography>
@@ -625,7 +829,11 @@ export default function HelpDialog(props) {
         </TabPanel>
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.handleClose} variant="outlined" id="help-close-button">
+        <Button
+          onClick={props.handleClose}
+          variant="outlined"
+          id="help-close-button"
+        >
           Close
         </Button>
       </DialogActions>

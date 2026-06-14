@@ -1,16 +1,28 @@
 name: CI Build
 
-# This is the "untrusted" stage of the CI pipeline. It runs on pull requests
-# (including those from forks) with a read-only token and NO access to secrets.
-# It builds and tests the proposed code, publishes coverage to the run's job
+# This is the "untrusted" stage of the CI pipeline. On pull requests (including
+# those from forks) it runs with a read-only token and NO access to secrets: it
+# builds and tests the proposed code, publishes coverage to the run's job
 # summaries, and uploads the build outputs as artifacts.
 #
-# The only privileged action (deploying a preview build) is handled by the
-# separate `pr-reports.yml` workflow, which runs base-branch code only and
-# never checks out pull request code. This separation means that code from a
-# fork can be built and tested safely without ever being able to reach
+# On pull requests the only privileged action (deploying a preview build) is
+# handled by the separate `pr-reports.yml` workflow, which runs base-branch code
+# only and never checks out pull request code. This separation means that code
+# from a fork can be built and tested safely without ever being able to reach
 # repository secrets or a write-enabled token.
+#
+# On `push` to `master` and on the nightly `schedule` (both of which can only run
+# trusted, already-merged code — a fork cannot trigger them on this repo) one
+# extra job runs: `publish-web-candidate`. It depends only on `build-web`, so the
+# freshly built web app is published as a per-commit candidate to
+# web.edumips.org as soon as the (fast) web build finishes, in parallel with the
+# slow desktop/snap/electron builds. That job — and only that job — is granted
+# the `PAT_WEBUI` secret (via the reusable `push-web.yml` workflow); it is gated
+# to `master` push/schedule events so it never runs for pull requests or forks.
 on:
+  push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
@@ -23,7 +35,8 @@ permissions:
 
 jobs:
   # Detect which files changed in the PR to conditionally run expensive builds.
-  # On schedule runs, all outputs are set to 'true' so every build runs.
+  # On schedule and push-to-master runs, all outputs are set to 'true' so every
+  # build runs (a merged master commit always gets the full pipeline).
   detect-changes:
     name: Detect file changes
     runs-on: ubuntu-latest
@@ -31,8 +44,8 @@ jobs:
       contents: read
       pull-requests: read
     outputs:
-      snap: ${{ github.event_name == 'schedule' && 'true' || steps.changes.outputs.snap }}
-      electron: ${{ github.event_name == 'schedule' && 'true' || steps.changes.outputs.electron }}
+      snap: ${{ (github.event_name == 'schedule' || github.event_name == 'push') && 'true' || steps.changes.outputs.snap }}
+      electron: ${{ (github.event_name == 'schedule' || github.event_name == 'push') && 'true' || steps.changes.outputs.electron }}
     steps:
       - uses: actions/checkout@v6
         if: github.event_name == 'pull_request'
@@ -66,6 +79,29 @@ jobs:
     with:
       ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+  # Publish the freshly built web app as a per-commit candidate to
+  # web.edumips.org. Runs ONLY on master push/schedule events (never on pull
+  # requests or forks), and depends solely on `build-web` so the candidate goes
+  # live as soon as the web build finishes — in parallel with the slow
+  # desktop/snap/electron jobs. The privileged publish logic (and the PAT_WEBUI
+  # secret) lives in the reusable `push-web.yml` workflow; it is reused here and
+  # also runnable on its own via workflow_dispatch. See
+  # docs/design/unified-web-versioning.md.
+  publish-web-candidate:
+    name: Publish web candidate
+    needs: build-web
+    if: >-
+      github.ref == 'refs/heads/master' &&
+      (github.event_name == 'push' || github.event_name == 'schedule')
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/push-web.yml
+    with:
+      run_id: ${{ github.run_id }}
+      head_sha: ${{ github.sha }}
+    secrets: inherit
+
   # Run web UI Playwright tests locally with Istanbul coverage instrumentation.
   # The coverage report is rendered as a Markdown table and published to this
   # run's job summary. No secrets are used here.
@@ -79,6 +115,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
 
       - name: Set up Node.JS
         uses: actions/setup-node@v6
@@ -161,6 +198,32 @@ jobs:
       - name: Publish coverage summary to job summary
         if: always() && hashFiles('coverage/web-coverage.md') != ''
         run: cat coverage/web-coverage.md >> "$GITHUB_STEP_SUMMARY"
+
+  # Run the pytest suite that guards the Python deploy-web-pages script.
+  # No paths-filter gate: the suite is fast and must always be green.
+  test-deploy-script:
+    name: Deploy script tests (pytest)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+
+      - name: Install pytest
+        run: pip install pytest
+
+      # The test file loads deploy-web-pages.py via importlib relative to the
+      # scripts directory, so the working-directory must be .github/scripts.
+      - name: Run deploy-script tests
+        working-directory: .github/scripts
+        run: python -m pytest test_deploy_web_pages.py -q
 
   # Persist the pull request number as an artifact so the privileged workflow
   # (which is triggered by workflow_run and therefore has no PR context) knows

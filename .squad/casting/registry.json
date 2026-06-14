@@ -1,0 +1,10 @@
+{
+  "agents": {
+    "lead": { "persistent_name": "Morpheus", "universe": "The Matrix", "created_at": "2026-06-05T07:18:06+02:00", "legacy_named": false, "status": "active" },
+    "core-dev": { "persistent_name": "Tank", "universe": "The Matrix", "created_at": "2026-06-05T07:18:06+02:00", "legacy_named": false, "status": "active" },
+    "frontend-dev": { "persistent_name": "Trinity", "universe": "The Matrix", "created_at": "2026-06-05T07:18:06+02:00", "legacy_named": false, "status": "active" },
+    "tester": { "persistent_name": "Smith", "universe": "The Matrix", "created_at": "2026-06-05T07:18:06+02:00", "legacy_named": false, "status": "active" },
+    "docs": { "persistent_name": "Link", "universe": "The Matrix", "created_at": "2026-06-05T07:18:06+02:00", "legacy_named": false, "status": "active" },
+    "mips64-isa-expert": { "persistent_name": "Cypher", "universe": "The Matrix", "created_at": "2026-06-05T07:18:06+02:00", "legacy_named": false, "status": "active" }
+  }
+}

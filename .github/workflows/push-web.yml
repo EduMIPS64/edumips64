@@ -1,0 +1,153 @@
+name: Push Web Build
+
+# Publishes every master commit's web build as a per-commit candidate at
+# /c/<sha>/ on web.edumips.org and indexes it in versions.json. It never
+# touches the production root — that only changes on an explicit promotion
+# (see promote-web.yml). See docs/design/unified-web-versioning.md.
+#
+# This is a reusable workflow. It is invoked in two ways:
+#   - workflow_call: from ci.yml's `publish-web-candidate` job on every master
+#     push/schedule, right after the `build-web` job, reusing the web artifact
+#     that CI just built (passed via run_id + head_sha).
+#   - workflow_dispatch: manually, to (re)publish the latest successful master
+#     CI build as a candidate.
+
+on:
+  workflow_call:
+    inputs:
+      run_id:
+        description: 'CI run id that produced the web artifact to publish.'
+        required: true
+        type: string
+      head_sha:
+        description: 'Full commit SHA the artifact was built from.'
+        required: true
+        type: string
+  workflow_dispatch:
+
+concurrency:
+  group: web-pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  push:
+    name: Push candidate build
+    if: >-
+      inputs.run_id != '' ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+
+    steps:
+      - name: Checkout edumips64 (full history for seq)
+        uses: actions/checkout@v6
+        with:
+          # fetch-depth: 0 is required so `git rev-list --count` and
+          # `git describe` can see the full master history.
+          fetch-depth: 0
+
+      - name: Resolve run and SHA
+        id: resolve
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_RUN_ID: ${{ inputs.run_id }}
+          INPUT_HEAD_SHA: ${{ inputs.head_sha }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${INPUT_RUN_ID}" ]]; then
+            # Reused from ci.yml: the web artifact lives in the calling CI run.
+            RUN_ID="${INPUT_RUN_ID}"
+            HEAD_SHA="${INPUT_HEAD_SHA}"
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            # Manual: find latest successful CI Build on master
+            RUN_JSON=$(gh run list \
+              --workflow ci.yml \
+              --branch master \
+              --status success \
+              --limit 1 \
+              --json databaseId,headSha \
+              --jq '.[0]' \
+              --repo "${{ github.repository }}")
+            if [[ -z "$RUN_JSON" || "$RUN_JSON" == "null" ]]; then
+              echo "ERROR: No successful CI run found on master"
+              exit 1
+            fi
+            RUN_ID=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['databaseId'])")
+            HEAD_SHA=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['headSha'])")
+          else
+            echo "ERROR: no run context (expected workflow_call inputs or workflow_dispatch)"
+            exit 1
+          fi
+          echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
+          echo "head_sha=${HEAD_SHA}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${HEAD_SHA:0:7}" >> "$GITHUB_OUTPUT"
+
+      - name: Download web artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ steps.resolve.outputs.run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifact/web
+          gh run download "${RUN_ID}" --name web --dir artifact/web \
+            --repo "${{ github.repository }}"
+
+      - name: Compute build identity and seq
+        id: build_id
+        env:
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
+        run: |
+          set -euo pipefail
+          # Make sure the pushed commit is present locally for git describe/rev-list.
+          git fetch --depth=0 origin "$HEAD_SHA" 2>/dev/null || true
+          BUILD=$(git describe --tags --match 'v*' --always "$HEAD_SHA" | sed 's/^v//')
+          SEQ=$(git rev-list --count "$HEAD_SHA")
+          TARGET_RELEASE=$(grep '^version=' gradle.properties | cut -d= -f2 | tr -d '"' | tr -d "'")
+          echo "build=${BUILD}" >> "$GITHUB_OUTPUT"
+          echo "seq=${SEQ}" >> "$GITHUB_OUTPUT"
+          echo "targetRelease=${TARGET_RELEASE}" >> "$GITHUB_OUTPUT"
+
+      - name: Clone Pages repo
+        env:
+          PAT_WEBUI: ${{ secrets.PAT_WEBUI }}
+        run: |
+          set -euo pipefail
+          git clone "https://x-access-token:${PAT_WEBUI}@github.com/EduMIPS64/web.edumips.org.git" \
+            pages-repo --branch master --depth 1
+          git -C pages-repo config user.name "github-actions[bot]"
+          git -C pages-repo config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Migrate legacy Pages layout if needed
+        run: .github/scripts/migrate-pages-if-needed.sh pages-repo "${{ github.workspace }}"
+
+      - name: Run push script
+        env:
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
+          SEQ: ${{ steps.build_id.outputs.seq }}
+          BUILD: ${{ steps.build_id.outputs.build }}
+          TARGET_RELEASE: ${{ steps.build_id.outputs.targetRelease }}
+        run: |
+          set -euo pipefail
+          cp .github/scripts/deploy-web-pages.py pages-repo/
+          cd pages-repo
+          python3 deploy-web-pages.py push \
+            "../artifact/web" \
+            "${HEAD_SHA}" \
+            "${SEQ}" \
+            "${BUILD}" \
+            "${TARGET_RELEASE}"
+          rm -f deploy-web-pages.py
+
+      - name: Commit and push
+        env:
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
+          SHORT_SHA: ${{ steps.resolve.outputs.short_sha }}
+        run: |
+          set -euo pipefail
+          cd pages-repo
+          git add -A
+          git diff --cached --quiet && { echo "Nothing to commit."; exit 0; }
+          git commit -m "Push candidate @ ${SHORT_SHA} (${HEAD_SHA})"
+          git push origin master

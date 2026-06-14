@@ -1,0 +1,271 @@
+# Project Context
+
+- **Owner:** Andrea Spadaccini
+- **Project:** EduMIPS64 — free cross-platform visual MIPS64 CPU simulator for education (CPU, Memory, Parser, Instructions, FPU).
+- **Stack:** Java 17+ (Gradle) core simulator, Swing UI, GWT-compiled Web Worker, React/JS web UI (npm/webpack), Sphinx docs (Python, EN/IT/ZH). Tests: JUnit + Playwright.
+- **Created:** 2026-06-05T07:18:06+02:00
+
+## Learnings
+
+### Classic JSX Runtime Requirement (2026-06-05)
+
+EduMIPS64 uses the **classic JSX runtime** (@babel/preset-react WITHOUT runtime:automatic). Every `src/webapp` React component MUST keep `import React` in scope, even if no JSX appears to reference React directly. Removing it compiles and builds successfully but crashes at runtime with "React is not defined", causing the entire Playwright test suite to fail. ESLint rules suggesting removal of unused imports must be reviewed manually before committing React component files. The JSX transformer needs React in scope regardless of visibility in the source code.
+
+### Nightly detection & unused DefinePlugin globals (2026-06-07)
+
+`window.location.pathname.includes('/nightly/')` misses `/nightly` without a trailing slash and false-matches paths like `/nightlybuild`. The correct SSR-safe pattern is: compute `path` via a ternary guard (`typeof window !== 'undefined' ? window.location.pathname : ''`), then check `path === '/nightly' || path.startsWith('/nightly/')`. Always access `window.location.pathname` only inside the defined-window branch.
+
+`DefinePlugin` injected globals (`COMMITHASH`, `BRANCH`) that were never consumed in `src/webapp/`. Unused injected globals bloat the bundle and create a false impression that those values are available to the app. Only inject what is actually used; verify with a codebase grep before adding new globals.
+
+### Web UI Statistics now sums all structural-stall counters (2026-06-05)
+
+The web UI `Statistics.js` component now sums all four structural-stall CPU counters (`dividerStalls`, `memoryStalls`, `exStalls`, `funcUnitStalls`) for display in the "Structural Stall" row (issue #1818 fix, PR #1819). When adding new structural-stall counters to `CPU.java`, ensure they are exported in `ResultFactory.java` and included in the sum in `Statistics.js`.
+
+### Version History Navigator — manifest contract, gating, and new files (2026-06-08)
+
+**Manifest contract** (`/manifest.json` at the root, fetched with `cache: 'no-cache'`):
+```json
+{
+  "current": <int>, "prev": <int>, "sha": <str>, "build": <str>,
+  "targetRelease": <str>, "promotedAt": <iso>, "promotedBy": <str>,
+  "history": [ { "n": <int>, "build": <str>, "sha": <str>, "targetRelease": <str>,
+                  "promotedAt": <iso>, "promotedBy": <str> }, ... ]
+}
+```
+`history` is newest-first in the manifest but `buildVersionList` re-sorts descending by `n`. Each `n` has a live snapshot at `/v/<n>/`.
+
+**Gating rule:** render `PreviousVersions` only when (a) `fetchManifest()` returns a valid, non-null manifest AND (b) `getBuildInfo().kind !== 'pr'`. Production always shows it; PR previews never do; local dev shows it only when the manifest is mocked (useful for Playwright tests).
+
+**Absolute hrefs:** `href` for each version must be `'/v/' + n + '/'` (absolute, not relative) so the link works correctly when the app is itself served from `/v/<k>/`.
+
+**No JS unit runner:** the project has no jest/vitest; unit-level coverage of `getViewedVersion`, `isValidManifest`, and `buildVersionList` relies on Playwright + `page.evaluate` or is deferred to CI.
+
+**New files:**
+- `src/webapp/versionHistory.js` — pure helpers (`getViewedVersion`, `buildVersionList`, `isValidManifest`) + async `fetchManifest`.
+- `src/test/webapp/version-history.spec.js` — Playwright specs: Test A mocks manifest via `page.route`, Test B asserts graceful absence with no mock.
+
+**Changed files:**
+- `src/webapp/components/HelpDialog.js` — added `PreviousVersions` component rendered below `<BuildInfoLine />` in the About TabPanel; added `Chip` import and `versionHistory` imports.
+
+### Contextual Run Controls — state model and component wiring (2026-06-09)
+
+**State derivation:** `deriveLogicalState(status, executing, inputRequest)` is a plain function defined at the top of `Header.js` (not in Simulator.js). It maps the three observable values to one of: `'EMPTY'`, `'READY'`, `'EXECUTING'`, `'ENDED'`, `'WAITING_FOR_INPUT'`.
+
+**Simulator state location:** `status` (READY/RUNNING/STOPPED), `executing` (boolean), and `inputRequest` (object|null) all live in `Simulator.js` state. `status` was already passed to `<Header>`; `executing` and `inputRequest` were added as new props in this change.
+
+**Contextual rendering wiring:** Execution controls (`showLoad`, `showStep`, `showMultiStep`, `showRun`, `showPause`, `showStop`) are computed as booleans from `logicalState` and used to conditionally mount buttons via JSX short-circuit (`{showX && <Button .../>}`). All execution controls are wrapped in `<Box sx={{ display:'flex', gap:1, minWidth:320 }}>` to prevent layout jank.
+
+**Stop special case:** Stop is shown in both READY and EXECUTING; rendered disabled (`stopDisabled = logicalState === 'EXECUTING'`) with tooltip `'Pause before stopping'` when disabled. The MUI Tooltip requires a non-disabled DOM child to show, so the disabled Button is wrapped in a `<span>`.
+
+**Editor controls:** Clear, Restore, and Open Code are disabled when `logicalState` is `'EXECUTING'` or `'WAITING_FOR_INPUT'` (replacing the old `status === 'RUNNING'` check, which incorrectly disabled them in READY/paused state). Save Code is now always enabled (design matrix: ✅ in all states).
+
+**Props removed from Simulator.js → Header.js:** `runEnabled`, `stepEnabled`, `pauseEnabled`, `stopEnabled` (all derivable from logical state now). `loadEnabled` kept because it reflects parsing-error validity.
+
+**Build verified:** `npm run build-dbg` compiled successfully. ESLint (post-prettier) shows only the 3 pre-existing unused-var errors (`fileContent`, `setFileContent`, `handleFileLoad`) that existed before this change.
+
+## 2026-06-09 — Contextual Run Controls Implementation Complete (PR #1835)
+
+Successfully implemented contextual run controls in `Header.js` and `Simulator.js`. Design locked with 8 constraints:
+1. Contextual hiding (conditional render, not display:none/visibility:hidden)
+2. Stop disabled (not hidden) during EXECUTING
+3. No PAUSED state (collapsed to READY)
+4. No STOPPING React state
+5. Conditional render for Playwright compat
+6. Fixed-min-width container prevents toolbar jank
+7. Keyboard shortcuts deferred
+8. WAITING_FOR_INPUT hides all execution controls
+
+**Implementation verified:**
+- `deriveLogicalState()` correctly maps 3 observable props to 5 logical states
+- All execution controls use `{showX && <Button>}` pattern (not in DOM when hidden)
+- Stop button wrapped in `<span>` for MUI Tooltip support when disabled
+- Editor controls properly re-enabled when paused (READY state, not EXECUTING)
+- Props cleanup: removed 4 enable-state bools, added `executing` + `inputRequest`
+- Full test suite: 68/70 PASS (2 pre-existing GPU crashes); contextual-controls spec: 8/8 PASS
+- No implementation bugs found; design fully realized
+
+## 2026-06-09 — Floating Draggable Debug Toolbar (PR #1835, second iteration)
+
+Andrea requested replacement of the inline execution controls with a VSCode-style floating debug toolbar.
+
+### Floating Toolbar Component (RunControlsToolbar.js)
+
+**New file:** `src/webapp/components/RunControlsToolbar.js`
+- MUI `Paper` with `position: fixed`, `elevation: 8`, rounded pill shape (`borderRadius: '24px'`), `zIndex: 1200`
+- Icon-only `IconButton` buttons (no text labels) with MUI `Tooltip`s for all action names
+- Drag handle (`DragIndicatorIcon`) at the left; uses `setPointerCapture` on the handle element so drag remains smooth even when pointer moves outside the handle
+- Position stored in `useState` (lazy initial value: center of viewport, y=80); constrained to stay on-screen via viewport bounds check in `handlePointerMove`
+- Refs renamed to `isDraggingRef` / `dragOffsetRef` to satisfy `@eslint-react/naming-convention-ref-name`
+- Returns `null` (not rendered) in EMPTY / ENDED / WAITING_FOR_INPUT states; same visibility logic as the previous inline controls
+- Mounted unconditionally from `Simulator.js` so position state persists across logical-state changes
+
+### Shared State Helper (simulatorState.js)
+
+**New file:** `src/webapp/simulatorState.js`
+Exports `deriveLogicalState(status, executing, inputRequest)` as a named export, consumed by both `Header.js` and `RunControlsToolbar.js`. Previously this function was inlined in `Header.js`.
+
+### Header.js Changes
+
+- Removed execution controls `Box` (contained Step / Multi Step / Run / Pause / Stop)
+- `Load` button is now **always visible** (no `showLoad` condition) — it is always present in the header AppBar regardless of logical state
+- Removed now-unused imports: `PlayArrowIcon`, `FastForwardIcon`, `PlayCircleIcon`, `PauseCircleIcon`, `StopCircleIcon`
+- Removed now-unused variables: `multiStepCount`, `showLoad`, `showStep`, `showMultiStep`, `showRun`, `showPause`, `showStop`, `stopDisabled`
+- Props removed from Header interface: `onRunClick`, `onStepClick`, `onPauseClick`, `onStopClick`, `multiStepCount`
+- `deriveLogicalState` imported from `../simulatorState` (no longer defined inline)
+
+### Simulator.js Mounting
+
+`RunControlsToolbar` is mounted immediately after `<Header>` in the ThemeProvider tree, receiving: `onStepClick`, `onRunClick`, `onPauseClick`, `onStopClick`, `status`, `executing`, `inputRequest`, `multiStepCount`.
+
+## 2026-06-09 — Floating Run Toolbar Iteration 2: Complete ✅
+
+PR #1835 floating toolbar implementation committed (609d66af). Inbox decisions merged into squad/decisions.md, orchestration log written, cross-team validation complete (Smith: 69/71 tests pass; Link: docs updated en/it/zh). Ready for merge.
+
+## 2026-06-09 — Always-Visible Toolbar Buttons (PR #1835, third iteration)
+
+Andrea requested that all five execution buttons always remain in the DOM when the toolbar is visible (READY or EXECUTING), and are greyed out/disabled instead of removed.
+
+### Change: RunControlsToolbar.js
+
+Replaced the `showStep` / `showMultiStep` / `showRun` / `showPause` boolean guards (JSX short-circuit `{showX && <Button/>}`) with always-rendered buttons using `disabled` prop:
+
+| Button | READY | EXECUTING |
+|--------|-------|-----------|
+| #step-button | enabled | disabled |
+| #multi-step-button | enabled | disabled |
+| #run-button | enabled | disabled |
+| #pause-button | disabled | enabled |
+| #stop-button | enabled | disabled ("Pause before stopping") |
+
+Derived as: `stepDisabled = logicalState !== 'READY'`, `pauseDisabled = logicalState !== 'EXECUTING'`, `stopDisabled = logicalState === 'EXECUTING'`.
+
+Every button is now wrapped in a `<span>` (not just Stop) so MUI Tooltip fires even when the child IconButton is disabled.
+
+The toolbar-hidden logic (`return null` in EMPTY/ENDED/WAITING_FOR_INPUT) is unchanged.
+
+Committed: 1facbfd2. ESLint clean, `npm run build-dbg` successful.
+
+### Note for Smith (test changes required)
+
+All 5 execution buttons are now always present in `#run-controls-toolbar` when it is visible. Tests must assert ENABLED/DISABLED state rather than presence/absence:
+
+- **In READY state:** `#step-button`, `#multi-step-button`, `#run-button`, `#stop-button` are present and **enabled**; `#pause-button` is present but **disabled**.
+- **In EXECUTING state:** `#pause-button` is present and **enabled**; `#step-button`, `#multi-step-button`, `#run-button`, `#stop-button` are present but **disabled**.
+- Any test that asserted a button was absent (not in DOM) in a given state should be rewritten to assert `disabled` attribute instead.
+
+### Candidate Build UI (2026-06-13)
+
+Implemented the frontend portion of the promotable candidate builds feature (§4 of morpheus-candidate-design.md):
+
+- **`buildInfo.js`**: Added `CANDIDATE_PATH_RE` regex and candidate detection inside the `PROD_HOSTNAME` branch, returning `kind:'candidate'` with `candidateDate`, `candidateN`, `candidateSha`, `candidateUrl`. The check runs before the plain `production` return so a candidate URL is correctly classified even though it's served from `web.edumips.org`.
+
+- **`versionHistory.js`**: Added `CANDIDATE_PATH_RE` at module top, then three new exported helpers: `getViewedCandidate(loc)`, `fetchCandidates()`, `buildCandidateList(candidatesData, viewedCandidate)`. Mirrors the style of existing `getViewedVersion`/`fetchManifest`/`buildVersionList`.
+
+- **`HelpDialog.js`**: Updated `BuildInfoLine` to handle `kind === 'candidate'`, added `CandidateBuilds` component (mirrors `PreviousVersions` structure), rendered it after `<PreviousVersions />` in the About tab. Each ListItem carries `data-candidate="${date}-${n}"` for Playwright targeting. The outer Box has `id="about-candidate-builds"`. The info banner appears only when `buildInfo.kind === 'candidate'`.
+
+ESLint: 0 errors (2 pre-existing array-index-key warnings in unrelated NavigationDrawer code). Prettier: clean. `npm run build-dbg`: succeeded.
+
+### Nightly → Candidate Badge Migration (2026-06-13)
+
+Removed the nightly lane entirely from the Header and CSS. Key changes:
+
+- **`Header.js`**: Removed `path`/`isNightly` runtime path-detection constants and their comment block. Replaced `{isNightly && <Tooltip>/<Chip id="nightly-build-chip" className="nightly-chip">}` with `{buildInfo.kind === 'candidate' && <Tooltip>/<Chip id="candidate-build-chip" className="candidate-chip">}`. Also removed pre-existing dead code: `fileContent` state, `setFileContent`, and `handleFileLoad` (these were never wired into JSX and caused ESLint `no-unused-vars` errors). The existing `buildInfo` useMemo is reused — no second `getBuildInfo` call.
+
+- **`main.css`**: Renamed `.nightly-chip` selector to `.candidate-chip`; updated the comment to reference `/<date>/<n>-<sha>/` paths. Kept the same purple visual treatment.
+
+- **Verify results:** ESLint 0 errors, Prettier clean, `npm run build-dbg` succeeded, `grep -rn nightly src/webapp/` returns nothing.
+
+- **DOM hooks for Smith:** chip id `candidate-build-chip`, class `candidate-chip`, aria-label `"Candidate build"`.
+
+
+- **2026-06-13:** Candidate builds UI session: implemented versionHistory candidate selection (lists from candidates.json), buildInfo display, HelpDialog docs, Header CANDIDATE badge (blue color). Playwright tests passing; UI integrated with Tank's CI/CD layer. Feature deployed in PR #1845.
+2026-06-09 — Replaced PlayArrowIcon with SkipNextIcon on #step-button in RunControlsToolbar.js to visually distinguish Single Step (▶|) from Multi Step (>>) and Run All.
+
+2026-06-09 — Produced design exploration mockups for program-management controls (Open Code, Save Code, Clear, Restore default sample): 4 alternatives (Alt A: Program▾ dropdown, Alt B: grouped segmented bar, Alt C: split button, Alt D: icon-only group with micro-labels), 6 PNGs rendered via Playwright setContent() + Chromium headless. Recipe: NODE_PATH=/path/to/node_modules node script.js; read HTML via fs.readFileSync + page.setContent(); screenshot with page.screenshot({ clip }). Output: ~/.copilot/session-state/359dc6eb.../files/mock-alt*.png + program-controls-options.md.
+- 2026-06-09: Regenerated program-management-controls mockups (v2) against post-merge master header (run controls now in floating RunControlsToolbar, not AppBar); 6 PNGs overwritten, gallery HTML cache-busted (?v=2), intro note updated to reflect accurate baseline.
+- 2026-06-09: Fixed icon rendering in all 6 program-controls mockup PNGs — replaced every Material Icons font ligature span with inline <svg fill="currentColor"><path d="…"/></svg> using MUI path data from node_modules/@mui/icons-material/*.js; re-rendered all PNGs (15–25 KB each), bumped gallery HTML to ?v=3. Lesson: inline SVG icons are 100% reliable in headless Chromium; font ligatures are not.
+
+### Program ▾ Dropdown Menu (2026-06-09)
+
+**New element IDs:**
+- `#program-menu-button` — the trigger `<Button>` in the AppBar that opens the Program menu; styled identically to other AppBar buttons (`color="inherit"`, `responsiveButtonSx`, `responsiveLabel`); uses `FolderOpenIcon` + `ArrowDropDownIcon`.
+- `#program-menu` — the `<Menu>` portal element (MUI default: rendered in a portal, NOT a child of the AppBar).
+
+**Preserved menu-item IDs (behavioral tests target these):**
+- `#clear-code-button` → "New"
+- `#load-code-button` → "Open…"
+- `#save-code-button` → "Save…"
+- `#restore-sample-button` → "Load Example"
+
+**Disable-on-execution behavior:** The trigger button has `disabled={editorDisabled}` where `editorDisabled = logicalState === 'EXECUTING' || logicalState === 'WAITING_FOR_INPUT'`. While disabled the whole menu is inaccessible (Andrea's explicit requirement #2).
+
+**MUI Portal / DOM presence caveat:** Menu items live in an MUI `<Menu>` which renders in a portal (outside the AppBar DOM subtree). When the menu is closed the `<MenuItem>` elements are NOT in the DOM — they only appear when the menu is open. Tests that need to interact with `#clear-code-button`, `#load-code-button`, etc. must first click `#program-menu-button` to open the menu.
+
+**Tooltip gotcha (disabled buttons):** MUI Tooltip does not fire on disabled `<Button>` elements. The trigger is wrapped in `<span>` inside the `<Tooltip>` to ensure the tooltip still appears when the button is disabled.
+
+**Removed (vestigial):** `handleFileLoad`, `fileContent`, `setFileContent` state and handler — these were unused since `onOpenClick` was extracted to `Simulator.js`.
+
+## 2026-06-09: Program Menu PR #1836 — Completed
+
+**Status:** Merged to squad/program-menu (commit b79f8029)
+
+Implemented Alternative A (Program ▾ dropdown). Build + lint green. Tests reworked by Smith (16 passed, APPROVE verdict). Docs updated by Link (trilingual). PR ready for review.
+
+
+## Learnings
+
+### Program menu gating contract (refined 2026-06-09)
+
+**New condition (programMenuDisabled):**
+```
+programMenuDisabled = logicalState === 'READY' || logicalState === 'EXECUTING' || logicalState === 'WAITING_FOR_INPUT'
+```
+
+- **DISABLED** whenever a program is loaded into the simulator (status `'RUNNING'`), which covers `READY` (loaded, paused), `EXECUTING` (actively running), and `WAITING_FOR_INPUT`.
+- **ENABLED** in `EMPTY` (no program loaded) and `ENDED` (execution finished).
+
+**Why ENDED stays enabled:** There is no Stop/Reset toolbar button available in the `ENDED` state. The Program menu (New / Open… / Load Example) is the *only* mechanism the user has to start a fresh program after one finishes. Disabling it in `ENDED` would leave the user stuck with no way to proceed without a full page reload.
+
+**Old (wrong) condition:** `editorDisabled = EXECUTING || WAITING_FOR_INPUT` — this incorrectly kept the menu enabled while a program was loaded but paused (`READY`), allowing the user to load a different program mid-simulation.
+
+---
+
+## 2026-06-14: Keyboard shortcuts (Issue #1706)
+
+### Shortcut scheme
+| Key | Action | Active when |
+|-----|--------|-------------|
+| F2  | Load program | always (when program is valid) |
+| F8  | Run All ↔ Pause toggle | Run All: READY; Pause: EXECUTING |
+| F9  | Single Step | READY |
+| F10 | Multi Step | READY |
+| Esc | Stop & reset | READY |
+
+Browser-reserved keys (F5, F11, F12, Ctrl+W, etc.) deliberately avoided.
+
+### Implementation notes
+
+**Dialog-guard pattern:** `if (document.querySelector('[role="dialog"]')) return;`  
+MUI dialogs set `role="dialog"` on their root element. This single check gates the shortcut handler against Help, Settings, and Input dialogs, so Esc closes dialogs normally and typing in Input isn't stolen.
+
+**Stale-closure pattern:** Used `keyboardHandlerRef` (a `React.useRef`) to hold the latest shortcut handler. The `window.addEventListener` effect has an empty dependency array — the stable `handleKeyDown` wrapper calls `keyboardHandlerRef.current(e)`, which always reads the freshest state/functions. This avoids both stale closures and spurious re-registrations, and introduces no new ESLint warnings above baseline.
+
+**Import:** `deriveLogicalState` imported from `../simulatorState` in `Simulator.js`.
+
+**Key file anchors (at time of implementation):**
+- `Simulator.js` ~565: `keyboardHandlerRef` and keyboard `useEffect`
+- `RunControlsToolbar.js` ~145: tooltips now include key hints (F9, F10, F8, Esc)
+- `Header.js` ~188: Load tooltip now includes `(F2)`
+- `HelpDialog.js` ~619: new `Shortcuts` tab (index=1); About shifted to index=2
+
+**Help dialog tab shift:** The "About" tab moved from index 1 to index 2. The existing `help-dialog.spec.js` test was updated to click `#help-tab-2` instead of `#help-tab-1`.
+
+### Trilingual docs + CHANGELOG
+- Added "Keyboard shortcuts" section to `docs/user/{en,it,zh}/src/user-interface-web.rst` using RST `list-table` directive.
+- Italian translated; Chinese translated.
+- CHANGELOG.md entry added under `## 1.4.1 (TBD) → ### Added`.
+
+### Build / lint
+- ESLint: 0 new issues above baseline (31 issues — all pre-existing).
+- `npm run build-dbg`: compiled successfully.
+- Playwright: not run locally (worker.js environment not available); test file `keyboard-shortcuts.spec.js` is well-formed and lint-clean.

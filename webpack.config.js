@@ -24,14 +24,19 @@ const copyPlugin = new CopyPlugin({
     }
   ],
 });
-const grPlugin = new GitRevisionPlugin();
+const grPlugin = new GitRevisionPlugin({
+  versionCommand: 'describe --tags --match v* --always --dirty',
+});
 const versionsPlugin = new webpack.DefinePlugin({
-  VERSION: JSON.stringify(grPlugin.version()),
-  COMMITHASH: JSON.stringify(grPlugin.commithash()),
-  BRANCH: JSON.stringify(grPlugin.branch()),
+  VERSION: JSON.stringify(grPlugin.version().replace(/^v/, '')),
 });
 const monacoPlugin = new MonacoWebpackPlugin({
-  languages: ['mips'],
+  // The app registers its own custom 'mips' Monarch grammar and tokens-provider
+  // factory in Code.js, deliberately replacing monaco's stock mips contribution
+  // (see the comments there about the tokenization race). Loading no built-in
+  // languages keeps the bundle minimal and avoids that race entirely. The core
+  // editor worker is still emitted regardless of this list.
+  languages: [],
   features: ['comment', 'foldng', 'hover'],
 });
 
@@ -45,6 +50,16 @@ module.exports = (env, argv) => {
     // Use an external source map in production and keep fast inline maps
     // only for development.
     devtool: isProduction ? 'source-map' : 'inline-source-map',
+    resolve: {
+      alias: {
+        // Force react-monaco-editor and monaco-vim to resolve the bare
+        // 'monaco-editor' import to the core editor API instead of the full
+        // package entry (editor.main), which eagerly bundles ~100 unused
+        // language grammars and the JSON/CSS/HTML/TS language services. The
+        // app only uses the core editor plus its own custom 'mips' grammar.
+        'monaco-editor$': 'monaco-editor/esm/vs/editor/editor.api',
+      },
+    },
     output: {
       path: outputPath,
       filename: 'ui.js',
@@ -52,6 +67,11 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' },
+        // Webpack 5 enforces fully-specified ESM resolution for .mjs files,
+        // which breaks extensionless imports like MUI's
+        // 'react-transition-group/TransitionGroupContext' (added in @mui v9.1).
+        // Relax the requirement for node_modules .mjs files.
+        { test: /\.mjs$/, include: /node_modules/, resolve: { fullySpecified: false } },
         { test: /\.css$/, use: ['style-loader', 'css-loader'] },
         { test: /\.ttf$/, use: ['file-loader'] },
         { test: /\.png$/, use: ['file-loader'] },

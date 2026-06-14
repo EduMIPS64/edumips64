@@ -18,6 +18,10 @@
 
 [Compiling under Mac OSX](#mac-os-x)
 
+[Versioning model](#versioning-model)
+
+[Web production promotion](#web-production-promotion)
+
 ### Requirements
 
 #### Dev Container
@@ -47,19 +51,35 @@ To generate an installable Windows MSI package (using the Gradle `msi` task), yo
 This project uses GitHub Actions for continuous integration
 (https://github.com/EduMIPS64/edumips64/actions).
 
-There are three main workflows:
+There are five main CI/CD workflows:
 
-- **CI Build** (`ci.yml`) — runs on every pull request and on a daily schedule.
-  Builds and tests the desktop application, builds the web application, runs the
-  web UI tests, and builds/tests the Snap package. It runs with a read-only
-  token and no access to secrets, so it can safely build code from forks.
+- **CI Build** (`ci.yml`) — runs on every pull request, on every push to
+  `master`, and on a daily schedule. Builds and tests the desktop application,
+  builds the web application, runs the web UI tests, and builds/tests the Snap
+  and Electron packages. On pull requests it runs with a read-only token and no
+  access to secrets, so it can safely build code from forks. On master
+  push/schedule events one extra job, `publish-web-candidate`, runs: it reuses
+  `push-web.yml` (with the `PAT_WEBUI` secret) to publish the just-built web app
+  as a candidate. That job is gated to `master` push/schedule events so secrets
+  are never exposed to pull-request or fork builds.
+  All CI checkouts use `fetch-depth: 0` so `git describe` works correctly.
 - **PR preview deploy** (`pr-reports.yml`) — triggered when a CI Build run
   completes. It runs from the base branch (never checking out pull request
   code) and deploys the pre-built web application to the staging environment.
+- **Push web build** (`push-web.yml`) — a **reusable** workflow invoked by
+  `ci.yml`'s `publish-web-candidate` job on every master push (and the nightly
+  schedule), right after the web build finishes — so the candidate goes live in
+  parallel with the slow desktop/snap/electron builds. It can also be run
+  manually via `workflow_dispatch`. Publishes the build as a per-commit
+  candidate to `web.edumips.org` at `/c/<full-sha>/` and indexes it in
+  `versions.json`. It never touches the production root. Users can browse and
+  share these builds from the web UI's **About** tab. See the
+  [Unified web versioning](#unified-web-versioning) section below for details.
 - **Release** (`release.yml`) — runs on every push to `master` to build all
-  release artifacts (JAR, MSI, Electron apps) and deploy the web application to
-  production. Can also be triggered manually to create a tagged GitHub release
-  with all artifacts attached.
+  release artifacts (JAR, MSI, Electron apps). The `deploy-prod` job is
+  disabled (`if: false`); production web deploys are now gated (see below).
+  Can also be triggered manually to create a tagged GitHub release with all
+  artifacts attached.
 
 ### Main Gradle tasks
 
@@ -82,12 +102,16 @@ Individual tasks for building single documentation (PDF and HTML) and jar target
 are available too: please read `build.gradle` for the complete list.  
 Gradle builds the following jar artifacts:
 
-- `edumips64-<version>.jar`: GUI executable jar (includes JavaHelp and picocli)
+- `edumips64-<build-version>.jar`: GUI executable jar (includes JavaHelp and picocli)
+
+The `<build-version>` is the full git-describe build identity. At a release tag it
+collapses to the plain version (e.g. `edumips64-1.4.1.jar`); on development builds
+it includes the commit distance and hash (e.g. `edumips64-1.4.1-5-gabc1234.jar`).
 
 Gradle is supported by all the main Java IDEs (e.g. IDEA, Eclipse, NetBeans).
 
 For developers that don't want to recompile the help files when creating a JAR, the
-`noHelpJar` Gradle task will produce `edumips64-<version>-nohelp.jar`, which does
+`noHelpJar` Gradle task will produce `edumips64-<build-version>-nohelp.jar`, which does
 not include the compiled help files.
 
 #### Build output directory
@@ -97,7 +121,7 @@ root of the repository, rather than Gradle's default `build/`. The layout is:
 
 | Artifact | Location |
 | --- | --- |
-| JARs (main, nohelp) | `out/edumips64-<version>[-nohelp].jar` |
+| JARs (main, nohelp) | `out/edumips64-<build-version>[-nohelp].jar` |
 | MSI installer | `out/EduMIPS64-<version>.msi` |
 | Electron packages | `out/WebEduMips64-<platform>-<arch>/` |
 | Web application (worker, ui, docs) | `out/web/` |
@@ -402,6 +426,131 @@ plugins, as the Maven repo uses Let's Encrypt as a certificate issuer, which
 is not trusted by default by the JDK.
 
 Follow instructions [here](https://dev.cloudburo.net/2018/06/03/install-letsencrypt-certificate-in-the-java-jdk-keystore-on-osx.html) to import the Let's Encrypt root certificates in the JDK keystore.
+
+### Versioning model
+
+EduMIPS64 uses **two distinct version concepts**:
+
+- **Release label** — `version` in `gradle.properties` (e.g. `1.4.1`). This is
+  the human-visible release name. It is constant between releases and is used for
+  git tags (`v1.4.1`), JAR filenames, and the MSI installer version. Bumped
+  manually before each release.
+
+- **Build identity** — `git describe --tags --match v* --always --dirty` with
+  the leading `v` stripped. This uniquely identifies every commit:
+  - At a release tag: identical to the release label (e.g. `1.4.1`).
+  - Between releases: includes the commit distance and short SHA
+    (e.g. `1.4.0-74-geec1768`).
+  - With local uncommitted changes: appended `-dirty`.
+
+The build identity is what appears in the Swing window title/status bar, the
+CLI `--version` output, the web UI header, and the user manual `|version|`
+substitution. It is derived automatically from git at build time — no manual
+bookkeeping is required.
+
+The Gradle provider is defined in `build.gradle.kts` (the `gitDescribe` val).
+All CI checkouts must use `fetch-depth: 0` so the full tag history is
+available for `git describe` to produce meaningful output.
+
+### Unified web versioning
+
+Production (`web.edumips.org`) is **not auto-deployed**. The `deploy-prod` job
+in `release.yml` is disabled (`if: false`). Every master build is *pushed* as a
+per-commit candidate; the maintainer later *promotes* one to production. The
+full design and rationale live in
+[`docs/design/unified-web-versioning.md`](design/unified-web-versioning.md).
+
+#### Model
+
+Every retained web build is identified by its commit SHA and lives at
+`/c/<full-sha>/`. A single root `versions.json` indexes them all:
+
+```json
+{
+  "current": "a08b8d56ebc959216ea1d576dc465fab0a5cfc22",
+  "versions": [
+    { "sha": "a08b8d5…", "shortsha": "a08b8d5", "seq": 1185,
+      "build": "1.4.0-116-ga08b8d56", "targetRelease": "1.4.1",
+      "pushedAt": "2026-06-14T06:00:00Z", "promoted": true,
+      "promotedAt": "2026-06-14T06:49:01Z", "promotedBy": "lupino3" },
+    { "sha": "99b56ff…", "shortsha": "99b56ff", "seq": 1184,
+      "build": "1.4.0-114-g99b56ff4", "targetRelease": "1.4.1",
+      "pushedAt": "2026-06-13T22:00:00Z", "promoted": false }
+  ]
+}
+```
+
+`seq = git rev-list --count <sha>` (the commit number; monotonic on linear
+master, robust to out-of-order CI). The retention rule is a single invariant:
+
+> keep a build **V** iff `V.promoted == true` **OR** `V.seq > current.seq`
+
+i.e. keep every promoted version, plus every candidate newer than the live one.
+Pages layout:
+
+```
+web.edumips.org/
+├── index.html + [all files]   ← physical copy of the current promoted build (root)
+├── c/<full-sha>/ …            ← every retained build (candidate or promoted)
+└── versions.json              ← the single index
+```
+
+`c/`, `versions.json`, `CNAME`, `.nojekyll` are reserved root names. The
+Pages-layout logic lives in `.github/scripts/deploy-web-pages.py` and is unit
+tested in `test_deploy_web_pages.py` (`cd .github/scripts && python -m pytest`).
+
+#### Operations
+
+- **push** (`push-web.yml`) — runs on every master commit (a `ci.yml` job
+  reuses it right after the web build; also runnable via `workflow_dispatch`).
+  Copies the artifact to `/c/<sha>/`, adds a `promoted: false` entry, and
+  **never touches the root or prunes**. Idempotent on CI re-runs. Computes `seq`
+  and the build string from a full-history checkout (`fetch-depth: 0`).
+- **promote** (`promote-web.yml`) — manual, gated to `lupino3` on `master`.
+  Input `sha` is a full or short SHA of an **already-pushed** candidate; leave
+  it empty to promote the **newest** candidate. The workflow verifies
+  `/c/<sha>/` exists, marks it promoted, sets `current`, copies the snapshot
+  into the root (clean replace), and prunes the non-promoted candidates older
+  than the new current (those "between" the previous live build and the
+  promoted one). **Promotion never builds** — there is no build job and no
+  artifact download; the bytes come from the candidate that was already pushed.
+- **rollback** (`rollback-web.yml`) — manual, gated. Sets `current` to the
+  newest promoted version older than the current one and copies its `/c/<sha>/`
+  into the root. No pruning (lowering `current` only grows the kept set, so the
+  invariant is preserved). Re-promoting an older promoted SHA is equivalent.
+
+All three Pages-writing jobs share the `web-pages-deploy` concurrency lock so
+deploys serialize.
+
+#### In-app version navigator
+
+The web UI's About tab fetches `/versions.json` (`cache:'no-cache'`, absolute
+path) once and renders two lists — **Promoted versions** (prominent, the live
+one marked **current**) and **Candidate builds** (all pending candidates). Each
+entry links to `/c/<sha>/` (opens in a new tab). Builds served from `/c/<sha>/`
+show an **ARCHIVED** badge in the header; the navigator is hidden on PR
+previews. See `src/webapp/versionHistory.js` and `buildInfo.js`.
+
+#### Migration from the legacy layout
+
+The previous model used `manifest.json` + `candidates.json`, `/v/<n>/`, date
+dirs, and `/prev/`. A one-shot `deploy-web-pages.py migrate [--repo PATH]
+[--dry-run]` converts it: it computes `seq` for each SHA, moves the old
+directories to `/c/<sha>/`, synthesizes `versions.json`, leaves `/v/<n>/`
+redirect stubs (kept one release cycle), and deletes the legacy index files,
+`prev/`, and the date dirs.
+
+This migration is **self-healing** and runs automatically. Every Pages-writing
+workflow (`push-web`, `promote-web`, `rollback-web`) invokes
+`.github/scripts/migrate-pages-if-needed.sh` right after cloning the Pages
+repo. The helper is idempotent: it runs `migrate` (and commits the result) only
+when `versions.json` is absent but legacy index files are present, and is a
+no-op once the repo is on the unified layout (or on a fresh, empty repo). This
+is why those three workflows check out the edumips64 repo with `fetch-depth: 0`
+— `migrate` needs full history to compute `seq` for past promoted builds. To
+preview the conversion manually, run `migrate --repo <full-clone> --dry-run`
+against a clone of the Pages repo.
+
 
 ### Manual release checklist
 
