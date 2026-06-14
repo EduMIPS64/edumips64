@@ -9,6 +9,11 @@
   (@Copilot, PR #1736)
 
 ### Fixed
+- `ANDI`, `ORI` and `XORI` now accept the full unsigned 16-bit immediate range
+  (`0`–`65535`), matching the MIPS64 zero-extended immediate semantics.
+  Previously, decimal immediates in `32768`–`65535` (e.g. the mask `65280` /
+  `0xFF00`) were wrongly rejected with an `IMMEDIATE_TOO_LARGE` error.
+  (Issue #1822)
 - Web UI Cache Configuration panel no longer loses focus after each keystroke,
   making input fields much easier to edit. (@davidepatti, PR #1804)
 

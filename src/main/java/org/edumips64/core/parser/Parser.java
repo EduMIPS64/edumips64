@@ -652,6 +652,45 @@ public class Parser {
                         column = line.length();
                         continue;
                       }
+                    // %Z: 16-bit unsigned (zero-extended) immediate.
+                    // Used by the logical-immediate instructions (ANDI/ORI/XORI), whose immediate is
+                    // zero-extended, so the full unsigned range [0, 65535] is legal. Unlike %I, a hex
+                    // literal such as 0xFFFF keeps its face value (65535), it is not reinterpreted as -1.
+                    // Also allows a memory label as a parameter -- the address will be used as immediate value.
+                    } else if (type == 'Z') {
+                      long immediateValue = 0;
+                      String errorMessage = "";
+
+                      try {
+                        immediateValue = Converter.parseImmediate(paramValue);
+                      } catch (NumberFormatException e) {
+                        // Invalid number, try to parse it as a memory label.
+                        MemoryElement tmpMem;
+                        try {
+                          tmpMem = symTab.getCell(paramValue.trim());
+                          immediateValue = tmpMem.getAddress();
+                        } catch (MemoryElementNotFoundException ex) {
+                          errorMessage = "INVALIDIMMEDIATE";
+                        }
+                      }
+
+                      if (errorMessage.isEmpty()) {
+                        if (immediateValue < 0) {
+                          errorMessage = "VALUEISNOTUNSIGNED";
+                          immediateValue = 0;
+                        } else if (immediateValue > 65535) {
+                          errorMessage = "16BIT_IMMEDIATE_TOO_LARGE";
+                          immediateValue = 0;
+                        }
+                      }
+
+                      // Casting to int is safe because we know the value is between 0 and 65535.
+                      tmpInst.getParams().add((int)immediateValue);
+                      if (!errorMessage.isEmpty()) {
+                        errors.addError(errorMessage, row, line.indexOf(paramValue) + 1, line);
+                        column = line.length();
+                        continue;
+                      }
                     // %U: 5-bit unsigned immediate.
                     // %C: 3-bit unsigned immediate.
                     } else if (type == 'U' || type == 'C') {

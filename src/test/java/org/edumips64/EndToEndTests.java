@@ -1035,6 +1035,27 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runMipsTest("xori.s");
   }
 
+  /* Issue #1822: ORI must zero-extend its 16-bit immediate, accepting decimal
+   * values in 32768..65535. Self-checking program (BREAKs on wrong result). */
+  @Test(timeout=2000)
+  public void testOriZeroExtend() throws Exception {
+    runMipsTest("ori-zero-extend.s");
+  }
+
+  /* Issue #1822: ANDI must zero-extend its 16-bit immediate (e.g. masking with
+   * 65280 / 0xFF00). Self-checking program (BREAKs on wrong result). */
+  @Test(timeout=2000)
+  public void testAndiZeroExtend() throws Exception {
+    runMipsTest("andi-zero-extend.s");
+  }
+
+  /* Issue #1822: XORI must zero-extend its 16-bit immediate. Self-checking
+   * program (BREAKs on wrong result). */
+  @Test(timeout=2000)
+  public void testXoriZeroExtend() throws Exception {
+    runMipsTest("xori-zero-extend.s");
+  }
+
   /* Test for circular #include detection (issue with inclusion loop not being detected) */
   @Test(expected = ParserMultiException.class, timeout=2000)
   public void testCircularInclude() throws Exception {

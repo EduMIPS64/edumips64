@@ -43,13 +43,14 @@ class XORI extends ALU_IType {
   XORI() {
     super.OPCODE_VALUE = "001110";
     this.name = "XORI";
+    this.syntax = "%R,%R,%Z";
   }
 
   //since this operation is carried out with zero padding of the immediate, //against sign_extend(immediate) methodology
   //of all others instructions in the same category, it is necessary the overriding of the ID method
   @Override
   public boolean ID() throws IntegerOverflowException, IrregularWriteOperationException, IrregularStringOfBitsException, TwosComplementSumException, JumpException, BreakException, WAWException, FPInvalidOperationException {
-    checkImmediateForOverflow();
+    checkUnsignedImmediateForOverflow();
     //if the source register is valid passing its own values into a temporary register
     Register rs = cpu.getRegister(params.get(RS_FIELD));
 
@@ -62,7 +63,7 @@ class XORI extends ALU_IType {
     Register rt = cpu.getRegister(params.get(RT_FIELD));
     rt.incrWriteSemaphore();
     //writing the immediate value of "params" on a temporary register
-    TR[IMM_FIELD].writeHalf(params.get(IMM_FIELD));
+    TR[IMM_FIELD].writeHalfUnsigned(params.get(IMM_FIELD));
     //forcing zero-padding in the same temporary register
     StringBuilder sb = new StringBuilder();
 

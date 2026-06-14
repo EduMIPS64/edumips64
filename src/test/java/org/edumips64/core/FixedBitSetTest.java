@@ -85,4 +85,38 @@ public class FixedBitSetTest {
     bitset.reset(false);
     assertEquals("Positive zero", bitset.readDouble());
   }
+
+  // Issue #1822: writeHalfUnsigned must zero-extend values in 0..65535.
+  @Test
+  public void testWriteHalfUnsignedZeroExtendsLargeValue() throws Exception {
+    // 40000 = 0x9C40. The result must be zero-extended (upper 48 bits all zero),
+    // not sign-extended.
+    bitset.writeHalfUnsigned(40000);
+    String expected = "0000000000000000000000000000000000000000000000001001110001000000";
+    assertEquals(expected, bitset.getBinString());
+  }
+
+  @Test
+  public void testWriteHalfUnsignedMaxValue() throws Exception {
+    bitset.writeHalfUnsigned(65535);
+    String expected = "0000000000000000000000000000000000000000000000001111111111111111";
+    assertEquals(expected, bitset.getBinString());
+  }
+
+  @Test(expected = IrregularWriteOperationException.class)
+  public void testWriteHalfUnsignedRejectsAbove65535() throws Exception {
+    bitset.writeHalfUnsigned(65536);
+  }
+
+  @Test(expected = IrregularWriteOperationException.class)
+  public void testWriteHalfUnsignedRejectsNegative() throws Exception {
+    bitset.writeHalfUnsigned(-1);
+  }
+
+  // Issue #1822 (minor): writeHalf(value, offset) had an off-by-one bound
+  // (it accepted up to 65536, but the 16-bit maximum is 65535).
+  @Test(expected = IrregularWriteOperationException.class)
+  public void testWriteHalfWithOffsetRejectsAbove65535() throws Exception {
+    bitset.writeHalf(65536, 0);
+  }
 }
