@@ -7,6 +7,10 @@
   (Run All / Pause), F9 (Single Step), F10 (Multi Step), Esc (Stop). Shortcuts
   are shown in button tooltips and documented in a new "Shortcuts" tab in the
   Help dialog. (Issue #1706)
+- Integer data directives (`.byte`, `.word16`, `.word32`, `.word` and
+  `.word64`) now accept a label as their value. The assembler stores the memory
+  address the label points to, resolving both data labels and forward code
+  labels (e.g. for jump tables). (Issue #1643)
 - Web UI now persists the editor's program contents in the browser's local
   storage, so your code survives page reloads. Also added a new "Restore default
   sample" button to reset the editor back to the bundled sample program.
