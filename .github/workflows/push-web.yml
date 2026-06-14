@@ -102,6 +102,9 @@ jobs:
           git -C pages-repo config user.name "github-actions[bot]"
           git -C pages-repo config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Migrate legacy Pages layout if needed
+        run: .github/scripts/migrate-pages-if-needed.sh pages-repo "${{ github.workspace }}"
+
       - name: Run push script
         env:
           HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}

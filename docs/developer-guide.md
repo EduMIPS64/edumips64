@@ -529,8 +529,18 @@ dirs, and `/prev/`. A one-shot `deploy-web-pages.py migrate [--repo PATH]
 [--dry-run]` converts it: it computes `seq` for each SHA, moves the old
 directories to `/c/<sha>/`, synthesizes `versions.json`, leaves `/v/<n>/`
 redirect stubs (kept one release cycle), and deletes the legacy index files,
-`prev/`, and the date dirs. Run it once against a full clone of the Pages repo
-with `--dry-run` first.
+`prev/`, and the date dirs.
+
+This migration is **self-healing** and runs automatically. Every Pages-writing
+workflow (`push-web`, `promote-web`, `rollback-web`) invokes
+`.github/scripts/migrate-pages-if-needed.sh` right after cloning the Pages
+repo. The helper is idempotent: it runs `migrate` (and commits the result) only
+when `versions.json` is absent but legacy index files are present, and is a
+no-op once the repo is on the unified layout (or on a fresh, empty repo). This
+is why those three workflows check out the edumips64 repo with `fetch-depth: 0`
+— `migrate` needs full history to compute `seq` for past promoted builds. To
+preview the conversion manually, run `migrate --repo <full-clone> --dry-run`
+against a clone of the Pages repo.
 
 
 ### Manual release checklist
