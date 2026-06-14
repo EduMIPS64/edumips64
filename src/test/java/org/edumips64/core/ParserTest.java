@@ -68,6 +68,56 @@ public class ParserTest extends BaseParsingTest {
     parseData(".word16 0b10000000000000000");
   }
 
+  // Tests for label references used as values in data directives (issue #1643).
+
+  @Test
+  public void Word64LabelReference() throws Exception {
+    // ptr should hold the address of the "buffer" data label.
+    parseData(".space 8\nbuffer: .space 8\nptr: .word64 buffer");
+    MemoryElement ptr = memory.getCellByIndex(2);
+    assertEquals(8, ptr.getValue());
+  }
+
+  @Test
+  public void Word32LabelReference() throws Exception {
+    parseData(".space 8\nbuffer: .space 8\nptr: .word32 buffer");
+    MemoryElement ptr = memory.getCellByIndex(2);
+    assertEquals(8, ptr.readWord(0));
+  }
+
+  @Test
+  public void Word16LabelReference() throws Exception {
+    parseData(".space 8\nbuffer: .space 8\nptr: .word16 buffer");
+    MemoryElement ptr = memory.getCellByIndex(2);
+    assertEquals(8, ptr.readHalf(0));
+  }
+
+  @Test
+  public void ByteLabelReference() throws Exception {
+    parseData(".space 8\nbuffer: .space 8\nptr: .byte buffer");
+    MemoryElement ptr = memory.getCellByIndex(2);
+    assertEquals(8, ptr.readByteUnsigned(0));
+  }
+
+  @Test
+  public void ForwardCodeLabelReference() throws Exception {
+    // A jump table referencing a code label defined after the data section.
+    parser.doParsing(".data\njt: .word64 target\n.code\nnop\ntarget: nop\nsyscall 0");
+    MemoryElement jt = memory.getCellByIndex(0);
+    assertEquals(4, jt.getValue());
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void ByteLabelReferenceOverflow() throws Exception {
+    // The label resolves to address 256, which does not fit in a byte.
+    parseData(".space 256\nbig: .space 8\nptr: .byte big");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void UndefinedLabelReference() throws Exception {
+    parseData(".word64 nonexistent");
+  }
+
   @Test
   public void Spaces() throws Exception {
     // The user should be able to reserve space in small and larger amounts, specifying the amount in hexadecimal

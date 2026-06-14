@@ -277,6 +277,17 @@ public class EndToEndTests extends BaseWithInstructionBuilderTest {
     runMipsTest("zero.s");
   }
 
+  /* Tests for label references used as values in data directives (issue #1643). */
+  @Test(timeout=2000)
+  public void testDataLabelReference() throws Exception {
+    runMipsTest("data-label-reference.s");
+  }
+
+  @Test(timeout=2000)
+  public void testJumpTable() throws Exception {
+    runMipsTest("jump-table.s");
+  }
+
   /* Test instruction and cycle count for the simplest valid program. */
   @Test(timeout=2000)
   public void testHalt() throws Exception {
