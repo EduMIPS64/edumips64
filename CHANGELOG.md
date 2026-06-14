@@ -3,6 +3,10 @@
 ## 1.4.1 (TBD)
 
 ### Added
+- Web UI now has keyboard shortcuts for run-control actions: F2 (Load), F8
+  (Run All / Pause), F9 (Single Step), F10 (Multi Step), Esc (Stop). Shortcuts
+  are shown in button tooltips and documented in a new "Shortcuts" tab in the
+  Help dialog. (Issue #1706)
 - Web UI now persists the editor's program contents in the browser's local
   storage, so your code survives page reloads. Also added a new "Restore default
   sample" button to reset the editor back to the bundled sample program.

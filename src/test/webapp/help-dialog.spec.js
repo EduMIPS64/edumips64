@@ -38,8 +38,11 @@ test('help dialog shows embedded documentation with navigation', async ({ page }
   // Check that the User Manual tab is present
   await page.waitForSelector('#help-tab-0');
 
-  // Check that the About tab is present
+  // Check that the Shortcuts tab is present (now tab 1)
   await page.waitForSelector('#help-tab-1');
+
+  // Check that the About tab is present (now tab 2)
+  await page.waitForSelector('#help-tab-2');
 
   // Verify the iframe with documentation is present
   await page.waitForSelector('#help-iframe');
@@ -68,8 +71,8 @@ test('help dialog shows embedded documentation with navigation', async ({ page }
   const iframeSrc = await page.getAttribute('#help-iframe', 'src');
   expect(iframeSrc).toContain('docs/it/html/index.html');
 
-  // Switch to About tab
-  await page.click('#help-tab-1');
+  // Switch to About tab (now tab 2)
+  await page.click('#help-tab-2');
   
   // Verify About content is displayed
   const aboutContent = await page.textContent('.help-content');

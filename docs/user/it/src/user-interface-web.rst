@@ -416,6 +416,37 @@ ai reload della pagina.
   *Reset to defaults* ripristina la palette originale (gli stessi
   valori RGB usati dal front-end Swing).
 
+Scorciatoie da tastiera
+-----------------------
+Le seguenti scorciatoie da tastiera sono disponibili in ogni momento,
+salvo quando un dialogo (Aiuto, Impostazioni, Input) è aperto.
+Tutti i tasti elencati invocano ``preventDefault()``, così le azioni
+predefinite del browser (es. F10 barra dei menu, Esc) non si
+attivano.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 35 50
+
+   * - Tasto
+     - Azione
+     - Attivo quando
+   * - **F2**
+     - Carica il programma
+     - Il programma non ha errori di sintassi
+   * - **F8**
+     - Esegui tutto / Pausa (toggle)
+     - Esegui tutto: programma caricato (READY); Pausa: in esecuzione
+   * - **F9**
+     - Passo singolo
+     - Programma caricato (READY)
+   * - **F10**
+     - Passo multiplo
+     - Programma caricato (READY)
+   * - **Esc**
+     - Ferma e reimposta CPU
+     - Programma caricato (READY)
+
 Eseguire EduMIPS64 come applicazione desktop o da CLI
 -----------------------------------------------------
 Il frontend web è comodo perché non richiede installazione, ma
