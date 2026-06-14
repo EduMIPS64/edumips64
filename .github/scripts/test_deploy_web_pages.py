@@ -568,3 +568,61 @@ def test_candidate_die_on_missing_artifact(tmp_path):
         assert exc_info.value.code == 1
     finally:
         os.chdir(old)
+
+
+# ---------------------------------------------------------------------------
+# §6.1 Test 9 (issue #1273): promote replaces root cleanly, leaving no stale
+# files from the previous build. This guards the "push files cleanly, keeping
+# only the ones needed for the current version" guarantee.
+# ---------------------------------------------------------------------------
+
+
+def test_promote_removes_stale_root_files(tmp_path):
+    pages = tmp_path / "pages"
+    pages.mkdir()
+
+    # First promote: seed the root with "version 1" build files, including
+    # several numbered chunk files that mimic webpack output.
+    art1 = tmp_path / "art1"
+    art1.mkdir()
+    (art1 / "index.html").write_text("v1")
+    (art1 / "ui.js").write_text("v1 main")
+    for chunk in ("111.ui.js", "222.ui.js", "333.ui.js"):
+        (art1 / chunk).write_text("v1 chunk")
+    (art1 / "old-asset").mkdir()
+    (art1 / "old-asset" / "logo.png").write_text("v1 logo")
+    promote(pages, art1, 1)
+
+    # Sanity: the v1 chunk files and asset dir are in the root after promote.
+    for stale in ("111.ui.js", "222.ui.js", "333.ui.js", "old-asset"):
+        assert (pages / stale).exists(), f"{stale} should exist after v1 promote"
+
+    # Second promote: "version 2" build with a completely different set of
+    # numbered chunks. None of the v1 chunks/assets exist in this artifact.
+    art2 = tmp_path / "art2"
+    art2.mkdir()
+    (art2 / "index.html").write_text("v2")
+    (art2 / "ui.js").write_text("v2 main")
+    for chunk in ("444.ui.js", "555.ui.js"):
+        (art2 / chunk).write_text("v2 chunk")
+    promote(pages, art2, 2)
+
+    # (a) Every stale v1-only file/dir must be gone from the root.
+    for stale in ("111.ui.js", "222.ui.js", "333.ui.js", "old-asset"):
+        assert not (pages / stale).exists(), (
+            f"stale file {stale} from v1 must be removed on v2 promote (issue #1273)"
+        )
+
+    # (b) The root must contain exactly the current (v2) artifact's prod files.
+    assert (pages / "444.ui.js").is_file()
+    assert (pages / "555.ui.js").is_file()
+    assert (pages / "index.html").read_text() == "v2"
+    assert (pages / "ui.js").read_text() == "v2 main"
+
+    # (c) Reserved infrastructure and the immutable version snapshots survive.
+    assert (pages / "manifest.json").is_file()
+    assert (pages / "v" / "1").is_dir()
+    assert (pages / "v" / "2").is_dir()
+    assert (pages / "prev").is_dir()
+    assert (pages / "CNAME").is_file()
+    assert (pages / ".nojekyll").is_file()
