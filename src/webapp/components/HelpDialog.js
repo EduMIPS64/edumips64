@@ -594,7 +594,7 @@ export default function HelpDialog(props) {
             height: { xs: '100vh', sm: '90vh' },
             m: { xs: 0, sm: 4 },
             maxHeight: { xs: '100vh', sm: 'calc(100% - 64px)' },
-            width: { xs: '100vw', sm: 'auto' },
+            width: { xs: '100vw', sm: '100%' },
             maxWidth: { xs: '100vw', sm: 'calc(100% - 64px)' },
             borderRadius: { xs: 0, sm: 1 },
           },
