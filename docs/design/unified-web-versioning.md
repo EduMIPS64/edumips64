@@ -173,7 +173,11 @@ Three subcommands replace today's `promote` / `candidate` / `rollback`.
 
 ### `push <artifact_dir> <sha> <seq> <build> <targetRelease>`
 
-Runs on **every** successful master CI build (ungated).
+Runs on **every** master commit — it is a `ci.yml` job (`publish-web-candidate`)
+that depends only on `build-web`, so it publishes as soon as the web build
+finishes (in parallel with the slow desktop/snap/electron jobs), plus a nightly
+schedule and a manual `workflow_dispatch` fallback. The privileged logic lives
+in the reusable `push-web.yml` workflow.
 
 1. If `/c/<sha>/` already exists (CI re-run) → idempotent no-op for the files.
 2. Copy the artifact into `/c/<sha>/` (immutable snapshot).
@@ -288,7 +292,7 @@ All version metadata now comes from **one** `versions.json` fetch.
 
 | File | Today | After |
 |------|-------|-------|
-| `candidate-web.yml` → **`push-web.yml`** | deploys candidate to date dir, updates `candidates.json` | computes `seq = git rev-list --count <sha>`, runs `push` → `/c/<sha>/`, updates `versions.json`. Still ungated, still `workflow_run` on CI success + `workflow_dispatch`. |
+| `candidate-web.yml` → **`push-web.yml`** | deploys candidate to date dir, updates `candidates.json` | computes `seq = git rev-list --count <sha>`, runs `push` → `/c/<sha>/`, updates `versions.json`. Now a **reusable workflow** (`workflow_call`) invoked by `ci.yml`'s `publish-web-candidate` job on every master push/schedule (right after `build-web`), plus `workflow_dispatch`. |
 | `promote-web.yml` | has a **`build` job** (fresh-mode) + downloads artifact + promotes | **`build` job removed**. Input: `sha` (full or short; default = **newest candidate** in `versions.json`). Verifies `/c/<sha>/` exists in Pages, runs `promote`. No artifact download, no webpack. Still gated to maintainer + master. |
 | `rollback-web.yml` | swaps `root` ↔ `prev/` | runs `rollback` (newest promoted below current) or `promote <prev promoted sha>`. Gated. |
 
