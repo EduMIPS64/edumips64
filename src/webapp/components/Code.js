@@ -4,7 +4,7 @@ import { initVimMode } from 'monaco-vim';
 // new
 import MonacoEditor from 'react-monaco-editor';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import * as monacoEditor from 'monaco-editor';
+import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
 
 // Resolve the Monaco editor theme name from the MUI palette mode passed in
 // by the parent (which already accounts for the user's THEME_MODE setting).
