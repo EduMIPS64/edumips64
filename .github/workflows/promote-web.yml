@@ -40,7 +40,9 @@ jobs:
       - name: Checkout edumips64 (for script)
         uses: actions/checkout@v6
         with:
-          fetch-depth: 1
+          # Full history so the one-shot legacy migration can compute
+          # seq = `git rev-list --count <sha>` for past promoted builds.
+          fetch-depth: 0
 
       - name: Clone Pages repo
         env:
@@ -51,6 +53,9 @@ jobs:
             pages-repo --branch master --depth 1
           git -C pages-repo config user.name "github-actions[bot]"
           git -C pages-repo config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Migrate legacy Pages layout if needed
+        run: .github/scripts/migrate-pages-if-needed.sh pages-repo "${{ github.workspace }}"
 
       - name: Resolve SHA to promote
         id: resolve
