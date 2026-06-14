@@ -1,15 +1,28 @@
 name: Push Web Build
 
-# Publishes every successful master CI build as a per-commit candidate at
+# Publishes every master commit's web build as a per-commit candidate at
 # /c/<sha>/ on web.edumips.org and indexes it in versions.json. It never
 # touches the production root — that only changes on an explicit promotion
 # (see promote-web.yml). See docs/design/unified-web-versioning.md.
+#
+# This is a reusable workflow. It is invoked in two ways:
+#   - workflow_call: from ci.yml's `publish-web-candidate` job on every master
+#     push/schedule, right after the `build-web` job, reusing the web artifact
+#     that CI just built (passed via run_id + head_sha).
+#   - workflow_dispatch: manually, to (re)publish the latest successful master
+#     CI build as a candidate.
 
 on:
-  workflow_run:
-    workflows: ["CI Build"]
-    types: [completed]
-    branches: [master]
+  workflow_call:
+    inputs:
+      run_id:
+        description: 'CI run id that produced the web artifact to publish.'
+        required: true
+        type: string
+      head_sha:
+        description: 'Full commit SHA the artifact was built from.'
+        required: true
+        type: string
   workflow_dispatch:
 
 concurrency:
@@ -20,9 +33,8 @@ jobs:
   push:
     name: Push candidate build
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.head_branch == 'master')
+      inputs.run_id != '' ||
+      github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -40,9 +52,15 @@ jobs:
         id: resolve
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_RUN_ID: ${{ inputs.run_id }}
+          INPUT_HEAD_SHA: ${{ inputs.head_sha }}
         run: |
           set -euo pipefail
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          if [[ -n "${INPUT_RUN_ID}" ]]; then
+            # Reused from ci.yml: the web artifact lives in the calling CI run.
+            RUN_ID="${INPUT_RUN_ID}"
+            HEAD_SHA="${INPUT_HEAD_SHA}"
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             # Manual: find latest successful CI Build on master
             RUN_JSON=$(gh run list \
               --workflow ci.yml \
@@ -59,9 +77,8 @@ jobs:
             RUN_ID=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['databaseId'])")
             HEAD_SHA=$(echo "$RUN_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['headSha'])")
           else
-            # workflow_run trigger
-            RUN_ID="${{ github.event.workflow_run.id }}"
-            HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
+            echo "ERROR: no run context (expected workflow_call inputs or workflow_dispatch)"
+            exit 1
           fi
           echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
           echo "head_sha=${HEAD_SHA}" >> "$GITHUB_OUTPUT"
@@ -101,6 +118,9 @@ jobs:
             pages-repo --branch master --depth 1
           git -C pages-repo config user.name "github-actions[bot]"
           git -C pages-repo config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Migrate legacy Pages layout if needed
+        run: .github/scripts/migrate-pages-if-needed.sh pages-repo "${{ github.workspace }}"
 
       - name: Run push script
         env:

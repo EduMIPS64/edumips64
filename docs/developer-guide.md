@@ -53,19 +53,27 @@ This project uses GitHub Actions for continuous integration
 
 There are five main CI/CD workflows:
 
-- **CI Build** (`ci.yml`) — runs on every pull request and on a daily schedule.
-  Builds and tests the desktop application, builds the web application, runs the
-  web UI tests, and builds/tests the Snap package. It runs with a read-only
-  token and no access to secrets, so it can safely build code from forks.
+- **CI Build** (`ci.yml`) — runs on every pull request, on every push to
+  `master`, and on a daily schedule. Builds and tests the desktop application,
+  builds the web application, runs the web UI tests, and builds/tests the Snap
+  and Electron packages. On pull requests it runs with a read-only token and no
+  access to secrets, so it can safely build code from forks. On master
+  push/schedule events one extra job, `publish-web-candidate`, runs: it reuses
+  `push-web.yml` (with the `PAT_WEBUI` secret) to publish the just-built web app
+  as a candidate. That job is gated to `master` push/schedule events so secrets
+  are never exposed to pull-request or fork builds.
   All CI checkouts use `fetch-depth: 0` so `git describe` works correctly.
 - **PR preview deploy** (`pr-reports.yml`) — triggered when a CI Build run
   completes. It runs from the base branch (never checking out pull request
   code) and deploys the pre-built web application to the staging environment.
-- **Push web build** (`push-web.yml`) — triggered when a CI Build run completes
-  successfully on `master`. Publishes the build as a per-commit candidate to
-  `web.edumips.org` at `/c/<full-sha>/` and indexes it in `versions.json`. It
-  never touches the production root. Users can browse and share these builds
-  from the web UI's **About** tab. See the
+- **Push web build** (`push-web.yml`) — a **reusable** workflow invoked by
+  `ci.yml`'s `publish-web-candidate` job on every master push (and the nightly
+  schedule), right after the web build finishes — so the candidate goes live in
+  parallel with the slow desktop/snap/electron builds. It can also be run
+  manually via `workflow_dispatch`. Publishes the build as a per-commit
+  candidate to `web.edumips.org` at `/c/<full-sha>/` and indexes it in
+  `versions.json`. It never touches the production root. Users can browse and
+  share these builds from the web UI's **About** tab. See the
   [Unified web versioning](#unified-web-versioning) section below for details.
 - **Release** (`release.yml`) — runs on every push to `master` to build all
   release artifacts (JAR, MSI, Electron apps). The `deploy-prod` job is
@@ -493,10 +501,11 @@ tested in `test_deploy_web_pages.py` (`cd .github/scripts && python -m pytest`).
 
 #### Operations
 
-- **push** (`push-web.yml`) — runs on every successful master CI build. Copies
-  the artifact to `/c/<sha>/`, adds a `promoted: false` entry, and **never
-  touches the root or prunes**. Idempotent on CI re-runs. Computes `seq` and the
-  build string from a full-history checkout (`fetch-depth: 0`).
+- **push** (`push-web.yml`) — runs on every master commit (a `ci.yml` job
+  reuses it right after the web build; also runnable via `workflow_dispatch`).
+  Copies the artifact to `/c/<sha>/`, adds a `promoted: false` entry, and
+  **never touches the root or prunes**. Idempotent on CI re-runs. Computes `seq`
+  and the build string from a full-history checkout (`fetch-depth: 0`).
 - **promote** (`promote-web.yml`) — manual, gated to `lupino3` on `master`.
   Input `sha` is a full or short SHA of an **already-pushed** candidate; leave
   it empty to promote the **newest** candidate. The workflow verifies
@@ -529,8 +538,18 @@ dirs, and `/prev/`. A one-shot `deploy-web-pages.py migrate [--repo PATH]
 [--dry-run]` converts it: it computes `seq` for each SHA, moves the old
 directories to `/c/<sha>/`, synthesizes `versions.json`, leaves `/v/<n>/`
 redirect stubs (kept one release cycle), and deletes the legacy index files,
-`prev/`, and the date dirs. Run it once against a full clone of the Pages repo
-with `--dry-run` first.
+`prev/`, and the date dirs.
+
+This migration is **self-healing** and runs automatically. Every Pages-writing
+workflow (`push-web`, `promote-web`, `rollback-web`) invokes
+`.github/scripts/migrate-pages-if-needed.sh` right after cloning the Pages
+repo. The helper is idempotent: it runs `migrate` (and commits the result) only
+when `versions.json` is absent but legacy index files are present, and is a
+no-op once the repo is on the unified layout (or on a fresh, empty repo). This
+is why those three workflows check out the edumips64 repo with `fetch-depth: 0`
+— `migrate` needs full history to compute `seq` for past promoted builds. To
+preview the conversion manually, run `migrate --repo <full-clone> --dry-run`
+against a clone of the Pages repo.
 
 
 ### Manual release checklist
