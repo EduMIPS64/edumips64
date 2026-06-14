@@ -28,6 +28,7 @@ import org.edumips64.core.*;
 import org.edumips64.core.is.AddressErrorException;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.InvalidDelaySlotException;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
 import org.edumips64.utils.CurrentLocale;
@@ -214,6 +215,15 @@ public class CPUSwingWorker extends SwingWorker<Void, Void> {
       } catch (MemoryElementNotFoundException ex) {
         logger.info("Attempt to read a non-existent cell (MemoryElementNotFoundException). " + ex);
         SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(mainFrame, CurrentLocale.getString("ERROR_LABEL"), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE));
+        haltCPU();
+        break;
+      } catch (InvalidDelaySlotException ex) {
+        // A control-transfer instruction in a branch delay slot is a user
+        // program error (UNPREDICTABLE on real MIPS), not an EduMIPS64 bug.
+        // Surface it like the other runtime errors instead of popping the
+        // bug-report dialog.
+        logger.info("InvalidDelaySlotException. " + ex);
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(mainFrame, ex.getMessage(), "EduMIPS64 - " + CurrentLocale.getString("ERROR"), JOptionPane.ERROR_MESSAGE));
         haltCPU();
         break;
       } catch (Exception ex) {

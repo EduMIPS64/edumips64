@@ -571,7 +571,11 @@ public class CPU {
     if (delaySlot && !pipe.isEmpty(Pipeline.Stage.IF)
             && pipe.IF() instanceof FlowControlInstructions) {
       String slotName = pipe.IF().getName();
-      long branchPC = old_pc.getValue();
+      // At this point old_pc holds the address of the instruction currently
+      // in IF (the delay slot), which sits one word after the branch/jump.
+      // Subtract one word to report the address of the offending
+      // branch/jump itself.
+      long branchPC = old_pc.getValue() - 4;
       logger.info("Control-transfer '" + slotName
               + "' detected in the delay slot of the branch/jump at PC 0x"
               + Long.toHexString(branchPC) + ": raising InvalidDelaySlotException.");
