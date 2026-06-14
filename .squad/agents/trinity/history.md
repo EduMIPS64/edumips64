@@ -227,3 +227,45 @@ programMenuDisabled = logicalState === 'READY' || logicalState === 'EXECUTING' |
 **Why ENDED stays enabled:** There is no Stop/Reset toolbar button available in the `ENDED` state. The Program menu (New / Open… / Load Example) is the *only* mechanism the user has to start a fresh program after one finishes. Disabling it in `ENDED` would leave the user stuck with no way to proceed without a full page reload.
 
 **Old (wrong) condition:** `editorDisabled = EXECUTING || WAITING_FOR_INPUT` — this incorrectly kept the menu enabled while a program was loaded but paused (`READY`), allowing the user to load a different program mid-simulation.
+
+---
+
+## 2026-06-14: Keyboard shortcuts (Issue #1706)
+
+### Shortcut scheme
+| Key | Action | Active when |
+|-----|--------|-------------|
+| F2  | Load program | always (when program is valid) |
+| F8  | Run All ↔ Pause toggle | Run All: READY; Pause: EXECUTING |
+| F9  | Single Step | READY |
+| F10 | Multi Step | READY |
+| Esc | Stop & reset | READY |
+
+Browser-reserved keys (F5, F11, F12, Ctrl+W, etc.) deliberately avoided.
+
+### Implementation notes
+
+**Dialog-guard pattern:** `if (document.querySelector('[role="dialog"]')) return;`  
+MUI dialogs set `role="dialog"` on their root element. This single check gates the shortcut handler against Help, Settings, and Input dialogs, so Esc closes dialogs normally and typing in Input isn't stolen.
+
+**Stale-closure pattern:** Used `keyboardHandlerRef` (a `React.useRef`) to hold the latest shortcut handler. The `window.addEventListener` effect has an empty dependency array — the stable `handleKeyDown` wrapper calls `keyboardHandlerRef.current(e)`, which always reads the freshest state/functions. This avoids both stale closures and spurious re-registrations, and introduces no new ESLint warnings above baseline.
+
+**Import:** `deriveLogicalState` imported from `../simulatorState` in `Simulator.js`.
+
+**Key file anchors (at time of implementation):**
+- `Simulator.js` ~565: `keyboardHandlerRef` and keyboard `useEffect`
+- `RunControlsToolbar.js` ~145: tooltips now include key hints (F9, F10, F8, Esc)
+- `Header.js` ~188: Load tooltip now includes `(F2)`
+- `HelpDialog.js` ~619: new `Shortcuts` tab (index=1); About shifted to index=2
+
+**Help dialog tab shift:** The "About" tab moved from index 1 to index 2. The existing `help-dialog.spec.js` test was updated to click `#help-tab-2` instead of `#help-tab-1`.
+
+### Trilingual docs + CHANGELOG
+- Added "Keyboard shortcuts" section to `docs/user/{en,it,zh}/src/user-interface-web.rst` using RST `list-table` directive.
+- Italian translated; Chinese translated.
+- CHANGELOG.md entry added under `## 1.4.1 (TBD) → ### Added`.
+
+### Build / lint
+- ESLint: 0 new issues above baseline (31 issues — all pre-existing).
+- `npm run build-dbg`: compiled successfully.
+- Playwright: not run locally (worker.js environment not available); test file `keyboard-shortcuts.spec.js` is well-formed and lint-clean.

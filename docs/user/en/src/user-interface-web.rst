@@ -400,6 +400,36 @@ reloads.
   restores the original palette (the same RGB values the Swing UI
   uses by default).
 
+Keyboard shortcuts
+------------------
+The following keyboard shortcuts are available at all times, unless a
+dialog (Help, Settings, Input) is open.  All listed keys call
+``preventDefault()`` so the browser's own default action (e.g. F10
+menu bar, Esc) does not also fire.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 35 50
+
+   * - Key
+     - Action
+     - Active when
+   * - **F2**
+     - Load program
+     - Program has no syntax errors
+   * - **F8**
+     - Run All / Pause (toggle)
+     - Run All: program loaded (READY); Pause: currently executing
+   * - **F9**
+     - Single Step
+     - Program loaded (READY)
+   * - **F10**
+     - Multi Step
+     - Program loaded (READY)
+   * - **Esc**
+     - Stop & reset CPU
+     - Program loaded (READY)
+
 Running EduMIPS64 as a desktop or CLI application
 -------------------------------------------------
 The web frontend is convenient because it requires no installation,

@@ -3,6 +3,10 @@
 ## 1.4.1 (TBD)
 
 ### Added
+- Web UI now has keyboard shortcuts for run-control actions: F2 (Load), F8
+  (Run All / Pause), F9 (Single Step), F10 (Multi Step), Esc (Stop). Shortcuts
+  are shown in button tooltips and documented in a new "Shortcuts" tab in the
+  Help dialog. (Issue #1706)
 - Integer data directives (`.byte`, `.word16`, `.word32`, `.word` and
   `.word64`) now accept a label as their value. The assembler stores the memory
   address the label points to, resolving both data labels and forward code

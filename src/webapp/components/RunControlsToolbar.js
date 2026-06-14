@@ -143,7 +143,7 @@ export default function RunControlsToolbar(props) {
 
       {/* Tooltip wraps a <span> so it still fires while the button is disabled. */}
       <Tooltip
-        title="Runs a single step of simulation"
+        title="Runs a single step of simulation (F9)"
         arrow
         placement="bottom"
       >
@@ -161,7 +161,7 @@ export default function RunControlsToolbar(props) {
       </Tooltip>
 
       <Tooltip
-        title={`Run ${multiStepCount} steps of simulation (configurable in Settings)`}
+        title={`Run ${multiStepCount} steps of simulation (configurable in Settings) (F10)`}
         arrow
         placement="bottom"
       >
@@ -178,7 +178,11 @@ export default function RunControlsToolbar(props) {
         </span>
       </Tooltip>
 
-      <Tooltip title="Run until the simulation ends" arrow placement="bottom">
+      <Tooltip
+        title="Run until the simulation ends (F8)"
+        arrow
+        placement="bottom"
+      >
         <span>
           <IconButton
             id="run-button"
@@ -192,7 +196,7 @@ export default function RunControlsToolbar(props) {
         </span>
       </Tooltip>
 
-      <Tooltip title="Pause the simulation" arrow placement="bottom">
+      <Tooltip title="Pause the simulation (F8)" arrow placement="bottom">
         <span>
           <IconButton
             id="pause-button"
@@ -210,7 +214,7 @@ export default function RunControlsToolbar(props) {
         title={
           stopDisabled
             ? 'Pause before stopping'
-            : 'Stop the simulation and reset the CPU'
+            : 'Stop the simulation and reset the CPU (Esc)'
         }
         arrow
         placement="bottom"

@@ -60,7 +60,7 @@ async function openAboutTab(page) {
   await page.waitForSelector('.help-title');
   // Move mouse away to avoid tooltip intercepting the tab click.
   await page.mouse.move(0, 0);
-  await page.click('#help-tab-1');
+  await page.click('#help-tab-2');
 }
 
 test.describe('unified version list in About tab', () => {

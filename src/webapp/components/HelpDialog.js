@@ -23,6 +23,13 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Typography } from '@mui/material';
 import Chip from '@mui/material/Chip';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
 import { getBuildInfo } from '../buildInfo';
@@ -609,7 +616,8 @@ export default function HelpDialog(props) {
           aria-label="help tabs"
         >
           <Tab label="User Manual" id="help-tab-0" />
-          <Tab label="About" id="help-tab-1" />
+          <Tab label="Shortcuts" id="help-tab-1" />
+          <Tab label="About" id="help-tab-2" />
         </Tabs>
       </Box>
       <DialogContent
@@ -697,6 +705,72 @@ export default function HelpDialog(props) {
           </Box>
         </TabPanel>
         <TabPanel value={tabValue} index={1}>
+          <Box id="help-shortcuts" sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Keyboard Shortcuts
+            </Typography>
+            <Typography gutterBottom sx={{ mb: 2 }}>
+              These keyboard shortcuts are active whenever no dialog is open.
+            </Typography>
+            <TableContainer component={Paper} variant="outlined">
+              <Table size="small" aria-label="keyboard shortcuts">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <strong>Key</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Action</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Active when</strong>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>
+                      <code>F2</code>
+                    </TableCell>
+                    <TableCell>Load program</TableCell>
+                    <TableCell>Program is valid (no errors)</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <code>F8</code>
+                    </TableCell>
+                    <TableCell>Run All / Pause (toggle)</TableCell>
+                    <TableCell>
+                      Run All: program loaded (READY); Pause: executing
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <code>F9</code>
+                    </TableCell>
+                    <TableCell>Single Step</TableCell>
+                    <TableCell>Program loaded (READY)</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <code>F10</code>
+                    </TableCell>
+                    <TableCell>Multi Step</TableCell>
+                    <TableCell>Program loaded (READY)</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <code>Esc</code>
+                    </TableCell>
+                    <TableCell>Stop &amp; reset CPU</TableCell>
+                    <TableCell>Program loaded (READY)</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </TabPanel>
+        <TabPanel value={tabValue} index={2}>
           <Box sx={{ p: 3 }}>
             <Typography>Version: {props.ver}</Typography>
             <BuildInfoLine />

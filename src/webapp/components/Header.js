@@ -186,7 +186,7 @@ export default function Header(props) {
             (Step / Multi Step / Run / Pause / Stop) live in the floating
             RunControlsToolbar overlay mounted from Simulator.js. */}
         <Tooltip
-          title="Load the current code into the simulator"
+          title="Load the current code into the simulator (F2)"
           arrow
           placement="top"
         >

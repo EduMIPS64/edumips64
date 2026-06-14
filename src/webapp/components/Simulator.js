@@ -38,6 +38,7 @@ import CacheConfig from "./CacheConfig";
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
 import SampleProgram from '../data/SampleProgram';
+import { deriveLogicalState } from '../simulatorState';
 
 const Simulator = ({worker, initialState, appInsights}) => {
   // The amount of steps to run in multi-step executions.
@@ -560,6 +561,85 @@ const Simulator = ({worker, initialState, appInsights}) => {
   React.useEffect(() => {
     worker.checkSyntax(code);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Global keyboard shortcuts for run-control actions.
+  // A ref holds a callback that reads the latest closures on every call, so
+  // the window listener itself is registered just once (empty cleanup deps
+  // would be wrong; we need status/executing/inputRequest/stepStride for the
+  // guard).  We keep the handler in a ref so the listener function identity
+  // is stable across re-renders and we only need to re-register when the
+  // observable state used for gating actually changes.
+  const keyboardHandlerRef = React.useRef(null);
+  keyboardHandlerRef.current = (e) => {
+    // Don't steal keys while a modal dialog is open (Help, Settings, Input).
+    if (document.querySelector('[role="dialog"]')) return;
+    const logicalState = deriveLogicalState(status, executing, inputRequest);
+    if (logicalState === 'WAITING_FOR_INPUT') return;
+
+    switch (e.key) {
+      case 'F2':
+        e.preventDefault();
+        if (isValidProgram()) {
+          appInsights.trackEvent({
+            name: 'click',
+            properties: { action: 'load', source: 'keyboard' },
+          });
+          loadCode();
+        }
+        break;
+      case 'F8':
+        e.preventDefault();
+        if (logicalState === 'READY') {
+          appInsights.trackEvent({
+            name: 'click',
+            properties: { action: 'run', source: 'keyboard' },
+          });
+          runCode();
+        } else if (logicalState === 'EXECUTING') {
+          appInsights.trackEvent({ name: 'pause', source: 'keyboard' });
+          setMustPause(true);
+        }
+        break;
+      case 'F9':
+        e.preventDefault();
+        if (logicalState === 'READY') {
+          appInsights.trackEvent({
+            name: 'click',
+            properties: { action: 'step', source: 'keyboard' },
+          });
+          stepCode(1);
+        }
+        break;
+      case 'F10':
+        e.preventDefault();
+        if (logicalState === 'READY') {
+          appInsights.trackEvent({
+            name: 'click',
+            properties: { action: 'step', source: 'keyboard' },
+          });
+          stepCode(stepStride);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        if (logicalState === 'READY') {
+          appInsights.trackEvent({
+            name: 'click',
+            properties: { action: 'stop', source: 'keyboard' },
+          });
+          stopCode();
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  React.useEffect(() => {
+    const handleKeyDown = (e) => keyboardHandlerRef.current(e);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const onCodeChange = (code) => {

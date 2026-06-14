@@ -24,7 +24,7 @@ test.describe('version display and archived-build chip', () => {
     await page.waitForSelector('.help-title');
 
     // Switch to About tab
-    await page.click('#help-tab-1');
+    await page.click('#help-tab-2');
 
     const aboutContent = await page.textContent('.help-content');
     expect(aboutContent).toContain('Version:');
