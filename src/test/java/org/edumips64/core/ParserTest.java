@@ -549,4 +549,83 @@ public class ParserTest extends BaseParsingTest {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Issue #1822: ANDI/ORI/XORI use a zero-extended 16-bit immediate, so they
+  // must accept the full unsigned range 0..65535 (not just the signed -32768..32767
+  // range). The decimal range 32768..65535 used to be rejected.
+  // ---------------------------------------------------------------------------
+
+  @Test
+  public void oriAcceptsZeroExtendedDecimalImmediate() throws Exception {
+    // 40000 is a legal ORI immediate (0..65535) in MIPS64. Must NOT throw.
+    parseCode("ori r1, r0, 40000");
+  }
+
+  @Test
+  public void andiAcceptsZeroExtendedDecimalImmediate() throws Exception {
+    // 65280 (0xFF00) is a common mask for bits 8..15. Must NOT throw.
+    parseCode("andi r1, r0, 65280");
+  }
+
+  @Test
+  public void xoriAcceptsZeroExtendedDecimalImmediate() throws Exception {
+    parseCode("xori r1, r0, 50000");
+  }
+
+  @Test
+  public void logicalImmediateAcceptsUpperBoundary() throws Exception {
+    // 65535 is the maximum legal zero-extended 16-bit immediate.
+    parseCode("ori r1, r0, 65535");
+    parseCode("andi r1, r0, 65535");
+    parseCode("xori r1, r0, 65535");
+  }
+
+  @Test
+  public void logicalImmediateAcceptsLowerBoundary() throws Exception {
+    parseCode("ori r1, r0, 0");
+    parseCode("andi r1, r0, 0");
+    parseCode("xori r1, r0, 0");
+  }
+
+  @Test
+  public void logicalImmediateAcceptsHexFullRange() throws Exception {
+    // 0xFFFF must mean 65535 (zero-extended), not -1.
+    parseCode("ori r1, r0, 0xFFFF");
+    parseCode("andi r1, r0, 0x8000");
+    parseCode("xori r1, r0, 0xC350");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void oriRejectsImmediateAbove65535() throws Exception {
+    parseCode("ori r1, r0, 65536");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void andiRejectsImmediateAbove65535() throws Exception {
+    parseCode("andi r1, r0, 65536");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void xoriRejectsHexImmediateAbove65535() throws Exception {
+    parseCode("xori r1, r0, 0x10000");
+  }
+
+  @Test(expected = ParserMultiException.class)
+  public void oriRejectsNegativeImmediate() throws Exception {
+    // The immediate is unsigned (zero-extended); negative values are invalid.
+    parseCode("ori r1, r0, -1");
+  }
+
+  @Test
+  public void signedImmediateInstructionsStillRejectZeroExtendedValues() throws Exception {
+    // Sanity check that the unsigned path is specific to the logical instructions:
+    // DADDI uses a signed immediate, so 40000 must still be rejected.
+    try {
+      parseCode("daddi r1, r0, 40000");
+      org.junit.Assert.fail("Expected DADDI to reject the out-of-range signed immediate 40000.");
+    } catch (ParserMultiException e) {
+      // expected
+    }
+  }
+
 }

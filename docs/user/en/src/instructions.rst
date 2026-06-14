@@ -294,7 +294,8 @@ Here's the list of I-Type ALU Instructions.
 * `ANDI rt, rs, immediate`
 
   Executes the bitwise AND between rs and the immediate value, putting the
-  result in rt.
+  result in rt. The 16-bit immediate is zero-extended, so it accepts the
+  unsigned range ``0``–``65535``.
 
 * `DADDI rt, rs, immediate`
 
@@ -330,7 +331,8 @@ Here's the list of I-Type ALU Instructions.
 * `ORI rt, rs, immediate`
 
   Executes the bitwise OR between rs and the immediate value, putting the
-  result in rt.
+  result in rt. The 16-bit immediate is zero-extended, so it accepts the
+  unsigned range ``0``–``65535``.
 
 * `SLTI rt, rs, immediate`
 
@@ -347,7 +349,8 @@ Here's the list of I-Type ALU Instructions.
 * `XORI rt, rs, immediate`
 
   Executes a bitwise exclusive OR (XOR) between rs and the immediate value,
-  and puts the result into rt.
+  and puts the result into rt. The 16-bit immediate is zero-extended, so it
+  accepts the unsigned range ``0``–``65535``.
 
 Load/Store instructions
 -----------------------

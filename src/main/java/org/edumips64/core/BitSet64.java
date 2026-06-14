@@ -232,8 +232,8 @@ public class BitSet64 extends FixedBitSet {
     }
   }
   /** Writes a half-word (16 bit) value into this FixedBitSet with a ofset: the value to be written must be in the
-   * range [-32768, 65536], otherwise an exception will be thrown.
-   * @param value number to be written: must be <CODE>-32768 &lt;= value &lt;= 65536</CODE>
+   * range [-32768, 65535], otherwise an exception will be thrown.
+   * @param value number to be written: must be <CODE>-32768 &lt;= value &lt;= 65535</CODE>
    * @param offset position to write the HalfWord
    * @throws IrregularWriteOperationException if value is not correct or anything else goes wrong during the operation
    * @throws NotAlignException if offset is not aligned to 16 bit
@@ -242,7 +242,7 @@ public class BitSet64 extends FixedBitSet {
     offset *= 8;
     offset = 48 - offset;
 
-    if (value < -32768 || value > 65536) {
+    if (value < -32768 || value > 65535) {
       throw new IrregularWriteOperationException();
     } else if (offset % 16 !=  0) {
       throw new NotAlignException();
