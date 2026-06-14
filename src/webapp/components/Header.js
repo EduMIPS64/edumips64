@@ -157,18 +157,18 @@ export default function Header(props) {
               sx={{ fontWeight: 'bold' }}
             />
           )}
-          {buildInfo.kind === 'candidate' && (
+          {buildInfo.kind === 'archive-build' && (
             <Tooltip
-              title="This is a candidate build, automatically deployed from a master commit. It may be unstable."
+              title="This is an archived per-commit build (a promoted snapshot or a candidate), not the live production version."
               arrow
               placement="bottom"
             >
               <Chip
                 id="candidate-build-chip"
                 size="small"
-                label="CANDIDATE"
+                label="ARCHIVED"
                 className="candidate-chip"
-                aria-label="Candidate build"
+                aria-label="Archived build"
                 sx={{ fontWeight: 'bold' }}
               />
             </Tooltip>

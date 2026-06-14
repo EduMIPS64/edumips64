@@ -31,41 +31,54 @@ Where to find the version
 Which web build am I running?
 ------------------------------
 The **production** web app at https://web.edumips.org carries the stable
-version. It is only updated when the maintainers explicitly promote a new
-release, so it is the safest choice for everyday use.
+version. It is only updated when the maintainers explicitly *promote* a new
+build, so it is the safest choice for everyday use.
 
-There are also other web builds, identified by a small coloured badge shown
-next to the **"Web Version"** label in the toolbar:
+Every commit to the development code is also built and published to its own
+permanent address under ``https://web.edumips.org/c/<commit>/``. A small
+coloured badge next to the **"Web Version"** label in the toolbar tells you
+which kind of build you are on:
 
 * **No badge** — you are on the normal production build. This is the stable
   version at https://web.edumips.org.
-* **``CANDIDATE``** (purple badge) — a build automatically deployed from every
-  commit to the latest development code. Each candidate build is labeled with
-  its date and sequence number (e.g., `2026-06-13 #2`). You can browse all
-  available candidates and share their URLs from the **About** tab. Candidates
-  may be unstable and are retained for 14 days. Hovering over the badge shows
-  a tooltip confirming this.
+* **``ARCHIVED``** — you are viewing a specific per-commit build served from
+  ``/c/<commit>/``. This may be a previously promoted version or a candidate
+  awaiting promotion; either way it is not the live production site. Hovering
+  over the badge shows a tooltip confirming this.
 * **``PR #N``** (yellow badge) — a temporary preview built for a specific
   proposed change (pull request) on GitHub. Clicking the badge opens the
   corresponding pull request page.
 * **``dev``** (blue badge) — someone is running a local development build
   directly on their machine.
 
-In short: **no badge → stable production; ``CANDIDATE`` → newest features but
-possibly unstable; ``PR #N`` / ``dev`` → temporary or preview builds.**
+In short: **no badge → stable production; ``ARCHIVED`` → a specific per-commit
+build; ``PR #N`` / ``dev`` → temporary or preview builds.**
 
-Viewing previous versions
---------------------------
-Every released web version is kept as an immutable snapshot and remains
-available for you to use. You can see a list of all retained versions and open
-an older one directly from the **Help** dialog:
+Browsing and switching versions
+-------------------------------
+All retained web builds — both the promoted releases and the pending
+candidates — are listed in one place, addressed by their commit identifier.
+Open the list from the **Help** dialog:
 
 1. Click **Help** → **About** (in the web app toolbar).
-2. Look for the **Previous Versions** section in the About tab.
-3. You will see a list of released versions with their dates.
-4. The current version is marked with a label so you know which one is live.
-5. Click any older version to open it in a new tab — your current work is
+2. The About tab shows two lists:
+
+   * **Promoted versions** — the manually promoted releases, shown
+     prominently. The live one is marked **current**.
+   * **Candidate builds** — newer builds that have not yet been promoted. All
+     pending candidates are shown (there are usually only a few).
+3. Click any entry to open that exact build in a new tab — your current work is
    preserved in the original tab.
 
-This is useful if you need to compare versions, verify a bug in an older release,
-or work with a version that suits your needs better.
+What is kept, and for how long
+------------------------------
+* **Promoted versions** are kept permanently as immutable snapshots, so you can
+  always go back to any release.
+* **Candidate builds** are kept until a promotion happens. When a build is
+  promoted, the candidates that came *before* it (and were never promoted) are
+  removed; candidates newer than the promoted build are preserved and stay
+  available until they are themselves promoted or superseded.
+
+This keeps the list focused: every promoted release plus the handful of builds
+that are still waiting to be promoted.
+

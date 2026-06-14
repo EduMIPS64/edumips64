@@ -1,164 +1,121 @@
-// Utilities for browsing the web UI's version history.
+// Utilities for browsing the web UI's unified version history.
 //
-// The production deployment accumulates immutable snapshots at /v/<n>/.
-// A root /manifest.json describes all retained versions.
-// Per-commit candidate builds are deployed to /<YYYY-MM-DD>/<n>-<sha>/ and
-// indexed by a root /candidates.json.
+// Every master build is pushed to an immutable directory at /c/<full-sha>/.
+// A single root /versions.json indexes all retained builds:
+//
+//   {
+//     "current": "<sha of the live promoted build>",
+//     "versions": [ { sha, shortsha, seq, build, targetRelease,
+//                     pushedAt, promoted, promotedAt?, promotedBy? }, ... ]
+//   }
+//
+// Retained builds are either *promoted* (shown prominently in About) or
+// pending *candidates* (newer than the live build, shown less prominently).
 
-const CANDIDATE_PATH_RE = /^\/(\d{4}-\d{2}-\d{2})\/(\d+)-([a-f0-9]{7,8})\//;
+// A build is served from /c/<full-sha>/ (40 hex chars).
+const BUILD_PATH_RE = /^\/c\/([0-9a-f]{40})(?:\/|$)/;
 
 /**
- * Given a window.location-like object, return the integer version number <n>
- * if the path is under /v/<n>/; otherwise return null (root = current).
+ * Given a window.location-like object, return the full commit SHA if the path
+ * is under /c/<sha>/; otherwise return null (root = current production).
  *
  * @param {{pathname?: string}} [loc] - Optional location object.
  *   Defaults to window.location when running in a browser.
- * @returns {number|null}
+ * @returns {string|null}
  */
-export function getViewedVersion(loc) {
+export function getViewedSha(loc) {
   const location =
     loc || (typeof window !== 'undefined' ? window.location : null);
   if (!location) {
     return null;
   }
-  const pathname = location.pathname || '';
-  const match = pathname.match(/^\/v\/(\d+)(?:\/|$)/);
-  if (!match) {
-    return null;
-  }
-  return parseInt(match[1], 10);
+  const match = (location.pathname || '').match(BUILD_PATH_RE);
+  return match ? match[1] : null;
 }
 
 /**
- * Strict shape check for a manifest object.
+ * Strict shape check for a versions index object.
  *
- * @param {unknown} manifest
+ * @param {unknown} data
  * @returns {boolean}
  */
-export function isValidManifest(manifest) {
-  if (!manifest || typeof manifest !== 'object') {
+export function isValidVersions(data) {
+  if (!data || typeof data !== 'object') {
     return false;
   }
-  if (!Number.isInteger(manifest.current) || manifest.current < 1) {
+  if (!Array.isArray(data.versions)) {
     return false;
   }
-  if (!Array.isArray(manifest.history)) {
+  // `current` may be null (no production build yet) or a non-empty string.
+  if (data.current != null && typeof data.current !== 'string') {
     return false;
   }
-  return manifest.history.every(
+  return data.versions.every(
     (entry) =>
       entry &&
       typeof entry === 'object' &&
-      Number.isInteger(entry.n) &&
-      typeof entry.build === 'string',
+      typeof entry.sha === 'string' &&
+      Number.isInteger(entry.seq) &&
+      typeof entry.build === 'string' &&
+      typeof entry.promoted === 'boolean',
   );
 }
 
-/**
- * Build a sorted (descending by n) list of version items for display.
- *
- * @param {object} manifest - Parsed manifest object.
- * @param {number|null} viewedN - The version being viewed, or null for root.
- * @returns {Array<{n: number, build: string, dateLabel: string, targetRelease: string, href: string, isCurrent: boolean, isViewed: boolean}>}
- */
-export function buildVersionList(manifest, viewedN) {
-  if (!isValidManifest(manifest)) {
-    return [];
+function toDateLabel(iso) {
+  if (!iso) {
+    return '';
   }
-  const sorted = [...manifest.history].sort((a, b) => b.n - a.n);
-  return sorted.map((entry) => {
-    let dateLabel = '';
-    if (entry.promotedAt) {
-      try {
-        const d = new Date(entry.promotedAt);
-        dateLabel = isNaN(d.getTime()) ? '' : d.toLocaleDateString();
-      } catch {
-        dateLabel = '';
-      }
-    }
-    return {
-      n: entry.n,
-      build: entry.build,
-      dateLabel,
-      targetRelease: entry.targetRelease || '',
-      href: '/v/' + entry.n + '/',
-      isCurrent: entry.n === manifest.current,
-      isViewed: entry.n === viewedN,
-    };
-  });
+  try {
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+  } catch {
+    return '';
+  }
 }
 
 /**
- * Fetch and validate the root manifest.json.
+ * Build a sorted (descending by seq) list of version items for display.
  *
- * @returns {Promise<object|null>} Parsed manifest if valid, null otherwise.
+ * Each item is tagged `promoted` (a manually-promoted version, shown
+ * prominently) or not (a pending candidate). `isCurrent` marks the live build.
+ *
+ * @param {object} data - Parsed versions.json object.
+ * @param {string|null} viewedSha - The SHA being viewed, or null for root.
+ * @returns {Array<{sha: string, shortsha: string, seq: number, build: string, dateLabel: string, targetRelease: string, href: string, promoted: boolean, isCurrent: boolean, isViewed: boolean}>}
  */
-export async function fetchManifest() {
+export function buildVersionList(data, viewedSha) {
+  if (!isValidVersions(data)) {
+    return [];
+  }
+  const sorted = [...data.versions].sort((a, b) => b.seq - a.seq);
+  return sorted.map((entry) => ({
+    sha: entry.sha,
+    shortsha: entry.shortsha || entry.sha.slice(0, 7),
+    seq: entry.seq,
+    build: entry.build,
+    dateLabel: toDateLabel(entry.promoted ? entry.promotedAt : entry.pushedAt),
+    targetRelease: entry.targetRelease || '',
+    href: '/c/' + entry.sha + '/',
+    promoted: entry.promoted === true,
+    isCurrent: entry.sha === data.current,
+    isViewed: viewedSha != null && entry.sha === viewedSha,
+  }));
+}
+
+/**
+ * Fetch and validate the root versions.json.
+ *
+ * @returns {Promise<object|null>} Parsed index if valid, null otherwise.
+ */
+export async function fetchVersions() {
   try {
-    const resp = await fetch('/manifest.json', { cache: 'no-cache' });
+    const resp = await fetch('/versions.json', { cache: 'no-cache' });
     if (!resp.ok) {
       return null;
     }
     const data = await resp.json();
-    return isValidManifest(data) ? data : null;
+    return isValidVersions(data) ? data : null;
   } catch {
     return null;
   }
-}
-
-/**
- * Parse candidate info from a location, or return null.
- *
- * @param {{pathname?: string}} [loc] - Optional location object.
- *   Defaults to window.location when running in a browser.
- * @returns {{date: string, n: number, shortsha: string}|null}
- */
-export function getViewedCandidate(loc) {
-  const location =
-    loc || (typeof window !== 'undefined' ? window.location : null);
-  if (!location) return null;
-  const match = (location.pathname || '').match(CANDIDATE_PATH_RE);
-  if (!match) return null;
-  return { date: match[1], n: parseInt(match[2], 10), shortsha: match[3] };
-}
-
-/**
- * Fetch /candidates.json — returns parsed object or null.
- *
- * @returns {Promise<object|null>} Parsed candidates object or null on error.
- */
-export async function fetchCandidates() {
-  try {
-    const resp = await fetch('/candidates.json', { cache: 'no-cache' });
-    if (!resp.ok) return null;
-    const data = await resp.json();
-    if (!data || !Array.isArray(data.candidates)) return null;
-    return data;
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Build display list from candidates data, sorted newest-first.
- *
- * @param {object|null} candidatesData - Parsed candidates.json object.
- * @param {{date: string, n: number, shortsha: string}|null} viewedCandidate
- * @returns {Array<{date: string, n: number, shortsha: string, build: string, href: string, deployedAt: string, label: string, isViewed: boolean}>}
- */
-export function buildCandidateList(candidatesData, viewedCandidate) {
-  if (!candidatesData || !Array.isArray(candidatesData.candidates)) return [];
-  return candidatesData.candidates.map((c) => ({
-    date: c.date,
-    n: c.n,
-    shortsha: c.shortsha,
-    build: c.build,
-    href: c.path,
-    deployedAt: c.deployedAt,
-    label: `${c.date} #${c.n} (${c.shortsha})`,
-    isViewed:
-      viewedCandidate != null &&
-      viewedCandidate.date === c.date &&
-      viewedCandidate.n === c.n,
-  }));
 }

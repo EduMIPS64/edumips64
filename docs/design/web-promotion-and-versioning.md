@@ -1,5 +1,12 @@
 # Design: Web UI Production Promotion & Versioning
 
+> **⚠️ Superseded (proposed):** the dual-index model described here
+> (`manifest.json` + `candidates.json`, `/v/<n>/` + date dirs + `/prev/`) is
+> being replaced by a single commit-addressed model. See
+> [`unified-web-versioning.md`](./unified-web-versioning.md). This document
+> remains the reference for the system as currently deployed until that change
+> lands.
+
 **Author:** Morpheus (Lead/Architect)  
 **Date:** 2026-06-05 (decisions locked 2026-06-07)  
 **Status:** IMPLEMENTED (PR #1826)  

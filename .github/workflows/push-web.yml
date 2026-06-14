@@ -1,4 +1,9 @@
-name: Candidate Web Deploy
+name: Push Web Build
+
+# Publishes every successful master CI build as a per-commit candidate at
+# /c/<sha>/ on web.edumips.org and indexes it in versions.json. It never
+# touches the production root — that only changes on an explicit promotion
+# (see promote-web.yml). See docs/design/unified-web-versioning.md.
 
 on:
   workflow_run:
@@ -12,8 +17,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy-candidate:
-    name: Deploy candidate build
+  push:
+    name: Push candidate build
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' &&
@@ -24,10 +29,12 @@ jobs:
       actions: read
 
     steps:
-      - name: Checkout edumips64 (for script)
+      - name: Checkout edumips64 (full history for seq)
         uses: actions/checkout@v6
         with:
-          fetch-depth: 1
+          # fetch-depth: 0 is required so `git rev-list --count` and
+          # `git describe` can see the full master history.
+          fetch-depth: 0
 
       - name: Resolve run and SHA
         id: resolve
@@ -70,10 +77,20 @@ jobs:
           gh run download "${RUN_ID}" --name web --dir artifact/web \
             --repo "${{ github.repository }}"
 
-      - name: Get build string
-        id: build_info
+      - name: Compute build identity and seq
+        id: build_id
+        env:
+          HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
         run: |
-          echo "build=$(git describe --tags --always)" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          # Make sure the pushed commit is present locally for git describe/rev-list.
+          git fetch --depth=0 origin "$HEAD_SHA" 2>/dev/null || true
+          BUILD=$(git describe --tags --match 'v*' --always "$HEAD_SHA" | sed 's/^v//')
+          SEQ=$(git rev-list --count "$HEAD_SHA")
+          TARGET_RELEASE=$(grep '^version=' gradle.properties | cut -d= -f2 | tr -d '"' | tr -d "'")
+          echo "build=${BUILD}" >> "$GITHUB_OUTPUT"
+          echo "seq=${SEQ}" >> "$GITHUB_OUTPUT"
+          echo "targetRelease=${TARGET_RELEASE}" >> "$GITHUB_OUTPUT"
 
       - name: Clone Pages repo
         env:
@@ -85,15 +102,22 @@ jobs:
           git -C pages-repo config user.name "github-actions[bot]"
           git -C pages-repo config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Deploy candidate
+      - name: Run push script
         env:
           HEAD_SHA: ${{ steps.resolve.outputs.head_sha }}
-          BUILD: ${{ steps.build_info.outputs.build }}
+          SEQ: ${{ steps.build_id.outputs.seq }}
+          BUILD: ${{ steps.build_id.outputs.build }}
+          TARGET_RELEASE: ${{ steps.build_id.outputs.targetRelease }}
         run: |
           set -euo pipefail
           cp .github/scripts/deploy-web-pages.py pages-repo/
           cd pages-repo
-          python3 deploy-web-pages.py candidate "../artifact/web" "$HEAD_SHA" "$BUILD" ""
+          python3 deploy-web-pages.py push \
+            "../artifact/web" \
+            "${HEAD_SHA}" \
+            "${SEQ}" \
+            "${BUILD}" \
+            "${TARGET_RELEASE}"
           rm -f deploy-web-pages.py
 
       - name: Commit and push
@@ -105,5 +129,5 @@ jobs:
           cd pages-repo
           git add -A
           git diff --cached --quiet && { echo "Nothing to commit."; exit 0; }
-          git commit -m "Candidate @ ${SHORT_SHA} (${HEAD_SHA})"
+          git commit -m "Push candidate @ ${SHORT_SHA} (${HEAD_SHA})"
           git push origin master

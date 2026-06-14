@@ -27,12 +27,9 @@ import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
 import { getBuildInfo } from '../buildInfo';
 import {
-  fetchManifest,
+  fetchVersions,
   buildVersionList,
-  getViewedVersion,
-  fetchCandidates,
-  buildCandidateList,
-  getViewedCandidate,
+  getViewedSha,
 } from '../versionHistory';
 
 // Render a localized description of the running build (production/PR/dev),
@@ -50,12 +47,12 @@ function BuildInfoLine() {
       </Typography>
     );
   }
-  if (buildInfo.kind === 'candidate') {
+  if (buildInfo.kind === 'archive-build') {
     return (
       <Typography id="about-build-info">
-        Build: candidate {buildInfo.candidateDate} #{buildInfo.candidateN} (
-        <Link href={buildInfo.candidateUrl} target="_blank" rel="noreferrer">
-          {buildInfo.candidateSha}
+        Build: archived (
+        <Link href={buildInfo.buildUrl} target="_blank" rel="noreferrer">
+          {buildInfo.sha.slice(0, 7)}
         </Link>
         )
       </Typography>
@@ -75,136 +72,112 @@ function BuildInfoLine() {
   return <Typography id="about-build-info">Build: development</Typography>;
 }
 
-// Renders the list of previous retained versions fetched from /manifest.json.
-// Gated on: valid manifest AND build kind !== 'pr'.
-function PreviousVersions() {
-  const [manifest, setManifest] = React.useState(null);
-  const viewedN = React.useMemo(() => getViewedVersion(), []);
+// Renders the unified version list from /versions.json. Promoted versions are
+// shown prominently; pending candidates (builds newer than the live one that
+// have not been promoted) are listed below in a lighter style. All retained
+// candidates are shown (they are expected to be few between promotions).
+// Gated on: valid versions index AND build kind !== 'pr'.
+function Versions() {
+  const [versionsData, setVersionsData] = React.useState(null);
+  const viewedSha = React.useMemo(() => getViewedSha(), []);
 
   React.useEffect(() => {
-    fetchManifest().then((m) => setManifest(m));
+    fetchVersions().then((v) => setVersionsData(v));
   }, []);
 
   const buildInfo = getBuildInfo();
-  if (!manifest || buildInfo.kind === 'pr') {
+  if (!versionsData || buildInfo.kind === 'pr') {
     return null;
   }
 
-  const versions = buildVersionList(manifest, viewedN);
-
-  return (
-    <Box id="about-previous-versions" sx={{ mt: 2 }}>
-      {viewedN != null && viewedN !== manifest.current && (
-        <Typography gutterBottom color="warning.main">
-          You are viewing an archived version (v{viewedN}).{' '}
-          <Link href="/">Open the latest.</Link>
-        </Typography>
-      )}
-      <Typography variant="h6" gutterBottom>
-        Previous versions
-      </Typography>
-      <List dense disablePadding>
-        {versions.map((item) => (
-          <ListItem key={item.n} disablePadding data-version={item.n}>
-            <ListItemText
-              primary={
-                item.isCurrent ? (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography component="span">
-                      {item.dateLabel
-                        ? `${item.dateLabel} (targets ${item.targetRelease})`
-                        : `v${item.n}`}
-                    </Typography>
-                    <Chip label="current" size="small" color="success" />
-                  </Box>
-                ) : (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Link
-                      href={item.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      title={item.build}
-                    >
-                      {item.dateLabel
-                        ? `${item.dateLabel} (targets ${item.targetRelease})`
-                        : `v${item.n}`}
-                    </Link>
-                    {item.isViewed && (
-                      <Typography component="span" variant="caption">
-                        (viewing)
-                      </Typography>
-                    )}
-                  </Box>
-                )
-              }
-            />
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
-}
-// Renders the list of per-commit candidate builds fetched from /candidates.json.
-// Gated on: non-empty candidate list AND build kind !== 'pr'.
-function CandidateBuilds() {
-  const [candidates, setCandidates] = React.useState(null);
-  const viewedCandidate = React.useMemo(() => getViewedCandidate(), []);
-
-  React.useEffect(() => {
-    fetchCandidates().then((c) => setCandidates(c));
-  }, []);
-
-  const buildInfo = getBuildInfo();
-  if (!candidates || buildInfo.kind === 'pr') {
-    return null;
-  }
-
-  const items = buildCandidateList(candidates, viewedCandidate);
+  const items = buildVersionList(versionsData, viewedSha);
   if (items.length === 0) {
     return null;
   }
 
+  const promoted = items.filter((it) => it.promoted);
+  const candidates = items.filter((it) => !it.promoted);
+  const viewedItem = viewedSha
+    ? items.find((it) => it.sha === viewedSha)
+    : null;
+
+  const renderEntry = (item) => (
+    <ListItem key={item.sha} disablePadding data-version={item.sha}>
+      <ListItemText
+        primary={
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {item.isCurrent ? (
+              <Typography
+                component="span"
+                sx={{ fontWeight: item.promoted ? 'bold' : 'normal' }}
+              >
+                {item.dateLabel
+                  ? `${item.dateLabel} (${item.shortsha}` +
+                    (item.targetRelease ? `, targets ${item.targetRelease})` : ')')
+                  : item.shortsha}
+              </Typography>
+            ) : (
+              <Link
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                title={item.build}
+                sx={{ fontWeight: item.promoted ? 'bold' : 'normal' }}
+              >
+                {item.dateLabel
+                  ? `${item.dateLabel} (${item.shortsha}` +
+                    (item.targetRelease ? `, targets ${item.targetRelease})` : ')')
+                  : item.shortsha}
+              </Link>
+            )}
+            {item.isCurrent && (
+              <Chip label="current" size="small" color="success" />
+            )}
+            {!item.promoted && (
+              <Chip label="candidate" size="small" color="info" variant="outlined" />
+            )}
+            {item.isViewed && !item.isCurrent && (
+              <Typography component="span" variant="caption">
+                (viewing)
+              </Typography>
+            )}
+          </Box>
+        }
+      />
+    </ListItem>
+  );
+
   return (
-    <Box id="about-candidate-builds" sx={{ mt: 2 }}>
-      {buildInfo.kind === 'candidate' && (
-        <Typography gutterBottom color="info.main">
-          You are viewing candidate build {buildInfo.candidateDate} #
-          {buildInfo.candidateN} ({buildInfo.candidateSha}).{' '}
-          <Link href="/">Open production.</Link>
+    <Box id="about-versions" sx={{ mt: 2 }}>
+      {viewedItem != null && !viewedItem.isCurrent && (
+        <Typography
+          gutterBottom
+          color={viewedItem.promoted ? 'warning.main' : 'info.main'}
+        >
+          You are viewing {viewedItem.promoted ? 'an archived' : 'a candidate'}{' '}
+          build ({viewedItem.shortsha}). <Link href="/">Open the latest.</Link>
         </Typography>
       )}
-      <Typography variant="h6" gutterBottom>
-        Candidate builds
-      </Typography>
-      <List dense disablePadding>
-        {items.map((item) => (
-          <ListItem
-            key={item.href}
-            disablePadding
-            data-candidate={`${item.date}-${item.n}`}
-          >
-            <ListItemText
-              primary={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Link
-                    href={item.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    title={item.build}
-                  >
-                    {item.label}
-                  </Link>
-                  {item.isViewed && (
-                    <Typography component="span" variant="caption">
-                      (viewing)
-                    </Typography>
-                  )}
-                </Box>
-              }
-            />
-          </ListItem>
-        ))}
-      </List>
+      {promoted.length > 0 && (
+        <>
+          <Typography variant="h6" gutterBottom>
+            Promoted versions
+          </Typography>
+          <List dense disablePadding id="about-promoted-versions">
+            {promoted.map(renderEntry)}
+          </List>
+        </>
+      )}
+      {candidates.length > 0 && (
+        <>
+          <Typography variant="h6" gutterBottom sx={{ mt: promoted.length ? 2 : 0 }}>
+            Candidate builds
+          </Typography>
+          <List dense disablePadding id="about-candidate-versions">
+            {candidates.map(renderEntry)}
+          </List>
+        </>
+      )}
     </Box>
   );
 }
@@ -722,8 +695,7 @@ export default function HelpDialog(props) {
           <Box sx={{ p: 3 }}>
             <Typography>Version: {props.ver}</Typography>
             <BuildInfoLine />
-            <PreviousVersions />
-            <CandidateBuilds />
+            <Versions />
             <Typography gutterBottom variant="h6" sx={{ mt: 2 }}>
               Quick Start
             </Typography>

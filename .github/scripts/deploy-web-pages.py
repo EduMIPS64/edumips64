@@ -1,8 +1,28 @@
 #!/usr/bin/env python3
 """deploy-web-pages.py — Pages-repo layout manager for web.edumips.org.
 
-Subcommands: promote | rollback | candidate
+Unified, commit-addressed web versioning. See
+docs/design/unified-web-versioning.md for the full design.
+
+Subcommands:
+  push <artifact_dir> <sha> <seq> <build> <target_release>
+      Publish a master build as a candidate at /c/<sha>/. Never touches root.
+  promote <sha> <actor>
+      Promote an already-pushed candidate to production. Copies /c/<sha>/ into
+      the root, marks it promoted, prunes non-promoted candidates older than the
+      new current. NEVER builds.
+  rollback <actor>
+      Revert production to the newest promoted version older than the current
+      one. Copies its /c/<sha>/ into root. Never prunes.
+  migrate [--repo PATH] [--dry-run]
+      One-shot conversion from the legacy manifest.json + candidates.json model
+      to versions.json + /c/<sha>/.
+
 Must be run with cwd = checkout of the Pages repo (EduMIPS64/web.edumips.org).
+
+KEEP-INVARIANT: a build V is retained iff
+    V.promoted == True  OR  V.seq > current.seq
+Every operation re-establishes this invariant.
 """
 
 import argparse
@@ -11,18 +31,20 @@ import os
 import re
 import shutil
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
-RESERVED_NAMES = ["v", "prev", "candidates.json", "manifest.json", "CNAME", ".nojekyll", ".git"]
-MAX_VERSIONS = 50
-DEFAULT_RETENTION_DAYS = 14
+# Top-level names that a root replacement must never delete.
+RESERVED_NAMES = ["c", "versions.json", "CNAME", ".nojekyll", ".git"]
+# Name of the per-build directory tree (immutable snapshots live at c/<sha>/).
+BUILDS_DIR = "c"
+INDEX_FILE = "versions.json"
 
-_DATE_DIR_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_FULL_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -30,7 +52,7 @@ _DATE_DIR_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 def die(msg: str) -> None:
-    """Print an error message to stderr and exit 1 (mirrors bash `die`)."""
+    """Print an error message to stderr and exit 1."""
     print(f"ERROR: {msg}", file=sys.stderr)
     sys.exit(1)
 
@@ -50,26 +72,13 @@ def ensure_static_files() -> None:
         print("Created missing .nojekyll")
 
 
-def is_candidate_date_dir(name: str) -> bool:
-    """Return True if name matches YYYY-MM-DD and is a directory."""
-    return bool(_DATE_DIR_RE.match(name)) and Path(name).is_dir()
-
-
 def root_prod_entries() -> list[str]:
-    """Return all top-level cwd entries (including dotfiles) not in RESERVED_NAMES.
+    """Return all top-level cwd entries (including dotfiles) not reserved.
 
-    Mirrors bash `dotglob` + extglob negation — hidden files ARE included.
-    Candidate date-dirs (YYYY-MM-DD) are also excluded to prevent promote/rollback
-    from clobbering them.
+    Hidden files ARE included (mirrors bash `dotglob`). The builds dir (c/),
+    versions.json, CNAME, .nojekyll and .git are preserved.
     """
-    entries = []
-    for entry in Path(".").iterdir():
-        if entry.name in RESERVED_NAMES:
-            continue
-        if is_candidate_date_dir(entry.name):
-            continue
-        entries.append(entry.name)
-    return entries
+    return [e.name for e in Path(".").iterdir() if e.name not in RESERVED_NAMES]
 
 
 def delete_root_prod_files() -> None:
@@ -94,7 +103,6 @@ def copy_contents_into(src: str | Path, dest: str | Path) -> None:
     for child in src.iterdir():
         dest_child = dest / child.name
         if child.is_symlink():
-            # Preserve symlinks as-is.
             link_target = os.readlink(child)
             if dest_child.exists() or dest_child.is_symlink():
                 dest_child.unlink()
@@ -107,198 +115,175 @@ def copy_contents_into(src: str | Path, dest: str | Path) -> None:
             shutil.copy2(child, dest_child)
 
 
-
-def prune_versions() -> None:
-    """Keep only the highest MAX_VERSIONS numeric-named subdirs under v/."""
-    v_dir = Path("v")
-    if not v_dir.is_dir():
-        return
-
-    numeric_dirs = sorted(
-        (int(d.name) for d in v_dir.iterdir() if d.is_dir() and d.name.isdigit()),
-        reverse=True,
-    )
-    if len(numeric_dirs) > MAX_VERSIONS:
-        for n in numeric_dirs[MAX_VERSIONS:]:
-            target = v_dir / str(n)
-            print(f"Pruning v/{n}")
-            shutil.rmtree(target)
-
-
-def read_manifest() -> dict | None:
-    """Return the parsed manifest.json dict, or None if the file is absent."""
-    p = Path("manifest.json")
+def read_index() -> dict:
+    """Return the parsed versions.json, or a fresh empty index if absent."""
+    p = Path(INDEX_FILE)
     if p.is_file():
-        return json.loads(p.read_text())
+        data = json.loads(p.read_text())
+        if not isinstance(data, dict) or not isinstance(data.get("versions"), list):
+            die(f"{INDEX_FILE} is malformed.")
+        data.setdefault("current", None)
+        return data
+    return {"current": None, "versions": []}
+
+
+def write_index(data: dict) -> None:
+    """Write versions.json with 2-space indent and a trailing newline.
+
+    `versions` is always sorted newest-first by seq before writing.
+    """
+    data["versions"].sort(key=lambda e: e["seq"], reverse=True)
+    Path(INDEX_FILE).write_text(json.dumps(data, indent=2) + "\n")
+
+
+def find_version(index: dict, sha: str) -> dict | None:
+    """Return the version entry for sha (or a unique short-sha prefix), else None."""
+    for entry in index["versions"]:
+        if entry["sha"] == sha:
+            return entry
+    # Allow short-sha lookups (unambiguous prefix match).
+    matches = [e for e in index["versions"] if e["sha"].startswith(sha)]
+    if len(matches) == 1:
+        return matches[0]
+    if len(matches) > 1:
+        die(f"Ambiguous sha prefix '{sha}' matches {len(matches)} versions.")
     return None
 
 
-def read_current_from_manifest() -> int:
-    """Return manifest.json's `current` value, or 0 if the file is absent."""
-    data = read_manifest()
-    if data is not None:
-        return int(data.get("current", 0))
-    return 0
+def current_entry(index: dict) -> dict | None:
+    """Return the version entry referenced by index['current'], or None."""
+    cur = index.get("current")
+    if not cur:
+        return None
+    return find_version(index, cur)
 
 
-def write_manifest(data: dict) -> None:
-    """Write manifest.json with 2-space indent and a trailing newline."""
-    Path("manifest.json").write_text(json.dumps(data, indent=2) + "\n")
+def build_dir(sha: str) -> Path:
+    """Return the Path to a build's immutable snapshot dir (c/<sha>/)."""
+    return Path(BUILDS_DIR) / sha
 
 
-def _max_v_subdir() -> int:
-    """Return the highest numeric subdir name under v/, or 0 if none exist."""
-    v_dir = Path("v")
-    if not v_dir.is_dir():
-        return 0
-    nums = [int(d.name) for d in v_dir.iterdir() if d.is_dir() and d.name.isdigit()]
-    return max(nums) if nums else 0
+def replace_root_with(sha: str) -> None:
+    """Clean-replace the root prod files with a copy of c/<sha>/."""
+    snapshot = build_dir(sha)
+    if not snapshot.is_dir():
+        die(f"{snapshot}/ does not exist — cannot copy into root.")
+    print(f"Replacing root prod files with {snapshot}/ ...")
+    delete_root_prod_files()
+    copy_contents_into(snapshot, Path("."))
 
 
-def filter_history_to_existing(history: list[dict]) -> list[dict]:
-    """Remove history entries whose v/<n>/ directory no longer exists."""
-    return [e for e in history if (Path("v") / str(e["n"])).is_dir()]
+def prune_to_invariant(index: dict) -> None:
+    """Delete every non-promoted version with seq < current.seq.
+
+    Removes both the versions.json entry and the c/<sha>/ directory.
+    Re-establishes keep(V) == V.promoted or V.seq > current.seq.
+    """
+    cur = current_entry(index)
+    if cur is None:
+        return
+    cur_seq = cur["seq"]
+    kept = []
+    for entry in index["versions"]:
+        if entry["promoted"] or entry["seq"] > cur_seq:
+            kept.append(entry)
+        else:
+            snapshot = build_dir(entry["sha"])
+            if snapshot.is_dir():
+                print(f"Pruning candidate {BUILDS_DIR}/{entry['sha']} (seq {entry['seq']})")
+                shutil.rmtree(snapshot)
+    index["versions"] = kept
 
 
 # ---------------------------------------------------------------------------
-# Subcommand: promote
+# Subcommand: push
 # ---------------------------------------------------------------------------
 
 
-def cmd_promote(artifact_dir: str, build_string: str, sha: str,
-                target_release: str, actor: str) -> None:
-    """Promote an artifact to production with versioned snapshot and rollback support."""
+def cmd_push(artifact_dir: str, sha: str, seq: int, build_string: str,
+             target_release: str) -> None:
+    """Publish a master build as a candidate at c/<sha>/. Never touches root."""
     artifact = Path(artifact_dir)
     if not artifact.is_dir():
         die(f"Artifact dir not found: {artifact_dir}")
+    if not _FULL_SHA_RE.match(sha):
+        die(f"push requires a full 40-char commit sha, got '{sha}'.")
 
-    # Guard: die if artifact's top-level entries (including dotfiles) contain a reserved name.
-    print("Checking artifact for reserved top-level names...")
-    for child in artifact.iterdir():
-        if child.name in RESERVED_NAMES:
-            die(f"Artifact contains reserved top-level name '{child.name}' — cannot promote.")
+    index = read_index()
+    snapshot = build_dir(sha)
+    existing = find_version(index, sha)
 
-    # Read full manifest (may be None on first run).
-    existing_manifest = read_manifest()
-    is_first_run = existing_manifest is None
+    if existing is not None and snapshot.is_dir():
+        # Idempotent: a CI re-run of the same commit. Leave files and entry
+        # untouched (the snapshot is immutable).
+        print(f"Build {sha} already pushed (idempotent no-op).")
+        ensure_static_files()
+        write_index(index)
+        return
 
-    if is_first_run:
-        current_n = 0
-        prev_n = 0
-        prior_history: list[dict] = []
-        print("First run detected: manifest.json absent.")
-        print("Seeding prev/ from current root prod files (first-run bootstrap)...")
-        existing_root = root_prod_entries()
-        if existing_root:
-            if Path("prev").exists():
-                shutil.rmtree("prev")
-            Path("prev").mkdir()
-            for name in existing_root:
-                src = Path(name)
-                dest = Path("prev") / name
-                if src.is_symlink():
-                    os.symlink(os.readlink(src), dest)
-                elif src.is_dir():
-                    shutil.copytree(src, dest, symlinks=True, copy_function=shutil.copy2)
-                else:
-                    shutil.copy2(src, dest)
-            print(f"Seeded prev/ with {len(existing_root)} root item(s).")
-        else:
-            print("Root has no prod files yet; prev/ will be empty on first promotion.")
-            Path("prev").mkdir(exist_ok=True)
-    else:
-        current_n = int(existing_manifest.get("current", 0))
-        prev_n = int(existing_manifest.get("prev", 0))
+    print(f"Pushing candidate {sha} (seq {seq}) to {snapshot}/ ...")
+    if snapshot.is_dir():
+        # Directory present but no index entry (partial state) — rewrite it.
+        shutil.rmtree(snapshot)
+    snapshot.mkdir(parents=True, exist_ok=True)
+    copy_contents_into(artifact, snapshot)
 
-        # Build prior history: use existing list, or backfill from top-level manifest fields.
-        if "history" in existing_manifest and isinstance(existing_manifest["history"], list):
-            prior_history = existing_manifest["history"]
-        elif current_n >= 1:
-            # History-less manifest: synthesize a single backfill entry.
-            backfill: dict = {
-                "n": current_n,
-                "build": existing_manifest.get("build", ""),
-                "sha": existing_manifest.get("sha", ""),
-                "targetRelease": existing_manifest.get("targetRelease", ""),
-                "promotedAt": existing_manifest.get("promotedAt", ""),
-                "promotedBy": existing_manifest.get("promotedBy", ""),
-            }
-            prior_history = [backfill]
-        else:
-            prior_history = []
-
-    # Monotonic version number: strictly greater than any number ever used.
-    max_history_n = max((e["n"] for e in prior_history), default=0)
-    new_n = max(current_n, prev_n, max_history_n, _max_v_subdir()) + 1
-
-    # Defensive guard: the target snapshot must not already exist.
-    target_snapshot = Path("v") / str(new_n)
-    if target_snapshot.exists():
-        die(f"v/{new_n}/ already exists — aborting to protect immutable snapshot.")
-
-    print(f"Promoting: current={current_n} -> new_n={new_n}, build={build_string}, sha={sha}")
-
-    if not is_first_run:
-        # Archive current root prod files into prev/.
-        print("Archiving current root into prev/...")
-        root_files = root_prod_entries()
-        if Path("prev").exists():
-            shutil.rmtree("prev")
-        Path("prev").mkdir()
-        for name in root_files:
-            src = Path(name)
-            dest = Path("prev") / name
-            if src.is_symlink():
-                os.symlink(os.readlink(src), dest)
-            elif src.is_dir():
-                shutil.copytree(src, dest, symlinks=True, copy_function=shutil.copy2)
-            else:
-                shutil.copy2(src, dest)
-        print("prev/ updated.")
-
-    # Copy artifact into v/<new_n>/ (immutable snapshot).
-    print(f"Creating immutable snapshot at v/{new_n}/...")
-    target_snapshot.mkdir(parents=True, exist_ok=True)
-    copy_contents_into(artifact, target_snapshot)
-
-    # Replace root production files with artifact contents.
-    print("Replacing root prod files...")
-    delete_root_prod_files()
-    copy_contents_into(artifact, Path("."))
-
-    # Prune old snapshots BEFORE writing the manifest.
-    prune_versions()
-
-    # Build new history entry and filter to dirs that still exist after pruning.
-    promoted_at = utc_now()
-    new_entry: dict = {
-        "n": new_n,
-        "build": build_string,
+    new_entry = {
         "sha": sha,
-        "targetRelease": target_release,
-        "promotedAt": promoted_at,
-        "promotedBy": actor,
-    }
-    combined = [new_entry] + [e for e in prior_history if e["n"] != new_n]
-    history = filter_history_to_existing(combined)
-
-    # Write manifest.json LAST (snapshot + prune already done).
-    manifest = {
-        "current": new_n,
-        "prev": current_n,
-        "sha": sha,
+        "shortsha": sha[:7],
+        "seq": int(seq),
         "build": build_string,
         "targetRelease": target_release,
-        "promotedAt": promoted_at,
-        "promotedBy": actor,
-        "history": history,
+        "pushedAt": utc_now(),
+        "promoted": False,
     }
-    write_manifest(manifest)
-    print("manifest.json written.")
+    # Upsert (replace any stale entry for this sha).
+    index["versions"] = [e for e in index["versions"] if e["sha"] != sha]
+    index["versions"].append(new_entry)
 
+    write_index(index)
     ensure_static_files()
+    print(f"Push complete: {BUILDS_DIR}/{sha}/ (candidate, seq {seq})")
 
-    print(f"Promote complete: v{new_n} @ {sha} by {actor}")
+
+# ---------------------------------------------------------------------------
+# Subcommand: promote (NEVER builds)
+# ---------------------------------------------------------------------------
+
+
+def cmd_promote(sha: str, actor: str) -> None:
+    """Promote an already-pushed candidate to production. Never builds."""
+    index = read_index()
+    entry = find_version(index, sha)
+    if entry is None:
+        die(f"Refusing to promote '{sha}': no such version in {INDEX_FILE} "
+            f"(promotion never builds — the commit must be pushed first).")
+    full_sha = entry["sha"]
+    if not build_dir(full_sha).is_dir():
+        die(f"Refusing to promote '{full_sha}': {BUILDS_DIR}/{full_sha}/ "
+            f"is missing (promotion never builds).")
+
+    cur = current_entry(index)
+    if cur is not None and full_sha == cur["sha"]:
+        print(f"{full_sha} is already current — refreshing root and metadata.")
+
+    print(f"Promoting {full_sha} (seq {entry['seq']}) by {actor} ...")
+
+    # 1. Mark promoted (idempotent — keep original promotion audit if re-promoting).
+    entry["promoted"] = True
+    entry.setdefault("promotedAt", utc_now())
+    entry.setdefault("promotedBy", actor)
+
+    # 2. Point current at it and copy into root (clean replace, no build).
+    index["current"] = full_sha
+    replace_root_with(full_sha)
+
+    # 3. Prune non-promoted candidates now in the past.
+    prune_to_invariant(index)
+
+    write_index(index)
+    ensure_static_files()
+    print(f"Promote complete: current={full_sha} (seq {entry['seq']}) by {actor}")
 
 
 # ---------------------------------------------------------------------------
@@ -307,141 +292,183 @@ def cmd_promote(artifact_dir: str, build_string: str, sha: str,
 
 
 def cmd_rollback(actor: str) -> None:
-    """Swap root and prev/ to revert to the last known good build."""
-    if not Path("manifest.json").is_file():
-        die("manifest.json not found — nothing to roll back to.")
-    if not Path("prev").is_dir():
-        die("prev/ directory not found — no previous build to roll back to.")
+    """Revert to the newest promoted version older than the current one."""
+    index = read_index()
+    cur = current_entry(index)
+    if cur is None:
+        die("No current version — nothing to roll back from.")
 
-    # Verify prev/ is non-empty before any destructive operation.
-    prev_contents = list(Path("prev").iterdir())
-    if not prev_contents:
-        die("prev/ is empty — cannot roll back.")
+    older_promoted = [
+        e for e in index["versions"]
+        if e["promoted"] and e["seq"] < cur["seq"]
+    ]
+    if not older_promoted:
+        die("No older promoted version to roll back to.")
 
-    manifest = json.loads(Path("manifest.json").read_text())
-    current_n = int(manifest["current"])
-    prev_n = int(manifest.get("prev", 0))
+    target = max(older_promoted, key=lambda e: e["seq"])
+    if not build_dir(target["sha"]).is_dir():
+        die(f"Rollback target {BUILDS_DIR}/{target['sha']}/ is missing.")
 
-    print(f"Rolling back: swapping root (v{current_n}) <-> prev (v{prev_n}), actor={actor}")
+    print(f"Rolling back: current {cur['sha']} (seq {cur['seq']}) "
+          f"-> {target['sha']} (seq {target['seq']}) by {actor}")
 
-    # STEP 1: Collect current root prod files BEFORE creating any staging dir.
-    root_files = root_prod_entries()
+    index["current"] = target["sha"]
+    replace_root_with(target["sha"])
+    # Lowering current only GROWS the kept set, so the invariant still holds:
+    # no pruning needed. The candidates between target and the former current
+    # become "future" again and are preserved.
 
-    # STEP 2: Stage root prod files in a temporary directory.
-    swap_dir = Path(".rollback-swap")
-    if swap_dir.exists():
-        shutil.rmtree(swap_dir)
-    swap_dir.mkdir()
-    for name in root_files:
-        shutil.move(name, swap_dir / name)
-
-    # STEP 3: Move prev/ contents into root.
-    print("Moving prev/ into root...")
-    for child in list(Path("prev").iterdir()):
-        shutil.move(str(child), child.name)
-
-    # STEP 4: Move former root (from swap_dir) into prev/, replacing it.
-    print("Moving former root into prev/...")
-    shutil.rmtree("prev")
-    Path("prev").mkdir()
-    for child in list(swap_dir.iterdir()):
-        shutil.move(str(child), Path("prev") / child.name)
-    shutil.rmtree(swap_dir)
-
-    # STEP 5: Update manifest — swap current <-> prev.
-    manifest["current"] = prev_n
-    manifest["prev"] = current_n
-    manifest["promotedAt"] = utc_now()
-    manifest["promotedBy"] = actor
-    manifest["rolledBackFrom"] = current_n
-    manifest["note"] = "rollback"
-    write_manifest(manifest)
-    print(f"manifest.json updated (swap: current=v{prev_n}, prev=v{current_n}).")
-
+    write_index(index)
     ensure_static_files()
-
-    print(f"Rollback complete: root ↔ prev swap (v{current_n} ↔ v{prev_n}) by {actor}")
-
-
-def prune_candidates(candidates_data: dict) -> dict:
-    """Remove candidate entries older than retentionDays and their directories."""
-    retention = candidates_data.get("retentionDays", DEFAULT_RETENTION_DAYS)
-    cutoff = (datetime.now(timezone.utc) - timedelta(days=retention)).strftime("%Y-%m-%d")
-
-    kept = []
-    removed_dates: set[str] = set()
-    for entry in candidates_data["candidates"]:
-        if entry["date"] < cutoff:
-            candidate_dir = Path(entry["date"]) / f"{entry['n']}-{entry['shortsha']}"
-            if candidate_dir.exists():
-                shutil.rmtree(candidate_dir)
-            removed_dates.add(entry["date"])
-        else:
-            kept.append(entry)
-
-    candidates_data["candidates"] = kept
-
-    for date_str in removed_dates:
-        date_path = Path(date_str)
-        if date_path.is_dir() and not any(date_path.iterdir()):
-            date_path.rmdir()
-
-    return candidates_data
+    print(f"Rollback complete: current={target['sha']} (seq {target['seq']}) by {actor}")
 
 
 # ---------------------------------------------------------------------------
-# Subcommand: candidate
+# Subcommand: migrate (one-shot legacy -> unified)
 # ---------------------------------------------------------------------------
 
 
-def cmd_candidate(artifact_dir: str, sha: str, build_string: str,
-                  target_release: str) -> None:
-    """Deploy a candidate build to /<date>/<n>-<shortsha>/ and update candidates.json."""
-    artifact = Path(artifact_dir)
-    if not artifact.is_dir():
-        die(f"Artifact dir not found: {artifact_dir}")
+def _seq_for(sha: str, repo: str | None) -> int:
+    """Compute seq = git rev-list --count <sha> from a local edumips64 clone."""
+    import subprocess
+    if not repo:
+        die("migrate requires --repo <path-to-edumips64-clone> to compute seq.")
+    try:
+        out = subprocess.check_output(
+            ["git", "-C", repo, "rev-list", "--count", sha],
+            text=True, stderr=subprocess.STDOUT,
+        )
+    except subprocess.CalledProcessError as exc:
+        die(f"git rev-list failed for {sha}: {exc.output}")
+    return int(out.strip())
 
-    date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    shortsha = sha[:7]
 
-    candidates_file = Path("candidates.json")
-    if candidates_file.is_file():
-        candidates_data = json.loads(candidates_file.read_text())
-    else:
-        candidates_data = {"candidates": [], "retentionDays": DEFAULT_RETENTION_DAYS}
+def _redirect_stub(target_url: str) -> str:
+    """Return a minimal HTML redirect page forwarding to target_url."""
+    return (
+        "<!doctype html><html><head><meta charset=\"utf-8\">"
+        f"<meta http-equiv=\"refresh\" content=\"0; url={target_url}\">"
+        f"<link rel=\"canonical\" href=\"{target_url}\">"
+        f"<title>Moved</title></head><body>"
+        f"<p>This build has moved to <a href=\"{target_url}\">{target_url}</a>.</p>"
+        "</body></html>\n"
+    )
 
-    today_ns = [e["n"] for e in candidates_data["candidates"] if e["date"] == date]
-    new_n = max(today_ns) + 1 if today_ns else 1
 
-    candidate_dir = Path(date) / f"{new_n}-{shortsha}"
-    print(f"Creating candidate at {candidate_dir}...")
-    candidate_dir.mkdir(parents=True, exist_ok=True)
-    copy_contents_into(artifact, candidate_dir)
+def cmd_migrate(repo: str | None, dry_run: bool) -> None:
+    """Convert legacy manifest.json + candidates.json to versions.json + c/<sha>/."""
+    manifest_path = Path("manifest.json")
+    candidates_path = Path("candidates.json")
+    if not manifest_path.is_file() and not candidates_path.is_file():
+        die("Neither manifest.json nor candidates.json found — nothing to migrate.")
 
-    new_entry: dict = {
-        "date": date,
-        "n": new_n,
-        "sha": sha,
-        "shortsha": shortsha,
-        "path": f"/{date}/{new_n}-{shortsha}/",
-        "build": build_string,
-        "targetRelease": target_release,
-        "deployedAt": utc_now(),
+    versions: dict[str, dict] = {}  # sha -> entry
+    moves: list[tuple[Path, str]] = []  # (old_dir, sha)
+    redirect_stubs: list[tuple[Path, str]] = []  # (old_v_dir, sha)
+
+    current_sha = None
+
+    # --- promoted versions from manifest.json ---
+    if manifest_path.is_file():
+        manifest = json.loads(manifest_path.read_text())
+        current_n = int(manifest.get("current", 0))
+        for e in manifest.get("history", []):
+            sha = e.get("sha", "")
+            if not _FULL_SHA_RE.match(sha):
+                print(f"WARNING: skipping manifest entry n={e.get('n')} "
+                      f"with non-full sha '{sha}'")
+                continue
+            seq = _seq_for(sha, repo)
+            entry = {
+                "sha": sha,
+                "shortsha": sha[:7],
+                "seq": seq,
+                "build": e.get("build", ""),
+                "targetRelease": e.get("targetRelease", ""),
+                "pushedAt": e.get("promotedAt", ""),
+                "promoted": True,
+                "promotedAt": e.get("promotedAt", ""),
+                "promotedBy": e.get("promotedBy", ""),
+            }
+            versions[sha] = entry
+            old_dir = Path("v") / str(e["n"])
+            if old_dir.is_dir():
+                moves.append((old_dir, sha))
+                redirect_stubs.append((old_dir, sha))
+            if int(e.get("n", -1)) == current_n:
+                current_sha = sha
+
+    # --- candidate versions from candidates.json ---
+    if candidates_path.is_file():
+        candidates = json.loads(candidates_path.read_text())
+        for e in candidates.get("candidates", []):
+            sha = e.get("sha", "")
+            if not _FULL_SHA_RE.match(sha):
+                print(f"WARNING: skipping candidate {e.get('path')} "
+                      f"with non-full sha '{sha}'")
+                continue
+            if sha in versions:
+                continue  # already promoted; promoted entry wins
+            seq = _seq_for(sha, repo)
+            versions[sha] = {
+                "sha": sha,
+                "shortsha": sha[:7],
+                "seq": seq,
+                "build": e.get("build", ""),
+                "targetRelease": e.get("targetRelease", ""),
+                "pushedAt": e.get("deployedAt", ""),
+                "promoted": False,
+            }
+            old_dir = Path(e["date"]) / f"{e['n']}-{e['shortsha']}"
+            if old_dir.is_dir():
+                moves.append((old_dir, sha))
+
+    index = {
+        "current": current_sha,
+        "versions": sorted(versions.values(), key=lambda x: x["seq"], reverse=True),
     }
-    candidates_data["candidates"] = [new_entry] + candidates_data["candidates"]
-    candidates_data["candidates"].sort(key=lambda e: (e["date"], e["n"]), reverse=True)
 
-    candidates_data = prune_candidates(candidates_data)
-    candidates_file.write_text(json.dumps(candidates_data, indent=2) + "\n")
-    print("candidates.json written.")
+    print(f"Migration plan: {len(index['versions'])} versions, "
+          f"current={current_sha}, {len(moves)} dir moves, "
+          f"{len(redirect_stubs)} redirect stubs.")
+    if dry_run:
+        print("--- DRY RUN: versions.json that WOULD be written ---")
+        print(json.dumps(index, indent=2))
+        print("--- moves ---")
+        for old, sha in moves:
+            print(f"  {old}  ->  {BUILDS_DIR}/{sha}/")
+        return
 
+    # Move directories into c/<sha>/.
+    Path(BUILDS_DIR).mkdir(exist_ok=True)
+    for old, sha in moves:
+        dest = build_dir(sha)
+        if dest.exists():
+            shutil.rmtree(old)
+            continue
+        shutil.move(str(old), str(dest))
+
+    # Replace promoted /v/<n>/ dirs with redirect stubs (one cycle).
+    Path("v").mkdir(exist_ok=True)
+    for old_v_dir, sha in redirect_stubs:
+        old_v_dir.mkdir(parents=True, exist_ok=True)
+        (old_v_dir / "index.html").write_text(
+            _redirect_stub(f"/{BUILDS_DIR}/{sha}/"))
+
+    # Remove legacy index files and prev/ (root copy already equals current).
+    for legacy in ("manifest.json", "candidates.json"):
+        if Path(legacy).is_file():
+            Path(legacy).unlink()
+    if Path("prev").is_dir():
+        shutil.rmtree("prev")
+    # Remove stale candidate date dirs that no longer have an index entry.
+    for entry in Path(".").iterdir():
+        if re.match(r"^\d{4}-\d{2}-\d{2}$", entry.name) and entry.is_dir():
+            shutil.rmtree(entry)
+
+    write_index(index)
     ensure_static_files()
-
-    if Path("nightly").is_dir():
-        shutil.rmtree("nightly")
-        print("Removed legacy /nightly/ directory.")
-
-    print(f"Candidate deploy complete: {candidate_dir} @ {sha}")
+    print(f"Migration complete: {INDEX_FILE} written with {len(index['versions'])} versions.")
 
 
 # ---------------------------------------------------------------------------
@@ -450,11 +477,7 @@ def cmd_candidate(artifact_dir: str, sha: str, build_string: str,
 
 
 class _ArgumentParser(argparse.ArgumentParser):
-    """ArgumentParser that exits with status 1 on usage errors.
-
-    Mirrors the bash script's `die` contract (any error exits 1) instead of
-    argparse's default exit status 2.
-    """
+    """ArgumentParser that exits with status 1 on usage errors."""
 
     def error(self, message: str):
         self.print_usage(sys.stderr)
@@ -465,25 +488,27 @@ class _ArgumentParser(argparse.ArgumentParser):
 def build_parser() -> argparse.ArgumentParser:
     parser = _ArgumentParser(
         prog="deploy-web-pages.py",
-        description="Pages-repo layout manager for web.edumips.org",
+        description="Unified commit-addressed layout manager for web.edumips.org",
     )
     sub = parser.add_subparsers(dest="subcmd")
 
-    p_promote = sub.add_parser("promote", help="Promote a web artifact to production")
-    p_promote.add_argument("artifact_dir")
-    p_promote.add_argument("build_string")
+    p_push = sub.add_parser("push", help="Publish a master build as a candidate")
+    p_push.add_argument("artifact_dir")
+    p_push.add_argument("sha")
+    p_push.add_argument("seq", type=int)
+    p_push.add_argument("build_string")
+    p_push.add_argument("target_release")
+
+    p_promote = sub.add_parser("promote", help="Promote an already-pushed candidate")
     p_promote.add_argument("sha")
-    p_promote.add_argument("target_release")
     p_promote.add_argument("actor")
 
-    p_rollback = sub.add_parser("rollback", help="Roll back to the previous production build")
+    p_rollback = sub.add_parser("rollback", help="Roll back to previous promoted build")
     p_rollback.add_argument("actor")
 
-    p_candidate = sub.add_parser("candidate", help="Deploy artifact as a candidate build")
-    p_candidate.add_argument("artifact_dir")
-    p_candidate.add_argument("sha")
-    p_candidate.add_argument("build_string")
-    p_candidate.add_argument("target_release")
+    p_migrate = sub.add_parser("migrate", help="One-shot legacy -> unified migration")
+    p_migrate.add_argument("--repo", help="Path to an edumips64 clone (for seq computation)")
+    p_migrate.add_argument("--dry-run", action="store_true")
 
     return parser
 
@@ -496,13 +521,15 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    if args.subcmd == "promote":
-        cmd_promote(args.artifact_dir, args.build_string, args.sha,
-                    args.target_release, args.actor)
+    if args.subcmd == "push":
+        cmd_push(args.artifact_dir, args.sha, args.seq, args.build_string,
+                 args.target_release)
+    elif args.subcmd == "promote":
+        cmd_promote(args.sha, args.actor)
     elif args.subcmd == "rollback":
         cmd_rollback(args.actor)
-    elif args.subcmd == "candidate":
-        cmd_candidate(args.artifact_dir, args.sha, args.build_string, args.target_release)
+    elif args.subcmd == "migrate":
+        cmd_migrate(args.repo, args.dry_run)
     else:
         parser.print_usage()
         sys.exit(1)

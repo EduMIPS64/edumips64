@@ -61,12 +61,12 @@ There are five main CI/CD workflows:
 - **PR preview deploy** (`pr-reports.yml`) — triggered when a CI Build run
   completes. It runs from the base branch (never checking out pull request
   code) and deploys the pre-built web application to the staging environment.
-- **Candidate web deploy** (`candidate-web.yml`) — triggered when a CI Build run
-  completes successfully on `master`. Deploys the build as a candidate build to
-  `web.edumips.org` at a per-commit URL path `/<YYYY-MM-DD>/<N>-<shortsha>/`.
-  Users can browse and share candidates from the web UI's **About** tab. The
-  `/candidates.json` index maintains a 14-day retention policy. See
-  [Candidate builds](#candidate-builds) section below for details.
+- **Push web build** (`push-web.yml`) — triggered when a CI Build run completes
+  successfully on `master`. Publishes the build as a per-commit candidate to
+  `web.edumips.org` at `/c/<full-sha>/` and indexes it in `versions.json`. It
+  never touches the production root. Users can browse and share these builds
+  from the web UI's **About** tab. See the
+  [Unified web versioning](#unified-web-versioning) section below for details.
 - **Release** (`release.yml`) — runs on every push to `master` to build all
   release artifacts (JAR, MSI, Electron apps). The `deploy-prod` job is
   disabled (`if: false`); production web deploys are now gated (see below).
@@ -444,128 +444,94 @@ The Gradle provider is defined in `build.gradle.kts` (the `gitDescribe` val).
 All CI checkouts must use `fetch-depth: 0` so the full tag history is
 available for `git describe` to produce meaningful output.
 
-### Web production promotion
+### Unified web versioning
 
 Production (`web.edumips.org`) is **not auto-deployed**. The `deploy-prod` job
-in `release.yml` is disabled (`if: false`). Promotion is manual and gated.
+in `release.yml` is disabled (`if: false`). Every master build is *pushed* as a
+per-commit candidate; the maintainer later *promotes* one to production. The
+full design and rationale live in
+[`docs/design/unified-web-versioning.md`](design/unified-web-versioning.md).
 
-#### Promoting a build to production
+#### Model
 
-**`promote-web.yml` serves two modes:**
-
-**Mode 1: Build and promote current master (one-click ship)**
-1. Open **Actions → Promote Web to Production** (`promote-web.yml`).
-2. Click **Run workflow**. Leave the **CI run ID** field **empty**.
-3. The workflow builds and tests the current `master` (via reusable `build-web.yml`, 
-   no secrets), then deploys the artifact to production.
-4. The Pages repo (`EduMIPS64/web.edumips.org`) receives the update with the following layout:
-
-   ```
-   web.edumips.org/
-   ├── index.html + [all files]   ← current promoted version (root)
-   ├── prev/                      ← previous promoted version
-   ├── v/
-   │   ├── 1/  2/  3/ …          ← immutable snapshots (up to 50 kept)
-   └── manifest.json              ← {current, prev, sha, build, promotedAt, …}
-   ```
-
-**Mode 2: Promote a specific past CI run (rollback / re-promote)**
-1. Open **Actions → Promote Web to Production** (`promote-web.yml`).
-2. Click **Run workflow** and enter the **CI run ID** whose `web` artifact to ship.
-   (Find the run ID in the URL of any successful CI run on `master`.)
-3. The workflow validates the run (must be a successful `ci.yml` run on `master`
-   with a `web` artifact), then deploys it to production using the same layout as Mode 1.
-   This mode is useful for: rolling back to a previous good build (find its run ID and
-   re-promote), re-promoting the current production version by id, or auditing which
-   runs have shipped.
-
-**Details:**
-- Only `lupino3` (Andrea) can trigger `promote-web.yml` (actor check enforced in
-  the workflow, in addition to the collaborator gate on `workflow_dispatch`).
-- Must be dispatched from the `master` branch in both modes.
-- The Pages-layout logic lives in `.github/scripts/deploy-web-pages.py`.
-
-#### Manifest and version history
-
-The **`manifest.json`** file on the Pages repo root carries metadata about all
-promoted web versions:
+Every retained web build is identified by its commit SHA and lives at
+`/c/<full-sha>/`. A single root `versions.json` indexes them all:
 
 ```json
 {
-  "current": 44,
-  "prev": 43,
-  "sha": "abc1234",
-  "build": "1.4.0-2-gabc1234",
-  "targetRelease": "1.4.1",
-  "promotedAt": "2026-06-07T18:49:37Z",
-  "promotedBy": "lupino3",
-  "history": [
-    { "n": 44, "build": "1.4.0-2-gabc1234", "sha": "abc1234", "targetRelease": "1.4.1", "promotedAt": "2026-06-07T18:49:37Z", "promotedBy": "lupino3" },
-    { "n": 43, "build": "1.4.0-1-gabc1233", "sha": "abc1233", "targetRelease": "1.4.1", "promotedAt": "2026-06-06T10:15:22Z", "promotedBy": "lupino3" }
+  "current": "a08b8d56ebc959216ea1d576dc465fab0a5cfc22",
+  "versions": [
+    { "sha": "a08b8d5…", "shortsha": "a08b8d5", "seq": 1185,
+      "build": "1.4.0-116-ga08b8d56", "targetRelease": "1.4.1",
+      "pushedAt": "2026-06-14T06:00:00Z", "promoted": true,
+      "promotedAt": "2026-06-14T06:49:01Z", "promotedBy": "lupino3" },
+    { "sha": "99b56ff…", "shortsha": "99b56ff", "seq": 1184,
+      "build": "1.4.0-114-g99b56ff4", "targetRelease": "1.4.1",
+      "pushedAt": "2026-06-13T22:00:00Z", "promoted": false }
   ]
 }
 ```
 
-The **`history`** array lists all retained versions (newest-first), with each entry
-containing the promotion number `n`, build identity string, git SHA, target release
-label, timestamp, and promoting actor. The array is backfilled with the live
-version on the first promotion after this feature is added, then grows with each
-subsequent promotion. Entries are pruned in lockstep with the `/v/<N>/` snapshots
-(MAX_VERSIONS=50 retained).
+`seq = git rev-list --count <sha>` (the commit number; monotonic on linear
+master, robust to out-of-order CI). The retention rule is a single invariant:
 
-**In-app version navigator:** The web UI's About tab fetches `/manifest.json` with
-`cache:'no-cache'` (absolute path, not relative). If the fetch succeeds and the
-manifest is valid, **and** the build is not a PR preview (detected by absence of
-`window.GIT_DESCRIBE.match(/^PR #/)`), the About tab renders a "Previous Versions"
-list linking to each archived version at `/v/<N>/` (opens in a new tab). The
-current version is marked. When viewing an archived snapshot at `/v/<N>/`, the
-About tab displays a "Return to latest" link instead.
+> keep a build **V** iff `V.promoted == true` **OR** `V.seq > current.seq`
 
-This gating ensures the navigator only appears for stable and candidate builds, not
-temporary PR previews.
+i.e. keep every promoted version, plus every candidate newer than the live one.
+Pages layout:
 
-#### Monotonic version numbering
+```
+web.edumips.org/
+├── index.html + [all files]   ← physical copy of the current promoted build (root)
+├── c/<full-sha>/ …            ← every retained build (candidate or promoted)
+└── versions.json              ← the single index
+```
 
-Promotion numbers are **monotonically increasing** — the next version is always
-`max(ever used) + 1`, never re-used. This fixes a latent bug where a promote
-after a rollback could re-use and mutate an existing immutable snapshot. The
-`deploy-web-pages.py` script maintains a `next_version` counter to enforce this
-invariant.
+`c/`, `versions.json`, `CNAME`, `.nojekyll` are reserved root names. The
+Pages-layout logic lives in `.github/scripts/deploy-web-pages.py` and is unit
+tested in `test_deploy_web_pages.py` (`cd .github/scripts && python -m pytest`).
 
-If the current production version is broken, open **Actions → Rollback Web
-Production** (`rollback-web.yml`) and click **Run workflow** (no inputs needed).
-This promotes `prev/` back to root and updates `manifest.json`. Gated to
-`lupino3` only.
+#### Operations
 
-Alternatively, use Mode 2 of `promote-web.yml` to re-promote a previous good build by its run ID.
+- **push** (`push-web.yml`) — runs on every successful master CI build. Copies
+  the artifact to `/c/<sha>/`, adds a `promoted: false` entry, and **never
+  touches the root or prunes**. Idempotent on CI re-runs. Computes `seq` and the
+  build string from a full-history checkout (`fetch-depth: 0`).
+- **promote** (`promote-web.yml`) — manual, gated to `lupino3` on `master`.
+  Input `sha` is a full or short SHA of an **already-pushed** candidate; leave
+  it empty to promote the **newest** candidate. The workflow verifies
+  `/c/<sha>/` exists, marks it promoted, sets `current`, copies the snapshot
+  into the root (clean replace), and prunes the non-promoted candidates older
+  than the new current (those "between" the previous live build and the
+  promoted one). **Promotion never builds** — there is no build job and no
+  artifact download; the bytes come from the candidate that was already pushed.
+- **rollback** (`rollback-web.yml`) — manual, gated. Sets `current` to the
+  newest promoted version older than the current one and copies its `/c/<sha>/`
+  into the root. No pruning (lowering `current` only grows the kept set, so the
+  invariant is preserved). Re-promoting an older promoted SHA is equivalent.
 
-#### Candidate builds
+All three Pages-writing jobs share the `web-pages-deploy` concurrency lock so
+deploys serialize.
 
-Every commit to `master` that passes CI is automatically deployed as a **candidate
-build** at a per-commit URL following the pattern `/<YYYY-MM-DD>/<N>-<shortsha>/`,
-where `<N>` is a 1-based per-day counter and `<shortsha>` is the 7-character commit
-SHA. Multiple commits on the same day receive incrementing numbers.
+#### In-app version navigator
 
-The `candidate-web.yml` workflow handles candidate deploys, triggered when a CI
-run completes successfully on `master`. The `.github/scripts/deploy-web-pages.py`
-script gains a `candidate` subcommand that:
+The web UI's About tab fetches `/versions.json` (`cache:'no-cache'`, absolute
+path) once and renders two lists — **Promoted versions** (prominent, the live
+one marked **current**) and **Candidate builds** (all pending candidates). Each
+entry links to `/c/<sha>/` (opens in a new tab). Builds served from `/c/<sha>/`
+show an **ARCHIVED** badge in the header; the navigator is hidden on PR
+previews. See `src/webapp/versionHistory.js` and `buildInfo.js`.
 
-- Computes the UTC date and per-day counter `N`.
-- Creates the candidate directory structure.
-- Updates a root-level `/candidates.json` index file listing all candidates sorted
-  newest-first (same format as `/manifest.json`, but with date-based entries and
-  retention metadata).
-- Automatically prunes candidates older than 14 days (configured in the JSON file).
-- Removes any legacy `/nightly/` directory on first run (one-time migration).
+#### Migration from the legacy layout
 
-The `/candidates.json` index file is excluded from promotion and rollback operations,
-which ensures candidate builds remain immutable and independent of production
-version management.
+The previous model used `manifest.json` + `candidates.json`, `/v/<n>/`, date
+dirs, and `/prev/`. A one-shot `deploy-web-pages.py migrate [--repo PATH]
+[--dry-run]` converts it: it computes `seq` for each SHA, moves the old
+directories to `/c/<sha>/`, synthesizes `versions.json`, leaves `/v/<n>/`
+redirect stubs (kept one release cycle), and deletes the legacy index files,
+`prev/`, and the date dirs. Run it once against a full clone of the Pages repo
+with `--dry-run` first.
 
-Users can browse and share specific candidate builds from the web UI's **About** tab,
-which fetches and displays the candidate list. This replaces the previous `/nightly/`
-ungated preview channel. Candidate builds show a **CANDIDATE** badge so users know
-they may be unstable.
 
 ### Manual release checklist
 
