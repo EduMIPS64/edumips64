@@ -80,6 +80,24 @@ directive or by the `.word64` directive.
 All the data types are interpreted as signed. This means that integer literals
 in the `.data` section must be between -2^(n-1) and 2^(n-1) - 1 (inclusive).
 
+Instead of a numeric literal, the value of an integer data directive (`.byte`,
+`.word16`, `.word32`, `.word` and `.word64`) can also be a label. In that case
+the assembler stores the memory address the label points to. The label may
+refer either to a location defined in the `.data` section or to an instruction
+in the `.code` section, and it can be defined before or after the directive
+that uses it (so jump tables that reference forward code labels work). The
+resolved address must fit in the directive's width, otherwise an error is
+reported; a 64-bit directive (`.word64`) can always hold an address. For
+example::
+
+    .data
+    buffer:   .space   8
+    buf_addr: .word64  buffer    ; stores the address of "buffer"
+    jump_tbl: .word64  routine   ; stores the address of a code label
+    .code
+    routine:  daddi r1, r0, 42
+              syscall 0
+
 There is a big difference between declaring a list of data elements using a
 single directive or by using multiple directives of the same type. EduMIPS64
 starts writing from the next 64-bit double word as soon as it finds a

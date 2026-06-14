@@ -84,6 +84,25 @@ I tipi di dato sono interpretati con segno. Questo significa che tutte le
 costanti intere nella sezione `.data` devono essere compresi tra -2^(n-1) e
 2^(n-1) - 1 (estremi inclusi).
 
+Invece di una costante numerica, il valore di una direttiva intera (`.byte`,
+`.word16`, `.word32`, `.word` e `.word64`) può essere anche una label. In tal
+caso l'assemblatore memorizza l'indirizzo di memoria a cui la label fa
+riferimento. La label può riferirsi sia a una posizione definita nella sezione
+`.data` sia a un'istruzione nella sezione `.code`, e può essere definita prima
+o dopo la direttiva che la utilizza (quindi le tabelle di salto che fanno
+riferimento a label di codice successive funzionano correttamente).
+L'indirizzo risolto deve entrare nell'ampiezza della direttiva, altrimenti
+viene segnalato un errore; una direttiva a 64 bit (`.word64`) può sempre
+contenere un indirizzo. Ad esempio::
+
+    .data
+    buffer:   .space   8
+    buf_addr: .word64  buffer    ; memorizza l'indirizzo di "buffer"
+    jump_tbl: .word64  routine   ; memorizza l'indirizzo di una label di codice
+    .code
+    routine:  daddi r1, r0, 42
+              syscall 0
+
 Esiste una differenza sostanziale tra la dichiarazione di una lista di dati
 utilizzando un'unica direttiva oppure direttive multiple dello stesso tipo.
 EduMIPS64 inizia la scrittura a partire dalla successiva double word a 64 bit
