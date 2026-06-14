@@ -67,6 +67,11 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' },
+        // Webpack 5 enforces fully-specified ESM resolution for .mjs files,
+        // which breaks extensionless imports like MUI's
+        // 'react-transition-group/TransitionGroupContext' (added in @mui v9.1).
+        // Relax the requirement for node_modules .mjs files.
+        { test: /\.mjs$/, include: /node_modules/, resolve: { fullySpecified: false } },
         { test: /\.css$/, use: ['style-loader', 'css-loader'] },
         { test: /\.ttf$/, use: ['file-loader'] },
         { test: /\.png$/, use: ['file-loader'] },
