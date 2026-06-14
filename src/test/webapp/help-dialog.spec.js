@@ -14,6 +14,16 @@ test('help dialog shows embedded documentation with navigation', async ({ page }
   // Wait for the help dialog to appear
   await page.waitForSelector('.help-title');
 
+  // The dialog must use most of the viewport height for readability (it is
+  // styled to 90vh via slotProps.paper). Guard against regressions such as the
+  // MUI v9 `PaperProps` removal, which collapsed the dialog to its content
+  // height (~2/5 of the viewport).
+  const paperHeightRatio = await page.evaluate(() => {
+    const paper = document.querySelector('.MuiDialog-paper');
+    return paper ? paper.getBoundingClientRect().height / window.innerHeight : 0;
+  });
+  expect(paperHeightRatio).toBeGreaterThan(0.8);
+
   // Verify the dialog title
   const title = await page.textContent('.help-title');
   expect(title).toContain('EduMIPS64');

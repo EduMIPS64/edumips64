@@ -582,17 +582,22 @@ export default function HelpDialog(props) {
       open={props.open}
       maxWidth="xl"
       fullWidth
-      PaperProps={{
-        sx: {
-          // On phones / small tablets give the dialog the whole screen
-          // (margins waste already-scarce space); on larger screens
-          // keep the previous "almost full height" appearance.
-          height: { xs: '100vh', sm: '90vh' },
-          m: { xs: 0, sm: 4 },
-          maxHeight: { xs: '100vh', sm: 'calc(100% - 64px)' },
-          width: { xs: '100vw', sm: 'auto' },
-          maxWidth: { xs: '100vw', sm: 'calc(100% - 64px)' },
-          borderRadius: { xs: 0, sm: 1 },
+      slotProps={{
+        // MUI v9 removed `PaperProps`; the Paper slot is now styled via
+        // `slotProps.paper`. Without this the dialog collapses to its content
+        // height (~2/5 of the viewport) instead of the intended tall layout.
+        paper: {
+          sx: {
+            // On phones / small tablets give the dialog the whole screen
+            // (margins waste already-scarce space); on larger screens
+            // keep the previous "almost full height" appearance.
+            height: { xs: '100vh', sm: '90vh' },
+            m: { xs: 0, sm: 4 },
+            maxHeight: { xs: '100vh', sm: 'calc(100% - 64px)' },
+            width: { xs: '100vw', sm: 'auto' },
+            maxWidth: { xs: '100vw', sm: 'calc(100% - 64px)' },
+            borderRadius: { xs: 0, sm: 1 },
+          },
         },
       }}
     >
