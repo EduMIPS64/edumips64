@@ -1,9 +1,21 @@
 # Design: Unified Web UI Versioning (commit-addressed builds)
 
-Status: **Proposed** (plan / RFC — supersedes the dual-index model in
-`web-promotion-and-versioning.md` once implemented).
+Status: **Accepted** — being implemented (supersedes the dual-index model in
+`web-promotion-and-versioning.md`).
 
 Owner: @lupino3
+
+## Resolved decisions
+
+The four open questions raised during review are resolved as follows:
+
+1. **Default promote target:** `promote-web.yml` with no `sha` input promotes
+   the **newest candidate** in `versions.json` (the highest `seq`).
+2. **Old-URL redirects:** migration emits `/v/<n>/` → `/c/<sha>/` redirect stubs
+   (kept for one release cycle) so existing links do not break.
+3. **Candidate volume in About:** show **all** pending candidates (they are
+   expected to be few between promotions); no cap.
+4. **`maxPromoted` cap:** keep **all** promoted versions forever. No cap for now.
 
 ---
 
@@ -261,7 +273,8 @@ All version metadata now comes from **one** `versions.json` fetch.
   `promoted` flag and `seq` relative to `current`.
 - **`HelpDialog.js`** — one fetch; render a single "Versions" section with
   promoted entries shown prominently (e.g. bold + date + "current" chip) and
-  candidates listed below in a lighter style. Keep the "you are viewing an
+  candidates listed below in a lighter style. **All** pending candidates are
+  shown (no cap — they are few between promotions). Keep the "you are viewing an
   older/candidate build → open latest" banner, driven by `current` vs the
   viewed SHA.
 - **`Header.js`** — badge logic: at `/c/<sha>/`, show `CANDIDATE` (purple) when
@@ -276,7 +289,7 @@ All version metadata now comes from **one** `versions.json` fetch.
 | File | Today | After |
 |------|-------|-------|
 | `candidate-web.yml` → **`push-web.yml`** | deploys candidate to date dir, updates `candidates.json` | computes `seq = git rev-list --count <sha>`, runs `push` → `/c/<sha>/`, updates `versions.json`. Still ungated, still `workflow_run` on CI success + `workflow_dispatch`. |
-| `promote-web.yml` | has a **`build` job** (fresh-mode) + downloads artifact + promotes | **`build` job removed**. Input: `sha` (or shortsha; default = newest candidate in `versions.json`). Verifies `/c/<sha>/` exists in Pages, runs `promote`. No artifact download, no webpack. Still gated to maintainer + master. |
+| `promote-web.yml` | has a **`build` job** (fresh-mode) + downloads artifact + promotes | **`build` job removed**. Input: `sha` (full or short; default = **newest candidate** in `versions.json`). Verifies `/c/<sha>/` exists in Pages, runs `promote`. No artifact download, no webpack. Still gated to maintainer + master. |
 | `rollback-web.yml` | swaps `root` ↔ `prev/` | runs `rollback` (newest promoted below current) or `promote <prev promoted sha>`. Gated. |
 
 The `web-pages-deploy` concurrency lock is retained on every Pages-writing job
@@ -298,13 +311,16 @@ maintainer against a full clone of both repos:
 4. Synthesize `versions.json` (promoted flags from manifest; `current` =
    manifest `current` SHA).
 5. Delete `manifest.json`, `candidates.json`, `prev/`, `v/`, and the date dirs.
+   Replace each old `/v/<n>/` directory with a tiny redirect stub
+   (`index.html` with a `<meta http-equiv="refresh">` + canonical link) that
+   forwards to the corresponding `/c/<sha>/`. These stubs are retained for one
+   release cycle so existing deep links keep working, then removed.
 6. Commit. The live root copy is left untouched (it already equals the current
    promoted build).
 
-Old URLs (`/v/<n>/`, `/<date>/…`) will 404 after migration; acceptable because
-those are only surfaced through the in-app navigator, which will point at the
-new `/c/<sha>/` URLs. (Optional nicety: emit `/v/<n>/` → `/c/<sha>/` redirect
-stubs for one release cycle.)
+Old candidate URLs (`/<date>/…`) hard-cut to 404 (they were only ever surfaced
+through the in-app navigator). Promoted `/v/<n>/` URLs get redirect stubs as
+above.
 
 ---
 
@@ -378,11 +394,4 @@ Each phase is independently reviewable; the new model is dark until Phase 5.
 
 ## Open questions for the maintainer
 
-1. **Default promote target:** should `promote-web.yml` with no input promote
-   the **newest** candidate, or always require an explicit SHA?
-2. **Old-URL redirects:** emit `/v/<n>/` → `/c/<sha>/` redirect stubs for one
-   cycle, or hard-cut (404 old URLs)?
-3. **Candidate volume in About:** show *all* pending candidates, or cap the
-   displayed list (e.g. newest N) with a "show all" expander?
-4. **`maxPromoted` cap:** keep all promoted versions forever (current
-   requirement), or introduce a configurable cap now?
+All resolved — see **Resolved decisions** at the top of this document.

@@ -1,5 +1,9 @@
 name: Rollback Web Production
 
+# Reverts production to the newest PROMOTED version older than the current one
+# (see docs/design/unified-web-versioning.md). The build is copied from its
+# existing /c/<sha>/ snapshot — no rebuild. Pending candidates are preserved.
+
 on:
   workflow_dispatch:
 

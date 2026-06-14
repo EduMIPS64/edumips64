@@ -34,45 +34,57 @@ Quale build web sto eseguendo?
 -------------------------------
 L'applicazione web di **produzione** all'indirizzo https://web.edumips.org
 contiene la versione stabile. Viene aggiornata solo quando i mantainer
-promuovono esplicitamente una nuova release, quindi è la scelta più sicura per
+*promuovono* esplicitamente una nuova build, quindi è la scelta più sicura per
 un utilizzo quotidiano.
 
-Esistono anche altre build web, identificate da un piccolo badge colorato
-mostrato accanto all'etichetta **"Web Version"** nella barra degli strumenti:
+Anche ogni commit del codice di sviluppo viene compilato e pubblicato a un
+proprio indirizzo permanente sotto ``https://web.edumips.org/c/<commit>/``. Un
+piccolo badge colorato accanto all'etichetta **"Web Version"** nella barra
+degli strumenti indica su quale tipo di build ti trovi:
 
 * **Nessun badge** — ti trovi sulla normale build di produzione. È la versione
   stabile di https://web.edumips.org.
-* **``CANDIDATE``** (badge viola) — una build distribuita automaticamente da ogni
-  commit al codice di sviluppo più recente. Ogni build candidate è etichettata
-  con la sua data e numero di sequenza (es., `2026-06-13 #2`). Puoi sfogliare
-  tutti i candidati disponibili e condividere i loro URL dalla scheda **About**.
-  I candidati possono essere instabili e vengono conservati per 14 giorni.
-  Passando con il mouse sul badge viene mostrato un tooltip che lo conferma.
+* **``ARCHIVED``** — stai visualizzando una build specifica di un singolo
+  commit, servita da ``/c/<commit>/``. Può trattarsi di una versione promossa
+  in passato o di un candidato in attesa di promozione; in ogni caso non è il
+  sito di produzione attivo. Passando con il mouse sul badge viene mostrato un
+  tooltip che lo conferma.
 * **``PR #N``** (badge giallo) — un'anteprima temporanea creata per una
   specifica modifica proposta (pull request) su GitHub. Cliccando sul badge si
   apre la pagina della pull request corrispondente.
 * **``dev``** (badge blu) — qualcuno sta eseguendo una build di sviluppo
   locale direttamente sul proprio computer.
 
-In sintesi: **nessun badge → produzione stabile; ``CANDIDATE`` → funzionalità
-più recenti ma possibilmente instabile; ``PR #N`` / ``dev`` → build
-temporanee o di anteprima.**
+In sintesi: **nessun badge → produzione stabile; ``ARCHIVED`` → una build
+specifica di un singolo commit; ``PR #N`` / ``dev`` → build temporanee o di
+anteprima.**
 
-Visualizzazione di versioni precedenti
----------------------------------------
-Ogni versione web rilasciata viene conservata come snapshot immutabile e
-rimane disponibile per l'uso. Puoi visualizzare un elenco di tutte le versioni
-conservate e aprire una versione precedente direttamente dalla finestra di
-dialogo **Help**:
+Sfogliare e cambiare versione
+-----------------------------
+Tutte le build web conservate — sia le release promosse sia i candidati in
+attesa — sono elencate in un unico posto, identificate dal loro commit. Apri
+l'elenco dalla finestra di dialogo **Help**:
 
 1. Fai clic su **Help** → **About** (nella barra degli strumenti dell'app web).
-2. Cerca la sezione **Previous Versions** nella scheda About.
-3. Vedrai un elenco delle versioni rilasciate con le rispettive date.
-4. La versione corrente è contrassegnata con un'etichetta in modo da sapere
-   quale è quella attiva.
-5. Fai clic su qualsiasi versione precedente per aprirla in una nuova scheda — il
-   tuo lavoro attuale viene preservato nella scheda originale.
+2. La scheda About mostra due elenchi:
 
-Questo è utile se hai bisogno di confrontare versioni, verificare un bug in una
-release precedente o lavorare con una versione che si adatta meglio alle tue
-esigenze.
+   * **Promoted versions** — le release promosse manualmente, mostrate in
+     evidenza. Quella attiva è contrassegnata come **current**.
+   * **Candidate builds** — le build più recenti non ancora promosse. Vengono
+     mostrati tutti i candidati in attesa (di solito sono pochi).
+3. Fai clic su una voce qualsiasi per aprire quella build esatta in una nuova
+   scheda — il tuo lavoro attuale viene preservato nella scheda originale.
+
+Cosa viene conservato, e per quanto tempo
+-----------------------------------------
+* Le **versioni promosse** vengono conservate in modo permanente come snapshot
+  immutabili, così puoi sempre tornare a qualunque release.
+* Le **build candidate** vengono conservate fino a quando non avviene una
+  promozione. Quando una build viene promossa, i candidati che la *precedevano*
+  (e non sono mai stati promossi) vengono rimossi; i candidati più recenti
+  della build promossa vengono preservati e restano disponibili finché non
+  vengono a loro volta promossi o superati.
+
+In questo modo l'elenco resta essenziale: ogni release promossa più i pochi
+candidati ancora in attesa di promozione.
+
