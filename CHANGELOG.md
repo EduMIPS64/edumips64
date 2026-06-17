@@ -3,6 +3,10 @@
 ## 1.4.1 (TBD)
 
 ### Added
+- Optional branch delay slot mode, as described in Hennessy & Patterson. When
+  enabled, the instruction immediately following a branch or jump is always
+  executed; otherwise it is squashed (the existing behavior). Exposed in both
+  the Swing UI (Main Settings tab) and the Web UI (General Settings).
 - Web UI now has keyboard shortcuts for run-control actions: F2 (Load), F8
   (Run All / Pause), F9 (Single Step), F10 (Multi Step), Esc (Stop). Shortcuts
   are shown in button tooltips and documented in a new "Shortcuts" tab in the

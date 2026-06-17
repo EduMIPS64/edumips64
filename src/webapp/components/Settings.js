@@ -39,6 +39,8 @@ const Settings = ({
   setAccordionAlerts,
   forwarding,
   setForwarding,
+  delaySlot,
+  setDelaySlot,
   stepStride,
   setStepStride,
   executionDelayMs,
@@ -53,6 +55,9 @@ const Settings = ({
   // changed, so we only allow toggling it when the simulator is not running
   // a program. This mirrors the way `CacheConfig` grays out its inputs.
   const forwardingDisabled = status === 'RUNNING';
+  // Delay slot has the same lifecycle: it changes pipeline semantics and
+  // resets the CPU on toggle, so we gray it out while a program is running.
+  const delaySlotDisabled = status === 'RUNNING';
   const handleColorChange = (key) => (e) => {
     // `pipelineColors` may be undefined when the parent doesn't wire the
     // setting (e.g. older callers); guard so we always start from a complete
@@ -150,6 +155,30 @@ const Settings = ({
                 }}
               >
                 CPU Forwarding
+              </Typography>
+            }
+          />
+        </Box>
+        <Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={!!delaySlot}
+                onChange={(e) => setDelaySlot(e.target.checked)}
+                color="primary"
+                size="small"
+                disabled={delaySlotDisabled}
+                inputProps={{ 'data-testid': 'delay-slot-switch' }}
+              />
+            }
+            label={
+              <Typography
+                sx={{
+                  fontSize: '0.85rem',
+                  color: delaySlotDisabled ? 'text.disabled' : 'text.primary',
+                }}
+              >
+                Branch Delay Slot
               </Typography>
             }
           />

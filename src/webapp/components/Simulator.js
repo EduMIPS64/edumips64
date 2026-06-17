@@ -91,6 +91,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
   const [fontSize, setFontSize] = useSetting(SettingKey.FONT_SIZE);
   const [accordionAlerts, setAccordionAlerts] = useSetting(SettingKey.ACCORDION_ALERTS);
   const [forwarding, setForwarding] = useSetting(SettingKey.FORWARDING);
+  const [delaySlot, setDelaySlot] = useSetting(SettingKey.DELAY_SLOT);
   const [stepStride, setStepStride] = useSetting(SettingKey.STEP_STRIDE);
   const [executionDelayMs, setExecutionDelayMs] = useSetting(
     SettingKey.EXECUTION_DELAY_MS,
@@ -137,6 +138,11 @@ const Simulator = ({worker, initialState, appInsights}) => {
   React.useEffect(() => {
     worker.setForwarding(forwarding);
   }, [forwarding]);
+
+  // Same pattern for the branch delay slot setting.
+  React.useEffect(() => {
+    worker.setDelaySlot(delaySlot);
+  }, [delaySlot]);
 
   // Track expanded state for each accordion
   const [expandedAccordions, setExpandedAccordions] = useSetting(SettingKey.EXPANDED_ACCORDIONS);
@@ -872,6 +878,8 @@ const Simulator = ({worker, initialState, appInsights}) => {
                   setAccordionAlerts={setAccordionAlerts}
                   forwarding={forwarding}
                   setForwarding={setForwarding}
+                  delaySlot={delaySlot}
+                  setDelaySlot={setDelaySlot}
                   stepStride={stepStride}
                   setStepStride={setStepStride}
                   executionDelayMs={executionDelayMs}

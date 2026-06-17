@@ -32,8 +32,10 @@ import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.AddressErrorException;
 import org.edumips64.core.is.BreakException;
 import org.edumips64.core.is.HaltException;
+import org.edumips64.core.is.FlowControlInstructions;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.is.IntegerOverflowException;
+import org.edumips64.core.is.InvalidDelaySlotException;
 import org.edumips64.core.is.JumpException;
 import org.edumips64.core.is.RAWException;
 import org.edumips64.core.is.StoppingException;
@@ -398,7 +400,7 @@ public class CPU {
 
   /** This method performs a single pipeline step
   */
-  public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException {
+  public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, InvalidDelaySlotException {
     configFPExceptionsAndRM();
     Optional<SynchronousException> syncex;
     if (status != CPUStatus.RUNNING && status != CPUStatus.STOPPING) {
@@ -415,20 +417,8 @@ public class CPU {
       stepWB();
 
       // Before MEM, snapshot GPR write semaphores so that, after EX, we can
-      // detect which registers were forwarded during MEM or EX in this
-      // cycle. Such values are available for the EX/MEM forwarding paths,
-      // but they are NOT available at the start of ID in the same cycle
-      // (no EX→ID nor MEM→ID forwarding path). Branch and register-based
-      // jump instructions, which read their operands in ID, must stall one
-      // extra cycle when their source register is in this set.
-      // Skip R0 (index 0) since it is architecturally immutable.
-      final boolean forwardingEnabled = isEnableForwarding();
-      int[] preSemaphores = new int[32];
-      if (forwardingEnabled) {
-        for (int i = 1; i < 32; i++) {
-          preSemaphores[i] = gpr[i].getWriteSemaphore();
-        }
-      }
+      // detect which registers were forwarded during MEM or EX in this cycle.
+      int[] preSemaphores = snapshotGPRWriteSemaphores();
 
       // MEM: Memory access stage.
       stepMEM();
@@ -440,16 +430,8 @@ public class CPU {
       syncex = stepEX();
 
       // After MEM+EX, detect which GPR registers were forwarded during this
-      // cycle (write semaphore decreased) and record them for branch/jump
-      // hazard detection in ID. Skip R0 (index 0).
-      registersForwardedThisCycle.clear();
-      if (forwardingEnabled) {
-        for (int i = 1; i < 32; i++) {
-          if (gpr[i].getWriteSemaphore() < preSemaphores[i]) {
-            registersForwardedThisCycle.add(gpr[i]);
-          }
-        }
-      }
+      // cycle and record them for branch/jump hazard detection in ID.
+      recordForwardedRegisters(preSemaphores);
 
       // ID: instruction decode / register fetch stage. The RAW exception is handled
       // via a return value instead of an exception because throwing exceptions proved
@@ -466,29 +448,7 @@ public class CPU {
         throw syncex.get();
       }
     } catch (JumpException ex) {
-      logger.info("Executing a Jump.");
-      try {
-        if (!pipe.isEmpty(Pipeline.Stage.IF)) {
-          logger.info("Executing the IF() method of the instruction in IF.");
-          pipe.IF().IF();
-        }
-      } catch (BreakException bex) {
-        // This needs to be ignored here because BREAK throws BreakException when it enters
-        // the IF stage, but if BREAK enters IF after a jump instruction is about to modify
-        // the program counter, then it must be discarded (like every other instruction).
-        logger.info("Caught a BREAK after a Jump: ignoring it.");
-      }
-
-      // A J-Type instruction has just modified the Program Counter. We need
-      // to put in the IF stage the instruction the PC points to, discarding
-      // the instruction that was fetched sequentially in the prior cycle.
-      // Then advance the jump instruction from ID to EX and put a bubble in
-      // ID, which represents the flushed slot in the cycle view.
-      pipe.flushAndSet(Pipeline.Stage.IF, mem.getInstruction(pc));
-      pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
-      pipe.setStage(Pipeline.Stage.ID, bubble);
-      old_pc.writeDoubleWord((pc.getValue()));
-      pc.writeDoubleWord((pc.getValue()) + 4);
+      handleJumpException();
 
     } catch (RAWException ex) {
       logger.info("RAW - Read-After-Write");
@@ -542,6 +502,127 @@ public class CPU {
 
     } finally {
       logger.info("End of cycle " + cycles + "\n---------------------------------------------\n" + pipeLineString() + "\n");
+    }
+  }
+
+  /**
+   * Snapshots the GPR write semaphores before the MEM and EX stages run, so
+   * that {@link #recordForwardedRegisters(int[])} can later detect which
+   * registers were forwarded during this cycle. Such values are available for
+   * the EX/MEM forwarding paths, but they are NOT available at the start of ID
+   * in the same cycle (no EX→ID nor MEM→ID forwarding path). Branch and
+   * register-based jump instructions, which read their operands in ID, must
+   * stall one extra cycle when their source register is in this set.
+   *
+   * <p>Returns an empty array when forwarding is disabled. Index 0 (R0) is
+   * skipped since it is architecturally immutable.
+   *
+   * @return the per-register write semaphores indexed by register number
+   */
+  private int[] snapshotGPRWriteSemaphores() {
+    int[] preSemaphores = new int[32];
+    if (isEnableForwarding()) {
+      for (int i = 1; i < 32; i++) {
+        preSemaphores[i] = gpr[i].getWriteSemaphore();
+      }
+    }
+    return preSemaphores;
+  }
+
+  /**
+   * Detects which GPR registers were forwarded during this cycle (write
+   * semaphore decreased relative to the pre-MEM/EX snapshot) and records them
+   * for branch/jump hazard detection in ID. Index 0 (R0) is skipped.
+   *
+   * @param preSemaphores the snapshot returned by {@link #snapshotGPRWriteSemaphores()}
+   */
+  private void recordForwardedRegisters(int[] preSemaphores) {
+    registersForwardedThisCycle.clear();
+    if (isEnableForwarding()) {
+      for (int i = 1; i < 32; i++) {
+        if (gpr[i].getWriteSemaphore() < preSemaphores[i]) {
+          registersForwardedThisCycle.add(gpr[i]);
+        }
+      }
+    }
+  }
+
+  /**
+   * Handles a {@link JumpException} raised during a step: executes the IF()
+   * method of the instruction sitting in the IF stage and advances the
+   * pipeline according to whether the delay slot is enabled.
+   */
+  private void handleJumpException() throws InvalidDelaySlotException, BreakException,
+          IrregularStringOfBitsException, IrregularWriteOperationException {
+    logger.info("Executing a Jump.");
+    final boolean delaySlot = isDelaySlotEnabled();
+
+    // Corner case: when the delay slot is enabled, the instruction that
+    // was fetched sequentially after the branch is about to be
+    // architecturally executed. If that instruction is itself a
+    // control-transfer (any subclass of FlowControlInstructions) the
+    // MIPS architecture says the behavior is UNPREDICTABLE (MIPS64
+    // Architecture For Programmers Volume II-A). Production assemblers
+    // either reject the pattern or warn; EduMIPS64 raises a clearly
+    // labelled, deterministic exception so the offending program is
+    // diagnosed instead of silently producing implementation-defined
+    // state. The check is intentionally skipped when delay slot is
+    // disabled, because the slot is squashed and never executes.
+    if (delaySlot && !pipe.isEmpty(Pipeline.Stage.IF)
+            && pipe.IF() instanceof FlowControlInstructions) {
+      String slotName = pipe.IF().getName();
+      // At this point old_pc holds the address of the instruction currently
+      // in IF (the delay slot), which sits one word after the branch/jump.
+      // Subtract one word to report the address of the offending
+      // branch/jump itself.
+      long branchPC = old_pc.getValue() - 4;
+      logger.info("Control-transfer '" + slotName
+              + "' detected in the delay slot of the branch/jump at PC 0x"
+              + Long.toHexString(branchPC) + ": raising InvalidDelaySlotException.");
+      throw new InvalidDelaySlotException(slotName, branchPC);
+    }
+
+    try {
+      if (!pipe.isEmpty(Pipeline.Stage.IF)) {
+        logger.info("Executing the IF() method of the instruction in IF.");
+        pipe.IF().IF();
+      }
+    } catch (BreakException bex) {
+      // When the delay slot is disabled the IF instruction is discarded,
+      // so a BREAK fetched right after the branch must be swallowed: the
+      // BREAK never actually entered the pipeline from the program's
+      // perspective. When the delay slot is enabled the instruction *is*
+      // executed, so the BreakException is a real one and must be
+      // re-thrown after the pipeline has been advanced so the cycle ends
+      // in a consistent state.
+      if (delaySlot) {
+        logger.info("BREAK in delay slot: propagating.");
+        // Advance the pipeline before re-throwing so the delay slot
+        // (which is the BREAK) lands in ID and the jump in EX, mirroring
+        // what happens on the regular delay-slot path below.
+        advanceDelaySlotPipeline();
+        throw bex;
+      }
+      logger.info("Caught a BREAK after a Jump: ignoring it.");
+    }
+
+    if (delaySlot) {
+      // Delay-slot semantics: the instruction in IF was fetched
+      // sequentially right after the branch/jump and is the architectural
+      // "delay slot". It is *not* squashed; we advance it into ID and
+      // fetch the branch target into IF.
+      advanceDelaySlotPipeline();
+    } else {
+      // A J-Type instruction has just modified the Program Counter. We need
+      // to put in the IF stage the instruction the PC points to, discarding
+      // the instruction that was fetched sequentially in the prior cycle.
+      // Then advance the jump instruction from ID to EX and put a bubble in
+      // ID, which represents the flushed slot in the cycle view.
+      pipe.flushAndSet(Pipeline.Stage.IF, mem.getInstruction(pc));
+      pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
+      pipe.setStage(Pipeline.Stage.ID, bubble);
+      old_pc.writeDoubleWord((pc.getValue()));
+      pc.writeDoubleWord((pc.getValue()) + 4);
     }
   }
 
@@ -854,6 +935,82 @@ public class CPU {
 
   public boolean isEnableForwarding() {
     return config.getBoolean(ConfigKey.FORWARDING);
+  }
+
+  /**
+   * @return true if the branch delay slot is enabled, in which case the
+   *         instruction sequentially fetched after a branch/jump is
+   *         executed regardless of whether the branch is taken (the
+   *         classical MIPS "delay slot" semantics described in Hennessy
+   *         &amp; Patterson). When this is false, the instruction in IF
+   *         at the time the jump resolves is squashed and replaced with
+   *         a bubble, which is the default EduMIPS64 behavior.
+   *
+   *         <p><b>Corner cases.</b> The MIPS64 Architecture For
+   *         Programmers Volume II-A classifies a number of patterns as
+   *         UNPREDICTABLE. EduMIPS64 picks a
+   *         deterministic, documented behavior for each so students see
+   *         a clear diagnostic instead of silent corruption:
+   *         <ul>
+   *           <li><b>Control-transfer in delay slot</b> (a branch or
+   *               jump fetched as the slot of another branch or jump):
+   *               raises an {@link org.edumips64.core.is.InvalidDelaySlotException}.
+   *               On real MIPS this is UNPREDICTABLE.</li>
+   *           <li><b>BREAK in delay slot</b>: with the delay slot
+   *               disabled the BREAK is squashed and silently ignored
+   *               (the BREAK never enters the pipeline architecturally);
+   *               with the delay slot enabled the BREAK propagates as a
+   *               regular {@link org.edumips64.core.is.BreakException}.</li>
+   *           <li><b>SYSCALL / HALT in delay slot</b>: with the delay
+   *               slot disabled the instruction is squashed; with the
+   *               delay slot enabled it executes and the program
+   *               terminates after the slot has retired, mirroring the
+   *               BREAK behavior. The branch target never runs.</li>
+   *           <li><b>Synchronous exception in delay slot</b> (integer
+   *               overflow, division by zero, address error, …): the
+   *               slot is advanced into ID before the exception is
+   *               re-thrown, so the pipeline ends the cycle in a
+   *               consistent state. The branch has already retired by
+   *               the time the EX-stage exception fires. Real MIPS
+   *               sets EPC = branch PC and Cause.BD = 1; EduMIPS64 has
+   *               no CP0 so it just reports the exception against the
+   *               slot's PC.</li>
+   *           <li><b>JAL / JALR link register</b>: R31 holds the
+   *               address of the instruction <em>after</em> the
+   *               architectural delay slot, per the MIPS64 ISA
+   *               definition of JAL/JALR — i.e.
+   *               JAL_PC + 8 when the delay slot is enabled, and
+   *               JAL_PC + 4 (the slot's own address, which is the
+   *               first instruction executed after JAL when the slot
+   *               is squashed) when it is disabled.</li>
+   *           <li><b>Not-taken branch</b>: the slot is the architectural
+   *               fall-through; it executes regardless of the setting.</li>
+   *         </ul>
+   *         The end-to-end suite pins down each of these in
+   *         {@code EndToEndTests#testDelaySlot*}.
+   */
+  public boolean isDelaySlotEnabled() {
+    return config.getBoolean(ConfigKey.DELAY_SLOT);
+  }
+
+  /**
+   * Advances the pipeline by one stage in delay-slot mode after a
+   * JumpException: the instruction previously in IF (the architectural
+   * delay slot) moves into ID, the branch/jump moves from ID to EX, and a
+   * fresh instruction is fetched from the (already updated) PC into IF.
+   *
+   * <p>Callers must have already validated that the IF instruction is
+   * <em>not</em> a control-transfer (see
+   * {@link org.edumips64.core.is.InvalidDelaySlotException}) — that
+   * pattern is UNPREDICTABLE on MIPS and is rejected by the
+   * JumpException handler before this method runs.
+   */
+  private void advanceDelaySlotPipeline() throws IrregularStringOfBitsException, IrregularWriteOperationException {
+    pipe.advance(Pipeline.Stage.ID, Pipeline.Stage.EX);
+    pipe.advance(Pipeline.Stage.IF, Pipeline.Stage.ID);
+    pipe.setStage(Pipeline.Stage.IF, mem.getInstruction(pc));
+    old_pc.writeDoubleWord((pc.getValue()));
+    pc.writeDoubleWord((pc.getValue()) + 4);
   }
 
   /**

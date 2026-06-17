@@ -401,6 +401,14 @@ ai reload della pagina.
 * **CPU Forwarding** — abilita o disabilita il forwarding nella
   pipeline. Disabilitato durante l'esecuzione perché modificarlo
   richiede un reset della CPU.
+* **Branch Delay Slot** — abilita o disabilita il classico delay slot
+  del branch MIPS, come descritto in Hennessy & Patterson. Quando è
+  abilitato, l'istruzione immediatamente successiva ad un branch o jump
+  viene **sempre eseguita**, indipendentemente dal fatto che il salto
+  sia preso o meno; quando è disabilitato (impostazione predefinita),
+  quell'istruzione viene scartata e la pipeline mostra una bolla.
+  Disabilitato durante l'esecuzione perché modificarlo richiede un
+  reset della CPU.
 * **Multi Step Size** — numero di cicli eseguiti da un singolo click
   del pulsante *Multi Step* sulla barra degli strumenti.
 * **Execution Delay (ms)** — ritardo inserito tra blocchi successivi

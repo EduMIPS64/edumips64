@@ -215,8 +215,8 @@ ignored. Don't forget to click "OK" if you want to save your changes. The
 after asking for confirmation; this is useful to recover from a misconfigured
 simulator without having to change each option manually.
 
-The Main Settings tab allow to configure forwarding and the number of steps
-in the Multi Cycle mode.
+The Main Settings tab allow to configure forwarding, the branch delay slot,
+and the number of steps in the Multi Cycle mode.
 
 The Behavior tab allow to enable or disable warnings during the parsing phase,
 the "Sync graphics with CPU in multi-step execution" option, when checked,
@@ -349,6 +349,77 @@ producer/consumer pairs:
 +------------------------------+----------------+-------------------+
 | Load → branch / register jump| 2              | 2                 |
 +------------------------------+----------------+-------------------+
+
+Branch Delay Slot
+~~~~~~~~~~~~~~~~~
+EduMIPS64 can optionally model the classical MIPS **branch delay slot**, as
+described in Hennessy & Patterson. The delay slot can be toggled from the
+Main Settings tab of the Settings dialog.
+
+When the delay slot is **disabled** (the default), the instruction
+sequentially fetched after a branch or jump is *squashed* when the jump
+resolves in the ID stage: it never reaches EX, MEM or WB, and the cycle
+view shows a bubble in the slot following the branch. This is the
+behavior the simulator has always had.
+
+When the delay slot is **enabled**, the instruction fetched immediately
+after a branch or jump (the *delay slot*) is **always executed**,
+regardless of whether the branch is taken. The branch target is then
+fetched into IF on the cycle after the delay slot. This matches the
+architectural behavior of the MIPS64 instruction set.
+
+A few notes:
+
+* The setting affects every flow-control instruction that updates the
+  program counter from the ID stage: unconditional branches (``B``,
+  ``J``, ``JAL``), conditional branches (``BEQ``, ``BNE``, ``BEQZ``,
+  ``BNEZ``, ``BGEZ``, ``BC1T``, ``BC1F``), and register-based jumps
+  (``JR``, ``JALR``).
+* Toggling the delay slot resets the simulation, because the pipeline
+  state would otherwise be inconsistent with the new semantics. The
+  simulator asks for confirmation before applying the change while a
+  program is in progress.
+* Programs written assuming the delay-slot semantics typically place a
+  ``NOP`` (or a useful instruction whose result is independent of the
+  branch) immediately after every branch or jump.
+
+Corner cases
+^^^^^^^^^^^^
+
+A number of patterns in a delay slot are classified as
+**UNPREDICTABLE** by the MIPS64 Architecture For Programmers,
+Volume II-A. EduMIPS64 picks a
+deterministic, documented behavior for each so that students see a
+clear diagnostic instead of silent corruption:
+
+* **Control transfer in a delay slot** — placing a branch or jump as
+  the delay slot of another branch or jump raises an
+  ``InvalidDelaySlotException`` at runtime, with a message that names
+  the offending instruction. On real MIPS this is UNPREDICTABLE; an
+  educational simulator surfaces the mistake instead of producing
+  arbitrary state.
+* **SYSCALL, HALT or BREAK in a delay slot** — when the delay slot is
+  enabled the slot instruction executes to completion before the
+  exception or program termination fires, so any side effects of the
+  syscall commit exactly once and the branch target is not fetched.
+  When the delay slot is disabled the slot is squashed, matching the
+  bubble semantics used everywhere else.
+* **Synchronous exception in a delay slot** — integer overflow,
+  division by zero and similar EX-stage exceptions raised by the slot
+  propagate cleanly after the slot has been advanced into ID, so the
+  pipeline ends the cycle in a self-consistent state. Real MIPS sets
+  ``EPC`` to the branch PC and ``Cause.BD`` to ``1``; EduMIPS64 does
+  not model CP0, so it simply reports the exception against the slot.
+* **JAL / JALR link register** — ``R31`` is set to the address of the
+  instruction *after* the architectural delay slot
+  (``JAL_PC + 8``) when the delay slot is enabled, and to the slot's
+  own address (``JAL_PC + 4``) when it is disabled. This matches the
+  MIPS64 ISA definition of JAL/JALR in both modes.
+* **Not-taken branch** — the slot is the architectural fall-through and
+  executes regardless of whether the branch is taken.
+
+End-to-end tests in ``EndToEndTests`` (search for ``testDelaySlot``)
+pin down each of these cases.
 
 Dinero Frontend
 ~~~~~~~~~~~~~~~

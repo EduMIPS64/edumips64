@@ -59,7 +59,13 @@ public class JALR extends FlowControl_RType {
 
     //saving PC value into a temporary register
     cpu.getRegister(31).incrWriteSemaphore();  //deadlock !!!
-    TR[PC_VALUE].writeDoubleWord(cpu.getPC().getValue() - 4);
+    // See JAL.ID() for the rationale: when the delay slot is enabled the
+    // link register must hold the address of the instruction after the
+    // delay slot (JALR_PC + 8); otherwise it holds the address of the
+    // instruction immediately after the JALR (which is the architectural
+    // fall-through when the slot is squashed).
+    long linkAddress = cpu.isDelaySlotEnabled() ? cpu.getPC().getValue() : cpu.getPC().getValue() - 4;
+    TR[PC_VALUE].writeDoubleWord(linkAddress);
     cpu.getPC().setBits(cpu.getRegister(params.get(RS_FIELD)).getBinString(), 0);
 
     if (cpu.isEnableForwarding()) {

@@ -315,6 +315,11 @@ General Settings
   脉动指示器。
 * **CPU Forwarding** — 启用或禁用流水线中的转发（forwarding）。在
   模拟器运行时禁用，因为更改它需要重置 CPU。
+* **Branch Delay Slot** — 启用或禁用经典 MIPS 分支延迟槽
+  （Hennessy & Patterson 中描述的）。启用时，紧随任何分支或跳转之后
+  的指令**总是被执行**，无论分支是否被采用；禁用时（默认设置），
+  该指令会被丢弃，流水线会显示一个气泡。在模拟器运行时禁用，因为
+  更改它需要重置 CPU。
 * **Multi Step Size** — 工具栏 *Multi Step* 按钮单击一次执行的周期数。
 * **Execution Delay (ms)** — 在 *Run All* 中两个连续内部批次之间插入
   的延迟。增大该值可以减慢长时间运行，使行高亮和面板更新等视觉反馈

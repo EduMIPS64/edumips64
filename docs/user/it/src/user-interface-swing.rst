@@ -231,8 +231,9 @@ Il tasto "Ripristina predefiniti" riporta tutte le impostazioni ai valori
 predefiniti, previa conferma da parte dell'utente; è utile per recuperare
 una configurazione errata senza dover modificare manualmente ogni opzione.
 
-La sezione "Impostazioni generali" consente di configurare il forwarding ed il
-numero di passi da effettuare nella modalità Cicli multipli.
+La sezione "Impostazioni generali" consente di configurare il forwarding, il
+branch delay slot ed il numero di passi da effettuare nella modalità Cicli
+multipli.
 
 La sezione "Comportamento" permette di abilitare o disabilitare gli avvisi
 durante la fase di parsing, l'opzione "sincronizza la GUI con la CPU
@@ -374,6 +375,82 @@ produttore/consumatore più comuni:
 +--------------------------------+-----------------+--------------------+
 | Load → branch / jump da reg.   | 2               | 2                  |
 +--------------------------------+-----------------+--------------------+
+
+Branch Delay Slot
+~~~~~~~~~~~~~~~~~
+EduMIPS64 può opzionalmente simulare il classico **delay slot** del
+branch del MIPS, come descritto in Hennessy & Patterson. Il delay slot
+può essere attivato dalla scheda Impostazioni Generali della finestra
+delle impostazioni.
+
+Quando il delay slot è **disabilitato** (impostazione predefinita),
+l'istruzione recuperata sequenzialmente dopo un branch o un jump viene
+*scartata* quando il salto viene risolto in fase ID: non raggiunge mai
+EX, MEM o WB, e la vista a cicli mostra una bolla nello slot successivo
+al branch. Questo è il comportamento storico del simulatore.
+
+Quando il delay slot è **abilitato**, l'istruzione recuperata
+immediatamente dopo un branch o un jump (il *delay slot*) viene
+**eseguita sempre**, indipendentemente dal fatto che il branch sia
+preso o meno. Il bersaglio del salto viene quindi recuperato in IF nel
+ciclo successivo al delay slot. Ciò corrisponde al comportamento
+architetturale dell'instruction set MIPS64.
+
+Alcune note:
+
+* L'impostazione interessa tutte le istruzioni di controllo del flusso
+  che aggiornano il PC dallo stadio ID: branch incondizionati (``B``,
+  ``J``, ``JAL``), branch condizionati (``BEQ``, ``BNE``, ``BEQZ``,
+  ``BNEZ``, ``BGEZ``, ``BC1T``, ``BC1F``) e jump basati su registro
+  (``JR``, ``JALR``).
+* La modifica del delay slot causa il reset della simulazione, perché
+  altrimenti lo stato della pipeline sarebbe inconsistente con la
+  nuova semantica. Il simulatore chiede conferma prima di applicare la
+  modifica quando un programma è in esecuzione.
+* I programmi scritti assumendo la semantica del delay slot
+  tipicamente inseriscono un ``NOP`` (o un'istruzione utile il cui
+  risultato non dipende dal branch) immediatamente dopo ogni branch o
+  jump.
+
+Casi particolari
+^^^^^^^^^^^^^^^^
+
+Alcuni schemi all'interno di un delay slot sono classificati come
+**UNPREDICTABLE** dal MIPS64 Architecture For Programmers,
+Volume II-A. EduMIPS64 sceglie per ciascuno
+un comportamento deterministico e documentato, in modo che lo
+studente veda una diagnostica chiara invece di stati corrotti
+silenziosamente:
+
+* **Istruzione di salto in un delay slot** — inserire un branch o un
+  jump come delay slot di un altro branch o jump solleva a runtime
+  un'eccezione ``InvalidDelaySlotException``, con un messaggio che
+  identifica l'istruzione problematica. Sui MIPS reali questo caso è
+  UNPREDICTABLE; un simulatore didattico segnala l'errore invece di
+  produrre stati arbitrari.
+* **SYSCALL, HALT o BREAK in un delay slot** — quando il delay slot è
+  abilitato, l'istruzione dello slot viene eseguita fino in fondo
+  prima che l'eccezione o la terminazione abbiano effetto: le syscall
+  con effetti collaterali vengono eseguite esattamente una volta e il
+  bersaglio del salto non viene mai fetched. Quando il delay slot è
+  disabilitato, lo slot viene scartato come una normale bolla.
+* **Eccezione sincrona in un delay slot** — overflow su intero,
+  divisione per zero e simili eccezioni dello stadio EX generate dallo
+  slot si propagano correttamente dopo che lo slot è stato avanzato in
+  ID, lasciando la pipeline in uno stato coerente. Sui MIPS reali
+  ``EPC`` punta al branch e ``Cause.BD`` vale ``1``; EduMIPS64 non
+  modella CP0 e riporta semplicemente l'eccezione contro lo slot.
+* **Registro di link di JAL / JALR** — ``R31`` viene impostato
+  all'indirizzo dell'istruzione *successiva* al delay slot
+  architetturale (``JAL_PC + 8``) quando il delay slot è abilitato, e
+  all'indirizzo dello slot stesso (``JAL_PC + 4``) quando è
+  disabilitato. In entrambi i casi il comportamento corrisponde alla
+  definizione MIPS64 di JAL/JALR.
+* **Branch non preso** — lo slot è il fall-through architetturale e
+  viene comunque eseguito, indipendentemente dall'esito del branch.
+
+I test end-to-end in ``EndToEndTests`` (cercare ``testDelaySlot``)
+verificano ciascuno di questi casi.
 
 Dinero Frontend
 ~~~~~~~~~~~~~~~
