@@ -30,6 +30,14 @@ const {
 // registry across Playwright upgrades.
 const MOBILE_VIEWPORT = { width: 393, height: 851 };
 
+// Minimum height (px) we treat as a tappable target on touch devices.
+const MIN_TAP_TARGET_PX = 24;
+
+// Fraction of an element that must fall inside the viewport for it to count as
+// reachable. Below 1.0 to tolerate the sub-pixel overflow MUI popup surfaces
+// can exhibit while remaining fully usable.
+const MIN_IN_VIEWPORT_RATIO = 0.9;
+
 test.use({
   viewport: MOBILE_VIEWPORT,
   isMobile: true,
@@ -62,7 +70,7 @@ async function expectReachable(page, selector) {
   await expect(
     locator,
     `${selector} should be within the viewport`,
-  ).toBeInViewport({ ratio: 0.9 });
+  ).toBeInViewport({ ratio: MIN_IN_VIEWPORT_RATIO });
 
   const box = await locator.boundingBox();
   expect(box, `${selector} should have a bounding box`).not.toBeNull();
@@ -70,7 +78,7 @@ async function expectReachable(page, selector) {
   // The control must start within the viewport (not clipped off the left edge)
   // and be tall enough to tap.
   expect(box.x).toBeGreaterThanOrEqual(0);
-  expect(box.height).toBeGreaterThanOrEqual(24);
+  expect(box.height).toBeGreaterThanOrEqual(MIN_TAP_TARGET_PX);
 }
 
 test('core header controls are reachable on a mobile viewport', async ({
