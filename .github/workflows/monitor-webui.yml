@@ -8,12 +8,17 @@ jobs:
   monitor-ui:
     runs-on: ubuntu-latest
     steps:
-      - name: Get deployed commit SHA from production manifest
+      - name: Get deployed commit SHA from production index
         id: deployed
         run: |
-          SHA=$(curl -sf https://web.edumips.org/manifest.json | jq -r '.sha')
-          if [ -z "$SHA" ] || [ "$SHA" = "null" ]; then
-            echo "Failed to fetch deployed SHA from manifest.json" >&2
+          # Unified web versioning stores the current production commit in
+          # versions.json. Keep a legacy manifest.json fallback for resilience.
+          SHA=$(curl -sf https://web.edumips.org/versions.json | jq -r '.current // empty')
+          if [ -z "$SHA" ]; then
+            SHA=$(curl -sf https://web.edumips.org/manifest.json | jq -r '.sha // empty')
+          fi
+          if ! [[ "$SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Failed to fetch deployed SHA from versions.json/manifest.json" >&2
             exit 1
           fi
           echo "sha=${SHA}" >> "$GITHUB_OUTPUT"

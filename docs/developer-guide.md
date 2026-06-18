@@ -51,7 +51,7 @@ To generate an installable Windows MSI package (using the Gradle `msi` task), yo
 This project uses GitHub Actions for continuous integration
 (https://github.com/EduMIPS64/edumips64/actions).
 
-There are five main CI/CD workflows:
+There are six main CI/CD workflows:
 
 - **CI Build** (`ci.yml`) — runs on every pull request, on every push to
   `master`, and on a daily schedule. Builds and tests the desktop application,
@@ -80,6 +80,11 @@ There are five main CI/CD workflows:
   disabled (`if: false`); production web deploys are now gated (see below).
   Can also be triggered manually to create a tagged GitHub release with all
   artifacts attached.
+- **Monitor production web UI** (`monitor-webui.yml`) — scheduled every 10
+  minutes. It reads the currently promoted production commit from
+  `https://web.edumips.org/versions.json` (`current` field), checks out that
+  commit in this repository, and runs the Playwright web test suite against
+  `https://web.edumips.org`.
 
 ### Main Gradle tasks
 
