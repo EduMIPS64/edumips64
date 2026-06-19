@@ -47,7 +47,7 @@ jobs:
       snap: ${{ (github.event_name == 'schedule' || github.event_name == 'push') && 'true' || steps.changes.outputs.snap }}
       electron: ${{ (github.event_name == 'schedule' || github.event_name == 'push') && 'true' || steps.changes.outputs.electron }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: github.event_name == 'pull_request'
 
       - name: Check changed paths
@@ -112,7 +112,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
@@ -207,7 +207,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
