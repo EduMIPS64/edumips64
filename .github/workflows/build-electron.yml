@@ -33,7 +33,7 @@ jobs:
             artifact-name: Electron Windows x64
             artifact-path: electron/dist/WebEduMips64-win32-x64
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref }}
 
