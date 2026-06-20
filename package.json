@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@babel/core": "8.0.1",
-    "@babel/preset-env": "8.0.1",
+    "@babel/preset-env": "8.0.2",
     "@babel/preset-react": "8.0.1",
     "@babel/runtime": "8.0.0",
     "@electron/packager": "^20.0.0",
