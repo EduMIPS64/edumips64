@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout edumips64 (for script)
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # Full history so the one-shot legacy migration can compute
           # seq = `git rev-list --count <sha>` for past promoted builds.

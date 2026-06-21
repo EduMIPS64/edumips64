@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout edumips64 (full history for seq)
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # fetch-depth: 0 is required so `git rev-list --count` and
           # `git describe` can see the full master history.

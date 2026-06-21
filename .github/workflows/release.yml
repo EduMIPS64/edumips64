@@ -49,7 +49,7 @@ jobs:
           echo "target_ref=${REF}" >> "$GITHUB_OUTPUT"
           echo "Target ref: ${REF}"
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ steps.resolve_ref.outputs.target_ref }}
           fetch-depth: 0          # full history so we can see tags
@@ -151,12 +151,12 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.prepare.outputs.target_ref }}
 
       - name: Checkout Wix repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: fbarresi/wix
           path: wix
@@ -258,7 +258,7 @@ jobs:
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.prepare.outputs.target_ref }}
 
