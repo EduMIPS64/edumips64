@@ -115,14 +115,14 @@ tasks.processResources {
 }
 
 tasks.processTestResources {
-    from("docs") {
-        include("user/*/EduMIPS64.hs")
-        include("user/*/EduMIPS64Index.xml")
-        include("user/*/EduMIPS64TOC.xml")
-        include("user/*/Map.jhm")
-        include("user/*/JavaHelpSearch/**")
-        include("user/*/img/**")
-        into("docs")
+    from("docs/user/en") {
+        include("EduMIPS64.hs")
+        include("EduMIPS64Index.xml")
+        include("EduMIPS64TOC.xml")
+        include("Map.jhm")
+        include("JavaHelpSearch/**")
+        include("img/**")
+        into("docs/user/en")
     }
 }
 

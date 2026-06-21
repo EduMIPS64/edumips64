@@ -31,7 +31,7 @@ import static org.junit.Assert.assertNotNull;
 
 /** Basic smoke tests for the Swing frontend. */
 public class MainSwingTest {
-  private static final long UI_TIMEOUT_MILLIS = 10000;
+  private static final long UI_TIMEOUT_MILLIS = Long.getLong("swing.test.timeout.ms", 10000L);
   private static final Timeout UI_TIMEOUT = Timeout.timeout(UI_TIMEOUT_MILLIS);
 
   private Robot robot;
