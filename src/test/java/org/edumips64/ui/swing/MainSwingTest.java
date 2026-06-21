@@ -55,7 +55,7 @@ public class MainSwingTest {
 
   @Test
   @GUITest
-  public void mainWindowRenders() {
+  public void testMainWindowRendersWithEnabledMenuItems() {
     launchApplication();
 
     window.requireVisible();
@@ -65,7 +65,7 @@ public class MainSwingTest {
 
   @Test
   @GUITest
-  public void canOpenAFileAndRunTheSimulator() throws Exception {
+  public void testOpenFileAndRunSimulatorToHalt() throws Exception {
     launchApplication();
 
     Path program = testResourcePath("halt.s");
@@ -82,7 +82,7 @@ public class MainSwingTest {
 
   @Test
   @GUITest
-  public void canOpenHelp() {
+  public void testOpenHelpManualWindow() {
     launchApplication();
 
     window.menuItemWithPath("Help", "Manual...").click();
