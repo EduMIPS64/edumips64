@@ -31,7 +31,8 @@ import static org.junit.Assert.assertNotNull;
 
 /** Basic smoke tests for the Swing frontend. */
 public class MainSwingTest {
-  private static final Timeout UI_TIMEOUT = Timeout.timeout(10000);
+  private static final long UI_TIMEOUT_MILLIS = 10000;
+  private static final Timeout UI_TIMEOUT = Timeout.timeout(UI_TIMEOUT_MILLIS);
 
   private Robot robot;
   private FrameFixture window;
@@ -69,7 +70,7 @@ public class MainSwingTest {
 
     Path program = testResourcePath("halt.s");
     window.menuItemWithPath("File", "Open...").click();
-    JFileChooserFixture fileChooser = JFileChooserFinder.findFileChooser().withTimeout(10000).using(robot);
+    JFileChooserFixture fileChooser = JFileChooserFinder.findFileChooser().withTimeout(UI_TIMEOUT_MILLIS).using(robot);
     fileChooser.selectFile(program.toFile());
     fileChooser.approve();
 
@@ -90,7 +91,7 @@ public class MainSwingTest {
       protected boolean isMatching(JFrame frame) {
         return "EduMIPS64 Help".equals(frame.getTitle()) && frame.isShowing();
       }
-    }).withTimeout(10000).using(robot);
+    }).withTimeout(UI_TIMEOUT_MILLIS).using(robot);
 
     helpWindow.requireVisible();
     helpWindow.close();
@@ -103,7 +104,7 @@ public class MainSwingTest {
       protected boolean isMatching(JFrame frame) {
         return frame.getTitle().startsWith("EduMIPS64 v.") && frame.isShowing();
       }
-    }).withTimeout(10000).using(robot);
+    }).withTimeout(UI_TIMEOUT_MILLIS).using(robot);
     GuiActionRunner.execute(() -> ((JFrame) window.target()).setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE));
   }
 
