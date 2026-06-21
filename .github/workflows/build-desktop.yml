@@ -44,8 +44,11 @@ jobs:
       - name: Check that every instruction is covered by a test
         run: sh utils/find-instructions.sh
 
+      - name: Install Xvfb for Swing tests
+        run: sudo apt-get update && sudo apt-get install -y xvfb
+
       - name: Compile and run tests
-        run: ./gradlew check
+        run: xvfb-run --auto-servernum ./gradlew check
 
       # Summarise the JaCoCo report (produced by `./gradlew check`) into a
       # small Markdown table and publish it to the run's job summary.
@@ -90,4 +93,3 @@ jobs:
         with:
           name: Chinese manual (PDF)
           path: ./out/docs/zh/pdf/EduMIPS64.pdf
-

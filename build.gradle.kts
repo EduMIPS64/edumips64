@@ -49,6 +49,7 @@ dependencies {
 
     // To run JUnit 4 tests.
     testImplementation("junit:junit:4.13.2")    
+    testImplementation("org.assertj:assertj-swing-junit:3.17.1")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
@@ -110,6 +111,18 @@ tasks.processResources {
     from("docs/user/en/src") {
         include("*.rst")
         into("org/edumips64/help/topics")
+    }
+}
+
+tasks.processTestResources {
+    from("docs") {
+        include("user/*/EduMIPS64.hs")
+        include("user/*/EduMIPS64Index.xml")
+        include("user/*/EduMIPS64TOC.xml")
+        include("user/*/Map.jhm")
+        include("user/*/JavaHelpSearch/**")
+        include("user/*/img/**")
+        into("docs")
     }
 }
 

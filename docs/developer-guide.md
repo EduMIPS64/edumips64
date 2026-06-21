@@ -243,6 +243,10 @@ side is reported the same way: the `build-desktop` job uses
 into a Markdown table on the run summary. Both summaries are published with a
 read-only token and require no repository secrets.
 
+Swing UI tests use AssertJ Swing and require a graphical display. The
+`build-desktop` GitHub Actions job runs `./gradlew check` under `xvfb-run` so
+the same JUnit suite can exercise the desktop UI in CI.
+
 ### Source code structure
 
 The source code structure follows the [Gradle project layout conventions](https://docs.gradle.org/current/userguide/java_plugin.html#N152C8).
