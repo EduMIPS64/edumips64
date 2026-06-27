@@ -371,6 +371,10 @@ if (org.gradle.internal.os.OperatingSystem.current().isLinux && !project.hasProp
     // How long to wait for Xvfb to create its lock file and start serving
     // clients before we assume it came up successfully.
     val xvfbStartupDelayMillis = 1000L
+    // How long to wait for Xvfb to exit gracefully before killing it forcibly.
+    val xvfbShutdownTimeoutSeconds = 5L
+    // Range of X display numbers to probe for a free one.
+    val xvfbDisplayRange = 99..199
 
     // Shared state between the start/stop tasks and the test JVM configuration.
     val xvfb = object {
@@ -383,12 +387,12 @@ if (org.gradle.internal.os.OperatingSystem.current().isLinux && !project.hasProp
         doLast {
             // Pick a free X display number to avoid clashing with a running
             // X server or a previous Xvfb instance.
-            val display = (99..199).firstOrNull { n -> !file("/tmp/.X$n-lock").exists() }?.let { ":$it" }
+            val display = xvfbDisplayRange.firstOrNull { n -> !file("/tmp/.X$n-lock").exists() }?.let { ":$it" }
             if (display == null) {
                 logger.warn(
-                    "No free X display found in the range :99-:199; the Swing UI tests " +
-                    "will be SKIPPED. Free up a display or pass -PuseRealDisplay to use " +
-                    "your current one."
+                    "No free X display found in the range :${xvfbDisplayRange.first}-:${xvfbDisplayRange.last}; " +
+                    "the Swing UI tests will be SKIPPED. Free up a display or pass " +
+                    "-PuseRealDisplay to use your current one."
                 )
                 return@doLast
             }
@@ -421,7 +425,7 @@ if (org.gradle.internal.os.OperatingSystem.current().isLinux && !project.hasProp
         doLast {
             xvfb.process?.let { process ->
                 process.destroy()
-                if (!process.waitFor(5, TimeUnit.SECONDS)) {
+                if (!process.waitFor(xvfbShutdownTimeoutSeconds, TimeUnit.SECONDS)) {
                     process.destroyForcibly()
                 }
             }
