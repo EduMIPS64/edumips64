@@ -253,9 +253,9 @@ Swing tests skip themselves. Pass `-PuseRealDisplay` to run them against your
 current display instead.
 
 Windows and macOS have no Xvfb equivalent in the standard toolchain, so on those
-platforms the Swing tests run against the real desktop when one is available and
-are skipped automatically on headless machines. CI only exercises the desktop UI
-on Linux (the `build-desktop` job).
+platforms the Swing tests are skipped by default (the build forces headless
+mode). Pass `-PuseRealDisplay` to run them against your current display instead.
+CI only exercises the desktop UI on Linux (the `build-desktop` job).
 
 ### Source code structure
 

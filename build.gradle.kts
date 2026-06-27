@@ -363,10 +363,10 @@ tasks {
 // out and run the tests against the current display instead.
 //
 // Windows and macOS have no Xvfb equivalent in the standard toolchain, so on
-// those platforms the Swing tests run against the real desktop when one is
-// available, and are skipped automatically on headless machines. CI only
-// exercises the desktop UI on Linux (the build-desktop job), where Xvfb is
-// available.
+// those platforms the Swing tests are SKIPPED by default (we force headless
+// mode) instead of grabbing the developer's real desktop. Pass -PuseRealDisplay
+// to run them against the current display instead. CI only exercises the
+// desktop UI on Linux (the build-desktop job), where Xvfb is available.
 if (org.gradle.internal.os.OperatingSystem.current().isLinux && !project.hasProperty("useRealDisplay")) {
     // How long to wait for Xvfb to create its lock file and start serving
     // clients before we assume it came up successfully.
@@ -453,6 +453,20 @@ if (org.gradle.internal.os.OperatingSystem.current().isLinux && !project.hasProp
                     "Linux, or pass -PuseRealDisplay to use your current display."
                 )
             }
+        }
+    }
+} else if (!org.gradle.internal.os.OperatingSystem.current().isLinux && !project.hasProperty("useRealDisplay")) {
+    // On Windows and macOS there is no Xvfb equivalent in the standard toolchain,
+    // so by default we force headless mode, which makes the Swing UI tests skip
+    // themselves instead of grabbing the developer's real display. Pass
+    // -PuseRealDisplay to run them against the current display instead.
+    tasks.withType<Test>().configureEach {
+        doFirst {
+            systemProperty("java.awt.headless", "true")
+            logger.warn(
+                "The Swing UI tests are SKIPPED by default on non-Linux platforms. " +
+                "Pass -PuseRealDisplay to run them against your current display instead."
+            )
         }
     }
 }
