@@ -243,9 +243,19 @@ side is reported the same way: the `build-desktop` job uses
 into a Markdown table on the run summary. Both summaries are published with a
 read-only token and require no repository secrets.
 
-Swing UI tests use AssertJ Swing and require a graphical display. The
-`build-desktop` GitHub Actions job runs `./gradlew check` under `xvfb-run` so
-the same JUnit suite can exercise the desktop UI in CI.
+Swing UI tests use AssertJ Swing and require a graphical display. To keep them
+from interfering with a developer's X session (the AWT robot moves the real
+mouse and keyboard), the Gradle build runs the whole test suite on a private
+[Xvfb](https://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml) virtual
+framebuffer display on Linux, both in CI and locally. Install the `xvfb` package
+to run them; if it is missing the build falls back to headless mode and the
+Swing tests skip themselves. Pass `-PuseRealDisplay` to run them against your
+current display instead.
+
+Windows and macOS have no Xvfb equivalent in the standard toolchain, so on those
+platforms the Swing tests run against the real desktop when one is available and
+are skipped automatically on headless machines. CI only exercises the desktop UI
+on Linux (the `build-desktop` job).
 
 ### Source code structure
 

@@ -352,6 +352,83 @@ tasks {
     }
 }
 
+// The Swing UI tests drive a real AWT robot, which moves the mouse and types on
+// whatever X display is currently active. On Linux we therefore run the whole
+// test suite on a private Xvfb (virtual framebuffer) display, both in CI and
+// locally, so the tests never interfere with the developer's X session (and
+// never hang waiting for focus on a busy desktop). When Xvfb is not installed
+// the suite falls back to headless mode, which makes the Swing tests skip
+// themselves instead of grabbing the real display. Pass -PuseRealDisplay to opt
+// out and run the tests against the current display instead.
+//
+// Windows and macOS have no Xvfb equivalent in the standard toolchain, so on
+// those platforms the Swing tests run against the real desktop when one is
+// available, and are skipped automatically on headless machines. CI only
+// exercises the desktop UI on Linux (the build-desktop job), where Xvfb is
+// available.
+if (org.gradle.internal.os.OperatingSystem.current().isLinux && !project.hasProperty("useRealDisplay")) {
+    // Shared state between the start/stop tasks and the test JVM configuration.
+    val xvfb = object {
+        var process: Process? = null
+        var display: String? = null
+    }
+
+    val startXvfb = tasks.register("startXvfb") {
+        description = "Starts a private Xvfb display for the Swing UI tests."
+        doLast {
+            // Pick a free X display number to avoid clashing with a running
+            // X server or a previous Xvfb instance.
+            val display = (99..199).firstOrNull { n -> !file("/tmp/.X$n-lock").exists() }
+                ?.let { ":$it" } ?: ":99"
+            try {
+                val process = ProcessBuilder(
+                    "Xvfb", display, "-screen", "0", "1280x1024x24", "-nolisten", "tcp"
+                )
+                    .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                    .redirectError(ProcessBuilder.Redirect.DISCARD)
+                    .start()
+                // Give Xvfb a moment to create its lock file and start serving.
+                Thread.sleep(1000)
+                if (!process.isAlive) {
+                    throw GradleException("Xvfb exited immediately on display $display")
+                }
+                xvfb.process = process
+                xvfb.display = display
+                logger.lifecycle("Started Xvfb on display $display for the Swing UI tests.")
+            } catch (e: Exception) {
+                logger.warn(
+                    "Could not start Xvfb ({}); the Swing UI tests will be skipped. " +
+                    "Install the 'xvfb' package to run them on Linux.", e.toString()
+                )
+            }
+        }
+    }
+
+    val stopXvfb = tasks.register("stopXvfb") {
+        description = "Stops the private Xvfb display used by the Swing UI tests."
+        doLast {
+            xvfb.process?.destroy()
+            xvfb.process = null
+            xvfb.display = null
+        }
+    }
+
+    tasks.withType<Test>().configureEach {
+        dependsOn(startXvfb)
+        finalizedBy(stopXvfb)
+        doFirst {
+            val display = xvfb.display
+            if (display != null) {
+                environment("DISPLAY", display)
+            } else {
+                // No virtual framebuffer available: force headless so the Swing
+                // tests skip instead of taking over the developer's real display.
+                systemProperty("java.awt.headless", "true")
+            }
+        }
+    }
+}
+
 tasks.check{
     dependsOn("jacocoTestReport")
 }
