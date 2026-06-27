@@ -2,6 +2,7 @@
  * EduMIPS64 Gradle build configuration
  */
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 import ru.vyarus.gradle.plugin.python.task.PythonTask
 import ru.vyarus.gradle.plugin.python.PythonExtension.Scope.VIRTUALENV
 
@@ -367,6 +368,10 @@ tasks {
 // exercises the desktop UI on Linux (the build-desktop job), where Xvfb is
 // available.
 if (org.gradle.internal.os.OperatingSystem.current().isLinux && !project.hasProperty("useRealDisplay")) {
+    // How long to wait for Xvfb to create its lock file and start serving
+    // clients before we assume it came up successfully.
+    val xvfbStartupDelayMillis = 1000L
+
     // Shared state between the start/stop tasks and the test JVM configuration.
     val xvfb = object {
         var process: Process? = null
@@ -378,8 +383,15 @@ if (org.gradle.internal.os.OperatingSystem.current().isLinux && !project.hasProp
         doLast {
             // Pick a free X display number to avoid clashing with a running
             // X server or a previous Xvfb instance.
-            val display = (99..199).firstOrNull { n -> !file("/tmp/.X$n-lock").exists() }
-                ?.let { ":$it" } ?: ":99"
+            val display = (99..199).firstOrNull { n -> !file("/tmp/.X$n-lock").exists() }?.let { ":$it" }
+            if (display == null) {
+                logger.warn(
+                    "No free X display found in the range :99-:199; the Swing UI tests " +
+                    "will be SKIPPED. Free up a display or pass -PuseRealDisplay to use " +
+                    "your current one."
+                )
+                return@doLast
+            }
             try {
                 val process = ProcessBuilder(
                     "Xvfb", display, "-screen", "0", "1280x1024x24", "-nolisten", "tcp"
@@ -388,7 +400,7 @@ if (org.gradle.internal.os.OperatingSystem.current().isLinux && !project.hasProp
                     .redirectError(ProcessBuilder.Redirect.DISCARD)
                     .start()
                 // Give Xvfb a moment to create its lock file and start serving.
-                Thread.sleep(1000)
+                Thread.sleep(xvfbStartupDelayMillis)
                 if (!process.isAlive) {
                     throw GradleException("Xvfb exited immediately on display $display")
                 }
@@ -397,7 +409,7 @@ if (org.gradle.internal.os.OperatingSystem.current().isLinux && !project.hasProp
                 logger.lifecycle("Started Xvfb on display $display for the Swing UI tests.")
             } catch (e: Exception) {
                 logger.warn(
-                    "Could not start Xvfb ({}); the Swing UI tests will be skipped. " +
+                    "Could not start Xvfb ({}); the Swing UI tests will be SKIPPED. " +
                     "Install the 'xvfb' package to run them on Linux.", e.toString()
                 )
             }
@@ -407,7 +419,12 @@ if (org.gradle.internal.os.OperatingSystem.current().isLinux && !project.hasProp
     val stopXvfb = tasks.register("stopXvfb") {
         description = "Stops the private Xvfb display used by the Swing UI tests."
         doLast {
-            xvfb.process?.destroy()
+            xvfb.process?.let { process ->
+                process.destroy()
+                if (!process.waitFor(5, TimeUnit.SECONDS)) {
+                    process.destroyForcibly()
+                }
+            }
             xvfb.process = null
             xvfb.display = null
         }
@@ -423,7 +440,14 @@ if (org.gradle.internal.os.OperatingSystem.current().isLinux && !project.hasProp
             } else {
                 // No virtual framebuffer available: force headless so the Swing
                 // tests skip instead of taking over the developer's real display.
+                // Make the reason visible in the Gradle output, since the skipped
+                // tests on their own do not explain why.
                 systemProperty("java.awt.headless", "true")
+                logger.warn(
+                    "No virtual framebuffer (Xvfb) is available: the Swing UI tests in " +
+                    "this run will be SKIPPED. Install the 'xvfb' package to run them on " +
+                    "Linux, or pass -PuseRealDisplay to use your current display."
+                )
             }
         }
     }
