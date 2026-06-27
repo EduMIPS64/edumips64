@@ -47,10 +47,12 @@ public class StatusBar {
 
   public StatusBar(ConfigStore cfg) {
     statusLabel = new JLabel();
+    statusLabel.setName("statusLabel");
     statusLabel.setFont(statusLabel.getFont().deriveFont((float)cfg.getInt(ConfigKey.UI_FONT_SIZE)));
     statusLabel.setText(CurrentLocale.getString("StatusBar.WELCOME") + " " + MetaInfo.VERSION);
 
     cpuStatusLabel = new JLabel();
+    cpuStatusLabel.setName("cpuStatusLabel");
     cpuStatusLabel.setFont(statusLabel.getFont().deriveFont((float)cfg.getInt(ConfigKey.UI_FONT_SIZE)));
 
     pb = new JProgressBar(0, 10);
@@ -87,4 +89,3 @@ public class StatusBar {
 
   public void setCpuStatusText(String text) {cpuStatusLabel.setText(text + "  ");}
 }
-
