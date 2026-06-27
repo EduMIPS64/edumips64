@@ -103,6 +103,9 @@ In particular you may find useful these tasks:
 
 You may also find useful using the `--console=plain` flag to better see what tasks
 are being executed.  
+Gradle's configuration cache is enabled in `gradle.properties`, so repeated
+invocations can reuse the configuration phase when the requested tasks support
+it.
 Individual tasks for building single documentation (PDF and HTML) and jar targets
 are available too: please read `build.gradle` for the complete list.  
 Gradle builds the following jar artifacts:
