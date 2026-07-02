@@ -22,12 +22,9 @@ import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import { styled } from '@mui/material/styles';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
-import {
-  createTheme,
-  responsiveFontSizes,
-  ThemeProvider,
-} from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { buildTheme } from '../theme';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Typography from '@mui/material/Typography';
@@ -661,8 +658,8 @@ const Simulator = ({worker, initialState, appInsights}) => {
   ))(({ theme }) => ({
     backgroundColor:
       theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, .05)'
-        : 'rgba(227, 245, 254, 1)',
+        ? 'rgba(141, 166, 255, 0.08)'
+        : 'rgba(53, 87, 212, 0.06)',
     flexDirection: 'row-reverse',
     '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
       transform: 'rotate(180deg)',
@@ -694,18 +691,10 @@ const Simulator = ({worker, initialState, appInsights}) => {
     document.documentElement.setAttribute('data-theme', paletteMode);
   }, [paletteMode]);
 
-  // `responsiveFontSizes` rescales the MUI typography variants
-  // (h1..h6, body etc.) so that text shrinks gracefully on phones
-  // and tablets. Without it MUI sticks to its desktop-tuned sizes,
-  // which look excessively large on devices like the iPad Pro.
-  const theme = React.useMemo(() => {
-    const base = createTheme({
-      palette: {
-        mode: paletteMode,
-      },
-    });
-    return responsiveFontSizes(base);
-  }, [paletteMode]);
+  // The theme (palette, typography, component overrides) is centralized in
+  // src/webapp/theme.js; it already applies `responsiveFontSizes` so text
+  // shrinks gracefully on phones and tablets.
+  const theme = React.useMemo(() => buildTheme(paletteMode), [paletteMode]);
 
   return (
     <>
@@ -771,7 +760,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="h7" sx={{ fontWeight: 600, color: 'primary.main' }}>
                   Stats
                   {accordionAlerts && accordionChanges.stats && <span className="accordion-change-indicator" />}
                 </Typography>
@@ -786,7 +775,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="h7" sx={{ fontWeight: 600, color: 'primary.main' }}>
                   Pipeline
                   {accordionAlerts && accordionChanges.pipeline && <span className="accordion-change-indicator" />}
                 </Typography>
@@ -801,7 +790,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="h7" sx={{ fontWeight: 600, color: 'primary.main' }}>
                   Registers
                   {accordionAlerts && accordionChanges.registers && <span className="accordion-change-indicator" />}
                 </Typography>
@@ -816,7 +805,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />} id="memory-accordion-summary">
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="h7" sx={{ fontWeight: 600, color: 'primary.main' }}>
                   Memory
                   {accordionAlerts && accordionChanges.memory && <span className="accordion-change-indicator" />}
                 </Typography>
@@ -831,7 +820,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="h7" sx={{ fontWeight: 600, color: 'primary.main' }}>
                   Standard Output
                   {accordionAlerts && accordionChanges.stdout && <span className="accordion-change-indicator" />}
                 </Typography>
@@ -846,7 +835,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: status === 'RUNNING' ? 'gray' : '#1976d2' }}>
+                <Typography variant="h7" sx={{ fontWeight: 600, color: status === 'RUNNING' ? 'text.disabled' : 'primary.main' }}>
                   Cache Configuration
                 </Typography>
               </AccordionSummary>
@@ -864,7 +853,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="h7" sx={{ fontWeight: 600, color: 'primary.main' }}>
                   General Settings
                 </Typography>
               </AccordionSummary>
