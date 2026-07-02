@@ -37,6 +37,7 @@ import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
 import SampleProgram from '../data/SampleProgram';
 import { deriveLogicalState } from '../simulatorState';
+import { executionReducer, initialExecState } from '../executionReducer';
 
 // Styled accordion header shared by all right-panel widgets. Defined at
 // module scope on purpose: defining a styled() component inside the
@@ -256,18 +257,17 @@ const Simulator = ({worker, initialState, appInsights}) => {
     }
   };
 
-  // Number of steps left to run. Used to keep track of execution.
-  // If set to -1, runs until the execution ends.
-  const [stepsToRun, setStepsToRun] = React.useState(0);
-
-  // Signals that the simulation must pause.
-  const [mustPause, setMustPause] = React.useState(false);
-
-  // Tracks whether the worker is currently running code.
-  const [executing, setExecuting] = React.useState(false);
-
-  // Tracks whether the simulation is running in "run all" mode (run until finished).
-  const [runAll, setRunAll] = React.useState(false);
+  // Execution state machine — replaces the four individual useState variables
+  // (stepsToRun, mustPause, runAll, executing) that previously suffered from
+  // stale-closure races.  useReducer makes every transition atomic: the
+  // reducer sees the complete current state and emits a complete new state,
+  // so no individual setter can race another.  See executionReducer.js for
+  // the full action documentation.
+  const [execState, dispatch] = React.useReducer(
+    executionReducer,
+    initialExecState,
+  );
+  const { stepsToRun, mustPause, runAll, executing } = execState;
 
   const simulatorRunning = status == 'RUNNING';
 
@@ -291,9 +291,15 @@ const Simulator = ({worker, initialState, appInsights}) => {
     return parsingErrors.some((e) => !e.isWarning);
   };
 
-  worker.onmessage = (e) => {
+  // Worker message handler — stored in a ref so the addEventListener-based
+  // subscription (below) can register a single stable wrapper once, while
+  // the *real* handler body is reassigned on every render and therefore
+  // always reads the latest closures (execState, scheduleNextBatch, …).
+  // This is identical in structure to the existing keyboardHandlerRef pattern.
+  const workerHandlerRef = React.useRef(null);
+  workerHandlerRef.current = (e) => {
     const result = worker.parseResult(e.data);
-    
+
     // For syntax check responses, only update parsing errors to avoid unnecessary re-renders
     if (result.method === 'checksyntax') {
       setParsingErrors(result.parsingErrors);
@@ -307,13 +313,26 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
     if (result.inputRequested) {
       applyResultState(result);
-      setExecuting(false);
+      dispatch({ type: 'INPUT_REQUESTED' });
       setInputRequest(result);
       return;
     }
-    
+
     updateState(result);
   };
+
+  // Register exactly one stable message listener for the lifetime of this
+  // component instead of the previous render-body `worker.onmessage = …`
+  // assignment, which was a side-effect during render — a React anti-pattern
+  // that could silently drop messages during Strict-Mode double-invocations
+  // and could not carry a cleanup.
+  React.useEffect(() => {
+    const handleMessage = (e) => workerHandlerRef.current(e);
+    worker.addEventListener('message', handleMessage);
+    return () => worker.removeEventListener('message', handleMessage);
+    // worker is a stable prop reference; include it so the linter is satisfied
+    // and so the subscription is re-created if a caller ever passes a new worker.
+  }, [worker]);
 
   const applyResultState = (result) => {
     setRegisters(result.registers);
@@ -351,16 +370,25 @@ const Simulator = ({worker, initialState, appInsights}) => {
       }
       alert(message);
       stopCode();
-      setExecuting(false);
-      // stopCode() queues state updates (setRunAll(false), setMustPause(true))
-      // and a worker.reset(), but those don't take effect within this closure.
-      // Return early to avoid falling through to the "schedule more steps"
-      // branch below, which would otherwise race worker.reset() with a new
-      // step() call against an already-reset (READY) CPU and surface a
-      // spurious "Cannot run in state READY" alert.
+      // stopCode() dispatches STOP (mustPause=true, runAll=false, stepsToRun=0),
+      // but since we are inside a worker-result handler (not a pending batch),
+      // hadPendingBatch is false and STOP leaves executing unchanged (still
+      // true).  Dispatch RESULT_RECEIVED with status='STOPPED' to atomically
+      // clear executing and reset all flags, preventing any follow-up batch
+      // from racing the worker.reset() already queued by stopCode().
+      dispatch({ type: 'RESULT_RECEIVED', status: 'STOPPED', encounteredBreak: false });
       return;
     }
 
+    // Dispatch the execution state transition atomically.  The reducer decides
+    // whether to stay in "executing" (more batches pending) or clear the flag.
+    dispatch({ type: 'RESULT_RECEIVED', status: result.status, encounteredBreak: result.encounteredBreak });
+
+    // Scheduling is a side-effect and cannot live inside the reducer.  We read
+    // the *pre-dispatch* execState here — which is correct, because the closure
+    // captured by workerHandlerRef.current reflects the last render before this
+    // message arrived (i.e., the state that drove the batch that just finished).
+    //
     // Note: we intentionally keep `executing === true` across inter-batch
     // delays when more steps are queued. Clearing `executing` between
     // batches would toggle the toolbar buttons (Run/Step/Stop becoming
@@ -369,19 +397,13 @@ const Simulator = ({worker, initialState, appInsights}) => {
     // should see the same "running" controls whether the worker is busy
     // stepping or we're simply waiting out the inter-batch delay.
     if (result.status !== 'RUNNING' || mustPause || result.encounteredBreak) {
-      setStepsToRun(0);
-      setMustPause(false);
-      setRunAll(false);
-      setExecuting(false);
+      // Execution halted; reducer already cleared all flags.  Nothing to schedule.
     } else if (stepsToRun > 0) {
       scheduleNextBatch(() => stepCode(stepsToRun));
     } else if (runAll) {
       scheduleNextBatch(() => stepCode(INTERNAL_STEPS_STRIDE));
-    } else {
-      // No further batches scheduled (e.g. a plain Single Step finishing):
-      // we're done executing for now.
-      setExecuting(false);
     }
+    // else: single step finished normally; reducer set executing=false — done.
   };
 
   // Pending timeout id for a delayed follow-up batch, so that stopping the
@@ -435,31 +457,27 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   // Business logic for click handlers.
   const runCode = () => {
-    setRunAll(true);
-    stepCode(INTERNAL_STEPS_STRIDE);
+    dispatch({ type: 'RUN_ALL_REQUESTED' });
+    worker.step(INTERNAL_STEPS_STRIDE);
   };
 
   const stepCode = (n) => {
     const toRun = Math.min(n, INTERNAL_STEPS_STRIDE);
-    setStepsToRun(n - toRun);
-    setExecuting(true);
+    dispatch({ type: 'STEP_REQUESTED', stepsRemaining: n - toRun });
     worker.step(toRun);
   };
 
   const stopCode = () => {
     // If a batch was sleeping between strides, cancel it. In that case no
     // worker result is in flight to flip `executing` back off via
-    // `updateState`, so clear it here too.
+    // `updateState`, so we pass hadPendingBatch=true and the reducer clears
+    // executing immediately.  When the worker is mid-step (hadPendingBatch
+    // false), the upcoming result will see mustPause=true and clear executing.
     const hadPendingBatch = nextBatchTimeout.current !== null;
     cancelPendingBatch();
-    setMustPause(true);
-    setRunAll(false);
-    setStepsToRun(0);
+    dispatch({ type: 'STOP', hadPendingBatch });
     setInputRequest(null);
-    if (hadPendingBatch) {
-      setExecuting(false);
-    }
-    worker.reset();  // Assuming simulator has a reset method
+    worker.reset();
   };
 
   const clearCode = () => {
@@ -468,9 +486,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
     setCode(".data\n\n.code\n  SYSCALL 0\n");
     isResetting.current = true;
     setInputRequest(null);
-    if (hadPendingBatch) {
-      setExecuting(false);
-    }
+    dispatch({ type: 'RESET', hadPendingBatch });
     worker.reset();
     // Clear accordion change markers
     setAccordionChanges({
@@ -500,9 +516,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
     setParsingErrors([]);
     isResetting.current = true;
     setInputRequest(null);
-    if (hadPendingBatch) {
-      setExecuting(false);
-    }
+    dispatch({ type: 'RESET', hadPendingBatch });
     worker.reset();
     // Run a fresh syntax check on the restored sample so any warnings in the
     // sample are surfaced immediately.
@@ -546,7 +560,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   const submitInput = (input) => {
     setInputRequest(null);
-    setExecuting(true);
+    dispatch({ type: 'INPUT_SUBMITTED' });
     worker.provideInput(input);
   };
 
@@ -618,7 +632,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
           runCode();
         } else if (logicalState === 'EXECUTING') {
           appInsights.trackEvent({ name: 'pause', source: 'keyboard' });
-          setMustPause(true);
+          dispatch({ type: 'PAUSE_REQUESTED' });
         }
         break;
       case 'F9':
@@ -722,7 +736,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
           onRunClick={clickRun}
           onPauseClick={() => {
             appInsights.trackEvent({ name: 'pause' });
-            setMustPause(true);
+            dispatch({ type: 'PAUSE_REQUESTED' });
           }}
           onStopClick={clickStop}
           status={status}
