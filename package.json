@@ -42,7 +42,7 @@
     "babel-plugin-istanbul": "^8.0.0",
     "copy-webpack-plugin": "14.0.0",
     "css-loader": "7.1.4",
-    "electron": "^42.0.0",
+    "electron": "^43.0.0",
     "eslint": "^10.0.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.6",
