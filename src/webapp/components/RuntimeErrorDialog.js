@@ -1,11 +1,16 @@
 import React from 'react';
 
+import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+
+// The cracked-CPU artwork used by the Swing UI's ErrorDialog, shown to the
+// left of the message like a classic JOptionPane error icon.
+import errorImage from '../static/error-hires.png';
 
 /**
  * RuntimeErrorDialog – informational MUI Dialog shown when the simulator
@@ -34,13 +39,21 @@ function RuntimeErrorDialog({ open, message, onClose }) {
     >
       <DialogTitle id="runtime-error-dialog-title">Runtime error</DialogTitle>
       <DialogContent>
-        <Typography
-          variant="body2"
-          component="pre"
-          sx={{ whiteSpace: 'pre-line', fontFamily: 'inherit', m: 0 }}
-        >
-          {message}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <img
+            src={errorImage}
+            alt=""
+            aria-hidden="true"
+            style={{ width: 140, height: 'auto', flexShrink: 0 }}
+          />
+          <Typography
+            variant="body2"
+            component="pre"
+            sx={{ whiteSpace: 'pre-line', fontFamily: 'inherit', m: 0 }}
+          >
+            {message}
+          </Typography>
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button
