@@ -66,7 +66,23 @@ module.exports = (env, argv) => {
     },
     module: {
       rules: [
-        { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' },
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          loader: 'babel-loader',
+          // Babel resolves its env from BABEL_ENV/NODE_ENV, *not* from
+          // webpack's --mode. Since Babel 8, @babel/preset-react defaults to
+          // the automatic JSX runtime and emits the development-only
+          // `jsxDEV()` calls unless the Babel env is 'production'. A
+          // `webpack --mode production` build therefore compiled dev-mode
+          // JSX while bundling production React (whose jsx-dev-runtime
+          // exports nothing), crashing the app at startup with
+          // "jsxDEV is not a function" and a blank page. Tie Babel's env to
+          // the webpack mode in production; keep the default resolution in
+          // development so `BABEL_ENV=coverage` still activates the istanbul
+          // instrumentation env from .babelrc.
+          options: isProduction ? { envName: 'production' } : {},
+        },
         // Webpack 5 enforces fully-specified ESM resolution for .mjs files,
         // which breaks extensionless imports like MUI's
         // 'react-transition-group/TransitionGroupContext' (added in @mui v9.1).
