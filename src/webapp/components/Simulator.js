@@ -140,6 +140,11 @@ const Simulator = ({ worker, initialState, appInsights }) => {
     applyChecksyntaxResult,
   } = useSimulatorData(initialState);
 
+  // Message shown in the RuntimeErrorDialog; null = dialog closed. Set by the
+  // execution controller when a runtime error result arrives (the controller
+  // stops the CPU immediately; the dialog is purely informational).
+  const [runtimeErrorMessage, setRuntimeErrorMessage] = React.useState(null);
+
   // ---------------------------------------------------------------------------
   // Execution controller (reducer, batch scheduling, worker subscription)
   // ---------------------------------------------------------------------------
