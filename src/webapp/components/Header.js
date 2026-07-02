@@ -26,6 +26,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import DownloadIcon from '@mui/icons-material/Download';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import HelpIcon from '@mui/icons-material/Help';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import UploadIcon from '@mui/icons-material/Upload';
 
@@ -283,6 +284,20 @@ export default function Header(props) {
             <ListItemText>Load Example</ListItemText>
           </MenuItem>
         </Menu>
+        <Tooltip
+          title="Simulator configuration (settings and cache)"
+          arrow
+          placement="top"
+        >
+          <IconButton
+            color="inherit"
+            id="config-button"
+            aria-label="Open configuration"
+            onClick={() => props.onConfigClick()}
+          >
+            <SettingsOutlinedIcon />
+          </IconButton>
+        </Tooltip>
         <IconButton
           color="inherit"
           className="help-button"

@@ -25,7 +25,7 @@ body {
   position: absolute;
   top: -40px;
   left: 0;
-  background: #1976d2;
+  background: #5b34c7;
   color: #fff;
   padding: 8px 16px;
   z-index: 100000;
@@ -55,20 +55,70 @@ body {
 }
 
 #right-panel {
-  overflow: auto;
+  /* The dashboard grid manages its own scrolling area. */
+  overflow: hidden;
   height: 100%;
-  border-left: 1px solid rgb(33, 150, 243);
+  border-left: 1px solid rgba(15, 23, 42, 0.10);
+  background-color: #edf0f7;
 }
 
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
-  background-color: #fff;
+  background-color: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgb(33, 150, 243);
-  border-radius: 5px 0 0 5px;
+  background-color: rgba(100, 116, 139, 0.45);
+  border-radius: 4px;
+}
+
+/* Data tables inside the dashboard cards. */
+#registers,
+#memory {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+#registers td,
+#memory td,
+#memory th {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+#registers tr:hover,
+#memory tbody tr:hover {
+  background-color: rgba(91, 52, 199, 0.06);
+}
+
+#registers td.registerName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #586174;
+  padding: 0 4px;
+}
+
+#memory th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #586174;
+}
+
+html[data-theme='dark'] #registers td,
+html[data-theme='dark'] #memory td,
+html[data-theme='dark'] #memory th {
+  border-bottom-color: rgba(148, 163, 184, 0.1);
+}
+
+html[data-theme='dark'] #registers tr:hover,
+html[data-theme='dark'] #memory tbody tr:hover {
+  background-color: rgba(179, 154, 252, 0.08);
+}
+
+html[data-theme='dark'] #registers td.registerName,
+html[data-theme='dark'] #memory th {
+  color: #94a3b8;
 }
 
 textarea {
@@ -213,7 +263,7 @@ div.error-accordion {
     overflow: visible;
     /* The right panel now sits *under* the editor, not next to it. */
     border-left: none;
-    border-top: 1px solid rgb(33, 150, 243);
+    border-top: 1px solid rgba(15, 23, 42, 0.10);
   }
 }
 
@@ -222,7 +272,8 @@ div.error-accordion {
    from the MUI palette mode), NOT the OS `prefers-color-scheme` media query,
    so these stay in sync when the user overrides the theme in Settings. */
 html[data-theme='dark'] #right-panel {
-  border-left-color: rgba(255, 255, 255, 0.188);
+  border-left-color: rgba(148, 163, 184, 0.16);
+  background-color: #0a0f1e;
 }
 
 html[data-theme='dark'] div.error-accordion {
