@@ -1,11 +1,10 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
-import CssBaseline from '@mui/material/CssBaseline';
-
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
-import Simulator from './components/Simulator';
+import AppErrorBoundary from './components/AppErrorBoundary';
+import AppLoader from './components/AppLoader';
 
 import './css/main.css'
 
@@ -76,20 +75,15 @@ worker.parseResult = (result) => {
 };
 worker.version = version;
 
-worker.reset();
-const initializer = (evt) => {
-  // Run this callback only once, to initialize the Simulator
-  // React component which will then handle all subsequent messages.
-  worker.removeEventListener('message', initializer);
-  const initState = worker.parseResult(evt.data);
-  const container = document.getElementById('simulator');
-  const root = createRoot(container);
-  
-  root.render(
-        <>
-        <CssBaseline />
-        <Simulator worker={worker} initialState={initState} appInsights={appInsights} />
-        </>
-  );
-};
-worker.addEventListener('message', initializer);
+// Mount React immediately so the user sees a loading indicator rather than
+// a blank page.  AppLoader registers its 'message'/'error' listeners in its
+// constructor and calls worker.reset() in componentDidMount, ensuring the
+// listener is always in place before the first worker message arrives.
+const container = document.getElementById('simulator');
+const root = createRoot(container);
+
+root.render(
+  <AppErrorBoundary appInsights={appInsights}>
+    <AppLoader worker={worker} appInsights={appInsights} />
+  </AppErrorBoundary>
+);
