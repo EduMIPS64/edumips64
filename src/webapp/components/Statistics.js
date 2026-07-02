@@ -89,4 +89,4 @@ const tableStyle = {
   );
 };
 
-export default Statistics;
+export default React.memo(Statistics);
