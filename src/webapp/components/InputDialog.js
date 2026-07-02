@@ -55,7 +55,9 @@ const InputDialog = ({ request, onSubmit, onCancel }) => {
           autoFocus
           fullWidth
           value={value}
-          inputProps={{ maxLength: maxLength > 0 ? maxLength : undefined }}
+          slotProps={{
+            htmlInput: { maxLength: maxLength > 0 ? maxLength : undefined },
+          }}
           onChange={(event) => {
             const next =
               maxLength > 0

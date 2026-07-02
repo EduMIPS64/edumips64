@@ -25,12 +25,9 @@
     "lodash": "^4.17.19",
     "monaco-editor-webpack-plugin": "^7.0.0",
     "monaco-vim": "^0.4.2",
-    "node-forge": "^1.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-icons": "^5.0.0",
-    "react-monaco-editor": "^0.59.0",
-    "react-redux": "^9.0.0"
+    "react-monaco-editor": "^0.59.0"
   },
   "devDependencies": {
     "@babel/core": "8.0.1",

@@ -144,7 +144,7 @@ const Settings = ({
                 color="primary"
                 size="small"
                 disabled={forwardingDisabled}
-                inputProps={{ 'data-testid': 'forwarding-switch' }}
+                slotProps={{ input: { 'data-testid': 'forwarding-switch' } }}
               />
             }
             label={
@@ -168,7 +168,7 @@ const Settings = ({
                 color="primary"
                 size="small"
                 disabled={delaySlotDisabled}
-                inputProps={{ 'data-testid': 'delay-slot-switch' }}
+                slotProps={{ input: { 'data-testid': 'delay-slot-switch' } }}
               />
             }
             label={
