@@ -44,6 +44,12 @@ RESERVED_NAMES = ["c", "versions.json", "CNAME", ".nojekyll", ".git"]
 BUILDS_DIR = "c"
 INDEX_FILE = "versions.json"
 
+# Number of most-recent promoted versions whose c/<sha>/ snapshot is retained.
+# The current production version is always retained regardless of this cap.
+# Promoted versions beyond this window keep their versions.json entry (with
+# "pruned": true) so the audit trail survives, but their snapshot is deleted.
+KEEP_PROMOTED = 10
+
 _FULL_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 
 # ---------------------------------------------------------------------------
@@ -174,24 +180,67 @@ def replace_root_with(sha: str) -> None:
 
 
 def prune_to_invariant(index: dict) -> None:
-    """Delete every non-promoted version with seq < current.seq.
+    """Apply the retention policy after a promote operation.
 
-    Removes both the versions.json entry and the c/<sha>/ directory.
-    Re-establishes keep(V) == V.promoted or V.seq > current.seq.
+    A version's c/<sha>/ snapshot is retained iff:
+      (1) It is the current production version, OR
+      (2) It is among the KEEP_PROMOTED most-recent promoted versions by seq, OR
+      (3) Its seq > current.seq (candidate newer than current).
+
+    For promoted versions outside the retention window: the versions.json entry
+    is kept with "pruned": true (audit trail / seq history preserved) but the
+    c/<sha>/ snapshot directory is deleted to reclaim Pages storage.
+
+    Non-promoted versions with seq < current.seq are removed entirely (both the
+    entry and the snapshot) — these are candidates that were skipped over and will
+    never be promoted.
+
+    promote and rollback refuse to target a pruned version.
     """
     cur = current_entry(index)
     if cur is None:
         return
     cur_seq = cur["seq"]
+
+    # Determine which promoted snapshots to keep on disk.
+    all_promoted_by_seq = sorted(
+        (e for e in index["versions"] if e["promoted"]),
+        key=lambda e: e["seq"],
+        reverse=True,
+    )
+    keep_snapshot_shas: set[str] = {cur["sha"]}  # current is always kept (rule 1)
+    for e in all_promoted_by_seq[:KEEP_PROMOTED]:  # top KEEP_PROMOTED (rule 2)
+        keep_snapshot_shas.add(e["sha"])
+
     kept = []
     for entry in index["versions"]:
-        if entry["promoted"] or entry["seq"] > cur_seq:
+        if entry["seq"] > cur_seq:
+            # Future candidate: always keep entirely (rule 3).
+            entry.pop("pruned", None)
             kept.append(entry)
+        elif entry["promoted"]:
+            if entry["sha"] in keep_snapshot_shas:
+                # Within retention window: keep snapshot, clear any stale pruned flag.
+                entry.pop("pruned", None)
+                kept.append(entry)
+            else:
+                # Promoted but outside KEEP_PROMOTED window: retain entry (audit
+                # trail) but delete the on-disk snapshot to save space.
+                entry["pruned"] = True
+                snapshot = build_dir(entry["sha"])
+                if snapshot.is_dir():
+                    print(f"Pruning old promoted snapshot {BUILDS_DIR}/{entry['sha']} "
+                          f"(seq {entry['seq']}, beyond KEEP_PROMOTED={KEEP_PROMOTED})")
+                    shutil.rmtree(snapshot)
+                kept.append(entry)
         else:
+            # Non-promoted and in the past: remove entry and snapshot entirely.
             snapshot = build_dir(entry["sha"])
             if snapshot.is_dir():
                 print(f"Pruning candidate {BUILDS_DIR}/{entry['sha']} (seq {entry['seq']})")
                 shutil.rmtree(snapshot)
+            # Entry intentionally omitted from kept.
+
     index["versions"] = kept
 
 
@@ -259,6 +308,11 @@ def cmd_promote(sha: str, actor: str) -> None:
         die(f"Refusing to promote '{sha}': no such version in {INDEX_FILE} "
             f"(promotion never builds — the commit must be pushed first).")
     full_sha = entry["sha"]
+    if entry.get("pruned"):
+        die(f"Refusing to promote '{full_sha}': this version has been pruned "
+            f"(its c/<sha>/ snapshot was deleted to save Pages storage). "
+            f"Pruned versions cannot be promoted. "
+            f"To restore it you would need to re-push the artifact with `push`.")
     if not build_dir(full_sha).is_dir():
         die(f"Refusing to promote '{full_sha}': {BUILDS_DIR}/{full_sha}/ "
             f"is missing (promotion never builds).")
@@ -300,10 +354,12 @@ def cmd_rollback(actor: str) -> None:
 
     older_promoted = [
         e for e in index["versions"]
-        if e["promoted"] and e["seq"] < cur["seq"]
+        if e["promoted"] and e["seq"] < cur["seq"] and not e.get("pruned")
     ]
     if not older_promoted:
-        die("No older promoted version to roll back to.")
+        die("No older promoted version to roll back to (all older promoted versions "
+            "have been pruned or no older promoted version exists). "
+            "With KEEP_PROMOTED=10 this should not happen in normal operation.")
 
     target = max(older_promoted, key=lambda e: e["seq"])
     if not build_dir(target["sha"]).is_dir():

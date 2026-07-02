@@ -22,23 +22,45 @@ import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import { styled } from '@mui/material/styles';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
-import {
-  createTheme,
-  responsiveFontSizes,
-  ThemeProvider,
-} from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { buildTheme } from '../theme';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Typography from '@mui/material/Typography';
 
-import { debounce, isEqual } from 'lodash';
+import debounce from 'lodash/debounce';
+import isEqual from 'lodash/isEqual';
 import Settings from './Settings';
 import CacheConfig from "./CacheConfig";
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
 import SampleProgram from '../data/SampleProgram';
 import { deriveLogicalState } from '../simulatorState';
+
+// Styled accordion header shared by all right-panel widgets. Defined at
+// module scope on purpose: defining a styled() component inside the
+// Simulator render body would create a new component *type* on every
+// render, making React unmount and remount every accordion header each
+// time a worker message updates state.
+const AccordionSummary = styled((props) => (
+  <MuiAccordionSummary
+    expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.8rem' }} />}
+    {...props}
+  />
+))(({ theme }) => ({
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(141, 166, 255, 0.08)'
+      : 'rgba(53, 87, 212, 0.06)',
+  flexDirection: 'row-reverse',
+  '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+    transform: 'rotate(180deg)',
+  },
+  '& .MuiAccordionSummary-content': {
+    marginLeft: theme.spacing(1),
+  },
+}));
 
 const Simulator = ({worker, initialState, appInsights}) => {
   // The amount of steps to run in multi-step executions.
@@ -271,7 +293,6 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   worker.onmessage = (e) => {
     const result = worker.parseResult(e.data);
-    console.log('Got message from worker.', result);
     
     // For syntax check responses, only update parsing errors to avoid unnecessary re-renders
     if (result.method === 'checksyntax') {
@@ -314,8 +335,6 @@ const Simulator = ({worker, initialState, appInsights}) => {
   };
 
   const updateState = (result) => {
-    console.log('Updating state.');
-
     applyResultState(result);
 
     // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
@@ -355,7 +374,6 @@ const Simulator = ({worker, initialState, appInsights}) => {
       setRunAll(false);
       setExecuting(false);
     } else if (stepsToRun > 0) {
-      console.log('Steps left: ' + stepsToRun);
       scheduleNextBatch(() => stepCode(stepsToRun));
     } else if (runAll) {
       scheduleNextBatch(() => stepCode(INTERNAL_STEPS_STRIDE));
@@ -397,25 +415,21 @@ const Simulator = ({worker, initialState, appInsights}) => {
   // Click handlers. Decoupled from business logic to place the telemetry hooks in the right place.
   const clickRun = () => {
     appInsights.trackEvent({name: "click", properties: {action: "run"}});
-    console.log('Executing runCode');
     runCode()
   }
 
   const clickStep = (n) => {
     appInsights.trackEvent({name: "click", properties: {action: "step"}});
-    console.log('Executing steps: ' + n);
     stepCode(n)
   }
 
   const clickLoad = () => {
     appInsights.trackEvent({name: "click", properties: {action: "load"}});
-    console.log('Executing loadCode');
     loadCode();
   }
 
   const clickStop = () => {
     appInsights.trackEvent({name: "click", properties: {action: "stop"}});
-    console.log('Stopping simulation');
     stopCode();
   }
 
@@ -653,25 +667,6 @@ const Simulator = ({worker, initialState, appInsights}) => {
     debouncedSyntaxCheck(code);
   };
 
-  const AccordionSummary = styled((props) => (
-    <MuiAccordionSummary
-      expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.8rem' }} />}
-      {...props}
-    />
-  ))(({ theme }) => ({
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, .05)'
-        : 'rgba(227, 245, 254, 1)',
-    flexDirection: 'row-reverse',
-    '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
-      transform: 'rotate(180deg)',
-    },
-    '& .MuiAccordionSummary-content': {
-      marginLeft: theme.spacing(1),
-    },
-  }));
-
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   // Resolve the user-selected theme mode: 'auto' defers to the OS media
@@ -694,18 +689,10 @@ const Simulator = ({worker, initialState, appInsights}) => {
     document.documentElement.setAttribute('data-theme', paletteMode);
   }, [paletteMode]);
 
-  // `responsiveFontSizes` rescales the MUI typography variants
-  // (h1..h6, body etc.) so that text shrinks gracefully on phones
-  // and tablets. Without it MUI sticks to its desktop-tuned sizes,
-  // which look excessively large on devices like the iPad Pro.
-  const theme = React.useMemo(() => {
-    const base = createTheme({
-      palette: {
-        mode: paletteMode,
-      },
-    });
-    return responsiveFontSizes(base);
-  }, [paletteMode]);
+  // The theme (palette, typography, component overrides) is centralized in
+  // src/webapp/theme.js; it already applies `responsiveFontSizes` so text
+  // shrinks gracefully on phones and tablets.
+  const theme = React.useMemo(() => buildTheme(paletteMode), [paletteMode]);
 
   return (
     <>
@@ -743,7 +730,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
           inputRequest={inputRequest}
           multiStepCount={stepStride}
         />
-        <Grid container id="main-grid" disableEqualOverflow spacing={0}>
+        <Grid container id="main-grid" spacing={0}>
           <Grid id="left-panel" size={{ xs: 12, md: 8 }}>
             <Code
               onChangeValue={onCodeChange}
@@ -756,10 +743,11 @@ const Simulator = ({worker, initialState, appInsights}) => {
               fontSize={fontSize}
               validInstructions={initialState.validInstructions}
               paletteMode={paletteMode}
+              pipelineColors={pipelineColors}
               onEditorReady={handleEditorReady}
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }} id="right-panel" disableEqualOverflow>
+          <Grid size={{ xs: 12, md: 4 }} id="right-panel">
             <ErrorList
               parsingErrors={parsingErrors}
               AccordionSummary={AccordionSummary}
@@ -771,7 +759,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
                   Stats
                   {accordionAlerts && accordionChanges.stats && <span className="accordion-change-indicator" />}
                 </Typography>
@@ -786,7 +774,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
                   Pipeline
                   {accordionAlerts && accordionChanges.pipeline && <span className="accordion-change-indicator" />}
                 </Typography>
@@ -801,7 +789,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
                   Registers
                   {accordionAlerts && accordionChanges.registers && <span className="accordion-change-indicator" />}
                 </Typography>
@@ -816,7 +804,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />} id="memory-accordion-summary">
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
                   Memory
                   {accordionAlerts && accordionChanges.memory && <span className="accordion-change-indicator" />}
                 </Typography>
@@ -831,7 +819,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
                   Standard Output
                   {accordionAlerts && accordionChanges.stdout && <span className="accordion-change-indicator" />}
                 </Typography>
@@ -846,7 +834,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: status === 'RUNNING' ? 'gray' : '#1976d2' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: status === 'RUNNING' ? 'text.disabled' : 'primary.main' }}>
                   Cache Configuration
                 </Typography>
               </AccordionSummary>
@@ -864,7 +852,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
                   General Settings
                 </Typography>
               </AccordionSummary>

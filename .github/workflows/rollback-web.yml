@@ -51,11 +51,30 @@ jobs:
           rm -f deploy-web-pages.py
 
       - name: Commit and push to Pages repo
+        id: push
         run: |
           set -euo pipefail
           cd pages-repo
+          # Read the new current entry's build string for verification.
+          BUILD=$(python3 -c "import json; d=json.load(open('versions.json')); cur=d['current']; e=[v for v in d['versions'] if v['sha']==cur][0]; print(e['build'])")
           git add -A
-          git diff --cached --quiet && { echo "Nothing to commit."; exit 0; }
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            echo "build=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           git commit -m "Rollback web to last known good (triggered by ${{ github.actor }})"
           git push origin master
-          echo "Rollback complete."
+          echo "Rollback complete. Reverted to build: ${BUILD}"
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+          echo "build=${BUILD}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify Pages deployment
+        if: steps.push.outputs.pushed == 'true'
+        env:
+          PAT_WEBUI: ${{ secrets.PAT_WEBUI }}
+          EXPECTED_BUILD: ${{ steps.push.outputs.build }}
+        run: |
+          set -euo pipefail
+          .github/scripts/verify-pages-deploy.sh "${EXPECTED_BUILD}" pages-repo

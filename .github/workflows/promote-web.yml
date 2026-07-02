@@ -81,6 +81,54 @@ jobs:
           echo "Promoting SHA: ${SHA}"
           echo "sha=${SHA}" >> "$GITHUB_OUTPUT"
 
+      # ---- Promotion gate ----------------------------------------------
+      # Never promote a candidate that does not actually work. The candidate
+      # is already published at https://web.edumips.org/c/<sha>/, so run the
+      # basic Playwright tests against that exact, publicly-served content
+      # before touching production. This is the last line of defense against
+      # shipping a broken bundle (e.g. the Babel 8 jsxDEV regression that
+      # blanked the page at startup): even if a broken build slips through
+      # CI and gets pushed as a candidate, promotion aborts here.
+      - name: Set up Node.JS
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install JS dependencies (for the candidate smoke test)
+        run: npm install
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Smoke-test the candidate before promotion
+        env:
+          SHA: ${{ steps.resolve.outputs.sha }}
+        run: |
+          set -euo pipefail
+          FULL_SHA=$(cd pages-repo && python3 <<'PY'
+          import json, os, sys
+          short = os.environ['SHA']
+          d = json.load(open('versions.json'))
+          m = [v for v in d['versions'] if v['sha'].startswith(short)]
+          if len(m) != 1:
+              sys.exit('ERROR: %d versions in versions.json match %s' % (len(m), short))
+          print(m[0]['sha'])
+          PY
+          )
+          echo "Smoke-testing candidate at https://web.edumips.org/c/${FULL_SHA}/"
+          PLAYWRIGHT_TARGET_URL="https://web.edumips.org/c/${FULL_SHA}" \
+            npx playwright test basic-tests
+      # --------------------------------------------------------------------
+
       - name: Run promote script (never builds)
         env:
           SHA: ${{ steps.resolve.outputs.sha }}
@@ -92,6 +140,7 @@ jobs:
           rm -f deploy-web-pages.py
 
       - name: Commit and push to Pages repo
+        id: push
         env:
           SHA: ${{ steps.resolve.outputs.sha }}
         run: |
@@ -100,7 +149,23 @@ jobs:
           # Read the resolved current SHA and its build string for the message.
           BUILD=$(python3 -c "import json; d=json.load(open('versions.json')); cur=d['current']; e=[v for v in d['versions'] if v['sha']==cur][0]; print(e['build'])")
           git add -A
-          git diff --cached --quiet && { echo "Nothing to commit."; exit 0; }
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            echo "build=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           git commit -m "Promote web to ${SHA:0:8} (${BUILD})"
           git push origin master
           echo "Promoted ${SHA} (${BUILD}) to web.edumips.org"
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+          echo "build=${BUILD}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify Pages deployment
+        if: steps.push.outputs.pushed == 'true'
+        env:
+          PAT_WEBUI: ${{ secrets.PAT_WEBUI }}
+          EXPECTED_BUILD: ${{ steps.push.outputs.build }}
+        run: |
+          set -euo pipefail
+          .github/scripts/verify-pages-deploy.sh "${EXPECTED_BUILD}" pages-repo

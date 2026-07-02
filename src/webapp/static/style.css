@@ -25,7 +25,7 @@ body {
   position: absolute;
   top: -40px;
   left: 0;
-  background: #1976d2;
+  background: #3557d4;
   color: #fff;
   padding: 8px 16px;
   z-index: 100000;
@@ -57,18 +57,23 @@ body {
 #right-panel {
   overflow: auto;
   height: 100%;
-  border-left: 1px solid rgb(33, 150, 243);
+  border-left: 1px solid rgba(15, 23, 42, 0.12);
+  background-color: #f5f6fa;
 }
 
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
-  background-color: #fff;
+  background-color: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgb(33, 150, 243);
-  border-radius: 5px 0 0 5px;
+  background-color: rgba(100, 116, 139, 0.45);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.7);
 }
 
 textarea {
@@ -101,35 +106,38 @@ td.instructionName {
 
 /* CSS classes for pipeline stages */
 .stageIf {
-  background-color: rgba(255, 255, 0, 0.5);
+  background-color: var(--pipeline-stage-if, rgba(255, 255, 0, 0.5));
 }
 
 .stageId {
-  background-color: rgba(0, 0, 255, 0.5);
+  background-color: var(--pipeline-stage-id, rgba(0, 0, 255, 0.5));
 }
 
 .stageEx {
-  background-color: rgba(255, 0, 0, 0.5);
+  background-color: var(--pipeline-stage-ex, rgba(255, 0, 0, 0.5));
 }
 
 .stageMem {
-  background-color: rgba(0, 255, 0, 0.5);
+  background-color: var(--pipeline-stage-mem, rgba(0, 255, 0, 0.5));
 }
 
 .stageWb {
-  background-color: rgba(255, 0, 255, 0.5);
+  background-color: var(--pipeline-stage-wb, rgba(255, 0, 255, 0.5));
 }
 
 .stageFPAdder {
-  background-color: rgba(0, 128, 0, 0.5);
+  background-color: var(--pipeline-stage-fp-adder, rgba(0, 128, 0, 0.5));
 }
 
 .stageFPMultiplier {
-  background-color: rgba(0, 128, 128, 0.5);
+  background-color: var(
+    --pipeline-stage-fp-multiplier,
+    rgba(0, 128, 128, 0.5)
+  );
 }
 
 .stageFPDivider {
-  background-color: rgba(128, 128, 0, 0.5);
+  background-color: var(--pipeline-stage-fp-divider, rgba(128, 128, 0, 0.5));
 }
 
 #errorCount {
@@ -167,6 +175,55 @@ div.error-list-item {
   margin-right: 10px;
 }
 
+/* ---------- Data tables (Registers / Memory) ---------- */
+
+#registers,
+#memory {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+#registers td,
+#memory td,
+#memory th {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+#registers tr:hover,
+#memory tbody tr:hover {
+  background-color: rgba(53, 87, 212, 0.06);
+}
+
+#registers td.registerName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #5b6577;
+  padding: 0 4px;
+}
+
+#memory th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #5b6577;
+}
+
+html[data-theme='dark'] #registers td,
+html[data-theme='dark'] #memory td,
+html[data-theme='dark'] #memory th {
+  border-bottom-color: rgba(148, 163, 184, 0.1);
+}
+
+html[data-theme='dark'] #registers tr:hover,
+html[data-theme='dark'] #memory tbody tr:hover {
+  background-color: rgba(141, 166, 255, 0.08);
+}
+
+html[data-theme='dark'] #registers td.registerName,
+html[data-theme='dark'] #memory th {
+  color: #97a3b8;
+}
+
 div.error-accordion {
   position: sticky;
   top: 0;
@@ -176,7 +233,7 @@ div.error-accordion {
      value (10000) leaked through every overlay because sticky + z-index
      creates a stacking context that outranks MUI portals. */
   z-index: 2;
-  border-bottom: 1px solid rgb(33, 150, 243);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
 }
 
 /* ---------- Responsive layout (tablets and phones) ----------
@@ -213,7 +270,7 @@ div.error-accordion {
     overflow: visible;
     /* The right panel now sits *under* the editor, not next to it. */
     border-left: none;
-    border-top: 1px solid rgb(33, 150, 243);
+    border-top: 1px solid rgba(15, 23, 42, 0.12);
   }
 }
 
@@ -222,7 +279,8 @@ div.error-accordion {
    from the MUI palette mode), NOT the OS `prefers-color-scheme` media query,
    so these stay in sync when the user overrides the theme in Settings. */
 html[data-theme='dark'] #right-panel {
-  border-left-color: rgba(255, 255, 255, 0.188);
+  border-left-color: rgba(148, 163, 184, 0.18);
+  background-color: #0e1526;
 }
 
 html[data-theme='dark'] div.error-accordion {

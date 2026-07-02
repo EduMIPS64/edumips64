@@ -5,6 +5,7 @@ import { initVimMode } from 'monaco-vim';
 import MonacoEditor from 'react-monaco-editor';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
+import { DEFAULT_PIPELINE_COLORS } from '../settings/schema';
 
 // Resolve the Monaco editor theme name from the MUI palette mode passed in
 // by the parent (which already accounts for the user's THEME_MODE setting).
@@ -15,6 +16,22 @@ const resolveMonacoTheme = (paletteMode, prefersDarkMode) => {
   if (paletteMode === 'dark') return 'vs-dark';
   if (paletteMode === 'light') return 'vs-light';
   return prefersDarkMode ? 'vs-dark' : 'vs-light';
+};
+
+const withAlpha = (hexColor, alphaHex) => `${hexColor}${alphaHex}`;
+
+const pipelineHighlightStyle = (pipelineColors) => {
+  const colors = { ...DEFAULT_PIPELINE_COLORS, ...(pipelineColors || {}) };
+  return {
+    '--pipeline-stage-if': withAlpha(colors.IF, '80'),
+    '--pipeline-stage-id': withAlpha(colors.ID, '80'),
+    '--pipeline-stage-ex': withAlpha(colors.EX, '80'),
+    '--pipeline-stage-mem': withAlpha(colors.MEM, '80'),
+    '--pipeline-stage-wb': withAlpha(colors.WB, '80'),
+    '--pipeline-stage-fp-adder': withAlpha(colors.FPAdder, '80'),
+    '--pipeline-stage-fp-multiplier': withAlpha(colors.FPMultiplier, '80'),
+    '--pipeline-stage-fp-divider': withAlpha(colors.FPDivider, '80'),
+  };
 };
 
 // Global MIPS language definition for the Monaco editor.
@@ -222,8 +239,6 @@ const Code = (props) => {
       newStageMap.set(props.pipeline.FPMultiplier7.Line, 'FPU Muliplier (7)');
     }
     setStageMap(newStageMap);
-    console.log('decorations');
-    console.log(newDecorations);
     decorationsRef.current = editor.deltaDecorations(
       decorationsRef.current,
       newDecorations,
@@ -361,7 +376,6 @@ const Code = (props) => {
       return;
     }
 
-    console.log('Parsing errors', props.parsingErrors);
     const lines = editor.getValue().split('\n');
     const markers = props.parsingErrors
       .filter((err) => {
@@ -383,7 +397,6 @@ const Code = (props) => {
           source: 'EduMIPS64',
         };
       });
-    console.log('Markers', markers);
 
     monaco.editor.setModelMarkers(model, 'EduMIPS64', markers);
   }, [props.parsingErrors, editor, monaco]);
@@ -393,16 +406,22 @@ const Code = (props) => {
   // the OS preference when the parent leaves the choice on `auto`.
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const editorTheme = resolveMonacoTheme(props.paletteMode, prefersDarkMode);
+  const highlightStyle = {
+    height: '100%',
+    ...pipelineHighlightStyle(props.pipelineColors),
+  };
 
   return (
-    <MonacoEditor
-      language="mips"
-      value={props.code}
-      options={options}
-      onChange={props.onChangeValue}
-      theme={editorTheme}
-      editorDidMount={editorDidMount}
-    />
+    <div style={highlightStyle}>
+      <MonacoEditor
+        language="mips"
+        value={props.code}
+        options={options}
+        onChange={props.onChangeValue}
+        theme={editorTheme}
+        editorDidMount={editorDidMount}
+      />
+    </div>
   );
 };
 
