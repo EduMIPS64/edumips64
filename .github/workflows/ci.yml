@@ -166,6 +166,29 @@ jobs:
           PLAYWRIGHT_TARGET_URL: 'http://localhost:8080'
         run: npx playwright test
 
+      # Guard against production-only bundle breakage: the coverage run above
+      # exercises a *development* webpack build, which cannot catch failures
+      # that only occur in the production bundle (e.g. the Babel 8 regression
+      # where dev-only jsxDEV() calls were emitted into a bundle carrying
+      # production React, blanking the page at startup). Rebuild the UI the
+      # same way the deployed candidates are built and smoke-test it.
+      - name: Build production UI bundle
+        run: npm run build
+
+      - name: Serve production bundle
+        run: python3 -m http.server 8081 --directory out/web &
+
+      - name: Wait for production server to be ready
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8081 && break || sleep 1
+          done
+
+      - name: Smoke-test production bundle
+        env:
+          PLAYWRIGHT_TARGET_URL: 'http://localhost:8081'
+        run: npx playwright test basic-tests
+
       # Upload Playwright traces, screenshots, and HTML report whenever the
       # test step fails so the failure is diagnosable without rerunning.
       - name: Upload Playwright artifacts on failure
