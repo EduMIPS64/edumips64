@@ -1,0 +1,60 @@
+import React from 'react';
+
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+
+/**
+ * RuntimeErrorDialog – informational MUI Dialog shown when the simulator
+ * encounters a runtime error (e.g. integer overflow, unsupported syscall).
+ *
+ * This is a pure UI component: the caller (Simulator.js) is responsible for
+ * all CPU state transitions (stopCode / dispatch) which must happen
+ * immediately when the error result arrives, *not* when the user dismisses
+ * this dialog.  The dialog is purely informational and can be closed at any
+ * time without side-effects.
+ *
+ * Props:
+ *   open     – boolean, controls visibility.
+ *   message  – string, the error message to display.
+ *   onClose  – callback invoked when the user clicks OK or closes the dialog.
+ */
+function RuntimeErrorDialog({ open, message, onClose }) {
+  return (
+    <Dialog
+      id="runtime-error-dialog"
+      open={Boolean(open)}
+      onClose={onClose}
+      aria-labelledby="runtime-error-dialog-title"
+      maxWidth="sm"
+      fullWidth
+    >
+      <DialogTitle id="runtime-error-dialog-title">Runtime error</DialogTitle>
+      <DialogContent>
+        <Typography
+          variant="body2"
+          component="pre"
+          sx={{ whiteSpace: 'pre-line', fontFamily: 'inherit', m: 0 }}
+        >
+          {message}
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          id="runtime-error-ok"
+          onClick={onClose}
+          variant="contained"
+          color="primary"
+          autoFocus
+        >
+          OK
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+export default RuntimeErrorDialog;

@@ -14,6 +14,7 @@ import Grid from '@mui/material/Grid';
 import ErrorList from './ErrorList';
 import StdOut from './StdOut';
 import InputDialog from './InputDialog';
+import RuntimeErrorDialog from './RuntimeErrorDialog';
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 
@@ -109,6 +110,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
   );
   const [stdout, setStdout] = React.useState('');
   const [inputRequest, setInputRequest] = React.useState(null);
+  const [runtimeErrorMessage, setRuntimeErrorMessage] = React.useState(null);
 
   const [viMode, setViMode] = useSetting(SettingKey.VI_MODE);
   const [fontSize, setFontSize] = useSetting(SettingKey.FONT_SIZE);
@@ -368,7 +370,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
           message += `\n\nInstruction: ${result.errorInstruction}\nPipeline stage: ${result.errorStage}`;
         }
       }
-      alert(message);
+      setRuntimeErrorMessage(message);
       stopCode();
       // stopCode() dispatches STOP (mustPause=true, runAll=false, stepsToRun=0),
       // but since we are inside a worker-result handler (not a pending batch),
@@ -716,6 +718,11 @@ const Simulator = ({worker, initialState, appInsights}) => {
           request={inputRequest}
           onSubmit={submitInput}
           onCancel={cancelInput}
+        />
+        <RuntimeErrorDialog
+          open={runtimeErrorMessage !== null}
+          message={runtimeErrorMessage || ''}
+          onClose={() => setRuntimeErrorMessage(null)}
         />
         <Header
           onLoadClick={loadCode}
