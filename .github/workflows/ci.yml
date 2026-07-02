@@ -126,6 +126,9 @@ jobs:
       - name: Install JS dependencies
         run: npm install
 
+      - name: Run JS unit tests
+        run: npm run test:unit
+
       - name: Cache Playwright browsers
         id: playwright-cache
         uses: actions/cache@v6
