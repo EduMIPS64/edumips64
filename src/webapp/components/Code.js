@@ -303,6 +303,19 @@ const Code = (props) => {
     };
   }, [props.parsedInstructions, stageMap, monaco]);
 
+  // react-monaco-editor disposes the *editor* on unmount but not its
+  // *model*. Monaco models are global, so every unmount leaks one — and
+  // under React.StrictMode's dev-only double-mount the leaked first model
+  // makes `monaco.editor.getModels()[0]` point at a stale orphan (which is
+  // exactly what the Playwright helpers read). Disposing the model here
+  // keeps the global model list in sync with the mounted editor.
+  const editorWillUnmount = (editor) => {
+    const model = editor.getModel();
+    if (model) {
+      model.dispose();
+    }
+  };
+
   const editorDidMount = (editor, monaco) => {
     // Expose monaco and editor to window for testing purposes
     window.monaco = monaco;
@@ -420,6 +433,7 @@ const Code = (props) => {
         onChange={props.onChangeValue}
         theme={editorTheme}
         editorDidMount={editorDidMount}
+        editorWillUnmount={editorWillUnmount}
       />
     </div>
   );

@@ -182,15 +182,45 @@ The `webapp` Gradle task automates the build process for the web UI. It:
 
 Custom NPM scripts:
 
-- `build-dbg`: runs `webpack -d` (compile with debugging symbols)
-- `build`: runs `webpack -p` (compile without debugging symbols, minified, etc)
+- `build-dbg`: development webpack build (inline source maps, React dev mode)
+- `build`: production webpack build (minified, production React runtime)
 - `start`: starts the webpack-dev-server with live reloading
+- `test`: runs the Playwright end-to-end tests (expects the app to be
+  served at `http://localhost:8080`, or set `PLAYWRIGHT_TARGET_URL`)
+- `test:unit`: runs the Vitest unit tests (fast, no browser; covers the
+  pure modules under `src/webapp` from `src/test/webapp-unit/`)
 
 Both `build` and `build-dbg` produce a `ui.js` file in the `out/web` directory.
 
-The code was tested with Node.JS 16. The CI environment uses this version.
+The required Node.JS version is pinned in `.nvmrc` (currently Node 24); CI
+installs dependencies with `npm ci`, so `package-lock.json` must stay
+canonical for that npm major version.
 
-There are Playwright tests for the web UI, which can be run with `npm test`.
+##### Web UI architecture
+
+- `index.js` boots App Insights, wraps the Web Worker (`worker.js`, the
+  simulator core compiled from Java) with helper methods, and mounts React
+  immediately inside `React.StrictMode` and an `AppErrorBoundary`.
+- `components/AppLoader.js` shows a loading indicator while the worker
+  initialises, and a friendly error screen (30 s watchdog) if `worker.js`
+  fails to load — the app can no longer silently render a blank page.
+- `components/Simulator.js` is the orchestrator. The heavy lifting lives in
+  hooks under `src/webapp/hooks/`:
+  - `useSimulatorData` — registers/memory/stats/pipeline/… state. Updates
+    are *reference-preserving* (deep-equal data keeps the previous object)
+    so the `React.memo`-wrapped display panels skip re-rendering when their
+    data did not change.
+  - `useExecutionController` — owns `executionReducer.js` (a pure, fully
+    unit-tested state machine for run/step/pause/stop and batch
+    scheduling) and the worker `message` subscription.
+  - `useKeyboardShortcuts` — the global F2/F8/F9/F10/Esc bindings.
+- Runtime errors surface in `RuntimeErrorDialog` (never `window.alert`).
+- `React.StrictMode` is enabled in development builds: render functions and
+  effects are intentionally double-invoked to flush out unsafe side
+  effects. New code must keep side effects out of render bodies and class
+  constructors, and every effect/listener needs a working cleanup — the
+  Playwright suite runs against a development build, so StrictMode
+  violations typically show up as e2e failures.
 
 #### Build environment indicator
 
