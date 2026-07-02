@@ -106,35 +106,38 @@ td.instructionName {
 
 /* CSS classes for pipeline stages */
 .stageIf {
-  background-color: rgba(255, 255, 0, 0.5);
+  background-color: var(--pipeline-stage-if, rgba(255, 255, 0, 0.5));
 }
 
 .stageId {
-  background-color: rgba(0, 0, 255, 0.5);
+  background-color: var(--pipeline-stage-id, rgba(0, 0, 255, 0.5));
 }
 
 .stageEx {
-  background-color: rgba(255, 0, 0, 0.5);
+  background-color: var(--pipeline-stage-ex, rgba(255, 0, 0, 0.5));
 }
 
 .stageMem {
-  background-color: rgba(0, 255, 0, 0.5);
+  background-color: var(--pipeline-stage-mem, rgba(0, 255, 0, 0.5));
 }
 
 .stageWb {
-  background-color: rgba(255, 0, 255, 0.5);
+  background-color: var(--pipeline-stage-wb, rgba(255, 0, 255, 0.5));
 }
 
 .stageFPAdder {
-  background-color: rgba(0, 128, 0, 0.5);
+  background-color: var(--pipeline-stage-fp-adder, rgba(0, 128, 0, 0.5));
 }
 
 .stageFPMultiplier {
-  background-color: rgba(0, 128, 128, 0.5);
+  background-color: var(
+    --pipeline-stage-fp-multiplier,
+    rgba(0, 128, 128, 0.5)
+  );
 }
 
 .stageFPDivider {
-  background-color: rgba(128, 128, 0, 0.5);
+  background-color: var(--pipeline-stage-fp-divider, rgba(128, 128, 0, 0.5));
 }
 
 #errorCount {
