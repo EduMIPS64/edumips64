@@ -16,7 +16,6 @@ import Chip from '@mui/material/Chip';
 import Link from '@mui/material/Link';
 
 import HelpDialog from './HelpDialog';
-import CpuStatusDisplay from './CpuStatusDisplay';
 import logoDark from '../static/logo-dark.png';
 import logoBright from '../static/logo.png';
 import { getBuildInfo } from '../buildInfo';
@@ -174,11 +173,8 @@ export default function Header(props) {
             </Tooltip>
           )}
         </Typography>
-        <Tooltip title="The current status of the CPU" arrow placement="top">
-          <div>
-            <CpuStatusDisplay status={props.status} />
-          </div>
-        </Tooltip>
+        {/* The CPU status chip moved to the bottom StatusBar in the IDE
+            workbench layout. */}
         {/* Execution controls — rendered contextually per logical state. Wrapped in
             a fixed-min-width container so the toolbar doesn't shift when the set
             of visible buttons changes between states. */}

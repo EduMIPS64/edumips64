@@ -46,4 +46,8 @@ export const SettingKey = Object.freeze({
   // `'light'`, or `'dark'`. Exposed as a toggle in the General Settings
   // panel so the dark theme can be exercised regardless of the OS setting.
   THEME_MODE: 'themeMode',
+
+  // Active tab of the IDE-style side panel, so a returning user lands on
+  // the panel they last used.
+  SIDE_PANEL_TAB: 'sidePanelTab',
 });

@@ -23,6 +23,18 @@ const ALLOWED_HELP_LANGUAGES = ['en', 'it', 'zh'];
 // palette mode.
 export const ALLOWED_THEME_MODES = ['auto', 'light', 'dark'];
 
+// Tab keys of the IDE-style side panel, in display order.
+export const SIDE_PANEL_TABS = [
+  'issues',
+  'registers',
+  'memory',
+  'pipeline',
+  'stats',
+  'stdout',
+  'cache',
+  'settings',
+];
+
 // Font size bounds for the code editor, in pt.
 const MIN_FONT_SIZE = 1;
 const MAX_FONT_SIZE = 72;
@@ -198,6 +210,13 @@ export const SETTINGS_SCHEMA = Object.freeze({
     type: SettingType.OBJECT,
     default: { ...DEFAULT_PIPELINE_COLORS },
     validate: isValidPipelineColors,
+  },
+  [SettingKey.SIDE_PANEL_TAB]: {
+    type: SettingType.STRING,
+    // Registers is the most-consulted widget while stepping through a
+    // program, so it is the default panel for first-time visitors.
+    default: 'registers',
+    validate: (v) => SIDE_PANEL_TABS.includes(v),
   },
   [SettingKey.THEME_MODE]: {
     type: SettingType.STRING,

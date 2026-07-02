@@ -7,30 +7,17 @@ import Registers from './Registers';
 import Statistics from './Statistics';
 import Header from './Header';
 import RunControlsToolbar from './RunControlsToolbar';
-import Accordion from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import Grid from '@mui/material/Grid';
-import ErrorList from './ErrorList';
+import IssuesPanel from './IssuesPanel';
+import SidePanel from './SidePanel';
+import StatusBar from './StatusBar';
 import StdOut from './StdOut';
 import InputDialog from './InputDialog';
-import Switch from '@mui/material/Switch';
-import Button from '@mui/material/Button';
-
-import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
-
-import { styled } from '@mui/material/styles';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
-import {
-  createTheme,
-  responsiveFontSizes,
-  ThemeProvider,
-} from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Typography from '@mui/material/Typography';
+import { buildTheme } from '../theme';
 
 import { debounce, isEqual } from 'lodash';
 import Settings from './Settings';
@@ -144,11 +131,12 @@ const Simulator = ({worker, initialState, appInsights}) => {
     worker.setDelaySlot(delaySlot);
   }, [delaySlot]);
 
-  // Track expanded state for each accordion
-  const [expandedAccordions, setExpandedAccordions] = useSetting(SettingKey.EXPANDED_ACCORDIONS);
+  // Active tab of the side panel (persisted so returning users land on the
+  // panel they last used).
+  const [activeTab, setActiveTab] = useSetting(SettingKey.SIDE_PANEL_TAB);
 
-  // Track if data has changed while accordion was collapsed
-  const [accordionChanges, setAccordionChanges] = React.useState({
+  // Track if data has changed in a panel while its tab was not active
+  const [panelChanges, setPanelChanges] = React.useState({
     stats: false,
     pipeline: false,
     registers: false,
@@ -166,7 +154,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
   // Ref to track if we are resetting the simulator (clearing code)
   const isResetting = React.useRef(false);
 
-  // Detect changes in accordion data when collapsed
+  // Detect changes in panel data while the corresponding tab is hidden
   React.useEffect(() => {
     if (!accordionAlerts) {
       prevStats.current = stats;
@@ -201,37 +189,31 @@ const Simulator = ({worker, initialState, appInsights}) => {
     prevMemory.current = memory;
     prevStdout.current = stdout;
     
-    // Only update state if there are actual changes for collapsed accordions
-    if ((!expandedAccordions.stats && statsChanged) ||
-        (!expandedAccordions.pipeline && pipelineChanged) ||
-        (!expandedAccordions.registers && registersChanged) ||
-        (!expandedAccordions.memory && memoryChanged) ||
-        (!expandedAccordions.stdout && stdoutChanged)) {
-      setAccordionChanges(prev => ({
+    // Only update state if there are actual changes for hidden tabs
+    if ((activeTab !== 'stats' && statsChanged) ||
+        (activeTab !== 'pipeline' && pipelineChanged) ||
+        (activeTab !== 'registers' && registersChanged) ||
+        (activeTab !== 'memory' && memoryChanged) ||
+        (activeTab !== 'stdout' && stdoutChanged)) {
+      setPanelChanges(prev => ({
         ...prev,
-        stats: prev.stats || (!expandedAccordions.stats && statsChanged),
-        pipeline: prev.pipeline || (!expandedAccordions.pipeline && pipelineChanged),
-        registers: prev.registers || (!expandedAccordions.registers && registersChanged),
-        memory: prev.memory || (!expandedAccordions.memory && memoryChanged),
-        stdout: prev.stdout || (!expandedAccordions.stdout && stdoutChanged),
+        stats: prev.stats || (activeTab !== 'stats' && statsChanged),
+        pipeline: prev.pipeline || (activeTab !== 'pipeline' && pipelineChanged),
+        registers: prev.registers || (activeTab !== 'registers' && registersChanged),
+        memory: prev.memory || (activeTab !== 'memory' && memoryChanged),
+        stdout: prev.stdout || (activeTab !== 'stdout' && stdoutChanged),
       }));
     }
-  }, [stats, pipeline, registers, memory, stdout, accordionAlerts, expandedAccordions]);
+  }, [stats, pipeline, registers, memory, stdout, accordionAlerts, activeTab]);
 
-  // Handle accordion expansion change
-  const handleAccordionChange = (panel) => (event, isExpanded) => {
-    setExpandedAccordions(prev => ({
+  // Handle side panel tab switches: activate the tab and clear its change
+  // indicator.
+  const handleTabChange = (tabKey) => {
+    setActiveTab(tabKey);
+    setPanelChanges(prev => ({
       ...prev,
-      [panel]: isExpanded,
+      [tabKey]: false,
     }));
-    
-    // Clear change indicator when accordion is opened
-    if (isExpanded) {
-      setAccordionChanges(prev => ({
-        ...prev,
-        [panel]: false,
-      }));
-    }
   };
 
   // Number of steps left to run. Used to keep track of execution.
@@ -459,7 +441,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
     }
     worker.reset();
     // Clear accordion change markers
-    setAccordionChanges({
+    setPanelChanges({
       stats: false,
       pipeline: false,
       registers: false,
@@ -494,7 +476,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
     // sample are surfaced immediately.
     worker.checkSyntax(SampleProgram);
     // Clear accordion change markers
-    setAccordionChanges({
+    setPanelChanges({
       stats: false,
       pipeline: false,
       registers: false,
@@ -653,25 +635,6 @@ const Simulator = ({worker, initialState, appInsights}) => {
     debouncedSyntaxCheck(code);
   };
 
-  const AccordionSummary = styled((props) => (
-    <MuiAccordionSummary
-      expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.8rem' }} />}
-      {...props}
-    />
-  ))(({ theme }) => ({
-    backgroundColor:
-      theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, .05)'
-        : 'rgba(227, 245, 254, 1)',
-    flexDirection: 'row-reverse',
-    '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
-      transform: 'rotate(180deg)',
-    },
-    '& .MuiAccordionSummary-content': {
-      marginLeft: theme.spacing(1),
-    },
-  }));
-
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   // Resolve the user-selected theme mode: 'auto' defers to the OS media
@@ -694,18 +657,105 @@ const Simulator = ({worker, initialState, appInsights}) => {
     document.documentElement.setAttribute('data-theme', paletteMode);
   }, [paletteMode]);
 
-  // `responsiveFontSizes` rescales the MUI typography variants
-  // (h1..h6, body etc.) so that text shrinks gracefully on phones
-  // and tablets. Without it MUI sticks to its desktop-tuned sizes,
-  // which look excessively large on devices like the iPad Pro.
-  const theme = React.useMemo(() => {
-    const base = createTheme({
-      palette: {
-        mode: paletteMode,
-      },
-    });
-    return responsiveFontSizes(base);
-  }, [paletteMode]);
+  // The theme (palette, typography, component overrides) is centralized in
+  // src/webapp/theme.js; it already applies `responsiveFontSizes` so text
+  // shrinks gracefully on phones and tablets.
+  const theme = React.useMemo(() => buildTheme(paletteMode), [paletteMode]);
+
+  // Problem counts, surfaced in the Issues tab badge and the status bar.
+  const errorCount = (parsingErrors || []).filter((e) => !e.isWarning).length;
+  const warningCount = (parsingErrors || []).filter((e) => e.isWarning).length;
+
+  // Panel descriptors for the IDE-style side panel. `showDot` reuses the
+  // change-alert machinery that used to drive the accordion indicators.
+  const sidePanels = [
+    {
+      key: 'issues',
+      label: 'Issues',
+      badge:
+        errorCount + warningCount > 0
+          ? {
+              count: errorCount + warningCount,
+              color: errorCount > 0 ? 'error' : 'warning',
+            }
+          : null,
+      content: (
+        <IssuesPanel
+          parsingErrors={parsingErrors}
+          onIssueClick={handleIssueClick}
+        />
+      ),
+    },
+    {
+      key: 'registers',
+      label: 'Registers',
+      showDot: accordionAlerts && panelChanges.registers,
+      content: <Registers {...registers} />,
+    },
+    {
+      key: 'memory',
+      label: 'Memory',
+      showDot: accordionAlerts && panelChanges.memory,
+      content: <Memory memory={memory} />,
+    },
+    {
+      key: 'pipeline',
+      label: 'Pipeline',
+      showDot: accordionAlerts && panelChanges.pipeline,
+      content: <Pipeline pipeline={pipeline} colors={pipelineColors} />,
+    },
+    {
+      key: 'stats',
+      label: 'Stats',
+      showDot: accordionAlerts && panelChanges.stats,
+      content: <Statistics {...stats} />,
+    },
+    {
+      key: 'stdout',
+      label: 'Output',
+      showDot: accordionAlerts && panelChanges.stdout,
+      content: <StdOut stdout={stdout} />,
+    },
+    {
+      key: 'cache',
+      label: 'Cache',
+      content: (
+        <CacheConfig
+          showTitle={false}
+          onChange={setCacheConfig}
+          status={status}
+        />
+      ),
+    },
+    {
+      key: 'settings',
+      label: 'Settings',
+      content: (
+        <Settings
+          viMode={viMode}
+          setViMode={setViMode}
+          fontSize={fontSize}
+          setFontSize={setFontSize}
+          accordionAlerts={accordionAlerts}
+          setAccordionAlerts={setAccordionAlerts}
+          forwarding={forwarding}
+          setForwarding={setForwarding}
+          delaySlot={delaySlot}
+          setDelaySlot={setDelaySlot}
+          stepStride={stepStride}
+          setStepStride={setStepStride}
+          executionDelayMs={executionDelayMs}
+          setExecutionDelayMs={setExecutionDelayMs}
+          pipelineColors={pipelineColors}
+          setPipelineColors={setPipelineColors}
+          themeMode={themeMode}
+          setThemeMode={setThemeMode}
+          status={status}
+          showTitle={false}
+        />
+      ),
+    },
+  ];
 
   return (
     <>
@@ -760,141 +810,21 @@ const Simulator = ({worker, initialState, appInsights}) => {
             />
           </Grid>
           <Grid size={{ xs: 12, md: 4 }} id="right-panel" disableEqualOverflow>
-            <ErrorList
-              parsingErrors={parsingErrors}
-              AccordionSummary={AccordionSummary}
-              onIssueClick={handleIssueClick}
+            <SidePanel
+              panels={sidePanels}
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
             />
-            <Accordion 
-              expanded={expandedAccordions.stats} 
-              onChange={handleAccordionChange('stats')} 
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  Stats
-                  {accordionAlerts && accordionChanges.stats && <span className="accordion-change-indicator" />}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Statistics {...stats} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.pipeline} 
-              onChange={handleAccordionChange('pipeline')} 
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  Pipeline
-                  {accordionAlerts && accordionChanges.pipeline && <span className="accordion-change-indicator" />}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Pipeline pipeline={pipeline} colors={pipelineColors} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.registers} 
-              onChange={handleAccordionChange('registers')} 
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  Registers
-                  {accordionAlerts && accordionChanges.registers && <span className="accordion-change-indicator" />}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Registers {...registers} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.memory} 
-              onChange={handleAccordionChange('memory')} 
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />} id="memory-accordion-summary">
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  Memory
-                  {accordionAlerts && accordionChanges.memory && <span className="accordion-change-indicator" />}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Memory memory={memory} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.stdout} 
-              onChange={handleAccordionChange('stdout')} 
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  Standard Output
-                  {accordionAlerts && accordionChanges.stdout && <span className="accordion-change-indicator" />}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <StdOut stdout={stdout} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.cache} 
-              onChange={handleAccordionChange('cache')} 
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: status === 'RUNNING' ? 'gray' : '#1976d2' }}>
-                  Cache Configuration
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <CacheConfig
-                  showTitle={false}
-                  onChange={setCacheConfig}
-                  status={status}
-                />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.settings} 
-              onChange={handleAccordionChange('settings')} 
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h7" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                  General Settings
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Settings
-                  viMode={viMode}
-                  setViMode={setViMode}
-                  fontSize={fontSize}
-                  setFontSize={setFontSize}
-                  accordionAlerts={accordionAlerts}
-                  setAccordionAlerts={setAccordionAlerts}
-                  forwarding={forwarding}
-                  setForwarding={setForwarding}
-                  delaySlot={delaySlot}
-                  setDelaySlot={setDelaySlot}
-                  stepStride={stepStride}
-                  setStepStride={setStepStride}
-                  executionDelayMs={executionDelayMs}
-                  setExecutionDelayMs={setExecutionDelayMs}
-                  pipelineColors={pipelineColors}
-                  setPipelineColors={setPipelineColors}
-                  themeMode={themeMode}
-                  setThemeMode={setThemeMode}
-                  status={status}
-                  showTitle={false}
-                />
-              </AccordionDetails>
-            </Accordion>
           </Grid>
         </Grid>
+        <StatusBar
+          status={status}
+          stats={stats}
+          parsingErrors={parsingErrors}
+          forwarding={forwarding}
+          version={worker.version}
+          onProblemsClick={() => handleTabChange('issues')}
+        />
       </ThemeProvider>
     </>
   );

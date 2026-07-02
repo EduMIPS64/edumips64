@@ -45,7 +45,8 @@ body {
 /* Define the grid of widgets. */
 
 #main-grid {
-  height: calc(100vh - 64px);
+  /* Viewport minus the header (64px) and the bottom status bar (26px). */
+  height: calc(100vh - 64px - 26px);
   overflow: hidden;
 }
 
@@ -55,20 +56,21 @@ body {
 }
 
 #right-panel {
-  overflow: auto;
+  /* The tabbed SidePanel manages its own scrolling area. */
+  overflow: hidden;
   height: 100%;
-  border-left: 1px solid rgb(33, 150, 243);
+  border-left: 1px solid rgba(31, 35, 40, 0.15);
 }
 
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
-  background-color: #fff;
+  background-color: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgb(33, 150, 243);
-  border-radius: 5px 0 0 5px;
+  background-color: rgba(110, 118, 129, 0.5);
+  border-radius: 4px;
 }
 
 textarea {
@@ -209,11 +211,12 @@ div.error-accordion {
   }
 
   #right-panel {
-    height: auto;
-    overflow: visible;
-    /* The right panel now sits *under* the editor, not next to it. */
+    /* The tabbed panel needs a bounded height to scroll inside; it sits
+       *under* the editor on small screens, not next to it. */
+    height: 65vh;
+    overflow: hidden;
     border-left: none;
-    border-top: 1px solid rgb(33, 150, 243);
+    border-top: 1px solid rgba(31, 35, 40, 0.15);
   }
 }
 
