@@ -48,7 +48,7 @@ jobs:
           cache: 'npm'
 
       - name: Install JS dependencies
-        run: npm install
+        run: npm ci
 
       - name: Cache GWT unit cache
         uses: actions/cache@v6

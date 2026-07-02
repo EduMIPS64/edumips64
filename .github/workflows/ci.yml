@@ -124,7 +124,7 @@ jobs:
           cache: 'npm'
 
       - name: Install JS dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run JS unit tests
         run: npm run test:unit

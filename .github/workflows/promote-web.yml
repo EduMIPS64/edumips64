@@ -96,7 +96,7 @@ jobs:
           cache: 'npm'
 
       - name: Install JS dependencies (for the candidate smoke test)
-        run: npm install
+        run: npm ci
 
       - name: Cache Playwright browsers
         id: playwright-cache
