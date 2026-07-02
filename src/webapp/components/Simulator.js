@@ -745,6 +745,7 @@ const Simulator = ({worker, initialState, appInsights}) => {
               fontSize={fontSize}
               validInstructions={initialState.validInstructions}
               paletteMode={paletteMode}
+              pipelineColors={pipelineColors}
               onEditorReady={handleEditorReady}
             />
           </Grid>
