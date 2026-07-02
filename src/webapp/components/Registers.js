@@ -61,4 +61,4 @@ const Registers = ({ gpr, fpu, special }) => {
   );
 };
 
-export default Registers;
+export default React.memo(Registers);

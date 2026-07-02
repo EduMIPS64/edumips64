@@ -505,4 +505,4 @@ const Pipeline = ({ pipeline, colors }) => {
   );
 };
 
-export default Pipeline;
+export default React.memo(Pipeline);

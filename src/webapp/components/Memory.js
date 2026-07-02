@@ -69,4 +69,4 @@ const Memory = (props) => {
     );
 };
 
-export default Memory;
+export default React.memo(Memory);

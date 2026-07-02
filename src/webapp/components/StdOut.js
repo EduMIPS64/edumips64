@@ -20,4 +20,4 @@ const StdOut = (props) => {
   );
 };
 
-export default StdOut;
+export default React.memo(StdOut);

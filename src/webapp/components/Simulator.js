@@ -15,8 +15,6 @@ import ErrorList from './ErrorList';
 import StdOut from './StdOut';
 import InputDialog from './InputDialog';
 import RuntimeErrorDialog from './RuntimeErrorDialog';
-import Switch from '@mui/material/Switch';
-import Button from '@mui/material/Button';
 
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 
@@ -33,12 +31,14 @@ import Typography from '@mui/material/Typography';
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 import Settings from './Settings';
-import CacheConfig from "./CacheConfig";
+import CacheConfig from './CacheConfig';
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
 import SampleProgram from '../data/SampleProgram';
-import { deriveLogicalState } from '../simulatorState';
-import { executionReducer, initialExecState } from '../executionReducer';
+
+import { useSimulatorData } from '../hooks/useSimulatorData';
+import { useExecutionController } from '../hooks/useExecutionController';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 
 // Styled accordion header shared by all right-panel widgets. Defined at
 // module scope on purpose: defining a styled() component inside the
@@ -64,19 +64,38 @@ const AccordionSummary = styled((props) => (
   },
 }));
 
-const Simulator = ({worker, initialState, appInsights}) => {
-  // The amount of steps to run in multi-step executions.
-  const INTERNAL_STEPS_STRIDE = 50;
+const Simulator = ({ worker, initialState, appInsights }) => {
+  // ---------------------------------------------------------------------------
+  // Settings (persisted in localStorage)
+  // ---------------------------------------------------------------------------
+  const [storedCode, setStoredCode, resetStoredCode] = useSetting(
+    SettingKey.EDITOR_CODE,
+  );
+  const [viMode, setViMode] = useSetting(SettingKey.VI_MODE);
+  const [fontSize, setFontSize] = useSetting(SettingKey.FONT_SIZE);
+  const [accordionAlerts, setAccordionAlerts] = useSetting(
+    SettingKey.ACCORDION_ALERTS,
+  );
+  const [forwarding, setForwarding] = useSetting(SettingKey.FORWARDING);
+  const [delaySlot, setDelaySlot] = useSetting(SettingKey.DELAY_SLOT);
+  const [stepStride, setStepStride] = useSetting(SettingKey.STEP_STRIDE);
+  const [executionDelayMs, setExecutionDelayMs] = useSetting(
+    SettingKey.EXECUTION_DELAY_MS,
+  );
+  const [pipelineColors, setPipelineColors] = useSetting(
+    SettingKey.PIPELINE_COLORS,
+  );
+  const [themeMode, setThemeMode] = useSetting(SettingKey.THEME_MODE);
+  const [expandedAccordions, setExpandedAccordions] = useSetting(
+    SettingKey.EXPANDED_ACCORDIONS,
+  );
 
-  const [registers, setRegisters] = React.useState(initialState.registers);
-  const [memory, setMemory] = React.useState(initialState.memory);
-  const [stats, setStats] = React.useState(initialState.statistics);
-
-  // Editor code persistence:
+  // ---------------------------------------------------------------------------
+  // Editor code persistence
+  // ---------------------------------------------------------------------------
   // - `storedCode` is what useLocalStorage actually holds ('' = "never edited by user").
   // - `code` is the live value the Monaco editor shows ('' maps to SampleProgram).
   // - Writes to localStorage are debounced so individual keystrokes don't block.
-  const [storedCode, setStoredCode, resetStoredCode] = useSetting(SettingKey.EDITOR_CODE);
   const [code, _setCode] = React.useState(() =>
     storedCode === '' ? SampleProgram : storedCode,
   );
@@ -100,45 +119,71 @@ const Simulator = ({worker, initialState, appInsights}) => {
     },
     [debouncedPersistCode],
   );
-  const [status, setStatus] = React.useState(initialState.status);
-  const [pipeline, setPipeline] = React.useState(initialState.pipeline);
-  const [parsingErrors, setParsingErrors] = React.useState(
-    initialState.parsingErrors,
-  );
-  const [parsedInstructions, setParsedInstructions] = React.useState(
-    initialState.parsedInstructions,
-  );
-  const [stdout, setStdout] = React.useState('');
-  const [inputRequest, setInputRequest] = React.useState(null);
-  const [runtimeErrorMessage, setRuntimeErrorMessage] = React.useState(null);
 
-  const [viMode, setViMode] = useSetting(SettingKey.VI_MODE);
-  const [fontSize, setFontSize] = useSetting(SettingKey.FONT_SIZE);
-  const [accordionAlerts, setAccordionAlerts] = useSetting(SettingKey.ACCORDION_ALERTS);
-  const [forwarding, setForwarding] = useSetting(SettingKey.FORWARDING);
-  const [delaySlot, setDelaySlot] = useSetting(SettingKey.DELAY_SLOT);
-  const [stepStride, setStepStride] = useSetting(SettingKey.STEP_STRIDE);
-  const [executionDelayMs, setExecutionDelayMs] = useSetting(
-    SettingKey.EXECUTION_DELAY_MS,
-  );
-  const [pipelineColors, setPipelineColors] = useSetting(
-    SettingKey.PIPELINE_COLORS,
-  );
-  const [themeMode, setThemeMode] = useSetting(SettingKey.THEME_MODE);
+  // ---------------------------------------------------------------------------
+  // Simulator data state (registers, memory, stats, pipeline, etc.)
+  // ---------------------------------------------------------------------------
+  const {
+    registers,
+    memory,
+    stats,
+    status,
+    pipeline,
+    parsingErrors,
+    parsedInstructions,
+    stdout,
+    inputRequest,
+    setStdout,
+    setParsingErrors,
+    setInputRequest,
+    applyResultState,
+    applyChecksyntaxResult,
+  } = useSimulatorData(initialState);
 
-  // `executionDelayMs` is read inside async callbacks that were captured when
-  // a step batch started (potentially many batches ago). Mirror the latest
-  // value in a ref so the delay applied between batches always reflects the
-  // *current* setting, not the one that was active when "Run All" was
-  // pressed. This lets the user tweak the delay live, mid-run.
-  const executionDelayRef = React.useRef(executionDelayMs);
+  // ---------------------------------------------------------------------------
+  // Execution controller (reducer, batch scheduling, worker subscription)
+  // ---------------------------------------------------------------------------
+  const { executing, dispatch, runCode, stepCode, stopCode, notifyReset } =
+    useExecutionController({
+      worker,
+      applyResultState,
+      applyChecksyntaxResult,
+      setInputRequest,
+      executionDelayMs,
+      onRuntimeError: setRuntimeErrorMessage,
+    });
+
+  const simulatorRunning = status === 'RUNNING';
+
+  // Tracks if the program has no syntax errors and can be loaded.
+  // TODO: Allow code execution w/ warnings in the worker, then uncomment the line below
+  const isValidProgram = () => {
+    if (!parsingErrors) {
+      return true;
+    } else {
+      return parsingErrors.filter((e) => !e.isWarning).length === 0;
+    }
+  };
+
+  // ---------------------------------------------------------------------------
+  // Worker settings sync
+  // ---------------------------------------------------------------------------
+
+  // Keep the simulator worker's forwarding flag in sync with the persisted
+  // setting. Runs once on mount (so a value restored from localStorage is
+  // pushed to the worker) and whenever the user toggles the switch.
   React.useEffect(() => {
-    executionDelayRef.current = executionDelayMs;
-  }, [executionDelayMs]);
+    worker.setForwarding(forwarding);
+  }, [forwarding]);
 
-  // Reference to the Monaco editor instance, populated by `<Code />` once
-  // the editor has mounted. Used by the Issues panel to jump the editor to
-  // the line/column of a parsing error or warning when the user clicks it.
+  // Same pattern for the branch delay slot setting.
+  React.useEffect(() => {
+    worker.setDelaySlot(delaySlot);
+  }, [delaySlot]);
+
+  // ---------------------------------------------------------------------------
+  // Editor ref (for Issues panel click-to-navigate)
+  // ---------------------------------------------------------------------------
   const editorRef = React.useRef(null);
   const handleEditorReady = React.useCallback((editor) => {
     editorRef.current = editor;
@@ -157,20 +202,9 @@ const Simulator = ({worker, initialState, appInsights}) => {
     editor.focus();
   }, []);
 
-  // Keep the simulator worker's forwarding flag in sync with the persisted
-  // setting. Runs once on mount (so a value restored from localStorage is
-  // pushed to the worker) and whenever the user toggles the switch.
-  React.useEffect(() => {
-    worker.setForwarding(forwarding);
-  }, [forwarding]);
-
-  // Same pattern for the branch delay slot setting.
-  React.useEffect(() => {
-    worker.setDelaySlot(delaySlot);
-  }, [delaySlot]);
-
-  // Track expanded state for each accordion
-  const [expandedAccordions, setExpandedAccordions] = useSetting(SettingKey.EXPANDED_ACCORDIONS);
+  // ---------------------------------------------------------------------------
+  // Accordion change-detection state
+  // ---------------------------------------------------------------------------
 
   // Track if data has changed while accordion was collapsed
   const [accordionChanges, setAccordionChanges] = React.useState({
@@ -190,6 +224,157 @@ const Simulator = ({worker, initialState, appInsights}) => {
 
   // Ref to track if we are resetting the simulator (clearing code)
   const isResetting = React.useRef(false);
+
+  // ---------------------------------------------------------------------------
+  // Syntax checking (stable debounced instance)
+  // ---------------------------------------------------------------------------
+
+  // A stable debounced wrapper around worker.checkSyntax.  Creating this with
+  // useMemo ensures the same debounced instance (with its internal timer state)
+  // is reused across re-renders.  A plain `const debouncedSyntaxCheck = debounce(...)`
+  // at the top of the function body would create a fresh function on every
+  // render, orphaning any pending timer from the previous render.
+  // Declared before business operations so restoreDefaultSample can call .cancel().
+  const debouncedSyntaxCheck = React.useMemo(
+    () => debounce((c) => worker.checkSyntax(c), 500),
+    // worker is stable across renders (passed as a prop reference).
+    [worker],
+  );
+
+  // ---------------------------------------------------------------------------
+  // Business operations
+  // ---------------------------------------------------------------------------
+  // All of these are declared before useKeyboardShortcuts so that the hook
+  // can receive stable function references without TDZ issues.
+
+  const loadCode = () => {
+    setStdout('');
+    worker.load(code);
+  };
+
+  const clearCode = () => {
+    notifyReset(); // cancels batch, dispatches RESET, worker.reset(), clears inputRequest
+    setCode('.data\n\n.code\n  SYSCALL 0\n');
+    isResetting.current = true;
+    setAccordionChanges({
+      stats: false,
+      pipeline: false,
+      registers: false,
+      memory: false,
+      stdout: false,
+    });
+  };
+
+  const restoreDefaultSample = () => {
+    notifyReset(); // cancels batch, dispatches RESET, worker.reset(), clears inputRequest
+    // Cancel any pending debounced writes / syntax checks so stale results
+    // from the previous code don't arrive after the restore.
+    debouncedPersistCode.cancel();
+    debouncedSyntaxCheck.cancel();
+    // Update local state immediately so the editor switches to the sample at
+    // once, without waiting for the debounced write round-trip.
+    _setCode(SampleProgram);
+    // Reset the persisted value to the sentinel so future reloads also show
+    // the sample (and benefit from any future sample update).
+    resetStoredCode();
+    // Clear stale parsing errors so the issues panel doesn't show diagnostics
+    // for the code that was just replaced.
+    setParsingErrors([]);
+    isResetting.current = true;
+    // Run a fresh syntax check on the restored sample so any warnings in the
+    // sample are surfaced immediately.
+    worker.checkSyntax(SampleProgram);
+    setAccordionChanges({
+      stats: false,
+      pipeline: false,
+      registers: false,
+      memory: false,
+      stdout: false,
+    });
+  };
+
+  const setCacheConfig = React.useCallback(
+    (config) => {
+      worker.setCacheConfig(config);
+    },
+    [worker],
+  );
+
+  const openCode = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.asm,.txt,.s';
+    fileInput.onchange = (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          setCode(e.target.result);
+        };
+        reader.readAsText(file);
+      }
+    };
+    fileInput.click();
+  };
+
+  const saveCode = () => {
+    const file = new Blob([code], { type: 'text/plain' });
+    const fileURL = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = fileURL;
+    link.download = 'code.s';
+    link.click();
+    URL.revokeObjectURL(fileURL);
+  };
+
+  const submitInput = (input) => {
+    setInputRequest(null);
+    dispatch({ type: 'INPUT_SUBMITTED' });
+    worker.provideInput(input);
+  };
+
+  const cancelInput = () => {
+    submitInput('');
+  };
+
+  // ---------------------------------------------------------------------------
+  // Click handlers (decouple telemetry from business logic)
+  // ---------------------------------------------------------------------------
+  const clickRun = () => {
+    appInsights.trackEvent({ name: 'click', properties: { action: 'run' } });
+    runCode();
+  };
+
+  const clickStep = (n) => {
+    appInsights.trackEvent({ name: 'click', properties: { action: 'step' } });
+    stepCode(n);
+  };
+
+  const clickStop = () => {
+    appInsights.trackEvent({ name: 'click', properties: { action: 'stop' } });
+    stopCode();
+  };
+
+  // ---------------------------------------------------------------------------
+  // Keyboard shortcuts
+  // ---------------------------------------------------------------------------
+  useKeyboardShortcuts({
+    status,
+    executing,
+    inputRequest,
+    isValidProgram,
+    loadCode,
+    runCode,
+    stepCode,
+    stopCode,
+    pauseCode: () => dispatch({ type: 'PAUSE_REQUESTED' }),
+    stepStride,
+    appInsights,
+  });
+
+  // ---------------------------------------------------------------------------
+  // Accordion change-detection effect
+  // ---------------------------------------------------------------------------
 
   // Detect changes in accordion data when collapsed
   React.useEffect(() => {
@@ -212,384 +397,68 @@ const Simulator = ({worker, initialState, appInsights}) => {
       isResetting.current = false;
       return;
     }
-    
+
     const statsChanged = !isEqual(stats, prevStats.current);
     const pipelineChanged = !isEqual(pipeline, prevPipeline.current);
     const registersChanged = !isEqual(registers, prevRegisters.current);
     const memoryChanged = !isEqual(memory, prevMemory.current);
     const stdoutChanged = stdout !== prevStdout.current;
-    
+
     // Update refs first
     prevStats.current = stats;
     prevPipeline.current = pipeline;
     prevRegisters.current = registers;
     prevMemory.current = memory;
     prevStdout.current = stdout;
-    
+
     // Only update state if there are actual changes for collapsed accordions
-    if ((!expandedAccordions.stats && statsChanged) ||
-        (!expandedAccordions.pipeline && pipelineChanged) ||
-        (!expandedAccordions.registers && registersChanged) ||
-        (!expandedAccordions.memory && memoryChanged) ||
-        (!expandedAccordions.stdout && stdoutChanged)) {
-      setAccordionChanges(prev => ({
+    if (
+      (!expandedAccordions.stats && statsChanged) ||
+      (!expandedAccordions.pipeline && pipelineChanged) ||
+      (!expandedAccordions.registers && registersChanged) ||
+      (!expandedAccordions.memory && memoryChanged) ||
+      (!expandedAccordions.stdout && stdoutChanged)
+    ) {
+      setAccordionChanges((prev) => ({
         ...prev,
         stats: prev.stats || (!expandedAccordions.stats && statsChanged),
-        pipeline: prev.pipeline || (!expandedAccordions.pipeline && pipelineChanged),
-        registers: prev.registers || (!expandedAccordions.registers && registersChanged),
+        pipeline:
+          prev.pipeline || (!expandedAccordions.pipeline && pipelineChanged),
+        registers:
+          prev.registers || (!expandedAccordions.registers && registersChanged),
         memory: prev.memory || (!expandedAccordions.memory && memoryChanged),
         stdout: prev.stdout || (!expandedAccordions.stdout && stdoutChanged),
       }));
     }
-  }, [stats, pipeline, registers, memory, stdout, accordionAlerts, expandedAccordions]);
+  }, [
+    stats,
+    pipeline,
+    registers,
+    memory,
+    stdout,
+    accordionAlerts,
+    expandedAccordions,
+  ]);
 
   // Handle accordion expansion change
   const handleAccordionChange = (panel) => (event, isExpanded) => {
-    setExpandedAccordions(prev => ({
+    setExpandedAccordions((prev) => ({
       ...prev,
       [panel]: isExpanded,
     }));
-    
+
     // Clear change indicator when accordion is opened
     if (isExpanded) {
-      setAccordionChanges(prev => ({
+      setAccordionChanges((prev) => ({
         ...prev,
         [panel]: false,
       }));
     }
   };
 
-  // Execution state machine — replaces the four individual useState variables
-  // (stepsToRun, mustPause, runAll, executing) that previously suffered from
-  // stale-closure races.  useReducer makes every transition atomic: the
-  // reducer sees the complete current state and emits a complete new state,
-  // so no individual setter can race another.  See executionReducer.js for
-  // the full action documentation.
-  const [execState, dispatch] = React.useReducer(
-    executionReducer,
-    initialExecState,
-  );
-  const { stepsToRun, mustPause, runAll, executing } = execState;
-
-  const simulatorRunning = status == 'RUNNING';
-
-  // Tracks if the program has no syntax errors and can be loaded.
-  // TODO: Allow code execution w/ warnings in the worker, then uncomment the line below
-  const isValidProgram = () => {
-    if (!parsingErrors) { return true; }
-    else {
-      return (parsingErrors.filter((e) => !e.isWarning).length === 0);
-    }
-  };
-
-  // Returns true if the given parsingErrors array contains at least one
-  // actual error (not just warnings). Used to decide whether it is safe
-  // to keep the parsed instructions around (e.g. to power the hover
-  // provider in the code editor): programs that only emit warnings are
-  // still successfully parsed and loadable, so we should not discard the
-  // parsed instructions in that case.
-  const hasRealErrors = (parsingErrors) => {
-    if (!parsingErrors) return false;
-    return parsingErrors.some((e) => !e.isWarning);
-  };
-
-  // Worker message handler — stored in a ref so the addEventListener-based
-  // subscription (below) can register a single stable wrapper once, while
-  // the *real* handler body is reassigned on every render and therefore
-  // always reads the latest closures (execState, scheduleNextBatch, …).
-  // This is identical in structure to the existing keyboardHandlerRef pattern.
-  const workerHandlerRef = React.useRef(null);
-  workerHandlerRef.current = (e) => {
-    const result = worker.parseResult(e.data);
-
-    // For syntax check responses, only update parsing errors to avoid unnecessary re-renders
-    if (result.method === 'checksyntax') {
-      setParsingErrors(result.parsingErrors);
-      if (hasRealErrors(result.parsingErrors)) {
-        setParsedInstructions(null);
-      } else {
-        setParsedInstructions(result.parsedInstructions);
-      }
-      return;
-    }
-
-    if (result.inputRequested) {
-      applyResultState(result);
-      dispatch({ type: 'INPUT_REQUESTED' });
-      setInputRequest(result);
-      return;
-    }
-
-    updateState(result);
-  };
-
-  // Register exactly one stable message listener for the lifetime of this
-  // component instead of the previous render-body `worker.onmessage = …`
-  // assignment, which was a side-effect during render — a React anti-pattern
-  // that could silently drop messages during Strict-Mode double-invocations
-  // and could not carry a cleanup.
-  React.useEffect(() => {
-    const handleMessage = (e) => workerHandlerRef.current(e);
-    worker.addEventListener('message', handleMessage);
-    return () => worker.removeEventListener('message', handleMessage);
-    // worker is a stable prop reference; include it so the linter is satisfied
-    // and so the subscription is re-created if a caller ever passes a new worker.
-  }, [worker]);
-
-  const applyResultState = (result) => {
-    setRegisters(result.registers);
-    setMemory(result.memory);
-    setStats(result.statistics);
-    setStatus(result.status);
-    setPipeline(result.pipeline);
-    setParsingErrors(result.parsingErrors);
-
-    if (hasRealErrors(result.parsingErrors)) {
-      setParsedInstructions(null);
-    } else {
-      setParsedInstructions(result.parsedInstructions);
-    }
-
-    if (result.stdout) {
-      setStdout(result.stdout);
-    }
-  };
-
-  const updateState = (result) => {
-    applyResultState(result);
-
-    // TODO: cleaner handling of error types. Checking the error message is a pretty weak check.
-    // Runtime errors should not cause multiple alert prompting to avoid webui getting stuck
-    if (!result.success && result.errorMessage !== 'Parsing errors.') {
-      // Synchronous exceptions carry structured info (errorCode, errorInstruction, errorStage).
-      // When present, compose a clearer, multi-line alert message.
-      let message = result.errorMessage;
-      if (result.errorCode) {
-        message = `Synchronous exception: ${result.errorMessage}`;
-        if (result.errorInstruction && result.errorStage) {
-          message += `\n\nInstruction: ${result.errorInstruction}\nPipeline stage: ${result.errorStage}`;
-        }
-      }
-      setRuntimeErrorMessage(message);
-      stopCode();
-      // stopCode() dispatches STOP (mustPause=true, runAll=false, stepsToRun=0),
-      // but since we are inside a worker-result handler (not a pending batch),
-      // hadPendingBatch is false and STOP leaves executing unchanged (still
-      // true).  Dispatch RESULT_RECEIVED with status='STOPPED' to atomically
-      // clear executing and reset all flags, preventing any follow-up batch
-      // from racing the worker.reset() already queued by stopCode().
-      dispatch({ type: 'RESULT_RECEIVED', status: 'STOPPED', encounteredBreak: false });
-      return;
-    }
-
-    // Dispatch the execution state transition atomically.  The reducer decides
-    // whether to stay in "executing" (more batches pending) or clear the flag.
-    dispatch({ type: 'RESULT_RECEIVED', status: result.status, encounteredBreak: result.encounteredBreak });
-
-    // Scheduling is a side-effect and cannot live inside the reducer.  We read
-    // the *pre-dispatch* execState here — which is correct, because the closure
-    // captured by workerHandlerRef.current reflects the last render before this
-    // message arrived (i.e., the state that drove the batch that just finished).
-    //
-    // Note: we intentionally keep `executing === true` across inter-batch
-    // delays when more steps are queued. Clearing `executing` between
-    // batches would toggle the toolbar buttons (Run/Step/Stop becoming
-    // enabled, Pause becoming disabled) every stride, which looks like a
-    // flash during long runs with a non-zero execution delay. The user
-    // should see the same "running" controls whether the worker is busy
-    // stepping or we're simply waiting out the inter-batch delay.
-    if (result.status !== 'RUNNING' || mustPause || result.encounteredBreak) {
-      // Execution halted; reducer already cleared all flags.  Nothing to schedule.
-    } else if (stepsToRun > 0) {
-      scheduleNextBatch(() => stepCode(stepsToRun));
-    } else if (runAll) {
-      scheduleNextBatch(() => stepCode(INTERNAL_STEPS_STRIDE));
-    }
-    // else: single step finished normally; reducer set executing=false — done.
-  };
-
-  // Pending timeout id for a delayed follow-up batch, so that stopping the
-  // simulation cancels any batch that was sleeping between strides instead
-  // of having it fire after `worker.reset()` and surface a spurious error.
-  const nextBatchTimeout = React.useRef(null);
-
-  const cancelPendingBatch = () => {
-    if (nextBatchTimeout.current !== null) {
-      clearTimeout(nextBatchTimeout.current);
-      nextBatchTimeout.current = null;
-    }
-  };
-
-  // Schedule the next internal step batch, inserting the user-configured
-  // execution delay so long runs are visually paced. A delay of 0 ms (the
-  // default) runs batches back-to-back, matching the pre-existing behavior.
-  const scheduleNextBatch = (fn) => {
-    cancelPendingBatch();
-    const delay = executionDelayRef.current;
-    if (delay <= 0) {
-      fn();
-      return;
-    }
-    nextBatchTimeout.current = setTimeout(() => {
-      nextBatchTimeout.current = null;
-      fn();
-    }, delay);
-  };
-
-  // Click handlers. Decoupled from business logic to place the telemetry hooks in the right place.
-  const clickRun = () => {
-    appInsights.trackEvent({name: "click", properties: {action: "run"}});
-    runCode()
-  }
-
-  const clickStep = (n) => {
-    appInsights.trackEvent({name: "click", properties: {action: "step"}});
-    stepCode(n)
-  }
-
-  const clickLoad = () => {
-    appInsights.trackEvent({name: "click", properties: {action: "load"}});
-    loadCode();
-  }
-
-  const clickStop = () => {
-    appInsights.trackEvent({name: "click", properties: {action: "stop"}});
-    stopCode();
-  }
-
-  // Business logic for click handlers.
-  const runCode = () => {
-    dispatch({ type: 'RUN_ALL_REQUESTED' });
-    worker.step(INTERNAL_STEPS_STRIDE);
-  };
-
-  const stepCode = (n) => {
-    const toRun = Math.min(n, INTERNAL_STEPS_STRIDE);
-    dispatch({ type: 'STEP_REQUESTED', stepsRemaining: n - toRun });
-    worker.step(toRun);
-  };
-
-  const stopCode = () => {
-    // If a batch was sleeping between strides, cancel it. In that case no
-    // worker result is in flight to flip `executing` back off via
-    // `updateState`, so we pass hadPendingBatch=true and the reducer clears
-    // executing immediately.  When the worker is mid-step (hadPendingBatch
-    // false), the upcoming result will see mustPause=true and clear executing.
-    const hadPendingBatch = nextBatchTimeout.current !== null;
-    cancelPendingBatch();
-    dispatch({ type: 'STOP', hadPendingBatch });
-    setInputRequest(null);
-    worker.reset();
-  };
-
-  const clearCode = () => {
-    const hadPendingBatch = nextBatchTimeout.current !== null;
-    cancelPendingBatch();
-    setCode(".data\n\n.code\n  SYSCALL 0\n");
-    isResetting.current = true;
-    setInputRequest(null);
-    dispatch({ type: 'RESET', hadPendingBatch });
-    worker.reset();
-    // Clear accordion change markers
-    setAccordionChanges({
-      stats: false,
-      pipeline: false,
-      registers: false,
-      memory: false,
-      stdout: false,
-    });
-  }
-
-  const restoreDefaultSample = () => {
-    const hadPendingBatch = nextBatchTimeout.current !== null;
-    cancelPendingBatch();
-    // Cancel any pending debounced writes / syntax checks so stale results
-    // from the previous code don't arrive after the restore.
-    debouncedPersistCode.cancel();
-    debouncedSyntaxCheck.cancel();
-    // Update local state immediately so the editor switches to the sample at
-    // once, without waiting for the debounced write round-trip.
-    _setCode(SampleProgram);
-    // Reset the persisted value to the sentinel so future reloads also show
-    // the sample (and benefit from any future sample update).
-    resetStoredCode();
-    // Clear stale parsing errors so the issues panel doesn't show diagnostics
-    // for the code that was just replaced.
-    setParsingErrors([]);
-    isResetting.current = true;
-    setInputRequest(null);
-    dispatch({ type: 'RESET', hadPendingBatch });
-    worker.reset();
-    // Run a fresh syntax check on the restored sample so any warnings in the
-    // sample are surfaced immediately.
-    worker.checkSyntax(SampleProgram);
-    // Clear accordion change markers
-    setAccordionChanges({
-      stats: false,
-      pipeline: false,
-      registers: false,
-      memory: false,
-      stdout: false,
-    });
-  };
-
-
-  const setCacheConfig = React.useCallback((config) => {
-    worker.setCacheConfig(config);
-  }, [worker]);
-
-  const openCode = () => {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = '.asm,.txt,.s';
-    fileInput.onchange = (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          setCode(e.target.result);
-        };
-        reader.readAsText(file);
-      }
-    };
-    fileInput.click();
-  }
-
-  const loadCode = () => {
-    setStdout("");
-    worker.load(code);
-  };
-
-  const submitInput = (input) => {
-    setInputRequest(null);
-    dispatch({ type: 'INPUT_SUBMITTED' });
-    worker.provideInput(input);
-  };
-
-  const cancelInput = () => {
-    submitInput('');
-  };
-
-  const saveCode = () => {
-    const file = new Blob([code], { type: 'text/plain' });
-    const fileURL = URL.createObjectURL(file);
-    const link = document.createElement('a');
-    link.href = fileURL;
-    link.download = 'code.s';
-    link.click();
-    URL.revokeObjectURL(fileURL);
-  };
-
-  // A stable debounced wrapper around worker.checkSyntax.  Creating this with
-  // useMemo ensures the same debounced instance (with its internal timer state)
-  // is reused across re-renders.  A plain `const debouncedSyntaxCheck = debounce(...)`
-  // at the top of the function body would create a fresh function on every
-  // render, orphaning any pending timer from the previous render.
-  const debouncedSyntaxCheck = React.useMemo(
-    () => debounce((c) => worker.checkSyntax(c), 500),
-    // worker is stable across renders (passed as a prop reference).
-    [worker],
-  );
+  // ---------------------------------------------------------------------------
+  // Syntax check on mount
+  // ---------------------------------------------------------------------------
 
   // Run a syntax check on the initial code once on mount so that warnings
   // (e.g. deprecated instructions in the sample program) are surfaced
@@ -599,90 +468,14 @@ const Simulator = ({worker, initialState, appInsights}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Global keyboard shortcuts for run-control actions.
-  // A ref holds a callback that reads the latest closures on every call, so
-  // the window listener itself is registered just once (empty cleanup deps
-  // would be wrong; we need status/executing/inputRequest/stepStride for the
-  // guard).  We keep the handler in a ref so the listener function identity
-  // is stable across re-renders and we only need to re-register when the
-  // observable state used for gating actually changes.
-  const keyboardHandlerRef = React.useRef(null);
-  keyboardHandlerRef.current = (e) => {
-    // Don't steal keys while a modal dialog is open (Help, Settings, Input).
-    if (document.querySelector('[role="dialog"]')) return;
-    const logicalState = deriveLogicalState(status, executing, inputRequest);
-    if (logicalState === 'WAITING_FOR_INPUT') return;
-
-    switch (e.key) {
-      case 'F2':
-        e.preventDefault();
-        if (isValidProgram()) {
-          appInsights.trackEvent({
-            name: 'click',
-            properties: { action: 'load', source: 'keyboard' },
-          });
-          loadCode();
-        }
-        break;
-      case 'F8':
-        e.preventDefault();
-        if (logicalState === 'READY') {
-          appInsights.trackEvent({
-            name: 'click',
-            properties: { action: 'run', source: 'keyboard' },
-          });
-          runCode();
-        } else if (logicalState === 'EXECUTING') {
-          appInsights.trackEvent({ name: 'pause', source: 'keyboard' });
-          dispatch({ type: 'PAUSE_REQUESTED' });
-        }
-        break;
-      case 'F9':
-        e.preventDefault();
-        if (logicalState === 'READY') {
-          appInsights.trackEvent({
-            name: 'click',
-            properties: { action: 'step', source: 'keyboard' },
-          });
-          stepCode(1);
-        }
-        break;
-      case 'F10':
-        e.preventDefault();
-        if (logicalState === 'READY') {
-          appInsights.trackEvent({
-            name: 'click',
-            properties: { action: 'step', source: 'keyboard' },
-          });
-          stepCode(stepStride);
-        }
-        break;
-      case 'Escape':
-        e.preventDefault();
-        if (logicalState === 'READY') {
-          appInsights.trackEvent({
-            name: 'click',
-            properties: { action: 'stop', source: 'keyboard' },
-          });
-          stopCode();
-        }
-        break;
-      default:
-        break;
-    }
+  const onCodeChange = (newCode) => {
+    setCode(newCode);
+    debouncedSyntaxCheck(newCode);
   };
 
-  React.useEffect(() => {
-    const handleKeyDown = (e) => keyboardHandlerRef.current(e);
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  const onCodeChange = (code) => {
-    setCode(code);
-    debouncedSyntaxCheck(code);
-  };
-
+  // ---------------------------------------------------------------------------
+  // Theme resolution
+  // ---------------------------------------------------------------------------
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
   // Resolve the user-selected theme mode: 'auto' defers to the OS media
@@ -710,6 +503,9 @@ const Simulator = ({worker, initialState, appInsights}) => {
   // shrinks gracefully on phones and tablets.
   const theme = React.useMemo(() => buildTheme(paletteMode), [paletteMode]);
 
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
   return (
     <>
       <ThemeProvider theme={theme}>
@@ -774,88 +570,123 @@ const Simulator = ({worker, initialState, appInsights}) => {
               AccordionSummary={AccordionSummary}
               onIssueClick={handleIssueClick}
             />
-            <Accordion 
-              expanded={expandedAccordions.stats} 
-              onChange={handleAccordionChange('stats')} 
+            <Accordion
+              expanded={expandedAccordions.stats}
+              onChange={handleAccordionChange('stats')}
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, color: 'primary.main' }}
+                >
                   Stats
-                  {accordionAlerts && accordionChanges.stats && <span className="accordion-change-indicator" />}
+                  {accordionAlerts && accordionChanges.stats && (
+                    <span className="accordion-change-indicator" />
+                  )}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Statistics {...stats} />
               </AccordionDetails>
             </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.pipeline} 
-              onChange={handleAccordionChange('pipeline')} 
+            <Accordion
+              expanded={expandedAccordions.pipeline}
+              onChange={handleAccordionChange('pipeline')}
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, color: 'primary.main' }}
+                >
                   Pipeline
-                  {accordionAlerts && accordionChanges.pipeline && <span className="accordion-change-indicator" />}
+                  {accordionAlerts && accordionChanges.pipeline && (
+                    <span className="accordion-change-indicator" />
+                  )}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Pipeline pipeline={pipeline} colors={pipelineColors} />
               </AccordionDetails>
             </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.registers} 
-              onChange={handleAccordionChange('registers')} 
+            <Accordion
+              expanded={expandedAccordions.registers}
+              onChange={handleAccordionChange('registers')}
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, color: 'primary.main' }}
+                >
                   Registers
-                  {accordionAlerts && accordionChanges.registers && <span className="accordion-change-indicator" />}
+                  {accordionAlerts && accordionChanges.registers && (
+                    <span className="accordion-change-indicator" />
+                  )}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Registers {...registers} />
               </AccordionDetails>
             </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.memory} 
-              onChange={handleAccordionChange('memory')} 
+            <Accordion
+              expanded={expandedAccordions.memory}
+              onChange={handleAccordionChange('memory')}
               disableGutters
             >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />} id="memory-accordion-summary">
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                id="memory-accordion-summary"
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, color: 'primary.main' }}
+                >
                   Memory
-                  {accordionAlerts && accordionChanges.memory && <span className="accordion-change-indicator" />}
+                  {accordionAlerts && accordionChanges.memory && (
+                    <span className="accordion-change-indicator" />
+                  )}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Memory memory={memory} />
               </AccordionDetails>
             </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.stdout} 
-              onChange={handleAccordionChange('stdout')} 
+            <Accordion
+              expanded={expandedAccordions.stdout}
+              onChange={handleAccordionChange('stdout')}
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, color: 'primary.main' }}
+                >
                   Standard Output
-                  {accordionAlerts && accordionChanges.stdout && <span className="accordion-change-indicator" />}
+                  {accordionAlerts && accordionChanges.stdout && (
+                    <span className="accordion-change-indicator" />
+                  )}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <StdOut stdout={stdout} />
               </AccordionDetails>
             </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.cache} 
-              onChange={handleAccordionChange('cache')} 
+            <Accordion
+              expanded={expandedAccordions.cache}
+              onChange={handleAccordionChange('cache')}
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: status === 'RUNNING' ? 'text.disabled' : 'primary.main' }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    fontWeight: 600,
+                    color:
+                      status === 'RUNNING' ? 'text.disabled' : 'primary.main',
+                  }}
+                >
                   Cache Configuration
                 </Typography>
               </AccordionSummary>
@@ -867,13 +698,16 @@ const Simulator = ({worker, initialState, appInsights}) => {
                 />
               </AccordionDetails>
             </Accordion>
-            <Accordion 
-              expanded={expandedAccordions.settings} 
-              onChange={handleAccordionChange('settings')} 
+            <Accordion
+              expanded={expandedAccordions.settings}
+              onChange={handleAccordionChange('settings')}
               disableGutters
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, color: 'primary.main' }}
+                >
                   General Settings
                 </Typography>
               </AccordionSummary>
