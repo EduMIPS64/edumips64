@@ -6,8 +6,7 @@ import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 import AppErrorBoundary from './components/AppErrorBoundary';
 import AppLoader from './components/AppLoader';
 
-import './css/main.css'
-
+import './css/main.css';
 
 // Set version from the webpack variables. Uses globals defined by webpack.
 // VERSION is git-describe (e.g. "1.4.0-74-ge1b45a15"), matching desktop identity.
@@ -17,15 +16,16 @@ const version = VERSION;
 // Initialize AppInsights.
 const appInsights = new ApplicationInsights({
   config: {
-    connectionString: 'InstrumentationKey=ae180a87-f990-410c-a51c-8077c240e265;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/',
+    connectionString:
+      'InstrumentationKey=ae180a87-f990-410c-a51c-8077c240e265;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/',
   },
 });
 appInsights.loadAppInsights();
 appInsights.context.application.ver = version;
 appInsights.context.application.build = version;
 const telemetryInitializer = (envelope) => {
-  envelope.tags['ai.cloud.role'] = process.env.NODE_ENV,
-  envelope.tags['ai.cloud.roleInstance'] = version;
+  ((envelope.tags['ai.cloud.role'] = process.env.NODE_ENV),
+    (envelope.tags['ai.cloud.roleInstance'] = version));
 };
 appInsights.addTelemetryInitializer(telemetryInitializer);
 appInsights.trackPageView();
@@ -36,15 +36,15 @@ appInsights.trackPageView();
 let worker = new Worker('worker.js');
 worker.reset = () => {
   worker.postMessage({ method: 'reset' });
-  appInsights.trackEvent({name: "reset"});
+  appInsights.trackEvent({ name: 'reset' });
 };
 worker.step = (n) => {
   worker.postMessage({ method: 'step', steps: n });
-  appInsights.trackEvent({name: 'step', properties: {steps: n}});
+  appInsights.trackEvent({ name: 'step', properties: { steps: n } });
 };
 worker.load = (code) => {
   worker.postMessage({ method: 'load', code });
-  appInsights.trackEvent({name: "load"});
+  appInsights.trackEvent({ name: 'load' });
 };
 
 worker.setCacheConfig = (config) => {
@@ -62,7 +62,7 @@ worker.setDelaySlot = (enabled) => {
 worker.checkSyntax = (code) => {
   worker.postMessage({ method: 'checksyntax', code });
 
-  appInsights.trackEvent({name: "checkSyntax"});
+  appInsights.trackEvent({ name: 'checkSyntax' });
 };
 worker.provideInput = (input) => {
   worker.postMessage({ method: 'provideInput', input });
@@ -76,14 +76,21 @@ worker.parseResult = (result) => {
 worker.version = version;
 
 // Mount React immediately so the user sees a loading indicator rather than
-// a blank page.  AppLoader registers its 'message'/'error' listeners in its
-// constructor and calls worker.reset() in componentDidMount, ensuring the
-// listener is always in place before the first worker message arrives.
+// a blank page.  AppLoader attaches its 'message'/'error' listeners and
+// calls worker.reset() in the same componentDidMount block, so the init
+// message can never be missed.
+//
+// StrictMode is a development-only canary: it double-invokes render
+// functions, constructors and effect setup/cleanup to surface unsafe side
+// effects (like the render-body worker.onmessage assignment fixed in
+// #1910). It renders nothing and has zero effect in production builds.
 const container = document.getElementById('simulator');
 const root = createRoot(container);
 
 root.render(
-  <AppErrorBoundary appInsights={appInsights}>
-    <AppLoader worker={worker} appInsights={appInsights} />
-  </AppErrorBoundary>
+  <React.StrictMode>
+    <AppErrorBoundary appInsights={appInsights}>
+      <AppLoader worker={worker} appInsights={appInsights} />
+    </AppErrorBoundary>
+  </React.StrictMode>,
 );

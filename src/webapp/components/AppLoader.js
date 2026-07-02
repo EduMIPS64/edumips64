@@ -22,17 +22,18 @@ import errorImage from '../static/error-hires.png';
  *                expired; an error panel is shown with a Reload button.
  *
  * Design choices:
- *   - The 'message' and 'error' listeners are attached synchronously in the
- *     constructor so they are guaranteed to be in place before
- *     componentDidMount calls worker.reset().  A useEffect-based approach
- *     would be equivalent for mount (effects also run after commit), but a
- *     class constructor makes the ordering explicit and avoids any ambiguity
- *     with React's concurrent scheduler.
- *   - worker.reset() is called from componentDidMount (NOT from index.js).
- *     React's commit phase runs the constructor → render → componentDidMount
- *     sequence atomically before yielding to the browser event loop, so the
- *     listener is always in place before reset() triggers the first worker
- *     message.  index.js must NOT call worker.reset() itself.
+ *   - The 'message' and 'error' listeners are attached in componentDidMount,
+ *     immediately before worker.reset() is called in the same method. The
+ *     worker only speaks when spoken to, so attaching and kicking in the same
+ *     synchronous block guarantees the init message is never missed. Doing
+ *     this in the constructor would be a side effect during render, which
+ *     React.StrictMode intentionally double-invokes — leaking a listener and
+ *     a watchdog timer per extra invocation.
+ *   - worker.reset() is called from componentDidMount (NOT from index.js);
+ *     index.js must NOT call worker.reset() itself. Under StrictMode's
+ *     dev-only mount→unmount→remount cycle reset() runs twice; the second
+ *     init message is consumed by the Simulator's own listener as a regular
+ *     READY result, which is harmless.
  *
  * Props:
  *   worker      – augmented Worker instance (parseResult / step / … already
@@ -48,18 +49,6 @@ class AppLoader extends React.Component {
     // Bind handlers so they can be removed from the worker later.
     this._onMessage = this._onMessage.bind(this);
     this._onError = this._onError.bind(this);
-
-    // Attach listeners NOW (synchronously, before reset() is called by the
-    // parent).  This ensures the first message is never missed.
-    this.props.worker.addEventListener('message', this._onMessage);
-    this.props.worker.addEventListener('error', this._onError);
-
-    // Arm a 30-second watchdog.  If neither a message nor an error event
-    // arrives within this window we surface an error so the user is not left
-    // staring at a blank spinner forever.
-    this._timeout = setTimeout(() => {
-      this._fail('The simulator core did not respond within 30 seconds. The worker.js file may be missing or failed to start.');
-    }, 30000);
   }
 
   _onMessage(evt) {
@@ -70,19 +59,26 @@ class AppLoader extends React.Component {
       const initialState = this.props.worker.parseResult(evt.data);
       this.setState({ phase: 'ready', initialState });
     } catch (err) {
-      this._fail(`Failed to parse the worker initialisation message: ${err.message}`);
+      this._fail(
+        `Failed to parse the worker initialisation message: ${err.message}`,
+      );
     }
   }
 
   _onError(evt) {
     this._cleanup();
-    const msg = (evt && evt.message) ? evt.message : 'The worker encountered an error during startup.';
+    const msg =
+      evt && evt.message
+        ? evt.message
+        : 'The worker encountered an error during startup.';
     this._fail(msg);
   }
 
   _fail(errorMessage) {
     try {
-      this.props.appInsights?.trackException?.({ exception: new Error(errorMessage) });
+      this.props.appInsights?.trackException?.({
+        exception: new Error(errorMessage),
+      });
     } catch (_) {
       // intentionally swallowed
     }
@@ -99,9 +95,23 @@ class AppLoader extends React.Component {
   }
 
   componentDidMount() {
-    // Kick the worker here — after the constructor has attached its listeners —
-    // to guarantee the init message is never missed regardless of React's
-    // scheduling behaviour.
+    // Attach listeners and kick the worker in the same synchronous block:
+    // the worker only emits messages in response to requests, so nothing can
+    // arrive between addEventListener and reset(). Listeners live in
+    // componentDidMount (not the constructor) so StrictMode's double-invoked
+    // constructor cannot leak them; componentWillUnmount cleans them up.
+    this.props.worker.addEventListener('message', this._onMessage);
+    this.props.worker.addEventListener('error', this._onError);
+
+    // Arm a 30-second watchdog. If neither a message nor an error event
+    // arrives within this window we surface an error so the user is not left
+    // staring at a blank spinner forever.
+    this._timeout = setTimeout(() => {
+      this._fail(
+        'The simulator core did not respond within 30 seconds. The worker.js file may be missing or failed to start.',
+      );
+    }, 30000);
+
     this.props.worker.reset();
   }
 
@@ -161,7 +171,10 @@ class AppLoader extends React.Component {
             <Typography variant="h6" color="error">
               Failed to load the EduMIPS64 simulator core
             </Typography>
-            <Typography variant="body2" sx={{ maxWidth: 500, textAlign: 'center' }}>
+            <Typography
+              variant="body2"
+              sx={{ maxWidth: 500, textAlign: 'center' }}
+            >
               {errorMessage}
             </Typography>
             <Button
