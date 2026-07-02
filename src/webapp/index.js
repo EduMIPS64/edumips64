@@ -30,7 +30,6 @@ const telemetryInitializer = (envelope) => {
 };
 appInsights.addTelemetryInitializer(telemetryInitializer);
 appInsights.trackPageView();
-console.log('Initialized AppInsights');
 
 // Web Worker that runs the EduMIPS64 core, built from the Java codebase.
 // Contains some syntactical sugar methods to make working with the
@@ -79,8 +78,6 @@ worker.version = version;
 
 worker.reset();
 const initializer = (evt) => {
-  console.log('Running the initializer callback');
-
   // Run this callback only once, to initialize the Simulator
   // React component which will then handle all subsequent messages.
   worker.removeEventListener('message', initializer);

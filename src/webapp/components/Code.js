@@ -239,8 +239,6 @@ const Code = (props) => {
       newStageMap.set(props.pipeline.FPMultiplier7.Line, 'FPU Muliplier (7)');
     }
     setStageMap(newStageMap);
-    console.log('decorations');
-    console.log(newDecorations);
     decorationsRef.current = editor.deltaDecorations(
       decorationsRef.current,
       newDecorations,
@@ -378,7 +376,6 @@ const Code = (props) => {
       return;
     }
 
-    console.log('Parsing errors', props.parsingErrors);
     const lines = editor.getValue().split('\n');
     const markers = props.parsingErrors
       .filter((err) => {
@@ -400,7 +397,6 @@ const Code = (props) => {
           source: 'EduMIPS64',
         };
       });
-    console.log('Markers', markers);
 
     monaco.editor.setModelMarkers(model, 'EduMIPS64', markers);
   }, [props.parsingErrors, editor, monaco]);
