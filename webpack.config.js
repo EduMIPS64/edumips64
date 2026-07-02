@@ -25,7 +25,12 @@ const copyPlugin = new CopyPlugin({
   ],
 });
 const grPlugin = new GitRevisionPlugin({
-  versionCommand: 'describe --tags --match v* --always --dirty',
+  // The plugin runs this through a shell (child_process.execSync with a
+  // joined string), so the glob MUST be quoted: an unquoted v* is expanded
+  // by the shell against the repo root, and since vitest.config.js exists
+  // it became `--match vitest.config.js` — no tag matched and the version
+  // silently degraded to a bare commit sha.
+  versionCommand: "describe --tags --match 'v*' --always --dirty",
 });
 const versionsPlugin = new webpack.DefinePlugin({
   VERSION: JSON.stringify(grPlugin.version().replace(/^v/, '')),
