@@ -8,6 +8,10 @@ import Button from '@mui/material/Button';
 
 import Simulator from './Simulator';
 
+// The cracked-CPU artwork that the Swing UI's ErrorDialog has shown for
+// years — reused here so the web error screen keeps the same personality.
+import errorImage from '../static/error-hires.png';
+
 /**
  * AppLoader mounts immediately and handles the worker initialisation
  * handshake.  Three states:
@@ -115,12 +119,14 @@ class AppLoader extends React.Component {
           <CssBaseline />
           <Box
             id="app-loading"
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            minHeight="100vh"
-            gap={2}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '100vh',
+              gap: 2,
+            }}
           >
             <CircularProgress />
             <Typography variant="body1">
@@ -137,14 +143,21 @@ class AppLoader extends React.Component {
           <CssBaseline />
           <Box
             id="app-load-error"
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            minHeight="100vh"
-            gap={2}
-            p={3}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '100vh',
+              gap: 2,
+              p: 3,
+            }}
           >
+            <img
+              src={errorImage}
+              alt="A cracked CPU"
+              style={{ width: 220, maxWidth: '60%', height: 'auto' }}
+            />
             <Typography variant="h6" color="error">
               Failed to load the EduMIPS64 simulator core
             </Typography>

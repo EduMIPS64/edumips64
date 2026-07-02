@@ -9,6 +9,10 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
+// The cracked-CPU artwork that the Swing UI's ErrorDialog has shown for
+// years — reused here so the web error screen keeps the same personality.
+import errorImage from '../static/error-hires.png';
+
 /**
  * Top-level error boundary that catches render/lifecycle errors anywhere in
  * the component tree below it.
@@ -54,14 +58,23 @@ class AppErrorBoundary extends React.Component {
     return (
       <Box
         id="error-boundary-fallback"
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-        bgcolor="#f5f5f5"
-        p={2}
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+          bgcolor: 'background.default',
+          p: 2,
+        }}
       >
         <Paper elevation={4} sx={{ maxWidth: 600, width: '100%', p: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+            <img
+              src={errorImage}
+              alt="A cracked CPU"
+              style={{ width: 220, maxWidth: '60%', height: 'auto' }}
+            />
+          </Box>
           <Typography variant="h5" component="h1" color="error" gutterBottom>
             EduMIPS64 hit an unexpected error
           </Typography>
@@ -82,7 +95,7 @@ class AppErrorBoundary extends React.Component {
               </Typography>
             </AccordionDetails>
           </Accordion>
-          <Box mt={3}>
+          <Box sx={{ mt: 3 }}>
             <Button
               id="error-boundary-reload"
               variant="contained"
