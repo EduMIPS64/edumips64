@@ -91,12 +91,20 @@ TRIGGERED_REDISPATCH=false
 redispatch() {
     if [[ "${TRIGGERED_REDISPATCH}" == "false" ]]; then
         echo "  -> Re-dispatching the deploy workflow ..."
-        gh_api -X POST \
+        HTTP=$(curl -sS -o /tmp/dispatch-resp.json -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer ${PAT_WEBUI}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
             -H "Content-Type: application/json" \
             -d '{"ref":"master"}' \
-            "${ACTIONS_API_BASE}/workflows/${DEPLOY_WORKFLOW}/dispatches" > /dev/null \
-            && TRIGGERED_REDISPATCH=true \
-            || echo "  -> WARNING: re-dispatch failed (missing actions scope?); continuing to poll."
+            "${ACTIONS_API_BASE}/workflows/${DEPLOY_WORKFLOW}/dispatches" || echo "000")
+        if [[ "${HTTP}" == "204" ]]; then
+            TRIGGERED_REDISPATCH=true
+        else
+            echo "  -> WARNING: re-dispatch failed (HTTP ${HTTP}): $(cat /tmp/dispatch-resp.json 2>/dev/null | head -c 200)"
+            echo "  -> If HTTP is 403, PAT_WEBUI needs the Actions write scope"
+            echo "     (classic: 'workflow'; fine-grained: Actions: Read and write)."
+        fi
     fi
 }
 
