@@ -628,3 +628,26 @@ def test_pruned_flag_cleared_when_version_reenters_window(pages, tmp_path, monke
     entry1 = next(e for e in idx["versions"] if e["seq"] == 1)
     assert not entry1.get("pruned")
     assert (pages / "c" / sha_for(1)).is_dir()
+
+# ---------------------------------------------------------------------------
+# Reserved-name protection
+# ---------------------------------------------------------------------------
+
+
+def test_promote_preserves_dot_github(tmp_path, pages):
+    """Promote must never delete the Pages repo's own deploy workflow.
+
+    Regression test for the 2026-07-03 incident: RESERVED_NAMES predated the
+    .github directory, so a promote's root replacement deleted the Actions
+    deploy workflow and left the site undeployable.
+    """
+    workflow = pages / ".github" / "workflows" / "deploy-pages.yml"
+    workflow.parent.mkdir(parents=True)
+    workflow.write_text("name: Deploy to GitHub Pages\n")
+
+    art = make_artifact(tmp_path, "art1", marker="one")
+    push(pages, art, 1)
+    promote(pages, 1)
+
+    assert workflow.exists(), ".github must survive a promote root replacement"
+    assert workflow.read_text() == "name: Deploy to GitHub Pages\n"
