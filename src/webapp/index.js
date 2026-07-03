@@ -1,10 +1,10 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { ApplicationInsights } from '@microsoft/applicationinsights-web';
-
 import AppErrorBoundary from './components/AppErrorBoundary';
 import AppLoader from './components/AppLoader';
+
+import { createTelemetry } from './telemetry';
 
 import './css/main.css';
 
@@ -13,16 +13,11 @@ import './css/main.css';
 /* global VERSION */
 const version = VERSION;
 
-// Initialize AppInsights.
-const appInsights = new ApplicationInsights({
-  config: {
-    connectionString:
-      'InstrumentationKey=ae180a87-f990-410c-a51c-8077c240e265;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/',
-  },
-});
-appInsights.loadAppInsights();
-appInsights.context.application.ver = version;
-appInsights.context.application.build = version;
+// Initialize telemetry. Only the 'production' deployment kind sends data to
+// Azure Application Insights; all other kinds (dev, pr, archive-build) use a
+// typed no-op stub so call sites work unchanged without emitting telemetry.
+const appInsights = createTelemetry(version);
+
 const telemetryInitializer = (envelope) => {
   ((envelope.tags['ai.cloud.role'] = process.env.NODE_ENV),
     (envelope.tags['ai.cloud.roleInstance'] = version));
