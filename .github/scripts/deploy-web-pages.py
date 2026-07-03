@@ -39,7 +39,10 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 # Top-level names that a root replacement must never delete.
-RESERVED_NAMES = ["c", "versions.json", "CNAME", ".nojekyll", ".git"]
+# ".github" hosts the Pages repo's own deploy workflow (Actions-based Pages
+# deployment since 2026-07-03): deleting it makes the site undeployable, as
+# the 02646c05 promote demonstrated by wiping it and stranding production.
+RESERVED_NAMES = ["c", "versions.json", "CNAME", ".nojekyll", ".git", ".github"]
 # Name of the per-build directory tree (immutable snapshots live at c/<sha>/).
 BUILDS_DIR = "c"
 INDEX_FILE = "versions.json"
