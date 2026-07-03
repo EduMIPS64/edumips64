@@ -417,17 +417,28 @@ Both `promote-web.yml` and `rollback-web.yml` call this script after the
 "Commit and push to Pages repo" step, provided the step set `pushed=true` (the
 script is skipped when nothing was committed, e.g. idempotent re-run).
 
-#### Phase 1 — GitHub Pages build API (up to 15 min)
+#### Phase 1 — Pages deploy workflow (up to 10 min)
 
-Poll `GET /repos/EduMIPS64/web.edumips.org/pages/builds/latest` using the
-`PAT_WEBUI` secret (the default `GITHUB_TOKEN` cannot see another repo's Pages
-builds).  Wait until:
+Since 2026-07-03 the web.edumips.org repo deploys through GitHub Actions
+(`.github/workflows/deploy-pages.yml` in that repo: checkout →
+`upload-pages-artifact` → `deploy-pages`; the Pages source is
+`build_type: workflow`).  This replaced the legacy branch-based Jekyll
+build, whose shared queue produced transient instant-"errored" builds
+(2026-07-02 incident) and whose duration had grown past 15 minutes.
+Actions deploys complete in ~1–2 minutes with explicit logs.
 
-- `status == "built"` **and** `commit == <pages-repo HEAD>`.
+Verification polls
+`GET /repos/EduMIPS64/web.edumips.org/actions/workflows/deploy-pages.yml/runs?head_sha=<pages-repo HEAD>`
+using the `PAT_WEBUI` secret, until the run for the pushed commit completes
+with `conclusion == "success"`.  If no run appears within 3 minutes (or the
+run fails), the script re-dispatches the workflow once via
+`workflow_dispatch` — the modern equivalent of the old "re-request a Pages
+build" recovery.
 
-If `status == "errored"`, immediately re-request a build via
-`POST /repos/EduMIPS64/web.edumips.org/pages/builds`.  This is the exact fix
-that resolved the 2026-07-02 incident.
+Additionally, `monitor-webui.yml` (every 10 minutes) compares the *intended*
+build string (from the Pages repo's raw `versions.json`) against what
+`web.edumips.org/ui.js` actually serves, and fails loudly on persistent
+drift — the backstop for deploys that never happened at all.
 
 #### Phase 2 — CDN propagation (up to 12 min)
 

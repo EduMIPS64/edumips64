@@ -21,12 +21,14 @@
 #   1  —  timeout or unrecoverable error (loud failure with recovery instructions)
 #
 # Design:
-#   Phase 1 — Poll the GitHub Pages build API for web.edumips.org until the
-#   latest build has status "built" for the commit we just pushed.  If the
-#   build reports "errored", immediately re-request a build via POST (this
-#   pattern fixed a real 2026-07-02 incident where a transient queue glitch
-#   caused an instant "errored" 0 ms build, silently leaving production stale).
-#   Phase 2 — Once the Pages build is confirmed, poll
+#   Phase 1 — Poll the "Deploy to GitHub Pages" workflow runs in the
+#   web.edumips.org repo (Actions-based Pages deployment since
+#   EduMIPS64/edumips64#1913; the legacy /pages/builds API no longer
+#   reflects deploys) until a run for the commit we just pushed completes
+#   successfully.  If no run appears, or the run fails, re-dispatch the
+#   workflow once via workflow_dispatch — the modern equivalent of the old
+#   "re-request a Pages build" recovery that fixed the 2026-07-02 incident.
+#   Phase 2 — Once the deploy run succeeded, poll
 #   https://web.edumips.org/ui.js?cb=<random> (cache-busting) until it
 #   contains the expected build string.  GitHub Pages CDN max-age is 600 s,
 #   so we allow up to 12 minutes here.
@@ -42,15 +44,16 @@ if [[ -z "${PAT_WEBUI:-}" ]]; then
     exit 1
 fi
 
-PAGES_API_BASE="https://api.github.com/repos/EduMIPS64/web.edumips.org/pages/builds"
+ACTIONS_API_BASE="https://api.github.com/repos/EduMIPS64/web.edumips.org/actions"
+DEPLOY_WORKFLOW="deploy-pages.yml"
 CDN_UI_JS="https://web.edumips.org/ui.js"
 
-# Phase 1: up to 35 minutes for the Pages build to complete. Legacy Jekyll
-# builds of this site have grown from ~100 s to >15 min as the site gained
-# per-commit candidate snapshots (a 15-minute budget caused a false-negative
-# verification on 2026-07-03 while the build was still 'building'). The
-# long-term fix is Actions-based deployment (issue #1913).
-BUILD_TIMEOUT=2100
+# Phase 1: up to 10 minutes for the deploy workflow to complete. Actions
+# deploys of this site take ~1-2 minutes (vs >15 min for the old legacy
+# Jekyll builds); 10 minutes leaves room for runner queueing.
+BUILD_TIMEOUT=600
+# Re-dispatch the deploy workflow if no run has appeared after this long.
+REDISPATCH_AFTER=180
 # Phase 2: up to 12 minutes for CDN propagation (max-age is 600 s).
 CDN_TIMEOUT=720
 # Seconds between poll attempts.
@@ -77,56 +80,72 @@ gh_api() {
 }
 
 # ---------------------------------------------------------------------------
-# Phase 1: Wait for the correct Pages build to finish.
+# Phase 1: Wait for the deploy workflow run for our commit to succeed.
 # ---------------------------------------------------------------------------
-echo "=== Phase 1: Waiting for GitHub Pages build (up to $((BUILD_TIMEOUT / 60)) min) ==="
+echo "=== Phase 1: Waiting for the Pages deploy workflow (up to $((BUILD_TIMEOUT / 60)) min) ==="
 
 BUILD_DEADLINE=$(( $(date +%s) + BUILD_TIMEOUT ))
-TRIGGERED_REBUILD=false
+REDISPATCH_AT=$(( $(date +%s) + REDISPATCH_AFTER ))
+TRIGGERED_REDISPATCH=false
+
+redispatch() {
+    if [[ "${TRIGGERED_REDISPATCH}" == "false" ]]; then
+        echo "  -> Re-dispatching the deploy workflow ..."
+        gh_api -X POST \
+            -H "Content-Type: application/json" \
+            -d '{"ref":"master"}' \
+            "${ACTIONS_API_BASE}/workflows/${DEPLOY_WORKFLOW}/dispatches" > /dev/null \
+            && TRIGGERED_REDISPATCH=true \
+            || echo "  -> WARNING: re-dispatch failed (missing actions scope?); continuing to poll."
+    fi
+}
 
 while true; do
     NOW=$(date +%s)
     if (( NOW >= BUILD_DEADLINE )); then
         echo ""
-        echo "ERROR: Timed out waiting for GitHub Pages build after $((BUILD_TIMEOUT / 60)) minutes."
+        echo "ERROR: Timed out waiting for the Pages deploy workflow after $((BUILD_TIMEOUT / 60)) minutes."
         echo ""
-        echo "Manual recovery — re-request a build:"
-        echo "  curl -s -X POST \\"
-        echo "    -H 'Authorization: Bearer \$PAT_WEBUI' \\"
-        echo "    -H 'Accept: application/vnd.github+json' \\"
-        echo "    https://api.github.com/repos/EduMIPS64/web.edumips.org/pages/builds"
+        echo "Manual recovery — re-dispatch the deploy workflow:"
+        echo "  gh workflow run ${DEPLOY_WORKFLOW} --repo EduMIPS64/web.edumips.org --ref master"
         exit 1
     fi
 
-    BUILD_JSON=$(gh_api "${PAGES_API_BASE}/latest" 2>/dev/null || echo '{}')
-    STATUS=$(echo "${BUILD_JSON}" | python3 -c \
-        "import json,sys; d=json.load(sys.stdin); print(d.get('status','unknown'))" \
-        2>/dev/null || echo "unknown")
-    COMMIT=$(echo "${BUILD_JSON}" | python3 -c \
-        "import json,sys; d=json.load(sys.stdin); print(d.get('commit',''))" \
-        2>/dev/null || echo "")
+    # All runs of the deploy workflow for the commit we just pushed
+    # (push-triggered and manually dispatched runs both carry head_sha).
+    RUNS_JSON=$(gh_api "${ACTIONS_API_BASE}/workflows/${DEPLOY_WORKFLOW}/runs?head_sha=${EXPECTED_SHA}&per_page=10" 2>/dev/null || echo '{}')
+    read -r RUN_STATUS RUN_CONCLUSION <<< "$(echo "${RUNS_JSON}" | python3 -c "
+import json, sys
+try:
+    d = json.load(sys.stdin)
+    runs = d.get('workflow_runs') or []
+except Exception:
+    runs = []
+if not runs:
+    print('absent none')
+else:
+    # Most recent run for this sha wins.
+    r = runs[0]
+    print(r.get('status') or 'unknown', r.get('conclusion') or 'none')
+" 2>/dev/null || echo "unknown none")"
 
-    echo "[$(date -u '+%H:%M:%S')] Pages build status=${STATUS}  commit=${COMMIT:0:8}  want=${EXPECTED_SHA:0:8}"
+    echo "[$(date -u '+%H:%M:%S')] deploy run status=${RUN_STATUS} conclusion=${RUN_CONCLUSION} sha=${EXPECTED_SHA:0:8}"
 
-    if [[ "${STATUS}" == "errored" ]]; then
-        # Re-request a build once — this is the fix for the 2026-07-02 incident
-        # where a transient GitHub queue glitch caused an instant zero-duration error.
-        if [[ "${TRIGGERED_REBUILD}" == "false" ]]; then
-            echo "  -> Build errored! Requesting a fresh build via POST ..."
-            gh_api -X POST "${PAGES_API_BASE}" > /dev/null
-            TRIGGERED_REBUILD=true
-            echo "  -> Rebuild requested. Continuing to poll..."
-        else
-            echo "  -> Build errored again after rebuild; continuing to poll..."
-        fi
-    elif [[ "${STATUS}" == "built" && "${COMMIT}" == "${EXPECTED_SHA}" ]]; then
+    if [[ "${RUN_STATUS}" == "completed" && "${RUN_CONCLUSION}" == "success" ]]; then
         echo ""
-        echo "Pages build complete for commit ${EXPECTED_SHA:0:8}."
+        echo "Deploy workflow succeeded for commit ${EXPECTED_SHA:0:8}."
         break
-    elif [[ "${STATUS}" == "built" && "${COMMIT}" != "${EXPECTED_SHA}" ]]; then
-        echo "  -> Built, but for wrong commit (${COMMIT:0:8}). Waiting for our build..."
+    elif [[ "${RUN_STATUS}" == "completed" ]]; then
+        # failure / cancelled / timed_out: try one re-dispatch, keep polling.
+        echo "  -> Deploy run concluded '${RUN_CONCLUSION}'."
+        redispatch
+    elif [[ "${RUN_STATUS}" == "absent" ]] && (( NOW >= REDISPATCH_AT )); then
+        # Push-triggered run never appeared (e.g. workflow file raced the
+        # build_type flip): kick one off manually.
+        echo "  -> No deploy run found for this commit yet."
+        redispatch
     fi
-    # For status "queued" or "building": just keep waiting.
+    # queued / in_progress / transient API errors: just keep waiting.
 
     sleep "${POLL_INTERVAL}"
 done

@@ -9,6 +9,32 @@ jobs:
   monitor-ui:
     runs-on: ubuntu-latest
     steps:
+      # Version-drift check (EduMIPS64/edumips64#1913): the Pages repo's
+      # versions.json is the *intended* production state; compare its current
+      # build string against what the CDN actually serves. A mismatch means a
+      # stale or failed deploy (the deployed copy of versions.json can't
+      # detect this — it would be stale together with ui.js). Deploys take
+      # ~1-2 minutes, so retry once after 120 s before alerting.
+      - name: Check version drift (intended vs served)
+        run: |
+          set -euo pipefail
+          check() {
+            INTENDED=$(curl -sf "https://raw.githubusercontent.com/EduMIPS64/web.edumips.org/master/versions.json?cb=${RANDOM}" \
+              | python3 -c "import json,sys; d=json.load(sys.stdin); cur=d['current']; print([v for v in d['versions'] if v['sha']==cur][0]['build'])")
+            SERVED=$(curl -sf "https://web.edumips.org/ui.js?cb=${RANDOM}" \
+              | grep -oaE '[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-g[0-9a-f]+' | head -1 || true)
+            echo "intended=${INTENDED} served=${SERVED}"
+            [ -n "${SERVED}" ] && [ "${INTENDED}" = "${SERVED}" ]
+          }
+          if ! check; then
+            echo "Mismatch — a deploy may be in flight; retrying in 120 s..."
+            sleep 120
+            check || {
+              echo "::error::web.edumips.org serves a different build than the Pages repo intends (stale or failed deploy). Re-dispatch: gh workflow run deploy-pages.yml --repo EduMIPS64/web.edumips.org --ref master"
+              exit 1
+            }
+          fi
+
       - name: Get deployed commit SHA from production index
         id: deployed
         run: |
