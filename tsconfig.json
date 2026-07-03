@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    // Emit: type-checking only — Babel handles the actual transpilation.
+    "noEmit": true,
+
+    // Language target and module format.
+    "target": "es2022",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+
+    // JSX: classic runtime (matches @babel/preset-react default in this repo).
+    "jsx": "react",
+
+    // Strict mode catches the most common type errors.
+    "strict": true,
+
+    // Allow JS files in the project (checked only if checkJs=true).
+    "allowJs": true,
+    // JS files are temporarily un-checked; only .ts/.tsx files are type-checked.
+    // Remove this line when the full migration is complete.
+    "checkJs": false,
+
+    // Don't error on missing type declarations for packages that lack them.
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/webapp/**/*",
+    "src/test/webapp-unit/**/*"
+  ]
+}

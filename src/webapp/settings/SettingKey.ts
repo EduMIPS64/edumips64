@@ -2,10 +2,10 @@
  * Enum-like object of all known setting keys used by the Web UI.
  *
  * This mirrors the `ConfigKey` enum in the Java simulator
- * (`org.edumips64.utils.ConfigKey`) and provides compile-time-ish checking
- * of keys: consumers should always import one of these constants rather than
- * using a raw string, so that typos surface at review time and renames can be
- * done safely.
+ * (`org.edumips64.utils.ConfigKey`) and provides compile-time checking of
+ * keys: consumers should always import one of these constants rather than
+ * using a raw string, so that typos surface at compile time and renames can
+ * be done safely.
  *
  * The *string value* of each key is the name used as the localStorage key
  * suffix (`edumips64:v1:<value>`). **Do not change these values**, because
@@ -46,4 +46,10 @@ export const SettingKey = Object.freeze({
   // `'light'`, or `'dark'`. Exposed as a toggle in the General Settings
   // panel so the dark theme can be exercised regardless of the OS setting.
   THEME_MODE: 'themeMode',
-});
+} as const);
+
+/**
+ * Union type of all valid setting key string values.
+ * Use this to annotate parameters that accept any SettingKey.
+ */
+export type SettingKeyType = (typeof SettingKey)[keyof typeof SettingKey];

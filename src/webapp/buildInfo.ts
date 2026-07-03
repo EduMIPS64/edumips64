@@ -22,29 +22,44 @@ const PR_REPO_URL = 'https://github.com/EduMIPS64/edumips64/pull';
 // A build served from /c/<full-sha>/ (40 hex chars).
 const BUILD_PATH_RE = /^\/c\/([0-9a-f]{40})\//;
 
+/** Location-like object accepted by getBuildInfo for testability. */
+export interface LocationLike {
+  hostname?: string;
+  pathname?: string;
+}
+
+/** Describes the deployment environment of the current build. */
+export type BuildKind = 'production' | 'archive-build' | 'pr' | 'dev';
+
+export interface BuildInfo {
+  kind: BuildKind;
+  prNumber: number | null;
+  prUrl: string | null;
+  sha?: string;
+  buildUrl?: string;
+}
+
 /**
  * Classify a `window.location`-like object.
  *
  * The `kind` is derived purely from the URL:
- *   - 'production'   served from the Pages root (the current promoted build)
+ *   - 'production'    served from the Pages root (the current promoted build)
  *   - 'archive-build' served from /c/<sha>/ (a candidate OR a promoted archive;
  *                     the distinction is resolved later against versions.json)
- *   - 'pr'           a pull-request preview build
- *   - 'dev'          anything else (localhost, file://, etc.)
+ *   - 'pr'            a pull-request preview build
+ *   - 'dev'           anything else (localhost, file://, etc.)
  *
- * @param {{hostname?: string, pathname?: string}} [loc] Optional location
- *   object. Defaults to `window.location` when running in a browser.
- * @returns {{kind: 'production'|'archive-build'|'pr'|'dev', prNumber: number|null, prUrl: string|null, sha?: string, buildUrl?: string}}
+ * @param loc Optional location object. Defaults to `window.location` in a browser.
  */
-export function getBuildInfo(loc) {
-  const location =
-    loc || (typeof window !== 'undefined' ? window.location : null);
+export function getBuildInfo(loc?: LocationLike | null): BuildInfo {
+  const location: LocationLike | null =
+    loc ?? (typeof window !== 'undefined' ? window.location : null);
   if (!location) {
     return { kind: 'dev', prNumber: null, prUrl: null };
   }
 
-  const hostname = (location.hostname || '').toLowerCase();
-  const pathname = location.pathname || '';
+  const hostname = (location.hostname ?? '').toLowerCase();
+  const pathname = location.pathname ?? '';
 
   if (hostname === PROD_HOSTNAME) {
     const buildMatch = pathname.match(BUILD_PATH_RE);

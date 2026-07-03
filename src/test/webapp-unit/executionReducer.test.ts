@@ -1,5 +1,5 @@
 /**
- * Unit tests for executionReducer.js
+ * Unit tests for executionReducer.ts
  *
  * These tests exercise every action in isolation and several multi-action
  * sequences that mirror real run-control flows.  No browser or JSDOM is
@@ -7,10 +7,15 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { executionReducer, initialExecState } from '../../webapp/executionReducer.js';
+import {
+  executionReducer,
+  initialExecState,
+  type ExecAction,
+  type ExecState,
+} from '../../webapp/executionReducer';
 
 // Convenience: apply a sequence of actions to the initial state.
-function apply(...actions) {
+function apply(...actions: ExecAction[]): ExecState {
   return actions.reduce(executionReducer, initialExecState);
 }
 
@@ -81,7 +86,7 @@ describe('RUN_ALL_REQUESTED', () => {
   it('preserves any pre-existing mustPause flag (edge case: pause before run lands)', () => {
     // This edge case should not arise in normal usage, but the reducer must be
     // safe: mustPause is spread from the previous state.
-    const stateWithPause = { ...initialExecState, mustPause: true };
+    const stateWithPause: ExecState = { ...initialExecState, mustPause: true };
     const state = executionReducer(stateWithPause, { type: 'RUN_ALL_REQUESTED' });
     expect(state.mustPause).toBe(true);
   });
@@ -296,8 +301,8 @@ describe('RESET', () => {
 
   it('does not set mustPause (distinguishes RESET from STOP)', () => {
     const running = apply({ type: 'RUN_ALL_REQUESTED' });
-    const reset = executionReducer(running, { type: 'RESET', hadPendingBatch: false });
-    const stop  = executionReducer(running, { type: 'STOP',  hadPendingBatch: false });
+    const reset  = executionReducer(running, { type: 'RESET',  hadPendingBatch: false });
+    const stop   = executionReducer(running, { type: 'STOP',   hadPendingBatch: false });
     expect(reset.mustPause).toBe(false);
     expect(stop.mustPause).toBe(true);
   });
@@ -361,8 +366,9 @@ describe('encounteredBreak', () => {
 
 describe('unknown action', () => {
   it('returns the same state reference for unrecognised action types', () => {
-    const state = { ...initialExecState };
-    const next = executionReducer(state, { type: '__UNKNOWN__' });
+    const state: ExecState = { ...initialExecState };
+    // Cast through unknown to simulate a runtime dispatch of an untyped action.
+    const next = executionReducer(state, { type: '__UNKNOWN__' } as unknown as ExecAction);
     expect(next).toBe(state);
   });
 });
