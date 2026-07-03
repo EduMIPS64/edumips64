@@ -303,8 +303,8 @@ test('pipelineColors also drive Monaco stage highlights', async ({ page }) => {
     .poll(() =>
       page.evaluate(() => {
         const codeWrapper = document.querySelector(
-          '.react-monaco-editor-container'
-        )?.parentElement;
+          '[data-testid="code-editor"]'
+        );
         const fill = document
           .querySelector('#pipeline g[data-stage="IF"]')
           ?.getAttribute('data-fill');

@@ -150,10 +150,12 @@ jobs:
           name: web
           path: out/web
 
-      # Rebuild only the webpack UI bundle with Istanbul instrumentation.
+      # Rebuild only the Vite UI bundle with Istanbul instrumentation.
       # worker.js was already compiled by the build-web job above.
-      - name: Rebuild webpack UI bundle with coverage instrumentation
-        run: BABEL_ENV=coverage npx webpack
+      # COVERAGE=true activates vite-plugin-istanbul (requireEnv: true),
+      # which injects window.__coverage__ collected by the Playwright fixtures.
+      - name: Rebuild Vite UI bundle with coverage instrumentation
+        run: COVERAGE=true npm run build-dbg
 
       # Serve the web application locally so tests can run against localhost.
       - name: Start local HTTP server
@@ -173,11 +175,9 @@ jobs:
         run: npx playwright test
 
       # Guard against production-only bundle breakage: the coverage run above
-      # exercises a *development* webpack build, which cannot catch failures
-      # that only occur in the production bundle (e.g. the Babel 8 regression
-      # where dev-only jsxDEV() calls were emitted into a bundle carrying
-      # production React, blanking the page at startup). Rebuild the UI the
-      # same way the deployed candidates are built and smoke-test it.
+      # exercises a development build, which cannot catch failures that only
+      # occur in the minified production bundle. Rebuild the UI the same way
+      # deployed candidates are built and smoke-test it.
       - name: Build production UI bundle
         run: npm run build
 

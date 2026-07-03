@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { initVimMode, type VimAdapterInstance } from 'monaco-vim';
 
-import MonacoEditor from 'react-monaco-editor';
+import { Editor } from '@monaco-editor/react';
+import type { OnMount } from '@monaco-editor/react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
 import { DEFAULT_PIPELINE_COLORS } from '../settings/schema';
@@ -114,6 +115,12 @@ const Code = ({
   // grammar can never reach the editor. We additionally call
   // `setMonarchTokensProvider` synchronously so the very first paint uses
   // our tokenizer (before the factory's `create()` is awaited).
+  //
+  // Note: monacoSetup.ts imports editor.main (not editor.api) to activate all
+  // editor features (hover, find, etc.), which also loads Monaco's built-in
+  // language contributions — including the stock mips grammar.  The
+  // registerTokensProviderFactory + setMonarchTokensProvider pattern below
+  // overrides the stock grammar at registration time, not just at runtime.
   //
   // The effect re-runs whenever `validInstructions` changes so newly added
   // instruction mnemonics are picked up by the keyword regex.
@@ -348,24 +355,18 @@ const Code = ({
     };
   }, [parsedInstructions, stageMap, monaco]);
 
-  // react-monaco-editor disposes the *editor* on unmount but not its
-  // *model*. Monaco models are global, so every unmount leaks one — and
-  // under React.StrictMode's dev-only double-mount the leaked first model
-  // makes `monaco.editor.getModels()[0]` point at a stale orphan (which is
-  // exactly what the Playwright helpers read). Disposing the model here
-  // keeps the global model list in sync with the mounted editor.
-  const editorWillUnmount = (
-    editorInstance: monacoEditor.editor.IStandaloneCodeEditor,
-  ) => {
-    const model = editorInstance.getModel();
-    if (model) {
-      model.dispose();
-    }
-  };
+  // @monaco-editor/react disposes the editor's model on unmount when
+  // keepCurrentModel is false (the default).  This replaces the manual
+  // editorWillUnmount + model.dispose() pattern from react-monaco-editor.
+  //
+  // Under React.StrictMode's dev-only double-mount sequence the lifecycle
+  // is: mount → cleanup (unmount + model disposal) → remount.  With
+  // keepCurrentModel=false the second mount starts with a fresh model,
+  // so monaco.editor.getModels() never accumulates stale orphans.
 
-  const editorDidMount = (
-    editorInstance: monacoEditor.editor.IStandaloneCodeEditor,
-    monacoInstance: typeof monacoEditor,
+  const onMount: OnMount = (
+    editorInstance,
+    monacoInstance,
   ) => {
     // Expose monaco and editor to window for testing purposes.
     // These properties are declared on Window in vendor.d.ts.
@@ -478,15 +479,25 @@ const Code = ({
   };
 
   return (
-    <div style={highlightStyle}>
-      <MonacoEditor
+    <div style={highlightStyle} data-testid="code-editor">
+      <Editor
         language="mips"
         value={code}
         options={options}
-        onChange={onChangeValue}
+        onChange={(value) => {
+          // @monaco-editor/react's onChange passes `string | undefined`; guard
+          // against undefined (fires when the model is being disposed).
+          if (value !== undefined) {
+            onChangeValue(value);
+          }
+        }}
         theme={editorTheme}
-        editorDidMount={editorDidMount}
-        editorWillUnmount={editorWillUnmount}
+        onMount={onMount}
+        // keepCurrentModel=false (the default) disposes the model on unmount.
+        // This prevents orphan models from accumulating under StrictMode's
+        // dev double-mount (see #1918).
+        keepCurrentModel={false}
+        height="100%"
       />
     </div>
   );
