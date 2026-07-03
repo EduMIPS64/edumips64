@@ -297,6 +297,16 @@ export interface SimulatorResult {
   errorInstruction: string;
   /** Pipeline stage where the exception occurred; empty string when none. */
   errorStage: string;
+  /**
+   * Pipe-separated list of valid MIPS instruction mnemonics that the
+   * assembler recognises, used to power the Monaco editor's keyword
+   * highlighting (Code.tsx).  Only present on the initial "reset" result
+   * returned when the worker first initialises; absent on all subsequent
+   * step/load/checksyntax results.
+   *
+   * Java source: ResultFactory.getValidInstructions()
+   */
+  validInstructions?: string;
 }
 
 // ---------------------------------------------------------------------------

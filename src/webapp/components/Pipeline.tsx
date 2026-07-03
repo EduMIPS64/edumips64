@@ -1,4 +1,7 @@
 import React from 'react';
+
+import type { Pipeline, PipelineInstruction } from '../simulator/protocol';
+import type { PipelineColors } from '../settings/schema';
 import { DEFAULT_PIPELINE_COLORS } from '../settings/schema';
 
 /*
@@ -26,12 +29,19 @@ import { DEFAULT_PIPELINE_COLORS } from '../settings/schema';
 const VIEW_W = 600;
 const VIEW_H = 320;
 
+interface BoxGeometry {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 // Geometry of the five integer stages. `x`/`y` is the top-left corner and
 // `w`/`h` are the box dimensions, in viewBox units. The EX block mirrors the
 // FP Divider block geometry (same width and horizontal position) so the
 // integer-pipeline diagram is vertically symmetric: ID/MEM connect to EX
 // with the same diagonal pattern they use for the FP Divider.
-const STAGE_BOXES = {
+const STAGE_BOXES: Record<string, BoxGeometry> = {
   IF: { x: 20, y: 140, w: 60, h: 50 },
   ID: { x: 110, y: 140, w: 60, h: 50 },
   EX: { x: 205, y: 30, w: 190, h: 40 },
@@ -59,15 +69,15 @@ const FP_ADD_H = 30;
 const FP_ADD_GAP = 6;
 const FP_ADD_W = (FPU_WIDTH - FP_ADD_GAP * (FP_ADD_COUNT - 1)) / FP_ADD_COUNT;
 
-const FP_DIV_BOX = { x: 205, y: 260, w: 190, h: 40 };
+const FP_DIV_BOX: BoxGeometry = { x: 205, y: 260, w: 190, h: 40 };
 
-const fpMultBox = (i) => ({
+const fpMultBox = (i: number): BoxGeometry => ({
   x: FPU_LEFT + i * (FP_MULT_W + FP_MULT_GAP),
   y: FP_MULT_Y,
   w: FP_MULT_W,
   h: FP_MULT_H,
 });
-const fpAddBox = (i) => ({
+const fpAddBox = (i: number): BoxGeometry => ({
   x: FPU_LEFT + i * (FP_ADD_W + FP_ADD_GAP),
   y: FP_ADD_Y,
   w: FP_ADD_W,
@@ -76,7 +86,8 @@ const fpAddBox = (i) => ({
 
 // Bubbles use the empty placeholder name " " or are altogether `null`.
 // Either way, they render as empty stage outlines (matching `GUIPipeline`).
-const isOccupied = (instr) => !!instr && instr.Name && instr.Name !== ' ';
+const isOccupied = (instr: PipelineInstruction | null): instr is PipelineInstruction =>
+  !!instr && !!instr.Name && instr.Name !== ' ';
 
 // Stage-tag set produced by `CycleBuilder` when an instruction was *stalled*
 // in the most recent CPU cycle. Each tag maps to a short user-friendly
@@ -84,7 +95,7 @@ const isOccupied = (instr) => !!instr && instr.Name && instr.Name !== ' ';
 // counter states (`DIV_COUNT` + numeric `DivCount`) and the integer/normal
 // stage tags (`IF`, `ID`, `EX`, `MEM`, `WB`, `A1`..`A4`, `M1`..`M7`, `DIV`)
 // are *not* stalls and intentionally absent here.
-const STALL_LABELS = {
+const STALL_LABELS: Record<string, string> = {
   RAW: 'RAW',
   WAW: 'WAW',
   StDiv: 'Struct: Div',
@@ -100,13 +111,23 @@ const STALL_LABELS = {
 // as either a plain string (its `name()`) or as an object that string-coerces
 // to its name; coerce defensively here so the lookup works either way and
 // `null`/`undefined` (no stage info yet) cleanly returns no label.
-const stageName = (stage) =>
+const stageName = (stage: string | null | unknown): string | null =>
   stage == null ? null : typeof stage === 'string' ? stage : String(stage);
 
-const stallLabel = (instr) => {
+const stallLabel = (instr: PipelineInstruction): string | null => {
   const name = stageName(instr?.Stage);
   return (name && STALL_LABELS[name]) || null;
 };
+
+interface StageBoxProps {
+  box: BoxGeometry;
+  label: string;
+  instr: PipelineInstruction | null;
+  fillColor: string;
+  stallColor: string;
+  outlineColor: string;
+  textColor: string;
+}
 
 /**
  * Render a single rectangular pipeline stage.
@@ -125,7 +146,7 @@ const StageBox = ({
   stallColor,
   outlineColor,
   textColor,
-}) => {
+}: StageBoxProps) => {
   const occupied = isOccupied(instr);
   const stall = occupied ? stallLabel(instr) : null;
   // The CycleBuilder's per-instruction stage tag (e.g. "IF"/"ID"/"EX"/.../
@@ -211,12 +232,20 @@ const StageBox = ({
   );
 };
 
+interface WireProps {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  color: string;
+}
+
 /**
  * Render a thin connector line between two stages. The lines mirror the
  * arrows drawn by the Swing widget but are kept un-arrowheaded for clarity
  * at small sizes.
  */
-const Wire = ({ x1, y1, x2, y2, color }) => (
+const Wire = ({ x1, y1, x2, y2, color }: WireProps) => (
   <line
     x1={x1}
     y1={y1}
@@ -234,7 +263,12 @@ const Wire = ({ x1, y1, x2, y2, color }) => (
  * `Wire`s, so no polyline helper is needed.
  */
 
-const Pipeline = ({ pipeline, colors }) => {
+interface PipelineProps {
+  pipeline: Pipeline;
+  colors?: PipelineColors | undefined;
+}
+
+const PipelineWidget = ({ pipeline, colors }: PipelineProps) => {
   // `colors` is the persisted setting; fall back to the schema defaults so
   // the widget keeps working even if it is rendered before settings are
   // wired in (e.g. in unit tests).
@@ -505,4 +539,4 @@ const Pipeline = ({ pipeline, colors }) => {
   );
 };
 
-export default React.memo(Pipeline);
+export default React.memo(PipelineWidget);

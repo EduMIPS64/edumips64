@@ -4,16 +4,26 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
+import type { CacheConfig } from '../settings/schema';
+import type { CpuStatus } from '../simulator/protocol';
 
-const parsePositiveInteger = (value) => {
+const parsePositiveInteger = (value: string): number | null => {
   const parsed = Number(value);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 };
 
-const CacheNumberField = ({ label, field, value, setCache, isDisabled }) => {
+interface CacheNumberFieldProps {
+  label: string;
+  field: keyof CacheConfig;
+  value: number;
+  setCache: (updater: (prev: CacheConfig) => CacheConfig) => void;
+  isDisabled: boolean;
+}
+
+const CacheNumberField = ({ label, field, value, setCache, isDisabled }: CacheNumberFieldProps) => {
   const [draftValue, setDraftValue] = React.useState(String(value));
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nextValue = e.target.value;
     setDraftValue(nextValue);
 
@@ -47,7 +57,14 @@ const CacheNumberField = ({ label, field, value, setCache, isDisabled }) => {
   );
 };
 
-const CacheRow = ({ label, cache, setCache, isDisabled }) => (
+interface CacheRowProps {
+  label: string;
+  cache: CacheConfig;
+  setCache: (updater: (prev: CacheConfig) => CacheConfig) => void;
+  isDisabled: boolean;
+}
+
+const CacheRow = ({ label, cache, setCache, isDisabled }: CacheRowProps) => (
   <Box sx={{ mb: 2 }}>
     <Typography
       sx={{
@@ -91,7 +108,12 @@ const CacheRow = ({ label, cache, setCache, isDisabled }) => (
   </Box>
 );
 
-const CacheConfig = ({ onChange, status }) => {
+interface CacheConfigProps {
+  onChange?: (config: { l1d: CacheConfig; l1i: CacheConfig }) => void;
+  status: CpuStatus;
+}
+
+const CacheConfigPanel = ({ onChange, status }: CacheConfigProps) => {
   const [l1d, setL1D] = useSetting(SettingKey.CACHE_L1D);
   const [l1i, setL1I] = useSetting(SettingKey.CACHE_L1I);
 
@@ -121,4 +143,4 @@ const CacheConfig = ({ onChange, status }) => {
   );
 };
 
-export default CacheConfig;
+export default CacheConfigPanel;

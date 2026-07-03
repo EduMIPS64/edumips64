@@ -195,32 +195,44 @@ Custom NPM scripts:
 
 ##### TypeScript adoption
 
-TypeScript is being adopted **incrementally**. The build toolchain (Babel +
-webpack) already handles `.ts`/`.tsx` files transparently, so converting a
-module does not break JS importers (all imports are extensionless).
+The web UI is **fully TypeScript** — the migration is complete as of phase 3.
+There are no remaining `.js` files under `src/webapp/`; `allowJs` is `false`
+in `tsconfig.json`.  All new webapp code must be `.ts`/`.tsx`.
 
-Current state (phase 2):
-- **New webapp code should be `.ts`/`.tsx`** — the toolchain and `tsconfig.json`
-  are fully wired.
-- **Remaining `.js` files are not type-checked** (`checkJs: false` in
-  `tsconfig.json`); they continue to work without modification.
-- Converted so far:
-  - Pure logic: `executionReducer.ts`, `simulatorState.ts`, `buildInfo.ts`,
-    `versionHistory.ts`, `settings/SettingKey.ts`, `settings/schema.ts`,
-    `hooks/useLocalStorage.ts`, `settings/useSetting.ts`.
-    Worker-boundary types live in `simulator/protocol.ts`.
-  - Hooks (phase 2): `hooks/useSimulatorData.ts`, `hooks/useExecutionController.ts`,
-    `hooks/useKeyboardShortcuts.ts`.
-  - Entry components (phase 2): `components/AppErrorBoundary.tsx`,
-    `components/AppLoader.tsx`, `components/RuntimeErrorDialog.tsx`.
+The migration was done in three incremental phases (PRs #1919, #1921, #1920,
+and the phase 3 PR):
+
+- **Phase 1** — Pure logic and settings: `executionReducer.ts`,
+  `simulatorState.ts`, `buildInfo.ts`, `versionHistory.ts`,
+  `settings/SettingKey.ts`, `settings/schema.ts`, `hooks/useLocalStorage.ts`,
+  `settings/useSetting.ts`.  Worker-boundary types live in
+  `simulator/protocol.ts`.
+- **Phase 2** — Hooks and entry components: `hooks/useSimulatorData.ts`,
+  `hooks/useExecutionController.ts`, `hooks/useKeyboardShortcuts.ts`;
+  `components/AppErrorBoundary.tsx`, `components/AppLoader.tsx`,
+  `components/RuntimeErrorDialog.tsx`.
+- **Phase 3** — Display components, Simulator orchestrator, and entry point:
+  all remaining `components/*.tsx` files (`Simulator.tsx`, `Code.tsx`,
+  `Header.tsx`, `RunControlsToolbar.tsx`, `HelpDialog.tsx`, `Settings.tsx`,
+  `CacheConfig.tsx`, and the smaller display panels); `theme.ts`;
+  `data/SampleProgram.ts`; `index.tsx`.
+
+Typing conventions:
+- Component props are typed with explicit `interface` declarations.
+- Protocol types (`Register`, `Registers`, `Memory`, `Statistics`, `Pipeline`,
+  `CpuStatus`, `SimulatorResult`, `SimulatorWorker`) live in
+  `simulator/protocol.ts` — the canonical source of truth for the worker
+  message boundary.
 - `settings/schema.ts` exports a `SettingValueMap` interface that maps every
   `SettingKey` string value to its concrete TypeScript type; `useSetting<K>`
   uses this to give call sites a precisely-typed `[value, setValue, reset]`
   tuple with no casts.
-- Unit tests for the converted modules are `.test.ts`; Vitest handles TS
-  natively (no extra configuration needed).
-- Phase 3 will convert `Simulator.js`, `Code.js`, `index.js`, and the display
-  components.
+- Third-party modules without bundled types (lodash/debounce, react-dom/client
+  and CSS/image asset imports) are declared in `src/webapp/vendor.d.ts`.
+  The webpack `VERSION` global (injected by `DefinePlugin`) is also declared
+  there.
+- Unit tests for all modules are `.test.ts`; Vitest handles TS natively
+  (no extra configuration needed).
 
 `npm run typecheck` is enforced in CI (`test-web-coverage` job) and must
 stay clean for PRs to merge.
@@ -233,13 +245,13 @@ canonical for that npm major version.
 
 ##### Web UI architecture
 
-- `index.js` boots App Insights, wraps the Web Worker (`worker.js`, the
+- `index.tsx` boots App Insights, wraps the Web Worker (`worker.js`, the
   simulator core compiled from Java) with helper methods, and mounts React
   immediately inside `React.StrictMode` and an `AppErrorBoundary`.
 - `components/AppLoader.tsx` shows a loading indicator while the worker
   initialises, and a friendly error screen (30 s watchdog) if `worker.js`
   fails to load — the app can no longer silently render a blank page.
-- `components/Simulator.js` is the orchestrator. The heavy lifting lives in
+- `components/Simulator.tsx` is the orchestrator. The heavy lifting lives in
   typed hooks under `src/webapp/hooks/`:
   - `useSimulatorData.ts` — registers/memory/stats/pipeline/… state. Updates
     are *reference-preserving* (deep-equal data keeps the previous object)

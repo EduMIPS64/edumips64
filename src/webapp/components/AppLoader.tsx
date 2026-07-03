@@ -222,14 +222,18 @@ class AppLoader extends React.Component<AppLoaderProps, AppLoaderState> {
       );
     }
 
-    // phase === 'ready'
+    // phase === 'ready': initialState is guaranteed non-null because the
+    // 'ready' transition only fires from setState({ phase: 'ready', initialState })
+    // where initialState is the parsed worker result.  The non-null assertion
+    // here avoids a misleading conditional guard in the hot rendering path.
+    if (!initialState) return null;
     return (
       <>
         <CssBaseline />
         <Simulator
           worker={worker}
           initialState={initialState}
-          appInsights={appInsights}
+          appInsights={appInsights!}
         />
       </>
     );

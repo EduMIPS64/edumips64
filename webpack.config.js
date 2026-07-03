@@ -49,7 +49,7 @@ module.exports = (env, argv) => {
   const isProduction = argv && argv.mode === 'production';
   return {
     mode: isProduction ? 'production' : 'development',
-    entry: './src/webapp/index.js',
+    entry: './src/webapp/index.tsx',
     // Inline source maps embed the full source into the bundle and bloat
     // the production build by an order of magnitude (~30 MiB vs ~2 MiB).
     // Use an external source map in production and keep fast inline maps

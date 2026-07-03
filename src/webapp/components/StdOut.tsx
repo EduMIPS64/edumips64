@@ -1,12 +1,16 @@
 import React from 'react';
 import { useTheme } from '@mui/material/styles';
 
-const StdOut = (props) => {
+interface StdOutProps {
+  stdout?: string;
+}
+
+const StdOut = ({ stdout }: StdOutProps) => {
   const theme = useTheme();
   return (
     <textarea
       readOnly
-      value={props.stdout || ''}
+      value={stdout || ''}
       id="stdout-view"
       style={{
         width: '100%',

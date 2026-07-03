@@ -3,7 +3,13 @@ import ErrorIcon from '@mui/icons-material/Error';
 import WarningIcon from '@mui/icons-material/Warning';
 import Chip from '@mui/material/Chip';
 
-const ErrorCount = ({ count }) => {
+import type { ParsingError } from '../simulator/protocol';
+
+interface CountProps {
+  count: number;
+}
+
+const ErrorCount = ({ count }: CountProps) => {
   if (count === 0) {
     return <React.Fragment />;
   }
@@ -17,7 +23,8 @@ const ErrorCount = ({ count }) => {
     />
   );
 };
-const WarningCount = ({ count }) => {
+
+const WarningCount = ({ count }: CountProps) => {
   if (count === 0) {
     return <React.Fragment />;
   }
@@ -32,7 +39,11 @@ const WarningCount = ({ count }) => {
   );
 };
 
-const ErrorDisplay = ({ parsingErrors }) => {
+interface ErrorDisplayProps {
+  parsingErrors: ParsingError[] | null | undefined;
+}
+
+const ErrorDisplay = ({ parsingErrors }: ErrorDisplayProps) => {
   const warningCount = parsingErrors
     ? parsingErrors.filter((e) => e.isWarning).length
     : 0;

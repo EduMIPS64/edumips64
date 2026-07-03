@@ -14,11 +14,8 @@
     // Strict mode catches the most common type errors.
     "strict": true,
 
-    // Allow JS files in the project (checked only if checkJs=true).
-    "allowJs": true,
-    // JS files are temporarily un-checked; only .ts/.tsx files are type-checked.
-    // Remove this line when the full migration is complete.
-    "checkJs": false,
+    // Disallow JS files now that the migration to TypeScript is complete.
+    "allowJs": false,
 
     // Don't error on missing type declarations for packages that lack them.
     "skipLibCheck": true
