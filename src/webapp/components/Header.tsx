@@ -30,17 +30,43 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import UploadIcon from '@mui/icons-material/Upload';
 
 import { deriveLogicalState } from '../simulatorState';
+import type { CpuStatus, ParsingError, SimulatorResult } from '../simulator/protocol';
 
-export default function Header(props) {
+interface HeaderProps {
+  onLoadClick: () => void;
+  loadEnabled: boolean;
+  onClearClick: () => void;
+  onOpenClick: () => void;
+  onSaveClick: () => void;
+  onRestoreClick: () => void;
+  // parsingErrors is passed from Simulator but not consumed in the Header render;
+  // included in the interface so the prop is accepted without a TS error.
+  parsingErrors?: ParsingError[] | null;
+  version: string;
+  status: CpuStatus;
+  executing: boolean;
+  inputRequest: SimulatorResult | null;
+  prefersDarkMode: boolean;
+}
+
+export default function Header({
+  onLoadClick,
+  loadEnabled,
+  onClearClick,
+  onOpenClick,
+  onSaveClick,
+  onRestoreClick,
+  version,
+  status,
+  executing,
+  inputRequest,
+  prefersDarkMode,
+}: HeaderProps) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [programAnchor, setProgramAnchor] = React.useState(null);
+  const [programAnchor, setProgramAnchor] = React.useState<HTMLElement | null>(null);
   const menuOpen = Boolean(programAnchor);
   // Derive the logical UI state for editor-control gating.
-  const logicalState = deriveLogicalState(
-    props.status,
-    props.executing,
-    props.inputRequest,
-  );
+  const logicalState = deriveLogicalState(status, executing, inputRequest);
 
   // The Program menu manages the editor's program (New / Open… / Save… / Load
   // Example). It must be unavailable whenever a program is loaded in the
@@ -64,7 +90,7 @@ export default function Header(props) {
   // while showing it inline on larger screens. This avoids the toolbar
   // overflowing on phones / tablets where 9+ full-text buttons plus
   // status chips can't possibly fit on one row.
-  const responsiveLabel = (text) => (
+  const responsiveLabel = (text: string) => (
     <Box
       component="span"
       sx={{
@@ -113,7 +139,7 @@ export default function Header(props) {
         <img
           id="logo"
           alt="EduMIPS64"
-          src={props.prefersDarkMode ? logoDark : logoBright}
+          src={prefersDarkMode ? logoDark : logoBright}
           className="logo"
         />
         <Typography
@@ -137,7 +163,7 @@ export default function Header(props) {
               <Chip
                 id="pr-build-chip"
                 component={Link}
-                href={buildInfo.prUrl}
+                href={buildInfo.prUrl ?? ''}
                 target="_blank"
                 rel="noreferrer"
                 clickable
@@ -176,7 +202,7 @@ export default function Header(props) {
         </Typography>
         <Tooltip title="The current status of the CPU" arrow placement="top">
           <div>
-            <CpuStatusDisplay status={props.status} />
+            <CpuStatusDisplay status={status} />
           </div>
         </Tooltip>
         {/* Execution controls — rendered contextually per logical state. Wrapped in
@@ -184,7 +210,7 @@ export default function Header(props) {
             of visible buttons changes between states. */}
         {/* Load button — always visible in the header. Execution controls
             (Step / Multi Step / Run / Pause / Stop) live in the floating
-            RunControlsToolbar overlay mounted from Simulator.js. */}
+            RunControlsToolbar overlay mounted from Simulator.tsx. */}
         <Tooltip
           title="Load the current code into the simulator (F2)"
           arrow
@@ -194,9 +220,9 @@ export default function Header(props) {
             color="inherit"
             className="load-button"
             id="load-button"
-            onClick={() => props.onLoadClick()}
+            onClick={() => onLoadClick()}
             startIcon={<UploadIcon />}
-            disabled={!props.loadEnabled}
+            disabled={!loadEnabled}
             sx={responsiveButtonSx}
           >
             {responsiveLabel('Load')}
@@ -230,12 +256,12 @@ export default function Header(props) {
           anchorEl={programAnchor}
           open={menuOpen}
           onClose={handleProgramMenuClose}
-          MenuListProps={{ 'aria-labelledby': 'program-menu-button' }}
+          slotProps={{ list: { 'aria-labelledby': 'program-menu-button' } }}
         >
           <MenuItem
             id="clear-code-button"
             onClick={() => {
-              props.onClearClick();
+              onClearClick();
               handleProgramMenuClose();
             }}
           >
@@ -248,7 +274,7 @@ export default function Header(props) {
           <MenuItem
             id="load-code-button"
             onClick={() => {
-              props.onOpenClick();
+              onOpenClick();
               handleProgramMenuClose();
             }}
           >
@@ -260,7 +286,7 @@ export default function Header(props) {
           <MenuItem
             id="save-code-button"
             onClick={() => {
-              props.onSaveClick();
+              onSaveClick();
               handleProgramMenuClose();
             }}
           >
@@ -273,7 +299,7 @@ export default function Header(props) {
           <MenuItem
             id="restore-sample-button"
             onClick={() => {
-              props.onRestoreClick();
+              onRestoreClick();
               handleProgramMenuClose();
             }}
           >
@@ -297,7 +323,7 @@ export default function Header(props) {
         <HelpDialog
           open={dialogOpen}
           handleClose={() => setDialogOpen(false)}
-          ver={props.version}
+          ver={version}
         />
       </ToolBar>
     </AppBar>

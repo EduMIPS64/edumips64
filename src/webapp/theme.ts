@@ -1,4 +1,4 @@
-import { createTheme, responsiveFontSizes } from '@mui/material/styles';
+import { createTheme, responsiveFontSizes, type PaletteMode } from '@mui/material/styles';
 
 /**
  * Central MUI theme for the web UI.
@@ -22,12 +22,12 @@ const FONT_STACK =
 const INDIGO = '#3557d4';
 const INDIGO_LIGHT = '#8da6ff';
 
-export function buildTheme(mode) {
+export function buildTheme(mode: PaletteMode) {
   const isDark = mode === 'dark';
 
   const palette = isDark
     ? {
-        mode: 'dark',
+        mode: 'dark' as const,
         primary: { main: INDIGO_LIGHT },
         secondary: { main: '#4dd0e1' },
         background: { default: '#0e1526', paper: '#141d33' },
@@ -35,7 +35,7 @@ export function buildTheme(mode) {
         text: { primary: '#e2e8f0', secondary: '#97a3b8' },
       }
     : {
-        mode: 'light',
+        mode: 'light' as const,
         primary: { main: INDIGO },
         secondary: { main: '#0891b2' },
         background: { default: '#f5f6fa', paper: '#ffffff' },

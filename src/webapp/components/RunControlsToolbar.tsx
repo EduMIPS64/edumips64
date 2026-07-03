@@ -13,6 +13,18 @@ import StopCircleIcon from '@mui/icons-material/StopCircle';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 import { deriveLogicalState } from '../simulatorState';
+import type { CpuStatus, SimulatorResult } from '../simulator/protocol';
+
+interface RunControlsToolbarProps {
+  onStepClick: (n: number) => void;
+  onRunClick: () => void;
+  onPauseClick: () => void;
+  onStopClick: () => void;
+  status: CpuStatus;
+  executing: boolean;
+  inputRequest: SimulatorResult | null;
+  multiStepCount: number;
+}
 
 /**
  * Floating, draggable debug-style toolbar for execution run controls.
@@ -27,18 +39,16 @@ import { deriveLogicalState } from '../simulatorState';
  *   EXECUTING → Pause enabled; Step, Multi Step, Run All, Stop disabled.
  *               Stop tooltip changes to "Pause before stopping" when disabled.
  */
-export default function RunControlsToolbar(props) {
-  const {
-    onStepClick,
-    onRunClick,
-    onPauseClick,
-    onStopClick,
-    status,
-    executing,
-    inputRequest,
-    multiStepCount,
-  } = props;
-
+export default function RunControlsToolbar({
+  onStepClick,
+  onRunClick,
+  onPauseClick,
+  onStopClick,
+  status,
+  executing,
+  inputRequest,
+  multiStepCount,
+}: RunControlsToolbarProps) {
   const logicalState = deriveLogicalState(status, executing, inputRequest);
 
   // Drag position — persists across logical-state changes as long as the
@@ -54,13 +64,13 @@ export default function RunControlsToolbar(props) {
   const isDraggingRef = React.useRef(false);
   const dragOffsetRef = React.useRef({ x: 0, y: 0 });
 
-  const handlePointerDown = (e) => {
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     isDraggingRef.current = true;
     dragOffsetRef.current = { x: e.clientX - pos.x, y: e.clientY - pos.y };
     e.currentTarget.setPointerCapture(e.pointerId);
   };
 
-  const handlePointerMove = (e) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDraggingRef.current) return;
     // Constrain so the toolbar stays fully on-screen.
     const TOOLBAR_W = 280;

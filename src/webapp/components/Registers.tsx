@@ -1,8 +1,13 @@
 import React from 'react';
 
+import type { Register, Registers } from '../simulator/protocol';
 import BinaryValue from './BinaryValue';
 
-const Register = ({ register }) => {
+interface RegisterRowProps {
+  register: Register;
+}
+
+const RegisterRow = ({ register }: RegisterRowProps) => {
   return (
     <>
       <td className="registerName">{register.name}</td>
@@ -16,7 +21,8 @@ const Register = ({ register }) => {
   );
 };
 
-const Registers = ({ gpr, fpu, special }) => {
+// Props match the Registers protocol type (spread from `registers` in Simulator).
+const RegistersPanel = ({ gpr, fpu, special }: Registers) => {
   return (
     <div>
       <table id="registers">
@@ -25,8 +31,8 @@ const Registers = ({ gpr, fpu, special }) => {
             // Ugly way of using a single table to show both GPR and FPU registers.
             gpr.map((register, i) => (
               <tr key={i}>
-                <Register register={register} />
-                <Register register={fpu[i]} />
+                <RegisterRow register={register} />
+                <RegisterRow register={fpu[i]} />
               </tr>
             ))
           }
@@ -34,7 +40,7 @@ const Registers = ({ gpr, fpu, special }) => {
             .filter((r) => r.name != 'FCSR')
             .map((register) => (
               <tr key={register.name}>
-                <Register register={register} />
+                <RegisterRow register={register} />
               </tr>
             ))}
         </tbody>
@@ -43,4 +49,4 @@ const Registers = ({ gpr, fpu, special }) => {
   );
 };
 
-export default React.memo(Registers);
+export default React.memo(RegistersPanel);

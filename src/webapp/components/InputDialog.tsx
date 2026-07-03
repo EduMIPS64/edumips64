@@ -9,7 +9,15 @@ import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-const InputDialog = ({ request, onSubmit, onCancel }) => {
+import type { SimulatorResult } from '../simulator/protocol';
+
+interface InputDialogProps {
+  request: SimulatorResult | null | undefined;
+  onSubmit: (input: string) => void;
+  onCancel: () => void;
+}
+
+const InputDialog = ({ request, onSubmit, onCancel }: InputDialogProps) => {
   const [value, setValue] = React.useState('');
   const [error, setError] = React.useState('');
 

@@ -9,7 +9,9 @@ import Header from './Header';
 import RunControlsToolbar from './RunControlsToolbar';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
-import MuiAccordionSummary from '@mui/material/AccordionSummary';
+import MuiAccordionSummary, {
+  type AccordionSummaryProps,
+} from '@mui/material/AccordionSummary';
 import Grid from '@mui/material/Grid';
 import ErrorList from './ErrorList';
 import StdOut from './StdOut';
@@ -35,17 +37,25 @@ import CacheConfig from './CacheConfig';
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
 import SampleProgram from '../data/SampleProgram';
+import type { CacheConfig as CacheConfigType } from '../settings/schema';
 
 import { useSimulatorData } from '../hooks/useSimulatorData';
 import { useExecutionController } from '../hooks/useExecutionController';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import type { SimulatorResult, SimulatorWorker } from '../simulator/protocol';
+import type { ITelemetryClient } from '../telemetry';
+import type * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
+import type { ExpandedAccordions } from '../settings/schema';
 
 // Styled accordion header shared by all right-panel widgets. Defined at
 // module scope on purpose: defining a styled() component inside the
 // Simulator render body would create a new component *type* on every
 // render, making React unmount and remount every accordion header each
 // time a worker message updates state.
-const AccordionSummary = styled((props) => (
+//
+// Explicitly type the wrapper so `styled()` knows that all AccordionSummary
+// props (children, expandIcon, etc.) are valid on the resulting component.
+const AccordionSummary = styled(({ ...props }: AccordionSummaryProps) => (
   <MuiAccordionSummary
     expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.8rem' }} />}
     {...props}
@@ -64,7 +74,20 @@ const AccordionSummary = styled((props) => (
   },
 }));
 
-const Simulator = ({ worker, initialState, appInsights }) => {
+// Key names for the right-panel accordion panels.
+type AccordionPanel = keyof ExpandedAccordions;
+
+// State shape for tracking which accordions have received new data while
+// they were collapsed (used to render the change-indicator dot).
+type AccordionChanges = Record<AccordionPanel, boolean>;
+
+interface SimulatorProps {
+  worker: SimulatorWorker;
+  initialState: SimulatorResult;
+  appInsights: ITelemetryClient;
+}
+
+const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // ---------------------------------------------------------------------------
   // Settings (persisted in localStorage)
   // ---------------------------------------------------------------------------
@@ -105,7 +128,7 @@ const Simulator = ({ worker, initialState, appInsights }) => {
   // function instance exists across re-renders (the instance carries the timer
   // state; recreating it on every render would orphan pending timers).
   const debouncedPersistCode = React.useMemo(
-    () => debounce((v) => setStoredCode(v), 500),
+    () => debounce((v: string) => setStoredCode(v), 500),
     // setStoredCode comes from useLocalStorage and is stable across renders.
     [setStoredCode],
   );
@@ -113,7 +136,7 @@ const Simulator = ({ worker, initialState, appInsights }) => {
   // Public setter: updates the editor display immediately while deferring the
   // localStorage write.
   const setCode = React.useCallback(
-    (newCode) => {
+    (newCode: string) => {
       _setCode(newCode);
       debouncedPersistCode(newCode);
     },
@@ -143,7 +166,7 @@ const Simulator = ({ worker, initialState, appInsights }) => {
   // Message shown in the RuntimeErrorDialog; null = dialog closed. Set by the
   // execution controller when a runtime error result arrives (the controller
   // stops the CPU immediately; the dialog is purely informational).
-  const [runtimeErrorMessage, setRuntimeErrorMessage] = React.useState(null);
+  const [runtimeErrorMessage, setRuntimeErrorMessage] = React.useState<string | null>(null);
 
   // ---------------------------------------------------------------------------
   // Execution controller (reducer, batch scheduling, worker subscription)
@@ -155,7 +178,7 @@ const Simulator = ({ worker, initialState, appInsights }) => {
       applyChecksyntaxResult,
       setInputRequest,
       executionDelayMs,
-      onRuntimeError: setRuntimeErrorMessage,
+      onRuntimeError: (message: string) => setRuntimeErrorMessage(message),
     });
 
   const simulatorRunning = status === 'RUNNING';
@@ -189,11 +212,14 @@ const Simulator = ({ worker, initialState, appInsights }) => {
   // ---------------------------------------------------------------------------
   // Editor ref (for Issues panel click-to-navigate)
   // ---------------------------------------------------------------------------
-  const editorRef = React.useRef(null);
-  const handleEditorReady = React.useCallback((editor) => {
-    editorRef.current = editor;
-  }, []);
-  const handleIssueClick = React.useCallback((row, column) => {
+  const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
+  const handleEditorReady = React.useCallback(
+    (editor: monacoEditor.editor.IStandaloneCodeEditor) => {
+      editorRef.current = editor;
+    },
+    [],
+  );
+  const handleIssueClick = React.useCallback((row: number, column: number) => {
     const editor = editorRef.current;
     if (!editor) {
       return;
@@ -212,12 +238,14 @@ const Simulator = ({ worker, initialState, appInsights }) => {
   // ---------------------------------------------------------------------------
 
   // Track if data has changed while accordion was collapsed
-  const [accordionChanges, setAccordionChanges] = React.useState({
+  const [accordionChanges, setAccordionChanges] = React.useState<AccordionChanges>({
     stats: false,
     pipeline: false,
     registers: false,
     memory: false,
     stdout: false,
+    cache: false,
+    settings: false,
   });
 
   // Refs to track previous values for change detection
@@ -241,7 +269,7 @@ const Simulator = ({ worker, initialState, appInsights }) => {
   // render, orphaning any pending timer from the previous render.
   // Declared before business operations so restoreDefaultSample can call .cancel().
   const debouncedSyntaxCheck = React.useMemo(
-    () => debounce((c) => worker.checkSyntax(c), 500),
+    () => debounce((c: string) => worker.checkSyntax(c), 500),
     // worker is stable across renders (passed as a prop reference).
     [worker],
   );
@@ -267,6 +295,8 @@ const Simulator = ({ worker, initialState, appInsights }) => {
       registers: false,
       memory: false,
       stdout: false,
+      cache: false,
+      settings: false,
     });
   };
 
@@ -295,11 +325,13 @@ const Simulator = ({ worker, initialState, appInsights }) => {
       registers: false,
       memory: false,
       stdout: false,
+      cache: false,
+      settings: false,
     });
   };
 
   const setCacheConfig = React.useCallback(
-    (config) => {
+    (config: { l1d: CacheConfigType; l1i: CacheConfigType }) => {
       worker.setCacheConfig(config);
     },
     [worker],
@@ -309,12 +341,16 @@ const Simulator = ({ worker, initialState, appInsights }) => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = '.asm,.txt,.s';
-    fileInput.onchange = (event) => {
-      const file = event.target.files[0];
+    fileInput.onchange = (event: Event) => {
+      const target = event.target as HTMLInputElement;
+      const file = target.files?.[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
-          setCode(e.target.result);
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const result = e.target?.result;
+          if (typeof result === 'string') {
+            setCode(result);
+          }
         };
         reader.readAsText(file);
       }
@@ -332,7 +368,7 @@ const Simulator = ({ worker, initialState, appInsights }) => {
     URL.revokeObjectURL(fileURL);
   };
 
-  const submitInput = (input) => {
+  const submitInput = (input: string) => {
     setInputRequest(null);
     dispatch({ type: 'INPUT_SUBMITTED' });
     worker.provideInput(input);
@@ -350,7 +386,7 @@ const Simulator = ({ worker, initialState, appInsights }) => {
     runCode();
   };
 
-  const clickStep = (n) => {
+  const clickStep = (n: number) => {
     appInsights.trackEvent({ name: 'click', properties: { action: 'step' } });
     stepCode(n);
   };
@@ -446,20 +482,21 @@ const Simulator = ({ worker, initialState, appInsights }) => {
   ]);
 
   // Handle accordion expansion change
-  const handleAccordionChange = (panel) => (event, isExpanded) => {
-    setExpandedAccordions((prev) => ({
-      ...prev,
-      [panel]: isExpanded,
-    }));
-
-    // Clear change indicator when accordion is opened
-    if (isExpanded) {
-      setAccordionChanges((prev) => ({
+  const handleAccordionChange =
+    (panel: AccordionPanel) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpandedAccordions((prev) => ({
         ...prev,
-        [panel]: false,
+        [panel]: isExpanded,
       }));
-    }
-  };
+
+      // Clear change indicator when accordion is opened
+      if (isExpanded) {
+        setAccordionChanges((prev) => ({
+          ...prev,
+          [panel]: false,
+        }));
+      }
+    };
 
   // ---------------------------------------------------------------------------
   // Syntax check on mount
@@ -473,7 +510,7 @@ const Simulator = ({ worker, initialState, appInsights }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onCodeChange = (newCode) => {
+  const onCodeChange = (newCode: string) => {
     setCode(newCode);
     debouncedSyntaxCheck(newCode);
   };
@@ -486,7 +523,7 @@ const Simulator = ({ worker, initialState, appInsights }) => {
   // Resolve the user-selected theme mode: 'auto' defers to the OS media
   // query, while 'light' / 'dark' force the corresponding palette so the
   // dark theme can be exercised regardless of the OS preference.
-  const paletteMode =
+  const paletteMode: 'light' | 'dark' =
     themeMode === 'light'
       ? 'light'
       : themeMode === 'dark'
@@ -504,7 +541,7 @@ const Simulator = ({ worker, initialState, appInsights }) => {
   }, [paletteMode]);
 
   // The theme (palette, typography, component overrides) is centralized in
-  // src/webapp/theme.js; it already applies `responsiveFontSizes` so text
+  // src/webapp/theme.ts; it already applies `responsiveFontSizes` so text
   // shrinks gracefully on phones and tablets.
   const theme = React.useMemo(() => buildTheme(paletteMode), [paletteMode]);
 
@@ -697,7 +734,6 @@ const Simulator = ({ worker, initialState, appInsights }) => {
               </AccordionSummary>
               <AccordionDetails>
                 <CacheConfig
-                  showTitle={false}
                   onChange={setCacheConfig}
                   status={status}
                 />
@@ -737,7 +773,6 @@ const Simulator = ({ worker, initialState, appInsights }) => {
                   themeMode={themeMode}
                   setThemeMode={setThemeMode}
                   status={status}
-                  showTitle={false}
                 />
               </AccordionDetails>
             </Accordion>

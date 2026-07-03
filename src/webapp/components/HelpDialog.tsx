@@ -9,7 +9,7 @@ import Link from '@mui/material/Link';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
-import Select from '@mui/material/Select';
+import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
@@ -37,6 +37,7 @@ import {
   fetchVersions,
   buildVersionList,
   getViewedSha,
+  type VersionItem,
 } from '../versionHistory';
 
 // Render a localized description of the running build (production/PR/dev),
@@ -48,7 +49,7 @@ function BuildInfoLine() {
     return (
       <Typography id="about-build-info">
         Build: preview for{' '}
-        <Link href={buildInfo.prUrl} target="_blank" rel="noreferrer">
+        <Link href={buildInfo.prUrl ?? ''} target="_blank" rel="noreferrer">
           pull request #{buildInfo.prNumber}
         </Link>
       </Typography>
@@ -59,7 +60,7 @@ function BuildInfoLine() {
       <Typography id="about-build-info">
         Build: archived (
         <Link href={buildInfo.buildUrl} target="_blank" rel="noreferrer">
-          {buildInfo.sha.slice(0, 7)}
+          {buildInfo.sha?.slice(0, 7)}
         </Link>
         )
       </Typography>
@@ -85,7 +86,7 @@ function BuildInfoLine() {
 // candidates are shown (they are expected to be few between promotions).
 // Gated on: valid versions index AND build kind !== 'pr'.
 function Versions() {
-  const [versionsData, setVersionsData] = React.useState(null);
+  const [versionsData, setVersionsData] = React.useState<Awaited<ReturnType<typeof fetchVersions>>>(null);
   const viewedSha = React.useMemo(() => getViewedSha(), []);
 
   React.useEffect(() => {
@@ -108,7 +109,7 @@ function Versions() {
     ? items.find((it) => it.sha === viewedSha)
     : null;
 
-  const renderEntry = (item) => (
+  const renderEntry = (item: VersionItem) => (
     <ListItem key={item.sha} disablePadding data-version={item.sha}>
       <ListItemText
         primary={
@@ -190,7 +191,7 @@ function Versions() {
 }
 
 const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
-const INTRODUCTION_LABELS = {
+const INTRODUCTION_LABELS: Record<string, string> = {
   en: 'Introduction',
   it: 'Introduzione',
   zh: '简介',
@@ -203,11 +204,22 @@ const SPHINX_SELECTORS = {
   nestedItem: ':scope > li.toctree-l2',
 };
 
+interface TocChild {
+  title: string;
+  url: string;
+}
+
+interface TocEntry {
+  title: string;
+  url: string;
+  children?: TocChild[];
+}
+
 /**
  * Parse the Sphinx-generated toctree HTML into a structured ToC format.
  * The toctree-wrapper contains nested ul/li elements with links.
  */
-function parseTocFromHtml(htmlString, language) {
+function parseTocFromHtml(htmlString: string, language: string): TocEntry[] {
   const parser = new DOMParser();
   const doc = parser.parseFromString(htmlString, 'text/html');
   // The user manual is built with two top-level `.. toctree::` directives:
@@ -223,7 +235,7 @@ function parseTocFromHtml(htmlString, language) {
     return [];
   }
 
-  const toc = [];
+  const toc: TocEntry[] = [];
 
   // Add Introduction as the first item (links to index.html)
   toc.push({
@@ -241,15 +253,15 @@ function parseTocFromHtml(htmlString, language) {
       const link = li.querySelector(':scope > a');
       if (!link) return;
 
-      const item = {
-        title: link.textContent.trim(),
-        url: link.getAttribute('href'),
+      const item: TocEntry = {
+        title: link.textContent?.trim() ?? '',
+        url: link.getAttribute('href') ?? '',
       };
 
       // Check for nested items (toctree-l2)
       const nestedList = li.querySelector(':scope > ul');
       if (nestedList) {
-        const children = [];
+        const children: TocChild[] = [];
         const nestedItems = nestedList.querySelectorAll(
           SPHINX_SELECTORS.nestedItem,
         );
@@ -257,8 +269,8 @@ function parseTocFromHtml(htmlString, language) {
           const nestedLink = nestedLi.querySelector(':scope > a');
           if (nestedLink) {
             children.push({
-              title: nestedLink.textContent.trim(),
-              url: nestedLink.getAttribute('href'),
+              title: nestedLink.textContent?.trim() ?? '',
+              url: nestedLink.getAttribute('href') ?? '',
             });
           }
         });
@@ -277,10 +289,10 @@ function parseTocFromHtml(htmlString, language) {
 /**
  * Custom hook to fetch and parse the ToC for a given language.
  */
-function useToc(language) {
-  const [toc, setToc] = React.useState([]);
+function useToc(language: string) {
+  const [toc, setToc] = React.useState<TocEntry[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const abortController = new AbortController();
@@ -307,11 +319,11 @@ function useToc(language) {
         }
       } catch (err) {
         // Ignore abort errors (expected when language changes quickly)
-        if (err.name === 'AbortError') {
+        if ((err as Error).name === 'AbortError') {
           return;
         }
         if (!abortController.signal.aborted) {
-          setError(err.message);
+          setError((err as Error).message);
           setLoading(false);
         }
       }
@@ -327,9 +339,14 @@ function useToc(language) {
   return { toc, loading, error };
 }
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
+interface TabPanelProps {
+  children?: React.ReactNode;
+  value: number;
+  index: number;
+  [key: string]: unknown;
+}
 
+function TabPanel({ children, value, index, ...other }: TabPanelProps) {
   return (
     <div
       role="tabpanel"
@@ -349,10 +366,18 @@ function TabPanel(props) {
   );
 }
 
-function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }) {
-  const [openItems, setOpenItems] = React.useState({});
+interface NavigationDrawerProps {
+  toc: TocEntry[];
+  onNavigate: (url: string) => void;
+  currentPage: string;
+  loading: boolean;
+  error: string | null;
+}
 
-  const handleToggle = (index) => {
+function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }: NavigationDrawerProps) {
+  const [openItems, setOpenItems] = React.useState<Record<number, boolean>>({});
+
+  const handleToggle = (index: number) => {
     setOpenItems((prev) => ({
       ...prev,
       [index]: !prev[index],
@@ -411,12 +436,16 @@ function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }) {
               >
                 <ListItemText
                   primary={item.title}
-                  primaryTypographyProps={{
-                    fontSize: '0.9rem',
-                    fontWeight: currentPage === item.url ? 600 : 400,
-                    noWrap: true,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
+                  slotProps={{
+                    primary: {
+                      noWrap: true,
+                      sx: {
+                        fontSize: '0.9rem',
+                        fontWeight: currentPage === item.url ? 600 : 400,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      },
+                    },
                   }}
                 />
                 {item.children &&
@@ -436,12 +465,16 @@ function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }) {
                       >
                         <ListItemText
                           primary={child.title}
-                          primaryTypographyProps={{
-                            fontSize: '0.85rem',
-                            fontWeight: currentPage === child.url ? 600 : 400,
-                            noWrap: true,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
+                          slotProps={{
+                            primary: {
+                              noWrap: true,
+                              sx: {
+                                fontSize: '0.85rem',
+                                fontWeight: currentPage === child.url ? 600 : 400,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              },
+                            },
                           }}
                         />
                       </ListItemButton>
@@ -457,23 +490,29 @@ function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }) {
   );
 }
 
-export default function HelpDialog(props) {
+interface HelpDialogProps {
+  open: boolean;
+  handleClose: () => void;
+  ver: string;
+}
+
+export default function HelpDialog({ open, handleClose, ver }: HelpDialogProps) {
   const [tabValue, setTabValue] = React.useState(0);
   // The `useSetting` hook sanitizes the persisted value against the
   // ALLOWED_LANGUAGES validator declared in the settings schema, so an
   // unexpected value (e.g. from an older schema version) falls back to 'en'.
   const [language, setLanguage] = useSetting(SettingKey.HELP_LANGUAGE);
   const [currentPage, setCurrentPage] = React.useState('index.html');
-  const iframeRef = React.useRef(null);
+  const iframeRef = React.useRef<HTMLIFrameElement>(null);
 
   // Dynamically fetch and parse the ToC based on the selected language
   const { toc, loading, error } = useToc(language);
 
-  const handleTabChange = (event, newValue) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
-  const handleLanguageChange = (event) => {
+  const handleLanguageChange = (event: SelectChangeEvent<string>) => {
     const newLang = event.target.value;
     if (ALLOWED_LANGUAGES.includes(newLang)) {
       setLanguage(newLang);
@@ -481,7 +520,7 @@ export default function HelpDialog(props) {
     } // else ignore invalid value
   };
 
-  const handleNavigate = (url) => {
+  const handleNavigate = (url: string) => {
     setCurrentPage(url);
     if (iframeRef.current) {
       iframeRef.current.src = `docs/${language}/html/${url}`;
@@ -585,8 +624,8 @@ export default function HelpDialog(props) {
 
   return (
     <Dialog
-      onClose={props.handleClose}
-      open={props.open}
+      onClose={handleClose}
+      open={open}
       maxWidth="xl"
       fullWidth
       slotProps={{
@@ -772,7 +811,7 @@ export default function HelpDialog(props) {
         </TabPanel>
         <TabPanel value={tabValue} index={2}>
           <Box sx={{ p: 3 }}>
-            <Typography>Version: {props.ver}</Typography>
+            <Typography>Version: {ver}</Typography>
             <BuildInfoLine />
             <Versions />
             <Typography gutterBottom variant="h6" sx={{ mt: 2 }}>
@@ -830,7 +869,7 @@ export default function HelpDialog(props) {
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={props.handleClose}
+          onClick={handleClose}
           variant="outlined"
           id="help-close-button"
         >

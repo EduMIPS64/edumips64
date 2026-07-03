@@ -15,10 +15,13 @@ import {
   MAX_EXECUTION_DELAY_MS,
   DEFAULT_PIPELINE_COLORS,
   ALLOWED_THEME_MODES,
+  type PipelineColors,
+  type ThemeMode,
 } from '../settings/schema';
+import type { CpuStatus } from '../simulator/protocol';
 
 // Human-readable labels for each pipeline color knob, in display order.
-const PIPELINE_COLOR_FIELDS = [
+const PIPELINE_COLOR_FIELDS: Array<{ key: keyof PipelineColors; label: string }> = [
   { key: 'IF', label: 'IF' },
   { key: 'ID', label: 'ID' },
   { key: 'EX', label: 'EX' },
@@ -29,6 +32,28 @@ const PIPELINE_COLOR_FIELDS = [
   { key: 'FPDivider', label: 'FP Divider' },
   { key: 'Stall', label: 'Stall' },
 ];
+
+interface SettingsProps {
+  viMode: boolean;
+  setViMode: (v: boolean) => void;
+  fontSize: number;
+  setFontSize: (v: number) => void;
+  accordionAlerts: boolean;
+  setAccordionAlerts: (v: boolean) => void;
+  forwarding: boolean;
+  setForwarding: (v: boolean) => void;
+  delaySlot: boolean;
+  setDelaySlot: (v: boolean) => void;
+  stepStride: number;
+  setStepStride: (v: number) => void;
+  executionDelayMs: number;
+  setExecutionDelayMs: (v: number) => void;
+  pipelineColors: PipelineColors | undefined;
+  setPipelineColors: (v: PipelineColors) => void;
+  themeMode: ThemeMode;
+  setThemeMode: (v: ThemeMode) => void;
+  status: CpuStatus;
+}
 
 const Settings = ({
   viMode,
@@ -50,7 +75,7 @@ const Settings = ({
   themeMode,
   setThemeMode,
   status,
-}) => {
+}: SettingsProps) => {
   // Forwarding affects the CPU pipeline behavior and resets the CPU when
   // changed, so we only allow toggling it when the simulator is not running
   // a program. This mirrors the way `CacheConfig` grays out its inputs.
@@ -58,15 +83,14 @@ const Settings = ({
   // Delay slot has the same lifecycle: it changes pipeline semantics and
   // resets the CPU on toggle, so we gray it out while a program is running.
   const delaySlotDisabled = status === 'RUNNING';
-  const handleColorChange = (key) => (e) => {
+  const handleColorChange = (key: keyof PipelineColors) => (e: React.ChangeEvent<HTMLInputElement>) => {
     // `pipelineColors` may be undefined when the parent doesn't wire the
     // setting (e.g. older callers); guard so we always start from a complete
     // object before merging the user's edit.
     const base = { ...DEFAULT_PIPELINE_COLORS, ...(pipelineColors || {}) };
     setPipelineColors({ ...base, [key]: e.target.value });
   };
-  const resetPipelineColors = () =>
-    setPipelineColors({ ...DEFAULT_PIPELINE_COLORS });
+  const resetPipelineColors = () => setPipelineColors({ ...DEFAULT_PIPELINE_COLORS });
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <Box
@@ -144,7 +168,9 @@ const Settings = ({
                 color="primary"
                 size="small"
                 disabled={forwardingDisabled}
-                slotProps={{ input: { 'data-testid': 'forwarding-switch' } }}
+                // TODO(ts): MUI's SwitchInputSlotPropsOverrides doesn't include
+                // data-* HTML attributes; cast to pass through to the input DOM node.
+                slotProps={{ input: { 'data-testid': 'forwarding-switch' } as React.ComponentProps<'input'> }}
               />
             }
             label={
@@ -168,7 +194,8 @@ const Settings = ({
                 color="primary"
                 size="small"
                 disabled={delaySlotDisabled}
-                slotProps={{ input: { 'data-testid': 'delay-slot-switch' } }}
+                // TODO(ts): same data-* attribute cast as above.
+                slotProps={{ input: { 'data-testid': 'delay-slot-switch' } as React.ComponentProps<'input'> }}
               />
             }
             label={
@@ -237,7 +264,7 @@ const Settings = ({
             size="small"
             exclusive
             value={themeMode || 'auto'}
-            onChange={(_, value) => {
+            onChange={(_, value: ThemeMode | null) => {
               // ToggleButtonGroup emits `null` when the user clicks the
               // currently-selected button; treat that as "no change" so the
               // theme mode never gets cleared from settings.
