@@ -1,3 +1,8 @@
+// Monaco must be configured before any @monaco-editor/react component can
+// mount.  This import wires the editor web worker and sets loader.config
+// so Monaco is loaded from the local bundle (not CDN).
+import './monacoSetup';
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -9,7 +14,7 @@ import type { SimulatorWorker } from './simulator/protocol';
 
 import './css/main.css';
 
-// VERSION is injected by webpack DefinePlugin at build time (git-describe
+// VERSION is injected by Vite's define at build time (git-describe
 // output, e.g. "1.4.0-74-ge1b45a15").  Declared in vendor.d.ts.
 const version = VERSION;
 

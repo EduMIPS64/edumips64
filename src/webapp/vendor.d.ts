@@ -12,12 +12,22 @@
  */
 
 // ---------------------------------------------------------------------------
-// Global injected by webpack DefinePlugin
+// Vite client types
 //
-// webpack bakes VERSION (the git-describe output, e.g. "1.4.0-74-ge1b45a15")
-// into the bundle at build time via DefinePlugin.  TypeScript needs to know
-// about it so references to the bare `VERSION` identifier are not flagged as
-// unknown names.
+// Provides TypeScript definitions for Vite-specific import suffixes such as
+// `?worker` (used in monacoSetup.ts to import Monaco's editor worker) and
+// `import.meta.env`.
+// ---------------------------------------------------------------------------
+
+/// <reference types="vite/client" />
+
+// ---------------------------------------------------------------------------
+// Global injected by Vite define
+//
+// Vite bakes VERSION (the git-describe output, e.g. "1.4.0-74-ge1b45a15")
+// into the bundle at build time via define in vite.config.ts.  TypeScript
+// needs to know about it so references to the bare `VERSION` identifier are
+// not flagged as unknown names.
 // ---------------------------------------------------------------------------
 
 declare const VERSION: string;

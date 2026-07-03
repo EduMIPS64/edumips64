@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    // Emit: type-checking only — Babel handles the actual transpilation.
+    // Emit: type-checking only — Vite/esbuild handles the actual transpilation.
     "noEmit": true,
 
     // Language target and module format.
@@ -8,8 +8,9 @@
     "module": "esnext",
     "moduleResolution": "bundler",
 
-    // JSX: classic runtime (matches @babel/preset-react default in this repo).
-    "jsx": "react",
+    // JSX: automatic runtime (react/jsx-runtime) — matches @vitejs/plugin-react
+    // default and avoids requiring `import React` in every JSX file.
+    "jsx": "react-jsx",
 
     // Strict mode catches the most common type errors.
     "strict": true,
