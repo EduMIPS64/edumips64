@@ -571,7 +571,7 @@ val npmBuild = tasks.register<Exec>("npmBuild") {
     inputs.files(
         "package.json",
         "package-lock.json",
-        "webpack.config.js"
+        "vite.config.mts"
     )
     inputs.dir("src/webapp")
     outputs.dir(layout.buildDirectory.dir("web"))

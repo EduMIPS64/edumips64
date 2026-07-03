@@ -166,8 +166,8 @@ UI as well to have a working local test environment (see next section).
 
 #### Web UI
 
-The web UI itself is based on React, and it's compiled / assembled using the NPM and
-webpack tools. The source code is in `src/webapp`.
+The web UI itself is based on React, and it's compiled / assembled using Vite
+(`vite.config.ts`). The source code is in `src/webapp`.
 
 The `webapp` Gradle task automates the build process for the web UI. It:
 1. Compiles the GWT worker (`war` task)
@@ -177,14 +177,18 @@ The `webapp` Gradle task automates the build process for the web UI. It:
    `-t web` tag, so the user interface chapter that is included is
    `user-interface-web.rst` only — see "User manual structure" below.
 3. Installs NPM dependencies (`npmInstall` task)
-4. Builds the React frontend (`npmBuild` task)
+4. Builds the React frontend (`npmBuild` task, runs `npm run build`)
 5. Copies the generated documentation into the web app bundle (`copyWebHelp` task)
 
 Custom NPM scripts:
 
-- `build-dbg`: development webpack build (inline source maps, React dev mode)
-- `build`: production webpack build (minified, production React runtime)
-- `start`: starts the webpack-dev-server with live reloading
+- `build-dbg`: development Vite build (`--mode development`; inline source
+  maps, no minification, React dev mode)
+- `build`: production Vite build (minified with esbuild, external source maps)
+- `start`: starts the Vite dev server on port 5173 with HMR. **Note:** the
+  Playwright tests expect the app at `http://localhost:8080`; for manual
+  interactive development use `npm start` and open that port, or set
+  `PLAYWRIGHT_TARGET_URL=http://localhost:5173` to test against the dev server.
 - `test`: runs the Playwright end-to-end tests (expects the app to be
   served at `http://localhost:8080`, or set `PLAYWRIGHT_TARGET_URL`)
 - `test:unit`: runs the Vitest unit tests (fast, no browser; covers the
@@ -229,8 +233,9 @@ Typing conventions:
   tuple with no casts.
 - Third-party modules without bundled types (lodash/debounce, react-dom/client
   and CSS/image asset imports) are declared in `src/webapp/vendor.d.ts`.
-  The webpack `VERSION` global (injected by `DefinePlugin`) is also declared
-  there.
+  The Vite `VERSION` global (injected by `define` in `vite.config.ts`) is also
+  declared there, along with a `/// <reference types="vite/client" />` directive
+  that types Vite-specific import suffixes such as `?worker`.
 - Unit tests for all modules are `.test.ts`; Vitest handles TS natively
   (no extra configuration needed).
 
