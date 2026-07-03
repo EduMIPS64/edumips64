@@ -31,6 +31,13 @@ interface VersionEntry {
   promoted: boolean;
   promotedAt?: string;
   promotedBy?: string;
+  /**
+   * True when the retention policy deleted this version's c/<sha>/ snapshot
+   * (deploy-web-pages.py keeps the entry for the audit trail). Pruned
+   * versions have no content to link to and cannot be promoted or rolled
+   * back to.
+   */
+  pruned?: boolean;
 }
 
 /** The shape of a parsed versions.json file. */
@@ -120,7 +127,11 @@ export function buildVersionList(data: unknown, viewedSha: string | null): Versi
   if (!isValidVersions(data)) {
     return [];
   }
-  const sorted = [...data.versions].sort((a, b) => b.seq - a.seq);
+  // Pruned versions have no snapshot on disk: linking to them would 404 and
+  // they are not valid rollback/promote targets, so they are not displayed.
+  const sorted = [...data.versions]
+    .filter((entry) => entry.pruned !== true)
+    .sort((a, b) => b.seq - a.seq);
   return sorted.map((entry) => ({
     sha: entry.sha,
     shortsha: entry.shortsha ?? entry.sha.slice(0, 7),
