@@ -9,9 +9,32 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
+import type { ITelemetryClient } from '../telemetry';
+
 // The cracked-CPU artwork that the Swing UI's ErrorDialog has shown for
 // years — reused here so the web error screen keeps the same personality.
 import errorImage from '../static/error-hires.png';
+
+// ---------------------------------------------------------------------------
+// Props and state types
+// ---------------------------------------------------------------------------
+
+interface AppErrorBoundaryProps {
+  /**
+   * Optional telemetry client. When provided, render errors are tracked via
+   * `trackException`. A missing or partially-initialised instance is handled
+   * safely (the try/catch in componentDidCatch suppresses any telemetry errors).
+   */
+  appInsights?: ITelemetryClient;
+  /** The wrapped component tree. */
+  children: React.ReactNode;
+}
+
+interface AppErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: React.ErrorInfo | null;
+}
 
 /**
  * Top-level error boundary that catches render/lifecycle errors anywhere in
@@ -19,41 +42,42 @@ import errorImage from '../static/error-hires.png';
  *
  * Error boundaries MUST be class components – React does not support the
  * componentDidCatch lifecycle method in function components.
- *
- * Props:
- *   appInsights  – (optional) ApplicationInsights instance. When provided,
- *                  exceptions are tracked via trackException. A missing or
- *                  partially-initialised instance is handled safely.
- *   children     – the wrapped component tree.
  */
-class AppErrorBoundary extends React.Component {
-  constructor(props) {
+class AppErrorBoundary extends React.Component<
+  AppErrorBoundaryProps,
+  AppErrorBoundaryState
+> {
+  constructor(props: AppErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error): Partial<AppErrorBoundaryState> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     this.setState({ errorInfo });
     // Guard so a missing / partially-constructed appInsights never throws.
     try {
       this.props.appInsights?.trackException?.({ exception: error });
-    } catch (_) {
+    } catch {
       // intentionally swallowed
     }
   }
 
-  render() {
+  render(): React.ReactNode {
     if (!this.state.hasError) {
       return this.props.children;
     }
 
     const { error, errorInfo } = this.state;
     const message = error ? error.message : 'An unknown error occurred.';
-    const stack = errorInfo ? errorInfo.componentStack : (error && error.stack ? error.stack : '');
+    const stack = errorInfo
+      ? errorInfo.componentStack
+      : error && error.stack
+        ? error.stack
+        : '';
 
     return (
       <Box
@@ -89,7 +113,11 @@ class AppErrorBoundary extends React.Component {
               <Typography
                 variant="caption"
                 component="pre"
-                sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', fontSize: '0.75rem' }}
+                sx={{
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-all',
+                  fontSize: '0.75rem',
+                }}
               >
                 {stack}
               </Typography>

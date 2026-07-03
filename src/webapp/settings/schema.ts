@@ -1,4 +1,4 @@
-import { SettingKey } from './SettingKey';
+import { SettingKey, type SettingKeyType } from './SettingKey';
 
 /**
  * Supported setting types.
@@ -308,4 +308,82 @@ export function sanitize(key: string, raw: unknown): unknown {
   }
 
   return raw;
+}
+
+// ---------------------------------------------------------------------------
+// SettingValueMap — per-key type inference for useSetting<K>
+// ---------------------------------------------------------------------------
+
+/**
+ * The expanded-accordions object that controls which Simulator panels are
+ * open by default and after user interaction.
+ */
+export interface ExpandedAccordions {
+  stats: boolean;
+  pipeline: boolean;
+  registers: boolean;
+  memory: boolean;
+  stdout: boolean;
+  cache: boolean;
+  settings: boolean;
+}
+
+/**
+ * L1 cache configuration parameters (L1D and L1I share the same shape).
+ */
+export interface CacheConfig {
+  size: number;
+  blockSize: number;
+  associativity: number;
+}
+
+/**
+ * Per-stage pipeline colours (hex `#RRGGBB` strings).
+ * Mirrors the keys in `DEFAULT_PIPELINE_COLORS`.
+ */
+export interface PipelineColors {
+  IF: string;
+  ID: string;
+  EX: string;
+  MEM: string;
+  WB: string;
+  FPAdder: string;
+  FPMultiplier: string;
+  FPDivider: string;
+  Stall: string;
+}
+
+/** Allowed values for the `THEME_MODE` setting. */
+export type ThemeMode = 'auto' | 'light' | 'dark';
+
+/**
+ * Maps every `SettingKeyType` string value to its concrete TypeScript value
+ * type.  This is the source of truth used by `useSetting<K>` to give call
+ * sites a precisely-typed `[value, setValue, reset]` tuple without any casts.
+ *
+ * Adding a new setting: add a row here and a matching row in `SETTINGS_SCHEMA`.
+ */
+export interface SettingValueMap extends Record<SettingKeyType, unknown> {
+  // Editor / general UI
+  viMode: boolean;
+  fontSize: number;
+  accordionAlerts: boolean;
+  expandedAccordions: ExpandedAccordions;
+  // Cache
+  'cache.l1d': CacheConfig;
+  'cache.l1i': CacheConfig;
+  // CPU
+  forwarding: boolean;
+  delaySlot: boolean;
+  // Execution
+  stepStride: number;
+  executionDelayMs: number;
+  // Help dialog
+  'help.language': string;
+  // Editor content
+  editorCode: string;
+  // Pipeline widget colours
+  pipelineColors: PipelineColors;
+  // UI theme
+  themeMode: ThemeMode;
 }

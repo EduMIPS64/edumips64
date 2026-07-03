@@ -12,6 +12,19 @@ import Typography from '@mui/material/Typography';
 // left of the message like a classic JOptionPane error icon.
 import errorImage from '../static/error-hires.png';
 
+// ---------------------------------------------------------------------------
+// Props type
+// ---------------------------------------------------------------------------
+
+interface RuntimeErrorDialogProps {
+  /** Controls dialog visibility. */
+  open: boolean;
+  /** Human-readable error message to display (may contain newlines). */
+  message: string;
+  /** Callback invoked when the user clicks OK or dismisses the dialog. */
+  onClose: () => void;
+}
+
 /**
  * RuntimeErrorDialog – informational MUI Dialog shown when the simulator
  * encounters a runtime error (e.g. integer overflow, unsupported syscall).
@@ -21,13 +34,12 @@ import errorImage from '../static/error-hires.png';
  * immediately when the error result arrives, *not* when the user dismisses
  * this dialog.  The dialog is purely informational and can be closed at any
  * time without side-effects.
- *
- * Props:
- *   open     – boolean, controls visibility.
- *   message  – string, the error message to display.
- *   onClose  – callback invoked when the user clicks OK or closes the dialog.
  */
-function RuntimeErrorDialog({ open, message, onClose }) {
+function RuntimeErrorDialog({
+  open,
+  message,
+  onClose,
+}: RuntimeErrorDialogProps): React.ReactElement {
   return (
     <Dialog
       id="runtime-error-dialog"

@@ -1,12 +1,22 @@
-import React from 'react';
+import { useState, useCallback } from 'react';
 import isEqual from 'lodash/isEqual';
+import type {
+  SimulatorResult,
+  Registers,
+  Memory,
+  Statistics,
+  CpuStatus,
+  Pipeline,
+  ParsingError,
+  PipelineInstruction,
+} from '../simulator/protocol';
 
 /**
  * Returns true if the given parsingErrors array contains at least one actual
  * error (not just warnings).  Exported so the execution controller can reuse
  * the same logic when processing checksyntax responses.
  */
-export const hasRealErrors = (parsingErrors) => {
+export const hasRealErrors = (parsingErrors: ParsingError[] | null): boolean => {
   if (!parsingErrors) return false;
   return parsingErrors.some((e) => !e.isWarning);
 };
@@ -30,22 +40,24 @@ export const hasRealErrors = (parsingErrors) => {
  *   - Individual setters (setStdout, setParsingErrors, setInputRequest) for the
  *     few call sites in Simulator.js that need fine-grained control.
  *
- * @param {object} initialState - the initial simulator state passed by AppLoader.
+ * @param initialState - the initial simulator state passed by AppLoader.
  */
-export function useSimulatorData(initialState) {
-  const [registers, setRegisters] = React.useState(initialState.registers);
-  const [memory, setMemory] = React.useState(initialState.memory);
-  const [stats, setStats] = React.useState(initialState.statistics);
-  const [status, setStatus] = React.useState(initialState.status);
-  const [pipeline, setPipeline] = React.useState(initialState.pipeline);
-  const [parsingErrors, setParsingErrors] = React.useState(
+export function useSimulatorData(initialState: SimulatorResult) {
+  const [registers, setRegisters] = useState<Registers>(initialState.registers);
+  const [memory, setMemory] = useState<Memory>(initialState.memory);
+  const [stats, setStats] = useState<Statistics>(initialState.statistics);
+  const [status, setStatus] = useState<CpuStatus>(initialState.status);
+  const [pipeline, setPipeline] = useState<Pipeline>(initialState.pipeline);
+  const [parsingErrors, setParsingErrors] = useState<ParsingError[] | null>(
     initialState.parsingErrors,
   );
-  const [parsedInstructions, setParsedInstructions] = React.useState(
-    initialState.parsedInstructions,
-  );
-  const [stdout, setStdout] = React.useState('');
-  const [inputRequest, setInputRequest] = React.useState(null);
+  const [parsedInstructions, setParsedInstructions] = useState<
+    PipelineInstruction[] | null
+  >(initialState.parsedInstructions);
+  const [stdout, setStdout] = useState<string>('');
+  // inputRequest carries the full SimulatorResult when the worker requests
+  // stdin input (result.inputRequested === true). null means no pending input.
+  const [inputRequest, setInputRequest] = useState<SimulatorResult | null>(null);
 
   /**
    * Apply a full worker result (step / load / reset) to the data state.
@@ -55,7 +67,7 @@ export function useSimulatorData(initialState) {
    * a shallow-compare of props, so a stable reference means the memo'd panel
    * will not re-render even though we called the setter.
    */
-  const applyResultState = React.useCallback((result) => {
+  const applyResultState = useCallback((result: SimulatorResult) => {
     setRegisters((prev) =>
       isEqual(prev, result.registers) ? prev : result.registers,
     );
@@ -93,7 +105,7 @@ export function useSimulatorData(initialState) {
    * Only updates parsingErrors and parsedInstructions so that the rest of the
    * UI does not re-render unnecessarily on every keypress.
    */
-  const applyChecksyntaxResult = React.useCallback((result) => {
+  const applyChecksyntaxResult = useCallback((result: SimulatorResult) => {
     setParsingErrors((prev) =>
       isEqual(prev, result.parsingErrors) ? prev : result.parsingErrors,
     );

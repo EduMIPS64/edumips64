@@ -1,5 +1,37 @@
-import React from 'react';
+import { useRef, useEffect } from 'react';
 import { deriveLogicalState } from '../simulatorState';
+import type { CpuStatus, SimulatorResult } from '../simulator/protocol';
+import type { ITelemetryClient } from '../telemetry';
+
+// ---------------------------------------------------------------------------
+// Params type
+// ---------------------------------------------------------------------------
+
+/** Parameters accepted by useKeyboardShortcuts. */
+export interface KeyboardShortcutsParams {
+  /** CPU status from the worker result. */
+  status: CpuStatus;
+  /** True while the worker is actively computing steps. */
+  executing: boolean;
+  /** Non-null while the InputDialog is open waiting for user input. */
+  inputRequest: SimulatorResult | null;
+  /** Returns true when the current editor content is a syntactically valid program. */
+  isValidProgram: () => boolean;
+  /** Load the current editor code into the simulator. */
+  loadCode: () => void;
+  /** Start run-all mode. */
+  runCode: () => void;
+  /** Run n steps. */
+  stepCode: (n: number) => void;
+  /** Stop execution and reset the simulator. */
+  stopCode: () => void;
+  /** Pause an in-progress run (dispatches PAUSE_REQUESTED). */
+  pauseCode: () => void;
+  /** Multi-step count from the STEP_STRIDE setting. */
+  stepStride: number;
+  /** Telemetry client for keyboard-shortcut action tracking. */
+  appInsights: ITelemetryClient;
+}
 
 /**
  * useKeyboardShortcuts — registers a window-level keydown handler for the
@@ -10,19 +42,6 @@ import { deriveLogicalState } from '../simulatorState';
  * reads the latest closures (status, executing, inputRequest, …).  This is
  * the same workerHandlerRef / keyboardHandlerRef pattern used elsewhere in
  * the codebase.
- *
- * @param {object} params
- * @param {string}        params.status        - 'READY' | 'RUNNING' | 'STOPPED'
- * @param {boolean}       params.executing     - true while worker is computing
- * @param {object|null}   params.inputRequest  - non-null while InputDialog is open
- * @param {function}      params.isValidProgram - () => boolean
- * @param {function}      params.loadCode      - () => void
- * @param {function}      params.runCode       - () => void
- * @param {function}      params.stepCode      - (n: number) => void
- * @param {function}      params.stopCode      - () => void
- * @param {function}      params.pauseCode     - () => void (dispatch PAUSE_REQUESTED)
- * @param {number}        params.stepStride    - multi-step count from settings
- * @param {object}        params.appInsights   - telemetry client
  */
 export function useKeyboardShortcuts({
   status,
@@ -36,9 +55,9 @@ export function useKeyboardShortcuts({
   pauseCode,
   stepStride,
   appInsights,
-}) {
-  const keyboardHandlerRef = React.useRef(null);
-  keyboardHandlerRef.current = (e) => {
+}: KeyboardShortcutsParams): void {
+  const keyboardHandlerRef = useRef<((e: KeyboardEvent) => void) | null>(null);
+  keyboardHandlerRef.current = (e: KeyboardEvent) => {
     // Don't steal keys while a modal dialog is open (Help, Settings, Input).
     if (document.querySelector('[role="dialog"]')) return;
     const logicalState = deriveLogicalState(status, executing, inputRequest);
@@ -64,7 +83,7 @@ export function useKeyboardShortcuts({
           });
           runCode();
         } else if (logicalState === 'EXECUTING') {
-          appInsights.trackEvent({ name: 'pause', source: 'keyboard' });
+          appInsights.trackEvent({ name: 'pause', properties: { source: 'keyboard' } });
           pauseCode();
         }
         break;
@@ -103,8 +122,12 @@ export function useKeyboardShortcuts({
     }
   };
 
-  React.useEffect(() => {
-    const handleKeyDown = (e) => keyboardHandlerRef.current(e);
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (keyboardHandlerRef.current) {
+        keyboardHandlerRef.current(e);
+      }
+    };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);

@@ -1,10 +1,58 @@
-import React from 'react';
-import { executionReducer, initialExecState } from '../executionReducer';
+import { useReducer, useRef, useEffect, useCallback } from 'react';
+import {
+  executionReducer,
+  initialExecState,
+  type ExecState,
+  type ExecAction,
+} from '../executionReducer';
+import type { SimulatorResult, SimulatorWorker } from '../simulator/protocol';
 
 // The number of steps dispatched to the worker in each internal batch.
 // Kept here (not in Simulator.js) so the scheduling logic in updateState
 // can reference it without prop-drilling.
 const INTERNAL_STEPS_STRIDE = 50;
+
+// ---------------------------------------------------------------------------
+// Param and return types
+// ---------------------------------------------------------------------------
+
+/** Parameters accepted by useExecutionController. */
+export interface ExecutionControllerParams {
+  /** The augmented worker proxy created in index.js (stable across renders). */
+  worker: SimulatorWorker;
+  /** Bulk state updater from useSimulatorData. */
+  applyResultState: (result: SimulatorResult) => void;
+  /** Checksyntax-only updater from useSimulatorData. */
+  applyChecksyntaxResult: (result: SimulatorResult) => void;
+  /** Input-request setter from useSimulatorData. */
+  setInputRequest: (v: SimulatorResult | null) => void;
+  /** Milliseconds to insert between step batches (0 = no delay). */
+  executionDelayMs: number;
+  /**
+   * Called with a human-readable message when a runtime error result arrives
+   * (e.g. synchronous exception, unsupported syscall). The caller renders the
+   * RuntimeErrorDialog; execution is stopped here regardless, immediately.
+   */
+  onRuntimeError: (message: string) => void;
+}
+
+/** The public API returned by useExecutionController to Simulator.js. */
+export interface ExecutionControllerAPI {
+  /** Full execution state for consumers that need more than `executing`. */
+  execState: ExecState;
+  /** Convenience destructure of execState.executing. */
+  executing: boolean;
+  /** Dispatch for PAUSE_REQUESTED / INPUT_SUBMITTED. */
+  dispatch: React.Dispatch<ExecAction>;
+  /** Start run-all mode (worker runs batches until STOPPED). */
+  runCode: () => void;
+  /** Run exactly n steps (batched internally by INTERNAL_STEPS_STRIDE). */
+  stepCode: (n: number) => void;
+  /** Stop execution and reset the worker to READY. */
+  stopCode: () => void;
+  /** Called by clearCode() / restoreDefaultSample() in Simulator.js. */
+  notifyReset: () => void;
+}
 
 /**
  * useExecutionController — owns all execution-related state and side-effects.
@@ -12,7 +60,7 @@ const INTERNAL_STEPS_STRIDE = 50;
  * Responsibilities:
  *   - The execution reducer (execState / dispatch) that replaces the old
  *     stepsToRun / mustPause / runAll / executing useState quartet.
- *   - Batch scheduling: nextBatchTimeout ref, cancelPendingBatch,
+ *   - Batch scheduling: nextBatchTimeoutRef ref, cancelPendingBatch,
  *     scheduleNextBatch, and executionDelayRef (a ref mirror of the
  *     executionDelayMs setting so live delay changes take effect mid-run).
  *   - Worker 'message' subscription (workerHandlerRef pattern):
@@ -20,24 +68,6 @@ const INTERNAL_STEPS_STRIDE = 50;
  *     reassigned on every render so it always reads the latest closures.
  *   - updateState decision logic: after each result it decides whether to
  *     schedule another batch, halt, or surface a runtime error.
- *
- * Public API returned to Simulator.js:
- *   - execState   ({ stepsToRun, mustPause, runAll, executing })
- *   - executing   — convenience destructure
- *   - dispatch    — for PAUSE_REQUESTED, INPUT_SUBMITTED
- *   - runCode()   — starts run-all mode
- *   - stepCode(n) — runs n steps (batched by INTERNAL_STEPS_STRIDE)
- *   - stopCode()  — stops execution and resets the worker
- *   - notifyReset() — called by clearCode / restoreDefaultSample;
- *                     handles the controller side (cancel batch, dispatch
- *                     RESET, worker.reset(), clear inputRequest).
- *
- * @param {object} params
- * @param {object}   params.worker                  - worker proxy (stable prop)
- * @param {function} params.applyResultState         - from useSimulatorData
- * @param {function} params.applyChecksyntaxResult   - from useSimulatorData
- * @param {function} params.setInputRequest          - from useSimulatorData
- * @param {number}   params.executionDelayMs         - ms between step batches
  */
 export function useExecutionController({
   worker,
@@ -45,18 +75,12 @@ export function useExecutionController({
   applyChecksyntaxResult,
   setInputRequest,
   executionDelayMs,
-  // Called with a human-readable message when a runtime error result arrives
-  // (e.g. synchronous exception, unsupported syscall). The caller renders the
-  // RuntimeErrorDialog; execution is stopped here regardless, immediately.
   onRuntimeError,
-}) {
+}: ExecutionControllerParams): ExecutionControllerAPI {
   // ---------------------------------------------------------------------------
   // Execution state machine (replaces the four individual useState variables)
   // ---------------------------------------------------------------------------
-  const [execState, dispatch] = React.useReducer(
-    executionReducer,
-    initialExecState,
-  );
+  const [execState, dispatch] = useReducer(executionReducer, initialExecState);
   const { stepsToRun, mustPause, runAll, executing } = execState;
 
   // `executionDelayMs` is read inside async callbacks captured when a step
@@ -64,8 +88,8 @@ export function useExecutionController({
   // a ref so the delay applied between batches always reflects the *current*
   // setting, not the one active when "Run All" was pressed.  This lets the
   // user tweak the delay live, mid-run.
-  const executionDelayRef = React.useRef(executionDelayMs);
-  React.useEffect(() => {
+  const executionDelayRef = useRef<number>(executionDelayMs);
+  useEffect(() => {
     executionDelayRef.current = executionDelayMs;
   }, [executionDelayMs]);
 
@@ -76,28 +100,28 @@ export function useExecutionController({
   // Pending timeout id for a delayed follow-up batch. Stored in a ref so that
   // stopping the simulation cancels any batch sleeping between strides instead
   // of having it fire after `worker.reset()` and surface a spurious error.
-  const nextBatchTimeout = React.useRef(null);
+  const nextBatchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const cancelPendingBatch = React.useCallback(() => {
-    if (nextBatchTimeout.current !== null) {
-      clearTimeout(nextBatchTimeout.current);
-      nextBatchTimeout.current = null;
+  const cancelPendingBatch = useCallback(() => {
+    if (nextBatchTimeoutRef.current !== null) {
+      clearTimeout(nextBatchTimeoutRef.current);
+      nextBatchTimeoutRef.current = null;
     }
   }, []);
 
   // Schedule the next internal step batch, inserting the user-configured
   // execution delay so long runs are visually paced.  A delay of 0 ms (the
   // default) runs batches back-to-back, matching the pre-existing behaviour.
-  const scheduleNextBatch = React.useCallback(
-    (fn) => {
+  const scheduleNextBatch = useCallback(
+    (fn: () => void) => {
       cancelPendingBatch();
       const delay = executionDelayRef.current;
       if (delay <= 0) {
         fn();
         return;
       }
-      nextBatchTimeout.current = setTimeout(() => {
-        nextBatchTimeout.current = null;
+      nextBatchTimeoutRef.current = setTimeout(() => {
+        nextBatchTimeoutRef.current = null;
         fn();
       }, delay);
     },
@@ -108,13 +132,13 @@ export function useExecutionController({
   // Public operations
   // ---------------------------------------------------------------------------
 
-  const runCode = React.useCallback(() => {
+  const runCode = useCallback(() => {
     dispatch({ type: 'RUN_ALL_REQUESTED' });
     worker.step(INTERNAL_STEPS_STRIDE);
   }, [worker]);
 
-  const stepCode = React.useCallback(
-    (n) => {
+  const stepCode = useCallback(
+    (n: number) => {
       const toRun = Math.min(n, INTERNAL_STEPS_STRIDE);
       dispatch({ type: 'STEP_REQUESTED', stepsRemaining: n - toRun });
       worker.step(toRun);
@@ -122,13 +146,13 @@ export function useExecutionController({
     [worker],
   );
 
-  const stopCode = React.useCallback(() => {
+  const stopCode = useCallback(() => {
     // If a batch was sleeping between strides, cancel it.  In that case no
     // worker result is in flight to flip `executing` back off via
     // `updateState`, so we pass hadPendingBatch=true and the reducer clears
     // executing immediately.  When the worker is mid-step (hadPendingBatch
     // false), the upcoming result will see mustPause=true and clear executing.
-    const hadPendingBatch = nextBatchTimeout.current !== null;
+    const hadPendingBatch = nextBatchTimeoutRef.current !== null;
     cancelPendingBatch();
     dispatch({ type: 'STOP', hadPendingBatch });
     setInputRequest(null);
@@ -138,8 +162,8 @@ export function useExecutionController({
   // Called by clearCode() / restoreDefaultSample() in Simulator.js.
   // Handles the controller side: cancel any pending batch, dispatch RESET,
   // reset the worker, and clear the inputRequest dialog.
-  const notifyReset = React.useCallback(() => {
-    const hadPendingBatch = nextBatchTimeout.current !== null;
+  const notifyReset = useCallback(() => {
+    const hadPendingBatch = nextBatchTimeoutRef.current !== null;
     cancelPendingBatch();
     dispatch({ type: 'RESET', hadPendingBatch });
     setInputRequest(null);
@@ -153,7 +177,7 @@ export function useExecutionController({
   // `updateState` is a render-local function; it reads stepsToRun/runAll/mustPause
   // from the render closure (same semantics as the original Simulator.js code).
   // Defined before the workerHandlerRef assignment so there is no TDZ concern.
-  const updateState = (result) => {
+  const updateState = (result: SimulatorResult) => {
     applyResultState(result);
 
     // TODO: cleaner handling of error types. Checking the error message is a
@@ -220,9 +244,9 @@ export function useExecutionController({
   // the *real* handler body is reassigned on every render and therefore
   // always reads the latest closures (execState, scheduleNextBatch, …).
   // This is the same pattern as the existing keyboardHandlerRef.
-  const workerHandlerRef = React.useRef(null);
-  workerHandlerRef.current = (e) => {
-    const result = worker.parseResult(e.data);
+  const workerHandlerRef = useRef<((e: MessageEvent) => void) | null>(null);
+  workerHandlerRef.current = (e: MessageEvent) => {
+    const result = worker.parseResult(e.data as Record<string, unknown>);
 
     // For syntax check responses, only update parsing errors to avoid
     // unnecessary re-renders on the rest of the UI.
@@ -246,8 +270,12 @@ export function useExecutionController({
   // assignment, which was a side-effect during render — a React anti-pattern
   // that could silently drop messages during Strict-Mode double-invocations
   // and could not carry a cleanup.
-  React.useEffect(() => {
-    const handleMessage = (e) => workerHandlerRef.current(e);
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (workerHandlerRef.current) {
+        workerHandlerRef.current(e);
+      }
+    };
     worker.addEventListener('message', handleMessage);
     return () => worker.removeEventListener('message', handleMessage);
     // worker is a stable prop reference; include it so the linter is satisfied
