@@ -45,8 +45,12 @@ fi
 PAGES_API_BASE="https://api.github.com/repos/EduMIPS64/web.edumips.org/pages/builds"
 CDN_UI_JS="https://web.edumips.org/ui.js"
 
-# Phase 1: up to 15 minutes for Pages build to complete.
-BUILD_TIMEOUT=900
+# Phase 1: up to 35 minutes for the Pages build to complete. Legacy Jekyll
+# builds of this site have grown from ~100 s to >15 min as the site gained
+# per-commit candidate snapshots (a 15-minute budget caused a false-negative
+# verification on 2026-07-03 while the build was still 'building'). The
+# long-term fix is Actions-based deployment (issue #1913).
+BUILD_TIMEOUT=2100
 # Phase 2: up to 12 minutes for CDN propagation (max-age is 600 s).
 CDN_TIMEOUT=720
 # Seconds between poll attempts.
