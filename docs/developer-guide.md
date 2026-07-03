@@ -199,19 +199,28 @@ TypeScript is being adopted **incrementally**. The build toolchain (Babel +
 webpack) already handles `.ts`/`.tsx` files transparently, so converting a
 module does not break JS importers (all imports are extensionless).
 
-Current state (phase 1):
+Current state (phase 2):
 - **New webapp code should be `.ts`/`.tsx`** — the toolchain and `tsconfig.json`
   are fully wired.
-- **Existing `.js` files are not type-checked** (`checkJs: false` in
+- **Remaining `.js` files are not type-checked** (`checkJs: false` in
   `tsconfig.json`); they continue to work without modification.
-- The pure, high-leverage modules have been converted first:
-  `executionReducer.ts`, `simulatorState.ts`, `buildInfo.ts`,
-  `versionHistory.ts`, `settings/SettingKey.ts`, `settings/schema.ts`,
-  `hooks/useLocalStorage.ts`, `settings/useSetting.ts`.
-  Worker-boundary types live in `simulator/protocol.ts`.
+- Converted so far:
+  - Pure logic: `executionReducer.ts`, `simulatorState.ts`, `buildInfo.ts`,
+    `versionHistory.ts`, `settings/SettingKey.ts`, `settings/schema.ts`,
+    `hooks/useLocalStorage.ts`, `settings/useSetting.ts`.
+    Worker-boundary types live in `simulator/protocol.ts`.
+  - Hooks (phase 2): `hooks/useSimulatorData.ts`, `hooks/useExecutionController.ts`,
+    `hooks/useKeyboardShortcuts.ts`.
+  - Entry components (phase 2): `components/AppErrorBoundary.tsx`,
+    `components/AppLoader.tsx`, `components/RuntimeErrorDialog.tsx`.
+- `settings/schema.ts` exports a `SettingValueMap` interface that maps every
+  `SettingKey` string value to its concrete TypeScript type; `useSetting<K>`
+  uses this to give call sites a precisely-typed `[value, setValue, reset]`
+  tuple with no casts.
 - Unit tests for the converted modules are `.test.ts`; Vitest handles TS
   natively (no extra configuration needed).
-- Phase 2 will convert the hooks; phase 3 the components.
+- Phase 3 will convert `Simulator.js`, `Code.js`, `index.js`, and the display
+  components.
 
 `npm run typecheck` is enforced in CI (`test-web-coverage` job) and must
 stay clean for PRs to merge.
@@ -227,20 +236,20 @@ canonical for that npm major version.
 - `index.js` boots App Insights, wraps the Web Worker (`worker.js`, the
   simulator core compiled from Java) with helper methods, and mounts React
   immediately inside `React.StrictMode` and an `AppErrorBoundary`.
-- `components/AppLoader.js` shows a loading indicator while the worker
+- `components/AppLoader.tsx` shows a loading indicator while the worker
   initialises, and a friendly error screen (30 s watchdog) if `worker.js`
   fails to load — the app can no longer silently render a blank page.
 - `components/Simulator.js` is the orchestrator. The heavy lifting lives in
-  hooks under `src/webapp/hooks/`:
-  - `useSimulatorData` — registers/memory/stats/pipeline/… state. Updates
+  typed hooks under `src/webapp/hooks/`:
+  - `useSimulatorData.ts` — registers/memory/stats/pipeline/… state. Updates
     are *reference-preserving* (deep-equal data keeps the previous object)
     so the `React.memo`-wrapped display panels skip re-rendering when their
     data did not change.
-  - `useExecutionController` — owns `executionReducer.ts` (a pure, fully
+  - `useExecutionController.ts` — owns `executionReducer.ts` (a pure, fully
     unit-tested state machine for run/step/pause/stop and batch
     scheduling) and the worker `message` subscription.
-  - `useKeyboardShortcuts` — the global F2/F8/F9/F10/Esc bindings.
-- Runtime errors surface in `RuntimeErrorDialog` (never `window.alert`).
+  - `useKeyboardShortcuts.ts` — the global F2/F8/F9/F10/Esc bindings.
+- Runtime errors surface in `components/RuntimeErrorDialog.tsx` (never `window.alert`).
 - `React.StrictMode` is enabled in development builds: render functions and
   effects are intentionally double-invoked to flush out unsafe side
   effects. New code must keep side effects out of render bodies and class
