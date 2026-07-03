@@ -1,5 +1,5 @@
 /**
- * executionReducer.js — pure state machine for the EduMIPS64 execution flags.
+ * executionReducer.ts — pure state machine for the EduMIPS64 execution flags.
  *
  * Why a reducer?
  * --------------
@@ -15,8 +15,8 @@
  * the reducer receives the complete current state and produces a complete
  * new state, so no individual setter can race another.
  *
- * No React imports — this module is pure JS and can be unit-tested without
- * a browser or JSDOM.
+ * No React imports — this module is pure TypeScript and can be unit-tested
+ * without a browser or JSDOM.
  */
 
 // ---------------------------------------------------------------------------
@@ -24,30 +24,28 @@
 // ---------------------------------------------------------------------------
 
 /**
- * @typedef {Object} ExecState
- * @property {number}  stepsToRun  – steps still queued after the current
- *   batch is dispatched to the worker; 0 = none pending.
- * @property {boolean} mustPause   – pause flag: if true, the next
- *   RESULT_RECEIVED transition clears all execution flags rather than
- *   scheduling another batch.
- * @property {boolean} runAll      – true while in "run until program ends"
- *   mode; drives the open-ended scheduling loop in the component.
- * @property {boolean} executing   – true while the worker is actively
- *   computing steps *or* while a scheduled inter-batch delay is in flight.
- *   Kept true across inter-batch delays so the toolbar buttons do not flash
- *   between strides (user sees the same "running" UI the whole time).
+ * Execution flags owned by the reducer.
+ *
+ * @property stepsToRun  – steps still queued after the current batch is
+ *   dispatched to the worker; 0 = none pending.
+ * @property mustPause   – pause flag: if true, the next RESULT_RECEIVED
+ *   transition clears all execution flags rather than scheduling another batch.
+ * @property runAll      – true while in "run until program ends" mode; drives
+ *   the open-ended scheduling loop in the component.
+ * @property executing   – true while the worker is actively computing steps
+ *   *or* while a scheduled inter-batch delay is in flight.  Kept true across
+ *   inter-batch delays so the toolbar buttons do not flash between strides
+ *   (user sees the same "running" UI the whole time).
  */
-
-/** @type {ExecState} */
-export const initialExecState = {
-  stepsToRun: 0,
-  mustPause: false,
-  runAll: false,
-  executing: false,
-};
+export interface ExecState {
+  stepsToRun: number;
+  mustPause: boolean;
+  runAll: boolean;
+  executing: boolean;
+}
 
 // ---------------------------------------------------------------------------
-// Actions
+// Actions — discriminated union
 // ---------------------------------------------------------------------------
 
 /**
@@ -92,16 +90,62 @@ export const initialExecState = {
  *   No payload.  Resumes execution (worker.provideInput is the side-effect).
  */
 
+interface StepRequestedAction {
+  type: 'STEP_REQUESTED';
+  stepsRemaining: number;
+}
+interface RunAllRequestedAction {
+  type: 'RUN_ALL_REQUESTED';
+}
+interface ResultReceivedAction {
+  type: 'RESULT_RECEIVED';
+  status: string;
+  encounteredBreak: boolean;
+}
+interface PauseRequestedAction {
+  type: 'PAUSE_REQUESTED';
+}
+interface StopAction {
+  type: 'STOP';
+  hadPendingBatch: boolean;
+}
+interface ResetAction {
+  type: 'RESET';
+  hadPendingBatch: boolean;
+}
+interface InputRequestedAction {
+  type: 'INPUT_REQUESTED';
+}
+interface InputSubmittedAction {
+  type: 'INPUT_SUBMITTED';
+}
+
+export type ExecAction =
+  | StepRequestedAction
+  | RunAllRequestedAction
+  | ResultReceivedAction
+  | PauseRequestedAction
+  | StopAction
+  | ResetAction
+  | InputRequestedAction
+  | InputSubmittedAction;
+
+// ---------------------------------------------------------------------------
+// Initial state
+// ---------------------------------------------------------------------------
+
+export const initialExecState: ExecState = {
+  stepsToRun: 0,
+  mustPause: false,
+  runAll: false,
+  executing: false,
+};
+
 // ---------------------------------------------------------------------------
 // Reducer
 // ---------------------------------------------------------------------------
 
-/**
- * @param {ExecState} state
- * @param {{ type: string, [key: string]: * }} action
- * @returns {ExecState}
- */
-export function executionReducer(state, action) {
+export function executionReducer(state: ExecState, action: ExecAction): ExecState {
   switch (action.type) {
     case 'STEP_REQUESTED':
       // The component has already called worker.step(stride).  Record how
@@ -189,7 +233,12 @@ export function executionReducer(state, action) {
       // User provided the required input; execution resumes.
       return { ...state, executing: true };
 
-    default:
+    default: {
+      // TypeScript exhaustiveness check: this branch is unreachable if all
+      // action types are handled above.
+      const _exhaustive: never = action;
+      void _exhaustive;
       return state;
+    }
   }
 }

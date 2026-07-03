@@ -64,6 +64,9 @@ module.exports = (env, argv) => {
         // app only uses the core editor plus its own custom 'mips' grammar.
         'monaco-editor$': 'monaco-editor/esm/vs/editor/editor.api',
       },
+      // Resolve TypeScript extensions first, then fall back to JS/JSX.
+      // The '...' spreads webpack's built-in defaults (e.g. '.js', '.json').
+      extensions: ['.ts', '.tsx', '...'],
     },
     output: {
       path: outputPath,
@@ -72,7 +75,7 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          test: /\.js$/,
+          test: /\.[jt]sx?$/,
           exclude: /node_modules/,
           loader: 'babel-loader',
           // Babel resolves its env from BABEL_ENV/NODE_ENV, *not* from

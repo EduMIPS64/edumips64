@@ -11,7 +11,8 @@
     "test:unit": "vitest run",
     "test:coverage": "BABEL_ENV=coverage npm run build-dbg && COVERAGE=true npx playwright test",
     "report:coverage": "nyc report --reporter=lcov --reporter=text",
-    "electron": "electron electron/electron_main.js"
+    "electron": "electron electron/electron_main.js",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "Andrea Spadaccini",
@@ -34,6 +35,7 @@
     "@babel/core": "8.0.1",
     "@babel/preset-env": "8.0.2",
     "@babel/preset-react": "8.0.1",
+    "@babel/preset-typescript": "^8.0.1",
     "@babel/runtime": "8.0.0",
     "@electron/packager": "^20.0.0",
     "@eslint-react/eslint-plugin": "^5.0.0",
@@ -54,6 +56,8 @@
     "playwright": "1.61.1",
     "prettier": "3.9.4",
     "style-loader": "4.0.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.1",
     "vitest": "^4.1.9",
     "webpack": "5.108.3",
     "webpack-bundle-analyzer": "5.3.0",

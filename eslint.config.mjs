@@ -3,6 +3,7 @@ import eslintReact from "@eslint-react/eslint-plugin";
 import prettierConfig from "eslint-config-prettier";
 import prettierPlugin from "eslint-plugin-prettier";
 import globals from "globals";
+import tseslint from "typescript-eslint";
 
 export default [
   // ESLint built-in recommended rules
@@ -34,6 +35,12 @@ export default [
       "prettier/prettier": "error",
     },
   },
+  // TypeScript-ESLint recommended (non-type-checked) rules for .ts files only.
+  // Does not change linting of .js/.jsx files.
+  ...tseslint.configs.recommended.map((cfg) => ({
+    ...cfg,
+    files: ["**/*.ts", "**/*.tsx"],
+  })),
   // Disable ESLint rules that conflict with Prettier formatting (must be last)
   prettierConfig,
 ];

@@ -14,7 +14,21 @@ export const SettingType = Object.freeze({
   NUMBER: 'number',
   STRING: 'string',
   OBJECT: 'object',
-});
+} as const);
+
+export type SettingTypeValue = (typeof SettingType)[keyof typeof SettingType];
+
+/**
+ * A single registry entry for one persistent setting.
+ *
+ * `validate` receives a value that has already passed the type check, so it
+ * can safely cast to the expected primitive/object type.
+ */
+export interface SchemaEntry {
+  type: SettingTypeValue;
+  default: unknown;
+  validate?: (v: unknown) => boolean;
+}
 
 const ALLOWED_HELP_LANGUAGES = ['en', 'it', 'zh'];
 
@@ -42,15 +56,20 @@ export const MIN_EXECUTION_DELAY_MS = 0;
 export const MAX_EXECUTION_DELAY_MS = 5000;
 
 // Shared validator for the L1D / L1I cache configuration objects.
-const isPositiveInteger = (v) => Number.isInteger(v) && v > 0;
-const isValidCacheConfig = (v) =>
-  isPositiveInteger(v.size) &&
-  isPositiveInteger(v.blockSize) &&
-  isPositiveInteger(v.associativity);
+const isPositiveInteger = (v: number) => Number.isInteger(v) && v > 0;
+const isValidCacheConfig = (v: unknown) => {
+  if (typeof v !== 'object' || v === null) return false;
+  const c = v as Record<string, unknown>;
+  return (
+    isPositiveInteger(c.size as number) &&
+    isPositiveInteger(c.blockSize as number) &&
+    isPositiveInteger(c.associativity as number)
+  );
+};
 
 // Hex color (`#RRGGBB`) validator used by the pipeline color settings.
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
-const isHexColor = (v) => typeof v === 'string' && HEX_COLOR_RE.test(v);
+const isHexColor = (v: unknown) => typeof v === 'string' && HEX_COLOR_RE.test(v);
 
 /**
  * Default colors for the Pipeline widget, mirroring the Swing UI's
@@ -72,10 +91,13 @@ export const DEFAULT_PIPELINE_COLORS = Object.freeze({
   Stall: '#9e9e9e', // Material grey 500 — Swing has no equivalent.
 });
 
-const isValidPipelineColors = (v) =>
-  Object.keys(DEFAULT_PIPELINE_COLORS).every(
-    (k) => v[k] === undefined || isHexColor(v[k]),
+const isValidPipelineColors = (v: unknown) => {
+  if (typeof v !== 'object' || v === null) return false;
+  const colors = v as Record<string, unknown>;
+  return Object.keys(DEFAULT_PIPELINE_COLORS).every(
+    (k) => colors[k] === undefined || isHexColor(colors[k]),
   );
+};
 
 /**
  * The single, canonical registry of all locally-persisted settings.
@@ -93,7 +115,7 @@ const isValidPipelineColors = (v) =>
  * `ConfigStore`: everything a user can tweak has exactly one row here, with
  * its type and its default value.
  */
-export const SETTINGS_SCHEMA = Object.freeze({
+export const SETTINGS_SCHEMA: Readonly<Record<string, SchemaEntry>> = Object.freeze({
   [SettingKey.VI_MODE]: {
     type: SettingType.BOOLEAN,
     default: false,
@@ -102,7 +124,7 @@ export const SETTINGS_SCHEMA = Object.freeze({
     type: SettingType.NUMBER,
     default: 14,
     validate: (v) =>
-      Number.isFinite(v) && v >= MIN_FONT_SIZE && v <= MAX_FONT_SIZE,
+      typeof v === 'number' && Number.isFinite(v) && v >= MIN_FONT_SIZE && v <= MAX_FONT_SIZE,
   },
   [SettingKey.ACCORDION_ALERTS]: {
     type: SettingType.BOOLEAN,
@@ -153,7 +175,7 @@ export const SETTINGS_SCHEMA = Object.freeze({
   [SettingKey.HELP_LANGUAGE]: {
     type: SettingType.STRING,
     default: 'en',
-    validate: (v) => ALLOWED_HELP_LANGUAGES.includes(v),
+    validate: (v) => typeof v === 'string' && ALLOWED_HELP_LANGUAGES.includes(v),
   },
   [SettingKey.FORWARDING]: {
     type: SettingType.BOOLEAN,
@@ -173,7 +195,10 @@ export const SETTINGS_SCHEMA = Object.freeze({
     // `Header.js` local state.
     default: 500,
     validate: (v) =>
-      Number.isInteger(v) && v >= MIN_STEP_STRIDE && v <= MAX_STEP_STRIDE,
+      typeof v === 'number' &&
+      Number.isInteger(v) &&
+      v >= MIN_STEP_STRIDE &&
+      v <= MAX_STEP_STRIDE,
   },
   [SettingKey.EXECUTION_DELAY_MS]: {
     type: SettingType.NUMBER,
@@ -181,6 +206,7 @@ export const SETTINGS_SCHEMA = Object.freeze({
     // behavior.
     default: 0,
     validate: (v) =>
+      typeof v === 'number' &&
       Number.isFinite(v) &&
       v >= MIN_EXECUTION_DELAY_MS &&
       v <= MAX_EXECUTION_DELAY_MS,
@@ -205,14 +231,14 @@ export const SETTINGS_SCHEMA = Object.freeze({
     // matches the pre-existing behavior. 'light' and 'dark' force the
     // corresponding MUI palette mode regardless of the OS setting.
     default: 'auto',
-    validate: (v) => ALLOWED_THEME_MODES.includes(v),
+    validate: (v) => typeof v === 'string' && ALLOWED_THEME_MODES.includes(v),
   },
 });
 
 /**
  * Return true if `value` matches the declared `type`.
  */
-function matchesType(value, type) {
+function matchesType(value: unknown, type: SettingTypeValue): boolean {
   switch (type) {
     case SettingType.BOOLEAN:
       return typeof value === 'boolean';
@@ -233,7 +259,7 @@ function matchesType(value, type) {
  * Look up the schema entry for `key`, or throw if `key` is not registered.
  * Using an unknown key is always a programmer error, never user data.
  */
-export function getSchema(key) {
+export function getSchema(key: string): SchemaEntry {
   const entry = SETTINGS_SCHEMA[key];
   if (!entry) {
     throw new Error(`Unknown setting key: "${key}"`);
@@ -253,7 +279,7 @@ export function getSchema(key) {
  * Never throws: invalid data is logged and silently replaced with the default,
  * so persistence can't break the simulator.
  */
-export function sanitize(key, raw) {
+export function sanitize(key: string, raw: unknown): unknown {
   const { type, default: defaultValue, validate } = getSchema(key);
 
   if (raw === undefined) {
@@ -278,7 +304,7 @@ export function sanitize(key, raw) {
 
   if (type === SettingType.OBJECT) {
     // Shallow-merge default under stored value so new default keys surface.
-    return { ...defaultValue, ...raw };
+    return { ...(defaultValue as object), ...(raw as object) };
   }
 
   return raw;

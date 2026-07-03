@@ -5,6 +5,7 @@ export default defineConfig({
     // Only pick up unit tests in the dedicated unit-test directory.
     // The Playwright specs in src/test/webapp are excluded intentionally:
     // they use @playwright/test globals and expect a real browser.
-    include: ['src/test/webapp-unit/**/*.test.js'],
+    // Include both .js and .ts test files — vitest handles TS natively.
+    include: ['src/test/webapp-unit/**/*.test.[jt]s'],
   },
 });

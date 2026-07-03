@@ -189,6 +189,32 @@ Custom NPM scripts:
   served at `http://localhost:8080`, or set `PLAYWRIGHT_TARGET_URL`)
 - `test:unit`: runs the Vitest unit tests (fast, no browser; covers the
   pure modules under `src/webapp` from `src/test/webapp-unit/`)
+- `typecheck`: runs `tsc --noEmit` to type-check all `.ts`/`.tsx` files
+  under `src/webapp/` and `src/test/webapp-unit/`; this is also run as a
+  CI step in `test-web-coverage` right after the unit tests
+
+##### TypeScript adoption
+
+TypeScript is being adopted **incrementally**. The build toolchain (Babel +
+webpack) already handles `.ts`/`.tsx` files transparently, so converting a
+module does not break JS importers (all imports are extensionless).
+
+Current state (phase 1):
+- **New webapp code should be `.ts`/`.tsx`** — the toolchain and `tsconfig.json`
+  are fully wired.
+- **Existing `.js` files are not type-checked** (`checkJs: false` in
+  `tsconfig.json`); they continue to work without modification.
+- The pure, high-leverage modules have been converted first:
+  `executionReducer.ts`, `simulatorState.ts`, `buildInfo.ts`,
+  `versionHistory.ts`, `settings/SettingKey.ts`, `settings/schema.ts`,
+  `hooks/useLocalStorage.ts`, `settings/useSetting.ts`.
+  Worker-boundary types live in `simulator/protocol.ts`.
+- Unit tests for the converted modules are `.test.ts`; Vitest handles TS
+  natively (no extra configuration needed).
+- Phase 2 will convert the hooks; phase 3 the components.
+
+`npm run typecheck` is enforced in CI (`test-web-coverage` job) and must
+stay clean for PRs to merge.
 
 Both `build` and `build-dbg` produce a `ui.js` file in the `out/web` directory.
 
@@ -210,7 +236,7 @@ canonical for that npm major version.
     are *reference-preserving* (deep-equal data keeps the previous object)
     so the `React.memo`-wrapped display panels skip re-rendering when their
     data did not change.
-  - `useExecutionController` — owns `executionReducer.js` (a pure, fully
+  - `useExecutionController` — owns `executionReducer.ts` (a pure, fully
     unit-tested state machine for run/step/pause/stop and batch
     scheduling) and the worker `message` subscription.
   - `useKeyboardShortcuts` — the global F2/F8/F9/F10/Esc bindings.
@@ -236,7 +262,7 @@ the application is currently running:
   forks, ad-hoc deployments, etc.).
 
 The same information is also surfaced in the "About" tab of the help dialog.
-The classification logic lives in `src/webapp/buildInfo.js` and is driven
+The classification logic lives in `src/webapp/buildInfo.ts` and is driven
 purely by `window.location`, so it does not require any build-time
 configuration.
 
@@ -578,7 +604,7 @@ path) once and renders two lists — **Promoted versions** (prominent, the live
 one marked **current**) and **Candidate builds** (all pending candidates). Each
 entry links to `/c/<sha>/` (opens in a new tab). Builds served from `/c/<sha>/`
 show an **ARCHIVED** badge in the header; the navigator is hidden on PR
-previews. See `src/webapp/versionHistory.js` and `buildInfo.js`.
+previews. See `src/webapp/versionHistory.ts` and `buildInfo.ts`.
 
 #### Migration from the legacy layout
 

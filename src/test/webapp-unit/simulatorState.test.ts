@@ -1,5 +1,5 @@
 /**
- * Unit tests for simulatorState.js — deriveLogicalState helper.
+ * Unit tests for simulatorState.ts — deriveLogicalState helper.
  *
  * deriveLogicalState(status, executing, inputRequest) maps the three
  * observable simulator values onto the five UI states used by the toolbar
@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { deriveLogicalState } from '../../webapp/simulatorState.js';
+import { deriveLogicalState } from '../../webapp/simulatorState';
 
 describe('deriveLogicalState', () => {
   describe('WAITING_FOR_INPUT', () => {
