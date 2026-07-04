@@ -191,8 +191,10 @@ Custom NPM scripts:
   `PLAYWRIGHT_TARGET_URL=http://localhost:5173` to test against the dev server.
 - `test`: runs the Playwright end-to-end tests (expects the app to be
   served at `http://localhost:8080`, or set `PLAYWRIGHT_TARGET_URL`)
-- `test:unit`: runs the Vitest unit tests (fast, no browser; covers the
-  pure modules under `src/webapp` from `src/test/webapp-unit/`)
+- `test:unit`: runs the Vitest unit tests (fast, no browser; covers
+  pure-logic modules and React hooks under `src/webapp` from
+  `src/test/webapp-unit/`; pure-module tests need no environment pragma,
+  hook tests use `// @vitest-environment jsdom`)
 - `typecheck`: runs `tsc --noEmit` to type-check all `.ts`/`.tsx` files
   under `src/webapp/` and `src/test/webapp-unit/`; this is also run as a
   CI step in `test-web-coverage` right after the unit tests
