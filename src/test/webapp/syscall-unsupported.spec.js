@@ -13,7 +13,7 @@ const {
  * filesystem, so only stdin/stdout are available).
  *
  * The worker raises an UnsupportedSyscallException which is routed through
- * ResultFactory.AddRuntimeErrors, so the alert must match the structured
+ * ResultFactory.AddRuntimeErrors, so the dialog must match the structured
  * "Synchronous exception" format produced by Simulator.js.
  */
 
@@ -72,105 +72,94 @@ filename:    .asciiz "nope.txt"
 `;
 
 /**
- * Helper that loads a program, runs it and captures all native alert() dialogs.
- * Returns the array of alert messages (typically length 1 for our tests).
+ * Helper that loads a program, runs it and waits for the runtime-error MUI
+ * dialog to appear. Returns the text content of the dialog.
  */
-async function runAndCollectAlerts(page, program) {
+async function runAndGetDialogText(page, program) {
   await page.goto(targetUri);
   await waitForPageReady(page);
-
-  const alertMessages = [];
-  page.on('dialog', async (dialog) => {
-    if (dialog.type() === 'alert') {
-      alertMessages.push(dialog.message());
-    }
-    await dialog.dismiss();
-  });
 
   await loadProgram(page, program);
   await removeOverlay(page);
 
   await page.click('#run-button');
 
-  // Wait until the alert handler has been invoked.
-  await expect.poll(() => alertMessages.length, { timeout: 15000 }).toBeGreaterThan(0);
+  // Wait until the runtime-error dialog appears.
+  const dialog = page.locator('#runtime-error-dialog');
+  await expect(dialog).toBeVisible({ timeout: 15000 });
 
-  return alertMessages;
+  const text = await dialog.innerText();
+
+  // Dismiss the dialog.
+  await page.click('#runtime-error-ok');
+  await expect(dialog).not.toBeVisible();
+
+  return text;
 }
 
 /**
- * Assertions common to every unsupported-syscall alert: structured prefix,
+ * Assertions common to every unsupported-syscall dialog: structured prefix,
  * correct faulting instruction and stage, and no raw Java exception toString
  * leak.
  *
- * The Web UI composes the alert as:
+ * The Web UI composes the message as:
  *   "Synchronous exception: <message>\n\nInstruction: <instr>\nPipeline stage: <stage>"
  */
-function assertUnsupportedSyscallAlert(alertMessage, expectedInstruction, expectedStage) {
-  expect(alertMessage).toContain('Synchronous exception');
-  expect(alertMessage).toContain(`Instruction: ${expectedInstruction}`);
-  expect(alertMessage).toContain(`Pipeline stage: ${expectedStage}`);
+function assertUnsupportedSyscallAlert(dialogText, expectedInstruction, expectedStage) {
+  expect(dialogText).toContain('Synchronous exception');
+  expect(dialogText).toContain(`Instruction: ${expectedInstruction}`);
+  expect(dialogText).toContain(`Pipeline stage: ${expectedStage}`);
   // Must not be the raw Java exception toString.
-  expect(alertMessage).not.toContain('org.edumips64.core');
+  expect(dialogText).not.toContain('org.edumips64.core');
 }
 
 test('invalid SYSCALL number produces a user-friendly unsupported-syscall alert', async ({
   page,
 }) => {
-  const alertMessages = await runAndCollectAlerts(page, invalidSyscallProgram);
+  const dialogText = await runAndGetDialogText(page, invalidSyscallProgram);
 
-  const alertMessage = alertMessages[0];
-  assertUnsupportedSyscallAlert(alertMessage, 'SYSCALL 6', 'ID');
-  expect(alertMessage).toContain('SYSCALL 6 is not a supported system call number');
+  assertUnsupportedSyscallAlert(dialogText, 'SYSCALL 6', 'ID');
+  expect(dialogText).toContain('SYSCALL 6 is not a supported system call number');
 
-  // No spurious follow-up alert (e.g. "Cannot run in state READY").
+  // Give UI a moment to settle; confirm no further dialogs appear.
   await page.waitForTimeout(1000);
-  expect(alertMessages).toHaveLength(1);
-  for (const msg of alertMessages) {
-    expect(msg).not.toContain('Cannot run in state');
-  }
+  await expect(page.locator('#runtime-error-dialog')).not.toBeVisible();
 });
 
 test('SYSCALL 4 (write) on a non-stdout fd produces a user-friendly alert', async ({
   page,
 }) => {
-  const alertMessages = await runAndCollectAlerts(page, writeToBadFdProgram);
+  const dialogText = await runAndGetDialogText(page, writeToBadFdProgram);
 
-  const alertMessage = alertMessages[0];
-  assertUnsupportedSyscallAlert(alertMessage, 'SYSCALL 4', 'MEM');
+  assertUnsupportedSyscallAlert(dialogText, 'SYSCALL 4', 'MEM');
   // The underlying message must identify SYSCALL 4 (write) and the offending fd.
-  expect(alertMessage).toContain('SYSCALL 4 (write) on file descriptor 7');
-  expect(alertMessage).toContain('stdout');
+  expect(dialogText).toContain('SYSCALL 4 (write) on file descriptor 7');
+  expect(dialogText).toContain('stdout');
 
   await page.waitForTimeout(1000);
-  expect(alertMessages).toHaveLength(1);
-  for (const msg of alertMessages) {
-    expect(msg).not.toContain('Cannot run in state');
-  }
+  await expect(page.locator('#runtime-error-dialog')).not.toBeVisible();
 });
 
 test('SYSCALL 3 (read) on a non-stdin fd produces a user-friendly alert', async ({
   page,
 }) => {
-  const alertMessages = await runAndCollectAlerts(page, readFromBadFdProgram);
+  const dialogText = await runAndGetDialogText(page, readFromBadFdProgram);
 
-  const alertMessage = alertMessages[0];
-  assertUnsupportedSyscallAlert(alertMessage, 'SYSCALL 3', 'MEM');
-  expect(alertMessage).toContain('SYSCALL 3 (read) on file descriptor 9');
-  expect(alertMessage).toContain('stdin');
+  assertUnsupportedSyscallAlert(dialogText, 'SYSCALL 3', 'MEM');
+  expect(dialogText).toContain('SYSCALL 3 (read) on file descriptor 9');
+  expect(dialogText).toContain('stdin');
 
   await page.waitForTimeout(1000);
-  expect(alertMessages).toHaveLength(1);
+  await expect(page.locator('#runtime-error-dialog')).not.toBeVisible();
 });
 
 test('SYSCALL 1 (open) is refused in the web UI environment', async ({ page }) => {
-  const alertMessages = await runAndCollectAlerts(page, openProgram);
+  const dialogText = await runAndGetDialogText(page, openProgram);
 
-  const alertMessage = alertMessages[0];
-  assertUnsupportedSyscallAlert(alertMessage, 'SYSCALL 1', 'MEM');
-  expect(alertMessage).toContain('SYSCALL 1 (open)');
-  expect(alertMessage).toContain('no filesystem');
+  assertUnsupportedSyscallAlert(dialogText, 'SYSCALL 1', 'MEM');
+  expect(dialogText).toContain('SYSCALL 1 (open)');
+  expect(dialogText).toContain('no filesystem');
 
   await page.waitForTimeout(1000);
-  expect(alertMessages).toHaveLength(1);
+  await expect(page.locator('#runtime-error-dialog')).not.toBeVisible();
 });

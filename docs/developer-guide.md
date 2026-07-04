@@ -166,8 +166,8 @@ UI as well to have a working local test environment (see next section).
 
 #### Web UI
 
-The web UI itself is based on React, and it's compiled / assembled using the NPM and
-webpack tools. The source code is in `src/webapp`.
+The web UI itself is based on React, and it's compiled / assembled using Vite
+(`vite.config.ts`). The source code is in `src/webapp`.
 
 The `webapp` Gradle task automates the build process for the web UI. It:
 1. Compiles the GWT worker (`war` task)
@@ -177,20 +177,104 @@ The `webapp` Gradle task automates the build process for the web UI. It:
    `-t web` tag, so the user interface chapter that is included is
    `user-interface-web.rst` only — see "User manual structure" below.
 3. Installs NPM dependencies (`npmInstall` task)
-4. Builds the React frontend (`npmBuild` task)
+4. Builds the React frontend (`npmBuild` task, runs `npm run build`)
 5. Copies the generated documentation into the web app bundle (`copyWebHelp` task)
 
 Custom NPM scripts:
 
-- `build-dbg`: runs `webpack -d` (compile with debugging symbols)
-- `build`: runs `webpack -p` (compile without debugging symbols, minified, etc)
-- `start`: starts the webpack-dev-server with live reloading
+- `build-dbg`: development Vite build (`--mode development`; inline source
+  maps, no minification, React dev mode)
+- `build`: production Vite build (minified with esbuild, external source maps)
+- `start`: starts the Vite dev server on port 5173 with HMR. **Note:** the
+  Playwright tests expect the app at `http://localhost:8080`; for manual
+  interactive development use `npm start` and open that port, or set
+  `PLAYWRIGHT_TARGET_URL=http://localhost:5173` to test against the dev server.
+- `test`: runs the Playwright end-to-end tests (expects the app to be
+  served at `http://localhost:8080`, or set `PLAYWRIGHT_TARGET_URL`)
+- `test:unit`: runs the Vitest unit tests (fast, no browser; covers
+  pure-logic modules and React hooks under `src/webapp` from
+  `src/test/webapp-unit/`; pure-module tests need no environment pragma,
+  hook tests use `// @vitest-environment jsdom`)
+- `typecheck`: runs `tsc --noEmit` to type-check all `.ts`/`.tsx` files
+  under `src/webapp/` and `src/test/webapp-unit/`; this is also run as a
+  CI step in `test-web-coverage` right after the unit tests
+
+##### TypeScript adoption
+
+The web UI is **fully TypeScript** — the migration is complete as of phase 3.
+There are no remaining `.js` files under `src/webapp/`; `allowJs` is `false`
+in `tsconfig.json`.  All new webapp code must be `.ts`/`.tsx`.
+
+The migration was done in three incremental phases (PRs #1919, #1921, #1920,
+and the phase 3 PR):
+
+- **Phase 1** — Pure logic and settings: `executionReducer.ts`,
+  `simulatorState.ts`, `buildInfo.ts`, `versionHistory.ts`,
+  `settings/SettingKey.ts`, `settings/schema.ts`, `hooks/useLocalStorage.ts`,
+  `settings/useSetting.ts`.  Worker-boundary types live in
+  `simulator/protocol.ts`.
+- **Phase 2** — Hooks and entry components: `hooks/useSimulatorData.ts`,
+  `hooks/useExecutionController.ts`, `hooks/useKeyboardShortcuts.ts`;
+  `components/AppErrorBoundary.tsx`, `components/AppLoader.tsx`,
+  `components/RuntimeErrorDialog.tsx`.
+- **Phase 3** — Display components, Simulator orchestrator, and entry point:
+  all remaining `components/*.tsx` files (`Simulator.tsx`, `Code.tsx`,
+  `Header.tsx`, `RunControlsToolbar.tsx`, `HelpDialog.tsx`, `Settings.tsx`,
+  `CacheConfig.tsx`, and the smaller display panels); `theme.ts`;
+  `data/SampleProgram.ts`; `index.tsx`.
+
+Typing conventions:
+- Component props are typed with explicit `interface` declarations.
+- Protocol types (`Register`, `Registers`, `Memory`, `Statistics`, `Pipeline`,
+  `CpuStatus`, `SimulatorResult`, `SimulatorWorker`) live in
+  `simulator/protocol.ts` — the canonical source of truth for the worker
+  message boundary.
+- `settings/schema.ts` exports a `SettingValueMap` interface that maps every
+  `SettingKey` string value to its concrete TypeScript type; `useSetting<K>`
+  uses this to give call sites a precisely-typed `[value, setValue, reset]`
+  tuple with no casts.
+- Third-party modules without bundled types (lodash/debounce, react-dom/client
+  and CSS/image asset imports) are declared in `src/webapp/vendor.d.ts`.
+  The Vite `VERSION` global (injected by `define` in `vite.config.ts`) is also
+  declared there, along with a `/// <reference types="vite/client" />` directive
+  that types Vite-specific import suffixes such as `?worker`.
+- Unit tests for all modules are `.test.ts`; Vitest handles TS natively
+  (no extra configuration needed).
+
+`npm run typecheck` is enforced in CI (`test-web-coverage` job) and must
+stay clean for PRs to merge.
 
 Both `build` and `build-dbg` produce a `ui.js` file in the `out/web` directory.
 
-The code was tested with Node.JS 16. The CI environment uses this version.
+The required Node.JS version is pinned in `.nvmrc` (currently Node 24); CI
+installs dependencies with `npm ci`, so `package-lock.json` must stay
+canonical for that npm major version.
 
-There are Playwright tests for the web UI, which can be run with `npm test`.
+##### Web UI architecture
+
+- `index.tsx` boots App Insights, wraps the Web Worker (`worker.js`, the
+  simulator core compiled from Java) with helper methods, and mounts React
+  immediately inside `React.StrictMode` and an `AppErrorBoundary`.
+- `components/AppLoader.tsx` shows a loading indicator while the worker
+  initialises, and a friendly error screen (30 s watchdog) if `worker.js`
+  fails to load — the app can no longer silently render a blank page.
+- `components/Simulator.tsx` is the orchestrator. The heavy lifting lives in
+  typed hooks under `src/webapp/hooks/`:
+  - `useSimulatorData.ts` — registers/memory/stats/pipeline/… state. Updates
+    are *reference-preserving* (deep-equal data keeps the previous object)
+    so the `React.memo`-wrapped display panels skip re-rendering when their
+    data did not change.
+  - `useExecutionController.ts` — owns `executionReducer.ts` (a pure, fully
+    unit-tested state machine for run/step/pause/stop and batch
+    scheduling) and the worker `message` subscription.
+  - `useKeyboardShortcuts.ts` — the global F2/F8/F9/F10/Esc bindings.
+- Runtime errors surface in `components/RuntimeErrorDialog.tsx` (never `window.alert`).
+- `React.StrictMode` is enabled in development builds: render functions and
+  effects are intentionally double-invoked to flush out unsafe side
+  effects. New code must keep side effects out of render bodies and class
+  constructors, and every effect/listener needs a working cleanup — the
+  Playwright suite runs against a development build, so StrictMode
+  violations typically show up as e2e failures.
 
 #### Build environment indicator
 
@@ -206,7 +290,7 @@ the application is currently running:
   forks, ad-hoc deployments, etc.).
 
 The same information is also surfaced in the "About" tab of the help dialog.
-The classification logic lives in `src/webapp/buildInfo.js` and is driven
+The classification logic lives in `src/webapp/buildInfo.ts` and is driven
 purely by `window.location`, so it does not require any build-time
 configuration.
 
@@ -548,7 +632,7 @@ path) once and renders two lists — **Promoted versions** (prominent, the live
 one marked **current**) and **Candidate builds** (all pending candidates). Each
 entry links to `/c/<sha>/` (opens in a new tab). Builds served from `/c/<sha>/`
 show an **ARCHIVED** badge in the header; the navigator is hidden on PR
-previews. See `src/webapp/versionHistory.js` and `buildInfo.js`.
+previews. See `src/webapp/versionHistory.ts` and `buildInfo.ts`.
 
 #### Migration from the legacy layout
 

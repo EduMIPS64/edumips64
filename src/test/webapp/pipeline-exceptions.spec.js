@@ -145,10 +145,17 @@ SYSCALL 0
 
 /**
  * Integer overflow on `ADD` raises a `SynchronousException` from `EX`. The
- * simulator surfaces this as an `alert()`; we capture the pipeline state
- * *while the alert is still pending* (before `stopCode()` resets the worker
- * and clears the pipeline view), then dismiss the dialog. Every occupied
- * stage must carry a non-empty, valid `data-cycle-stage`.
+ * simulator surfaces this as a MUI RuntimeErrorDialog (#runtime-error-dialog).
+ * We capture the pipeline state at the moment the dialog first appears using a
+ * MutationObserver installed in the page BEFORE clicking Run. MutationObserver
+ * callbacks are queued as microtasks and therefore fire before the next task
+ * (i.e. before the Worker's reset-response message), giving us a reliable
+ * snapshot of the error-state pipeline before stopCode()'s worker.reset() is
+ * processed by the worker and clears the pipeline.
+ *
+ * Every occupied stage must carry a non-empty, valid `data-cycle-stage`, which
+ * proves that `cycleBuilder.step()` is in the `finally` clause of
+ * `Simulator.step()`.
  */
 test('SynchronousException (INTOVERFLOW): cycleBuilder stays in sync', async ({
   page,
@@ -169,61 +176,72 @@ SYSCALL 0
 `
   );
 
-  // Capture the pipeline state at the very moment the simulator surfaces
-  // its synchronous-exception alert, before `stopCode()` resets the worker
-  // and clears the pipeline view. We do this by monkey-patching
-  // `window.alert` *in the page* so the snapshot is taken synchronously
-  // from the same closure that fires the alert.
+  // Install a MutationObserver that captures the pipeline state the instant
+  // #runtime-error-dialog first becomes visible. The observer callback is a
+  // microtask: it fires after React's DOM commit but before the next macro-
+  // task (the Worker's reset-response message). This makes the snapshot
+  // reliable without relying on Playwright round-trips after the dialog opens.
   await page.evaluate(() => {
-    window.__alertCount = 0;
     window.__pipelineSnap = null;
-    const origAlert = window.alert;
-    window.alert = function (msg) {
-      window.__alertCount += 1;
-      try {
-        const out = {};
-        document.querySelectorAll('#pipeline g[data-stage]').forEach((g) => {
-          const stage = g.getAttribute('data-stage');
-          out[stage] = {
-            instruction: g.getAttribute('data-instruction') || '',
-            stall: g.getAttribute('data-stall') || '',
-            cycleStage: g.getAttribute('data-cycle-stage') || '',
-          };
-        });
-        window.__pipelineSnap = out;
-      } catch (_) {
-        /* ignore */
-      }
-      // Suppress the actual alert (it would block subsequent page.evaluate
-      // calls); the test no longer needs the dialog to fire.
-      return origAlert ? undefined : undefined;
-    };
+    window.__dialogSeen = false;
+    const observer = new MutationObserver(() => {
+      if (window.__dialogSeen) return;
+      const dialog = document.getElementById('runtime-error-dialog');
+      if (!dialog) return;
+      // MUI renders the dialog as present in the DOM but with aria-hidden=true
+      // when closed. It is "visible" when aria-hidden is absent or 'false'.
+      const hidden = dialog.getAttribute('aria-hidden');
+      if (hidden === 'true') return;
+      window.__dialogSeen = true;
+      // Capture pipeline synchronously from the same microtask.
+      const out = {};
+      document.querySelectorAll('#pipeline g[data-stage]').forEach((g) => {
+        const stage = g.getAttribute('data-stage');
+        out[stage] = {
+          instruction: g.getAttribute('data-instruction') || '',
+          stall: g.getAttribute('data-stall') || '',
+          cycleStage: g.getAttribute('data-cycle-stage') || '',
+        };
+      });
+      window.__pipelineSnap = out;
+      observer.disconnect();
+    });
+    observer.observe(document.body, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['aria-hidden'],
+    });
   });
 
   await page.click('#run-button');
+
+  // Wait until the observer has fired (dialog appeared and snapshot taken).
   await expect
-    .poll(async () => await page.evaluate(() => window.__alertCount), {
-      timeout: 15000,
-    })
-    .toBeGreaterThan(0);
+    .poll(async () => page.evaluate(() => window.__dialogSeen), { timeout: 15000 })
+    .toBe(true);
 
-  const snapAtAlert = await page.evaluate(() => window.__pipelineSnap);
+  const snapAtDialog = await page.evaluate(() => window.__pipelineSnap);
 
-  expect(snapAtAlert, 'no pipeline snapshot was captured at alert time').toBeTruthy();
-  const occupied = occupiedCycleStages(snapAtAlert);
-  expect(occupied.length, `pipeline was empty: ${JSON.stringify(snapAtAlert)}`).toBeGreaterThan(0);
+  // Dismiss the dialog via the OK button.
+  const runtimeDialog = page.locator('#runtime-error-dialog');
+  await expect(runtimeDialog).toBeVisible({ timeout: 5000 });
+  await page.click('#runtime-error-ok');
+  await expect(runtimeDialog).not.toBeVisible();
+
+  expect(snapAtDialog, 'no pipeline snapshot was captured at dialog time').toBeTruthy();
+  const occupied = occupiedCycleStages(snapAtDialog);
+  expect(occupied.length, `pipeline was empty: ${JSON.stringify(snapAtDialog)}`).toBeGreaterThan(0);
   for (const { stage, cycleStage } of occupied) {
     expect(cycleStage, `occupied stage ${stage} has no CycleState after overflow`).not.toBe('');
     expect(VALID_CYCLE_STATES.has(cycleStage), `unknown CycleState "${cycleStage}" at ${stage}`).toBe(true);
   }
   // ADD is the trapping instruction; if it is still observable in the
-  // pipeline at the moment the alert fired, its `cycleStage` must be set —
+  // pipeline at the moment the dialog appeared, its `cycleStage` must be set —
   // that is the assertion that goes red if `cycleBuilder.step()` is moved
-  // out of the `finally` clause. (The alert is fired from the result-
-  // handling closure; depending on where in the run loop the result is
-  // delivered, ADD may already have moved past WB by the time the alert
-  // is rendered, so we only assert when ADD is actually visible.)
-  const addBox = Object.values(snapAtAlert).find((s) => s.instruction === 'ADD');
+  // out of the `finally` clause. (Depending on where in the run loop the
+  // result is delivered, ADD may already have moved past WB, so we only
+  // assert when ADD is actually visible.)
+  const addBox = Object.values(snapAtDialog).find((s) => s.instruction === 'ADD');
   if (addBox) {
     expect(addBox.cycleStage, 'ADD has no CycleState (finally clause likely missing)').not.toBe('');
   }

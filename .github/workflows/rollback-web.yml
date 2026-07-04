@@ -51,11 +51,57 @@ jobs:
           rm -f deploy-web-pages.py
 
       - name: Commit and push to Pages repo
+        id: push
         run: |
           set -euo pipefail
           cd pages-repo
+          # Read the new current entry's build string for verification.
+          BUILD=$(python3 -c "import json; d=json.load(open('versions.json')); cur=d['current']; e=[v for v in d['versions'] if v['sha']==cur][0]; print(e['build'])")
           git add -A
-          git diff --cached --quiet && { echo "Nothing to commit."; exit 0; }
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            echo "build=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           git commit -m "Rollback web to last known good (triggered by ${{ github.actor }})"
           git push origin master
-          echo "Rollback complete."
+          echo "Rollback complete. Reverted to build: ${BUILD}"
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+          echo "build=${BUILD}" >> "$GITHUB_OUTPUT"
+
+      # Explicitly trigger the Pages deploy workflow rather than relying on the
+      # push event alone: on 2026-07-03 GitHub dropped the push webhook for a
+      # promote commit and no deploy run was ever created. The dispatch is
+      # idempotent alongside the push trigger (concurrency group 'pages' in
+      # the deploy workflow serialises; a duplicate run deploys the same
+      # commit). Requires PAT_WEBUI to have Actions write scope; a 403 here
+      # is loud and actionable rather than a silent 10-minute verify timeout.
+      - name: Trigger Pages deploy
+        if: steps.push.outputs.pushed == 'true'
+        env:
+          PAT_WEBUI: ${{ secrets.PAT_WEBUI }}
+        run: |
+          set -euo pipefail
+          HTTP=$(curl -sS -o /tmp/dispatch-resp.json -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer ${PAT_WEBUI}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -H "Content-Type: application/json" \
+            -d '{"ref":"master"}' \
+            "https://api.github.com/repos/EduMIPS64/web.edumips.org/actions/workflows/deploy-pages.yml/dispatches")
+          if [[ "${HTTP}" != "204" ]]; then
+            echo "::warning::Deploy dispatch returned HTTP ${HTTP}: $(head -c 200 /tmp/dispatch-resp.json 2>/dev/null)."
+            echo "::warning::If 403, grant PAT_WEBUI the Actions write scope (classic: 'workflow'; fine-grained: Actions R/W). Relying on the push trigger for this run."
+          else
+            echo "Deploy workflow dispatched."
+          fi
+
+      - name: Verify Pages deployment
+        if: steps.push.outputs.pushed == 'true'
+        env:
+          PAT_WEBUI: ${{ secrets.PAT_WEBUI }}
+          EXPECTED_BUILD: ${{ steps.push.outputs.build }}
+        run: |
+          set -euo pipefail
+          .github/scripts/verify-pages-deploy.sh "${EXPECTED_BUILD}" pages-repo

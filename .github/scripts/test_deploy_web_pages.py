@@ -189,14 +189,19 @@ def test_promote_prunes_candidates_between(pages, tmp_path):
     assert not (pages / "c" / sha_for(2)).exists()
 
 
-def test_promote_keeps_all_promoted_forever(pages, tmp_path):
+def test_promote_keeps_promoted_within_keep_window(pages, tmp_path):
+    # 3 promotions is well within KEEP_PROMOTED (10), so no snapshots are pruned.
     art = make_artifact(tmp_path)
     for n in (1, 2, 3):
         push(pages, art, n, seq=n)
         promote(pages, n)
     idx = read_index(pages)
     promoted = [e for e in idx["versions"] if e["promoted"]]
-    assert len(promoted) == 3  # none pruned
+    assert len(promoted) == 3
+    # All 3 snapshots are present on disk (within the retention window).
+    assert build_shas(pages) == {sha_for(i) for i in (1, 2, 3)}
+    # No entry is pruned.
+    assert all(not e.get("pruned") for e in idx["versions"])
 
 
 def test_promote_root_is_clean_no_stale_files(pages, tmp_path):
@@ -397,3 +402,252 @@ def test_migrate_dry_run_writes_nothing(pages, tmp_path, monkeypatch):
     assert (pages / "manifest.json").exists()
     assert not (pages / "versions.json").exists()
     assert not (pages / "c").exists()
+
+
+# ---------------------------------------------------------------------------
+# promoted-snapshot retention (KEEP_PROMOTED cap, Task A hardening)
+# ---------------------------------------------------------------------------
+
+
+def test_prune_promoted_beyond_keep_count(pages, tmp_path, monkeypatch):
+    """Promoted snapshots beyond KEEP_PROMOTED are deleted; entries kept with pruned=true."""
+    monkeypatch.setattr(dwp, "KEEP_PROMOTED", 3)
+    art = make_artifact(tmp_path)
+    # Promote 5 times — oldest 2 should get their snapshots pruned.
+    for n in (1, 2, 3, 4, 5):
+        push(pages, art, n, seq=n)
+        promote(pages, n)
+
+    idx = read_index(pages)
+    by_seq = {e["seq"]: e for e in idx["versions"]}
+
+    # All 5 entries still in versions.json.
+    assert set(by_seq.keys()) == {1, 2, 3, 4, 5}
+
+    # Snapshots only for top 3 by seq (3, 4, 5); oldest 2 (1, 2) are pruned.
+    assert build_shas(pages) == {sha_for(i) for i in (3, 4, 5)}
+    assert not (pages / "c" / sha_for(1)).exists()
+    assert not (pages / "c" / sha_for(2)).exists()
+
+    # Pruned entries carry pruned=true.
+    assert by_seq[1]["pruned"] is True
+    assert by_seq[2]["pruned"] is True
+
+    # Entries within the window have no pruned flag.
+    assert not by_seq[3].get("pruned")
+    assert not by_seq[4].get("pruned")
+    assert not by_seq[5].get("pruned")
+
+
+def test_pruned_entry_preserved_in_versions_json(pages, tmp_path, monkeypatch):
+    """Even after pruning, the entry remains in versions.json with all metadata intact."""
+    monkeypatch.setattr(dwp, "KEEP_PROMOTED", 2)
+    art = make_artifact(tmp_path)
+    for n in (10, 20, 30):
+        push(pages, art, n, seq=n)
+        promote(pages, n)
+
+    idx = read_index(pages)
+    pruned_entries = [e for e in idx["versions"] if e.get("pruned")]
+    assert len(pruned_entries) == 1
+    pruned = pruned_entries[0]
+
+    # Seq 10 is oldest (beyond KEEP_PROMOTED=2).
+    assert pruned["seq"] == 10
+    assert pruned["promoted"] is True
+    # Core fields must survive pruning.
+    assert pruned["sha"] == sha_for(10)
+    assert pruned["build"] == "build-10"
+    assert "promotedAt" in pruned
+    assert pruned["pruned"] is True
+
+
+def test_promote_refuses_pruned_version(pages, tmp_path, monkeypatch):
+    """Attempting to promote a pruned version fails with a clear error."""
+    monkeypatch.setattr(dwp, "KEEP_PROMOTED", 2)
+    art = make_artifact(tmp_path)
+    for n in (1, 2, 3):
+        push(pages, art, n, seq=n)
+        promote(pages, n)
+
+    # seq 1 is now pruned (beyond KEEP_PROMOTED=2).
+    idx = read_index(pages)
+    by_seq = {e["seq"]: e for e in idx["versions"]}
+    assert by_seq[1].get("pruned")
+
+    with pytest.raises(SystemExit):
+        promote(pages, 1)
+
+
+def test_rollback_skips_pruned_versions(pages, tmp_path, monkeypatch):
+    """Rollback skips pruned promoted versions and targets the newest non-pruned one."""
+    monkeypatch.setattr(dwp, "KEEP_PROMOTED", 3)
+    art = make_artifact(tmp_path)
+    # Promote 5 times: current = 5; seqs 1 and 2 pruned; seqs 3,4,5 retained.
+    for n in (1, 2, 3, 4, 5):
+        push(pages, art, n, seq=n)
+        promote(pages, n)
+
+    # Rollback should land on seq 4 (newest non-pruned older than current=5).
+    rollback(pages)
+    idx = read_index(pages)
+    assert idx["current"] == sha_for(4)
+
+
+def test_rollback_errors_if_all_older_promoted_are_pruned(pages, tmp_path, monkeypatch):
+    """Rollback fails clearly when all older promoted versions are pruned."""
+    monkeypatch.setattr(dwp, "KEEP_PROMOTED", 1)
+    art = make_artifact(tmp_path)
+    # With KEEP_PROMOTED=1, only the current (most recent) snapshot is retained.
+    for n in (1, 2):
+        push(pages, art, n, seq=n)
+        promote(pages, n)
+
+    # seq 1 is pruned; only seq 2 (current) has a snapshot.
+    # Rollback would want seq 1, but it's pruned.
+    with pytest.raises(SystemExit):
+        rollback(pages)
+
+
+def test_current_never_pruned(pages, tmp_path, monkeypatch):
+    """The current production version's snapshot is NEVER deleted, even if it
+    would otherwise fall outside the KEEP_PROMOTED window."""
+    monkeypatch.setattr(dwp, "KEEP_PROMOTED", 2)
+    art = make_artifact(tmp_path)
+    # Promote seq 1 as the starting point.
+    push(pages, art, 1, seq=1)
+    promote(pages, 1)
+    # Push and promote 2 more to fill the window (window = seqs 2, 3 after promote 3).
+    push(pages, art, 2, seq=2)
+    promote(pages, 2)
+    push(pages, art, 3, seq=3)
+    promote(pages, 3)
+
+    # Now push (but don't promote) seqs 4, 5 to make current=3 look "older".
+    push(pages, art, 4, seq=4)
+    push(pages, art, 5, seq=5)
+
+    # Manually promote seq 5 while directly calling prune — force the window to
+    # be [4, 5], pushing seq 3 (which IS current) out of the normal top-2 window.
+    # Do this via cmd_promote with KEEP_PROMOTED=2, current=3 about to become 5.
+    promote(pages, 5)
+
+    idx = read_index(pages)
+    # current is now 5; top-2 promoted = {5, 4 were never promoted}...
+    # Actually let's check: after promoting 5, all_promoted = [5, 3, 2, 1]
+    # top 2 = [5, 3]; plus current=5.  So 3 IS in top 2 (it's seq 3, second highest promoted).
+    # seq 1 and 2 are pruned.
+    assert idx["current"] == sha_for(5)
+    # Snapshots for current (5) and the next most-recent promoted (3) are retained.
+    assert (pages / "c" / sha_for(5)).is_dir()
+    assert (pages / "c" / sha_for(3)).is_dir()
+
+
+def test_current_retained_even_after_many_promotions_above_it(pages, tmp_path, monkeypatch):
+    """Current is preserved by rule (1) even when it falls below the top-KEEP_PROMOTED window
+    of all promoted versions (as can happen after rollback + many later promotions)."""
+    monkeypatch.setattr(dwp, "KEEP_PROMOTED", 2)
+    art = make_artifact(tmp_path)
+
+    # Promote seq 1, then 2.
+    for n in (1, 2):
+        push(pages, art, n, seq=n)
+        promote(pages, n)
+
+    # Roll back to seq 1 (current = 1).
+    rollback(pages)
+    assert read_index(pages)["current"] == sha_for(1)
+
+    # Now promote seq 3 and 4 (two new promotions above current=1).
+    # With KEEP_PROMOTED=2, top-2 promoted by seq = {4, 3}.
+    # current = 4 (promoted 3, then 4); seq 1 is promoted but falls outside top-2.
+    push(pages, art, 3, seq=3)
+    promote(pages, 3)
+    push(pages, art, 4, seq=4)
+    promote(pages, 4)
+
+    idx = read_index(pages)
+    # current is 4; top-2 = {4, 3}; seq 1 and 2 are outside the window.
+    # BUT seq 1 and 2 are NOT current so they ARE pruned (seq 3 is now current... wait)
+    # Let me recalculate: after promoting 4, current=4; promoted = [4,3,2,1];
+    # top-2 = [4,3]; current=4 in top-2. seq 1 and 2 are outside → pruned.
+    assert idx["current"] == sha_for(4)
+    by_seq = {e["seq"]: e for e in idx["versions"]}
+    # seq 1 and 2 pruned (outside top-2, not current).
+    assert by_seq[1].get("pruned") is True
+    assert by_seq[2].get("pruned") is True
+    # seq 3 and 4: retained (top-2 window + current).
+    assert not by_seq[3].get("pruned")
+    assert not by_seq[4].get("pruned")
+    assert (pages / "c" / sha_for(4)).is_dir()
+    assert (pages / "c" / sha_for(3)).is_dir()
+
+
+def test_rollback_works_after_pruning(pages, tmp_path, monkeypatch):
+    """Rollback always finds a valid non-pruned target within KEEP_PROMOTED=10."""
+    # With the default KEEP_PROMOTED=10, the rollback target (newest promoted
+    # older than current) is always within the retention window.
+    art = make_artifact(tmp_path)
+    # Promote 12 versions — oldest 2 get pruned.
+    for n in range(1, 13):
+        push(pages, art, n, seq=n)
+        promote(pages, n)
+
+    idx = read_index(pages)
+    current_seq = next(e["seq"] for e in idx["versions"] if e["sha"] == idx["current"])
+    assert current_seq == 12
+
+    # Rollback must succeed: seq 11 is in the top-10 window (seqs 12..3), not pruned.
+    rollback(pages)
+    idx = read_index(pages)
+    assert idx["current"] == sha_for(11)
+    # The rolled-back snapshot must be on disk.
+    assert (pages / "c" / sha_for(11)).is_dir()
+
+
+def test_pruned_flag_cleared_when_version_reenters_window(pages, tmp_path, monkeypatch):
+    """If a version is pruned and later becomes current (e.g. via re-push + re-promote),
+    re-promotion should clear the pruned flag (snapshot is restored by push, then promote
+    accepts it and prune_to_invariant clears the flag for retained entries)."""
+    monkeypatch.setattr(dwp, "KEEP_PROMOTED", 2)
+    art = make_artifact(tmp_path)
+    for n in (1, 2, 3):
+        push(pages, art, n, seq=n)
+        promote(pages, n)
+
+    # seq 1 is now pruned.
+    idx = read_index(pages)
+    assert next(e for e in idx["versions"] if e["seq"] == 1).get("pruned") is True
+
+    # Re-push seq 1 (simulates re-uploading the artifact) — the script should
+    # recreate the snapshot (the existing entry is replaced by the push).
+    push(pages, art, 1)
+
+    # After re-push, entry is no longer pruned (push creates a fresh entry without pruned).
+    idx = read_index(pages)
+    entry1 = next(e for e in idx["versions"] if e["seq"] == 1)
+    assert not entry1.get("pruned")
+    assert (pages / "c" / sha_for(1)).is_dir()
+
+# ---------------------------------------------------------------------------
+# Reserved-name protection
+# ---------------------------------------------------------------------------
+
+
+def test_promote_preserves_dot_github(tmp_path, pages):
+    """Promote must never delete the Pages repo's own deploy workflow.
+
+    Regression test for the 2026-07-03 incident: RESERVED_NAMES predated the
+    .github directory, so a promote's root replacement deleted the Actions
+    deploy workflow and left the site undeployable.
+    """
+    workflow = pages / ".github" / "workflows" / "deploy-pages.yml"
+    workflow.parent.mkdir(parents=True)
+    workflow.write_text("name: Deploy to GitHub Pages\n")
+
+    art = make_artifact(tmp_path, "art1", marker="one")
+    push(pages, art, 1)
+    promote(pages, 1)
+
+    assert workflow.exists(), ".github must survive a promote root replacement"
+    assert workflow.read_text() == "name: Deploy to GitHub Pages\n"

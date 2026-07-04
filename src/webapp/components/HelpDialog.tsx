@@ -1,0 +1,881 @@
+import React from 'react';
+
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogActions from '@mui/material/DialogActions';
+import Link from '@mui/material/Link';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
+import Select, { type SelectChangeEvent } from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import Collapse from '@mui/material/Collapse';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import CircularProgress from '@mui/material/CircularProgress';
+import { Typography } from '@mui/material';
+import Chip from '@mui/material/Chip';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import { useSetting } from '../settings/useSetting';
+import { SettingKey } from '../settings/SettingKey';
+import { getBuildInfo } from '../buildInfo';
+import {
+  fetchVersions,
+  buildVersionList,
+  getViewedSha,
+  type VersionItem,
+} from '../versionHistory';
+
+// Render a localized description of the running build (production/PR/dev),
+// shown in the "About" tab so users can clearly tell which version of the
+// web UI they are running and link back to the PR for preview builds.
+function BuildInfoLine() {
+  const buildInfo = getBuildInfo();
+  if (buildInfo.kind === 'pr') {
+    return (
+      <Typography id="about-build-info">
+        Build: preview for{' '}
+        <Link href={buildInfo.prUrl ?? ''} target="_blank" rel="noreferrer">
+          pull request #{buildInfo.prNumber}
+        </Link>
+      </Typography>
+    );
+  }
+  if (buildInfo.kind === 'archive-build') {
+    return (
+      <Typography id="about-build-info">
+        Build: archived (
+        <Link href={buildInfo.buildUrl} target="_blank" rel="noreferrer">
+          {buildInfo.sha?.slice(0, 7)}
+        </Link>
+        )
+      </Typography>
+    );
+  }
+  if (buildInfo.kind === 'production') {
+    return (
+      <Typography id="about-build-info">
+        Build: production (
+        <Link href="https://web.edumips.org" target="_blank" rel="noreferrer">
+          web.edumips.org
+        </Link>
+        )
+      </Typography>
+    );
+  }
+  return <Typography id="about-build-info">Build: development</Typography>;
+}
+
+// Renders the unified version list from /versions.json. Promoted versions are
+// shown prominently; pending candidates (builds newer than the live one that
+// have not been promoted) are listed below in a lighter style. All retained
+// candidates are shown (they are expected to be few between promotions).
+// Gated on: valid versions index AND build kind !== 'pr'.
+function Versions() {
+  const [versionsData, setVersionsData] = React.useState<Awaited<ReturnType<typeof fetchVersions>>>(null);
+  const viewedSha = React.useMemo(() => getViewedSha(), []);
+
+  React.useEffect(() => {
+    fetchVersions().then((v) => setVersionsData(v));
+  }, []);
+
+  const buildInfo = getBuildInfo();
+  if (!versionsData || buildInfo.kind === 'pr') {
+    return null;
+  }
+
+  const items = buildVersionList(versionsData, viewedSha);
+  if (items.length === 0) {
+    return null;
+  }
+
+  const promoted = items.filter((it) => it.promoted);
+  const candidates = items.filter((it) => !it.promoted);
+  const viewedItem = viewedSha
+    ? items.find((it) => it.sha === viewedSha)
+    : null;
+
+  const renderEntry = (item: VersionItem) => (
+    <ListItem key={item.sha} disablePadding data-version={item.sha}>
+      <ListItemText
+        primary={
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {item.isCurrent ? (
+              <Typography
+                component="span"
+                sx={{ fontWeight: item.promoted ? 'bold' : 'normal' }}
+              >
+                {item.dateLabel
+                  ? `${item.dateLabel} (${item.shortsha}` +
+                    (item.targetRelease ? `, targets ${item.targetRelease})` : ')')
+                  : item.shortsha}
+              </Typography>
+            ) : (
+              <Link
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                title={item.build}
+                sx={{ fontWeight: item.promoted ? 'bold' : 'normal' }}
+              >
+                {item.dateLabel
+                  ? `${item.dateLabel} (${item.shortsha}` +
+                    (item.targetRelease ? `, targets ${item.targetRelease})` : ')')
+                  : item.shortsha}
+              </Link>
+            )}
+            {item.isCurrent && (
+              <Chip label="current" size="small" color="success" />
+            )}
+            {!item.promoted && (
+              <Chip label="candidate" size="small" color="info" variant="outlined" />
+            )}
+            {item.isViewed && !item.isCurrent && (
+              <Typography component="span" variant="caption">
+                (viewing)
+              </Typography>
+            )}
+          </Box>
+        }
+      />
+    </ListItem>
+  );
+
+  return (
+    <Box id="about-versions" sx={{ mt: 2 }}>
+      {viewedItem != null && !viewedItem.isCurrent && (
+        <Typography
+          gutterBottom
+          color={viewedItem.promoted ? 'warning.main' : 'info.main'}
+        >
+          You are viewing {viewedItem.promoted ? 'an archived' : 'a candidate'}{' '}
+          build ({viewedItem.shortsha}). <Link href="/">Open the latest.</Link>
+        </Typography>
+      )}
+      {promoted.length > 0 && (
+        <>
+          <Typography variant="h6" gutterBottom>
+            Promoted versions
+          </Typography>
+          <List dense disablePadding id="about-promoted-versions">
+            {promoted.map(renderEntry)}
+          </List>
+        </>
+      )}
+      {candidates.length > 0 && (
+        <>
+          <Typography variant="h6" gutterBottom sx={{ mt: promoted.length ? 2 : 0 }}>
+            Candidate builds
+          </Typography>
+          <List dense disablePadding id="about-candidate-versions">
+            {candidates.map(renderEntry)}
+          </List>
+        </>
+      )}
+    </Box>
+  );
+}
+
+const ALLOWED_LANGUAGES = ['en', 'it', 'zh'];
+const INTRODUCTION_LABELS: Record<string, string> = {
+  en: 'Introduction',
+  it: 'Introduzione',
+  zh: '简介',
+};
+
+// Sphinx HTML structure CSS selectors
+const SPHINX_SELECTORS = {
+  tocWrapper: '.toctree-wrapper',
+  topLevelItem: ':scope > ul > li.toctree-l1',
+  nestedItem: ':scope > li.toctree-l2',
+};
+
+interface TocChild {
+  title: string;
+  url: string;
+}
+
+interface TocEntry {
+  title: string;
+  url: string;
+  children?: TocChild[];
+}
+
+/**
+ * Parse the Sphinx-generated toctree HTML into a structured ToC format.
+ * The toctree-wrapper contains nested ul/li elements with links.
+ */
+function parseTocFromHtml(htmlString: string, language: string): TocEntry[] {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlString, 'text/html');
+  // The user manual is built with two top-level `.. toctree::` directives:
+  // one for the UI-independent chapters and one for the UI-specific chapter
+  // (selected at build time via Sphinx tags). Merge entries from every
+  // toctree-wrapper found on the page so all chapters show up in the drawer.
+  const toctreeWrappers = doc.querySelectorAll(SPHINX_SELECTORS.tocWrapper);
+
+  if (toctreeWrappers.length === 0) {
+    console.warn(
+      'Could not find toctree-wrapper in documentation HTML. The documentation structure may have changed.',
+    );
+    return [];
+  }
+
+  const toc: TocEntry[] = [];
+
+  // Add Introduction as the first item (links to index.html)
+  toc.push({
+    title: INTRODUCTION_LABELS[language] || INTRODUCTION_LABELS.en,
+    url: 'index.html',
+  });
+
+  toctreeWrappers.forEach((toctreeWrapper) => {
+    // Parse the top-level list items (toctree-l1)
+    const topLevelItems = toctreeWrapper.querySelectorAll(
+      SPHINX_SELECTORS.topLevelItem,
+    );
+
+    topLevelItems.forEach((li) => {
+      const link = li.querySelector(':scope > a');
+      if (!link) return;
+
+      const item: TocEntry = {
+        title: link.textContent?.trim() ?? '',
+        url: link.getAttribute('href') ?? '',
+      };
+
+      // Check for nested items (toctree-l2)
+      const nestedList = li.querySelector(':scope > ul');
+      if (nestedList) {
+        const children: TocChild[] = [];
+        const nestedItems = nestedList.querySelectorAll(
+          SPHINX_SELECTORS.nestedItem,
+        );
+        nestedItems.forEach((nestedLi) => {
+          const nestedLink = nestedLi.querySelector(':scope > a');
+          if (nestedLink) {
+            children.push({
+              title: nestedLink.textContent?.trim() ?? '',
+              url: nestedLink.getAttribute('href') ?? '',
+            });
+          }
+        });
+        if (children.length > 0) {
+          item.children = children;
+        }
+      }
+
+      toc.push(item);
+    });
+  });
+
+  return toc;
+}
+
+/**
+ * Custom hook to fetch and parse the ToC for a given language.
+ */
+function useToc(language: string) {
+  const [toc, setToc] = React.useState<TocEntry[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const abortController = new AbortController();
+
+    async function fetchToc() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`docs/${language}/html/index.html`, {
+          signal: abortController.signal,
+        });
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch ToC: ${response.status} ${response.statusText}`,
+          );
+        }
+        const htmlString = await response.text();
+        const parsedToc = parseTocFromHtml(htmlString, language);
+
+        if (!abortController.signal.aborted) {
+          setToc(parsedToc);
+          setLoading(false);
+        }
+      } catch (err) {
+        // Ignore abort errors (expected when language changes quickly)
+        if ((err as Error).name === 'AbortError') {
+          return;
+        }
+        if (!abortController.signal.aborted) {
+          setError((err as Error).message);
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchToc();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [language]);
+
+  return { toc, loading, error };
+}
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  value: number;
+  index: number;
+  [key: string]: unknown;
+}
+
+function TabPanel({ children, value, index, ...other }: TabPanelProps) {
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`help-tabpanel-${index}`}
+      aria-labelledby={`help-tab-${index}`}
+      style={{
+        display: value === index ? 'flex' : 'none',
+        flexGrow: 1,
+        height: '100%',
+        width: '100%',
+      }}
+      {...other}
+    >
+      {value === index && children}
+    </div>
+  );
+}
+
+interface NavigationDrawerProps {
+  toc: TocEntry[];
+  onNavigate: (url: string) => void;
+  currentPage: string;
+  loading: boolean;
+  error: string | null;
+}
+
+function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }: NavigationDrawerProps) {
+  const [openItems, setOpenItems] = React.useState<Record<number, boolean>>({});
+
+  const handleToggle = (index: number) => {
+    setOpenItems((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          width: { xs: '100%', sm: 280 },
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ width: { xs: '100%', sm: 280 }, height: '100%', p: 2 }}>
+        <Typography color="error" variant="body2">
+          Failed to load navigation: {error}
+        </Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Box
+      sx={{
+        width: { xs: '100%', sm: 280 },
+        height: '100%',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+      }}
+    >
+      <List dense>
+        {toc.map((item, index) => (
+          <React.Fragment key={index}>
+            <ListItem disablePadding>
+              <ListItemButton
+                id={`toc-item-${item.title.replace(/\s+/g, '-').toLowerCase()}`}
+                onClick={() => {
+                  if (item.children) {
+                    handleToggle(index);
+                  } else {
+                    onNavigate(item.url);
+                  }
+                }}
+                selected={currentPage === item.url}
+              >
+                <ListItemText
+                  primary={item.title}
+                  slotProps={{
+                    primary: {
+                      noWrap: true,
+                      sx: {
+                        fontSize: '0.9rem',
+                        fontWeight: currentPage === item.url ? 600 : 400,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      },
+                    },
+                  }}
+                />
+                {item.children &&
+                  (openItems[index] ? <ExpandLess /> : <ExpandMore />)}
+              </ListItemButton>
+            </ListItem>
+            {item.children && (
+              <Collapse in={openItems[index]} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {item.children.map((child, childIndex) => (
+                    <ListItem key={childIndex} disablePadding>
+                      <ListItemButton
+                        id={`toc-item-${child.title.replace(/\s+/g, '-').toLowerCase()}`}
+                        sx={{ pl: 4 }}
+                        onClick={() => onNavigate(child.url)}
+                        selected={currentPage === child.url}
+                      >
+                        <ListItemText
+                          primary={child.title}
+                          slotProps={{
+                            primary: {
+                              noWrap: true,
+                              sx: {
+                                fontSize: '0.85rem',
+                                fontWeight: currentPage === child.url ? 600 : 400,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              },
+                            },
+                          }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </Collapse>
+            )}
+          </React.Fragment>
+        ))}
+      </List>
+    </Box>
+  );
+}
+
+interface HelpDialogProps {
+  open: boolean;
+  handleClose: () => void;
+  ver: string;
+}
+
+export default function HelpDialog({ open, handleClose, ver }: HelpDialogProps) {
+  const [tabValue, setTabValue] = React.useState(0);
+  // The `useSetting` hook sanitizes the persisted value against the
+  // ALLOWED_LANGUAGES validator declared in the settings schema, so an
+  // unexpected value (e.g. from an older schema version) falls back to 'en'.
+  const [language, setLanguage] = useSetting(SettingKey.HELP_LANGUAGE);
+  const [currentPage, setCurrentPage] = React.useState('index.html');
+  const iframeRef = React.useRef<HTMLIFrameElement>(null);
+
+  // Dynamically fetch and parse the ToC based on the selected language
+  const { toc, loading, error } = useToc(language);
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  const handleLanguageChange = (event: SelectChangeEvent<string>) => {
+    const newLang = event.target.value;
+    if (ALLOWED_LANGUAGES.includes(newLang)) {
+      setLanguage(newLang);
+      setCurrentPage('index.html');
+    } // else ignore invalid value
+  };
+
+  const handleNavigate = (url: string) => {
+    setCurrentPage(url);
+    if (iframeRef.current) {
+      iframeRef.current.src = `docs/${language}/html/${url}`;
+    }
+  };
+
+  // Inject custom CSS into iframe after it loads
+  const handleIframeLoad = () => {
+    try {
+      const iframe = iframeRef.current;
+      if (iframe && iframe.contentDocument) {
+        const doc = iframe.contentDocument;
+
+        // Check if custom CSS is already injected
+        if (!doc.getElementById('custom-help-styles')) {
+          const style = doc.createElement('style');
+          style.id = 'custom-help-styles';
+          style.textContent = `
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif !important;
+              -webkit-font-smoothing: antialiased;
+              -moz-osx-font-smoothing: grayscale;
+              line-height: 1.6 !important;
+              color: #333 !important;
+              padding: 24px !important;
+              background: #fff !important;
+            }
+            h1, h2, h3, h4, h5, h6 {
+              font-family: inherit !important;
+              font-weight: 600 !important;
+              margin-top: 24px !important;
+              margin-bottom: 16px !important;
+              color: #1a1a1a !important;
+            }
+            h1 {
+              font-size: 2rem !important;
+              border-bottom: 2px solid #e0e0e0 !important;
+              padding-bottom: 8px !important;
+            }
+            h2 { font-size: 1.5rem !important; }
+            h3 { font-size: 1.25rem !important; }
+            a {
+              color: #1976d2 !important;
+              text-decoration: none !important;
+            }
+            a:hover { text-decoration: underline !important; }
+            pre {
+              background: #f5f5f5 !important;
+              border: 1px solid #e0e0e0 !important;
+              border-radius: 4px !important;
+              padding: 16px !important;
+              overflow-x: auto !important;
+            }
+            code {
+              background: #f5f5f5 !important;
+              border-radius: 3px !important;
+              padding: 2px 6px !important;
+              font-size: 0.875rem !important;
+            }
+            pre code {
+              background: transparent !important;
+              padding: 0 !important;
+            }
+            table {
+              border-collapse: collapse !important;
+              margin: 16px 0 !important;
+            }
+            th, td {
+              border: 1px solid #e0e0e0 !important;
+              padding: 12px !important;
+            }
+            th {
+              background: #f5f5f5 !important;
+              font-weight: 600 !important;
+            }
+            .related, .sphinxsidebar, div.clearer {
+              display: none !important;
+            }
+            /* Hide Sphinx's per-heading "¶" permalink anchors. They are
+               useful in the standalone Sphinx site (right-click → copy
+               link), but inside our embedded help iframe they don't
+               navigate anywhere useful and just clutter every heading. */
+            a.headerlink {
+              display: none !important;
+            }
+            .documentwrapper, .bodywrapper, .body {
+              margin: 0 !important;
+              width: 100% !important;
+            }
+          `;
+          doc.head.appendChild(style);
+        }
+      }
+    } catch (e) {
+      // Ignore cross-origin errors
+      console.warn('Could not inject styles into iframe:', e);
+    }
+  };
+
+  return (
+    <Dialog
+      onClose={handleClose}
+      open={open}
+      maxWidth="xl"
+      fullWidth
+      slotProps={{
+        // MUI v9 removed `PaperProps`; the Paper slot is now styled via
+        // `slotProps.paper`. Without this the dialog collapses to its content
+        // height (~2/5 of the viewport) instead of the intended tall layout.
+        paper: {
+          sx: {
+            // On phones / small tablets give the dialog the whole screen
+            // (margins waste already-scarce space); on larger screens
+            // keep the previous "almost full height" appearance.
+            height: { xs: '100vh', sm: '90vh' },
+            m: { xs: 0, sm: 4 },
+            maxHeight: { xs: '100vh', sm: 'calc(100% - 64px)' },
+            width: { xs: '100vw', sm: '100%' },
+            maxWidth: { xs: '100vw', sm: 'calc(100% - 64px)' },
+            borderRadius: { xs: 0, sm: 1 },
+          },
+        },
+      }}
+    >
+      <DialogTitle className="help-title">EduMIPS64 Web Frontend</DialogTitle>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          aria-label="help tabs"
+        >
+          <Tab label="User Manual" id="help-tab-0" />
+          <Tab label="Shortcuts" id="help-tab-1" />
+          <Tab label="About" id="help-tab-2" />
+        </Tabs>
+      </Box>
+      <DialogContent
+        className="help-content"
+        sx={{ p: 0, display: 'flex', flexGrow: 1, overflow: 'hidden' }}
+      >
+        <TabPanel value={tabValue} index={0}>
+          <Box
+            sx={{
+              display: 'flex',
+              // On narrow viewports stack the navigation drawer above
+              // the iframe instead of side-by-side, so the manual
+              // content gets the full width of the dialog.
+              flexDirection: { xs: 'column', sm: 'row' },
+              height: '100%',
+              width: '100%',
+            }}
+          >
+            {/* Navigation Drawer */}
+            <Box
+              sx={{
+                width: { xs: '100%', sm: 280 },
+                minWidth: { xs: '100%', sm: 280 },
+                maxWidth: { xs: '100%', sm: 280 },
+                // Constrain the drawer height when stacked on top of
+                // the iframe so the manual content stays visible.
+                height: { xs: 'auto', sm: '100%' },
+                maxHeight: { xs: '40%', sm: 'none' },
+                flexShrink: 0,
+                borderRight: { xs: 0, sm: 1 },
+                borderBottom: { xs: 1, sm: 0 },
+                borderColor: 'divider',
+                bgcolor: 'background.paper',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <Box
+                sx={{
+                  p: { xs: 1, sm: 2 },
+                  borderBottom: 1,
+                  borderColor: 'divider',
+                }}
+              >
+                <FormControl size="small" fullWidth>
+                  <InputLabel id="language-select-label">Language</InputLabel>
+                  <Select
+                    labelId="language-select-label"
+                    id="language-select"
+                    value={language}
+                    label="Language"
+                    onChange={handleLanguageChange}
+                  >
+                    <MenuItem value="en">English</MenuItem>
+                    <MenuItem value="it">Italiano</MenuItem>
+                    <MenuItem value="zh">中文</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+              <NavigationDrawer
+                toc={toc}
+                onNavigate={handleNavigate}
+                currentPage={currentPage}
+                loading={loading}
+                error={error}
+              />
+            </Box>
+
+            {/* Content Area */}
+            <Box sx={{ flexGrow: 1, overflow: 'hidden', minHeight: 0 }}>
+              <iframe
+                ref={iframeRef}
+                src={`docs/${language}/html/${currentPage}`}
+                onLoad={handleIframeLoad}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  border: 'none',
+                }}
+                title="EduMIPS64 User Manual"
+                id="help-iframe"
+              />
+            </Box>
+          </Box>
+        </TabPanel>
+        <TabPanel value={tabValue} index={1}>
+          <Box id="help-shortcuts" sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Keyboard Shortcuts
+            </Typography>
+            <Typography gutterBottom sx={{ mb: 2 }}>
+              These keyboard shortcuts are active whenever no dialog is open.
+            </Typography>
+            <TableContainer component={Paper} variant="outlined">
+              <Table size="small" aria-label="keyboard shortcuts">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <strong>Key</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Action</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Active when</strong>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>
+                      <code>F2</code>
+                    </TableCell>
+                    <TableCell>Load program</TableCell>
+                    <TableCell>Program is valid (no errors)</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <code>F8</code>
+                    </TableCell>
+                    <TableCell>Run All / Pause (toggle)</TableCell>
+                    <TableCell>
+                      Run All: program loaded (READY); Pause: executing
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <code>F9</code>
+                    </TableCell>
+                    <TableCell>Single Step</TableCell>
+                    <TableCell>Program loaded (READY)</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <code>F10</code>
+                    </TableCell>
+                    <TableCell>Multi Step</TableCell>
+                    <TableCell>Program loaded (READY)</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <code>Esc</code>
+                    </TableCell>
+                    <TableCell>Stop &amp; reset CPU</TableCell>
+                    <TableCell>Program loaded (READY)</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        </TabPanel>
+        <TabPanel value={tabValue} index={2}>
+          <Box sx={{ p: 3 }}>
+            <Typography>Version: {ver}</Typography>
+            <BuildInfoLine />
+            <Versions />
+            <Typography gutterBottom variant="h6" sx={{ mt: 2 }}>
+              Quick Start
+            </Typography>
+            <Typography gutterBottom>
+              Once you load a program, hover over any instruction to see
+              information about it. You will be able to see the address, its
+              binary representation, the opcode and the CPU stage in which the
+              instruction is in the current step, if it is in the pipeline.
+            </Typography>
+            <Typography gutterBottom>
+              CPU stages are also encoded by colors.
+            </Typography>
+            <Typography gutterBottom variant="h6" sx={{ mt: 2 }}>
+              About EduMIPS64
+            </Typography>
+            <Typography gutterBottom>
+              This is the web version of the{' '}
+              <Link href="https://www.edumips.org">
+                EduMIPS64 CPU simulator
+              </Link>
+              .
+            </Typography>
+            <Typography gutterBottom>
+              This is currently <strong>work-in-progress</strong>, very early
+              stages and not fully functional. See{' '}
+              <Link
+                href="https://github.com/EduMIPS64/edumips64/issues?q=is%3Aissue+is%3Aopen+label%3Acomponent%3Aweb-ui"
+                target="_blank"
+                rel="noreferrer"
+              >
+                known issues
+              </Link>
+              .
+            </Typography>
+            <Typography gutterBottom>
+              The core of the simulator is cross-compiled from Java to
+              JavaScript, and the UI is developed with React.
+            </Typography>
+            <Typography gutterBottom>
+              If you are interested in the evolution of this web application or
+              want to contribute to it, please get in touch via{' '}
+              <Link
+                href="https://github.com/EduMIPS64/edumips64"
+                target="_blank"
+                rel="noreferrer"
+              >
+                GitHub
+              </Link>
+              !
+            </Typography>
+          </Box>
+        </TabPanel>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={handleClose}
+          variant="outlined"
+          id="help-close-button"
+        >
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}

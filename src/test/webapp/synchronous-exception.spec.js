@@ -10,7 +10,7 @@ const {
  * Tests for how the Web UI reports synchronous exceptions raised by the CPU.
  *
  * When a program triggers a synchronous exception (e.g. integer overflow), the
- * simulator must surface a user-friendly alert that includes the faulting
+ * simulator must surface a user-friendly dialog that includes the faulting
  * instruction and the pipeline stage, rather than a raw
  * `org.edumips64.core.is.IntegerOverflowException: INTOVERFLOW` string.
  */
@@ -35,46 +35,36 @@ test('integer overflow produces a user-friendly synchronous-exception alert', as
   await page.goto(targetUri);
   await waitForPageReady(page);
 
-  // Capture all native alert() dialogs shown by the simulator. We collect
-  // every alert (not just the first) so we can also assert that the Run All
-  // flow does not surface a spurious follow-up "Cannot run in state READY"
-  // dialog after the real synchronous-exception alert.
-  const alertMessages = [];
-  page.on('dialog', async (dialog) => {
-    if (dialog.type() === 'alert') {
-      alertMessages.push(dialog.message());
-    }
-    await dialog.dismiss();
-  });
-
   await loadProgram(page, overflowProgram);
   await removeOverlay(page);
 
   // Run the program; once the overflow fires, the worker will post a failure
-  // Result and the UI will show the alert.
+  // Result and the UI will show the runtime-error dialog.
   await page.click('#run-button');
 
-  // Wait until the alert handler has been invoked.
-  await expect.poll(() => alertMessages.length, { timeout: 15000 }).toBeGreaterThan(0);
+  // Wait until the runtime-error dialog appears.
+  const dialog = page.locator('#runtime-error-dialog');
+  await expect(dialog).toBeVisible({ timeout: 15000 });
 
-  const alertMessage = alertMessages[0];
+  const dialogText = await dialog.innerText();
 
-  // The alert must describe the exception in plain English, and include the
+  // The dialog must describe the exception in plain English, and include the
   // faulting instruction and pipeline stage.
-  expect(alertMessage).toContain('Synchronous exception');
-  expect(alertMessage).toContain('Integer overflow');
-  expect(alertMessage).toContain('INTOVERFLOW');
-  expect(alertMessage).toMatch(/Instruction:\s*ADD\b/i);
-  expect(alertMessage).toContain('Pipeline stage: EX');
+  expect(dialogText).toContain('Synchronous exception');
+  expect(dialogText).toContain('Integer overflow');
+  expect(dialogText).toContain('INTOVERFLOW');
+  expect(dialogText).toMatch(/Instruction:\s*ADD\b/i);
+  expect(dialogText).toContain('Pipeline stage: EX');
 
   // It must NOT be the raw Java exception toString (which used to be the case).
-  expect(alertMessage).not.toContain('org.edumips64.core');
+  expect(dialogText).not.toContain('org.edumips64.core');
 
-  // Give the UI a moment to (not) fire any follow-up alerts, then assert that
-  // no spurious second dialog (e.g. "Cannot run in state READY") was shown.
+  // Dismiss the dialog.
+  await page.click('#runtime-error-ok');
+  await expect(dialog).not.toBeVisible();
+
+  // Give the UI a moment to settle and confirm no further runtime-error
+  // dialogs appear (no spurious "Cannot run in state READY" etc.).
   await page.waitForTimeout(1000);
-  expect(alertMessages).toHaveLength(1);
-  for (const msg of alertMessages) {
-    expect(msg).not.toContain('Cannot run in state');
-  }
+  await expect(dialog).not.toBeVisible();
 });

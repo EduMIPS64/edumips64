@@ -15,7 +15,15 @@ The four open questions raised during review are resolved as follows:
    (kept for one release cycle) so existing links do not break.
 3. **Candidate volume in About:** show **all** pending candidates (they are
    expected to be few between promotions); no cap.
-4. **`maxPromoted` cap:** keep **all** promoted versions forever. No cap for now.
+4. **`maxPromoted` cap (updated 2026-07-02):** the site reached 0.31 GB of
+   GitHub Pages' 1 GB limit because promoted snapshots under `c/` were never
+   pruned.  The retention policy is now `KEEP_PROMOTED = 10` — see
+   [Promoted-snapshot retention](#promoted-snapshot-retention-task-a) below.
+5. **Deploy verification (added 2026-07-02):** both a promotion and a rollback
+   "succeeded" (workflow green) while the GitHub Pages legacy build errored
+   instantly (0 ms, transient queue glitch), silently leaving production stale.
+   A post-push verification step was added to both workflows — see
+   [Deploy verification](#deploy-verification-task-b) below.
 
 ---
 
@@ -330,15 +338,127 @@ above.
 
 ## Storage considerations
 
-- **Promoted** versions accumulate indefinitely (one per promotion). This is the
-  explicit requirement ("keep all promoted past versions"). Each build is a few
-  MB; an optional `maxPromoted` cap can be added later if needed.
+- **Promoted** versions: only the `KEEP_PROMOTED = 10` most-recent promoted
+  snapshots (plus the current production version, always) are kept on disk.
+  Older promoted entries remain in `versions.json` with `"pruned": true` so the
+  audit trail and `seq` history survive, but their `c/<sha>/` directory is
+  deleted to reclaim space.  This is the "promoted-snapshot retention" policy
+  that replaced the earlier "keep all promoted forever" rule, motivated by the
+  site reaching 0.31 GB of GitHub Pages' 1 GB limit (incident 2026-07-02).
 - **Candidates** are bounded by promotion cadence: promote regularly → few
   pending candidates. The old 14-day candidate retention is replaced by
   "prune-on-promote," which is deterministic rather than time-based.
 - Source maps (`*.map`) and the bundled `docs/` dominate per-build size. A
   future optimization (out of scope) is to exclude `*.map` from immutable
   snapshots while keeping them for the live root only.
+
+---
+
+## Promoted-snapshot retention
+
+*Tracking issue: 2026-07-02 incident — 0.31 GB of 1 GB Pages limit consumed.*
+
+### Policy
+
+A promoted version's `c/<sha>/` snapshot is retained on disk iff:
+
+1. It is the current production version (`index["current"]`), **OR**
+2. It is among the `KEEP_PROMOTED = 10` most-recent promoted versions by `seq`,
+   **OR**
+3. Its `seq` > `current.seq` (it is a future candidate — unchanged rule).
+
+Promoted versions that fail all three conditions have their `c/<sha>/` directory
+deleted, but their `versions.json` entry is preserved with `"pruned": true`.
+This keeps the full audit trail and `seq` ordering intact while reclaiming disk
+space.
+
+### `"pruned": true` field
+
+A pruned entry carries this extra field:
+
+```json
+{
+  "sha": "...",
+  "seq": 1150,
+  "promoted": true,
+  "pruned": true,
+  "promotedAt": "...",
+  "promotedBy": "lupino3"
+}
+```
+
+- `promote` and `rollback` refuse to target a pruned version (the snapshot is
+  gone; `push` must be used to re-upload it first).
+- `prune_to_invariant` clears the `pruned` flag if a version re-enters the
+  retention window (e.g. after a rollback makes it current).
+
+### Rollback safety
+
+Rollback targets the newest promoted version older than `current` whose entry is
+**not** pruned (i.e. whose snapshot exists on disk).  With `KEEP_PROMOTED = 10`
+this is always in the retention window (it is the second-highest-seq promoted
+version), so rollback will not encounter a pruned target in normal operation.
+A pytest (`test_rollback_works_after_pruning`) verifies this invariant explicitly.
+
+---
+
+## Deploy verification
+
+*Tracking issue: 2026-07-02 incident — both a promotion and a rollback workflow
+reported success while the GitHub Pages legacy build errored instantly (0 ms,
+transient queue glitch), silently leaving production stale until a build was
+manually re-requested via `POST /repos/EduMIPS64/web.edumips.org/pages/builds`.*
+
+### Implementation
+
+`.github/scripts/verify-pages-deploy.sh <expected-build-string> <pages-repo-path>`
+
+Both `promote-web.yml` and `rollback-web.yml` call this script after the
+"Commit and push to Pages repo" step, provided the step set `pushed=true` (the
+script is skipped when nothing was committed, e.g. idempotent re-run).
+
+#### Phase 1 — Pages deploy workflow (up to 10 min)
+
+Since 2026-07-03 the web.edumips.org repo deploys through GitHub Actions
+(`.github/workflows/deploy-pages.yml` in that repo: checkout →
+`upload-pages-artifact` → `deploy-pages`; the Pages source is
+`build_type: workflow`).  This replaced the legacy branch-based Jekyll
+build, whose shared queue produced transient instant-"errored" builds
+(2026-07-02 incident) and whose duration had grown past 15 minutes.
+Actions deploys complete in ~1–2 minutes with explicit logs.
+
+Verification polls
+`GET /repos/EduMIPS64/web.edumips.org/actions/workflows/deploy-pages.yml/runs?head_sha=<pages-repo HEAD>`
+using the `PAT_WEBUI` secret, until the run for the pushed commit completes
+with `conclusion == "success"`.  If no run appears within 3 minutes (or the
+run fails), the script re-dispatches the workflow once via
+`workflow_dispatch` — the modern equivalent of the old "re-request a Pages
+build" recovery.
+
+Additionally, `monitor-webui.yml` (every 10 minutes) compares the *intended*
+build string (from the Pages repo's raw `versions.json`) against what
+`web.edumips.org/ui.js` actually serves, and fails loudly on persistent
+drift — the backstop for deploys that never happened at all.
+
+#### Phase 2 — CDN propagation (up to 12 min)
+
+Once the Pages build is confirmed, poll
+`https://web.edumips.org/ui.js?cb=<random>` (cache-busting) until the response
+body contains the `expected-build-string`.  GitHub Pages CDN `max-age` is 600 s,
+so 12 minutes is generous.
+
+- For **promote**: the expected string is the promoted version's `build` field
+  from `versions.json` (e.g. `1.4.0-173-g5e4edfa1`).
+- For **rollback**: the expected string is the new current entry's `build` field
+  read from `versions.json` before the push step exits.
+
+Both workflows capture `build=<string>` as a step output from the push step and
+pass it to the verify script.
+
+#### Failure mode
+
+On timeout the script exits 1 with explicit instructions for manual recovery,
+failing the workflow loudly rather than silently succeeding with stale content.
 
 ---
 

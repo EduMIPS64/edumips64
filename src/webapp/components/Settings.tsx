@@ -1,0 +1,363 @@
+import React from 'react';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Switch from '@mui/material/Switch';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import TextField from '@mui/material/TextField';
+import {
+  MIN_STEP_STRIDE,
+  MAX_STEP_STRIDE,
+  MIN_EXECUTION_DELAY_MS,
+  MAX_EXECUTION_DELAY_MS,
+  DEFAULT_PIPELINE_COLORS,
+  ALLOWED_THEME_MODES,
+  type PipelineColors,
+  type ThemeMode,
+} from '../settings/schema';
+import type { CpuStatus } from '../simulator/protocol';
+
+// Human-readable labels for each pipeline color knob, in display order.
+const PIPELINE_COLOR_FIELDS: Array<{ key: keyof PipelineColors; label: string }> = [
+  { key: 'IF', label: 'IF' },
+  { key: 'ID', label: 'ID' },
+  { key: 'EX', label: 'EX' },
+  { key: 'MEM', label: 'MEM' },
+  { key: 'WB', label: 'WB' },
+  { key: 'FPAdder', label: 'FP Adder' },
+  { key: 'FPMultiplier', label: 'FP Multiplier' },
+  { key: 'FPDivider', label: 'FP Divider' },
+  { key: 'Stall', label: 'Stall' },
+];
+
+interface SettingsProps {
+  viMode: boolean;
+  setViMode: (v: boolean) => void;
+  fontSize: number;
+  setFontSize: (v: number) => void;
+  accordionAlerts: boolean;
+  setAccordionAlerts: (v: boolean) => void;
+  forwarding: boolean;
+  setForwarding: (v: boolean) => void;
+  delaySlot: boolean;
+  setDelaySlot: (v: boolean) => void;
+  stepStride: number;
+  setStepStride: (v: number) => void;
+  executionDelayMs: number;
+  setExecutionDelayMs: (v: number) => void;
+  pipelineColors: PipelineColors | undefined;
+  setPipelineColors: (v: PipelineColors) => void;
+  themeMode: ThemeMode;
+  setThemeMode: (v: ThemeMode) => void;
+  status: CpuStatus;
+}
+
+const Settings = ({
+  viMode,
+  setViMode,
+  fontSize,
+  setFontSize,
+  accordionAlerts,
+  setAccordionAlerts,
+  forwarding,
+  setForwarding,
+  delaySlot,
+  setDelaySlot,
+  stepStride,
+  setStepStride,
+  executionDelayMs,
+  setExecutionDelayMs,
+  pipelineColors,
+  setPipelineColors,
+  themeMode,
+  setThemeMode,
+  status,
+}: SettingsProps) => {
+  // Forwarding affects the CPU pipeline behavior and resets the CPU when
+  // changed, so we only allow toggling it when the simulator is not running
+  // a program. This mirrors the way `CacheConfig` grays out its inputs.
+  const forwardingDisabled = status === 'RUNNING';
+  // Delay slot has the same lifecycle: it changes pipeline semantics and
+  // resets the CPU on toggle, so we gray it out while a program is running.
+  const delaySlotDisabled = status === 'RUNNING';
+  const handleColorChange = (key: keyof PipelineColors) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    // `pipelineColors` may be undefined when the parent doesn't wire the
+    // setting (e.g. older callers); guard so we always start from a complete
+    // object before merging the user's edit.
+    const base = { ...DEFAULT_PIPELINE_COLORS, ...(pipelineColors || {}) };
+    setPipelineColors({ ...base, [key]: e.target.value });
+  };
+  const resetPipelineColors = () => setPipelineColors({ ...DEFAULT_PIPELINE_COLORS });
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: 2,
+          alignItems: 'center',
+        }}
+      >
+        <Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={viMode}
+                onChange={(e) => setViMode(e.target.checked)}
+                color="primary"
+                size="small"
+              />
+            }
+            label={
+              <Typography sx={{ fontSize: '0.85rem' }}>
+                Editor Vi Mode
+              </Typography>
+            }
+          />
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography sx={{ fontSize: '0.85rem' }}>Font Size</Typography>
+          <ButtonGroup size="small" variant="contained">
+            <Button
+              onClick={() => setFontSize(Math.max(fontSize - 1, 1))}
+              aria-label="Decrease font size"
+            >
+              -
+            </Button>
+            <Button
+              disabled
+              sx={{ minWidth: '40px' }}
+              aria-label={`Current font size: ${fontSize}`}
+            >
+              {fontSize}
+            </Button>
+            <Button
+              onClick={() => setFontSize(fontSize + 1)}
+              aria-label="Increase font size"
+            >
+              +
+            </Button>
+          </ButtonGroup>
+        </Box>
+        <Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={accordionAlerts}
+                onChange={(e) => setAccordionAlerts(e.target.checked)}
+                color="primary"
+                size="small"
+              />
+            }
+            label={
+              <Typography sx={{ fontSize: '0.85rem' }}>
+                Accordion Change Alerts
+              </Typography>
+            }
+          />
+        </Box>
+        <Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={forwarding}
+                onChange={(e) => setForwarding(e.target.checked)}
+                color="primary"
+                size="small"
+                disabled={forwardingDisabled}
+                // TODO(ts): MUI's SwitchInputSlotPropsOverrides doesn't include
+                // data-* HTML attributes; cast to pass through to the input DOM node.
+                slotProps={{ input: { 'data-testid': 'forwarding-switch' } as React.ComponentProps<'input'> }}
+              />
+            }
+            label={
+              <Typography
+                sx={{
+                  fontSize: '0.85rem',
+                  color: forwardingDisabled ? 'text.disabled' : 'text.primary',
+                }}
+              >
+                CPU Forwarding
+              </Typography>
+            }
+          />
+        </Box>
+        <Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={!!delaySlot}
+                onChange={(e) => setDelaySlot(e.target.checked)}
+                color="primary"
+                size="small"
+                disabled={delaySlotDisabled}
+                // TODO(ts): same data-* attribute cast as above.
+                slotProps={{ input: { 'data-testid': 'delay-slot-switch' } as React.ComponentProps<'input'> }}
+              />
+            }
+            label={
+              <Typography
+                sx={{
+                  fontSize: '0.85rem',
+                  color: delaySlotDisabled ? 'text.disabled' : 'text.primary',
+                }}
+              >
+                Branch Delay Slot
+              </Typography>
+            }
+          />
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <TextField
+            label="Multi Step Size"
+            type="number"
+            size="small"
+            value={stepStride}
+            onChange={(e) => {
+              const value = parseInt(e.target.value, 10);
+              if (
+                Number.isInteger(value) &&
+                value >= MIN_STEP_STRIDE &&
+                value <= MAX_STEP_STRIDE
+              ) {
+                setStepStride(value);
+              }
+            }}
+            slotProps={{
+              htmlInput: { min: MIN_STEP_STRIDE, max: MAX_STEP_STRIDE },
+            }}
+            sx={{ width: '140px' }}
+          />
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <TextField
+            label="Execution Delay (ms)"
+            type="number"
+            size="small"
+            value={executionDelayMs}
+            onChange={(e) => {
+              const value = parseInt(e.target.value, 10);
+              if (
+                Number.isInteger(value) &&
+                value >= MIN_EXECUTION_DELAY_MS &&
+                value <= MAX_EXECUTION_DELAY_MS
+              ) {
+                setExecutionDelayMs(value);
+              }
+            }}
+            slotProps={{
+              htmlInput: {
+                min: MIN_EXECUTION_DELAY_MS,
+                max: MAX_EXECUTION_DELAY_MS,
+                step: 10,
+              },
+            }}
+            sx={{ width: '160px' }}
+          />
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography sx={{ fontSize: '0.85rem' }}>Theme</Typography>
+          <ToggleButtonGroup
+            size="small"
+            exclusive
+            value={themeMode || 'auto'}
+            onChange={(_, value: ThemeMode | null) => {
+              // ToggleButtonGroup emits `null` when the user clicks the
+              // currently-selected button; treat that as "no change" so the
+              // theme mode never gets cleared from settings.
+              if (value && ALLOWED_THEME_MODES.includes(value)) {
+                setThemeMode(value);
+              }
+            }}
+            aria-label="Theme mode"
+            data-testid="theme-mode-toggle"
+          >
+            {ALLOWED_THEME_MODES.map((mode) => (
+              <ToggleButton
+                key={mode}
+                value={mode}
+                aria-label={`Theme mode: ${mode}`}
+                data-testid={`theme-mode-${mode}`}
+                sx={{ fontSize: '0.75rem', textTransform: 'capitalize' }}
+              >
+                {mode}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        </Box>
+      </Box>
+      <Box>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: 1,
+          }}
+        >
+          <Typography sx={{ fontSize: '0.85rem', fontWeight: 'bold' }}>
+            Pipeline Colors
+          </Typography>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={resetPipelineColors}
+            data-testid="pipeline-colors-reset"
+          >
+            Reset to defaults
+          </Button>
+        </Box>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: 1.5,
+          }}
+        >
+          {PIPELINE_COLOR_FIELDS.map(({ key, label }) => {
+            const value =
+              (pipelineColors && pipelineColors[key]) ||
+              DEFAULT_PIPELINE_COLORS[key];
+            const inputId = `pipeline-color-${key}`;
+            return (
+              <Box
+                key={key}
+                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+              >
+                <Box
+                  component="input"
+                  type="color"
+                  id={inputId}
+                  data-testid={`pipeline-color-${key}`}
+                  value={value}
+                  onChange={handleColorChange(key)}
+                  sx={{
+                    width: 36,
+                    height: 28,
+                    border: '1px solid #ccc',
+                    borderRadius: 1,
+                    padding: 0,
+                    background: 'none',
+                    cursor: 'pointer',
+                  }}
+                />
+                <Typography
+                  component="label"
+                  htmlFor={inputId}
+                  sx={{ fontSize: '0.8rem' }}
+                >
+                  {label}
+                </Typography>
+              </Box>
+            );
+          })}
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
+export default Settings;

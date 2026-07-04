@@ -42,6 +42,19 @@ async function openSettingsAccordion(page) {
   await expect(summary).toHaveAttribute('aria-expanded', 'true');
 }
 
+async function setPipelineColor(page, key, value) {
+  const input = page.getByTestId(`pipeline-color-${key}`);
+  await input.evaluate((el, v) => {
+    const setter = Object.getOwnPropertyDescriptor(
+      window.HTMLInputElement.prototype,
+      'value'
+    ).set;
+    setter.call(el, v);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }, value);
+}
+
 /**
  * Test: Vi Mode and font size persist across page reloads.
  */
@@ -229,20 +242,8 @@ test('pipelineColors persist across page reloads', async ({ page }) => {
   // Set IF and Stall colors via the native color inputs. React tracks
   // input values via a hidden internal property, so we have to use the
   // native setter to make sure the synthetic onChange fires.
-  const setColor = async (key, value) => {
-    const input = page.getByTestId(`pipeline-color-${key}`);
-    await input.evaluate((el, v) => {
-      const setter = Object.getOwnPropertyDescriptor(
-        window.HTMLInputElement.prototype,
-        'value'
-      ).set;
-      setter.call(el, v);
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true }));
-    }, value);
-  };
-  await setColor('IF', '#123456');
-  await setColor('Stall', '#abcdef');
+  await setPipelineColor(page, 'IF', '#123456');
+  await setPipelineColor(page, 'Stall', '#abcdef');
 
   // The persisted value is written by `useLocalStorage`'s effect, which
   // fires asynchronously after the render — wait for the storage write to
@@ -278,6 +279,55 @@ test('pipelineColors persist across page reloads', async ({ page }) => {
   await expect(ifInput).toHaveValue('#123456');
   const stallInput = page.getByTestId('pipeline-color-Stall');
   await expect(stallInput).toHaveValue('#abcdef');
+});
+
+test('pipelineColors also drive Monaco stage highlights', async ({ page }) => {
+  await waitForPageReady(page);
+  await removeOverlay(page);
+
+  await openSettingsAccordion(page);
+  await setPipelineColor(page, 'IF', '#123456');
+
+  await loadProgram(
+    page,
+    `.code
+  daddi r1,r0,1
+  daddi r2,r0,2
+  syscall 0
+`
+  );
+
+  await page.click('#step-button');
+
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const codeWrapper = document.querySelector(
+          '[data-testid="code-editor"]'
+        );
+        const fill = document
+          .querySelector('#pipeline g[data-stage="IF"]')
+          ?.getAttribute('data-fill');
+        const hasDecoration = window.editor
+          .getModel()
+          .getAllDecorations()
+          .some((d) => d.options.className === 'stageIf');
+        if (!codeWrapper || !fill) {
+          return null;
+        }
+        const style = getComputedStyle(codeWrapper);
+        return {
+          fill,
+          highlightColor: style.getPropertyValue('--pipeline-stage-if').trim(),
+          hasDecoration,
+        };
+      })
+    )
+    .toMatchObject({
+      fill: '#123456',
+      highlightColor: '#12345680',
+      hasDecoration: true,
+    });
 });
 
 /**

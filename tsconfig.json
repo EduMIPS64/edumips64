@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    // Emit: type-checking only — Vite/esbuild handles the actual transpilation.
+    "noEmit": true,
+
+    // Language target and module format.
+    "target": "es2022",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+
+    // JSX: automatic runtime (react/jsx-runtime) — matches @vitejs/plugin-react
+    // default and avoids requiring `import React` in every JSX file.
+    "jsx": "react-jsx",
+
+    // Strict mode catches the most common type errors.
+    "strict": true,
+
+    // Disallow JS files now that the migration to TypeScript is complete.
+    "allowJs": false,
+
+    // Don't error on missing type declarations for packages that lack them.
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/webapp/**/*",
+    "src/test/webapp-unit/**/*"
+  ]
+}
