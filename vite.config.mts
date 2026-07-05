@@ -42,6 +42,49 @@ function copyDocsPlugin(): Plugin {
   };
 }
 
+// Serve the GWT-compiled simulator core (worker.js) from out/web on the dev
+// server.  Vite's root is src/webapp, but worker.js is a build artifact that
+// lives in out/web (produced by `gradlew assembleWebApp`), so `new
+// Worker("worker.js")` would otherwise hit the SPA fallback and receive
+// index.html — surfacing as "Failed to load the EduMIPS64 simulator core /
+// Unexpected token '<'".  This middleware bridges that gap for `npm start`;
+// the production build already emits worker.js next to ui.js, so it is
+// dev-only (apply: 'serve').
+function serveGwtWorkerPlugin(): Plugin {
+  // The only artifacts the worker entrypoint needs at runtime.  worker.js is
+  // self-contained; clear.cache.gif is included for completeness.
+  const CONTENT_TYPES: Record<string, string> = {
+    '/worker.js': 'application/javascript',
+    '/clear.cache.gif': 'image/gif',
+  };
+  return {
+    name: 'serve-gwt-worker',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const pathname = (req.url || '').split('?')[0];
+        const contentType = CONTENT_TYPES[pathname];
+        if (!contentType) {
+          return next();
+        }
+        const file = path.resolve(__dirname, 'out/web', pathname.slice(1));
+        if (!fs.existsSync(file)) {
+          // Fall through so the user still gets a clear 404 rather than the
+          // HTML fallback; the console error then points at the missing
+          // build artifact instead of a confusing syntax error.
+          res.statusCode = 404;
+          res.end(
+            `${pathname} not found in out/web — run \`./gradlew assembleWebApp\` to build the GWT worker.`,
+          );
+          return;
+        }
+        res.setHeader('Content-Type', contentType);
+        fs.createReadStream(file).pipe(res);
+      });
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => {
   const isDev = mode === 'development';
   return {
@@ -121,6 +164,10 @@ export default defineConfig(({ mode }) => {
         : []),
 
       copyDocsPlugin(),
+
+      // Dev-only: serve the GWT worker.js from out/web so `npm start` can
+      // load the simulator core (see plugin comment above).
+      serveGwtWorkerPlugin(),
     ],
   };
 });
