@@ -9,12 +9,13 @@ const {
 /**
  * Coverage for the Settings dialog itself: the gear button in the header
  * opens a modal dialog (mirroring the Help dialog) with settings grouped
- * into a UI tab (editor/appearance + Execution pacing) and a Simulation tab
- * (CPU / Cache — disabled while a program is running). The individual
- * controls inside each tab are covered by settings-persistence.spec.js,
- * forwarding.spec.js and cache-simulator.spec.js; this spec only checks the
- * dialog shell, navigation between tabs, the RUNNING-disabled Simulation
- * tab, and the two Reset to defaults buttons.
+ * into a UI tab (General / Editor / Pipeline Colors sections) and a
+ * Simulation tab (CPU / Cache sections — disabled while a program is
+ * running). The individual controls inside each tab are covered by
+ * settings-persistence.spec.js, forwarding.spec.js and
+ * cache-simulator.spec.js; this spec only checks the dialog shell,
+ * navigation between tabs, the RUNNING-disabled Simulation tab, and the two
+ * Reset to defaults buttons.
  */
 
 test('settings dialog opens from the gear button next to the Program menu', async ({
@@ -48,7 +49,7 @@ test('settings dialog opens from the gear button next to the Program menu', asyn
   await page.close();
 });
 
-test('the UI tab groups appearance and Execution settings together', async ({
+test('the UI tab groups General, Editor and Pipeline Colors into labeled sections', async ({
   page,
 }) => {
   await page.goto(targetUri);
@@ -59,13 +60,30 @@ test('the UI tab groups appearance and Execution settings together', async ({
   await page.waitForSelector('.settings-title');
 
   const uiPanel = page.locator('#settings-tabpanel-0');
-  await expect(page.getByLabel('Editor Vi Mode')).toBeVisible();
-  await expect(page.getByLabel('Accordion Change Alerts')).toBeVisible();
-  await expect(page.getByTestId('theme-mode-toggle')).toBeVisible();
 
-  await expect(uiPanel.getByText('Execution', { exact: true })).toBeVisible();
+  // General: theme, accordion alerts, and the two Execution-pacing fields.
+  await expect(uiPanel.getByText('General', { exact: true })).toBeVisible();
+  await expect(page.getByTestId('theme-mode-toggle')).toBeVisible();
+  await expect(page.getByLabel('Accordion Change Alerts')).toBeVisible();
   await expect(page.getByLabel('Multi Step Size')).toBeVisible();
   await expect(page.getByLabel('Execution Delay (ms)')).toBeVisible();
+
+  // Editor: Vi mode and font size.
+  await expect(uiPanel.getByText('Editor', { exact: true })).toBeVisible();
+  await expect(page.getByLabel('Editor Vi Mode')).toBeVisible();
+  await expect(page.getByLabel('Increase font size')).toBeVisible();
+
+  // Pipeline Colors: the per-stage color pickers.
+  await expect(uiPanel.getByText('Pipeline Colors', { exact: true })).toBeVisible();
+  await expect(page.getByTestId('pipeline-color-IF')).toBeVisible();
+
+  const [generalBox, editorBox, colorsBox] = await Promise.all([
+    uiPanel.getByText('General', { exact: true }).boundingBox(),
+    uiPanel.getByText('Editor', { exact: true }).boundingBox(),
+    uiPanel.getByText('Pipeline Colors', { exact: true }).boundingBox(),
+  ]);
+  expect(generalBox.y).toBeLessThan(editorBox.y);
+  expect(editorBox.y).toBeLessThan(colorsBox.y);
 
   await page.close();
 });
@@ -194,23 +212,28 @@ SYSCALL 0
   await page.waitForSelector('.settings-title');
 
   // The Simulation tab itself must be unselectable while RUNNING — its CPU
-  // and cache settings would reset the CPU if applied now.
+  // and cache settings, and its "Reset Simulation to defaults" button,
+  // would reset the CPU if applied now.
   await expect(page.locator('#settings-tab-1')).toBeDisabled();
-  // The dialog opens on the UI tab, which stays fully usable.
+  // The dialog opens on the UI tab, which stays fully usable, including its
+  // own reset button.
   await expect(page.getByLabel('Editor Vi Mode')).toBeVisible();
   await expect(page.getByLabel('Editor Vi Mode')).toBeEnabled();
-
-  // The Simulation reset button is disabled too, for the same reason.
-  await expect(page.locator('#settings-reset-simulation-button')).toBeDisabled();
-  // The UI reset button is unaffected — none of those settings touch the CPU.
   await expect(page.locator('#settings-reset-ui-button')).toBeEnabled();
+
+  // The Simulation tab's content (including its reset button) lives inside
+  // that tab's panel, which isn't rendered while the disabled tab can't be
+  // selected — so it isn't just disabled, it's unreachable.
+  await expect(page.locator('#settings-reset-simulation-button')).toHaveCount(0);
 
   await page.click('#settings-close-button');
   await page.click('#stop-button');
 
-  // Once stopped, the Simulation tab is reachable again.
+  // Once stopped, the Simulation tab is reachable again, and its reset
+  // button is enabled.
   await page.click('#settings-button');
   await expect(page.locator('#settings-tab-1')).toBeEnabled();
+  await page.getByRole('tab', { name: 'Simulation' }).click();
   await expect(page.locator('#settings-reset-simulation-button')).toBeEnabled();
 });
 

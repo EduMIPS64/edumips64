@@ -33,14 +33,16 @@ import UploadIcon from '@mui/icons-material/Upload';
 
 import { deriveLogicalState } from '../simulatorState';
 import type { CpuStatus, ParsingError, SimulatorResult } from '../simulator/protocol';
-import type { UiSettingsPanelProps } from './settings/UiSettingsPanel';
+import type { GeneralSettingsPanelProps } from './settings/GeneralSettingsPanel';
+import type { EditorSettingsPanelProps } from './settings/EditorSettingsPanel';
+import type { PipelineColorsPanelProps } from './settings/PipelineColorsPanel';
 import type { CpuSettingsPanelProps } from './settings/CpuSettingsPanel';
-import type { ExecutionSettingsPanelProps } from './settings/ExecutionSettingsPanel';
 import type { CacheConfig as CacheConfigType } from '../settings/schema';
 
-type SettingsProps = UiSettingsPanelProps &
-  Omit<CpuSettingsPanelProps, 'status'> &
-  ExecutionSettingsPanelProps & {
+type SettingsProps = GeneralSettingsPanelProps &
+  EditorSettingsPanelProps &
+  PipelineColorsPanelProps &
+  Omit<CpuSettingsPanelProps, 'status'> & {
     onCacheConfigChange?: (config: { l1d: CacheConfigType; l1i: CacheConfigType }) => void;
   };
 

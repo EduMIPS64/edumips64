@@ -11,15 +11,18 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 
-import UiSettingsPanel, {
-  type UiSettingsPanelProps,
-} from './settings/UiSettingsPanel';
+import GeneralSettingsPanel, {
+  type GeneralSettingsPanelProps,
+} from './settings/GeneralSettingsPanel';
+import EditorSettingsPanel, {
+  type EditorSettingsPanelProps,
+} from './settings/EditorSettingsPanel';
+import PipelineColorsPanel, {
+  type PipelineColorsPanelProps,
+} from './settings/PipelineColorsPanel';
 import CpuSettingsPanel, {
   type CpuSettingsPanelProps,
 } from './settings/CpuSettingsPanel';
-import ExecutionSettingsPanel, {
-  type ExecutionSettingsPanelProps,
-} from './settings/ExecutionSettingsPanel';
 import CacheConfig from './CacheConfig';
 import {
   resetUiSettings,
@@ -67,9 +70,10 @@ function SectionHeading({
   );
 }
 
-type SettingsDialogProps = UiSettingsPanelProps &
-  Omit<CpuSettingsPanelProps, 'status'> &
-  ExecutionSettingsPanelProps & {
+type SettingsDialogProps = GeneralSettingsPanelProps &
+  EditorSettingsPanelProps &
+  PipelineColorsPanelProps &
+  Omit<CpuSettingsPanelProps, 'status'> & {
     open: boolean;
     handleClose: () => void;
     status: CpuStatus;
@@ -174,26 +178,41 @@ export default function SettingsDialog({
       </Box>
       <DialogContent className="settings-content" sx={{ p: 0 }}>
         <TabPanel value={tabValue} index={0}>
-          <UiSettingsPanel
-            viMode={viMode}
-            setViMode={setViMode}
-            fontSize={fontSize}
-            setFontSize={setFontSize}
+          <SectionHeading first>General</SectionHeading>
+          <GeneralSettingsPanel
             accordionAlerts={accordionAlerts}
             setAccordionAlerts={setAccordionAlerts}
-            pipelineColors={pipelineColors}
-            setPipelineColors={setPipelineColors}
             themeMode={themeMode}
             setThemeMode={setThemeMode}
-          />
-
-          <SectionHeading>Execution</SectionHeading>
-          <ExecutionSettingsPanel
             stepStride={stepStride}
             setStepStride={setStepStride}
             executionDelayMs={executionDelayMs}
             setExecutionDelayMs={setExecutionDelayMs}
           />
+
+          <SectionHeading>Editor</SectionHeading>
+          <EditorSettingsPanel
+            viMode={viMode}
+            setViMode={setViMode}
+            fontSize={fontSize}
+            setFontSize={setFontSize}
+          />
+
+          <SectionHeading>Pipeline Colors</SectionHeading>
+          <PipelineColorsPanel
+            pipelineColors={pipelineColors}
+            setPipelineColors={setPipelineColors}
+          />
+
+          <Divider sx={{ my: 3 }} />
+          <Button
+            onClick={handleResetUi}
+            variant="text"
+            color="inherit"
+            id="settings-reset-ui-button"
+          >
+            Reset UI to defaults
+          </Button>
         </TabPanel>
         <TabPanel value={tabValue} index={1}>
           <SectionHeading first>CPU</SectionHeading>
@@ -207,27 +226,20 @@ export default function SettingsDialog({
 
           <SectionHeading>Cache</SectionHeading>
           <CacheConfig onChange={onCacheConfigChange} status={status} />
+
+          <Divider sx={{ my: 3 }} />
+          <Button
+            onClick={handleResetSimulation}
+            variant="text"
+            color="inherit"
+            id="settings-reset-simulation-button"
+            disabled={isRunning}
+          >
+            Reset Simulation to defaults
+          </Button>
         </TabPanel>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={handleResetUi}
-          variant="text"
-          color="inherit"
-          id="settings-reset-ui-button"
-          sx={{ mr: 'auto' }}
-        >
-          Reset UI to defaults
-        </Button>
-        <Button
-          onClick={handleResetSimulation}
-          variant="text"
-          color="inherit"
-          id="settings-reset-simulation-button"
-          disabled={isRunning}
-        >
-          Reset Simulation to defaults
-        </Button>
         <Button
           onClick={handleClose}
           variant="outlined"
