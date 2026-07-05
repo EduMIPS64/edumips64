@@ -17,6 +17,11 @@ import type { ITelemetryClient } from '../telemetry';
 // years — reused here so the web error screen keeps the same personality.
 import errorImage from '../static/error-hires.png';
 
+// The Swing UI's SplashScreen.java artwork (an undecorated 500×300 dialog
+// showing just this image, centered on screen) — reused here so the web
+// loading screen has the same personality while the worker starts up.
+import splashImage from '../static/splash.png';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -168,13 +173,35 @@ class AppLoader extends React.Component<AppLoaderProps, AppLoaderState> {
               alignItems: 'center',
               justifyContent: 'center',
               minHeight: '100vh',
-              gap: 2,
+              gap: 3,
+              px: 2,
+              // Same soft grey-to-white backdrop as the Swing splash image
+              // itself, sampled from its corners, so the picture doesn't
+              // sit in a mismatched box — this loading screen intentionally
+              // does not follow the app's light/dark theme setting, exactly
+              // like the Swing splash always looks the same regardless of
+              // the desktop app's own dark-theme preference.
+              background:
+                'radial-gradient(circle at 60% 35%, #fcfcfc 0%, #eef1f1 45%, #d6d9d9 100%)',
             }}
           >
-            <CircularProgress />
-            <Typography variant="body1">
-              Loading the EduMIPS64 simulator core&hellip;
-            </Typography>
+            <Box
+              component="img"
+              src={splashImage}
+              alt="EduMIPS64"
+              sx={{
+                width: 'min(500px, 90vw)',
+                height: 'auto',
+                borderRadius: 1,
+                boxShadow: '0 16px 40px rgba(0, 0, 0, 0.22)',
+              }}
+            />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <CircularProgress size={22} sx={{ color: '#d70000' }} />
+              <Typography variant="body1" sx={{ color: '#3a3a3a' }}>
+                Loading the EduMIPS64 simulator core&hellip;
+              </Typography>
+            </Box>
           </Box>
         </>
       );
