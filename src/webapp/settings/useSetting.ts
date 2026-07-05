@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { resetStoredValue, useLocalStorage } from '../hooks/useLocalStorage';
 import { getSchema, sanitize, type SettingValueMap } from './schema';
-import type { SettingKeyType } from './SettingKey';
+import { SettingKey, type SettingKeyType } from './SettingKey';
 
 /**
  * Higher-level hook for a single persisted setting.
@@ -74,4 +74,57 @@ export function useSetting<K extends SettingKeyType>(
   );
 
   return [value, setValue, resetRaw];
+}
+
+function resetSettings(keys: SettingKeyType[]): void {
+  for (const key of keys) {
+    resetStoredValue(key, getSchema(key).default);
+  }
+}
+
+/**
+ * Settings shown on the Settings dialog's UI tab: editor/appearance and
+ * execution-pacing knobs. None of these affect the CPU or worker state, so
+ * resetting them is always safe, even while a program is running.
+ */
+const UI_SETTINGS_KEYS: SettingKeyType[] = [
+  SettingKey.VI_MODE,
+  SettingKey.FONT_SIZE,
+  SettingKey.ACCORDION_ALERTS,
+  SettingKey.THEME_MODE,
+  SettingKey.PIPELINE_COLORS,
+  SettingKey.STEP_STRIDE,
+  SettingKey.EXECUTION_DELAY_MS,
+];
+
+/**
+ * Settings shown on the Settings dialog's Simulation tab: CPU behavior and
+ * cache configuration. Applying these defaults resets the CPU (forwarding /
+ * delay slot changes reset the pipeline; cache changes reset the CPU via
+ * the worker's `setCacheConfig`), so callers should only invoke this while
+ * not RUNNING — the Simulation tab itself is disabled in that state.
+ */
+const SIMULATION_SETTINGS_KEYS: SettingKeyType[] = [
+  SettingKey.FORWARDING,
+  SettingKey.DELAY_SLOT,
+  SettingKey.CACHE_L1D,
+  SettingKey.CACHE_L1I,
+];
+
+/**
+ * Reset the UI-tab settings to their schema defaults. Mirrors (a scoped
+ * subset of) the Swing UI's "Reset to defaults" button (`GUIConfig.java`),
+ * including resetting settings whose `useSetting` hook lives in a different
+ * component — see `resetStoredValue`.
+ */
+export function resetUiSettings(): void {
+  resetSettings(UI_SETTINGS_KEYS);
+}
+
+/**
+ * Reset the Simulation-tab settings (CPU + cache) to their schema defaults.
+ * Callers must not invoke this while a program is running (see above).
+ */
+export function resetSimulationSettings(): void {
+  resetSettings(SIMULATION_SETTINGS_KEYS);
 }

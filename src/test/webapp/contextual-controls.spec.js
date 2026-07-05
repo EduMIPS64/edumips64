@@ -82,7 +82,7 @@ test('EMPTY: load-button visible; run-controls-toolbar absent; execution buttons
   await expect(page.locator('#stop-button:not([disabled])')).toHaveCount(0);
 });
 
-test('EMPTY: program-menu-button visible and enabled; help-button visible', async ({
+test('EMPTY: program-menu-button visible and enabled; settings-button and help-button visible', async ({
   page,
 }) => {
   await page.goto(targetUri);
@@ -101,6 +101,7 @@ test('EMPTY: program-menu-button visible and enabled; help-button visible', asyn
   await expect(page.locator('#restore-sample-button')).toBeVisible();
   await page.keyboard.press('Escape');
 
+  await expect(page.locator('#settings-button')).toBeVisible();
   await expect(page.locator('#help-button')).toBeVisible();
 });
 
@@ -137,7 +138,7 @@ test('READY: step/multi-step/run/stop visible & enabled; pause visible but disab
   await expect(page.locator('#pause-button')).toBeDisabled();
 });
 
-test('READY: program-menu-button visible but DISABLED; help-button visible', async ({ page }) => {
+test('READY: program-menu-button visible but DISABLED; settings-button and help-button visible', async ({ page }) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await loadProgram(page, simpleProgram);
@@ -149,6 +150,9 @@ test('READY: program-menu-button visible but DISABLED; help-button visible', asy
   await expect(page.locator('#program-menu-button')).toBeVisible();
   await expect(page.locator('#program-menu-button')).toBeDisabled();
 
+  // Unlike the Program menu, Settings and Help stay reachable while a
+  // program is loaded — neither touches the loaded program directly.
+  await expect(page.locator('#settings-button')).toBeVisible();
   await expect(page.locator('#help-button')).toBeVisible();
 });
 
@@ -249,7 +253,7 @@ test('ENDED: load-button visible; run-controls-toolbar absent; execution buttons
   await expect(page.locator('#load-button')).toBeVisible();
 });
 
-test('ENDED: program-menu-button visible and enabled; help-button visible', async ({ page }) => {
+test('ENDED: program-menu-button visible and enabled; settings-button and help-button visible', async ({ page }) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await loadProgram(page, simpleProgram);
@@ -267,6 +271,7 @@ test('ENDED: program-menu-button visible and enabled; help-button visible', asyn
   await expect(page.locator('#restore-sample-button')).toBeVisible();
   await page.keyboard.press('Escape');
 
+  await expect(page.locator('#settings-button')).toBeVisible();
   await expect(page.locator('#help-button')).toBeVisible();
 });
 

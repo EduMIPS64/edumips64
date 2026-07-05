@@ -113,6 +113,25 @@ interface CacheConfigProps {
   status: CpuStatus;
 }
 
+// `onChange` ultimately calls the worker's `setCacheConfig`, which resets the
+// CPU (see Simulator.setCacheConfig in the Java client). This component used
+// to be the only occupant of its own "Cache" tab, so a naive "push on every
+// mount" effect only ran when a user deliberately opened that tab. Now that
+// Cache shares a tab with CPU/Execution, simply opening Settings to flip a
+// CPU switch also mounts this component — a naive effect would silently
+// reset a running simulation just from that.
+//
+// The persisted cache config only needs to reach the worker once per page
+// load (the worker has no other way of learning a user's non-default
+// preference), and only once it's actually safe to do so (never while
+// RUNNING). Two effects split those concerns:
+//   - the first fires at most once for the whole page session, deferring
+//     until `status` is not RUNNING;
+//   - the second fires on genuine edits to l1d/l1i after this *instance* has
+//     already painted once, so real edits (only possible while not running)
+//     and settings-wide resets still propagate immediately.
+let hasSyncedCacheConfigThisSession = false;
+
 const CacheConfigPanel = ({ onChange, status }: CacheConfigProps) => {
   const [l1d, setL1D] = useSetting(SettingKey.CACHE_L1D);
   const [l1i, setL1I] = useSetting(SettingKey.CACHE_L1I);
@@ -120,6 +139,25 @@ const CacheConfigPanel = ({ onChange, status }: CacheConfigProps) => {
   const isDisabled = status === 'RUNNING';
 
   React.useEffect(() => {
+    if (hasSyncedCacheConfigThisSession || isDisabled) {
+      return;
+    }
+    hasSyncedCacheConfigThisSession = true;
+    if (onChange) {
+      onChange({ l1d, l1i });
+    }
+    // Deliberately keyed on `isDisabled` alone: this effect's only job is to
+    // retry the one-time initial sync once it becomes safe. Value changes
+    // are handled by the edit-propagation effect below.
+    // eslint-disable-next-line @eslint-react/exhaustive-deps
+  }, [isDisabled]);
+
+  const isFirstRenderRef = React.useRef(true);
+  React.useEffect(() => {
+    if (isFirstRenderRef.current) {
+      isFirstRenderRef.current = false;
+      return;
+    }
     if (onChange) {
       onChange({ l1d, l1i });
     }
