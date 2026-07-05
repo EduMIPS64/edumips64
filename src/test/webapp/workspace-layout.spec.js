@@ -121,6 +121,18 @@ test('dragging the vertical handle resizes the widgets column and persists', asy
   expect(Math.abs(afterReload.width - after.width)).toBeLessThan(20);
 });
 
+test('the Cycles region keeps its header on a narrow (stacked) viewport', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 500, height: 900 });
+  // The stacked layout still labels the Cycles region with its header bar
+  // (title + collapse toggle), matching the other stacked widgets.
+  const bottom = page.locator('#bottom-panel');
+  await bottom.scrollIntoViewIfNeeded();
+  await expect(bottom.getByText('Cycles')).toBeVisible();
+  await expect(page.getByTestId('toggle-bottom')).toBeVisible();
+});
+
 test('the widgets column cannot be dragged below its minimum width', async ({
   page,
 }) => {

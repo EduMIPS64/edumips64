@@ -172,6 +172,47 @@ const WorkspaceLayoutView = ({
       }
     };
 
+  // Bottom-region header bar (title + collapse toggle), shared by the desktop
+  // and mobile layouts so the Cycles region is always clearly labelled.
+  const bottomHeader = (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexShrink: 0,
+        minHeight: BAR,
+        px: 1,
+      }}
+    >
+      <Typography
+        variant="subtitle2"
+        sx={{ fontWeight: 600, color: 'primary.main' }}
+      >
+        {bottomTitle}
+      </Typography>
+      <Tooltip
+        title={live.bottomCollapsed ? 'Expand cycles' : 'Collapse cycles'}
+        placement="left"
+      >
+        <IconButton
+          size="small"
+          aria-label={live.bottomCollapsed ? 'Expand cycles' : 'Collapse cycles'}
+          data-testid="toggle-bottom"
+          onClick={() =>
+            commit({ ...live, bottomCollapsed: !live.bottomCollapsed })
+          }
+        >
+          {live.bottomCollapsed ? (
+            <KeyboardArrowUpIcon fontSize="small" />
+          ) : (
+            <KeyboardArrowDownIcon fontSize="small" />
+          )}
+        </IconButton>
+      </Tooltip>
+    </Box>
+  );
+
   // --- Mobile: stacked, non-resizable flow ---------------------------------
 
   if (isSmall) {
@@ -188,9 +229,20 @@ const WorkspaceLayoutView = ({
         </Box>
         <Box
           id="bottom-panel"
-          sx={{ borderTop: 1, borderColor: 'divider', height: '60vh' }}
+          sx={{
+            borderTop: 1,
+            borderColor: 'divider',
+            display: 'flex',
+            flexDirection: 'column',
+            // Collapsed → just the header; otherwise a bounded, scrollable
+            // region so the stacked page stays navigable on a phone.
+            height: live.bottomCollapsed ? 'auto' : '60vh',
+          }}
         >
-          {bottom}
+          {bottomHeader}
+          {!live.bottomCollapsed && (
+            <Box sx={{ flex: 1, minHeight: 0, px: 1, pb: 1 }}>{bottom}</Box>
+          )}
         </Box>
       </Box>
     );
@@ -391,43 +443,9 @@ const WorkspaceLayoutView = ({
           bgcolor: 'background.paper',
         }}
       >
-        {/* Header bar: title + collapse toggle. */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexShrink: 0,
-            minHeight: BAR,
-            px: 1,
-          }}
-        >
-          <Typography
-            variant="subtitle2"
-            sx={{ fontWeight: 600, color: 'primary.main' }}
-          >
-            {bottomTitle}
-          </Typography>
-          <Tooltip
-            title={bottomCollapsed ? 'Expand cycles' : 'Collapse cycles'}
-            placement="left"
-          >
-            <IconButton
-              size="small"
-              aria-label={bottomCollapsed ? 'Expand cycles' : 'Collapse cycles'}
-              data-testid="toggle-bottom"
-              onClick={() =>
-                commit({ ...live, bottomCollapsed: !bottomCollapsed })
-              }
-            >
-              {bottomCollapsed ? (
-                <KeyboardArrowUpIcon fontSize="small" />
-              ) : (
-                <KeyboardArrowDownIcon fontSize="small" />
-              )}
-            </IconButton>
-          </Tooltip>
-        </Box>
+        {/* Header bar: title + collapse toggle (shared with the mobile
+            layout). */}
+        {bottomHeader}
         {/* Content (hidden when collapsed so only the header bar shows). */}
         {!bottomCollapsed && (
           <Box sx={{ flex: 1, minHeight: 0, px: 1, pb: 1 }}>{bottom}</Box>
