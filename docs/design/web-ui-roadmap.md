@@ -46,13 +46,19 @@ below).
 User stories and features:
 
 * ~~`D.1, D.3` (Proper toolchain, Material UI)~~
-* `U.6-8` (Improved UI, including settings) — `U.8` (Settings UI) is done,
-  including persisting preferences to local storage (see also `S.2`); `U.6`
-  (full pipeline widget) and `U.7` (full cycles widget) are still pending.
+* `U.6-8` (Improved UI, including settings) — `U.6` (full pipeline widget)
+  and `U.8` (Settings UI) are done: the pipeline widget mirrors the Swing
+  `GUIPipeline` layout (IF/ID/EX/MEM/WB plus the FP adder/multiplier/divider
+  functional units), colors active and stalled stages, and labels the
+  specific hazard (RAW/WAW/structural); settings persist to local storage
+  (see also `S.2`). `U.7` (full cycles widget, i.e. a temporal
+  instruction-vs-cycle diagram like Swing's `GUICycles`) is still pending —
+  the web UI only shows the current cycle's pipeline snapshot, not a
+  history across cycles.
 * ~~`S.1-2` (Forwarding setting, persisted via HTML5 storage)~~
 
 ### GA (EduMIPS64 2.0)
-Status: **Not started**
+Status: **In Progress**
 
 Fully working web simulator, suitable as a replacement for the current simulator.
 
@@ -80,7 +86,7 @@ of future features might be:
 
 ## User Stories / Features
 
-Anything that is done (as of 28/04/2026) is marked with strike-through.
+Anything that is done (as of 05/07/2026) is marked with strike-through.
 
 ### Prerequisites
 This section contains the preliminary work necessary to move forward with the
@@ -112,8 +118,13 @@ implementation of the remaining features.
 3. ~~Basic registers, memory and code widgets.~~
 4. ~~Basic pipeline widget (no graphics, just text)~~
 5. ~~I/O widgets (necessary for `E.5.1`)~~
-6. Full Pipeline widget (state of which instructions are in which stage)
-7. Full Cycles widget (temporal instruction diagram)
+6. ~~Full Pipeline widget (state of which instructions are in which stage)~~
+   (mirrors the Swing `GUIPipeline`: IF/ID/EX/MEM/WB plus the FP
+   adder/multiplier/divider functional units, customizable per-stage
+   colors, and labeled RAW/WAW/structural stalls)
+7. Full Cycles widget (temporal instruction diagram) — the Swing `Cycles`
+   panel's history-across-cycles view; the web UI currently only shows the
+   current cycle's pipeline snapshot
 8. ~~Settings UI (necessary for `S.*`)~~
 9. ~~Code editor with syntax highlighting (e.g., ACE or Monaco)~~ (Monaco,
    with a custom MIPS language definition, inline parser-error markers and
