@@ -387,6 +387,52 @@ describe('sanitize — THEME_MODE validator', () => {
 });
 
 // ---------------------------------------------------------------------------
+// workspaceLayout validator
+// ---------------------------------------------------------------------------
+
+describe('sanitize(workspaceLayout)', () => {
+  const valid = {
+    rightWidthPct: 40,
+    bottomHeightPct: 25,
+    rightCollapsed: false,
+    bottomCollapsed: true,
+  };
+
+  it('returns a fully-valid layout unchanged', () => {
+    expect(sanitize(SettingKey.WORKSPACE_LAYOUT, valid)).toEqual(valid);
+  });
+
+  it('falls back to the default when a percentage is out of range', () => {
+    suppressWarn();
+    const def = getSchema(SettingKey.WORKSPACE_LAYOUT).default;
+    // rightWidthPct max is 60.
+    expect(
+      sanitize(SettingKey.WORKSPACE_LAYOUT, { ...valid, rightWidthPct: 95 }),
+    ).toEqual(def);
+    // bottomHeightPct min is 12.
+    expect(
+      sanitize(SettingKey.WORKSPACE_LAYOUT, { ...valid, bottomHeightPct: 2 }),
+    ).toEqual(def);
+  });
+
+  it('falls back to the default when a collapse flag is missing or non-boolean', () => {
+    suppressWarn();
+    const def = getSchema(SettingKey.WORKSPACE_LAYOUT).default;
+    const { rightCollapsed: _omit, ...missingFlag } = valid;
+    void _omit;
+    expect(sanitize(SettingKey.WORKSPACE_LAYOUT, missingFlag)).toEqual(def);
+    expect(
+      sanitize(SettingKey.WORKSPACE_LAYOUT, { ...valid, bottomCollapsed: 1 }),
+    ).toEqual(def);
+  });
+
+  it('falls back to the default for undefined', () => {
+    const def = getSchema(SettingKey.WORKSPACE_LAYOUT).default;
+    expect(sanitize(SettingKey.WORKSPACE_LAYOUT, undefined)).toEqual(def);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Schema completeness — every SettingKey is registered
 // ---------------------------------------------------------------------------
 

@@ -81,10 +81,16 @@ describe('colorKeyForState', () => {
 });
 
 describe('Cycles — empty state', () => {
-  it('shows a hint when no cycle has been executed yet', () => {
-    render(<Cycles cycles={{ time: 0, elements: [] }} />);
-    expect(screen.getByTestId('cycles-widget-empty')).toBeTruthy();
-    expect(screen.queryByTestId('cycles-widget')).toBeNull();
+  it('renders an empty diagram (no rows) when no cycle has been executed yet', () => {
+    const { container } = render(<Cycles cycles={{ time: 0, elements: [] }} />);
+    // The widget still renders — just with no instruction rows — rather than
+    // a placeholder message, so the bottom region always shows the grid frame.
+    expect(screen.getByTestId('cycles-widget').getAttribute('data-time')).toBe(
+      '0',
+    );
+    expect(
+      container.querySelectorAll('[data-testid="cycles-row"]'),
+    ).toHaveLength(0);
   });
 });
 

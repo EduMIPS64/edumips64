@@ -155,26 +155,25 @@ const CyclesWidget = ({ cycles, colors }: CyclesProps) => {
     }
   }, [cycles.time, rows.length]);
 
-  if (cycles.time === 0 || rows.length === 0) {
-    return (
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        data-testid="cycles-widget-empty"
-      >
-        Load a program and execute at least one cycle to see the temporal
-        instruction/cycle diagram.
-      </Typography>
-    );
-  }
-
-  const columnCount = cycles.time - minCycle + 1;
+  // No early return for the empty case: an empty program (or one that hasn't
+  // been stepped yet) renders as an empty diagram — the sticky "Instruction"
+  // header over a blank grid — rather than a placeholder message.
+  const columnCount = Math.max(0, cycles.time - minCycle + 1);
   const timelineWidth = columnCount * CELL_W;
   // Position of `cycle` (1-based CPU cycle) inside the timeline pane.
   const cycleX = (cycle: number) => (cycle - minCycle) * CELL_W;
 
   return (
-    <div data-testid="cycles-widget" data-time={cycles.time}>
+    <div
+      data-testid="cycles-widget"
+      data-time={cycles.time}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        minHeight: 0,
+      }}
+    >
       {truncated && (
         <Typography variant="caption" color="text.secondary">
           Long execution: showing only the most recent {MAX_COLUMNS} cycles /{' '}
@@ -184,8 +183,9 @@ const CyclesWidget = ({ cycles, colors }: CyclesProps) => {
       <Box
         ref={scrollRef}
         sx={{
+          flex: 1,
+          minHeight: 0,
           overflow: 'auto',
-          maxHeight: 360,
           border: 1,
           borderColor: 'divider',
           fontFamily: 'monospace',

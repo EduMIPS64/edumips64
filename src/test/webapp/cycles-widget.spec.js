@@ -36,13 +36,18 @@ test.beforeEach(async ({ page }) => {
   await removeOverlay(page);
 });
 
-test('cycles widget shows a hint before any program is loaded', async ({
+test('cycles widget renders an empty diagram before any program is loaded', async ({
   page,
 }) => {
-  // On a fresh page the CPU is in READY with zero cycles executed, so the
-  // widget shows its empty-state hint instead of an empty grid.
-  await expect(page.getByTestId('cycles-widget-empty')).toBeVisible();
-  await expect(page.getByTestId('cycles-widget')).toHaveCount(0);
+  // On a fresh page the CPU is in READY with zero cycles executed. The widget
+  // is always present in the bottom region, showing an empty grid (no rows)
+  // rather than a placeholder message.
+  await expect(page.getByTestId('cycles-widget')).toBeVisible();
+  await expect(page.getByTestId('cycles-widget')).toHaveAttribute(
+    'data-time',
+    '0',
+  );
+  await expect(page.getByTestId('cycles-row')).toHaveCount(0);
 });
 
 test('stepping fills the temporal diagram row by row', async ({ page }) => {
