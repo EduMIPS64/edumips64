@@ -150,6 +150,7 @@ export const SETTINGS_SCHEMA: Readonly<Record<string, SchemaEntry>> = Object.fre
     default: {
       stats: true,
       pipeline: true,
+      cycles: true,
       registers: true,
       memory: false,
       stdout: false,
@@ -322,6 +323,7 @@ export function sanitize(key: string, raw: unknown): unknown {
 export interface ExpandedAccordions {
   stats: boolean;
   pipeline: boolean;
+  cycles: boolean;
   registers: boolean;
   memory: boolean;
   stdout: boolean;

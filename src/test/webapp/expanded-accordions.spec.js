@@ -58,6 +58,7 @@ test('default panel expansion highlights pipeline and registers', async ({
 
   await expectExpanded(page, /^Stats/, true);
   await expectExpanded(page, /^Pipeline/, true);
+  await expectExpanded(page, /^Cycles/, true);
   await expectExpanded(page, /^Registers/, true);
   await expectExpanded(page, /^Memory/, false);
   await expectExpanded(page, /^Standard Output/, false);

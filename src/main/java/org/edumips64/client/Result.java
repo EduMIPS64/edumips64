@@ -36,6 +36,11 @@ public class Result {
   public String registers = "";
   public String statistics = "";
   public String cachestats = "";
+  // JSON-serialized temporal pipeline diagram (instruction-vs-cycle history)
+  // built from the CycleBuilder. Shape: {"time": N, "elements": [{"name",
+  // "serialNumber", "startTime", "states": [...]}]}. Parsed by the Web UI's
+  // worker wrapper alongside registers/memory/statistics.
+  public String cycles = "";
   public Pipeline pipeline;
   public boolean encounteredBreak = false;
   public JsArray<ParserError> parsingErrors;

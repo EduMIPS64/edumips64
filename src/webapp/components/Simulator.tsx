@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Code from './Code';
+import Cycles from './Cycles';
 import Memory from './Memory';
 import Pipeline from './Pipeline';
 import Registers from './Registers';
@@ -150,6 +151,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     stats,
     status,
     pipeline,
+    cycles,
     parsingErrors,
     parsedInstructions,
     stdout,
@@ -239,6 +241,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   const [accordionChanges, setAccordionChanges] = React.useState<AccordionChanges>({
     stats: false,
     pipeline: false,
+    cycles: false,
     registers: false,
     memory: false,
     stdout: false,
@@ -247,6 +250,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // Refs to track previous values for change detection
   const prevStats = React.useRef(stats);
   const prevPipeline = React.useRef(pipeline);
+  const prevCycles = React.useRef(cycles);
   const prevRegisters = React.useRef(registers);
   const prevMemory = React.useRef(memory);
   const prevStdout = React.useRef(stdout);
@@ -288,6 +292,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     setAccordionChanges({
       stats: false,
       pipeline: false,
+      cycles: false,
       registers: false,
       memory: false,
       stdout: false,
@@ -316,6 +321,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     setAccordionChanges({
       stats: false,
       pipeline: false,
+      cycles: false,
       registers: false,
       memory: false,
       stdout: false,
@@ -414,6 +420,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     if (!accordionAlerts) {
       prevStats.current = stats;
       prevPipeline.current = pipeline;
+      prevCycles.current = cycles;
       prevRegisters.current = registers;
       prevMemory.current = memory;
       prevStdout.current = stdout;
@@ -424,6 +431,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     if (isResetting.current) {
       prevStats.current = stats;
       prevPipeline.current = pipeline;
+      prevCycles.current = cycles;
       prevRegisters.current = registers;
       prevMemory.current = memory;
       prevStdout.current = stdout;
@@ -433,6 +441,10 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
 
     const statsChanged = !isEqual(stats, prevStats.current);
     const pipelineChanged = !isEqual(pipeline, prevPipeline.current);
+    // useSimulatorData preserves the cycles reference when the data is
+    // deep-equal, so a reference comparison is sufficient here (the object
+    // can grow large over long executions, making isEqual costly).
+    const cyclesChanged = cycles !== prevCycles.current;
     const registersChanged = !isEqual(registers, prevRegisters.current);
     const memoryChanged = !isEqual(memory, prevMemory.current);
     const stdoutChanged = stdout !== prevStdout.current;
@@ -440,6 +452,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     // Update refs first
     prevStats.current = stats;
     prevPipeline.current = pipeline;
+    prevCycles.current = cycles;
     prevRegisters.current = registers;
     prevMemory.current = memory;
     prevStdout.current = stdout;
@@ -448,6 +461,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     if (
       (!expandedAccordions.stats && statsChanged) ||
       (!expandedAccordions.pipeline && pipelineChanged) ||
+      (!expandedAccordions.cycles && cyclesChanged) ||
       (!expandedAccordions.registers && registersChanged) ||
       (!expandedAccordions.memory && memoryChanged) ||
       (!expandedAccordions.stdout && stdoutChanged)
@@ -457,6 +471,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
         stats: prev.stats || (!expandedAccordions.stats && statsChanged),
         pipeline:
           prev.pipeline || (!expandedAccordions.pipeline && pipelineChanged),
+        cycles: prev.cycles || (!expandedAccordions.cycles && cyclesChanged),
         registers:
           prev.registers || (!expandedAccordions.registers && registersChanged),
         memory: prev.memory || (!expandedAccordions.memory && memoryChanged),
@@ -466,6 +481,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   }, [
     stats,
     pipeline,
+    cycles,
     registers,
     memory,
     stdout,
@@ -661,6 +677,26 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
               </AccordionSummary>
               <AccordionDetails>
                 <Pipeline pipeline={pipeline} colors={pipelineColors} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion
+              expanded={expandedAccordions.cycles}
+              onChange={handleAccordionChange('cycles')}
+              disableGutters
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, color: 'primary.main' }}
+                >
+                  Cycles
+                  {accordionAlerts && accordionChanges.cycles && (
+                    <span className="accordion-change-indicator" />
+                  )}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Cycles cycles={cycles} colors={pipelineColors} />
               </AccordionDetails>
             </Accordion>
             <Accordion
