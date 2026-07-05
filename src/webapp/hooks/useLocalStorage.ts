@@ -109,15 +109,7 @@ export function useLocalStorage<T>(
     (next: T | ((prev: T) => T)) => {
       const current = getSnapshot(key, defaultValue);
       const newValue = typeof next === 'function' ? (next as (prev: T) => T)(current) : next;
-      try {
-        window.localStorage.setItem(key, JSON.stringify(newValue));
-      } catch (e) {
-        console.warn(`useLocalStorage: failed to write "${name}"`, e);
-      }
-      // Invalidate the parse cache for this key
-      parseCacheMap.delete(key);
-      // Notify all same-tab subscribers (storage event doesn't fire in the writing tab)
-      notifyLocal(key);
+      writeStoredValue(key, name, newValue);
     },
     [key, name, defaultValue],
   );
@@ -125,6 +117,37 @@ export function useLocalStorage<T>(
   const reset = useCallback(() => setValue(defaultValue), [setValue, defaultValue]);
 
   return [value, setValue, reset];
+}
+
+/**
+ * Write a value directly to a (namespaced) localStorage key and notify every
+ * same-tab `useLocalStorage`/`useSetting` instance subscribed to it, without
+ * needing a mounted hook instance for that key. Used by `resetStoredValue`
+ * below, so a single "reset to defaults" action can reset settings whose
+ * hooks live deep inside other components (e.g. cache configuration) without
+ * threading callbacks through every layer.
+ */
+function writeStoredValue(key: string, name: string, value: unknown): void {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    console.warn(`useLocalStorage: failed to write "${name}"`, e);
+  }
+  // Invalidate the parse cache for this key
+  parseCacheMap.delete(key);
+  // Notify all same-tab subscribers (storage event doesn't fire in the writing tab)
+  notifyLocal(key);
+}
+
+/**
+ * Reset a persisted setting to `defaultValue` by its (unnamespaced) key name,
+ * without needing a mounted `useLocalStorage`/`useSetting` hook instance.
+ * Any component currently subscribed to that key (via either hook) picks up
+ * the change immediately, the same way it would if that component's own
+ * `reset()` had been called.
+ */
+export function resetStoredValue(name: string, defaultValue: unknown): void {
+  writeStoredValue(storageKey(name), name, defaultValue);
 }
 
 // ---------------------------------------------------------------------------

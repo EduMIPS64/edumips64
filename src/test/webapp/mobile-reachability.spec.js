@@ -167,6 +167,7 @@ test('core header controls are reachable on a mobile viewport', async ({
   // Primary header controls a user needs to drive the simulator.
   await expectReachable(page, '#load-button');
   await expectReachable(page, '#program-menu-button');
+  await expectReachable(page, '#settings-button');
   await expectReachable(page, '#help-button');
 });
 

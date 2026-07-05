@@ -5,6 +5,8 @@ const {
   waitForPageReady,
   loadProgram,
   runToCompletion,
+  openSettingsDialog,
+  closeSettingsDialog,
 } = require('./test-utils');
 
 const STORAGE_PREFIX = 'edumips64:v1:';
@@ -74,24 +76,11 @@ test.afterEach(async ({ page }) => {
 });
 
 /**
- * Ensure the General Settings accordion is expanded. Mirrors the helper used
- * in `settings-persistence.spec.js`.
- */
-async function openSettingsAccordion(page) {
-  const summary = page.getByRole('button', { name: /General Settings/ });
-  await summary.waitFor({ state: 'visible' });
-  if ((await summary.getAttribute('aria-expanded')) !== 'true') {
-    await summary.click();
-  }
-  await expect(summary).toHaveAttribute('aria-expanded', 'true');
-}
-
-/**
- * Toggle the "CPU Forwarding" switch to the desired state. Uses the
- * accessible label so the test exercises the same DOM the user sees.
+ * Toggle the "CPU Forwarding" switch to the desired state, then close the
+ * (modal) Settings dialog so the rest of the page is reachable again.
  */
 async function setForwarding(page, enabled) {
-  await openSettingsAccordion(page);
+  await openSettingsDialog(page, 'Simulation');
   const forwardingSwitch = page.getByLabel('CPU Forwarding');
   await forwardingSwitch.waitFor({ state: 'visible' });
   const isChecked = await forwardingSwitch.isChecked();
@@ -99,6 +88,7 @@ async function setForwarding(page, enabled) {
     await forwardingSwitch.click();
   }
   await expect(forwardingSwitch).toBeChecked({ checked: enabled });
+  await closeSettingsDialog(page);
 }
 
 /**
@@ -234,7 +224,7 @@ test('forwarding switch persists across page reloads', async ({ page }) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsAccordion(page);
+  await openSettingsDialog(page, 'Simulation');
   const forwardingSwitch = page.getByLabel('CPU Forwarding');
   await expect(forwardingSwitch).toBeChecked();
 });
@@ -268,8 +258,9 @@ test('forwarding is applied on a fresh session and yields identical cycle/stall 
 
   // Do NOT toggle the switch — the test is that the restored value is what
   // drives the CPU. Just confirm it is still "on".
-  await openSettingsAccordion(page);
+  await openSettingsDialog(page, 'Simulation');
   await expect(page.getByLabel('CPU Forwarding')).toBeChecked();
+  await closeSettingsDialog(page);
 
   await loadProgram(page, FORWARDING_PROGRAM);
   await runToCompletion(page);
@@ -318,20 +309,22 @@ SYSCALL 0
   // not yet completed). `loadProgram` waits for `#step-button:not([disabled])`
   // which is exactly the RUNNING condition.
 
-  await openSettingsAccordion(page);
-  const forwardingSwitch = page.getByLabel('CPU Forwarding');
+  // The CPU Forwarding switch is unreachable while RUNNING: the entire
+  // Simulation tab is disabled (see settings-dialog.spec.js for the
+  // dedicated coverage of that), so opening Settings lands on — and stays
+  // on — the UI tab.
+  await page.click('#settings-button');
+  await page.waitForSelector('.settings-title');
+  await expect(page.locator('#settings-tab-1')).toBeDisabled();
+  await expect(page.getByLabel('CPU Forwarding')).not.toBeVisible();
 
-  // The switch must be disabled while the simulator is RUNNING.
-  await expect(forwardingSwitch).toBeDisabled();
-
-  // Try to flip it anyway; the state must not change. Playwright's `.click()`
-  // with `force: true` bypasses actionability checks, which lets us assert
-  // that even a forced click is ignored by the disabled <input>.
-  await forwardingSwitch.click({ force: true });
-  await expect(forwardingSwitch).not.toBeChecked();
+  // The Settings dialog is modal, so #stop-button (part of the run-controls
+  // toolbar behind it) must be reached with the dialog closed.
+  await closeSettingsDialog(page);
+  await page.click('#stop-button');
 
   // Stopping the simulation must re-enable the switch, so the user can
   // change forwarding for the next run.
-  await page.click('#stop-button');
-  await expect(forwardingSwitch).toBeEnabled();
+  await openSettingsDialog(page, 'Simulation');
+  await expect(page.getByLabel('CPU Forwarding')).toBeEnabled();
 });

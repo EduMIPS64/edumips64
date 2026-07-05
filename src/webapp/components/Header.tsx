@@ -16,6 +16,7 @@ import Chip from '@mui/material/Chip';
 import Link from '@mui/material/Link';
 
 import HelpDialog from './HelpDialog';
+import SettingsDialog from './SettingsDialog';
 import CpuStatusDisplay from './CpuStatusDisplay';
 import logoDark from '../static/logo-dark.png';
 import logoBright from '../static/logo.png';
@@ -27,12 +28,25 @@ import DownloadIcon from '@mui/icons-material/Download';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import HelpIcon from '@mui/icons-material/Help';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import SettingsIcon from '@mui/icons-material/Settings';
 import UploadIcon from '@mui/icons-material/Upload';
 
 import { deriveLogicalState } from '../simulatorState';
 import type { CpuStatus, ParsingError, SimulatorResult } from '../simulator/protocol';
+import type { GeneralSettingsPanelProps } from './settings/GeneralSettingsPanel';
+import type { EditorSettingsPanelProps } from './settings/EditorSettingsPanel';
+import type { PipelineColorsPanelProps } from './settings/PipelineColorsPanel';
+import type { CpuSettingsPanelProps } from './settings/CpuSettingsPanel';
+import type { CacheConfig as CacheConfigType } from '../settings/schema';
 
-interface HeaderProps {
+type SettingsProps = GeneralSettingsPanelProps &
+  EditorSettingsPanelProps &
+  PipelineColorsPanelProps &
+  Omit<CpuSettingsPanelProps, 'status'> & {
+    onCacheConfigChange?: (config: { l1d: CacheConfigType; l1i: CacheConfigType }) => void;
+  };
+
+interface HeaderProps extends SettingsProps {
   onLoadClick: () => void;
   loadEnabled: boolean;
   onClearClick: () => void;
@@ -61,8 +75,28 @@ export default function Header({
   executing,
   inputRequest,
   prefersDarkMode,
+  onCacheConfigChange,
+  viMode,
+  setViMode,
+  fontSize,
+  setFontSize,
+  accordionAlerts,
+  setAccordionAlerts,
+  pipelineColors,
+  setPipelineColors,
+  themeMode,
+  setThemeMode,
+  forwarding,
+  setForwarding,
+  delaySlot,
+  setDelaySlot,
+  stepStride,
+  setStepStride,
+  executionDelayMs,
+  setExecutionDelayMs,
 }: HeaderProps) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [settingsDialogOpen, setSettingsDialogOpen] = React.useState(false);
   const [programAnchor, setProgramAnchor] = React.useState<HTMLElement | null>(null);
   const menuOpen = Boolean(programAnchor);
   // Derive the logical UI state for editor-control gating.
@@ -309,6 +343,43 @@ export default function Header({
             <ListItemText>Load Example</ListItemText>
           </MenuItem>
         </Menu>
+        <Tooltip title="Settings" arrow placement="top">
+          <IconButton
+            color="inherit"
+            className="settings-button"
+            id="settings-button"
+            aria-label="Open settings"
+            onClick={() => {
+              setSettingsDialogOpen(true);
+            }}
+          >
+            <SettingsIcon />
+          </IconButton>
+        </Tooltip>
+        <SettingsDialog
+          open={settingsDialogOpen}
+          handleClose={() => setSettingsDialogOpen(false)}
+          status={status}
+          onCacheConfigChange={onCacheConfigChange}
+          viMode={viMode}
+          setViMode={setViMode}
+          fontSize={fontSize}
+          setFontSize={setFontSize}
+          accordionAlerts={accordionAlerts}
+          setAccordionAlerts={setAccordionAlerts}
+          pipelineColors={pipelineColors}
+          setPipelineColors={setPipelineColors}
+          themeMode={themeMode}
+          setThemeMode={setThemeMode}
+          forwarding={forwarding}
+          setForwarding={setForwarding}
+          delaySlot={delaySlot}
+          setDelaySlot={setDelaySlot}
+          stepStride={stepStride}
+          setStepStride={setStepStride}
+          executionDelayMs={executionDelayMs}
+          setExecutionDelayMs={setExecutionDelayMs}
+        />
         <IconButton
           color="inherit"
           className="help-button"
