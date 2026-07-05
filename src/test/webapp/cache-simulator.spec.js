@@ -7,21 +7,24 @@ const {
   waitForSimulationComplete,
   loadProgram,
   runToCompletion,
+  openSettingsDialog,
+  closeSettingsDialog,
 } = require('./test-utils');
 
 /**
- * Helper function to set cache configuration values.
- * Uses positional selectors within each cache section to find the correct input fields.
- * The order of inputs is: Size, Block Size, Associativity.
+ * Helper function to set cache configuration values, via the Settings
+ * dialog's Cache tab. Uses positional selectors within each cache section to
+ * find the correct input fields. The order of inputs is: Size, Block Size,
+ * Associativity.
+ *
+ * Closes the (modal) Settings dialog before returning, so callers can go
+ * straight into loading/running a program.
+ *
  * @param {import('@playwright/test').Page} page - Playwright page object
  * @param {string} cacheType - 'L1 Data Cache' or 'L1 Instruction Cache'
  * @param {object} config - { size, blockSize, associativity }
  */
 async function setCacheConfig(page, cacheType, config) {
-  // The "Cache Configuration" accordion that wraps these inputs is collapsed
-  // by default (issue #1697). Make sure it's expanded before trying to fill
-  // any field, otherwise the inputs aren't visible/editable and Playwright
-  // will hang until the test times out.
   await expandCacheConfig(page);
 
   // Find the cache configuration section by its label
@@ -41,20 +44,17 @@ async function setCacheConfig(page, cacheType, config) {
     const assocInput = cacheSection.locator('input[type="number"]').nth(2);
     await assocInput.fill(String(config.associativity));
   }
+
+  await closeSettingsDialog(page);
 }
 
+/**
+ * Open the Settings dialog on its Cache tab. Cache configuration used to
+ * live in a collapsible "Cache Configuration" accordion (issue #1697); it
+ * now lives in the Settings dialog opened via the gear button.
+ */
 async function expandCacheConfig(page) {
-  const cacheAccordionSummary = page.getByRole('button', {
-    name: /Cache Configuration/,
-  });
-  await cacheAccordionSummary.waitFor({ state: 'visible' });
-  if ((await cacheAccordionSummary.getAttribute('aria-expanded')) !== 'true') {
-    await cacheAccordionSummary.click();
-    await expect(cacheAccordionSummary).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    );
-  }
+  await openSettingsDialog(page, 'Cache');
 }
 
 /**

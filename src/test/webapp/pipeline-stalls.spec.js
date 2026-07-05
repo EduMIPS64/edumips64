@@ -4,6 +4,8 @@ const {
   removeOverlay,
   waitForPageReady,
   loadProgram,
+  openSettingsDialog,
+  closeSettingsDialog,
 } = require('./test-utils');
 
 /**
@@ -55,23 +57,19 @@ test.afterEach(async ({ page }) => {
 });
 
 /**
- * Ensure the General Settings accordion is expanded and toggle the
- * "CPU Forwarding" switch to the desired state. Mirrors the helpers in
+ * Open the Settings dialog's CPU tab and toggle the "CPU Forwarding" switch
+ * to the desired state, then close the (modal) dialog. Mirrors the helper in
  * `forwarding.spec.js` so this spec stays self-contained.
  */
 async function setForwarding(page, enabled) {
-  const summary = page.getByRole('button', { name: /General Settings/ });
-  await summary.waitFor({ state: 'visible' });
-  if ((await summary.getAttribute('aria-expanded')) !== 'true') {
-    await summary.click();
-  }
-  await expect(summary).toHaveAttribute('aria-expanded', 'true');
+  await openSettingsDialog(page, 'CPU');
   const forwardingSwitch = page.getByLabel('CPU Forwarding');
   await forwardingSwitch.waitFor({ state: 'visible' });
   if ((await forwardingSwitch.isChecked()) !== enabled) {
     await forwardingSwitch.click();
   }
   await expect(forwardingSwitch).toBeChecked({ checked: enabled });
+  await closeSettingsDialog(page);
 }
 
 /**

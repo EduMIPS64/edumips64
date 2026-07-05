@@ -74,6 +74,37 @@ async function clickProgramMenuItem(page, id) {
 }
 
 /**
+ * Helper function to open the Settings dialog (the gear button next to the
+ * Program menu) and, optionally, switch to a given tab.
+ *
+ * The dialog is modal (like the Help dialog): while it is open, controls
+ * elsewhere on the page (Load, Program menu, Run controls, ...) are not
+ * reachable. Callers that need to interact with those must call
+ * `closeSettingsDialog` first.
+ *
+ * @param {import('@playwright/test').Page} page - Playwright page object
+ * @param {'UI'|'CPU'|'Execution'|'Cache'} [tabName] - tab to select; if
+ *   omitted, whichever tab was last active (or "UI", the first tab, on a
+ *   fresh open) stays selected.
+ */
+async function openSettingsDialog(page, tabName) {
+  await page.click('#settings-button');
+  await page.waitForSelector('.settings-title');
+  if (tabName) {
+    await page.getByRole('tab', { name: tabName }).click();
+  }
+}
+
+/**
+ * Helper function to close the Settings dialog opened by `openSettingsDialog`.
+ * @param {import('@playwright/test').Page} page - Playwright page object
+ */
+async function closeSettingsDialog(page) {
+  await page.click('#settings-close-button');
+  await page.waitForSelector('.settings-title', { state: 'hidden' });
+}
+
+/**
  * Helper function to wait for simulator to finish execution
  * @param {import('@playwright/test').Page} page - Playwright page object
  */
@@ -192,6 +223,8 @@ module.exports = {
   resetSimulator,
   openProgramMenu,
   clickProgramMenuItem,
+  openSettingsDialog,
+  closeSettingsDialog,
   loadProgram,
   runToCompletion
 };
