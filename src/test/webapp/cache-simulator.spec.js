@@ -54,7 +54,7 @@ async function setCacheConfig(page, cacheType, config) {
  * now lives in the Settings dialog opened via the gear button.
  */
 async function expandCacheConfig(page) {
-  await openSettingsDialog(page, 'Cache');
+  await openSettingsDialog(page, 'Simulation');
 }
 
 /**

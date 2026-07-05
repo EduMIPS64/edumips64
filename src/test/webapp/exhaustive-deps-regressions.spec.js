@@ -53,7 +53,7 @@ async function setViMode(page, enabled) {
  * close the (modal) dialog.
  */
 async function setCacheConfig(page, cacheType, config) {
-  await openSettingsDialog(page, 'Cache');
+  await openSettingsDialog(page, 'Simulation');
   const cacheSection = page.locator(`text=${cacheType}`).locator('..');
 
   if (config.size !== undefined) {

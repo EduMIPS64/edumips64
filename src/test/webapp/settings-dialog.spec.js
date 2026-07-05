@@ -4,10 +4,11 @@ const { targetUri, waitForPageReady, removeOverlay } = require('./test-utils');
 /**
  * Coverage for the Settings dialog itself: the gear button in the header
  * opens a modal dialog (mirroring the Help dialog) with settings grouped
- * into UI / CPU / Execution / Cache tabs. The individual controls inside
- * each tab are covered by settings-persistence.spec.js, forwarding.spec.js
- * and cache-simulator.spec.js; this spec only checks the dialog shell and
- * navigation between tabs.
+ * into a UI tab and a Simulation tab (CPU / Execution / Cache sections).
+ * The individual controls inside each tab are covered by
+ * settings-persistence.spec.js, forwarding.spec.js and
+ * cache-simulator.spec.js; this spec only checks the dialog shell,
+ * navigation between tabs, and the dialog-wide Reset to defaults button.
  */
 
 test('settings dialog opens from the gear button next to the Program menu', async ({
@@ -29,15 +30,11 @@ test('settings dialog opens from the gear button next to the Program menu', asyn
   const title = await page.textContent('.settings-title');
   expect(title).toContain('Settings');
 
-  // All four tabs are present.
+  // Both tabs are present.
   await page.waitForSelector('#settings-tab-0');
   await page.waitForSelector('#settings-tab-1');
-  await page.waitForSelector('#settings-tab-2');
-  await page.waitForSelector('#settings-tab-3');
   expect(await page.textContent('#settings-tab-0')).toBe('UI');
-  expect(await page.textContent('#settings-tab-1')).toBe('CPU');
-  expect(await page.textContent('#settings-tab-2')).toBe('Execution');
-  expect(await page.textContent('#settings-tab-3')).toBe('Cache');
+  expect(await page.textContent('#settings-tab-1')).toBe('Simulation');
 
   // The dialog opens on the UI tab by default, showing its controls.
   await expect(page.getByLabel('Editor Vi Mode')).toBeVisible();
@@ -45,7 +42,7 @@ test('settings dialog opens from the gear button next to the Program menu', asyn
   await page.close();
 });
 
-test('settings dialog tabs are logically grouped by settings type', async ({
+test('the Simulation tab groups CPU, Execution and Cache into labeled sections', async ({
   page,
 }) => {
   await page.goto(targetUri);
@@ -55,29 +52,38 @@ test('settings dialog tabs are logically grouped by settings type', async ({
   await page.click('#settings-button');
   await page.waitForSelector('.settings-title');
 
-  // UI tab: editor/appearance settings.
+  // UI tab controls are visible by default...
   await expect(page.getByLabel('Editor Vi Mode')).toBeVisible();
-  await expect(page.getByLabel('Accordion Change Alerts')).toBeVisible();
-  await expect(page.getByTestId('theme-mode-toggle')).toBeVisible();
 
-  // CPU tab: pipeline behavior settings.
+  // ...and not part of the Simulation tab's panel.
   await page.click('#settings-tab-1');
-  await expect(page.getByLabel('CPU Forwarding')).toBeVisible();
-  await expect(page.getByLabel('Branch Delay Slot')).toBeVisible();
-  // UI-tab controls are not part of this panel.
   await expect(page.getByLabel('Editor Vi Mode')).not.toBeVisible();
 
-  // Execution tab: run pacing settings.
-  await page.click('#settings-tab-2');
+  // Scope section-heading lookups to the Simulation tabpanel: the
+  // right-hand Statistics panel behind the (still-rendered, just visually
+  // dimmed) dialog also has an "Execution" heading of its own.
+  const simulationPanel = page.locator('#settings-tabpanel-1');
+
+  // All three sections are visible together, in a single tab, in order.
+  await expect(simulationPanel.getByText('CPU', { exact: true })).toBeVisible();
+  await expect(page.getByLabel('CPU Forwarding')).toBeVisible();
+  await expect(page.getByLabel('Branch Delay Slot')).toBeVisible();
+
+  await expect(simulationPanel.getByText('Execution', { exact: true })).toBeVisible();
   await expect(page.getByLabel('Multi Step Size')).toBeVisible();
   await expect(page.getByLabel('Execution Delay (ms)')).toBeVisible();
-  await expect(page.getByLabel('CPU Forwarding')).not.toBeVisible();
 
-  // Cache tab: L1 cache configuration.
-  await page.click('#settings-tab-3');
+  await expect(simulationPanel.getByText('Cache', { exact: true })).toBeVisible();
   await expect(page.locator('text=L1 Instruction Cache')).toBeVisible();
   await expect(page.locator('text=L1 Data Cache')).toBeVisible();
-  await expect(page.getByLabel('Multi Step Size')).not.toBeVisible();
+
+  const [cpuBox, executionBox, cacheBox] = await Promise.all([
+    simulationPanel.getByText('CPU', { exact: true }).boundingBox(),
+    simulationPanel.getByText('Execution', { exact: true }).boundingBox(),
+    simulationPanel.getByText('Cache', { exact: true }).boundingBox(),
+  ]);
+  expect(cpuBox.y).toBeLessThan(executionBox.y);
+  expect(executionBox.y).toBeLessThan(cacheBox.y);
 
   await page.close();
 });
@@ -95,6 +101,30 @@ test('settings dialog closes with the Close button', async ({ page }) => {
 
   // The gear button remains available to reopen it.
   await expect(page.locator('#settings-button')).toBeVisible();
+});
+
+test('Reset to defaults asks for confirmation and is cancelable', async ({
+  page,
+}) => {
+  await page.goto(targetUri);
+  await waitForPageReady(page);
+  await removeOverlay(page);
+
+  await page.click('#settings-button');
+  await page.waitForSelector('.settings-title');
+
+  const viModeSwitch = page.getByLabel('Editor Vi Mode');
+  await viModeSwitch.click();
+  await expect(viModeSwitch).toBeChecked();
+
+  // Dismiss the confirmation instead of accepting it.
+  page.once('dialog', (dialog) => dialog.dismiss());
+  await page.click('#settings-reset-button');
+
+  // The setting must be unchanged: the reset was canceled.
+  await expect(viModeSwitch).toBeChecked();
+
+  await page.close();
 });
 
 test('cache configuration and general settings are no longer separate accordions', async ({

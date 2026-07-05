@@ -8,6 +8,8 @@ import DialogActions from '@mui/material/DialogActions';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import Typography from '@mui/material/Typography';
 
 import UiSettingsPanel, {
   type UiSettingsPanelProps,
@@ -19,6 +21,7 @@ import ExecutionSettingsPanel, {
   type ExecutionSettingsPanelProps,
 } from './settings/ExecutionSettingsPanel';
 import CacheConfig from './CacheConfig';
+import { resetAllDialogSettings } from '../settings/useSetting';
 import type { CacheConfig as CacheConfigType } from '../settings/schema';
 import type { CpuStatus } from '../simulator/protocol';
 
@@ -41,8 +44,28 @@ function TabPanel({ children, value, index }: TabPanelProps) {
   );
 }
 
+function SectionHeading({
+  children,
+  first,
+}: {
+  children: React.ReactNode;
+  first?: boolean;
+}) {
+  return (
+    <>
+      {!first && <Divider sx={{ my: 3 }} />}
+      <Typography
+        variant="subtitle2"
+        sx={{ fontWeight: 700, mb: 2, color: 'primary.main' }}
+      >
+        {children}
+      </Typography>
+    </>
+  );
+}
+
 type SettingsDialogProps = UiSettingsPanelProps &
-  CpuSettingsPanelProps &
+  Omit<CpuSettingsPanelProps, 'status'> &
   ExecutionSettingsPanelProps & {
     open: boolean;
     handleClose: () => void;
@@ -83,6 +106,16 @@ export default function SettingsDialog({
     setTabValue(newValue);
   };
 
+  const handleResetAll = () => {
+    if (
+      window.confirm(
+        'Reset all settings to their defaults? This cannot be undone.',
+      )
+    ) {
+      resetAllDialogSettings();
+    }
+  };
+
   return (
     <Dialog
       onClose={handleClose}
@@ -109,9 +142,7 @@ export default function SettingsDialog({
           aria-label="settings tabs"
         >
           <Tab label="UI" id="settings-tab-0" />
-          <Tab label="CPU" id="settings-tab-1" />
-          <Tab label="Execution" id="settings-tab-2" />
-          <Tab label="Cache" id="settings-tab-3" />
+          <Tab label="Simulation" id="settings-tab-1" />
         </Tabs>
       </Box>
       <DialogContent className="settings-content" sx={{ p: 0 }}>
@@ -130,6 +161,7 @@ export default function SettingsDialog({
           />
         </TabPanel>
         <TabPanel value={tabValue} index={1}>
+          <SectionHeading first>CPU</SectionHeading>
           <CpuSettingsPanel
             forwarding={forwarding}
             setForwarding={setForwarding}
@@ -137,20 +169,29 @@ export default function SettingsDialog({
             setDelaySlot={setDelaySlot}
             status={status}
           />
-        </TabPanel>
-        <TabPanel value={tabValue} index={2}>
+
+          <SectionHeading>Execution</SectionHeading>
           <ExecutionSettingsPanel
             stepStride={stepStride}
             setStepStride={setStepStride}
             executionDelayMs={executionDelayMs}
             setExecutionDelayMs={setExecutionDelayMs}
           />
-        </TabPanel>
-        <TabPanel value={tabValue} index={3}>
+
+          <SectionHeading>Cache</SectionHeading>
           <CacheConfig onChange={onCacheConfigChange} status={status} />
         </TabPanel>
       </DialogContent>
       <DialogActions>
+        <Button
+          onClick={handleResetAll}
+          variant="text"
+          color="inherit"
+          id="settings-reset-button"
+          sx={{ mr: 'auto' }}
+        >
+          Reset to defaults
+        </Button>
         <Button
           onClick={handleClose}
           variant="outlined"

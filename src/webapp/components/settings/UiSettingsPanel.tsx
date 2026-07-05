@@ -67,8 +67,6 @@ const UiSettingsPanel = ({
       const base = { ...DEFAULT_PIPELINE_COLORS, ...(pipelineColors || {}) };
       setPipelineColors({ ...base, [key]: e.target.value });
     };
-  const resetPipelineColors = () =>
-    setPipelineColors({ ...DEFAULT_PIPELINE_COLORS });
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -170,26 +168,9 @@ const UiSettingsPanel = ({
         </Box>
       </Box>
       <Box>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            mb: 1,
-          }}
-        >
-          <Typography sx={{ fontSize: '0.85rem', fontWeight: 'bold' }}>
-            Pipeline Colors
-          </Typography>
-          <Button
-            size="small"
-            variant="outlined"
-            onClick={resetPipelineColors}
-            data-testid="pipeline-colors-reset"
-          >
-            Reset to defaults
-          </Button>
-        </Box>
+        <Typography sx={{ fontSize: '0.85rem', fontWeight: 'bold', mb: 1 }}>
+          Pipeline Colors
+        </Typography>
         <Box
           sx={{
             display: 'grid',

@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { resetStoredValue, useLocalStorage } from '../hooks/useLocalStorage';
 import { getSchema, sanitize, type SettingValueMap } from './schema';
-import type { SettingKeyType } from './SettingKey';
+import { SettingKey, type SettingKeyType } from './SettingKey';
 
 /**
  * Higher-level hook for a single persisted setting.
@@ -74,4 +74,36 @@ export function useSetting<K extends SettingKeyType>(
   );
 
   return [value, setValue, resetRaw];
+}
+
+/**
+ * The settings surfaced in the Settings dialog (UI + Simulation tabs).
+ * Deliberately excludes `EDITOR_CODE` (the user's in-progress program),
+ * `EXPANDED_ACCORDIONS` (right-rail layout, not a "setting") and
+ * `HELP_LANGUAGE` (belongs to the Help dialog, not this one).
+ */
+const SETTINGS_DIALOG_KEYS: SettingKeyType[] = [
+  SettingKey.VI_MODE,
+  SettingKey.FONT_SIZE,
+  SettingKey.ACCORDION_ALERTS,
+  SettingKey.THEME_MODE,
+  SettingKey.PIPELINE_COLORS,
+  SettingKey.FORWARDING,
+  SettingKey.DELAY_SLOT,
+  SettingKey.STEP_STRIDE,
+  SettingKey.EXECUTION_DELAY_MS,
+  SettingKey.CACHE_L1D,
+  SettingKey.CACHE_L1I,
+];
+
+/**
+ * Reset every setting shown in the Settings dialog to its schema default.
+ * Mirrors the Swing UI's "Reset to defaults" button (`GUIConfig.java`),
+ * including resetting settings whose `useSetting` hook lives in a different
+ * component (e.g. cache configuration) — see `resetStoredValue`.
+ */
+export function resetAllDialogSettings(): void {
+  for (const key of SETTINGS_DIALOG_KEYS) {
+    resetStoredValue(key, getSchema(key).default);
+  }
 }

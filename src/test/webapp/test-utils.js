@@ -83,9 +83,9 @@ async function clickProgramMenuItem(page, id) {
  * `closeSettingsDialog` first.
  *
  * @param {import('@playwright/test').Page} page - Playwright page object
- * @param {'UI'|'CPU'|'Execution'|'Cache'} [tabName] - tab to select; if
- *   omitted, whichever tab was last active (or "UI", the first tab, on a
- *   fresh open) stays selected.
+ * @param {'UI'|'Simulation'} [tabName] - tab to select ("Simulation" holds
+ *   the CPU / Execution / Cache sections); if omitted, whichever tab was
+ *   last active (or "UI", the first tab, on a fresh open) stays selected.
  */
 async function openSettingsDialog(page, tabName) {
   await page.click('#settings-button');

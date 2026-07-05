@@ -12,7 +12,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useSetting } from '../../webapp/settings/useSetting';
+import { useSetting, resetAllDialogSettings } from '../../webapp/settings/useSetting';
 import { SettingKey } from '../../webapp/settings/SettingKey';
 import { getSchema, DEFAULT_PIPELINE_COLORS } from '../../webapp/settings/schema';
 
@@ -224,5 +224,84 @@ describe('useSetting — multi-instance sync', () => {
 
     // FORWARDING should be unaffected.
     expect(hook2.result.current[0]).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// resetAllDialogSettings — the Settings dialog's "Reset to defaults" button
+// ---------------------------------------------------------------------------
+
+describe('resetAllDialogSettings', () => {
+  it('resets a setting to its default even though no hook instance for it is mounted', () => {
+    // Write a non-default value directly, without mounting a hook — this is
+    // the situation for cache config, whose useSetting calls live inside
+    // CacheConfig.tsx, not in the component that renders the reset button.
+    window.localStorage.setItem(
+      `edumips64:v1:${SettingKey.CACHE_L1D}`,
+      JSON.stringify({ size: 4096, blockSize: 32, associativity: 2 }),
+    );
+
+    act(() => {
+      resetAllDialogSettings();
+    });
+
+    const { result } = renderHook(() => useSetting(SettingKey.CACHE_L1D));
+    expect(result.current[0]).toEqual(getSchema(SettingKey.CACHE_L1D).default);
+  });
+
+  it('updates an already-mounted hook instance immediately (same-tab notification)', () => {
+    const { result } = renderHook(() => useSetting(SettingKey.FORWARDING));
+    act(() => {
+      result.current[1](true);
+    });
+    expect(result.current[0]).toBe(true);
+
+    act(() => {
+      resetAllDialogSettings();
+    });
+
+    expect(result.current[0]).toBe(false);
+  });
+
+  it('resets every dialog-owned setting: UI, CPU, execution and cache', () => {
+    const viMode = renderHook(() => useSetting(SettingKey.VI_MODE));
+    const delaySlot = renderHook(() => useSetting(SettingKey.DELAY_SLOT));
+    const stepStride = renderHook(() => useSetting(SettingKey.STEP_STRIDE));
+    const pipelineColors = renderHook(() => useSetting(SettingKey.PIPELINE_COLORS));
+
+    act(() => {
+      viMode.result.current[1](true);
+      delaySlot.result.current[1](true);
+      stepStride.result.current[1](999);
+      pipelineColors.result.current[1]({ ...DEFAULT_PIPELINE_COLORS, IF: '#000000' });
+    });
+
+    act(() => {
+      resetAllDialogSettings();
+    });
+
+    expect(viMode.result.current[0]).toBe(false);
+    expect(delaySlot.result.current[0]).toBe(false);
+    expect(stepStride.result.current[0]).toBe(getSchema(SettingKey.STEP_STRIDE).default);
+    expect(pipelineColors.result.current[0]).toEqual(DEFAULT_PIPELINE_COLORS);
+  });
+
+  it('does not touch settings outside the dialog (editor code, expanded accordions, help language)', () => {
+    const editorCode = renderHook(() => useSetting(SettingKey.EDITOR_CODE));
+    const helpLanguage = renderHook(() => useSetting(SettingKey.HELP_LANGUAGE));
+
+    act(() => {
+      editorCode.result.current[1]('.code\nSYSCALL 0\n');
+      helpLanguage.result.current[1]('it');
+    });
+
+    act(() => {
+      resetAllDialogSettings();
+    });
+
+    // Untouched — a "reset settings" action must never discard the user's
+    // in-progress program or their Help-dialog language preference.
+    expect(editorCode.result.current[0]).toBe('.code\nSYSCALL 0\n');
+    expect(helpLanguage.result.current[0]).toBe('it');
   });
 });

@@ -62,7 +62,7 @@ test.afterEach(async ({ page }) => {
  * `forwarding.spec.js` so this spec stays self-contained.
  */
 async function setForwarding(page, enabled) {
-  await openSettingsDialog(page, 'CPU');
+  await openSettingsDialog(page, 'Simulation');
   const forwardingSwitch = page.getByLabel('CPU Forwarding');
   await forwardingSwitch.waitFor({ state: 'visible' });
   if ((await forwardingSwitch.isChecked()) !== enabled) {

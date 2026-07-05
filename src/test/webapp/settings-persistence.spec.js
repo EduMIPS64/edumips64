@@ -164,7 +164,7 @@ test('stepStride and executionDelayMs persist across page reloads', async ({ pag
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsDialog(page, 'Execution');
+  await openSettingsDialog(page, 'Simulation');
 
   // Change Multi Step Size from the default (500) to 250.
   const strideInput = page.getByLabel('Multi Step Size');
@@ -194,7 +194,7 @@ test('stepStride and executionDelayMs persist across page reloads', async ({ pag
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsDialog(page, 'Execution');
+  await openSettingsDialog(page, 'Simulation');
 
   await expect(page.getByLabel('Multi Step Size')).toHaveValue('250');
   await expect(page.getByLabel('Execution Delay (ms)')).toHaveValue('100');
@@ -324,13 +324,24 @@ test('pipelineColors also drive Monaco stage highlights', async ({ page }) => {
  * Test: the Pipeline Colors "Reset to defaults" button restores every entry
  * to the schema defaults.
  */
-test('pipelineColors reset restores schema defaults', async ({ page }) => {
+/**
+ * Test: the dialog-wide "Reset to defaults" button (next to Close) restores
+ * every setting shown in the dialog, not just the one in the tab it was
+ * clicked from. Mirrors the Swing UI's `Config.RESET` button.
+ */
+test('Reset to defaults restores every dialog setting, not just the current tab', async ({
+  page,
+}) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
   await openSettingsDialog(page, 'UI');
 
-  // Pick a non-default value for IF to make sure reset really overwrites.
+  // Pick non-default values on the UI tab.
+  const viModeSwitch = page.getByLabel('Editor Vi Mode');
+  await viModeSwitch.click();
+  await expect(viModeSwitch).toBeChecked();
+
   const ifInput = page.getByTestId('pipeline-color-IF');
   await ifInput.evaluate((el) => {
     const setter = Object.getOwnPropertyDescriptor(
@@ -343,10 +354,25 @@ test('pipelineColors reset restores schema defaults', async ({ page }) => {
   });
   await expect(ifInput).toHaveValue('#000000');
 
-  await page.getByTestId('pipeline-colors-reset').click();
+  // ...and a non-default value on the Simulation tab, without closing the
+  // dialog — the reset must reach across tabs.
+  await page.getByRole('tab', { name: 'Simulation' }).click();
+  const forwardingSwitch = page.getByLabel('CPU Forwarding');
+  await forwardingSwitch.click();
+  await expect(forwardingSwitch).toBeChecked();
 
+  // The button asks for confirmation via window.confirm(); accept it.
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.click('#settings-reset-button');
+
+  // Simulation tab: forwarding back to its default (off).
+  await expect(forwardingSwitch).not.toBeChecked();
+
+  // UI tab: both Vi Mode and the pipeline color are back to their defaults.
+  await page.getByRole('tab', { name: 'UI' }).click();
+  await expect(page.getByLabel('Editor Vi Mode')).not.toBeChecked();
   // Schema default for IF (mirrors Swing UI's `IF_COLOR`).
-  await expect(ifInput).toHaveValue('#ebeb3b');
+  await expect(page.getByTestId('pipeline-color-IF')).toHaveValue('#ebeb3b');
 });
 
 /**

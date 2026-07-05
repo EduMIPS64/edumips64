@@ -80,7 +80,7 @@ test.afterEach(async ({ page }) => {
  * (modal) Settings dialog so the rest of the page is reachable again.
  */
 async function setForwarding(page, enabled) {
-  await openSettingsDialog(page, 'CPU');
+  await openSettingsDialog(page, 'Simulation');
   const forwardingSwitch = page.getByLabel('CPU Forwarding');
   await forwardingSwitch.waitFor({ state: 'visible' });
   const isChecked = await forwardingSwitch.isChecked();
@@ -224,7 +224,7 @@ test('forwarding switch persists across page reloads', async ({ page }) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsDialog(page, 'CPU');
+  await openSettingsDialog(page, 'Simulation');
   const forwardingSwitch = page.getByLabel('CPU Forwarding');
   await expect(forwardingSwitch).toBeChecked();
 });
@@ -258,7 +258,7 @@ test('forwarding is applied on a fresh session and yields identical cycle/stall 
 
   // Do NOT toggle the switch — the test is that the restored value is what
   // drives the CPU. Just confirm it is still "on".
-  await openSettingsDialog(page, 'CPU');
+  await openSettingsDialog(page, 'Simulation');
   await expect(page.getByLabel('CPU Forwarding')).toBeChecked();
   await closeSettingsDialog(page);
 
@@ -309,7 +309,7 @@ SYSCALL 0
   // not yet completed). `loadProgram` waits for `#step-button:not([disabled])`
   // which is exactly the RUNNING condition.
 
-  await openSettingsDialog(page, 'CPU');
+  await openSettingsDialog(page, 'Simulation');
   let forwardingSwitch = page.getByLabel('CPU Forwarding');
 
   // The switch must be disabled while the simulator is RUNNING.
@@ -328,7 +328,7 @@ SYSCALL 0
 
   // Stopping the simulation must re-enable the switch, so the user can
   // change forwarding for the next run.
-  await openSettingsDialog(page, 'CPU');
+  await openSettingsDialog(page, 'Simulation');
   forwardingSwitch = page.getByLabel('CPU Forwarding');
   await expect(forwardingSwitch).toBeEnabled();
 });
