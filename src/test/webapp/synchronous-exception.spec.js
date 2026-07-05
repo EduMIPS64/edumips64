@@ -54,7 +54,7 @@ test('integer overflow produces a user-friendly synchronous-exception alert', as
   expect(dialogText).toContain('Integer overflow');
   expect(dialogText).toContain('INTOVERFLOW');
   expect(dialogText).toMatch(/Instruction:\s*ADD\b/i);
-  expect(dialogText).toContain('Pipeline stage: EX');
+  expect(dialogText).toContain('stage: EX');
 
   // It must NOT be the raw Java exception toString (which used to be the case).
   expect(dialogText).not.toContain('org.edumips64.core');

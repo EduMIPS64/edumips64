@@ -40,6 +40,7 @@ import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.core.cache.CacheConfig;
 import org.edumips64.utils.ConfigKey;
 import org.edumips64.utils.ConfigStore;
+import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.InMemoryConfigStore;
 import org.edumips64.utils.io.InputNeededException;
@@ -97,6 +98,20 @@ public class Simulator {
     resultFactory = new ResultFactory(cpu, memory, cachesim, stdout, cycleBuilder);
     supportedInstructions = instructionBuilder.getSupportedInstructionString();
     info("initialization complete!");
+  }
+
+  /**
+   * Set the language used for localized messages produced by the core (parser
+   * errors, runtime/synchronous-exception text, input-dialog prompts). The
+   * value is one of the codes understood by {@link CurrentLocale}: {@code en},
+   * {@code it} or {@code zhcn}. It is written to this simulator's
+   * {@link ConfigStore} and installed on the static {@link CurrentLocale}
+   * facade, which the core consults through {@code CurrentLocale.getString}.
+   */
+  public Result setLanguage(String lang) {
+    config.putString(ConfigKey.LANGUAGE, lang);
+    CurrentLocale.setConfig(config);
+    return resultFactory.Success();
   }
 
   public Result setForwarding(boolean enabled) {

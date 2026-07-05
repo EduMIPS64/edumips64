@@ -25,21 +25,22 @@ package org.edumips64.client;
 
 import org.edumips64.core.SynchronousException;
 import org.edumips64.core.SynchronousExceptionCode;
+import org.edumips64.utils.CurrentLocale;
 
 /**
  * Converts a {@link SynchronousException} into a user-friendly message for the
- * Web UI. The Swing UI uses {@code CurrentLocale} to look up localised
- * messages; in the Web UI we don't have access to that infrastructure, so this
- * class renders a short English description from the exception code and
- * appends information about the faulting instruction and pipeline stage when
- * available.
+ * Web UI. The message text is localized through {@link CurrentLocale} (the GWT
+ * super-source provider reads the same {@code CurrentLocaleMessages*.properties}
+ * files as the Swing UI), reusing the existing {@code <CODE>.Message},
+ * {@code SYNCEX.CAUSE} and {@code SYNCEX.STAGE} keys. The faulting instruction
+ * and pipeline stage are appended when available.
  */
 public final class SynchronousExceptionFormatter {
   private SynchronousExceptionFormatter() {}
 
   /**
-   * Builds a user-friendly message for the given exception, of the form
-   * {@code "<description> (<code>) caused by <instr> in stage <stage>"}.
+   * Builds a user-friendly, localized message for the given exception, of the
+   * form {@code "<description> (<code>) <cause> <instr>, <stage> <stage>"}.
    * The instruction / stage suffix is omitted when the exception does not
    * carry that information.
    */
@@ -50,16 +51,32 @@ public final class SynchronousExceptionFormatter {
     SynchronousExceptionCode code = e.getCode();
     StringBuilder sb = new StringBuilder();
     if (code == null) {
-      sb.append("Synchronous exception");
+      sb.append(localize("SYNCEX.GENERIC", "Synchronous exception"));
     } else {
-      sb.append(code.getDescription()).append(" (").append(code.name()).append(")");
+      sb.append(localize(code.name() + ".Message", code.getDescription()))
+        .append(" (").append(code.name()).append(")");
     }
     if (e.getInstructionName() != null && e.getStage() != null) {
-      sb.append(" caused by ")
+      sb.append(" ")
+        .append(localize("SYNCEX.CAUSE", "Caused by instruction:"))
+        .append(" ")
         .append(e.getInstructionName())
-        .append(" in stage ")
+        .append(", ")
+        .append(localize("SYNCEX.STAGE", "stage:"))
+        .append(" ")
         .append(e.getStage());
     }
     return sb.toString();
+  }
+
+  /**
+   * Looks up {@code key} via {@link CurrentLocale}. Because that facade falls
+   * back to returning the key itself when no translation exists, we treat a
+   * result equal to the key as "missing" and use {@code fallback} instead, so
+   * the UI never shows a raw message key.
+   */
+  private static String localize(String key, String fallback) {
+    String value = CurrentLocale.getString(key);
+    return (value == null || value.equals(key)) ? fallback : value;
   }
 }

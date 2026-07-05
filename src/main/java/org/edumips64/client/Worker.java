@@ -87,6 +87,15 @@ public class Worker implements EntryPoint {
             boolean delaySlotEnabled = data.getAsAny("enabled").asBoolean();
             postMessage(withMethod(simulator.setDelaySlot(delaySlotEnabled), method));
             break;
+          case "setlanguage":
+            // Localize the strings the core produces (parser errors, runtime
+            // exceptions, input prompts). Set it on both simulators: the main
+            // one raises runtime/load errors, parsingSimulator raises the
+            // checksyntax parser errors.
+            String lang = data.getAsAny("lang").asString();
+            simulator.setLanguage(lang);
+            postMessage(withMethod(parsingSimulator.setLanguage(lang), method));
+            break;
           case "setcacheconfig":
             JsPropertyMap<Object> config = Js.cast(data.get("config"));
             JsPropertyMap<Object> l1d = Js.cast(config.get("l1d"));

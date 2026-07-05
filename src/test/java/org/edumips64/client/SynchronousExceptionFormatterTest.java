@@ -44,7 +44,7 @@ public class SynchronousExceptionFormatterTest extends BaseTest {
     String message = SynchronousExceptionFormatter.format(e);
 
     assertEquals(
-        "Integer overflow (INTOVERFLOW) caused by DADD R1,R2,R3 in stage EX",
+        "Integer overflow (INTOVERFLOW) Caused by instruction: DADD R1,R2,R3, stage: EX",
         message);
   }
 
@@ -56,7 +56,7 @@ public class SynchronousExceptionFormatterTest extends BaseTest {
     String message = SynchronousExceptionFormatter.format(e);
 
     assertEquals(
-        "Division by zero (DIVZERO) caused by DIV R1,R0 in stage EX",
+        "Division by zero (DIVZERO) Caused by instruction: DIV R1,R0, stage: EX",
         message);
   }
 
