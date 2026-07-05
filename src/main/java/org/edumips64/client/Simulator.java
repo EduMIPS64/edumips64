@@ -121,6 +121,7 @@ public class Simulator {
     config.putBoolean(ConfigKey.FORWARDING, enabled);
     cpu.reset();
     cycleBuilder = new CycleBuilder(cpu);
+    resultFactory = new ResultFactory(cpu, memory, cachesim, stdout, cycleBuilder);
     return resultFactory.Success();
   }
 
@@ -134,6 +135,7 @@ public class Simulator {
     config.putBoolean(ConfigKey.DELAY_SLOT, enabled);
     cpu.reset();
     cycleBuilder = new CycleBuilder(cpu);
+    resultFactory = new ResultFactory(cpu, memory, cachesim, stdout, cycleBuilder);
     return resultFactory.Success();
   }
 
