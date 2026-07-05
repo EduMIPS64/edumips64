@@ -13,15 +13,36 @@ contenuti sono indipendenti dall'interfaccia utente.
 
 Panoramica del layout
 ---------------------
-La finestra è suddivisa in una barra degli strumenti superiore e due
-aree principali:
+La finestra è organizzata in una barra degli strumenti superiore e in
+un'area di lavoro ridimensionabile con tre regioni:
 
-* a sinistra, l'**editor di codice** (un editor MIPS64 basato su
-  Monaco);
-* a destra, una pila di pannelli a fisarmonica che mostrano lo stato
-  della simulazione: **Issues**, **Statistics**, **Pipeline**,
-  **Registers**, **Memory**, **Standard Output**, **Cache
-  Configuration** e **General Settings**.
+* a sinistra dell'area superiore, l'**editor di codice** (un editor
+  MIPS64 basato su Monaco);
+* a destra dell'area superiore, una colonna di pannelli a fisarmonica
+  che mostrano lo stato della simulazione: **Issues**, **Statistics**,
+  **Pipeline**, **Registers**, **Memory** e **Standard Output**;
+* lungo tutta la larghezza dell'area inferiore, il diagramma dei
+  **Cycles** — una vista temporale istruzioni-per-ciclo della pipeline
+  che si sviluppa orizzontalmente man mano che il programma viene
+  eseguito (vedi *Il diagramma dei cicli* più avanti).
+
+Il confine tra l'editor di codice e la colonna dei pannelli, e il confine
+tra l'area superiore e la regione dei cicli, possono essere trascinati per
+ridimensionarli; ogni regione mantiene una dimensione minima, così che
+l'editor di codice resti sempre utilizzabile. La colonna dei pannelli e la
+regione dei cicli possono essere ridotte a una barra sottile con il
+pulsante di attivazione presente nella loro intestazione, e riespanse con
+lo stesso pulsante. Le dimensioni scelte e lo stato ridotto/espanso sono
+salvati nella memoria locale del browser e ripristinati alla visita
+successiva.
+
+Su finestre strette (telefoni e piccoli tablet) le tre regioni vengono
+impilate verticalmente e l'intera pagina scorre, invece di essere
+suddivisa.
+
+La **Cache Configuration** e le **General Settings** descritte più avanti
+in questo capitolo si raggiungono dal pulsante a forma di ingranaggio
+nella barra degli strumenti superiore, non dalla colonna di destra.
 
 La barra degli strumenti
 ------------------------
@@ -347,6 +368,10 @@ I colori dei singoli stadi (incluso quello *Stall*) possono essere
 personalizzati dalla sezione *General Settings → Pipeline Colors*
 (vedi sotto) e vengono salvati nel local storage del browser.
 
+Il pannello Pipeline mostra solo il ciclo *corrente*. Per la storia di
+ogni istruzione lungo tutti i cicli, vedi *Il diagramma dei cicli* più
+avanti.
+
 Registers
 ~~~~~~~~~
 Contiene il valore dei registri general purpose interi, dei registri
@@ -423,6 +448,39 @@ ai reload della pagina.
   essere modificata con un selettore di colore; il pulsante
   *Reset to defaults* ripristina la palette originale (gli stessi
   valori RGB usati dal front-end Swing).
+
+Il diagramma dei cicli
+----------------------
+La regione **Cycles**, lungo tutto il bordo inferiore della finestra,
+mostra il comportamento *temporale* della pipeline: un diagramma di quale
+stadio ha occupato ogni istruzione in ogni ciclo di clock. Riprende la
+finestra "Cycles" della classica interfaccia desktop Swing.
+
+* ogni **riga** è un'istruzione, nell'ordine in cui è stata prelevata,
+  etichettata a sinistra con il suo testo assembly;
+* ogni **colonna** è un ciclo di CPU, numerato in alto;
+* ogni **cella** mostra, con lo stesso codice colore del pannello
+  *Pipeline*, lo stadio in cui l'istruzione si trovava in quel ciclo:
+  ``IF``, ``ID``, ``EX``, ``MEM``, ``WB`` per la pipeline intera;
+  ``A1``–``A4`` e ``M1``–``M7`` per il sommatore e il moltiplicatore FP;
+  e ``DIV`` (con il contatore per ciclo del divisore ``D00``–``D24``)
+  per il divisore FP.
+
+I cicli di stallo sono disegnati con il colore dedicato *Stall* ed
+etichettati con l'hazard che li ha causati (``RAW``, ``WAW`` e le
+etichette di stallo strutturale ``StDiv`` / ``StEx`` / ``StFun`` /
+``Str`` / ``StAdd`` / ``StMul``), usando esattamente la stessa
+classificazione del pannello *Pipeline*. Poiché il diagramma è costruito
+dagli stessi dati che disegna la finestra "Cycles" di Swing, la vista web
+e quella desktop non sono mai in disaccordo sulla storia di un'esecuzione.
+
+Il diagramma scorre per seguire il ciclo più recente man mano che il
+programma avanza; entrambe le barre di scorrimento possono essere usate
+per rivedere cicli o istruzioni precedenti. Prima che un programma sia
+stato eseguito, la regione mostra una griglia vuota. Per esecuzioni molto
+lunghe vengono mantenuti sullo schermo solo i cicli e le istruzioni più
+recenti (una nota sopra la griglia lo segnala) per mantenere reattivo il
+browser.
 
 Scorciatoie da tastiera
 -----------------------

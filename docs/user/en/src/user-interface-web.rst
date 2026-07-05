@@ -13,13 +13,33 @@ interface.
 
 Layout overview
 ---------------
-The window is split into a top toolbar and two main areas:
+The window is organized into a top toolbar and a resizable workspace with
+three regions:
 
-* On the left, the **code editor** (a Monaco-based MIPS64 editor).
-* On the right, a stack of collapsible panels showing the runtime
-  state of the simulation: **Issues**, **Statistics**, **Pipeline**,
-  **Registers**, **Memory**, **Standard Output**, **Cache
-  Configuration** and **General Settings**.
+* On the left of the upper area, the **code editor** (a Monaco-based
+  MIPS64 editor).
+* On the right of the upper area, a column of collapsible panels showing
+  the runtime state of the simulation: **Issues**, **Statistics**,
+  **Pipeline**, **Registers**, **Memory** and **Standard Output**.
+* Across the full width of the lower area, the **Cycles** diagram — a
+  temporal, instruction-versus-cycle view of the pipeline that grows
+  horizontally as the program runs (see *The Cycles diagram* below).
+
+The boundary between the code editor and the widgets column, and the
+boundary between the upper area and the Cycles region, can be dragged to
+resize them; each region keeps a minimum size so the code editor always
+stays usable. The widgets column and the Cycles region can each be
+collapsed to a thin bar with the toggle button in their header, and
+expanded again from the same button. The chosen sizes and collapsed
+states are saved in the browser's local storage and restored on the next
+visit.
+
+On narrow windows (phones and small tablets) the three regions stack
+vertically and the whole page scrolls, instead of being split.
+
+The **Cache Configuration** and **General Settings** described later in
+this chapter are reached from the gear button in the top toolbar rather
+than from the right-hand column.
 
 The top toolbar
 ---------------
@@ -335,6 +355,9 @@ The per-stage colours (including the *Stall* colour) can be
 customised from *General Settings → Pipeline Colors* (see below) and
 are persisted in browser local storage.
 
+The Pipeline panel shows only the *current* cycle. For the history of
+every instruction across all cycles, see *The Cycles diagram* below.
+
 Registers
 ~~~~~~~~~
 The contents of the integer general-purpose registers, the
@@ -406,6 +429,36 @@ reloads.
   edited with a colour picker, and the *Reset to defaults* button
   restores the original palette (the same RGB values the Swing UI
   uses by default).
+
+The Cycles diagram
+------------------
+The **Cycles** region across the bottom of the window shows the
+*temporal* behaviour of the pipeline: a diagram of which stage every
+instruction occupied at every clock cycle. It mirrors the "Cycles"
+window of the classic Swing desktop UI.
+
+* each **row** is one instruction, in the order it was fetched, labelled
+  on the left with its assembly text;
+* each **column** is one CPU cycle, numbered along the top;
+* each **cell** shows, with the same colour code as the *Pipeline*
+  panel, the stage the instruction was in during that cycle: ``IF``,
+  ``ID``, ``EX``, ``MEM``, ``WB`` for the integer pipeline; ``A1``–``A4``
+  and ``M1``–``M7`` for the FP Adder and Multiplier; and ``DIV`` (with
+  the per-cycle divider counter ``D00``–``D24``) for the FP Divider.
+
+Stall cycles are drawn in the dedicated *Stall* colour and labelled with
+the hazard that caused them (``RAW``, ``WAW`` and the structural-stall
+tags ``StDiv`` / ``StEx`` / ``StFun`` / ``Str`` / ``StAdd`` / ``StMul``),
+using exactly the same classification as the *Pipeline* panel. Because
+the diagram is built from the same data the Swing "Cycles" window draws,
+the web and desktop views never disagree on the history of a run.
+
+The diagram scrolls to follow the most recent cycle as the program
+advances; both scrollbars can be used to review earlier cycles or
+instructions. Before a program has run, the region shows an empty grid.
+For very long executions only the most recent cycles and instructions are
+kept on screen (a note above the grid says so) to keep the browser
+responsive.
 
 Keyboard shortcuts
 ------------------

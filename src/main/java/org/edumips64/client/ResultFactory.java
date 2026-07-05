@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONString;
 
 import org.edumips64.core.CPU;
 import org.edumips64.core.IrregularStringOfBitsException;
@@ -40,6 +41,7 @@ import org.edumips64.core.fpu.RegisterFP;
 import org.edumips64.core.is.InstructionInterface;
 import org.edumips64.core.parser.ParserMultiException;
 import org.edumips64.utils.CycleBuilder;
+import org.edumips64.utils.CycleElement;
 import org.edumips64.utils.io.InputNeededException;
 import org.edumips64.utils.io.StringWriter;
 
@@ -161,7 +163,47 @@ public class ResultFactory {
         r.registers = getRegisters();
         r.statistics = getStatistics();
         r.cachestats = getCacheStats();
+        r.cycles = getCycles();
         return r;
+    }
+
+    /**
+     * Serializes the CycleBuilder's full temporal diagram (the same data the
+     * Swing {@code GUICycles} widget draws) so the Web UI can render the
+     * instruction-vs-cycle history. Bubble-only rows are skipped, mirroring
+     * {@code CycleElement.shouldRender()} checks in the Swing painter.
+     *
+     * <p>Shape: {@code {"time": N, "elements": [{"name", "serialNumber",
+     * "startTime", "states": ["IF","ID",...]}]}}. {@code time} is the current
+     * CPU cycle (columns of the diagram); {@code startTime} is the 1-based
+     * cycle at which the instruction entered IF.
+     */
+    private String getCycles() {
+        var cyclesJson = new FluentJsonObject();
+        JSONArray elements = new JSONArray();
+        int time = 0;
+        if (cycleBuilder != null) {
+            time = cycleBuilder.getTime();
+            for (CycleElement el : cycleBuilder.getElementsList()) {
+                if (!el.shouldRender()) {
+                    continue;
+                }
+                JSONArray states = new JSONArray();
+                for (String state : el.getStates()) {
+                    states.set(states.size(), new JSONString(state));
+                }
+                elements.set(elements.size(), new FluentJsonObject()
+                        .put("name", el.getName())
+                        .put("serialNumber", el.getSerialNumber())
+                        .put("startTime", el.getTime())
+                        .put("states", states)
+                        .toJsonObject());
+            }
+        }
+        return cyclesJson
+                .put("time", time)
+                .put("elements", elements)
+                .toString();
     }
     private String getCacheStats() {
         var cachestatsJson = new FluentJsonObject();

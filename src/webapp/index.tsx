@@ -79,6 +79,10 @@ const worker = Object.assign(rawWorker, {
     result.registers = JSON.parse(result.registers as string);
     result.memory = JSON.parse(result.memory as string);
     result.statistics = JSON.parse(result.statistics as string);
+    // Guard against a stale cached worker.js that predates the cycles field.
+    result.cycles = JSON.parse(
+      (result.cycles as string) || '{"time":0,"elements":[]}',
+    );
     return result;
   },
   version,

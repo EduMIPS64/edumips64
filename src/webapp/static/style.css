@@ -42,24 +42,11 @@ body {
 
 
 
-/* Define the grid of widgets. */
-
-#main-grid {
-  height: calc(100vh - 64px);
-  overflow: hidden;
-}
-
-#left-panel {
-  height: 100%;
-  resize: horizontal;
-}
-
-#right-panel {
-  overflow: auto;
-  height: 100%;
-  border-left: 1px solid rgba(15, 23, 42, 0.12);
-  background-color: #f5f6fa;
-}
+/* The three-region workspace (code / widgets / cycles) is laid out and
+   sized entirely by the WorkspaceLayout component via MUI `sx`, including
+   its resizable split and the mobile stacked fallback. Only the page-level
+   scroll behaviour lives here (see the `body` rules above and the
+   responsive block below). */
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -244,33 +231,10 @@ div.error-accordion {
 @media (max-width: 900px) {
   body {
     /* The desktop layout pins the page to the viewport (no scroll) so
-       Monaco can fill the left pane. On small viewports the panels are
-       stacked, so allow the document to scroll. */
+       Monaco can fill the left pane. On small viewports the WorkspaceLayout
+       stacks the regions, so allow the document to scroll. */
     max-height: none;
     overflow: auto;
-  }
-
-  #main-grid {
-    /* Let the natural document flow govern the height; don't try to
-       fit the whole simulator in a single viewport. */
-    height: auto;
-    overflow: visible;
-  }
-
-  #left-panel {
-    /* Give the editor a usable, but bounded, height so the right
-       panel is reachable by scrolling. */
-    height: 60vh;
-    min-height: 320px;
-    resize: none;
-  }
-
-  #right-panel {
-    height: auto;
-    overflow: visible;
-    /* The right panel now sits *under* the editor, not next to it. */
-    border-left: none;
-    border-top: 1px solid rgba(15, 23, 42, 0.12);
   }
 }
 
@@ -278,19 +242,8 @@ div.error-accordion {
    Driven by the app's resolved theme (the data-theme attribute set on <html>
    from the MUI palette mode), NOT the OS `prefers-color-scheme` media query,
    so these stay in sync when the user overrides the theme in Settings. */
-html[data-theme='dark'] #right-panel {
-  border-left-color: rgba(148, 163, 184, 0.18);
-  background-color: #0e1526;
-}
-
 html[data-theme='dark'] div.error-accordion {
   border-bottom-color: rgba(255, 255, 255, 0.188);
-}
-
-@media (max-width: 900px) {
-  html[data-theme='dark'] #right-panel {
-    border-top-color: rgba(255, 255, 255, 0.188);
-  }
 }
 
 html[data-theme='dark'] textarea {

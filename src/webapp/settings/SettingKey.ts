@@ -46,6 +46,11 @@ export const SettingKey = Object.freeze({
   // `'light'`, or `'dark'`. Exposed as a toggle in the General Settings
   // panel so the dark theme can be exercised regardless of the OS setting.
   THEME_MODE: 'themeMode',
+
+  // Resizable-workspace geometry: the width of the right widgets column, the
+  // height of the bottom Cycles region, and whether either is collapsed.
+  // Persisted so a user's chosen layout survives reloads.
+  WORKSPACE_LAYOUT: 'workspaceLayout',
 } as const);
 
 /**

@@ -47,7 +47,7 @@ User stories and features:
 
 * ~~`D.1, D.3` (Proper toolchain, Material UI)~~
 * ~~`U.6` (full pipeline widget)~~
-* `U.7` (full cycles widget, i.e. a temporal instruction-vs-cycle diagram like Swing's `GUICycles`)
+* ~~`U.7` (full cycles widget, i.e. a temporal instruction-vs-cycle diagram like Swing's `GUICycles`)~~
 * ~~`U.8` (Settings UI)~~
 * ~~`S.1-2` (Forwarding setting, persisted via HTML5 storage)~~
 
@@ -115,9 +115,12 @@ implementation of the remaining features.
    (mirrors the Swing `GUIPipeline`: IF/ID/EX/MEM/WB plus the FP
    adder/multiplier/divider functional units, customizable per-stage
    colors, and labeled RAW/WAW/structural stalls)
-7. Full Cycles widget (temporal instruction diagram) — the Swing `Cycles`
-   panel's history-across-cycles view; the web UI currently only shows the
-   current cycle's pipeline snapshot
+7. ~~Full Cycles widget (temporal instruction diagram)~~ (mirrors the Swing
+   `GUICycles` history-across-cycles view: one row per fetched instruction,
+   one column per CPU cycle, cells color-coded by pipeline stage/stall using
+   the shared pipeline palette. The worker serializes the same
+   `CycleBuilder` element list the Swing widget draws, so the two UIs can't
+   drift apart on stall semantics.)
 8. ~~Settings UI (necessary for `S.*`)~~
 9. ~~Code editor with syntax highlighting (e.g., ACE or Monaco)~~
 10. Localization (the Help dialog already supports en/it/zh; the rest of

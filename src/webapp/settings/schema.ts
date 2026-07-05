@@ -55,6 +55,16 @@ export const MAX_STEP_STRIDE = 100000;
 export const MIN_EXECUTION_DELAY_MS = 0;
 export const MAX_EXECUTION_DELAY_MS = 5000;
 
+// Resizable-workspace bounds, as a percentage of the workspace size. The
+// right widgets column may take 20–60% of the width; the bottom Cycles
+// region may take 12–70% of the height. The minimums keep every region
+// usable (the code editor never shrinks below 40% width, the upper region
+// never below 30% height).
+export const MIN_RIGHT_WIDTH_PCT = 20;
+export const MAX_RIGHT_WIDTH_PCT = 60;
+export const MIN_BOTTOM_HEIGHT_PCT = 12;
+export const MAX_BOTTOM_HEIGHT_PCT = 70;
+
 // Shared validator for the L1D / L1I cache configuration objects.
 const isPositiveInteger = (v: number) => Number.isInteger(v) && v > 0;
 const isValidCacheConfig = (v: unknown) => {
@@ -90,6 +100,22 @@ export const DEFAULT_PIPELINE_COLORS = Object.freeze({
   FPDivider: '#808000', // Swing default rgb(128, 128,   0)
   Stall: '#9e9e9e', // Material grey 500 — Swing has no equivalent.
 });
+
+// Validator for the resizable-workspace layout object. Percentages must be
+// finite numbers inside their documented bounds; the collapse flags must be
+// booleans. Out-of-range or malformed values fall back to the default.
+const inRange = (v: unknown, min: number, max: number) =>
+  typeof v === 'number' && Number.isFinite(v) && v >= min && v <= max;
+const isValidWorkspaceLayout = (v: unknown) => {
+  if (typeof v !== 'object' || v === null) return false;
+  const l = v as Record<string, unknown>;
+  return (
+    inRange(l.rightWidthPct, MIN_RIGHT_WIDTH_PCT, MAX_RIGHT_WIDTH_PCT) &&
+    inRange(l.bottomHeightPct, MIN_BOTTOM_HEIGHT_PCT, MAX_BOTTOM_HEIGHT_PCT) &&
+    typeof l.rightCollapsed === 'boolean' &&
+    typeof l.bottomCollapsed === 'boolean'
+  );
+};
 
 const isValidPipelineColors = (v: unknown) => {
   if (typeof v !== 'object' || v === null) return false;
@@ -234,6 +260,16 @@ export const SETTINGS_SCHEMA: Readonly<Record<string, SchemaEntry>> = Object.fre
     default: 'auto',
     validate: (v) => typeof v === 'string' && ALLOWED_THEME_MODES.includes(v),
   },
+  [SettingKey.WORKSPACE_LAYOUT]: {
+    type: SettingType.OBJECT,
+    default: {
+      rightWidthPct: 34,
+      bottomHeightPct: 30,
+      rightCollapsed: false,
+      bottomCollapsed: false,
+    },
+    validate: isValidWorkspaceLayout,
+  },
 });
 
 /**
@@ -356,6 +392,18 @@ export interface PipelineColors {
 export type ThemeMode = 'auto' | 'light' | 'dark';
 
 /**
+ * Geometry of the resizable workspace: the width of the right widgets column
+ * and the height of the bottom Cycles region (each as a percentage of the
+ * workspace), plus whether either region is collapsed to a thin bar.
+ */
+export interface WorkspaceLayout {
+  rightWidthPct: number;
+  bottomHeightPct: number;
+  rightCollapsed: boolean;
+  bottomCollapsed: boolean;
+}
+
+/**
  * Maps every `SettingKeyType` string value to its concrete TypeScript value
  * type.  This is the source of truth used by `useSetting<K>` to give call
  * sites a precisely-typed `[value, setValue, reset]` tuple without any casts.
@@ -385,4 +433,6 @@ export interface SettingValueMap extends Record<SettingKeyType, unknown> {
   pipelineColors: PipelineColors;
   // UI theme
   themeMode: ThemeMode;
+  // Resizable-workspace geometry
+  workspaceLayout: WorkspaceLayout;
 }

@@ -58,6 +58,7 @@ function makeResult(overrides: Partial<SimulatorResult> = {}): SimulatorResult {
     memory: makeMemory(),
     statistics: makeStats(),
     pipeline: makePipeline(),
+    cycles: { time: 0, elements: [] },
     encounteredBreak: false,
     parsingErrors: null,
     parsedInstructions: null,

@@ -1,18 +1,19 @@
 import React from 'react';
 
 import Code from './Code';
+import Cycles from './Cycles';
 import Memory from './Memory';
 import Pipeline from './Pipeline';
 import Registers from './Registers';
 import Statistics from './Statistics';
 import Header from './Header';
 import RunControlsToolbar from './RunControlsToolbar';
+import WorkspaceLayout from './WorkspaceLayout';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary, {
   type AccordionSummaryProps,
 } from '@mui/material/AccordionSummary';
-import Grid from '@mui/material/Grid';
 import ErrorList from './ErrorList';
 import StdOut from './StdOut';
 import InputDialog from './InputDialog';
@@ -110,6 +111,9 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   const [expandedAccordions, setExpandedAccordions] = useSetting(
     SettingKey.EXPANDED_ACCORDIONS,
   );
+  const [workspaceLayout, setWorkspaceLayout] = useSetting(
+    SettingKey.WORKSPACE_LAYOUT,
+  );
 
   // ---------------------------------------------------------------------------
   // Editor code persistence
@@ -150,6 +154,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     stats,
     status,
     pipeline,
+    cycles,
     parsingErrors,
     parsedInstructions,
     stdout,
@@ -600,8 +605,11 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
           inputRequest={inputRequest}
           multiStepCount={stepStride}
         />
-        <Grid container id="main-grid" spacing={0}>
-          <Grid id="left-panel" size={{ xs: 12, md: 8 }}>
+        <WorkspaceLayout
+          layout={workspaceLayout}
+          onLayoutChange={setWorkspaceLayout}
+          bottomTitle="Cycles"
+          left={
             <Code
               onChangeValue={onCodeChange}
               code={code}
@@ -616,118 +624,121 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
               pipelineColors={pipelineColors}
               onEditorReady={handleEditorReady}
             />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }} id="right-panel">
-            <ErrorList
-              parsingErrors={parsingErrors}
-              AccordionSummary={AccordionSummary}
-              onIssueClick={handleIssueClick}
-            />
-            <Accordion
-              expanded={expandedAccordions.stats}
-              onChange={handleAccordionChange('stats')}
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 600, color: 'primary.main' }}
-                >
-                  Stats
-                  {accordionAlerts && accordionChanges.stats && (
-                    <span className="accordion-change-indicator" />
-                  )}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Statistics {...stats} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion
-              expanded={expandedAccordions.pipeline}
-              onChange={handleAccordionChange('pipeline')}
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 600, color: 'primary.main' }}
-                >
-                  Pipeline
-                  {accordionAlerts && accordionChanges.pipeline && (
-                    <span className="accordion-change-indicator" />
-                  )}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Pipeline pipeline={pipeline} colors={pipelineColors} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion
-              expanded={expandedAccordions.registers}
-              onChange={handleAccordionChange('registers')}
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 600, color: 'primary.main' }}
-                >
-                  Registers
-                  {accordionAlerts && accordionChanges.registers && (
-                    <span className="accordion-change-indicator" />
-                  )}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Registers {...registers} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion
-              expanded={expandedAccordions.memory}
-              onChange={handleAccordionChange('memory')}
-              disableGutters
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                id="memory-accordion-summary"
+          }
+          bottom={<Cycles cycles={cycles} colors={pipelineColors} />}
+          right={
+            <>
+              <ErrorList
+                parsingErrors={parsingErrors}
+                AccordionSummary={AccordionSummary}
+                onIssueClick={handleIssueClick}
+              />
+              <Accordion
+                expanded={expandedAccordions.stats}
+                onChange={handleAccordionChange('stats')}
+                disableGutters
               >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 600, color: 'primary.main' }}
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 600, color: 'primary.main' }}
+                  >
+                    Stats
+                    {accordionAlerts && accordionChanges.stats && (
+                      <span className="accordion-change-indicator" />
+                    )}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Statistics {...stats} />
+                </AccordionDetails>
+              </Accordion>
+              <Accordion
+                expanded={expandedAccordions.pipeline}
+                onChange={handleAccordionChange('pipeline')}
+                disableGutters
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 600, color: 'primary.main' }}
+                  >
+                    Pipeline
+                    {accordionAlerts && accordionChanges.pipeline && (
+                      <span className="accordion-change-indicator" />
+                    )}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Pipeline pipeline={pipeline} colors={pipelineColors} />
+                </AccordionDetails>
+              </Accordion>
+              <Accordion
+                expanded={expandedAccordions.registers}
+                onChange={handleAccordionChange('registers')}
+                disableGutters
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 600, color: 'primary.main' }}
+                  >
+                    Registers
+                    {accordionAlerts && accordionChanges.registers && (
+                      <span className="accordion-change-indicator" />
+                    )}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Registers {...registers} />
+                </AccordionDetails>
+              </Accordion>
+              <Accordion
+                expanded={expandedAccordions.memory}
+                onChange={handleAccordionChange('memory')}
+                disableGutters
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  id="memory-accordion-summary"
                 >
-                  Memory
-                  {accordionAlerts && accordionChanges.memory && (
-                    <span className="accordion-change-indicator" />
-                  )}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Memory memory={memory} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion
-              expanded={expandedAccordions.stdout}
-              onChange={handleAccordionChange('stdout')}
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 600, color: 'primary.main' }}
-                >
-                  Standard Output
-                  {accordionAlerts && accordionChanges.stdout && (
-                    <span className="accordion-change-indicator" />
-                  )}
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <StdOut stdout={stdout} />
-              </AccordionDetails>
-            </Accordion>
-          </Grid>
-        </Grid>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 600, color: 'primary.main' }}
+                  >
+                    Memory
+                    {accordionAlerts && accordionChanges.memory && (
+                      <span className="accordion-change-indicator" />
+                    )}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Memory memory={memory} />
+                </AccordionDetails>
+              </Accordion>
+              <Accordion
+                expanded={expandedAccordions.stdout}
+                onChange={handleAccordionChange('stdout')}
+                disableGutters
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 600, color: 'primary.main' }}
+                  >
+                    Standard Output
+                    {accordionAlerts && accordionChanges.stdout && (
+                      <span className="accordion-change-indicator" />
+                    )}
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <StdOut stdout={stdout} />
+                </AccordionDetails>
+              </Accordion>
+            </>
+          }
+        />
       </ThemeProvider>
     </>
   );

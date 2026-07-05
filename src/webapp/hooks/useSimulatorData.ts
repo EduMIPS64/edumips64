@@ -7,6 +7,7 @@ import type {
   Statistics,
   CpuStatus,
   Pipeline,
+  CyclesDiagram,
   ParsingError,
   PipelineInstruction,
 } from '../simulator/protocol';
@@ -48,6 +49,7 @@ export function useSimulatorData(initialState: SimulatorResult) {
   const [stats, setStats] = useState<Statistics>(initialState.statistics);
   const [status, setStatus] = useState<CpuStatus>(initialState.status);
   const [pipeline, setPipeline] = useState<Pipeline>(initialState.pipeline);
+  const [cycles, setCycles] = useState<CyclesDiagram>(initialState.cycles);
   const [parsingErrors, setParsingErrors] = useState<ParsingError[] | null>(
     initialState.parsingErrors,
   );
@@ -80,6 +82,7 @@ export function useSimulatorData(initialState: SimulatorResult) {
     setPipeline((prev) =>
       isEqual(prev, result.pipeline) ? prev : result.pipeline,
     );
+    setCycles((prev) => (isEqual(prev, result.cycles) ? prev : result.cycles));
     setParsingErrors((prev) =>
       isEqual(prev, result.parsingErrors) ? prev : result.parsingErrors,
     );
@@ -127,6 +130,7 @@ export function useSimulatorData(initialState: SimulatorResult) {
     stats,
     status,
     pipeline,
+    cycles,
     parsingErrors,
     parsedInstructions,
     stdout,

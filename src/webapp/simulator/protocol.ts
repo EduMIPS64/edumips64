@@ -96,6 +96,45 @@ export interface Pipeline {
 }
 
 // ---------------------------------------------------------------------------
+// Cycles (serialised by ResultFactory.getCycles())
+// ---------------------------------------------------------------------------
+
+/**
+ * One row of the temporal instruction-vs-cycle diagram: a single instruction
+ * instance that entered the pipeline, with the state it occupied at each
+ * cycle since it was fetched.
+ *
+ * Java source of truth: org.edumips64.utils.CycleElement, serialised by
+ * ResultFactory.getCycles().
+ */
+export interface CycleDiagramElement {
+  /** Full assembly representation, e.g. "DADD R1,R2,R3". */
+  name: string;
+  /** Serial number of the underlying instruction (shared across re-fetches). */
+  serialNumber: number;
+  /** 1-based CPU cycle at which the instruction entered the IF stage. */
+  startTime: number;
+  /**
+   * One entry per cycle, starting at startTime.  Values are CycleBuilder
+   * state tags: stages ("IF","ID","EX","MEM","WB","A1".."A4","M1".."M7",
+   * "DIV","D00".."D24"), stall tags ("RAW","WAW","StDiv","StEx","StFun",
+   * "Str","StAdd","StMul"), or " " for a squashed fetch.
+   */
+  states: string[];
+}
+
+/**
+ * The full temporal diagram (after worker.parseResult() calls JSON.parse).
+ * Java source: ResultFactory.getCycles()
+ */
+export interface CyclesDiagram {
+  /** Current CPU cycle — the number of columns in the diagram. */
+  time: number;
+  /** One row per rendered instruction, in fetch order. */
+  elements: CycleDiagramElement[];
+}
+
+// ---------------------------------------------------------------------------
 // ParsingError (Java source: ParserError.java)
 // ---------------------------------------------------------------------------
 
@@ -255,6 +294,11 @@ export interface SimulatorResult {
   statistics: Statistics;
   /** Pipeline snapshot (direct JsType object, not JSON-serialised). */
   pipeline: Pipeline;
+  /**
+   * Temporal instruction-vs-cycle diagram (after JSON.parse in parseResult).
+   * Mirrors the data drawn by the Swing GUICycles widget.
+   */
+  cycles: CyclesDiagram;
   /** true when the CPU hit a BREAK instruction during the last step batch. */
   encounteredBreak: boolean;
   /** Parser diagnostics from the last load/checksyntax call; null until populated. */
