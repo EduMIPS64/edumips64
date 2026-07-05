@@ -21,7 +21,10 @@ import ExecutionSettingsPanel, {
   type ExecutionSettingsPanelProps,
 } from './settings/ExecutionSettingsPanel';
 import CacheConfig from './CacheConfig';
-import { resetAllDialogSettings } from '../settings/useSetting';
+import {
+  resetUiSettings,
+  resetSimulationSettings,
+} from '../settings/useSetting';
 import type { CacheConfig as CacheConfigType } from '../settings/schema';
 import type { CpuStatus } from '../simulator/protocol';
 
@@ -101,18 +104,42 @@ export default function SettingsDialog({
   setExecutionDelayMs,
 }: SettingsDialogProps) {
   const [tabValue, setTabValue] = React.useState(0);
+  const isRunning = status === 'RUNNING';
+
+  // This component is always mounted by Header (its `open` prop just toggles
+  // MUI's Dialog visibility), so `tabValue` persists across closes/reopens —
+  // it does NOT reset just because the dialog was closed. A disabled Tab
+  // only blocks *future* clicks; it does nothing about content already
+  // showing for that index. So if the Simulation tab was active before the
+  // dialog closed and a program is now running, force back to the UI tab
+  // rather than reopening straight into disabled Simulation content.
+  React.useEffect(() => {
+    if (open && isRunning && tabValue === 1) {
+      setTabValue(0);
+    }
+  }, [open, isRunning, tabValue]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
-  const handleResetAll = () => {
+  const handleResetUi = () => {
     if (
       window.confirm(
-        'Reset all settings to their defaults? This cannot be undone.',
+        'Reset UI settings to their defaults? This cannot be undone.',
       )
     ) {
-      resetAllDialogSettings();
+      resetUiSettings();
+    }
+  };
+
+  const handleResetSimulation = () => {
+    if (
+      window.confirm(
+        'Reset Simulation settings to their defaults? This cannot be undone.',
+      )
+    ) {
+      resetSimulationSettings();
     }
   };
 
@@ -142,7 +169,7 @@ export default function SettingsDialog({
           aria-label="settings tabs"
         >
           <Tab label="UI" id="settings-tab-0" />
-          <Tab label="Simulation" id="settings-tab-1" />
+          <Tab label="Simulation" id="settings-tab-1" disabled={isRunning} />
         </Tabs>
       </Box>
       <DialogContent className="settings-content" sx={{ p: 0 }}>
@@ -159,6 +186,14 @@ export default function SettingsDialog({
             themeMode={themeMode}
             setThemeMode={setThemeMode}
           />
+
+          <SectionHeading>Execution</SectionHeading>
+          <ExecutionSettingsPanel
+            stepStride={stepStride}
+            setStepStride={setStepStride}
+            executionDelayMs={executionDelayMs}
+            setExecutionDelayMs={setExecutionDelayMs}
+          />
         </TabPanel>
         <TabPanel value={tabValue} index={1}>
           <SectionHeading first>CPU</SectionHeading>
@@ -170,27 +205,28 @@ export default function SettingsDialog({
             status={status}
           />
 
-          <SectionHeading>Execution</SectionHeading>
-          <ExecutionSettingsPanel
-            stepStride={stepStride}
-            setStepStride={setStepStride}
-            executionDelayMs={executionDelayMs}
-            setExecutionDelayMs={setExecutionDelayMs}
-          />
-
           <SectionHeading>Cache</SectionHeading>
           <CacheConfig onChange={onCacheConfigChange} status={status} />
         </TabPanel>
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={handleResetAll}
+          onClick={handleResetUi}
           variant="text"
           color="inherit"
-          id="settings-reset-button"
+          id="settings-reset-ui-button"
           sx={{ mr: 'auto' }}
         >
-          Reset to defaults
+          Reset UI to defaults
+        </Button>
+        <Button
+          onClick={handleResetSimulation}
+          variant="text"
+          color="inherit"
+          id="settings-reset-simulation-button"
+          disabled={isRunning}
+        >
+          Reset Simulation to defaults
         </Button>
         <Button
           onClick={handleClose}

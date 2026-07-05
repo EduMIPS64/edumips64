@@ -164,7 +164,7 @@ test('stepStride and executionDelayMs persist across page reloads', async ({ pag
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsDialog(page, 'Simulation');
+  await openSettingsDialog(page, 'UI');
 
   // Change Multi Step Size from the default (500) to 250.
   const strideInput = page.getByLabel('Multi Step Size');
@@ -194,7 +194,7 @@ test('stepStride and executionDelayMs persist across page reloads', async ({ pag
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsDialog(page, 'Simulation');
+  await openSettingsDialog(page, 'UI');
 
   await expect(page.getByLabel('Multi Step Size')).toHaveValue('250');
   await expect(page.getByLabel('Execution Delay (ms)')).toHaveValue('100');
@@ -325,11 +325,13 @@ test('pipelineColors also drive Monaco stage highlights', async ({ page }) => {
  * to the schema defaults.
  */
 /**
- * Test: the dialog-wide "Reset to defaults" button (next to Close) restores
- * every setting shown in the dialog, not just the one in the tab it was
- * clicked from. Mirrors the Swing UI's `Config.RESET` button.
+ * Test: "Reset UI to defaults" only touches the UI tab's settings (which
+ * now includes Execution), leaving Simulation-tab settings (CPU, cache)
+ * untouched. Mirrors the Swing UI's `Config.RESET`, but scoped by type per
+ * review feedback: applying Simulation defaults resets the CPU, so the two
+ * are kept independent.
  */
-test('Reset to defaults restores every dialog setting, not just the current tab', async ({
+test('Reset UI to defaults resets only the UI tab, not Simulation', async ({
   page,
 }) => {
   await waitForPageReady(page);
@@ -337,7 +339,6 @@ test('Reset to defaults restores every dialog setting, not just the current tab'
 
   await openSettingsDialog(page, 'UI');
 
-  // Pick non-default values on the UI tab.
   const viModeSwitch = page.getByLabel('Editor Vi Mode');
   await viModeSwitch.click();
   await expect(viModeSwitch).toBeChecked();
@@ -354,25 +355,55 @@ test('Reset to defaults restores every dialog setting, not just the current tab'
   });
   await expect(ifInput).toHaveValue('#000000');
 
-  // ...and a non-default value on the Simulation tab, without closing the
-  // dialog — the reset must reach across tabs.
+  // A non-default value on the Simulation tab, which "Reset UI" must not touch.
   await page.getByRole('tab', { name: 'Simulation' }).click();
   const forwardingSwitch = page.getByLabel('CPU Forwarding');
   await forwardingSwitch.click();
   await expect(forwardingSwitch).toBeChecked();
 
-  // The button asks for confirmation via window.confirm(); accept it.
-  page.once('dialog', (dialog) => dialog.accept());
-  await page.click('#settings-reset-button');
-
-  // Simulation tab: forwarding back to its default (off).
-  await expect(forwardingSwitch).not.toBeChecked();
-
-  // UI tab: both Vi Mode and the pipeline color are back to their defaults.
+  // Back to UI to click its reset button. The button asks for confirmation
+  // via window.confirm(); accept it.
   await page.getByRole('tab', { name: 'UI' }).click();
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.click('#settings-reset-ui-button');
+
   await expect(page.getByLabel('Editor Vi Mode')).not.toBeChecked();
   // Schema default for IF (mirrors Swing UI's `IF_COLOR`).
   await expect(page.getByTestId('pipeline-color-IF')).toHaveValue('#ebeb3b');
+
+  // Simulation-tab setting survives.
+  await page.getByRole('tab', { name: 'Simulation' }).click();
+  await expect(page.getByLabel('CPU Forwarding')).toBeChecked();
+});
+
+/**
+ * Test: "Reset Simulation to defaults" only touches CPU/cache settings,
+ * leaving UI-tab settings untouched.
+ */
+test('Reset Simulation to defaults resets only the Simulation tab, not UI', async ({
+  page,
+}) => {
+  await waitForPageReady(page);
+  await removeOverlay(page);
+
+  await openSettingsDialog(page, 'UI');
+  const viModeSwitch = page.getByLabel('Editor Vi Mode');
+  await viModeSwitch.click();
+  await expect(viModeSwitch).toBeChecked();
+
+  await page.getByRole('tab', { name: 'Simulation' }).click();
+  const forwardingSwitch = page.getByLabel('CPU Forwarding');
+  await forwardingSwitch.click();
+  await expect(forwardingSwitch).toBeChecked();
+
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.click('#settings-reset-simulation-button');
+
+  await expect(forwardingSwitch).not.toBeChecked();
+
+  // UI-tab setting survives.
+  await page.getByRole('tab', { name: 'UI' }).click();
+  await expect(page.getByLabel('Editor Vi Mode')).toBeChecked();
 });
 
 /**

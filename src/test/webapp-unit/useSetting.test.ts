@@ -12,9 +12,16 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useSetting, resetAllDialogSettings } from '../../webapp/settings/useSetting';
+import {
+  useSetting,
+  resetUiSettings,
+  resetSimulationSettings,
+} from '../../webapp/settings/useSetting';
 import { SettingKey } from '../../webapp/settings/SettingKey';
-import { getSchema, DEFAULT_PIPELINE_COLORS } from '../../webapp/settings/schema';
+import {
+  getSchema,
+  DEFAULT_PIPELINE_COLORS,
+} from '../../webapp/settings/schema';
 
 beforeEach(() => window.localStorage.clear());
 afterEach(() => window.localStorage.clear());
@@ -76,7 +83,9 @@ describe('useSetting — setValue (direct)', () => {
       const [, setValue] = result.current;
       setValue(20);
     });
-    const stored = window.localStorage.getItem(`edumips64:v1:${SettingKey.FONT_SIZE}`);
+    const stored = window.localStorage.getItem(
+      `edumips64:v1:${SettingKey.FONT_SIZE}`,
+    );
     expect(stored).toBe('20');
   });
 
@@ -91,7 +100,9 @@ describe('useSetting — setValue (direct)', () => {
     const [value] = result.current;
     expect((value as typeof DEFAULT_PIPELINE_COLORS).IF).toBe('#112233');
     // Other keys come from either the stored value or the default.
-    expect((value as typeof DEFAULT_PIPELINE_COLORS).ID).toBe(DEFAULT_PIPELINE_COLORS.ID);
+    expect((value as typeof DEFAULT_PIPELINE_COLORS).ID).toBe(
+      DEFAULT_PIPELINE_COLORS.ID,
+    );
   });
 });
 
@@ -178,14 +189,20 @@ describe('useSetting — reset', () => {
     act(() => {
       result.current[1]('dark');
     });
-    expect(window.localStorage.getItem(`edumips64:v1:${SettingKey.THEME_MODE}`)).toBe('"dark"');
+    expect(
+      window.localStorage.getItem(`edumips64:v1:${SettingKey.THEME_MODE}`),
+    ).toBe('"dark"');
 
     act(() => {
       result.current[2]();
     });
     // reset() calls setValue(default), writing the default back to localStorage.
-    const storedAfterReset = window.localStorage.getItem(`edumips64:v1:${SettingKey.THEME_MODE}`);
-    expect(storedAfterReset).toBe(JSON.stringify(getSchema(SettingKey.THEME_MODE).default));
+    const storedAfterReset = window.localStorage.getItem(
+      `edumips64:v1:${SettingKey.THEME_MODE}`,
+    );
+    expect(storedAfterReset).toBe(
+      JSON.stringify(getSchema(SettingKey.THEME_MODE).default),
+    );
   });
 
   it('resetting an already-default value is a no-op', () => {
@@ -228,10 +245,76 @@ describe('useSetting — multi-instance sync', () => {
 });
 
 // ---------------------------------------------------------------------------
-// resetAllDialogSettings — the Settings dialog's "Reset to defaults" button
+// resetUiSettings / resetSimulationSettings — the Settings dialog's two
+// "Reset to defaults" buttons
 // ---------------------------------------------------------------------------
 
-describe('resetAllDialogSettings', () => {
+describe('resetUiSettings', () => {
+  it('resets UI and execution settings: vi mode, pipeline colors, step stride', () => {
+    const viMode = renderHook(() => useSetting(SettingKey.VI_MODE));
+    const stepStride = renderHook(() => useSetting(SettingKey.STEP_STRIDE));
+    const pipelineColors = renderHook(() =>
+      useSetting(SettingKey.PIPELINE_COLORS),
+    );
+
+    act(() => {
+      viMode.result.current[1](true);
+      stepStride.result.current[1](999);
+      pipelineColors.result.current[1]({
+        ...DEFAULT_PIPELINE_COLORS,
+        IF: '#000000',
+      });
+    });
+
+    act(() => {
+      resetUiSettings();
+    });
+
+    expect(viMode.result.current[0]).toBe(false);
+    expect(stepStride.result.current[0]).toBe(
+      getSchema(SettingKey.STEP_STRIDE).default,
+    );
+    expect(pipelineColors.result.current[0]).toEqual(DEFAULT_PIPELINE_COLORS);
+  });
+
+  it('does not touch Simulation-tab settings (forwarding, delay slot, cache)', () => {
+    const forwarding = renderHook(() => useSetting(SettingKey.FORWARDING));
+    const delaySlot = renderHook(() => useSetting(SettingKey.DELAY_SLOT));
+
+    act(() => {
+      forwarding.result.current[1](true);
+      delaySlot.result.current[1](true);
+    });
+
+    act(() => {
+      resetUiSettings();
+    });
+
+    expect(forwarding.result.current[0]).toBe(true);
+    expect(delaySlot.result.current[0]).toBe(true);
+  });
+
+  it('does not touch settings outside the dialog (editor code, expanded accordions, help language)', () => {
+    const editorCode = renderHook(() => useSetting(SettingKey.EDITOR_CODE));
+    const helpLanguage = renderHook(() => useSetting(SettingKey.HELP_LANGUAGE));
+
+    act(() => {
+      editorCode.result.current[1]('.code\nSYSCALL 0\n');
+      helpLanguage.result.current[1]('it');
+    });
+
+    act(() => {
+      resetUiSettings();
+    });
+
+    // Untouched — a "reset settings" action must never discard the user's
+    // in-progress program or their Help-dialog language preference.
+    expect(editorCode.result.current[0]).toBe('.code\nSYSCALL 0\n');
+    expect(helpLanguage.result.current[0]).toBe('it');
+  });
+});
+
+describe('resetSimulationSettings', () => {
   it('resets a setting to its default even though no hook instance for it is mounted', () => {
     // Write a non-default value directly, without mounting a hook — this is
     // the situation for cache config, whose useSetting calls live inside
@@ -242,7 +325,7 @@ describe('resetAllDialogSettings', () => {
     );
 
     act(() => {
-      resetAllDialogSettings();
+      resetSimulationSettings();
     });
 
     const { result } = renderHook(() => useSetting(SettingKey.CACHE_L1D));
@@ -257,51 +340,53 @@ describe('resetAllDialogSettings', () => {
     expect(result.current[0]).toBe(true);
 
     act(() => {
-      resetAllDialogSettings();
+      resetSimulationSettings();
     });
 
     expect(result.current[0]).toBe(false);
   });
 
-  it('resets every dialog-owned setting: UI, CPU, execution and cache', () => {
-    const viMode = renderHook(() => useSetting(SettingKey.VI_MODE));
+  it('resets both CPU settings and both cache configs', () => {
+    const forwarding = renderHook(() => useSetting(SettingKey.FORWARDING));
     const delaySlot = renderHook(() => useSetting(SettingKey.DELAY_SLOT));
+    const l1d = renderHook(() => useSetting(SettingKey.CACHE_L1D));
+    const l1i = renderHook(() => useSetting(SettingKey.CACHE_L1I));
+
+    act(() => {
+      forwarding.result.current[1](true);
+      delaySlot.result.current[1](true);
+      l1d.result.current[1]({ size: 4096, blockSize: 32, associativity: 2 });
+      l1i.result.current[1]({ size: 4096, blockSize: 32, associativity: 2 });
+    });
+
+    act(() => {
+      resetSimulationSettings();
+    });
+
+    expect(forwarding.result.current[0]).toBe(false);
+    expect(delaySlot.result.current[0]).toBe(false);
+    expect(l1d.result.current[0]).toEqual(
+      getSchema(SettingKey.CACHE_L1D).default,
+    );
+    expect(l1i.result.current[0]).toEqual(
+      getSchema(SettingKey.CACHE_L1I).default,
+    );
+  });
+
+  it('does not touch UI-tab settings (vi mode, pipeline colors, step stride)', () => {
+    const viMode = renderHook(() => useSetting(SettingKey.VI_MODE));
     const stepStride = renderHook(() => useSetting(SettingKey.STEP_STRIDE));
-    const pipelineColors = renderHook(() => useSetting(SettingKey.PIPELINE_COLORS));
 
     act(() => {
       viMode.result.current[1](true);
-      delaySlot.result.current[1](true);
       stepStride.result.current[1](999);
-      pipelineColors.result.current[1]({ ...DEFAULT_PIPELINE_COLORS, IF: '#000000' });
     });
 
     act(() => {
-      resetAllDialogSettings();
+      resetSimulationSettings();
     });
 
-    expect(viMode.result.current[0]).toBe(false);
-    expect(delaySlot.result.current[0]).toBe(false);
-    expect(stepStride.result.current[0]).toBe(getSchema(SettingKey.STEP_STRIDE).default);
-    expect(pipelineColors.result.current[0]).toEqual(DEFAULT_PIPELINE_COLORS);
-  });
-
-  it('does not touch settings outside the dialog (editor code, expanded accordions, help language)', () => {
-    const editorCode = renderHook(() => useSetting(SettingKey.EDITOR_CODE));
-    const helpLanguage = renderHook(() => useSetting(SettingKey.HELP_LANGUAGE));
-
-    act(() => {
-      editorCode.result.current[1]('.code\nSYSCALL 0\n');
-      helpLanguage.result.current[1]('it');
-    });
-
-    act(() => {
-      resetAllDialogSettings();
-    });
-
-    // Untouched — a "reset settings" action must never discard the user's
-    // in-progress program or their Help-dialog language preference.
-    expect(editorCode.result.current[0]).toBe('.code\nSYSCALL 0\n');
-    expect(helpLanguage.result.current[0]).toBe('it');
+    expect(viMode.result.current[0]).toBe(true);
+    expect(stepStride.result.current[0]).toBe(999);
   });
 });

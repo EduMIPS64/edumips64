@@ -309,17 +309,14 @@ SYSCALL 0
   // not yet completed). `loadProgram` waits for `#step-button:not([disabled])`
   // which is exactly the RUNNING condition.
 
-  await openSettingsDialog(page, 'Simulation');
-  let forwardingSwitch = page.getByLabel('CPU Forwarding');
-
-  // The switch must be disabled while the simulator is RUNNING.
-  await expect(forwardingSwitch).toBeDisabled();
-
-  // Try to flip it anyway; the state must not change. Playwright's `.click()`
-  // with `force: true` bypasses actionability checks, which lets us assert
-  // that even a forced click is ignored by the disabled <input>.
-  await forwardingSwitch.click({ force: true });
-  await expect(forwardingSwitch).not.toBeChecked();
+  // The CPU Forwarding switch is unreachable while RUNNING: the entire
+  // Simulation tab is disabled (see settings-dialog.spec.js for the
+  // dedicated coverage of that), so opening Settings lands on — and stays
+  // on — the UI tab.
+  await page.click('#settings-button');
+  await page.waitForSelector('.settings-title');
+  await expect(page.locator('#settings-tab-1')).toBeDisabled();
+  await expect(page.getByLabel('CPU Forwarding')).not.toBeVisible();
 
   // The Settings dialog is modal, so #stop-button (part of the run-controls
   // toolbar behind it) must be reached with the dialog closed.
@@ -329,6 +326,5 @@ SYSCALL 0
   // Stopping the simulation must re-enable the switch, so the user can
   // change forwarding for the next run.
   await openSettingsDialog(page, 'Simulation');
-  forwardingSwitch = page.getByLabel('CPU Forwarding');
-  await expect(forwardingSwitch).toBeEnabled();
+  await expect(page.getByLabel('CPU Forwarding')).toBeEnabled();
 });
