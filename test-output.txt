@@ -1,0 +1,1736 @@
+
+Running 109 tests using 32 workers
+
+  -    1 [chromium] › src/test/webapp/contextual-controls.spec.js:338:6 › toolbar is draggable: position changes after drag gesture
+  ✘    2 [chromium] › src/test/webapp/app-loading.spec.js:19:1 › app loading gate resolves and simulator becomes ready (10ms)
+  ✘    4 [chromium] › src/test/webapp/basic-tests.spec.js:4:1 › single step works (6ms)
+  ✘    3 [chromium] › src/test/webapp/cache-simulator.spec.js:99:1 › cache configuration textboxes can be cleared and keep focus while typing (6ms)
+  ✘    5 [chromium] › src/test/webapp/a11y-quick-wins.spec.js:13:3 › accessibility quick wins › document has lang, single h1, and a skip link (7ms)
+  ✘    7 [chromium] › src/test/webapp/cache-simulator.spec.js:262:1 › changing cache configuration affects cache misses (9ms)
+  ✘    8 [chromium] › src/test/webapp/cache-simulator.spec.js:176:1 › cache statistics are displayed after running a program (6ms)
+  ✘    6 [chromium] › src/test/webapp/a11y-quick-wins.spec.js:43:3 › accessibility quick wins › CPU status chip is exposed as a polite live region (6ms)
+  ✘   10 [chromium] › src/test/webapp/contextual-controls.spec.js:85:1 › EMPTY: program-menu-button visible and enabled; settings-button and help-button visible (7ms)
+  ✘   16 [chromium] › src/test/webapp/contextual-controls.spec.js:141:1 › READY: program-menu-button visible but DISABLED; settings-button and help-button visible (5ms)
+  ✘    9 [chromium] › src/test/webapp/cache-simulator.spec.js:125:1 › cache configuration falls back to defaults when persisted values are invalid (6ms)
+  ✘   14 [chromium] › src/test/webapp/clear-button.spec.js:19:1 › clear button resets simulator state and UI (10ms)
+  ✘   12 [chromium] › src/test/webapp/cache-simulator.spec.js:422:1 › cache statistics reset when loading new program (9ms)
+  ✘   11 [chromium] › src/test/webapp/cache-simulator.spec.js:216:1 › cache misses are recorded for memory accesses (7ms)
+  ✘   13 [chromium] › src/test/webapp/cache-simulator.spec.js:379:1 › instruction cache shows hits for loop iterations (6ms)
+  ✘   15 [chromium] › src/test/webapp/cache-simulator.spec.js:311:1 › larger block size reduces misses for sequential access (6ms)
+  ✘   18 [chromium] › src/test/webapp/clear-button.spec.js:96:1 › clear button removes error accordion after syntax errors (5ms)
+  ✘   21 [chromium] › src/test/webapp/contextual-controls.spec.js:65:1 › EMPTY: load-button visible; run-controls-toolbar absent; execution buttons not actionable (6ms)
+  ✘   22 [chromium] › src/test/webapp/contextual-controls.spec.js:110:1 › READY: step/multi-step/run/stop visible & enabled; pause visible but disabled; load still visible (6ms)
+  ✘   19 [chromium] › src/test/webapp/contextual-controls.spec.js:180:1 › EXECUTING: pause visible & enabled; stop visible but disabled; step/multi-step/run visible but disabled; load-button still visible in header (6ms)
+  ✘   17 [chromium] › src/test/webapp/a11y-quick-wins.spec.js:54:3 › accessibility quick wins › help iframe does not render Sphinx pilcrow permalinks (7ms)
+  ✘   24 [chromium] › src/test/webapp/clear-button.spec.js:147:1 › clear button removes accordion change markers (7ms)
+  ✘   23 [chromium] › src/test/webapp/contextual-controls.spec.js:234:1 › ENDED: load-button visible; run-controls-toolbar absent; execution buttons not actionable (9ms)
+  ✘   20 [chromium] › src/test/webapp/a11y-quick-wins.spec.js:33:3 › accessibility quick wins › help button has an accessible name (8ms)
+  ✘   25 [chromium] › src/test/webapp/contextual-controls.spec.js:256:1 › ENDED: program-menu-button visible and enabled; settings-button and help-button visible (9ms)
+  ✘   30 [chromium] › src/test/webapp/deprecated-warnings.spec.js:31:1 › deprecated instruction is flagged by the syntax checker (5ms)
+  ✘   27 [chromium] › src/test/webapp/cycles-widget.spec.js:39:1 › cycles widget renders an empty diagram before any program is loaded (6ms)
+  ✘   31 [chromium] › src/test/webapp/contextual-controls.spec.js:283:1 › lifecycle: EMPTY → READY → ENDED control transitions (5ms)
+  ✘   29 [chromium] › src/test/webapp/cycles-widget.spec.js:89:1 › a RAW hazard is tagged and painted with the stall color (5ms)
+  ✘   26 [chromium] › src/test/webapp/cycles-widget.spec.js:53:1 › stepping fills the temporal diagram row by row (7ms)
+  ✘   28 [chromium] › src/test/webapp/deprecated-warnings.spec.js:49:1 › hover tooltip works after loading code with a warning (5ms)
+  ✘   32 [chromium] › src/test/webapp/cycles-widget.spec.js:108:1 › the diagram survives a run to completion and resets on reload (7ms)
+  ✘   33 [chromium] › src/test/webapp/editor-persistence.spec.js:39:1 › editor contents persist across page reload (6ms)
+  ✘   34 [chromium] › src/test/webapp/editor-persistence.spec.js:91:1 › restore default sample button restores the bundled sample (7ms)
+  ✘   37 [chromium] › src/test/webapp/exhaustive-deps-regressions.spec.js:160:1 › cache config changes synchronize before the next run (6ms)
+  ✘   35 [chromium] › src/test/webapp/exhaustive-deps-regressions.spec.js:97:1 › syntax errors update Monaco error markers (6ms)
+  ✘   40 [chromium] › src/test/webapp/expanded-accordions.spec.js:53:1 › default panel expansion highlights pipeline and registers (5ms)
+  ✘   36 [chromium] › src/test/webapp/exhaustive-deps-regressions.spec.js:124:1 › Vim mode can be enabled and disabled after the editor mounts (11ms)
+  ✘   42 [chromium] › src/test/webapp/help-dialog.spec.js:88:1 › help documentation loads correctly in iframe (9ms)
+  ✘   38 [chromium] › src/test/webapp/expanded-accordions.spec.js:72:1 › panel expansion is persisted and restored across reloads (6ms)
+  ✘   43 [chromium] › src/test/webapp/help-dialog.spec.js:113:1 › help navigation allows browsing different sections (6ms)
+  ✘   41 [chromium] › src/test/webapp/forwarding.spec.js:211:1 › forwarding switch persists across page reloads (6ms)
+  ✘   39 [chromium] › src/test/webapp/forwarding.spec.js:145:1 › forwarding.s runs with 15 cycles when forwarding is enabled (11ms)
+  ✘   47 [chromium] › src/test/webapp/help-dialog.spec.js:5:1 › help dialog shows embedded documentation with navigation (6ms)
+  ✘   44 [chromium] › src/test/webapp/forwarding.spec.js:239:1 › forwarding is applied on a fresh session and yields identical cycle/stall counts (6ms)
+  ✘   46 [chromium] › src/test/webapp/issue-jump.spec.js:37:1 › clicking an Issues entry jumps the editor to that line (6ms)
+  ✘   45 [chromium] › src/test/webapp/forwarding.spec.js:125:1 › forwarding.s runs with 18 cycles when forwarding is disabled (7ms)
+  ✘   49 [chromium] › src/test/webapp/keyboard-shortcuts.spec.js:81:1 › F8 starts Run All and Esc stops and resets (6ms)
+  ✘   50 [chromium] › src/test/webapp/keyboard-shortcuts.spec.js:61:1 › F9 advances a single simulation step after loading (5ms)
+  ✘   48 [chromium] › src/test/webapp/keyboard-shortcuts.spec.js:33:1 › F2 loads the program and shows the run-controls toolbar (6ms)
+  ✘   51 [chromium] › src/test/webapp/forwarding.spec.js:287:1 › forwarding switch is disabled while a program is running (10ms)
+  ✘   53 [chromium] › src/test/webapp/mobile-reachability.spec.js:157:1 › core header controls are reachable on a mobile viewport (7ms)
+  ✘   52 [chromium] › src/test/webapp/forwarding.spec.js:170:1 › issue51-halt.s cycle counts match EndToEndTests under both forwarding settings (6ms)
+  ✘   54 [chromium] › src/test/webapp/mobile-reachability.spec.js:174:1 › the Program menu opens and its items are reachable on a mobile viewport (5ms)
+  ✘   55 [chromium] › src/test/webapp/memory-hex-width.spec.js:66:1 › memory values remain 64-bit width after store byte instruction (6ms)
+  ✘   56 [chromium] › src/test/webapp/mobile-reachability.spec.js:205:1 › simulator state (registers and memory) is inspectable from a mobile viewport (5ms)
+  ✘   58 [chromium] › src/test/webapp/pipeline-exceptions.spec.js:101:1 › BreakException: cycleBuilder stays in sync (every occupied stage has a CycleState) (5ms)
+  ✘   57 [chromium] › src/test/webapp/keyboard-shortcuts.spec.js:114:1 › Help dialog has a Shortcuts tab that lists all keys (6ms)
+  ✘   61 [chromium] › src/test/webapp/mobile-reachability.spec.js:190:1 › a program can be loaded and the run toolbar is reachable on a mobile viewport (4ms)
+  ✘   59 [chromium] › src/test/webapp/memory-hex-width.spec.js:26:1 › memory values should have consistent 64-bit hex width (7ms)
+  ✘   60 [chromium] › src/test/webapp/pipeline-stalls.spec.js:243:1 › Structural Divider hazard: second DIV.D stalls in ID with the Struct: Div tag (6ms)
+  ✘   63 [chromium] › src/test/webapp/program-menu.spec.js:48:1 › program-menu: all four items visible when menu opened in EMPTY state (5ms)
+  ✘   62 [chromium] › src/test/webapp/pipeline-stalls.spec.js:199:1 › WAW hazard: ADD.D stalls in ID with the WAW tag (5ms)
+  ✘   64 [chromium] › src/test/webapp/pipeline-stalls.spec.js:150:1 › RAW hazard: DSUB stalls in ID with the RAW tag (forwarding off) (6ms)
+  ✘   65 [chromium] › src/test/webapp/pipeline-exceptions.spec.js:160:1 › SynchronousException (INTOVERFLOW): cycleBuilder stays in sync (6ms)
+  ✘   66 [chromium] › src/test/webapp/program-menu.spec.js:84:1 › program-menu: button disabled during READY and EXECUTING, re-enabled after stop (→ EMPTY) (7ms)
+  ✘   67 [chromium] › src/test/webapp/program-menu.spec.js:122:1 › program-menu: button disabled during READY and EXECUTING, re-enabled after simulation ends (ENDED) (6ms)
+  ✘   68 [chromium] › src/test/webapp/sample-program-clean.spec.js:9:1 › default sample loads with zero issues on a fresh page (10ms)
+  ✘   69 [chromium] › src/test/webapp/sample-program-stdout.spec.js:47:1 › stdout text is visible in light theme with dark OS (6ms)
+  ✘   70 [chromium] › src/test/webapp/sample-program-stdout.spec.js:115:1 › stdout text is visible in dark theme with light OS (9ms)
+  ✘   71 [chromium] › src/test/webapp/settings-dialog.spec.js:147:1 › Reset UI to defaults asks for confirmation and is cancelable (7ms)
+  ✘   72 [chromium] › src/test/webapp/settings-dialog.spec.js:52:1 › the UI tab groups General, Editor and Pipeline Colors into labeled sections (6ms)
+  ✘   73 [chromium] › src/test/webapp/settings-dialog.spec.js:91:1 › the Simulation tab groups CPU and Cache into labeled sections (16ms)
+  ✘   77 [chromium] › src/test/webapp/settings-persistence.spec.js:46:1 › viMode and fontSize persist across page reloads (6ms)
+  ✘   75 [chromium] › src/test/webapp/settings-dialog.spec.js:171:1 › Reset Simulation to defaults asks for confirmation and is cancelable (6ms)
+  ✘   76 [chromium] › src/test/webapp/settings-dialog.spec.js:132:1 › settings dialog closes with the Close button (9ms)
+  ✘   82 [chromium] › src/test/webapp/settings-persistence.spec.js:163:1 › stepStride and executionDelayMs persist across page reloads (8ms)
+  ✘   79 [chromium] › src/test/webapp/settings-dialog.spec.js:21:1 › settings dialog opens from the gear button next to the Program menu (6ms)
+  ✘   78 [chromium] › src/test/webapp/settings-dialog.spec.js:240:1 › cache configuration and general settings are no longer separate accordions (6ms)
+  ✘   74 [chromium] › src/test/webapp/settings-dialog.spec.js:193:1 › the Simulation tab and its reset button are disabled while a program is running (12ms)
+  ✘   80 [chromium] › src/test/webapp/settings-persistence.spec.js:225:1 › pipelineColors persist across page reloads (8ms)
+  ✘   84 [chromium] › src/test/webapp/single-step-registers.spec.js:98:1 › register values after stepping a program to completion match expected output (6ms)
+  ✘   81 [chromium] › src/test/webapp/settings-persistence.spec.js:334:1 › Reset UI to defaults resets only the UI tab, not Simulation (9ms)
+  ✘   83 [chromium] › src/test/webapp/settings-persistence.spec.js:95:1 › accordionAlerts persists across page reloads (10ms)
+  ✘   86 [chromium] › src/test/webapp/syscall-unsupported.spec.js:116:1 › invalid SYSCALL number produces a user-friendly unsupported-syscall alert (6ms)
+  ✘   85 [chromium] › src/test/webapp/settings-persistence.spec.js:128:1 › expandedAccordions persists across page reloads (7ms)
+  ✘   88 [chromium] › src/test/webapp/synchronous-exception.spec.js:32:1 › integer overflow produces a user-friendly synchronous-exception alert (6ms)
+  ✘   87 [chromium] › src/test/webapp/syscall-unsupported.spec.js:129:1 › SYSCALL 4 (write) on a non-stdout fd produces a user-friendly alert (8ms)
+  ✘   90 [chromium] › src/test/webapp/settings-persistence.spec.js:273:1 › pipelineColors also drive Monaco stage highlights (5ms)
+  ✘   89 [chromium] › src/test/webapp/syntax-highlighting-during-run.spec.js:50:3 › Syntax highlighting during execution (#1723) › instruction lines keep their colour while Run All is in progress (6ms)
+  ✘   93 [chromium] › src/test/webapp/version-and-candidate-badge.spec.js:19:3 › version display and archived-build chip › About tab shows a non-empty version string (5ms)
+  ✘   92 [chromium] › src/test/webapp/syscall-unsupported.spec.js:143:1 › SYSCALL 3 (read) on a non-stdin fd produces a user-friendly alert (8ms)
+  ✘   91 [chromium] › src/test/webapp/single-step-registers.spec.js:71:1 › single stepping advances the cycle counter one cycle at a time (5ms)
+  ✘   95 [chromium] › src/test/webapp/syscall-unsupported.spec.js:156:1 › SYSCALL 1 (open) is refused in the web UI environment (14ms)
+  ✘   96 [chromium] › src/test/webapp/settings-persistence.spec.js:383:1 › Reset Simulation to defaults resets only the Simulation tab, not UI (5ms)
+  ✘   94 [chromium] › src/test/webapp/syscall3.spec.js:57:1 › syscall 3 caps the input at the maximum allowed length (6ms)
+  ✘   97 [chromium] › src/test/webapp/syscall3.spec.js:36:1 › syscall 3 opens an input dialog and resumes execution (6ms)
+  ✘   98 [chromium] › src/test/webapp/version-and-candidate-badge.spec.js:48:3 › version display and archived-build chip › archived-build chip is absent on a normal (non-archive) load (4ms)
+  ✘   99 [chromium] › src/test/webapp/version-and-candidate-badge.spec.js:63:3 › version display and archived-build chip › archived-build detection is path-based (unit-level check) (5ms)
+  ✘  100 [chromium] › src/test/webapp/version-history.spec.js:67:3 › unified version list in About tab › A: shows promoted and candidate sections when versions.json is available (4ms)
+  ✘  101 [chromium] › src/test/webapp/version-history.spec.js:110:3 › unified version list in About tab › B: section is absent when versions.json returns 404 (4ms)
+  ✘  102 [chromium] › src/test/webapp/version-history.spec.js:126:3 › unified version list in About tab › C: section is absent when versions array is empty (4ms)
+  ✘  103 [chromium] › src/test/webapp/workspace-layout.spec.js:48:1 › the three regions are laid out: widgets on the right, cycles across the bottom (5ms)
+  ✘  104 [chromium] › src/test/webapp/workspace-layout.spec.js:63:1 › collapsing the right panel widens the editor and hides the widgets (4ms)
+  ✘  105 [chromium] › src/test/webapp/workspace-layout.spec.js:144:1 › the Cycles region keeps its header on a narrow (stacked) viewport (4ms)
+  ✘  106 [chromium] › src/test/webapp/workspace-layout.spec.js:101:1 › dragging the vertical handle resizes the widgets column and persists (4ms)
+  ✘  107 [chromium] › src/test/webapp/workspace-layout.spec.js:156:1 › the widgets column cannot be dragged below its minimum width (4ms)
+  ✘  108 [chromium] › src/test/webapp/workspace-layout.spec.js:125:1 › the floating run toolbar stays on-screen when the window narrows (4ms)
+  ✘  109 [chromium] › src/test/webapp/workspace-layout.spec.js:83:1 › collapsing the bottom region gives the upper region more height (4ms)
+
+
+  1) [chromium] › src/test/webapp/a11y-quick-wins.spec.js:13:3 › accessibility quick wins › document has lang, single h1, and a skip link 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/a11y-quick-wins-accessibil-ce752-g-single-h1-and-a-skip-link-chromium/error-context.md
+
+  2) [chromium] › src/test/webapp/a11y-quick-wins.spec.js:33:3 › accessibility quick wins › help button has an accessible name 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/a11y-quick-wins-accessibil-a2c34-tton-has-an-accessible-name-chromium/error-context.md
+
+  3) [chromium] › src/test/webapp/a11y-quick-wins.spec.js:43:3 › accessibility quick wins › CPU status chip is exposed as a polite live region 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/a11y-quick-wins-accessibil-0e213-sed-as-a-polite-live-region-chromium/error-context.md
+
+  4) [chromium] › src/test/webapp/a11y-quick-wins.spec.js:54:3 › accessibility quick wins › help iframe does not render Sphinx pilcrow permalinks 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/a11y-quick-wins-accessibil-2b19a-r-Sphinx-pilcrow-permalinks-chromium/error-context.md
+
+  5) [chromium] › src/test/webapp/app-loading.spec.js:19:1 › app loading gate resolves and simulator becomes ready 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/app-loading-app-loading-ga-85cff-and-simulator-becomes-ready-chromium/error-context.md
+
+  6) [chromium] › src/test/webapp/basic-tests.spec.js:4:1 › single step works ──────────────────────
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/basic-tests-single-step-works-chromium/error-context.md
+
+  7) [chromium] › src/test/webapp/cache-simulator.spec.js:99:1 › cache configuration textboxes can be cleared and keep focus while typing 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cache-simulator-cache-conf-3c47e-and-keep-focus-while-typing-chromium/error-context.md
+
+  8) [chromium] › src/test/webapp/cache-simulator.spec.js:125:1 › cache configuration falls back to defaults when persisted values are invalid 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cache-simulator-cache-conf-8e791-ersisted-values-are-invalid-chromium/error-context.md
+
+  9) [chromium] › src/test/webapp/cache-simulator.spec.js:176:1 › cache statistics are displayed after running a program 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cache-simulator-cache-stat-324d5-yed-after-running-a-program-chromium/error-context.md
+
+  10) [chromium] › src/test/webapp/cache-simulator.spec.js:216:1 › cache misses are recorded for memory accesses 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cache-simulator-cache-miss-2c265-ecorded-for-memory-accesses-chromium/error-context.md
+
+  11) [chromium] › src/test/webapp/cache-simulator.spec.js:262:1 › changing cache configuration affects cache misses 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cache-simulator-changing-c-e4d32-ration-affects-cache-misses-chromium/error-context.md
+
+  12) [chromium] › src/test/webapp/cache-simulator.spec.js:311:1 › larger block size reduces misses for sequential access 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cache-simulator-larger-blo-1eb05-isses-for-sequential-access-chromium/error-context.md
+
+  13) [chromium] › src/test/webapp/cache-simulator.spec.js:379:1 › instruction cache shows hits for loop iterations 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cache-simulator-instructio-fcd9b-ws-hits-for-loop-iterations-chromium/error-context.md
+
+  14) [chromium] › src/test/webapp/cache-simulator.spec.js:422:1 › cache statistics reset when loading new program 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cache-simulator-cache-stat-f6426-et-when-loading-new-program-chromium/error-context.md
+
+  15) [chromium] › src/test/webapp/clear-button.spec.js:19:1 › clear button resets simulator state and UI 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/clear-button-clear-button-resets-simulator-state-and-UI-chromium/error-context.md
+
+  16) [chromium] › src/test/webapp/clear-button.spec.js:96:1 › clear button removes error accordion after syntax errors 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/clear-button-clear-button--a4f63-cordion-after-syntax-errors-chromium/error-context.md
+
+  17) [chromium] › src/test/webapp/clear-button.spec.js:147:1 › clear button removes accordion change markers 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/clear-button-clear-button-removes-accordion-change-markers-chromium/error-context.md
+
+  18) [chromium] › src/test/webapp/contextual-controls.spec.js:65:1 › EMPTY: load-button visible; run-controls-toolbar absent; execution buttons not actionable 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/contextual-controls-EMPTY--c6945-tion-buttons-not-actionable-chromium/error-context.md
+
+  19) [chromium] › src/test/webapp/contextual-controls.spec.js:85:1 › EMPTY: program-menu-button visible and enabled; settings-button and help-button visible 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/contextual-controls-EMPTY--f2532-ton-and-help-button-visible-chromium/error-context.md
+
+  20) [chromium] › src/test/webapp/contextual-controls.spec.js:110:1 › READY: step/multi-step/run/stop visible & enabled; pause visible but disabled; load still visible 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/contextual-controls-READY--411da-disabled-load-still-visible-chromium/error-context.md
+
+  21) [chromium] › src/test/webapp/contextual-controls.spec.js:141:1 › READY: program-menu-button visible but DISABLED; settings-button and help-button visible 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/contextual-controls-READY--43032-ton-and-help-button-visible-chromium/error-context.md
+
+  22) [chromium] › src/test/webapp/contextual-controls.spec.js:180:1 › EXECUTING: pause visible & enabled; stop visible but disabled; step/multi-step/run visible but disabled; load-button still visible in header 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/contextual-controls-EXECUT-7a168-ton-still-visible-in-header-chromium/error-context.md
+
+  23) [chromium] › src/test/webapp/contextual-controls.spec.js:234:1 › ENDED: load-button visible; run-controls-toolbar absent; execution buttons not actionable 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/contextual-controls-ENDED--ad189-tion-buttons-not-actionable-chromium/error-context.md
+
+  24) [chromium] › src/test/webapp/contextual-controls.spec.js:256:1 › ENDED: program-menu-button visible and enabled; settings-button and help-button visible 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/contextual-controls-ENDED--fbde1-ton-and-help-button-visible-chromium/error-context.md
+
+  25) [chromium] › src/test/webapp/contextual-controls.spec.js:283:1 › lifecycle: EMPTY → READY → ENDED control transitions 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/contextual-controls-lifecy-84386-→-ENDED-control-transitions-chromium/error-context.md
+
+  26) [chromium] › src/test/webapp/cycles-widget.spec.js:39:1 › cycles widget renders an empty diagram before any program is loaded 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cycles-widget-cycles-widge-e8cee-efore-any-program-is-loaded-chromium/error-context.md
+
+  27) [chromium] › src/test/webapp/cycles-widget.spec.js:53:1 › stepping fills the temporal diagram row by row 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cycles-widget-stepping-fills-the-temporal-diagram-row-by-row-chromium/error-context.md
+
+  28) [chromium] › src/test/webapp/cycles-widget.spec.js:89:1 › a RAW hazard is tagged and painted with the stall color 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cycles-widget-a-RAW-hazard-224eb-ainted-with-the-stall-color-chromium/error-context.md
+
+  29) [chromium] › src/test/webapp/cycles-widget.spec.js:108:1 › the diagram survives a run to completion and resets on reload 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cycles-widget-the-diagram--19f7b-letion-and-resets-on-reload-chromium/error-context.md
+
+  30) [chromium] › src/test/webapp/deprecated-warnings.spec.js:31:1 › deprecated instruction is flagged by the syntax checker 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/deprecated-warnings-deprec-96237-agged-by-the-syntax-checker-chromium/error-context.md
+
+  31) [chromium] › src/test/webapp/deprecated-warnings.spec.js:49:1 › hover tooltip works after loading code with a warning 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/deprecated-warnings-hover--db483-loading-code-with-a-warning-chromium/error-context.md
+
+  32) [chromium] › src/test/webapp/editor-persistence.spec.js:39:1 › editor contents persist across page reload 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/editor-persistence-editor--687ae--persist-across-page-reload-chromium/error-context.md
+
+  33) [chromium] › src/test/webapp/editor-persistence.spec.js:91:1 › restore default sample button restores the bundled sample 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/editor-persistence-restore-3f80c-restores-the-bundled-sample-chromium/error-context.md
+
+  34) [chromium] › src/test/webapp/exhaustive-deps-regressions.spec.js:97:1 › syntax errors update Monaco error markers 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/exhaustive-deps-regression-61440-update-Monaco-error-markers-chromium/error-context.md
+
+  35) [chromium] › src/test/webapp/exhaustive-deps-regressions.spec.js:124:1 › Vim mode can be enabled and disabled after the editor mounts 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/exhaustive-deps-regression-3717b-led-after-the-editor-mounts-chromium/error-context.md
+
+  36) [chromium] › src/test/webapp/exhaustive-deps-regressions.spec.js:160:1 › cache config changes synchronize before the next run 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/exhaustive-deps-regression-77d15-hronize-before-the-next-run-chromium/error-context.md
+
+  37) [chromium] › src/test/webapp/expanded-accordions.spec.js:53:1 › default panel expansion highlights pipeline and registers 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/expanded-accordions-defaul-ceae9-ghts-pipeline-and-registers-chromium/error-context.md
+
+  38) [chromium] › src/test/webapp/expanded-accordions.spec.js:72:1 › panel expansion is persisted and restored across reloads 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/expanded-accordions-panel--418b9-and-restored-across-reloads-chromium/error-context.md
+
+  39) [chromium] › src/test/webapp/forwarding.spec.js:125:1 › forwarding.s runs with 18 cycles when forwarding is disabled 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/forwarding-forwarding-s-ru-b280e-when-forwarding-is-disabled-chromium/error-context.md
+
+  40) [chromium] › src/test/webapp/forwarding.spec.js:145:1 › forwarding.s runs with 15 cycles when forwarding is enabled 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/forwarding-forwarding-s-ru-fc86f--when-forwarding-is-enabled-chromium/error-context.md
+
+  41) [chromium] › src/test/webapp/forwarding.spec.js:170:1 › issue51-halt.s cycle counts match EndToEndTests under both forwarding settings 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/forwarding-issue51-halt-s--77ae8-er-both-forwarding-settings-chromium/error-context.md
+
+  42) [chromium] › src/test/webapp/forwarding.spec.js:211:1 › forwarding switch persists across page reloads 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/forwarding-forwarding-switch-persists-across-page-reloads-chromium/error-context.md
+
+  43) [chromium] › src/test/webapp/forwarding.spec.js:239:1 › forwarding is applied on a fresh session and yields identical cycle/stall counts 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/forwarding-forwarding-is-a-989c2-dentical-cycle-stall-counts-chromium/error-context.md
+
+  44) [chromium] › src/test/webapp/forwarding.spec.js:287:1 › forwarding switch is disabled while a program is running 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/forwarding-forwarding-swit-00b5f--while-a-program-is-running-chromium/error-context.md
+
+  45) [chromium] › src/test/webapp/help-dialog.spec.js:5:1 › help dialog shows embedded documentation with navigation 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/help-dialog-help-dialog-sh-1f354-cumentation-with-navigation-chromium/error-context.md
+
+  46) [chromium] › src/test/webapp/help-dialog.spec.js:88:1 › help documentation loads correctly in iframe 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/help-dialog-help-documentation-loads-correctly-in-iframe-chromium/error-context.md
+
+  47) [chromium] › src/test/webapp/help-dialog.spec.js:113:1 › help navigation allows browsing different sections 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/help-dialog-help-navigatio-1e3dc-browsing-different-sections-chromium/error-context.md
+
+  48) [chromium] › src/test/webapp/issue-jump.spec.js:37:1 › clicking an Issues entry jumps the editor to that line 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/issue-jump-clicking-an-Iss-62eb7-mps-the-editor-to-that-line-chromium/error-context.md
+
+  49) [chromium] › src/test/webapp/keyboard-shortcuts.spec.js:33:1 › F2 loads the program and shows the run-controls toolbar 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/keyboard-shortcuts-F2-load-6c4bc-ws-the-run-controls-toolbar-chromium/error-context.md
+
+  50) [chromium] › src/test/webapp/keyboard-shortcuts.spec.js:61:1 › F9 advances a single simulation step after loading 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/keyboard-shortcuts-F9-adva-2b8f9-mulation-step-after-loading-chromium/error-context.md
+
+  51) [chromium] › src/test/webapp/keyboard-shortcuts.spec.js:81:1 › F8 starts Run All and Esc stops and resets 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/keyboard-shortcuts-F8-star-228e3-ll-and-Esc-stops-and-resets-chromium/error-context.md
+
+  52) [chromium] › src/test/webapp/keyboard-shortcuts.spec.js:114:1 › Help dialog has a Shortcuts tab that lists all keys 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/keyboard-shortcuts-Help-di-7b512-uts-tab-that-lists-all-keys-chromium/error-context.md
+
+  53) [chromium] › src/test/webapp/memory-hex-width.spec.js:26:1 › memory values should have consistent 64-bit hex width 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/memory-hex-width-memory-va-ab374-consistent-64-bit-hex-width-chromium/error-context.md
+
+  54) [chromium] › src/test/webapp/memory-hex-width.spec.js:66:1 › memory values remain 64-bit width after store byte instruction 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/memory-hex-width-memory-va-c015e-fter-store-byte-instruction-chromium/error-context.md
+
+  55) [chromium] › src/test/webapp/mobile-reachability.spec.js:157:1 › core header controls are reachable on a mobile viewport 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/mobile-reachability-core-h-73979-chable-on-a-mobile-viewport-chromium/error-context.md
+
+  56) [chromium] › src/test/webapp/mobile-reachability.spec.js:174:1 › the Program menu opens and its items are reachable on a mobile viewport 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/mobile-reachability-the-Pr-42f6c-chable-on-a-mobile-viewport-chromium/error-context.md
+
+  57) [chromium] › src/test/webapp/mobile-reachability.spec.js:190:1 › a program can be loaded and the run toolbar is reachable on a mobile viewport 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/mobile-reachability-a-prog-e9b42-chable-on-a-mobile-viewport-chromium/error-context.md
+
+  58) [chromium] › src/test/webapp/mobile-reachability.spec.js:205:1 › simulator state (registers and memory) is inspectable from a mobile viewport 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/mobile-reachability-simula-390e3-able-from-a-mobile-viewport-chromium/error-context.md
+
+  59) [chromium] › src/test/webapp/pipeline-exceptions.spec.js:101:1 › BreakException: cycleBuilder stays in sync (every occupied stage has a CycleState) 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/pipeline-exceptions-BreakE-b0d84-ied-stage-has-a-CycleState--chromium/error-context.md
+
+  60) [chromium] › src/test/webapp/pipeline-exceptions.spec.js:160:1 › SynchronousException (INTOVERFLOW): cycleBuilder stays in sync 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/pipeline-exceptions-Synchr-ece99--cycleBuilder-stays-in-sync-chromium/error-context.md
+
+  61) [chromium] › src/test/webapp/pipeline-stalls.spec.js:150:1 › RAW hazard: DSUB stalls in ID with the RAW tag (forwarding off) 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/pipeline-stalls-RAW-hazard-b55a6-the-RAW-tag-forwarding-off--chromium/error-context.md
+
+  62) [chromium] › src/test/webapp/pipeline-stalls.spec.js:199:1 › WAW hazard: ADD.D stalls in ID with the WAW tag 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/pipeline-stalls-WAW-hazard-ce75c-alls-in-ID-with-the-WAW-tag-chromium/error-context.md
+
+  63) [chromium] › src/test/webapp/pipeline-stalls.spec.js:243:1 › Structural Divider hazard: second DIV.D stalls in ID with the Struct: Div tag 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/pipeline-stalls-Structural-b2911--ID-with-the-Struct-Div-tag-chromium/error-context.md
+
+  64) [chromium] › src/test/webapp/program-menu.spec.js:48:1 › program-menu: all four items visible when menu opened in EMPTY state 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/program-menu-program-menu--43a5f--menu-opened-in-EMPTY-state-chromium/error-context.md
+
+  65) [chromium] › src/test/webapp/program-menu.spec.js:84:1 › program-menu: button disabled during READY and EXECUTING, re-enabled after stop (→ EMPTY) 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/program-menu-program-menu--f19e2-enabled-after-stop-→-EMPTY--chromium/error-context.md
+
+  66) [chromium] › src/test/webapp/program-menu.spec.js:122:1 › program-menu: button disabled during READY and EXECUTING, re-enabled after simulation ends (ENDED) 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/program-menu-program-menu--334e3-fter-simulation-ends-ENDED--chromium/error-context.md
+
+  67) [chromium] › src/test/webapp/sample-program-clean.spec.js:9:1 › default sample loads with zero issues on a fresh page 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/sample-program-clean-defau-25ba8-zero-issues-on-a-fresh-page-chromium/error-context.md
+
+  68) [chromium] › src/test/webapp/sample-program-stdout.spec.js:47:1 › stdout text is visible in light theme with dark OS 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/sample-program-stdout-stdo-3e7ac-in-light-theme-with-dark-OS-chromium/error-context.md
+
+  69) [chromium] › src/test/webapp/sample-program-stdout.spec.js:115:1 › stdout text is visible in dark theme with light OS 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/sample-program-stdout-stdo-b0839-in-dark-theme-with-light-OS-chromium/error-context.md
+
+  70) [chromium] › src/test/webapp/settings-dialog.spec.js:21:1 › settings dialog opens from the gear button next to the Program menu 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-dialog-settings-d-67426-on-next-to-the-Program-menu-chromium/error-context.md
+
+  71) [chromium] › src/test/webapp/settings-dialog.spec.js:52:1 › the UI tab groups General, Editor and Pipeline Colors into labeled sections 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-dialog-the-UI-tab-98476-olors-into-labeled-sections-chromium/error-context.md
+
+  72) [chromium] › src/test/webapp/settings-dialog.spec.js:91:1 › the Simulation tab groups CPU and Cache into labeled sections 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-dialog-the-Simula-cb9c9-Cache-into-labeled-sections-chromium/error-context.md
+
+  73) [chromium] › src/test/webapp/settings-dialog.spec.js:132:1 › settings dialog closes with the Close button 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-dialog-settings-dialog-closes-with-the-Close-button-chromium/error-context.md
+
+  74) [chromium] › src/test/webapp/settings-dialog.spec.js:147:1 › Reset UI to defaults asks for confirmation and is cancelable 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-dialog-Reset-UI-t-a2b66-firmation-and-is-cancelable-chromium/error-context.md
+
+  75) [chromium] › src/test/webapp/settings-dialog.spec.js:171:1 › Reset Simulation to defaults asks for confirmation and is cancelable 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-dialog-Reset-Simu-44425-firmation-and-is-cancelable-chromium/error-context.md
+
+  76) [chromium] › src/test/webapp/settings-dialog.spec.js:193:1 › the Simulation tab and its reset button are disabled while a program is running 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-dialog-the-Simula-12340--while-a-program-is-running-chromium/error-context.md
+
+  77) [chromium] › src/test/webapp/settings-dialog.spec.js:240:1 › cache configuration and general settings are no longer separate accordions 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-dialog-cache-conf-0557d--longer-separate-accordions-chromium/error-context.md
+
+  78) [chromium] › src/test/webapp/settings-persistence.spec.js:46:1 › viMode and fontSize persist across page reloads 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-persistence-viMod-701c0-persist-across-page-reloads-chromium/error-context.md
+
+  79) [chromium] › src/test/webapp/settings-persistence.spec.js:95:1 › accordionAlerts persists across page reloads 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-persistence-accor-71af5-ersists-across-page-reloads-chromium/error-context.md
+
+  80) [chromium] › src/test/webapp/settings-persistence.spec.js:128:1 › expandedAccordions persists across page reloads 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-persistence-expan-4ada8-ersists-across-page-reloads-chromium/error-context.md
+
+  81) [chromium] › src/test/webapp/settings-persistence.spec.js:163:1 › stepStride and executionDelayMs persist across page reloads 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-persistence-stepS-fdc9d-persist-across-page-reloads-chromium/error-context.md
+
+  82) [chromium] › src/test/webapp/settings-persistence.spec.js:225:1 › pipelineColors persist across page reloads 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-persistence-pipel-822fd-persist-across-page-reloads-chromium/error-context.md
+
+  83) [chromium] › src/test/webapp/settings-persistence.spec.js:273:1 › pipelineColors also drive Monaco stage highlights 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-persistence-pipel-4e01b-ive-Monaco-stage-highlights-chromium/error-context.md
+
+  84) [chromium] › src/test/webapp/settings-persistence.spec.js:334:1 › Reset UI to defaults resets only the UI tab, not Simulation 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-persistence-Reset-78ff8-y-the-UI-tab-not-Simulation-chromium/error-context.md
+
+  85) [chromium] › src/test/webapp/settings-persistence.spec.js:383:1 › Reset Simulation to defaults resets only the Simulation tab, not UI 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/settings-persistence-Reset-fb756-y-the-Simulation-tab-not-UI-chromium/error-context.md
+
+  86) [chromium] › src/test/webapp/single-step-registers.spec.js:71:1 › single stepping advances the cycle counter one cycle at a time 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/single-step-registers-sing-73b67-counter-one-cycle-at-a-time-chromium/error-context.md
+
+  87) [chromium] › src/test/webapp/single-step-registers.spec.js:98:1 › register values after stepping a program to completion match expected output 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/single-step-registers-regi-ae081-etion-match-expected-output-chromium/error-context.md
+
+  88) [chromium] › src/test/webapp/synchronous-exception.spec.js:32:1 › integer overflow produces a user-friendly synchronous-exception alert 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/synchronous-exception-inte-29e9e-synchronous-exception-alert-chromium/error-context.md
+
+  89) [chromium] › src/test/webapp/syntax-highlighting-during-run.spec.js:50:3 › Syntax highlighting during execution (#1723) › instruction lines keep their colour while Run All is in progress 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/syntax-highlighting-during-cce76-hile-Run-All-is-in-progress-chromium/error-context.md
+
+  90) [chromium] › src/test/webapp/syscall-unsupported.spec.js:116:1 › invalid SYSCALL number produces a user-friendly unsupported-syscall alert 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/syscall-unsupported-invali-66db0-y-unsupported-syscall-alert-chromium/error-context.md
+
+  91) [chromium] › src/test/webapp/syscall-unsupported.spec.js:129:1 › SYSCALL 4 (write) on a non-stdout fd produces a user-friendly alert 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/syscall-unsupported-SYSCAL-26803-duces-a-user-friendly-alert-chromium/error-context.md
+
+  92) [chromium] › src/test/webapp/syscall-unsupported.spec.js:143:1 › SYSCALL 3 (read) on a non-stdin fd produces a user-friendly alert 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/syscall-unsupported-SYSCAL-4cecd-duces-a-user-friendly-alert-chromium/error-context.md
+
+  93) [chromium] › src/test/webapp/syscall-unsupported.spec.js:156:1 › SYSCALL 1 (open) is refused in the web UI environment 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/syscall-unsupported-SYSCAL-8fc90-d-in-the-web-UI-environment-chromium/error-context.md
+
+  94) [chromium] › src/test/webapp/syscall3.spec.js:36:1 › syscall 3 opens an input dialog and resumes execution 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/syscall3-syscall-3-opens-a-dfdc2-ialog-and-resumes-execution-chromium/error-context.md
+
+  95) [chromium] › src/test/webapp/syscall3.spec.js:57:1 › syscall 3 caps the input at the maximum allowed length 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/syscall3-syscall-3-caps-th-68ea0--the-maximum-allowed-length-chromium/error-context.md
+
+  96) [chromium] › src/test/webapp/version-and-candidate-badge.spec.js:19:3 › version display and archived-build chip › About tab shows a non-empty version string 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/version-and-candidate-badg-6b6b7--a-non-empty-version-string-chromium/error-context.md
+
+  97) [chromium] › src/test/webapp/version-and-candidate-badge.spec.js:48:3 › version display and archived-build chip › archived-build chip is absent on a normal (non-archive) load 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/version-and-candidate-badg-9f45e-n-a-normal-non-archive-load-chromium/error-context.md
+
+  98) [chromium] › src/test/webapp/version-and-candidate-badge.spec.js:63:3 › version display and archived-build chip › archived-build detection is path-based (unit-level check) 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/version-and-candidate-badg-9b49e-ath-based-unit-level-check--chromium/error-context.md
+
+  99) [chromium] › src/test/webapp/version-history.spec.js:67:3 › unified version list in About tab › A: shows promoted and candidate sections when versions.json is available 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/version-history-unified-ve-32f48--versions-json-is-available-chromium/error-context.md
+
+  100) [chromium] › src/test/webapp/version-history.spec.js:110:3 › unified version list in About tab › B: section is absent when versions.json returns 404 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/version-history-unified-ve-24a32-n-versions-json-returns-404-chromium/error-context.md
+
+  101) [chromium] › src/test/webapp/version-history.spec.js:126:3 › unified version list in About tab › C: section is absent when versions array is empty 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/version-history-unified-ve-e4d95-hen-versions-array-is-empty-chromium/error-context.md
+
+  102) [chromium] › src/test/webapp/workspace-layout.spec.js:48:1 › the three regions are laid out: widgets on the right, cycles across the bottom 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/workspace-layout-the-three-dd0f5-ht-cycles-across-the-bottom-chromium/error-context.md
+
+  103) [chromium] › src/test/webapp/workspace-layout.spec.js:63:1 › collapsing the right panel widens the editor and hides the widgets 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/workspace-layout-collapsin-d79cc-ditor-and-hides-the-widgets-chromium/error-context.md
+
+  104) [chromium] › src/test/webapp/workspace-layout.spec.js:83:1 › collapsing the bottom region gives the upper region more height 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/workspace-layout-collapsin-fec71-he-upper-region-more-height-chromium/error-context.md
+
+  105) [chromium] › src/test/webapp/workspace-layout.spec.js:101:1 › dragging the vertical handle resizes the widgets column and persists 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/workspace-layout-dragging--e33d8-widgets-column-and-persists-chromium/error-context.md
+
+  106) [chromium] › src/test/webapp/workspace-layout.spec.js:125:1 › the floating run toolbar stays on-screen when the window narrows 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/workspace-layout-the-float-f1c78-een-when-the-window-narrows-chromium/error-context.md
+
+  107) [chromium] › src/test/webapp/workspace-layout.spec.js:144:1 › the Cycles region keeps its header on a narrow (stacked) viewport 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/workspace-layout-the-Cycle-f1761-n-a-narrow-stacked-viewport-chromium/error-context.md
+
+  108) [chromium] › src/test/webapp/workspace-layout.spec.js:156:1 › the widgets column cannot be dragged below its minimum width 
+
+    Error: browserType.launch: Executable doesn't exist at /home/andrea/.cache/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/workspace-layout-the-widge-6d7cf-ged-below-its-minimum-width-chromium/error-context.md
+
+  108 failed
+    [chromium] › src/test/webapp/a11y-quick-wins.spec.js:13:3 › accessibility quick wins › document has lang, single h1, and a skip link 
+    [chromium] › src/test/webapp/a11y-quick-wins.spec.js:33:3 › accessibility quick wins › help button has an accessible name 
+    [chromium] › src/test/webapp/a11y-quick-wins.spec.js:43:3 › accessibility quick wins › CPU status chip is exposed as a polite live region 
+    [chromium] › src/test/webapp/a11y-quick-wins.spec.js:54:3 › accessibility quick wins › help iframe does not render Sphinx pilcrow permalinks 
+    [chromium] › src/test/webapp/app-loading.spec.js:19:1 › app loading gate resolves and simulator becomes ready 
+    [chromium] › src/test/webapp/basic-tests.spec.js:4:1 › single step works ───────────────────────
+    [chromium] › src/test/webapp/cache-simulator.spec.js:99:1 › cache configuration textboxes can be cleared and keep focus while typing 
+    [chromium] › src/test/webapp/cache-simulator.spec.js:125:1 › cache configuration falls back to defaults when persisted values are invalid 
+    [chromium] › src/test/webapp/cache-simulator.spec.js:176:1 › cache statistics are displayed after running a program 
+    [chromium] › src/test/webapp/cache-simulator.spec.js:216:1 › cache misses are recorded for memory accesses 
+    [chromium] › src/test/webapp/cache-simulator.spec.js:262:1 › changing cache configuration affects cache misses 
+    [chromium] › src/test/webapp/cache-simulator.spec.js:311:1 › larger block size reduces misses for sequential access 
+    [chromium] › src/test/webapp/cache-simulator.spec.js:379:1 › instruction cache shows hits for loop iterations 
+    [chromium] › src/test/webapp/cache-simulator.spec.js:422:1 › cache statistics reset when loading new program 
+    [chromium] › src/test/webapp/clear-button.spec.js:19:1 › clear button resets simulator state and UI 
+    [chromium] › src/test/webapp/clear-button.spec.js:96:1 › clear button removes error accordion after syntax errors 
+    [chromium] › src/test/webapp/clear-button.spec.js:147:1 › clear button removes accordion change markers 
+    [chromium] › src/test/webapp/contextual-controls.spec.js:65:1 › EMPTY: load-button visible; run-controls-toolbar absent; execution buttons not actionable 
+    [chromium] › src/test/webapp/contextual-controls.spec.js:85:1 › EMPTY: program-menu-button visible and enabled; settings-button and help-button visible 
+    [chromium] › src/test/webapp/contextual-controls.spec.js:110:1 › READY: step/multi-step/run/stop visible & enabled; pause visible but disabled; load still visible 
+    [chromium] › src/test/webapp/contextual-controls.spec.js:141:1 › READY: program-menu-button visible but DISABLED; settings-button and help-button visible 
+    [chromium] › src/test/webapp/contextual-controls.spec.js:180:1 › EXECUTING: pause visible & enabled; stop visible but disabled; step/multi-step/run visible but disabled; load-button still visible in header 
+    [chromium] › src/test/webapp/contextual-controls.spec.js:234:1 › ENDED: load-button visible; run-controls-toolbar absent; execution buttons not actionable 
+    [chromium] › src/test/webapp/contextual-controls.spec.js:256:1 › ENDED: program-menu-button visible and enabled; settings-button and help-button visible 
+    [chromium] › src/test/webapp/contextual-controls.spec.js:283:1 › lifecycle: EMPTY → READY → ENDED control transitions 
+    [chromium] › src/test/webapp/cycles-widget.spec.js:39:1 › cycles widget renders an empty diagram before any program is loaded 
+    [chromium] › src/test/webapp/cycles-widget.spec.js:53:1 › stepping fills the temporal diagram row by row 
+    [chromium] › src/test/webapp/cycles-widget.spec.js:89:1 › a RAW hazard is tagged and painted with the stall color 
+    [chromium] › src/test/webapp/cycles-widget.spec.js:108:1 › the diagram survives a run to completion and resets on reload 
+    [chromium] › src/test/webapp/deprecated-warnings.spec.js:31:1 › deprecated instruction is flagged by the syntax checker 
+    [chromium] › src/test/webapp/deprecated-warnings.spec.js:49:1 › hover tooltip works after loading code with a warning 
+    [chromium] › src/test/webapp/editor-persistence.spec.js:39:1 › editor contents persist across page reload 
+    [chromium] › src/test/webapp/editor-persistence.spec.js:91:1 › restore default sample button restores the bundled sample 
+    [chromium] › src/test/webapp/exhaustive-deps-regressions.spec.js:97:1 › syntax errors update Monaco error markers 
+    [chromium] › src/test/webapp/exhaustive-deps-regressions.spec.js:124:1 › Vim mode can be enabled and disabled after the editor mounts 
+    [chromium] › src/test/webapp/exhaustive-deps-regressions.spec.js:160:1 › cache config changes synchronize before the next run 
+    [chromium] › src/test/webapp/expanded-accordions.spec.js:53:1 › default panel expansion highlights pipeline and registers 
+    [chromium] › src/test/webapp/expanded-accordions.spec.js:72:1 › panel expansion is persisted and restored across reloads 
+    [chromium] › src/test/webapp/forwarding.spec.js:125:1 › forwarding.s runs with 18 cycles when forwarding is disabled 
+    [chromium] › src/test/webapp/forwarding.spec.js:145:1 › forwarding.s runs with 15 cycles when forwarding is enabled 
+    [chromium] › src/test/webapp/forwarding.spec.js:170:1 › issue51-halt.s cycle counts match EndToEndTests under both forwarding settings 
+    [chromium] › src/test/webapp/forwarding.spec.js:211:1 › forwarding switch persists across page reloads 
+    [chromium] › src/test/webapp/forwarding.spec.js:239:1 › forwarding is applied on a fresh session and yields identical cycle/stall counts 
+    [chromium] › src/test/webapp/forwarding.spec.js:287:1 › forwarding switch is disabled while a program is running 
+    [chromium] › src/test/webapp/help-dialog.spec.js:5:1 › help dialog shows embedded documentation with navigation 
+    [chromium] › src/test/webapp/help-dialog.spec.js:88:1 › help documentation loads correctly in iframe 
+    [chromium] › src/test/webapp/help-dialog.spec.js:113:1 › help navigation allows browsing different sections 
+    [chromium] › src/test/webapp/issue-jump.spec.js:37:1 › clicking an Issues entry jumps the editor to that line 
+    [chromium] › src/test/webapp/keyboard-shortcuts.spec.js:33:1 › F2 loads the program and shows the run-controls toolbar 
+    [chromium] › src/test/webapp/keyboard-shortcuts.spec.js:61:1 › F9 advances a single simulation step after loading 
+    [chromium] › src/test/webapp/keyboard-shortcuts.spec.js:81:1 › F8 starts Run All and Esc stops and resets 
+    [chromium] › src/test/webapp/keyboard-shortcuts.spec.js:114:1 › Help dialog has a Shortcuts tab that lists all keys 
+    [chromium] › src/test/webapp/memory-hex-width.spec.js:26:1 › memory values should have consistent 64-bit hex width 
+    [chromium] › src/test/webapp/memory-hex-width.spec.js:66:1 › memory values remain 64-bit width after store byte instruction 
+    [chromium] › src/test/webapp/mobile-reachability.spec.js:157:1 › core header controls are reachable on a mobile viewport 
+    [chromium] › src/test/webapp/mobile-reachability.spec.js:174:1 › the Program menu opens and its items are reachable on a mobile viewport 
+    [chromium] › src/test/webapp/mobile-reachability.spec.js:190:1 › a program can be loaded and the run toolbar is reachable on a mobile viewport 
+    [chromium] › src/test/webapp/mobile-reachability.spec.js:205:1 › simulator state (registers and memory) is inspectable from a mobile viewport 
+    [chromium] › src/test/webapp/pipeline-exceptions.spec.js:101:1 › BreakException: cycleBuilder stays in sync (every occupied stage has a CycleState) 
+    [chromium] › src/test/webapp/pipeline-exceptions.spec.js:160:1 › SynchronousException (INTOVERFLOW): cycleBuilder stays in sync 
+    [chromium] › src/test/webapp/pipeline-stalls.spec.js:150:1 › RAW hazard: DSUB stalls in ID with the RAW tag (forwarding off) 
+    [chromium] › src/test/webapp/pipeline-stalls.spec.js:199:1 › WAW hazard: ADD.D stalls in ID with the WAW tag 
+    [chromium] › src/test/webapp/pipeline-stalls.spec.js:243:1 › Structural Divider hazard: second DIV.D stalls in ID with the Struct: Div tag 
+    [chromium] › src/test/webapp/program-menu.spec.js:48:1 › program-menu: all four items visible when menu opened in EMPTY state 
+    [chromium] › src/test/webapp/program-menu.spec.js:84:1 › program-menu: button disabled during READY and EXECUTING, re-enabled after stop (→ EMPTY) 
+    [chromium] › src/test/webapp/program-menu.spec.js:122:1 › program-menu: button disabled during READY and EXECUTING, re-enabled after simulation ends (ENDED) 
+    [chromium] › src/test/webapp/sample-program-clean.spec.js:9:1 › default sample loads with zero issues on a fresh page 
+    [chromium] › src/test/webapp/sample-program-stdout.spec.js:47:1 › stdout text is visible in light theme with dark OS 
+    [chromium] › src/test/webapp/sample-program-stdout.spec.js:115:1 › stdout text is visible in dark theme with light OS 
+    [chromium] › src/test/webapp/settings-dialog.spec.js:21:1 › settings dialog opens from the gear button next to the Program menu 
+    [chromium] › src/test/webapp/settings-dialog.spec.js:52:1 › the UI tab groups General, Editor and Pipeline Colors into labeled sections 
+    [chromium] › src/test/webapp/settings-dialog.spec.js:91:1 › the Simulation tab groups CPU and Cache into labeled sections 
+    [chromium] › src/test/webapp/settings-dialog.spec.js:132:1 › settings dialog closes with the Close button 
+    [chromium] › src/test/webapp/settings-dialog.spec.js:147:1 › Reset UI to defaults asks for confirmation and is cancelable 
+    [chromium] › src/test/webapp/settings-dialog.spec.js:171:1 › Reset Simulation to defaults asks for confirmation and is cancelable 
+    [chromium] › src/test/webapp/settings-dialog.spec.js:193:1 › the Simulation tab and its reset button are disabled while a program is running 
+    [chromium] › src/test/webapp/settings-dialog.spec.js:240:1 › cache configuration and general settings are no longer separate accordions 
+    [chromium] › src/test/webapp/settings-persistence.spec.js:46:1 › viMode and fontSize persist across page reloads 
+    [chromium] › src/test/webapp/settings-persistence.spec.js:95:1 › accordionAlerts persists across page reloads 
+    [chromium] › src/test/webapp/settings-persistence.spec.js:128:1 › expandedAccordions persists across page reloads 
+    [chromium] › src/test/webapp/settings-persistence.spec.js:163:1 › stepStride and executionDelayMs persist across page reloads 
+    [chromium] › src/test/webapp/settings-persistence.spec.js:225:1 › pipelineColors persist across page reloads 
+    [chromium] › src/test/webapp/settings-persistence.spec.js:273:1 › pipelineColors also drive Monaco stage highlights 
+    [chromium] › src/test/webapp/settings-persistence.spec.js:334:1 › Reset UI to defaults resets only the UI tab, not Simulation 
+    [chromium] › src/test/webapp/settings-persistence.spec.js:383:1 › Reset Simulation to defaults resets only the Simulation tab, not UI 
+    [chromium] › src/test/webapp/single-step-registers.spec.js:71:1 › single stepping advances the cycle counter one cycle at a time 
+    [chromium] › src/test/webapp/single-step-registers.spec.js:98:1 › register values after stepping a program to completion match expected output 
+    [chromium] › src/test/webapp/synchronous-exception.spec.js:32:1 › integer overflow produces a user-friendly synchronous-exception alert 
+    [chromium] › src/test/webapp/syntax-highlighting-during-run.spec.js:50:3 › Syntax highlighting during execution (#1723) › instruction lines keep their colour while Run All is in progress 
+    [chromium] › src/test/webapp/syscall-unsupported.spec.js:116:1 › invalid SYSCALL number produces a user-friendly unsupported-syscall alert 
+    [chromium] › src/test/webapp/syscall-unsupported.spec.js:129:1 › SYSCALL 4 (write) on a non-stdout fd produces a user-friendly alert 
+    [chromium] › src/test/webapp/syscall-unsupported.spec.js:143:1 › SYSCALL 3 (read) on a non-stdin fd produces a user-friendly alert 
+    [chromium] › src/test/webapp/syscall-unsupported.spec.js:156:1 › SYSCALL 1 (open) is refused in the web UI environment 
+    [chromium] › src/test/webapp/syscall3.spec.js:36:1 › syscall 3 opens an input dialog and resumes execution 
+    [chromium] › src/test/webapp/syscall3.spec.js:57:1 › syscall 3 caps the input at the maximum allowed length 
+    [chromium] › src/test/webapp/version-and-candidate-badge.spec.js:19:3 › version display and archived-build chip › About tab shows a non-empty version string 
+    [chromium] › src/test/webapp/version-and-candidate-badge.spec.js:48:3 › version display and archived-build chip › archived-build chip is absent on a normal (non-archive) load 
+    [chromium] › src/test/webapp/version-and-candidate-badge.spec.js:63:3 › version display and archived-build chip › archived-build detection is path-based (unit-level check) 
+    [chromium] › src/test/webapp/version-history.spec.js:67:3 › unified version list in About tab › A: shows promoted and candidate sections when versions.json is available 
+    [chromium] › src/test/webapp/version-history.spec.js:110:3 › unified version list in About tab › B: section is absent when versions.json returns 404 
+    [chromium] › src/test/webapp/version-history.spec.js:126:3 › unified version list in About tab › C: section is absent when versions array is empty 
+    [chromium] › src/test/webapp/workspace-layout.spec.js:48:1 › the three regions are laid out: widgets on the right, cycles across the bottom 
+    [chromium] › src/test/webapp/workspace-layout.spec.js:63:1 › collapsing the right panel widens the editor and hides the widgets 
+    [chromium] › src/test/webapp/workspace-layout.spec.js:83:1 › collapsing the bottom region gives the upper region more height 
+    [chromium] › src/test/webapp/workspace-layout.spec.js:101:1 › dragging the vertical handle resizes the widgets column and persists 
+    [chromium] › src/test/webapp/workspace-layout.spec.js:125:1 › the floating run toolbar stays on-screen when the window narrows 
+    [chromium] › src/test/webapp/workspace-layout.spec.js:144:1 › the Cycles region keeps its header on a narrow (stacked) viewport 
+    [chromium] › src/test/webapp/workspace-layout.spec.js:156:1 › the widgets column cannot be dragged below its minimum width 
+  1 skipped
