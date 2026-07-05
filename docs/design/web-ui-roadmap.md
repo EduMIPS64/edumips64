@@ -46,15 +46,9 @@ below).
 User stories and features:
 
 * ~~`D.1, D.3` (Proper toolchain, Material UI)~~
-* `U.6-8` (Improved UI, including settings) — `U.6` (full pipeline widget)
-  and `U.8` (Settings UI) are done: the pipeline widget mirrors the Swing
-  `GUIPipeline` layout (IF/ID/EX/MEM/WB plus the FP adder/multiplier/divider
-  functional units), colors active and stalled stages, and labels the
-  specific hazard (RAW/WAW/structural); settings persist to local storage
-  (see also `S.2`). `U.7` (full cycles widget, i.e. a temporal
-  instruction-vs-cycle diagram like Swing's `GUICycles`) is still pending —
-  the web UI only shows the current cycle's pipeline snapshot, not a
-  history across cycles.
+* ~~`U.6` (full pipeline widget)~~
+* `U.7` (full cycles widget, i.e. a temporal instruction-vs-cycle diagram like Swing's `GUICycles`)
+* ~~`U.8` (Settings UI)~~
 * ~~`S.1-2` (Forwarding setting, persisted via HTML5 storage)~~
 
 ### GA (EduMIPS64 2.0)
@@ -63,11 +57,11 @@ Status: **In Progress**
 Fully working web simulator, suitable as a replacement for the current simulator.
 
 * `E.7-8` (Dinero Tracefile Download, file-based SYSCALL)
-* `U.9-10` (Better code editor, localization) — `U.9` (Monaco-based editor
-  with MIPS syntax highlighting and inline error markers) is done; `U.10`
-  (localization of the simulator UI) is still pending. The Help dialog
-  already supports English/Italian/Chinese.
-* `S.3-5` (Most runtime settings)
+* ~~`U.9` (Monaco-based editor with MIPS syntax highlighting and inline error markers)~~
+* `U.10` (localization of the simulator UI)
+* `S.3` (exceptions settings)
+* `S.4` (FPU settings)
+* `S.5` (warning/error settings)
 * ~~`D.4` (Instrumentation)~~
 
 ### Future (EduMIPS64 3.0)
@@ -82,7 +76,6 @@ of future features might be:
 * support for opening from URL?
 * maybe some sort of backend support to have workspaces, save files in external
   services such as GDrive, Gist, etc..
-* a no-Javascript version that uses SSR?
 
 ## User Stories / Features
 
@@ -126,9 +119,7 @@ implementation of the remaining features.
    panel's history-across-cycles view; the web UI currently only shows the
    current cycle's pipeline snapshot
 8. ~~Settings UI (necessary for `S.*`)~~
-9. ~~Code editor with syntax highlighting (e.g., ACE or Monaco)~~ (Monaco,
-   with a custom MIPS language definition, inline parser-error markers and
-   optional Vim keybindings)
+9. ~~Code editor with syntax highlighting (e.g., ACE or Monaco)~~
 10. Localization (the Help dialog already supports en/it/zh; the rest of
     the UI is still English-only)
 11. Show binary/decimal/hex values of all numbers in the UI. (partially:
