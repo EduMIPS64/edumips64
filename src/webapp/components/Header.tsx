@@ -187,7 +187,6 @@ export default function Header({
             gap: 1,
           }}
         >
-          {buildInfo.kind === 'dev' ? 'Web Version (dev)' : 'Web Version'}
           {buildInfo.kind === 'pr' && (
             <Tooltip
               title="This is a preview build for a pull request. Click to open the PR on GitHub."
