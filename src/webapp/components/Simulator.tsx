@@ -9,27 +9,23 @@ import Statistics from './Statistics';
 import Header from './Header';
 import RunControlsToolbar from './RunControlsToolbar';
 import WorkspaceLayout from './WorkspaceLayout';
-import Accordion from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import MuiAccordionSummary, {
-  type AccordionSummaryProps,
-} from '@mui/material/AccordionSummary';
-import ErrorList from './ErrorList';
+import Box from '@mui/material/Box';
+import DashboardCard from './DashboardCard';
+import IssuesCard from './IssuesCard';
 import StdOut from './StdOut';
 import InputDialog from './InputDialog';
 import RuntimeErrorDialog from './RuntimeErrorDialog';
 
-import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
-
-import { styled } from '@mui/material/styles';
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
+import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined';
+import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
+import TerminalOutlinedIcon from '@mui/icons-material/TerminalOutlined';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { buildTheme } from '../theme';
-
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Typography from '@mui/material/Typography';
 
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
@@ -44,41 +40,6 @@ import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import type { SimulatorResult, SimulatorWorker } from '../simulator/protocol';
 import type { ITelemetryClient } from '../telemetry';
 import type * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
-import type { ExpandedAccordions } from '../settings/schema';
-
-// Styled accordion header shared by all right-panel widgets. Defined at
-// module scope on purpose: defining a styled() component inside the
-// Simulator render body would create a new component *type* on every
-// render, making React unmount and remount every accordion header each
-// time a worker message updates state.
-//
-// Explicitly type the wrapper so `styled()` knows that all AccordionSummary
-// props (children, expandIcon, etc.) are valid on the resulting component.
-const AccordionSummary = styled(({ ...props }: AccordionSummaryProps) => (
-  <MuiAccordionSummary
-    expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.8rem' }} />}
-    {...props}
-  />
-))(({ theme }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark'
-      ? 'rgba(141, 166, 255, 0.08)'
-      : 'rgba(53, 87, 212, 0.06)',
-  flexDirection: 'row-reverse',
-  '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
-    transform: 'rotate(180deg)',
-  },
-  '& .MuiAccordionSummary-content': {
-    marginLeft: theme.spacing(1),
-  },
-}));
-
-// Key names for the right-panel accordion panels.
-type AccordionPanel = keyof ExpandedAccordions;
-
-// State shape for tracking which accordions have received new data while
-// they were collapsed (used to render the change-indicator dot).
-type AccordionChanges = Record<AccordionPanel, boolean>;
 
 interface SimulatorProps {
   worker: SimulatorWorker;
@@ -108,9 +69,6 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     SettingKey.PIPELINE_COLORS,
   );
   const [themeMode, setThemeMode] = useSetting(SettingKey.THEME_MODE);
-  const [expandedAccordions, setExpandedAccordions] = useSetting(
-    SettingKey.EXPANDED_ACCORDIONS,
-  );
   const [workspaceLayout, setWorkspaceLayout] = useSetting(
     SettingKey.WORKSPACE_LAYOUT,
   );
@@ -237,29 +195,6 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   }, []);
 
   // ---------------------------------------------------------------------------
-  // Accordion change-detection state
-  // ---------------------------------------------------------------------------
-
-  // Track if data has changed while accordion was collapsed
-  const [accordionChanges, setAccordionChanges] = React.useState<AccordionChanges>({
-    stats: false,
-    pipeline: false,
-    registers: false,
-    memory: false,
-    stdout: false,
-  });
-
-  // Refs to track previous values for change detection
-  const prevStats = React.useRef(stats);
-  const prevPipeline = React.useRef(pipeline);
-  const prevRegisters = React.useRef(registers);
-  const prevMemory = React.useRef(memory);
-  const prevStdout = React.useRef(stdout);
-
-  // Ref to track if we are resetting the simulator (clearing code)
-  const isResetting = React.useRef(false);
-
-  // ---------------------------------------------------------------------------
   // Syntax checking (stable debounced instance)
   // ---------------------------------------------------------------------------
 
@@ -289,14 +224,6 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   const clearCode = () => {
     notifyReset(); // cancels batch, dispatches RESET, worker.reset(), clears inputRequest
     setCode('.data\n\n.code\n  SYSCALL 0\n');
-    isResetting.current = true;
-    setAccordionChanges({
-      stats: false,
-      pipeline: false,
-      registers: false,
-      memory: false,
-      stdout: false,
-    });
   };
 
   const restoreDefaultSample = () => {
@@ -314,17 +241,9 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     // Clear stale parsing errors so the issues panel doesn't show diagnostics
     // for the code that was just replaced.
     setParsingErrors([]);
-    isResetting.current = true;
     // Run a fresh syntax check on the restored sample so any warnings in the
     // sample are surfaced immediately.
     worker.checkSyntax(SampleProgram);
-    setAccordionChanges({
-      stats: false,
-      pipeline: false,
-      registers: false,
-      memory: false,
-      stdout: false,
-    });
   };
 
   const setCacheConfig = React.useCallback(
@@ -409,91 +328,6 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     stepStride,
     appInsights,
   });
-
-  // ---------------------------------------------------------------------------
-  // Accordion change-detection effect
-  // ---------------------------------------------------------------------------
-
-  // Detect changes in accordion data when collapsed
-  React.useEffect(() => {
-    if (!accordionAlerts) {
-      prevStats.current = stats;
-      prevPipeline.current = pipeline;
-      prevRegisters.current = registers;
-      prevMemory.current = memory;
-      prevStdout.current = stdout;
-      return;
-    }
-
-    // If we are resetting, update refs but don't trigger changes
-    if (isResetting.current) {
-      prevStats.current = stats;
-      prevPipeline.current = pipeline;
-      prevRegisters.current = registers;
-      prevMemory.current = memory;
-      prevStdout.current = stdout;
-      isResetting.current = false;
-      return;
-    }
-
-    const statsChanged = !isEqual(stats, prevStats.current);
-    const pipelineChanged = !isEqual(pipeline, prevPipeline.current);
-    const registersChanged = !isEqual(registers, prevRegisters.current);
-    const memoryChanged = !isEqual(memory, prevMemory.current);
-    const stdoutChanged = stdout !== prevStdout.current;
-
-    // Update refs first
-    prevStats.current = stats;
-    prevPipeline.current = pipeline;
-    prevRegisters.current = registers;
-    prevMemory.current = memory;
-    prevStdout.current = stdout;
-
-    // Only update state if there are actual changes for collapsed accordions
-    if (
-      (!expandedAccordions.stats && statsChanged) ||
-      (!expandedAccordions.pipeline && pipelineChanged) ||
-      (!expandedAccordions.registers && registersChanged) ||
-      (!expandedAccordions.memory && memoryChanged) ||
-      (!expandedAccordions.stdout && stdoutChanged)
-    ) {
-      setAccordionChanges((prev) => ({
-        ...prev,
-        stats: prev.stats || (!expandedAccordions.stats && statsChanged),
-        pipeline:
-          prev.pipeline || (!expandedAccordions.pipeline && pipelineChanged),
-        registers:
-          prev.registers || (!expandedAccordions.registers && registersChanged),
-        memory: prev.memory || (!expandedAccordions.memory && memoryChanged),
-        stdout: prev.stdout || (!expandedAccordions.stdout && stdoutChanged),
-      }));
-    }
-  }, [
-    stats,
-    pipeline,
-    registers,
-    memory,
-    stdout,
-    accordionAlerts,
-    expandedAccordions,
-  ]);
-
-  // Handle accordion expansion change
-  const handleAccordionChange =
-    (panel: AccordionPanel) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpandedAccordions((prev) => ({
-        ...prev,
-        [panel]: isExpanded,
-      }));
-
-      // Clear change indicator when accordion is opened
-      if (isExpanded) {
-        setAccordionChanges((prev) => ({
-          ...prev,
-          [panel]: false,
-        }));
-      }
-    };
 
   // ---------------------------------------------------------------------------
   // Syntax check on mount
@@ -627,116 +461,60 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
           }
           bottom={<Cycles cycles={cycles} colors={pipelineColors} />}
           right={
-            <>
-              <ErrorList
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1.5,
+                p: 1.5,
+                height: '100%',
+                overflow: 'auto',
+                alignContent: 'start',
+              }}
+            >
+              <IssuesCard
                 parsingErrors={parsingErrors}
-                AccordionSummary={AccordionSummary}
                 onIssueClick={handleIssueClick}
               />
-              <Accordion
-                expanded={expandedAccordions.stats}
-                onChange={handleAccordionChange('stats')}
-                disableGutters
+              <DashboardCard
+                id="stats-card"
+                title="Stats"
+                icon={<InsightsOutlinedIcon fontSize="small" />}
+                maxContentHeight="42vh"
               >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 600, color: 'primary.main' }}
-                  >
-                    Stats
-                    {accordionAlerts && accordionChanges.stats && (
-                      <span className="accordion-change-indicator" />
-                    )}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Statistics {...stats} />
-                </AccordionDetails>
-              </Accordion>
-              <Accordion
-                expanded={expandedAccordions.pipeline}
-                onChange={handleAccordionChange('pipeline')}
-                disableGutters
+                <Statistics {...stats} />
+              </DashboardCard>
+              <DashboardCard
+                id="pipeline-card"
+                title="Pipeline"
+                icon={<AccountTreeOutlinedIcon fontSize="small" />}
               >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 600, color: 'primary.main' }}
-                  >
-                    Pipeline
-                    {accordionAlerts && accordionChanges.pipeline && (
-                      <span className="accordion-change-indicator" />
-                    )}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Pipeline pipeline={pipeline} colors={pipelineColors} />
-                </AccordionDetails>
-              </Accordion>
-              <Accordion
-                expanded={expandedAccordions.registers}
-                onChange={handleAccordionChange('registers')}
-                disableGutters
+                <Pipeline pipeline={pipeline} colors={pipelineColors} />
+              </DashboardCard>
+              <DashboardCard
+                id="registers-card"
+                title="Registers"
+                icon={<DnsOutlinedIcon fontSize="small" />}
+                maxContentHeight="48vh"
               >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 600, color: 'primary.main' }}
-                  >
-                    Registers
-                    {accordionAlerts && accordionChanges.registers && (
-                      <span className="accordion-change-indicator" />
-                    )}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Registers {...registers} />
-                </AccordionDetails>
-              </Accordion>
-              <Accordion
-                expanded={expandedAccordions.memory}
-                onChange={handleAccordionChange('memory')}
-                disableGutters
+                <Registers {...registers} />
+              </DashboardCard>
+              <DashboardCard
+                id="memory-card"
+                title="Memory"
+                icon={<StorageOutlinedIcon fontSize="small" />}
+                maxContentHeight="40vh"
               >
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  id="memory-accordion-summary"
-                >
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 600, color: 'primary.main' }}
-                  >
-                    Memory
-                    {accordionAlerts && accordionChanges.memory && (
-                      <span className="accordion-change-indicator" />
-                    )}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Memory memory={memory} />
-                </AccordionDetails>
-              </Accordion>
-              <Accordion
-                expanded={expandedAccordions.stdout}
-                onChange={handleAccordionChange('stdout')}
-                disableGutters
+                <Memory memory={memory} />
+              </DashboardCard>
+              <DashboardCard
+                id="stdout-card"
+                title="Standard Output"
+                icon={<TerminalOutlinedIcon fontSize="small" />}
               >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 600, color: 'primary.main' }}
-                  >
-                    Standard Output
-                    {accordionAlerts && accordionChanges.stdout && (
-                      <span className="accordion-change-indicator" />
-                    )}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <StdOut stdout={stdout} />
-                </AccordionDetails>
-              </Accordion>
-            </>
+                <StdOut stdout={stdout} />
+              </DashboardCard>
+            </Box>
           }
         />
       </ThemeProvider>
