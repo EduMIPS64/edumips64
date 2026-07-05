@@ -1,5 +1,12 @@
 const { test, expect } = require('./fixtures');
-const { targetUri, waitForPageReady, removeOverlay, loadProgram } = require('./test-utils');
+const {
+  targetUri,
+  waitForPageReady,
+  removeOverlay,
+  loadProgram,
+  openSettingsDialog,
+  closeSettingsDialog,
+} = require('./test-utils');
 
 const STORAGE_PREFIX = 'edumips64:v1:';
 
@@ -19,28 +26,6 @@ test.beforeEach(async ({ page }) => {
     keysToRemove.forEach((k) => window.localStorage.removeItem(k));
   }, STORAGE_PREFIX);
 });
-
-/**
- * Helper: ensure the General Settings accordion is expanded.
- *
- * The MUI `AccordionSummary` renders as a button whose accessible name is the
- * text it contains ("General Settings"). We target it by role so that
- * `aria-expanded` is read from the correct element — an earlier version of
- * this helper took `text=... >> ..` which landed on the Typography's parent,
- * not on the button, so `aria-expanded` was always `null` and the helper
- * ended up *toggling* (collapsing) the accordion instead of ensuring it was
- * open, which made the switches invisible and timed the tests out.
- */
-async function openSettingsAccordion(page) {
-  const summary = page.getByRole('button', { name: /General Settings/ });
-  await summary.waitFor({ state: 'visible' });
-  if ((await summary.getAttribute('aria-expanded')) !== 'true') {
-    await summary.click();
-  }
-  // Wait until the accordion reports as expanded before returning, so the
-  // switches inside have had a chance to become visible.
-  await expect(summary).toHaveAttribute('aria-expanded', 'true');
-}
 
 async function setPipelineColor(page, key, value) {
   const input = page.getByTestId(`pipeline-color-${key}`);
@@ -62,7 +47,7 @@ test('viMode and fontSize persist across page reloads', async ({ page }) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsAccordion(page);
+  await openSettingsDialog(page, 'UI');
 
   // Toggle Vi Mode on
   const viModeSwitch = page.getByLabel('Editor Vi Mode');
@@ -93,7 +78,7 @@ test('viMode and fontSize persist across page reloads', async ({ page }) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsAccordion(page);
+  await openSettingsDialog(page, 'UI');
 
   // Assert Vi Mode is still on
   const viModeSwitchAfterReload = page.getByLabel('Editor Vi Mode');
@@ -111,7 +96,7 @@ test('accordionAlerts persists across page reloads', async ({ page }) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsAccordion(page);
+  await openSettingsDialog(page, 'UI');
 
   // Accordion Alerts is on by default; toggle it off
   const alertsSwitch = page.getByLabel('Accordion Change Alerts');
@@ -131,7 +116,7 @@ test('accordionAlerts persists across page reloads', async ({ page }) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsAccordion(page);
+  await openSettingsDialog(page, 'UI');
 
   const alertsSwitchAfterReload = page.getByLabel('Accordion Change Alerts');
   await expect(alertsSwitchAfterReload).not.toBeChecked();
@@ -179,7 +164,7 @@ test('stepStride and executionDelayMs persist across page reloads', async ({ pag
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsAccordion(page);
+  await openSettingsDialog(page, 'UI');
 
   // Change Multi Step Size from the default (500) to 250.
   const strideInput = page.getByLabel('Multi Step Size');
@@ -209,10 +194,14 @@ test('stepStride and executionDelayMs persist across page reloads', async ({ pag
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsAccordion(page);
+  await openSettingsDialog(page, 'UI');
 
   await expect(page.getByLabel('Multi Step Size')).toHaveValue('250');
   await expect(page.getByLabel('Execution Delay (ms)')).toHaveValue('100');
+
+  // The Settings dialog is modal, so it must be closed before interacting
+  // with the editor / Load button behind it.
+  await closeSettingsDialog(page);
 
   // The Multi Step button is only rendered in READY state (contextual run
   // controls).  Load a minimal program so the toolbar transitions from EMPTY
@@ -237,7 +226,7 @@ test('pipelineColors persist across page reloads', async ({ page }) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsAccordion(page);
+  await openSettingsDialog(page, 'UI');
 
   // Set IF and Stall colors via the native color inputs. React tracks
   // input values via a hidden internal property, so we have to use the
@@ -273,7 +262,7 @@ test('pipelineColors persist across page reloads', async ({ page }) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsAccordion(page);
+  await openSettingsDialog(page, 'UI');
 
   const ifInput = page.getByTestId('pipeline-color-IF');
   await expect(ifInput).toHaveValue('#123456');
@@ -285,8 +274,9 @@ test('pipelineColors also drive Monaco stage highlights', async ({ page }) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsAccordion(page);
+  await openSettingsDialog(page, 'UI');
   await setPipelineColor(page, 'IF', '#123456');
+  await closeSettingsDialog(page);
 
   await loadProgram(
     page,
@@ -334,13 +324,25 @@ test('pipelineColors also drive Monaco stage highlights', async ({ page }) => {
  * Test: the Pipeline Colors "Reset to defaults" button restores every entry
  * to the schema defaults.
  */
-test('pipelineColors reset restores schema defaults', async ({ page }) => {
+/**
+ * Test: "Reset UI to defaults" only touches the UI tab's settings (which
+ * now includes Execution), leaving Simulation-tab settings (CPU, cache)
+ * untouched. Mirrors the Swing UI's `Config.RESET`, but scoped by type per
+ * review feedback: applying Simulation defaults resets the CPU, so the two
+ * are kept independent.
+ */
+test('Reset UI to defaults resets only the UI tab, not Simulation', async ({
+  page,
+}) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await openSettingsAccordion(page);
+  await openSettingsDialog(page, 'UI');
 
-  // Pick a non-default value for IF to make sure reset really overwrites.
+  const viModeSwitch = page.getByLabel('Editor Vi Mode');
+  await viModeSwitch.click();
+  await expect(viModeSwitch).toBeChecked();
+
   const ifInput = page.getByTestId('pipeline-color-IF');
   await ifInput.evaluate((el) => {
     const setter = Object.getOwnPropertyDescriptor(
@@ -353,10 +355,55 @@ test('pipelineColors reset restores schema defaults', async ({ page }) => {
   });
   await expect(ifInput).toHaveValue('#000000');
 
-  await page.getByTestId('pipeline-colors-reset').click();
+  // A non-default value on the Simulation tab, which "Reset UI" must not touch.
+  await page.getByRole('tab', { name: 'Simulation' }).click();
+  const forwardingSwitch = page.getByLabel('CPU Forwarding');
+  await forwardingSwitch.click();
+  await expect(forwardingSwitch).toBeChecked();
 
+  // Back to UI to click its reset button. The button asks for confirmation
+  // via window.confirm(); accept it.
+  await page.getByRole('tab', { name: 'UI' }).click();
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.click('#settings-reset-ui-button');
+
+  await expect(page.getByLabel('Editor Vi Mode')).not.toBeChecked();
   // Schema default for IF (mirrors Swing UI's `IF_COLOR`).
-  await expect(ifInput).toHaveValue('#ebeb3b');
+  await expect(page.getByTestId('pipeline-color-IF')).toHaveValue('#ebeb3b');
+
+  // Simulation-tab setting survives.
+  await page.getByRole('tab', { name: 'Simulation' }).click();
+  await expect(page.getByLabel('CPU Forwarding')).toBeChecked();
+});
+
+/**
+ * Test: "Reset Simulation to defaults" only touches CPU/cache settings,
+ * leaving UI-tab settings untouched.
+ */
+test('Reset Simulation to defaults resets only the Simulation tab, not UI', async ({
+  page,
+}) => {
+  await waitForPageReady(page);
+  await removeOverlay(page);
+
+  await openSettingsDialog(page, 'UI');
+  const viModeSwitch = page.getByLabel('Editor Vi Mode');
+  await viModeSwitch.click();
+  await expect(viModeSwitch).toBeChecked();
+
+  await page.getByRole('tab', { name: 'Simulation' }).click();
+  const forwardingSwitch = page.getByLabel('CPU Forwarding');
+  await forwardingSwitch.click();
+  await expect(forwardingSwitch).toBeChecked();
+
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.click('#settings-reset-simulation-button');
+
+  await expect(forwardingSwitch).not.toBeChecked();
+
+  // UI-tab setting survives.
+  await page.getByRole('tab', { name: 'UI' }).click();
+  await expect(page.getByLabel('Editor Vi Mode')).toBeChecked();
 });
 
 /**

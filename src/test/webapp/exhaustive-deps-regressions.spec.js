@@ -5,6 +5,8 @@ const {
   waitForPageReady,
   loadProgram,
   runToCompletion,
+  openSettingsDialog,
+  closeSettingsDialog,
 } = require('./test-utils');
 
 const STORAGE_PREFIX = 'edumips64:v1:';
@@ -32,28 +34,26 @@ async function setEditorContent(page, code) {
   await page.keyboard.insertText(code);
 }
 
-async function openSettingsAccordion(page) {
-  const summary = page.getByRole('button', { name: /General Settings/ });
-  await summary.waitFor({ state: 'visible' });
-  if ((await summary.getAttribute('aria-expanded')) !== 'true') {
-    await summary.click();
+/**
+ * Toggle "Editor Vi Mode" to the desired state via the (modal) Settings
+ * dialog's UI tab, then close the dialog so the editor is reachable again.
+ */
+async function setViMode(page, enabled) {
+  await openSettingsDialog(page, 'UI');
+  const viModeSwitch = page.getByLabel('Editor Vi Mode');
+  if ((await viModeSwitch.isChecked()) !== enabled) {
+    await viModeSwitch.click();
   }
-  await expect(summary).toHaveAttribute('aria-expanded', 'true');
+  await expect(viModeSwitch).toBeChecked({ checked: enabled });
+  await closeSettingsDialog(page);
 }
 
-async function expandCacheConfig(page) {
-  const cacheAccordionSummary = page.getByRole('button', {
-    name: /Cache Configuration/,
-  });
-  await cacheAccordionSummary.waitFor({ state: 'visible' });
-  if ((await cacheAccordionSummary.getAttribute('aria-expanded')) !== 'true') {
-    await cacheAccordionSummary.click();
-  }
-  await expect(cacheAccordionSummary).toHaveAttribute('aria-expanded', 'true');
-}
-
+/**
+ * Set cache configuration values via the Settings dialog's Cache tab, then
+ * close the (modal) dialog.
+ */
 async function setCacheConfig(page, cacheType, config) {
-  await expandCacheConfig(page);
+  await openSettingsDialog(page, 'Simulation');
   const cacheSection = page.locator(`text=${cacheType}`).locator('..');
 
   if (config.size !== undefined) {
@@ -74,6 +74,8 @@ async function setCacheConfig(page, cacheType, config) {
       .nth(2)
       .fill(String(config.associativity));
   }
+
+  await closeSettingsDialog(page);
 }
 
 async function getCacheStats(page) {
@@ -124,12 +126,9 @@ test('Vim mode can be enabled and disabled after the editor mounts', async ({
 }) => {
   await waitForPageReady(page);
   await setEditorContent(page, '.code\nSYSCALL 0\n');
-  await openSettingsAccordion(page);
 
-  const viModeSwitch = page.getByLabel('Editor Vi Mode');
-  await expect(viModeSwitch).not.toBeChecked();
-  await viModeSwitch.click();
-  await expect(viModeSwitch).toBeChecked();
+  // Enable Vi Mode (dialog closes afterwards, so the editor is reachable).
+  await setViMode(page, true);
 
   await page.evaluate(() => {
     window.editor.setPosition({ lineNumber: 1, column: 1 });
@@ -144,8 +143,9 @@ test('Vim mode can be enabled and disabled after the editor mounts', async ({
     .poll(() => page.evaluate(() => window.editor.getValue()))
     .toBe('.code\nSYSCALL 0\n');
 
-  await viModeSwitch.click();
-  await expect(viModeSwitch).not.toBeChecked();
+  // Disable Vi Mode again.
+  await setViMode(page, false);
+
   await page.evaluate(() => {
     window.editor.setPosition({ lineNumber: 1, column: 1 });
     window.editor.focus();

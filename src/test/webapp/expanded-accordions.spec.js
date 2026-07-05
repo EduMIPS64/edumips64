@@ -45,8 +45,10 @@ async function expectExpanded(page, name, expanded) {
 
 /**
  * Issue #1697 — defaults reflect the simulator's primary purpose:
- * Stats / Pipeline / Registers expanded; Memory / Standard Output /
- * Cache Configuration / General Settings collapsed.
+ * Stats / Pipeline / Registers expanded; Memory / Standard Output
+ * collapsed. Cache configuration and general settings used to be collapsible
+ * panels here too, but now live in the Settings dialog (opened via the gear
+ * button), so they are no longer part of this expand/collapse model.
  */
 test('default panel expansion highlights pipeline and registers', async ({
   page,
@@ -59,8 +61,6 @@ test('default panel expansion highlights pipeline and registers', async ({
   await expectExpanded(page, /^Registers/, true);
   await expectExpanded(page, /^Memory/, false);
   await expectExpanded(page, /^Standard Output/, false);
-  await expectExpanded(page, /^Cache Configuration/, false);
-  await expectExpanded(page, /^General Settings/, false);
 });
 
 /**
@@ -75,17 +75,13 @@ test('panel expansion is persisted and restored across reloads', async ({
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  // Collapse Pipeline (default: open) and expand Memory + General Settings
-  // (default: closed). These three changes should round-trip through
-  // localStorage.
+  // Collapse Pipeline (default: open) and expand Memory (default: closed).
+  // These two changes should round-trip through localStorage.
   await panelButton(page, /^Pipeline/).click();
   await expectExpanded(page, /^Pipeline/, false);
 
   await panelButton(page, /^Memory/).click();
   await expectExpanded(page, /^Memory/, true);
-
-  await panelButton(page, /^General Settings/).click();
-  await expectExpanded(page, /^General Settings/, true);
 
   // Verify localStorage actually got written. The shape comes from
   // `SETTINGS_SCHEMA[EXPANDED_ACCORDIONS]` in `src/webapp/settings/schema.js`.
@@ -97,7 +93,6 @@ test('panel expansion is persisted and restored across reloads', async ({
   const parsed = JSON.parse(stored);
   expect(parsed.pipeline).toBe(false);
   expect(parsed.memory).toBe(true);
-  expect(parsed.settings).toBe(true);
 
   // Reload and confirm the toggled state is restored, not the defaults.
   await page.reload();
@@ -106,7 +101,6 @@ test('panel expansion is persisted and restored across reloads', async ({
 
   await expectExpanded(page, /^Pipeline/, false);
   await expectExpanded(page, /^Memory/, true);
-  await expectExpanded(page, /^General Settings/, true);
   // Untouched panels keep their defaults.
   await expectExpanded(page, /^Stats/, true);
   await expectExpanded(page, /^Registers/, true);

@@ -32,8 +32,6 @@ import Typography from '@mui/material/Typography';
 
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
-import Settings from './Settings';
-import CacheConfig from './CacheConfig';
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
 import SampleProgram from '../data/SampleProgram';
@@ -244,8 +242,6 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     registers: false,
     memory: false,
     stdout: false,
-    cache: false,
-    settings: false,
   });
 
   // Refs to track previous values for change detection
@@ -295,8 +291,6 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
       registers: false,
       memory: false,
       stdout: false,
-      cache: false,
-      settings: false,
     });
   };
 
@@ -325,8 +319,6 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
       registers: false,
       memory: false,
       stdout: false,
-      cache: false,
-      settings: false,
     });
   };
 
@@ -575,6 +567,25 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
           executing={executing}
           inputRequest={inputRequest}
           prefersDarkMode={prefersDarkMode}
+          onCacheConfigChange={setCacheConfig}
+          viMode={viMode}
+          setViMode={setViMode}
+          fontSize={fontSize}
+          setFontSize={setFontSize}
+          accordionAlerts={accordionAlerts}
+          setAccordionAlerts={setAccordionAlerts}
+          pipelineColors={pipelineColors}
+          setPipelineColors={setPipelineColors}
+          themeMode={themeMode}
+          setThemeMode={setThemeMode}
+          forwarding={forwarding}
+          setForwarding={setForwarding}
+          delaySlot={delaySlot}
+          setDelaySlot={setDelaySlot}
+          stepStride={stepStride}
+          setStepStride={setStepStride}
+          executionDelayMs={executionDelayMs}
+          setExecutionDelayMs={setExecutionDelayMs}
         />
         <RunControlsToolbar
           onStepClick={clickStep}
@@ -713,67 +724,6 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
               </AccordionSummary>
               <AccordionDetails>
                 <StdOut stdout={stdout} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion
-              expanded={expandedAccordions.cache}
-              onChange={handleAccordionChange('cache')}
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    fontWeight: 600,
-                    color:
-                      status === 'RUNNING' ? 'text.disabled' : 'primary.main',
-                  }}
-                >
-                  Cache Configuration
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <CacheConfig
-                  onChange={setCacheConfig}
-                  status={status}
-                />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion
-              expanded={expandedAccordions.settings}
-              onChange={handleAccordionChange('settings')}
-              disableGutters
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 600, color: 'primary.main' }}
-                >
-                  General Settings
-                </Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Settings
-                  viMode={viMode}
-                  setViMode={setViMode}
-                  fontSize={fontSize}
-                  setFontSize={setFontSize}
-                  accordionAlerts={accordionAlerts}
-                  setAccordionAlerts={setAccordionAlerts}
-                  forwarding={forwarding}
-                  setForwarding={setForwarding}
-                  delaySlot={delaySlot}
-                  setDelaySlot={setDelaySlot}
-                  stepStride={stepStride}
-                  setStepStride={setStepStride}
-                  executionDelayMs={executionDelayMs}
-                  setExecutionDelayMs={setExecutionDelayMs}
-                  pipelineColors={pipelineColors}
-                  setPipelineColors={setPipelineColors}
-                  themeMode={themeMode}
-                  setThemeMode={setThemeMode}
-                  status={status}
-                />
               </AccordionDetails>
             </Accordion>
           </Grid>
