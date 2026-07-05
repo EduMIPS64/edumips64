@@ -3,6 +3,7 @@ const {
   targetUri,
   removeOverlay,
   waitForPageReady,
+  loadProgram,
 } = require('./test-utils');
 
 /**
@@ -119,6 +120,25 @@ test('dragging the vertical handle resizes the widgets column and persists', asy
   await removeOverlay(page);
   const afterReload = await box(page, '#right-panel');
   expect(Math.abs(afterReload.width - after.width)).toBeLessThan(20);
+});
+
+test('the floating run toolbar stays on-screen when the window narrows', async ({
+  page,
+}) => {
+  // The toolbar only appears once a program is loaded (READY state).
+  await loadProgram(page, '.code\n  daddi r1, r0, 1\n  syscall 0\n');
+  const toolbar = page.locator('#run-controls-toolbar');
+  await expect(toolbar).toBeVisible();
+
+  // Shrink the viewport well below the toolbar's mount-time centre.
+  await page.setViewportSize({ width: 520, height: 900 });
+  await page.waitForTimeout(150);
+
+  const box = await toolbar.boundingBox();
+  expect(box).not.toBeNull();
+  // Still fully within the (narrow) viewport, not pushed off the right edge.
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(520 + 1);
 });
 
 test('the Cycles region keeps its header on a narrow (stacked) viewport', async ({

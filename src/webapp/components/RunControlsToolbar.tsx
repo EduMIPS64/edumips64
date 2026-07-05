@@ -15,6 +15,18 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { deriveLogicalState } from '../simulatorState';
 import type { CpuStatus, SimulatorResult } from '../simulator/protocol';
 
+// Approximate rendered size of the floating pill, used to keep it fully
+// on-screen when positioning, dragging, and re-clamping on window resize.
+const TOOLBAR_W = 280;
+const TOOLBAR_H = 48;
+
+// Default horizontal position: horizontally centered. Recomputed on resize
+// as long as the user hasn't dragged the toolbar to a spot of their own.
+const centeredX = (): number =>
+  typeof window !== 'undefined'
+    ? Math.max(0, Math.round(window.innerWidth / 2) - TOOLBAR_W / 2)
+    : 100;
+
 interface RunControlsToolbarProps {
   onStepClick: (n: number) => void;
   onRunClick: () => void;
@@ -53,16 +65,31 @@ export default function RunControlsToolbar({
 
   // Drag position — persists across logical-state changes as long as the
   // component remains mounted.  Default: horizontally centered, below header.
-  const [pos, setPos] = React.useState(() => ({
-    x:
-      typeof window !== 'undefined'
-        ? Math.max(0, Math.round(window.innerWidth / 2) - 130)
-        : 100,
-    y: 80,
-  }));
+  const [pos, setPos] = React.useState(() => ({ x: centeredX(), y: 80 }));
 
   const isDraggingRef = React.useRef(false);
   const dragOffsetRef = React.useRef({ x: 0, y: 0 });
+  // Whether the user has repositioned the toolbar. Until they do, it stays
+  // centered and follows window resizes; once dragged, it keeps its spot
+  // (still re-clamped so a shrinking window can never hide it).
+  const hasDraggedRef = React.useRef(false);
+
+  // Keep the toolbar on-screen when the window is resized. Without this the
+  // fixed-position pill keeps the x it had at mount, so narrowing the window
+  // pushes it off the right edge and it appears "lost".
+  React.useEffect(() => {
+    const onResize = () => {
+      setPos((prev) => {
+        const targetX = hasDraggedRef.current ? prev.x : centeredX();
+        return {
+          x: Math.max(0, Math.min(window.innerWidth - TOOLBAR_W, targetX)),
+          y: Math.max(0, Math.min(window.innerHeight - TOOLBAR_H, prev.y)),
+        };
+      });
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     isDraggingRef.current = true;
@@ -72,9 +99,9 @@ export default function RunControlsToolbar({
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDraggingRef.current) return;
+    // A real drag has occurred: stop auto-centering on resize.
+    hasDraggedRef.current = true;
     // Constrain so the toolbar stays fully on-screen.
-    const TOOLBAR_W = 280;
-    const TOOLBAR_H = 48;
     const x = Math.max(
       0,
       Math.min(
