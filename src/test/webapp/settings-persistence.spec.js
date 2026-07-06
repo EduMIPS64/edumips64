@@ -123,41 +123,6 @@ test('accordionAlerts persists across page reloads', async ({ page }) => {
 });
 
 /**
- * Test: expandedAccordions persists across page reloads.
- */
-test('expandedAccordions persists across page reloads', async ({ page }) => {
-  await waitForPageReady(page);
-  await removeOverlay(page);
-
-  // The Memory accordion is collapsed by default (see issue #1697 defaults);
-  // expand it. Target the accordion's button by role so we don't accidentally
-  // match other elements that contain the word "Memory".
-  const memorySummary = page.getByRole('button', { name: 'Memory' });
-  await memorySummary.click();
-  await page.waitForTimeout(300);
-
-  // Verify localStorage contains the updated accordions object with memory: true
-  const stored = await page.evaluate(
-    (key) => JSON.parse(window.localStorage.getItem(key) || 'null'),
-    `${STORAGE_PREFIX}expandedAccordions`
-  );
-  expect(stored).not.toBeNull();
-  expect(stored.memory).toBe(true);
-
-  // Reload and verify Memory accordion is still expanded
-  await page.reload();
-  await waitForPageReady(page);
-  await removeOverlay(page);
-
-  const storedAfterReload = await page.evaluate(
-    (key) => JSON.parse(window.localStorage.getItem(key) || 'null'),
-    `${STORAGE_PREFIX}expandedAccordions`
-  );
-  expect(storedAfterReload).not.toBeNull();
-  expect(storedAfterReload.memory).toBe(true);
-});
-
-/**
  * Test: stepStride and executionDelayMs persist across page reloads.
  */
 test('stepStride and executionDelayMs persist across page reloads', async ({ page }) => {

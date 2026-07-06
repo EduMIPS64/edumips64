@@ -8,10 +8,10 @@ const {
 } = require('./test-utils');
 
 /**
- * Helper function to expand Memory accordion and wait for table
+ * Helper function to wait for the Memory table to be populated.
+ * Memory is always visible in the DashboardCard layout (no accordion to expand).
  */
 async function expandMemoryAndWaitForTable(page) {
-  await page.click('#memory-accordion-summary');
   await page.waitForSelector('#memory tbody tr', { timeout: 5000 });
 }
 
