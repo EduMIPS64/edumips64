@@ -107,15 +107,10 @@ SYSCALL 0
   // Remove overlay before interacting
   await removeOverlay(page);
 
-  const inputArea = page.locator('.monaco-editor textarea.inputarea');
-  await inputArea.click({ force: true });
-
-  // Clear existing text
-  await page.keyboard.press('ControlOrMeta+a');
-  await page.keyboard.press('Backspace');
-
-  // Insert invalid program
-  await page.keyboard.insertText(invalidProgram);
+  // Insert invalid program directly using Monaco API
+  await page.evaluate((prog) => {
+    window.monaco.editor.getModels()[0].setValue(prog);
+  }, invalidProgram);
 
   // Remove overlay again
   await removeOverlay(page);
