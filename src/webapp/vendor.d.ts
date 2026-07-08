@@ -141,6 +141,6 @@ declare module '*.svg' {
 // ---------------------------------------------------------------------------
 
 interface Window {
-  monaco: typeof import('monaco-editor/esm/vs/editor/editor.api') | null;
-  editor: import('monaco-editor/esm/vs/editor/editor.api').editor.IStandaloneCodeEditor | null;
+  monaco: typeof import('monaco-editor') | null;
+  editor: import('monaco-editor').editor.IStandaloneCodeEditor | null;
 }
