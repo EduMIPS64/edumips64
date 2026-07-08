@@ -27,21 +27,20 @@
  */
 
 import { loader } from '@monaco-editor/react';
-// Import editor.api for the typed Monaco API surface …
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
-// … and import editor.main as a side-effect-only import to activate all editor
-// feature contributions (hover provider, find-replace, bracket matching, etc.).
-// editor.api is the type surface only; editor.main adds feature plugins via
-// side effects, which is required for editor.action.showHover to work.
-// At runtime these are the same singleton: editor.main re-exports editor.api,
-// so Code.tsx's `import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api'`
-// shares the same object and sees the registered features.
+// monaco-editor 0.53+ restructured its ESM distribution: the package's `.`
+// export now resolves to `esm/vs/editor/editor.main`, which is both the
+// typed Monaco API surface (formerly editor.api) *and* activates all editor
+// feature contributions (hover provider, find-replace, bracket matching,
+// etc.) as a side effect of import — there is no longer a separate
+// type-only `editor.api` entry point exposed via the package's `exports`
+// map (the file still exists on disk, but resolving it deeply is
+// unsupported and breaks under `moduleResolution: bundler`).
+// At runtime this is the same singleton imported everywhere else (e.g.
+// Code.tsx's `import * as monacoEditor from 'monaco-editor'`), so it sees
+// the registered features.
 // editor.main also loads built-in language grammars; our custom MIPS grammar
 // overrides the stock one via registerTokensProviderFactory in Code.tsx.
-// Side-effect import to register editor features (hover, find, etc.).
-// The rule @typescript-eslint/no-require-imports does not apply to side-effect
-// imports, so no disable comment is needed.
-import 'monaco-editor/esm/vs/editor/editor.main';
+import * as monaco from 'monaco-editor';
 // Vite-specific ?worker import: emits the worker as a separate chunk and
 // returns a Worker constructor whose URL resolves via import.meta.url.
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';

@@ -39,7 +39,7 @@ import { useExecutionController } from '../hooks/useExecutionController';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import type { SimulatorResult, SimulatorWorker } from '../simulator/protocol';
 import type { ITelemetryClient } from '../telemetry';
-import type * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
+import type * as monacoEditor from 'monaco-editor';
 
 interface SimulatorProps {
   worker: SimulatorWorker;
