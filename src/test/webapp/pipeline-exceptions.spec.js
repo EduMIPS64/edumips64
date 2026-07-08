@@ -179,11 +179,59 @@ SYSCALL 0
   // Install a MutationObserver that captures the pipeline state the instant
   // #runtime-error-dialog first becomes visible. The observer callback is a
   // microtask: it fires after React's DOM commit but before the next macro-
-  // task (the Worker's reset-response message). This makes the snapshot
-  // reliable without relying on Playwright round-trips after the dialog opens.
+  // task (the Worker's reset-response message). This *usually* gives a
+  // reliable snapshot of the error-state pipeline, but the dialog becoming
+  // visible and the pipeline being cleared by stopCode()'s worker.reset() can
+  // land in the same batch of DOM mutations under some timing (observed in
+  // CI: 2026-07-05 and 2026-07-07 "Monitor production web UI" runs). When
+  // that happens, reading the DOM at dialog time already sees an emptied
+  // pipeline. To make the snapshot robust against that race, we also track a
+  // rolling "last non-empty" pipeline snapshot via a second observer scoped
+  // to #pipeline itself, and fall back to it if the dialog-time sample has no
+  // occupied stages.
   await page.evaluate(() => {
     window.__pipelineSnap = null;
+    window.__lastNonEmptySnap = null;
     window.__dialogSeen = false;
+
+    const capturePipeline = () => {
+      const out = {};
+      document.querySelectorAll('#pipeline g[data-stage]').forEach((g) => {
+        const stage = g.getAttribute('data-stage');
+        out[stage] = {
+          instruction: g.getAttribute('data-instruction') || '',
+          stall: g.getAttribute('data-stall') || '',
+          cycleStage: g.getAttribute('data-cycle-stage') || '',
+        };
+      });
+      return out;
+    };
+    const isOccupied = (snap) => Object.values(snap).some((s) => s.instruction);
+
+    // Keep the most recent pipeline snapshot that had at least one occupied
+    // stage, so we can recover the pre-overflow pipeline state even if the
+    // dialog-time sample below races with the pipeline being cleared.
+    const pipelineEl = document.getElementById('pipeline');
+    const pipelineObserver = new MutationObserver(() => {
+      const snap = capturePipeline();
+      if (isOccupied(snap)) {
+        window.__lastNonEmptySnap = snap;
+      }
+    });
+    if (pipelineEl) {
+      pipelineObserver.observe(pipelineEl, {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['data-instruction', 'data-cycle-stage', 'data-stall'],
+      });
+    }
+    // Seed with the current state in case no further mutations occur before
+    // the dialog appears.
+    const initial = capturePipeline();
+    if (isOccupied(initial)) {
+      window.__lastNonEmptySnap = initial;
+    }
+
     const observer = new MutationObserver(() => {
       if (window.__dialogSeen) return;
       const dialog = document.getElementById('runtime-error-dialog');
@@ -194,17 +242,9 @@ SYSCALL 0
       if (hidden === 'true') return;
       window.__dialogSeen = true;
       // Capture pipeline synchronously from the same microtask.
-      const out = {};
-      document.querySelectorAll('#pipeline g[data-stage]').forEach((g) => {
-        const stage = g.getAttribute('data-stage');
-        out[stage] = {
-          instruction: g.getAttribute('data-instruction') || '',
-          stall: g.getAttribute('data-stall') || '',
-          cycleStage: g.getAttribute('data-cycle-stage') || '',
-        };
-      });
-      window.__pipelineSnap = out;
+      window.__pipelineSnap = capturePipeline();
       observer.disconnect();
+      pipelineObserver.disconnect();
     });
     observer.observe(document.body, {
       subtree: true,
@@ -220,7 +260,14 @@ SYSCALL 0
     .poll(async () => page.evaluate(() => window.__dialogSeen), { timeout: 15000 })
     .toBe(true);
 
-  const snapAtDialog = await page.evaluate(() => window.__pipelineSnap);
+  const snapAtDialog = await page.evaluate(() => {
+    const atDialog = window.__pipelineSnap;
+    const hasOccupied = atDialog && Object.values(atDialog).some((s) => s.instruction);
+    // If the dialog-time sample lost the race against the pipeline being
+    // cleared, fall back to the last snapshot that had occupied stages —
+    // that is the pipeline state that actually produced the overflow.
+    return hasOccupied ? atDialog : window.__lastNonEmptySnap;
+  });
 
   // Dismiss the dialog via the OK button.
   const runtimeDialog = page.locator('#runtime-error-dialog');
