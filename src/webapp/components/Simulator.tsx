@@ -462,9 +462,10 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
           bottom={<Cycles cycles={cycles} colors={pipelineColors} />}
           right={
             <Box
+              id="dashboard"
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
                 gap: 1.5,
                 p: 1.5,
                 height: '100%',
@@ -496,6 +497,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                 title="Registers"
                 icon={<DnsOutlinedIcon fontSize="small" />}
                 maxContentHeight="48vh"
+                fullWidth
               >
                 <Registers {...registers} />
               </DashboardCard>
@@ -504,6 +506,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                 title="Memory"
                 icon={<StorageOutlinedIcon fontSize="small" />}
                 maxContentHeight="40vh"
+                fullWidth
               >
                 <Memory memory={memory} />
               </DashboardCard>
@@ -511,6 +514,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                 id="stdout-card"
                 title="Standard Output"
                 icon={<TerminalOutlinedIcon fontSize="small" />}
+                fullWidth
               >
                 <StdOut stdout={stdout} />
               </DashboardCard>
