@@ -114,16 +114,22 @@ test('the diagram survives a run to completion and resets on reload', async ({
   // When execution finishes, the widget must report the final cycle count
   // (matching the Stats panel) and still contain one row per instruction
   // fetch. The exact count depends on stall timing, so just require > 5.
-  await expect(page.getByTestId('cycles-widget')).toHaveAttribute(
-    'data-time',
-    /^\d+$/,
-  );
+  //
+  // The widget's `data-time` attribute and the Stats panel's `#stat-cycles`
+  // text are updated by separate re-renders, so reading them as two
+  // one-shot snapshots races: one can be captured mid-run (e.g. "1") while
+  // the other has already reached the final count (e.g. "10"). Re-read both
+  // together and retry until they agree, so the comparison only happens once
+  // the run has well and truly settled.
+  const widget = page.getByTestId('cycles-widget');
   const stats = page.locator('#stat-cycles');
-  const statCycles = await stats.textContent();
-  await expect(page.getByTestId('cycles-widget')).toHaveAttribute(
-    'data-time',
-    statCycles.trim(),
-  );
+  let statCycles;
+  await expect(async () => {
+    const widgetTime = await widget.getAttribute('data-time');
+    statCycles = (await stats.textContent()).trim();
+    expect(widgetTime).toMatch(/^\d+$/);
+    expect(widgetTime).toBe(statCycles);
+  }).toPass({ timeout: 30000 });
 
   // Re-loading the program resets the CycleBuilder: the diagram restarts
   // from the first fetch (cycle 1, one row) rather than keeping the history
