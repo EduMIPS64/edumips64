@@ -4,7 +4,7 @@ import { initVimMode, type VimAdapterInstance } from 'monaco-vim';
 import { Editor } from '@monaco-editor/react';
 import type { OnMount } from '@monaco-editor/react';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
+import * as monacoEditor from 'monaco-editor';
 import { DEFAULT_PIPELINE_COLORS } from '../settings/schema';
 import type { Pipeline, ParsingError, PipelineInstruction } from '../simulator/protocol';
 import type { PipelineColors } from '../settings/schema';
@@ -425,6 +425,13 @@ const Code = ({
     lineNumbersMinChars: 3,
     automaticLayout: true,
     fontSize,
+    // monaco-editor 0.55 defaults to the browser's native EditContext API
+    // (window.EditContext) for text input on browsers that support it,
+    // replacing the classic hidden `<textarea class="inputarea">` element.
+    // monaco-vim's key handling and our Playwright e2e tests both target
+    // that textarea directly, so force the classic textarea-based input
+    // handling to keep both working.
+    editContext: false,
   };
 
   // Hook to compute and set markers for warnings and errors.

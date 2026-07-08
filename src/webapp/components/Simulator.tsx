@@ -43,7 +43,7 @@ import { useExecutionController } from '../hooks/useExecutionController';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import type { SimulatorResult, SimulatorWorker } from '../simulator/protocol';
 import type { ITelemetryClient } from '../telemetry';
-import type * as monacoEditor from 'monaco-editor/esm/vs/editor/editor.api';
+import type * as monacoEditor from 'monaco-editor';
 import type { ExpandedAccordions } from '../settings/schema';
 
 // Styled accordion header shared by all right-panel widgets. Defined at
