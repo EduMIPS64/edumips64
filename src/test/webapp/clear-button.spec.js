@@ -39,7 +39,9 @@ SYSCALL 0
   expect(parseInt(cyclesBeforeClear || '0', 10)).toBeGreaterThan(0);
 
   // Verify that instructions executed is non-zero
-  const instructionsBeforeClear = await page.locator('#stat-instructions').textContent();
+  const instructionsBeforeClear = await page
+    .locator('#stat-instructions')
+    .textContent();
   expect(parseInt(instructionsBeforeClear || '0', 10)).toBeGreaterThan(0);
 
   // Remove overlay before clicking clear button
@@ -55,14 +57,22 @@ SYSCALL 0
   const cyclesAfterClear = await page.locator('#stat-cycles').textContent();
   expect(cyclesAfterClear).toBe('0');
 
-  const instructionsAfterClear = await page.locator('#stat-instructions').textContent();
+  const instructionsAfterClear = await page
+    .locator('#stat-instructions')
+    .textContent();
   expect(instructionsAfterClear).toBe('0');
 
-  const rawStallsAfterClear = await page.locator('#stat-raw-stalls').textContent();
+  const rawStallsAfterClear = await page
+    .locator('#stat-raw-stalls')
+    .textContent();
   expect(rawStallsAfterClear).toBe('0');
-  const wawStallsAfterClear = await page.locator('#stat-waw-stalls').textContent();
+  const wawStallsAfterClear = await page
+    .locator('#stat-waw-stalls')
+    .textContent();
   expect(wawStallsAfterClear).toBe('0');
-  const structuralStallsAfterClear = await page.locator('#stat-structural-stalls').textContent();
+  const structuralStallsAfterClear = await page
+    .locator('#stat-structural-stalls')
+    .textContent();
   expect(structuralStallsAfterClear).toBe('0');
 
   // 2) Verify that the code is the trivial "syscall 0" program
@@ -86,7 +96,9 @@ SYSCALL 0
  * Test: Verify Clear button works after a program with errors
  * Load a program with syntax errors, then clear and verify error accordion disappears
  */
-test('clear button removes issues card after syntax errors', async ({ page }) => {
+test('clear button removes issues card after syntax errors', async ({
+  page,
+}) => {
   await page.goto(targetUri);
 
   await waitForPageReady(page);

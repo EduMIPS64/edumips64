@@ -88,9 +88,9 @@ The project follows Gradle project layout conventions:
 - Look at existing code for patterns and style consistency
 
 ### JavaScript/React
-- ESLint configuration in `.eslintrc.json`
-- Extends: `eslint:recommended`, `plugin:react/recommended`, `plugin:react-hooks/recommended`, `prettier`
-- Prettier for code formatting (`.prettierrc`)
+- Linting and formatting via [Biome](https://biomejs.dev/), configured in `biome.json`
+- Recommended rules plus the React rule domain (`useExhaustiveDependencies`, `useHookAtTopLevel`, etc.)
+- Run `npm run lint` to check, `npm run format` to auto-format
 - React prop-types validation is disabled
 
 ## Development Workflow

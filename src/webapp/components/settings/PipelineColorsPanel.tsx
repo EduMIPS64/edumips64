@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import {
@@ -50,9 +50,7 @@ const PipelineColorsPanel = ({
       }}
     >
       {PIPELINE_COLOR_FIELDS.map(({ key, label }) => {
-        const value =
-          (pipelineColors && pipelineColors[key]) ||
-          DEFAULT_PIPELINE_COLORS[key];
+        const value = pipelineColors?.[key] || DEFAULT_PIPELINE_COLORS[key];
         const inputId = `pipeline-color-${key}`;
         return (
           <Box key={key} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

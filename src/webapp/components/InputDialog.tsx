@@ -52,11 +52,20 @@ const InputDialog = ({ request, onSubmit, onCancel }: InputDialogProps) => {
 
   const promptMessage = request?.inputPromptMessage || 'Please input your text';
   const promptWithMax =
-    maxLength > 0 ? `${promptMessage} (max ${maxLength} characters)` : promptMessage;
+    maxLength > 0
+      ? `${promptMessage} (max ${maxLength} characters)`
+      : promptMessage;
 
   return (
-    <Dialog open={Boolean(request)} onClose={cancelInput} maxWidth="xs" fullWidth>
-      <DialogTitle>{request?.inputDialogTitle || 'EduMIPS64 - Input'}</DialogTitle>
+    <Dialog
+      open={Boolean(request)}
+      onClose={cancelInput}
+      maxWidth="xs"
+      fullWidth
+    >
+      <DialogTitle>
+        {request?.inputDialogTitle || 'EduMIPS64 - Input'}
+      </DialogTitle>
       <DialogContent>
         <Typography sx={{ mb: 2 }}>{promptWithMax}</Typography>
         <TextField

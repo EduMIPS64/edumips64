@@ -1,4 +1,8 @@
-import { createTheme, responsiveFontSizes, type PaletteMode } from '@mui/material/styles';
+import {
+  createTheme,
+  responsiveFontSizes,
+  type PaletteMode,
+} from '@mui/material/styles';
 
 /**
  * Central MUI theme for the web UI.
@@ -15,8 +19,7 @@ import { createTheme, responsiveFontSizes, type PaletteMode } from '@mui/materia
  * structure depend on the theme.
  */
 
-const FONT_STACK =
-  '"Inter", "Roboto", "Helvetica Neue", "Arial", sans-serif';
+const FONT_STACK = '"Inter", "Roboto", "Helvetica Neue", "Arial", sans-serif';
 
 // Brand colors, shared by both modes.
 const INDIGO = '#3557d4';

@@ -145,7 +145,10 @@ export const initialExecState: ExecState = {
 // Reducer
 // ---------------------------------------------------------------------------
 
-export function executionReducer(state: ExecState, action: ExecAction): ExecState {
+export function executionReducer(
+  state: ExecState,
+  action: ExecAction,
+): ExecState {
   switch (action.type) {
     case 'STEP_REQUESTED':
       // The component has already called worker.step(stride).  Record how

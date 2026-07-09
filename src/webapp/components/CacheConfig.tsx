@@ -20,7 +20,13 @@ interface CacheNumberFieldProps {
   isDisabled: boolean;
 }
 
-const CacheNumberField = ({ label, field, value, setCache, isDisabled }: CacheNumberFieldProps) => {
+const CacheNumberField = ({
+  label,
+  field,
+  value,
+  setCache,
+  isDisabled,
+}: CacheNumberFieldProps) => {
   const [draftValue, setDraftValue] = React.useState(String(value));
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,6 +144,10 @@ const CacheConfigPanel = ({ onChange, status }: CacheConfigProps) => {
 
   const isDisabled = status === 'RUNNING';
 
+  // Deliberately keyed on `isDisabled` alone: this effect's only job is to
+  // retry the one-time initial sync once it becomes safe. Value changes are
+  // handled by the edit-propagation effect below.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: see comment above.
   React.useEffect(() => {
     if (hasSyncedCacheConfigThisSession || isDisabled) {
       return;
@@ -146,10 +156,6 @@ const CacheConfigPanel = ({ onChange, status }: CacheConfigProps) => {
     if (onChange) {
       onChange({ l1d, l1i });
     }
-    // Deliberately keyed on `isDisabled` alone: this effect's only job is to
-    // retry the one-time initial sync once it becomes safe. Value changes
-    // are handled by the edit-propagation effect below.
-    // eslint-disable-next-line @eslint-react/exhaustive-deps
   }, [isDisabled]);
 
   const isFirstRenderRef = React.useRef(true);

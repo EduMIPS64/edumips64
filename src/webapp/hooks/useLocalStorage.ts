@@ -28,7 +28,9 @@ function getListeners(key: string): Set<Listener> {
 
 /** Notify all same-tab subscribers for a given localStorage key. */
 function notifyLocal(key: string): void {
-  getListeners(key).forEach((fn) => fn());
+  getListeners(key).forEach((fn) => {
+    fn();
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -108,13 +110,17 @@ export function useLocalStorage<T>(
   const setValue = useCallback(
     (next: T | ((prev: T) => T)) => {
       const current = getSnapshot(key, defaultValue);
-      const newValue = typeof next === 'function' ? (next as (prev: T) => T)(current) : next;
+      const newValue =
+        typeof next === 'function' ? (next as (prev: T) => T)(current) : next;
       writeStoredValue(key, name, newValue);
     },
     [key, name, defaultValue],
   );
 
-  const reset = useCallback(() => setValue(defaultValue), [setValue, defaultValue]);
+  const reset = useCallback(
+    () => setValue(defaultValue),
+    [setValue, defaultValue],
+  );
 
   return [value, setValue, reset];
 }
@@ -177,7 +183,10 @@ function getSnapshot<T>(key: string, defaultValue: T): T {
     try {
       parsed = JSON.parse(raw) as T;
     } catch (e) {
-      console.warn(`useLocalStorage: failed to parse value for key "${key}"`, e);
+      console.warn(
+        `useLocalStorage: failed to parse value for key "${key}"`,
+        e,
+      );
       parsed = defaultValue;
     }
   }

@@ -58,11 +58,13 @@ async function clearSettings(page) {
     const keysToRemove = [];
     for (let i = 0; i < window.localStorage.length; i++) {
       const k = window.localStorage.key(i);
-      if (k && k.startsWith(prefix)) {
+      if (k?.startsWith(prefix)) {
         keysToRemove.push(k);
       }
     }
-    keysToRemove.forEach((k) => window.localStorage.removeItem(k));
+    keysToRemove.forEach((k) => {
+      window.localStorage.removeItem(k);
+    });
   }, STORAGE_PREFIX);
 }
 
@@ -97,23 +99,23 @@ async function setForwarding(page, enabled) {
 async function getExecutionStats(page) {
   const cycles = parseInt(
     (await page.locator('#stat-cycles').textContent()) || '0',
-    10
+    10,
   );
   const instructions = parseInt(
     (await page.locator('#stat-instructions').textContent()) || '0',
-    10
+    10,
   );
   const rawStalls = parseInt(
     (await page.locator('#stat-raw-stalls').textContent()) || '0',
-    10
+    10,
   );
   const wawStalls = parseInt(
     (await page.locator('#stat-waw-stalls').textContent()) || '0',
-    10
+    10,
   );
   const structuralStalls = parseInt(
     (await page.locator('#stat-structural-stalls').textContent()) || '0',
-    10
+    10,
   );
   return { cycles, instructions, rawStalls, wawStalls, structuralStalls };
 }
@@ -180,7 +182,7 @@ test('issue51-halt.s cycle counts match EndToEndTests under both forwarding sett
   const statsNoFwd = await getExecutionStats(page);
   expect(statsNoFwd.cycles).toBe(EXPECTED_ISSUE51_WITHOUT_FORWARDING.cycles);
   expect(statsNoFwd.instructions).toBe(
-    EXPECTED_ISSUE51_WITHOUT_FORWARDING.instructions
+    EXPECTED_ISSUE51_WITHOUT_FORWARDING.instructions,
   );
 
   // Reload so the second run starts from a clean CPU state (the
@@ -197,7 +199,7 @@ test('issue51-halt.s cycle counts match EndToEndTests under both forwarding sett
   const statsFwd = await getExecutionStats(page);
   expect(statsFwd.cycles).toBe(EXPECTED_ISSUE51_WITH_FORWARDING.cycles);
   expect(statsFwd.instructions).toBe(
-    EXPECTED_ISSUE51_WITH_FORWARDING.instructions
+    EXPECTED_ISSUE51_WITH_FORWARDING.instructions,
   );
 
   // Sanity check: the same program halts in fewer cycles with forwarding on.
@@ -216,7 +218,7 @@ test('forwarding switch persists across page reloads', async ({ page }) => {
 
   const stored = await page.evaluate(
     (key) => window.localStorage.getItem(key),
-    `${STORAGE_PREFIX}forwarding`
+    `${STORAGE_PREFIX}forwarding`,
   );
   expect(stored).toBe('true');
 

@@ -3,10 +3,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
-import type {
-  CyclesDiagram,
-  CycleDiagramElement,
-} from '../simulator/protocol';
+import type { CyclesDiagram, CycleDiagramElement } from '../simulator/protocol';
 import type { PipelineColors } from '../settings/schema';
 import { DEFAULT_PIPELINE_COLORS } from '../settings/schema';
 
@@ -147,6 +144,7 @@ const CyclesWidget = ({ cycles, colors }: CyclesProps) => {
   // setViewPosition call after every draw: scroll to the right/bottom edge
   // whenever a new cycle arrives.
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally re-runs whenever a new cycle arrives (see comment above).
   React.useEffect(() => {
     const node = scrollRef.current;
     if (node) {
@@ -219,7 +217,13 @@ const CyclesWidget = ({ cycles, colors }: CyclesProps) => {
           >
             Instruction
           </Box>
-          <div style={{ position: 'relative', width: timelineWidth, height: CELL_H }}>
+          <div
+            style={{
+              position: 'relative',
+              width: timelineWidth,
+              height: CELL_H,
+            }}
+          >
             {Array.from({ length: columnCount }, (_, i) => (
               <span
                 key={minCycle + i}
@@ -248,8 +252,7 @@ const CyclesWidget = ({ cycles, colors }: CyclesProps) => {
             sx={{
               display: 'flex',
               width: NAME_COL_W + timelineWidth,
-              bgcolor:
-                rowIndex % 2 === 1 ? 'action.hover' : 'background.paper',
+              bgcolor: rowIndex % 2 === 1 ? 'action.hover' : 'background.paper',
             }}
           >
             <Box

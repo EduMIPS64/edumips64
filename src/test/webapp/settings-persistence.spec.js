@@ -19,11 +19,13 @@ test.beforeEach(async ({ page }) => {
     const keysToRemove = [];
     for (let i = 0; i < window.localStorage.length; i++) {
       const k = window.localStorage.key(i);
-      if (k && k.startsWith(prefix)) {
+      if (k?.startsWith(prefix)) {
         keysToRemove.push(k);
       }
     }
-    keysToRemove.forEach((k) => window.localStorage.removeItem(k));
+    keysToRemove.forEach((k) => {
+      window.localStorage.removeItem(k);
+    });
   }, STORAGE_PREFIX);
 });
 
@@ -32,7 +34,7 @@ async function setPipelineColor(page, key, value) {
   await input.evaluate((el, v) => {
     const setter = Object.getOwnPropertyDescriptor(
       window.HTMLInputElement.prototype,
-      'value'
+      'value',
     ).set;
     setter.call(el, v);
     el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -63,13 +65,13 @@ test('viMode and fontSize persist across page reloads', async ({ page }) => {
   // Verify localStorage was updated
   const viModeStored = await page.evaluate(
     (key) => window.localStorage.getItem(key),
-    `${STORAGE_PREFIX}viMode`
+    `${STORAGE_PREFIX}viMode`,
   );
   expect(viModeStored).toBe('true');
 
   const fontSizeStored = await page.evaluate(
     (key) => window.localStorage.getItem(key),
-    `${STORAGE_PREFIX}fontSize`
+    `${STORAGE_PREFIX}fontSize`,
   );
   expect(fontSizeStored).toBe('16');
 
@@ -107,7 +109,7 @@ test('accordionAlerts persists across page reloads', async ({ page }) => {
   // Verify localStorage
   const stored = await page.evaluate(
     (key) => window.localStorage.getItem(key),
-    `${STORAGE_PREFIX}accordionAlerts`
+    `${STORAGE_PREFIX}accordionAlerts`,
   );
   expect(stored).toBe('false');
 
@@ -125,7 +127,9 @@ test('accordionAlerts persists across page reloads', async ({ page }) => {
 /**
  * Test: stepStride and executionDelayMs persist across page reloads.
  */
-test('stepStride and executionDelayMs persist across page reloads', async ({ page }) => {
+test('stepStride and executionDelayMs persist across page reloads', async ({
+  page,
+}) => {
   await waitForPageReady(page);
   await removeOverlay(page);
 
@@ -144,13 +148,13 @@ test('stepStride and executionDelayMs persist across page reloads', async ({ pag
   // Verify localStorage was updated.
   const strideStored = await page.evaluate(
     (key) => window.localStorage.getItem(key),
-    `${STORAGE_PREFIX}stepStride`
+    `${STORAGE_PREFIX}stepStride`,
   );
   expect(strideStored).toBe('250');
 
   const delayStored = await page.evaluate(
     (key) => window.localStorage.getItem(key),
-    `${STORAGE_PREFIX}executionDelayMs`
+    `${STORAGE_PREFIX}executionDelayMs`,
   );
   expect(delayStored).toBe('100');
 
@@ -180,7 +184,11 @@ test('stepStride and executionDelayMs persist across page reloads', async ({ pag
   // from the persisted setting.
   await page.waitForSelector('#multi-step-button');
   await page.hover('#multi-step-button');
-  await expect(page.locator('.MuiTooltip-tooltip').filter({ hasText: 'Run 250 steps of simulation' })).toBeVisible();
+  await expect(
+    page
+      .locator('.MuiTooltip-tooltip')
+      .filter({ hasText: 'Run 250 steps of simulation' }),
+  ).toBeVisible();
 });
 
 /**
@@ -206,15 +214,15 @@ test('pipelineColors persist across page reloads', async ({ page }) => {
     .poll(() =>
       page.evaluate(
         (key) => JSON.parse(window.localStorage.getItem(key) || 'null'),
-        `${STORAGE_PREFIX}pipelineColors`
-      )
+        `${STORAGE_PREFIX}pipelineColors`,
+      ),
     )
     .toMatchObject({ IF: '#123456', Stall: '#abcdef' });
 
   // Verify localStorage was updated with our overrides on top of the defaults.
   const stored = await page.evaluate(
     (key) => JSON.parse(window.localStorage.getItem(key) || 'null'),
-    `${STORAGE_PREFIX}pipelineColors`
+    `${STORAGE_PREFIX}pipelineColors`,
   );
   expect(stored).not.toBeNull();
   expect(stored.IF).toBe('#123456');
@@ -249,7 +257,7 @@ test('pipelineColors also drive Monaco stage highlights', async ({ page }) => {
   daddi r1,r0,1
   daddi r2,r0,2
   syscall 0
-`
+`,
   );
 
   await page.click('#step-button');
@@ -258,7 +266,7 @@ test('pipelineColors also drive Monaco stage highlights', async ({ page }) => {
     .poll(() =>
       page.evaluate(() => {
         const codeWrapper = document.querySelector(
-          '[data-testid="code-editor"]'
+          '[data-testid="code-editor"]',
         );
         const fill = document
           .querySelector('#pipeline g[data-stage="IF"]')
@@ -276,7 +284,7 @@ test('pipelineColors also drive Monaco stage highlights', async ({ page }) => {
           highlightColor: style.getPropertyValue('--pipeline-stage-if').trim(),
           hasDecoration,
         };
-      })
+      }),
     )
     .toMatchObject({
       fill: '#123456',
@@ -312,7 +320,7 @@ test('Reset UI to defaults resets only the UI tab, not Simulation', async ({
   await ifInput.evaluate((el) => {
     const setter = Object.getOwnPropertyDescriptor(
       window.HTMLInputElement.prototype,
-      'value'
+      'value',
     ).set;
     setter.call(el, '#000000');
     el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -379,10 +387,12 @@ test.afterEach(async ({ page }) => {
     const keysToRemove = [];
     for (let i = 0; i < window.localStorage.length; i++) {
       const k = window.localStorage.key(i);
-      if (k && k.startsWith(prefix)) {
+      if (k?.startsWith(prefix)) {
         keysToRemove.push(k);
       }
     }
-    keysToRemove.forEach((k) => window.localStorage.removeItem(k));
+    keysToRemove.forEach((k) => {
+      window.localStorage.removeItem(k);
+    });
   }, STORAGE_PREFIX);
 });

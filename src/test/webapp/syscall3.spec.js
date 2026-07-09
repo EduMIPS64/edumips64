@@ -33,7 +33,9 @@ async function openStdoutAccordion(page) {
   await page.locator('text=Standard Output').click();
 }
 
-test('syscall 3 opens an input dialog and resumes execution', async ({ page }) => {
+test('syscall 3 opens an input dialog and resumes execution', async ({
+  page,
+}) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
 
@@ -54,7 +56,9 @@ test('syscall 3 opens an input dialog and resumes execution', async ({ page }) =
   await expect(page.locator('#stdout-view')).toHaveValue('abcde');
 });
 
-test('syscall 3 caps the input at the maximum allowed length', async ({ page }) => {
+test('syscall 3 caps the input at the maximum allowed length', async ({
+  page,
+}) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
 

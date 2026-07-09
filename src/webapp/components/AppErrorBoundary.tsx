@@ -52,7 +52,9 @@ class AppErrorBoundary extends React.Component<
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<AppErrorBoundaryState> {
+  static getDerivedStateFromError(
+    error: Error,
+  ): Partial<AppErrorBoundaryState> {
     return { hasError: true, error };
   }
 
@@ -75,7 +77,7 @@ class AppErrorBoundary extends React.Component<
     const message = error ? error.message : 'An unknown error occurred.';
     const stack = errorInfo
       ? errorInfo.componentStack
-      : error && error.stack
+      : error?.stack
         ? error.stack
         : '';
 

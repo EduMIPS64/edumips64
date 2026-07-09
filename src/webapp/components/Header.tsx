@@ -32,7 +32,11 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import UploadIcon from '@mui/icons-material/Upload';
 
 import { deriveLogicalState } from '../simulatorState';
-import type { CpuStatus, ParsingError, SimulatorResult } from '../simulator/protocol';
+import type {
+  CpuStatus,
+  ParsingError,
+  SimulatorResult,
+} from '../simulator/protocol';
 import type { GeneralSettingsPanelProps } from './settings/GeneralSettingsPanel';
 import type { EditorSettingsPanelProps } from './settings/EditorSettingsPanel';
 import type { PipelineColorsPanelProps } from './settings/PipelineColorsPanel';
@@ -43,7 +47,10 @@ type SettingsProps = GeneralSettingsPanelProps &
   EditorSettingsPanelProps &
   PipelineColorsPanelProps &
   Omit<CpuSettingsPanelProps, 'status'> & {
-    onCacheConfigChange?: (config: { l1d: CacheConfigType; l1i: CacheConfigType }) => void;
+    onCacheConfigChange?: (config: {
+      l1d: CacheConfigType;
+      l1i: CacheConfigType;
+    }) => void;
   };
 
 interface HeaderProps extends SettingsProps {
@@ -97,7 +104,9 @@ export default function Header({
 }: HeaderProps) {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [settingsDialogOpen, setSettingsDialogOpen] = React.useState(false);
-  const [programAnchor, setProgramAnchor] = React.useState<HTMLElement | null>(null);
+  const [programAnchor, setProgramAnchor] = React.useState<HTMLElement | null>(
+    null,
+  );
   const menuOpen = Boolean(programAnchor);
   // Derive the logical UI state for editor-control gating.
   const logicalState = deriveLogicalState(status, executing, inputRequest);

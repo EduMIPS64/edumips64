@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -75,7 +75,9 @@ export default function DashboardCard({
         onClick={collapsible ? onToggle : undefined}
         aria-expanded={collapsible ? expanded : undefined}
         aria-label={
-          collapsible ? `${expanded ? 'Collapse' : 'Expand'} ${title}` : undefined
+          collapsible
+            ? `${expanded ? 'Collapse' : 'Expand'} ${title}`
+            : undefined
         }
         sx={{
           display: 'flex',
@@ -109,7 +111,12 @@ export default function DashboardCard({
         <Typography
           variant="subtitle2"
           component={collapsible ? 'span' : 'h3'}
-          sx={{ fontWeight: 700, flexGrow: 1, lineHeight: 1.2, textAlign: 'left' }}
+          sx={{
+            fontWeight: 700,
+            flexGrow: 1,
+            lineHeight: 1.2,
+            textAlign: 'left',
+          }}
         >
           {title}
         </Typography>

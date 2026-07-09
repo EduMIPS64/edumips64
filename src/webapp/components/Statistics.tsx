@@ -58,7 +58,9 @@ const StatTile = ({ icon, label, value, valueId }: StatTileProps) => {
   return (
     <Tooltip title={label} arrow enterDelay={400}>
       <Box role="group" aria-label={label} tabIndex={0} sx={tileSx}>
-        <Box sx={{ display: 'flex', color: 'primary.main', flexShrink: 0 }}>{icon}</Box>
+        <Box sx={{ display: 'flex', color: 'primary.main', flexShrink: 0 }}>
+          {icon}
+        </Box>
         <Typography id={valueId} component="div" sx={valueSx}>
           {value}
         </Typography>
@@ -79,15 +81,27 @@ interface PairStatTileProps {
 // A compact "count / misses" stat used for cache metrics: one icon per
 // cache-access type, pairing the access count with its miss count so the two
 // related numbers read together instead of as separate unlabeled chips.
-const PairStatTile = ({ icon, label, count, countId, misses, missesId }: PairStatTileProps) => {
+const PairStatTile = ({
+  icon,
+  label,
+  count,
+  countId,
+  misses,
+  missesId,
+}: PairStatTileProps) => {
   return (
     <Tooltip title={label} arrow enterDelay={400}>
       <Box role="group" aria-label={label} tabIndex={0} sx={tileSx}>
-        <Box sx={{ display: 'flex', color: 'primary.main', flexShrink: 0 }}>{icon}</Box>
+        <Box sx={{ display: 'flex', color: 'primary.main', flexShrink: 0 }}>
+          {icon}
+        </Box>
         <Typography id={countId} component="div" sx={valueSx}>
           {count}
         </Typography>
-        <Typography component="div" sx={{ ...valueSx, fontWeight: 500, color: 'text.disabled' }}>
+        <Typography
+          component="div"
+          sx={{ ...valueSx, fontWeight: 500, color: 'text.disabled' }}
+        >
           /
         </Typography>
         <Typography
@@ -177,7 +191,10 @@ const StatisticsPanel = ({
 }: Statistics) => {
   const cpi = instructions === 0 ? 0 : (cycles / instructions).toFixed(2);
   const structuralStalls =
-    (dividerStalls || 0) + (memoryStalls || 0) + (exStalls || 0) + (funcUnitStalls || 0);
+    (dividerStalls || 0) +
+    (memoryStalls || 0) +
+    (exStalls || 0) +
+    (funcUnitStalls || 0);
 
   // TODO: FCSR.
   return (

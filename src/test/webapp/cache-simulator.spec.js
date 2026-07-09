@@ -1,10 +1,7 @@
 const { test, expect } = require('./fixtures');
 const {
   targetUri,
-  removeOverlay,
   waitForPageReady,
-  waitForRunningState,
-  waitForSimulationComplete,
   loadProgram,
   runToCompletion,
   openSettingsDialog,

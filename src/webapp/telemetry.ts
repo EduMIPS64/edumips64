@@ -13,7 +13,10 @@ import { getBuildInfo, type BuildKind } from './buildInfo';
 
 export interface ITelemetryClient {
   loadAppInsights(): void;
-  trackEvent(event: { name: string; properties?: Record<string, unknown> }): void;
+  trackEvent(event: {
+    name: string;
+    properties?: Record<string, unknown>;
+  }): void;
   trackPageView(): void;
   trackException(exception: { exception: Error }): void;
   addTelemetryInitializer(initializer: (envelope: unknown) => void): void;
@@ -39,7 +42,10 @@ class NoOpTelemetry implements ITelemetryClient {
 
   loadAppInsights(): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  trackEvent(_event: { name: string; properties?: Record<string, unknown> }): void {}
+  trackEvent(_event: {
+    name: string;
+    properties?: Record<string, unknown>;
+  }): void {}
   trackPageView(): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   trackException(_exception: { exception: Error }): void {}

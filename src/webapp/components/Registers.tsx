@@ -37,7 +37,7 @@ const RegistersPanel = ({ gpr, fpu, special }: Registers) => {
             ))
           }
           {special
-            .filter((r) => r.name != 'FCSR')
+            .filter((r) => r.name !== 'FCSR')
             .map((register) => (
               <tr key={register.name}>
                 <RegisterRow register={register} />

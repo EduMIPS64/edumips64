@@ -1,8 +1,10 @@
 const { test, expect } = require('./fixtures');
 
-const targetUri = process.env.PLAYWRIGHT_TARGET_URL || "http://localhost:8080";
+const targetUri = process.env.PLAYWRIGHT_TARGET_URL || 'http://localhost:8080';
 
-test('help dialog shows embedded documentation with navigation', async ({ page }) => {
+test('help dialog shows embedded documentation with navigation', async ({
+  page,
+}) => {
   await page.goto(targetUri);
 
   // Wait for the page to load
@@ -49,7 +51,7 @@ test('help dialog shows embedded documentation with navigation', async ({ page }
 
   // Verify the language selector is present
   await page.waitForSelector('#language-select');
-  
+
   // Verify navigation is present (check for at least one navigation item)
   const navigationItems = await page.$$('#toc-item-introduction');
   expect(navigationItems.length).toBeGreaterThan(0);
@@ -57,23 +59,23 @@ test('help dialog shows embedded documentation with navigation', async ({ page }
   // Test language switching
   await page.click('#language-select');
   await page.click('li[data-value="it"]');
-  
+
   // Wait for iframe src to change to Italian
   await page.waitForFunction(
     () => {
       const iframe = document.querySelector('#help-iframe');
-      return iframe && iframe.src.includes('docs/it/html/index.html');
+      return iframe?.src.includes('docs/it/html/index.html');
     },
-    { timeout: 5000 }
+    { timeout: 5000 },
   );
-  
+
   // Verify the iframe src changed to Italian
   const iframeSrc = await page.getAttribute('#help-iframe', 'src');
   expect(iframeSrc).toContain('docs/it/html/index.html');
 
   // Switch to About tab (now tab 2)
   await page.click('#help-tab-2');
-  
+
   // Verify About content is displayed
   const aboutContent = await page.textContent('.help-content');
   expect(aboutContent).toContain('Version:');
@@ -124,10 +126,10 @@ test('help navigation allows browsing different sections', async ({ page }) => {
 
   // Click to expand "Instruction Set" section
   await page.click('#toc-item-the-instruction-set');
-  
+
   // Wait for the submenu to expand
   await page.waitForTimeout(500);
-  
+
   // Click on a sub-item "ALU Instructions"
   await page.click('#toc-item-alu-instructions');
 
@@ -136,8 +138,9 @@ test('help navigation allows browsing different sections', async ({ page }) => {
 
   // Verify the iframe src changed
   const iframeSrc = await page.getAttribute('#help-iframe', 'src');
-  expect(iframeSrc).toContain('docs/en/html/instructions.html#alu-instructions');
+  expect(iframeSrc).toContain(
+    'docs/en/html/instructions.html#alu-instructions',
+  );
 
   await page.close();
 });
-

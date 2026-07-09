@@ -17,11 +17,13 @@ test.beforeEach(async ({ page }) => {
     const keysToRemove = [];
     for (let i = 0; i < window.localStorage.length; i++) {
       const k = window.localStorage.key(i);
-      if (k && k.startsWith(prefix)) {
+      if (k?.startsWith(prefix)) {
         keysToRemove.push(k);
       }
     }
-    keysToRemove.forEach((k) => window.localStorage.removeItem(k));
+    keysToRemove.forEach((k) => {
+      window.localStorage.removeItem(k);
+    });
   }, STORAGE_PREFIX);
 });
 
@@ -101,7 +103,7 @@ test('syntax errors update Monaco error markers', async ({ page }) => {
 
   const marker = await page.waitForFunction(
     () => {
-      const model = window.editor && window.editor.getModel();
+      const model = window.editor?.getModel();
       if (!window.monaco || !model) return null;
       return window.monaco.editor
         .getModelMarkers({ resource: model.uri })

@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { initVimMode, type VimAdapterInstance } from 'monaco-vim';
 
 import { Editor } from '@monaco-editor/react';
@@ -6,7 +7,11 @@ import type { OnMount } from '@monaco-editor/react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import * as monacoEditor from 'monaco-editor';
 import { DEFAULT_PIPELINE_COLORS } from '../settings/schema';
-import type { Pipeline, ParsingError, PipelineInstruction } from '../simulator/protocol';
+import type {
+  Pipeline,
+  ParsingError,
+  PipelineInstruction,
+} from '../simulator/protocol';
 import type { PipelineColors } from '../settings/schema';
 
 // Resolve the Monaco editor theme name from the MUI palette mode passed in
@@ -75,7 +80,8 @@ const Code = ({
   onEditorReady,
 }: CodeProps) => {
   const [monaco, setMonaco] = useState<typeof monacoEditor | null>(null);
-  const [editor, setEditor] = useState<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
+  const [editor, setEditor] =
+    useState<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
   const vimInstanceRef = useRef<VimAdapterInstance | null>(null);
   const hoverDisposableRef = useRef<monacoEditor.IDisposable | null>(null);
 
@@ -83,7 +89,9 @@ const Code = ({
   const decorationsRef = useRef<string[]>([]);
 
   // Maps line of code to CPU stage.
-  const [stageMap, setStageMap] = useState<Map<number, string>>(() => new Map());
+  const [stageMap, setStageMap] = useState<Map<number, string>>(
+    () => new Map(),
+  );
 
   // Install our MIPS syntax highlighting provider.
   //
@@ -195,93 +203,85 @@ const Code = ({
       range: new monaco.Range(instr.Line, 1, instr.Line, 1),
       options: { isWholeLine: true, className },
     });
-    if (pipeline.IF && pipeline.IF.Line) {
+    if (pipeline.IF?.Line) {
       newDecorations.push(createDecoration(pipeline.IF, 'stageIf'));
       newStageMap.set(pipeline.IF.Line, 'Instruction Fetch (IF)');
     }
-    if (pipeline.ID && pipeline.ID.Line) {
+    if (pipeline.ID?.Line) {
       newDecorations.push(createDecoration(pipeline.ID, 'stageId'));
       newStageMap.set(pipeline.ID.Line, 'Instruction Decode (ID)');
     }
-    if (pipeline.EX && pipeline.EX.Line) {
+    if (pipeline.EX?.Line) {
       newDecorations.push(createDecoration(pipeline.EX, 'stageEx'));
       newStageMap.set(pipeline.EX.Line, 'Execute (EX)');
     }
-    if (pipeline.MEM && pipeline.MEM.Line) {
+    if (pipeline.MEM?.Line) {
       newDecorations.push(createDecoration(pipeline.MEM, 'stageMem'));
       newStageMap.set(pipeline.MEM.Line, 'Memory Access (MEM)');
     }
-    if (pipeline.WB && pipeline.WB.Line) {
+    if (pipeline.WB?.Line) {
       newDecorations.push(createDecoration(pipeline.WB, 'stageWb'));
       newStageMap.set(pipeline.WB.Line, 'Write Back (WB)');
     }
-    if (pipeline.FPDivider && pipeline.FPDivider.Line) {
+    if (pipeline.FPDivider?.Line) {
       newDecorations.push(
         createDecoration(pipeline.FPDivider, 'stageFPDivider'),
       );
       newStageMap.set(pipeline.FPDivider.Line, 'FPU Divider');
     }
-    if (pipeline.FPAdder1 && pipeline.FPAdder1.Line) {
-      newDecorations.push(
-        createDecoration(pipeline.FPAdder1, 'stageFPAdder'),
-      );
+    if (pipeline.FPAdder1?.Line) {
+      newDecorations.push(createDecoration(pipeline.FPAdder1, 'stageFPAdder'));
       newStageMap.set(pipeline.FPAdder1.Line, 'FPU Adder (1)');
     }
-    if (pipeline.FPAdder2 && pipeline.FPAdder2.Line) {
-      newDecorations.push(
-        createDecoration(pipeline.FPAdder2, 'stageFPAdder'),
-      );
+    if (pipeline.FPAdder2?.Line) {
+      newDecorations.push(createDecoration(pipeline.FPAdder2, 'stageFPAdder'));
       newStageMap.set(pipeline.FPAdder2.Line, 'FPU Adder (2)');
     }
-    if (pipeline.FPAdder3 && pipeline.FPAdder3.Line) {
-      newDecorations.push(
-        createDecoration(pipeline.FPAdder3, 'stageFPAdder'),
-      );
+    if (pipeline.FPAdder3?.Line) {
+      newDecorations.push(createDecoration(pipeline.FPAdder3, 'stageFPAdder'));
       newStageMap.set(pipeline.FPAdder3.Line, 'FPU Adder (3)');
     }
-    if (pipeline.FPAdder4 && pipeline.FPAdder4.Line) {
-      newDecorations.push(
-        createDecoration(pipeline.FPAdder4, 'stageFPAdder'),
-      );
+    if (pipeline.FPAdder4?.Line) {
+      newDecorations.push(createDecoration(pipeline.FPAdder4, 'stageFPAdder'));
       newStageMap.set(pipeline.FPAdder4.Line, 'FPU Adder (4)');
     }
-    if (pipeline.FPMultiplier1 && pipeline.FPMultiplier1.Line) {
+    if (pipeline.FPMultiplier1?.Line) {
       newDecorations.push(
         createDecoration(pipeline.FPMultiplier1, 'stageFPMultiplier'),
       );
       newStageMap.set(pipeline.FPMultiplier1.Line, 'FPU Muliplier (1)');
     }
-    if (pipeline.FPMultiplier2 && pipeline.FPMultiplier2.Line) {
+    if (pipeline.FPMultiplier2?.Line) {
       newDecorations.push(
         createDecoration(pipeline.FPMultiplier2, 'stageFPMultiplier'),
       );
       newStageMap.set(pipeline.FPMultiplier2.Line, 'FPU Muliplier (2)');
     }
-    if (pipeline.FPMultiplier3 && pipeline.FPMultiplier3.Line) {
+    if (pipeline.FPMultiplier3?.Line) {
       newDecorations.push(
         createDecoration(pipeline.FPMultiplier3, 'stageFPMultiplier'),
       );
       newStageMap.set(pipeline.FPMultiplier3.Line, 'FPU Muliplier (3)');
     }
-    if (pipeline.FPMultiplier4 && pipeline.FPMultiplier4.Line) {
+    if (pipeline.FPMultiplier4?.Line) {
       newDecorations.push(
         createDecoration(pipeline.FPMultiplier4, 'stageFPMultiplier'),
       );
       newStageMap.set(pipeline.FPMultiplier4.Line, 'FPU Muliplier (4)');
     }
-    if (pipeline.FPMultiplier5 && pipeline.FPMultiplier5.Line) {
+    if (pipeline.FPMultiplier5?.Line) {
       newDecorations.push(
         createDecoration(pipeline.FPMultiplier5, 'stageFPMultiplier'),
       );
       newStageMap.set(pipeline.FPMultiplier5.Line, 'FPU Muliplier (5)');
     }
-    if (pipeline.FPMultiplier6 && pipeline.FPMultiplier6.Line) {
+    if (pipeline.FPMultiplier6?.Line) {
       newDecorations.push(
         createDecoration(pipeline.FPMultiplier6, 'stageFPMultiplier'),
       );
       newStageMap.set(pipeline.FPMultiplier6.Line, 'FPU Muliplier (6)');
     }
-    if (pipeline.FPMultiplier7 && pipeline.FPMultiplier7.Line) {
+    if (pipeline.FPMultiplier7?.Line) {
       newDecorations.push(
         createDecoration(pipeline.FPMultiplier7, 'stageFPMultiplier'),
       );
@@ -303,8 +303,12 @@ const Code = ({
     const map = new Map<number, PipelineInstruction>();
     if (parsedInstructions) {
       parsedInstructions
-        .filter((instruction): instruction is PipelineInstruction => Boolean(instruction))
-        .forEach((instruction) => map.set(instruction.Line, instruction));
+        .filter((instruction): instruction is PipelineInstruction =>
+          Boolean(instruction),
+        )
+        .forEach((instruction) => {
+          map.set(instruction.Line, instruction);
+        });
     }
 
     if (hoverDisposableRef.current) {
@@ -325,6 +329,7 @@ const Code = ({
           return;
         }
 
+        // biome-ignore lint/style/noNonNullAssertion: guarded by the `map.has(line)` check above.
         const instruction = map.get(line)!;
         const contents = [
           { value: `*Address*: \`${instruction.Address}\`` },
@@ -364,10 +369,7 @@ const Code = ({
   // keepCurrentModel=false the second mount starts with a fresh model,
   // so monaco.editor.getModels() never accumulates stale orphans.
 
-  const onMount: OnMount = (
-    editorInstance,
-    monacoInstance,
-  ) => {
+  const onMount: OnMount = (editorInstance, monacoInstance) => {
     // Expose monaco and editor to window for testing purposes.
     // These properties are declared on Window in vendor.d.ts.
     window.monaco = monacoInstance;
@@ -391,7 +393,9 @@ const Code = ({
     editorInstance.addAction({
       id: 'editor.action.insertLineAfter',
       label: 'Insert Line After',
-      keybindings: [monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.Enter],
+      keybindings: [
+        monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.Enter,
+      ],
       run: (ed) => {
         ed.trigger('keyboard', 'type', { text: '\n' });
       },

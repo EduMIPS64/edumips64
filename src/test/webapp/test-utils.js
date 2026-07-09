@@ -11,7 +11,7 @@ const targetUri = process.env.PLAYWRIGHT_TARGET_URL || 'http://localhost:8080';
 async function removeOverlay(page) {
   await page.evaluate(() => {
     const overlay = document.getElementById(
-      'webpack-dev-server-client-overlay'
+      'webpack-dev-server-client-overlay',
     );
     if (overlay) {
       overlay.remove();
@@ -60,7 +60,9 @@ async function waitForRunningState(page) {
  * @param {string} title - Visible card title, e.g. "Memory" or "Standard Output"
  */
 async function expandDashboardCard(page, title) {
-  const toggle = page.getByRole('button', { name: new RegExp(`^Expand ${title}$`) });
+  const toggle = page.getByRole('button', {
+    name: new RegExp(`^Expand ${title}$`),
+  });
   if (await toggle.count()) {
     await toggle.click();
   }
@@ -128,7 +130,9 @@ async function waitForSimulationComplete(page) {
   // Wait for the simulation to have run at least one cycle
   // This ensures we don't check for completion before the simulation has actually started
   // We use a regex to ensure it's a positive number (not 0, not empty)
-  await expect(page.locator('#stat-cycles')).toHaveText(/^[1-9][0-9]*$/, { timeout: 30000 });
+  await expect(page.locator('#stat-cycles')).toHaveText(/^[1-9][0-9]*$/, {
+    timeout: 30000,
+  });
 
   // Wait for the Program menu button to become enabled — it is disabled whenever
   // a program is loaded into the simulator (READY/EXECUTING/WAITING_FOR_INPUT)
@@ -180,7 +184,9 @@ async function loadProgram(page, program) {
   await removeOverlay(page);
 
   // Wait for Load button to be enabled (syntax valid) - this implicitly waits for syntax check
-  await page.waitForSelector('#load-button:not([disabled])', { timeout: 10000 });
+  await page.waitForSelector('#load-button:not([disabled])', {
+    timeout: 10000,
+  });
 
   // Click Load button using the id selector for precision
   await page.click('#load-button');
@@ -235,5 +241,5 @@ module.exports = {
   openSettingsDialog,
   closeSettingsDialog,
   loadProgram,
-  runToCompletion
+  runToCompletion,
 };

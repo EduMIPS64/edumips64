@@ -27,11 +27,13 @@ test.beforeEach(async ({ page }) => {
     const keysToRemove = [];
     for (let i = 0; i < window.localStorage.length; i++) {
       const k = window.localStorage.key(i);
-      if (k && k.startsWith(prefix)) {
+      if (k?.startsWith(prefix)) {
         keysToRemove.push(k);
       }
     }
-    keysToRemove.forEach((k) => window.localStorage.removeItem(k));
+    keysToRemove.forEach((k) => {
+      window.localStorage.removeItem(k);
+    });
   }, STORAGE_PREFIX);
 });
 
@@ -40,14 +42,21 @@ test.beforeEach(async ({ page }) => {
  * when expanded, "Expand X" when collapsed), so match on the title alone.
  */
 function panelToggle(page, title) {
-  return page.getByRole('button', { name: new RegExp(`^(Collapse|Expand) ${title}$`) });
+  return page.getByRole('button', {
+    name: new RegExp(`^(Collapse|Expand) ${title}$`),
+  });
 }
 
 async function expectExpanded(page, title, expanded) {
   const btn = panelToggle(page, title);
   await btn.waitFor({ state: 'visible' });
-  await expect(btn).toHaveAttribute('aria-expanded', expanded ? 'true' : 'false');
-  await expect(btn).toHaveAccessibleName(expanded ? `Collapse ${title}` : `Expand ${title}`);
+  await expect(btn).toHaveAttribute(
+    'aria-expanded',
+    expanded ? 'true' : 'false',
+  );
+  await expect(btn).toHaveAccessibleName(
+    expanded ? `Collapse ${title}` : `Expand ${title}`,
+  );
 }
 
 /**

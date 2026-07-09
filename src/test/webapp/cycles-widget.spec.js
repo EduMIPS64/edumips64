@@ -74,9 +74,10 @@ test('stepping fills the temporal diagram row by row', async ({ page }) => {
   // stage progression.
   const expectedStages = ['IF', 'ID', 'EX', 'MEM', 'WB'];
   for (let cycle = 1; cycle <= 5; cycle++) {
-    await expect(
-      firstRow.locator(`[data-cycle="${cycle}"]`),
-    ).toHaveAttribute('data-state', expectedStages[cycle - 1]);
+    await expect(firstRow.locator(`[data-cycle="${cycle}"]`)).toHaveAttribute(
+      'data-state',
+      expectedStages[cycle - 1],
+    );
   }
 
   // Cell colors come from the shared pipeline palette.
@@ -97,9 +98,7 @@ test('a RAW hazard is tagged and painted with the stall color', async ({
     await page.click('#step-button');
   }
 
-  const dadd = page.locator(
-    '[data-testid="cycles-row"][data-name*="DADD R3"]',
-  );
+  const dadd = page.locator('[data-testid="cycles-row"][data-name*="DADD R3"]');
   const rawCells = dadd.locator('[data-state="RAW"]');
   await expect(rawCells.first()).toBeVisible();
   await expect(rawCells.first()).toHaveCSS('background-color', STALL_COLOR);

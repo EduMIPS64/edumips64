@@ -15,8 +15,6 @@
  *     are only present in the DOM when the menu is open.
  */
 
-'use strict';
-
 const { test, expect } = require('./fixtures');
 const {
   targetUri,
@@ -70,7 +68,9 @@ test('program-menu: all four items visible when menu opened in EMPTY state', asy
   await expect(page.locator('#clear-code-button')).toContainText('New');
   await expect(page.locator('#load-code-button')).toContainText('Open');
   await expect(page.locator('#save-code-button')).toContainText('Save');
-  await expect(page.locator('#restore-sample-button')).toContainText('Load Example');
+  await expect(page.locator('#restore-sample-button')).toContainText(
+    'Load Example',
+  );
 
   // Dismiss with Escape — items should leave the DOM again.
   await page.keyboard.press('Escape');
@@ -97,14 +97,18 @@ test('program-menu: button disabled during READY and EXECUTING, re-enabled after
   await page.click('#run-button');
 
   // Wait until EXECUTING: pause becomes enabled (definitive signal).
-  await page.waitForSelector('#pause-button:not([disabled])', { timeout: 10000 });
+  await page.waitForSelector('#pause-button:not([disabled])', {
+    timeout: 10000,
+  });
 
   // Program menu button must be disabled while CPU is running.
   await expect(page.locator('#program-menu-button')).toBeDisabled();
 
   // Pause execution to transition back to READY cleanly.
   await page.click('#pause-button');
-  await page.waitForSelector('#step-button:not([disabled])', { timeout: 10000 });
+  await page.waitForSelector('#step-button:not([disabled])', {
+    timeout: 10000,
+  });
 
   // Back in READY — still disabled (program is still loaded).
   await expect(page.locator('#program-menu-button')).toBeDisabled();
@@ -113,7 +117,9 @@ test('program-menu: button disabled during READY and EXECUTING, re-enabled after
   await page.click('#stop-button');
 
   // In EMPTY state the button must be ENABLED again.
-  await page.waitForSelector('#program-menu-button:not([disabled])', { timeout: 10000 });
+  await page.waitForSelector('#program-menu-button:not([disabled])', {
+    timeout: 10000,
+  });
   await expect(page.locator('#program-menu-button')).toBeEnabled();
 
   await page.close();

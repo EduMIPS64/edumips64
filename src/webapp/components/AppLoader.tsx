@@ -105,10 +105,9 @@ class AppLoader extends React.Component<AppLoaderProps, AppLoaderState> {
 
   private _onError(evt: ErrorEvent): void {
     this._cleanup();
-    const msg =
-      evt && evt.message
-        ? evt.message
-        : 'The worker encountered an error during startup.';
+    const msg = evt?.message
+      ? evt.message
+      : 'The worker encountered an error during startup.';
     this._fail(msg);
   }
 
@@ -260,6 +259,7 @@ class AppLoader extends React.Component<AppLoaderProps, AppLoaderState> {
         <Simulator
           worker={worker}
           initialState={initialState}
+          // biome-ignore lint/style/noNonNullAssertion: appInsights is always initialized by the time this component mounts and renders here.
           appInsights={appInsights!}
         />
       </>

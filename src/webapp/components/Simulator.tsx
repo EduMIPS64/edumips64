@@ -133,7 +133,9 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // Message shown in the RuntimeErrorDialog; null = dialog closed. Set by the
   // execution controller when a runtime error result arrives (the controller
   // stops the CPU immediately; the dialog is purely informational).
-  const [runtimeErrorMessage, setRuntimeErrorMessage] = React.useState<string | null>(null);
+  const [runtimeErrorMessage, setRuntimeErrorMessage] = React.useState<
+    string | null
+  >(null);
 
   // ---------------------------------------------------------------------------
   // Execution controller (reducer, batch scheduling, worker subscription)
@@ -167,11 +169,13 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // Keep the simulator worker's forwarding flag in sync with the persisted
   // setting. Runs once on mount (so a value restored from localStorage is
   // pushed to the worker) and whenever the user toggles the switch.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: worker is a stable module singleton; re-run only when the setting changes
   React.useEffect(() => {
     worker.setForwarding(forwarding);
   }, [forwarding]);
 
   // Same pattern for the branch delay slot setting.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: worker is a stable module singleton; re-run only when the setting changes
   React.useEffect(() => {
     worker.setDelaySlot(delaySlot);
   }, [delaySlot]);
@@ -179,7 +183,8 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // ---------------------------------------------------------------------------
   // Editor ref (for Issues panel click-to-navigate)
   // ---------------------------------------------------------------------------
-  const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
+  const editorRef =
+    React.useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
   const handleEditorReady = React.useCallback(
     (editor: monacoEditor.editor.IStandaloneCodeEditor) => {
       editorRef.current = editor;
@@ -356,9 +361,9 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // Run a syntax check on the initial code once on mount so that warnings
   // (e.g. deprecated instructions in the sample program) are surfaced
   // immediately, without requiring the user to edit the code first.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally runs once on mount with the initial code
   React.useEffect(() => {
     worker.checkSyntax(code);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onCodeChange = (newCode: string) => {
@@ -400,163 +405,161 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // Render
   // ---------------------------------------------------------------------------
   return (
-    <>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <InputDialog
-          request={inputRequest}
-          onSubmit={submitInput}
-          onCancel={cancelInput}
-        />
-        <RuntimeErrorDialog
-          open={runtimeErrorMessage !== null}
-          message={runtimeErrorMessage || ''}
-          onClose={() => setRuntimeErrorMessage(null)}
-        />
-        <Header
-          onLoadClick={loadCode}
-          loadEnabled={isValidProgram()}
-          onClearClick={clearCode}
-          onOpenClick={openCode}
-          onSaveClick={saveCode}
-          onRestoreClick={restoreDefaultSample}
-          parsingErrors={parsingErrors}
-          version={worker.version}
-          status={status}
-          executing={executing}
-          inputRequest={inputRequest}
-          prefersDarkMode={prefersDarkMode}
-          onCacheConfigChange={setCacheConfig}
-          viMode={viMode}
-          setViMode={setViMode}
-          fontSize={fontSize}
-          setFontSize={setFontSize}
-          accordionAlerts={accordionAlerts}
-          setAccordionAlerts={setAccordionAlerts}
-          pipelineColors={pipelineColors}
-          setPipelineColors={setPipelineColors}
-          themeMode={themeMode}
-          setThemeMode={setThemeMode}
-          forwarding={forwarding}
-          setForwarding={setForwarding}
-          delaySlot={delaySlot}
-          setDelaySlot={setDelaySlot}
-          stepStride={stepStride}
-          setStepStride={setStepStride}
-          executionDelayMs={executionDelayMs}
-          setExecutionDelayMs={setExecutionDelayMs}
-        />
-        <RunControlsToolbar
-          onStepClick={clickStep}
-          onRunClick={clickRun}
-          onPauseClick={() => {
-            appInsights.trackEvent({ name: 'pause' });
-            dispatch({ type: 'PAUSE_REQUESTED' });
-          }}
-          onStopClick={clickStop}
-          status={status}
-          executing={executing}
-          inputRequest={inputRequest}
-          multiStepCount={stepStride}
-        />
-        <WorkspaceLayout
-          layout={workspaceLayout}
-          onLayoutChange={setWorkspaceLayout}
-          bottomTitle="Cycles"
-          left={
-            <Code
-              onChangeValue={onCodeChange}
-              code={code}
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <InputDialog
+        request={inputRequest}
+        onSubmit={submitInput}
+        onCancel={cancelInput}
+      />
+      <RuntimeErrorDialog
+        open={runtimeErrorMessage !== null}
+        message={runtimeErrorMessage || ''}
+        onClose={() => setRuntimeErrorMessage(null)}
+      />
+      <Header
+        onLoadClick={loadCode}
+        loadEnabled={isValidProgram()}
+        onClearClick={clearCode}
+        onOpenClick={openCode}
+        onSaveClick={saveCode}
+        onRestoreClick={restoreDefaultSample}
+        parsingErrors={parsingErrors}
+        version={worker.version}
+        status={status}
+        executing={executing}
+        inputRequest={inputRequest}
+        prefersDarkMode={prefersDarkMode}
+        onCacheConfigChange={setCacheConfig}
+        viMode={viMode}
+        setViMode={setViMode}
+        fontSize={fontSize}
+        setFontSize={setFontSize}
+        accordionAlerts={accordionAlerts}
+        setAccordionAlerts={setAccordionAlerts}
+        pipelineColors={pipelineColors}
+        setPipelineColors={setPipelineColors}
+        themeMode={themeMode}
+        setThemeMode={setThemeMode}
+        forwarding={forwarding}
+        setForwarding={setForwarding}
+        delaySlot={delaySlot}
+        setDelaySlot={setDelaySlot}
+        stepStride={stepStride}
+        setStepStride={setStepStride}
+        executionDelayMs={executionDelayMs}
+        setExecutionDelayMs={setExecutionDelayMs}
+      />
+      <RunControlsToolbar
+        onStepClick={clickStep}
+        onRunClick={clickRun}
+        onPauseClick={() => {
+          appInsights.trackEvent({ name: 'pause' });
+          dispatch({ type: 'PAUSE_REQUESTED' });
+        }}
+        onStopClick={clickStop}
+        status={status}
+        executing={executing}
+        inputRequest={inputRequest}
+        multiStepCount={stepStride}
+      />
+      <WorkspaceLayout
+        layout={workspaceLayout}
+        onLayoutChange={setWorkspaceLayout}
+        bottomTitle="Cycles"
+        left={
+          <Code
+            onChangeValue={onCodeChange}
+            code={code}
+            parsingErrors={parsingErrors}
+            parsedInstructions={parsedInstructions}
+            pipeline={pipeline}
+            running={simulatorRunning}
+            viMode={viMode}
+            fontSize={fontSize}
+            validInstructions={initialState.validInstructions}
+            paletteMode={paletteMode}
+            pipelineColors={pipelineColors}
+            onEditorReady={handleEditorReady}
+          />
+        }
+        bottom={<Cycles cycles={cycles} colors={pipelineColors} />}
+        right={
+          <Box
+            id="dashboard"
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
+              gap: 1.5,
+              p: 1.5,
+              // Grow with the content; the parent panel (WorkspaceLayout's
+              // right column) provides the scrollbar. A definite height
+              // here would let the grid compress the card rows instead of
+              // overflowing.
+              minHeight: '100%',
+              alignContent: 'start',
+            }}
+          >
+            <IssuesCard
               parsingErrors={parsingErrors}
-              parsedInstructions={parsedInstructions}
-              pipeline={pipeline}
-              running={simulatorRunning}
-              viMode={viMode}
-              fontSize={fontSize}
-              validInstructions={initialState.validInstructions}
-              paletteMode={paletteMode}
-              pipelineColors={pipelineColors}
-              onEditorReady={handleEditorReady}
+              onIssueClick={handleIssueClick}
             />
-          }
-          bottom={<Cycles cycles={cycles} colors={pipelineColors} />}
-          right={
-            <Box
-              id="dashboard"
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
-                gap: 1.5,
-                p: 1.5,
-                // Grow with the content; the parent panel (WorkspaceLayout's
-                // right column) provides the scrollbar. A definite height
-                // here would let the grid compress the card rows instead of
-                // overflowing.
-                minHeight: '100%',
-                alignContent: 'start',
-              }}
+            <DashboardCard
+              id="stats-card"
+              title="Stats"
+              icon={<InsightsOutlinedIcon fontSize="small" />}
+              fullWidth
+              expanded={expandedAccordions.stats}
+              onToggle={() => toggleAccordion('stats')}
             >
-              <IssuesCard
-                parsingErrors={parsingErrors}
-                onIssueClick={handleIssueClick}
-              />
-              <DashboardCard
-                id="stats-card"
-                title="Stats"
-                icon={<InsightsOutlinedIcon fontSize="small" />}
-                fullWidth
-                expanded={expandedAccordions.stats}
-                onToggle={() => toggleAccordion('stats')}
-              >
-                <Statistics {...stats} />
-              </DashboardCard>
-              <DashboardCard
-                id="pipeline-card"
-                title="Pipeline"
-                icon={<AccountTreeOutlinedIcon fontSize="small" />}
-                fullWidth
-                expanded={expandedAccordions.pipeline}
-                onToggle={() => toggleAccordion('pipeline')}
-              >
-                <Pipeline pipeline={pipeline} colors={pipelineColors} />
-              </DashboardCard>
-              <DashboardCard
-                id="registers-card"
-                title="Registers"
-                icon={<DnsOutlinedIcon fontSize="small" />}
-                maxContentHeight="48vh"
-                fullWidth
-                expanded={expandedAccordions.registers}
-                onToggle={() => toggleAccordion('registers')}
-              >
-                <Registers {...registers} />
-              </DashboardCard>
-              <DashboardCard
-                id="memory-card"
-                title="Memory"
-                icon={<StorageOutlinedIcon fontSize="small" />}
-                maxContentHeight="40vh"
-                fullWidth
-                expanded={expandedAccordions.memory}
-                onToggle={() => toggleAccordion('memory')}
-              >
-                <Memory memory={memory} />
-              </DashboardCard>
-              <DashboardCard
-                id="stdout-card"
-                title="Standard Output"
-                icon={<TerminalOutlinedIcon fontSize="small" />}
-                fullWidth
-                expanded={expandedAccordions.stdout}
-                onToggle={() => toggleAccordion('stdout')}
-              >
-                <StdOut stdout={stdout} />
-              </DashboardCard>
-            </Box>
-          }
-        />
-      </ThemeProvider>
-    </>
+              <Statistics {...stats} />
+            </DashboardCard>
+            <DashboardCard
+              id="pipeline-card"
+              title="Pipeline"
+              icon={<AccountTreeOutlinedIcon fontSize="small" />}
+              fullWidth
+              expanded={expandedAccordions.pipeline}
+              onToggle={() => toggleAccordion('pipeline')}
+            >
+              <Pipeline pipeline={pipeline} colors={pipelineColors} />
+            </DashboardCard>
+            <DashboardCard
+              id="registers-card"
+              title="Registers"
+              icon={<DnsOutlinedIcon fontSize="small" />}
+              maxContentHeight="48vh"
+              fullWidth
+              expanded={expandedAccordions.registers}
+              onToggle={() => toggleAccordion('registers')}
+            >
+              <Registers {...registers} />
+            </DashboardCard>
+            <DashboardCard
+              id="memory-card"
+              title="Memory"
+              icon={<StorageOutlinedIcon fontSize="small" />}
+              maxContentHeight="40vh"
+              fullWidth
+              expanded={expandedAccordions.memory}
+              onToggle={() => toggleAccordion('memory')}
+            >
+              <Memory memory={memory} />
+            </DashboardCard>
+            <DashboardCard
+              id="stdout-card"
+              title="Standard Output"
+              icon={<TerminalOutlinedIcon fontSize="small" />}
+              fullWidth
+              expanded={expandedAccordions.stdout}
+              onToggle={() => toggleAccordion('stdout')}
+            >
+              <StdOut stdout={stdout} />
+            </DashboardCard>
+          </Box>
+        }
+      />
+    </ThemeProvider>
   );
 };
 
