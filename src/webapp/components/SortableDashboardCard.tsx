@@ -65,11 +65,19 @@ export default function SortableDashboardCard({
       ref={setNodeRef}
       style={{
         gridColumn: fullWidth ? '1 / -1' : 'auto',
-        transform: CSS.Transform.toString(transform),
-        transition: transition ?? undefined,
-        opacity: isDragging ? 0.6 : 1,
-        boxShadow: isDragging ? '0 8px 24px rgba(0, 0, 0, 0.35)' : undefined,
-        zIndex: isDragging ? 2 : undefined,
+        // While this card is the one being dragged, `Simulator`'s
+        // `DragOverlay` renders a floating clone that follows the pointer at
+        // a fixed size (see its own comment for why), so this in-grid
+        // original must NOT also chase the pointer via dnd-kit's transform —
+        // doing both at once is exactly what made the dragged card visually
+        // warp into whatever slot it passed over. It stays put as a plain
+        // dimmed placeholder (no shadow — that lives on the overlay clone
+        // now, see `Simulator`) marking the reserved spot, while its
+        // siblings still animate into their new positions via their own
+        // (non-dragging) transform below.
+        transform: isDragging ? undefined : CSS.Transform.toString(transform),
+        transition: isDragging ? undefined : (transition ?? undefined),
+        opacity: isDragging ? 0.35 : 1,
         position: 'relative',
       }}
     >

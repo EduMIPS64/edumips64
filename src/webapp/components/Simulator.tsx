@@ -19,9 +19,13 @@ import RuntimeErrorDialog from './RuntimeErrorDialog';
 import {
   DndContext,
   type DragEndEvent,
+  type DragStartEvent,
+  DragOverlay,
+  type DropAnimation,
   KeyboardSensor,
   PointerSensor,
   closestCenter,
+  defaultDropAnimationSideEffects,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
@@ -31,9 +35,11 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import DashboardCard from './DashboardCard';
 
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined';
 import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import TerminalOutlinedIcon from '@mui/icons-material/TerminalOutlined';
@@ -253,8 +259,36 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     }),
   );
 
+  // The currently-dragged widget id (both for pointer and keyboard-driven
+  // drags), and the on-screen width of its card at the moment the drag
+  // started. `DragOverlay` renders its child outside the dashboard's grid
+  // (in a portal-like fixed-position layer), so nothing constrains its size
+  // to the current hover slot the way an in-place sortable item would be —
+  // that's what let the dragged card visually assume the aspect ratio of
+  // whatever slot it was hovering. Pinning the overlay to the width the card
+  // had *before* the drag started (grid layout only varies card width, since
+  // every card is `fullWidth`) keeps its whole footprint stable for the
+  // entire drag, and the in-grid original renders as a plain dimmed
+  // placeholder (see `SortableDashboardCard`) instead of following the
+  // pointer itself.
+  const [activeWidgetId, setActiveWidgetId] =
+    React.useState<DashboardWidgetId | null>(null);
+  const [activeWidgetWidth, setActiveWidgetWidth] = React.useState<
+    number | undefined
+  >(undefined);
+
+  const handleDashboardDragStart = React.useCallback(
+    (event: DragStartEvent) => {
+      setActiveWidgetId(event.active.id as DashboardWidgetId);
+      setActiveWidgetWidth(event.active.rect.current.initial?.width);
+    },
+    [],
+  );
+
   const handleDashboardDragEnd = React.useCallback(
     (event: DragEndEvent) => {
+      setActiveWidgetId(null);
+      setActiveWidgetWidth(undefined);
       const { active, over } = event;
       if (!over || active.id === over.id) {
         return;
@@ -269,6 +303,23 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
       });
     },
     [setWidgetOrder],
+  );
+
+  const handleDashboardDragCancel = React.useCallback(() => {
+    setActiveWidgetId(null);
+    setActiveWidgetWidth(undefined);
+  }, []);
+
+  // A subtle, close-to-default drop animation: the overlay eases from
+  // wherever it was released back into the dropped slot, with a gentle fade
+  // (no bouncy scale/shadow pop) so it reads as a "settle", not an effect.
+  const dashboardDropAnimation: DropAnimation = React.useMemo(
+    () => ({
+      sideEffects: defaultDropAnimationSideEffects({
+        styles: { active: { opacity: '0.4' } },
+      }),
+    }),
+    [],
   );
 
   // ---------------------------------------------------------------------------
@@ -624,7 +675,9 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
             <DndContext
               sensors={dashboardSensors}
               collisionDetection={closestCenter}
+              onDragStart={handleDashboardDragStart}
               onDragEnd={handleDashboardDragEnd}
+              onDragCancel={handleDashboardDragCancel}
             >
               <SortableContext
                 items={widgetOrder}
@@ -656,6 +709,46 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                   );
                 })}
               </SortableContext>
+              <DragOverlay dropAnimation={dashboardDropAnimation}>
+                {activeWidgetId && dashboardWidgets[activeWidgetId] ? (
+                  <Box
+                    sx={{
+                      width: activeWidgetWidth,
+                      // A visibly "picked up" look — a slightly stronger
+                      // shadow than the card's resting elevation — without a
+                      // hard outline/border, so the clone reads as the same
+                      // card lifted off the page rather than a boxed-in copy.
+                      boxShadow: 6,
+                      borderRadius: 1.25,
+                      cursor: 'grabbing',
+                    }}
+                  >
+                    <DashboardCard
+                      title={dashboardWidgets[activeWidgetId].title}
+                      icon={dashboardWidgets[activeWidgetId].icon}
+                      maxContentHeight={
+                        dashboardWidgets[activeWidgetId].maxContentHeight
+                      }
+                      expanded={dashboardWidgets[activeWidgetId].expanded}
+                      onToggle={() => {}}
+                      dragHandle={
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            pl: 0.5,
+                            color: 'text.secondary',
+                          }}
+                        >
+                          <DragIndicatorIcon fontSize="small" />
+                        </Box>
+                      }
+                    >
+                      {dashboardWidgets[activeWidgetId].content}
+                    </DashboardCard>
+                  </Box>
+                ) : null}
+              </DragOverlay>
             </DndContext>
           </Box>
         }
