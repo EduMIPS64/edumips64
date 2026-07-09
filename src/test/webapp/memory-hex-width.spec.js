@@ -4,14 +4,16 @@ const {
   waitForPageReady,
   waitForRunningState,
   loadProgram,
-  runToCompletion
+  runToCompletion,
+  expandDashboardCard
 } = require('./test-utils');
 
 /**
- * Helper function to expand Memory accordion and wait for table
+ * Helper function to expand the Memory card (collapsed by default) and wait
+ * for its table to be populated.
  */
 async function expandMemoryAndWaitForTable(page) {
-  await page.click('#memory-accordion-summary');
+  await expandDashboardCard(page, 'Memory');
   await page.waitForSelector('#memory tbody tr', { timeout: 5000 });
 }
 

@@ -6,6 +6,7 @@ const {
   loadProgram,
   openProgramMenu,
   runToCompletion,
+  expandDashboardCard,
 } = require('./test-utils');
 
 /**
@@ -225,10 +226,9 @@ test('simulator state (registers and memory) is inspectable from a mobile viewpo
   expect(await readRegister(page, 'R1')).toBe(5);
   expect(await readRegister(page, 'R2')).toBe(15);
 
-  // Inspect the memory via the mobile UI. The Memory accordion is collapsed by
-  // default, so tap its summary to reveal the table — proving it can be opened
-  // and read on a phone-sized, touch-enabled viewport.
-  await page.tap('#memory-accordion-summary');
+  // Memory defaults to collapsed; expand it via the touch-reachable header
+  // toggle, then wait for its table.
+  await expandDashboardCard(page, 'Memory');
   await page.waitForSelector('#memory tbody tr', { timeout: 5000 });
   const memoryTable = page.locator('#memory');
   await expect(memoryTable).toBeVisible();
