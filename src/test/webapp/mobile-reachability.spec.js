@@ -6,6 +6,7 @@ const {
   loadProgram,
   openProgramMenu,
   runToCompletion,
+  expandDashboardCard,
 } = require('./test-utils');
 
 /**
@@ -225,7 +226,9 @@ test('simulator state (registers and memory) is inspectable from a mobile viewpo
   expect(await readRegister(page, 'R1')).toBe(5);
   expect(await readRegister(page, 'R2')).toBe(15);
 
-  // Memory is always visible in the DashboardCard layout; wait for the table.
+  // Memory defaults to collapsed; expand it via the touch-reachable header
+  // toggle, then wait for its table.
+  await expandDashboardCard(page, 'Memory');
   await page.waitForSelector('#memory tbody tr', { timeout: 5000 });
   const memoryTable = page.locator('#memory');
   await expect(memoryTable).toBeVisible();

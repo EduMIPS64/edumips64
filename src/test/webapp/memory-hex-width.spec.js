@@ -4,14 +4,16 @@ const {
   waitForPageReady,
   waitForRunningState,
   loadProgram,
-  runToCompletion
+  runToCompletion,
+  expandDashboardCard
 } = require('./test-utils');
 
 /**
- * Helper function to wait for the Memory table to be populated.
- * Memory is always visible in the DashboardCard layout (no accordion to expand).
+ * Helper function to expand the Memory card (collapsed by default) and wait
+ * for its table to be populated.
  */
 async function expandMemoryAndWaitForTable(page) {
+  await expandDashboardCard(page, 'Memory');
   await page.waitForSelector('#memory tbody tr', { timeout: 5000 });
 }
 

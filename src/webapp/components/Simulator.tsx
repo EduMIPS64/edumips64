@@ -32,7 +32,10 @@ import isEqual from 'lodash/isEqual';
 import { useSetting } from '../settings/useSetting';
 import { SettingKey } from '../settings/SettingKey';
 import SampleProgram from '../data/SampleProgram';
-import type { CacheConfig as CacheConfigType } from '../settings/schema';
+import type {
+  CacheConfig as CacheConfigType,
+  ExpandedAccordions,
+} from '../settings/schema';
 
 import { useSimulatorData } from '../hooks/useSimulatorData';
 import { useExecutionController } from '../hooks/useExecutionController';
@@ -58,6 +61,9 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   const [fontSize, setFontSize] = useSetting(SettingKey.FONT_SIZE);
   const [accordionAlerts, setAccordionAlerts] = useSetting(
     SettingKey.ACCORDION_ALERTS,
+  );
+  const [expandedAccordions, setExpandedAccordions] = useSetting(
+    SettingKey.EXPANDED_ACCORDIONS,
   );
   const [forwarding, setForwarding] = useSetting(SettingKey.FORWARDING);
   const [delaySlot, setDelaySlot] = useSetting(SettingKey.DELAY_SLOT);
@@ -193,6 +199,20 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
     editor.setPosition({ lineNumber: row, column: safeColumn });
     editor.focus();
   }, []);
+
+  // Toggles a single dashboard card's expanded/collapsed state, persisting
+  // the whole `expandedAccordions` map via `useSetting` so a returning user
+  // sees the same layout they left (mirrors the pre-DashboardCard Accordion
+  // behavior — same schema key, same storage shape).
+  const toggleAccordion = React.useCallback(
+    (panel: keyof ExpandedAccordions) => {
+      setExpandedAccordions((prev) => ({
+        ...prev,
+        [panel]: !prev[panel],
+      }));
+    },
+    [setExpandedAccordions],
+  );
 
   // ---------------------------------------------------------------------------
   // Syntax checking (stable debounced instance)
@@ -485,6 +505,8 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                 title="Stats"
                 icon={<InsightsOutlinedIcon fontSize="small" />}
                 fullWidth
+                expanded={expandedAccordions.stats}
+                onToggle={() => toggleAccordion('stats')}
               >
                 <Statistics {...stats} />
               </DashboardCard>
@@ -493,6 +515,8 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                 title="Pipeline"
                 icon={<AccountTreeOutlinedIcon fontSize="small" />}
                 fullWidth
+                expanded={expandedAccordions.pipeline}
+                onToggle={() => toggleAccordion('pipeline')}
               >
                 <Pipeline pipeline={pipeline} colors={pipelineColors} />
               </DashboardCard>
@@ -502,6 +526,8 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                 icon={<DnsOutlinedIcon fontSize="small" />}
                 maxContentHeight="48vh"
                 fullWidth
+                expanded={expandedAccordions.registers}
+                onToggle={() => toggleAccordion('registers')}
               >
                 <Registers {...registers} />
               </DashboardCard>
@@ -511,6 +537,8 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                 icon={<StorageOutlinedIcon fontSize="small" />}
                 maxContentHeight="40vh"
                 fullWidth
+                expanded={expandedAccordions.memory}
+                onToggle={() => toggleAccordion('memory')}
               >
                 <Memory memory={memory} />
               </DashboardCard>
@@ -519,6 +547,8 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                 title="Standard Output"
                 icon={<TerminalOutlinedIcon fontSize="small" />}
                 fullWidth
+                expanded={expandedAccordions.stdout}
+                onToggle={() => toggleAccordion('stdout')}
               >
                 <StdOut stdout={stdout} />
               </DashboardCard>
