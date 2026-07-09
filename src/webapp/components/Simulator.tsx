@@ -10,11 +10,27 @@ import Header from './Header';
 import RunControlsToolbar from './RunControlsToolbar';
 import WorkspaceLayout from './WorkspaceLayout';
 import Box from '@mui/material/Box';
-import DashboardCard from './DashboardCard';
+import SortableDashboardCard from './SortableDashboardCard';
 import IssuesCard from './IssuesCard';
 import StdOut from './StdOut';
 import InputDialog from './InputDialog';
 import RuntimeErrorDialog from './RuntimeErrorDialog';
+
+import {
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
@@ -34,6 +50,7 @@ import { SettingKey } from '../settings/SettingKey';
 import SampleProgram from '../data/SampleProgram';
 import type {
   CacheConfig as CacheConfigType,
+  DashboardWidgetId,
   ExpandedAccordions,
 } from '../settings/schema';
 
@@ -78,6 +95,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   const [workspaceLayout, setWorkspaceLayout] = useSetting(
     SettingKey.WORKSPACE_LAYOUT,
   );
+  const [widgetOrder, setWidgetOrder] = useSetting(SettingKey.WIDGET_ORDER);
 
   // ---------------------------------------------------------------------------
   // Editor code persistence
@@ -217,6 +235,40 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
       }));
     },
     [setExpandedAccordions],
+  );
+
+  // ---------------------------------------------------------------------------
+  // Dashboard card drag-and-drop reordering
+  // ---------------------------------------------------------------------------
+
+  // PointerSensor uses a small activation distance so a stray click on the
+  // drag handle (e.g. while aiming for a nearby control) doesn't start a
+  // drag; KeyboardSensor lets the handle be operated with Space/Enter to
+  // lift, arrow keys to move, and Space/Enter to drop, using dnd-kit's
+  // built-in sortable coordinate getter.
+  const dashboardSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDashboardDragEnd = React.useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) {
+        return;
+      }
+      setWidgetOrder((prev) => {
+        const oldIndex = prev.indexOf(active.id as DashboardWidgetId);
+        const newIndex = prev.indexOf(over.id as DashboardWidgetId);
+        if (oldIndex === -1 || newIndex === -1) {
+          return prev;
+        }
+        return arrayMove(prev, oldIndex, newIndex);
+      });
+    },
+    [setWidgetOrder],
   );
 
   // ---------------------------------------------------------------------------
@@ -402,6 +454,71 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   const theme = React.useMemo(() => buildTheme(paletteMode), [paletteMode]);
 
   // ---------------------------------------------------------------------------
+  // Dashboard card definitions
+  // ---------------------------------------------------------------------------
+
+  // Static per-widget metadata (title, icon, sizing) and content, keyed by
+  // the same stable ids used by the `WIDGET_ORDER` setting. Rebuilt every
+  // render (it's cheap: a handful of object literals), but keyed access
+  // means the drag-and-drop reorder below only ever changes *sequence*, not
+  // identity, so React reconciles moved cards instead of remounting them.
+  const dashboardWidgets: Record<
+    DashboardWidgetId,
+    {
+      title: string;
+      icon: React.ReactNode;
+      maxContentHeight?: string;
+      fullWidth?: boolean;
+      expanded: boolean;
+      onToggle: () => void;
+      content: React.ReactNode;
+    }
+  > = {
+    stats: {
+      title: 'Stats',
+      icon: <InsightsOutlinedIcon fontSize="small" />,
+      fullWidth: true,
+      expanded: expandedAccordions.stats,
+      onToggle: () => toggleAccordion('stats'),
+      content: <Statistics {...stats} />,
+    },
+    pipeline: {
+      title: 'Pipeline',
+      icon: <AccountTreeOutlinedIcon fontSize="small" />,
+      fullWidth: true,
+      expanded: expandedAccordions.pipeline,
+      onToggle: () => toggleAccordion('pipeline'),
+      content: <Pipeline pipeline={pipeline} colors={pipelineColors} />,
+    },
+    registers: {
+      title: 'Registers',
+      icon: <DnsOutlinedIcon fontSize="small" />,
+      maxContentHeight: '48vh',
+      fullWidth: true,
+      expanded: expandedAccordions.registers,
+      onToggle: () => toggleAccordion('registers'),
+      content: <Registers {...registers} />,
+    },
+    memory: {
+      title: 'Memory',
+      icon: <StorageOutlinedIcon fontSize="small" />,
+      maxContentHeight: '40vh',
+      fullWidth: true,
+      expanded: expandedAccordions.memory,
+      onToggle: () => toggleAccordion('memory'),
+      content: <Memory memory={memory} />,
+    },
+    stdout: {
+      title: 'Standard Output',
+      icon: <TerminalOutlinedIcon fontSize="small" />,
+      fullWidth: true,
+      expanded: expandedAccordions.stdout,
+      onToggle: () => toggleAccordion('stdout'),
+      content: <StdOut stdout={stdout} />,
+    },
+  };
+
+  // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
   return (
@@ -504,58 +621,42 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
               parsingErrors={parsingErrors}
               onIssueClick={handleIssueClick}
             />
-            <DashboardCard
-              id="stats-card"
-              title="Stats"
-              icon={<InsightsOutlinedIcon fontSize="small" />}
-              fullWidth
-              expanded={expandedAccordions.stats}
-              onToggle={() => toggleAccordion('stats')}
+            <DndContext
+              sensors={dashboardSensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDashboardDragEnd}
             >
-              <Statistics {...stats} />
-            </DashboardCard>
-            <DashboardCard
-              id="pipeline-card"
-              title="Pipeline"
-              icon={<AccountTreeOutlinedIcon fontSize="small" />}
-              fullWidth
-              expanded={expandedAccordions.pipeline}
-              onToggle={() => toggleAccordion('pipeline')}
-            >
-              <Pipeline pipeline={pipeline} colors={pipelineColors} />
-            </DashboardCard>
-            <DashboardCard
-              id="registers-card"
-              title="Registers"
-              icon={<DnsOutlinedIcon fontSize="small" />}
-              maxContentHeight="48vh"
-              fullWidth
-              expanded={expandedAccordions.registers}
-              onToggle={() => toggleAccordion('registers')}
-            >
-              <Registers {...registers} />
-            </DashboardCard>
-            <DashboardCard
-              id="memory-card"
-              title="Memory"
-              icon={<StorageOutlinedIcon fontSize="small" />}
-              maxContentHeight="40vh"
-              fullWidth
-              expanded={expandedAccordions.memory}
-              onToggle={() => toggleAccordion('memory')}
-            >
-              <Memory memory={memory} />
-            </DashboardCard>
-            <DashboardCard
-              id="stdout-card"
-              title="Standard Output"
-              icon={<TerminalOutlinedIcon fontSize="small" />}
-              fullWidth
-              expanded={expandedAccordions.stdout}
-              onToggle={() => toggleAccordion('stdout')}
-            >
-              <StdOut stdout={stdout} />
-            </DashboardCard>
+              <SortableContext
+                items={widgetOrder}
+                strategy={verticalListSortingStrategy}
+              >
+                {widgetOrder.map((widgetId) => {
+                  const widget = dashboardWidgets[widgetId];
+                  // Guard against a widget id that has no definition (should
+                  // not happen: `sanitize` normalizes the stored order to
+                  // exactly the known ids), so a future mismatch degrades to
+                  // "skip this entry" instead of crashing the dashboard.
+                  if (!widget) {
+                    return null;
+                  }
+                  return (
+                    <SortableDashboardCard
+                      key={widgetId}
+                      id={widgetId}
+                      htmlId={`${widgetId}-card`}
+                      title={widget.title}
+                      icon={widget.icon}
+                      maxContentHeight={widget.maxContentHeight}
+                      fullWidth={widget.fullWidth}
+                      expanded={widget.expanded}
+                      onToggle={widget.onToggle}
+                    >
+                      {widget.content}
+                    </SortableDashboardCard>
+                  );
+                })}
+              </SortableContext>
+            </DndContext>
           </Box>
         }
       />

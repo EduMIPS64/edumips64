@@ -14,6 +14,12 @@ export const SettingType = Object.freeze({
   NUMBER: 'number',
   STRING: 'string',
   OBJECT: 'object',
+  // An array of strings. Unlike `OBJECT`, which is shallow-merged onto the
+  // default, an `ARRAY` value is *normalized* against the default array on
+  // read (see `sanitize`): unknown entries are dropped and any default
+  // entries missing from the stored value are appended, so the array always
+  // ends up a permutation of the default's elements.
+  ARRAY: 'array',
 } as const);
 
 export type SettingTypeValue = (typeof SettingType)[keyof typeof SettingType];
@@ -116,6 +122,34 @@ const isValidWorkspaceLayout = (v: unknown) => {
     typeof l.rightCollapsed === 'boolean' &&
     typeof l.bottomCollapsed === 'boolean'
   );
+};
+
+/**
+ * Stable ids for the reorderable dashboard cards in the Simulator's right
+ * panel, in their default display order. These are the *only* ids the
+ * `WIDGET_ORDER` setting ever contains — the `Issues` card is not part of
+ * the reorderable set (it appears/disappears with parsing errors and is
+ * always pinned above the reorderable cards).
+ */
+export const DEFAULT_WIDGET_ORDER = Object.freeze([
+  'stats',
+  'pipeline',
+  'registers',
+  'memory',
+  'stdout',
+]);
+
+export type DashboardWidgetId = (typeof DEFAULT_WIDGET_ORDER)[number];
+
+// A valid stored widget order is an array of strings with no duplicates.
+// Unknown ids and missing ids are *not* rejected here — they are normalized
+// (dropped / appended) by `sanitize`'s ARRAY branch, so that adding a future
+// widget or renaming/removing one never throws away an otherwise-valid saved
+// layout.
+const isValidWidgetOrder = (v: unknown) => {
+  if (!Array.isArray(v)) return false;
+  if (!v.every((entry) => typeof entry === 'string')) return false;
+  return new Set(v).size === v.length;
 };
 
 const isValidPipelineColors = (v: unknown) => {
@@ -276,6 +310,11 @@ export const SETTINGS_SCHEMA: Readonly<Record<string, SchemaEntry>> =
       },
       validate: isValidWorkspaceLayout,
     },
+    [SettingKey.WIDGET_ORDER]: {
+      type: SettingType.ARRAY,
+      default: [...DEFAULT_WIDGET_ORDER],
+      validate: isValidWidgetOrder,
+    },
   });
 
 /**
@@ -293,6 +332,8 @@ function matchesType(value: unknown, type: SettingTypeValue): boolean {
       return (
         typeof value === 'object' && value !== null && !Array.isArray(value)
       );
+    case SettingType.ARRAY:
+      return Array.isArray(value);
     default:
       return false;
   }
@@ -348,6 +389,22 @@ export function sanitize(key: string, raw: unknown): unknown {
   if (type === SettingType.OBJECT) {
     // Shallow-merge default under stored value so new default keys surface.
     return { ...(defaultValue as object), ...(raw as object) };
+  }
+
+  if (type === SettingType.ARRAY) {
+    // Normalize against the default array: drop entries that are no longer
+    // known (e.g. a widget removed in a later release), then append any
+    // default entries missing from the stored value (e.g. a widget added in
+    // a later release), preserving their relative order from the default.
+    // This keeps a user's saved layout intact across simulator updates
+    // instead of discarding it wholesale.
+    const storedArr = raw as string[];
+    const defaultArr = defaultValue as string[];
+    const known = new Set(defaultArr);
+    const filtered = storedArr.filter((entry) => known.has(entry));
+    const present = new Set(filtered);
+    const missing = defaultArr.filter((entry) => !present.has(entry));
+    return [...filtered, ...missing];
   }
 
   return raw;
@@ -441,4 +498,6 @@ export interface SettingValueMap extends Record<SettingKeyType, unknown> {
   themeMode: ThemeMode;
   // Resizable-workspace geometry
   workspaceLayout: WorkspaceLayout;
+  // Dashboard card drag-and-drop order
+  widgetOrder: DashboardWidgetId[];
 }

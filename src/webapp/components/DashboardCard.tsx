@@ -25,6 +25,14 @@ interface DashboardCardProps {
    * the whole header becomes a toggle button when it is provided.
    */
   onToggle?: () => void;
+  /**
+   * Optional drag-handle element (e.g. a `DragIndicator` icon button)
+   * rendered to the left of the header, *outside* the header's own
+   * `<button>` — a `<button>` cannot contain another interactive element,
+   * and the handle needs its own independent pointer/keyboard listeners for
+   * drag-and-drop reordering, separate from the collapse toggle.
+   */
+  dragHandle?: React.ReactNode;
 }
 
 /**
@@ -54,6 +62,7 @@ export default function DashboardCard({
   children,
   expanded = true,
   onToggle,
+  dragHandle,
 }: DashboardCardProps) {
   const collapsible = onToggle !== undefined;
   const showDivider = !collapsible || expanded;
@@ -70,67 +79,77 @@ export default function DashboardCard({
       }}
     >
       <Box
-        component={collapsible ? 'button' : 'div'}
-        type={collapsible ? 'button' : undefined}
-        onClick={collapsible ? onToggle : undefined}
-        aria-expanded={collapsible ? expanded : undefined}
-        aria-label={
-          collapsible
-            ? `${expanded ? 'Collapse' : 'Expand'} ${title}`
-            : undefined
-        }
         sx={{
           display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          px: 1.5,
-          py: 0.75,
-          color: 'primary.main',
-          border: 0,
+          alignItems: 'stretch',
           borderBottom: showDivider ? 1 : 0,
           borderStyle: 'solid',
           borderColor: 'divider',
-          borderRadius: 0,
-          ...(collapsible
-            ? {
-                width: '100%',
-                m: 0,
-                bgcolor: 'transparent',
-                font: 'inherit',
-                textAlign: 'left',
-                cursor: 'pointer',
-                '&:focus-visible': {
-                  outline: '2px solid currentColor',
-                  outlineOffset: -2,
-                },
-              }
-            : {}),
         }}
       >
-        {icon}
-        <Typography
-          variant="subtitle2"
-          component={collapsible ? 'span' : 'h3'}
+        {dragHandle}
+        <Box
+          component={collapsible ? 'button' : 'div'}
+          type={collapsible ? 'button' : undefined}
+          onClick={collapsible ? onToggle : undefined}
+          aria-expanded={collapsible ? expanded : undefined}
+          aria-label={
+            collapsible
+              ? `${expanded ? 'Collapse' : 'Expand'} ${title}`
+              : undefined
+          }
           sx={{
-            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            px: 1.5,
+            py: 0.75,
             flexGrow: 1,
-            lineHeight: 1.2,
-            textAlign: 'left',
+            minWidth: 0,
+            color: 'primary.main',
+            border: 0,
+            borderRadius: 0,
+            ...(collapsible
+              ? {
+                  width: '100%',
+                  m: 0,
+                  bgcolor: 'transparent',
+                  font: 'inherit',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  '&:focus-visible': {
+                    outline: '2px solid currentColor',
+                    outlineOffset: -2,
+                  },
+                }
+              : {}),
           }}
         >
-          {title}
-        </Typography>
-        {action}
-        {collapsible && (
-          <ExpandMoreIcon
-            fontSize="small"
-            aria-hidden="true"
+          {icon}
+          <Typography
+            variant="subtitle2"
+            component={collapsible ? 'span' : 'h3'}
             sx={{
-              transition: 'transform 200ms ease',
-              transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
+              fontWeight: 700,
+              flexGrow: 1,
+              lineHeight: 1.2,
+              textAlign: 'left',
             }}
-          />
-        )}
+          >
+            {title}
+          </Typography>
+          {action}
+          {collapsible && (
+            <ExpandMoreIcon
+              fontSize="small"
+              aria-hidden="true"
+              sx={{
+                transition: 'transform 200ms ease',
+                transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
+              }}
+            />
+          )}
+        </Box>
       </Box>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <Box
