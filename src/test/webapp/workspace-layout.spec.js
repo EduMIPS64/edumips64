@@ -23,7 +23,9 @@ async function clearSettings(page) {
     const keys = [];
     for (let i = 0; i < window.localStorage.length; i++) {
       const k = window.localStorage.key(i);
-      if (k?.startsWith(prefix)) keys.push(k);
+      if (k?.startsWith(prefix)) {
+        keys.push(k);
+      }
     }
     keys.forEach((k) => {
       window.localStorage.removeItem(k);

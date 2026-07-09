@@ -94,16 +94,18 @@ async function singleStep(page) {
  */
 async function readPipeline(page) {
   return await page.evaluate(() => {
-    const out = {};
+    const entries = [];
     document.querySelectorAll('#pipeline g[data-stage]').forEach((g) => {
-      const stage = g.getAttribute('data-stage');
-      out[stage] = {
-        instruction: g.getAttribute('data-instruction') || '',
-        stall: g.getAttribute('data-stall') || '',
-        fill: (g.getAttribute('data-fill') || '').toLowerCase(),
-      };
+      entries.push([
+        g.getAttribute('data-stage'),
+        {
+          instruction: g.getAttribute('data-instruction') || '',
+          stall: g.getAttribute('data-stall') || '',
+          fill: (g.getAttribute('data-fill') || '').toLowerCase(),
+        },
+      ]);
     });
-    return out;
+    return Object.fromEntries(entries);
   });
 }
 
