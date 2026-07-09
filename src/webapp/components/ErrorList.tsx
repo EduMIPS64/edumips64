@@ -41,7 +41,7 @@ const ErrorList = ({
   AccordionSummary,
   onIssueClick,
 }: ErrorListProps) => {
-  if (parsingErrors === undefined) {
+  if (parsingErrors === undefined || parsingErrors === null) {
     return <React.Fragment />;
   }
   return (
