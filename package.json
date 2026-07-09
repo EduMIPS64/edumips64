@@ -52,6 +52,6 @@
     "vitest": "^4.1.9"
   },
   "overrides": {
-    "uuid": "^14.0.0"
+    "dompurify": "^3.4.11"
   }
 }
