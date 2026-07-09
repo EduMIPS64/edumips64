@@ -108,16 +108,22 @@ interface StatGroupProps {
 }
 
 // A lightweight section grouping: a small caption-style label followed by a
-// wrapping row of tiles, without heavy headers/tables.
+// wrapping row of tiles. On `sm`+ the group's own layout is dissolved
+// (`display: contents`) so its label and tile row become direct items of the
+// parent grid in Statistics.tsx below — that's what lets every group's label
+// share one right-aligned column and every chip row share one left-aligned
+// start x, without hardcoding a column width. On `xs` there's no room for a
+// separate label column, so the group falls back to its own flex row with
+// the label to the left of the wrapping tiles, as before.
 const StatGroup = ({ title, children }: StatGroupProps) => {
   return (
     <Box
       sx={{
-        display: 'flex',
+        display: { xs: 'flex', sm: 'contents' },
         alignItems: 'center',
         flexWrap: 'wrap',
         gap: 0.5,
-        '&:not(:first-of-type)': { mt: 0.5 },
+        '&:not(:first-of-type)': { mt: { xs: 0.5, sm: 0 } },
       }}
     >
       <Typography
@@ -129,12 +135,24 @@ const StatGroup = ({ title, children }: StatGroupProps) => {
           textTransform: 'uppercase',
           color: 'text.secondary',
           flexShrink: 0,
-          mr: 0.25,
+          mr: { xs: 0.25, sm: 0 },
+          textAlign: { sm: 'right' },
+          alignSelf: { sm: 'center' },
+          whiteSpace: 'nowrap',
         }}
       >
         {title}
       </Typography>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>{children}</Box>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 0.5,
+          alignSelf: { sm: 'center' },
+        }}
+      >
+        {children}
+      </Box>
     </Box>
   );
 };
@@ -163,7 +181,15 @@ const StatisticsPanel = ({
 
   // TODO: FCSR.
   return (
-    <div id="statistics">
+    <Box
+      id="statistics"
+      sx={{
+        display: { xs: 'block', sm: 'grid' },
+        gridTemplateColumns: { sm: 'max-content 1fr' },
+        columnGap: 1,
+        rowGap: 0.5,
+      }}
+    >
       <StatGroup title="Execution">
         <StatTile
           icon={<TimerOutlinedIcon fontSize="small" />}
@@ -237,7 +263,7 @@ const StatisticsPanel = ({
           missesId="stat-l1d-write-misses"
         />
       </StatGroup>
-    </div>
+    </Box>
   );
 };
 
