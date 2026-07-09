@@ -5,6 +5,19 @@ const STORAGE_PREFIX = 'edumips64:v1:';
 const EXPANDED_KEY = `${STORAGE_PREFIX}expandedAccordions`;
 
 /**
+ * Tests for the DashboardCard collapse/expand behavior.
+ *
+ * Each dashboard panel (Stats, Pipeline, Registers, Memory, Standard Output)
+ * is a `DashboardCard` whose header is a real `<button>` carrying
+ * `aria-expanded` and an `aria-label` of the form "Collapse <Title>" /
+ * "Expand <Title>" (see `DashboardCard.tsx`). Clicking it (or activating it
+ * via keyboard) collapses the card body with an MUI `<Collapse>` while
+ * leaving the header visible, so we always locate panels by role+name and
+ * assert `aria-expanded`, never by reading the wrapping div's class list —
+ * that way the tests survive styling changes.
+ */
+
+/**
  * Clear all edumips64 localStorage keys before each test so first-run
  * defaults are exercised, not state left over from a previous test.
  */
@@ -25,25 +38,41 @@ test.beforeEach(async ({ page }) => {
 });
 
 /**
- * The MUI AccordionSummary renders as a `<button role="button">` whose
- * accessible name is the panel title. The button carries `aria-expanded`,
- * which is the source of truth for whether the accordion is open. We always
- * locate panels by role+name and assert `aria-expanded`, never by reading
- * the wrapping div's class list, so the tests survive MUI implementation
- * changes.
+ * The header toggle's accessible name changes with its state ("Collapse X"
+ * when expanded, "Expand X" when collapsed), so match on the title alone.
  */
-function panelButton(page, name) {
-  return page.getByRole('button', { name }).first();
+function panelToggle(page, title) {
+  return page.getByRole('button', {
+    name: new RegExp(`^(Collapse|Expand) ${title}$`),
+  });
 }
 
-async function expectExpanded(page, name, expanded) {
-  const btn = panelButton(page, name);
+async function expectExpanded(page, title, expanded) {
+  const btn = panelToggle(page, title);
   await btn.waitFor({ state: 'visible' });
   await expect(btn).toHaveAttribute(
     'aria-expanded',
     expanded ? 'true' : 'false',
   );
+  await expect(btn).toHaveAccessibleName(
+    expanded ? `Collapse ${title}` : `Expand ${title}`,
+  );
 }
+
+/**
+ * Verify that all dashboard panel headers are present and visible on page
+ * load, regardless of whether their body is currently expanded or collapsed.
+ */
+test('all simulator panels are visible on load', async ({ page }) => {
+  await waitForPageReady(page);
+  await removeOverlay(page);
+
+  await expect(page.locator('#stats-card')).toBeVisible();
+  await expect(page.locator('#pipeline-card')).toBeVisible();
+  await expect(page.locator('#registers-card')).toBeVisible();
+  await expect(page.locator('#memory-card')).toBeVisible();
+  await expect(page.locator('#stdout-card')).toBeVisible();
+});
 
 /**
  * Issue #1697 — defaults reflect the simulator's primary purpose:
@@ -58,11 +87,34 @@ test('default panel expansion highlights pipeline and registers', async ({
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await expectExpanded(page, /^Stats/, true);
-  await expectExpanded(page, /^Pipeline/, true);
-  await expectExpanded(page, /^Registers/, true);
-  await expectExpanded(page, /^Memory/, false);
-  await expectExpanded(page, /^Standard Output/, false);
+  await expectExpanded(page, 'Stats', true);
+  await expectExpanded(page, 'Pipeline', true);
+  await expectExpanded(page, 'Registers', true);
+  await expectExpanded(page, 'Memory', false);
+  await expectExpanded(page, 'Standard Output', false);
+});
+
+/**
+ * A collapsed card is just its header: verify the body is actually gone from
+ * the accessibility/layout tree (not merely styled to look collapsed).
+ */
+test('collapsing a panel hides its body', async ({ page }) => {
+  await waitForPageReady(page);
+  await removeOverlay(page);
+
+  await expect(page.locator('#stats-card')).toBeVisible();
+
+  await panelToggle(page, 'Stats').click();
+  await expectExpanded(page, 'Stats', false);
+
+  // Statistics content lives inside the Stats card; once collapsed it must
+  // no longer be rendered.
+  await expect(page.locator('#stat-cycles')).toHaveCount(0);
+
+  // Expanding it again brings the content back.
+  await panelToggle(page, 'Stats').click();
+  await expectExpanded(page, 'Stats', true);
+  await expect(page.locator('#stat-cycles')).toBeVisible();
 });
 
 /**
@@ -79,14 +131,14 @@ test('panel expansion is persisted and restored across reloads', async ({
 
   // Collapse Pipeline (default: open) and expand Memory (default: closed).
   // These two changes should round-trip through localStorage.
-  await panelButton(page, /^Pipeline/).click();
-  await expectExpanded(page, /^Pipeline/, false);
+  await panelToggle(page, 'Pipeline').click();
+  await expectExpanded(page, 'Pipeline', false);
 
-  await panelButton(page, /^Memory/).click();
-  await expectExpanded(page, /^Memory/, true);
+  await panelToggle(page, 'Memory').click();
+  await expectExpanded(page, 'Memory', true);
 
   // Verify localStorage actually got written. The shape comes from
-  // `SETTINGS_SCHEMA[EXPANDED_ACCORDIONS]` in `src/webapp/settings/schema.js`.
+  // `SETTINGS_SCHEMA[EXPANDED_ACCORDIONS]` in `src/webapp/settings/schema.ts`.
   const stored = await page.evaluate(
     (key) => window.localStorage.getItem(key),
     EXPANDED_KEY,
@@ -101,9 +153,29 @@ test('panel expansion is persisted and restored across reloads', async ({
   await waitForPageReady(page);
   await removeOverlay(page);
 
-  await expectExpanded(page, /^Pipeline/, false);
-  await expectExpanded(page, /^Memory/, true);
+  await expectExpanded(page, 'Pipeline', false);
+  await expectExpanded(page, 'Memory', true);
   // Untouched panels keep their defaults.
-  await expectExpanded(page, /^Stats/, true);
-  await expectExpanded(page, /^Registers/, true);
+  await expectExpanded(page, 'Stats', true);
+  await expectExpanded(page, 'Registers', true);
+});
+
+/**
+ * The toggle must be keyboard-operable: focus it and activate with the
+ * keyboard (a native <button> handles Enter/Space activation for free), not
+ * just via pointer click.
+ */
+test('panel toggle is keyboard operable', async ({ page }) => {
+  await waitForPageReady(page);
+  await removeOverlay(page);
+
+  const toggle = panelToggle(page, 'Registers');
+  await toggle.focus();
+  await expect(toggle).toBeFocused();
+
+  await page.keyboard.press('Enter');
+  await expectExpanded(page, 'Registers', false);
+
+  await page.keyboard.press('Space');
+  await expectExpanded(page, 'Registers', true);
 });

@@ -13,8 +13,7 @@ const {
  * Load a test program, run it to completion, then click clear and verify:
  * 1) Statistics are at 0
  * 2) Code is the trivial "syscall 0" program
- * 3) Error accordion is not visible
- * 4) Change markers are not visible
+ * 3) Issues card is not visible
  */
 test('clear button resets simulator state and UI', async ({ page }) => {
   await page.goto(targetUri);
@@ -86,15 +85,9 @@ SYSCALL 0
   // The clearCode function sets code to ".data\n\n.code\n  SYSCALL 0\n"
   expect(editorContent.trim()).toBe('.data\n\n.code\n  SYSCALL 0'.trim());
 
-  // 3) Verify that the error accordion is not visible
-  // The error accordion only renders when parsingErrors is defined
-  const errorAccordion = page.locator('.error-accordion');
-  await expect(errorAccordion).toHaveCount(0);
-
-  // 4) Verify that change markers are not visible
-  // Change markers have class "accordion-change-indicator"
-  const changeMarkers = page.locator('.accordion-change-indicator');
-  await expect(changeMarkers).toHaveCount(0);
+  // 3) Verify that the issues card is not visible (no parsing errors after clear)
+  const issuesCard = page.locator('#issues-card');
+  await expect(issuesCard).toHaveCount(0);
 
   await page.close();
 });
@@ -103,7 +96,7 @@ SYSCALL 0
  * Test: Verify Clear button works after a program with errors
  * Load a program with syntax errors, then clear and verify error accordion disappears
  */
-test('clear button removes error accordion after syntax errors', async ({
+test('clear button removes issues card after syntax errors', async ({
   page,
 }) => {
   await page.goto(targetUri);
@@ -130,9 +123,9 @@ SYSCALL 0
   // Wait a bit for syntax checking to complete
   await page.waitForTimeout(1000);
 
-  // Verify that the error accordion is visible
-  const errorAccordionBefore = page.locator('.error-accordion');
-  await expect(errorAccordionBefore).toBeVisible();
+  // Verify that the issues card is visible
+  const issuesCardBefore = page.locator('#issues-card');
+  await expect(issuesCardBefore).toBeVisible();
 
   // Open the Program menu and click "New" (Clear)
   await clickProgramMenuItem(page, '#clear-code-button');
@@ -140,61 +133,9 @@ SYSCALL 0
   // Wait for state to update
   await page.waitForTimeout(500);
 
-  // Verify that the error accordion is not visible after clear
-  const errorAccordionAfter = page.locator('.error-accordion');
-  await expect(errorAccordionAfter).toHaveCount(0);
-
-  await page.close();
-});
-
-/**
- * Test: Verify change markers appear during execution and are cleared
- * This test verifies the full lifecycle of accordion change markers
- */
-test('clear button removes accordion change markers', async ({ page }) => {
-  await page.goto(targetUri);
-
-  await waitForPageReady(page);
-
-  // Load a simple program
-  const testProgram = `.code
-DADDI r1, r0, 100
-SYSCALL 0
-`;
-
-  await loadProgram(page, testProgram);
-
-  // Collapse an accordion (e.g., stats) to trigger change markers when it updates
-  const statsAccordion = page.locator('text=Stats').locator('..');
-  await statsAccordion.click();
-
-  // Wait for accordion to collapse
-  await page.waitForTimeout(300);
-
-  // Run the program to completion
-  await runToCompletion(page);
-
-  // Wait a bit for change markers to appear
-  await page.waitForTimeout(500);
-
-  // Verify that at least one change marker is visible
-  // (Stats should have changed while collapsed)
-  const changeMarkersBefore = page.locator('.accordion-change-indicator');
-  const countBefore = await changeMarkersBefore.count();
-  expect(countBefore).toBeGreaterThan(0);
-
-  // Remove overlay before clicking clear button
-  await removeOverlay(page);
-
-  // Open the Program menu and click "New" (Clear)
-  await clickProgramMenuItem(page, '#clear-code-button');
-
-  // Wait for state to update
-  await page.waitForTimeout(500);
-
-  // Verify that all change markers are removed
-  const changeMarkersAfter = page.locator('.accordion-change-indicator');
-  await expect(changeMarkersAfter).toHaveCount(0);
+  // Verify that the issues card is not visible after clear
+  const issuesCardAfter = page.locator('#issues-card');
+  await expect(issuesCardAfter).toHaveCount(0);
 
   await page.close();
 });

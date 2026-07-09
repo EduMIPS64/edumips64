@@ -51,6 +51,24 @@ async function waitForRunningState(page) {
 }
 
 /**
+ * Ensure a DashboardCard (Stats/Pipeline/Registers/Memory/Standard Output) is
+ * expanded, clicking its header toggle if it is currently collapsed. Some
+ * panels (Memory, Standard Output) default to collapsed, so any test that
+ * needs to read their body content must call this first.
+ *
+ * @param {import('@playwright/test').Page} page - Playwright page object
+ * @param {string} title - Visible card title, e.g. "Memory" or "Standard Output"
+ */
+async function expandDashboardCard(page, title) {
+  const toggle = page.getByRole('button', {
+    name: new RegExp(`^Expand ${title}$`),
+  });
+  if (await toggle.count()) {
+    await toggle.click();
+  }
+}
+
+/**
  * Helper function to open the Program ▾ dropdown menu.
  * MUI <Menu> renders its items in a portal only when open, so callers must
  * invoke this before interacting with any of the four program-menu items.
@@ -217,6 +235,7 @@ module.exports = {
   waitForRunningState,
   waitForSimulationComplete,
   resetSimulator,
+  expandDashboardCard,
   openProgramMenu,
   clickProgramMenuItem,
   openSettingsDialog,

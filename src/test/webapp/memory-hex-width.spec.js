@@ -5,13 +5,15 @@ const {
   waitForRunningState,
   loadProgram,
   runToCompletion,
+  expandDashboardCard,
 } = require('./test-utils');
 
 /**
- * Helper function to expand Memory accordion and wait for table
+ * Helper function to expand the Memory card (collapsed by default) and wait
+ * for its table to be populated.
  */
 async function expandMemoryAndWaitForTable(page) {
-  await page.click('#memory-accordion-summary');
+  await expandDashboardCard(page, 'Memory');
   await page.waitForSelector('#memory tbody tr', { timeout: 5000 });
 }
 
@@ -104,12 +106,6 @@ test('memory values remain 64-bit width after store byte instruction', async ({
     // A valid 64-bit hex value should have exactly 16 hex characters
     expect(trimmedValue).toMatch(/^[0-9A-Fa-f]{16}$/);
   }
-
-  // Verify that the stored value 6 appears in one of the memory cells
-  // (the byte 6 should be visible as part of the 64-bit hex representation)
-  const _memoryContent = await page.textContent('#memory');
-  // The value 6 stored as a byte at the beginning of an 8-byte cell
-  // should show up as 0600000000000000 (little-endian) or similar
 
   await page.close();
 });

@@ -45,12 +45,11 @@ test('deprecated instruction is flagged by the syntax checker', async ({
   // program must still be loadable (no errors).
   await loadProgram(page, DEPRECATED_PROGRAM);
 
-  // The Issues accordion should show the deprecated-instruction warning.
+  // The Issues card should be visible, confirming at least one issue was raised.
+  await expect(page.locator('#issues-card')).toBeVisible({ timeout: 10000 });
+  // And there should be at least one warning item listed inside it.
   const warningItem = page.locator('.error-list-item').first();
-  await expect(warningItem).toBeVisible({ timeout: 10000 });
-
-  // And the warning chip in the Issues header should show "1".
-  await expect(page.getByRole('heading', { name: /Issues\s*1/ })).toBeVisible();
+  await expect(warningItem).toBeVisible({ timeout: 5000 });
 });
 
 test('hover tooltip works after loading code with a warning', async ({
