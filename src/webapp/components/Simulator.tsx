@@ -468,8 +468,11 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                 gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
                 gap: 1.5,
                 p: 1.5,
-                height: '100%',
-                overflow: 'auto',
+                // Grow with the content; the parent panel (WorkspaceLayout's
+                // right column) provides the scrollbar. A definite height
+                // here would let the grid compress the card rows instead of
+                // overflowing.
+                minHeight: '100%',
                 alignContent: 'start',
               }}
             >
@@ -481,7 +484,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                 id="stats-card"
                 title="Stats"
                 icon={<InsightsOutlinedIcon fontSize="small" />}
-                maxContentHeight="42vh"
+                fullWidth
               >
                 <Statistics {...stats} />
               </DashboardCard>
@@ -489,6 +492,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                 id="pipeline-card"
                 title="Pipeline"
                 icon={<AccountTreeOutlinedIcon fontSize="small" />}
+                fullWidth
               >
                 <Pipeline pipeline={pipeline} colors={pipelineColors} />
               </DashboardCard>
