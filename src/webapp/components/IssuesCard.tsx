@@ -44,7 +44,6 @@ const IssuesCard = ({ parsingErrors, onIssueClick }: IssuesCardProps) => {
       icon={<ReportProblemOutlinedIcon fontSize="small" />}
       action={<ErrorDisplay parsingErrors={parsingErrors} />}
       maxContentHeight="30vh"
-      fullWidth
     >
       <List sx={{ width: '100%', py: 0 }} dense>
         {parsingErrors.map((value) => (

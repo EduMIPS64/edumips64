@@ -37,12 +37,7 @@ import {
 } from '@dnd-kit/sortable';
 import DashboardCard from './DashboardCard';
 
-import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
-import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined';
-import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
-import TerminalOutlinedIcon from '@mui/icons-material/TerminalOutlined';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { ThemeProvider } from '@mui/material/styles';
@@ -260,17 +255,16 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   );
 
   // The currently-dragged widget id (both for pointer and keyboard-driven
-  // drags), and the on-screen width of its card at the moment the drag
-  // started. `DragOverlay` renders its child outside the dashboard's grid
+  // drags), and the on-screen width of its section at the moment the drag
+  // started. `DragOverlay` renders its child outside the dashboard stack
   // (in a portal-like fixed-position layer), so nothing constrains its size
   // to the current hover slot the way an in-place sortable item would be —
-  // that's what let the dragged card visually assume the aspect ratio of
-  // whatever slot it was hovering. Pinning the overlay to the width the card
-  // had *before* the drag started (grid layout only varies card width, since
-  // every card is `fullWidth`) keeps its whole footprint stable for the
-  // entire drag, and the in-grid original renders as a plain dimmed
-  // placeholder (see `SortableDashboardCard`) instead of following the
-  // pointer itself.
+  // that's what let the dragged section visually assume the aspect ratio of
+  // whatever slot it was hovering. Pinning the overlay to the width the
+  // section had *before* the drag started keeps its whole footprint stable
+  // for the entire drag, and the in-place original renders as a plain
+  // dimmed placeholder (see `SortableDashboardCard`) instead of following
+  // the pointer itself.
   const [activeWidgetId, setActiveWidgetId] =
     React.useState<DashboardWidgetId | null>(null);
   const [activeWidgetWidth, setActiveWidgetWidth] = React.useState<
@@ -508,18 +502,15 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // Dashboard card definitions
   // ---------------------------------------------------------------------------
 
-  // Static per-widget metadata (title, icon, sizing) and content, keyed by
-  // the same stable ids used by the `WIDGET_ORDER` setting. Rebuilt every
-  // render (it's cheap: a handful of object literals), but keyed access
-  // means the drag-and-drop reorder below only ever changes *sequence*, not
-  // identity, so React reconciles moved cards instead of remounting them.
+  // Static per-widget metadata (title) and content, keyed by the same
+  // stable ids used by the `WIDGET_ORDER` setting. Rebuilt every render
+  // (it's cheap: a handful of object literals), but keyed access means the
+  // drag-and-drop reorder below only ever changes *sequence*, not identity,
+  // so React reconciles moved cards instead of remounting them.
   const dashboardWidgets: Record<
     DashboardWidgetId,
     {
       title: string;
-      icon: React.ReactNode;
-      maxContentHeight?: string;
-      fullWidth?: boolean;
       expanded: boolean;
       onToggle: () => void;
       content: React.ReactNode;
@@ -527,42 +518,30 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   > = {
     stats: {
       title: 'Stats',
-      icon: <InsightsOutlinedIcon fontSize="small" />,
-      fullWidth: true,
       expanded: expandedAccordions.stats,
       onToggle: () => toggleAccordion('stats'),
       content: <Statistics {...stats} />,
     },
     pipeline: {
       title: 'Pipeline',
-      icon: <AccountTreeOutlinedIcon fontSize="small" />,
-      fullWidth: true,
       expanded: expandedAccordions.pipeline,
       onToggle: () => toggleAccordion('pipeline'),
       content: <Pipeline pipeline={pipeline} colors={pipelineColors} />,
     },
     registers: {
       title: 'Registers',
-      icon: <DnsOutlinedIcon fontSize="small" />,
-      maxContentHeight: '48vh',
-      fullWidth: true,
       expanded: expandedAccordions.registers,
       onToggle: () => toggleAccordion('registers'),
       content: <Registers {...registers} />,
     },
     memory: {
       title: 'Memory',
-      icon: <StorageOutlinedIcon fontSize="small" />,
-      maxContentHeight: '40vh',
-      fullWidth: true,
       expanded: expandedAccordions.memory,
       onToggle: () => toggleAccordion('memory'),
       content: <Memory memory={memory} />,
     },
     stdout: {
       title: 'Standard Output',
-      icon: <TerminalOutlinedIcon fontSize="small" />,
-      fullWidth: true,
       expanded: expandedAccordions.stdout,
       onToggle: () => toggleAccordion('stdout'),
       content: <StdOut stdout={stdout} />,
@@ -656,16 +635,12 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
           <Box
             id="dashboard"
             sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
-              gap: 1.5,
-              p: 1.5,
-              // Grow with the content; the parent panel (WorkspaceLayout's
-              // right column) provides the scrollbar. A definite height
-              // here would let the grid compress the card rows instead of
-              // overflowing.
+              // A flat, flush, single-column stack of sections — the classic
+              // accordion look. Each section paints its own tinted header
+              // strip and bottom hairline (see `DashboardCard`); the parent
+              // panel (WorkspaceLayout's right column) provides the
+              // scrollbar.
               minHeight: '100%',
-              alignContent: 'start',
             }}
           >
             <IssuesCard
@@ -698,9 +673,6 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                       id={widgetId}
                       htmlId={`${widgetId}-card`}
                       title={widget.title}
-                      icon={widget.icon}
-                      maxContentHeight={widget.maxContentHeight}
-                      fullWidth={widget.fullWidth}
                       expanded={widget.expanded}
                       onToggle={widget.onToggle}
                     >
@@ -723,10 +695,6 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                   >
                     <DashboardCard
                       title={dashboardWidgets[activeWidgetId].title}
-                      icon={dashboardWidgets[activeWidgetId].icon}
-                      maxContentHeight={
-                        dashboardWidgets[activeWidgetId].maxContentHeight
-                      }
                       expanded={dashboardWidgets[activeWidgetId].expanded}
                       onToggle={() => {}}
                       dragHandle={
@@ -734,7 +702,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                           sx={{
                             display: 'flex',
                             alignItems: 'center',
-                            pl: 0.5,
+                            pr: 1,
                             color: 'text.secondary',
                           }}
                         >

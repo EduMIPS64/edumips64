@@ -243,6 +243,28 @@ test('reordering a card via mouse drag changes DOM order', async ({ page }) => {
 
   expect(await dashboardCardOrder(page)).toEqual(DEFAULT_CARD_IDS);
 
+  // Collapse every section first so all five header strips sit within the
+  // viewport regardless of how tall the expanded section bodies are (the
+  // flat accordion-style sections are tall enough to push the lower
+  // handles below the fold, where pointer coordinates derived from
+  // `boundingBox()` land on whatever is visually rendered instead of the
+  // intended target). Collapsed sections remain fully draggable — that's
+  // asserted separately by the collapse-toggle test above.
+  for (const title of [
+    'Stats',
+    'Pipeline',
+    'Registers',
+    'Memory',
+    'Standard Output',
+  ]) {
+    const toggle = page.getByRole('button', {
+      name: new RegExp(`^(Collapse|Expand) ${title}$`),
+    });
+    if ((await toggle.getAttribute('aria-expanded')) === 'true') {
+      await toggle.click();
+    }
+  }
+
   // dnd-kit's PointerSensor only starts a drag after the pointer has moved
   // past its activation distance, so a single `dragTo()` (which Playwright
   // implements as one hover-then-move) is not always reliable — drive the

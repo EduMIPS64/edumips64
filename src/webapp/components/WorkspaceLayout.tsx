@@ -222,14 +222,7 @@ const WorkspaceLayoutView = ({
         <Box id="left-panel" sx={{ height: '60vh', minHeight: 320 }}>
           {left}
         </Box>
-        <Box
-          id="right-panel"
-          sx={{
-            borderTop: 1,
-            borderColor: 'divider',
-            bgcolor: 'background.default',
-          }}
-        >
+        <Box id="right-panel" sx={{ borderTop: 1, borderColor: 'divider' }}>
           {right}
         </Box>
         <Box
@@ -312,7 +305,7 @@ const WorkspaceLayoutView = ({
               alignItems: 'center',
               borderLeft: 1,
               borderColor: 'divider',
-              bgcolor: 'background.default',
+              bgcolor: 'background.paper',
             }}
           >
             <Tooltip title="Expand panels" placement="left">
@@ -372,11 +365,7 @@ const WorkspaceLayoutView = ({
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                // Distinct from the DashboardCard's own paper background so
-                // each card's elevation/shadow reads as a floating tile
-                // instead of blending into the panel (matches the
-                // dashboard-layout proposal's right-panel treatment).
-                bgcolor: 'background.default',
+                bgcolor: 'background.paper',
               }}
             >
               {/* Slim header with the collapse toggle. */}

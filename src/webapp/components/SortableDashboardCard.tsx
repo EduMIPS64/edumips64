@@ -17,9 +17,6 @@ interface SortableDashboardCardProps {
   /** DOM `id` attribute for the rendered card, e.g. `"stats-card"`. */
   htmlId: string;
   title: string;
-  icon?: React.ReactNode;
-  maxContentHeight?: string;
-  fullWidth?: boolean;
   expanded?: boolean;
   onToggle?: () => void;
   children?: React.ReactNode;
@@ -30,23 +27,20 @@ interface SortableDashboardCardProps {
  * drag-and-drop reordered within the dashboard's `SortableContext`
  * (see `Simulator.tsx`).
  *
- * The drag handle is a dedicated `IconButton` rendered to the left of the
- * card header, entirely separate from the header's own click-to-collapse
- * `<button>` (see `DashboardCard`'s `dragHandle` slot) so dragging never
- * conflicts with expanding/collapsing the card.
+ * The drag handle is a dedicated `IconButton` at the right end of the
+ * section's header strip, entirely separate from the header's own
+ * click-to-collapse `<button>` (see `DashboardCard`'s `dragHandle` slot)
+ * so dragging never conflicts with expanding/collapsing the section.
  *
  * `useSortable`'s `setNodeRef`/`style` (transform + transition) are applied
- * to an outer wrapping `<div>` — a plain grid item — rather than to
- * `DashboardCard`'s own root `Card`, since `DashboardCard` is also used
- * standalone (e.g. `IssuesCard`) without any sortable behavior.
+ * to an outer wrapping `<div>` rather than to `DashboardCard`'s own root,
+ * since `DashboardCard` is also used standalone (e.g. `IssuesCard`)
+ * without any sortable behavior.
  */
 export default function SortableDashboardCard({
   id,
   htmlId,
   title,
-  icon,
-  maxContentHeight,
-  fullWidth,
   expanded,
   onToggle,
   children,
@@ -64,16 +58,14 @@ export default function SortableDashboardCard({
     <div
       ref={setNodeRef}
       style={{
-        gridColumn: fullWidth ? '1 / -1' : 'auto',
         // While this card is the one being dragged, `Simulator`'s
         // `DragOverlay` renders a floating clone that follows the pointer at
-        // a fixed size (see its own comment for why), so this in-grid
+        // a fixed size (see its own comment for why), so this in-place
         // original must NOT also chase the pointer via dnd-kit's transform —
         // doing both at once is exactly what made the dragged card visually
         // warp into whatever slot it passed over. It stays put as a plain
-        // dimmed placeholder (no shadow — that lives on the overlay clone
-        // now, see `Simulator`) marking the reserved spot, while its
-        // siblings still animate into their new positions via their own
+        // dimmed placeholder marking the reserved spot, while its siblings
+        // still animate into their new positions via their own
         // (non-dragging) transform below.
         transform: isDragging ? undefined : CSS.Transform.toString(transform),
         transition: isDragging ? undefined : (transition ?? undefined),
@@ -84,9 +76,6 @@ export default function SortableDashboardCard({
       <DashboardCard
         id={htmlId}
         title={title}
-        icon={icon}
-        maxContentHeight={maxContentHeight}
-        fullWidth={fullWidth}
         expanded={expanded}
         onToggle={onToggle}
         dragHandle={
@@ -94,7 +83,7 @@ export default function SortableDashboardCard({
             sx={{
               display: 'flex',
               alignItems: 'center',
-              pl: 0.5,
+              pr: 1,
             }}
           >
             <IconButton
