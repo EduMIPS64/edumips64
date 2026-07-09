@@ -714,13 +714,10 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                   <Box
                     sx={{
                       width: activeWidgetWidth,
-                      // A single large-blur, zero-spread shadow so the clone
-                      // reads as the unchanged card gently floating above the
-                      // page. MUI's numbered elevations (e.g. `boxShadow: 6`)
-                      // include tight edge-hugging components that render as
-                      // an ugly grey ring around the card — avoid them here.
-                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
-                      borderRadius: 1.25,
+                      // No extra decoration: the clone must look *exactly*
+                      // like the resting card (only the Card's own
+                      // elevation-1 paper shadow) — any added shadow/ring
+                      // reads as a heavy border around the dragged card.
                       cursor: 'grabbing',
                     }}
                   >
