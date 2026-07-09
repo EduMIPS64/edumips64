@@ -86,7 +86,8 @@ function BuildInfoLine() {
 // candidates are shown (they are expected to be few between promotions).
 // Gated on: valid versions index AND build kind !== 'pr'.
 function Versions() {
-  const [versionsData, setVersionsData] = React.useState<Awaited<ReturnType<typeof fetchVersions>>>(null);
+  const [versionsData, setVersionsData] =
+    React.useState<Awaited<ReturnType<typeof fetchVersions>>>(null);
   const viewedSha = React.useMemo(() => getViewedSha(), []);
 
   React.useEffect(() => {
@@ -121,7 +122,9 @@ function Versions() {
               >
                 {item.dateLabel
                   ? `${item.dateLabel} (${item.shortsha}` +
-                    (item.targetRelease ? `, targets ${item.targetRelease})` : ')')
+                    (item.targetRelease
+                      ? `, targets ${item.targetRelease})`
+                      : ')')
                   : item.shortsha}
               </Typography>
             ) : (
@@ -134,7 +137,9 @@ function Versions() {
               >
                 {item.dateLabel
                   ? `${item.dateLabel} (${item.shortsha}` +
-                    (item.targetRelease ? `, targets ${item.targetRelease})` : ')')
+                    (item.targetRelease
+                      ? `, targets ${item.targetRelease})`
+                      : ')')
                   : item.shortsha}
               </Link>
             )}
@@ -142,7 +147,12 @@ function Versions() {
               <Chip label="current" size="small" color="success" />
             )}
             {!item.promoted && (
-              <Chip label="candidate" size="small" color="info" variant="outlined" />
+              <Chip
+                label="candidate"
+                size="small"
+                color="info"
+                variant="outlined"
+              />
             )}
             {item.isViewed && !item.isCurrent && (
               <Typography component="span" variant="caption">
@@ -178,7 +188,11 @@ function Versions() {
       )}
       {candidates.length > 0 && (
         <>
-          <Typography variant="h6" gutterBottom sx={{ mt: promoted.length ? 2 : 0 }}>
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{ mt: promoted.length ? 2 : 0 }}
+          >
             Candidate builds
           </Typography>
           <List dense disablePadding id="about-candidate-versions">
@@ -374,7 +388,13 @@ interface NavigationDrawerProps {
   error: string | null;
 }
 
-function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }: NavigationDrawerProps) {
+function NavigationDrawer({
+  toc,
+  onNavigate,
+  currentPage,
+  loading,
+  error,
+}: NavigationDrawerProps) {
   const [openItems, setOpenItems] = React.useState<Record<number, boolean>>({});
 
   const handleToggle = (index: number) => {
@@ -470,7 +490,8 @@ function NavigationDrawer({ toc, onNavigate, currentPage, loading, error }: Navi
                               noWrap: true,
                               sx: {
                                 fontSize: '0.85rem',
-                                fontWeight: currentPage === child.url ? 600 : 400,
+                                fontWeight:
+                                  currentPage === child.url ? 600 : 400,
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                               },
@@ -496,7 +517,11 @@ interface HelpDialogProps {
   ver: string;
 }
 
-export default function HelpDialog({ open, handleClose, ver }: HelpDialogProps) {
+export default function HelpDialog({
+  open,
+  handleClose,
+  ver,
+}: HelpDialogProps) {
   const [tabValue, setTabValue] = React.useState(0);
   // The `useSetting` hook sanitizes the persisted value against the
   // ALLOWED_LANGUAGES validator declared in the settings schema, so an
@@ -531,7 +556,7 @@ export default function HelpDialog({ open, handleClose, ver }: HelpDialogProps) 
   const handleIframeLoad = () => {
     try {
       const iframe = iframeRef.current;
-      if (iframe && iframe.contentDocument) {
+      if (iframe?.contentDocument) {
         const doc = iframe.contentDocument;
 
         // Check if custom CSS is already injected
@@ -868,11 +893,7 @@ export default function HelpDialog({ open, handleClose, ver }: HelpDialogProps) 
         </TabPanel>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={handleClose}
-          variant="outlined"
-          id="help-close-button"
-        >
+        <Button onClick={handleClose} variant="outlined" id="help-close-button">
           Close
         </Button>
       </DialogActions>

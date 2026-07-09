@@ -40,7 +40,9 @@ test.describe('accessibility quick wins', () => {
     await expect(helpBtn).toBeVisible();
   });
 
-  test('CPU status chip is exposed as a polite live region', async ({ page }) => {
+  test('CPU status chip is exposed as a polite live region', async ({
+    page,
+  }) => {
     await page.goto(targetUri);
     await waitForPageReady(page);
 
@@ -51,7 +53,9 @@ test.describe('accessibility quick wins', () => {
     await expect(status).toHaveAttribute('aria-live', 'polite');
   });
 
-  test('help iframe does not render Sphinx pilcrow permalinks', async ({ page }) => {
+  test('help iframe does not render Sphinx pilcrow permalinks', async ({
+    page,
+  }) => {
     await page.goto(targetUri);
     await waitForPageReady(page);
 
@@ -64,7 +68,9 @@ test.describe('accessibility quick wins', () => {
 
     // Heading should still render; Sphinx anchors should be hidden.
     await expect(frame.locator('h1').first()).toBeVisible();
-    const visibleHeaderlinks = await frame.locator('a.headerlink:visible').count();
+    const visibleHeaderlinks = await frame
+      .locator('a.headerlink:visible')
+      .count();
     expect(visibleHeaderlinks).toBe(0);
   });
 });

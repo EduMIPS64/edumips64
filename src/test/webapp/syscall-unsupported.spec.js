@@ -105,7 +105,11 @@ async function runAndGetDialogText(page, program) {
  * The Web UI composes the message as:
  *   "Synchronous exception: <message>\n\nInstruction: <instr>\nPipeline stage: <stage>"
  */
-function assertUnsupportedSyscallAlert(dialogText, expectedInstruction, expectedStage) {
+function assertUnsupportedSyscallAlert(
+  dialogText,
+  expectedInstruction,
+  expectedStage,
+) {
   expect(dialogText).toContain('Synchronous exception');
   expect(dialogText).toContain(`Instruction: ${expectedInstruction}`);
   expect(dialogText).toContain(`Pipeline stage: ${expectedStage}`);
@@ -119,7 +123,9 @@ test('invalid SYSCALL number produces a user-friendly unsupported-syscall alert'
   const dialogText = await runAndGetDialogText(page, invalidSyscallProgram);
 
   assertUnsupportedSyscallAlert(dialogText, 'SYSCALL 6', 'ID');
-  expect(dialogText).toContain('SYSCALL 6 is not a supported system call number');
+  expect(dialogText).toContain(
+    'SYSCALL 6 is not a supported system call number',
+  );
 
   // Give UI a moment to settle; confirm no further dialogs appear.
   await page.waitForTimeout(1000);
@@ -153,7 +159,9 @@ test('SYSCALL 3 (read) on a non-stdin fd produces a user-friendly alert', async 
   await expect(page.locator('#runtime-error-dialog')).not.toBeVisible();
 });
 
-test('SYSCALL 1 (open) is refused in the web UI environment', async ({ page }) => {
+test('SYSCALL 1 (open) is refused in the web UI environment', async ({
+  page,
+}) => {
   const dialogText = await runAndGetDialogText(page, openProgram);
 
   assertUnsupportedSyscallAlert(dialogText, 'SYSCALL 1', 'MEM');

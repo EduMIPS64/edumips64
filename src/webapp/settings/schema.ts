@@ -79,7 +79,8 @@ const isValidCacheConfig = (v: unknown) => {
 
 // Hex color (`#RRGGBB`) validator used by the pipeline color settings.
 const HEX_COLOR_RE = /^#[0-9a-fA-F]{6}$/;
-const isHexColor = (v: unknown) => typeof v === 'string' && HEX_COLOR_RE.test(v);
+const isHexColor = (v: unknown) =>
+  typeof v === 'string' && HEX_COLOR_RE.test(v);
 
 /**
  * Default colors for the Pipeline widget, mirroring the Swing UI's
@@ -141,136 +142,141 @@ const isValidPipelineColors = (v: unknown) => {
  * `ConfigStore`: everything a user can tweak has exactly one row here, with
  * its type and its default value.
  */
-export const SETTINGS_SCHEMA: Readonly<Record<string, SchemaEntry>> = Object.freeze({
-  [SettingKey.VI_MODE]: {
-    type: SettingType.BOOLEAN,
-    default: false,
-  },
-  [SettingKey.FONT_SIZE]: {
-    type: SettingType.NUMBER,
-    default: 14,
-    validate: (v) =>
-      typeof v === 'number' && Number.isFinite(v) && v >= MIN_FONT_SIZE && v <= MAX_FONT_SIZE,
-  },
-  [SettingKey.ACCORDION_ALERTS]: {
-    type: SettingType.BOOLEAN,
-    default: true,
-  },
-  [SettingKey.EXPANDED_ACCORDIONS]: {
-    type: SettingType.OBJECT,
-    // Defaults follow the simulator's primary purpose: a first-time visitor
-    // should see the pipeline, registers, and stats — the headline features
-    // of a CPU simulator — without having to scroll-and-click. Memory and
-    // standard output stay collapsed by default to keep the right rail
-    // compact on small screens; the change-indicator dot still draws
-    // attention to them when something changes.
-    //
-    // Cache configuration and general settings used to live here as
-    // collapsible panels too, but now live in the Settings dialog (opened
-    // via the gear button in the header), so they no longer need an
-    // expand/collapse state.
-    //
-    // This is only the *default* — every user-driven expand/collapse is
-    // persisted to localStorage via `useSetting`, so a returning user always
-    // sees the layout they last left.
-    default: {
-      stats: true,
-      pipeline: true,
-      registers: true,
-      memory: false,
-      stdout: false,
+export const SETTINGS_SCHEMA: Readonly<Record<string, SchemaEntry>> =
+  Object.freeze({
+    [SettingKey.VI_MODE]: {
+      type: SettingType.BOOLEAN,
+      default: false,
     },
-  },
-  [SettingKey.CACHE_L1D]: {
-    type: SettingType.OBJECT,
-    default: {
-      size: 1024,
-      blockSize: 16,
-      associativity: 1,
+    [SettingKey.FONT_SIZE]: {
+      type: SettingType.NUMBER,
+      default: 14,
+      validate: (v) =>
+        typeof v === 'number' &&
+        Number.isFinite(v) &&
+        v >= MIN_FONT_SIZE &&
+        v <= MAX_FONT_SIZE,
     },
-    validate: isValidCacheConfig,
-  },
-  [SettingKey.CACHE_L1I]: {
-    type: SettingType.OBJECT,
-    default: {
-      size: 1024,
-      blockSize: 16,
-      associativity: 1,
+    [SettingKey.ACCORDION_ALERTS]: {
+      type: SettingType.BOOLEAN,
+      default: true,
     },
-    validate: isValidCacheConfig,
-  },
-  [SettingKey.HELP_LANGUAGE]: {
-    type: SettingType.STRING,
-    default: 'en',
-    validate: (v) => typeof v === 'string' && ALLOWED_HELP_LANGUAGES.includes(v),
-  },
-  [SettingKey.FORWARDING]: {
-    type: SettingType.BOOLEAN,
-    // Matches the Java `ConfigStore` default for `ConfigKey.FORWARDING`.
-    default: false,
-  },
-  [SettingKey.DELAY_SLOT]: {
-    type: SettingType.BOOLEAN,
-    // Matches the Java `ConfigStore` default for `ConfigKey.DELAY_SLOT`.
-    // Off by default to preserve the simulator's classic semantics where
-    // the instruction sequentially after a branch is squashed.
-    default: false,
-  },
-  [SettingKey.STEP_STRIDE]: {
-    type: SettingType.NUMBER,
-    // Matches the legacy `multiStepCount` default that used to live in
-    // `Header.js` local state.
-    default: 500,
-    validate: (v) =>
-      typeof v === 'number' &&
-      Number.isInteger(v) &&
-      v >= MIN_STEP_STRIDE &&
-      v <= MAX_STEP_STRIDE,
-  },
-  [SettingKey.EXECUTION_DELAY_MS]: {
-    type: SettingType.NUMBER,
-    // 0 means "no artificial delay between batches", which is the pre-existing
-    // behavior.
-    default: 0,
-    validate: (v) =>
-      typeof v === 'number' &&
-      Number.isFinite(v) &&
-      v >= MIN_EXECUTION_DELAY_MS &&
-      v <= MAX_EXECUTION_DELAY_MS,
-  },
-  [SettingKey.EDITOR_CODE]: {
-    type: SettingType.STRING,
-    // Use an empty string as the sentinel for "user hasn't customized the editor
-    // yet". This avoids baking today's SampleProgram into localStorage on the
-    // very first visit, which would prevent a future sample update from being
-    // visible to users who never edited the editor.  Simulator.js maps '' back
-    // to the current SampleProgram when rendering.
-    default: '',
-  },
-  [SettingKey.PIPELINE_COLORS]: {
-    type: SettingType.OBJECT,
-    default: { ...DEFAULT_PIPELINE_COLORS },
-    validate: isValidPipelineColors,
-  },
-  [SettingKey.THEME_MODE]: {
-    type: SettingType.STRING,
-    // 'auto' follows the OS-level `prefers-color-scheme` media query, which
-    // matches the pre-existing behavior. 'light' and 'dark' force the
-    // corresponding MUI palette mode regardless of the OS setting.
-    default: 'auto',
-    validate: (v) => typeof v === 'string' && ALLOWED_THEME_MODES.includes(v),
-  },
-  [SettingKey.WORKSPACE_LAYOUT]: {
-    type: SettingType.OBJECT,
-    default: {
-      rightWidthPct: 34,
-      bottomHeightPct: 30,
-      rightCollapsed: false,
-      bottomCollapsed: false,
+    [SettingKey.EXPANDED_ACCORDIONS]: {
+      type: SettingType.OBJECT,
+      // Defaults follow the simulator's primary purpose: a first-time visitor
+      // should see the pipeline, registers, and stats — the headline features
+      // of a CPU simulator — without having to scroll-and-click. Memory and
+      // standard output stay collapsed by default to keep the right rail
+      // compact on small screens; the change-indicator dot still draws
+      // attention to them when something changes.
+      //
+      // Cache configuration and general settings used to live here as
+      // collapsible panels too, but now live in the Settings dialog (opened
+      // via the gear button in the header), so they no longer need an
+      // expand/collapse state.
+      //
+      // This is only the *default* — every user-driven expand/collapse is
+      // persisted to localStorage via `useSetting`, so a returning user always
+      // sees the layout they last left.
+      default: {
+        stats: true,
+        pipeline: true,
+        registers: true,
+        memory: false,
+        stdout: false,
+      },
     },
-    validate: isValidWorkspaceLayout,
-  },
-});
+    [SettingKey.CACHE_L1D]: {
+      type: SettingType.OBJECT,
+      default: {
+        size: 1024,
+        blockSize: 16,
+        associativity: 1,
+      },
+      validate: isValidCacheConfig,
+    },
+    [SettingKey.CACHE_L1I]: {
+      type: SettingType.OBJECT,
+      default: {
+        size: 1024,
+        blockSize: 16,
+        associativity: 1,
+      },
+      validate: isValidCacheConfig,
+    },
+    [SettingKey.HELP_LANGUAGE]: {
+      type: SettingType.STRING,
+      default: 'en',
+      validate: (v) =>
+        typeof v === 'string' && ALLOWED_HELP_LANGUAGES.includes(v),
+    },
+    [SettingKey.FORWARDING]: {
+      type: SettingType.BOOLEAN,
+      // Matches the Java `ConfigStore` default for `ConfigKey.FORWARDING`.
+      default: false,
+    },
+    [SettingKey.DELAY_SLOT]: {
+      type: SettingType.BOOLEAN,
+      // Matches the Java `ConfigStore` default for `ConfigKey.DELAY_SLOT`.
+      // Off by default to preserve the simulator's classic semantics where
+      // the instruction sequentially after a branch is squashed.
+      default: false,
+    },
+    [SettingKey.STEP_STRIDE]: {
+      type: SettingType.NUMBER,
+      // Matches the legacy `multiStepCount` default that used to live in
+      // `Header.js` local state.
+      default: 500,
+      validate: (v) =>
+        typeof v === 'number' &&
+        Number.isInteger(v) &&
+        v >= MIN_STEP_STRIDE &&
+        v <= MAX_STEP_STRIDE,
+    },
+    [SettingKey.EXECUTION_DELAY_MS]: {
+      type: SettingType.NUMBER,
+      // 0 means "no artificial delay between batches", which is the pre-existing
+      // behavior.
+      default: 0,
+      validate: (v) =>
+        typeof v === 'number' &&
+        Number.isFinite(v) &&
+        v >= MIN_EXECUTION_DELAY_MS &&
+        v <= MAX_EXECUTION_DELAY_MS,
+    },
+    [SettingKey.EDITOR_CODE]: {
+      type: SettingType.STRING,
+      // Use an empty string as the sentinel for "user hasn't customized the editor
+      // yet". This avoids baking today's SampleProgram into localStorage on the
+      // very first visit, which would prevent a future sample update from being
+      // visible to users who never edited the editor.  Simulator.js maps '' back
+      // to the current SampleProgram when rendering.
+      default: '',
+    },
+    [SettingKey.PIPELINE_COLORS]: {
+      type: SettingType.OBJECT,
+      default: { ...DEFAULT_PIPELINE_COLORS },
+      validate: isValidPipelineColors,
+    },
+    [SettingKey.THEME_MODE]: {
+      type: SettingType.STRING,
+      // 'auto' follows the OS-level `prefers-color-scheme` media query, which
+      // matches the pre-existing behavior. 'light' and 'dark' force the
+      // corresponding MUI palette mode regardless of the OS setting.
+      default: 'auto',
+      validate: (v) => typeof v === 'string' && ALLOWED_THEME_MODES.includes(v),
+    },
+    [SettingKey.WORKSPACE_LAYOUT]: {
+      type: SettingType.OBJECT,
+      default: {
+        rightWidthPct: 34,
+        bottomHeightPct: 30,
+        rightCollapsed: false,
+        bottomCollapsed: false,
+      },
+      validate: isValidWorkspaceLayout,
+    },
+  });
 
 /**
  * Return true if `value` matches the declared `type`.

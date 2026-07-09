@@ -30,12 +30,32 @@ const STORAGE_PREFIX = 'edumips64:v1:';
 // Mirrors the `CycleState` enum in
 // `src/main/java/org/edumips64/client/CycleState.java`.
 const VALID_CYCLE_STATES = new Set([
-  'IF', 'ID', 'EX', 'MEM', 'WB',
-  'RAW', 'WAW',
-  'StDiv', 'StEx', 'StFun', 'Str', 'StAdd', 'StMul',
-  'A1', 'A2', 'A3', 'A4',
-  'M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7',
-  'DIV', 'DIV_COUNT',
+  'IF',
+  'ID',
+  'EX',
+  'MEM',
+  'WB',
+  'RAW',
+  'WAW',
+  'StDiv',
+  'StEx',
+  'StFun',
+  'Str',
+  'StAdd',
+  'StMul',
+  'A1',
+  'A2',
+  'A3',
+  'A4',
+  'M1',
+  'M2',
+  'M3',
+  'M4',
+  'M5',
+  'M6',
+  'M7',
+  'DIV',
+  'DIV_COUNT',
 ]);
 
 async function clearSettings(page) {
@@ -43,11 +63,13 @@ async function clearSettings(page) {
     const keysToRemove = [];
     for (let i = 0; i < window.localStorage.length; i++) {
       const k = window.localStorage.key(i);
-      if (k && k.startsWith(prefix)) {
+      if (k?.startsWith(prefix)) {
         keysToRemove.push(k);
       }
     }
-    keysToRemove.forEach((k) => window.localStorage.removeItem(k));
+    keysToRemove.forEach((k) => {
+      window.localStorage.removeItem(k);
+    });
   }, STORAGE_PREFIX);
 }
 
@@ -111,7 +133,7 @@ DADD  R1, R2, R3
 DSUB  R4, R5, R6
 BREAK
 SYSCALL 0
-`
+`,
   );
 
   await page.click('#run-button');
@@ -125,22 +147,34 @@ SYSCALL 0
         const snap = await readPipeline(page);
         return Object.values(snap).some((s) => s.instruction === 'BREAK');
       },
-      { timeout: 15000 }
+      { timeout: 15000 },
     )
     .toBe(true);
 
   const snap = await readPipeline(page);
   const occupied = occupiedCycleStages(snap);
-  expect(occupied.length, `pipeline was empty: ${JSON.stringify(snap)}`).toBeGreaterThan(0);
+  expect(
+    occupied.length,
+    `pipeline was empty: ${JSON.stringify(snap)}`,
+  ).toBeGreaterThan(0);
   for (const { stage, cycleStage } of occupied) {
-    expect(cycleStage, `occupied stage ${stage} has no CycleState (cycleBuilder lagged the CPU)`).not.toBe('');
-    expect(VALID_CYCLE_STATES.has(cycleStage), `unknown CycleState "${cycleStage}" at ${stage}`).toBe(true);
+    expect(
+      cycleStage,
+      `occupied stage ${stage} has no CycleState (cycleBuilder lagged the CPU)`,
+    ).not.toBe('');
+    expect(
+      VALID_CYCLE_STATES.has(cycleStage),
+      `unknown CycleState "${cycleStage}" at ${stage}`,
+    ).toBe(true);
   }
   // BREAK in particular must have a CycleState recorded for the cycle the
   // BreakException was thrown — that is the assertion that goes red if
   // `cycleBuilder.step()` is moved out of the `finally` clause.
   const breakBox = Object.values(snap).find((s) => s.instruction === 'BREAK');
-  expect(breakBox.cycleStage, 'BREAK has no CycleState (finally clause likely missing)').not.toBe('');
+  expect(
+    breakBox.cycleStage,
+    'BREAK has no CycleState (finally clause likely missing)',
+  ).not.toBe('');
 });
 
 /**
@@ -173,7 +207,7 @@ LW    R8, big(R0)
 LW    R9, one(R0)
 ADD   R10, R8, R9
 SYSCALL 0
-`
+`,
   );
 
   // Install a MutationObserver that captures the pipeline state the instant
@@ -257,12 +291,15 @@ SYSCALL 0
 
   // Wait until the observer has fired (dialog appeared and snapshot taken).
   await expect
-    .poll(async () => page.evaluate(() => window.__dialogSeen), { timeout: 15000 })
+    .poll(async () => page.evaluate(() => window.__dialogSeen), {
+      timeout: 15000,
+    })
     .toBe(true);
 
   const snapAtDialog = await page.evaluate(() => {
     const atDialog = window.__pipelineSnap;
-    const hasOccupied = atDialog && Object.values(atDialog).some((s) => s.instruction);
+    const hasOccupied =
+      atDialog && Object.values(atDialog).some((s) => s.instruction);
     // If the dialog-time sample lost the race against the pipeline being
     // cleared, fall back to the last snapshot that had occupied stages —
     // that is the pipeline state that actually produced the overflow.
@@ -275,12 +312,24 @@ SYSCALL 0
   await page.click('#runtime-error-ok');
   await expect(runtimeDialog).not.toBeVisible();
 
-  expect(snapAtDialog, 'no pipeline snapshot was captured at dialog time').toBeTruthy();
+  expect(
+    snapAtDialog,
+    'no pipeline snapshot was captured at dialog time',
+  ).toBeTruthy();
   const occupied = occupiedCycleStages(snapAtDialog);
-  expect(occupied.length, `pipeline was empty: ${JSON.stringify(snapAtDialog)}`).toBeGreaterThan(0);
+  expect(
+    occupied.length,
+    `pipeline was empty: ${JSON.stringify(snapAtDialog)}`,
+  ).toBeGreaterThan(0);
   for (const { stage, cycleStage } of occupied) {
-    expect(cycleStage, `occupied stage ${stage} has no CycleState after overflow`).not.toBe('');
-    expect(VALID_CYCLE_STATES.has(cycleStage), `unknown CycleState "${cycleStage}" at ${stage}`).toBe(true);
+    expect(
+      cycleStage,
+      `occupied stage ${stage} has no CycleState after overflow`,
+    ).not.toBe('');
+    expect(
+      VALID_CYCLE_STATES.has(cycleStage),
+      `unknown CycleState "${cycleStage}" at ${stage}`,
+    ).toBe(true);
   }
   // ADD is the trapping instruction; if it is still observable in the
   // pipeline at the moment the dialog appeared, its `cycleStage` must be set —
@@ -288,8 +337,13 @@ SYSCALL 0
   // out of the `finally` clause. (Depending on where in the run loop the
   // result is delivered, ADD may already have moved past WB, so we only
   // assert when ADD is actually visible.)
-  const addBox = Object.values(snapAtDialog).find((s) => s.instruction === 'ADD');
+  const addBox = Object.values(snapAtDialog).find(
+    (s) => s.instruction === 'ADD',
+  );
   if (addBox) {
-    expect(addBox.cycleStage, 'ADD has no CycleState (finally clause likely missing)').not.toBe('');
+    expect(
+      addBox.cycleStage,
+      'ADD has no CycleState (finally clause likely missing)',
+    ).not.toBe('');
   }
 });

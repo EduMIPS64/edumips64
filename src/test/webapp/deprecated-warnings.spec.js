@@ -1,5 +1,10 @@
 const { test, expect } = require('./fixtures');
-const { targetUri, waitForPageReady, removeOverlay, loadProgram } = require('./test-utils');
+const {
+  targetUri,
+  waitForPageReady,
+  removeOverlay,
+  loadProgram,
+} = require('./test-utils');
 
 /**
  * Tests for the behavior of deprecated-instruction warnings.
@@ -28,7 +33,9 @@ loop:
 \tsyscall\t0
 `;
 
-test('deprecated instruction is flagged by the syntax checker', async ({ page }) => {
+test('deprecated instruction is flagged by the syntax checker', async ({
+  page,
+}) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await removeOverlay(page);
@@ -46,7 +53,9 @@ test('deprecated instruction is flagged by the syntax checker', async ({ page })
   await expect(page.getByRole('heading', { name: /Issues\s*1/ })).toBeVisible();
 });
 
-test('hover tooltip works after loading code with a warning', async ({ page }) => {
+test('hover tooltip works after loading code with a warning', async ({
+  page,
+}) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await removeOverlay(page);
@@ -66,14 +75,19 @@ test('hover tooltip works after loading code with a warning', async ({ page }) =
     let target = 1;
     for (let i = 1; i <= model.getLineCount(); i++) {
       const text = model.getLineContent(i).trim();
-      if (text.startsWith('daddi')) { target = i; break; }
+      if (text.startsWith('daddi')) {
+        target = i;
+        break;
+      }
     }
     editor.setPosition({ lineNumber: target, column: 5 });
     editor.focus();
     editor.trigger('test', 'editor.action.showHover', {});
     await new Promise((r) => setTimeout(r, 1000));
     const nodes = document.querySelectorAll('.monaco-hover .hover-contents');
-    return Array.from(nodes).map((e) => e.innerText).join('\n');
+    return Array.from(nodes)
+      .map((e) => e.innerText)
+      .join('\n');
   });
 
   expect(hoverContents).toContain('Address');

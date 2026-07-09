@@ -145,8 +145,7 @@ const WorkspaceLayoutView = ({
   const onHandleKeyDown =
     (which: 'vertical' | 'horizontal') => (e: React.KeyboardEvent) => {
       if (which === 'vertical') {
-        const dir =
-          e.key === 'ArrowLeft' ? 1 : e.key === 'ArrowRight' ? -1 : 0;
+        const dir = e.key === 'ArrowLeft' ? 1 : e.key === 'ArrowRight' ? -1 : 0;
         if (!dir) return;
         e.preventDefault();
         commit({
@@ -197,7 +196,9 @@ const WorkspaceLayoutView = ({
       >
         <IconButton
           size="small"
-          aria-label={live.bottomCollapsed ? 'Expand cycles' : 'Collapse cycles'}
+          aria-label={
+            live.bottomCollapsed ? 'Expand cycles' : 'Collapse cycles'
+          }
           data-testid="toggle-bottom"
           onClick={() =>
             commit({ ...live, bottomCollapsed: !live.bottomCollapsed })
@@ -221,10 +222,7 @@ const WorkspaceLayoutView = ({
         <Box id="left-panel" sx={{ height: '60vh', minHeight: 320 }}>
           {left}
         </Box>
-        <Box
-          id="right-panel"
-          sx={{ borderTop: 1, borderColor: 'divider' }}
-        >
+        <Box id="right-panel" sx={{ borderTop: 1, borderColor: 'divider' }}>
           {right}
         </Box>
         <Box

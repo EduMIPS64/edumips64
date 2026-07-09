@@ -16,7 +16,9 @@ const { targetUri, waitForPageReady } = require('./test-utils');
  *   2. The error panel (#app-load-error) was never shown.
  *   3. The loading spinner (#app-loading) is no longer in the DOM once ready.
  */
-test('app loading gate resolves and simulator becomes ready', async ({ page }) => {
+test('app loading gate resolves and simulator becomes ready', async ({
+  page,
+}) => {
   await page.goto(targetUri);
 
   // The app must reach the ready state (simulator fully loaded).

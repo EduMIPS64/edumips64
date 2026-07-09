@@ -1,59 +1,59 @@
 .logo {
-    height: 30px;
-    padding-left: 0.5em;
-    margin-right: 10px;
+  height: 30px;
+  padding-left: 0.5em;
+  margin-right: 10px;
 }
 
 .settings-button {
-    margin-left: auto;
+  margin-left: auto;
 }
 
 .help-button {
-    margin-right: 1em;
+  margin-right: 1em;
 }
 
 .help-title {
-     padding: 30px !important;
+  padding: 30px;
 }
 
 .help-content {
-     padding: 30px !important;
+  padding: 30px;
 }
 
 /* On phones / small tablets the 30px gutters of the help dialog eat up
    precious horizontal space and make the manual unreadable. Tighten
    them up below ~900px. */
 @media (max-width: 900px) {
-    .help-title {
-        padding: 16px !important;
-    }
-    .help-content {
-        padding: 12px !important;
-    }
+  .help-title {
+    padding: 16px;
+  }
+  .help-content {
+    padding: 12px;
+  }
 }
 
 .accordion-change-indicator {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    background-color: #3557d4;
-    border-radius: 50%;
-    margin-left: 8px;
-    animation: pulse 1.5s ease-in-out infinite;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #3557d4;
+  border-radius: 50%;
+  margin-left: 8px;
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
 @keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
-
 
 /* Candidate channel badge — shown when served from /<date>/<n>-<sha>/ path */
 .candidate-chip {
-    background-color: #7b1fa2 !important;
-    color: #fff !important;
+  background-color: #7b1fa2;
+  color: #fff;
 }

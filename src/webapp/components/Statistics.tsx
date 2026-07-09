@@ -37,7 +37,9 @@ interface PluralRowProps {
 
 const PluralRow = ({ label, value, valueId }: PluralRowProps) => {
   const pluralSuffix = value !== 1 ? 's' : '';
-  return <Row label={`${label}${pluralSuffix}`} value={value} valueId={valueId} />;
+  return (
+    <Row label={`${label}${pluralSuffix}`} value={value} valueId={valueId} />
+  );
 };
 
 // Props match the Statistics protocol type (spread from `stats` in Simulator).
@@ -70,14 +72,27 @@ const StatisticsPanel = ({
         <table style={tableStyle}>
           <tbody>
             <tr>
-              <th colSpan={2} style={{ textAlign: 'left', fontSize: '1rem', padding: '0.5rem 0' }}>
+              <th
+                colSpan={2}
+                style={{
+                  textAlign: 'left',
+                  fontSize: '1rem',
+                  padding: '0.5rem 0',
+                }}
+              >
                 Execution
               </th>
             </tr>
             <PluralRow value={cycles} label="Cycle" valueId="stat-cycles" />
-            <PluralRow value={instructions} label="Instruction" valueId="stat-instructions" />
+            <PluralRow
+              value={instructions}
+              label="Instruction"
+              valueId="stat-instructions"
+            />
             <Row
-              value={instructions === 0 ? 0 : (cycles / instructions).toFixed(2)}
+              value={
+                instructions === 0 ? 0 : (cycles / instructions).toFixed(2)
+              }
               label="Cycles per Instructions (CPI)"
             />
           </tbody>
@@ -88,28 +103,79 @@ const StatisticsPanel = ({
         <table style={tableStyle}>
           <tbody>
             <tr>
-              <th colSpan={2} style={{ textAlign: 'left', fontSize: '1rem', padding: '0.5rem 0' }}>
+              <th
+                colSpan={2}
+                style={{
+                  textAlign: 'left',
+                  fontSize: '1rem',
+                  padding: '0.5rem 0',
+                }}
+              >
                 Stalls
               </th>
             </tr>
-            <PluralRow value={rawStalls} label="RAW Stall" valueId="stat-raw-stalls" />
-            <PluralRow value={wawStalls} label="WAW Stall" valueId="stat-waw-stalls" />
             <PluralRow
-              value={(dividerStalls || 0) + (memoryStalls || 0) + (exStalls || 0) + (funcUnitStalls || 0)}
+              value={rawStalls}
+              label="RAW Stall"
+              valueId="stat-raw-stalls"
+            />
+            <PluralRow
+              value={wawStalls}
+              label="WAW Stall"
+              valueId="stat-waw-stalls"
+            />
+            <PluralRow
+              value={
+                (dividerStalls || 0) +
+                (memoryStalls || 0) +
+                (exStalls || 0) +
+                (funcUnitStalls || 0)
+              }
               label="Structural Stall"
               valueId="stat-structural-stalls"
             />
             <tr>
-              <th colSpan={2} style={{ textAlign: 'left', fontSize: '1rem', padding: '0.5rem 0' }}>
+              <th
+                colSpan={2}
+                style={{
+                  textAlign: 'left',
+                  fontSize: '1rem',
+                  padding: '0.5rem 0',
+                }}
+              >
                 Cache Memory Statistics
               </th>
             </tr>
-            <Row value={L1I_reads} label="L1 Instruction Reads" valueId="stat-l1i-reads" />
-            <Row value={L1I_misses} label="L1 Instruction Misses" valueId="stat-l1i-misses" />
-            <Row value={L1D_reads} label="L1 Data Reads" valueId="stat-l1d-reads" />
-            <Row value={L1D_reads_misses} label="L1 Data Read Misses" valueId="stat-l1d-read-misses" />
-            <Row value={L1D_writes} label="L1 Data Writes" valueId="stat-l1d-writes" />
-            <Row value={L1D_writes_misses} label="L1 Data Write Misses" valueId="stat-l1d-write-misses" />
+            <Row
+              value={L1I_reads}
+              label="L1 Instruction Reads"
+              valueId="stat-l1i-reads"
+            />
+            <Row
+              value={L1I_misses}
+              label="L1 Instruction Misses"
+              valueId="stat-l1i-misses"
+            />
+            <Row
+              value={L1D_reads}
+              label="L1 Data Reads"
+              valueId="stat-l1d-reads"
+            />
+            <Row
+              value={L1D_reads_misses}
+              label="L1 Data Read Misses"
+              valueId="stat-l1d-read-misses"
+            />
+            <Row
+              value={L1D_writes}
+              label="L1 Data Writes"
+              valueId="stat-l1d-writes"
+            />
+            <Row
+              value={L1D_writes_misses}
+              label="L1 Data Write Misses"
+              valueId="stat-l1d-write-misses"
+            />
           </tbody>
         </table>
       </div>

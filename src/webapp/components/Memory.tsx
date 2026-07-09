@@ -13,10 +13,16 @@ const MemoryElement = ({ memoryelement }: MemoryElementProps) => {
   return (
     <>
       <td>
-        <BinaryValue hexString={memoryelement.address_hex} value={memoryelement.address} />
+        <BinaryValue
+          hexString={memoryelement.address_hex}
+          value={memoryelement.address}
+        />
       </td>
       <td>
-        <BinaryValue hexString={memoryelement.value_hex} value={memoryelement.value} />
+        <BinaryValue
+          hexString={memoryelement.value_hex}
+          value={memoryelement.value}
+        />
       </td>
       <td className="elementLabel">{memoryelement.label}</td>
       <td className="elementCode">{memoryelement.code}</td>
@@ -47,7 +53,7 @@ const MemoryPanel = ({ memory }: MemoryProps) => {
             </tr>
           </thead>
           <tbody>
-            {cells.map((memoryelement, i) => (
+            {cells.map((_memoryelement, i) => (
               <tr key={i}>
                 <MemoryElement memoryelement={cells[i]} />
               </tr>

@@ -1,5 +1,10 @@
 const { test, expect } = require('./fixtures');
-const { targetUri, removeOverlay, waitForPageReady, clickProgramMenuItem } = require('./test-utils');
+const {
+  targetUri,
+  removeOverlay,
+  waitForPageReady,
+  clickProgramMenuItem,
+} = require('./test-utils');
 
 const STORAGE_PREFIX = 'edumips64:v1:';
 const EDITOR_CODE_KEY = `${STORAGE_PREFIX}editorCode`;
@@ -13,11 +18,13 @@ test.beforeEach(async ({ page }) => {
     const keysToRemove = [];
     for (let i = 0; i < window.localStorage.length; i++) {
       const k = window.localStorage.key(i);
-      if (k && k.startsWith(prefix)) {
+      if (k?.startsWith(prefix)) {
         keysToRemove.push(k);
       }
     }
-    keysToRemove.forEach((k) => window.localStorage.removeItem(k));
+    keysToRemove.forEach((k) => {
+      window.localStorage.removeItem(k);
+    });
   }, STORAGE_PREFIX);
 });
 

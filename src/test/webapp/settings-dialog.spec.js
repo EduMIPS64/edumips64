@@ -74,7 +74,9 @@ test('the UI tab groups General, Editor and Pipeline Colors into labeled section
   await expect(page.getByLabel('Increase font size')).toBeVisible();
 
   // Pipeline Colors: the per-stage color pickers.
-  await expect(uiPanel.getByText('Pipeline Colors', { exact: true })).toBeVisible();
+  await expect(
+    uiPanel.getByText('Pipeline Colors', { exact: true }),
+  ).toBeVisible();
   await expect(page.getByTestId('pipeline-color-IF')).toBeVisible();
 
   const [generalBox, editorBox, colorsBox] = await Promise.all([
@@ -116,7 +118,9 @@ test('the Simulation tab groups CPU and Cache into labeled sections', async ({
   await expect(page.getByLabel('CPU Forwarding')).toBeVisible();
   await expect(page.getByLabel('Branch Delay Slot')).toBeVisible();
 
-  await expect(simulationPanel.getByText('Cache', { exact: true })).toBeVisible();
+  await expect(
+    simulationPanel.getByText('Cache', { exact: true }),
+  ).toBeVisible();
   await expect(page.locator('text=L1 Instruction Cache')).toBeVisible();
   await expect(page.locator('text=L1 Data Cache')).toBeVisible();
 
@@ -224,7 +228,9 @@ SYSCALL 0
   // The Simulation tab's content (including its reset button) lives inside
   // that tab's panel, which isn't rendered while the disabled tab can't be
   // selected — so it isn't just disabled, it's unreachable.
-  await expect(page.locator('#settings-reset-simulation-button')).toHaveCount(0);
+  await expect(page.locator('#settings-reset-simulation-button')).toHaveCount(
+    0,
+  );
 
   await page.click('#settings-close-button');
   await page.click('#stop-button');

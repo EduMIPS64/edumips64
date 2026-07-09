@@ -100,7 +100,9 @@ export function useExecutionController({
   // Pending timeout id for a delayed follow-up batch. Stored in a ref so that
   // stopping the simulation cancels any batch sleeping between strides instead
   // of having it fire after `worker.reset()` and surface a spurious error.
-  const nextBatchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const nextBatchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   const cancelPendingBatch = useCallback(() => {
     if (nextBatchTimeoutRef.current !== null) {

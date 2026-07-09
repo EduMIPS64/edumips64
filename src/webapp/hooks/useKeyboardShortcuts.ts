@@ -83,7 +83,10 @@ export function useKeyboardShortcuts({
           });
           runCode();
         } else if (logicalState === 'EXECUTING') {
-          appInsights.trackEvent({ name: 'pause', properties: { source: 'keyboard' } });
+          appInsights.trackEvent({
+            name: 'pause',
+            properties: { source: 'keyboard' },
+          });
           pauseCode();
         }
         break;

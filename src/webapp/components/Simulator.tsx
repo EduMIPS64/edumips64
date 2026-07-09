@@ -169,7 +169,9 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // Message shown in the RuntimeErrorDialog; null = dialog closed. Set by the
   // execution controller when a runtime error result arrives (the controller
   // stops the CPU immediately; the dialog is purely informational).
-  const [runtimeErrorMessage, setRuntimeErrorMessage] = React.useState<string | null>(null);
+  const [runtimeErrorMessage, setRuntimeErrorMessage] = React.useState<
+    string | null
+  >(null);
 
   // ---------------------------------------------------------------------------
   // Execution controller (reducer, batch scheduling, worker subscription)
@@ -205,17 +207,18 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // pushed to the worker) and whenever the user toggles the switch.
   React.useEffect(() => {
     worker.setForwarding(forwarding);
-  }, [forwarding]);
+  }, [forwarding, worker.setForwarding]);
 
   // Same pattern for the branch delay slot setting.
   React.useEffect(() => {
     worker.setDelaySlot(delaySlot);
-  }, [delaySlot]);
+  }, [delaySlot, worker.setDelaySlot]);
 
   // ---------------------------------------------------------------------------
   // Editor ref (for Issues panel click-to-navigate)
   // ---------------------------------------------------------------------------
-  const editorRef = React.useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
+  const editorRef =
+    React.useRef<monacoEditor.editor.IStandaloneCodeEditor | null>(null);
   const handleEditorReady = React.useCallback(
     (editor: monacoEditor.editor.IStandaloneCodeEditor) => {
       editorRef.current = editor;
@@ -241,13 +244,14 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // ---------------------------------------------------------------------------
 
   // Track if data has changed while accordion was collapsed
-  const [accordionChanges, setAccordionChanges] = React.useState<AccordionChanges>({
-    stats: false,
-    pipeline: false,
-    registers: false,
-    memory: false,
-    stdout: false,
-  });
+  const [accordionChanges, setAccordionChanges] =
+    React.useState<AccordionChanges>({
+      stats: false,
+      pipeline: false,
+      registers: false,
+      memory: false,
+      stdout: false,
+    });
 
   // Refs to track previous values for change detection
   const prevStats = React.useRef(stats);
@@ -480,7 +484,8 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
 
   // Handle accordion expansion change
   const handleAccordionChange =
-    (panel: AccordionPanel) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+    (panel: AccordionPanel) =>
+    (_event: React.SyntheticEvent, isExpanded: boolean) => {
       setExpandedAccordions((prev) => ({
         ...prev,
         [panel]: isExpanded,
@@ -502,9 +507,9 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // Run a syntax check on the initial code once on mount so that warnings
   // (e.g. deprecated instructions in the sample program) are surfaced
   // immediately, without requiring the user to edit the code first.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: deliberately runs only once on mount; see comment above.
   React.useEffect(() => {
     worker.checkSyntax(code);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onCodeChange = (newCode: string) => {
@@ -546,201 +551,199 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // Render
   // ---------------------------------------------------------------------------
   return (
-    <>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <InputDialog
-          request={inputRequest}
-          onSubmit={submitInput}
-          onCancel={cancelInput}
-        />
-        <RuntimeErrorDialog
-          open={runtimeErrorMessage !== null}
-          message={runtimeErrorMessage || ''}
-          onClose={() => setRuntimeErrorMessage(null)}
-        />
-        <Header
-          onLoadClick={loadCode}
-          loadEnabled={isValidProgram()}
-          onClearClick={clearCode}
-          onOpenClick={openCode}
-          onSaveClick={saveCode}
-          onRestoreClick={restoreDefaultSample}
-          parsingErrors={parsingErrors}
-          version={worker.version}
-          status={status}
-          executing={executing}
-          inputRequest={inputRequest}
-          prefersDarkMode={prefersDarkMode}
-          onCacheConfigChange={setCacheConfig}
-          viMode={viMode}
-          setViMode={setViMode}
-          fontSize={fontSize}
-          setFontSize={setFontSize}
-          accordionAlerts={accordionAlerts}
-          setAccordionAlerts={setAccordionAlerts}
-          pipelineColors={pipelineColors}
-          setPipelineColors={setPipelineColors}
-          themeMode={themeMode}
-          setThemeMode={setThemeMode}
-          forwarding={forwarding}
-          setForwarding={setForwarding}
-          delaySlot={delaySlot}
-          setDelaySlot={setDelaySlot}
-          stepStride={stepStride}
-          setStepStride={setStepStride}
-          executionDelayMs={executionDelayMs}
-          setExecutionDelayMs={setExecutionDelayMs}
-        />
-        <RunControlsToolbar
-          onStepClick={clickStep}
-          onRunClick={clickRun}
-          onPauseClick={() => {
-            appInsights.trackEvent({ name: 'pause' });
-            dispatch({ type: 'PAUSE_REQUESTED' });
-          }}
-          onStopClick={clickStop}
-          status={status}
-          executing={executing}
-          inputRequest={inputRequest}
-          multiStepCount={stepStride}
-        />
-        <WorkspaceLayout
-          layout={workspaceLayout}
-          onLayoutChange={setWorkspaceLayout}
-          bottomTitle="Cycles"
-          left={
-            <Code
-              onChangeValue={onCodeChange}
-              code={code}
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <InputDialog
+        request={inputRequest}
+        onSubmit={submitInput}
+        onCancel={cancelInput}
+      />
+      <RuntimeErrorDialog
+        open={runtimeErrorMessage !== null}
+        message={runtimeErrorMessage || ''}
+        onClose={() => setRuntimeErrorMessage(null)}
+      />
+      <Header
+        onLoadClick={loadCode}
+        loadEnabled={isValidProgram()}
+        onClearClick={clearCode}
+        onOpenClick={openCode}
+        onSaveClick={saveCode}
+        onRestoreClick={restoreDefaultSample}
+        parsingErrors={parsingErrors}
+        version={worker.version}
+        status={status}
+        executing={executing}
+        inputRequest={inputRequest}
+        prefersDarkMode={prefersDarkMode}
+        onCacheConfigChange={setCacheConfig}
+        viMode={viMode}
+        setViMode={setViMode}
+        fontSize={fontSize}
+        setFontSize={setFontSize}
+        accordionAlerts={accordionAlerts}
+        setAccordionAlerts={setAccordionAlerts}
+        pipelineColors={pipelineColors}
+        setPipelineColors={setPipelineColors}
+        themeMode={themeMode}
+        setThemeMode={setThemeMode}
+        forwarding={forwarding}
+        setForwarding={setForwarding}
+        delaySlot={delaySlot}
+        setDelaySlot={setDelaySlot}
+        stepStride={stepStride}
+        setStepStride={setStepStride}
+        executionDelayMs={executionDelayMs}
+        setExecutionDelayMs={setExecutionDelayMs}
+      />
+      <RunControlsToolbar
+        onStepClick={clickStep}
+        onRunClick={clickRun}
+        onPauseClick={() => {
+          appInsights.trackEvent({ name: 'pause' });
+          dispatch({ type: 'PAUSE_REQUESTED' });
+        }}
+        onStopClick={clickStop}
+        status={status}
+        executing={executing}
+        inputRequest={inputRequest}
+        multiStepCount={stepStride}
+      />
+      <WorkspaceLayout
+        layout={workspaceLayout}
+        onLayoutChange={setWorkspaceLayout}
+        bottomTitle="Cycles"
+        left={
+          <Code
+            onChangeValue={onCodeChange}
+            code={code}
+            parsingErrors={parsingErrors}
+            parsedInstructions={parsedInstructions}
+            pipeline={pipeline}
+            running={simulatorRunning}
+            viMode={viMode}
+            fontSize={fontSize}
+            validInstructions={initialState.validInstructions}
+            paletteMode={paletteMode}
+            pipelineColors={pipelineColors}
+            onEditorReady={handleEditorReady}
+          />
+        }
+        bottom={<Cycles cycles={cycles} colors={pipelineColors} />}
+        right={
+          <>
+            <ErrorList
               parsingErrors={parsingErrors}
-              parsedInstructions={parsedInstructions}
-              pipeline={pipeline}
-              running={simulatorRunning}
-              viMode={viMode}
-              fontSize={fontSize}
-              validInstructions={initialState.validInstructions}
-              paletteMode={paletteMode}
-              pipelineColors={pipelineColors}
-              onEditorReady={handleEditorReady}
+              AccordionSummary={AccordionSummary}
+              onIssueClick={handleIssueClick}
             />
-          }
-          bottom={<Cycles cycles={cycles} colors={pipelineColors} />}
-          right={
-            <>
-              <ErrorList
-                parsingErrors={parsingErrors}
-                AccordionSummary={AccordionSummary}
-                onIssueClick={handleIssueClick}
-              />
-              <Accordion
-                expanded={expandedAccordions.stats}
-                onChange={handleAccordionChange('stats')}
-                disableGutters
-              >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 600, color: 'primary.main' }}
-                  >
-                    Stats
-                    {accordionAlerts && accordionChanges.stats && (
-                      <span className="accordion-change-indicator" />
-                    )}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Statistics {...stats} />
-                </AccordionDetails>
-              </Accordion>
-              <Accordion
-                expanded={expandedAccordions.pipeline}
-                onChange={handleAccordionChange('pipeline')}
-                disableGutters
-              >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 600, color: 'primary.main' }}
-                  >
-                    Pipeline
-                    {accordionAlerts && accordionChanges.pipeline && (
-                      <span className="accordion-change-indicator" />
-                    )}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Pipeline pipeline={pipeline} colors={pipelineColors} />
-                </AccordionDetails>
-              </Accordion>
-              <Accordion
-                expanded={expandedAccordions.registers}
-                onChange={handleAccordionChange('registers')}
-                disableGutters
-              >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 600, color: 'primary.main' }}
-                  >
-                    Registers
-                    {accordionAlerts && accordionChanges.registers && (
-                      <span className="accordion-change-indicator" />
-                    )}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Registers {...registers} />
-                </AccordionDetails>
-              </Accordion>
-              <Accordion
-                expanded={expandedAccordions.memory}
-                onChange={handleAccordionChange('memory')}
-                disableGutters
-              >
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  id="memory-accordion-summary"
+            <Accordion
+              expanded={expandedAccordions.stats}
+              onChange={handleAccordionChange('stats')}
+              disableGutters
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, color: 'primary.main' }}
                 >
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 600, color: 'primary.main' }}
-                  >
-                    Memory
-                    {accordionAlerts && accordionChanges.memory && (
-                      <span className="accordion-change-indicator" />
-                    )}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Memory memory={memory} />
-                </AccordionDetails>
-              </Accordion>
-              <Accordion
-                expanded={expandedAccordions.stdout}
-                onChange={handleAccordionChange('stdout')}
-                disableGutters
+                  Stats
+                  {accordionAlerts && accordionChanges.stats && (
+                    <span className="accordion-change-indicator" />
+                  )}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Statistics {...stats} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion
+              expanded={expandedAccordions.pipeline}
+              onChange={handleAccordionChange('pipeline')}
+              disableGutters
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, color: 'primary.main' }}
+                >
+                  Pipeline
+                  {accordionAlerts && accordionChanges.pipeline && (
+                    <span className="accordion-change-indicator" />
+                  )}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Pipeline pipeline={pipeline} colors={pipelineColors} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion
+              expanded={expandedAccordions.registers}
+              onChange={handleAccordionChange('registers')}
+              disableGutters
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, color: 'primary.main' }}
+                >
+                  Registers
+                  {accordionAlerts && accordionChanges.registers && (
+                    <span className="accordion-change-indicator" />
+                  )}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Registers {...registers} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion
+              expanded={expandedAccordions.memory}
+              onChange={handleAccordionChange('memory')}
+              disableGutters
+            >
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                id="memory-accordion-summary"
               >
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 600, color: 'primary.main' }}
-                  >
-                    Standard Output
-                    {accordionAlerts && accordionChanges.stdout && (
-                      <span className="accordion-change-indicator" />
-                    )}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <StdOut stdout={stdout} />
-                </AccordionDetails>
-              </Accordion>
-            </>
-          }
-        />
-      </ThemeProvider>
-    </>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, color: 'primary.main' }}
+                >
+                  Memory
+                  {accordionAlerts && accordionChanges.memory && (
+                    <span className="accordion-change-indicator" />
+                  )}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Memory memory={memory} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion
+              expanded={expandedAccordions.stdout}
+              onChange={handleAccordionChange('stdout')}
+              disableGutters
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 600, color: 'primary.main' }}
+                >
+                  Standard Output
+                  {accordionAlerts && accordionChanges.stdout && (
+                    <span className="accordion-change-indicator" />
+                  )}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <StdOut stdout={stdout} />
+              </AccordionDetails>
+            </Accordion>
+          </>
+        }
+      />
+    </ThemeProvider>
   );
 };
 

@@ -31,8 +31,6 @@
  * visible. `toBeHidden()` matches both "not in DOM" and `display:none`.
  */
 
-'use strict';
-
 const { test, expect } = require('./fixtures');
 const {
   targetUri,
@@ -40,7 +38,6 @@ const {
   loadProgram,
   runToCompletion,
   removeOverlay,
-  waitForSimulationComplete,
   openProgramMenu,
 } = require('./test-utils');
 
@@ -62,7 +59,9 @@ SYSCALL 0
 
 // ─── EMPTY state ─────────────────────────────────────────────────────────────
 
-test('EMPTY: load-button visible; run-controls-toolbar absent; execution buttons not actionable', async ({ page }) => {
+test('EMPTY: load-button visible; run-controls-toolbar absent; execution buttons not actionable', async ({
+  page,
+}) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
 
@@ -76,7 +75,9 @@ test('EMPTY: load-button visible; run-controls-toolbar absent; execution buttons
   // (new floating-toolbar design) or present but disabled (production design).
   // The :not([disabled]) filter makes toHaveCount(0) pass in both cases.
   await expect(page.locator('#step-button:not([disabled])')).toHaveCount(0);
-  await expect(page.locator('#multi-step-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#multi-step-button:not([disabled])')).toHaveCount(
+    0,
+  );
   await expect(page.locator('#run-button:not([disabled])')).toHaveCount(0);
   await expect(page.locator('#pause-button:not([disabled])')).toHaveCount(0);
   await expect(page.locator('#stop-button:not([disabled])')).toHaveCount(0);
@@ -138,7 +139,9 @@ test('READY: step/multi-step/run/stop visible & enabled; pause visible but disab
   await expect(page.locator('#pause-button')).toBeDisabled();
 });
 
-test('READY: program-menu-button visible but DISABLED; settings-button and help-button visible', async ({ page }) => {
+test('READY: program-menu-button visible but DISABLED; settings-button and help-button visible', async ({
+  page,
+}) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await loadProgram(page, simpleProgram);
@@ -191,7 +194,9 @@ test('EXECUTING: pause visible & enabled; stop visible but disabled; step/multi-
   // Wait until the UI enters EXECUTING: #pause-button becomes enabled.
   // (In the always-present model, pause is visible even in READY but disabled;
   // we must wait for it to be enabled as the definitive EXECUTING signal.)
-  await page.waitForSelector('#pause-button:not([disabled])', { timeout: 10000 });
+  await page.waitForSelector('#pause-button:not([disabled])', {
+    timeout: 10000,
+  });
 
   // ── assertions while EXECUTING ──
   await expect(page.locator('#pause-button')).toBeVisible();
@@ -224,14 +229,18 @@ test('EXECUTING: pause visible & enabled; stop visible but disabled; step/multi-
   await page.click('#pause-button');
   // Wait for READY state: step button becomes enabled (it's always present, just
   // disabled during EXECUTING), then reset cleanly.
-  await page.waitForSelector('#step-button:not([disabled])', { timeout: 10000 });
+  await page.waitForSelector('#step-button:not([disabled])', {
+    timeout: 10000,
+  });
   // Reset the simulator so subsequent tests start from a clean EMPTY state.
   await page.click('#stop-button');
 });
 
 // ─── ENDED state ─────────────────────────────────────────────────────────────
 
-test('ENDED: load-button visible; run-controls-toolbar absent; execution buttons not actionable', async ({ page }) => {
+test('ENDED: load-button visible; run-controls-toolbar absent; execution buttons not actionable', async ({
+  page,
+}) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await loadProgram(page, simpleProgram);
@@ -245,7 +254,9 @@ test('ENDED: load-button visible; run-controls-toolbar absent; execution buttons
   // Note: #stop-button is intentionally excluded — in some UI designs it
   // remains enabled in ENDED state to allow resetting the simulator.
   await expect(page.locator('#step-button:not([disabled])')).toHaveCount(0);
-  await expect(page.locator('#multi-step-button:not([disabled])')).toHaveCount(0);
+  await expect(page.locator('#multi-step-button:not([disabled])')).toHaveCount(
+    0,
+  );
   await expect(page.locator('#run-button:not([disabled])')).toHaveCount(0);
   await expect(page.locator('#pause-button:not([disabled])')).toHaveCount(0);
 
@@ -253,7 +264,9 @@ test('ENDED: load-button visible; run-controls-toolbar absent; execution buttons
   await expect(page.locator('#load-button')).toBeVisible();
 });
 
-test('ENDED: program-menu-button visible and enabled; settings-button and help-button visible', async ({ page }) => {
+test('ENDED: program-menu-button visible and enabled; settings-button and help-button visible', async ({
+  page,
+}) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await loadProgram(page, simpleProgram);
@@ -280,7 +293,9 @@ test('ENDED: program-menu-button visible and enabled; settings-button and help-b
 // A single test that walks through EMPTY → READY → ENDED in one page load,
 // asserting key control visibility at each transition.
 
-test('lifecycle: EMPTY → READY → ENDED control transitions', async ({ page }) => {
+test('lifecycle: EMPTY → READY → ENDED control transitions', async ({
+  page,
+}) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
 
@@ -335,7 +350,9 @@ test('lifecycle: EMPTY → READY → ENDED control transitions', async ({ page }
 // `setPointerCapture` in the snap Chromium build on this host.
 // A robust drag test would require a dedicated Playwright fixture that
 // bypasses the pointer-capture limitation. Deferred.
-test.skip('toolbar is draggable: position changes after drag gesture', async ({ page }) => {
+test.skip('toolbar is draggable: position changes after drag gesture', async ({
+  page,
+}) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await loadProgram(page, simpleProgram);
@@ -345,8 +362,14 @@ test.skip('toolbar is draggable: position changes after drag gesture', async ({ 
   const handle = toolbar.locator('[aria-label="Drag toolbar"]');
 
   const before = await toolbar.boundingBox();
-  await handle.dispatchEvent('pointerdown', { clientX: before.x + 10, clientY: before.y + 10 });
-  await handle.dispatchEvent('pointermove', { clientX: before.x + 60, clientY: before.y + 60 });
+  await handle.dispatchEvent('pointerdown', {
+    clientX: before.x + 10,
+    clientY: before.y + 10,
+  });
+  await handle.dispatchEvent('pointermove', {
+    clientX: before.x + 60,
+    clientY: before.y + 60,
+  });
   await handle.dispatchEvent('pointerup', {});
   const after = await toolbar.boundingBox();
 

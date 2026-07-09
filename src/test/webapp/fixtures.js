@@ -8,8 +8,8 @@
  */
 
 const { test: baseTest, expect } = require('@playwright/test');
-const path = require('path');
-const fs = require('fs');
+const path = require('node:path');
+const fs = require('node:fs');
 
 const COVERAGE_DIR = path.join(process.cwd(), '.nyc_output');
 

@@ -133,7 +133,7 @@ test('stdout text is visible in dark theme with light OS', async ({ page }) => {
 
   // Assert the app published the resolved palette to the DOM.
   const dataTheme = await page.evaluate(() =>
-    document.documentElement.getAttribute('data-theme')
+    document.documentElement.getAttribute('data-theme'),
   );
   expect(dataTheme).toBe('dark');
 
@@ -156,4 +156,3 @@ test('stdout text is visible in dark theme with light OS', async ({ page }) => {
   // The StdOut.js theme-aware inline style guarantees this.
   expect(textBrightness).toBeGreaterThan(150);
 });
-

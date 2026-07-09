@@ -36,47 +36,52 @@ interface ErrorListProps {
   onIssueClick?: (row: number, column: number) => void;
 }
 
-const ErrorList = ({ parsingErrors, AccordionSummary, onIssueClick }: ErrorListProps) => {
-  if (parsingErrors == undefined) {
+const ErrorList = ({
+  parsingErrors,
+  AccordionSummary,
+  onIssueClick,
+}: ErrorListProps) => {
+  if (parsingErrors === undefined) {
     return <React.Fragment />;
   }
   return (
-    <>
-      <Accordion defaultExpanded disableGutters className="error-accordion">
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 'bold', color: 'primary.main' }}>
-            Issues
-          </Typography>
-          <ErrorDisplay parsingErrors={parsingErrors} />
-        </AccordionSummary>
-        <AccordionDetails>
-          <List sx={{ width: '100%' }} dense>
-            {parsingErrors.map((value) => (
-              <ListItem key={JSON.stringify(value)} disableGutters disablePadding>
-                <ListItemButton
-                  onClick={
-                    onIssueClick
-                      ? () => onIssueClick(value.row, value.column)
-                      : undefined
-                  }
-                  className="error-list-item-button"
-                  aria-label={`Jump to line ${value.row}, position ${value.column}: ${value.description}`}
-                  data-issue-row={value.row}
-                  data-issue-column={value.column}
-                >
-                  <ListItemIcon className="error-list-item">
-                    <DecideIconType errorType={value.isWarning} />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={`Line ${value.row} Position ${value.column}: ${value.description}`}
-                  />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </AccordionDetails>
-      </Accordion>
-    </>
+    <Accordion defaultExpanded disableGutters className="error-accordion">
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Typography
+          variant="h6"
+          sx={{ flexGrow: 1, fontWeight: 'bold', color: 'primary.main' }}
+        >
+          Issues
+        </Typography>
+        <ErrorDisplay parsingErrors={parsingErrors} />
+      </AccordionSummary>
+      <AccordionDetails>
+        <List sx={{ width: '100%' }} dense>
+          {parsingErrors.map((value) => (
+            <ListItem key={JSON.stringify(value)} disableGutters disablePadding>
+              <ListItemButton
+                onClick={
+                  onIssueClick
+                    ? () => onIssueClick(value.row, value.column)
+                    : undefined
+                }
+                className="error-list-item-button"
+                aria-label={`Jump to line ${value.row}, position ${value.column}: ${value.description}`}
+                data-issue-row={value.row}
+                data-issue-column={value.column}
+              >
+                <ListItemIcon className="error-list-item">
+                  <DecideIconType errorType={value.isWarning} />
+                </ListItemIcon>
+                <ListItemText
+                  primary={`Line ${value.row} Position ${value.column}: ${value.description}`}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 

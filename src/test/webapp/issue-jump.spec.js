@@ -34,7 +34,9 @@ async function typeProgram(page, program) {
   await page.keyboard.insertText(program);
 }
 
-test('clicking an Issues entry jumps the editor to that line', async ({ page }) => {
+test('clicking an Issues entry jumps the editor to that line', async ({
+  page,
+}) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await removeOverlay(page);
@@ -57,7 +59,9 @@ test('clicking an Issues entry jumps the editor to that line', async ({ page }) 
   expect(buttonCount).toBeGreaterThan(0);
   const targetButton = issueButtons.first();
   const issueRow = Number(await targetButton.getAttribute('data-issue-row'));
-  const issueColumn = Number(await targetButton.getAttribute('data-issue-column'));
+  const issueColumn = Number(
+    await targetButton.getAttribute('data-issue-column'),
+  );
   expect(Number.isFinite(issueRow)).toBe(true);
   expect(Number.isFinite(issueColumn)).toBe(true);
 
@@ -78,12 +82,17 @@ test('clicking an Issues entry jumps the editor to that line', async ({ page }) 
   // After the click the editor's cursor must be on the line reported by
   // the issue, at the expected (clamped) column. Poll because the click's
   // effect on the Monaco view propagates asynchronously.
-  await expect.poll(async () => {
-    return page.evaluate(() => {
-      const pos = window.editor.getPosition();
-      return pos ? { line: pos.lineNumber, column: pos.column } : null;
-    });
-  }, { timeout: 5000 }).toEqual({ line: expectedLine, column: expectedColumn });
+  await expect
+    .poll(
+      async () => {
+        return page.evaluate(() => {
+          const pos = window.editor.getPosition();
+          return pos ? { line: pos.lineNumber, column: pos.column } : null;
+        });
+      },
+      { timeout: 5000 },
+    )
+    .toEqual({ line: expectedLine, column: expectedColumn });
 
   // The offending line must be within the editor's currently visible range,
   // i.e. revealLineInCenter actually scrolled the viewport.
@@ -94,5 +103,8 @@ test('clicking an Issues entry jumps the editor to that line', async ({ page }) 
   const isVisible = visible.some(
     ([start, end]) => expectedLine >= start && expectedLine <= end,
   );
-  expect(isVisible, `Line ${expectedLine} should be visible after click; visible ranges: ${JSON.stringify(visible)}`).toBe(true);
+  expect(
+    isVisible,
+    `Line ${expectedLine} should be visible after click; visible ranges: ${JSON.stringify(visible)}`,
+  ).toBe(true);
 });

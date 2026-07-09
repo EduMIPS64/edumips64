@@ -17,7 +17,9 @@ import type {
  * error (not just warnings).  Exported so the execution controller can reuse
  * the same logic when processing checksyntax responses.
  */
-export const hasRealErrors = (parsingErrors: ParsingError[] | null): boolean => {
+export const hasRealErrors = (
+  parsingErrors: ParsingError[] | null,
+): boolean => {
   if (!parsingErrors) return false;
   return parsingErrors.some((e) => !e.isWarning);
 };
@@ -59,7 +61,9 @@ export function useSimulatorData(initialState: SimulatorResult) {
   const [stdout, setStdout] = useState<string>('');
   // inputRequest carries the full SimulatorResult when the worker requests
   // stdin input (result.inputRequested === true). null means no pending input.
-  const [inputRequest, setInputRequest] = useState<SimulatorResult | null>(null);
+  const [inputRequest, setInputRequest] = useState<SimulatorResult | null>(
+    null,
+  );
 
   /**
    * Apply a full worker result (step / load / reset) to the data state.

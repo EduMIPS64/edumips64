@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Keyboard shortcuts spec — issue #1706.
  *
@@ -30,7 +28,9 @@ SYSCALL 0
 
 // ─── F2: Load program ─────────────────────────────────────────────────────────
 
-test('F2 loads the program and shows the run-controls toolbar', async ({ page }) => {
+test('F2 loads the program and shows the run-controls toolbar', async ({
+  page,
+}) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
   await removeOverlay(page);
@@ -43,14 +43,19 @@ test('F2 loads the program and shows the run-controls toolbar', async ({ page })
   await page.keyboard.insertText(shortProgram);
 
   // Wait for the Load button to be enabled (syntax valid).
-  await page.waitForSelector('#load-button:not([disabled])', { timeout: 10000 });
+  await page.waitForSelector('#load-button:not([disabled])', {
+    timeout: 10000,
+  });
 
   // Press F2 to load.
   await page.keyboard.press('F2');
   await page.mouse.move(0, 0);
 
   // The run-controls toolbar should now be visible (simulator is in READY state).
-  await page.waitForSelector('#run-controls-toolbar', { state: 'visible', timeout: 10000 });
+  await page.waitForSelector('#run-controls-toolbar', {
+    state: 'visible',
+    timeout: 10000,
+  });
   await expect(page.locator('#run-controls-toolbar')).toBeVisible();
 
   await page.close();
@@ -71,7 +76,9 @@ test('F9 advances a single simulation step after loading', async ({ page }) => {
   await page.keyboard.press('F9');
 
   // The cycle counter should increment.
-  await expect(page.locator('#stat-cycles')).not.toHaveText(initialCycles, { timeout: 5000 });
+  await expect(page.locator('#stat-cycles')).not.toHaveText(initialCycles, {
+    timeout: 5000,
+  });
 
   await page.close();
 });
@@ -89,10 +96,15 @@ test('F8 starts Run All and Esc stops and resets', async ({ page }) => {
 
   // After the program ends the toolbar disappears (ENDED state).
   // Wait for the toolbar to be hidden.
-  await page.waitForSelector('#run-controls-toolbar', { state: 'hidden', timeout: 10000 });
+  await page.waitForSelector('#run-controls-toolbar', {
+    state: 'hidden',
+    timeout: 10000,
+  });
 
   // The program menu button (disabled while RUNNING) should now be enabled.
-  await page.waitForSelector('#program-menu-button:not([disabled])', { timeout: 10000 });
+  await page.waitForSelector('#program-menu-button:not([disabled])', {
+    timeout: 10000,
+  });
 
   // Reload so we have a fresh READY state for the Esc test.
   await page.click('#load-button');
@@ -103,15 +115,22 @@ test('F8 starts Run All and Esc stops and resets', async ({ page }) => {
   await page.keyboard.press('Escape');
 
   // Toolbar should disappear and program menu button should be re-enabled.
-  await page.waitForSelector('#run-controls-toolbar', { state: 'hidden', timeout: 10000 });
-  await page.waitForSelector('#program-menu-button:not([disabled])', { timeout: 10000 });
+  await page.waitForSelector('#run-controls-toolbar', {
+    state: 'hidden',
+    timeout: 10000,
+  });
+  await page.waitForSelector('#program-menu-button:not([disabled])', {
+    timeout: 10000,
+  });
 
   await page.close();
 });
 
 // ─── Help dialog: Shortcuts tab ───────────────────────────────────────────────
 
-test('Help dialog has a Shortcuts tab that lists all keys', async ({ page }) => {
+test('Help dialog has a Shortcuts tab that lists all keys', async ({
+  page,
+}) => {
   await page.goto(targetUri);
   await waitForPageReady(page);
 
@@ -124,7 +143,10 @@ test('Help dialog has a Shortcuts tab that lists all keys', async ({ page }) => 
   await page.click('#help-tab-1');
 
   // The shortcuts panel should be visible.
-  await page.waitForSelector('#help-shortcuts', { state: 'visible', timeout: 5000 });
+  await page.waitForSelector('#help-shortcuts', {
+    state: 'visible',
+    timeout: 5000,
+  });
 
   // All five keys should appear in the panel text.
   const shortcutsPanel = page.locator('#help-shortcuts');

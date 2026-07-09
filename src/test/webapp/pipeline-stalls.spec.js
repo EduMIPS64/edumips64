@@ -39,11 +39,13 @@ async function clearSettings(page) {
     const keysToRemove = [];
     for (let i = 0; i < window.localStorage.length; i++) {
       const k = window.localStorage.key(i);
-      if (k && k.startsWith(prefix)) {
+      if (k?.startsWith(prefix)) {
         keysToRemove.push(k);
       }
     }
-    keysToRemove.forEach((k) => window.localStorage.removeItem(k));
+    keysToRemove.forEach((k) => {
+      window.localStorage.removeItem(k);
+    });
   }, STORAGE_PREFIX);
 }
 
@@ -93,16 +95,14 @@ async function singleStep(page) {
 async function readPipeline(page) {
   return await page.evaluate(() => {
     const out = {};
-    document
-      .querySelectorAll('#pipeline g[data-stage]')
-      .forEach((g) => {
-        const stage = g.getAttribute('data-stage');
-        out[stage] = {
-          instruction: g.getAttribute('data-instruction') || '',
-          stall: g.getAttribute('data-stall') || '',
-          fill: (g.getAttribute('data-fill') || '').toLowerCase(),
-        };
-      });
+    document.querySelectorAll('#pipeline g[data-stage]').forEach((g) => {
+      const stage = g.getAttribute('data-stage');
+      out[stage] = {
+        instruction: g.getAttribute('data-instruction') || '',
+        stall: g.getAttribute('data-stall') || '',
+        fill: (g.getAttribute('data-fill') || '').toLowerCase(),
+      };
+    });
     return out;
   });
 }
@@ -121,7 +121,7 @@ async function stepUntil(page, predicate, maxSteps = 30) {
   }
   throw new Error(
     `Predicate not satisfied within ${maxSteps} cycles. ` +
-      `Last pipeline: ${JSON.stringify(await readPipeline(page))}`
+      `Last pipeline: ${JSON.stringify(await readPipeline(page))}`,
   );
 }
 
@@ -160,12 +160,12 @@ test('RAW hazard: DSUB stalls in ID with the RAW tag (forwarding off)', async ({
 DADD  R1, R2, R3
 DSUB  R4, R1, R5
 SYSCALL 0
-`
+`,
   );
 
   const snap = await stepUntil(
     page,
-    (p) => p.ID && p.ID.stall === 'RAW' && p.ID.instruction === 'DSUB'
+    (p) => p.ID && p.ID.stall === 'RAW' && p.ID.instruction === 'DSUB',
   );
 
   expect(snap.ID.instruction).toBe('DSUB');
@@ -217,13 +217,13 @@ L.D   F8, x(R0)
 MUL.D F0, F2, F4
 ADD.D F0, F6, F8
 SYSCALL 0
-`
+`,
   );
 
   const snap = await stepUntil(
     page,
     (p) => p.ID && p.ID.stall === 'WAW' && p.ID.instruction === 'ADD.D',
-    50
+    50,
   );
 
   expect(snap.ID.instruction).toBe('ADD.D');
@@ -258,13 +258,13 @@ L.D   F4, y(R0)
 DIV.D F0, F2, F4
 DIV.D F6, F2, F4
 SYSCALL 0
-`
+`,
   );
 
   const snap = await stepUntil(
     page,
     (p) => p.ID && p.ID.stall === 'Struct: Div' && p.ID.instruction === 'DIV.D',
-    60
+    60,
   );
 
   expect(snap.ID.instruction).toBe('DIV.D');
@@ -274,5 +274,7 @@ SYSCALL 0
   // Note: the Statistics panel's "Structural Stall" counter now sums all four
   // structural-stall counters (divider, memory, EX, funcUnit), so we assert
   // that it reflects at least the divider stalls seen above.
-  expect(await readStat(page, 'stat-structural-stalls')).toBeGreaterThanOrEqual(1);
+  expect(await readStat(page, 'stat-structural-stalls')).toBeGreaterThanOrEqual(
+    1,
+  );
 });

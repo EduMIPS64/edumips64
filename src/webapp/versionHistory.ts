@@ -108,7 +108,7 @@ function toDateLabel(iso: string | undefined): string {
   }
   try {
     const d = new Date(iso);
-    return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+    return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString();
   } catch {
     return '';
   }
@@ -123,7 +123,10 @@ function toDateLabel(iso: string | undefined): string {
  * @param data       Parsed versions.json object.
  * @param viewedSha  The SHA being viewed, or null for root.
  */
-export function buildVersionList(data: unknown, viewedSha: string | null): VersionItem[] {
+export function buildVersionList(
+  data: unknown,
+  viewedSha: string | null,
+): VersionItem[] {
   if (!isValidVersions(data)) {
     return [];
   }
@@ -139,7 +142,7 @@ export function buildVersionList(data: unknown, viewedSha: string | null): Versi
     build: entry.build,
     dateLabel: toDateLabel(entry.promoted ? entry.promotedAt : entry.pushedAt),
     targetRelease: entry.targetRelease ?? '',
-    href: '/c/' + entry.sha + '/',
+    href: `/c/${entry.sha}/`,
     promoted: entry.promoted === true,
     isCurrent: entry.sha === data.current,
     isViewed: viewedSha != null && entry.sha === viewedSha,

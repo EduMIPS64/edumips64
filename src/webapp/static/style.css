@@ -1,5 +1,5 @@
 body {
-  background-color: 'white';
+  background-color: "white";
   max-height: 100vh;
   overflow: hidden;
 }
@@ -8,7 +8,7 @@ body {
    Used for the document-level <h1> in index.html (the visible UI uses
    MUI panel headings at H3). */
 .visually-hidden {
-  position: absolute !important;
+  position: absolute;
   width: 1px;
   height: 1px;
   padding: 0;
@@ -30,7 +30,7 @@ body {
   padding: 8px 16px;
   z-index: 100000;
   text-decoration: none;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   border-radius: 0 0 4px 0;
 }
 
@@ -39,8 +39,6 @@ body {
   outline: 2px solid #fff;
   outline-offset: -4px;
 }
-
-
 
 /* The three-region workspace (code / widgets / cycles) is laid out and
    sized entirely by the WorkspaceLayout component via MUI `sx`, including
@@ -78,7 +76,7 @@ div#controls {
   margin: 0.5em 0;
 }
 
-div#controls>input {
+div#controls > input {
   padding: 0.5em;
   margin: 0 0.5em;
 }
@@ -117,10 +115,7 @@ td.instructionName {
 }
 
 .stageFPMultiplier {
-  background-color: var(
-    --pipeline-stage-fp-multiplier,
-    rgba(0, 128, 128, 0.5)
-  );
+  background-color: var(--pipeline-stage-fp-multiplier, rgba(0, 128, 128, 0.5));
 }
 
 .stageFPDivider {
@@ -195,19 +190,19 @@ div.error-list-item {
   color: #5b6577;
 }
 
-html[data-theme='dark'] #registers td,
-html[data-theme='dark'] #memory td,
-html[data-theme='dark'] #memory th {
+html[data-theme="dark"] #registers td,
+html[data-theme="dark"] #memory td,
+html[data-theme="dark"] #memory th {
   border-bottom-color: rgba(148, 163, 184, 0.1);
 }
 
-html[data-theme='dark'] #registers tr:hover,
-html[data-theme='dark'] #memory tbody tr:hover {
+html[data-theme="dark"] #registers tr:hover,
+html[data-theme="dark"] #memory tbody tr:hover {
   background-color: rgba(141, 166, 255, 0.08);
 }
 
-html[data-theme='dark'] #registers td.registerName,
-html[data-theme='dark'] #memory th {
+html[data-theme="dark"] #registers td.registerName,
+html[data-theme="dark"] #memory th {
   color: #97a3b8;
 }
 
@@ -242,19 +237,19 @@ div.error-accordion {
    Driven by the app's resolved theme (the data-theme attribute set on <html>
    from the MUI palette mode), NOT the OS `prefers-color-scheme` media query,
    so these stay in sync when the user overrides the theme in Settings. */
-html[data-theme='dark'] div.error-accordion {
+html[data-theme="dark"] div.error-accordion {
   border-bottom-color: rgba(255, 255, 255, 0.188);
 }
 
-html[data-theme='dark'] textarea {
+html[data-theme="dark"] textarea {
   background: transparent;
   color: white;
 }
 
-html[data-theme='dark'] ::-webkit-scrollbar {
+html[data-theme="dark"] ::-webkit-scrollbar {
   background-color: #1e1e1e;
 }
 
-html[data-theme='dark'] ::-webkit-scrollbar-thumb {
+html[data-theme="dark"] ::-webkit-scrollbar-thumb {
   background-color: rgb(97, 97, 97);
 }

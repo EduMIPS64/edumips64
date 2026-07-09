@@ -55,10 +55,10 @@
       groupName: "webpack packages",
       matchPackageNames: ["/webpack/"],
     },
-    // Group ESLint packages together and automerge minor updates
+    // Group Biome packages together and automerge minor updates
     {
-      groupName: "ESLint packages",
-      matchPackageNames: ["/eslint/"],
+      groupName: "Biome packages",
+      matchPackageNames: ["/biome/"],
       matchUpdateTypes: ["minor"],
       automerge: true,
     },

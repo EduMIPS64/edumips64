@@ -86,7 +86,9 @@ const fpAddBox = (i: number): BoxGeometry => ({
 
 // Bubbles use the empty placeholder name " " or are altogether `null`.
 // Either way, they render as empty stage outlines (matching `GUIPipeline`).
-const isOccupied = (instr: PipelineInstruction | null): instr is PipelineInstruction =>
+const isOccupied = (
+  instr: PipelineInstruction | null,
+): instr is PipelineInstruction =>
   !!instr && !!instr.Name && instr.Name !== ' ';
 
 // Stage-tag set produced by `CycleBuilder` when an instruction was *stalled*

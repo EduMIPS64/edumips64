@@ -57,7 +57,7 @@ declare module 'lodash/isEqual' {
 // ---------------------------------------------------------------------------
 
 declare module 'lodash/debounce' {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: generic constraint needs to accept any function signature.
   function debounce<T extends (...args: any[]) => any>(
     func: T,
     wait?: number,
