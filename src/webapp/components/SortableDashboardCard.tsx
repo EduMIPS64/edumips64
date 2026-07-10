@@ -76,9 +76,14 @@ export default function SortableDashboardCard({
   // because that click isn't guaranteed to arrive at all — it only fires
   // when press and release hit the same element), while a genuine,
   // deliberate click always comes much later.
+  // useLayoutEffect, not useEffect: the timestamp must be recorded
+  // synchronously in the same commit that flips `isDragging` to false.
+  // A passive effect runs after paint, and the synthetic click can be
+  // dispatched between the commit and the effect — it would then read a
+  // fresh `isDragging === false` closure but a stale timestamp.
   const dragEndTimeRef = React.useRef(Number.NEGATIVE_INFINITY);
   const wasDraggingRef = React.useRef(false);
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     if (wasDraggingRef.current && !isDragging) {
       dragEndTimeRef.current = performance.now();
     }

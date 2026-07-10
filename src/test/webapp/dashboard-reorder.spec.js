@@ -276,6 +276,25 @@ test('reordering a card via mouse drag changes DOM order', async ({ page }) => {
     }
   }
 
+  // The Collapse animations keep shifting the lower headers upward for a
+  // few hundred ms after the last click; coordinates measured mid-animation
+  // would aim the mousedown at where a header *was*, so the drag would
+  // never activate (this made the test flaky on slow CI runners). Wait for
+  // the Registers header to hold still before measuring anything.
+  const registersHeader = cardHeader(page, 'Registers');
+  let settledY = Number.NaN;
+  await expect
+    .poll(
+      async () => {
+        const box = await registersHeader.boundingBox();
+        const isStable = box !== null && box.y === settledY;
+        settledY = box === null ? Number.NaN : box.y;
+        return isStable;
+      },
+      { intervals: [200] },
+    )
+    .toBe(true);
+
   // The pointer drag handle is the card header itself. dnd-kit's
   // MouseSensor only starts a drag after the pointer has moved past its
   // activation distance, so a single `dragTo()` (which Playwright
@@ -289,7 +308,6 @@ test('reordering a card via mouse drag changes DOM order', async ({ page }) => {
   // detection — what this test cares about is that Registers (originally
   // 3rd) ends up ahead of its original position, proving the drag actually
   // reordered the list rather than merely visually animating.
-  const registersHeader = cardHeader(page, 'Registers');
   const statsCard = page.locator('#stats-card');
 
   const handleBox = await registersHeader.boundingBox();
@@ -306,12 +324,15 @@ test('reordering a card via mouse drag changes DOM order', async ({ page }) => {
   await page.mouse.move(startX, startY);
   await page.mouse.down();
   // Move in several small steps, well past dnd-kit's activation distance,
-  // so intermediate pointermove events are dispatched.
+  // so intermediate pointermove events are dispatched. The short pause
+  // after each step lets dnd-kit's rAF-scheduled measuring and collision
+  // detection keep up on slow (coverage-instrumented) CI runners.
   const steps = 8;
   for (let i = 1; i <= steps; i++) {
     const x = startX + ((endX - startX) * i) / steps;
     const y = startY + ((endY - startY) * i) / steps;
     await page.mouse.move(x, y);
+    await page.waitForTimeout(50);
   }
   await page.mouse.up();
 
@@ -334,5 +355,14 @@ test('reordering a card via mouse drag changes DOM order', async ({ page }) => {
   // Dragging by the header must not have toggled the dragged card's
   // collapse state as a side effect (the click a browser synthesizes after
   // a same-element press/release is suppressed by `SortableDashboardCard`).
-  await expect(registersHeader).toHaveAttribute('aria-expanded', 'false');
+  // Scope the locator to the real card: the `DragOverlay`'s drop-animation
+  // clone renders an identical header, and in a backgrounded headless page
+  // (parallel test workers) rAF throttling can keep that clone mounted
+  // long enough for an unscoped `getByRole` to hit a strict-mode violation
+  // on two "Expand Registers" buttons.
+  await expect(
+    page
+      .locator('#registers-card')
+      .getByRole('button', { name: /^(Collapse|Expand) Registers$/ }),
+  ).toHaveAttribute('aria-expanded', 'false');
 });
