@@ -25,6 +25,22 @@ interface DashboardCardProps {
    * the whole header becomes a toggle button when it is provided.
    */
   onToggle?: () => void;
+  /**
+   * Pointer-drag activation listeners spread onto the header itself, so
+   * the whole header strip doubles as the drag handle for reordering
+   * (see `SortableDashboardCard`). Purely behavioral — the header looks
+   * exactly the same with or without them.
+   */
+  headerDragProps?: {
+    onMouseDown?: React.MouseEventHandler;
+    onTouchStart?: React.TouchEventHandler;
+  };
+  /**
+   * Extra element rendered as a sibling of the header (a `<button>`
+   * cannot contain another interactive element) — used for the
+   * visually-hidden keyboard "Reorder" handle of sortable cards.
+   */
+  dragHandle?: React.ReactNode;
 }
 
 /**
@@ -54,6 +70,8 @@ export default function DashboardCard({
   children,
   expanded = true,
   onToggle,
+  headerDragProps,
+  dragHandle,
 }: DashboardCardProps) {
   const collapsible = onToggle !== undefined;
   const showDivider = !collapsible || expanded;
@@ -66,6 +84,9 @@ export default function DashboardCard({
         flexDirection: 'column',
         minWidth: 0,
         overflow: 'hidden',
+        // Anchor for the visually-hidden keyboard drag handle, which is
+        // absolutely positioned over the header. No visual effect.
+        position: 'relative',
         gridColumn: fullWidth ? '1 / -1' : 'auto',
       }}
     >
@@ -79,6 +100,7 @@ export default function DashboardCard({
             ? `${expanded ? 'Collapse' : 'Expand'} ${title}`
             : undefined
         }
+        {...headerDragProps}
         sx={{
           display: 'flex',
           alignItems: 'center',
@@ -132,6 +154,7 @@ export default function DashboardCard({
           />
         )}
       </Box>
+      {dragHandle}
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <Box
           sx={{

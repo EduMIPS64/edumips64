@@ -51,6 +51,11 @@ export const SettingKey = Object.freeze({
   // height of the bottom Cycles region, and whether either is collapsed.
   // Persisted so a user's chosen layout survives reloads.
   WORKSPACE_LAYOUT: 'workspaceLayout',
+
+  // Drag-and-drop order of the reorderable dashboard cards (Stats, Pipeline,
+  // Registers, Memory, Standard Output) in the right panel. Stored as an
+  // array of stable widget ids; see `DEFAULT_WIDGET_ORDER` in `schema.ts`.
+  WIDGET_ORDER: 'widgetOrder',
 } as const);
 
 /**

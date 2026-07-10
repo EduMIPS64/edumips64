@@ -20,6 +20,9 @@
   "author": "Andrea Spadaccini",
   "license": "GPL-2.0-or-later",
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@microsoft/applicationinsights-web": "^3.0.0",

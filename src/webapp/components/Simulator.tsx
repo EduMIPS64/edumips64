@@ -10,11 +10,33 @@ import Header from './Header';
 import RunControlsToolbar from './RunControlsToolbar';
 import WorkspaceLayout from './WorkspaceLayout';
 import Box from '@mui/material/Box';
-import DashboardCard from './DashboardCard';
+import SortableDashboardCard from './SortableDashboardCard';
 import IssuesCard from './IssuesCard';
 import StdOut from './StdOut';
 import InputDialog from './InputDialog';
 import RuntimeErrorDialog from './RuntimeErrorDialog';
+
+import {
+  DndContext,
+  type DragEndEvent,
+  type DragStartEvent,
+  DragOverlay,
+  type DropAnimation,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  closestCenter,
+  defaultDropAnimationSideEffects,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import DashboardCard from './DashboardCard';
 
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
@@ -34,6 +56,7 @@ import { SettingKey } from '../settings/SettingKey';
 import SampleProgram from '../data/SampleProgram';
 import type {
   CacheConfig as CacheConfigType,
+  DashboardWidgetId,
   ExpandedAccordions,
 } from '../settings/schema';
 
@@ -78,6 +101,7 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   const [workspaceLayout, setWorkspaceLayout] = useSetting(
     SettingKey.WORKSPACE_LAYOUT,
   );
+  const [widgetOrder, setWidgetOrder] = useSetting(SettingKey.WIDGET_ORDER);
 
   // ---------------------------------------------------------------------------
   // Editor code persistence
@@ -217,6 +241,91 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
       }));
     },
     [setExpandedAccordions],
+  );
+
+  // ---------------------------------------------------------------------------
+  // Dashboard card drag-and-drop reordering
+  // ---------------------------------------------------------------------------
+
+  // The whole card header is the drag handle (see `SortableDashboardCard`),
+  // and it's also the click-to-collapse toggle, so the sensors' activation
+  // constraints are what tell a drag from a click: MouseSensor needs a few
+  // pixels of movement before it lifts (a plain click still toggles), and
+  // TouchSensor needs a long-press (a tap toggles, and a swipe that starts
+  // on a header scrolls the panel instead of dragging the card).
+  // KeyboardSensor drives the dedicated hidden "Reorder" button with
+  // Space/Enter to lift, arrow keys to move, and Space/Enter to drop,
+  // using dnd-kit's built-in sortable coordinate getter.
+  const dashboardSensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 8 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  // The currently-dragged widget id (both for pointer and keyboard-driven
+  // drags), and the on-screen width of its section at the moment the drag
+  // started. `DragOverlay` renders its child outside the dashboard stack
+  // (in a portal-like fixed-position layer), so nothing constrains its size
+  // to the current hover slot the way an in-place sortable item would be —
+  // that's what let the dragged section visually assume the aspect ratio of
+  // whatever slot it was hovering. Pinning the overlay to the width the
+  // section had *before* the drag started keeps its whole footprint stable
+  // for the entire drag, and the in-place original renders as a plain
+  // dimmed placeholder (see `SortableDashboardCard`) instead of following
+  // the pointer itself.
+  const [activeWidgetId, setActiveWidgetId] =
+    React.useState<DashboardWidgetId | null>(null);
+  const [activeWidgetWidth, setActiveWidgetWidth] = React.useState<
+    number | undefined
+  >(undefined);
+
+  const handleDashboardDragStart = React.useCallback(
+    (event: DragStartEvent) => {
+      setActiveWidgetId(event.active.id as DashboardWidgetId);
+      setActiveWidgetWidth(event.active.rect.current.initial?.width);
+    },
+    [],
+  );
+
+  const handleDashboardDragEnd = React.useCallback(
+    (event: DragEndEvent) => {
+      setActiveWidgetId(null);
+      setActiveWidgetWidth(undefined);
+      const { active, over } = event;
+      if (!over || active.id === over.id) {
+        return;
+      }
+      setWidgetOrder((prev) => {
+        const oldIndex = prev.indexOf(active.id as DashboardWidgetId);
+        const newIndex = prev.indexOf(over.id as DashboardWidgetId);
+        if (oldIndex === -1 || newIndex === -1) {
+          return prev;
+        }
+        return arrayMove(prev, oldIndex, newIndex);
+      });
+    },
+    [setWidgetOrder],
+  );
+
+  const handleDashboardDragCancel = React.useCallback(() => {
+    setActiveWidgetId(null);
+    setActiveWidgetWidth(undefined);
+  }, []);
+
+  // A subtle, close-to-default drop animation: the overlay eases from
+  // wherever it was released back into the dropped slot, with a gentle fade
+  // (no bouncy scale/shadow pop) so it reads as a "settle", not an effect.
+  const dashboardDropAnimation: DropAnimation = React.useMemo(
+    () => ({
+      sideEffects: defaultDropAnimationSideEffects({
+        styles: { active: { opacity: '0.4' } },
+      }),
+    }),
+    [],
   );
 
   // ---------------------------------------------------------------------------
@@ -402,6 +511,65 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   const theme = React.useMemo(() => buildTheme(paletteMode), [paletteMode]);
 
   // ---------------------------------------------------------------------------
+  // Dashboard card definitions
+  // ---------------------------------------------------------------------------
+
+  // Static per-widget metadata (title, icon, scroll cap) and content, keyed
+  // by the same stable ids used by the `WIDGET_ORDER` setting. Rebuilt every
+  // render (it's cheap: a handful of object literals), but keyed access
+  // means the drag-and-drop reorder below only ever changes *sequence*, not
+  // identity, so React reconciles moved cards instead of remounting them.
+  const dashboardWidgets: Record<
+    DashboardWidgetId,
+    {
+      title: string;
+      icon: React.ReactNode;
+      maxContentHeight?: string;
+      expanded: boolean;
+      onToggle: () => void;
+      content: React.ReactNode;
+    }
+  > = {
+    stats: {
+      title: 'Stats',
+      icon: <InsightsOutlinedIcon fontSize="small" />,
+      expanded: expandedAccordions.stats,
+      onToggle: () => toggleAccordion('stats'),
+      content: <Statistics {...stats} />,
+    },
+    pipeline: {
+      title: 'Pipeline',
+      icon: <AccountTreeOutlinedIcon fontSize="small" />,
+      expanded: expandedAccordions.pipeline,
+      onToggle: () => toggleAccordion('pipeline'),
+      content: <Pipeline pipeline={pipeline} colors={pipelineColors} />,
+    },
+    registers: {
+      title: 'Registers',
+      icon: <DnsOutlinedIcon fontSize="small" />,
+      maxContentHeight: '48vh',
+      expanded: expandedAccordions.registers,
+      onToggle: () => toggleAccordion('registers'),
+      content: <Registers {...registers} />,
+    },
+    memory: {
+      title: 'Memory',
+      icon: <StorageOutlinedIcon fontSize="small" />,
+      maxContentHeight: '40vh',
+      expanded: expandedAccordions.memory,
+      onToggle: () => toggleAccordion('memory'),
+      content: <Memory memory={memory} />,
+    },
+    stdout: {
+      title: 'Standard Output',
+      icon: <TerminalOutlinedIcon fontSize="small" />,
+      expanded: expandedAccordions.stdout,
+      onToggle: () => toggleAccordion('stdout'),
+      content: <StdOut stdout={stdout} />,
+    },
+  };
+
+  // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
   return (
@@ -504,58 +672,69 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
               parsingErrors={parsingErrors}
               onIssueClick={handleIssueClick}
             />
-            <DashboardCard
-              id="stats-card"
-              title="Stats"
-              icon={<InsightsOutlinedIcon fontSize="small" />}
-              fullWidth
-              expanded={expandedAccordions.stats}
-              onToggle={() => toggleAccordion('stats')}
+            <DndContext
+              sensors={dashboardSensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDashboardDragStart}
+              onDragEnd={handleDashboardDragEnd}
+              onDragCancel={handleDashboardDragCancel}
             >
-              <Statistics {...stats} />
-            </DashboardCard>
-            <DashboardCard
-              id="pipeline-card"
-              title="Pipeline"
-              icon={<AccountTreeOutlinedIcon fontSize="small" />}
-              fullWidth
-              expanded={expandedAccordions.pipeline}
-              onToggle={() => toggleAccordion('pipeline')}
-            >
-              <Pipeline pipeline={pipeline} colors={pipelineColors} />
-            </DashboardCard>
-            <DashboardCard
-              id="registers-card"
-              title="Registers"
-              icon={<DnsOutlinedIcon fontSize="small" />}
-              maxContentHeight="48vh"
-              fullWidth
-              expanded={expandedAccordions.registers}
-              onToggle={() => toggleAccordion('registers')}
-            >
-              <Registers {...registers} />
-            </DashboardCard>
-            <DashboardCard
-              id="memory-card"
-              title="Memory"
-              icon={<StorageOutlinedIcon fontSize="small" />}
-              maxContentHeight="40vh"
-              fullWidth
-              expanded={expandedAccordions.memory}
-              onToggle={() => toggleAccordion('memory')}
-            >
-              <Memory memory={memory} />
-            </DashboardCard>
-            <DashboardCard
-              id="stdout-card"
-              title="Standard Output"
-              icon={<TerminalOutlinedIcon fontSize="small" />}
-              fullWidth
-              expanded={expandedAccordions.stdout}
-              onToggle={() => toggleAccordion('stdout')}
-            >
-              <StdOut stdout={stdout} />
-            </DashboardCard>
+              <SortableContext
+                items={widgetOrder}
+                strategy={verticalListSortingStrategy}
+              >
+                {widgetOrder.map((widgetId) => {
+                  const widget = dashboardWidgets[widgetId];
+                  // Guard against a widget id that has no definition (should
+                  // not happen: `sanitize` normalizes the stored order to
+                  // exactly the known ids), so a future mismatch degrades to
+                  // "skip this entry" instead of crashing the dashboard.
+                  if (!widget) {
+                    return null;
+                  }
+                  return (
+                    <SortableDashboardCard
+                      key={widgetId}
+                      id={widgetId}
+                      htmlId={`${widgetId}-card`}
+                      title={widget.title}
+                      icon={widget.icon}
+                      maxContentHeight={widget.maxContentHeight}
+                      expanded={widget.expanded}
+                      onToggle={widget.onToggle}
+                    >
+                      {widget.content}
+                    </SortableDashboardCard>
+                  );
+                })}
+              </SortableContext>
+              <DragOverlay dropAnimation={dashboardDropAnimation}>
+                {activeWidgetId && dashboardWidgets[activeWidgetId] ? (
+                  <Box
+                    sx={{
+                      width: activeWidgetWidth,
+                      // No extra decoration: the clone must look *exactly*
+                      // like the resting card (only the Card's own
+                      // elevation-1 paper shadow) — any added shadow/ring
+                      // reads as a heavy border around the dragged card.
+                      cursor: 'grabbing',
+                    }}
+                  >
+                    <DashboardCard
+                      title={dashboardWidgets[activeWidgetId].title}
+                      icon={dashboardWidgets[activeWidgetId].icon}
+                      maxContentHeight={
+                        dashboardWidgets[activeWidgetId].maxContentHeight
+                      }
+                      expanded={dashboardWidgets[activeWidgetId].expanded}
+                      onToggle={() => {}}
+                    >
+                      {dashboardWidgets[activeWidgetId].content}
+                    </DashboardCard>
+                  </Box>
+                ) : null}
+              </DragOverlay>
+            </DndContext>
           </Box>
         }
       />
