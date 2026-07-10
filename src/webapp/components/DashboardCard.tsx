@@ -1,6 +1,7 @@
 import type React from 'react';
 
 import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -11,6 +12,7 @@ interface DashboardCardProps {
   icon?: React.ReactNode;
   action?: React.ReactNode;
   maxContentHeight?: string;
+  fullWidth?: boolean;
   children?: React.ReactNode;
   /**
    * Whether the card's body is shown. When omitted, the card has no
@@ -24,29 +26,39 @@ interface DashboardCardProps {
    */
   onToggle?: () => void;
   /**
-   * Optional drag-handle element (e.g. a `DragIndicator` icon button)
-   * rendered at the right end of the header strip, *outside* the header's
-   * own `<button>` — a `<button>` cannot contain another interactive
-   * element, and the handle needs its own independent pointer/keyboard
-   * listeners for drag-and-drop reordering, separate from the collapse
-   * toggle.
+   * Pointer-drag activation listeners spread onto the header itself, so
+   * the whole header strip doubles as the drag handle for reordering
+   * (see `SortableDashboardCard`). Purely behavioral — the header looks
+   * exactly the same with or without them.
+   */
+  headerDragProps?: {
+    onMouseDown?: React.MouseEventHandler;
+    onTouchStart?: React.TouchEventHandler;
+  };
+  /**
+   * Extra element rendered as a sibling of the header (a `<button>`
+   * cannot contain another interactive element) — used for the
+   * visually-hidden keyboard "Reorder" handle of sortable cards.
    */
   dragHandle?: React.ReactNode;
 }
 
 /**
- * A single dashboard section, styled like the classic accordion look: a
- * flat, full-bleed row with a subtly tinted header strip (chevron on the
- * left, then the title), a hairline divider below the section, and no
- * card box, rounded corners or elevation shadow. Visually this matches
- * the pre-dashboard-card Accordion UI exactly; the only addition is the
- * optional drag handle at the right end of the header strip.
+ * A single dashboard widget: a card with a compact colored header (icon +
+ * title + optional trailing element) and a content area that can scroll
+ * internally when `maxContentHeight` is set, so a long Registers or Memory
+ * table never blows up the dashboard grid.
  *
  * When `onToggle` is supplied, the header becomes a clickable/keyboard
  * operable toggle (native `<button>`, so Enter/Space "just work") that
- * collapses the body with `<Collapse>`; the chevron points down when
- * collapsed and rotates up when expanded, exactly like the old
- * AccordionSummary.
+ * collapses the body with `<Collapse>`. The header itself always stays
+ * visible — only the body height animates to zero — so a collapsed card is
+ * simply its header, and since nothing but the Card's own rounded
+ * background is ever visible below the header's hairline, the collapsed
+ * card keeps fully rounded corners on all four sides, exactly like an
+ * expanded one. The header's bottom hairline is only painted while
+ * expanded (there's nothing to divide from otherwise), so a collapsed card
+ * never shows a stray line sitting on top of the rounded corner.
  */
 export default function DashboardCard({
   id,
@@ -54,112 +66,99 @@ export default function DashboardCard({
   icon,
   action,
   maxContentHeight,
+  fullWidth,
   children,
   expanded = true,
   onToggle,
+  headerDragProps,
   dragHandle,
 }: DashboardCardProps) {
   const collapsible = onToggle !== undefined;
+  const showDivider = !collapsible || expanded;
 
   return (
-    <Box
+    <Card
       id={id}
       sx={{
+        display: 'flex',
+        flexDirection: 'column',
         minWidth: 0,
-        borderBottom: 1,
-        borderStyle: 'solid',
-        borderColor: 'divider',
-        bgcolor: 'background.paper',
+        overflow: 'hidden',
+        // Anchor for the visually-hidden keyboard drag handle, which is
+        // absolutely positioned over the header. No visual effect.
+        position: 'relative',
+        gridColumn: fullWidth ? '1 / -1' : 'auto',
       }}
     >
       <Box
+        component={collapsible ? 'button' : 'div'}
+        type={collapsible ? 'button' : undefined}
+        onClick={collapsible ? onToggle : undefined}
+        aria-expanded={collapsible ? expanded : undefined}
+        aria-label={
+          collapsible
+            ? `${expanded ? 'Collapse' : 'Expand'} ${title}`
+            : undefined
+        }
+        {...headerDragProps}
         sx={{
           display: 'flex',
-          alignItems: 'stretch',
-          bgcolor: (theme) =>
-            theme.palette.mode === 'dark'
-              ? 'rgba(141, 166, 255, 0.08)'
-              : 'rgba(53, 87, 212, 0.06)',
+          alignItems: 'center',
+          gap: 1,
+          px: 1.5,
+          py: 0.75,
+          color: 'primary.main',
+          border: 0,
+          borderBottom: showDivider ? 1 : 0,
+          borderStyle: 'solid',
+          borderColor: 'divider',
+          borderRadius: 0,
+          ...(collapsible
+            ? {
+                width: '100%',
+                m: 0,
+                bgcolor: 'transparent',
+                font: 'inherit',
+                textAlign: 'left',
+                cursor: 'pointer',
+                '&:focus-visible': {
+                  outline: '2px solid currentColor',
+                  outlineOffset: -2,
+                },
+              }
+            : {}),
         }}
       >
-        <Box
-          component={collapsible ? 'button' : 'div'}
-          type={collapsible ? 'button' : undefined}
-          onClick={collapsible ? onToggle : undefined}
-          aria-expanded={collapsible ? expanded : undefined}
-          aria-label={
-            collapsible
-              ? `${expanded ? 'Collapse' : 'Expand'} ${title}`
-              : undefined
-          }
+        {icon}
+        <Typography
+          variant="subtitle2"
+          component={collapsible ? 'span' : 'h3'}
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            px: 2,
-            minHeight: 44,
+            fontWeight: 700,
             flexGrow: 1,
-            minWidth: 0,
-            border: 0,
-            borderRadius: 0,
-            ...(collapsible
-              ? {
-                  width: '100%',
-                  m: 0,
-                  bgcolor: 'transparent',
-                  font: 'inherit',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  transition: 'background-color 120ms ease',
-                  '&:hover': {
-                    bgcolor: (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(141, 166, 255, 0.06)'
-                        : 'rgba(53, 87, 212, 0.05)',
-                  },
-                  '&:focus-visible': {
-                    outline: '2px solid currentColor',
-                    outlineOffset: -2,
-                  },
-                }
-              : {}),
+            lineHeight: 1.2,
+            textAlign: 'left',
           }}
         >
-          {collapsible && (
-            <ExpandMoreIcon
-              fontSize="small"
-              aria-hidden="true"
-              sx={{
-                color: 'text.secondary',
-                transition: 'transform 200ms ease',
-                transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
-              }}
-            />
-          )}
-          {icon}
-          <Typography
-            variant="subtitle2"
-            component={collapsible ? 'span' : 'h3'}
+          {title}
+        </Typography>
+        {action}
+        {collapsible && (
+          <ExpandMoreIcon
+            fontSize="small"
+            aria-hidden="true"
             sx={{
-              fontWeight: 600,
-              color: 'primary.main',
-              flexGrow: 1,
-              lineHeight: 1.2,
-              textAlign: 'left',
+              transition: 'transform 200ms ease',
+              transform: expanded ? 'rotate(0deg)' : 'rotate(-90deg)',
             }}
-          >
-            {title}
-          </Typography>
-          {action}
-        </Box>
-        {dragHandle}
+          />
+        )}
       </Box>
+      {dragHandle}
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <Box
           sx={{
-            px: 2,
-            pt: 0.5,
-            pb: 2,
+            p: 1.5,
             overflow: 'auto',
             ...(maxContentHeight ? { maxHeight: maxContentHeight } : {}),
           }}
@@ -167,6 +166,6 @@ export default function DashboardCard({
           {children}
         </Box>
       </Collapse>
-    </Box>
+    </Card>
   );
 }

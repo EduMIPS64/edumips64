@@ -23,7 +23,8 @@ import {
   DragOverlay,
   type DropAnimation,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   closestCenter,
   defaultDropAnimationSideEffects,
   useSensor,
@@ -37,7 +38,11 @@ import {
 } from '@dnd-kit/sortable';
 import DashboardCard from './DashboardCard';
 
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import DnsOutlinedIcon from '@mui/icons-material/DnsOutlined';
+import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined';
+import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
+import TerminalOutlinedIcon from '@mui/icons-material/TerminalOutlined';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { ThemeProvider } from '@mui/material/styles';
@@ -242,13 +247,20 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // Dashboard card drag-and-drop reordering
   // ---------------------------------------------------------------------------
 
-  // PointerSensor uses a small activation distance so a stray click on the
-  // drag handle (e.g. while aiming for a nearby control) doesn't start a
-  // drag; KeyboardSensor lets the handle be operated with Space/Enter to
-  // lift, arrow keys to move, and Space/Enter to drop, using dnd-kit's
-  // built-in sortable coordinate getter.
+  // The whole card header is the drag handle (see `SortableDashboardCard`),
+  // and it's also the click-to-collapse toggle, so the sensors' activation
+  // constraints are what tell a drag from a click: MouseSensor needs a few
+  // pixels of movement before it lifts (a plain click still toggles), and
+  // TouchSensor needs a long-press (a tap toggles, and a swipe that starts
+  // on a header scrolls the panel instead of dragging the card).
+  // KeyboardSensor drives the dedicated hidden "Reorder" button with
+  // Space/Enter to lift, arrow keys to move, and Space/Enter to drop,
+  // using dnd-kit's built-in sortable coordinate getter.
   const dashboardSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 8 },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
@@ -502,15 +514,17 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   // Dashboard card definitions
   // ---------------------------------------------------------------------------
 
-  // Static per-widget metadata (title) and content, keyed by the same
-  // stable ids used by the `WIDGET_ORDER` setting. Rebuilt every render
-  // (it's cheap: a handful of object literals), but keyed access means the
-  // drag-and-drop reorder below only ever changes *sequence*, not identity,
-  // so React reconciles moved cards instead of remounting them.
+  // Static per-widget metadata (title, icon, scroll cap) and content, keyed
+  // by the same stable ids used by the `WIDGET_ORDER` setting. Rebuilt every
+  // render (it's cheap: a handful of object literals), but keyed access
+  // means the drag-and-drop reorder below only ever changes *sequence*, not
+  // identity, so React reconciles moved cards instead of remounting them.
   const dashboardWidgets: Record<
     DashboardWidgetId,
     {
       title: string;
+      icon: React.ReactNode;
+      maxContentHeight?: string;
       expanded: boolean;
       onToggle: () => void;
       content: React.ReactNode;
@@ -518,30 +532,37 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
   > = {
     stats: {
       title: 'Stats',
+      icon: <InsightsOutlinedIcon fontSize="small" />,
       expanded: expandedAccordions.stats,
       onToggle: () => toggleAccordion('stats'),
       content: <Statistics {...stats} />,
     },
     pipeline: {
       title: 'Pipeline',
+      icon: <AccountTreeOutlinedIcon fontSize="small" />,
       expanded: expandedAccordions.pipeline,
       onToggle: () => toggleAccordion('pipeline'),
       content: <Pipeline pipeline={pipeline} colors={pipelineColors} />,
     },
     registers: {
       title: 'Registers',
+      icon: <DnsOutlinedIcon fontSize="small" />,
+      maxContentHeight: '48vh',
       expanded: expandedAccordions.registers,
       onToggle: () => toggleAccordion('registers'),
       content: <Registers {...registers} />,
     },
     memory: {
       title: 'Memory',
+      icon: <StorageOutlinedIcon fontSize="small" />,
+      maxContentHeight: '40vh',
       expanded: expandedAccordions.memory,
       onToggle: () => toggleAccordion('memory'),
       content: <Memory memory={memory} />,
     },
     stdout: {
       title: 'Standard Output',
+      icon: <TerminalOutlinedIcon fontSize="small" />,
       expanded: expandedAccordions.stdout,
       onToggle: () => toggleAccordion('stdout'),
       content: <StdOut stdout={stdout} />,
@@ -635,12 +656,16 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
           <Box
             id="dashboard"
             sx={{
-              // A flat, flush, single-column stack of sections — the classic
-              // accordion look. Each section paints its own tinted header
-              // strip and bottom hairline (see `DashboardCard`); the parent
-              // panel (WorkspaceLayout's right column) provides the
-              // scrollbar.
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', lg: '1fr 1fr' },
+              gap: 1.5,
+              p: 1.5,
+              // Grow with the content; the parent panel (WorkspaceLayout's
+              // right column) provides the scrollbar. A definite height
+              // here would let the grid compress the card rows instead of
+              // overflowing.
               minHeight: '100%',
+              alignContent: 'start',
             }}
           >
             <IssuesCard
@@ -673,6 +698,8 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                       id={widgetId}
                       htmlId={`${widgetId}-card`}
                       title={widget.title}
+                      icon={widget.icon}
+                      maxContentHeight={widget.maxContentHeight}
                       expanded={widget.expanded}
                       onToggle={widget.onToggle}
                     >
@@ -695,20 +722,12 @@ const Simulator = ({ worker, initialState, appInsights }: SimulatorProps) => {
                   >
                     <DashboardCard
                       title={dashboardWidgets[activeWidgetId].title}
+                      icon={dashboardWidgets[activeWidgetId].icon}
+                      maxContentHeight={
+                        dashboardWidgets[activeWidgetId].maxContentHeight
+                      }
                       expanded={dashboardWidgets[activeWidgetId].expanded}
                       onToggle={() => {}}
-                      dragHandle={
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            pr: 1,
-                            color: 'text.secondary',
-                          }}
-                        >
-                          <DragIndicatorIcon fontSize="small" />
-                        </Box>
-                      }
                     >
                       {dashboardWidgets[activeWidgetId].content}
                     </DashboardCard>

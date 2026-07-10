@@ -21,14 +21,17 @@ test.use({ viewport: { width: 1600, height: 1000 } });
  * Tests for drag-and-drop reordering of the dashboard cards (Stats,
  * Pipeline, Registers, Memory, Standard Output) in the right panel.
  *
- * Each card's header carries a dedicated "Reorder <Title>" drag-handle
- * button (see `SortableDashboardCard.tsx`), entirely separate from the
- * header's own "Collapse/Expand <Title>" toggle button exercised by
- * `expanded-accordions.spec.js`. The handle supports dnd-kit's keyboard
- * sensor: focus it, Space/Enter lifts the card, arrow keys move it among
- * its siblings, and Space/Enter drops it — this is the interaction these
- * tests drive, since it's far more deterministic in CI than simulating raw
- * pointer-drag event sequences past dnd-kit's activation-distance threshold.
+ * The whole card header is the pointer drag handle (see
+ * `SortableDashboardCard.tsx`): grabbing a header and moving past the
+ * MouseSensor's activation distance starts a drag, while a plain click
+ * still toggles collapse/expand (exercised by
+ * `expanded-accordions.spec.js`). Keyboard reordering goes through a
+ * dedicated visually-hidden "Reorder <Title>" button next to each header:
+ * focus it, Space/Enter lifts the card, arrow keys move it among its
+ * siblings, and Space/Enter drops it — that's the interaction most of
+ * these tests drive, since it's far more deterministic in CI than
+ * simulating raw pointer-drag event sequences past dnd-kit's
+ * activation-distance threshold.
  */
 
 /**
@@ -51,9 +54,20 @@ test.beforeEach(async ({ page }) => {
   }, STORAGE_PREFIX);
 });
 
-/** Drag-handle button locator, keyed by the card's visible title. */
+/**
+ * Keyboard drag-handle button locator, keyed by the card's visible title.
+ * The button is visually hidden (1x1, revealed on keyboard focus) but
+ * always present in the accessibility tree.
+ */
 function dragHandle(page, title) {
   return page.getByRole('button', { name: `Reorder ${title}` });
+}
+
+/** Header collapse-toggle button locator — also the pointer drag handle. */
+function cardHeader(page, title) {
+  return page.getByRole('button', {
+    name: new RegExp(`^(Collapse|Expand) ${title}$`),
+  });
 }
 
 /**
@@ -219,11 +233,10 @@ test('the drag handle does not interfere with the header collapse toggle', async
   await removeOverlay(page);
 
   // Sanity check that both controls exist independently and clicking the
-  // collapse toggle does not move the handle's focus/registration or vice
-  // versa — regression guard for the handle-inside-header layout change.
-  const toggle = page.getByRole('button', {
-    name: /^(Collapse|Expand) Stats$/,
-  });
+  // header (which is both the collapse toggle and the pointer drag handle)
+  // still toggles: the MouseSensor's activation distance means a plain
+  // click never starts a drag.
+  const toggle = cardHeader(page, 'Stats');
   const handle = dragHandle(page, 'Stats');
 
   await expect(toggle).toBeVisible();
@@ -243,13 +256,13 @@ test('reordering a card via mouse drag changes DOM order', async ({ page }) => {
 
   expect(await dashboardCardOrder(page)).toEqual(DEFAULT_CARD_IDS);
 
-  // Collapse every section first so all five header strips sit within the
-  // viewport regardless of how tall the expanded section bodies are (the
-  // flat accordion-style sections are tall enough to push the lower
-  // handles below the fold, where pointer coordinates derived from
-  // `boundingBox()` land on whatever is visually rendered instead of the
-  // intended target). Collapsed sections remain fully draggable — that's
-  // asserted separately by the collapse-toggle test above.
+  // Collapse every card first so all five headers sit within the viewport
+  // regardless of how tall the expanded card bodies are (expanded cards are
+  // tall enough to push the lower headers below the fold, where pointer
+  // coordinates derived from `boundingBox()` land on whatever is visually
+  // rendered instead of the intended target). Collapsed cards remain fully
+  // draggable — that's asserted separately by the collapse-toggle test
+  // above.
   for (const title of [
     'Stats',
     'Pipeline',
@@ -257,18 +270,17 @@ test('reordering a card via mouse drag changes DOM order', async ({ page }) => {
     'Memory',
     'Standard Output',
   ]) {
-    const toggle = page.getByRole('button', {
-      name: new RegExp(`^(Collapse|Expand) ${title}$`),
-    });
+    const toggle = cardHeader(page, title);
     if ((await toggle.getAttribute('aria-expanded')) === 'true') {
       await toggle.click();
     }
   }
 
-  // dnd-kit's PointerSensor only starts a drag after the pointer has moved
-  // past its activation distance, so a single `dragTo()` (which Playwright
+  // The pointer drag handle is the card header itself. dnd-kit's
+  // MouseSensor only starts a drag after the pointer has moved past its
+  // activation distance, so a single `dragTo()` (which Playwright
   // implements as one hover-then-move) is not always reliable — drive the
-  // pointer manually instead: press on the "Registers" handle, move in
+  // pointer manually instead: press on the "Registers" header, move in
   // several small steps well past the activation threshold (so dnd-kit sees
   // intermediate pointermove events and can compute collisions), then
   // release near the "Stats" card (the first card in the list). Exactly
@@ -277,10 +289,10 @@ test('reordering a card via mouse drag changes DOM order', async ({ page }) => {
   // detection — what this test cares about is that Registers (originally
   // 3rd) ends up ahead of its original position, proving the drag actually
   // reordered the list rather than merely visually animating.
-  const registersHandle = dragHandle(page, 'Registers');
+  const registersHeader = cardHeader(page, 'Registers');
   const statsCard = page.locator('#stats-card');
 
-  const handleBox = await registersHandle.boundingBox();
+  const handleBox = await registersHeader.boundingBox();
   const targetBox = await statsCard.boundingBox();
   if (!handleBox || !targetBox) {
     throw new Error('Could not measure drag handle or drop target.');
@@ -318,4 +330,9 @@ test('reordering a card via mouse drag changes DOM order', async ({ page }) => {
   expect(finalOrder.indexOf('memory-card')).toBeLessThan(
     finalOrder.indexOf('stdout-card'),
   );
+
+  // Dragging by the header must not have toggled the dragged card's
+  // collapse state as a side effect (the click a browser synthesizes after
+  // a same-element press/release is suppressed by `SortableDashboardCard`).
+  await expect(registersHeader).toHaveAttribute('aria-expanded', 'false');
 });

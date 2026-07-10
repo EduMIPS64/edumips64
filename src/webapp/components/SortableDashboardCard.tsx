@@ -1,10 +1,9 @@
-import type React from 'react';
+import React from 'react';
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 import DashboardCard from './DashboardCard';
@@ -17,6 +16,8 @@ interface SortableDashboardCardProps {
   /** DOM `id` attribute for the rendered card, e.g. `"stats-card"`. */
   htmlId: string;
   title: string;
+  icon?: React.ReactNode;
+  maxContentHeight?: string;
   expanded?: boolean;
   onToggle?: () => void;
   children?: React.ReactNode;
@@ -27,10 +28,19 @@ interface SortableDashboardCardProps {
  * drag-and-drop reordered within the dashboard's `SortableContext`
  * (see `Simulator.tsx`).
  *
- * The drag handle is a dedicated `IconButton` at the right end of the
- * section's header strip, entirely separate from the header's own
- * click-to-collapse `<button>` (see `DashboardCard`'s `dragHandle` slot)
- * so dragging never conflicts with expanding/collapsing the section.
+ * The whole card header doubles as the pointer drag handle: the mouse and
+ * touch activation listeners are spread onto the header itself (see
+ * `DashboardCard`'s `headerDragProps`), so grabbing a card anywhere on its
+ * header strip starts a drag, while a plain click still toggles
+ * collapse/expand — the sensors' activation constraints (movement
+ * distance for mouse, long-press for touch) are what tell the two apart.
+ *
+ * Keyboard reordering can't share the header the same way (Space/Enter on
+ * the header button must keep toggling collapse), so a dedicated
+ * visually-hidden "Reorder <Title>" button carries dnd-kit's keyboard
+ * listeners: it's the next tab stop after the header, invisible until
+ * keyboard-focused, and operates with Space/Enter to lift, arrow keys to
+ * move, Space/Enter to drop.
  *
  * `useSortable`'s `setNodeRef`/`style` (transform + transition) are applied
  * to an outer wrapping `<div>` rather than to `DashboardCard`'s own root,
@@ -41,6 +51,8 @@ export default function SortableDashboardCard({
   id,
   htmlId,
   title,
+  icon,
+  maxContentHeight,
   expanded,
   onToggle,
   children,
@@ -49,10 +61,38 @@ export default function SortableDashboardCard({
     attributes,
     listeners,
     setNodeRef,
+    setActivatorNodeRef,
     transform,
     transition,
     isDragging,
   } = useSortable({ id });
+
+  // After a pointer drag that started and ended over this card's header,
+  // the browser still synthesizes a `click` on the header button, which
+  // would collapse/expand the card the user just finished dragging.
+  // Swallow it by ignoring toggles for a short window after the drag ends:
+  // the synthetic click arrives within a few milliseconds of the drop
+  // (a timestamp window is used rather than a "consume next click" flag
+  // because that click isn't guaranteed to arrive at all — it only fires
+  // when press and release hit the same element), while a genuine,
+  // deliberate click always comes much later.
+  const dragEndTimeRef = React.useRef(Number.NEGATIVE_INFINITY);
+  const wasDraggingRef = React.useRef(false);
+  React.useEffect(() => {
+    if (wasDraggingRef.current && !isDragging) {
+      dragEndTimeRef.current = performance.now();
+    }
+    wasDraggingRef.current = isDragging;
+  }, [isDragging]);
+
+  const handleToggle =
+    onToggle &&
+    (() => {
+      if (isDragging || performance.now() - dragEndTimeRef.current < 400) {
+        return;
+      }
+      onToggle();
+    });
 
   return (
     <div
@@ -71,34 +111,71 @@ export default function SortableDashboardCard({
         transition: isDragging ? undefined : (transition ?? undefined),
         opacity: isDragging ? 0.35 : 1,
         position: 'relative',
+        // The wrapper, not the Card, is the dashboard grid's child, so the
+        // full-width span lives here (cf. `DashboardCard`'s `fullWidth`).
+        gridColumn: '1 / -1',
       }}
     >
       <DashboardCard
         id={htmlId}
         title={title}
+        icon={icon}
+        maxContentHeight={maxContentHeight}
         expanded={expanded}
-        onToggle={onToggle}
+        onToggle={handleToggle}
+        headerDragProps={{
+          // dnd-kit types its listeners map as Record<string, Function>;
+          // narrow each handler to the React event type of its prop.
+          onMouseDown: listeners?.onMouseDown as
+            | React.MouseEventHandler
+            | undefined,
+          onTouchStart: listeners?.onTouchStart as
+            | React.TouchEventHandler
+            | undefined,
+        }}
         dragHandle={
           <Box
+            component="button"
+            type="button"
+            ref={setActivatorNodeRef}
+            aria-label={`Reorder ${title}`}
+            {...attributes}
+            onKeyDown={
+              listeners?.onKeyDown as React.KeyboardEventHandler | undefined
+            }
             sx={{
+              // Visually hidden (but focusable) 1x1 button over the header's
+              // right edge; on keyboard focus it expands into a small chip so
+              // sighted keyboard users can see what they're operating.
+              position: 'absolute',
+              top: 6,
+              right: 6,
+              // Explicit px units: in MUI's sx, a bare `width: 1` means 100%.
+              width: '1px',
+              height: '1px',
+              p: 0,
+              border: 0,
+              overflow: 'hidden',
+              bgcolor: 'transparent',
+              color: 'primary.main',
               display: 'flex',
               alignItems: 'center',
-              pr: 1,
+              justifyContent: 'center',
+              cursor: 'grab',
+              '&:focus-visible': {
+                width: 'auto',
+                height: 'auto',
+                p: 0.25,
+                overflow: 'visible',
+                bgcolor: 'background.paper',
+                borderRadius: 1,
+                outline: '2px solid currentColor',
+                outlineOffset: -2,
+                zIndex: 1,
+              },
             }}
           >
-            <IconButton
-              size="small"
-              aria-label={`Reorder ${title}`}
-              sx={{
-                cursor: isDragging ? 'grabbing' : 'grab',
-                color: 'text.secondary',
-                touchAction: 'none',
-              }}
-              {...attributes}
-              {...listeners}
-            >
-              <DragIndicatorIcon fontSize="small" />
-            </IconButton>
+            <DragIndicatorIcon fontSize="small" aria-hidden="true" />
           </Box>
         }
       >
