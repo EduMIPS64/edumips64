@@ -25,7 +25,8 @@
 ### Requirements
 
 #### Dev Container
-All requirements are available in the Development Container image described in the `.devcontainer/devcontainer.json` dev container. See https://containers.dev/ for documentation on dev containers.
+
+All requirements are available in the Development Container image described in the `.devcontainer/devcontainer.json` dev container. See <https://containers.dev/> for documentation on dev containers.
 
 Github codespaces will use the dev container by default and give you a fully set up dev environment, useable for desktop, web and documentation development work.
 
@@ -41,7 +42,7 @@ To build the user documentation, you'll need Python 3.14+ with pip.
 - JavaHelp
 - GWT (experimental)
 - Python dependencies to build the documentation (they'll be installed in a virtual environment)
-  - Sphinx (http://www.sphinx-doc.org/)
+  - Sphinx (<http://www.sphinx-doc.org/>)
   - rst2pdf (for the PDF files)
 
 See `requirements.txt` for the versions of Python packages.
@@ -49,7 +50,7 @@ See `requirements.txt` for the versions of Python packages.
 To generate an installable Windows MSI package (using the Gradle `msi` task), you will need the WiX toolset.
 
 This project uses GitHub Actions for continuous integration
-(https://github.com/EduMIPS64/edumips64/actions).
+(<https://github.com/EduMIPS64/edumips64/actions>).
 
 There are six main CI/CD workflows:
 
@@ -170,6 +171,7 @@ The web UI itself is based on React, and it's compiled / assembled using Vite
 (`vite.config.ts`). The source code is in `src/webapp`.
 
 The `webapp` Gradle task automates the build process for the web UI. It:
+
 1. Compiles the GWT worker (`war` task)
 2. Generates the Web-flavored HTML documentation
    (`htmlDocsWebEn`, `htmlDocsWebIt`, `htmlDocsWebZh` tasks). These are
@@ -224,6 +226,7 @@ and the phase 3 PR):
   `data/SampleProgram.ts`; `index.tsx`.
 
 Typing conventions:
+
 - Component props are typed with explicit `interface` declarations.
 - Protocol types (`Register`, `Registers`, `Memory`, `Statistics`, `Pipeline`,
   `CpuStatus`, `SimulatorResult`, `SimulatorWorker`) live in
@@ -303,15 +306,20 @@ involved.
 To run tests with coverage locally:
 
 1. Build the web application with coverage instrumentation:
+
    ```
    BABEL_ENV=coverage npm run build-dbg
    ```
+
 2. Start a local server serving `out/web` on port 8080 (e.g. `python3 -m http.server 8080 --directory out/web`).
 3. Run the tests with coverage collection enabled:
+
    ```
    COVERAGE=true npm test
    ```
+
 4. Generate the HTML/lcov report:
+
    ```
    npm run report:coverage
    ```
@@ -445,8 +453,6 @@ current `MetaInfo.VERSION`. `HelpTopicsTest` verifies that every entry
 in `topics.index` resolves to a non-empty resource bundled in the JAR
 — if a row references a missing file, this test fails and protects
 the hermetic-build contract.
-
-
 
 We use the [GitHub Flow](http://scottchacon.com/2011/08/31/github-flow.html)
 development workflow, which means that `master` is always fully working
@@ -654,7 +660,6 @@ is why those three workflows check out the edumips64 repo with `fetch-depth: 0`
 preview the conversion manually, run `migrate --repo <full-clone> --dry-run`
 against a clone of the Pages repo.
 
-
 ### Manual release checklist
 
 Most of the release process is automated via the `release.yml` GitHub Actions workflow.
@@ -671,7 +676,7 @@ Before triggering a release:
 - Update the version in `snapcraft.yaml`
 - Merge all changes to `master`
 - **Smoke-test the release artifacts produced by the automatic `release.yml`
-  run for the merge commit to `master` _before_ triggering the manual run.**
+  run for the merge commit to `master` *before* triggering the manual run.**
   The same workflow runs on every push to `master` (without `create_release`),
   so the JAR, MSI, Electron apps and PDF manuals for the exact commit you are
   about to release are already available as workflow-run artifacts. Download
@@ -699,7 +704,7 @@ automatic pre-release run on `master`, see above), manually verify:
 
 Trigger builds on snapcraft.
 
-Check the 'edge' snap and promote it to stable if it works (https://snapcraft.io/edumips64/releases, needs login)
+Check the 'edge' snap and promote it to stable if it works (<https://snapcraft.io/edumips64/releases>, needs login)
 Test both on amd64 and armhf (Raspberry Pi)
 
-Update winget manifest on https://github.com/microsoft/winget-pkgs/tree/master/manifests/e/EduMIPS64/EduMIPS64
+Update winget manifest on <https://github.com/microsoft/winget-pkgs/tree/master/manifests/e/EduMIPS64/EduMIPS64>

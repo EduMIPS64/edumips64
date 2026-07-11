@@ -19,6 +19,7 @@
 Andrea wants to let AI agents merge to `master` freely for development agility, but production deploys to `web.edumips.org` must be **gated by an explicit human action**. Previously, every push to master auto-deployed to production via `release.yml`'s `deploy-prod` job — incompatible with "agents loose on master."
 
 Three sub-problems solved:
+
 1. **Manual promotion** — decouple merge-to-master from deploy-to-prod.
 2. **Fast rollback** — `https://web.edumips.org/prev/` serves the previous promoted release.
 3. **Versioning** — unified build identity via `git describe` while web ships continuously with a promotion counter.
@@ -28,7 +29,7 @@ Three sub-problems solved:
 ## Current State (pre-implementation baseline)
 
 | Aspect | Details |
-|--------|---------|
+| -------- | --------- |
 | **Prod hosting** | GitHub Pages from `EduMIPS64/web.edumips.org` repo (branch `master`). DNS: `web.edumips.org`. |
 | **Prod deploy trigger** | `release.yml` → `deploy-prod` job runs on every push to master + workflow_dispatch. Auth: `PAT_WEBUI`. |
 | **PR previews** | Azure Blob Storage (`edumips64ci`). URL: `https://edumips64ci.z16.web.core.windows.net/<PR>/`. |
@@ -52,6 +53,7 @@ This section describes the system as built. All workflows live in `.github/workf
 **Workflow:** `.github/workflows/promote-web.yml` (`workflow_dispatch`)
 
 **Inputs:** `run_id` (optional) — the CI run whose `web` artifact to promote. Behavior depends on whether it is provided:
+
 - **Empty `run_id`** → **Build+promote current master:** a `build` job (using reusable `build-web.yml`) builds and tests the current master, then the `promote` job deploys that fresh artifact. One-click "ship current master" mode. Security preserved: `build-web.yml` has `contents: read` only and never sees `PAT_WEBUI`; the credential lives only in the `promote` job.
 - **`run_id` provided** → **Promote a specific validated run:** skip the build; validate that the given run is from this repo, ran `ci.yml`, concluded `success`, on `master` branch, and has a `web` artifact. Deploy that immutable artifact. This preserves rollback (re-promote a previously-validated run by id), re-promote (run the same id again), and audit (promote an arbitrary run by explicit id).
 
@@ -60,10 +62,12 @@ This section describes the system as built. All workflows live in `.github/workf
 **Access control:** `if: github.actor == 'lupino3'` — only Andrea can trigger.
 
 **Steps (build+promote mode, no `run_id`):**
+
 1. **Build** (via reusable `build-web.yml` on current `master`): GWT worker + React/webpack bundle to `out/web/`, no secrets required.
 2. **Promote** (same flow as below, using current run id as `SOURCE_RUN_ID`).
 
 **Steps (promote-specific-run mode, `run_id` provided):**
+
 1. **Validate** the source CI run: confirms it belongs to this repo, ran `ci.yml`, concluded `success`, on `master` branch, and has a `web` artifact. Use the validated SHA and `run_id` as `SOURCE_RUN_ID`.
 2. **Checkout** this repo at the validated SHA with `fetch-depth: 0`.
 3. **Compute build identity:** `git describe --tags --match 'v*' --always <SHA> | sed 's/^v//'` → e.g. `1.4.0-2-gabc1234`. Also reads `targetRelease` from `gradle.properties`.
@@ -93,11 +97,13 @@ This section describes the system as built. All workflows live in `.github/workf
 
 **Workflow:** `.github/workflows/candidate-web.yml`
 
-**Trigger:** 
+**Trigger:**
+
 - `workflow_run` event after a successful **CI Build** (`ci.yml`) on `master` branch (per-commit, replacing the old daily nightly cron).
 - `workflow_dispatch` for on-demand manual deployment.
 
 **Mechanism:**
+
 1. Finds the successful `ci.yml` run that triggered the workflow_run event (or the latest green run if manual dispatch).
 2. Downloads its `web` artifact.
 3. Computes the date-based candidate directory path: `<YYYY-MM-DD>/<N>-<shortsha>/` where:
@@ -118,6 +124,7 @@ This section describes the system as built. All workflows live in `.github/workf
 **Build identity & metadata:** Each candidate build includes git-describe string, SHA, and the candidate date/N identifier (no promotion number — those are reserved for gated production promotions).
 
 **Root index file (`/candidates.json`):**
+
 ```json
 {
   "candidates": [
@@ -127,6 +134,7 @@ This section describes the system as built. All workflows live in `.github/workf
   "retentionDays": 14
 }
 ```
+
 Candidates are sorted newest-first for easy discovery of the latest build.
 
 ### Versioning Model (Unified Build Identity, Split Release Label)
@@ -134,7 +142,7 @@ Candidates are sorted newest-first for easy discovery of the latest build.
 The system uses three complementary identifiers:
 
 | Layer | Identifier | Source | Purpose | Advances |
-|-------|-----------|--------|---------|----------|
+| ------- | ----------- | -------- | --------- | ---------- |
 | **Release label** | `1.4.1` | `gradle.properties version=` | Git tags, JAR/MSI naming | On tagged desktop releases (manual) |
 | **Build identity** | `1.4.0-2-gabc1234` | `git describe --tags --match 'v*' --always --dirty` (leading `v` stripped) | Displayed everywhere; unique per commit | Every commit (auto-derived, monotonic) |
 | **Promotion number** | `44` | `manifest.json` in Pages repo | Web deploy counter, rollback UX | On each production promotion |
@@ -142,7 +150,7 @@ The system uses three complementary identifiers:
 **How build identity is wired:**
 
 | Surface | Mechanism |
-|---------|-----------|
+| --------- | ----------- |
 | **Desktop (Swing) + CLI** | `build.gradle.kts` `sharedManifest` writes git-describe to `Signature-Version` → `MetaInfo.java` reads it at class-load. Flows automatically to window title, status bar, crash dialog, CLI `--version`. |
 | **Web UI** | `webpack.config.js` uses `GitRevisionPlugin` → injected via `DefinePlugin` into `index.js`. |
 | **User manual (Sphinx docs)** | `docs/user/common_conf.py` reads git-describe for the `version`/`release` config. |
@@ -178,6 +186,7 @@ EduMIPS64/web.edumips.org repo:
 ```
 
 **manifest.json example:**
+
 ```json
 {
   "current": 44,
@@ -195,7 +204,7 @@ The structure is bootstrapped automatically on the first `promote-web.yml` run �
 ### URL Scheme
 
 | URL | Content |
-|-----|---------|
+| ----- | --------- |
 | `https://web.edumips.org/` | Current promoted version (stable) |
 | `https://web.edumips.org/prev/` | Previous promoted version (rollback target) |
 | `https://web.edumips.org/v/44/` | Immutable snapshot by promotion number |
@@ -219,7 +228,7 @@ Organized by decision point. Each lists the option(s) we evaluated and rejected,
 ### Promotion Trigger
 
 | Rejected option | Rationale |
-|-----------------|-----------|
+| ----------------- | ----------- |
 | **(A) Environment approval gate** — add a `Production` GitHub Environment with required reviewers to the existing `deploy-prod` job; every master push creates a pending deployment awaiting approval. | Creates notification noise on every merge. No way to skip/batch. Artifact is rebuilt per push (not immutable promotion of an already-tested build). |
 | **(C) Git tag triggers deploy** — pushing a tag like `web-v<N>` triggers prod deploy by rebuilding from tag. | Rebuilding from tag means what you tested ≠ what you deploy (non-immutable). Agents could accidentally push tags. Extra manual step. |
 | **(D) Hard build+promote, dropping run_id** — a single workflow that ALWAYS rebuilds master and promotes, with no `run_id` input. | Removes the ability to re-promote / roll back by promoting a previously-validated run by id. Wastes CI resources by always rebuilding when an identical green artifact already exists. Loses audit trail of which runs have been shipped. |
@@ -236,7 +245,7 @@ Organized by decision point. Each lists the option(s) we evaluated and rejected,
 ### Versioning Scheme
 
 | Rejected option | Rationale |
-|-----------------|-----------|
+| ----------------- | ----------- |
 | **(i) Single unified version across all components** — `1.4.1` for everything, web promotions use `1.4.1+build.44`. | Web ships continuously; version is stale between desktop releases. Many builds share `1.4.1` — not point-in-time. |
 | **(iii) Fully independent semver per component** — `core-2.0.0`, `swing-1.4.1`, `web-1.3.0`. | Over-engineered. Core is embedded in both Swing and Web and is not independently shippable. Creates coordination burden with no clear user benefit. |
 | **(iv) Core+shell decomposition** — separate semver for Core vs shell versions. | Requires defining a fuzzy "core change" boundary (e.g. ResultFactory). The git SHA in the manifest already provides full traceability without a separate core release process. |
@@ -244,7 +253,7 @@ Organized by decision point. Each lists the option(s) we evaluated and rejected,
 ### Build Identity Source
 
 | Rejected option | Rationale |
-|-----------------|-----------|
+| ----------------- | ----------- |
 | **(a) Status quo** — `gradle.properties version=` embedded verbatim. | Not unique between releases — all interim commits share the same string. |
 | **(b) SNAPSHOT suffix** — `1.4.1-SNAPSHOT`. | Still shared build-to-build; marks "not a release" but doesn't distinguish individual commits. |
 | **GITHUB_RUN_NUMBER** — auto-incrementing CI counter. | Not portable outside CI. Not meaningful to users. Doesn't collapse to a clean label at tagged releases. |
@@ -275,7 +284,7 @@ Organized by decision point. Each lists the option(s) we evaluated and rejected,
 ## Phased Rollout
 
 | Phase | Scope | Effort | Outcome |
-|-------|-------|--------|---------|
+| ------- | ------- | -------- | --------- |
 | **Phase 0** ✅ | Disable auto-deploy: `if: false` on `deploy-prod` in `release.yml`. | 5 min | Agents can merge without shipping to prod. |
 | **Phase 1–2** ✅ | `promote-web.yml` with full versioned layout (`/v/N/`, `/prev/`, `manifest.json`, prune at 50). | 2-3 hours | Manual promotion + rollback history. |
 | **Phase 3** ✅ | `rollback-web.yml` for emergency swap. Git-describe build identity in desktop+CLI (`build.gradle.kts` `sharedManifest` → `MetaInfo`), web (`webpack.config.js` `GitRevisionPlugin`), docs (`common_conf.py`). `fetch-depth: 0` across workflows. | 2-3 hours | Complete versioning + rollback. |
@@ -297,11 +306,13 @@ The web UI's About tab now fetches the root `/manifest.json` (with `cache:'no-ca
 When viewing an archived snapshot at `/v/<N>/`, the About tab displays a "Return to latest" link instead, making navigation back to the current version obvious.
 
 The `manifest.json` `history` array entry schema:
+
 ```json
 { "n": 44, "build": "1.4.0-2-gabc1234", "sha": "abc1234", "targetRelease": "1.4.1", "promotedAt": "2026-06-07T18:49:37Z", "promotedBy": "lupino3" }
 ```
 
 **Gating:** The navigator only appears if:
+
 1. `/manifest.json` fetch succeeds and parses.
 2. The build is NOT a PR preview (detected via `window.GIT_DESCRIBE`).
 
@@ -321,7 +332,7 @@ This ensures the navigator is available on stable production and candidate build
 ## Resolved Decisions (2026-06-07)
 
 | # | Question | Decision |
-|---|----------|----------|
+| --- | ---------- | ---------- |
 | 1 | Who can promote? | Andrea (lupino3) only. `workflow_dispatch` + actor check is sufficient. |
 | 2 | Phase 0 now? | Yes — no pending releases. |
 | 3 | Artifact retention? | Accept 90-day limit; rebuild from SHA if expired. No durability backstop. |

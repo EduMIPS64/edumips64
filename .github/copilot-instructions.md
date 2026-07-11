@@ -7,9 +7,11 @@ EduMIPS64 is a free, cross-platform visual MIPS64 CPU simulator written in Java 
 ## Development Environment
 
 ### Dev Container
+
 The repository includes a dev container configuration (`.devcontainer/devcontainer.json`) that provides a fully configured development environment. GitHub Codespaces will use this by default.
 
 ### Requirements
+
 - Java JDK 17 or above
 - Node.js 16+ (for web UI development)
 - Python 3.12+ with pip (for documentation)
@@ -18,6 +20,7 @@ The repository includes a dev container configuration (`.devcontainer/devcontain
 ## Project Structure
 
 ### Source Code Layout
+
 The project follows Gradle project layout conventions:
 
 - **`src/main/java/org/edumips64/`** - Main Java source code
@@ -43,6 +46,7 @@ The project follows Gradle project layout conventions:
 ## Build System
 
 ### Gradle Tasks
+
 - `./gradlew assemble` - Compile and assemble JAR artifacts
 - `./gradlew check` - Run tests and compile documentation
 - `./gradlew run` - Run the application
@@ -50,6 +54,7 @@ The project follows Gradle project layout conventions:
 - `./gradlew noHelpJar` - Build JAR without help files (faster for development)
 
 ### NPM Scripts (Web UI)
+
 - `npm start` - Start webpack dev server with live reloading
 - `npm run build-dbg` - Build with debugging symbols
 - `npm run build` - Production build (minified)
@@ -58,6 +63,7 @@ The project follows Gradle project layout conventions:
 ## Testing Guidelines
 
 ### General Testing Principles
+
 - All new features **must** include unit tests with good coverage
 - The `master` branch must always be in a working state (all tests passing)
 - Unit tests are stored in `src/test/`
@@ -65,29 +71,34 @@ The project follows Gradle project layout conventions:
 ### Test Types
 
 #### Java Unit Tests
+
 - **End-to-end tests**: `EndToEndTests.java` - Runs MIPS64 assembly programs
   - Test failures trigger `BREAK` instruction → `BreakException`
 - **CPU tests**: `CpuTests.java` - Tests forwarding, Dinero Tracefile generation
 - **Component tests**: `ParserTest.java`, `MemoryTest.java`, etc. - Test individual components in isolation
 
 #### Test Patterns
+
 - Assembly tests go in `CpuTests.java` (has boilerplate for executing assembly)
 - Component-specific tests should be in dedicated test classes
 - Look at existing test classes for proper initialization patterns
 - Swing UI code is excluded from coverage reports
 
 #### Web UI Tests
+
 - Playwright tests in `src/test/webapp/`
 - Run with `npm test`
 
 ## Code Style and Conventions
 
 ### Java
+
 - Follow standard Java conventions
 - Pay attention to initialization code when creating new test classes
 - Look at existing code for patterns and style consistency
 
 ### JavaScript/React
+
 - Linting and formatting via [Biome](https://biomejs.dev/), configured in `biome.json`
 - Recommended rules plus the React rule domain (`useExhaustiveDependencies`, `useHookAtTopLevel`, etc.)
 - Run `npm run lint` to check, `npm run format` to auto-format
@@ -96,13 +107,16 @@ The project follows Gradle project layout conventions:
 ## Development Workflow
 
 ### GitHub Flow
+
 We use the [GitHub Flow](http://scottchacon.com/2011/08/31/github-flow.html) workflow:
+
 - `master` branch is always fully working
 - Development happens in feature branches
 - Pull requests must pass CI checks before merging
 - No direct commits to `master` (protected branch)
 
 ### Pull Request Requirements
+
 - All tests must pass (GitHub Actions CI)
 - Code must build successfully
 - New features must include unit tests
@@ -111,6 +125,7 @@ We use the [GitHub Flow](http://scottchacon.com/2011/08/31/github-flow.html) wor
 ## GWT Web Worker
 
 The EduMIPS64 core is cross-compiled to JavaScript using GWT and runs as a Web Worker:
+
 - Source: `org.edumips64.client` package
 - Configuration: `webclient.gwt.xml`
 - Build: `./gradlew war` produces `worker.js` in `out/web/`
@@ -119,9 +134,10 @@ The EduMIPS64 core is cross-compiled to JavaScript using GWT and runs as a Web W
 ## Documentation
 
 ### User Documentation
+
 - Built with Sphinx (Python)
 - Source: `docs/` directory
-- Available online at http://edumips64.rtfd.io
+- Available online at <http://edumips64.rtfd.io>
 - Build with `./gradlew check` (includes documentation compilation)
 - Requirements in `docs/requirements.txt`
 - User documentation is localized in three languages, each under its own subdirectory:
@@ -137,6 +153,7 @@ The EduMIPS64 core is cross-compiled to JavaScript using GWT and runs as a Web W
   speaker can refine the wording later, but do not skip any language.
 
 ### Developer Documentation
+
 - Developer guide: `docs/developer-guide.md`
 - README: `readme.md`
 - Code of Conduct: `CODE_OF_CONDUCT.md`
@@ -150,40 +167,45 @@ The EduMIPS64 core is cross-compiled to JavaScript using GWT and runs as a Web W
 ## Important Guidelines for Code Changes
 
 ### Minimal Changes
+
 - Make the smallest possible changes to achieve the goal
 - Don't remove or modify working code unless absolutely necessary
 - Don't fix unrelated bugs or broken tests
 - Focus on the specific issue at hand
 
 ### Security
+
 - No secrets in source code
 - Validate changes don't introduce security vulnerabilities
 - Fix any vulnerabilities related to your changes
 
 ### Dependencies
+
 - Use existing libraries whenever possible
 - Only add/update dependencies if absolutely necessary
 - For npm dependencies: Check package security
 
 ## Community and Support
 
-- **Code of Conduct**: Contributor Covenant - report issues to andrea.spadaccini@gmail.com
-- **IRC**: #edumips64 on Libera.chat (https://web.libera.chat/)
-- **Website**: http://www.edumips.org
-- **Blog**: http://edumips64.blogspot.com
+- **Code of Conduct**: Contributor Covenant - report issues to <andrea.spadaccini@gmail.com>
+- **IRC**: #edumips64 on Libera.chat (<https://web.libera.chat/>)
+- **Website**: <http://www.edumips.org>
+- **Blog**: <http://edumips64.blogspot.com>
 
 ## Platform-Specific Notes
 
 ### Windows
+
 - Builds natively (PowerShell) and in WSL
 - WiX toolset required for MSI packages (`./gradlew msi`)
 
 ### Mac OS X
+
 - Tested on Catalina 10.15.2 with AdoptOpenJDK 11.0.7
 - May need to trust Let's Encrypt certificates for Gradle GWT plugins
 
 ## Continuous Integration
 
-- GitHub Actions: https://github.com/EduMIPS64/edumips64/actions
+- GitHub Actions: <https://github.com/EduMIPS64/edumips64/actions>
 - All PRs must pass CI checks
 - CI runs on pushes to `master` and all pull requests

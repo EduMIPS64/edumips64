@@ -1,6 +1,6 @@
 # Documentation
 
-This directory contains both the user and the developer documentation. 
+This directory contains both the user and the developer documentation.
 
 The directory `user` contains the source of the user documentation, which can
 be either consulted via GitHub itself, since it can render reStructuredText,
