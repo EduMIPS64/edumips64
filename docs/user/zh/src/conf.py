@@ -25,7 +25,7 @@ pdf_font_path = [os.path.abspath(os.path.dirname(__file__))]
 pdf_language = "zh_CN"
 source_encoding = "utf-8"
 language = "zh_CN"
-copyright = u'2011, Andrea Spadaccini (and the EduMIPS64 development team)'
+copyright = u'2011, Andrea Spadaccini (and the EduMIPS64 development team)'  # pylint: disable=redefined-builtin -- name required by Sphinx
 man_pages = [
     ('index', 'edumips64', u'EduMIPS64 Documentation',
      [u'Andrea Spadaccini (and the EduMIPS64 development team)'], 1)
