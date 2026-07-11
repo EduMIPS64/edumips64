@@ -535,8 +535,8 @@ which analyzes every PR. Codacy reads the tool configuration files committed
 at the repo root, so the two always agree:
 
 - **JavaScript/TypeScript**: Biome (`biome.json`), run via `npm run lint`.
-  `.eslintrc.json` is a deliberately empty ESLint config whose only purpose
-  is to stop Codacy's ESLint from applying defaults that conflict with Biome.
+  The ESLint tools are deliberately disabled on Codacy — their default
+  patterns conflict with Biome (e.g. on quote style); don't re-enable them.
 - **Markdown**: markdownlint (`.markdownlint.json` for rules,
   `.markdownlint-cli2.jsonc` for globs), run via `npm run lint:md`.
 - **Shell**: shellcheck, run in the `lint-docs` CI job.
