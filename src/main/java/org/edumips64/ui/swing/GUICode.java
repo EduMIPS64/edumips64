@@ -201,6 +201,9 @@ public class GUICode extends GUIComponent {
             if (instruction.getComment() != null) {
               return ";" + instruction.getComment();
             }
+            break;
+          default:
+            break;
         }
         return "";
       }

@@ -209,6 +209,7 @@ html[data-theme="dark"] #memory th {
 div.error-accordion {
   position: sticky;
   top: 0;
+
   /* Keep the sticky Issues accordion above sibling accordions in the
      right panel, but well below MUI overlays such as the Help dialog
      (default modal z-index = 1300) and tooltips/popovers. The previous

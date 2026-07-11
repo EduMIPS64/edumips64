@@ -53,7 +53,7 @@ public class CliRunner {
       runReplLoop(cli, commandLine);
 
     } catch (Exception e) {
-      org.edumips64.utils.cli.Cli.printErrorMessage(e);
+      Cli.printErrorMessage(e);
       System.exit(1);
     }
   }

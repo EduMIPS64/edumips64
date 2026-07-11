@@ -104,10 +104,12 @@ jobs:
 
   # Run web UI Playwright tests locally with Istanbul coverage instrumentation.
   # Lint all Markdown files (markdownlint-cli2; rules in .markdownlint.json,
-  # globs/ignores in .markdownlint-cli2.jsonc). A dedicated job so markdown
-  # feedback lands fast, without waiting for the web build.
+  # globs/ignores in .markdownlint-cli2.jsonc) and all shell scripts
+  # (shellcheck, preinstalled on ubuntu runners; .squad/ is agent scaffolding
+  # and excluded, mirroring .codacy.yaml). A dedicated job so this feedback
+  # lands fast, without waiting for the web build.
   lint-docs:
-    name: Lint Markdown
+    name: Lint Markdown and shell scripts
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -127,6 +129,9 @@ jobs:
 
       - name: Lint Markdown
         run: npm run lint:md
+
+      - name: Lint shell scripts
+        run: git ls-files '*.sh' | grep -v '^\.squad/' | xargs shellcheck
 
   # The coverage report is rendered as a Markdown table and published to this
   # run's job summary. No secrets are used here.

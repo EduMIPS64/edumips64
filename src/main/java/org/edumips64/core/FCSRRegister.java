@@ -138,6 +138,8 @@ public class FCSRRegister extends BitSet32 {
       case TOWARDS_MINUS_INFINITY:
         setBits("11", FCSR_RM_FIELD_INIT);
         break;
+      default:
+        break;
     }
   }
 
@@ -161,6 +163,8 @@ public class FCSRRegister extends BitSet32 {
           break;
         case INVALID_OPERATION:
           setFCSREnables("V", (value) ? 1 : 0);
+          break;
+        default:
           break;
       }
     } catch (IrregularStringOfBitsException e) {

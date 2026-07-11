@@ -14,6 +14,8 @@
 
 [Unit tests](#unit-tests)
 
+[Linting and static analysis](#linting-and-static-analysis)
+
 [Compiling under Windows](#windows)
 
 [Compiling under Mac OSX](#mac-os-x)
@@ -525,6 +527,30 @@ appear in assembly source (for example `BUBBLE`, which the pipeline
 inserts to represent stalls, and `DDIV3`, which is the Java class name
 for the 3-operand form of the `DDIV` mnemonic). Only extend this list
 for entries that are genuinely not reachable from MIPS64 assembly.
+
+## Linting and static analysis
+
+Lint checks run both locally/in CI and on [Codacy](https://app.codacy.com/gh/EduMIPS64/edumips64),
+which analyzes every PR. Codacy reads the tool configuration files committed
+at the repo root, so the two always agree:
+
+- **JavaScript/TypeScript**: Biome (`biome.json`), run via `npm run lint`.
+  `.eslintrc.json` is a deliberately empty ESLint config whose only purpose
+  is to stop Codacy's ESLint from applying defaults that conflict with Biome.
+- **Markdown**: markdownlint (`.markdownlint.json` for rules,
+  `.markdownlint-cli2.jsonc` for globs), run via `npm run lint:md`.
+- **Shell**: shellcheck, run in the `lint-docs` CI job.
+- **Java**: PMD with the curated ruleset in `ruleset.xml` (Codacy only; the
+  ruleset documents why the excluded rules don't fit this codebase).
+- **Python**: Prospector (`.prospector.yaml`), plus Pylint and Bandit with
+  targeted inline suppressions.
+- **CSS**: Stylelint (`.stylelintrc.json`).
+- **Kotlin (build scripts)**: detekt, with file-level suppressions in
+  `build.gradle.kts`.
+
+When Codacy flags something that contradicts a deliberate project convention,
+prefer updating the relevant config file (with a comment explaining why) over
+churning the code.
 
 ## Windows
 

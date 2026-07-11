@@ -101,7 +101,7 @@ redispatch() {
         if [[ "${HTTP}" == "204" ]]; then
             TRIGGERED_REDISPATCH=true
         else
-            echo "  -> WARNING: re-dispatch failed (HTTP ${HTTP}): $(cat /tmp/dispatch-resp.json 2>/dev/null | head -c 200)"
+            echo "  -> WARNING: re-dispatch failed (HTTP ${HTTP}): $(head -c 200 /tmp/dispatch-resp.json 2>/dev/null)"
             echo "  -> If HTTP is 403, PAT_WEBUI needs the Actions write scope"
             echo "     (classic: 'workflow'; fine-grained: Actions: Read and write)."
         fi

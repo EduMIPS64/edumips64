@@ -23,10 +23,10 @@ UNTESTED_FILENAME="/tmp/untested-instructions-$(date +%F-%T).txt"
 #     the DDIV tests.
 EXCLUDE_REGEX="^(BUBBLE|DDIV3)$"
 
-find "${TESTDIR}" -name "*.s" | xargs cat | sed "s/;.*$//" | sed "s/\s/ /g" | sed "s/^\s*//g" | sed "s/^.*://g" | cut -d " " -f 1 | grep -v "^[.;#/\\]" | tr "a-z" "A-Z" | grep -v "^$" | sort -u > "${TESTED_FILENAME}"
+find "${TESTDIR}" -name "*.s" -print0 | xargs -0 cat | sed "s/;.*$//" | sed "s/\s/ /g" | sed "s/^\s*//g" | sed "s/^.*://g" | cut -d " " -f 1 | grep -v "^[.;#/\\]" | tr "[:lower:]" "[:upper:]" | grep -v "^$" | sort -u > "${TESTED_FILENAME}"
 echo "Tested instructions: $(wc -l < "${TESTED_FILENAME}")"
 
-grep -ri class.*extends src/main/java/org/edumips64/core/is/ | grep -v Exception | grep -v abstract | sed "s/^.*class//" | cut -d" " -f 2 | sed "s/_/./g" | grep -vE "${EXCLUDE_REGEX}" | sort -u > "${IS_FILENAME}"
+grep -ri "class.*extends" src/main/java/org/edumips64/core/is/ | grep -v Exception | grep -v abstract | sed "s/^.*class//" | cut -d" " -f 2 | sed "s/_/./g" | grep -vE "${EXCLUDE_REGEX}" | sort -u > "${IS_FILENAME}"
 echo "Total instructions in the instruction set (excluding non-user-addressable ones): $(wc -l < "${IS_FILENAME}")"
 
 diff -u "${IS_FILENAME}" "${TESTED_FILENAME}" | grep "^-" | grep -v -- "^---" | grep -v -- "- " | sed "s/^-//" > "${UNTESTED_FILENAME}"

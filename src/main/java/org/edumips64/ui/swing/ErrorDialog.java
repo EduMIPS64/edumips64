@@ -23,6 +23,7 @@
 package org.edumips64.ui.swing;
 
 import org.edumips64.core.parser.ParserException;
+import org.edumips64.ui.swing.img.IMGLoader;
 import org.edumips64.utils.CurrentLocale;
 import org.edumips64.utils.ConfigStore;
 
@@ -103,7 +104,7 @@ public class ErrorDialog extends JDialog {
 
     try {
       ImageIcon mainImageIcon = new ImageIcon(
-                           org.edumips64.ui.swing.img.IMGLoader.getImage(
+                           IMGLoader.getImage(
                              ((numError > 0) ? "error-hires.png" : "warning-hires.png")
                            ));
       mainImageIcon = new ImageIcon(mainImageIcon.getImage().getScaledInstance(130, 100, java.awt.Image.SCALE_SMOOTH));

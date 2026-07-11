@@ -20,7 +20,7 @@ sys.path.append(os.path.abspath("../.."))
 from common_conf import *  # noqa: F401, F403  -- re-export Sphinx config defaults
 
 language = "en"
-copyright = u'2011, Andrea Spadaccini (and the EduMIPS64 development team)'
+copyright = u'2011, Andrea Spadaccini (and the EduMIPS64 development team)'  # pylint: disable=redefined-builtin -- name required by Sphinx
 man_pages = [
     ('index', 'edumips64', u'EduMIPS64 Documentation',
      [u'Andrea Spadaccini (and the EduMIPS64 development team)'], 1)

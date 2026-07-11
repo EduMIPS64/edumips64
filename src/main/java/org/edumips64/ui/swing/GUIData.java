@@ -216,6 +216,8 @@ public class GUIData extends GUIComponent {
           case 4:
             toReturn = memory.getCellByIndex(row).getComment();
             break;
+          default:
+            break;
           }
         } catch (IrregularStringOfBitsException | MemoryElementNotFoundException ex) {
           LOGGER.warning(ex.toString());

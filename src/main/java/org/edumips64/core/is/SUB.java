@@ -69,7 +69,7 @@ public class SUB extends ALU_RType {
     } else {
       //performing sign extension
       outputstring = outputstring.substring(1, 33);
-      String filledOutputstring = new String(outputstring);
+      String filledOutputstring = outputstring;
 
       for (int i = 0; i < 32; i++) {
         filledOutputstring = outputstring.charAt(0) + filledOutputstring;

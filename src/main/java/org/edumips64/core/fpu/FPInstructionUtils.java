@@ -246,8 +246,8 @@ public class FPInstructionUtils {
       // At this point operands can be added and if an overflow or an underflow occurs
       // and if exceptions are activated then trap else results are returned
       MathContext mc = new MathContext(1000, RoundingMode.HALF_EVEN);
-      BigDecimal operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false)));
-      BigDecimal operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false)));
+      BigDecimal operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false))); // NOPMD - exact binary value of the double is intended
+      BigDecimal operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false))); // NOPMD - exact binary value of the double is intended
       BigDecimal result = operand1.add(operand2, mc);
 
       //checking for underflows or overflows are performed inside the doubleToBin method (if relative traps are disabled output is returned)
@@ -312,8 +312,8 @@ public class FPInstructionUtils {
     //at this point operands can be subtracted and if an overflow or an underflow occurs
     //and if exceptions are activated then a trap happens else results are returned
     MathContext mc = new MathContext(1000, RoundingMode.HALF_EVEN);
-    BigDecimal operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false)));
-    BigDecimal operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false)));
+    BigDecimal operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false))); // NOPMD - exact binary value of the double is intended
+    BigDecimal operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false))); // NOPMD - exact binary value of the double is intended
 
     BigDecimal result = operand1.subtract(operand2, mc);
     //checking for underflows or overflows are performed inside the doubleToBin method (if the relative traps are disabled the output is returned)
@@ -373,8 +373,8 @@ public class FPInstructionUtils {
     //at this point operands can be multiplied and if an overflow or an underflow occurs
     //and if exceptions are activated then a trap happens else results are returned
     MathContext mc = new MathContext(1000, RoundingMode.HALF_EVEN);
-    BigDecimal operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false)));
-    BigDecimal operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false)));
+    BigDecimal operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false))); // NOPMD - exact binary value of the double is intended
+    BigDecimal operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false))); // NOPMD - exact binary value of the double is intended
 
     BigDecimal result = operand1.multiply(operand2, mc);
 
@@ -443,8 +443,8 @@ public class FPInstructionUtils {
     //at this point operands can be divided and if an  underflow occurs
     //and if exceptions are activated then a trap happens else results are returned
     MathContext mc = new MathContext(1000, RoundingMode.HALF_EVEN);
-    BigDecimal operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false)));
-    BigDecimal operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false)));
+    BigDecimal operand1 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value1, false))); // NOPMD - exact binary value of the double is intended
+    BigDecimal operand2 = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value2, false))); // NOPMD - exact binary value of the double is intended
 
     BigDecimal result = operand1.divide(operand2, mc);
 
@@ -575,6 +575,8 @@ public class FPInstructionUtils {
           return 1;
         case '1':
           return -1;
+        default:
+          break;
       }
     }
 
@@ -649,7 +651,7 @@ public class FPInstructionUtils {
     final int INT_PART = 0;
     final int DEC_PART = 1;
 
-    BigDecimal bd = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value, false)));
+    BigDecimal bd = new BigDecimal(Double.longBitsToDouble(Converter.binToLong(value, false))); // NOPMD - exact binary value of the double is intended
     String plainValue = bd.toPlainString();
     //removing the sign
     plainValue = plainValue.replaceFirst("-", "");
@@ -694,6 +696,8 @@ public class FPInstructionUtils {
           if (bd.doubleValue() < 0) {
             int_part_value++;
           }
+          break;
+        default:
           break;
       }
 

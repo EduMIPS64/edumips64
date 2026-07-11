@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "rule-empty-line-before": [
+      "always-multi-line",
+      { "except": ["first-nested"], "ignore": ["after-comment"] }
+    ],
+    "comment-empty-line-before": [
+      "always",
+      { "except": ["first-nested"], "ignore": ["stylelint-commands"] }
+    ]
+  }
+}

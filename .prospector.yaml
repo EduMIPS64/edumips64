@@ -1,0 +1,8 @@
+# Prospector configuration, read by Codacy for the Python scripts in
+# .github/scripts/ and utils/. Docstring conventions are not enforced in
+# this project (most Python files are small internal tools and tests).
+doc-warnings: false
+
+mccabe:
+  options:
+    max-complexity: 15

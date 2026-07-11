@@ -137,7 +137,7 @@ public class Register extends BitSet64 {
 
 
   public String toString() {
-    String s = new String();
+    String s = "";
 
     try {
       s = getHexString();

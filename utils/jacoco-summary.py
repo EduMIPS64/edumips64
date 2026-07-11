@@ -8,7 +8,7 @@ Markdown summary. It performs no network access and executes no project code, so
 it is safe to run on untrusted pull request builds.
 """
 import sys
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # nosec B405 -- parses only the locally generated JaCoCo report
 
 COUNTERS = ["INSTRUCTION", "BRANCH", "LINE", "METHOD", "CLASS"]
 
@@ -19,7 +19,7 @@ def main():
         return 1
 
     report_path, out_path = sys.argv[1], sys.argv[2]
-    root = ET.parse(report_path).getroot()
+    root = ET.parse(report_path).getroot()  # nosec B314 -- trusted local file
 
     totals = {}
     for counter in root.findall("counter"):

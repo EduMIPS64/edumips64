@@ -90,6 +90,8 @@ public class FPPipeline {
           return (adder.getFuncUnit().get(Constants.FPAdderStatus.A3) != null);
         case 4:
           return (adder.getFuncUnit().get(Constants.FPAdderStatus.A4) != null);
+        default:
+          break;
       }
 
     if (funcUnit.compareToIgnoreCase("MULTIPLIER") == 0)

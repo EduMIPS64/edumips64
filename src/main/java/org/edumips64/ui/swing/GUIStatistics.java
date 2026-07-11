@@ -225,6 +225,8 @@ public class GUIStatistics extends GUIComponent {
       case 22:
         label.setText(" " + L1D_writes_misses + " " + CurrentLocale.getString("L1D WRITE MISSES"));
         return label;
+      default:
+        break;
       }
 
       return label;

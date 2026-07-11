@@ -521,7 +521,7 @@ public class Parser {
 
               //timmy
               for (int timmy = 0; timmy < deprecateInstruction.length; timmy++) {
-                if (deprecateInstruction[timmy].toUpperCase().equals(line.substring(column, end).toUpperCase())) {
+                if (deprecateInstruction[timmy].equalsIgnoreCase(line.substring(column, end))) {
                   errors.addWarning("WINMIPS64_NOT_MIPS64", row, column + 1, line);
                 }
               }

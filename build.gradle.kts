@@ -1,6 +1,16 @@
 /*
  * EduMIPS64 Gradle build configuration
  */
+// detekt rules that don't add signal in a Gradle build script: helper
+// functions need no KDoc, repeated literals are task/path names, and
+// catching Exception around optional Xvfb startup is intentional.
+@file:Suppress(
+    "UndocumentedPublicFunction",
+    "StringLiteralDuplication",
+    "LabeledExpression",
+    "TooGenericExceptionCaught",
+)
+
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import ru.vyarus.gradle.plugin.python.task.PythonTask
