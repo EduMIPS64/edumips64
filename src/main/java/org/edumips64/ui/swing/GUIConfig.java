@@ -387,7 +387,7 @@ public class GUIConfig extends JDialog {
     }
 
     grid_add(panel, comp, gbl, gbc, .2, 0, 1, row, 1, 1);
-    panel.setMinimumSize(new java.awt.Dimension(10, 10));
+    panel.setMinimumSize(new Dimension(10, 10));
   }
 
   private static void grid_add(

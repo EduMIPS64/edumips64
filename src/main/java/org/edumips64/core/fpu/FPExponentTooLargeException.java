@@ -29,7 +29,4 @@ package org.edumips64.core.fpu;
 public class FPExponentTooLargeException extends Exception {
   private static final long serialVersionUID = -5339487049447646349L;
 
-  public FPExponentTooLargeException() {
-  }
-
 }

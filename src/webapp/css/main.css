@@ -27,6 +27,7 @@
   .help-title {
     padding: 16px;
   }
+
   .help-content {
     padding: 12px;
   }
@@ -47,6 +48,7 @@
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }

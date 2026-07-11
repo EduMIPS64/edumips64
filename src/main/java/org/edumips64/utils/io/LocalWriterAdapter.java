@@ -2,7 +2,7 @@
 
 package org.edumips64.utils.io;
 
-public class LocalWriterAdapter implements org.edumips64.utils.io.Writer {
+public class LocalWriterAdapter implements Writer {
   private java.io.Writer writer;
 
   public LocalWriterAdapter(java.io.Writer writer) {

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="EduMIPS64"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+  <description>
+    PMD ruleset for EduMIPS64, read by Codacy in place of its default
+    pattern selection. Only rules that are actionable and compatible with
+    the project's conventions are enabled. Deliberately excluded:
+    - Naming rules (MethodNamingConventions, ClassNamingConventions):
+      pipeline-stage methods (IF/ID/EX/MEM/WB) and MIPS instruction class
+      names (e.g. ADD_D, ALU_IType) are intentional domain naming, and
+      test methods use descriptive snake_case.
+    - UnusedPrivateMethod: false positives on picocli @Command methods
+      invoked via reflection (e.g. utils/cli/ShowCommand.java).
+    - UnusedPrivateField: false positives on fields used from Swing inner
+      classes (GUICode, GUIData, GUIRegisters).
+    - Refactoring-level rules (NPathComplexity, AvoidReassigningParameters,
+      CollapsibleIfStatements, SingularField, ...): not actionable as lint
+      signal on this codebase; complexity is addressed in code review.
+  </description>
+
+  <rule ref="category/java/bestpractices.xml/SwitchStmtsShouldHaveDefault"/>
+  <rule ref="category/java/codestyle.xml/UnnecessaryConstructor"/>
+  <rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName"/>
+  <rule ref="category/java/design.xml/SimplifyBooleanExpressions"/>
+  <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor"/>
+  <rule ref="category/java/errorprone.xml/UnnecessaryCaseChange"/>
+  <rule ref="category/java/performance.xml/StringInstantiation"/>
+</ruleset>

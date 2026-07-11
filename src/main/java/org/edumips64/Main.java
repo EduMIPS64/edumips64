@@ -46,6 +46,7 @@ import org.edumips64.utils.CycleBuilder;
 import org.edumips64.utils.JavaPrefsConfigStore;
 import org.edumips64.utils.MetaInfo;
 import org.edumips64.utils.cli.Args;
+import org.edumips64.utils.cli.Banner;
 import org.edumips64.utils.cli.Version;
 import org.edumips64.utils.io.LocalFileUtils;
 import org.edumips64.utils.io.LocalWriter;
@@ -135,9 +136,9 @@ public class Main {
 
   private static void showVersion(Args cliArgs) {
     if (cliArgs != null && cliArgs.isNoBanner()) {
-      org.edumips64.utils.cli.Banner.printCompact(System.out);
+      Banner.printCompact(System.out);
     } else {
-      org.edumips64.utils.cli.Banner.print(System.out);
+      Banner.print(System.out);
     }
   }
 

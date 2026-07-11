@@ -125,7 +125,7 @@ public class SymbolTable {
   }
 
   public String toString() {
-    String output = new String();
+    String output = "";
     output += "\nInstructions:\n";
     for(Map.Entry<String, Integer> entry : instr_labels.entrySet()) {
       output += entry.getKey() + ": " + entry.getValue() + "\n";
