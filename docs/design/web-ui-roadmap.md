@@ -1,4 +1,5 @@
 # Web UI Roadmap
+
 This is the list of user stories for the web UI, categorized in milestones, which
 will serve as a guide for the development of the Web UI.
 
@@ -7,7 +8,7 @@ section and then the number of the story (e.g., `BREAK support` is `E.6`).
 
 ## Introduction
 
-The current Web UI is available at https://web.edumips.org/.
+The current Web UI is available at <https://web.edumips.org/>.
 
 EduMIPS64 was born in 2006 as a desktop application, even if it initially ran
 as a Java applet in addition to running as a desktop app.
@@ -24,9 +25,11 @@ This document analyzes the work necessary to build a modern, clean web UI for
 EduMIPS64 and, by extension, refine the Java -> JS API created with GWT.
 
 ## Milestones
+
 ### Alpha (EduMIPS64 2.0-alpha)
+
 Status: **Completed**
-Tracked on https://github.com/EduMIPS64/edumips64/issues/852 (closed)
+Tracked on <https://github.com/EduMIPS64/edumips64/issues/852> (closed)
 
 This milestone is a basic working simulator, with a pretty rough UI and just enough
 basic features to run most programs and verify its working.
@@ -37,6 +40,7 @@ User stories and features:
 * ~~`U.1-5` (Basic functional UI, no settings)~~
 
 ### Beta (EduMIPS64 2.0-beta)
+
 Status: **In Progress**
 
 This milestone will improve the UI and enable settings support. The web UI
@@ -52,6 +56,7 @@ User stories and features:
 * ~~`S.1-2` (Forwarding setting, persisted via HTML5 storage)~~
 
 ### GA (EduMIPS64 2.0)
+
 Status: **In Progress**
 
 Fully working web simulator, suitable as a replacement for the current simulator.
@@ -65,6 +70,7 @@ Fully working web simulator, suitable as a replacement for the current simulator
 * ~~`D.4` (Instrumentation)~~
 
 ### Future (EduMIPS64 3.0)
+
 Status: **Not started**
 
 The web allows us to do much more than we could do as a Java application. Examples
@@ -82,6 +88,7 @@ of future features might be:
 Anything that is done (as of 05/07/2026) is marked with strike-through.
 
 ### Prerequisites
+
 This section contains the preliminary work necessary to move forward with the
 implementation of the remaining features.
 
@@ -89,6 +96,7 @@ implementation of the remaining features.
 2. ~~decide which layout to use (#86)~~
 
 ### Execution
+
 1. ~~open a MIPS64 assembly program from a text area~~
 2. ~~executing a MIPS64 assembly program~~
    1. ~~all at once~~
@@ -96,7 +104,7 @@ implementation of the remaining features.
       1. ~~setting a customizable processor frequency (to show updates slowly)~~
    1. ~~step-by-step~~
       1. ~~with a customizable stride~~
-  1. ~~reset execution state while paused~~
+3. ~~reset execution state while paused~~
 4. ~~graceful handling of all errors, including parser errors~~
 5. SYSCALL support
    1. ~~console I/O (via Web UI)~~ (output via the StdOut accordion, input
@@ -106,6 +114,7 @@ implementation of the remaining features.
 8. SYSCALL File I/O (not sure it's possible, needs to be investigated)
 
 ### UI
+
 1. ~~Basic code editor text area widget~~
 2. ~~Execution controls (start/stop/etc.)~~
 3. ~~Basic registers, memory and code widgets.~~
@@ -131,6 +140,7 @@ implementation of the remaining features.
 12. ~~Show program counter~~ (rendered with the other special registers)
 
 ### Settings
+
 1. ~~Enabling / disabling forwarding~~
 2. ~~Storing preferences locally (probably with HTML5 storage)~~ (a
    schema-driven `useSetting` hook persists every preference to
@@ -140,12 +150,13 @@ implementation of the remaining features.
 5. Setting parser warning/errors options
 
 ### Development features - DONE
+
 1. ~~Move to a proper JS toolchain.~~
 2. ~~Build and deploy the frontend JS from a separate GitHub repository to web.edumips.org. (#87)~~
    **Dropped.** The web UI will keep living in the same repository as the
    Java core: it shares the GWT-compiled worker with the core, and the
    single-repo setup has worked well in practice.
 3. ~~Move to React Material UI~~
-4. ~~Find a good (dashboard) Material UI template to use as a starting point (e.g. https://github.com/devias-io/react-material-dashboard)~~
+4. ~~Find a good (dashboard) Material UI template to use as a starting point (e.g. <https://github.com/devias-io/react-material-dashboard>)~~
 5. ~~Instrument web UI (Google Analytics + some metrics)~~ (Azure
    Application Insights)
