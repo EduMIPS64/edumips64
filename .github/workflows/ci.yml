@@ -103,6 +103,31 @@ jobs:
     secrets: inherit
 
   # Run web UI Playwright tests locally with Istanbul coverage instrumentation.
+  # Lint all Markdown files (markdownlint-cli2; rules in .markdownlint.json,
+  # globs/ignores in .markdownlint-cli2.jsonc). A dedicated job so markdown
+  # feedback lands fast, without waiting for the web build.
+  lint-docs:
+    name: Lint Markdown
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Set up Node.JS
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install JS dependencies
+        run: npm ci
+
+      - name: Lint Markdown
+        run: npm run lint:md
+
   # The coverage report is rendered as a Markdown table and published to this
   # run's job summary. No secrets are used here.
   test-web-coverage:

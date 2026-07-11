@@ -59,6 +59,7 @@ The project follows Gradle project layout conventions:
 - `npm run build-dbg` - Build with debugging symbols
 - `npm run build` - Production build (minified)
 - `npm test` - Run Playwright tests
+- `npm run lint:md` - Lint all Markdown files (`lint:md:fix` to auto-fix)
 
 ## Testing Guidelines
 
@@ -103,6 +104,11 @@ The project follows Gradle project layout conventions:
 - Recommended rules plus the React rule domain (`useExhaustiveDependencies`, `useHookAtTopLevel`, etc.)
 - Run `npm run lint` to check, `npm run format` to auto-format
 - React prop-types validation is disabled
+
+### Markdown
+
+- Linted with `markdownlint-cli2` (rules in `.markdownlint.json`, globs/ignores in `.markdownlint-cli2.jsonc`); enforced in CI by the `lint-docs` job
+- Run `npm run lint:md` to check, `npm run lint:md:fix` to auto-fix
 
 ## Development Workflow
 
