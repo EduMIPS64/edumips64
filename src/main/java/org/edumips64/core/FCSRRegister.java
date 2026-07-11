@@ -258,6 +258,8 @@ public class FCSRRegister extends BitSet32 {
         return getFCSREnables("U");
       case INVALID_OPERATION:
         return getFCSREnables("V");
+      default:
+        break;
     }
 
     return false;
@@ -273,6 +275,8 @@ public class FCSRRegister extends BitSet32 {
         return "U";
       case INVALID_OPERATION:
         return "V";
+      default:
+        break;
     }
     // Can't happen.
     return null;
@@ -300,6 +304,8 @@ public class FCSRRegister extends BitSet32 {
           throw new FPUnderflowException();
         case INVALID_OPERATION:
           throw new FPInvalidOperationException();
+        default:
+          break;
       }
 
       // Otherwise, just set the corresponding FCSR flag.

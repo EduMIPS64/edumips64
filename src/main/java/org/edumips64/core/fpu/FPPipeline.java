@@ -110,6 +110,8 @@ public class FPPipeline {
           return (multiplier.getFuncUnit().get(Constants.FPMultiplierStatus.M6) != null);
         case 7:
           return (multiplier.getFuncUnit().get(Constants.FPMultiplierStatus.M7) != null);
+        default:
+          break;
       }
 
     return funcUnit.compareToIgnoreCase("DIVIDER") == 0 && (divider.getFuncUnit() != null);
@@ -134,6 +136,8 @@ public class FPPipeline {
         return adderFu.get(Constants.FPAdderStatus.A3);
       case 4:
         return adderFu.get(Constants.FPAdderStatus.A4);
+      default:
+        break;
       }
     }
 
@@ -154,6 +158,8 @@ public class FPPipeline {
         return multiplierFu.get(Constants.FPMultiplierStatus.M6);
       case 7:
         return multiplierFu.get(Constants.FPMultiplierStatus.M7);
+      default:
+        break;
       }
     }
 
