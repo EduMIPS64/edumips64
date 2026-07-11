@@ -1,0 +1,14 @@
+// Globs and ignores for markdownlint-cli2 (run via `npm run lint:md`).
+// Lint rules live in .markdownlint.json so that Codacy picks them up too.
+{
+  "globs": ["**/*.md"],
+  "ignores": [
+    "node_modules/**",
+    ".squad/**",
+    ".copilot/**",
+    ".github/agents/**",
+    ".gradle/**",
+    "out/**",
+    "build/**"
+  ]
+}

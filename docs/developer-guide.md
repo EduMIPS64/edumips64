@@ -1,4 +1,6 @@
-### Table of Contents
+# EduMIPS64 Developer Guide
+
+## Table of Contents
 
 [Requirements](#requirements)
 
@@ -10,8 +12,6 @@
 
 [User manual structure](#user-manual-structure)
 
-[Submitting code](#submitting-code)
-
 [Unit tests](#unit-tests)
 
 [Compiling under Windows](#windows)
@@ -20,17 +20,17 @@
 
 [Versioning model](#versioning-model)
 
-[Web production promotion](#web-production-promotion)
+[Unified web versioning](#unified-web-versioning)
 
-### Requirements
+## Requirements
 
-#### Dev Container
+### Dev Container
 
 All requirements are available in the Development Container image described in the `.devcontainer/devcontainer.json` dev container. See <https://containers.dev/> for documentation on dev containers.
 
 Github codespaces will use the dev container by default and give you a fully set up dev environment, useable for desktop, web and documentation development work.
 
-#### List of requirements
+### List of requirements
 
 In order to compile EduMIPS64, you need the Java JDK version 17 or above.
 
@@ -87,7 +87,7 @@ There are six main CI/CD workflows:
   commit in this repository, and runs the Playwright web test suite against
   `https://web.edumips.org`.
 
-### Main Gradle tasks
+## Main Gradle tasks
 
 All the tasks of Gradle
 [Java](https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_tasks) and
@@ -120,7 +120,7 @@ For developers that don't want to recompile the help files when creating a JAR, 
 `noHelpJar` Gradle task will produce `edumips64-<build-version>-nohelp.jar`, which does
 not include the compiled help files.
 
-#### Build output directory
+### Build output directory
 
 All Gradle-produced artifacts are written under the `out/` directory at the
 root of the repository, rather than Gradle's default `build/`. The layout is:
@@ -136,19 +136,19 @@ root of the repository, rather than Gradle's default `build/`. The layout is:
 
 The `out/` directory is ignored by Git.
 
-### Visual Studio Code
+## Visual Studio Code
 
 If you want to work on EduMIPS64 with Visual Studio Code, you need to download the Java Extension Pack
 (see [Java in Visual Studio Code](https://code.visualstudio.com/docs/languages/java)).
 
 With the Java Extension Pack, you can directly import the Gradle project and use auto-complete, run unit tests, etc.
 
-### Working on the Web UI
+## Working on the Web UI
 
 An experimental web frontend, based on GWT and React, is being developed
 right now.
 
-#### Web Worker
+### Web Worker
 
 The core of EduMIPS64 is cross-compiled to Javascript using GWT. It is meant to
 run inside a web worker. The code for the worker is in the `org.edumips64.client`
@@ -165,7 +165,7 @@ the directory `out/web/`.
 `out/web`. If you re-build the worker, you need to re-build the rest of the web
 UI as well to have a working local test environment (see next section).
 
-#### Web UI
+### Web UI
 
 The web UI itself is based on React, and it's compiled / assembled using Vite
 (`vite.config.ts`). The source code is in `src/webapp`.
@@ -200,8 +200,12 @@ Custom NPM scripts:
 - `typecheck`: runs `tsc --noEmit` to type-check all `.ts`/`.tsx` files
   under `src/webapp/` and `src/test/webapp-unit/`; this is also run as a
   CI step in `test-web-coverage` right after the unit tests
+- `lint:md`: lints all Markdown files with `markdownlint-cli2` (rules in
+  `.markdownlint.json`, globs/ignores in `.markdownlint-cli2.jsonc`);
+  enforced in CI by the `lint-docs` job in `ci.yml`. Use `lint:md:fix` to
+  auto-fix most issues
 
-##### TypeScript adoption
+#### TypeScript adoption
 
 The web UI is **fully TypeScript** — the migration is complete as of phase 3.
 There are no remaining `.js` files under `src/webapp/`; `allowJs` is `false`
@@ -253,7 +257,7 @@ The required Node.JS version is pinned in `.nvmrc` (currently Node 24); CI
 installs dependencies with `npm ci`, so `package-lock.json` must stay
 canonical for that npm major version.
 
-##### Web UI architecture
+#### Web UI architecture
 
 - `index.tsx` boots App Insights, wraps the Web Worker (`worker.js`, the
   simulator core compiled from Java) with helper methods, and mounts React
@@ -279,7 +283,7 @@ canonical for that npm major version.
   Playwright suite runs against a development build, so StrictMode
   violations typically show up as e2e failures.
 
-#### Build environment indicator
+### Build environment indicator
 
 The header of the web UI shows a label that identifies which deployment of
 the application is currently running:
@@ -297,7 +301,7 @@ The classification logic lives in `src/webapp/buildInfo.ts` and is driven
 purely by `window.location`, so it does not require any build-time
 configuration.
 
-#### Web UI code coverage
+### Web UI code coverage
 
 The web UI tests can generate Istanbul code coverage data. CI publishes this
 report on the GitHub Actions run summary — no third-party coverage service is
@@ -307,20 +311,20 @@ To run tests with coverage locally:
 
 1. Build the web application with coverage instrumentation:
 
-   ```
+   ```bash
    BABEL_ENV=coverage npm run build-dbg
    ```
 
 2. Start a local server serving `out/web` on port 8080 (e.g. `python3 -m http.server 8080 --directory out/web`).
 3. Run the tests with coverage collection enabled:
 
-   ```
+   ```bash
    COVERAGE=true npm test
    ```
 
 4. Generate the HTML/lcov report:
 
-   ```
+   ```bash
    npm run report:coverage
    ```
 
@@ -349,7 +353,7 @@ platforms the Swing tests are skipped by default (the build forces headless
 mode). Pass `-PuseRealDisplay` to run them against your current display instead.
 CI only exercises the desktop UI on Linux (the `build-desktop` job).
 
-### Source code structure
+## Source code structure
 
 The source code structure follows the [Gradle project layout conventions](https://docs.gradle.org/current/userguide/java_plugin.html#N152C8).
 The main package for the simulator is `org.edumips64`, therefore the Java code
@@ -369,7 +373,7 @@ contains an experimental CLI front-end.
   to decouple the core code from packages that are not available in the GWT
   JRE emulation (such as `java.io`).
 
-### User manual structure
+## User manual structure
 
 The user manual lives under `docs/user/<lang>/src/` (one Sphinx project per
 language: `en`, `it`, `zh`). The sources are split into a UI-independent
@@ -401,7 +405,7 @@ Any user-facing change must be reflected in all three languages
 interface, it should go into the matching `user-interface-<flavor>.rst`
 file only.
 
-### CLI banner and in-shell help browser
+## CLI banner and in-shell help browser
 
 The interactive CLI shell (`--headless`) shows a stylised startup
 banner and offers an in-shell user-manual browser. The implementation
@@ -462,7 +466,7 @@ status, meaning that no commits can be pushed directly to `master` and any
 pull requests for `master` have to pass the status checks (Github Actions building
 the code and executing unit tests).
 
-### Unit tests
+## Unit tests
 
 It is expected that all new features are implemented with good unit tests coverage.
 
@@ -500,7 +504,7 @@ The Swing UI code is explicitly excluded from code coverage reports because
 writing tests for it is quite difficult and might not be worth it since we
 might be migrating to a new shiny web-based frontend.
 
-#### Instruction coverage check
+### Instruction coverage check
 
 Every instruction implemented under `src/main/java/org/edumips64/core/is/`
 must be exercised by at least one `.s` program under `src/test/resources/`.
@@ -522,11 +526,11 @@ inserts to represent stalls, and `DDIV3`, which is the Java class name
 for the 3-operand form of the `DDIV` mnemonic). Only extend this list
 for entries that are genuinely not reachable from MIPS64 assembly.
 
-### Windows
+## Windows
 
 EduMIPS64 compiles under Windows, both natively (e.g., using PowerShell) and in WSL.
 
-### Mac OS X
+## Mac OS X
 
 The build works under Mac OS X (tested with Catalina 10.15.2, AdoptOpenJDK 11.0.7).
 
@@ -534,9 +538,9 @@ The only thing that might not work out of the box is downloading the Gradle GWT
 plugins, as the Maven repo uses Let's Encrypt as a certificate issuer, which
 is not trusted by default by the JDK.
 
-Follow instructions [here](https://dev.cloudburo.net/2018/06/03/install-letsencrypt-certificate-in-the-java-jdk-keystore-on-osx.html) to import the Let's Encrypt root certificates in the JDK keystore.
+Follow [these instructions for importing the Let's Encrypt root certificates](https://dev.cloudburo.net/2018/06/03/install-letsencrypt-certificate-in-the-java-jdk-keystore-on-osx.html) into the JDK keystore.
 
-### Versioning model
+## Versioning model
 
 EduMIPS64 uses **two distinct version concepts**:
 
@@ -561,7 +565,7 @@ The Gradle provider is defined in `build.gradle.kts` (the `gitDescribe` val).
 All CI checkouts must use `fetch-depth: 0` so the full tag history is
 available for `git describe` to produce meaningful output.
 
-### Unified web versioning
+## Unified web versioning
 
 Production (`web.edumips.org`) is **not auto-deployed**. The `deploy-prod` job
 in `release.yml` is disabled (`if: false`). Every master build is *pushed* as a
@@ -569,7 +573,7 @@ per-commit candidate; the maintainer later *promotes* one to production. The
 full design and rationale live in
 [`docs/design/unified-web-versioning.md`](design/unified-web-versioning.md).
 
-#### Model
+### Model
 
 Every retained web build is identified by its commit SHA and lives at
 `/c/<full-sha>/`. A single root `versions.json` indexes them all:
@@ -597,7 +601,7 @@ master, robust to out-of-order CI). The retention rule is a single invariant:
 i.e. keep every promoted version, plus every candidate newer than the live one.
 Pages layout:
 
-```
+```text
 web.edumips.org/
 ├── index.html + [all files]   ← physical copy of the current promoted build (root)
 ├── c/<full-sha>/ …            ← every retained build (candidate or promoted)
@@ -608,7 +612,7 @@ web.edumips.org/
 Pages-layout logic lives in `.github/scripts/deploy-web-pages.py` and is unit
 tested in `test_deploy_web_pages.py` (`cd .github/scripts && python -m pytest`).
 
-#### Operations
+### Operations
 
 - **push** (`push-web.yml`) — runs on every master commit (a `ci.yml` job
   reuses it right after the web build; also runnable via `workflow_dispatch`).
@@ -631,7 +635,7 @@ tested in `test_deploy_web_pages.py` (`cd .github/scripts && python -m pytest`).
 All three Pages-writing jobs share the `web-pages-deploy` concurrency lock so
 deploys serialize.
 
-#### In-app version navigator
+### In-app version navigator
 
 The web UI's About tab fetches `/versions.json` (`cache:'no-cache'`, absolute
 path) once and renders two lists — **Promoted versions** (prominent, the live
@@ -640,7 +644,7 @@ entry links to `/c/<sha>/` (opens in a new tab). Builds served from `/c/<sha>/`
 show an **ARCHIVED** badge in the header; the navigator is hidden on PR
 previews. See `src/webapp/versionHistory.ts` and `buildInfo.ts`.
 
-#### Migration from the legacy layout
+### Migration from the legacy layout
 
 The previous model used `manifest.json` + `candidates.json`, `/v/<n>/`, date
 dirs, and `/prev/`. A one-shot `deploy-web-pages.py migrate [--repo PATH]
@@ -660,7 +664,7 @@ is why those three workflows check out the edumips64 repo with `fetch-depth: 0`
 preview the conversion manually, run `migrate --repo <full-clone> --dry-run`
 against a clone of the Pages repo.
 
-### Manual release checklist
+## Manual release checklist
 
 Most of the release process is automated via the `release.yml` GitHub Actions workflow.
 To create a release, trigger the workflow manually from the Actions tab with `create_release: true`.

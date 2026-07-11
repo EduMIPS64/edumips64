@@ -18,12 +18,12 @@ The four open questions raised during review are resolved as follows:
 4. **`maxPromoted` cap (updated 2026-07-02):** the site reached 0.31 GB of
    GitHub Pages' 1 GB limit because promoted snapshots under `c/` were never
    pruned.  The retention policy is now `KEEP_PROMOTED = 10` — see
-   [Promoted-snapshot retention](#promoted-snapshot-retention-task-a) below.
+   [Promoted-snapshot retention](#promoted-snapshot-retention) below.
 5. **Deploy verification (added 2026-07-02):** both a promotion and a rollback
    "succeeded" (workflow green) while the GitHub Pages legacy build errored
    instantly (0 ms, transient queue glitch), silently leaving production stale.
    A post-push verification step was added to both workflows — see
-   [Deploy verification](#deploy-verification-task-b) below.
+   [Deploy verification](#deploy-verification) below.
 
 ---
 
@@ -88,7 +88,7 @@ Let `current` be the SHA of the live production version (served at `/`). Each
 build has a monotonic `seq` (commit number, see below). The Pages repo keeps a
 build **iff**:
 
-```
+```text
 keep(V)  ⇔  V.promoted == true   OR   V.seq > current.seq
 ```
 
@@ -116,7 +116,7 @@ rollback both fall out of it naturally (see Operations).
 
 ## Directory layout (new)
 
-```
+```text
 EduMIPS64/web.edumips.org/
 ├── index.html, ui.js, style.css, ...   ← physical copy of the CURRENT promoted build
 ├── c/                                   ← every retained build, addressed by commit SHA

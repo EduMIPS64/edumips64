@@ -163,7 +163,7 @@ At a tagged commit (e.g. `v1.4.1`), `git describe` yields exactly `1.4.1` — no
 
 All content lives in the separate Pages repo `EduMIPS64/web.edumips.org`:
 
-```
+```text
 EduMIPS64/web.edumips.org repo:
 ├── index.html              ← current prod (physical copy)
 ├── [all current files]     ← current prod assets

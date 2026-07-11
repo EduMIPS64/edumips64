@@ -1,6 +1,6 @@
 # EduMIPS64 version 1.4.1
 
-*TBD*
+TBD
 
 EduMIPS64 is a GPL MIPS64 Instruction Set Architecture (ISA) simulator and graphical debugger.
 

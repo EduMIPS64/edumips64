@@ -14,6 +14,8 @@
     "electron": "electron electron/electron_main.js",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
+    "lint:md": "markdownlint-cli2",
+    "lint:md:fix": "markdownlint-cli2 --fix",
     "format": "biome format --write ."
   },
   "keywords": [],
@@ -47,6 +49,7 @@
     "electron": "^43.0.0",
     "esbuild": "^0.28.1",
     "jsdom": "^29.1.1",
+    "markdownlint-cli2": "0.23.0",
     "nyc": "^18.0.0",
     "playwright": "1.61.1",
     "typescript": "^7.0.2",
