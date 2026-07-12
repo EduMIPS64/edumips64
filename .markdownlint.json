@@ -1,6 +1,7 @@
 {
   "default": true,
   "MD013": false,
+  "MD033": { "allowed_elements": ["picture", "source", "img"] },
   "MD024": { "siblings_only": true },
   "MD060": false
 }

@@ -12,8 +12,15 @@ EduMIPS64 is a free cross-platform visual MIPS64 CPU simulator written in Java.
 
 It runs both as a stand-alone Java Swing application and as a React-based web Single-Page Application (deployed at <https://web.edumips.org>).
 
-![Swing UI Screenshot](http://www.edumips.org/edumips64-1.3.0.png)
-![Web UI Screenshot](http://www.edumips.org/screenshot-web.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://www.edumips.org/screenshot-web-dark.png">
+  <img alt="Web UI Screenshot" src="https://www.edumips.org/screenshot-web.png">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://www.edumips.org/screenshot-swing-dark.png">
+  <img alt="Swing UI Screenshot" src="https://www.edumips.org/screenshot-swing-light.png">
+</picture>
 
 ⚡ The web UI is also bundled as an Electron package for all major platforms.
 
