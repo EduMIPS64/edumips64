@@ -55,7 +55,7 @@ dependencies {
     implementation("javax.help:javahelp:2.0.05")
     implementation("info.picocli:picocli:4.7.7")
 
-    testImplementation(platform("org.junit:junit-bom:6.1.1"))
+    testImplementation(platform("org.junit:junit-bom:6.1.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     // To run JUnit 4 tests.
