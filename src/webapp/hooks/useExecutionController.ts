@@ -10,6 +10,14 @@ import type { SimulatorResult, SimulatorWorker } from '../simulator/protocol';
 // The number of steps dispatched to the worker in each internal batch.
 // Kept here (not in Simulator.js) so the scheduling logic in updateState
 // can reference it without prop-drilling.
+//
+// This stride only applies when there is no execution delay: it exists purely
+// for throughput (fewer worker round-trips), and with no delay the
+// intermediate states would be invisible anyway.  When the user sets a
+// non-zero execution delay they want to *watch* the run, so batches shrink to
+// a single cycle and every cycle gets its own UI update — matching the Swing
+// UI, where CPUSwingWorker steps one cycle at a time and repaints (and
+// sleeps) between cycles in verbose mode.
 const INTERNAL_STEPS_STRIDE = 50;
 
 // ---------------------------------------------------------------------------
@@ -134,18 +142,26 @@ export function useExecutionController({
   // Public operations
   // ---------------------------------------------------------------------------
 
+  // Batch size for the next worker.step() call.  Read from the ref (not the
+  // prop) so a delay change mid-run takes effect from the next batch onward,
+  // switching between paced single-cycle updates and full-speed strides live.
+  const currentStride = useCallback(
+    () => (executionDelayRef.current > 0 ? 1 : INTERNAL_STEPS_STRIDE),
+    [],
+  );
+
   const runCode = useCallback(() => {
     dispatch({ type: 'RUN_ALL_REQUESTED' });
-    worker.step(INTERNAL_STEPS_STRIDE);
-  }, [worker]);
+    worker.step(currentStride());
+  }, [worker, currentStride]);
 
   const stepCode = useCallback(
     (n: number) => {
-      const toRun = Math.min(n, INTERNAL_STEPS_STRIDE);
+      const toRun = Math.min(n, currentStride());
       dispatch({ type: 'STEP_REQUESTED', stepsRemaining: n - toRun });
       worker.step(toRun);
     },
-    [worker],
+    [worker, currentStride],
   );
 
   const stopCode = useCallback(() => {
@@ -236,7 +252,7 @@ export function useExecutionController({
     } else if (stepsToRun > 0) {
       scheduleNextBatch(() => stepCode(stepsToRun));
     } else if (runAll) {
-      scheduleNextBatch(() => stepCode(INTERNAL_STEPS_STRIDE));
+      scheduleNextBatch(() => stepCode(currentStride()));
     }
     // else: single step finished normally; reducer set executing=false — done.
   };
