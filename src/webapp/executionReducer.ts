@@ -54,13 +54,14 @@ export interface ExecState {
  *
  * STEP_REQUESTED      — user pressed Step (or a multi-step batch was scheduled).
  *   payload: { stepsRemaining }  number of steps still queued after the
- *   current batch is sent to the worker (i.e. n - stride, where stride =
- *   Math.min(n, INTERNAL_STEPS_STRIDE)).  The actual worker.step(stride)
- *   call is a side-effect kept in the component.
+ *   current batch is sent to the worker (i.e. n - stride, where stride is
+ *   1 when a non-zero execution delay is set, INTERNAL_STEPS_STRIDE
+ *   otherwise).  The actual worker.step(stride) call is a side-effect kept
+ *   in the component.
  *
  * RUN_ALL_REQUESTED   — user pressed Run All.
  *   No payload.  Equivalent to the original setRunAll(true) + stepCode(...).
- *   The component calls worker.step(INTERNAL_STEPS_STRIDE) as a side-effect.
+ *   The component calls worker.step() with the current stride as a side-effect.
  *
  * RESULT_RECEIVED     — a step result arrived from the worker.
  *   payload: { status, encounteredBreak }
