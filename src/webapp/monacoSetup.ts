@@ -28,22 +28,28 @@
 
 import { loader } from '@monaco-editor/react';
 // monaco-editor 0.53+ restructured its ESM distribution: the package's `.`
-// export now resolves to `esm/vs/editor/editor.main`, which is both the
-// typed Monaco API surface (formerly editor.api) *and* activates all editor
-// feature contributions (hover provider, find-replace, bracket matching,
-// etc.) as a side effect of import — there is no longer a separate
-// type-only `editor.api` entry point exposed via the package's `exports`
-// map (the file still exists on disk, but resolving it deeply is
+// export resolves to a generated entry point (`esm/vs/index.js` as of
+// 0.56.0, `esm/vs/editor/editor.main.js` in earlier 0.53.x-0.55.x) which is
+// both the typed Monaco API surface (formerly editor.api) *and* activates
+// all editor feature contributions (hover provider, find-replace, bracket
+// matching, etc.) as a side effect of import — there is no longer a
+// separate type-only `editor.api` entry point exposed via the package's
+// `exports` map (the file still exists on disk, but resolving it deeply is
 // unsupported and breaks under `moduleResolution: bundler`).
 // At runtime this is the same singleton imported everywhere else (e.g.
 // Code.tsx's `import * as monacoEditor from 'monaco-editor'`), so it sees
 // the registered features.
-// editor.main also loads built-in language grammars; our custom MIPS grammar
-// overrides the stock one via registerTokensProviderFactory in Code.tsx.
+// The entry point also loads built-in language grammars; our custom MIPS
+// grammar overrides the stock one via registerTokensProviderFactory in
+// Code.tsx.
 import * as monaco from 'monaco-editor';
 // Vite-specific ?worker import: emits the worker as a separate chunk and
 // returns a Worker constructor whose URL resolves via import.meta.url.
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+// monaco-editor 0.56.0 changed the package's `exports` wildcard from
+// `"./*": "./*"` to `"./*": "./esm/vs/*.js"` (it now prepends `esm/vs/`
+// itself), so the subpath passed here must NOT repeat the `esm/vs/` prefix
+// or it resolves to the nonexistent `esm/vs/esm/vs/editor/editor.worker.js`.
+import EditorWorker from 'monaco-editor/editor/editor.worker?worker';
 
 // Wire the Monaco editor worker.  MonacoEnvironment.getWorker is the
 // non-deprecated replacement for getWorkerUrl.
