@@ -101,6 +101,25 @@ export default defineConfig(({ mode }) => {
     // and at /c/<sha>/ — absolute paths would break deep-path deploys.
     base: './',
 
+    resolve: {
+      alias: [
+        // monaco-editor 0.56.0 changed its package `exports` wildcard from
+        // `"./*": "./*"` to `"./*": "./esm/vs/*.js"` (it now prepends
+        // esm/vs/ itself). Third-party packages built against older
+        // monaco-editor versions — e.g. monaco-vim@0.4.4's dist bundles —
+        // still import the pre-0.56.0 deep path
+        // (`monaco-editor/esm/vs/editor/editor.api`), which now resolves to
+        // the nonexistent `esm/vs/esm/vs/editor/editor.api.js`. Rewrite
+        // those specifiers to the new supported prefix so they keep
+        // resolving regardless of which monaco-editor version originally
+        // built the consuming package.
+        {
+          find: /^monaco-editor\/esm\/vs\/(.*)$/,
+          replacement: 'monaco-editor/$1',
+        },
+      ],
+    },
+
     define: {
       // Inject the build version (git-describe output, e.g. "1.4.0-74-ge1b45a15")
       // as a global constant.  Declared in vendor.d.ts.
