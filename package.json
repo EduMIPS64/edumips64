@@ -46,7 +46,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
-    "electron": "^43.0.0",
+    "electron": "^44.0.0",
     "esbuild": "^0.28.1",
     "jsdom": "^30.0.0",
     "markdownlint-cli2": "0.23.2",
