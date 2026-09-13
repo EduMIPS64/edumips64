@@ -161,6 +161,7 @@ public class CPU {
     configFPExceptionsAndRM();
     fpPipe = new FPPipeline();
     fpPipe.reset();
+    configFpuTiming();
 
 
     // Pipeline initialization
@@ -402,6 +403,7 @@ public class CPU {
   */
   public void step() throws AddressErrorException, HaltException, IrregularWriteOperationException, StoppedCPUException, MemoryElementNotFoundException, IrregularStringOfBitsException, TwosComplementSumException, SynchronousException, BreakException, NotAlignException, InvalidDelaySlotException {
     configFPExceptionsAndRM();
+    configFpuTiming();
     Optional<SynchronousException> syncex;
     if (status != CPUStatus.RUNNING && status != CPUStatus.STOPPING) {
       throw new StoppedCPUException();
@@ -1076,6 +1078,12 @@ public class CPU {
       Logger.getLogger(CPU.class.getName()).log(Level.SEVERE, null, ex);
     }
 
+  }
+
+  /** Pushes FPU timing settings (e.g., the DIV.D latency) from the config store into the
+   *  FP pipeline. Only affects instructions issued after this call. */
+  private void configFpuTiming() {
+    fpPipe.setDividerLatency(config.getInt(ConfigKey.FP_DIVIDER_LATENCY));
   }
 
   public String toString() {
