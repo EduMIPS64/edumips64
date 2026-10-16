@@ -162,7 +162,7 @@ jobs:
           path: wix
 
       - name: Download JAR
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8.0.2
         with:
           name: JAR
           path: out
@@ -204,7 +204,7 @@ jobs:
     needs: build-web
     steps:
       # Download web application built in 'build-web'
-      - uses: actions/download-artifact@v8.0.1
+      - uses: actions/download-artifact@v8.0.2
         name: Download web application artifacts
         with:
           name: web
@@ -263,7 +263,7 @@ jobs:
           ref: ${{ needs.prepare.outputs.target_ref }}
 
       # Download every artifact into its own subdirectory.
-      - uses: actions/download-artifact@v8.0.1
+      - uses: actions/download-artifact@v8.0.2
         with:
           path: release-artifacts
 

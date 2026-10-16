@@ -42,7 +42,7 @@ jobs:
       environment: ${{ steps.env.outputs.environment }}
     steps:
       - name: Download PR number artifact
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8.0.2
         with:
           name: pr-number
           path: pr
@@ -120,7 +120,7 @@ jobs:
       url: https://edumips64ci.z16.web.core.windows.net/${{ needs.metadata.outputs.pr }}/
     steps:
       - name: Download web application artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8.0.2
         with:
           name: web
           path: out/web
