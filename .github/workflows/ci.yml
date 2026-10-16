@@ -178,7 +178,7 @@ jobs:
 
       # Download the pre-built web application (includes the GWT worker.js).
       - name: Download web application artifacts
-        uses: actions/download-artifact@v8.0.1
+        uses: actions/download-artifact@v8.0.2
         with:
           name: web
           path: out/web
