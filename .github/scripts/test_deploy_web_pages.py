@@ -651,3 +651,57 @@ def test_promote_preserves_dot_github(tmp_path, pages):
 
     assert workflow.exists(), ".github must survive a promote root replacement"
     assert workflow.read_text() == "name: Deploy to GitHub Pages\n"
+
+
+# ---------------------------------------------------------------------------
+# candidate backlog cap (KEEP_CANDIDATES)
+# ---------------------------------------------------------------------------
+
+
+def test_push_caps_candidates_without_current(pages, tmp_path, monkeypatch):
+    """With no promotion yet, only the KEEP_CANDIDATES newest candidates survive."""
+    monkeypatch.setattr(dwp, "KEEP_CANDIDATES", 3)
+    art = make_artifact(tmp_path)
+    for n in range(1, 6):
+        push(pages, art, n)
+    assert build_shas(pages) == {sha_for(n) for n in (3, 4, 5)}
+    assert [e["seq"] for e in read_index(pages)["versions"]] == [5, 4, 3]
+
+
+def test_push_cap_counts_only_candidates_newer_than_current(pages, tmp_path, monkeypatch):
+    """Promoted versions are never dropped by the cap and don't count towards it."""
+    monkeypatch.setattr(dwp, "KEEP_CANDIDATES", 2)
+    art = make_artifact(tmp_path)
+    push(pages, art, 1)
+    promote(pages, 1)
+    push(pages, art, 2)
+    promote(pages, 2)
+    for n in range(3, 7):
+        push(pages, art, n)
+    idx = read_index(pages)
+    assert idx["current"] == sha_for(2)
+    assert build_shas(pages) == {sha_for(n) for n in (1, 2, 5, 6)}
+    assert {e["seq"] for e in idx["versions"]} == {1, 2, 5, 6}
+    # Root (production) is untouched by push-side pruning.
+    assert (pages / "index.html").is_file()
+
+
+def test_capped_candidate_cannot_be_promoted(pages, tmp_path, monkeypatch):
+    """A candidate dropped by the cap is gone from the index, so promote refuses it."""
+    monkeypatch.setattr(dwp, "KEEP_CANDIDATES", 1)
+    art = make_artifact(tmp_path)
+    push(pages, art, 1)
+    push(pages, art, 2)
+    with pytest.raises(SystemExit):
+        promote(pages, 1)
+    promote(pages, 2)
+    assert read_index(pages)["current"] == sha_for(2)
+
+
+def test_push_under_cap_prunes_nothing(pages, tmp_path):
+    """Default cap leaves a normal backlog alone."""
+    art = make_artifact(tmp_path)
+    for n in range(1, 6):
+        push(pages, art, n)
+    assert len(build_shas(pages)) == 5
+    assert dwp.KEEP_CANDIDATES >= 5

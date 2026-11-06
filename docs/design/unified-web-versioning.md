@@ -60,8 +60,9 @@ This is redundant and confusing:
    tab than ordinary candidates.
 5. Retention rule:
    - **Past** (older than the live version): keep **only promoted** versions.
-   - **Future** (newer than the live version): keep **all** candidates, in the
-     web root, until a promotion happens.
+   - **Future** (newer than the live version): keep candidates until a
+     promotion happens, capped at the `KEEP_CANDIDATES` (30) newest; older ones
+     are dropped on push so the Pages artifact stays under the 1 GB limit.
 6. **Promotion never rebuilds.** It is a pure metadata + file-copy + cleanup
    operation against builds that were already pushed.
 7. The whole scheme is **well documented** (design doc + user docs ×3 langs +
@@ -96,6 +97,11 @@ In words: **keep every promoted version, plus every candidate newer than the
 live one.** Everything else (a never-promoted candidate that is now in the past)
 is pruned. Every deploy operation re-establishes this invariant; promotion and
 rollback both fall out of it naturally (see Operations).
+
+**Candidate cap.** `push` additionally drops the oldest non-promoted
+candidates beyond `KEEP_CANDIDATES` (30). Without it, a long gap between
+promotions lets candidates accumulate without bound: in Nov 2026, 138 of them
+(~72 MB each) pushed the Pages artifact to 2.2 GB and `deploy-pages` timed out.
 
 ### `seq` — the commit number
 
