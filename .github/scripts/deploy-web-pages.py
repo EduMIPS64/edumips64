@@ -7,6 +7,7 @@ docs/design/unified-web-versioning.md for the full design.
 Subcommands:
   push <artifact_dir> <sha> <seq> <build> <target_release>
       Publish a master build as a candidate at /c/<sha>/. Never touches root.
+      Drops the oldest candidates beyond KEEP_CANDIDATES.
   promote <sha> <actor>
       Promote an already-pushed candidate to production. Copies /c/<sha>/ into
       the root, marks it promoted, prunes non-promoted candidates older than the
@@ -22,7 +23,9 @@ Must be run with cwd = checkout of the Pages repo (EduMIPS64/web.edumips.org).
 
 KEEP-INVARIANT: a build V is retained iff
     V.promoted == True  OR  V.seq > current.seq
-Every operation re-establishes this invariant.
+Every operation re-establishes this invariant, subject to one cap: only the
+KEEP_CANDIDATES newest non-promoted candidates are kept (enforced on push), so
+the Pages artifact stays bounded when promotions are infrequent.
 """
 
 import argparse
@@ -52,6 +55,14 @@ INDEX_FILE = "versions.json"
 # Promoted versions beyond this window keep their versions.json entry (with
 # "pruned": true) so the audit trail survives, but their snapshot is deleted.
 KEEP_PROMOTED = 10
+
+# Maximum number of non-promoted candidates (seq > current.seq) kept on disk.
+# Without this cap, candidates accumulate on every master push until the next
+# promotion; in Nov 2026 ~138 of them (~72 MB each) pushed the Pages artifact
+# to 2.2 GB compressed, past the 1 GB Pages limit, and deploy-pages timed out.
+# At ~15 MB compressed per build, 30 candidates + KEEP_PROMOTED + current stays
+# well under 1 GB. Oldest candidates are dropped first (entry and snapshot).
+KEEP_CANDIDATES = 30
 
 _FULL_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 
@@ -247,6 +258,35 @@ def prune_to_invariant(index: dict) -> None:
     index["versions"] = kept
 
 
+def prune_excess_candidates(index: dict) -> None:
+    """Drop the oldest non-promoted candidates beyond KEEP_CANDIDATES.
+
+    Only non-promoted versions newer than current count as candidates (with no
+    current, every non-promoted version does). Promoted versions are never
+    touched here. Dropped candidates are removed entirely (entry and snapshot),
+    like skipped-over candidates in prune_to_invariant.
+    """
+    cur = current_entry(index)
+    cur_seq = cur["seq"] if cur is not None else None
+    candidates = sorted(
+        (e for e in index["versions"]
+         if not e["promoted"] and (cur_seq is None or e["seq"] > cur_seq)),
+        key=lambda e: e["seq"],
+        reverse=True,
+    )
+    excess = candidates[KEEP_CANDIDATES:]
+    if not excess:
+        return
+    drop = {e["sha"] for e in excess}
+    for entry in excess:
+        snapshot = build_dir(entry["sha"])
+        if snapshot.is_dir():
+            print(f"Pruning old candidate {BUILDS_DIR}/{entry['sha']} "
+                  f"(seq {entry['seq']}, beyond KEEP_CANDIDATES={KEEP_CANDIDATES})")
+            shutil.rmtree(snapshot)
+    index["versions"] = [e for e in index["versions"] if e["sha"] not in drop]
+
+
 # ---------------------------------------------------------------------------
 # Subcommand: push
 # ---------------------------------------------------------------------------
@@ -254,7 +294,10 @@ def prune_to_invariant(index: dict) -> None:
 
 def cmd_push(artifact_dir: str, sha: str, seq: int, build_string: str,
              target_release: str) -> None:
-    """Publish a master build as a candidate at c/<sha>/. Never touches root."""
+    """Publish a master build as a candidate at c/<sha>/. Never touches root.
+
+    Afterwards, drops the oldest non-promoted candidates beyond KEEP_CANDIDATES.
+    """
     artifact = Path(artifact_dir)
     if not artifact.is_dir():
         die(f"Artifact dir not found: {artifact_dir}")
@@ -292,6 +335,9 @@ def cmd_push(artifact_dir: str, sha: str, seq: int, build_string: str,
     # Upsert (replace any stale entry for this sha).
     index["versions"] = [e for e in index["versions"] if e["sha"] != sha]
     index["versions"].append(new_entry)
+
+    # Keep the candidate backlog bounded (see KEEP_CANDIDATES).
+    prune_excess_candidates(index)
 
     write_index(index)
     ensure_static_files()
