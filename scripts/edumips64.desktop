@@ -2,4 +2,4 @@
 Name=EduMIPS64
 Type=Application
 Exec=edumips64-snap-wrapper.sh
-Icon=${SNAP}/icon.png
+Icon=${SNAP}/icons/edumips64.png
