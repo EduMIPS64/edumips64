@@ -58,6 +58,7 @@ jobs:
           filters: |
             snap:
               - 'snapcraft.yaml'
+              - '.github/workflows/build-snap.yml'
               - 'scripts/**'
               - 'docs/requirements.txt'
               - 'gradle.properties'
