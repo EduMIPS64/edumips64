@@ -38,6 +38,12 @@ jobs:
         with:
           name: snap
           path: .
+      # Run the same automated review the Snap Store applies on upload, so
+      # store rejections show up in CI instead of only by email afterwards.
+      - name: Review snap with review-tools (Snap Store checks)
+        run: |
+          sudo snap install review-tools
+          review-tools.snap-review edumips64*.snap
       - name: Unpack and install snap
         run: |
           unsquashfs edumips64*.snap
