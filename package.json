@@ -49,7 +49,7 @@
     "electron": "^45.0.0",
     "esbuild": "^0.28.1",
     "jsdom": "^31.0.0",
-    "markdownlint-cli2": "0.24.0",
+    "markdownlint-cli2": "0.24.1",
     "nyc": "^18.0.0",
     "playwright": "1.65.0",
     "typescript": "^7.0.2",
