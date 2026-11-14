@@ -3,7 +3,7 @@
   "image": "mcr.microsoft.com/devcontainers/java:17-trixie",
   "features": {
     "ghcr.io/devcontainers/features/python:1": {
-      "version": "3.14"
+      "version": "3.15"
     }
   },
   "customizations": {
