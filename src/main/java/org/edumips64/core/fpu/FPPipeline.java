@@ -257,6 +257,15 @@ public class FPPipeline {
     return divider.getCounter();
   }
 
+  /** Sets the number of cycles a DIV.D instruction takes to go through the divider.
+   *  Only affects instructions entering the divider after this call; an instruction
+   *  already in flight keeps counting down with the latency that was in effect when
+   *  it was issued.
+   *  @param latency number of cycles, must be positive. */
+  public void setDividerLatency(int latency) {
+    divider.setLatency(latency);
+  }
+
   /* Resets the fp pipeline */
   public void reset() {
     nInstructions = 0;
@@ -446,17 +455,26 @@ public class FPPipeline {
       }
     }
   }
-  /** This class models the 24 steps floating point divider, instructions are not pipelined
-   *  and for this reason a structural hazard happens when a DIV.fmt would to enter the FU when
-   *  another DIV.fmt is present */
+  /** This class models the floating point divider (24 cycles by default), instructions
+   *  are not pipelined and for this reason a structural hazard happens when a DIV.fmt
+   *  would to enter the FU when another DIV.fmt is present */
   private class Divider implements FPFunctionalUnit {
+    static final int DEFAULT_LATENCY = 24;
     InstructionInterface instr;
     public int counter;
+    private int latency = DEFAULT_LATENCY;
     Divider() {
       this.reset();
     }
     InstructionInterface getFuncUnit() {
       return instr;
+    }
+
+    // Clamped to 1: a latency of 0 or less would leave counter at 0 on entry, and
+    // both step() (counter > 0) and getInstruction() (counter == 1) would never
+    // fire, so the divider would stall forever.
+    void setLatency(int latency) {
+      this.latency = Math.max(1, latency);
     }
 
 
@@ -474,7 +492,7 @@ public class FPPipeline {
       if (this.instr == null) {
         if (!simulation) {
           this.instr = instr;
-          this.counter = 24;
+          this.counter = latency;
         }
 
         return 0;
@@ -497,8 +515,12 @@ public class FPPipeline {
      * this method is called from getCompletedInstruction in order to prepare the pipeline for a new instruction entrance  */
     public void step() {
       //if counter has reached 0 the instruction was removed by the previous getCompletedInstruction invocation wich called removeLast()
-      //if counter is a number between 0 and 24 it must be decremented by 1
-      if (this.instr != null && counter > 0 && counter < 25) {
+      //while counter is positive it must be decremented by 1. Note: this must
+      //NOT be bounded by the *current* `latency` field — setDividerLatency()
+      //can lower it below an in-flight instruction's counter (set from the
+      //latency in effect when it was issued), and comparing against the live
+      //field here would then stop the countdown forever, hanging the divider.
+      if (this.instr != null && counter > 0) {
         counter--;
       }
 
