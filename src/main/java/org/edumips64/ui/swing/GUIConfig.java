@@ -78,6 +78,7 @@ public class GUIConfig extends JDialog {
     String BEHAVIOR = CurrentLocale.getString("Config.BEHAVIOR");
     String FPUEXCEPTIONS = CurrentLocale.getString("Config.FPUEXCEPTIONS");
     String FPUROUNDING = CurrentLocale.getString("Config.FPUROUNDING");
+    String FPUTIMING = CurrentLocale.getString("Config.FPUTIMING");
     String CACHE = CurrentLocale.getString("Config.CACHE");
 
     cache = new HashMap<>();
@@ -89,6 +90,7 @@ public class GUIConfig extends JDialog {
     tabPanel.addTab(BEHAVIOR, makeBehaviorPanel());
     tabPanel.addTab(FPUEXCEPTIONS, makeExceptionsPanel());
     tabPanel.addTab(FPUROUNDING, makeRoundingPanel());
+    tabPanel.addTab(FPUTIMING, makeFpuTimingPanel());
     tabPanel.addTab(CACHE, makeCachePanel());
 
     logger.log(Level.INFO, "Current values: " + cache.toString());
@@ -509,6 +511,28 @@ public class GUIConfig extends JDialog {
 
       setVisible(false);
     });
+  }
+
+  private JPanel makeFpuTimingPanel() {
+    gbl = new GridBagLayout();
+    gbc = new GridBagConstraints();
+
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.insets = new Insets(0, 10, 0, 10);
+
+    JPanel panel = new JPanel();
+
+    panel.setLayout(gbl);
+    panel.setAlignmentY(JPanel.TOP_ALIGNMENT);
+    int row = 2;
+
+    addRow(panel, row++, ConfigKey.FP_DIVIDER_LATENCY, new JNumberField());
+
+    // fill remaining vertical space
+    grid_add(panel, new JPanel(), gbl, gbc, 0, 1, 0, row, GridBagConstraints.REMAINDER, 1);
+
+    return panel;
   }
 
   private JPanel makeCachePanel() {

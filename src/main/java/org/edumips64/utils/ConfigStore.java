@@ -82,6 +82,9 @@ public abstract class ConfigStore {
     // How to show memory cells containing floating point values.
     ConfigStore.defaults.put(ConfigKey.FP_LONG_DOUBLE_VIEW, true);  // long=true  double=false
 
+    // FPU timing: number of cycles a DIV.D instruction takes in the divider.
+    ConfigStore.defaults.put(ConfigKey.FP_DIVIDER_LATENCY, 24);
+
     // UI font options.
     ConfigStore.defaults.put(ConfigKey.UI_FONT_SIZE, 18);
     ConfigStore.defaults.put(ConfigKey.UI_DARK_THEME, false);
